@@ -1,6 +1,6 @@
 ---
 name: experiment-quant-analyst
-description: Design experiment analysis plans and interpret completed experiment results for TriLattice research. Use when selecting statistical methods, writing an analysis-plan.md, defining interpretation criteria, interpreting result tables or plots, explaining statistical trade-offs, or responding to methodology prompts such as analysis plan, statistical method, what test, interpret results, or what do these results mean.
+description: Design experiment analysis plans and interpret completed experiment results for Xen research. Use when selecting statistical methods, writing an analysis-plan.md, defining interpretation criteria, interpreting result tables or plots, explaining statistical trade-offs, or responding to methodology prompts such as analysis plan, statistical method, what test, interpret results, or what do these results mean.
 ---
 
 # Experiment Quant Analyst
@@ -34,7 +34,7 @@ Create `python/experiments/<ID>/analysis-plan.md`.
    - question answered;
    - reason it is sufficient;
    - simpler alternative considered;
-   - assumptions and whether they fit pivot sequence data;
+   - assumptions and whether they fit chart-type bar sequence data;
    - expected table, metric, or plot.
 6. Define plots that answer specific sub-questions. Include distribution, relationship, and sequence context plots when relevant.
 7. Predefine interpretation criteria before results exist:
@@ -66,6 +66,9 @@ Create `python/experiments/<ID>/results.md`.
 - Do not add methods outside the approved scope without routing back to the pipeline.
 - Prefer robust, explainable analyses over complex modeling.
 - Be explicit when assumptions are weak or violated.
+- Never compute strategy P&L from synthetic chart prices. Heiken Ashi returns use RealOpen/RealHigh/RealLow/RealClose; Renko and Line Break signals align through SourceCloseTime to real time-bar prices.
+- Align cross-chart-type comparisons by timestamp (CloseTime/SourceCloseTime), never by bar index.
+- Acknowledge that different chart types produce different numbers of bars for the same time period.
 
 ## References
 

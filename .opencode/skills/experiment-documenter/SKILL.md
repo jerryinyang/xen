@@ -1,6 +1,6 @@
 ---
 name: experiment-documenter
-description: Document completed TriLattice experiments and maintain experiment indexes. Use when writing report.md, summarizing experiment findings, updating python/experiments/INDEX.md, updating docs/experiments-docs/INDEX.md, recording negative or inconclusive results, or responding to prompts such as document, write report, summarize, update docs, experiment report, findings, or write up results.
+description: Document completed Xen experiments and maintain experiment indexes. Use when writing report.md, summarizing experiment findings, updating python/experiments/INDEX.md, updating docs/experiments-docs/INDEX.md, recording negative or inconclusive results, or responding to prompts such as document, write report, summarize, update docs, experiment report, findings, or write up results.
 ---
 
 # Experiment Documenter

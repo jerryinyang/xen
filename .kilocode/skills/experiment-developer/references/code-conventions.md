@@ -1,6 +1,6 @@
 # Code Conventions
 
-Project-specific code conventions for the TriLattice research pipeline.
+Project-specific code conventions for the Xen research pipeline.
 
 ---
 
@@ -22,19 +22,17 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
 
-# Load data using Polars/Parquet
-DATA_DIR = Path("/Users/jerryinyang/cAlgo/Sources/Robots/TriLattice/TriLattice/data")
-path = sorted(DATA_DIR.glob("features_*.parquet"))[-1]  # Latest features file
+DATA_DIR = Path("data")
 
+# Load time bars — baseline for all comparisons
+timebars_path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
 df = (
-    pl.scan_parquet(path)
-    .select(["ConfirmTime", "Label", "Regime", "BarReturn", "ValidationStatus"])
-    .filter(pl.col("ValidationStatus") == "Valid")  # Adjust as per scope
-    .sort("ConfirmTime")
+    pl.scan_parquet(timebars_path)
+    .sort("CloseTime")
     .collect()
 )
 
-# Apply global holdout split — only the first 70% of ConfirmTime-ordered data
+# Apply global holdout split — only the first 70% of CloseTime-ordered data
 total_rows = len(df)
 analysis_cutoff = int(total_rows * 0.7)
 analysis_set = df.slice(0, analysis_cutoff)
@@ -44,14 +42,20 @@ train_cutoff = int(analysis_cutoff * 0.7)
 train_set = analysis_set.slice(0, train_cutoff)
 test_set = analysis_set.slice(train_cutoff, analysis_cutoff - train_cutoff)
 
+# Generate chart types on-demand from the scoped source data
+from linebreak_generator import generate_linebreak
+lb_bars = generate_linebreak(analysis_set, level=3)
+
 # Apply experiment-specific filtering from scope document
-# e.g., eur_data = train_set.filter(pl.col("Symbol") == "EURUSD")
+# e.g., eurusd_data = analysis_set.filter(pl.col("Symbol") == "EURUSD")
 ```
 
-**Important**: 
-- `Label` is a **string column** (`"HH"`, `"HL"`, `"LH"`, `"LL"`). Handle accordingly.
-- `Regime` is a **string column** (`"Low"`, `"Medium"`, `"High"`).
-- Use `ConfirmTime` for all temporal ordering, not `PeakTime` (look-ahead bias prevention).
+**Important**:
+- `Direction` is an **int32 column** (`+1` for Up, `-1` for Down). Handle accordingly.
+- Use `CloseTime` for temporal ordering of time bars, `SourceCloseTime` for chart-type bars.
+- For cross-chart-type comparisons, align by timestamp — never by bar index.
+- Strategy P&L must use real prices. Heiken Ashi returns use `RealClose` (never `HAClose`); Renko and Line Break signals use `SourceCloseTime` to align to real time-bar prices.
+- Chart-type generators are deterministic: same input + same parameters = same output.
 
 ---
 
@@ -61,34 +65,52 @@ Check these modules before creating new reusable functions:
 
 | Module | Path | Key Functions |
 |--------|------|--------------|
+| Line Break Generator | `python/src/linebreak_generator.py` | `generate_linebreak()` |
+| Renko Generator | `python/src/renko_generator.py` | `generate_renko()` |
+| Heiken Ashi Generator | `python/src/heiken_ashi_generator.py` | `generate_heiken_ashi()` |
 | Correlation | `python/src/correlation.py` | `compute_spearman_with_bootstrap()`, `compute_pearson()` |
 | Mean Reversion | `python/src/mean_reversion.py` | `compute_hurst_exponent()`, `test_mean_reversion()` |
 | Regression | `python/src/regression.py` | `rank_regression()`, `compute_effect_sizes()` |
-| Structure | `python/src/structure.py` | Label transition analysis, sequence processing |
 
 If a function you need already exists, import and use it. Do not re-implement.
 
-**TriLattice Data Access Pattern**:
+**Xen Data Access Pattern**:
 ```python
 from pathlib import Path
+from linebreak_generator import generate_linebreak
+from renko_generator import generate_renko
+from heiken_ashi_generator import generate_heiken_ashi
 
-DATA_DIR = Path("/Users/jerryinyang/cAlgo/Sources/Robots/TriLattice/TriLattice/data")
-FEATURES_PATH = sorted(DATA_DIR.glob("features_*.parquet"))[-1]
+DATA_DIR = Path("data")
 
-def load_tri_lattice_features(
-    columns: list[str] | None = None,
-    validation_status: str = "Valid",
+def load_time_bars(
+    instrument: str | None = None,
 ) -> pl.DataFrame:
-    """Load TriLattice features with optional filtering."""
-    scan = pl.scan_parquet(FEATURES_PATH)
+    """Load time bars with optional instrument filtering."""
+    path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
+    scan = pl.scan_parquet(path)
     
-    if columns:
-        scan = scan.select(columns)
+    if instrument:
+        # Filter by symbol in filename or column if available
+        pass
     
-    if validation_status:
-        scan = scan.filter(pl.col("ValidationStatus") == validation_status)
-    
-    return scan.sort("ConfirmTime").collect()
+    return scan.sort("CloseTime").collect()
+
+
+def generate_chart_type(
+    chart_type: str,
+    time_bars: pl.DataFrame,
+    **params,
+) -> pl.DataFrame:
+    """Generate chart-type data on-demand from time bars."""
+    if chart_type == "linebreak":
+        return generate_linebreak(time_bars, level=params.get("level", 3))
+    elif chart_type == "renko":
+        return generate_renko(time_bars, atr_period=params.get("atr_period", 14))
+    elif chart_type == "heiken_ashi":
+        return generate_heiken_ashi(time_bars)
+    else:
+        raise ValueError(f"Unknown chart type: {chart_type}")
 ```
 
 ---
@@ -185,29 +207,33 @@ import polars as pl
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
-# Import existing analysis modules as needed
-# from correlation import compute_spearman_with_bootstrap
+from linebreak_generator import generate_linebreak
+from renko_generator import generate_renko
+from heiken_ashi_generator import generate_heiken_ashi
 
 # === 1. Load data ===
-DATA_DIR = Path("/Users/jerryinyang/cAlgo/Sources/Robots/TriLattice/TriLattice/data")
-path = sorted(DATA_DIR.glob("features_*.parquet"))[-1]
+DATA_DIR = Path("data")
+timebars_path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
 
 df = (
-    pl.scan_parquet(path)
-    .select(["ConfirmTime", "Label", "Regime", "BarReturn", "ValidationStatus"])
-    .filter(pl.col("ValidationStatus") == "Valid")
-    .sort("ConfirmTime")
+    pl.scan_parquet(timebars_path)
+    .sort("CloseTime")
     .collect()
 )
 
-# Apply global holdout — first 70% of ConfirmTime-ordered data
+# Apply global holdout — first 70% of CloseTime-ordered data
 total_rows = len(df)
 analysis_cutoff = int(total_rows * 0.7)
 df = df.slice(0, analysis_cutoff)
 
+# Generate chart types on-demand if needed
+# lb_bars = generate_linebreak(df, level=3)
+# renko_bars = generate_renko(df, atr_period=14)
+# ha_candles = generate_heiken_ashi(df)
+
 # === 2. Apply scope filtering ===
-# Filter by instrument, regime, label, etc. per scope document
-# e.g., df = df.filter(pl.col("Regime") == "Low")
+# Filter by instrument, chart type, etc. per scope document
+# e.g., eurusd_data = df.filter(pl.col("Symbol") == "EURUSD")
 
 # === 3. Execute analysis steps ===
 # Call analysis functions in plan order
@@ -246,10 +272,13 @@ def safe_computation(data: np.ndarray) -> float:
 
 | Pattern | Why Avoid | Correct Approach |
 |---------|-----------|-----------------|
-| Hardcoded paths like `/Users/...` | Breaks on other machines | Use `DATA_PATH` registry or relative paths |
+| Hardcoded absolute paths like `/Users/...` | Breaks on other machines | Use `DATA_DIR = Path("data")` relative path |
 | `data.dropna()` without checking | Silent data loss | Explicit NaN handling with warnings |
 | Mixing computation with plotting | Violates separation of concerns | Separate analysis functions from plot functions |
 | Print statements in analysis functions | Side effects | Return data structures, let caller format |
 | Magic numbers in thresholds | Undocumented assumptions | Derive from data or document explicitly |
 | Lines > 100 characters | Readability | Break into multiple lines |
 | Functions > 30 lines | Complexity | Split into sub-functions |
+| Using synthetic chart prices for P&L | Incorrect P&L | Use real prices aligned by `CloseTime` or `SourceCloseTime` |
+| Aligning chart types by bar count | Look-ahead bias | Always align by timestamp (CloseTime/SourceCloseTime) |
+| Assuming same bar count across chart types | Logical error | Different chart types produce different bar counts for same period |

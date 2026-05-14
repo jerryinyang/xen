@@ -1,6 +1,6 @@
 # Experiment Templates
 
-Standard templates for all experiment artifacts. Use these templates consistently — do not invent custom formats.
+Standard templates for all Xen experiment artifacts. Use these templates consistently — do not invent custom formats.
 
 ---
 
@@ -21,18 +21,13 @@ Save to: `python/experiments/<EXP-ID>/scope.md`
 
 ## Scope Boundaries
 
-- **Features**: <which TriLattice features are used, referencing the 30-column schema in `docs/references/dataset-reference.md`>
-- **Feature Categories**: 
-  - [ ] Pivot Metadata (Timestamp, PeakTime, ConfirmTime, etc.)
-  - [ ] Structure Labeling (Label, Regime, IsAmbiguous, IsTrainingTarget)
-  - [ ] Bar Features (BarReturn, BarRange, BarDuration, etc.)
-  - [ ] Structure Features (PriceDistanceToPrior, TimeDistanceToPrior, Slope, etc.)
-  - [ ] Context Features (SequenceContext, ContextRegime, Session, ImbalanceFlag, ValidationStatus)
-- **Validation Filter**: <whether to use only `ValidationStatus == "Valid"` or include artifacts>
-- **Instruments**: <which symbols (any cTrader-available instrument)>
+- **Chart Types**: <Time, LineBreak, Renko, Heiken Ashi — which are included>
+- **Chart Type Parameters**: <LineBreak level(s), Renko ATR period(s), time bar timeframe(s)>
+- **Instruments**: <EURUSD, XAUUSD, BTCUSD, USTEC — which and why>
 - **Time range**: Full dataset with nested chronological split. First 70% = analysis set (split 70/30 for train/test); final 30% = global holdout (never used).
 - **Global holdout**: The final 30% of the full dataset must not be loaded, inspected, or used in any capacity.
-- **Look-ahead bias prevention**: All labels assigned at `ConfirmTime` — analysis must respect this.
+- **Look-ahead bias prevention**: Chart-type generators process data sequentially. Analysis must respect SourceCloseTime for temporal alignment.
+- **Synthetic price discipline**: No strategy P&L from Heiken Ashi prices or Renko brick prices. All returns use RealClose or time-bar Close aligned by timestamp.
 - **Exclusions**: <what is explicitly NOT in scope>
 
 ## Success / Failure Criteria
@@ -49,7 +44,7 @@ Save to: `python/experiments/<EXP-ID>/scope.md`
 
 ## Data Requirements
 
-<Pre-processing, filtering, transformations needed before analysis.>
+<Pre-processing, filtering, transformations needed before analysis. Which chart types, which generators, which parameters.>
 
 ### Standard Loading Pattern
 
@@ -57,18 +52,14 @@ Save to: `python/experiments/<EXP-ID>/scope.md`
 import polars as pl
 from pathlib import Path
 
-DATA_DIR = Path("/Users/jerryinyang/cAlgo/Sources/Robots/TriLattice/TriLattice/data")
-path = sorted(DATA_DIR.glob("features_*.parquet"))[-1]
+DATA_DIR = Path("data")
+path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
 
-df = (
+bars = (
     pl.scan_parquet(path)
-    .select(["ConfirmTime", "Label", "Regime", "BarReturn", "ValidationStatus"])
-    .filter(pl.col("ValidationStatus") == "Valid")  # Adjust as needed
-    .sort("ConfirmTime")
+    .sort("CloseTime")
     .collect()
 )
-
-df = df.drop_nulls().to_pandas()
 ```
 
 ## Suggested Direction
@@ -96,10 +87,10 @@ Save to: `python/experiments/<EXP-ID>/analysis-plan.md`
 - **Method**: <name of statistical/computational method>
 - **Why this method**: <justification, especially re: simplicity>
 - **Simpler alternative considered**: <what and why it doesn't suffice, or is equivalent>
-- **Assumptions**: <what this method assumes; whether it holds for TriLattice data>
-  - **Temporal structure**: Data has chronological ordering by ConfirmTime
-  - **Label validity**: Consider ValidationStatus filter implications
-  - **Regime conditioning**: May need to stratify by Regime/ContextRegime
+- **Assumptions**: <what this method assumes; whether it holds for chart-type comparison data>
+  - **Temporal structure**: Data has chronological ordering by CloseTime/SourceCloseTime
+  - **Cross-chart alignment**: Comparisons are by timestamp, not bar index
+  - **Synthetic prices**: HA prices and Renko brick prices are not used for strategy P&L; real prices are used for alignment
 - **Expected output**: <what this step produces — a number, a plot, a table>
 
 ### Step 2: ...
@@ -121,23 +112,26 @@ Save to: `python/experiments/<EXP-ID>/analysis-plan.md`
 - Visualisations: <planned> / <budget>
 - New modules: <planned> / <budget>
 
-## TriLattice-Specific Considerations
+## Chart-Type Comparison Considerations
 
-### Look-ahead Bias Prevention
-- ConfirmTime is the authoritative timestamp for all temporal ordering
-- Never use PeakTime for sorting or windowing (it represents detection, not confirmation)
+### Cross-Chart Alignment
+- Different chart types produce different numbers of bars for the same time period
+- Always align by timestamp (SourceCloseTime), never by bar index
+- Report alignment rates: what fraction of chart-type events have a matching time-bar event within a tolerance window
 
-### Validation Status Handling
-- Default: Use only `ValidationStatus == "Valid"` pivots
-- If including artifacts, document rationale and impact on results
+### Synthetic Price Discipline
+- Never compute strategy P&L from Heiken Ashi HA prices or Renko brick prices
+- Use RealClose for all return calculations involving Heiken Ashi
+- For Line Break and Renko, use SourceCloseTime-aligned time-bar prices
+
+### Bar Density Differences
+- Chart types have vastly different bar counts (e.g., Renko may produce 10-50x fewer bars than 1-minute time bars)
+- Statistical comparison must account for different sample sizes
+- Consider density-normalised metrics where appropriate
 
 ### Regime Stratification
-- Consider analyzing Low/Medium/High volatility regimes separately
-- Use ContextRegime for the regime at feature emission time
-
-### Feature Encoding
-- String enums (Label, Regime, PivotType, etc.) may need numeric encoding for certain methods
-- Use encoding from _pipeline-config.md Enum Encoding Reference
+- Consider analyzing low/medium/high volatility regimes separately
+- Regime labels are derived from time-bar realised volatility, applied uniformly across chart types
 ```
 
 ---
@@ -164,9 +158,11 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | <file> | Edge cases | PASS/FAIL | <details> |
 | <file> | Type safety | PASS/FAIL | <details> |
 | <file> | NaN handling | PASS/FAIL | <details> |
-| <file> | Holdout exclusion | PASS/FAIL | <verify only first 70% of ConfirmTime-ordered data is used> |
-| <file> | Look-ahead bias | PASS/FAIL | <verify ConfirmTime used for temporal ordering, not PeakTime> |
-| <file> | Validation status | PASS/FAIL | <verify ValidationStatus handling matches scope> |
+| <file> | Holdout exclusion | PASS/FAIL | <verify only first 70% of time-ordered data is used> |
+| <file> | Look-ahead bias | PASS/FAIL | <verify SourceCloseTime used for temporal alignment> |
+| <file> | Synthetic price discipline | PASS/FAIL | <verify no strategy P&L computed from HA prices or Renko brick prices> |
+| <file> | Chart-type alignment | PASS/FAIL | <verify alignment by timestamp, not bar index> |
+| <file> | Generator determinism | PASS/FAIL | <verify generators produce identical output from identical input> |
 | <file> | Docstrings | PASS/FAIL | <details> |
 
 ## Numerical Validation
@@ -278,7 +274,7 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 
 **Date**: <completion date>
 **Instruments**: <which>
-**Levels**: <which>
+**Chart Types**: <which>
 
 ---
 
@@ -292,7 +288,7 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 
 ## Method Summary
 
-<2–3 sentence description of the analytical approach. Reference analysis-plan.md for details.>
+<2-3 sentence description of the analytical approach. Reference analysis-plan.md for details.>
 
 ## Key Findings
 
@@ -312,7 +308,7 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 
 <Clear statement: hypothesis SUPPORTED / REFUTED / INCONCLUSIVE.>
 
-<1–2 paragraph explanation of what we learned and why it matters.>
+<1-2 paragraph explanation of what we learned and why it matters.>
 
 ## Limitations
 
@@ -322,7 +318,7 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 ## Implications for Future Research
 
 - <What new questions does this raise?>
-- <What ideas from docs/ideas.md should be prioritised/deprioritised?>
+- <What chart-type comparisons should be prioritised/deprioritised?>
 
 ## Recommended Next Experiments
 
@@ -381,9 +377,15 @@ Save to: `python/experiments/<EXP-ID>/governance/pre-execution-review.md` or `po
 
 ### Principles Check
 
-| Artifact | Data-Driven | Non-Parametric | Adaptive | Holdout Excluded |
-|----------|------------|---------------|----------|-----------------|
+| Artifact | Data-Driven | Non-Parametric | Phantom Price Discipline | Holdout Excluded |
+|----------|------------|---------------|--------------------------|-----------------|
 | <artifact> | PASS/FAIL | PASS/FAIL | PASS/FAIL | PASS/FAIL |
+
+### Chart-Type Comparison Check
+
+| Artifact | Timestamp Alignment | Bar Count Adjustment | Generator Determinism |
+|----------|-------------------|---------------------|---------------------|
+| <artifact> | PASS/FAIL | PASS/FAIL | PASS/FAIL |
 
 ### Quality Check (type-specific)
 
@@ -427,5 +429,4 @@ or
 ```
 VERDICT: REJECT
 REASON: <brief explanation>
-```
 ```

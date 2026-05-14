@@ -1,6 +1,6 @@
 ---
 name: research-pipeline
-description: Orchestrate the TriLattice research experiment lifecycle from idea or EXP-ID through scoped design, analysis planning, implementation, manual execution handoff, audit, interpretation, documentation, and governance review. Use when starting a new experiment, resuming a partial experiment, designing experiment scope, running the research pipeline end to end, continuing an EXP or VAL item, or enforcing the TriLattice experiment process.
+description: Orchestrate the Xen research experiment lifecycle from idea or EXP-ID through scoped design, analysis planning, implementation, manual execution handoff, audit, interpretation, documentation, and governance review. Use when starting a new experiment, resuming a partial experiment, designing experiment scope, running the research pipeline end to end, continuing an EXP or VAL item, or enforcing the Xen experiment process.
 ---
 
 # Research Pipeline
@@ -68,7 +68,7 @@ Create `python/experiments/<ID>/scope.md`.
 1. Clarify the idea with no more than three questions per round.
 2. Split broad ideas into one falsifiable question per experiment.
 3. State a testable hypothesis, or a precise exploratory question.
-4. Define features, instruments, levels, time range, validation filters, and exclusions.
+4. Define chart types, instruments, features, levels, time range, and exclusions.
 5. Include the mandatory exclusion: the final 30 percent global holdout is excluded from all analysis.
 6. Define measurable success, failure, and inconclusive criteria.
 7. Set the complexity budget for tests, plots, and new code modules.
@@ -190,11 +190,14 @@ Report: python/experiments/<ID>/report.md
 - Do not execute experiment code inside the pipeline.
 - Do not bypass governance.
 - Do not inspect or load the final 30 percent global holdout.
-- Use `ConfirmTime` for temporal ordering; do not use `PeakTime` as the analysis clock.
-- Do not use information after `ConfirmTime` when analyzing a pivot.
-- Respect the scope's `ValidationStatus` filter; default to `Valid` only.
+- Use `CloseTime` for temporal ordering of time bars; use `SourceCloseTime` for chart-type events when aligning to real time. Never use chart-type bar indices for temporal alignment across different chart types.
+- Do not use information after the event timestamp when analyzing a chart-type event.
+- Respect the scope's filtering and time range boundaries.
 - Do not expand scope after approval. Create a new experiment for follow-up questions.
 - Flag phase misalignment with checkpoint objectives before proceeding.
+- For Heiken Ashi experiments: never compute returns from HA prices. Always use `RealOpen/RealHigh/RealLow/RealClose` for return evaluation.
+- For Renko strategy experiments: never compute P&L from brick prices. Use `SourceCloseTime` to align each signal to real time-bar prices.
+- For chart-type comparisons: always align by timestamp, never by bar count.
 
 ## References
 
@@ -202,6 +205,7 @@ Report: python/experiments/<ID>/report.md
 | --- | --- |
 | bundled pipeline config in this skill directory | Always |
 | `docs/references/dataset-reference.md` | Always |
+| `docs/references/architecture.md` | Always |
 | bundled experiment templates | Stage 1 |
 | bundled scope-design reference | Stage 1 when scope is ambiguous |
 | bundled governance constraints | Stage 4 and Stage 8 |

@@ -1,6 +1,6 @@
 ---
 name: experiment-auditor
-description: Audit TriLattice experiment code, outputs, and result integrity. Use when validating analysis implementation, checking numerical results, reviewing scope compliance, verifying holdout exclusion, finding bugs, assessing statistical assumptions, or responding to prompts such as audit, validate, check code, verify results, test correctness, numerical check, or is this experiment correct.
+description: Audit Xen experiment code, outputs, and result integrity. Use when validating analysis implementation, checking numerical results, reviewing scope compliance, verifying holdout exclusion, finding bugs, assessing statistical assumptions, or responding to prompts such as audit, validate, check code, verify results, test correctness, numerical check, or is this experiment correct.
 ---
 
 # Experiment Auditor
@@ -30,8 +30,9 @@ Validate whether the implementation and results can be trusted. Report findings 
    - no undocumented extra analyses were added.
 2. Check data handling:
    - final 30 percent global holdout is excluded;
-   - chronological ordering uses `ConfirmTime`;
-   - validation status filtering is correct;
+   - chronological ordering uses `CloseTime` (time bars) or `SourceCloseTime` (chart-type bars);
+   - cross-chart-type alignment uses timestamps, never bar indices;
+   - synthetic price discipline: HA returns use `RealClose`, never `HAClose`; Renko/Line Break signal returns use real prices aligned through `SourceCloseTime`;
    - NaN and missing values are handled explicitly.
 3. Check code correctness:
    - formulas, joins, groupings, lag logic, and indices are correct;
@@ -46,7 +47,8 @@ Validate whether the implementation and results can be trusted. Report findings 
    - sample sizes are sufficient;
    - outliers and dependence risks are acknowledged;
    - chosen methods still fit the data produced.
-6. Check result plausibility against project value ranges and enums from the references.
+6. Check result plausibility against project value ranges and schemas from the references.
+7. Check chart-type generator determinism: same input + same parameters = same output.
 
 ## Report
 

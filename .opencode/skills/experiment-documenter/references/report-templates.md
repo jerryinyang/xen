@@ -15,7 +15,7 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 
 **Date**: <completion date>
 **Instruments**: <which>
-**Feature Categories**: <which (Pivot Metadata, Structure Labeling, Bar Features, Structure Features, Context Features)>
+**Feature Categories**: <which (Time Bars, Line Break, Renko, Heiken Ashi)>
 
 ---
 
@@ -54,7 +54,7 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 ## Limitations
 
 - <Limitation 1: e.g., tested on one instrument only>
-- <Limitation 2: e.g., sample size for low-volatility regime pivots was small>
+- <Limitation 2: e.g., sample size for low-volatility regime events was small>
 
 ## Implications for Future Research
 
@@ -118,7 +118,7 @@ This is the authoritative detailed catalog of all experiments. Append each exper
 **Status**: COMPLETED / INCONCLUSIVE / FAILED
 **Date**: YYYY-MM-DD
 **Instruments**: <which>
-**Feature Categories**: <which (Pivot Metadata, Structure Labeling, Bar Features, Structure Features, Context Features)>
+**Feature Categories**: <which (Time Bars, Line Break, Renko, Heiken Ashi)>
 
 ### Hypothesis Tests
 
@@ -129,7 +129,7 @@ This is the authoritative detailed catalog of all experiments. Append each exper
 
 - **Instruments**: <tested instruments>
 - **Feature Categories**: <which categories used>
-- **Features**: <specific TriLattice features used>
+- **Features**: <specific Xen features used — e.g., Direction, SourceCount, RealClose returns, etc.>
 - **Parameter ranges**: <ranges tested>
 - **Exclusions**: <what was explicitly excluded>
 - **Constraints**: <key assumptions and constraints>
@@ -171,14 +171,15 @@ This is the authoritative detailed catalog of all experiments. Append each exper
 
 **Hypothesis REFUTED.**
 
-The data shows no evidence that ConfirmationStrength predicts next-pivot BarReturn
-(Spearman ρ = 0.02, 95% CI [-0.01, 0.05], p = 0.18). The effect, if it
-exists, is smaller than our minimum detectable effect size of 0.10 given
-our sample of 14,233 valid EURUSD pivots.
+The data shows no evidence that Line Break direction agreement predicts
+next-bar RealClose return (Spearman ρ = 0.02, 95% CI [-0.01, 0.05],
+p = 0.18). The effect, if it exists, is smaller than our minimum
+detectable effect size of 0.10 given our sample of 14,233 valid EURUSD
+chart-type events.
 
-This means that high confirmation strength does not reliably predict
-subsequent bar returns in this dataset. We should deprioritise this
-line of research and focus on features with stronger predictive signals.
+This means that direction agreement does not reliably predict subsequent
+bar returns in this dataset. We should deprioritise this line of research
+and focus on features with stronger predictive signals.
 ```
 
 ### Bad: Vague and Overreaching

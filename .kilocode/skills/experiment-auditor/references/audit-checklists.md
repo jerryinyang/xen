@@ -39,12 +39,10 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 
 | Metric | Expected Range | Actual Range | Pass? |
 |--------|---------------|-------------|-------|
-| Correlation values | [-1, 1] | [<min>, <max>] | YES/NO |
-| Percentages | [0, 100] or [0, 1] | [<min>, <max>] | YES/NO |
-| Counts | ≥ 0 | [<min>, <max>] | YES/NO |
-| ConfirmationStrength | ≥ 0 | [<min>, <max>] | YES/NO |
-| PriceMomentum | {-1, 0, +1} | [<min>, <max>] | YES/NO |
-| BarReturn / BarRange | ℝ (check for extreme outliers) | [<min>, <max>] | YES/NO |
+| Direction | {+1, -1} | [<min>, <max>] | YES/NO |
+| RealClose returns | ℝ (check for extreme outliers) | [<min>, <max>] | YES/NO |
+| TickVolume / SourceCount | ≥ 0 | [<min>, <max>] | YES/NO |
+| SourceCloseTime | Monotonically increasing | [<first>, <last>] | YES/NO |
 
 ### Statistical Sanity
 
@@ -110,36 +108,39 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | NaN silent propagation | Any computation on DataFrame columns | Check for `isna()` checks or `dropna()` calls |
 | Wrong split (random vs chronological) | Data splitting code | Verify `.iloc[:N]` not `train_test_split` |
 | Holdout contamination | Any data loading | Verify `int(len(df) * 0.7)` cutoff is applied before any analysis |
-| String/numeric confusion | `Label` or `Regime` column comparisons | Verify `"HH"/"HL"/"LH"/"LL"` and `"Low"/"Medium"/"High"` string comparisons, not numeric |
-| Look-ahead bias | Temporal ordering code | Verify `ConfirmTime` used for sorting, not `PeakTime` |
-| Validation status filter | Data loading code | Verify `ValidationStatus` filter matches scope specification |
+| String/numeric confusion | `Direction` column comparisons | Verify `Direction` is `+1/-1` (int), not string |
+| Look-ahead bias | Temporal ordering code | Verify `CloseTime` or `SourceCloseTime` used for sorting, never bar index |
+| Synthetic price returns | Any return computation on HA or Renko-derived signals | Verify returns use real time-matched prices, never `HAClose` or Renko brick prices |
+| Cross-chart-type alignment | Any comparison across chart types | Verify alignment by timestamp, not by bar count or index |
+| Chart-type generator determinism | Any generator output | Verify same input + parameters produces identical output |
 | Division by zero | Any ratio computation | Check for denominator > 0 guard |
 | Wrong sample size in CI | Bootstrap or statistical test calls | Verify the `n=` passed matches actual data size |
 
 ### Value Range Reference
 
-Use these ranges for plausibility checks (from `_pipeline-config.md`):
+Use these ranges for plausibility checks (from `_pipeline-config.md` and `dataset-reference.md`):
 
-| Feature | Expected Range | Notes |
-|---------|---------------|-------|
-| `BarReturn`, `BarRange` | ℝ | Can be positive or negative (price returns/ranges) |
-| `TickDensity` | ≥ 0 | Ticks per second |
-| `VolatilityProxy` | ≥ 0 | EMSTD of bar returns |
-| `PriceDistanceToPrior` | ≥ 0 or null | Absolute price change from previous pivot |
-| `TimeDistanceToPrior` | ≥ 0 or null | Seconds since previous pivot |
-| `Slope` | ℝ | Price distance / time distance |
-| `ConfirmationStrength` | ≥ 0 | Reversal magnitude at confirmation |
-| `Label` | "HH", "HL", "LH", "LL", "Ambiguous" | Structure labeling, string column |
-| `Regime` | "Low", "Medium", "High" | Volatility regime, string column |
-| `ValidationStatus` | "Valid", "Artifact", "Pending" | Cross-representation validation result |
-| `IsAmbiguous` | {true, false} | Boolean flag for ambiguous structure |
-| `IsTrainingTarget` | {true, false} | Boolean flag for time-triggered low-confidence |
+| Column | Source | Expected Range | Notes |
+|--------|--------|---------------|-------|
+| `Open`, `High`, `Low`, `Close` | Time bars, LB, Renko | Positive real (price domain) | OHLC prices, typical forex/commodity range |
+| `HAOpen`, `HAHigh`, `HALow`, `HAClose` | Heiken Ashi | real-valued | Synthetic prices — never use for strategy P&L |
+| `RealOpen`, `RealHigh`, `RealLow`, `RealClose` | Heiken Ashi | Positive real (price domain) | Actual prices, use for returns |
+| `Direction` | All chart types | {+1, -1} | Up or Down, int32 |
+| `Level` | Line Break | Positive int | Line Break level parameter (default: 3) |
+| `BrickSize` | Renko | Positive real | ATR-derived brick size |
+| `ATRPeriod` | Renko | Positive int | ATR period used (default: 14) |
+| `TickVolume` | Time bars | ≥ 0 | Broker-reported tick volume, if available |
+| `SourceCount` | Line Break, Renko, Heiken Ashi | ≥ 0 | Number of source 1-minute bars consumed since prior confirmed event |
+| `SourceCloseTime` | LB, Renko | datetime | Time-matched real bar close timestamp |
+| `CloseTime` / `OpenTime` | Time bars, LB, Renko | datetime | Bar open/close timestamps |
+| `DurationSeconds` | Time bars | ≥ 0 | Bar duration in seconds |
+| `SumAbsDelta` | Time bars | ≥ 0 | Sum of absolute price changes |
 
 ### Audit Proportionality Guide
 
 | Experiment Complexity | Audit Depth |
 |----------------------|-------------|
-| Descriptive / EDA (0-1 tests, 2-4 plots) | Light: check holdout exclusion, value ranges, scope compliance |
-| Single hypothesis (1-2 tests, 2-3 plots) | Standard: all six dimensions |
-| Comparative across instruments (2-4 tests, 3-5 plots) | Thorough: all six dimensions + cross-instrument consistency |
-| Multi-feature relationship (2-3 tests, 3-5 plots) | Thorough: all six dimensions + interaction checks |
+| Descriptive / EDA (0-1 tests, 2-4 plots) | Light: check holdout exclusion, synthetic price discipline, value ranges, scope compliance |
+| Single hypothesis test (1-2 tests, 2-3 plots) | Standard: all dimensions, check timestamp alignment |
+| Comparative across chart types (2-4 tests, 3-5 plots) | Thorough: all dimensions + cross-chart-type consistency and alignment |
+| Multi-feature relationship (2-3 tests, 3-5 plots) | Thorough: all dimensions + interaction checks, synthetic price and alignment checks |

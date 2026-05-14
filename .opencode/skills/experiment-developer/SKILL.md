@@ -1,6 +1,6 @@
 ---
 name: experiment-developer
-description: Implement approved TriLattice experiment analysis plans in Python. Use when creating or modifying experiment scripts, reusable analysis utilities, result generation code, plots, or fixes requested by audit for files under python/experiments/<ID>/code or python/src. Trigger on implement, write code, create script, code the analysis, build module, implement the plan, or fix audited experiment code.
+description: Implement approved Xen experiment analysis plans in Python. Use when creating or modifying experiment scripts, reusable analysis utilities, result generation code, plots, or fixes requested by audit for files under python/experiments/<ID>/code or python/src. Trigger on implement, write code, create script, code the analysis, build module, implement the plan, or fix audited experiment code.
 ---
 
 # Experiment Developer
@@ -28,10 +28,11 @@ Translate an approved scope and analysis plan into Python code. Implement only t
    - avoid notebooks unless the user or plan explicitly requires them.
 3. Load data with the standard project pattern from `code-conventions.md`.
 4. Exclude the final 30 percent global holdout before analysis.
-5. Preserve chronological ordering by `ConfirmTime`.
-6. Apply only filters approved in the scope.
-7. Write focused, typed functions for reusable computations.
-8. Save plots under `python/experiments/<ID>/plots/`.
+5. Preserve chronological ordering by `CloseTime` (time bars) or `SourceCloseTime` (chart-type bars).
+6. For cross-chart-type comparisons, align by timestamp — never by bar index.
+7. Apply only filters approved in the scope.
+8. Write focused, typed functions for reusable computations.
+9. Save plots under `python/experiments/<ID>/plots/`.
 9. Save machine-readable outputs under `python/experiments/<ID>/results/` when practical.
 10. Keep stdout concise and useful for manual execution.
 
@@ -42,6 +43,8 @@ Translate an approved scope and analysis plan into Python code. Implement only t
 - Return data from functions; keep file I/O in orchestration code.
 - Handle empty inputs, NaN values, insufficient sample size, and divide-by-zero cases.
 - Use deterministic seeds when randomness is required.
+- For chart-type generators, same input + same parameters must produce identical output.
+- Never use synthetic chart prices for strategy P&L. Heiken Ashi returns use `RealOpen`, `RealHigh`, `RealLow`, `RealClose`; Renko and Line Break signals align through `SourceCloseTime` to real time-bar prices.
 - Avoid magic numbers unless the analysis plan defines them.
 - Do not add exploratory analyses or extra plots outside the plan.
 
