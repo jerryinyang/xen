@@ -1,0 +1,54 @@
+# Build outputs
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+.codex
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+.pytest_cache/
+
+# Data files
+*.parquet
+*.csv
+*.h5
+*.hdf5
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.csproj.user
+*.sln.docstates
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Secrets/Config
+*.env
+.env.*
+appsettings.Development.json
+appsettings.Local.json
+
+# Temporary files
+*.tmp
+*.temp
+**/.ignore/
+
+**/data/**
