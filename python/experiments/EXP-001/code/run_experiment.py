@@ -75,7 +75,7 @@ ANALYSIS_FRACTION = 0.7
 TRAIN_FRACTION = 0.7
 MIN_VALID_INSTRUMENTS = 3
 GHOST_REDUCTION_THRESHOLD = 0.25
-ENTROPY_INCREASE_THRESHOLD = 0.10
+ENTROPY_HEADROOM_THRESHOLD = 0.50
 PRIMARY_EVENT_TYPES = ["LineBreak3", "Renko"]
 
 # ---------------------------------------------------------------------------
@@ -103,12 +103,12 @@ def load_analysis_timebar_data(instrument: str) -> tuple[pl.DataFrame, int]:
         raise FileNotFoundError(
             f"No time-bar file found for {instrument} matching {pattern}"
         )
-    scan = pl.scan_parquet(matches)
+    scan = pl.scan_parquet(matches).sort("CloseTime")
     total_rows = int(scan.select(pl.len()).collect().item())
     analysis_rows = int(total_rows * ANALYSIS_FRACTION)
     if analysis_rows <= 0:
         return pl.DataFrame(), analysis_rows
-    analysis_df = scan.head(analysis_rows).collect().unique().sort("CloseTime")
+    analysis_df = scan.slice(0, analysis_rows).collect()
     return analysis_df, analysis_rows
 
 
@@ -233,9 +233,19 @@ def compute_ghost_rate_event(df: pl.DataFrame, min_tick: float) -> float:
     """Ghost rate for event bars using real closes aligned by timestamp.
 
     A bar is ghost if the absolute real-price movement from the previous
-    aligned close is below ``min_tick``.
+    distinct source timestamp is below ``min_tick``. Same-``SourceCloseTime``
+    rows, which can occur when Renko emits multiple bricks from one source bar,
+    are excluded from the denominator because they have zero elapsed source
+    time by construction.
     """
     if len(df) == 0:
+        return 0.0
+    if "SourceCloseTime" in df.columns:
+        df = df.sort("SourceCloseTime").filter(
+            pl.col("SourceCloseTime").shift(1).is_null()
+            | (pl.col("SourceCloseTime") != pl.col("SourceCloseTime").shift(1))
+        )
+    if len(df) <= 1:
         return 0.0
     close_diff = df["RealClose"].diff().abs()
     mask = close_diff < min_tick
@@ -455,6 +465,16 @@ def relative_change(numerator: float, denominator: float) -> float:
     if not np.isfinite(denominator) or denominator == 0:
         return np.nan
     return numerator / denominator
+
+
+def entropy_headroom_capture(event_entropy: float, time_entropy: float) -> float:
+    """Return share of remaining binary-entropy headroom captured by an event type."""
+    if not np.isfinite(event_entropy) or not np.isfinite(time_entropy):
+        return np.nan
+    headroom = 1.0 - time_entropy
+    if headroom <= 0:
+        return 1.0 if event_entropy >= time_entropy else np.nan
+    return (event_entropy - time_entropy) / headroom
 
 
 def decide_hypothesis_verdict(
@@ -998,25 +1018,23 @@ def main() -> None:
             ghost_reduction = relative_change(
                 time_ghost - event_ghost, time_ghost
             )
-            entropy_increase = relative_change(
-                event_entropy - time_entropy, time_entropy
-            )
+            entropy_capture = entropy_headroom_capture(event_entropy, time_entropy)
             meets_ghost = (
                 np.isfinite(ghost_reduction)
                 and ghost_reduction >= GHOST_REDUCTION_THRESHOLD
             )
             meets_entropy = (
-                np.isfinite(entropy_increase)
-                and entropy_increase >= ENTROPY_INCREASE_THRESHOLD
+                np.isfinite(entropy_capture)
+                and entropy_capture >= ENTROPY_HEADROOM_THRESHOLD
             )
             threshold_records.append(
                 {
                     "Instrument": inst,
                     "ChartType": event_type,
                     "GhostReductionRelative": ghost_reduction,
-                    "EntropyIncreaseRelative": entropy_increase,
+                    "EntropyHeadroomCapture": entropy_capture,
                     "MeetsGhostThreshold": meets_ghost,
-                    "MeetsEntropyThreshold": meets_entropy,
+                    "MeetsEntropyHeadroomThreshold": meets_entropy,
                     "MeetsBothThresholds": meets_ghost and meets_entropy,
                     "PrimaryForVerdict": event_type in PRIMARY_EVENT_TYPES,
                 }

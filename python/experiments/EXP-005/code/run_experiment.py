@@ -53,9 +53,9 @@ def find_latest_timebars(instrument: str) -> Path:
 def load_time_bars(instrument: str) -> pl.DataFrame:
     """Load and chronologically scope time bars for an instrument."""
     path = find_latest_timebars(instrument)
-    df = pl.read_parquet(path).sort("CloseTime")
-    cutoff = int(len(df) * 0.7)
-    return df.slice(0, cutoff)
+    scan = pl.scan_parquet(path).sort("CloseTime")
+    total_rows = int(scan.select(pl.len()).collect().item())
+    return scan.slice(0, int(total_rows * 0.7)).collect()
 
 
 def generate_chart_types(time_bars: pl.DataFrame) -> dict[str, pl.DataFrame]:

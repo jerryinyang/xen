@@ -44,11 +44,9 @@ from pathlib import Path
 DATA_DIR = Path("data")
 path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
 
-bars = (
-    pl.scan_parquet(path)
-    .sort("CloseTime")
-    .collect()
-)
+scan = pl.scan_parquet(path).sort("CloseTime")
+total_rows = int(scan.select(pl.len()).collect().item())
+bars = scan.slice(0, int(total_rows * 0.7)).collect()
 ```
 
 ## Suggested Direction

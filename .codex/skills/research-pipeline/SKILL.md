@@ -13,12 +13,13 @@ Coordinate the experiment workflow. Do not replace specialist skills; route work
    If the file tool cannot resolve skill-relative paths, locate the file whose path
    ends with `/research-pipeline/_pipeline-config.md` and read that match.
 2. Read `docs/references/dataset-reference.md`.
-3. Read `python/experiments/INDEX.md` to identify existing experiments and the next EXP-ID.
-4. Read `docs/experiments-docs/INDEX.md` for current research direction.
-5. Read the newest checkpoint under `docs/experiments-docs/checkpoints/`:
+3. Read `docs/references/architecture.md`.
+4. Read `python/experiments/INDEX.md` to identify existing experiments and the next EXP-ID.
+5. Read `docs/experiments-docs/INDEX.md` for current research direction.
+6. Read the newest checkpoint under `docs/experiments-docs/checkpoints/`:
    - use `design.md` for active phase objectives;
    - use `retrospective.md` for completed phase lessons.
-6. Determine the entry point: new EXP, resume EXP, VAL rerun, scope-only design, or phase batch work.
+7. Determine the entry point: new EXP, resume EXP, VAL rerun, scope-only design, or phase batch work.
 
 ## Routing
 
@@ -72,9 +73,10 @@ Create `python/experiments/<ID>/scope.md`.
 5. Include the mandatory exclusion: the final 30 percent global holdout is excluded from all analysis.
 6. Define measurable success, failure, and inconclusive criteria.
 7. Set the complexity budget for tests, plots, and new code modules.
-8. Use the bundled experiment templates in this skill's `references` directory.
+8. Define metric denominators and zero-baseline behavior before implementation.
+9. Use the bundled experiment templates in this skill's `references` directory.
    If needed, locate the file ending with `/research-pipeline/references/experiment-templates.md`.
-9. Use the bundled scope-design reference when scope design needs more detailed heuristics.
+10. Use the bundled scope-design reference when scope design needs more detailed heuristics.
    If needed, locate the file ending with `/research-pipeline/references/scope-design.md`.
 
 ## Stage 2: Analysis Plan
@@ -89,10 +91,20 @@ Invoke `experiment-developer` with the approved scope and analysis plan.
 
 Expected artifact: `python/experiments/<ID>/code/run_experiment.py`.
 
+Before approving implementation, verify that the code follows the project code
+conventions: lazy chronological holdout slicing, bounded memory use, concise
+logging, no silent deduplication, no full-data collection before holdout
+exclusion, and finite handling for zero-baseline metrics.
+
 ## Stage 4: Pre-Execution Governance
 
 Review `scope.md`, `analysis-plan.md`, and `code/run_experiment.py` against the bundled governance constraints.
 If needed, locate the file ending with `/research-pipeline/references/governance-constraints.md`.
+
+Also review the implementation against the developer code conventions and the
+active checkpoint `design.md`. Scope criteria that are mathematically
+unattainable, compare percentage improvement against a zero baseline, or leave
+event-chart duplicate timestamp denominators undefined must receive `REVISE`.
 
 Write `python/experiments/<ID>/governance/pre-execution-review.md` with one verdict:
 

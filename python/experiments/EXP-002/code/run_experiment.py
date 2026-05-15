@@ -95,7 +95,7 @@ def scan_timebar_data(instrument: str) -> pl.LazyFrame:
     Returns
     -------
     pl.LazyFrame
-        Sorted, deduplicated lazy time-bar scan.
+        Sorted lazy time-bar scan.
     """
 
     pattern = f"timebars/timebars_{instrument.lower()}_*.parquet"
@@ -108,7 +108,6 @@ def scan_timebar_data(instrument: str) -> pl.LazyFrame:
         pl.scan_parquet(matches)
         .select(TIMEBAR_COLUMNS)
         .sort("CloseTime")
-        .unique(maintain_order=True)
     )
 
 
@@ -298,18 +297,22 @@ def compute_hybrid_rate(
     prev_times[1:] = chart_times[:-1]
     starts = np.searchsorted(time_times, prev_times, side="right")
     ends = np.searchsorted(time_times, chart_times, side="right")
-    starts[0] = ends[0]
+    starts[0] = 0
 
     hybrid_count = 0
+    eligible_count = 0
     for start, end, regime in zip(starts, ends, chart_regimes):
         covered_count = valid_prefix[end] - valid_prefix[start]
         if covered_count == 0 or regime not in regime_values:
             continue
+        eligible_count += 1
         same_regime_count = prefix_counts[int(regime)][end] - prefix_counts[int(regime)][start]
         if same_regime_count != covered_count:
             hybrid_count += 1
 
-    return hybrid_count / len(chart_times)
+    if eligible_count == 0:
+        return 0.0
+    return hybrid_count / eligible_count
 
 
 def compute_transition_lags(
@@ -598,7 +601,9 @@ def plot_improvement_heatmap(
     ----------
     df : pd.DataFrame
         Summary DataFrame with ``Instrument``, ``ChartType``, ``Metric``,
-        ``Improvement``.
+        ``Improvement``. Values are relative improvements where the time-bar
+        baseline is positive and absolute differences where the baseline is
+        zero.
     save_path : Path
         File path to save the figure.
 
@@ -624,7 +629,7 @@ def plot_improvement_heatmap(
             sns.heatmap(
                 pivot,
                 annot=True,
-                fmt=".2%",
+                fmt=".3f",
                 cmap="RdYlGn",
                 center=0,
                 ax=ax,
@@ -852,14 +857,15 @@ def main() -> None:
                 base_l = instrument_metrics[inst]["Time"]["MedianLag"]
                 ev_l = instrument_metrics[inst][event_type]["MedianLag"]
 
-                h_improve = (
-                    (base_h - ev_h) / base_h if base_h > 0 else np.nan
-                )
-                l_improve = (
-                    (base_l - ev_l) / base_l
-                    if base_l > 0 and not np.isnan(base_l) and not np.isnan(ev_l)
-                    else np.nan
-                )
+                h_improve = base_h - ev_h
+                if base_h > 0:
+                    h_improve = h_improve / base_h
+
+                l_improve = np.nan
+                if not np.isnan(base_l) and not np.isnan(ev_l):
+                    l_improve = base_l - ev_l
+                    if base_l > 0:
+                        l_improve = l_improve / base_l
 
                 improvement_records.append(
                     {
@@ -867,6 +873,9 @@ def main() -> None:
                         "ChartType": event_type,
                         "Metric": "HybridRate",
                         "Improvement": h_improve,
+                        "ImprovementKind": (
+                            "relative" if base_h > 0 else "absolute_difference"
+                        ),
                     }
                 )
                 improvement_records.append(
@@ -875,6 +884,9 @@ def main() -> None:
                         "ChartType": event_type,
                         "Metric": "MedianLag",
                         "Improvement": l_improve,
+                        "ImprovementKind": (
+                            "relative" if base_l > 0 else "absolute_difference"
+                        ),
                     }
                 )
 

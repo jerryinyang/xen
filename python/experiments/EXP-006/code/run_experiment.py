@@ -62,9 +62,10 @@ def load_and_holdout(path: Path) -> pl.DataFrame:
     pl.DataFrame
         First 70 % of rows ordered by ``CloseTime``.
     """
-    df = pl.read_parquet(path).sort("CloseTime")
-    cutoff = int(len(df) * (1.0 - HOLDOUT_FRACTION))
-    return df.slice(0, cutoff)
+    scan = pl.scan_parquet(path).sort("CloseTime")
+    total_rows = int(scan.select(pl.len()).collect().item())
+    cutoff = int(total_rows * (1.0 - HOLDOUT_FRACTION))
+    return scan.slice(0, cutoff).collect()
 
 
 # ---------------------------------------------------------------------------

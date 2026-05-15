@@ -6,7 +6,9 @@ Project-specific code conventions for the Xen research pipeline.
 
 ## Standard Data Loading Pattern
 
-All experiment scripts should use this loading pattern:
+All experiment scripts should use this lazy loading pattern. It is the default
+unless an approved analysis plan documents why a smaller explicit file read is
+safe.
 
 ```python
 """
@@ -24,18 +26,13 @@ from pathlib import Path
 
 DATA_DIR = Path("data")
 
-# Load time bars — baseline for all comparisons
+# Load time bars — baseline for all comparisons.
+# Sort before slicing so the first 70% is chronological, not physical row order.
 timebars_path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
-df = (
-    pl.scan_parquet(timebars_path)
-    .sort("CloseTime")
-    .collect()
-)
-
-# Apply global holdout split — only the first 70% of CloseTime-ordered data
-total_rows = len(df)
+scan = pl.scan_parquet(timebars_path).sort("CloseTime")
+total_rows = int(scan.select(pl.len()).collect().item())
 analysis_cutoff = int(total_rows * 0.7)
-analysis_set = df.slice(0, analysis_cutoff)
+analysis_set = scan.slice(0, analysis_cutoff).collect()
 
 # Within analysis set: train/test chronological split
 train_cutoff = int(analysis_cutoff * 0.7)
@@ -53,6 +50,8 @@ lb_bars = generate_linebreak(analysis_set, level=3)
 **Important**:
 - `Direction` is an **int32 column** (`+1` for Up, `-1` for Down). Handle accordingly.
 - Use `CloseTime` for temporal ordering of time bars, `SourceCloseTime` for chart-type bars.
+- Apply the global holdout split in the lazy plan before collecting analysis rows. Do not `read_parquet()` the full dataset for experiments unless the approved plan explicitly permits it.
+- Do not call `.unique()` in loaders unless the scope requires deduplication and the code reports pre/post row counts. Silent dedupe changes the 70% analysis boundary.
 - For cross-chart-type comparisons, align by timestamp — never by bar index.
 - Strategy P&L must use real prices. Heiken Ashi returns use `RealClose` (never `HAClose`); Renko and Line Break signals use `SourceCloseTime` to align to real time-bar prices.
 - Chart-type generators are deterministic: same input + same parameters = same output.
@@ -88,13 +87,14 @@ def load_time_bars(
 ) -> pl.DataFrame:
     """Load time bars with optional instrument filtering."""
     path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
-    scan = pl.scan_parquet(path)
+    scan = pl.scan_parquet(path).sort("CloseTime")
     
     if instrument:
         # Filter by symbol in filename or column if available
         pass
     
-    return scan.sort("CloseTime").collect()
+    total_rows = int(scan.select(pl.len()).collect().item())
+    return scan.slice(0, int(total_rows * 0.7)).collect()
 
 
 def generate_chart_type(
@@ -215,16 +215,12 @@ from heiken_ashi_generator import generate_heiken_ashi
 DATA_DIR = Path("data")
 timebars_path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
 
-df = (
-    pl.scan_parquet(timebars_path)
-    .sort("CloseTime")
-    .collect()
-)
+scan = pl.scan_parquet(timebars_path).sort("CloseTime")
 
-# Apply global holdout — first 70% of CloseTime-ordered data
-total_rows = len(df)
+# Apply global holdout — first 70% of CloseTime-ordered data.
+total_rows = int(scan.select(pl.len()).collect().item())
 analysis_cutoff = int(total_rows * 0.7)
-df = df.slice(0, analysis_cutoff)
+df = scan.slice(0, analysis_cutoff).collect()
 
 # Generate chart types on-demand if needed
 # lb_bars = generate_linebreak(df, level=3)
@@ -247,6 +243,37 @@ df = df.slice(0, analysis_cutoff)
 # Print or save numerical results
 # print(f"Result: {result_1}")
 ```
+
+---
+
+## Organisation, Logging, and Performance Standards
+
+Use the sample experiments under `.ignore/samples/python/experiments` as the
+style reference. Current expectations:
+
+- Put imports first, then path setup, constants, small I/O helpers, pure
+  computation helpers, plotting helpers, orchestration, and `main()`.
+- Keep file I/O in orchestration. Reusable functions accept and return
+  DataFrames, arrays, dictionaries, or figures.
+- Create `plots/` and `results/` directories in orchestration, not as a side
+  effect of importing the module.
+- Use concise progress logging. Prefer `logging.getLogger(__name__)` for new
+  code; `print()` is acceptable only for short manual-run summaries in legacy
+  experiment scripts.
+- Use lazy Polars scans for large Parquet inputs, select only required columns,
+  sort by the governing timestamp before slicing, and collect only the analysis
+  set.
+- Avoid row-wise Python loops over large arrays when Polars, NumPy, or
+  `searchsorted` can express the computation directly.
+- Bound plotting memory by aggregating first or by deterministic sampling with a
+  fixed seed. Do not convert millions of rows to pandas solely for plotting.
+- For zero-baseline metrics, do not report percentage improvement. Emit absolute
+  differences or a separate metric kind so plots and threshold tables remain
+  finite and interpretable.
+- For event charts that can emit multiple rows at the same `SourceCloseTime`,
+  define whether same-source rows are excluded, merged, or counted before
+  computing rates. Do not let zero-duration duplicate-source rows silently
+  dominate denominators.
 
 ---
 

@@ -27,6 +27,9 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | <file> | Type safety | PASS/FAIL | <details> |
 | <file> | NaN handling | PASS/FAIL | <details> |
 | <file> | Holdout exclusion | PASS/FAIL | <details> |
+| <file> | Loader ordering | PASS/FAIL | Lazy scan sorts by timestamp before slicing first 70%; no full holdout collection. |
+| <file> | Memory/performance | PASS/FAIL | Large inputs stay lazy/column-pruned; plotting samples or aggregates before pandas conversion. |
+| <file> | Logging/output | PASS/FAIL | Manual-run output is concise and failures are traceable. |
 | <file> | Docstrings | PASS/FAIL | <details> |
 
 ## Numerical Validation
@@ -108,6 +111,10 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | NaN silent propagation | Any computation on DataFrame columns | Check for `isna()` checks or `dropna()` calls |
 | Wrong split (random vs chronological) | Data splitting code | Verify `.iloc[:N]` not `train_test_split` |
 | Holdout contamination | Any data loading | Verify `int(len(df) * 0.7)` cutoff is applied before any analysis |
+| Full-data collection before holdout split | Any `read_parquet()` or `.collect()` before `.slice()` / `.head()` | Verify the code does not materialize or inspect final 30% rows |
+| Physical-row cutoff before chronological sort | Any `.head()` / `.slice()` before `.sort("CloseTime")` | Sort by `CloseTime` or `SourceCloseTime` before taking the first 70% |
+| Silent deduplication drift | Any `.unique()` in loaders | Require a scope reason and pre/post row-count reporting |
+| Zero-baseline percentage improvement | Any `(baseline - value) / baseline` | When baseline is zero, emit absolute difference or mark the relative metric undefined |
 | String/numeric confusion | `Direction` column comparisons | Verify `Direction` is `+1/-1` (int), not string |
 | Look-ahead bias | Temporal ordering code | Verify `CloseTime` or `SourceCloseTime` used for sorting, never bar index |
 | Synthetic price returns | Any return computation on HA or Renko-derived signals | Verify returns use real time-matched prices, never `HAClose` or Renko brick prices |
@@ -115,6 +122,7 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | Chart-type generator determinism | Any generator output | Verify same input + parameters produces identical output |
 | Division by zero | Any ratio computation | Check for denominator > 0 guard |
 | Wrong sample size in CI | Bootstrap or statistical test calls | Verify the `n=` passed matches actual data size |
+| Duplicate-source event denominator bias | Renko or other event charts with repeated `SourceCloseTime` | Verify zero-duration same-source rows are excluded, merged, or explicitly counted by design |
 
 ### Value Range Reference
 

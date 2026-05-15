@@ -16,7 +16,7 @@ Determine whether Line Break and Renko provide more information-dense bars than 
 
 ### Step 2: Compute Information-Density Metrics
 
-- **Method**: Descriptive statistics for bar count, bars per day, ghost rate, directional entropy, median absolute real-price movement per bar, and coefficient of variation by volatility tercile.
+- **Method**: Descriptive statistics for bar count, bars per day, ghost rate, directional entropy, directional-entropy headroom capture, median absolute real-price movement per bar, and coefficient of variation by volatility tercile.
 - **Why this method**: The experiment is a characterisation task; simple descriptive metrics answer the question without model assumptions.
 - **Simpler alternative considered**: Bar count alone. It does not distinguish useful compression from empty or low-information bars.
 - **Assumptions**: Volatility terciles are derived only from the time-bar analysis set and then applied by timestamp; observations are temporally dependent, so the plan reports effect sizes and uncertainty rather than assuming independent rows.
@@ -39,7 +39,7 @@ Determine whether Line Break and Renko provide more information-dense bars than 
 
 ## Interpretation Guide
 
-- If Line Break or Renko reduces ghost rate by at least 25% and increases entropy by at least 10% on at least 3 instruments with intervals excluding zero, the hypothesis is supported.
+- If Line Break or Renko reduces ghost rate by at least 25% and captures at least 50% of remaining entropy headroom on at least 3 instruments with intervals excluding zero, the hypothesis is supported.
 - If improvements occur in only 1 instrument or confidence intervals include zero across all event-based types, the hypothesis is refuted.
 - If results differ by instrument class or effects are consistent but below threshold, the result is inconclusive and should guide narrower Phase 2 scopes.
 
@@ -62,6 +62,7 @@ Determine whether Line Break and Renko provide more information-dense bars than 
 - Do not compute strategy returns or P&L.
 - Heiken Ashi movement metrics use `RealClose`, not `HAClose`.
 - Renko and Line Break movement metrics use `SourceCloseTime`-aligned time-bar closes, not construction closes for return-like quantities.
+- For event ghost-rate denominators, exclude repeated `SourceCloseTime` rows emitted from the same source bar so Renko multi-brick construction does not create artificial zero-real-movement ghosts.
 
 ### Bar Density Differences
 

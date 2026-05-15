@@ -2,7 +2,7 @@
 
 ## Objective
 
-Assess whether Line Break and Renko provide cleaner volatility and trend regime representation than 1-minute time bars, using predefined regime labels derived from time-bar realised volatility.
+Assess the boundary cost Line Break and Renko incur when mapped onto volatility and trend regimes derived from 1-minute time bars. The time-bar baseline is a lower bound because regimes are defined on those bars.
 
 ## Methodology
 
@@ -24,23 +24,23 @@ Assess whether Line Break and Renko provide cleaner volatility and trend regime 
 
 ### Step 3: Measure Hybrid Rate and Transition Lag
 
-- **Method**: Descriptive transition metrics plus paired bootstrap confidence intervals for chart-type improvement over time bars.
+- **Method**: Descriptive transition metrics plus paired bootstrap confidence intervals for chart-type excess cost versus the time-bar lower bound.
 - **Why this method**: Hybrid rate and lag directly match the hypothesis and avoid distributional assumptions.
-- **Simpler alternative considered**: Kruskal-Wallis test across chart types. It tests broad distribution differences but does not directly quantify improvement versus baseline.
+- **Simpler alternative considered**: Kruskal-Wallis test across chart types. It tests broad distribution differences but does not directly quantify boundary cost versus the baseline.
 - **Assumptions**: Transition events are temporally clustered and not independent; bootstrap intervals are computed at transition-block or instrument level where possible.
-- **Expected output**: Per-instrument effect-size table for hybrid rate reduction and median lag reduction.
+- **Expected output**: Per-instrument effect-size table for absolute hybrid-rate and median-lag excess versus the time-bar lower bound.
 
 ## Visualisations
 
 1. Regime timeline with chart-type events overlaid for one representative instrument - verifies alignment.
 2. Grouped bar chart of hybrid rate by chart type and instrument - compares boundary cleanliness.
 3. Box plot of transition lag by chart type - compares speed of regime reflection.
-4. Heatmap of improvement versus time bars by instrument and metric - shows consistency.
+4. Heatmap of absolute or relative improvement versus time bars by instrument and metric - shows consistency without dividing by a zero baseline.
 
 ## Interpretation Guide
 
-- If Line Break or Renko has at least 20% lower hybrid rate and transition lag than time bars on at least 3 instruments with intervals excluding zero, the hypothesis is supported.
-- If time bars equal or beat both event-based types on at least 3 instruments, the hypothesis is refuted.
+- If Line Break or Renko stays within the predefined absolute boundary-cost limits on at least 3 instruments, the chart type preserves usable regime representation.
+- If both event-based types exceed either boundary-cost limit on at least 3 instruments, the original cleaner-than-time-bars hypothesis is refuted.
 - If hybrid rate improves while transition lag worsens, the result is inconclusive and should be reported as a trade-off rather than a win.
 
 ## Complexity Check
@@ -64,6 +64,7 @@ Assess whether Line Break and Renko provide cleaner volatility and trend regime 
 ### Bar Density Differences
 
 - Report event counts around each transition to avoid mistaking sparse events for clean regimes.
+- Do not compute percentage improvement when the time-bar baseline is zero; use absolute differences and label them as such.
 
 ### Regime Stratification
 

@@ -2,11 +2,11 @@
 
 ## Hypothesis
 
-Line Break level 3 and Renko ATR-14 represent volatility regime boundaries more cleanly than 1-minute time bars on at least 3 of 4 instruments, measured by lower hybrid rate and lower regime transition lag.
+Line Break level 3 and Renko ATR-14 are evaluated for volatility-regime boundary cost versus the 1-minute time-bar lower bound, measured by hybrid rate and regime transition lag. Because regimes are defined on 1-minute time bars, the time-bar baseline has zero hybrid rate and zero transition lag by construction; event charts can only match that lower bound or incur additional boundary cost.
 
 ## Question
 
-Do Line Break and Renko align more cleanly with volatility and trend regime transitions than the 1-minute time-bar baseline?
+How much boundary cost do Line Break and Renko incur relative to the 1-minute time-bar regime timeline, and is the cost small enough to preserve useful regime representation?
 
 ## Scope Boundaries
 
@@ -21,8 +21,8 @@ Do Line Break and Renko align more cleanly with volatility and trend regime tran
 
 ## Success / Failure Criteria
 
-- **Evidence FOR**: On at least 3 instruments, Line Break level 3 or Renko ATR-14 has at least 20% lower hybrid rate and at least 20% lower median transition lag than time bars, with paired bootstrap 95% confidence intervals excluding zero for the improvement.
-- **Evidence AGAINST**: Time bars match or outperform Line Break and Renko on both hybrid rate and transition lag for at least 3 instruments.
+- **Evidence FOR**: On at least 3 instruments, Line Break level 3 or Renko ATR-14 has hybrid rate no greater than 0.05 and median transition lag no greater than 2 source time bars, with paired bootstrap summaries showing bounded absolute excess versus time bars.
+- **Evidence AGAINST**: Line Break and Renko both exceed either the 0.05 hybrid-rate bound or 2-bar median-lag bound on at least 3 instruments.
 - **Inconclusive**: Hybrid-rate and lag results disagree materially, effects are below thresholds, or volatility regime transitions are too sparse to estimate reliably.
 
 ## Complexity Budget
@@ -44,11 +44,9 @@ from pathlib import Path
 DATA_DIR = Path("data")
 path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
 
-bars = (
-    pl.scan_parquet(path)
-    .sort("CloseTime")
-    .collect()
-)
+scan = pl.scan_parquet(path).sort("CloseTime")
+total_rows = int(scan.select(pl.len()).collect().item())
+bars = scan.slice(0, int(total_rows * 0.7)).collect()
 ```
 
 ## Suggested Direction

@@ -70,7 +70,7 @@ RESULTS_DIR = PYTHON_ROOT / "experiments/EXP-004/results"
 # Data loading
 # ---------------------------------------------------------------------------
 def load_timebar_data(instrument: str) -> pl.DataFrame:
-    """Load and concatenate all time-bar Parquet files for an instrument.
+    """Load the chronological non-holdout time-bar slice for an instrument.
 
     Parameters
     ----------
@@ -80,7 +80,7 @@ def load_timebar_data(instrument: str) -> pl.DataFrame:
     Returns
     -------
     pl.DataFrame
-        Concatenated, sorted, deduplicated time-bar data.
+        First 70% of chronologically sorted time-bar data.
     """
     pattern = f"timebars/timebars_{instrument.lower()}_*.parquet"
     matches = sorted(DATA_DIR.glob(pattern))
@@ -88,12 +88,9 @@ def load_timebar_data(instrument: str) -> pl.DataFrame:
         raise FileNotFoundError(
             f"No time-bar file found for {instrument} matching {pattern}"
         )
-    return (
-        pl.scan_parquet(matches)
-        .sort("CloseTime")
-        .unique()
-        .collect()
-    )
+    scan = pl.scan_parquet(matches).sort("CloseTime")
+    total_rows = int(scan.select(pl.len()).collect().item())
+    return scan.slice(0, int(total_rows * 0.7)).collect()
 
 
 # ---------------------------------------------------------------------------
@@ -856,12 +853,11 @@ def main() -> None:
     for instrument in INSTRUMENTS:
         try:
             print(f"Processing {instrument} ...")
-            full_df = load_timebar_data(instrument)
-            if len(full_df) == 0:
+            analysis_df = load_timebar_data(instrument)
+            if len(analysis_df) == 0:
                 print(f"  Skipping {instrument}: empty dataset")
                 continue
 
-            analysis_df = full_df.slice(0, int(len(full_df) * 0.7))
             n_analysis = len(analysis_df)
             print(f"  Analysis rows: {n_analysis:,}")
 

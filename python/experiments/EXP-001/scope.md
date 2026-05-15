@@ -2,7 +2,7 @@
 
 ## Hypothesis
 
-Line Break and Renko event bars have higher information density than 1-minute time bars on at least 3 of 4 instruments, measured as lower ghost rate and higher directional entropy per bar. Heiken Ashi is included as a smoothed time-bar transformation but is not expected to reduce bar count.
+Line Break and Renko event bars have higher information density than 1-minute time bars on at least 3 of 4 instruments, measured as lower ghost rate and better use of remaining directional-entropy headroom. Heiken Ashi is included as a smoothed time-bar transformation but is not expected to reduce bar count.
 
 ## Question
 
@@ -21,7 +21,7 @@ Which Phase 1 chart types spend fewer bars on economically empty movement, and h
 
 ## Success / Failure Criteria
 
-- **Evidence FOR**: On at least 3 instruments, Line Break level 3 or Renko ATR-14 has ghost rate at least 25% lower than time bars and directional entropy per bar at least 10% higher than time bars, with bootstrap 95% confidence intervals for the paired instrument-level differences excluding zero.
+- **Evidence FOR**: On at least 3 instruments, Line Break level 3 or Renko ATR-14 has ghost rate at least 25% lower than time bars and captures at least 50% of the remaining directional-entropy headroom toward the binary maximum of 1.0, with bootstrap 95% confidence intervals for the paired instrument-level differences excluding zero.
 - **Evidence AGAINST**: Fewer than 2 instruments meet both improvement thresholds, or bootstrap intervals include zero for all event-based chart types.
 - **Inconclusive**: Improvements are directionally consistent but below threshold, confidence intervals overlap zero, or valid data volume is insufficient for at least 3 instruments.
 
@@ -33,7 +33,7 @@ Which Phase 1 chart types spend fewer bars on economically empty movement, and h
 
 ## Data Requirements
 
-Load each instrument's 1-minute time-bar Parquet data, sort by `CloseTime`, apply the 70% analysis cutoff before any chart generation, then generate Line Break, Renko, and Heiken Ashi from the analysis set only. Define ghost bars consistently before execution: for time bars and Heiken Ashi, near-zero real range or absolute close-to-close movement below one instrument-specific minimum observed non-zero tick increment proxy; for Line Break and Renko, zero real-price movement between adjacent `SourceCloseTime`-aligned closes.
+Load each instrument's 1-minute time-bar Parquet data, sort by `CloseTime`, apply the 70% analysis cutoff before any chart generation, then generate Line Break, Renko, and Heiken Ashi from the analysis set only. Define ghost bars consistently before execution: for time bars and Heiken Ashi, near-zero real range or absolute close-to-close movement below one instrument-specific minimum observed non-zero tick increment proxy; for Line Break and Renko, zero real-price movement between adjacent distinct `SourceCloseTime`-aligned closes. When an event generator emits multiple rows with the same `SourceCloseTime`, exclude same-source duplicate rows from the ghost-rate denominator rather than counting construction artifacts as market ghosts.
 
 ### Standard Loading Pattern
 
@@ -44,11 +44,9 @@ from pathlib import Path
 DATA_DIR = Path("data")
 path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
 
-bars = (
-    pl.scan_parquet(path)
-    .sort("CloseTime")
-    .collect()
-)
+scan = pl.scan_parquet(path).sort("CloseTime")
+total_rows = int(scan.select(pl.len()).collect().item())
+bars = scan.slice(0, int(total_rows * 0.7)).collect()
 ```
 
 ## Suggested Direction
