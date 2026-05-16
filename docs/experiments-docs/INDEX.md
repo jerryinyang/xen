@@ -1,5 +1,11 @@
 # Experiments Index (Comprehensive)
 
+## Checkpoint Retrospectives
+
+| Checkpoint | Status | Key Synthesis | Document |
+| --- | --- | --- | --- |
+| 2026-05-14-001-chart-type-validation | COMPLETED | Phase 1 validates time bars as the master timeline for 1-minute-source analysis; higher-timeframe robustness remains a Phase 1B bridge item before Phase 2 signal-quality characterization. | [retrospective.md](checkpoints/2026-05-14-001-chart-type-validation/retrospective.md) |
+
 ## EXP-001 — Information Density & Ghost Bar Comparison
 
 **Status**: REFUTED
