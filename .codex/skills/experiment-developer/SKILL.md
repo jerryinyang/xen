@@ -35,16 +35,39 @@ Translate an approved scope and analysis plan into Python code. Implement only t
 9. Save plots under `python/experiments/<ID>/plots/`.
 9. Save machine-readable outputs under `python/experiments/<ID>/results/` when practical.
 10. Keep stdout concise and useful for manual execution.
+11. Run a code-standards self-check before completion using the bundled
+    `code-conventions.md`; fix any violations unless the approved plan
+    explicitly requires the exception.
 
 ## Code Requirements
 
 - Use type hints for public functions.
 - Use docstrings for reusable functions.
 - Return data from functions; keep file I/O in orchestration code.
+- Put imports first, then path setup, constants, small I/O helpers, pure
+  computation helpers, plotting helpers, orchestration, and `main()`.
+- Create `plots/` and `results/` directories inside orchestration, not during
+  module import.
+- Prefer `logging.getLogger(__name__)` for new scripts. Legacy `print()` is
+  acceptable only for concise manual-run summaries from `main()` or
+  orchestration-level progress messages.
+- Use lazy Polars scans for large Parquet inputs, select only needed columns,
+  sort by the governing timestamp before slicing, and collect only the analysis
+  set.
+- Do not reload or regenerate large data solely for plotting when the analysis
+  pass can return the sampled or aggregated plot inputs.
+- Convert to pandas only after aggregation or deterministic sampling; do not
+  convert millions of rows just to plot.
 - Handle empty inputs, NaN values, insufficient sample size, and divide-by-zero cases.
 - Use deterministic seeds when randomness is required.
 - For chart-type generators, same input + same parameters must produce identical output.
-- Never use synthetic chart prices for strategy P&L. Heiken Ashi returns use `RealOpen`, `RealHigh`, `RealLow`, `RealClose`; Renko and Line Break signals align through `SourceCloseTime` to real time-bar prices.
+- Never use synthetic chart prices for strategy P&L or signal-quality return
+  evaluation. Heiken Ashi strategy returns use `RealOpen`, `RealHigh`,
+  `RealLow`, `RealClose`; Renko and Line Break signals align through
+  `SourceCloseTime` to real time-bar prices.
+- If the approved scope is explicitly a Heiken Ashi synthetic-price distortion
+  diagnostic, `HAClose`-based diagnostic returns are allowed only when labelled
+  non-tradable and kept separate from strategy/P&L metrics.
 - Avoid magic numbers unless the analysis plan defines them.
 - Do not add exploratory analyses or extra plots outside the plan.
 
@@ -55,6 +78,7 @@ After implementation, summarize:
 - files created or modified;
 - how to run `python/experiments/<ID>/code/run_experiment.py`;
 - expected output files;
+- code-standards self-check result;
 - any deviation from the approved plan, if unavoidable.
 
 Do not run the experiment code when acting inside `research-pipeline`; the pipeline has a manual execution gate. Outside the pipeline, run tests or lightweight checks when appropriate.

@@ -8,7 +8,7 @@ Measure whether chart-type statistics are stable under predefined synthetic nois
 
 ### Step 1: Generate Deterministic Perturbed Source Bars
 
-- **Method**: Apply fixed 0%, 10%, 20%, and 30% perturbation levels to analysis-set 1-minute bars only, with OHLC repair and validation.
+- **Method**: Apply fixed 0%, 10%, 20%, and 30% perturbation levels to analysis-set 1-minute bars only, with full OHLC repair (ensuring High >= max(Open, Close) and Low <= min(Open, Close)) and validation. Bars with unreparable OHLC violations after repair are counted; if the proportion exceeds 5% per the scope's inconclusive criterion, results are flagged as inconclusive.
 - **Why this method**: Deterministic perturbation gives repeatable stress tests and avoids adding simulation variance to a Phase 1 characterisation experiment.
 - **Simpler alternative considered**: Single 20% perturbation only. It would answer the success criterion but would not reveal whether robustness degrades monotonically.
 - **Assumptions**: Perturbations are artificial stressors, not a realistic microstructure noise model; results describe robustness to this perturbation family only.
@@ -16,7 +16,7 @@ Measure whether chart-type statistics are stable under predefined synthetic nois
 
 ### Step 2: Regenerate Chart Types and Compute Stability Metrics
 
-- **Method**: Sequentially regenerate all chart types from each perturbed source dataset, then compute direction stability, variance ratio stability, and Lempel-Ziv complexity drift versus unperturbed baseline.
+- **Method**: Sequentially regenerate all chart types from each perturbed source dataset, then compute direction stability, return variance stability, and Lempel-Ziv 76 complexity drift (normalised by log2(n) for cross-length comparability) versus unperturbed baseline. For Heiken Ashi, return variance stability uses HAClose returns (distortion diagnostic per synthetic price discipline), not RealClose which is identical to time-bar Close.
 - **Why this method**: It measures the chart transformation's response to source noise rather than only the source bars' response.
 - **Simpler alternative considered**: Compare only close-to-close return variance. That misses direction and sequence-complexity robustness, both named in the phase design.
 - **Assumptions**: Metrics are descriptive and temporally dependent; no i.i.d. row-level inference is assumed.
@@ -36,13 +36,13 @@ Measure whether chart-type statistics are stable under predefined synthetic nois
 2. Heatmap of 20% noise robustness rank by instrument and metric - shows consistency.
 3. Box plot of direction stability by chart type at 20% noise - compares core hypothesis metric.
 4. Bar chart of invalid or repaired OHLC rows by instrument and noise level - validates perturbation quality.
-5. Scatter plot of variance drift versus complexity drift - shows robustness trade-offs.
+5. Scatter plot of return variance drift versus complexity drift - shows robustness trade-offs.
 
 ## Interpretation Guide
 
 - If Line Break or Renko has at least 25% lower relative drift than time bars in at least two metrics on at least 3 instruments, the hypothesis is supported.
 - If time bars are as stable or more stable in at least two metrics on at least 3 instruments, the hypothesis is refuted.
-- If Heiken Ashi reduces variance but synthetic-to-real distortion grows materially, report that as the expected smoothing/distortion trade-off, not as strategy evidence.
+- If Heiken Ashi shows lower return variance drift (using HAClose returns) but the HAClose-to-RealClose distortion ratio grows under noise, report that as the expected smoothing/distortion trade-off, not as strategy evidence.
 
 ## Complexity Check
 
@@ -61,7 +61,7 @@ Measure whether chart-type statistics are stable under predefined synthetic nois
 
 ### Synthetic Price Discipline
 
-- Heiken Ashi distortion diagnostics may use `HAClose` versus `RealClose`, but no tradable return conclusion may be drawn from HA prices.
+- Heiken Ashi return variance stability uses HAClose returns as a distortion diagnostic. This is not a tradable return; it measures how stable HA's smoothing transformation is under noise. RealClose returns for HA would be identical to time-bar returns (degenerate comparison).
 - Renko stability uses generated direction and real timestamp context, not brick-price P&L.
 
 ### Bar Density Differences

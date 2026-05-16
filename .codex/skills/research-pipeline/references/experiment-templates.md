@@ -27,7 +27,7 @@ Save to: `python/experiments/<EXP-ID>/scope.md`
 - **Time range**: Full dataset with nested chronological split. First 70% = analysis set (split 70/30 for train/test); final 30% = global holdout (never used).
 - **Global holdout**: The final 30% of the full dataset must not be loaded, inspected, or used in any capacity.
 - **Look-ahead bias prevention**: Chart-type generators process data sequentially. Analysis must respect SourceCloseTime for temporal alignment.
-- **Synthetic price discipline**: No strategy P&L from Heiken Ashi prices or Renko brick prices. All returns use RealClose or time-bar Close aligned by timestamp.
+- **Synthetic price discipline**: No strategy P&L from Heiken Ashi prices or Renko brick prices. Strategy and signal-return metrics use RealClose or time-bar Close aligned by timestamp. HA synthetic returns are allowed only for explicitly scoped, non-tradable distortion diagnostics.
 - **Exclusions**: <what is explicitly NOT in scope>
 
 ## Success / Failure Criteria
@@ -90,7 +90,7 @@ Save to: `python/experiments/<EXP-ID>/analysis-plan.md`
 - **Assumptions**: <what this method assumes; whether it holds for chart-type comparison data>
   - **Temporal structure**: Data has chronological ordering by CloseTime/SourceCloseTime
   - **Cross-chart alignment**: Comparisons are by timestamp, not bar index
-  - **Synthetic prices**: HA prices and Renko brick prices are not used for strategy P&L; real prices are used for alignment
+  - **Synthetic prices**: HA prices and Renko brick prices are not used for strategy P&L; real prices are used for alignment. HA synthetic returns appear only in explicit non-tradable distortion diagnostics.
 - **Expected output**: <what this step produces — a number, a plot, a table>
 
 ### Step 2: ...
@@ -121,7 +121,8 @@ Save to: `python/experiments/<EXP-ID>/analysis-plan.md`
 
 ### Synthetic Price Discipline
 - Never compute strategy P&L from Heiken Ashi HA prices or Renko brick prices
-- Use RealClose for all return calculations involving Heiken Ashi
+- Use RealClose for strategy and signal-return calculations involving Heiken Ashi
+- Use HAClose returns only when the approved scope is an HA synthetic-price distortion diagnostic and labels them non-tradable
 - For Line Break and Renko, use SourceCloseTime-aligned time-bar prices
 
 ### Bar Density Differences

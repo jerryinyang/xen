@@ -12,7 +12,8 @@ SRC_DIR = PYTHON_ROOT / "src"
 sys.path.insert(0, str(SRC_DIR))
 
 import json
-from typing import Any
+import logging
+from typing import Any, Callable
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -27,21 +28,18 @@ from time_alignment import normalize_timestamp_columns
 DATA_DIR = PROJECT_ROOT / "data"
 PLOTS_DIR = PYTHON_ROOT / "experiments/EXP-006/plots"
 RESULTS_DIR = PYTHON_ROOT / "experiments/EXP-006/results"
-PLOTS_DIR.mkdir(parents=True, exist_ok=True)
-RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
-INSTRUMENT_FILES: dict[str, str] = {
-    "EURUSD": "timebars/timebars_eurusd_20230102_000000_20260514_203330.parquet",
-    "XAUUSD": "timebars/timebars_xauusd_20230102_230200_20260514_204148.parquet",
-    "BTCUSD": "timebars/timebars_btcusd_20230102_000000_20260514_203813.parquet",
-    "USTEC": "timebars/timebars_ustec_20230102_230000_20260514_204410.parquet",
-}
+INSTRUMENTS = ["EURUSD", "XAUUSD", "BTCUSD", "USTEC"]
+TIMEBAR_COLUMNS = ["OpenTime", "CloseTime", "Open", "High", "Low", "Close"]
 
 HOLDOUT_FRACTION = 0.30
 ROLLING_VOL_WINDOW = 30
 BOOT_BLOCK_SIZE = 100
 BOOT_N = 1000
 BOOT_SEED = 42
+PLOT_SAMPLE_N = 20_000
+
+LOGGER = logging.getLogger(__name__)
 
 sns.set_theme(style="whitegrid")
 
@@ -49,6 +47,26 @@ sns.set_theme(style="whitegrid")
 # ---------------------------------------------------------------------------
 # Data loading
 # ---------------------------------------------------------------------------
+def find_latest_timebars(instrument: str) -> Path:
+    """Return the latest time-bar Parquet path for an instrument.
+
+    Parameters
+    ----------
+    instrument : str
+        Instrument symbol.
+
+    Returns
+    -------
+    Path
+        Latest matching time-bar file.
+    """
+    pattern = f"timebars/timebars_{instrument.lower()}_*.parquet"
+    paths = sorted(DATA_DIR.glob(pattern))
+    if not paths:
+        raise FileNotFoundError(f"No time-bar files found for {instrument}")
+    return paths[-1]
+
+
 def load_and_holdout(path: Path) -> pl.DataFrame:
     """Load time bars, sort chronologically, and exclude the global holdout.
 
@@ -62,7 +80,7 @@ def load_and_holdout(path: Path) -> pl.DataFrame:
     pl.DataFrame
         First 70 % of rows ordered by ``CloseTime``.
     """
-    scan = pl.scan_parquet(path).sort("CloseTime")
+    scan = pl.scan_parquet(path).select(TIMEBAR_COLUMNS).sort("CloseTime")
     total_rows = int(scan.select(pl.len()).collect().item())
     cutoff = int(total_rows * (1.0 - HOLDOUT_FRACTION))
     return scan.slice(0, cutoff).collect()
@@ -157,7 +175,7 @@ def direction_change_freq(returns: np.ndarray) -> float:
 def block_bootstrap_compression(
     real_arr: np.ndarray,
     ha_arr: np.ndarray,
-    metric_fn: callable,
+    metric_fn: Callable[[np.ndarray], float],
     block_size: int = BOOT_BLOCK_SIZE,
     n_boot: int = BOOT_N,
     seed: int = BOOT_SEED,
@@ -192,7 +210,11 @@ def block_bootstrap_compression(
     n_blocks = int(np.ceil(n / block_size))
     max_start = n - block_size + 1
 
-    point = 1.0 - metric_fn(ha_arr) / metric_fn(real_arr)
+    real_metric = metric_fn(real_arr)
+    ha_metric = metric_fn(ha_arr)
+    if real_metric == 0 or not np.isfinite(real_metric) or not np.isfinite(ha_metric):
+        raise ValueError("Compression ratio is undefined for non-finite or zero baseline")
+    point = 1.0 - ha_metric / real_metric
 
     boot_values: list[float] = []
     for _ in range(n_boot):
@@ -210,6 +232,8 @@ def block_bootstrap_compression(
         boot_values.append(1.0 - m_ha / m_real)
 
     boot_arr = np.array(boot_values)
+    if len(boot_arr) == 0:
+        raise ValueError("No finite bootstrap compression ratios were produced")
     return {
         "point_estimate": float(point),
         "ci_lower": float(np.percentile(boot_arr, 2.5)),
@@ -221,7 +245,55 @@ def block_bootstrap_compression(
 # ---------------------------------------------------------------------------
 # Core computation per instrument
 # ---------------------------------------------------------------------------
-def analyse_instrument(instrument: str, path: Path) -> dict[str, Any]:
+def build_analysis_frame(path: Path) -> pl.DataFrame:
+    """Build the paired real/HA analysis DataFrame once.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the time-bar Parquet file.
+
+    Returns
+    -------
+    pl.DataFrame
+        Clean paired data with real and HA diagnostic returns.
+    """
+    tb = load_and_holdout(path)
+    ha = generate_heiken_ashi(tb)
+
+    # Join on CloseTime to recover original High/Low alongside HA columns
+    tb = normalize_timestamp_columns(tb, ["CloseTime"])
+    ha = normalize_timestamp_columns(ha, ["CloseTime"])
+    df = tb.join(ha, on="CloseTime", how="inner")
+
+    df = df.with_columns(
+        (pl.col("RealClose").log() - pl.col("RealClose").shift(1).log()).alias(
+            "real_return"
+        ),
+        (pl.col("HAClose").log() - pl.col("HAClose").shift(1).log()).alias(
+            "ha_return"
+        ),
+        ((pl.col("High") - pl.col("Low")) / pl.col("Close") * 100.0).alias(
+            "real_range_pct"
+        ),
+        ((pl.col("HAHigh") - pl.col("HALow")) / pl.col("HAClose") * 100.0).alias(
+            "ha_range_pct"
+        ),
+    )
+
+    df = add_regimes(df, window=ROLLING_VOL_WINDOW)
+
+    return df.filter(
+        pl.col("real_return").is_not_null()
+        & pl.col("ha_return").is_not_null()
+        & pl.col("regime").is_not_null()
+    )
+
+
+def analyse_instrument(
+    instrument: str,
+    path: Path,
+) -> tuple[dict[str, Any], pl.DataFrame]:
     """Run the full EXP-006 analysis for a single instrument.
 
     Parameters
@@ -233,46 +305,14 @@ def analyse_instrument(instrument: str, path: Path) -> dict[str, Any]:
 
     Returns
     -------
-    dict
-        Nested dict with aggregate metrics, regime-stratified metrics,
-        and bootstrap confidence intervals.
+    tuple[dict, pl.DataFrame]
+        Nested metrics and bounded columns needed by plotting.
     """
-    print(f"[{instrument}] Loading data …")
-    tb = load_and_holdout(path)
-
-    print(f"[{instrument}] Generating Heiken Ashi …")
-    ha = generate_heiken_ashi(tb)
-
-    # Join on CloseTime to recover original High/Low alongside HA columns
-    tb = normalize_timestamp_columns(tb, ["CloseTime"])
-    ha = normalize_timestamp_columns(ha, ["CloseTime"])
-    df = tb.join(ha, on="CloseTime", how="inner")
-
-    print(f"[{instrument}] Computing returns and ranges …")
-    df = df.with_columns(
-        (pl.col("RealClose").log() - pl.col("RealClose").shift(1).log()).alias(
-            "real_return"
-        ),
-        (pl.col("HAClose").log() - pl.col("HAClose").shift(1).log()).alias("ha_return"),
-        ((pl.col("High") - pl.col("Low")) / pl.col("Close") * 100.0).alias(
-            "real_range_pct"
-        ),
-        ((pl.col("HAHigh") - pl.col("HALow")) / pl.col("HAClose") * 100.0).alias(
-            "ha_range_pct"
-        ),
-    )
-
-    df = add_regimes(df, window=ROLLING_VOL_WINDOW)
-
-    # Drop rows with missing returns or regime
-    clean = df.filter(
-        pl.col("real_return").is_not_null()
-        & pl.col("ha_return").is_not_null()
-        & pl.col("regime").is_not_null()
-    )
+    LOGGER.info("[%s] Loading data and generating Heiken Ashi", instrument)
+    clean = build_analysis_frame(path)
 
     n_rows = len(clean)
-    print(f"[{instrument}] Clean rows after regime labelling: {n_rows:,}")
+    LOGGER.info("[%s] Clean rows after regime labelling: %s", instrument, f"{n_rows:,}")
     if n_rows < BOOT_BLOCK_SIZE * 2:
         raise ValueError(f"[{instrument}] Insufficient clean rows: {n_rows}")
 
@@ -295,10 +335,10 @@ def analyse_instrument(instrument: str, path: Path) -> dict[str, Any]:
     }
 
     # --- Bootstrap CIs for the two key metrics ---
-    print(f"[{instrument}] Bootstrapping volatility compression …")
+    LOGGER.info("[%s] Bootstrapping volatility compression", instrument)
     vol_bootstrap = block_bootstrap_compression(real_ret, ha_ret, realised_volatility)
 
-    print(f"[{instrument}] Bootstrapping median-abs-return compression …")
+    LOGGER.info("[%s] Bootstrapping median-abs-return compression", instrument)
     mad_bootstrap = block_bootstrap_compression(real_ret, ha_ret, median_abs_return)
 
     # --- Regime-stratified metrics ---
@@ -326,7 +366,7 @@ def analyse_instrument(instrument: str, path: Path) -> dict[str, Any]:
             "n_bars": len(sub),
         }
 
-    return {
+    result = {
         "instrument": instrument,
         "aggregate": aggregate,
         "regimes": regime_results,
@@ -335,6 +375,10 @@ def analyse_instrument(instrument: str, path: Path) -> dict[str, Any]:
             "median_abs_return_compression": mad_bootstrap,
         },
     }
+    plot_frame = clean.select(
+        ["CloseTime", "RealClose", "HAClose", "real_return", "ha_return"]
+    )
+    return result, plot_frame
 
 
 # ---------------------------------------------------------------------------
@@ -383,8 +427,8 @@ def plot_paired_close_window(
         linewidth=1.2,
     )
     ax.set_title(
-        f"{instrument} — Real vs Heiken Ashi Close (representative window, "
-        f"n={n_bars})",
+        f"{instrument} - Real vs Heiken Ashi Close "
+        f"(representative window, n={n_bars})",
         fontsize=12,
     )
     ax.set_xlabel("Close Time")
@@ -511,6 +555,28 @@ def plot_abs_return_box(
     return fig
 
 
+def sample_abs_returns(clean: pl.DataFrame) -> tuple[np.ndarray, np.ndarray]:
+    """Return bounded absolute-return arrays for plotting.
+
+    Parameters
+    ----------
+    clean : pl.DataFrame
+        Paired analysis frame with ``real_return`` and ``ha_return``.
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        Sampled absolute real and HA diagnostic returns.
+    """
+    real_abs = np.abs(clean["real_return"].to_numpy())
+    ha_abs = np.abs(clean["ha_return"].to_numpy())
+    if len(real_abs) <= PLOT_SAMPLE_N:
+        return real_abs, ha_abs
+    rng = np.random.default_rng(BOOT_SEED)
+    idx = rng.choice(len(real_abs), size=PLOT_SAMPLE_N, replace=False)
+    return real_abs[idx], ha_abs[idx]
+
+
 def plot_regime_heatmap(
     results: list[dict[str, Any]],
     save_path: Path | None = None,
@@ -596,61 +662,46 @@ def plot_regime_heatmap(
 # Main orchestration
 # ---------------------------------------------------------------------------
 def main() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
     all_results: list[dict[str, Any]] = []
     plot_data: list[tuple[str, np.ndarray, np.ndarray]] = []
     example_df: pl.DataFrame | None = None
     example_instrument: str = "EURUSD"
 
-    for instrument, rel_path in INSTRUMENT_FILES.items():
-        path = DATA_DIR / rel_path
-        if not path.exists():
-            raise FileNotFoundError(f"Data file not found: {path}")
-
-        result = analyse_instrument(instrument, path)
+    for instrument in INSTRUMENTS:
+        path = find_latest_timebars(instrument)
+        result, clean = analyse_instrument(instrument, path)
         all_results.append(result)
 
-        # Gather data for the box plot
-        df_instr = load_and_holdout(path)
-        ha_instr = generate_heiken_ashi(df_instr)
-        df_instr = normalize_timestamp_columns(df_instr, ["CloseTime"])
-        ha_instr = normalize_timestamp_columns(ha_instr, ["CloseTime"])
-        combined = df_instr.join(ha_instr, on="CloseTime", how="inner")
-        combined = combined.with_columns(
-            (pl.col("RealClose").log() - pl.col("RealClose").shift(1).log()).alias(
-                "real_return"
-            ),
-            (pl.col("HAClose").log() - pl.col("HAClose").shift(1).log()).alias(
-                "ha_return"
-            ),
-        ).filter(
-            pl.col("real_return").is_not_null() & pl.col("ha_return").is_not_null()
-        )
-        real_abs = np.abs(combined["real_return"].to_numpy())
-        ha_abs = np.abs(combined["ha_return"].to_numpy())
+        real_abs, ha_abs = sample_abs_returns(clean)
         plot_data.append((instrument, real_abs, ha_abs))
 
         # Keep one representative dataframe for the window timeline plot
         if instrument == example_instrument:
-            example_df = combined
+            example_df = clean
 
-        # Print concise summary to stdout
         vol_comp = result["bootstrap"]["volatility_compression"]
         mad_comp = result["bootstrap"]["median_abs_return_compression"]
-        print(
+        LOGGER.info(
             f"[{instrument}] Vol compression: {vol_comp['point_estimate']:.3f} "
-            f"(95 % CI {vol_comp['ci_lower']:.3f}–{vol_comp['ci_upper']:.3f}) | "
+            f"(95 pct CI {vol_comp['ci_lower']:.3f}-{vol_comp['ci_upper']:.3f}) | "
             f"MAD compression: {mad_comp['point_estimate']:.3f} "
-            f"(95 % CI {mad_comp['ci_lower']:.3f}–{mad_comp['ci_upper']:.3f})"
+            f"(95 pct CI {mad_comp['ci_lower']:.3f}-{mad_comp['ci_upper']:.3f})"
         )
 
     # --- Save numerical results ---
     results_path = RESULTS_DIR / "distortion_metrics.json"
     with open(results_path, "w") as fh:
         json.dump(all_results, fh, indent=2, default=str)
-    print(f"\nResults saved to {results_path}")
+    LOGGER.info("")
+    LOGGER.info("Results saved to %s", results_path)
 
     # --- Generate plots ---
-    print("\nGenerating plots …")
+    LOGGER.info("")
+    LOGGER.info("Generating plots ...")
 
     if example_df is not None:
         plot_paired_close_window(
@@ -658,27 +709,28 @@ def main() -> None:
             example_instrument,
             save_path=PLOTS_DIR / "01_paired_close_window.png",
         )
-        print("  • 01_paired_close_window.png")
+        LOGGER.info("  - 01_paired_close_window.png")
 
     plot_volatility_compression_bar(
         all_results,
         save_path=PLOTS_DIR / "02_volatility_compression.png",
     )
-    print("  • 02_volatility_compression.png")
+    LOGGER.info("  - 02_volatility_compression.png")
 
     plot_abs_return_box(
         plot_data,
         save_path=PLOTS_DIR / "03_abs_return_box.png",
     )
-    print("  • 03_abs_return_box.png")
+    LOGGER.info("  - 03_abs_return_box.png")
 
     plot_regime_heatmap(
         all_results,
         save_path=PLOTS_DIR / "04_regime_heatmap.png",
     )
-    print("  • 04_regime_heatmap.png")
+    LOGGER.info("  - 04_regime_heatmap.png")
 
-    print("\nExperiment EXP-006 complete.")
+    LOGGER.info("")
+    LOGGER.info("Experiment EXP-006 complete.")
 
 
 if __name__ == "__main__":

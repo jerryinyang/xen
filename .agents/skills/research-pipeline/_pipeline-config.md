@@ -164,7 +164,7 @@ These binding constraints apply to all Xen research.
 | **No academic-finance pitfalls** | Reject techniques relying on assumptions known to fail in real markets (normality, stationarity, i.i.d., constant volatility). Prefer empirical/bootstrap/permutation methods. |
 | **Data-driven** | Conclusions emerge from data, not assumptions. No pre-conceived shapes or distributions. |
 | **Non-parametric by default** | Distribution-free methods first. Parametric only with non-parametric cross-validation. |
-| **Synthetic price discipline** | Heiken Ashi prices and Renko brick prices are synthetic — never compute strategy P&L from chart-construction prices. Always use time-matched real prices. |
+| **Synthetic price discipline** | Heiken Ashi prices and Renko brick prices are synthetic — never compute strategy P&L from chart-construction prices. Always use time-matched real prices. `HAClose` returns are allowed only for explicitly scoped, non-tradable HA distortion diagnostics. |
 | **Timestamp alignment over bar count** | Cross-chart-type comparisons align by timestamp, never by bar index. |
 | **Deterministic generation** | All chart-type generators produce identical output from identical input. No random seeds. |
 | **Streaming compatibility** | All generators must work as sequential stateful functions (no look-ahead). |
@@ -302,5 +302,10 @@ If an experiment needs more, it should be **split into multiple experiments**.
 - **NaN handling**: Explicit — never let NaN propagate silently
 - **Function size**: Split if exceeding ~30 lines
 - **Look-ahead bias**: Never use data from after the event timestamp when analyzing a chart-type event
-- **Synthetic price discipline**: Never use Heiken Ashi HA prices or Renko brick prices for strategy P&L; always use time-matched real prices
+- **Synthetic price discipline**: Never use Heiken Ashi HA prices or Renko brick prices for strategy P&L; always use time-matched real prices. `HAClose` returns are allowed only for explicitly scoped, non-tradable HA distortion diagnostics.
 - **Timestamp alignment**: Cross-chart-type comparisons align by timestamp (CloseTime or SourceCloseTime), never by bar index
+- **Organization**: imports -> path setup -> constants -> I/O helpers -> pure computation -> plotting -> orchestration -> `main()`
+- **Import side effects**: no directory creation, file writes, data loads, or plotting at module import time
+- **Logging/output**: concise progress output; helper functions return data instead of printing
+- **Performance**: lazy Polars scans, timestamp sort before first-70-percent slicing, column projection where practical, and bounded pandas conversions for plots
+- **Plot reuse**: do not rerun heavy loads or chart generation solely for plotting when the analysis pass can return bounded plot inputs

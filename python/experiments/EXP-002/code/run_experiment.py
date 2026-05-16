@@ -3,7 +3,12 @@ Experiment EXP-002: Volatility & Trend Regime Representation
 Implements the analysis plan from analysis-plan.md.
 """
 import sys
+import hashlib
+import json
+import platform
+import subprocess
 from pathlib import Path
+from importlib import metadata
 
 PYTHON_ROOT = Path(__file__).resolve().parents[3]
 PROJECT_ROOT = PYTHON_ROOT.parent
@@ -79,11 +84,73 @@ TIMEBAR_COLUMNS = [
 BOOTSTRAP_SEED = 42
 N_BOOTSTRAP = 10_000
 ROLLING_VOL_WINDOW = 20
+HYBRID_RATE_BOUND = 0.05
+MEDIAN_LAG_BOUND = 2.0
+MIN_VALID_INSTRUMENTS = 3
+PACKAGE_NAMES = ["numpy", "pandas", "polars", "matplotlib", "seaborn"]
+MAX_TIMELINE_PLOT_ROWS = 5_000
 
 
 # ---------------------------------------------------------------------------
 # Data loading
 # ---------------------------------------------------------------------------
+def instrument_timebar_paths(instrument: str) -> list[Path]:
+    """Return all matching time-bar files for an instrument."""
+    pattern = f"timebars/timebars_{instrument.lower()}_*.parquet"
+    matches = sorted(DATA_DIR.glob(pattern))
+    if not matches:
+        raise FileNotFoundError(
+            f"No time-bar file found for {instrument} matching {pattern}"
+        )
+    return matches
+
+
+def sha256_file(path: Path) -> str:
+    """Return the SHA-256 digest for a file."""
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def git_commit() -> str | None:
+    """Return the current git commit, if available."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=PROJECT_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except Exception:
+        return None
+    return result.stdout.strip()
+
+
+def package_versions() -> dict[str, str]:
+    """Return versions for runtime packages used by this experiment."""
+    versions: dict[str, str] = {}
+    for package_name in PACKAGE_NAMES:
+        try:
+            versions[package_name] = metadata.version(package_name)
+        except metadata.PackageNotFoundError:
+            versions[package_name] = "not-installed"
+    return versions
+
+
+def file_manifest(path: Path) -> dict[str, Any]:
+    """Return reproducibility metadata for an input or source file."""
+    stat = path.stat()
+    return {
+        "path": str(path.relative_to(PROJECT_ROOT)),
+        "size_bytes": stat.st_size,
+        "mtime_ns": stat.st_mtime_ns,
+        "sha256": sha256_file(path),
+    }
+
+
 def scan_timebar_data(instrument: str) -> pl.LazyFrame:
     """Scan all time-bar Parquet files for an instrument.
 
@@ -98,12 +165,7 @@ def scan_timebar_data(instrument: str) -> pl.LazyFrame:
         Sorted lazy time-bar scan.
     """
 
-    pattern = f"timebars/timebars_{instrument.lower()}_*.parquet"
-    matches = sorted(DATA_DIR.glob(pattern))
-    if not matches:
-        raise FileNotFoundError(
-            f"No time-bar file found for {instrument} matching {pattern}"
-        )
+    matches = instrument_timebar_paths(instrument)
     return (
         pl.scan_parquet(matches)
         .select(TIMEBAR_COLUMNS)
@@ -111,7 +173,9 @@ def scan_timebar_data(instrument: str) -> pl.LazyFrame:
     )
 
 
-def load_analysis_timebar_data(instrument: str) -> tuple[pl.DataFrame, int]:
+def load_analysis_timebar_data(
+    instrument: str,
+) -> tuple[pl.DataFrame, int, list[Path]]:
     """Load only the first 70% chronological analysis slice.
 
     The full dataset row count is used only to determine the global holdout
@@ -124,9 +188,10 @@ def load_analysis_timebar_data(instrument: str) -> tuple[pl.DataFrame, int]:
 
     Returns
     -------
-    tuple[pl.DataFrame, int]
-        Analysis-set bars and full source row count.
+    tuple[pl.DataFrame, int, list[Path]]
+        Analysis-set bars, full source row count, and input paths.
     """
+    paths = instrument_timebar_paths(instrument)
     scan = scan_timebar_data(instrument)
     source_rows = scan.select(pl.len()).collect().item()
     analysis_rows = int(source_rows * 0.7)
@@ -135,7 +200,7 @@ def load_analysis_timebar_data(instrument: str) -> tuple[pl.DataFrame, int]:
         .slice(0, analysis_rows)
         .collect()
     )
-    return analysis_df, source_rows
+    return analysis_df, source_rows, paths
 
 
 # ---------------------------------------------------------------------------
@@ -177,8 +242,8 @@ def generate_chart(
 def compute_realised_volatility(time_bars: pl.DataFrame) -> pl.DataFrame:
     """Add rolling realised volatility to time bars.
 
-    Uses log-range proxy: ln(High) - ln(Low) per bar, then
-    rolling mean over ``ROLLING_VOL_WINDOW`` bars.
+    Uses close-to-close log returns and computes a rolling standard
+    deviation over ``ROLLING_VOL_WINDOW`` bars.
 
     Parameters
     ----------
@@ -190,9 +255,8 @@ def compute_realised_volatility(time_bars: pl.DataFrame) -> pl.DataFrame:
     pl.DataFrame
         Time bars with ``RealisedVol`` column.
     """
-    log_high = (pl.col("High") + 1e-12).log()
-    log_low = (pl.col("Low") + 1e-12).log()
-    vol = (log_high - log_low).rolling_mean(window_size=ROLLING_VOL_WINDOW)
+    log_return = pl.col("Close").log() - pl.col("Close").shift(1).log()
+    vol = log_return.rolling_std(window_size=ROLLING_VOL_WINDOW)
     return time_bars.with_columns(vol.alias("RealisedVol"))
 
 
@@ -222,7 +286,9 @@ def assign_regime_terciles(
         )
     q33, q66 = np.quantile(train_vol, [1 / 3, 2 / 3])
     regime = (
-        pl.when(pl.col("RealisedVol") <= q33)
+        pl.when(pl.col("RealisedVol").is_null())
+        .then(None)
+        .when(pl.col("RealisedVol") <= q33)
         .then(1)
         .when(pl.col("RealisedVol") <= q66)
         .then(2)
@@ -321,11 +387,11 @@ def compute_transition_lags(
     time_col: str,
     regime_col: str = "Regime",
 ) -> np.ndarray:
-    """Lags (in time-bar counts) from time-bar regime transition to chart bar.
+    """Lags from a time-bar regime transition to a confirming chart event.
 
-    For each regime transition in the time-bar series, find the first
-    chart bar at or after that timestamp and record the number of time
-    bars between the transition and the chart bar.
+    A confirming chart event is the first non-reused chart event at or after
+    the transition timestamp whose aligned regime equals the new time-bar
+    regime before the next time-bar regime transition.
 
     Parameters
     ----------
@@ -343,15 +409,29 @@ def compute_transition_lags(
     np.ndarray
         Array of lag values in time-bar counts (empty if no transitions).
     """
+    lags, _, _ = compute_transition_lag_details(
+        chart_df, time_bars, time_col, regime_col
+    )
+    return lags
+
+
+def compute_transition_lag_details(
+    chart_df: pl.DataFrame,
+    time_bars: pl.DataFrame,
+    time_col: str,
+    regime_col: str = "Regime",
+) -> tuple[np.ndarray, int, int]:
+    """Return confirming transition lags plus transition coverage counts."""
     if len(chart_df) <= 1:
-        return np.array([], dtype=float)
+        return np.array([], dtype=float), 0, 0
 
     time_sorted = time_bars.sort("CloseTime").select(["CloseTime", regime_col])
-    chart_sorted = chart_df.sort(time_col).select(time_col)
+    chart_sorted = chart_df.sort(time_col).select([time_col, regime_col])
 
     time_times = time_sorted["CloseTime"].to_numpy()
     time_regimes = time_sorted[regime_col].to_numpy()
     chart_times = chart_sorted[time_col].to_numpy()
+    chart_regimes = chart_sorted[regime_col].to_numpy()
 
     valid_time_mask = np.isfinite(time_regimes.astype(float))
     comparable_pairs = valid_time_mask[1:] & valid_time_mask[:-1]
@@ -359,19 +439,46 @@ def compute_transition_lags(
         comparable_pairs & (time_regimes[1:] != time_regimes[:-1])
     )[0] + 1
     if len(trans_idx) == 0:
-        return np.array([], dtype=float)
+        return np.array([], dtype=float), 0, 0
 
     chart_positions = np.searchsorted(
         chart_times, time_times[trans_idx], side="left"
     )
-    valid_chart_positions = chart_positions < len(chart_times)
-    if not valid_chart_positions.any():
-        return np.array([], dtype=float)
+    in_range = chart_positions < len(chart_times)
 
-    matched_chart_times = chart_times[chart_positions[valid_chart_positions]]
-    matched_time_idx = np.searchsorted(time_times, matched_chart_times, side="left")
-    matched_trans_idx = trans_idx[valid_chart_positions]
-    return (matched_time_idx - matched_trans_idx).astype(float)
+    valid = in_range.copy()
+    valid_positions = chart_positions[in_range]
+    valid_transition_numbers = np.where(in_range)[0]
+    next_transition_times = np.empty(len(valid_transition_numbers), dtype=time_times.dtype)
+    has_next_transition = valid_transition_numbers + 1 < len(trans_idx)
+    next_transition_times[has_next_transition] = time_times[
+        trans_idx[valid_transition_numbers[has_next_transition] + 1]
+    ]
+    next_transition_times[~has_next_transition] = time_times[-1]
+
+    before_next_transition = np.ones(len(valid_positions), dtype=bool)
+    before_next_transition[has_next_transition] = (
+        chart_times[valid_positions[has_next_transition]]
+        < next_transition_times[has_next_transition]
+    )
+    matches_new_regime = (
+        chart_regimes[valid_positions]
+        == time_regimes[trans_idx[valid_transition_numbers]]
+    )
+
+    valid_indices = valid_transition_numbers[
+        before_next_transition & matches_new_regime
+    ]
+    matched_positions = chart_positions[valid_indices]
+    if len(matched_positions) == 0:
+        return np.array([], dtype=float), int(len(trans_idx)), int(len(trans_idx))
+
+    matched_time_idx = np.searchsorted(
+        time_times, chart_times[matched_positions], side="left"
+    )
+    lags = (matched_time_idx - trans_idx[valid_indices]).astype(float)
+    missed = int(len(trans_idx) - len(lags))
+    return lags, int(len(trans_idx)), missed
 
 
 def compute_median_lag_by_instrument(
@@ -450,9 +557,116 @@ def bootstrap_mean_ci(
     )
 
 
+def decide_hypothesis_verdict(
+    instrument_metrics: dict[str, dict[str, dict[str, float]]],
+) -> tuple[str, str, int]:
+    """Apply EXP-002 success/failure criteria to event chart metrics."""
+    valid_instruments = [
+        instrument
+        for instrument in INSTRUMENTS
+        if instrument in instrument_metrics
+        and "LineBreak3" in instrument_metrics[instrument]
+        and "Renko" in instrument_metrics[instrument]
+    ]
+    if len(valid_instruments) < MIN_VALID_INSTRUMENTS:
+        return (
+            "INCONCLUSIVE",
+            f"Only {len(valid_instruments)} valid instruments; "
+            f"{MIN_VALID_INSTRUMENTS} are required.",
+            len(valid_instruments),
+        )
+
+    support_candidates: list[str] = []
+    failure_counts: dict[str, int] = {}
+    for chart_type in ["LineBreak3", "Renko"]:
+        within_bound = 0
+        exceeds_bound = 0
+        for instrument in valid_instruments:
+            metrics = instrument_metrics[instrument][chart_type]
+            hybrid = metrics["HybridRate"]
+            median_lag = metrics["MedianLag"]
+            if (
+                np.isfinite(hybrid)
+                and np.isfinite(median_lag)
+                and hybrid <= HYBRID_RATE_BOUND
+                and median_lag <= MEDIAN_LAG_BOUND
+            ):
+                within_bound += 1
+            if (
+                not np.isfinite(hybrid)
+                or not np.isfinite(median_lag)
+                or hybrid > HYBRID_RATE_BOUND
+                or median_lag > MEDIAN_LAG_BOUND
+            ):
+                exceeds_bound += 1
+        failure_counts[chart_type] = exceeds_bound
+        if within_bound >= MIN_VALID_INSTRUMENTS:
+            support_candidates.append(chart_type)
+
+    if support_candidates:
+        return (
+            "SUPPORTED",
+            "At least one primary event chart type stayed within the "
+            "absolute hybrid-rate and median-lag bounds on "
+            f"{MIN_VALID_INSTRUMENTS}+ instruments: "
+            + ", ".join(support_candidates),
+            len(valid_instruments),
+        )
+
+    if all(
+        failure_counts[chart_type] >= MIN_VALID_INSTRUMENTS
+        for chart_type in ["LineBreak3", "Renko"]
+    ):
+        return (
+            "REFUTED",
+            "LineBreak3 and Renko both exceeded at least one absolute "
+            f"boundary-cost bound on {MIN_VALID_INSTRUMENTS}+ instruments.",
+            len(valid_instruments),
+        )
+
+    return (
+        "INCONCLUSIVE",
+        "Hybrid-rate and median-lag criteria did not consistently support "
+        "or refute the hypothesis.",
+        len(valid_instruments),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Plotting functions
 # ---------------------------------------------------------------------------
+def sample_for_timeline_plot(
+    df: pl.DataFrame,
+    time_col: str,
+    max_rows: int = MAX_TIMELINE_PLOT_ROWS,
+) -> pl.DataFrame:
+    """Return an evenly spaced chronological sample for timeline plotting.
+
+    Parameters
+    ----------
+    df : pl.DataFrame
+        Input DataFrame.
+    time_col : str
+        Timestamp column used for chronological ordering.
+    max_rows : int
+        Maximum rows to return.
+
+    Returns
+    -------
+    pl.DataFrame
+        Chronologically sorted DataFrame with at most ``max_rows`` rows.
+    """
+    sorted_df = df.sort(time_col)
+    if sorted_df.height <= max_rows:
+        return sorted_df
+    indices = np.linspace(0, sorted_df.height - 1, max_rows, dtype=np.int64)
+    return (
+        sorted_df.with_row_index("_plot_idx")
+        .filter(pl.col("_plot_idx").is_in(indices.tolist()))
+        .drop("_plot_idx")
+    )
+
+
 def plot_regime_timeline(
     time_bars: pl.DataFrame,
     chart_events: dict[str, pl.DataFrame],
@@ -477,7 +691,7 @@ def plot_regime_timeline(
     sns.set_theme(style="whitegrid")
     fig, ax = plt.subplots(figsize=(14, 5))
 
-    tb = time_bars.sort("CloseTime").to_pandas()
+    tb = sample_for_timeline_plot(time_bars, "CloseTime").to_pandas()
     ax.fill_between(
         tb["CloseTime"],
         tb["Regime"] - 0.4,
@@ -492,7 +706,7 @@ def plot_regime_timeline(
         if chart_name == "Time":
             continue
         time_col = "SourceCloseTime" if "SourceCloseTime" in cdf.columns else "CloseTime"
-        cdf_pd = cdf.sort(time_col).to_pandas()
+        cdf_pd = sample_for_timeline_plot(cdf, time_col).to_pandas()
         ax.scatter(
             cdf_pd[time_col],
             cdf_pd["Regime"],
@@ -679,6 +893,7 @@ def main() -> None:
     lag_records: list[dict[str, Any]] = []
     improvement_records: list[dict[str, Any]] = []
     bootstrap_records: list[dict[str, Any]] = []
+    input_file_records: dict[str, list[Path]] = {}
 
     instrument_metrics: dict[str, dict[str, dict[str, float]]] = {}
     timeline_events: dict[str, dict[str, pl.DataFrame]] = {}
@@ -687,7 +902,10 @@ def main() -> None:
     for instrument in INSTRUMENTS:
         try:
             print(f"Processing {instrument} ...")
-            analysis_df, source_rows = load_analysis_timebar_data(instrument)
+            analysis_df, source_rows, input_paths = load_analysis_timebar_data(
+                instrument
+            )
+            input_file_records[instrument] = input_paths
             if len(analysis_df) == 0:
                 print(f"  Skipping {instrument}: empty dataset")
                 continue
@@ -701,6 +919,7 @@ def main() -> None:
             analysis_df = compute_realised_volatility(analysis_df)
             train_df = compute_realised_volatility(train_df)
             analysis_df = assign_regime_terciles(analysis_df, train_df)
+            metric_time_bars = analysis_df.drop_nulls(subset=["Regime"])
 
             # Build regime lookup table by timestamp
             regime_table = analysis_df.select(["CloseTime", "Regime"])
@@ -719,6 +938,7 @@ def main() -> None:
 
             for chart_name, config in CHART_CONFIG.items():
                 chart_df = generate_chart(analysis_df, config)
+                generated_rows_before_join = len(chart_df)
 
                 # Add Direction for time bars if missing
                 if config.get("needs_direction"):
@@ -747,15 +967,23 @@ def main() -> None:
                     )
 
                 # Drop rows with missing regime labels
+                rows_before_regime_drop = len(chart_df)
                 chart_df = chart_df.drop_nulls(subset=["Regime"])
+                dropped_regime_rows = rows_before_regime_drop - len(chart_df)
 
                 hybrid = compute_hybrid_rate(
-                    chart_df, analysis_df, config["time_col"]
+                    chart_df, metric_time_bars, config["time_col"]
                 )
-                lags = compute_transition_lags(
-                    chart_df, analysis_df, config["time_col"]
+                lags, transition_count, missed_transitions = (
+                    compute_transition_lag_details(
+                        chart_df, metric_time_bars, config["time_col"]
+                    )
                 )
                 median_lag = float(np.median(lags)) if len(lags) else np.nan
+                p95_lag = (
+                    float(np.quantile(lags, 0.95)) if len(lags) else np.nan
+                )
+                max_lag = float(np.max(lags)) if len(lags) else np.nan
                 n_bars = len(chart_df)
 
                 start_time = (
@@ -778,6 +1006,11 @@ def main() -> None:
                         "TestBars": len(test_df),
                         "HybridRate": hybrid,
                         "MedianLag": median_lag,
+                        "P95Lag": p95_lag,
+                        "MaxLag": max_lag,
+                        "TransitionCount": transition_count,
+                        "MatchedTransitions": len(lags),
+                        "MissedTransitions": missed_transitions,
                     }
                 )
 
@@ -787,7 +1020,15 @@ def main() -> None:
                         "ChartType": chart_name,
                         "SourceRows": source_rows,
                         "AnalysisRows": n_analysis,
+                        "GeneratedRowsBeforeRegimeJoin": generated_rows_before_join,
                         "GeneratedRows": n_bars,
+                        "MatchedRegimeRows": n_bars,
+                        "DroppedRegimeRows": dropped_regime_rows,
+                        "DroppedRegimeRate": (
+                            dropped_regime_rows / rows_before_regime_drop
+                            if rows_before_regime_drop
+                            else 0.0
+                        ),
                         "AnalysisStart": start_time,
                         "AnalysisEnd": end_time,
                     }
@@ -926,6 +1167,21 @@ def main() -> None:
     lag_df = pd.DataFrame(lag_records)
     improvement_df = pd.DataFrame(improvement_records)
     bootstrap_df = pd.DataFrame(bootstrap_records)
+    verdict, verdict_reason, valid_instruments = decide_hypothesis_verdict(
+        instrument_metrics
+    )
+    verdict_df = pd.DataFrame(
+        [
+            {
+                "Verdict": verdict,
+                "Reason": verdict_reason,
+                "ValidInstruments": valid_instruments,
+                "MinimumValidInstruments": MIN_VALID_INSTRUMENTS,
+                "HybridRateBound": HYBRID_RATE_BOUND,
+                "MedianLagBound": MEDIAN_LAG_BOUND,
+            }
+        ]
+    )
 
     summary_df.to_csv(RESULTS_DIR / "summary_metrics.csv", index=False)
     validation_df.to_csv(
@@ -935,17 +1191,53 @@ def main() -> None:
     improvement_df.to_csv(
         RESULTS_DIR / "improvement_vs_time.csv", index=False
     )
+    verdict_df.to_csv(RESULTS_DIR / "hypothesis_verdict.csv", index=False)
     if not bootstrap_df.empty:
         bootstrap_df.to_csv(
             RESULTS_DIR / "bootstrap_results.csv", index=False
         )
+    manifest = {
+        "experiment": "EXP-002",
+        "script": str(Path(__file__).resolve().relative_to(PROJECT_ROOT)),
+        "git_commit": git_commit(),
+        "python": platform.python_version(),
+        "platform": platform.platform(),
+        "package_versions": package_versions(),
+        "analysis_fraction": 0.7,
+        "train_fraction": 0.7,
+        "rolling_vol_window": ROLLING_VOL_WINDOW,
+        "volatility_estimator": "rolling_std_close_to_close_log_return",
+        "bootstrap_seed": BOOTSTRAP_SEED,
+        "n_bootstrap": N_BOOTSTRAP,
+        "thresholds": {
+            "hybrid_rate_bound": HYBRID_RATE_BOUND,
+            "median_lag_bound": MEDIAN_LAG_BOUND,
+        },
+        "chart_config": CHART_CONFIG,
+        "input_files": {
+            instrument: [file_manifest(path) for path in paths]
+            for instrument, paths in input_file_records.items()
+        },
+        "source_files": [
+            file_manifest(Path(__file__).resolve()),
+            file_manifest(SRC_DIR / "linebreak_generator.py"),
+            file_manifest(SRC_DIR / "renko_generator.py"),
+            file_manifest(SRC_DIR / "heiken_ashi_generator.py"),
+            file_manifest(SRC_DIR / "time_alignment.py"),
+        ],
+    }
+    (RESULTS_DIR / "run_manifest.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+    )
 
     print(f"Saved summary_metrics.csv ({len(summary_df)} rows)")
     print(f"Saved validation_table.csv ({len(validation_df)} rows)")
     print(f"Saved lag_data.csv ({len(lag_df)} rows)")
     print(f"Saved improvement_vs_time.csv ({len(improvement_df)} rows)")
+    print(f"Saved hypothesis_verdict.csv: {verdict}")
     if not bootstrap_df.empty:
         print(f"Saved bootstrap_results.csv ({len(bootstrap_df)} rows)")
+    print("Saved run_manifest.json")
 
     # --- Produce visualisations ---
     print("Generating plots ...")

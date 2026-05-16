@@ -127,6 +127,11 @@ Heiken Ashi prices and Renko brick prices are synthetic chart-construction price
 | No magic numbers | Are all thresholds derived from data or documented? |
 | Code quality | PEP 8, docstrings, descriptive names, ~30 line function limit? |
 | Data loading | Is Polars/Parquet used correctly? Are columns properly selected before `collect()`? |
+| Organization | Are imports, path setup, constants, I/O helpers, computation helpers, plotting helpers, orchestration, and `main()` clearly separated? |
+| Import side effects | Does module import avoid creating directories, writing files, loading data, or plotting? |
+| Logging/output | Is manual-run output concise and traceable, with helper functions returning data instead of printing? |
+| Plot memory | Are plot inputs aggregated or sampled before pandas conversion? |
+| Repeated heavy work | Does plotting reuse analysis outputs instead of reloading or regenerating large datasets? |
 | Generator determinism | If chart-type generators are called, are they deterministic? No random seeds? |
 
 ### Audit Report (audit.md)
@@ -184,7 +189,10 @@ Allow up to 2 revision cycles.
 Fundamental, unfixable issues. Examples:
 - Holdout contamination (data from the 30% reserve was used)
 - Look-ahead bias (using data from after the event timestamp when analyzing an event)
-- Synthetic price violation (computing strategy P&L from Heiken Ashi prices or Renko brick prices instead of real prices)
+- Synthetic price violation (computing strategy P&L from Heiken Ashi prices or
+  Renko brick prices instead of real prices; `HAClose` diagnostic returns are
+  allowed only for explicitly scoped HA distortion experiments that label them
+  non-tradable)
 - Bar-index alignment (comparing chart types by bar index instead of timestamp)
 - Scope creep beyond what can be fixed with revision
 - Method fundamentally violates core constraints (e.g., assumes normality with no cross-validation)

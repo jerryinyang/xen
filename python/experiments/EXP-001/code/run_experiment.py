@@ -3,7 +3,12 @@ Experiment EXP-001: Information Density & Ghost Bar Comparison
 Implements the analysis plan from analysis-plan.md.
 """
 import sys
+import hashlib
+import json
+import platform
+import subprocess
 from pathlib import Path
+from importlib import metadata
 
 PYTHON_ROOT = Path(__file__).resolve().parents[3]
 PROJECT_ROOT = PYTHON_ROOT.parent
@@ -76,12 +81,73 @@ TRAIN_FRACTION = 0.7
 MIN_VALID_INSTRUMENTS = 3
 GHOST_REDUCTION_THRESHOLD = 0.25
 ENTROPY_HEADROOM_THRESHOLD = 0.50
+ABS_ENTROPY_GAIN_THRESHOLD = 0.005
 PRIMARY_EVENT_TYPES = ["LineBreak3", "Renko"]
+PACKAGE_NAMES = ["numpy", "pandas", "polars", "matplotlib", "seaborn"]
 
 # ---------------------------------------------------------------------------
 # Data loading
 # ---------------------------------------------------------------------------
-def load_analysis_timebar_data(instrument: str) -> tuple[pl.DataFrame, int]:
+def instrument_timebar_paths(instrument: str) -> list[Path]:
+    """Return all matching time-bar files for an instrument."""
+    pattern = f"timebars/timebars_{instrument.lower()}_*.parquet"
+    matches = sorted(DATA_DIR.glob(pattern))
+    if not matches:
+        raise FileNotFoundError(
+            f"No time-bar file found for {instrument} matching {pattern}"
+        )
+    return matches
+
+
+def sha256_file(path: Path) -> str:
+    """Return the SHA-256 digest for a file."""
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def git_commit() -> str | None:
+    """Return the current git commit, if available."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=PROJECT_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except Exception:
+        return None
+    return result.stdout.strip()
+
+
+def package_versions() -> dict[str, str]:
+    """Return versions for runtime packages used by this experiment."""
+    versions: dict[str, str] = {}
+    for package_name in PACKAGE_NAMES:
+        try:
+            versions[package_name] = metadata.version(package_name)
+        except metadata.PackageNotFoundError:
+            versions[package_name] = "not-installed"
+    return versions
+
+
+def file_manifest(path: Path) -> dict[str, Any]:
+    """Return reproducibility metadata for an input or source file."""
+    stat = path.stat()
+    return {
+        "path": str(path.relative_to(PROJECT_ROOT)),
+        "size_bytes": stat.st_size,
+        "mtime_ns": stat.st_mtime_ns,
+        "sha256": sha256_file(path),
+    }
+
+
+def load_analysis_timebar_data(
+    instrument: str,
+) -> tuple[pl.DataFrame, int, list[Path]]:
     """Load only the non-holdout analysis rows for an instrument.
 
     The full row count is read through the lazy plan to define the mandatory
@@ -94,22 +160,17 @@ def load_analysis_timebar_data(instrument: str) -> tuple[pl.DataFrame, int]:
 
     Returns
     -------
-    tuple[pl.DataFrame, int]
-        Analysis-set time bars and the analysis row cutoff.
+    tuple[pl.DataFrame, int, list[Path]]
+        Analysis-set time bars, the analysis row cutoff, and input paths.
     """
-    pattern = f"timebars/timebars_{instrument.lower()}_*.parquet"
-    matches = sorted(DATA_DIR.glob(pattern))
-    if not matches:
-        raise FileNotFoundError(
-            f"No time-bar file found for {instrument} matching {pattern}"
-        )
+    matches = instrument_timebar_paths(instrument)
     scan = pl.scan_parquet(matches).sort("CloseTime")
     total_rows = int(scan.select(pl.len()).collect().item())
     analysis_rows = int(total_rows * ANALYSIS_FRACTION)
     if analysis_rows <= 0:
-        return pl.DataFrame(), analysis_rows
+        return pl.DataFrame(), analysis_rows, matches
     analysis_df = scan.slice(0, analysis_rows).collect()
-    return analysis_df, analysis_rows
+    return analysis_df, analysis_rows, matches
 
 
 def train_cutoff_time(df: pl.DataFrame) -> Any:
@@ -251,6 +312,18 @@ def compute_ghost_rate_event(df: pl.DataFrame, min_tick: float) -> float:
     mask = close_diff < min_tick
     mask = mask.fill_null(False)
     return float(mask.mean())
+
+
+def distinct_source_rows(df: pl.DataFrame, time_col: str) -> pl.DataFrame:
+    """Keep the first row per source timestamp for sensitivity metrics."""
+    if time_col != "SourceCloseTime" or time_col not in df.columns:
+        return df
+    if len(df) == 0:
+        return df
+    return df.sort(time_col).filter(
+        pl.col(time_col).shift(1).is_null()
+        | (pl.col(time_col) != pl.col(time_col).shift(1))
+    )
 
 
 def compute_ghost_rate(
@@ -504,6 +577,10 @@ def decide_hypothesis_verdict(
     for chart_type in PRIMARY_EVENT_TYPES:
         chart_rows = primary[primary["ChartType"] == chart_type]
         meets_count = int(chart_rows["MeetsBothThresholds"].sum())
+        ghost_positive_count = int(chart_rows["MeetsGhostThreshold"].sum())
+        entropy_positive_count = int(
+            chart_rows["MeetsEntropyPracticalThreshold"].sum()
+        )
         ghost_ci = bootstrap_df[
             (bootstrap_df["Comparison"] == f"{chart_type} vs Time")
             & (bootstrap_df["Metric"] == "GhostRateReduction")
@@ -522,11 +599,19 @@ def decide_hypothesis_verdict(
             and bool(entropy_ci.iloc[0]["CI_Excludes_Zero"])
             and float(entropy_ci.iloc[0]["MeanDiff"]) > 0
         )
+        entropy_practical_mean = (
+            not entropy_ci.empty
+            and float(entropy_ci.iloc[0]["MeanDiff"])
+            >= ABS_ENTROPY_GAIN_THRESHOLD
+        )
 
         if (
             meets_count >= MIN_VALID_INSTRUMENTS
+            and ghost_positive_count >= MIN_VALID_INSTRUMENTS
+            and entropy_positive_count >= MIN_VALID_INSTRUMENTS
             and ghost_ci_positive
             and entropy_ci_positive
+            and entropy_practical_mean
         ):
             support_candidates.append(chart_type)
         if meets_count >= 2 and ghost_ci_positive and entropy_ci_positive:
@@ -535,9 +620,10 @@ def decide_hypothesis_verdict(
     if support_candidates:
         return (
             "SUPPORTED",
-            "At least one primary event chart type met both thresholds on "
-            f"{MIN_VALID_INSTRUMENTS}+ instruments with positive bootstrap "
-            "intervals excluding zero: "
+            "At least one primary event chart type met the ghost-rate, "
+            "entropy-headroom, and absolute entropy-gain thresholds on "
+            f"{MIN_VALID_INSTRUMENTS}+ instruments, with positive descriptive "
+            "bootstrap summaries: "
             + ", ".join(support_candidates),
         )
     if refuted_by_all:
@@ -761,19 +847,23 @@ def main() -> None:
 
     summary_records: list[dict[str, Any]] = []
     validation_records: list[dict[str, Any]] = []
+    sensitivity_records: list[dict[str, Any]] = []
     movement_records: list[dict[str, Any]] = []
     daily_counts_eurusd: dict[str, pd.DataFrame] = {}
     failure_records: list[dict[str, str]] = []
+    input_file_records: dict[str, list[Path]] = {}
 
     instrument_ghost: dict[str, dict[str, float]] = {}
     instrument_entropy: dict[str, dict[str, float]] = {}
+    instrument_entropy_distinct: dict[str, dict[str, float]] = {}
 
     for instrument in INSTRUMENTS:
         try:
             print(f"Processing {instrument} ...")
-            analysis_df, analysis_cutoff = load_analysis_timebar_data(
+            analysis_df, analysis_cutoff, input_paths = load_analysis_timebar_data(
                 instrument
             )
+            input_file_records[instrument] = input_paths
             if len(analysis_df) == 0:
                 print(f"  Skipping {instrument}: empty dataset")
                 failure_records.append(
@@ -790,6 +880,7 @@ def main() -> None:
 
             instrument_ghost[instrument] = {}
             instrument_entropy[instrument] = {}
+            instrument_entropy_distinct[instrument] = {}
 
             for chart_name, config in CHART_CONFIG.items():
                 chart_df = generate_chart(analysis_df, config)
@@ -855,6 +946,38 @@ def main() -> None:
                 )
                 cv_by_tercile = compute_cv_by_tercile(movements, terciles)
 
+                distinct_chart = distinct_source_rows(
+                    chart_df, config["time_col"]
+                ).sort(config["time_col"])
+                distinct_movements = (
+                    distinct_chart[close_col]
+                    .diff()
+                    .abs()
+                    .drop_nulls()
+                    .to_numpy()
+                )
+                distinct_entropy = directional_entropy(
+                    distinct_chart["Direction"]
+                )
+                distinct_median_movement = (
+                    float(np.median(distinct_movements))
+                    if len(distinct_movements) > 0
+                    else np.nan
+                )
+                sensitivity_records.append(
+                    {
+                        "Instrument": instrument,
+                        "ChartType": chart_name,
+                        "RawRows": n_bars,
+                        "DistinctSourceRows": len(distinct_chart),
+                        "DirectionalEntropyDistinctSource": distinct_entropy,
+                        "MedianAbsMovementDistinctSource": distinct_median_movement,
+                        "RowsDroppedAsSameSourceDuplicates": (
+                            n_bars - len(distinct_chart)
+                        ),
+                    }
+                )
+
                 train_bars, test_bars = split_counts_by_time(
                     chart_df, config["time_col"], train_end_time
                 )
@@ -878,6 +1001,9 @@ def main() -> None:
 
                 instrument_ghost[instrument][chart_name] = ghost
                 instrument_entropy[instrument][chart_name] = entropy
+                instrument_entropy_distinct[instrument][
+                    chart_name
+                ] = distinct_entropy
 
                 start_time = (
                     chart_df[config["time_col"]].min()
@@ -960,12 +1086,12 @@ def main() -> None:
         )
         entropy_diffs = np.array(
             [
-                instrument_entropy[inst][event_type]
-                - instrument_entropy[inst]["Time"]
+                instrument_entropy_distinct[inst][event_type]
+                - instrument_entropy_distinct[inst]["Time"]
                 for inst in INSTRUMENTS
-                if inst in instrument_entropy
-                and "Time" in instrument_entropy[inst]
-                and event_type in instrument_entropy[inst]
+                if inst in instrument_entropy_distinct
+                and "Time" in instrument_entropy_distinct[inst]
+                and event_type in instrument_entropy_distinct[inst]
             ]
         )
 
@@ -1006,36 +1132,48 @@ def main() -> None:
                 inst not in instrument_ghost
                 or "Time" not in instrument_ghost[inst]
                 or event_type not in instrument_ghost[inst]
-                or inst not in instrument_entropy
-                or "Time" not in instrument_entropy[inst]
-                or event_type not in instrument_entropy[inst]
+                or inst not in instrument_entropy_distinct
+                or "Time" not in instrument_entropy_distinct[inst]
+                or event_type not in instrument_entropy_distinct[inst]
             ):
                 continue
             time_ghost = instrument_ghost[inst]["Time"]
             event_ghost = instrument_ghost[inst][event_type]
-            time_entropy = instrument_entropy[inst]["Time"]
-            event_entropy = instrument_entropy[inst][event_type]
+            time_entropy = instrument_entropy_distinct[inst]["Time"]
+            event_entropy = instrument_entropy_distinct[inst][event_type]
             ghost_reduction = relative_change(
                 time_ghost - event_ghost, time_ghost
             )
+            entropy_increase = event_entropy - time_entropy
             entropy_capture = entropy_headroom_capture(event_entropy, time_entropy)
             meets_ghost = (
                 np.isfinite(ghost_reduction)
                 and ghost_reduction >= GHOST_REDUCTION_THRESHOLD
             )
-            meets_entropy = (
+            meets_entropy_headroom = (
                 np.isfinite(entropy_capture)
                 and entropy_capture >= ENTROPY_HEADROOM_THRESHOLD
+            )
+            meets_entropy_practical = (
+                np.isfinite(entropy_increase)
+                and entropy_increase >= ABS_ENTROPY_GAIN_THRESHOLD
             )
             threshold_records.append(
                 {
                     "Instrument": inst,
                     "ChartType": event_type,
                     "GhostReductionRelative": ghost_reduction,
+                    "EntropyIncreaseAbsolute": entropy_increase,
                     "EntropyHeadroomCapture": entropy_capture,
+                    "EntropyComparisonBasis": "distinct_source_for_event_charts",
                     "MeetsGhostThreshold": meets_ghost,
-                    "MeetsEntropyHeadroomThreshold": meets_entropy,
-                    "MeetsBothThresholds": meets_ghost and meets_entropy,
+                    "MeetsEntropyHeadroomThreshold": meets_entropy_headroom,
+                    "MeetsEntropyPracticalThreshold": meets_entropy_practical,
+                    "MeetsBothThresholds": (
+                        meets_ghost
+                        and meets_entropy_headroom
+                        and meets_entropy_practical
+                    ),
                     "PrimaryForVerdict": event_type in PRIMARY_EVENT_TYPES,
                 }
             )
@@ -1043,6 +1181,7 @@ def main() -> None:
     # --- Save machine-readable results ---
     summary_df = pd.DataFrame(summary_records)
     validation_df = pd.DataFrame(validation_records)
+    sensitivity_df = pd.DataFrame(sensitivity_records)
     bootstrap_df = pd.DataFrame(bootstrap_records)
     threshold_df = pd.DataFrame(threshold_records)
     failures_df = pd.DataFrame(failure_records)
@@ -1066,6 +1205,9 @@ def main() -> None:
     validation_df.to_csv(
         RESULTS_DIR / "validation_table.csv", index=False
     )
+    sensitivity_df.to_csv(
+        RESULTS_DIR / "distinct_source_sensitivity.csv", index=False
+    )
     bootstrap_df.to_csv(
         RESULTS_DIR / "bootstrap_results.csv", index=False
     )
@@ -1076,14 +1218,51 @@ def main() -> None:
     failures_df.to_csv(
         RESULTS_DIR / "instrument_failures.csv", index=False
     )
+    manifest = {
+        "experiment": "EXP-001",
+        "script": str(Path(__file__).resolve().relative_to(PROJECT_ROOT)),
+        "git_commit": git_commit(),
+        "python": platform.python_version(),
+        "platform": platform.platform(),
+        "package_versions": package_versions(),
+        "analysis_fraction": ANALYSIS_FRACTION,
+        "train_fraction": TRAIN_FRACTION,
+        "bootstrap_seed": BOOTSTRAP_SEED,
+        "n_bootstrap": N_BOOTSTRAP,
+        "thresholds": {
+            "ghost_reduction": GHOST_REDUCTION_THRESHOLD,
+            "entropy_headroom": ENTROPY_HEADROOM_THRESHOLD,
+            "absolute_entropy_gain": ABS_ENTROPY_GAIN_THRESHOLD,
+        },
+        "chart_config": CHART_CONFIG,
+        "input_files": {
+            instrument: [file_manifest(path) for path in paths]
+            for instrument, paths in input_file_records.items()
+        },
+        "source_files": [
+            file_manifest(Path(__file__).resolve()),
+            file_manifest(SRC_DIR / "linebreak_generator.py"),
+            file_manifest(SRC_DIR / "renko_generator.py"),
+            file_manifest(SRC_DIR / "heiken_ashi_generator.py"),
+            file_manifest(SRC_DIR / "time_alignment.py"),
+        ],
+    }
+    (RESULTS_DIR / "run_manifest.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+    )
 
     print(f"Saved summary_metrics.csv ({len(summary_df)} rows)")
     print(f"Saved validation_table.csv ({len(validation_df)} rows)")
+    print(
+        "Saved distinct_source_sensitivity.csv "
+        f"({len(sensitivity_df)} rows)"
+    )
     print(f"Saved bootstrap_results.csv ({len(bootstrap_df)} rows)")
     print(
         f"Saved threshold_evaluation.csv ({len(threshold_df)} rows)"
     )
     print(f"Saved hypothesis_verdict.csv: {verdict}")
+    print("Saved run_manifest.json")
     if not failures_df.empty:
         print(f"Saved instrument_failures.csv ({len(failures_df)} rows)")
 

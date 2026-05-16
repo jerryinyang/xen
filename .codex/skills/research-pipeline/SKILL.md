@@ -91,10 +91,19 @@ Invoke `experiment-developer` with the approved scope and analysis plan.
 
 Expected artifact: `python/experiments/<ID>/code/run_experiment.py`.
 
+Require the implementation response to include a code-standards self-check
+against `experiment-developer/references/code-conventions.md`, specifically:
+organization, lazy loading and holdout exclusion, bounded plotting/data
+conversion, concise logging/output, zero-baseline handling, duplicate-source
+event denominators, and synthetic-price discipline.
+
 Before approving implementation, verify that the code follows the project code
-conventions: lazy chronological holdout slicing, bounded memory use, concise
-logging, no silent deduplication, no full-data collection before holdout
-exclusion, and finite handling for zero-baseline metrics.
+conventions: imports before path setup and constants, output directories created
+only in orchestration, lazy chronological holdout slicing, bounded memory use,
+concise logging, no silent deduplication, no full-data collection before
+holdout exclusion, no repeated heavy loads/generation for plotting when the
+analysis pass already has the data, and finite handling for zero-baseline
+metrics.
 
 ## Stage 4: Pre-Execution Governance
 
@@ -102,9 +111,14 @@ Review `scope.md`, `analysis-plan.md`, and `code/run_experiment.py` against the 
 If needed, locate the file ending with `/research-pipeline/references/governance-constraints.md`.
 
 Also review the implementation against the developer code conventions and the
-active checkpoint `design.md`. Scope criteria that are mathematically
-unattainable, compare percentage improvement against a zero baseline, or leave
-event-chart duplicate timestamp denominators undefined must receive `REVISE`.
+active checkpoint `design.md`. Code that creates output directories at import
+time, reads or materializes large inputs before the holdout split, converts full
+large analysis sets to pandas for plotting, silently deduplicates loader rows,
+uses noisy helper-level `print()` output, repeats heavy data loads for plots, or
+does not define duplicate-source event denominators must receive `REVISE`.
+Scope criteria that are mathematically unattainable, compare percentage
+improvement against a zero baseline, or leave event-chart duplicate timestamp
+denominators undefined must also receive `REVISE`.
 
 Write `python/experiments/<ID>/governance/pre-execution-review.md` with one verdict:
 
@@ -207,8 +221,15 @@ Report: python/experiments/<ID>/report.md
 - Respect the scope's filtering and time range boundaries.
 - Do not expand scope after approval. Create a new experiment for follow-up questions.
 - Flag phase misalignment with checkpoint objectives before proceeding.
-- For Heiken Ashi experiments: never compute returns from HA prices. Always use `RealOpen/RealHigh/RealLow/RealClose` for return evaluation.
-- For Renko strategy experiments: never compute P&L from brick prices. Use `SourceCloseTime` to align each signal to real time-bar prices.
+- For Heiken Ashi strategy, signal-quality, or return-evaluation experiments:
+  never compute returns from HA prices. Always use
+  `RealOpen/RealHigh/RealLow/RealClose` for return evaluation.
+- HA synthetic-price distortion experiments may compute `HAClose`-based
+  diagnostic returns only when the approved scope explicitly says the metric is
+  non-tradable synthetic-price distortion and no P&L or signal validation uses
+  those returns.
+- For Renko strategy experiments: never compute P&L from brick prices. Use
+  `SourceCloseTime` to align each signal to real time-bar prices.
 - For chart-type comparisons: always align by timestamp, never by bar count.
 
 ## References

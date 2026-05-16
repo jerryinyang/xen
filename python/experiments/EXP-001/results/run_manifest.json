@@ -1,0 +1,132 @@
+{
+  "analysis_fraction": 0.7,
+  "bootstrap_seed": 42,
+  "chart_config": {
+    "HeikenAshi": {
+      "close_col": "RealClose",
+      "generator": "heiken_ashi",
+      "ghost_fn": "heiken_ashi",
+      "params": {},
+      "time_col": "CloseTime"
+    },
+    "LineBreak3": {
+      "close_col": null,
+      "generator": "linebreak",
+      "ghost_fn": "event",
+      "params": {
+        "level": 3
+      },
+      "time_col": "SourceCloseTime"
+    },
+    "LineBreak5": {
+      "close_col": null,
+      "generator": "linebreak",
+      "ghost_fn": "event",
+      "params": {
+        "level": 5
+      },
+      "time_col": "SourceCloseTime"
+    },
+    "Renko": {
+      "close_col": null,
+      "generator": "renko",
+      "ghost_fn": "event",
+      "params": {
+        "atr_period": 14
+      },
+      "time_col": "SourceCloseTime"
+    },
+    "Time": {
+      "close_col": "Close",
+      "generator": null,
+      "ghost_fn": "timebar",
+      "params": {},
+      "time_col": "CloseTime"
+    }
+  },
+  "experiment": "EXP-001",
+  "git_commit": "0a9c6c05df42ac60811e1bafa58e4b5f194368a0",
+  "input_files": {
+    "BTCUSD": [
+      {
+        "mtime_ns": 1778791098592825179,
+        "path": "data/timebars/timebars_btcusd_20230102_000000_20260514_203813.parquet",
+        "sha256": "ff66db519c60307a955f78fc0206b7afd6a7be9d66e017123ef412f0577c9fb5",
+        "size_bytes": 22481929
+      }
+    ],
+    "EURUSD": [
+      {
+        "mtime_ns": 1778790814960153272,
+        "path": "data/timebars/timebars_eurusd_20230102_000000_20260514_203330.parquet",
+        "sha256": "dc772eb602f0f5b7542be1582435724ca3b996eb4e105fa03439c540ddc138f1",
+        "size_bytes": 13387398
+      }
+    ],
+    "USTEC": [
+      {
+        "mtime_ns": 1778791454627649977,
+        "path": "data/timebars/timebars_ustec_20230102_230000_20260514_204410.parquet",
+        "sha256": "271566308b0367f5eb12b607a0f599b0121ced8d6c498881f219b41b47c9807b",
+        "size_bytes": 12993748
+      }
+    ],
+    "XAUUSD": [
+      {
+        "mtime_ns": 1778791312041603588,
+        "path": "data/timebars/timebars_xauusd_20230102_230200_20260514_204148.parquet",
+        "sha256": "eba7d3344404de28737f575355457b3751c23c3bcea6ecdb5c076a31171d0d83",
+        "size_bytes": 13742353
+      }
+    ]
+  },
+  "n_bootstrap": 10000,
+  "package_versions": {
+    "matplotlib": "3.10.9",
+    "numpy": "2.4.4",
+    "pandas": "3.0.3",
+    "polars": "1.40.1",
+    "seaborn": "0.13.2"
+  },
+  "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+  "python": "3.13.1",
+  "script": "python/experiments/EXP-001/code/run_experiment.py",
+  "source_files": [
+    {
+      "mtime_ns": 1778840524995144062,
+      "path": "python/experiments/EXP-001/code/run_experiment.py",
+      "sha256": "a8f12c2df7c660d21cfe61c03f4fcf73cc3b671ab7c274104d0f804bcac370dd",
+      "size_bytes": 43371
+    },
+    {
+      "mtime_ns": 1778789211039081510,
+      "path": "python/src/linebreak_generator.py",
+      "sha256": "85c78378d0ed614748a5d66410ce4251a4aaafc92b3b26ec3a7534ef6a7c9473",
+      "size_bytes": 3408
+    },
+    {
+      "mtime_ns": 1778789211094956510,
+      "path": "python/src/renko_generator.py",
+      "sha256": "758cac7e476990881948926c8c85923c9c8c81c391d1c56fff0558949d18231e",
+      "size_bytes": 4016
+    },
+    {
+      "mtime_ns": 1778789210980106947,
+      "path": "python/src/heiken_ashi_generator.py",
+      "sha256": "9782582fae8013f1621a6621914f362a85f8c46feafb3eebc471c795d04adc75",
+      "size_bytes": 2594
+    },
+    {
+      "mtime_ns": 1778799853053187688,
+      "path": "python/src/time_alignment.py",
+      "sha256": "52dc3e2208e2852994193dbacefc34eed3f414cc796e2bdb47f574be6056f823",
+      "size_bytes": 824
+    }
+  ],
+  "thresholds": {
+    "absolute_entropy_gain": 0.005,
+    "entropy_headroom": 0.5,
+    "ghost_reduction": 0.25
+  },
+  "train_fraction": 0.7
+}

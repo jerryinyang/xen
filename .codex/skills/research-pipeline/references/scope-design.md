@@ -72,7 +72,8 @@ If an experiment needs more than these limits, **split it into multiple experime
 ### Common Exclusions
 
 Always consider excluding:
-- Heiken Ashi HA prices from return calculations (use RealClose only)
+- Heiken Ashi HA prices from strategy/P&L/signal-return calculations (use
+  RealClose only)
 - Low-activity periods where chart-type generators produce very few bars
 - Specific sessions or time periods with known data anomalies
 - The final 30% global holdout (always — non-negotiable)
@@ -81,7 +82,11 @@ Always consider excluding:
 ### Phantom Price Considerations
 
 For any experiment involving Heiken Ashi:
-- **Mandatory**: All return metrics use `RealClose` (or time-bar `Close`), never `HAClose`
+- **Mandatory**: Strategy/P&L/signal-return metrics use `RealClose` (or
+  time-bar `Close`), never `HAClose`
+- **Allowed only for HA distortion scopes**: `HAClose` returns may be measured
+  as non-tradable synthetic-price distortion diagnostics when the scope says so
+  explicitly and compares them against real prices at identical `CloseTime`
 - **Mandatory**: Report synthetic-to-real price ratio: how much does HA smooth vs real prices
 - **Mandatory**: Document whether HA is used for signals only (acceptable) or for P&L (prohibited)
 

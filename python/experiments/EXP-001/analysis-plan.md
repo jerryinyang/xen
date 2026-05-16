@@ -16,19 +16,19 @@ Determine whether Line Break and Renko provide more information-dense bars than 
 
 ### Step 2: Compute Information-Density Metrics
 
-- **Method**: Descriptive statistics for bar count, bars per day, ghost rate, directional entropy, directional-entropy headroom capture, median absolute real-price movement per bar, and coefficient of variation by volatility tercile.
+- **Method**: Descriptive statistics for bar count, bars per day, ghost rate, directional entropy, directional-entropy headroom capture, absolute entropy gain, median absolute real-price movement per bar, coefficient of variation by volatility tercile, and distinct-source sensitivity metrics for event charts.
 - **Why this method**: The experiment is a characterisation task; simple descriptive metrics answer the question without model assumptions.
 - **Simpler alternative considered**: Bar count alone. It does not distinguish useful compression from empty or low-information bars.
 - **Assumptions**: Volatility terciles are derived only from the time-bar analysis set and then applied by timestamp; observations are temporally dependent, so the plan reports effect sizes and uncertainty rather than assuming independent rows.
-- **Expected output**: Per-instrument and pooled summary tables.
+- **Expected output**: Per-instrument and pooled summary tables, plus a distinct-source sensitivity table for event-chart entropy and real-price movement metrics.
 
 ### Step 3: Compare Event-Based Types With Time Bars
 
-- **Method**: Paired instrument-level bootstrap confidence intervals for ghost-rate reduction and entropy increase, plus a sign-count summary across instruments.
+- **Method**: Paired instrument-level effect sizes for ghost-rate reduction, entropy-headroom capture, and absolute entropy gain, plus sign-count summaries across instruments and descriptive bootstrap confidence intervals. Verdict entropy comparisons use distinct-source event rows; raw chart-row entropy remains in `summary_metrics.csv`.
 - **Why this method**: Four instruments are too few for strong parametric inference; paired bootstrap intervals and sign counts are transparent and distribution-light.
 - **Simpler alternative considered**: A t-test on instrument-level differences. It adds an unjustified normality assumption for very small n.
 - **Assumptions**: Instruments are treated as the primary comparison units; bootstrap results are descriptive uncertainty estimates, not proof of independent market behavior.
-- **Expected output**: Effect-size table with bootstrap 95% intervals and support/refutation flags.
+- **Expected output**: Effect-size table with practical-threshold flags, bootstrap 95% intervals, support/refutation flags, and a run manifest recording input data and code provenance.
 
 ## Visualisations
 
@@ -39,8 +39,8 @@ Determine whether Line Break and Renko provide more information-dense bars than 
 
 ## Interpretation Guide
 
-- If Line Break or Renko reduces ghost rate by at least 25% and captures at least 50% of remaining entropy headroom on at least 3 instruments with intervals excluding zero, the hypothesis is supported.
-- If improvements occur in only 1 instrument or confidence intervals include zero across all event-based types, the hypothesis is refuted.
+- If Line Break or Renko reduces ghost rate by at least 25%, captures at least 50% of remaining entropy headroom, and increases distinct-source directional entropy by at least 0.005 bits on at least 3 instruments, the hypothesis is supported. Bootstrap intervals are reported as descriptive consistency checks, not as standalone proof.
+- If improvements meet all three practical thresholds on fewer than 2 instruments for every primary event chart type, the hypothesis is refuted.
 - If results differ by instrument class or effects are consistent but below threshold, the result is inconclusive and should guide narrower Phase 2 scopes.
 
 ## Complexity Check
@@ -63,6 +63,7 @@ Determine whether Line Break and Renko provide more information-dense bars than 
 - Heiken Ashi movement metrics use `RealClose`, not `HAClose`.
 - Renko and Line Break movement metrics use `SourceCloseTime`-aligned time-bar closes, not construction closes for return-like quantities.
 - For event ghost-rate denominators, exclude repeated `SourceCloseTime` rows emitted from the same source bar so Renko multi-brick construction does not create artificial zero-real-movement ghosts.
+- Emit distinct-source sensitivity metrics for event-chart entropy and real-price movement so same-source construction artifacts remain visible.
 
 ### Bar Density Differences
 

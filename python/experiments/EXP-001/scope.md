@@ -2,7 +2,7 @@
 
 ## Hypothesis
 
-Line Break and Renko event bars have higher information density than 1-minute time bars on at least 3 of 4 instruments, measured as lower ghost rate and better use of remaining directional-entropy headroom. Heiken Ashi is included as a smoothed time-bar transformation but is not expected to reduce bar count.
+Line Break and Renko event bars have higher information density than 1-minute time bars on at least 3 of 4 instruments, measured as lower ghost rate, better use of remaining directional-entropy headroom, and a practical absolute entropy gain. Heiken Ashi is included as a smoothed time-bar transformation but is not expected to reduce bar count.
 
 ## Question
 
@@ -21,9 +21,9 @@ Which Phase 1 chart types spend fewer bars on economically empty movement, and h
 
 ## Success / Failure Criteria
 
-- **Evidence FOR**: On at least 3 instruments, Line Break level 3 or Renko ATR-14 has ghost rate at least 25% lower than time bars and captures at least 50% of the remaining directional-entropy headroom toward the binary maximum of 1.0, with bootstrap 95% confidence intervals for the paired instrument-level differences excluding zero.
-- **Evidence AGAINST**: Fewer than 2 instruments meet both improvement thresholds, or bootstrap intervals include zero for all event-based chart types.
-- **Inconclusive**: Improvements are directionally consistent but below threshold, confidence intervals overlap zero, or valid data volume is insufficient for at least 3 instruments.
+- **Evidence FOR**: On at least 3 instruments, Line Break level 3 or Renko ATR-14 has ghost rate at least 25% lower than time bars, captures at least 50% of the remaining directional-entropy headroom toward the binary maximum of 1.0, and increases directional entropy by at least 0.005 bits. Event-chart entropy comparisons for this verdict use distinct `SourceCloseTime` rows so same-source Renko construction artifacts do not drive the threshold. Bootstrap summaries are descriptive consistency checks and are not sufficient on their own to support the hypothesis.
+- **Evidence AGAINST**: Fewer than 2 instruments meet the ghost-rate, entropy-headroom, and absolute entropy-gain thresholds for every primary event chart type.
+- **Inconclusive**: Improvements are directionally consistent but below practical thresholds, bootstrap summaries disagree with the instrument-level effects, or valid data volume is insufficient for at least 3 instruments.
 
 ## Complexity Budget
 
@@ -33,7 +33,7 @@ Which Phase 1 chart types spend fewer bars on economically empty movement, and h
 
 ## Data Requirements
 
-Load each instrument's 1-minute time-bar Parquet data, sort by `CloseTime`, apply the 70% analysis cutoff before any chart generation, then generate Line Break, Renko, and Heiken Ashi from the analysis set only. Define ghost bars consistently before execution: for time bars and Heiken Ashi, near-zero real range or absolute close-to-close movement below one instrument-specific minimum observed non-zero tick increment proxy; for Line Break and Renko, zero real-price movement between adjacent distinct `SourceCloseTime`-aligned closes. When an event generator emits multiple rows with the same `SourceCloseTime`, exclude same-source duplicate rows from the ghost-rate denominator rather than counting construction artifacts as market ghosts.
+Load each instrument's 1-minute time-bar Parquet data, sort by `CloseTime`, apply the 70% analysis cutoff before any chart generation, then generate Line Break, Renko, and Heiken Ashi from the analysis set only. Define ghost bars consistently before execution: for time bars and Heiken Ashi, near-zero real range or absolute close-to-close movement below one instrument-specific minimum observed non-zero tick increment proxy; for Line Break and Renko, zero real-price movement between adjacent distinct `SourceCloseTime`-aligned closes. When an event generator emits multiple rows with the same `SourceCloseTime`, exclude same-source duplicate rows from the ghost-rate denominator rather than counting construction artifacts as market ghosts, and emit distinct-source sensitivity metrics for entropy and real-price movement so construction artifacts remain auditable.
 
 ### Standard Loading Pattern
 
@@ -51,4 +51,4 @@ bars = scan.slice(0, int(total_rows * 0.7)).collect()
 
 ## Suggested Direction
 
-Produce per-instrument, per-chart-type summary tables for bar count, bars per day, ghost rate, directional entropy, and real-price movement per bar. Compare event-based chart types to time bars using paired instrument-level effect sizes and bootstrap confidence intervals.
+Produce per-instrument, per-chart-type summary tables for bar count, bars per day, ghost rate, directional entropy, real-price movement per bar, distinct-source sensitivity metrics, and a reproducibility manifest. Compare event-based chart types to time bars using paired instrument-level effect sizes, sign counts, and descriptive bootstrap confidence intervals.

@@ -66,7 +66,13 @@ Create `python/experiments/<ID>/results.md`.
 - Do not add methods outside the approved scope without routing back to the pipeline.
 - Prefer robust, explainable analyses over complex modeling.
 - Be explicit when assumptions are weak or violated.
-- Never compute strategy P&L from synthetic chart prices. Heiken Ashi returns use RealOpen/RealHigh/RealLow/RealClose; Renko and Line Break signals align through SourceCloseTime to real time-bar prices.
+- Never compute strategy P&L from synthetic chart prices. Heiken Ashi strategy,
+  signal-quality, and return-evaluation metrics use
+  RealOpen/RealHigh/RealLow/RealClose; Renko and Line Break signals align
+  through SourceCloseTime to real time-bar prices.
+- For explicitly scoped Heiken Ashi synthetic-price distortion diagnostics,
+  `HAClose` returns may be planned only as non-tradable diagnostic metrics and
+  must be compared against real prices at identical `CloseTime`.
 - Align cross-chart-type comparisons by timestamp (CloseTime/SourceCloseTime), never by bar index.
 - Acknowledge that different chart types produce different numbers of bars for the same time period.
 

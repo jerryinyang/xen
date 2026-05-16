@@ -260,9 +260,15 @@ style reference. Current expectations:
 - Use concise progress logging. Prefer `logging.getLogger(__name__)` for new
   code; `print()` is acceptable only for short manual-run summaries in legacy
   experiment scripts.
+- Resolve input files dynamically from `DATA_DIR` unless the approved scope
+  pins exact files for reproducibility. If exact files are pinned, fail loudly
+  when they are missing.
 - Use lazy Polars scans for large Parquet inputs, select only required columns,
   sort by the governing timestamp before slicing, and collect only the analysis
   set.
+- Reuse already-loaded/generated analysis data for plots by returning bounded
+  plot inputs from the analysis pass. Do not run a second full load/generation
+  pass just to build visualisations.
 - Avoid row-wise Python loops over large arrays when Polars, NumPy, or
   `searchsorted` can express the computation directly.
 - Bound plotting memory by aggregating first or by deterministic sampling with a
@@ -274,6 +280,28 @@ style reference. Current expectations:
   define whether same-source rows are excluded, merged, or counted before
   computing rates. Do not let zero-duration duplicate-source rows silently
   dominate denominators.
+- Heiken Ashi `HAClose` returns are allowed only for approved synthetic-price
+  distortion diagnostics. Label them as non-tradable and keep them separate from
+  strategy returns, signal validation, and P&L.
+
+### Self-Check Before Completion
+
+Before marking an experiment implementation complete, verify:
+
+1. Imports/path setup/constants/helper sections match the sample organization.
+2. Output directories are created in `main()` or orchestration only.
+3. Every large Parquet read uses lazy scan -> timestamp sort -> first-70% slice
+   -> collect, with column projection when possible.
+4. No loader uses `.unique()` without scope approval and pre/post row counts.
+5. Plotting inputs are aggregated or deterministically sampled before pandas
+   conversion.
+6. Expensive generated chart data is not recomputed for plotting if the
+   analysis pass already computed it.
+7. Zero-baseline ratios are finite or explicitly marked undefined.
+8. Event-chart duplicate-source timestamp denominators are explicitly defined.
+9. Logging/output is concise and progress-oriented.
+10. Any HA synthetic returns are scope-approved diagnostics, not tradable
+    returns.
 
 ---
 

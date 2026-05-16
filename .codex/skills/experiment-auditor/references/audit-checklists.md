@@ -30,6 +30,8 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | <file> | Loader ordering | PASS/FAIL | Lazy scan sorts by timestamp before slicing first 70%; no full holdout collection. |
 | <file> | Memory/performance | PASS/FAIL | Large inputs stay lazy/column-pruned; plotting samples or aggregates before pandas conversion. |
 | <file> | Logging/output | PASS/FAIL | Manual-run output is concise and failures are traceable. |
+| <file> | Organization/import side effects | PASS/FAIL | Imports/path/constants/helpers/orchestration follow sample structure; no output directories are created at import time. |
+| <file> | Plot data reuse | PASS/FAIL | Heavy data loads and chart generation are not repeated solely for visualisations. |
 | <file> | Docstrings | PASS/FAIL | <details> |
 
 ## Numerical Validation
@@ -113,11 +115,14 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | Holdout contamination | Any data loading | Verify `int(len(df) * 0.7)` cutoff is applied before any analysis |
 | Full-data collection before holdout split | Any `read_parquet()` or `.collect()` before `.slice()` / `.head()` | Verify the code does not materialize or inspect final 30% rows |
 | Physical-row cutoff before chronological sort | Any `.head()` / `.slice()` before `.sort("CloseTime")` | Sort by `CloseTime` or `SourceCloseTime` before taking the first 70% |
+| Import-time side effects | Module-level `mkdir()`, file writes, plotting setup with filesystem effects | Move effects into `main()` or orchestration |
+| Repeated heavy analysis pass | Loading/generating the same large data again for plots | Return bounded plot inputs from the analysis pass |
+| Unbounded pandas conversion | `.to_pandas()` on full analysis/event sets | Aggregate or deterministically sample first |
 | Silent deduplication drift | Any `.unique()` in loaders | Require a scope reason and pre/post row-count reporting |
 | Zero-baseline percentage improvement | Any `(baseline - value) / baseline` | When baseline is zero, emit absolute difference or mark the relative metric undefined |
 | String/numeric confusion | `Direction` column comparisons | Verify `Direction` is `+1/-1` (int), not string |
 | Look-ahead bias | Temporal ordering code | Verify `CloseTime` or `SourceCloseTime` used for sorting, never bar index |
-| Synthetic price returns | Any return computation on HA or Renko-derived signals | Verify returns use real time-matched prices, never `HAClose` or Renko brick prices |
+| Synthetic price returns | Any return computation on HA or Renko-derived signals | Verify strategy/P&L/signal returns use real time-matched prices, never `HAClose` or Renko brick prices. `HAClose` returns are allowed only for explicit HA distortion diagnostics labelled non-tradable. |
 | Cross-chart-type alignment | Any comparison across chart types | Verify alignment by timestamp, not by bar count or index |
 | Chart-type generator determinism | Any generator output | Verify same input + parameters produces identical output |
 | Division by zero | Any ratio computation | Check for denominator > 0 guard |

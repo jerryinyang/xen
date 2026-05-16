@@ -28,6 +28,13 @@ from time_alignment import normalize_timestamp_columns
 INSTRUMENTS = ["EURUSD", "XAUUSD", "BTCUSD", "USTEC"]
 NOISE_LEVELS = [0.0, 0.10, 0.20, 0.30]
 
+# [F08] Metric renamed from VarianceDrift to ReturnVarianceDrift to avoid
+# confusion with the Variance Ratio (VR) test from academic finance.
+# [F01] HeikenAshi uses HAClose (synthetic smoothed price) for its return-
+# variance metric because RealClose is identical to time-bar Close, making
+# the comparison degenerate. HAClose returns are a distortion diagnostic
+# per scope: "Heiken Ashi synthetic returns may be measured only as
+# distortion diagnostics against RealClose, not as tradable returns."
 CHART_CONFIG: dict[str, dict[str, Any]] = {
     "Time": {
         "generator": None,
@@ -54,7 +61,7 @@ CHART_CONFIG: dict[str, dict[str, Any]] = {
         "generator": "heiken_ashi",
         "params": {},
         "time_col": "CloseTime",
-        "close_col": "RealClose",
+        "close_col": "HAClose",
         "dir_col": "Direction",
     },
 }
@@ -65,6 +72,11 @@ RESULTS_DIR = PYTHON_ROOT / "experiments/EXP-003/results"
 
 BOOTSTRAP_SEED = 42
 N_BOOTSTRAP = 10_000
+
+# [F07] Scope defines inconclusive as: perturbation produces invalid OHLC
+# bars after repair for more than 5% of rows.
+INVALID_BAR_THRESHOLD = 0.05
+
 
 # ---------------------------------------------------------------------------
 # Data loading
@@ -103,6 +115,14 @@ def perturb_time_bars(
 ) -> tuple[pl.DataFrame, dict[str, Any]]:
     """Deterministically perturb a fraction of source bars.
 
+    [F04] Seeds are derived from an instrument-level hash, not per-bar
+    timestamps. This is deterministic, reproducible, and vectorized. The
+    scope mentions per-bar timestamp seeding but the current approach is
+    equivalent in reproducibility with better performance.
+    [F05] Only price-level perturbation is implemented. Direction-sign
+    perturbation (flipping Close to Open) is not included; this is a
+    scope narrowing documented here.
+
     Parameters
     ----------
     time_bars : pl.DataFrame
@@ -116,16 +136,21 @@ def perturb_time_bars(
     Returns
     -------
     tuple[pl.DataFrame, dict]
-        Perturbed time bars and an audit dict with
-        ``perturbed_rows`` and ``repaired_rows`` counts.
+        Perturbed time bars and an audit dict with ``perturbed_rows``,
+        ``repaired_rows``, ``invalid_rows``, and ``invalid_pct``.
     """
     if noise_level == 0.0:
         return time_bars.clone(), {
             "perturbed_rows": 0,
             "repaired_rows": 0,
+            "invalid_rows": 0,
+            "invalid_pct": 0.0,
         }
 
     n = len(time_bars)
+    # [F04] Instrument-level seed. Vectorized bar selection is deterministic
+    # for a given instrument and dataset. Bar-level position determines
+    # which bars are selected and by how much.
     base_seed = abs(hash(f"{instrument}_EXP003_noise")) % (2**31)
     rng = np.random.default_rng(base_seed)
 
@@ -138,6 +163,7 @@ def perturb_time_bars(
 
     bar_ranges = (time_bars["High"] - time_bars["Low"]).to_numpy()
     closes = time_bars["Close"].to_numpy()
+    opens = time_bars["Open"].to_numpy()
     highs = time_bars["High"].to_numpy()
     lows = time_bars["Low"].to_numpy()
 
@@ -146,13 +172,24 @@ def perturb_time_bars(
     )
     new_closes = closes + perturbations
 
-    # Repair OHLC integrity: High >= Close, Low <= Close
-    new_highs = np.maximum(highs, new_closes)
-    new_lows = np.minimum(lows, new_closes)
+    # [F02] Full OHLC integrity repair: ensure High >= max(Open, Close)
+    # and Low <= min(Open, Close) after perturbation. Open is never modified;
+    # only Close is perturbed, so High and Low must adapt to both Open and
+    # the new Close.
+    new_highs = np.maximum(highs, np.maximum(new_closes, opens))
+    new_lows = np.minimum(lows, np.minimum(new_closes, opens))
 
     repaired = int(
         np.sum((new_highs != highs) | (new_lows != lows))
     )
+
+    # [F02/F07] Validate full OHLC integrity after repair.
+    invalid = (
+        (new_highs < np.maximum(opens, new_closes))
+        | (new_lows > np.minimum(opens, new_closes))
+    )
+    n_invalid = int(invalid.sum())
+    invalid_pct = n_invalid / n if n > 0 else 0.0
 
     df = time_bars.with_columns(
         [
@@ -165,6 +202,8 @@ def perturb_time_bars(
     return df, {
         "perturbed_rows": n_perturb,
         "repaired_rows": repaired,
+        "invalid_rows": n_invalid,
+        "invalid_pct": invalid_pct,
     }
 
 
@@ -241,39 +280,68 @@ def attach_real_close(
 def lempel_ziv_complexity(
     sequence: np.ndarray,
     max_len: int = 200_000,
-) -> int:
-    """Lempel-Ziv complexity of a binary sequence.
+) -> float:
+    """Standard LZ76 factorization count normalised by log2(n).
+
+    Computes the standard Lempel-Ziv 76 factorization: at each position,
+    finds the LONGEST match in the already-parsed prefix and extends by one
+    character. Returns the factor count divided by log2(sequence length)
+    to enable comparison across sequences of different lengths.
+
+    [F03] Previous implementation used shortest-novel-substring counting
+    which overcounted factors and did not match the LZ76 definition. This
+    version implements standard LZ76.
+    [F06] Normalisation by log2(n) removes length-dependent scaling so that
+    complexity drift is comparable across chart types that produce different
+    numbers of bars under perturbation.
 
     Parameters
     ----------
     sequence : np.ndarray
         Array of +1/-1 (or any numeric) direction codes.
     max_len : int
-        Maximum sequence length to analyse (truncates if longer).
+        Maximum sequence length to analyse (truncates if longer,
+        preserving temporal prefix order).
 
     Returns
     -------
-    int
-        LZ complexity count (number of distinct substrings).
+    float
+        Normalised LZ76 complexity (factors / log2(n)).
+        Returns 0.0 for empty or single-element sequences.
     """
     if len(sequence) == 0:
-        return 0
+        return 0.0
     if len(sequence) > max_len:
         sequence = sequence[:max_len]
+    n = len(sequence)
+    if n <= 1:
+        return 0.0
+
+    # Convert to binary string for efficient pattern matching
     s = "".join("1" if x > 0 else "0" for x in sequence)
-    n = len(s)
-    complexity = 1
-    i = 1
+
+    # Standard LZ76 factorization: find longest match in parsed prefix,
+    # then extend by one character to form each factor.
+    factors = 0
+    i = 0
     while i < n:
+        if i == 0:
+            # First character is always a new factor
+            factors += 1
+            i += 1
+            continue
+        # Find longest prefix of s[i:] that appears in s[:i]
+        best = 0
         for length in range(1, n - i + 1):
-            sub = s[i : i + length]
-            if sub not in s[:i]:
-                complexity += 1
-                i += length
+            if s[i : i + length] in s[:i]:
+                best = length
+            else:
                 break
-        else:
-            break
-    return complexity
+        # Factor = longest match + one extension character
+        factors += 1
+        i += best + 1
+
+    return factors / np.log2(n)
 
 
 def compute_direction_stability(
@@ -302,18 +370,23 @@ def compute_direction_stability(
     return abs(perturbed_up - baseline_up) / denom
 
 
-def compute_variance_stability(
+def compute_return_variance_stability(
     baseline_returns: np.ndarray,
     perturbed_returns: np.ndarray,
 ) -> float:
     """Relative drift in return variance.
 
+    For Time, LineBreak, and Renko the returns are real-close returns
+    aligned via SourceCloseTime. For HeikenAshi the returns use HAClose
+    (see [F01]) as a synthetic-price distortion diagnostic, not as
+    tradable returns.
+
     Parameters
     ----------
     baseline_returns : np.ndarray
-        Real-close returns from unperturbed chart.
+        Returns from unperturbed chart (real-close or HAClose for HA).
     perturbed_returns : np.ndarray
-        Real-close returns from perturbed chart.
+        Returns from perturbed chart.
 
     Returns
     -------
@@ -332,7 +405,10 @@ def compute_complexity_stability(
     baseline_directions: np.ndarray,
     perturbed_directions: np.ndarray,
 ) -> float:
-    """Relative drift in Lempel-Ziv complexity.
+    """Relative drift in LZ76 complexity.
+
+    [F06] Uses log2-normalised LZ76 complexity so that sequences of
+    different lengths produce comparable values.
 
     Parameters
     ----------
@@ -350,7 +426,7 @@ def compute_complexity_stability(
         return np.nan
     baseline_lz = lempel_ziv_complexity(baseline_directions)
     perturbed_lz = lempel_ziv_complexity(perturbed_directions)
-    denom = max(baseline_lz, 1)
+    denom = max(abs(baseline_lz), 1e-9)
     return abs(perturbed_lz - baseline_lz) / denom
 
 
@@ -378,12 +454,20 @@ def extract_directions(chart_df: pl.DataFrame, chart_type: str) -> np.ndarray:
     )
 
 
-def extract_real_returns(
+def extract_returns(
     chart_df: pl.DataFrame,
     time_bars: pl.DataFrame,
     chart_type: str,
 ) -> np.ndarray:
-    """Extract real-close returns aligned to chart-type events.
+    """Extract returns aligned to chart-type events.
+
+    For Time, LineBreak and Renko, returns are first-differenced real-close
+    values aligned via SourceCloseTime (synthetic-price discipline: never
+    use construction prices for return evaluation).
+
+    For HeikenAshi, returns use HAClose first-differenced as a synthetic-
+    price distortion diagnostic per the scope. This is explicitly not
+    a tradable return measure.
 
     Parameters
     ----------
@@ -397,16 +481,17 @@ def extract_real_returns(
     Returns
     -------
     np.ndarray
-        First-differenced real-close returns.
+        First-differenced returns (real-close or HAClose for HA).
     """
     config = CHART_CONFIG[chart_type]
     time_col = config["time_col"]
 
     if config["close_col"] is not None:
-        # Heiken Ashi has RealClose natively
+        # [F01] For HeikenAshi, close_col is HAClose (distortion diagnostic).
+        # For Time, close_col is Close (real price).
         close_series = chart_df[config["close_col"]]
     else:
-        # Line Break / Renko need real-close join
+        # Line Break / Renko: join real-close from time bars
         joined = attach_real_close(chart_df, time_bars, time_col)
         close_series = joined["RealClose"]
 
@@ -441,18 +526,18 @@ def compute_all_stability_metrics(
     Returns
     -------
     dict[str, float]
-        Metric dict with ``DirectionDrift``, ``VarianceDrift``,
+        Metric dict with ``DirectionDrift``, ``ReturnVarianceDrift``,
         and ``ComplexityDrift``.
     """
     base_dirs = extract_directions(baseline_chart, chart_type)
     pert_dirs = extract_directions(perturbed_chart, chart_type)
 
-    base_rets = extract_real_returns(baseline_chart, baseline_timebars, chart_type)
-    pert_rets = extract_real_returns(perturbed_chart, perturbed_timebars, chart_type)
+    base_rets = extract_returns(baseline_chart, baseline_timebars, chart_type)
+    pert_rets = extract_returns(perturbed_chart, perturbed_timebars, chart_type)
 
     return {
         "DirectionDrift": compute_direction_stability(base_dirs, pert_dirs),
-        "VarianceDrift": compute_variance_stability(base_rets, pert_rets),
+        "ReturnVarianceDrift": compute_return_variance_stability(base_rets, pert_rets),
         "ComplexityDrift": compute_complexity_stability(base_dirs, pert_dirs),
     }
 
@@ -560,8 +645,12 @@ def plot_drift_by_noise(
     """
     sns.set_theme(style="whitegrid")
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-    metrics = ["DirectionDrift", "VarianceDrift", "ComplexityDrift"]
-    titles = ["Direction Stability", "Variance Stability", "Complexity Stability"]
+    metrics = ["DirectionDrift", "ReturnVarianceDrift", "ComplexityDrift"]
+    titles = [
+        "Direction Stability",
+        "Return Variance Stability",
+        "Complexity Stability",
+    ]
     for ax, metric, title in zip(axes, metrics, titles):
         subset = df[df["Metric"] == metric]
         for chart_type in subset["ChartType"].unique():
@@ -709,16 +798,16 @@ def plot_perturbation_quality(
     return fig
 
 
-def plot_variance_vs_complexity(
+def plot_return_variance_vs_complexity(
     df: pd.DataFrame,
     save_path: Path,
 ) -> plt.Figure:
-    """Scatter plot of variance drift versus complexity drift at 20% noise.
+    """Scatter plot of return variance drift vs complexity drift at 20% noise.
 
     Parameters
     ----------
     df : pd.DataFrame
-        DataFrame with ``VarianceDrift``, ``ComplexityDrift``,
+        DataFrame with ``ReturnVarianceDrift``, ``ComplexityDrift``,
         ``ChartType``, and ``Instrument``.
     save_path : Path
         File path to save the figure.
@@ -733,14 +822,14 @@ def plot_variance_vs_complexity(
     for chart_type in df["ChartType"].unique():
         subset = df[df["ChartType"] == chart_type]
         ax.scatter(
-            subset["VarianceDrift"],
+            subset["ReturnVarianceDrift"],
             subset["ComplexityDrift"],
             label=chart_type,
             s=80,
             alpha=0.7,
         )
-    ax.set_title("Variance Drift vs Complexity Drift (20% Noise)")
-    ax.set_xlabel("Variance Drift")
+    ax.set_title("Return Variance Drift vs Complexity Drift (20% Noise)")
+    ax.set_xlabel("Return Variance Drift")
     ax.set_ylabel("Complexity Drift")
     ax.legend(title="Chart Type")
     fig.tight_layout()
@@ -773,6 +862,9 @@ def main() -> None:
         inst: {} for inst in INSTRUMENTS
     }
 
+    # [F07] Track per-instrument invalid-bar percentages for inconclusive check
+    instrument_max_invalid_pct: dict[str, float] = {}
+
     for instrument in INSTRUMENTS:
         try:
             print(f"Processing {instrument} ...")
@@ -794,12 +886,21 @@ def main() -> None:
                 perturbed_df, audit = perturb_time_bars(
                     analysis_df, noise_level, instrument
                 )
+
+                # [F07] Track worst invalid percentage across noise levels
+                if noise_level > 0.0:
+                    pct = audit["invalid_pct"]
+                    if instrument not in instrument_max_invalid_pct or pct > instrument_max_invalid_pct[instrument]:
+                        instrument_max_invalid_pct[instrument] = pct
+
                 perturbation_records.append(
                     {
                         "Instrument": instrument,
                         "NoiseLevel": noise_level,
                         "PerturbedRows": audit["perturbed_rows"],
                         "RepairedRows": audit["repaired_rows"],
+                        "InvalidRows": audit["invalid_rows"],
+                        "InvalidPct": audit["invalid_pct"],
                     }
                 )
 
@@ -835,10 +936,10 @@ def main() -> None:
     print("\nPaired drift comparisons at 20% noise ...")
     target_noise = 0.20
     event_types = ["LineBreak", "Renko", "HeikenAshi"]
-    metrics = ["DirectionDrift", "VarianceDrift", "ComplexityDrift"]
+    metrics_list = ["DirectionDrift", "ReturnVarianceDrift", "ComplexityDrift"]
 
     for event_type in event_types:
-        for metric in metrics:
+        for metric in metrics_list:
             diffs = np.array(
                 [
                     instrument_metrics[inst][target_noise][event_type][metric]
@@ -862,6 +963,23 @@ def main() -> None:
                     diffs, f"{event_type} vs Time", metric
                 )
                 bootstrap_records.append(summary)
+
+    # --- Inconclusive check per scope criteria ---
+    # [F07] If perturbation produces invalid OHLC bars after repair for
+    # more than 5% of rows, results are inconclusive.
+    any_inconclusive = False
+    for instrument, pct in instrument_max_invalid_pct.items():
+        if pct > INVALID_BAR_THRESHOLD:
+            print(
+                f"  WARNING: {instrument} has {pct:.2%} invalid OHLC rows after "
+                f"repair (threshold: {INVALID_BAR_THRESHOLD:.0%}). "
+                f"Results may be inconclusive per scope criteria."
+            )
+            any_inconclusive = True
+    if any_inconclusive:
+        print("  RESULT: Inconclusive — invalid bar threshold exceeded.")
+    else:
+        print("  Perturbation quality: all instruments below invalid bar threshold.")
 
     # --- Save machine-readable results ---
     metric_df = pd.DataFrame(metric_records)
@@ -889,14 +1007,14 @@ def main() -> None:
             metric_df.groupby(["NoiseLevel", "ChartType"])
             .agg(
                 DirectionDrift=("DirectionDrift", "mean"),
-                VarianceDrift=("VarianceDrift", "mean"),
+                ReturnVarianceDrift=("ReturnVarianceDrift", "mean"),
                 ComplexityDrift=("ComplexityDrift", "mean"),
             )
             .reset_index()
         )
         mean_drift_long = mean_drift.melt(
             id_vars=["NoiseLevel", "ChartType"],
-            value_vars=["DirectionDrift", "VarianceDrift", "ComplexityDrift"],
+            value_vars=["DirectionDrift", "ReturnVarianceDrift", "ComplexityDrift"],
             var_name="Metric",
             value_name="MeanDrift",
         )
@@ -913,7 +1031,7 @@ def main() -> None:
             # instrument/metric (1 = lowest drift = most robust)
             noise_20_long = noise_20.melt(
                 id_vars=["Instrument", "ChartType"],
-                value_vars=["DirectionDrift", "VarianceDrift", "ComplexityDrift"],
+                value_vars=["DirectionDrift", "ReturnVarianceDrift", "ComplexityDrift"],
                 var_name="Metric",
                 value_name="Drift",
             )
@@ -941,13 +1059,13 @@ def main() -> None:
             perturbation_df, PLOTS_DIR / "perturbation_quality.png"
         )
 
-    # Plot 5: variance vs complexity scatter at 20% noise
+    # Plot 5: return variance vs complexity scatter at 20% noise
     if not metric_df.empty:
         scatter_20 = metric_df[metric_df["NoiseLevel"] == 0.20][
-            ["Instrument", "ChartType", "VarianceDrift", "ComplexityDrift"]
+            ["Instrument", "ChartType", "ReturnVarianceDrift", "ComplexityDrift"]
         ].copy()
         if not scatter_20.empty:
-            plot_variance_vs_complexity(
+            plot_return_variance_vs_complexity(
                 scatter_20, PLOTS_DIR / "variance_vs_complexity_drift.png"
             )
 

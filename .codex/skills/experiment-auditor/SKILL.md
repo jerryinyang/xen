@@ -39,16 +39,25 @@ Validate whether the implementation and results can be trusted. Report findings 
    - edge cases are handled;
    - public functions have useful type hints and docstrings;
    - random processes are deterministic.
-4. Check numerical outputs:
+4. Check code standards against `experiment-developer/references/code-conventions.md`:
+   - organization follows the sample structure;
+   - output directories are created only in orchestration;
+   - large Parquet loads are lazy, column-pruned where practical, sorted before
+     holdout slicing, and collected only after the first-70-percent cut;
+   - plotting converts only aggregated or deterministically sampled data to
+     pandas;
+   - heavy loads/generator passes are not repeated solely for plotting;
+   - logging/output is concise and traceable.
+5. Check numerical outputs:
    - spot-check selected calculations manually or with small samples;
    - verify ranges, counts, p-values, intervals, and effect signs;
    - compare plots against tabular outputs when possible.
-5. Check statistical assumptions:
+6. Check statistical assumptions:
    - sample sizes are sufficient;
    - outliers and dependence risks are acknowledged;
    - chosen methods still fit the data produced.
-6. Check result plausibility against project value ranges and schemas from the references.
-7. Check chart-type generator determinism: same input + same parameters = same output.
+7. Check result plausibility against project value ranges and schemas from the references.
+8. Check chart-type generator determinism: same input + same parameters = same output.
 
 ## Report
 
@@ -67,7 +76,9 @@ Include exact file paths, functions, result files, and reproduction notes for ea
 - Do not reinterpret results as final conclusions; leave that to `experiment-quant-analyst`.
 - Do not expand the experiment scope.
 - Do not inspect the final 30 percent global holdout.
-- Prefer concrete evidence over broad style feedback.
+- Prefer concrete evidence over broad style feedback, but treat code-standard
+  violations that can change correctness, memory footprint, reproducibility, or
+  governance enforcement as audit findings.
 
 ## References
 

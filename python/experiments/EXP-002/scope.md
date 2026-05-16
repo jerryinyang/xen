@@ -15,7 +15,7 @@ How much boundary cost do Line Break and Renko incur relative to the 1-minute ti
 - **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC.
 - **Time range**: Full available dataset per instrument with nested chronological split. First 70% = analysis set; within that, first 70% = train segment and last 30% = test segment. Final 30% = global holdout.
 - **Global holdout**: The final 30% of the full chronologically ordered dataset must not be loaded, inspected, summarized, plotted, or used in any capacity.
-- **Look-ahead bias prevention**: Regime labels are computed from completed time bars available at or before each timestamp. Chart-type events are aligned by `CloseTime` or `SourceCloseTime`.
+- **Look-ahead bias prevention**: Regime labels are computed from completed time bars available at or before each timestamp using rolling close-to-close log-return volatility. Chart-type events are aligned by `CloseTime` or `SourceCloseTime`.
 - **Synthetic price discipline**: No P&L or strategy-return analysis. Heiken Ashi regime metrics use real source prices where price movement is needed.
 - **Exclusions**: No parameter search, no predictive models, no strategy validation, no higher-timeframe regimes, no post-hoc regime definitions based on generated chart-type output.
 
@@ -33,7 +33,7 @@ How much boundary cost do Line Break and Renko incur relative to the 1-minute ti
 
 ## Data Requirements
 
-Compute realised volatility on 1-minute time bars within the analysis set only, assign low/medium/high regimes by expanding or rolling train-derived terciles, and apply those labels to chart-type events by timestamp. Define trend direction consistently by chart-type `Direction` where available and by time-bar close-to-close sign for time bars.
+Compute realised volatility on 1-minute time bars within the analysis set only as rolling standard deviation of close-to-close log returns, assign low/medium/high regimes by train-derived terciles, and apply those labels to chart-type events by timestamp. Rows without a defined rolling regime are excluded from metric denominators and reported. Define trend direction consistently by chart-type `Direction` where available and by time-bar close-to-close sign for time bars.
 
 ### Standard Loading Pattern
 
@@ -51,4 +51,4 @@ bars = scan.slice(0, int(total_rows * 0.7)).collect()
 
 ## Suggested Direction
 
-Measure how often chart bars straddle regime boundaries, how quickly direction/regime labels reflect a new volatility regime, and whether the result is consistent across instruments without adding a forecasting model.
+Measure how often chart bars straddle regime boundaries, how quickly chart events confirm a new volatility regime, transition coverage/missed-transition counts, and whether the result is consistent across instruments without adding a forecasting model.

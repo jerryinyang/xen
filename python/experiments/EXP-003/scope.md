@@ -21,7 +21,7 @@ How robust are each chart type's descriptive statistics when the source 1-minute
 
 ## Success / Failure Criteria
 
-- **Evidence FOR**: At the 20% noise level, Line Break or Renko has at least 25% lower relative drift than time bars in at least two of three metrics: direction stability, variance ratio stability, and complexity stability; this must hold on at least 3 instruments.
+- **Evidence FOR**: At the 20% noise level, Line Break or Renko has at least 25% lower relative drift than time bars in at least two of three metrics: direction stability, return variance stability, and complexity stability; this must hold on at least 3 instruments. For Heiken Ashi, return variance stability uses HAClose returns as a distortion diagnostic (not real返回) per synthetic price discipline.
 - **Evidence AGAINST**: Time bars have equal or lower relative drift than Line Break and Renko in at least two of three metrics on at least 3 instruments.
 - **Inconclusive**: Stability rankings change materially across noise types, effects are below threshold, or perturbation produces invalid OHLC bars after repair for more than 5% of rows.
 
@@ -33,7 +33,7 @@ How robust are each chart type's descriptive statistics when the source 1-minute
 
 ## Data Requirements
 
-Use deterministic perturbations at 0%, 10%, 20%, and 30% of eligible source bars. Perturb close values or direction signs according to a documented deterministic seed derived from instrument and timestamp, then repair OHLC integrity so `High >= max(Open, Close)` and `Low <= min(Open, Close)`. All perturbation happens after holdout exclusion.
+Use deterministic perturbations at 0%, 10%, 20%, and 30% of eligible source bars. Perturb close values according to an instrument-level deterministic seed (vectorized bar selection and magnitude sampling from a seeded RNG). Direction-sign perturbation is not included (scope narrowing from original "close values or direction signs"). After perturbation, repair full OHLC integrity so that `High >= max(Open, Close)` and `Low <= min(Open, Close)` for every bar. All perturbation happens after holdout exclusion.
 
 ### Standard Loading Pattern
 
