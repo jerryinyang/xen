@@ -15,7 +15,7 @@ How large is the distortion between Heiken Ashi synthetic prices and real prices
 - **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC.
 - **Time range**: Full available dataset per instrument with nested chronological split. First 70% = analysis set; within that, first 70% = train segment and last 30% = test segment. Final 30% = global holdout.
 - **Global holdout**: The final 30% of the full chronologically ordered dataset must not be loaded, inspected, summarized, plotted, or used in any capacity.
-- **Look-ahead bias prevention**: Heiken Ashi is computed sequentially from completed source bars. Distortion is evaluated at each source bar's `CloseTime`.
+- **Look-ahead bias prevention**: Heiken Ashi is computed sequentially from completed source bars. Distortion is evaluated at each source bar's `CloseTime`. Regime labels are calibrated on the train segment and applied only to later timestamps so regime-dependent summaries use point-in-time-known thresholds.
 - **Synthetic price discipline**: This experiment intentionally measures HA synthetic-price distortion. It must not treat HA returns as tradable returns or use them for strategy P&L.
 - **Exclusions**: No Line Break or Renko analysis, no strategy backtesting, no predictive modelling, no higher timeframe HA, no claim that lower HA volatility is improved risk.
 
@@ -33,7 +33,7 @@ How large is the distortion between Heiken Ashi synthetic prices and real prices
 
 ## Data Requirements
 
-Generate Heiken Ashi from analysis-set 1-minute time bars only. Compare `HAClose` changes to `RealClose` changes at identical `CloseTime` values. Stratify by low/medium/high volatility regimes derived from real time-bar returns.
+Generate Heiken Ashi from analysis-set 1-minute time bars only. Compare `HAClose` changes to `RealClose` changes at identical `CloseTime` values. Stratify by low/medium/high volatility regimes derived from real time-bar returns, with thresholds calibrated on the train segment and applied only to the later evaluation segment.
 
 ### Standard Loading Pattern
 

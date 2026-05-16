@@ -13,7 +13,7 @@ What speed-precision trade-off does each chart type exhibit when detecting real-
 - **Chart Types**: 1-minute time bars, Line Break, Renko, Heiken Ashi.
 - **Chart Type Parameters**: Line Break level 3; Renko ATR period 14; Heiken Ashi generated from 1-minute source bars; 1-minute time bars as baseline.
 - **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC.
-- **Time range**: Full available dataset per instrument with nested chronological split. First 70% = analysis set; within that, first 70% = train segment and last 30% = test segment. Final 30% = global holdout.
+- **Time range**: Full available dataset per instrument with chronological holdout exclusion. First 70% = analysis set used for characterisation; final 30% = global holdout. No nested train/test split is used because this experiment fits no predictive model.
 - **Global holdout**: The final 30% of the full chronologically ordered dataset must not be loaded, inspected, summarized, plotted, or used in any capacity.
 - **Look-ahead bias prevention**: Reversal labels use only completed time-bar data and confirmation rules that are timestamped when knowable. Chart-type signals are evaluated at their `CloseTime` or `SourceCloseTime`.
 - **Synthetic price discipline**: Signal timing may come from chart-type direction changes, but reversal truth and validation use real time-bar prices. No strategy returns or P&L are computed.
@@ -21,7 +21,7 @@ What speed-precision trade-off does each chart type exhibit when detecting real-
 
 ## Success / Failure Criteria
 
-- **Evidence FOR**: Line Break or Renko median detection latency is at least 30% lower than the time-bar baseline on at least 3 instruments, while precision is no more than 10 percentage points higher than time bars, confirming a speed trade-off rather than broad dominance.
+- **Evidence FOR**: Line Break or Renko median detection latency is at least 30% lower than the time-bar baseline on at least 3 instruments, while total signal precision (`matched / total signals`, including duplicate same-direction signals in the denominator) is no more than 10 percentage points higher than time bars, confirming a speed trade-off rather than broad dominance.
 - **Evidence AGAINST**: Event-based detection latency is not at least 15% lower than time bars on at least 3 instruments, or event-based precision is materially worse by more than 25 percentage points on at least 3 instruments.
 - **Inconclusive**: Too few confirmed reversals exist, latency improves but precision collapses beyond threshold, or reversal labels are unstable under a simple sensitivity check.
 
@@ -33,7 +33,7 @@ What speed-precision trade-off does each chart type exhibit when detecting real-
 
 ## Data Requirements
 
-Define real-price trend reversals from 1-minute time bars using a single documented swing threshold set before execution, such as rolling ATR-scaled directional movement confirmed at a timestamp. Generate chart-type reversal signals from direction changes and compare each signal to the nearest confirmed real-price reversal within a fixed tolerance window.
+Define real-price trend reversals from 1-minute time bars using a single documented swing threshold set before execution, such as rolling ATR-scaled directional movement confirmed at a timestamp. Generate chart-type reversal signals from direction changes and compare each signal to the first same-direction confirmed real-price reversal within a fixed 120-minute forward tolerance window. Reversal-label sensitivity must be checked by comparing the primary threshold (`1.5 x ATR`) with one alternate threshold (`2.0 x ATR`) and reporting overlap stability.
 
 ### Standard Loading Pattern
 

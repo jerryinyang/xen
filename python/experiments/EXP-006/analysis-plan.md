@@ -16,7 +16,7 @@ Quantify how much Heiken Ashi synthetic prices distort real return magnitude and
 
 ### Step 2: Compute Distortion Metrics
 
-- **Method**: Descriptive compression ratios for median absolute return, realised volatility, high-low range, and direction-change frequency; stratify by volatility tercile.
+- **Method**: Descriptive compression ratios for median absolute return, realised volatility, high-low range, and direction-change frequency; stratify by volatility tercile using thresholds calibrated on the train segment and applied only to the later evaluation segment.
 - **Why this method**: Ratios directly quantify the synthetic-price distortion named in the hypothesis.
 - **Simpler alternative considered**: Single volatility compression factor. It is necessary but insufficient because HA can also distort direction changes and return magnitudes differently.
 - **Assumptions**: HA returns are diagnostic synthetic-price changes, not tradable returns; real returns use `RealClose`.
@@ -24,7 +24,7 @@ Quantify how much Heiken Ashi synthetic prices distort real return magnitude and
 
 ### Step 3: Estimate Uncertainty of Compression
 
-- **Method**: Block bootstrap confidence intervals for volatility and median absolute return compression ratios.
+- **Method**: Block bootstrap confidence intervals for volatility and median absolute return compression ratios, with both metrics evaluated from the same resampled blocks for efficiency and consistency.
 - **Why this method**: Block bootstrap respects temporal clustering better than independent row resampling and avoids normality assumptions.
 - **Simpler alternative considered**: Parametric confidence interval for variance ratios. It assumes distributional properties that are weak for market returns.
 - **Assumptions**: Blocks provide an approximate uncertainty measure; results are descriptive, not a claim of stationary compression.
@@ -67,4 +67,4 @@ Quantify how much Heiken Ashi synthetic prices distort real return magnitude and
 
 ### Regime Stratification
 
-- Regime labels are derived from real time-bar volatility and applied to paired HA rows by `CloseTime`.
+- Regime labels are derived from real time-bar volatility and applied to paired HA rows by `CloseTime`, but only after the calibration segment so regime-dependent summaries do not use future-informed thresholds.

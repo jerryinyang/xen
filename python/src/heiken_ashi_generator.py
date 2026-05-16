@@ -29,11 +29,15 @@ class HeikenAshiGenerator:
     previous_ha_open: float | None = None
     previous_ha_close: float | None = None
 
-    def update(self, row: dict[str, Any]) -> dict[str, Any]:
-        real_open = float(row["Open"])
-        real_high = float(row["High"])
-        real_low = float(row["Low"])
-        real_close = float(row["Close"])
+    def update(
+        self,
+        open_time: Any,
+        close_time: Any,
+        real_open: float,
+        real_high: float,
+        real_low: float,
+        real_close: float,
+    ) -> dict[str, Any]:
         ha_close = (real_open + real_high + real_low + real_close) / 4.0
 
         if self.previous_ha_open is None or self.previous_ha_close is None:
@@ -48,8 +52,8 @@ class HeikenAshiGenerator:
         self.previous_ha_close = ha_close
 
         return {
-            "OpenTime": row["OpenTime"],
-            "CloseTime": row["CloseTime"],
+            "OpenTime": open_time,
+            "CloseTime": close_time,
             "HAOpen": ha_open,
             "HAHigh": ha_high,
             "HALow": ha_low,
@@ -67,7 +71,20 @@ def generate_heiken_ashi(time_bars: pl.DataFrame) -> pl.DataFrame:
     """Generate Heiken Ashi candles from completed time bars."""
     _validate_time_bars(time_bars)
     generator = HeikenAshiGenerator()
-    rows = [generator.update(row) for row in time_bars.sort("CloseTime").iter_rows(named=True)]
+    source_rows = time_bars.select(
+        ["OpenTime", "CloseTime", "Open", "High", "Low", "Close"]
+    )
+    rows = [
+        generator.update(
+            open_time,
+            close_time,
+            float(open_price),
+            float(high),
+            float(low),
+            float(close),
+        )
+        for open_time, close_time, open_price, high, low, close in source_rows.iter_rows()
+    ]
     return _frame(rows, HA_COLUMNS)
 
 

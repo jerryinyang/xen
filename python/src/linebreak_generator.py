@@ -32,36 +32,88 @@ class LineBreakGenerator:
         if self.level < 1:
             raise ValueError("level must be >= 1")
 
-    def update(self, row: dict[str, Any]) -> list[dict[str, Any]]:
+    def update(
+        self,
+        open_time: Any,
+        close_time: Any,
+        open_price: float,
+        close: float,
+    ) -> list[dict[str, Any]]:
         self.pending_count += 1
-        close = float(row["Close"])
 
         if not self.lines:
-            return [self._append_line(row, close, close, 1 if close >= float(row["Open"]) else -1)]
+            return [
+                self._append_line(
+                    open_time,
+                    close_time,
+                    close,
+                    close,
+                    1 if close >= open_price else -1,
+                )
+            ]
 
         last = self.lines[-1]
         direction = int(last["Direction"])
 
         if direction >= 0 and close > float(last["Close"]):
-            return [self._append_line(row, float(last["Close"]), close, 1)]
+            return [
+                self._append_line(
+                    open_time,
+                    close_time,
+                    float(last["Close"]),
+                    close,
+                    1,
+                )
+            ]
         if direction <= 0 and close < float(last["Close"]):
-            return [self._append_line(row, float(last["Close"]), close, -1)]
+            return [
+                self._append_line(
+                    open_time,
+                    close_time,
+                    float(last["Close"]),
+                    close,
+                    -1,
+                )
+            ]
 
         reversal_window = self.lines[-self.level :]
         reversal_high = max(float(line["High"]) for line in reversal_window)
         reversal_low = min(float(line["Low"]) for line in reversal_window)
 
         if close > reversal_high:
-            return [self._append_line(row, float(last["Close"]), close, 1)]
+            return [
+                self._append_line(
+                    open_time,
+                    close_time,
+                    float(last["Close"]),
+                    close,
+                    1,
+                )
+            ]
         if close < reversal_low:
-            return [self._append_line(row, float(last["Close"]), close, -1)]
+            return [
+                self._append_line(
+                    open_time,
+                    close_time,
+                    float(last["Close"]),
+                    close,
+                    -1,
+                )
+            ]
 
         return []
 
-    def _append_line(self, row: dict[str, Any], open_price: float, close_price: float, direction: int) -> dict[str, Any]:
+    def _append_line(
+        self,
+        open_time: Any,
+        close_time: Any,
+        open_price: float,
+        close_price: float,
+        direction: int,
+    ) -> dict[str, Any]:
         line = {
-            "OpenTime": row["OpenTime"],
-            "CloseTime": row["CloseTime"],
+            "OpenTime": open_time,
+            "CloseTime": close_time,
             "Open": open_price,
             "High": max(open_price, close_price),
             "Low": min(open_price, close_price),
@@ -69,7 +121,7 @@ class LineBreakGenerator:
             "Direction": direction,
             "Level": self.level,
             "SourceCount": self.pending_count,
-            "SourceCloseTime": row["CloseTime"],
+            "SourceCloseTime": close_time,
         }
         self.lines.append(line)
         self.pending_count = 0
@@ -81,8 +133,18 @@ def generate_linebreak(time_bars: pl.DataFrame, level: int = 3) -> pl.DataFrame:
     _validate_time_bars(time_bars)
     generator = LineBreakGenerator(level=level)
     rows: list[dict[str, Any]] = []
-    for row in time_bars.sort("CloseTime").iter_rows(named=True):
-        rows.extend(generator.update(row))
+    source_rows = time_bars.select(
+        ["OpenTime", "CloseTime", "Open", "Close"]
+    )
+    for open_time, close_time, open_price, close_price in source_rows.iter_rows():
+        rows.extend(
+            generator.update(
+                open_time,
+                close_time,
+                float(open_price),
+                float(close_price),
+            )
+        )
     return _frame(rows, LINEBREAK_COLUMNS)
 
 

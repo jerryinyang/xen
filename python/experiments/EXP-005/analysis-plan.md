@@ -8,7 +8,7 @@ Measure whether chart types agree on trend direction and event timing after time
 
 ### Step 1: Build Direction and Regime Tables
 
-- **Method**: Extract direction labels from time bars, Line Break, Renko, and Heiken Ashi; assign volatility regime labels from time-bar realised volatility.
+- **Method**: Extract direction labels from time bars, Line Break, Renko, and Heiken Ashi; collapse repeated event-chart rows at the same source timestamp; assign volatility regime labels from time-bar realised volatility using thresholds calibrated on the train segment and applied only to the later evaluation segment.
 - **Why this method**: Direction and regime are the minimal common concepts across all Phase 1 chart types.
 - **Simpler alternative considered**: Use only up/down bar counts. That ignores whether directions occur at the same real times.
 - **Assumptions**: Direction is chart-type-specific but comparable as a sign label; regime labels are descriptive and derived independently from time bars.
@@ -16,7 +16,7 @@ Measure whether chart types agree on trend direction and event timing after time
 
 ### Step 2: Pairwise Timestamp Alignment
 
-- **Method**: Nearest-neighbour timestamp matching within a fixed tolerance window, reporting overlap rate and unmatched rates for every chart-type pair.
+- **Method**: Nearest-neighbour timestamp matching within a fixed tolerance window for sparse event-chart pairs, with exact timestamp alignment for time-bar versus Heiken Ashi comparisons where `CloseTime` is shared.
 - **Why this method**: It directly implements design compliance for cross-chart-type comparison by timestamp.
 - **Simpler alternative considered**: Resampling all chart types to 1-minute timestamps. That may be useful later but can blur sparse event timing in this experiment.
 - **Assumptions**: A tolerance window is necessary because event-based charts do not emit bars every minute; sensitivity to one wider tolerance can be reported without changing the main criterion.
@@ -24,7 +24,7 @@ Measure whether chart types agree on trend direction and event timing after time
 
 ### Step 3: Estimate Direction Agreement by Regime
 
-- **Method**: Pairwise agreement rates by instrument and regime, paired bootstrap intervals for Line Break/Renko agreement improvement versus each chart type's agreement with time bars.
+- **Method**: Pairwise agreement rates by instrument and regime, paired bootstrap intervals for Line Break/Renko agreement improvement versus each chart type's agreement with time bars on the medium/high-regime subset that has valid point-in-time regime labels.
 - **Why this method**: Agreement rates are direct and interpretable; paired intervals avoid row-level independence assumptions.
 - **Simpler alternative considered**: Cohen's kappa. Kappa can be informative, but with sparse event overlap and imbalanced directions it may obscure the raw agreement rate; it can be reported as a secondary sensitivity only if budget allows.
 - **Assumptions**: Agreement does not imply predictive value or profitability; it only measures correspondence.

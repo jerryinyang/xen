@@ -37,8 +37,10 @@ CHART_TYPES = ["timebars", "linebreak", "renko", "heiken_ashi"]
 TOLERANCE_BASE = "5m"
 TOLERANCE_WIDE = "15m"
 REGIME_WINDOW = 60
+REGIME_CALIBRATION_FRACTION = 0.7
 BOOTSTRAP_ITERATIONS = 10_000
 BOOTSTRAP_SEED = 42
+TIMEBAR_COLUMNS = ["OpenTime", "CloseTime", "Open", "High", "Low", "Close"]
 
 
 def find_latest_timebars(instrument: str) -> Path:
@@ -53,7 +55,7 @@ def find_latest_timebars(instrument: str) -> Path:
 def load_time_bars(instrument: str) -> pl.DataFrame:
     """Load and chronologically scope time bars for an instrument."""
     path = find_latest_timebars(instrument)
-    scan = pl.scan_parquet(path).sort("CloseTime")
+    scan = pl.scan_parquet(path).select(TIMEBAR_COLUMNS).sort("CloseTime")
     total_rows = int(scan.select(pl.len()).collect().item())
     return scan.slice(0, int(total_rows * 0.7)).collect()
 
@@ -106,13 +108,28 @@ def build_direction_table(
         direction.alias("direction"),
         pl.lit(instrument).alias("instrument"),
     ).with_columns(pl.col("direction").cast(pl.Int8))
-    return normalize_timestamp_columns(out, ["timestamp"])
+    out = normalize_timestamp_columns(out, ["timestamp"])
+
+    if chart_type in ("linebreak", "renko"):
+        # Event charts can emit multiple rows for the same source minute.
+        # Collapse to one state per source timestamp so pairwise denominators
+        # remain time-based rather than chart-density-based.
+        out = (
+            out.group_by("timestamp", maintain_order=True)
+            .agg(
+                pl.col("direction").last().alias("direction"),
+                pl.col("instrument").last().alias("instrument"),
+            )
+            .sort("timestamp")
+        )
+
+    return out
 
 
 def compute_regime_labels(
     time_bars: pl.DataFrame,
     window: int = REGIME_WINDOW,
-) -> pl.DataFrame:
+) -> tuple[pl.DataFrame, dict[str, Any]]:
     """Compute low/medium/high volatility regime labels from time bars.
 
     Parameters
@@ -124,24 +141,38 @@ def compute_regime_labels(
 
     Returns
     -------
-    pl.DataFrame
-        Columns: CloseTime, regime.
+    tuple[pl.DataFrame, dict[str, Any]]
+        Regime table plus calibration metadata.
     """
     df = time_bars.with_columns(
         (pl.col("Close").log() - pl.col("Close").shift(1).log())
         .alias("log_ret")
     ).with_columns(
         pl.col("log_ret")
-        .rolling_std(window_size=window, min_periods=window)
+        .rolling_std(window_size=window, min_samples=window)
         .alias("vol")
     )
-    vol_series = df.filter(pl.col("vol").is_not_null())["vol"]
-    if len(vol_series) == 0:
+
+    vol_df = df.filter(pl.col("vol").is_not_null()).select(["CloseTime", "vol"])
+    if vol_df.height == 0:
         raise ValueError("Insufficient data to compute regime labels")
-    q33 = float(vol_series.quantile(0.33))
-    q66 = float(vol_series.quantile(0.66))
+
+    calibration_rows = max(
+        window,
+        int(vol_df.height * REGIME_CALIBRATION_FRACTION),
+    )
+    calibration_rows = min(calibration_rows, vol_df.height)
+    calibration = vol_df.slice(0, calibration_rows)
+    q33, q66 = calibration.select(
+        pl.col("vol").quantile(0.33).alias("q33"),
+        pl.col("vol").quantile(0.66).alias("q66"),
+    ).row(0)
+    evaluation_start = calibration[-1, "CloseTime"]
+
     out = df.with_columns(
         pl.when(pl.col("vol").is_null())
+        .then(None)
+        .when(pl.col("CloseTime") <= pl.lit(evaluation_start))
         .then(None)
         .when(pl.col("vol") <= q33)
         .then(pl.lit("low"))
@@ -150,7 +181,13 @@ def compute_regime_labels(
         .otherwise(pl.lit("high"))
         .alias("regime")
     ).select(["CloseTime", "regime"])
-    return normalize_timestamp_columns(out, ["CloseTime"])
+    metadata = {
+        "q33": float(q33),
+        "q66": float(q66),
+        "calibration_rows": calibration_rows,
+        "evaluation_start": evaluation_start,
+    }
+    return normalize_timestamp_columns(out, ["CloseTime"]), metadata
 
 
 def add_regime_labels(
@@ -204,10 +241,19 @@ def _join_asof_direction(
     )
 
 
+def pair_uses_exact_alignment(
+    chart_a: str,
+    chart_b: str,
+) -> bool:
+    """Return whether the pair should align on exact timestamps."""
+    return frozenset((chart_a, chart_b)) == frozenset(("timebars", "heiken_ashi"))
+
+
 def align_pairwise(
     left: pl.DataFrame,
     right: pl.DataFrame,
     tolerance: timedelta,
+    exact_match: bool = False,
 ) -> pl.DataFrame:
     """Align two direction tables by nearest timestamp within tolerance.
 
@@ -225,6 +271,17 @@ def align_pairwise(
     pl.DataFrame
         Left table with an added ``direction_right`` column.
     """
+    if exact_match:
+        left = normalize_timestamp_columns(left, ["timestamp"])
+        right = normalize_timestamp_columns(right, ["timestamp"])
+        return left.join(
+            right.select(["timestamp", "direction"]).rename(
+                {"direction": "direction_right"}
+            ),
+            on="timestamp",
+            how="left",
+        )
+
     bw = _join_asof_direction(left, right, "backward", tolerance)
     fw = _join_asof_direction(left, right, "forward", tolerance)
     bw = normalize_timestamp_columns(bw, ["timestamp"])
@@ -264,9 +321,10 @@ def _directed_metrics(
     left: pl.DataFrame,
     right: pl.DataFrame,
     tolerance: timedelta,
+    exact_match: bool = False,
 ) -> dict[str, Any]:
     """Compute directed overlap and agreement metrics."""
-    aligned = align_pairwise(left, right, tolerance)
+    aligned = align_pairwise(left, right, tolerance, exact_match=exact_match)
     matched = aligned.filter(pl.col("direction_right").is_not_null())
     n_left = left.height
     n_matched = matched.height
@@ -302,10 +360,11 @@ def compute_unordered_pair_metrics(
     tolerance: timedelta,
     chart_a: str,
     chart_b: str,
+    exact_match: bool = False,
 ) -> dict[str, Any]:
     """Compute symmetric metrics by averaging both directions."""
-    ab = _directed_metrics(df_a, df_b, tolerance)
-    ba = _directed_metrics(df_b, df_a, tolerance)
+    ab = _directed_metrics(df_a, df_b, tolerance, exact_match=exact_match)
+    ba = _directed_metrics(df_b, df_a, tolerance, exact_match=exact_match)
     avg_regime = {
         r: float(np.nanmean([ab["regime_agreements"][r], ba["regime_agreements"][r]]))
         for r in ("low", "medium", "high")
@@ -326,6 +385,7 @@ def bootstrap_agreement_diff(
     target_a: pl.DataFrame,
     target_b: pl.DataFrame,
     tolerance: timedelta,
+    regimes: tuple[str, ...] | None = None,
     n_iter: int = BOOTSTRAP_ITERATIONS,
     seed: int = BOOTSTRAP_SEED,
 ) -> dict[str, float]:
@@ -334,6 +394,17 @@ def bootstrap_agreement_diff(
     Compares ref->target_a agreement minus ref->target_b agreement
     on the subset of reference events that match both targets.
     """
+    if regimes is not None:
+        ref_df = ref_df.filter(pl.col("regime").is_in(list(regimes)))
+
+    if ref_df.height == 0:
+        return {
+            "diff_mean": float("nan"),
+            "ci_lower": float("nan"),
+            "ci_upper": float("nan"),
+            "n": 0,
+        }
+
     a_aligned = align_pairwise(ref_df, target_a, tolerance).rename(
         {"direction_right": "direction_a"}
     )
@@ -637,7 +708,10 @@ def _process_instrument(
     """Load data, generate charts, and compute metrics for one instrument."""
     time_bars = load_time_bars(instrument)
     charts = generate_chart_types(time_bars)
-    regime_df = compute_regime_labels(time_bars, window=REGIME_WINDOW)
+    regime_df, regime_meta = compute_regime_labels(
+        time_bars,
+        window=REGIME_WINDOW,
+    )
 
     direction_tables: dict[str, pl.DataFrame] = {}
     for chart_type, df in charts.items():
@@ -651,11 +725,22 @@ def _process_instrument(
     for i in range(len(CHART_TYPES)):
         for j in range(i + 1, len(CHART_TYPES)):
             ca, cb = CHART_TYPES[i], CHART_TYPES[j]
+            exact_match = pair_uses_exact_alignment(ca, cb)
             m_base = compute_unordered_pair_metrics(
-                direction_tables[ca], direction_tables[cb], tol_base, ca, cb
+                direction_tables[ca],
+                direction_tables[cb],
+                tol_base,
+                ca,
+                cb,
+                exact_match=exact_match,
             )
             m_wide = compute_unordered_pair_metrics(
-                direction_tables[ca], direction_tables[cb], tol_wide, ca, cb
+                direction_tables[ca],
+                direction_tables[cb],
+                tol_wide,
+                ca,
+                cb,
+                exact_match=exact_match,
             )
             pairwise.append(_record_pair(m_base, instrument, TOLERANCE_BASE))
             pairwise.append(_record_pair(m_wide, instrument, TOLERANCE_WIDE))
@@ -672,34 +757,51 @@ def _process_instrument(
                     }
                 )
 
-    boot1 = bootstrap_agreement_diff(
-        direction_tables["linebreak"],
-        direction_tables["renko"],
-        direction_tables["timebars"],
-        tol_base,
-    )
-    boot2 = bootstrap_agreement_diff(
-        direction_tables["renko"],
-        direction_tables["linebreak"],
-        direction_tables["timebars"],
-        tol_base,
-    )
-    bootstrap = [
-        {
-            "instrument": instrument,
-            "reference": "linebreak",
-            "target_a": "renko",
-            "target_b": "timebars",
-            **boot1,
-        },
-        {
-            "instrument": instrument,
-            "reference": "renko",
-            "target_a": "linebreak",
-            "target_b": "timebars",
-            **boot2,
-        },
-    ]
+    bootstrap: list[dict[str, Any]] = []
+    regime_scopes = {
+        "medium_high": ("medium", "high"),
+        "medium": ("medium",),
+        "high": ("high",),
+    }
+    for regime_scope, regimes in regime_scopes.items():
+        boot1 = bootstrap_agreement_diff(
+            direction_tables["linebreak"],
+            direction_tables["renko"],
+            direction_tables["timebars"],
+            tol_base,
+            regimes=regimes,
+        )
+        boot2 = bootstrap_agreement_diff(
+            direction_tables["renko"],
+            direction_tables["linebreak"],
+            direction_tables["timebars"],
+            tol_base,
+            regimes=regimes,
+        )
+        bootstrap.extend(
+            [
+                {
+                    "instrument": instrument,
+                    "reference": "linebreak",
+                    "target_a": "renko",
+                    "target_b": "timebars",
+                    "regime_scope": regime_scope,
+                    "calibration_rows": regime_meta["calibration_rows"],
+                    "evaluation_start": regime_meta["evaluation_start"],
+                    **boot1,
+                },
+                {
+                    "instrument": instrument,
+                    "reference": "renko",
+                    "target_a": "linebreak",
+                    "target_b": "timebars",
+                    "regime_scope": regime_scope,
+                    "calibration_rows": regime_meta["calibration_rows"],
+                    "evaluation_start": regime_meta["evaluation_start"],
+                    **boot2,
+                },
+            ]
+        )
 
     return pairwise, regime, sens, bootstrap, direction_tables
 
@@ -708,6 +810,14 @@ def main() -> None:
     """Run the full EXP-005 analysis pipeline."""
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    print("EXP-005: Cross-Chart-Type Alignment & Regime Correspondence")
+    print(f"Instruments: {', '.join(INSTRUMENTS)}")
+    print(
+        f"Tolerances: base={TOLERANCE_BASE}, wide={TOLERANCE_WIDE}; "
+        f"regime window={REGIME_WINDOW}"
+    )
+    print(f"Output: {PLOTS_DIR} and {RESULTS_DIR}\n")
 
     tol_base = _parse_tolerance(TOLERANCE_BASE)
     tol_wide = _parse_tolerance(TOLERANCE_WIDE)
@@ -719,12 +829,18 @@ def main() -> None:
     all_direction_tables: dict[str, dict[str, pl.DataFrame]] = {}
 
     for instrument in INSTRUMENTS:
+        print(f"Processing {instrument} ...", flush=True)
         p, r, s, b, dts = _process_instrument(instrument, tol_base, tol_wide)
         pairwise_records.extend(p)
         regime_records.extend(r)
         sensitivity_records.extend(s)
         bootstrap_records.extend(b)
         all_direction_tables[instrument] = dts
+        print(
+            f"  pairwise={len(p)}, regime={len(r)}, "
+            f"sensitivity={len(s)}, bootstrap={len(b)}",
+            flush=True,
+        )
 
     pairwise_df = pl.DataFrame(pairwise_records)
     regime_df_out = pl.DataFrame(regime_records)
@@ -735,6 +851,15 @@ def main() -> None:
     regime_df_out.write_csv(RESULTS_DIR / "regime_metrics.csv")
     bootstrap_df.write_csv(RESULTS_DIR / "bootstrap_cis.csv")
     sensitivity_df.write_csv(RESULTS_DIR / "sensitivity_metrics.csv")
+
+    print(
+        "\nSaved "
+        f"pairwise_metrics.csv ({pairwise_df.height} rows), "
+        f"regime_metrics.csv ({regime_df_out.height} rows), "
+        f"bootstrap_cis.csv ({bootstrap_df.height} rows), "
+        f"sensitivity_metrics.csv ({sensitivity_df.height} rows)",
+        flush=True,
+    )
 
     (RESULTS_DIR / "results.json").write_text(
         json.dumps(
@@ -748,7 +873,9 @@ def main() -> None:
             default=str,
         )
     )
+    print("Saved results.json", flush=True)
 
+    print("\nGenerating plots ...", flush=True)
     plot_agreement_heatmap(
         pairwise_df.filter(pl.col("tolerance") == TOLERANCE_BASE),
         PLOTS_DIR / "agreement_heatmap.png",
@@ -767,6 +894,8 @@ def main() -> None:
         "EURUSD",
         PLOTS_DIR / "timeline_raster.png",
     )
+    print(f"Plots saved to {PLOTS_DIR}", flush=True)
+    print("EXP-005 complete.")
 
 
 if __name__ == "__main__":

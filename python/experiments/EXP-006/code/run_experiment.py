@@ -13,14 +13,13 @@ sys.path.insert(0, str(SRC_DIR))
 
 import json
 import logging
-from typing import Any, Callable
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
 import polars as pl
 import seaborn as sns
 from heiken_ashi_generator import generate_heiken_ashi
-from time_alignment import normalize_timestamp_columns
 
 # ---------------------------------------------------------------------------
 # Paths & constants
@@ -34,6 +33,7 @@ TIMEBAR_COLUMNS = ["OpenTime", "CloseTime", "Open", "High", "Low", "Close"]
 
 HOLDOUT_FRACTION = 0.30
 ROLLING_VOL_WINDOW = 30
+REGIME_CALIBRATION_FRACTION = 0.7
 BOOT_BLOCK_SIZE = 100
 BOOT_N = 1000
 BOOT_SEED = 42
@@ -111,17 +111,30 @@ def add_regimes(df: pl.DataFrame, window: int = ROLLING_VOL_WINDOW) -> pl.DataFr
         .alias("rolling_vol")
     )
 
-    vols = df.filter(pl.col("rolling_vol").is_not_null())["rolling_vol"].to_numpy()
-    if len(vols) == 0:
-        return df.with_columns(pl.lit("Unknown").alias("regime"))
-
-    q1, q2 = (
-        float(np.nanquantile(vols, 1.0 / 3.0)),
-        float(np.nanquantile(vols, 2.0 / 3.0)),
+    vol_df = df.filter(pl.col("rolling_vol").is_not_null()).select(
+        ["CloseTime", "rolling_vol"]
     )
+    if vol_df.height == 0:
+        return df.with_columns(pl.lit(None).alias("regime"))
+
+    calibration_rows = max(
+        window,
+        int(vol_df.height * REGIME_CALIBRATION_FRACTION),
+    )
+    calibration_rows = min(calibration_rows, vol_df.height)
+    calibration = vol_df.slice(0, calibration_rows)
+    q1, q2 = calibration.select(
+        pl.col("rolling_vol").quantile(1.0 / 3.0).alias("q1"),
+        pl.col("rolling_vol").quantile(2.0 / 3.0).alias("q2"),
+    ).row(0)
+    evaluation_start = calibration[-1, "CloseTime"]
 
     df = df.with_columns(
-        pl.when(pl.col("rolling_vol") <= q1)
+        pl.when(pl.col("rolling_vol").is_null())
+        .then(None)
+        .when(pl.col("CloseTime") <= pl.lit(evaluation_start))
+        .then(None)
+        .when(pl.col("rolling_vol") <= q1)
         .then(pl.lit("Low"))
         .when(pl.col("rolling_vol") <= q2)
         .then(pl.lit("Medium"))
@@ -172,24 +185,23 @@ def direction_change_freq(returns: np.ndarray) -> float:
 # ---------------------------------------------------------------------------
 # Block bootstrap for compression ratios
 # ---------------------------------------------------------------------------
-def block_bootstrap_compression(
+def block_bootstrap_key_metrics(
     real_arr: np.ndarray,
     ha_arr: np.ndarray,
-    metric_fn: Callable[[np.ndarray], float],
     block_size: int = BOOT_BLOCK_SIZE,
     n_boot: int = BOOT_N,
     seed: int = BOOT_SEED,
-) -> dict[str, float]:
-    """Block-bootstrap confidence interval for a compression ratio.
+) -> dict[str, dict[str, float]]:
+    """Block-bootstrap confidence intervals for the two scoped key metrics.
 
-    Compression ratio is defined as ``1 - metric(ha) / metric(real)``.
+    The two scoped metrics are:
+    - realised volatility compression
+    - median absolute return compression
 
     Parameters
     ----------
     real_arr, ha_arr : np.ndarray
         Paired 1-D arrays (already NaN-dropped and aligned).
-    metric_fn : callable
-        Function that takes a 1-D array and returns a scalar metric.
     block_size : int
         Block length in observations.
     n_boot : int
@@ -199,8 +211,8 @@ def block_bootstrap_compression(
 
     Returns
     -------
-    dict
-        Keys: ``point_estimate``, ``ci_lower``, ``ci_upper``, ``median``.
+    dict[str, dict[str, float]]
+        Bootstrap summaries for both key compression ratios.
     """
     rng = np.random.default_rng(seed)
     n = len(real_arr)
@@ -210,13 +222,28 @@ def block_bootstrap_compression(
     n_blocks = int(np.ceil(n / block_size))
     max_start = n - block_size + 1
 
-    real_metric = metric_fn(real_arr)
-    ha_metric = metric_fn(ha_arr)
-    if real_metric == 0 or not np.isfinite(real_metric) or not np.isfinite(ha_metric):
+    vol_real = realised_volatility(real_arr)
+    vol_ha = realised_volatility(ha_arr)
+    mad_real = median_abs_return(real_arr)
+    mad_ha = median_abs_return(ha_arr)
+    if (
+        vol_real == 0
+        or mad_real == 0
+        or not np.isfinite(vol_real)
+        or not np.isfinite(vol_ha)
+        or not np.isfinite(mad_real)
+        or not np.isfinite(mad_ha)
+    ):
         raise ValueError("Compression ratio is undefined for non-finite or zero baseline")
-    point = 1.0 - ha_metric / real_metric
+    points = {
+        "volatility_compression": 1.0 - vol_ha / vol_real,
+        "median_abs_return_compression": 1.0 - mad_ha / mad_real,
+    }
 
-    boot_values: list[float] = []
+    boot_values = {
+        "volatility_compression": [],
+        "median_abs_return_compression": [],
+    }
     for _ in range(n_boot):
         starts = rng.integers(0, max_start, size=n_blocks)
         indices = np.concatenate([np.arange(s, s + block_size) for s in starts])[:n]
@@ -224,22 +251,30 @@ def block_bootstrap_compression(
         r_boot = real_arr[indices]
         h_boot = ha_arr[indices]
 
-        m_real = metric_fn(r_boot)
-        m_ha = metric_fn(h_boot)
-        if m_real == 0 or not np.isfinite(m_real) or not np.isfinite(m_ha):
-            continue
+        r_vol = realised_volatility(r_boot)
+        h_vol = realised_volatility(h_boot)
+        if r_vol != 0 and np.isfinite(r_vol) and np.isfinite(h_vol):
+            boot_values["volatility_compression"].append(1.0 - h_vol / r_vol)
 
-        boot_values.append(1.0 - m_ha / m_real)
+        r_mad = median_abs_return(r_boot)
+        h_mad = median_abs_return(h_boot)
+        if r_mad != 0 and np.isfinite(r_mad) and np.isfinite(h_mad):
+            boot_values["median_abs_return_compression"].append(
+                1.0 - h_mad / r_mad
+            )
 
-    boot_arr = np.array(boot_values)
-    if len(boot_arr) == 0:
-        raise ValueError("No finite bootstrap compression ratios were produced")
-    return {
-        "point_estimate": float(point),
-        "ci_lower": float(np.percentile(boot_arr, 2.5)),
-        "ci_upper": float(np.percentile(boot_arr, 97.5)),
-        "median": float(np.percentile(boot_arr, 50.0)),
-    }
+    summary: dict[str, dict[str, float]] = {}
+    for key, point_estimate in points.items():
+        boot_arr = np.array(boot_values[key], dtype=float)
+        if len(boot_arr) == 0:
+            raise ValueError(f"No finite bootstrap values were produced for {key}")
+        summary[key] = {
+            "point_estimate": float(point_estimate),
+            "ci_lower": float(np.percentile(boot_arr, 2.5)),
+            "ci_upper": float(np.percentile(boot_arr, 97.5)),
+            "median": float(np.percentile(boot_arr, 50.0)),
+        }
+    return summary
 
 
 # ---------------------------------------------------------------------------
@@ -261,19 +296,14 @@ def build_analysis_frame(path: Path) -> pl.DataFrame:
     tb = load_and_holdout(path)
     ha = generate_heiken_ashi(tb)
 
-    # Join on CloseTime to recover original High/Low alongside HA columns
-    tb = normalize_timestamp_columns(tb, ["CloseTime"])
-    ha = normalize_timestamp_columns(ha, ["CloseTime"])
-    df = tb.join(ha, on="CloseTime", how="inner")
-
-    df = df.with_columns(
+    df = ha.with_columns(
         (pl.col("RealClose").log() - pl.col("RealClose").shift(1).log()).alias(
             "real_return"
         ),
         (pl.col("HAClose").log() - pl.col("HAClose").shift(1).log()).alias(
             "ha_return"
         ),
-        ((pl.col("High") - pl.col("Low")) / pl.col("Close") * 100.0).alias(
+        ((pl.col("RealHigh") - pl.col("RealLow")) / pl.col("RealClose") * 100.0).alias(
             "real_range_pct"
         ),
         ((pl.col("HAHigh") - pl.col("HALow")) / pl.col("HAClose") * 100.0).alias(
@@ -286,7 +316,6 @@ def build_analysis_frame(path: Path) -> pl.DataFrame:
     return df.filter(
         pl.col("real_return").is_not_null()
         & pl.col("ha_return").is_not_null()
-        & pl.col("regime").is_not_null()
     )
 
 
@@ -335,11 +364,8 @@ def analyse_instrument(
     }
 
     # --- Bootstrap CIs for the two key metrics ---
-    LOGGER.info("[%s] Bootstrapping volatility compression", instrument)
-    vol_bootstrap = block_bootstrap_compression(real_ret, ha_ret, realised_volatility)
-
-    LOGGER.info("[%s] Bootstrapping median-abs-return compression", instrument)
-    mad_bootstrap = block_bootstrap_compression(real_ret, ha_ret, median_abs_return)
+    LOGGER.info("[%s] Bootstrapping key compression metrics", instrument)
+    bootstrap = block_bootstrap_key_metrics(real_ret, ha_ret)
 
     # --- Regime-stratified metrics ---
     regime_results: dict[str, dict[str, Any]] = {}
@@ -370,10 +396,7 @@ def analyse_instrument(
         "instrument": instrument,
         "aggregate": aggregate,
         "regimes": regime_results,
-        "bootstrap": {
-            "volatility_compression": vol_bootstrap,
-            "median_abs_return_compression": mad_bootstrap,
-        },
+        "bootstrap": bootstrap,
     }
     plot_frame = clean.select(
         ["CloseTime", "RealClose", "HAClose", "real_return", "ha_return"]

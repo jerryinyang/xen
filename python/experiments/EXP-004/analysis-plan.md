@@ -24,11 +24,11 @@ Quantify the detection latency and precision of chart-type trend reversal signal
 
 ### Step 3: Match Signals to Real Reversals
 
-- **Method**: Event matching within a fixed tolerance window, reporting median latency, precision, recall, and split rate; paired bootstrap intervals for latency differences versus time bars.
+- **Method**: Event matching within a fixed 120-minute tolerance window, reporting median latency, total signal precision, recall, and split rate; exact instrument-count support summaries and tail probabilities for the 3-of-4 decision rule rather than pooled mean-latency uncertainty.
 - **Why this method**: These metrics map directly to speed and fidelity without strategy-return assumptions.
 - **Simpler alternative considered**: Correlation between signal direction and future price movement. That would move toward predictive validation and is out of Phase 1 scope.
-- **Assumptions**: Matched events are temporally dependent; interpretation focuses on instrument-level summaries and effect sizes.
-- **Expected output**: Speed-precision table, latency intervals, and support/refutation flags.
+- **Assumptions**: Matched events are temporally dependent; interpretation focuses on instrument-level summaries and effect sizes. Precision counts duplicate same-direction signals in the denominator so event-dense charts are not rewarded for redundant signals.
+- **Expected output**: Speed-precision table, latency intervals, support/refutation flags, and reversal-label stability diagnostics under the alternate threshold.
 
 ## Visualisations
 
@@ -58,6 +58,7 @@ Quantify the detection latency and precision of chart-type trend reversal signal
 - Report unmatched real reversals and unmatched chart-type signals.
 - The final 30% global holdout remains excluded before reversal labelling, chart generation, event matching, and plotting.
 - Time bars and Heiken Ashi use `CloseTime`; Line Break and Renko use `SourceCloseTime`.
+- The primary tolerance window is 120 minutes and must be reported alongside a simple alternate-threshold stability check.
 
 ### Synthetic Price Discipline
 
@@ -67,7 +68,7 @@ Quantify the detection latency and precision of chart-type trend reversal signal
 
 ### Bar Density Differences
 
-- Normalise false signal and split rates per elapsed time and per reference reversal count.
+- Normalise false signal and split rates per elapsed time and per reference reversal count. Precision uses total emitted signals, not only matched-plus-false signals.
 
 ### Regime Stratification
 

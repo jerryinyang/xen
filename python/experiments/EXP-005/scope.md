@@ -15,7 +15,7 @@ Do chart types agree on trend direction and trend-change timing, and does agreem
 - **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC.
 - **Time range**: Full available dataset per instrument with nested chronological split. First 70% = analysis set; within that, first 70% = train segment and last 30% = test segment. Final 30% = global holdout.
 - **Global holdout**: The final 30% of the full chronologically ordered dataset must not be loaded, inspected, summarized, plotted, or used in any capacity.
-- **Look-ahead bias prevention**: Direction labels use only information available at each event timestamp. Regime labels come from time-bar realised volatility known at or before the timestamp.
+- **Look-ahead bias prevention**: Direction labels use only information available at each event timestamp. Regime labels come from time-bar realised volatility known at or before the timestamp, with volatility tercile thresholds calibrated on the train segment and applied only to the later evaluation segment.
 - **Synthetic price discipline**: No strategy P&L or signal return validation. Agreement is based on direction labels and timestamps, not synthetic chart prices.
 - **Exclusions**: No claim that agreement implies profitability, no predictive modelling, no optimisation of tolerance windows, no bar-index alignment.
 
@@ -33,7 +33,7 @@ Do chart types agree on trend direction and trend-change timing, and does agreem
 
 ## Data Requirements
 
-Generate chart-type event direction tables and align them by timestamp using a predeclared tolerance window, such as nearest event within 5 source minutes for event-based chart types and exact `CloseTime` for time-bar/Heiken Ashi comparisons where possible. Volatility regimes are derived from time bars and applied uniformly by timestamp.
+Generate chart-type event direction tables and align them by timestamp using a predeclared tolerance window, such as nearest event within 5 source minutes for event-based chart types and exact `CloseTime` for time-bar/Heiken Ashi comparisons where possible. Collapse repeated event-chart rows at the same `SourceCloseTime` to one state per source minute before pairwise comparison. Volatility regimes are derived from time bars, calibrated on the train segment, and applied only to later timestamps.
 
 ### Standard Loading Pattern
 

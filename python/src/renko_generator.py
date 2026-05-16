@@ -36,10 +36,14 @@ class RenkoGenerator:
         if self.atr_period < 1:
             raise ValueError("atr_period must be >= 1")
 
-    def update(self, row: dict[str, Any]) -> list[dict[str, Any]]:
-        close = float(row["Close"])
-        high = float(row["High"])
-        low = float(row["Low"])
+    def update(
+        self,
+        open_time: Any,
+        close_time: Any,
+        high: float,
+        low: float,
+        close: float,
+    ) -> list[dict[str, Any]]:
         self.pending_count += 1
 
         if self.anchor_close is None:
@@ -60,9 +64,27 @@ class RenkoGenerator:
 
         rows: list[dict[str, Any]] = []
         while self.anchor_close is not None and close >= self.anchor_close + brick_size:
-            rows.append(self._append_brick(row, self.anchor_close, self.anchor_close + brick_size, brick_size, 1))
+            rows.append(
+                self._append_brick(
+                    open_time,
+                    close_time,
+                    self.anchor_close,
+                    self.anchor_close + brick_size,
+                    brick_size,
+                    1,
+                )
+            )
         while self.anchor_close is not None and close <= self.anchor_close - brick_size:
-            rows.append(self._append_brick(row, self.anchor_close, self.anchor_close - brick_size, brick_size, -1))
+            rows.append(
+                self._append_brick(
+                    open_time,
+                    close_time,
+                    self.anchor_close,
+                    self.anchor_close - brick_size,
+                    brick_size,
+                    -1,
+                )
+            )
         return rows
 
     def _true_range(self, high: float, low: float) -> float:
@@ -72,15 +94,16 @@ class RenkoGenerator:
 
     def _append_brick(
         self,
-        row: dict[str, Any],
+        open_time: Any,
+        close_time: Any,
         open_price: float,
         close_price: float,
         brick_size: float,
         direction: int,
     ) -> dict[str, Any]:
         brick = {
-            "OpenTime": row["OpenTime"],
-            "CloseTime": row["CloseTime"],
+            "OpenTime": open_time,
+            "CloseTime": close_time,
             "Open": open_price,
             "High": max(open_price, close_price),
             "Low": min(open_price, close_price),
@@ -89,7 +112,7 @@ class RenkoGenerator:
             "BrickSize": brick_size,
             "ATRPeriod": self.atr_period,
             "SourceCount": self.pending_count,
-            "SourceCloseTime": row["CloseTime"],
+            "SourceCloseTime": close_time,
         }
         self.anchor_close = close_price
         self.pending_count = 0
@@ -101,8 +124,19 @@ def generate_renko(time_bars: pl.DataFrame, atr_period: int = 14) -> pl.DataFram
     _validate_time_bars(time_bars)
     generator = RenkoGenerator(atr_period=atr_period)
     rows: list[dict[str, Any]] = []
-    for row in time_bars.sort("CloseTime").iter_rows(named=True):
-        rows.extend(generator.update(row))
+    source_rows = time_bars.select(
+        ["OpenTime", "CloseTime", "High", "Low", "Close"]
+    )
+    for open_time, close_time, high, low, close in source_rows.iter_rows():
+        rows.extend(
+            generator.update(
+                open_time,
+                close_time,
+                float(high),
+                float(low),
+                float(close),
+            )
+        )
     return _frame(rows, RENKO_COLUMNS)
 
 

@@ -3,6 +3,7 @@ Experiment EXP-004: Market Structure Capture Speed & Fidelity
 Implements the analysis plan from analysis-plan.md.
 """
 import sys
+from math import comb
 from pathlib import Path
 
 PYTHON_ROOT = Path(__file__).resolve().parents[3]
@@ -58,12 +59,10 @@ ALT_SWING_THRESHOLD = 2.0
 ATR_PERIOD = 14
 TOLERANCE_MINUTES = 120
 
-BOOTSTRAP_SEED = 42
-N_BOOTSTRAP = 10_000
-
 DATA_DIR = PROJECT_ROOT / "data"
 PLOTS_DIR = PYTHON_ROOT / "experiments/EXP-004/plots"
 RESULTS_DIR = PYTHON_ROOT / "experiments/EXP-004/results"
+TIMEBAR_COLUMNS = ["OpenTime", "CloseTime", "Open", "High", "Low", "Close"]
 
 
 # ---------------------------------------------------------------------------
@@ -88,7 +87,7 @@ def load_timebar_data(instrument: str) -> pl.DataFrame:
         raise FileNotFoundError(
             f"No time-bar file found for {instrument} matching {pattern}"
         )
-    scan = pl.scan_parquet(matches).sort("CloseTime")
+    scan = pl.scan_parquet(matches).select(TIMEBAR_COLUMNS).sort("CloseTime")
     total_rows = int(scan.select(pl.len()).collect().item())
     return scan.slice(0, int(total_rows * 0.7)).collect()
 
@@ -134,8 +133,9 @@ def compute_atr(
     tr[0] = highs[0] - lows[0]
 
     atr = np.full(n, np.nan)
-    for i in range(period - 1, n):
-        atr[i] = float(np.mean(tr[i - period + 1 : i + 1]))
+    rolling_sum = np.cumsum(tr, dtype=float)
+    prior_sum = np.concatenate(([0.0], rolling_sum[:-period]))
+    atr[period - 1 :] = (rolling_sum[period - 1 :] - prior_sum) / period
     return atr
 
 
@@ -143,6 +143,7 @@ def detect_swing_reversals(
     time_bars: pl.DataFrame,
     threshold: float,
     atr_period: int = ATR_PERIOD,
+    atr: np.ndarray | None = None,
 ) -> pl.DataFrame:
     """Detect ATR-scaled swing reversals on 1-minute time bars.
 
@@ -167,7 +168,10 @@ def detect_swing_reversals(
     closes = time_bars["Close"].to_numpy()
     highs = time_bars["High"].to_numpy()
     lows = time_bars["Low"].to_numpy()
-    close_times = time_bars["CloseTime"].to_numpy()
+    close_times = np.asarray(
+        time_bars["CloseTime"].to_numpy(),
+        dtype="datetime64[us]",
+    )
     n = len(closes)
 
     if n < atr_period + 2:
@@ -175,7 +179,7 @@ def detect_swing_reversals(
             {"ReversalTime": [], "Direction": [], "ATR": []}
         )
 
-    atr = compute_atr(time_bars, atr_period)
+    atr_values = compute_atr(time_bars, atr_period) if atr is None else atr
     start_idx = atr_period
     direction = 1 if closes[start_idx] >= closes[start_idx - 1] else -1
     extreme = highs[start_idx] if direction == 1 else lows[start_idx]
@@ -185,7 +189,7 @@ def detect_swing_reversals(
     rev_atrs: list[float] = []
 
     for i in range(start_idx + 1, n):
-        current_atr = atr[i]
+        current_atr = atr_values[i]
         if np.isnan(current_atr) or current_atr <= 0:
             continue
 
@@ -210,7 +214,7 @@ def detect_swing_reversals(
 
     return pl.DataFrame(
         {
-            "ReversalTime": rev_times,
+            "ReversalTime": np.asarray(rev_times, dtype="datetime64[us]"),
             "Direction": rev_dirs,
             "ATR": rev_atrs,
         }
@@ -285,7 +289,10 @@ def extract_direction_changes(
             -1,
         )
 
-    times = chart_df[time_col].to_numpy()
+    times = np.asarray(
+        chart_df[time_col].to_numpy(),
+        dtype="datetime64[us]",
+    )
     change_mask = directions[1:] != directions[:-1]
     change_indices = np.where(change_mask)[0] + 1
 
@@ -304,13 +311,14 @@ def match_signals_to_reversals(
     real_reversals: pl.DataFrame,
     signals: pl.DataFrame,
     tolerance_minutes: int = TOLERANCE_MINUTES,
-) -> tuple[pl.DataFrame, int, int]:
+) -> tuple[pl.DataFrame, int, int, int]:
     """Match chart-type signals to real reversals within tolerance.
 
     A signal matches a real reversal if it occurs after the reversal,
     within the tolerance window, and has the same direction. Each real
     reversal gets at most one matched signal (the first chronologically).
-    Additional signals within the tolerance window are duplicates.
+    Additional same-direction signals before the next matched reversal
+    count as duplicate signals for split-rate accounting.
     Signals not matching any real reversal are false signals.
 
     Parameters
@@ -324,11 +332,11 @@ def match_signals_to_reversals(
 
     Returns
     -------
-    tuple[pl.DataFrame, int, int]
+    tuple[pl.DataFrame, int, int, int]
         Matching table (one row per real reversal), false signal count,
-        and duplicate signal count.
+        duplicate signal count, and split-event count.
     """
-    if len(real_reversals) == 0 or len(signals) == 0:
+    if len(real_reversals) == 0:
         empty = pl.DataFrame(
             {
                 "ReversalTime": [],
@@ -336,44 +344,73 @@ def match_signals_to_reversals(
                 "LatencyMinutes": [],
                 "Matched": [],
                 "Direction": [],
+                "DuplicateSignalsInWindow": [],
             }
         )
-        return empty, 0, 0 if len(signals) == 0 else len(signals)
+        return empty, len(signals), 0, 0
 
     rev_times = real_reversals["ReversalTime"].to_numpy()
-    rev_dirs = real_reversals["Direction"].to_numpy()
+    rev_dirs = real_reversals["Direction"].to_numpy().astype(np.int8)
     sig_times = signals["SignalTime"].to_numpy()
-    sig_dirs = signals["Direction"].to_numpy()
-
-    matched = np.zeros(len(signals), dtype=bool)
-    matched_rev_idx = np.full(len(signals), -1, dtype=int)
+    sig_dirs = signals["Direction"].to_numpy().astype(np.int8)
     tolerance_td = np.timedelta64(tolerance_minutes, "m")
+    matched_signal_indices = np.full(len(rev_times), -1, dtype=int)
+    duplicate_counts = np.zeros(len(rev_times), dtype=int)
+    duplicate_signal_count = 0
+    split_event_count = 0
 
-    for r_idx in range(len(rev_times)):
-        r_time = rev_times[r_idx]
-        r_dir = rev_dirs[r_idx]
-        deadline = r_time + tolerance_td
+    for direction in (-1, 1):
+        rev_indices = np.flatnonzero(rev_dirs == direction)
+        sig_indices = np.flatnonzero(sig_dirs == direction)
+        if len(rev_indices) == 0:
+            continue
 
-        candidates = np.where(
-            (sig_times >= r_time)
-            & (sig_times <= deadline)
-            & (sig_dirs == r_dir)
-            & (~matched)
-        )[0]
+        rev_times_dir = rev_times[rev_indices]
+        sig_times_dir = sig_times[sig_indices]
+        matched_positions = np.full(len(rev_indices), -1, dtype=int)
 
-        if len(candidates) > 0:
-            first = candidates[0]
-            matched[first] = True
-            matched_rev_idx[first] = r_idx
+        signal_ptr = 0
+        for rev_pos, rev_time in enumerate(rev_times_dir):
+            while signal_ptr < len(sig_times_dir) and sig_times_dir[signal_ptr] < rev_time:
+                signal_ptr += 1
+            if (
+                signal_ptr < len(sig_times_dir)
+                and sig_times_dir[signal_ptr] <= rev_time + tolerance_td
+            ):
+                matched_positions[rev_pos] = signal_ptr
+                matched_signal_indices[rev_indices[rev_pos]] = sig_indices[signal_ptr]
+                signal_ptr += 1
+
+        matched_rev_positions = np.flatnonzero(matched_positions >= 0)
+        for idx, rev_pos in enumerate(matched_rev_positions):
+            match_pos = matched_positions[rev_pos]
+            next_match_pos = (
+                matched_positions[matched_rev_positions[idx + 1]]
+                if idx + 1 < len(matched_rev_positions)
+                else len(sig_times_dir)
+            )
+            deadline = rev_times_dir[rev_pos] + tolerance_td
+            dup_count = 0
+            pos = match_pos + 1
+            while pos < next_match_pos and sig_times_dir[pos] <= deadline:
+                dup_count += 1
+                pos += 1
+            if dup_count > 0:
+                duplicate_counts[rev_indices[rev_pos]] = dup_count
+                duplicate_signal_count += dup_count
+                split_event_count += 1
+
+    matched_count = int(np.sum(matched_signal_indices >= 0))
+    false_count = int(len(sig_times) - matched_count - duplicate_signal_count)
 
     records: list[dict[str, Any]] = []
     for r_idx in range(len(rev_times)):
         r_time = rev_times[r_idx]
         r_dir = rev_dirs[r_idx]
-        sig_idx_arr = np.where(matched_rev_idx == r_idx)[0]
+        sig_idx = matched_signal_indices[r_idx]
 
-        if len(sig_idx_arr) > 0:
-            s_time = sig_times[sig_idx_arr[0]]
+        if sig_idx >= 0:
+            s_time = sig_times[sig_idx]
             latency = float((s_time - r_time) / np.timedelta64(1, "m"))
             records.append(
                 {
@@ -382,6 +419,7 @@ def match_signals_to_reversals(
                     "LatencyMinutes": latency,
                     "Matched": True,
                     "Direction": r_dir,
+                    "DuplicateSignalsInWindow": int(duplicate_counts[r_idx]),
                 }
             )
         else:
@@ -392,36 +430,11 @@ def match_signals_to_reversals(
                     "LatencyMinutes": np.nan,
                     "Matched": False,
                     "Direction": r_dir,
+                    "DuplicateSignalsInWindow": 0,
                 }
             )
 
-    unmatched_indices = np.where(~matched)[0]
-    false_count = 0
-    duplicate_count = 0
-
-    for s_idx in unmatched_indices:
-        s_time = sig_times[s_idx]
-        s_dir = sig_dirs[s_idx]
-        is_duplicate = False
-
-        for r_idx in range(len(rev_times)):
-            r_time = rev_times[r_idx]
-            r_dir = rev_dirs[r_idx]
-            deadline = r_time + tolerance_td
-            if (
-                s_time >= r_time
-                and s_time <= deadline
-                and s_dir == r_dir
-            ):
-                is_duplicate = True
-                break
-
-        if is_duplicate:
-            duplicate_count += 1
-        else:
-            false_count += 1
-
-    return pl.DataFrame(records), false_count, duplicate_count
+    return pl.DataFrame(records), false_count, duplicate_signal_count, split_event_count
 
 
 # ---------------------------------------------------------------------------
@@ -431,10 +444,12 @@ def compute_metrics(
     matching_df: pl.DataFrame,
     false_count: int,
     duplicate_count: int,
+    split_event_count: int,
     total_real: int,
+    total_signals: int,
     total_minutes: float,
 ) -> dict[str, Any]:
-    """Compute latency, precision, recall, and split rate.
+    """Compute latency, precision, recall, and split metrics.
 
     Parameters
     ----------
@@ -444,8 +459,12 @@ def compute_metrics(
         Number of false signals.
     duplicate_count : int
         Number of duplicate signals.
+    split_event_count : int
+        Number of real reversals with more than one same-direction signal.
     total_real : int
         Total reference reversals.
+    total_signals : int
+        Total chart-type signals.
     total_minutes : float
         Total elapsed minutes in analysis set.
 
@@ -455,15 +474,22 @@ def compute_metrics(
         Metric dictionary.
     """
     if total_real == 0 or len(matching_df) == 0:
+        signal_precision = (
+            0.0 if total_signals == 0 else 0.0
+        )
         return {
             "Matched": 0,
+            "SignalCount": total_signals,
             "False": false_count,
             "Duplicates": duplicate_count,
+            "SplitEvents": split_event_count,
             "MedianLatency": np.nan,
             "MeanLatency": np.nan,
-            "Precision": np.nan,
+            "Precision": signal_precision,
+            "MatchPrecision": np.nan,
             "Recall": np.nan,
             "SplitRate": np.nan,
+            "DuplicateSignalRate": np.nan if total_signals == 0 else duplicate_count / total_signals,
             "FalsePerDay": np.nan,
             "DuplicatePerDay": np.nan,
         }
@@ -478,11 +504,13 @@ def compute_metrics(
     median_latency = float(np.median(latencies)) if len(latencies) > 0 else np.nan
     mean_latency = float(np.mean(latencies)) if len(latencies) > 0 else np.nan
 
-    precision = (
-        matched / (matched + false_count) if (matched + false_count) > 0 else 0.0
+    signal_precision = matched / total_signals if total_signals > 0 else 0.0
+    match_precision = (
+        matched / (matched + false_count) if (matched + false_count) > 0 else np.nan
     )
     recall = matched / total_real if total_real > 0 else 0.0
-    split_rate = duplicate_count / matched if matched > 0 else 0.0
+    split_rate = split_event_count / total_real if total_real > 0 else 0.0
+    duplicate_signal_rate = duplicate_count / total_signals if total_signals > 0 else 0.0
 
     days = total_minutes / 1440.0
     false_per_day = false_count / days if days > 0 else 0.0
@@ -490,73 +518,115 @@ def compute_metrics(
 
     return {
         "Matched": matched,
+        "SignalCount": total_signals,
         "False": false_count,
         "Duplicates": duplicate_count,
+        "SplitEvents": split_event_count,
         "MedianLatency": median_latency,
         "MeanLatency": mean_latency,
-        "Precision": precision,
+        "Precision": signal_precision,
+        "MatchPrecision": match_precision,
         "Recall": recall,
         "SplitRate": split_rate,
+        "DuplicateSignalRate": duplicate_signal_rate,
         "FalsePerDay": false_per_day,
         "DuplicatePerDay": dup_per_day,
     }
 
 
-# ---------------------------------------------------------------------------
-# Bootstrap
-# ---------------------------------------------------------------------------
-def bootstrap_paired_latency_ci(
-    instrument_latencies: dict[str, dict[str, float]],
-    chart_type: str,
-    baseline: str = "Time",
-    n_bootstrap: int = N_BOOTSTRAP,
-    seed: int = BOOTSTRAP_SEED,
-) -> tuple[float, float, float]:
-    """Bootstrap percentile CI for mean paired latency difference.
+def exact_tail_probability_at_least(successes: int, total: int) -> float:
+    """Return the exact upper-tail probability under a fair sign null."""
+    if total <= 0:
+        return np.nan
+    return sum(comb(total, k) for k in range(successes, total + 1)) / (2 ** total)
 
-    Parameters
-    ----------
-    instrument_latencies : dict
-        ``{instrument: {chart_type: median_latency}}``.
-    chart_type : str
-        Chart type to compare against baseline.
-    baseline : str
-        Baseline chart type (default "Time").
-    n_bootstrap : int
-        Number of bootstrap resamples.
-    seed : int
-        Random seed.
 
-    Returns
-    -------
-    tuple[float, float, float]
-        (mean_diff, ci_lower, ci_upper).
-    """
-    diffs = [
-        latencies[baseline] - latencies[chart_type]
-        for inst, latencies in instrument_latencies.items()
-        if baseline in latencies
-        and chart_type in latencies
-        and not np.isnan(latencies[baseline])
-        and not np.isnan(latencies[chart_type])
-    ]
+def nearest_directional_overlap(
+    reference: pl.DataFrame,
+    candidate: pl.DataFrame,
+    tolerance_minutes: int = TOLERANCE_MINUTES,
+) -> tuple[int, np.ndarray]:
+    """Count same-direction nearest matches within a symmetric tolerance."""
+    if len(reference) == 0 or len(candidate) == 0:
+        return 0, np.array([], dtype=float)
 
-    if len(diffs) == 0:
-        return (np.nan, np.nan, np.nan)
+    ref_times = reference["ReversalTime"].to_numpy()
+    ref_dirs = reference["Direction"].to_numpy().astype(np.int8)
+    cand_times = candidate["ReversalTime"].to_numpy()
+    cand_dirs = candidate["Direction"].to_numpy().astype(np.int8)
+    tolerance_td = np.timedelta64(tolerance_minutes, "m")
 
-    diffs_arr = np.array(diffs)
-    rng = np.random.default_rng(seed)
-    n = len(diffs_arr)
-    boot_means = []
-    for _ in range(n_bootstrap):
-        sample = rng.choice(diffs_arr, size=n, replace=True)
-        boot_means.append(np.mean(sample))
+    matched_count = 0
+    deltas: list[np.ndarray] = []
+    for direction in (-1, 1):
+        ref_dir = ref_times[ref_dirs == direction]
+        cand_dir = cand_times[cand_dirs == direction]
+        if len(ref_dir) == 0 or len(cand_dir) == 0:
+            continue
 
-    boot_means_arr = np.array(boot_means)
-    mean_diff = float(np.mean(diffs_arr))
-    ci_lo = float(np.quantile(boot_means_arr, 0.025))
-    ci_hi = float(np.quantile(boot_means_arr, 0.975))
-    return (mean_diff, ci_lo, ci_hi)
+        insert = np.searchsorted(cand_dir, ref_dir, side="left")
+        best_delta = np.full(len(ref_dir), np.timedelta64(tolerance_minutes + 1, "m"))
+
+        prev_mask = insert > 0
+        if np.any(prev_mask):
+            prev_delta = ref_dir[prev_mask] - cand_dir[insert[prev_mask] - 1]
+            best_delta[prev_mask] = np.minimum(best_delta[prev_mask], prev_delta)
+
+        next_mask = insert < len(cand_dir)
+        if np.any(next_mask):
+            next_delta = cand_dir[insert[next_mask]] - ref_dir[next_mask]
+            best_delta[next_mask] = np.minimum(best_delta[next_mask], next_delta)
+
+        matched_mask = best_delta <= tolerance_td
+        matched_count += int(np.sum(matched_mask))
+        if np.any(matched_mask):
+            deltas.append(
+                best_delta[matched_mask].astype("timedelta64[m]").astype(float)
+            )
+
+    if not deltas:
+        return matched_count, np.array([], dtype=float)
+    return matched_count, np.concatenate(deltas)
+
+
+def evaluate_reversal_stability(
+    primary: pl.DataFrame,
+    alternate: pl.DataFrame,
+    tolerance_minutes: int = TOLERANCE_MINUTES,
+) -> dict[str, Any]:
+    """Measure how stable reversal labels remain under the alternate threshold."""
+    primary_matches, primary_deltas = nearest_directional_overlap(
+        primary,
+        alternate,
+        tolerance_minutes=tolerance_minutes,
+    )
+    alternate_matches, alternate_deltas = nearest_directional_overlap(
+        alternate,
+        primary,
+        tolerance_minutes=tolerance_minutes,
+    )
+    primary_overlap = (
+        primary_matches / len(primary) if len(primary) > 0 else np.nan
+    )
+    alternate_overlap = (
+        alternate_matches / len(alternate) if len(alternate) > 0 else np.nan
+    )
+    all_deltas = np.concatenate(
+        [arr for arr in (primary_deltas, alternate_deltas) if len(arr) > 0]
+    ) if (len(primary_deltas) > 0 or len(alternate_deltas) > 0) else np.array([], dtype=float)
+    median_shift = float(np.median(all_deltas)) if len(all_deltas) > 0 else np.nan
+    return {
+        "PrimaryCount": len(primary),
+        "AlternateCount": len(alternate),
+        "PrimaryOverlapRate": primary_overlap,
+        "AlternateOverlapRate": alternate_overlap,
+        "MedianConfirmationShiftMinutes": median_shift,
+        "StableLabels": (
+            min(primary_overlap, alternate_overlap) >= 0.70
+            if not np.isnan(primary_overlap) and not np.isnan(alternate_overlap)
+            else False
+        ),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -829,6 +899,9 @@ def main() -> None:
     """Run the full EXP-004 analysis pipeline."""
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    legacy_bootstrap_path = RESULTS_DIR / "bootstrap_latency_ci.csv"
+    if legacy_bootstrap_path.exists():
+        legacy_bootstrap_path.unlink()
 
     print("EXP-004: Market Structure Capture Speed & Fidelity")
     print(f"Instruments: {', '.join(INSTRUMENTS)}")
@@ -840,10 +913,11 @@ def main() -> None:
     latency_records: list[dict[str, Any]] = []
     pr_records: list[dict[str, Any]] = []
     latency_long_records: list[dict[str, Any]] = []
+    support_records: list[dict[str, Any]] = []
+    sensitivity_records: list[dict[str, Any]] = []
 
     instrument_latencies: dict[str, dict[str, float]] = {}
     instrument_metrics: dict[str, dict[str, dict[str, Any]]] = {}
-    sensitivity_counts: dict[str, dict[str, int]] = {}
 
     # Variables for event timeline plot
     plot_instrument: str | None = None
@@ -865,20 +939,28 @@ def main() -> None:
             total_minutes = float(time_span.total_seconds() / 60.0)
 
             # Real-price reversal reference
+            atr_values = compute_atr(analysis_df, ATR_PERIOD)
             real_reversals = detect_swing_reversals(
-                analysis_df, threshold=SWING_THRESHOLD
+                analysis_df,
+                threshold=SWING_THRESHOLD,
+                atr=atr_values,
             )
             alt_reversals = detect_swing_reversals(
-                analysis_df, threshold=ALT_SWING_THRESHOLD
+                analysis_df,
+                threshold=ALT_SWING_THRESHOLD,
+                atr=atr_values,
             )
             n_real = len(real_reversals)
             print(
                 f"  Real reversals: {n_real} (alt threshold: {len(alt_reversals)})"
             )
-            sensitivity_counts[instrument] = {
-                "Primary": n_real,
-                "Alternate": len(alt_reversals),
-            }
+            sensitivity = evaluate_reversal_stability(
+                real_reversals,
+                alt_reversals,
+                tolerance_minutes=TOLERANCE_MINUTES,
+            )
+            sensitivity["Instrument"] = instrument
+            sensitivity_records.append(sensitivity)
 
             instrument_latencies[instrument] = {}
             instrument_metrics[instrument] = {}
@@ -897,8 +979,9 @@ def main() -> None:
                     config.get("dir_col"),
                 )
                 signals_by_chart[chart_name] = signals
+                total_signals = len(signals)
 
-                matching_df, false_count, duplicate_count = (
+                matching_df, false_count, duplicate_count, split_event_count = (
                     match_signals_to_reversals(
                         real_reversals, signals, TOLERANCE_MINUTES
                     )
@@ -908,7 +991,9 @@ def main() -> None:
                     matching_df,
                     false_count,
                     duplicate_count,
+                    split_event_count,
                     n_real,
+                    total_signals,
                     total_minutes,
                 )
                 instrument_metrics[instrument][chart_name] = metrics
@@ -927,8 +1012,12 @@ def main() -> None:
                             "LatencyMinutes": row["LatencyMinutes"],
                             "Matched": row["Matched"],
                             "Direction": row["Direction"],
+                            "DuplicateSignalsInWindow": row[
+                                "DuplicateSignalsInWindow"
+                            ],
                             "FalseCount": false_count,
                             "DuplicateCount": duplicate_count,
+                            "SplitEventCount": split_event_count,
                         }
                     )
 
@@ -947,8 +1036,10 @@ def main() -> None:
                         "Instrument": instrument,
                         "ChartType": chart_name,
                         "Precision": metrics["Precision"],
+                        "MatchPrecision": metrics["MatchPrecision"],
                         "Recall": metrics["Recall"],
                         "SplitRate": metrics["SplitRate"],
+                        "DuplicateSignalRate": metrics["DuplicateSignalRate"],
                         "FalsePerDay": metrics["FalsePerDay"],
                         "DuplicatePerDay": metrics["DuplicatePerDay"],
                     }
@@ -993,40 +1084,13 @@ def main() -> None:
             print(f"  Warning: Failed to process {instrument}: {exc}")
             continue
 
-    # --- Bootstrap latency CIs (event types vs Time) ---
-    bootstrap_records: list[dict[str, Any]] = []
     event_types = ["LineBreak", "Renko", "HeikenAshi"]
-    for event_type in event_types:
-        mean_diff, ci_lo, ci_hi = bootstrap_paired_latency_ci(
-            instrument_latencies, event_type, baseline="Time"
-        )
-        bootstrap_records.append(
-            {
-                "Comparison": f"{event_type} vs Time",
-                "MeanDiff": mean_diff,
-                "CI_Lower": ci_lo,
-                "CI_Upper": ci_hi,
-                "CI_Excludes_Zero": (ci_lo > 0) or (ci_hi < 0),
-                "N_Instruments": sum(
-                    1
-                    for inst in instrument_latencies
-                    if "Time" in instrument_latencies[inst]
-                    and event_type in instrument_latencies[inst]
-                    and not np.isnan(
-                        instrument_latencies[inst]["Time"]
-                    )
-                    and not np.isnan(
-                        instrument_latencies[inst][event_type]
-                    )
-                ),
-            }
-        )
 
     # --- Save results ---
     event_matching_df = pd.DataFrame(event_matching_records)
     latency_df = pd.DataFrame(latency_records)
     pr_df = pd.DataFrame(pr_records)
-    bootstrap_df = pd.DataFrame(bootstrap_records)
+    sensitivity_df = pd.DataFrame(sensitivity_records)
 
     event_matching_df.to_csv(
         RESULTS_DIR / "event_matching_table.csv", index=False
@@ -1035,21 +1099,26 @@ def main() -> None:
     pr_df.to_csv(
         RESULTS_DIR / "precision_recall_summary.csv", index=False
     )
-    bootstrap_df.to_csv(
-        RESULTS_DIR / "bootstrap_latency_ci.csv", index=False
+    sensitivity_df.to_csv(
+        RESULTS_DIR / "sensitivity_summary.csv", index=False
     )
 
     print(f"\nSaved event_matching_table.csv ({len(event_matching_df)} rows)")
     print(f"Saved latency_summary.csv ({len(latency_df)} rows)")
     print(f"Saved precision_recall_summary.csv ({len(pr_df)} rows)")
-    print(f"Saved bootstrap_latency_ci.csv ({len(bootstrap_df)} rows)")
+    print(f"Saved sensitivity_summary.csv ({len(sensitivity_df)} rows)")
 
     # --- Sensitivity check ---
-    print("\nSensitivity check (reversal counts):")
-    for inst, counts in sensitivity_counts.items():
+    print("\nSensitivity check:")
+    for record in sensitivity_records:
         print(
-            f"  {inst}: primary={counts['Primary']}, "
-            f"alternate={counts['Alternate']}"
+            "  "
+            f"{record['Instrument']}: primary={record['PrimaryCount']}, "
+            f"alternate={record['AlternateCount']}, "
+            f"overlap={record['PrimaryOverlapRate']:.1%}/"
+            f"{record['AlternateOverlapRate']:.1%}, "
+            f"median_shift={record['MedianConfirmationShiftMinutes']:.1f}m, "
+            f"stable={record['StableLabels']}"
         )
 
     # --- Produce visualisations ---
@@ -1125,9 +1194,12 @@ def main() -> None:
 
     # --- Hypothesis support summary ---
     print("\nHypothesis Support Summary:")
+    total_instruments = len(INSTRUMENTS)
     for event_type in event_types:
+        evaluable_count = 0
         faster_count = 0
         precision_ok_count = 0
+        combined_count = 0
         for inst in INSTRUMENTS:
             if (
                 inst in instrument_latencies
@@ -1136,18 +1208,64 @@ def main() -> None:
             ):
                 time_lat = instrument_latencies[inst]["Time"]
                 evt_lat = instrument_latencies[inst][event_type]
-                if not np.isnan(time_lat) and not np.isnan(evt_lat):
-                    if time_lat > 0 and (time_lat - evt_lat) / time_lat >= 0.30:
-                        faster_count += 1
-                    time_prec = instrument_metrics[inst]["Time"]["Precision"]
-                    evt_prec = instrument_metrics[inst][event_type]["Precision"]
-                    if not np.isnan(time_prec) and not np.isnan(evt_prec):
-                        if evt_prec <= time_prec + 0.10:
-                            precision_ok_count += 1
-        print(
-            f"  {event_type}: >=30% faster on {faster_count}/4 instruments, "
-            f"precision within +10pp on {precision_ok_count}/4 instruments"
+                time_prec = instrument_metrics[inst]["Time"]["Precision"]
+                evt_prec = instrument_metrics[inst][event_type]["Precision"]
+                if (
+                    np.isnan(time_lat)
+                    or np.isnan(evt_lat)
+                    or np.isnan(time_prec)
+                    or np.isnan(evt_prec)
+                ):
+                    continue
+
+                evaluable_count += 1
+                faster = (
+                    time_lat > 0 and (time_lat - evt_lat) / time_lat >= 0.30
+                )
+                precision_ok = evt_prec <= time_prec + 0.10
+
+                if faster:
+                    faster_count += 1
+                if precision_ok:
+                    precision_ok_count += 1
+                if faster and precision_ok:
+                    combined_count += 1
+        support_records.append(
+            {
+                "ChartType": event_type,
+                "EvaluableInstruments": evaluable_count,
+                "FasterCount": faster_count,
+                "PrecisionOkCount": precision_ok_count,
+                "CombinedSupportCount": combined_count,
+                "DecisionRuleEvaluable": evaluable_count == total_instruments,
+                "FasterRuleMet": (
+                    evaluable_count == total_instruments and faster_count >= 3
+                ),
+                "CombinedRuleMet": (
+                    evaluable_count == total_instruments and combined_count >= 3
+                ),
+                "FasterTailProbability": exact_tail_probability_at_least(
+                    faster_count,
+                    evaluable_count,
+                ),
+                "CombinedTailProbability": exact_tail_probability_at_least(
+                    combined_count,
+                    evaluable_count,
+                ),
+            }
         )
+        print(
+            f"  {event_type}: evaluable={evaluable_count}/{total_instruments}, "
+            f">=30% faster on {faster_count}/{evaluable_count}, "
+            f"precision within +10pp on {precision_ok_count}/{evaluable_count}, "
+            f"combined support on {combined_count}/{evaluable_count}, "
+            f"combined tail p={exact_tail_probability_at_least(combined_count, evaluable_count):.4f}"
+        )
+
+    pd.DataFrame(support_records).to_csv(
+        RESULTS_DIR / "support_summary.csv",
+        index=False,
+    )
 
     print("EXP-004 complete.")
 
