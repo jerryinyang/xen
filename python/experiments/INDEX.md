@@ -14,7 +14,7 @@
 | EXP-004-TF | Timeframe Replication: Market Structure Capture Speed & Fidelity | REFUTED | Event charts faster (0-15 min vs 30 min) AND more precise (0.51-1.02 vs 0.15-0.25); speed-recall-precision trade-off | 2026-05-17 |
 | EXP-005-TF | Timeframe Replication: Cross-Chart-Type Alignment & Regime Correspondence | REFUTED | LB<->Renko agreement 100% on matched events but only 50% overlap; improvement over Time bars only 1-2pp (need ≥10pp) | 2026-05-17 |
 | EXP-006-TF | Timeframe Replication: Heiken Ashi Synthetic Price Distortion Quantification | REFUTED | Volatility compression 23-27% (need ≥30%); return compression 23-29% meets ≥20% but both thresholds required | 2026-05-17 |
-| EXP-007 | Multi-State Signal-Quality Baseline | PLANNED | Scope and analysis plan created; functional gate for Block B signal-quality measurement | 2026-05-17 |
+| EXP-007 | Multi-State Signal-Quality Baseline | SUPPORTED | Measurement gate passed via 15m Renko FE/AE and LineBreak AE differentiation; FE/AE carry forward, precision/run-continuation do not | 2026-05-17 |
 | EXP-008 | Renko as a Precision Gate Over Time-Bar Signals | PLANNED | Scope and analysis plan created; tests 1-minute and 15-minute Renko-confirmed time-bar signals | 2026-05-17 |
 | EXP-009 | Heiken Ashi Direction as a Signal Generator, Evaluated on Real Prices | PLANNED | Scope and analysis plan created; tests HA direction changes as real-price signal candidates | 2026-05-17 |
 | EXP-010 | Line Break as a Confirmation Layer Over Renko Signals | PLANNED | Scope and analysis plan created; tests Line Break-confirmed Renko quality and coverage cost | 2026-05-17 |

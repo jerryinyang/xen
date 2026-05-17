@@ -204,11 +204,12 @@ def future_window_extrema(
     future_min = np.full(len(times), np.nan)
     max_queue: deque[int] = deque()
     min_queue: deque[int] = deque()
-    delta = np.timedelta64(window_minutes, "m")
+    time_values = times.astype("datetime64[ns]").astype(np.int64, copy=False)
+    delta = np.timedelta64(window_minutes, "m").astype("timedelta64[ns]").astype(np.int64)
 
-    for idx in range(len(times) - 1, -1, -1):
+    for idx in range(len(time_values) - 1, -1, -1):
         candidate = idx + 1
-        if candidate < len(times):
+        if candidate < len(time_values):
             while max_queue and max_values[max_queue[-1]] <= max_values[candidate]:
                 max_queue.pop()
             max_queue.append(candidate)
@@ -216,10 +217,10 @@ def future_window_extrema(
                 min_queue.pop()
             min_queue.append(candidate)
 
-        cutoff = times[idx] + delta
-        while max_queue and times[max_queue[0]] > cutoff:
+        cutoff = time_values[idx] + delta
+        while max_queue and time_values[max_queue[0]] > cutoff:
             max_queue.popleft()
-        while min_queue and times[min_queue[0]] > cutoff:
+        while min_queue and time_values[min_queue[0]] > cutoff:
             min_queue.popleft()
 
         if max_queue:
@@ -497,18 +498,16 @@ def attach_multiplicity_and_recall_inputs(
     if moves.empty:
         return out
     move_by_direction = {
-        direction: group["MoveTime"].to_numpy(dtype="datetime64[ns]")
+        direction: np.sort(group["MoveTime"].to_numpy(dtype="datetime64[ns]"))
         for direction, group in moves.groupby("Direction")
     }
     tol = np.timedelta64(RECALL_TOLERANCE_MINUTES, "m")
     for direction, move_times in move_by_direction.items():
         signal_mask = out["Direction"].to_numpy(int) == int(direction)
         signal_times = out.loc[signal_mask, "SignalTime"].to_numpy(dtype="datetime64[ns]")
-        counts = []
-        for signal_time in signal_times:
-            left = np.searchsorted(move_times, signal_time - tol, side="left")
-            right = np.searchsorted(move_times, signal_time + tol, side="right")
-            counts.append(right - left)
+        left = np.searchsorted(move_times, signal_times - tol, side="left")
+        right = np.searchsorted(move_times, signal_times + tol, side="right")
+        counts = right - left
         out.loc[signal_mask, "SignalMultiplicity"] = counts
     return out
 
@@ -524,14 +523,14 @@ def event_recall(evaluated: pd.DataFrame, moves: pd.DataFrame) -> float:
     }
     tol = np.timedelta64(RECALL_TOLERANCE_MINUTES, "m")
     captured = 0
-    for row in moves.itertuples(index=False):
-        signal_times = signal_by_direction.get(int(row.Direction))
+    for direction, move_group in moves.groupby("Direction"):
+        signal_times = signal_by_direction.get(int(direction))
         if signal_times is None or len(signal_times) == 0:
             continue
-        move_time = np.datetime64(row.MoveTime)
-        left = np.searchsorted(signal_times, move_time - tol, side="left")
-        right = np.searchsorted(signal_times, move_time + tol, side="right")
-        captured += int(right > left)
+        move_times = np.sort(move_group["MoveTime"].to_numpy(dtype="datetime64[ns]"))
+        left = np.searchsorted(signal_times, move_times - tol, side="left")
+        right = np.searchsorted(signal_times, move_times + tol, side="right")
+        captured += int(np.count_nonzero(right > left))
     return captured / len(moves)
 
 
@@ -769,12 +768,12 @@ def save_outputs(
     comparisons: pd.DataFrame,
     extra_tables: dict[str, pd.DataFrame] | None = None,
 ) -> None:
-    validation_df.to_csv(results_dir / "load_validation.csv", index=False)
-    evaluated.to_csv(results_dir / "signal_metrics.csv", index=False)
-    summary.to_csv(results_dir / "summary_metrics.csv", index=False)
-    comparisons.to_csv(results_dir / "comparison_metrics.csv", index=False)
+    validation_df.to_parquet(results_dir / "load_validation.parquet", index=False)
+    evaluated.to_parquet(results_dir / "signal_metrics.parquet", index=False)
+    summary.to_parquet(results_dir / "summary_metrics.parquet", index=False)
+    comparisons.to_parquet(results_dir / "comparison_metrics.parquet", index=False)
     for name, table in (extra_tables or {}).items():
-        table.to_csv(results_dir / f"{name}.csv", index=False)
+        table.to_parquet(results_dir / f"{name}.parquet", index=False)
 
 
 def plot_distribution(
@@ -857,7 +856,9 @@ def run_exp007() -> None:
     missing_rows: list[dict[str, Any]] = []
 
     for instrument in INSTRUMENTS:
+        LOGGER.info("%s: loading %s", exp_id, instrument)
         data = load_instrument_data(instrument)
+        LOGGER.info("%s: building real-price context for %s", exp_id, instrument)
         context = build_context(data)
         moves = qualifying_moves(context)
         moves_by_instrument[instrument] = moves
@@ -865,6 +866,7 @@ def run_exp007() -> None:
         groups: list[pd.DataFrame] = []
 
         for timeframe, bars in data.timeframes.items():
+            LOGGER.info("%s: generating %s signal sets for %s", exp_id, timeframe, instrument)
             time_signals = timebar_signals(bars, instrument, timeframe, "Time")
             groups.append(time_signals)
             for chart_type in ["LineBreak", "Renko", "HeikenAshi"]:
@@ -889,10 +891,13 @@ def run_exp007() -> None:
         evaluated_parts.append(
             evaluate_signal_groups(groups, {instrument: context}, {instrument: moves})
         )
+        LOGGER.info("%s: evaluated %s", exp_id, instrument)
 
     evaluated = pd.concat(evaluated_parts, ignore_index=True) if evaluated_parts else empty_signal_frame()
     validation_df = pd.DataFrame(validation_rows)
+    LOGGER.info("%s: summarizing metrics", exp_id)
     summary = summarize_metrics(evaluated, moves_by_instrument)
+    LOGGER.info("%s: computing bootstrap comparisons", exp_id)
     comparisons = compare_signal_sets(
         evaluated,
         [("EventMinusTime", chart_type, "Time") for chart_type in ["LineBreak", "Renko", "HeikenAshi"]],
@@ -905,6 +910,7 @@ def run_exp007() -> None:
     )
     proceed = proceed_criteria(comparisons)
     validation = framework_validation_table(evaluated)
+    LOGGER.info("%s: writing outputs", exp_id)
     save_outputs(
         results_dir,
         validation_df,
@@ -914,8 +920,9 @@ def run_exp007() -> None:
         {"missing_signal_states": pd.DataFrame(missing_rows), "proceed_criteria": proceed, "framework_validation": validation},
     )
     write_manifest(exp_id, results_dir, validation_df)
+    LOGGER.info("%s: plotting outputs", exp_id)
     plot_distribution(evaluated, plots_dir / "01_fe60_distribution.png", "FE_60m", "FE 60m by signal set")
-    plot_distribution(evaluated, plots_dir / "02_ae60_distribution.png", "AE 60m by signal set")
+    plot_distribution(evaluated, plots_dir / "02_ae60_distribution.png", "AE_60m", "AE 60m by signal set")
     plot_bar(summary, plots_dir / "03_precision_recall.png", "Precision60", "Signal-level precision")
     plot_heatmap(summary, plots_dir / "04_run_continuation_regime.png", "RunContinuation30", "Run continuation by regime")
     plot_bar(pd.DataFrame(missing_rows).rename(columns={"ChartType": "SignalSet"}), plots_dir / "05_signal_count_ratio.png", "Signals", "Signal counts")

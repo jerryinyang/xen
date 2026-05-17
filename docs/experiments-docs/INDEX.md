@@ -6,15 +6,6 @@
 | --- | --- | --- | --- |
 | 2026-05-14-001-chart-type-validation | COMPLETED | Phase 1 validates time bars as the master timeline for 1-minute-source analysis; higher-timeframe robustness remains a Phase 1B bridge item before Phase 2 signal-quality characterization. | [retrospective.md](checkpoints/2026-05-14-001-chart-type-validation/retrospective.md) |
 
-## Planned Phase 2 Block B Experiments
-
-| ID | Title | Status | Purpose | Artifacts |
-| --- | --- | --- | --- | --- |
-| EXP-007 | Multi-State Signal-Quality Baseline | PLANNED | Establish the real-price signal-quality measurement gate for Block B using FE, AE, bounded signal-level precision, event-level recall, run continuation, and explicit missing-signal states. | [scope.md](../../python/experiments/EXP-007/scope.md), [analysis-plan.md](../../python/experiments/EXP-007/analysis-plan.md) |
-| EXP-008 | Renko as a Precision Gate Over Time-Bar Signals | PLANNED | Test whether Renko-confirmed time-bar signals improve real-price signal quality at 1-minute and 15-minute source timeframes. | [scope.md](../../python/experiments/EXP-008/scope.md), [analysis-plan.md](../../python/experiments/EXP-008/analysis-plan.md) |
-| EXP-009 | Heiken Ashi Direction as a Signal Generator, Evaluated on Real Prices | PLANNED | Test whether HA direction changes, evaluated only on real time-bar prices, improve signal quality versus raw time-bar direction changes. | [scope.md](../../python/experiments/EXP-009/scope.md), [analysis-plan.md](../../python/experiments/EXP-009/analysis-plan.md) |
-| EXP-010 | Line Break as a Confirmation Layer Over Renko Signals | PLANNED | Test whether Line Break confirmation selects a higher-quality subset of Renko signals and quantify the coverage cost. | [scope.md](../../python/experiments/EXP-010/scope.md), [analysis-plan.md](../../python/experiments/EXP-010/analysis-plan.md) |
-| EXP-011 | Event-Native Volatility Regime Detection | PLANNED | Test three fixed Renko-native regime features without clustering, weights, custom bins, or post-hoc feature selection. | [scope.md](../../python/experiments/EXP-011/scope.md), [analysis-plan.md](../../python/experiments/EXP-011/analysis-plan.md) |
 
 ## EXP-001 — Information Density & Ghost Bar Comparison
 
@@ -740,3 +731,49 @@ Volatility compression threshold (≥30%) not met on any instrument (range: 23.5
 - HA direction change frequency is 27-29% lower, confirming trend smoothing
 - Compression is slightly higher in low-volatility regimes for most instruments
 - The practical conclusion remains valid: HA compresses return magnitude by 23-29%, making HA-price-derived returns unsuitable for strategy evaluation
+
+
+## EXP-007 - Multi-State Signal-Quality Baseline
+
+**Status**: SUPPORTED
+**Date**: 2026-05-17
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: Time Bars, Line Break level 3, Renko ATR-14, Heiken Ashi
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Real-price signal quality cannot be adequately characterized by binary direction alone. A multi-state signal-quality framework measuring forward excursion, adverse excursion, run continuation, signal-level precision, and event-level recall in ATR units on the real-price timeline produces pre-specified differentiation across chart types and volatility regimes.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: Time Bars, Line Break level 3, Renko ATR-14, Heiken Ashi
+- **Features**: FE and AE at 30/60/120/240 minutes, log FE/AE ratio, 60-minute signal-level precision, event-level recall, 30-minute run continuation, signal multiplicity, missing-signal states
+- **Parameter ranges**: 1-minute and 15-minute source timeframes; Line Break level 3; Renko ATR period 14
+- **Exclusions**: No strategy P&L, no parameter optimization, no predictive models, no chart-combination logic, no 1-hour Block B signal-quality analysis
+- **Constraints**: Final 30% global holdout excluded; all outcomes measured from aligned 1-minute real OHLC prices; event charts aligned by `SourceCloseTime`; time bars and Heiken Ashi aligned by `CloseTime`
+
+### Results / Observations
+
+- Proceed criteria met:
+  - 15-minute Renko AE60: 4/4 instruments, CIs excluding zero
+  - 15-minute Renko FE60: 4/4 instruments, CIs excluding zero
+  - 15-minute LineBreak AE60: 3/4 instruments, CIs excluding zero
+- No 1-minute proceed criterion passed.
+- 15-minute Renko-minus-Time AE60 mean differences: BTCUSD `-0.738`, EURUSD `-0.299`, USTEC `-0.448`, XAUUSD `-0.400`; all CIs exclude zero.
+- 15-minute Renko-minus-Time FE60 mean differences: BTCUSD `-0.242`, EURUSD `-0.427`, USTEC `-0.282`, XAUUSD `-0.326`; all CIs exclude zero.
+- Weighted 15-minute means: Time FE60 `4.964`, Time AE60 `4.943`; Renko FE60 `4.644`, Renko AE60 `4.462`; LineBreak FE60 `4.732`, LineBreak AE60 `4.622`.
+- Weighted precision stayed tightly clustered: 15-minute Time `0.836`, Heiken Ashi `0.836`, LineBreak `0.824`, Renko `0.818`; no precision proceed criterion passed.
+- Event-chart missing source-bar shares: 1-minute LineBreak `0.737`, 1-minute Renko `0.720`, 15-minute LineBreak `0.763`, 15-minute Renko `0.759`.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+EXP-007 supports the measurement-gate hypothesis because the pre-specified proceed gate was met through 15-minute FE60 and AE60 differentiation. The support validates the framework, not a simple event-chart superiority claim: Renko reduced both favourable and adverse excursion relative to Time at 15 minutes.
+
+### Hypothesis-Agnostic Observations
+
+- FE60 and AE60 should carry forward as separate primary metrics for Block B; combining them would hide the main trade-off.
+- Signal-level precision and run continuation did not differentiate chart types strongly enough to drive downstream experiments.
+- Missing-signal states are large enough that every downstream event-chart signal-quality experiment must report coverage cost explicitly.
