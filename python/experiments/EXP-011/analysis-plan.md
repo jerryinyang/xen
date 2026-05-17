@@ -2,7 +2,7 @@
 
 ## Objective
 
-Determine whether three pre-fixed Renko-native features produce volatility regime labels that reduce Renko boundary cost and missed transitions relative to time-bar-derived tercile regimes, without introducing parameter search.
+Determine whether three pre-fixed Renko-native features produce volatility regime labels that reduce Renko boundary cost and missed transitions relative to time-bar-derived tercile regimes, without introducing parameter search, and whether supported features also produce descriptive 15-minute FE60/AE60 signal-quality strata.
 
 ## Methodology
 
@@ -16,7 +16,7 @@ Determine whether three pre-fixed Renko-native features produce volatility regim
 
 ### Step 2: Freeze Tercile Regime Boundaries
 
-- **Method**: Compute tercile boundaries for each feature on the nested train segment only and apply them unchanged to the remaining analysis set.
+- **Method**: Compute tercile boundaries for each feature on the train segment only and apply them unchanged to the remaining analysis set.
 - **Why this method**: It prevents leakage from test periods and avoids segmentation optimization.
 - **Simpler alternative considered**: Full-analysis terciles. Rejected because it uses information outside the train segment for calibration.
 - **Assumptions**: Train-segment feature distributions are sufficient to define fixed low/medium/high event-native regimes.
@@ -28,15 +28,15 @@ Determine whether three pre-fixed Renko-native features produce volatility regim
 - **Why this method**: Hybrid rate and missed transitions are the direct failure modes identified in EXP-002 and Block A.
 - **Simpler alternative considered**: Agreement rate only. Rejected because agreement does not directly measure boundary cost.
 - **Assumptions**: Time-bar regimes remain the reference, not the replacement; event-native regimes are evaluated as Renko-specific analytical strata.
-- **Expected output**: Feature-specific boundary-cost table and verdict.
+- **Expected output**: Feature-specific boundary-cost table and verdict for each timeframe, without selecting a single best feature.
 
 ### Step 4: Describe Signal-Quality Stratification
 
-- **Method**: Use the EXP-007 framework to summarize FE and AE distributions by each event-native tercile and compare descriptive separation with time-bar regime strata.
-- **Why this method**: Event-native regimes are useful only if they also create interpretable signal-quality strata.
+- **Method**: Use the EXP-007 framework to summarize FE60 and AE60 distributions by each event-native tercile and compare descriptive separation with time-bar regime strata. Treat 15-minute signal-quality stratification as the Phase 3 relevance check; 1-minute stratification is exploratory context.
+- **Why this method**: Event-native regimes are useful for downstream signal work only if they also create interpretable signal-quality strata in the timeframe where EXP-007 validated FE60/AE60 differentiation.
 - **Simpler alternative considered**: Select the feature with the strongest FE separation. Rejected as post-hoc feature selection.
 - **Assumptions**: This step is descriptive; it cannot override the pre-specified boundary-cost criteria.
-- **Expected output**: Descriptive FE/AE separation table by feature, instrument, timeframe, and regime.
+- **Expected output**: Descriptive FE60/AE60 separation table by feature, instrument, timeframe, and regime.
 
 ## Visualisations
 
@@ -44,13 +44,13 @@ Determine whether three pre-fixed Renko-native features produce volatility regim
 2. Hybrid-rate comparison bars for each feature versus time-bar regimes.
 3. Missed-transition-rate comparison bars for each feature.
 4. Agreement heatmap between event-native labels and time-bar regime labels.
-5. FE/AE distribution by event-native tercile versus time-bar tercile.
+5. FE60/AE60 distribution by event-native tercile versus time-bar tercile.
 
 ## Interpretation Guide
 
 - If one pre-fixed feature reduces hybrid or missed-transition rates on at least 3 of 4 instruments, that feature is supported as a Renko-specific regime stratifier.
 - If multiple features work, report them independently; do not rank or combine them into a selected best feature.
-- If boundary cost improves but signal-quality strata do not separate descriptively, event-native regimes may be useful for mechanics but not for Phase 3 signal design.
+- If boundary cost improves but 15-minute FE60/AE60 strata do not separate descriptively, event-native regimes may be useful for mechanics but not for Phase 3 signal design.
 - If no feature improves boundary cost, keep time-bar regimes as the only regime reference for Renko signal analysis.
 
 ## Complexity Check

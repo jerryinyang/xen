@@ -68,7 +68,7 @@ All Block B experiments evaluate signal quality using the same set of real-price
 **Outputs per signal:**
 - **Forward excursion (FE):** The maximum favourable real-price move in the N minutes following signal emission, measured in ATR units. N = {30, 60, 120, 240} minutes. Primary metric.
 - **Adverse excursion (AE):** The maximum adverse real-price move within the same window, measured in ATR units, computed independently of whether FE is reached first. Primary metric. AE = 0 is a valid and meaningful outcome (price never moved adversely before reaching the target); it must be preserved as-is in distributions and not imputed or replaced.
-- **FE/AE ratio:** Secondary metric only. Computed as log(FE + ε) − log(AE + ε) where ε = 0.01 ATR, to prevent explosion at AE = 0 and to produce a symmetric, interpretable scale. Raw FE/AE is never used. Where AE = 0 occurs for more than 20% of signals in any stratum, the log-ratio must be flagged and FE and AE reported separately as the primary evidence for that stratum.
+- **Log FE/AE ratio:** Secondary metric only. Computed as log(FE + ε) − log(AE + ε) where ε = 0.01 ATR, to prevent explosion at AE = 0 and to produce a symmetric, interpretable scale. Raw FE/AE is never used. Where AE = 0 occurs for more than 20% of signals in any stratum, the log-ratio must be flagged and FE and AE reported separately as the primary evidence for that stratum.
 - **Run continuation:** Boolean per signal. Whether the 1-minute time-bar close moves in the signal direction by at least 0.1× ATR within a 30-minute window following signal emission. Computed from real time-bar prices only.
 - **Signal-level precision:** Fraction of signals where FE at the 60-minute window ≥ 1.0× ATR. Denominator is the count of signals emitted. This metric is bounded [0, 1] by construction — one signal either meets the threshold or does not. It cannot exceed 1.0.
 - **Event-level recall:** Fraction of qualifying real-price moves (any 60-minute window starting from a time-bar bar where the subsequent maximum favourable move ≥ 1.0× ATR) that have a corresponding signal within a 30-minute tolerance window. Denominator is the count of qualifying real-price moves, not signals. Reported separately from precision.
@@ -82,7 +82,7 @@ All Block B experiments evaluate signal quality using the same set of real-price
 - Metrics computed separately per instrument and per volatility regime (train-set tercile labels, same methodology as Phase 1).
 - Framework must be deterministic: identical inputs must produce identical outputs across runs. This must be verified by a test that runs the framework twice on the same input and compares outputs exactly.
 - Framework must carry explicit missing-signal indicators: if a chart type did not emit in a window, that absence is coded as a measurable state with its own denominator contribution, not excluded.
-- No look-ahead: the framework must not use any price, ATR value, or regime label that could not have been known at the signal emission timestamp. This must be verified by a test that checks all look-up windows are strictly forward from the signal timestamp.
+- No look-ahead: signal generation, ATR calibration, regime labels, and confirmation eligibility must not use any price, ATR value, or regime label that could not have been known at the signal emission timestamp. Forward windows are allowed only for post-signal outcome measurement (FE, AE, precision, recall, and run continuation). This must be verified by a test that checks feature, regime, and confirmation lookups are at or before the signal timestamp, while outcome windows start after the signal timestamp.
 - All metric denominators must be declared before execution and must not change based on results. Signal-level precision denominator = signals emitted. Event-level recall denominator = qualifying real-price moves in the analysis segment. Neither may be post-hoc filtered.
 
 This framework is the shared evaluation substrate for all Block B experiments. Any Block B experiment that needs a metric not listed above must define it as an extension of the framework, not as a separate ad hoc computation.
@@ -158,7 +158,7 @@ This experiment does not test a strategy or optimise parameters. It characterise
 **Key metrics:**
 - Forward excursion (FE) distribution at 30, 60, 120, 240 minutes per chart type, timeframe, and regime.
 - Adverse excursion (AE) distribution in the same windows.
-- FE/AE ratio distribution per chart type and timeframe.
+- Log FE/AE ratio distribution per chart type and timeframe.
 - Run-continuation rate per chart type and timeframe.
 - Signal-quality precision (FE ≥ 1.0× ATR) per chart type, timeframe, and regime.
 - Signal-quality recall (qualifying real-price moves captured) per chart type and timeframe.
@@ -191,7 +191,9 @@ EXP-007 was SUPPORTED. The specific pattern of support shapes how EXP-008 throug
 
 ---
 
-**Hypothesis:** Time-bar direction signals confirmed by a Renko emission within a defined tolerance window show a better AE-relative-to-FE trade-off than the full set of time-bar direction signals at 15-minute, even after accounting for the coverage cost imposed by Renko's 72–76% missing-signal rate.
+### EXP-008: Renko as a Precision Gate Over Time-Bar Signals
+
+**Hypothesis:** Time-bar direction signals confirmed by a same-or-prior Renko emission within a defined tolerance window show a better AE-relative-to-FE trade-off than the full set of time-bar direction signals at 15-minute, even after accounting for the coverage cost imposed by Renko's 72–76% missing-signal rate.
 
 **Question:** Does Renko confirmation select a subset of time-bar signals with a meaningfully improved log FE/AE ratio compared to the unfiltered time-bar pool, and is that improvement large enough relative to the coverage reduction to represent a net gain on the full signal-opportunity population?
 
@@ -211,9 +213,9 @@ The 1-minute arm runs as exploratory only. EXP-007 found no 1-minute differentia
 **Timeframes:** 1-minute and 15-minute  
 **Scope:**
 - At 1-minute: the gating trade-off is precision for latency — Renko is slower but more precise. The experiment quantifies whether the precision gain justifies the latency and coverage cost.
-- At 15-minute: Renko is faster *and* more precise than time bars simultaneously (Block A EXP-004-TF). The experiment tests whether this stronger property translates into a measurable real-price signal-quality improvement over time bars alone.
+- At 15-minute: Renko is faster *and* more precise than time bars simultaneously (Block A EXP-004-TF). The experiment tests whether this stronger property translates into a measurable AE/FE trade-off improvement over time bars alone.
 - Both timeframes run in the same experiment. Results are reported separately per timeframe and compared. No single "best timeframe" is selected; both are characterised.
-- Signal timestamps resolved from time bars; Renko confirmation tested against Renko native CloseTime.
+- Signal timestamps resolved from time bars; Renko confirmation tested against same-or-prior Renko native CloseTime within the tolerance window.
 - No Renko construction prices used in any return or excursion calculation.
 - The missing-signal state (Renko did not emit in the window) is a first-class outcome: not excluded from analysis.
 - Regime labels and ATR from time-bar train segment, matching Phase 1 conventions.
@@ -257,7 +259,7 @@ This experiment runs at 15-minute only. EXP-007 found no 1-minute differentiatio
 
 ### EXP-010: Line Break as a Confirmation Layer Over Renko Signals
 
-**Hypothesis:** Renko signals confirmed by a Line Break emission show a better AE-relative-to-FE trade-off than the full Renko signal set at 15-minute, because Line Break's coverage selection identifies the subset of Renko events with the strongest directional momentum.
+**Hypothesis:** Renko signals confirmed by a same-or-prior Line Break emission show a better AE-relative-to-FE trade-off than the full Renko signal set at 15-minute, because Line Break's coverage selection identifies the subset of Renko events with the strongest directional momentum.
 
 **Question:** Does Line Break confirmation select a Renko subset with a meaningfully improved log FE/AE ratio at 15-minute, and is that improvement large enough relative to the additional coverage reduction to represent a net gain over Renko alone?
 
@@ -276,7 +278,7 @@ The 1-minute arm runs with the same exploratory status as EXP-008: no validated 
 **Chart types:** Renko ATR-14 (primary signal layer), Line Break level 3 (confirmation layer)  
 **Timeframes:** 1-minute and 15-minute  
 **Scope:**
-- Primary signal timestamps from Renko SourceCloseTime; Line Break confirmation tested against Line Break SourceCloseTime within the tolerance window.
+- Primary signal timestamps from Renko SourceCloseTime; Line Break confirmation tested against same-or-prior Line Break SourceCloseTime within the tolerance window.
 - All excursion and return metrics resolved from 1-minute time-bar real prices at Renko signal timestamps, regardless of source timeframe.
 - Neither Renko nor Line Break construction prices used in any excursion or return calculation.
 - Missing Line Break confirmation (Line Break did not emit in the window) is the non-confirmed case: it must be analysed explicitly, not excluded.
@@ -310,6 +312,7 @@ The question is not whether event-native regimes are better than time-bar regime
 
 **Instruments:** EURUSD, XAUUSD, BTCUSD, USTEC  
 **Chart types:** Renko ATR-14 (primary), Time Bars (reference and real-price anchor)  
+**Timeframes:** 1-minute and 15-minute. The 1-hour Block A result motivates the boundary-cost concern but is not rerun in Block B because EXP-007 validated downstream signal-quality differentiation only at 15-minute, with 1-minute retained as exploratory context.
 **Scope:**
 - Feature set is fixed: the three features listed above. No additional features may be added after seeing results.
 - Segmentation is fixed at terciles for all three features. No alternative segmentation (quartiles, clustering, custom bins) is explored.
@@ -326,7 +329,7 @@ The question is not whether event-native regimes are better than time-bar regime
 **In scope:**
 - Block A: Timeframe replication of EXP-001 through EXP-006 on 15-minute and 1-hour source bars.
 - Block B: Signal-quality characterisation using the shared real-price measurement framework.
-- Multi-state signal-quality metrics: forward excursion, adverse excursion, FE/AE ratio, run continuation, precision, recall — all in ATR units on real prices.
+- Multi-state signal-quality metrics: forward excursion, adverse excursion, log FE/AE ratio, run continuation, precision, recall — all in ATR units on real prices.
 - Cross-chart combination as a contribution test (not a competition): Renko gating time bars, Line Break stratifying Renko, HA smoothing evaluated on real prices.
 - Event-native volatility regime features derived from Renko internal structure.
 - Regime-stratified signal-quality analysis using time-bar-derived tercile labels (consistent with Phase 1).
@@ -339,7 +342,7 @@ The question is not whether event-native regimes are better than time-bar regime
 - Predictive models or machine learning.
 - Live trading integration.
 - Additional instruments beyond EURUSD, XAUUSD, BTCUSD, USTEC.
-- Timeframes beyond 15-minute and 1-hour for Block B experiments (Block A covers this; Block B runs on 1-minute unless a Block A finding specifically motivates a different timeframe).
+- Timeframes beyond 1-minute and 15-minute for Block B experiments. The 1-hour replication results inform rationale only; they are not part of Block B signal-quality testing.
 - Any analysis that computes returns from HA or Renko construction prices.
 - Any analysis that uses out-of-sample data from the final 30% global holdout.
 - Tick-level data or sub-minute source bars.
@@ -359,7 +362,7 @@ Phase 2 is successful if it produces:
 
 3. **Multi-state signal-quality baseline (EXP-007):** A characterised signal-quality distribution for each chart type on real prices, demonstrating whether the FE/AE framework differentiates chart types in ways that binary direction entropy cannot.
 
-4. **Renko-as-gate result (EXP-008):** A quantified precision-coverage trade-off for Renko-confirmed time-bar signals, with regime-stratified results.
+4. **Renko-as-gate result (EXP-008):** A quantified AE/FE trade-off for Renko-confirmed time-bar signals, with coverage-adjusted and regime-stratified results.
 
 5. **HA signal evaluation result (EXP-009):** A quantified comparison of HA direction signals evaluated on real prices versus time-bar direction signals, with signal-count ratio and regime-stratified results.
 
@@ -378,10 +381,10 @@ Phase 2 is successful if it produces:
 | ~~**1**~~ | ~~15-minute and 1-hour bar aggregation pipeline; Block A data preparation~~ | **Complete** |
 | ~~**2–3**~~ | ~~EXP-001-TF through EXP-003-TF~~ | **Complete** |
 | ~~**4–5**~~ | ~~EXP-004-TF through EXP-006-TF; Block A timeframe generalisation verdict~~ | **Complete — 2026-05-17** |
-| **1** | Shared signal-quality measurement framework implementation + validation | Framework utility; unit tests for determinism, no-lookahead, fixed denominators, AE=0 handling, log FE/AE ratio, signal-level precision bounded [0,1], multiplicity diagnostic |
-| **2** | EXP-007 (Multi-State Signal-Quality Baseline) at 1-minute and 15-minute | Baseline signal-quality distributions per chart type, both timeframes |
-| **3** | EXP-008 (Renko as Precision Gate, 1-minute) | Renko-gating precision-coverage analysis |
-| **4** | EXP-009 (HA Signal Evaluated on Real Prices) | HA signal-quality comparison |
-| **5** | EXP-010 (Line Break Confirmation Layer, 1-minute and 15-minute) | Line Break stratification analysis; coverage-selection vs. directional-filtering distinction |
-| **6** | EXP-011 (Event-Native Regime Detection) | Event-native regime feature analysis, hybrid-rate reduction assessment |
+| ~~**1**~~ | ~~Shared signal-quality measurement framework implementation + validation~~ | **Complete via EXP-007 — determinism, no-lookahead, fixed denominators, AE=0 handling, log FE/AE ratio, bounded signal-level precision, multiplicity diagnostic** |
+| ~~**2**~~ | ~~EXP-007 (Multi-State Signal-Quality Baseline) at 1-minute and 15-minute~~ | **Complete — 15-minute FE60/AE60 validated; 1-minute exploratory only downstream** |
+| **3** | EXP-008 (Renko as Precision Gate, 15-minute confirmatory; 1-minute exploratory) | Coverage-adjusted AE/FE gating analysis |
+| **4** | EXP-009 (HA Signal Evaluated on Real Prices, 15-minute only) | HA coverage-adjusted AE/FE signal-quality comparison |
+| **5** | EXP-010 (Line Break Confirmation Layer, 15-minute confirmatory; 1-minute exploratory) | Line Break stratification analysis; coverage-selection vs. exploratory 1-minute contrast |
+| **6** | EXP-011 (Event-Native Regime Detection, 1-minute and 15-minute) | Event-native regime feature analysis, hybrid-rate reduction assessment, descriptive FE60/AE60 stratification |
 | **7** | Phase 2 retrospective + Phase 3 design | Retrospective document, Phase 3 checkpoint |

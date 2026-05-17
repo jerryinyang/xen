@@ -140,6 +140,7 @@ def load_all_instruments() -> tuple[dict[str, InstrumentData], pd.DataFrame]:
     loaded: dict[str, InstrumentData] = {}
     rows: list[dict[str, Any]] = []
     for instrument in INSTRUMENTS:
+        LOGGER.info("loading %s analysis data", instrument)
         data = load_instrument_data(instrument)
         loaded[instrument] = data
         rows.extend(validation_rows_for_instrument(data))
@@ -231,7 +232,10 @@ def future_window_extrema(
     return future_max, future_min
 
 
-def build_context(data: InstrumentData) -> RealPriceContext:
+def build_context(
+    data: InstrumentData,
+    outcome_windows: Iterable[int] = WINDOWS_MINUTES,
+) -> RealPriceContext:
     """Build real-price arrays, ATR, and train-calibrated volatility regimes."""
     bars = data.real_1m.to_pandas()
     times = bars["CloseTime"].to_numpy(dtype="datetime64[ns]")
@@ -267,7 +271,7 @@ def build_context(data: InstrumentData) -> RealPriceContext:
         regimes=regimes,
         train_end_time=pd.Timestamp(times[max(data.train_rows - 1, 0)]),
         future_price_extrema={
-            window: future_window_extrema(times, high, low, window) for window in WINDOWS_MINUTES
+            window: future_window_extrema(times, high, low, window) for window in outcome_windows
         },
         future_close_extrema={
             window: future_window_extrema(times, close, close, window) for window in {RUN_WINDOW}
@@ -367,6 +371,8 @@ def empty_signal_frame() -> pd.DataFrame:
 
 
 def add_regime_to_signals(signals: pd.DataFrame, context: RealPriceContext) -> pd.DataFrame:
+    if "Regime" in signals.columns:
+        return signals.copy()
     if signals.empty:
         signals = signals.copy()
         signals["Regime"] = []
@@ -380,7 +386,11 @@ def add_regime_to_signals(signals: pd.DataFrame, context: RealPriceContext) -> p
     return out
 
 
-def evaluate_signals(signals: pd.DataFrame, context: RealPriceContext) -> pd.DataFrame:
+def evaluate_signals(
+    signals: pd.DataFrame,
+    context: RealPriceContext,
+    outcome_windows: Iterable[int] = WINDOWS_MINUTES,
+) -> pd.DataFrame:
     """Compute FE, AE, precision, recall inputs, and continuation on real prices."""
     signals = add_regime_to_signals(signals, context).reset_index(drop=True)
     if signals.empty:
@@ -399,7 +409,7 @@ def evaluate_signals(signals: pd.DataFrame, context: RealPriceContext) -> pd.Dat
     out["RealPriceResolved"] = exact
     out["ATRAtSignal"] = np.where(usable, atr_at_signal, np.nan)
 
-    for window in WINDOWS_MINUTES:
+    for window in outcome_windows:
         fe = np.full(len(out), np.nan)
         ae = np.full(len(out), np.nan)
         future_high, future_low = context.future_price_extrema[window]
@@ -667,29 +677,91 @@ def compare_signal_sets(
     return pd.DataFrame(rows)
 
 
+def coverage_adjusted_outcomes(
+    evaluated: pd.DataFrame,
+    selected_set: str,
+    reference_set: str,
+    label: str,
+) -> pd.DataFrame:
+    """Summarize selected-signal outcomes against the full reference opportunity count."""
+    rows: list[dict[str, Any]] = []
+    group_cols = ["Instrument", "Timeframe", "Regime"]
+    for key, group in evaluated.groupby(group_cols, dropna=False):
+        record = dict(zip(group_cols, key))
+        selected = group[group["SignalSet"] == selected_set]
+        reference = group[group["SignalSet"] == reference_set]
+        reference_count = len(reference)
+        selected_count = len(selected)
+        coverage = selected_count / reference_count if reference_count else float("nan")
+        selected_fe = float(selected["FE_60m"].mean()) if selected_count else float("nan")
+        selected_ae = float(selected["AE_60m"].mean()) if selected_count else float("nan")
+        reference_fe = float(reference["FE_60m"].mean()) if reference_count else float("nan")
+        reference_ae = float(reference["AE_60m"].mean()) if reference_count else float("nan")
+        rows.append(
+            {
+                **record,
+                "Comparison": label,
+                "SignalSet": selected_set,
+                "SelectedSet": selected_set,
+                "ReferenceSet": reference_set,
+                "SelectedSignals": selected_count,
+                "ReferenceOpportunities": reference_count,
+                "Coverage": coverage,
+                "MissingShare": 1.0 - coverage if np.isfinite(coverage) else float("nan"),
+                "SelectedFE60Mean": selected_fe,
+                "SelectedAE60Mean": selected_ae,
+                "SelectedLogFEAERatio60Mean": float(selected["LogFEAERatio_60m"].mean())
+                if selected_count
+                else float("nan"),
+                "ReferenceFE60Mean": reference_fe,
+                "ReferenceAE60Mean": reference_ae,
+                "ReferenceLogFEAERatio60Mean": float(reference["LogFEAERatio_60m"].mean())
+                if reference_count
+                else float("nan"),
+                "CoverageAdjustedFE60Mean": selected_fe * coverage
+                if np.isfinite(selected_fe) and np.isfinite(coverage)
+                else float("nan"),
+                "CoverageAdjustedAE60Mean": selected_ae * coverage
+                if np.isfinite(selected_ae) and np.isfinite(coverage)
+                else float("nan"),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
 def confirmation_mask(
     candidate: pd.DataFrame,
     confirmer: pd.DataFrame,
     tolerance_minutes: int,
     require_same_direction: bool = True,
 ) -> np.ndarray:
-    """Return candidate rows with a confirming event at or after the candidate timestamp."""
+    """Return candidate rows with a confirming event known by the candidate timestamp."""
     if candidate.empty or confirmer.empty:
         return np.zeros(len(candidate), dtype=bool)
+    candidate = candidate.reset_index(drop=True)
     mask = np.zeros(len(candidate), dtype=bool)
-    by_direction = {
-        direction: np.sort(group["SignalTime"].to_numpy(dtype="datetime64[ns]"))
-        for direction, group in confirmer.groupby("Direction")
-    }
-    all_times = np.sort(confirmer["SignalTime"].to_numpy(dtype="datetime64[ns]"))
     tolerance = np.timedelta64(tolerance_minutes, "m")
-    for idx, row in enumerate(candidate.itertuples(index=False)):
-        signal_time = np.datetime64(row.SignalTime)
-        times = by_direction.get(int(row.Direction), np.array([], dtype="datetime64[ns]")) if require_same_direction else all_times
-        left = np.searchsorted(times, signal_time, side="left")
-        right = np.searchsorted(times, signal_time + tolerance, side="right")
-        mask[idx] = right > left
-    return mask
+    candidate_times = candidate["SignalTime"].to_numpy(dtype="datetime64[ns]")
+    if require_same_direction:
+        for direction, group in candidate.groupby("Direction", sort=False):
+            confirmer_times = np.sort(
+                confirmer.loc[confirmer["Direction"] == direction, "SignalTime"].to_numpy(
+                    dtype="datetime64[ns]"
+                )
+            )
+            if len(confirmer_times) == 0:
+                continue
+            candidate_index = group.index.to_numpy()
+            times = candidate_times[candidate_index]
+            left = np.searchsorted(confirmer_times, times - tolerance, side="left")
+            right = np.searchsorted(confirmer_times, times, side="right")
+            mask[candidate_index] = right > left
+        return mask
+
+    confirmer_times = np.sort(confirmer["SignalTime"].to_numpy(dtype="datetime64[ns]"))
+    left = np.searchsorted(confirmer_times, candidate_times - tolerance, side="left")
+    right = np.searchsorted(confirmer_times, candidate_times, side="right")
+    return right > left
 
 
 def write_manifest(exp_id: str, results_dir: Path, validation_df: pd.DataFrame, extra: dict[str, Any] | None = None) -> None:
@@ -776,6 +848,31 @@ def save_outputs(
         table.to_parquet(results_dir / f"{name}.parquet", index=False)
 
 
+def signal_denominator_diagnostics(evaluated: pd.DataFrame) -> pd.DataFrame:
+    """Report how same-timestamp event rows contribute to signal denominators."""
+    if evaluated.empty or "SignalTime" not in evaluated.columns:
+        return pd.DataFrame()
+    rows: list[dict[str, Any]] = []
+    group_cols = ["Instrument", "Timeframe", "SignalSet", "ChartType"]
+    for key, group in evaluated.groupby(group_cols, dropna=False):
+        record = dict(zip(group_cols, key))
+        signals = len(group)
+        distinct_times = int(group["SignalTime"].nunique())
+        rows.append(
+            {
+                **record,
+                "Signals": signals,
+                "DistinctSignalTimes": distinct_times,
+                "DuplicateTimestampRows": signals - distinct_times,
+                "DuplicateTimestampShare": (signals - distinct_times) / signals
+                if signals
+                else float("nan"),
+                "DenominatorPolicy": "Each emitted signal row is counted; same-timestamp event rows are preserved.",
+            }
+        )
+    return pd.DataFrame(rows)
+
+
 def plot_distribution(
     evaluated: pd.DataFrame,
     path: Path,
@@ -828,22 +925,32 @@ def evaluate_signal_groups(
     groups: list[pd.DataFrame],
     contexts: dict[str, RealPriceContext],
     moves_by_instrument: dict[str, pd.DataFrame],
+    outcome_windows: Iterable[int] = WINDOWS_MINUTES,
 ) -> pd.DataFrame:
     evaluated_parts: list[pd.DataFrame] = []
     for signals in groups:
         if signals.empty:
             continue
         instrument = str(signals["Instrument"].iloc[0])
-        metrics = evaluate_signals(signals, contexts[instrument])
+        metrics = evaluate_signals(signals, contexts[instrument], outcome_windows)
         metrics = attach_multiplicity_and_recall_inputs(metrics, moves_by_instrument[instrument])
         evaluated_parts.append(metrics)
     return pd.concat(evaluated_parts, ignore_index=True) if evaluated_parts else empty_signal_frame()
 
 
-def prepare_inputs() -> tuple[dict[str, InstrumentData], dict[str, RealPriceContext], dict[str, pd.DataFrame], pd.DataFrame]:
+def prepare_inputs(
+    outcome_windows: Iterable[int] = WINDOWS_MINUTES,
+) -> tuple[dict[str, InstrumentData], dict[str, RealPriceContext], dict[str, pd.DataFrame], pd.DataFrame]:
+    outcome_windows = tuple(outcome_windows)
     loaded, validation_df = load_all_instruments()
-    contexts = {instrument: build_context(data) for instrument, data in loaded.items()}
-    moves = {instrument: qualifying_moves(context) for instrument, context in contexts.items()}
+    contexts: dict[str, RealPriceContext] = {}
+    moves: dict[str, pd.DataFrame] = {}
+    for instrument, data in loaded.items():
+        LOGGER.info("building %s real-price context for windows %s", instrument, outcome_windows)
+        context = build_context(data, outcome_windows)
+        contexts[instrument] = context
+        LOGGER.info("building %s qualifying-move diagnostics", instrument)
+        moves[instrument] = qualifying_moves(context)
     return loaded, contexts, moves, validation_df
 
 
@@ -968,28 +1075,40 @@ def framework_validation_table(evaluated: pd.DataFrame) -> pd.DataFrame:
 def run_exp008() -> None:
     exp_id = "EXP-008"
     results_dir, plots_dir = experiment_dirs(exp_id)
-    loaded, contexts, moves, validation_df = prepare_inputs()
-    groups: list[pd.DataFrame] = []
+    outcome_windows = (PRIMARY_WINDOW,)
+    loaded, contexts, moves, validation_df = prepare_inputs(outcome_windows)
+    evaluated_parts: list[pd.DataFrame] = []
     coverage_rows: list[dict[str, Any]] = []
 
     for instrument, data in loaded.items():
+        context = contexts[instrument]
+        instrument_moves = moves[instrument]
         for timeframe, bars in data.timeframes.items():
+            LOGGER.info("%s: building %s %s signal sets", exp_id, instrument, timeframe)
             time_signals = timebar_signals(bars, instrument, timeframe, "AllTime")
             renko = event_chart_signals(generate_chart(bars, "Renko"), "Renko", instrument, timeframe, "RawRenko")
-            groups.append(renko)
+            evaluated_time = attach_multiplicity_and_recall_inputs(
+                evaluate_signals(time_signals, context, outcome_windows),
+                instrument_moves,
+            )
+            evaluated_parts.append(evaluated_time)
+            evaluated_renko = attach_multiplicity_and_recall_inputs(
+                evaluate_signals(renko, context, outcome_windows),
+                instrument_moves,
+            )
+            evaluated_parts.append(evaluated_renko)
+
             for window in CONFIRMATION_WINDOWS:
                 confirmed = confirmation_mask(time_signals, renko, window)
                 label = f"{window}m"
-                confirmed_signals = time_signals[confirmed].copy()
-                confirmed_signals["SignalSet"] = f"RenkoConfirmedTime_{label}"
-                nonconfirmed_signals = time_signals[~confirmed].copy()
-                nonconfirmed_signals["SignalSet"] = f"RenkoNonConfirmedTime_{label}"
+                confirmed_metrics = evaluated_time.loc[confirmed].copy()
+                confirmed_metrics["SignalSet"] = f"RenkoConfirmedTime_{label}"
                 if window == PRIMARY_CONFIRMATION_WINDOW:
-                    all_time = time_signals.copy()
-                    all_time["SignalSet"] = "AllTime"
-                    groups.extend([all_time, confirmed_signals, nonconfirmed_signals])
+                    nonconfirmed_metrics = evaluated_time.loc[~confirmed].copy()
+                    nonconfirmed_metrics["SignalSet"] = f"RenkoNonConfirmedTime_{label}"
+                    evaluated_parts.extend([confirmed_metrics, nonconfirmed_metrics])
                 else:
-                    groups.append(confirmed_signals)
+                    evaluated_parts.append(confirmed_metrics)
                 coverage_rows.append(
                     {
                         "Instrument": instrument,
@@ -1002,7 +1121,7 @@ def run_exp008() -> None:
                     }
                 )
 
-    evaluated = evaluate_signal_groups(groups, contexts, moves)
+    evaluated = pd.concat(evaluated_parts, ignore_index=True) if evaluated_parts else empty_signal_frame()
     summary = summarize_metrics(evaluated, moves)
     comparisons = compare_signal_sets(
         evaluated,
@@ -1011,35 +1130,57 @@ def run_exp008() -> None:
             ("ConfirmedMinusRawRenko", "RenkoConfirmedTime_15m", "RawRenko"),
             ("ConfirmedMinusNonConfirmed", "RenkoConfirmedTime_15m", "RenkoNonConfirmedTime_15m"),
         ],
-        {"FE60": "FE_60m", "AE60": "AE_60m", "Precision60": "PrecisionHit_60m", "RunContinuation30": "RunContinuation_30m"},
+        {
+            "FE60": "FE_60m",
+            "AE60": "AE_60m",
+            "LogFEAERatio60": "LogFEAERatio_60m",
+        },
     )
-    save_outputs(results_dir, validation_df, evaluated, summary, comparisons, {"coverage": pd.DataFrame(coverage_rows)})
+    coverage_adjusted = coverage_adjusted_outcomes(
+        evaluated,
+        "RenkoConfirmedTime_15m",
+        "AllTime",
+        "RenkoConfirmedTimeVsAllTime",
+    )
+    save_outputs(
+        results_dir,
+        validation_df,
+        evaluated,
+        summary,
+        comparisons,
+        {
+            "coverage": pd.DataFrame(coverage_rows),
+            "coverage_adjusted_outcomes": coverage_adjusted,
+            "signal_denominator_diagnostics": signal_denominator_diagnostics(evaluated),
+        },
+    )
     write_manifest(exp_id, results_dir, validation_df)
     plot_distribution(evaluated, plots_dir / "01_fe_ae_distribution.png", "FE_60m", "EXP-008 FE 60m")
-    plot_bar(summary, plots_dir / "02_precision_recall.png", "Precision60", "EXP-008 precision")
+    plot_bar(coverage_adjusted, plots_dir / "02_coverage_adjusted_fe.png", "CoverageAdjustedFE60Mean", "EXP-008 coverage-adjusted FE")
     plot_bar(pd.DataFrame(coverage_rows).rename(columns={"ToleranceMinutes": "SignalSet"}), plots_dir / "03_coverage_cost.png", "Coverage", "Renko confirmation coverage")
-    plot_heatmap(summary, plots_dir / "04_regime_quality.png", "FE60Mean", "FE by regime")
-    plot_bar(summary, plots_dir / "05_timeframe_contrast.png", "FE60Mean", "Timeframe contrast")
+    plot_heatmap(summary, plots_dir / "04_regime_quality.png", "LogFEAERatio60Mean", "Log FE/AE by regime")
+    plot_bar(summary, plots_dir / "05_timeframe_contrast.png", "LogFEAERatio60Mean", "Timeframe contrast")
     print(f"{exp_id}: wrote results to {results_dir.relative_to(PROJECT_ROOT)}")
 
 
 def run_exp009() -> None:
     exp_id = "EXP-009"
     results_dir, plots_dir = experiment_dirs(exp_id)
-    loaded, contexts, moves, validation_df = prepare_inputs()
+    outcome_windows = (PRIMARY_WINDOW,)
+    loaded, contexts, moves, validation_df = prepare_inputs(outcome_windows)
     groups: list[pd.DataFrame] = []
     alignment_rows: list[dict[str, Any]] = []
 
     for instrument, data in loaded.items():
-        bars = data.timeframes["1m"]
-        time_changes = timebar_signals(bars, instrument, "1m", "TimeDirectionChange", direction_changes_only=True)
-        ha_changes = heiken_ashi_signals(generate_chart(bars, "HeikenAshi"), instrument, "1m", "HADirectionChange", direction_changes_only=True)
+        bars = data.timeframes["15m"]
+        time_changes = timebar_signals(bars, instrument, "15m", "TimeDirectionChange", direction_changes_only=True)
+        ha_changes = heiken_ashi_signals(generate_chart(bars, "HeikenAshi"), instrument, "15m", "HADirectionChange", direction_changes_only=True)
         groups.extend([time_changes, ha_changes])
         aligned = confirmation_mask(ha_changes, time_changes, PRIMARY_CONFIRMATION_WINDOW, require_same_direction=True)
         alignment_rows.append(
             {
                 "Instrument": instrument,
-                "Timeframe": "1m",
+                "Timeframe": "15m",
                 "TimeDirectionChanges": len(time_changes),
                 "HADirectionChanges": len(ha_changes),
                 "HASignalCountRatio": len(ha_changes) / len(time_changes) if len(time_changes) else float("nan"),
@@ -1047,17 +1188,38 @@ def run_exp009() -> None:
             }
         )
 
-    evaluated = evaluate_signal_groups(groups, contexts, moves)
+    evaluated = evaluate_signal_groups(groups, contexts, moves, outcome_windows)
     summary = summarize_metrics(evaluated, moves)
     comparisons = compare_signal_sets(
         evaluated,
         [("HAMinusTime", "HADirectionChange", "TimeDirectionChange")],
-        {"FE60": "FE_60m", "AE60": "AE_60m", "Precision60": "PrecisionHit_60m", "RunContinuation30": "RunContinuation_30m"},
+        {
+            "FE60": "FE_60m",
+            "AE60": "AE_60m",
+            "LogFEAERatio60": "LogFEAERatio_60m",
+        },
     )
-    save_outputs(results_dir, validation_df, evaluated, summary, comparisons, {"alignment": pd.DataFrame(alignment_rows)})
+    coverage_adjusted = coverage_adjusted_outcomes(
+        evaluated,
+        "HADirectionChange",
+        "TimeDirectionChange",
+        "HADirectionChangeVsTimeDirectionChange",
+    )
+    save_outputs(
+        results_dir,
+        validation_df,
+        evaluated,
+        summary,
+        comparisons,
+        {
+            "alignment": pd.DataFrame(alignment_rows),
+            "coverage_adjusted_outcomes": coverage_adjusted,
+            "signal_denominator_diagnostics": signal_denominator_diagnostics(evaluated),
+        },
+    )
     write_manifest(exp_id, results_dir, validation_df)
     plot_distribution(evaluated, plots_dir / "01_fe_ae_distribution.png", "FE_60m", "EXP-009 FE 60m")
-    plot_bar(summary, plots_dir / "02_precision_recall.png", "Precision60", "EXP-009 precision")
+    plot_bar(coverage_adjusted, plots_dir / "02_coverage_adjusted_fe.png", "CoverageAdjustedFE60Mean", "EXP-009 coverage-adjusted FE")
     plot_bar(pd.DataFrame(alignment_rows).rename(columns={"Instrument": "SignalSet"}), plots_dir / "03_signal_count_ratio.png", "HASignalCountRatio", "HA signal-count ratio")
     plot_bar(pd.DataFrame(alignment_rows).rename(columns={"Instrument": "SignalSet"}), plots_dir / "04_alignment_heatmap.png", "HAAlignedToTimeShare", "HA/time alignment")
     print(f"{exp_id}: wrote results to {results_dir.relative_to(PROJECT_ROOT)}")
@@ -1066,7 +1228,8 @@ def run_exp009() -> None:
 def run_exp010() -> None:
     exp_id = "EXP-010"
     results_dir, plots_dir = experiment_dirs(exp_id)
-    loaded, contexts, moves, validation_df = prepare_inputs()
+    outcome_windows = (PRIMARY_WINDOW,)
+    loaded, contexts, moves, validation_df = prepare_inputs(outcome_windows)
     groups: list[pd.DataFrame] = []
     coverage_rows: list[dict[str, Any]] = []
 
@@ -1097,7 +1260,7 @@ def run_exp010() -> None:
                     }
                 )
 
-    evaluated = evaluate_signal_groups(groups, contexts, moves)
+    evaluated = evaluate_signal_groups(groups, contexts, moves, outcome_windows)
     summary = summarize_metrics(evaluated, moves)
     comparisons = compare_signal_sets(
         evaluated,
@@ -1105,22 +1268,44 @@ def run_exp010() -> None:
             ("ConfirmedMinusAllRenko", "LBConfirmedRenko_15m", "AllRenko"),
             ("ConfirmedMinusNonConfirmed", "LBConfirmedRenko_15m", "LBNonConfirmedRenko_15m"),
         ],
-        {"FE60": "FE_60m", "AE60": "AE_60m", "Precision60": "PrecisionHit_60m", "RunContinuation30": "RunContinuation_30m"},
+        {
+            "FE60": "FE_60m",
+            "AE60": "AE_60m",
+            "LogFEAERatio60": "LogFEAERatio_60m",
+        },
     )
-    save_outputs(results_dir, validation_df, evaluated, summary, comparisons, {"coverage": pd.DataFrame(coverage_rows)})
+    coverage_adjusted = coverage_adjusted_outcomes(
+        evaluated,
+        "LBConfirmedRenko_15m",
+        "AllRenko",
+        "LBConfirmedRenkoVsAllRenko",
+    )
+    save_outputs(
+        results_dir,
+        validation_df,
+        evaluated,
+        summary,
+        comparisons,
+        {
+            "coverage": pd.DataFrame(coverage_rows),
+            "coverage_adjusted_outcomes": coverage_adjusted,
+            "signal_denominator_diagnostics": signal_denominator_diagnostics(evaluated),
+        },
+    )
     write_manifest(exp_id, results_dir, validation_df)
     plot_distribution(evaluated, plots_dir / "01_confirmed_nonconfirmed_fe.png", "FE_60m", "EXP-010 FE 60m")
     plot_bar(pd.DataFrame(coverage_rows).rename(columns={"ToleranceMinutes": "SignalSet"}), plots_dir / "02_coverage_cost.png", "Coverage", "Line Break confirmation coverage")
-    plot_bar(summary, plots_dir / "03_precision_recall.png", "Precision60", "EXP-010 precision")
-    plot_heatmap(summary, plots_dir / "04_regime_quality.png", "FE60Mean", "EXP-010 FE by regime")
-    plot_bar(summary, plots_dir / "05_timeframe_interpretation.png", "FE60Mean", "Timeframe interpretation")
+    plot_bar(coverage_adjusted, plots_dir / "03_coverage_adjusted_fe.png", "CoverageAdjustedFE60Mean", "EXP-010 coverage-adjusted FE")
+    plot_heatmap(summary, plots_dir / "04_regime_quality.png", "LogFEAERatio60Mean", "EXP-010 log FE/AE by regime")
+    plot_bar(summary, plots_dir / "05_timeframe_interpretation.png", "LogFEAERatio60Mean", "Timeframe interpretation")
     print(f"{exp_id}: wrote results to {results_dir.relative_to(PROJECT_ROOT)}")
 
 
 def run_exp011() -> None:
     exp_id = "EXP-011"
     results_dir, plots_dir = experiment_dirs(exp_id)
-    loaded, contexts, moves, validation_df = prepare_inputs()
+    outcome_windows = (PRIMARY_WINDOW,)
+    loaded, contexts, moves, validation_df = prepare_inputs(outcome_windows)
     feature_rows: list[pd.DataFrame] = []
     boundary_rows: list[dict[str, Any]] = []
     transition_rows: list[dict[str, Any]] = []
@@ -1146,7 +1331,7 @@ def run_exp011() -> None:
                 feature_signals = feature_signals.drop(columns=[f"{feature}Regime"])
                 signal_groups.append(feature_signals)
 
-    evaluated = evaluate_signal_groups(signal_groups, contexts, moves)
+    evaluated = evaluate_signal_groups(signal_groups, contexts, moves, outcome_windows)
     summary = summarize_metrics(evaluated, moves)
     features_df = pd.concat(feature_rows, ignore_index=True) if feature_rows else pd.DataFrame()
     comparisons = pd.DataFrame(transition_rows)
@@ -1156,7 +1341,11 @@ def run_exp011() -> None:
         evaluated,
         summary,
         comparisons,
-        {"event_native_features": features_df, "feature_boundaries": pd.DataFrame(boundary_rows)},
+        {
+            "event_native_features": features_df,
+            "feature_boundaries": pd.DataFrame(boundary_rows),
+            "signal_denominator_diagnostics": signal_denominator_diagnostics(evaluated),
+        },
     )
     write_manifest(exp_id, results_dir, validation_df)
     plot_feature_histograms(features_df, plots_dir / "01_feature_distributions.png")
@@ -1178,13 +1367,16 @@ def renko_feature_table(
     df = renko_bars.select(["SourceCloseTime", "Open", "Close", "BrickSize", "SourceCount"]).to_pandas()
     df = df.rename(columns={"SourceCloseTime": "SignalTime"})
     df["SignalTime"] = pd.to_datetime(df["SignalTime"])
+    df = df.sort_values("SignalTime", kind="mergesort").reset_index(drop=True)
     times = df["SignalTime"].to_numpy(dtype="datetime64[ns]")
-    event_density: list[int] = []
-    source_median: list[float] = []
-    for idx, time in enumerate(times):
-        left = np.searchsorted(times, time - np.timedelta64(60, "m"), side="left")
-        event_density.append(idx - left + 1)
-        source_median.append(float(np.median(df["SourceCount"].to_numpy(float)[left : idx + 1])))
+    left = np.searchsorted(times, times - np.timedelta64(60, "m"), side="left")
+    event_density = np.arange(len(times)) - left + 1
+    source_median = (
+        pd.Series(df["SourceCount"].to_numpy(float), index=df["SignalTime"])
+        .rolling("60min", closed="both")
+        .median()
+        .to_numpy()
+    )
     real_idx = np.searchsorted(context.times, times, side="left")
     atr = np.full(len(real_idx), np.nan)
     timebar_regime = np.full(len(real_idx), None, dtype=object)

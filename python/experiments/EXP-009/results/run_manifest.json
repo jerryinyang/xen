@@ -1,0 +1,61 @@
+{
+  "analysis_fraction": 0.7,
+  "bootstrap_max_sample_n": 5000,
+  "bootstrap_n": 10000,
+  "bootstrap_seed": 42,
+  "experiment": "EXP-009",
+  "git_commit": "be4d05b343ba99b59cd702da8aa4d1113da742c2",
+  "input_files": [
+    {
+      "path": "data/timebars/timebars_btcusd_20230102_000000_20260514_203813.parquet",
+      "sha256": "ff66db519c60307a955f78fc0206b7afd6a7be9d66e017123ef412f0577c9fb5",
+      "size_bytes": 22481929
+    },
+    {
+      "path": "data/timebars/timebars_eurusd_20230102_000000_20260514_203330.parquet",
+      "sha256": "dc772eb602f0f5b7542be1582435724ca3b996eb4e105fa03439c540ddc138f1",
+      "size_bytes": 13387398
+    },
+    {
+      "path": "data/timebars/timebars_ustec_20230102_230000_20260514_204410.parquet",
+      "sha256": "271566308b0367f5eb12b607a0f599b0121ced8d6c498881f219b41b47c9807b",
+      "size_bytes": 12993748
+    },
+    {
+      "path": "data/timebars/timebars_xauusd_20230102_230200_20260514_204148.parquet",
+      "sha256": "eba7d3344404de28737f575355457b3751c23c3bcea6ecdb5c076a31171d0d83",
+      "size_bytes": 13742353
+    }
+  ],
+  "instruments": [
+    "EURUSD",
+    "XAUUSD",
+    "BTCUSD",
+    "USTEC"
+  ],
+  "packages": {
+    "matplotlib": "3.10.9",
+    "numpy": "2.4.4",
+    "pandas": "3.0.3",
+    "polars": "1.40.1",
+    "seaborn": "0.13.2"
+  },
+  "python": "3.13.1",
+  "source_files": [
+    "python/src/signal_quality.py",
+    "python/src/linebreak_generator.py",
+    "python/src/renko_generator.py",
+    "python/src/heiken_ashi_generator.py"
+  ],
+  "timeframes": {
+    "15m": 15,
+    "1m": 1
+  },
+  "train_fraction": 0.7,
+  "windows_minutes": [
+    30,
+    60,
+    120,
+    240
+  ]
+}
