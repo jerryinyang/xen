@@ -6,6 +6,16 @@
 | --- | --- | --- | --- |
 | 2026-05-14-001-chart-type-validation | COMPLETED | Phase 1 validates time bars as the master timeline for 1-minute-source analysis; higher-timeframe robustness remains a Phase 1B bridge item before Phase 2 signal-quality characterization. | [retrospective.md](checkpoints/2026-05-14-001-chart-type-validation/retrospective.md) |
 
+## Planned Phase 2 Block B Experiments
+
+| ID | Title | Status | Purpose | Artifacts |
+| --- | --- | --- | --- | --- |
+| EXP-007 | Multi-State Signal-Quality Baseline | PLANNED | Establish the real-price signal-quality measurement gate for Block B using FE, AE, bounded signal-level precision, event-level recall, run continuation, and explicit missing-signal states. | [scope.md](../../python/experiments/EXP-007/scope.md), [analysis-plan.md](../../python/experiments/EXP-007/analysis-plan.md) |
+| EXP-008 | Renko as a Precision Gate Over Time-Bar Signals | PLANNED | Test whether Renko-confirmed time-bar signals improve real-price signal quality at 1-minute and 15-minute source timeframes. | [scope.md](../../python/experiments/EXP-008/scope.md), [analysis-plan.md](../../python/experiments/EXP-008/analysis-plan.md) |
+| EXP-009 | Heiken Ashi Direction as a Signal Generator, Evaluated on Real Prices | PLANNED | Test whether HA direction changes, evaluated only on real time-bar prices, improve signal quality versus raw time-bar direction changes. | [scope.md](../../python/experiments/EXP-009/scope.md), [analysis-plan.md](../../python/experiments/EXP-009/analysis-plan.md) |
+| EXP-010 | Line Break as a Confirmation Layer Over Renko Signals | PLANNED | Test whether Line Break confirmation selects a higher-quality subset of Renko signals and quantify the coverage cost. | [scope.md](../../python/experiments/EXP-010/scope.md), [analysis-plan.md](../../python/experiments/EXP-010/analysis-plan.md) |
+| EXP-011 | Event-Native Volatility Regime Detection | PLANNED | Test three fixed Renko-native regime features without clustering, weights, custom bins, or post-hoc feature selection. | [scope.md](../../python/experiments/EXP-011/scope.md), [analysis-plan.md](../../python/experiments/EXP-011/analysis-plan.md) |
+
 ## EXP-001 — Information Density & Ghost Bar Comparison
 
 **Status**: REFUTED
@@ -328,3 +338,405 @@ Zero of 4 instruments meet the 30% volatility compression threshold. Compression
 - HA direction change frequency is 30-35% lower, confirming trend smoothing
 - HA mean range is higher than real range because HAClose averaging produces wider apparent candle bodies
 - The practical implication is unchanged: HA-derived returns are unsuitable for strategy evaluation
+
+---
+
+## EXP-001-TF — Timeframe Replication: Information Density & Ghost Bar Comparison
+
+**Status**: REFUTED
+**Date**: 2026-05-17
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Chart Types**: Time Bars (15m, 1h), Line Break (levels 3, 5), Renko (ATR 14), Heiken Ashi
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Line Break and Renko event bars have higher information density than same-timeframe time bars on at least 3 of 4 instruments at 15m and 1h source timeframes, measured as lower ghost rate (≥25% reduction), better use of remaining directional-entropy headroom (≥50% capture), and a practical absolute entropy gain (≥0.005 bits).
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Chart Types**: Time Bars (15m, 1h), Line Break (levels 3, 5), Renko (ATR 14), Heiken Ashi
+- **Features**: Ghost rate, directional entropy, volatility terciles, bootstrap confidence intervals, distinct-source sensitivity
+- **Parameter ranges**: Source timeframes 15m and 1h; LineBreak level 3 and 5; Renko ATR period 14
+- **Exclusions**: No strategy backtesting, no parameter optimization, no predictive modeling, no source timeframes beyond 15m and 1h
+- **Constraints**: Final 30% global holdout excluded before aggregation; synthetic price discipline; timestamp alignment over bar count
+
+### Results / Observations
+
+Ghost reduction and entropy metrics by instrument, timeframe, and chart type:
+
+| Instrument | TF | ChartType | GhostRate | DirectionalEntropy | BarsPerElapsedDay |
+|------------|-----|-----------|-----------|-------------------|-------------------|
+| EURUSD | 15m | Time | 0.0218 | 0.99938 | 64.3 |
+| EURUSD | 15m | LineBreak3 | 0.0064 | 0.99963 | 16.8 |
+| EURUSD | 15m | Renko | 0.0007 | 0.99959 | 16.0 |
+| EURUSD | 1h | Time | 0.0097 | 0.99997 | 14.7 |
+| EURUSD | 1h | Renko | 0.0000 | 0.99954 | 3.8 |
+| BTCUSD | 15m | Time | 0.0003 | 0.99996 | 79.3 |
+| BTCUSD | 15m | Renko | 0.0000 | 0.99953 | 17.6 |
+
+Threshold evaluation (all combinations):
+
+| Timeframe | ChartType | SupportCount (of 4) | Verdict |
+|-----------|-----------|---------------------|---------|
+| 15m | LineBreak3 | 0 | REFUTED |
+| 15m | Renko | 0 | REFUTED |
+| 1h | LineBreak3 | 0 | REFUTED |
+| 1h | Renko | 0 | REFUTED |
+
+Bootstrap (n=4 instruments):
+- 15m LB3 GhostReduction: mean 0.865, CI [0.742, 0.988]
+- 15m LB3 EntropyGain: mean -0.0034, CI [-0.0058, -0.0010] — entirely negative
+- 1h Renko GhostReduction: mean 1.0, CI [1.0, 1.0]
+- 1h Renko EntropyGain: mean -0.0042, CI [-0.0069, -0.0014] — entirely negative
+
+Renko duplicate-source share: 12-21% across instruments/timeframes. LineBreak: 0%.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+Ghost-rate reduction replicates robustly (70-100%) but directional entropy gains are uniformly negative across all instruments and timeframes. SupportCount = 0/4 for all combinations. Maximum headroom capture was 40.6% (EURUSD 15m LB3), below the 50% threshold.
+
+### Hypothesis-Agnostic Observations
+
+- Event charts reduce ghost bars and bar count but also reduce directional entropy at higher timeframes
+- Renko duplicate-source rows (12-21%) require explicit denominator handling for entropy metrics
+- Bar compression at 15m: LB3 ~26% of time bars, Renko ~25%. At 1h: LB3 ~27%, Renko ~26%
+- The entropy reduction pattern is consistent across all 4 instruments, suggesting a structural property of event charts at higher timeframes
+
+---
+
+## EXP-002-TF — Timeframe Replication: Volatility & Trend Regime Representation
+
+**Status**: REFUTED
+**Date**: 2026-05-17
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Chart Types**: Time Bars (15m, 1h), Line Break (level 3), Renko (ATR 14), Heiken Ashi
+
+### Hypothesis Tests
+
+1. **Hypothesis**: On at least 3 instruments at each tested timeframe, Line Break level 3 or Renko ATR-14 has hybrid rate ≤0.05 and median transition lag ≤2 source time bars.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Chart Types**: Time Bars (15m, 1h), Line Break (level 3), Renko (ATR 14), Heiken Ashi
+- **Features**: Rolling realised volatility (window=20), train-derived tercile regime labels, hybrid rate, confirmed transition lag, paired bootstrap
+- **Parameter ranges**: Source timeframes 15m and 1h; LineBreak level 3; Renko ATR period 14
+- **Exclusions**: No parameter search, no predictive models, no strategy validation, no source timeframes beyond 15m and 1h
+- **Constraints**: Final 30% global holdout excluded before aggregation; synthetic price discipline; timestamp alignment via CloseTime/SourceCloseTime
+
+### Results / Observations
+
+Hybrid rate by chart type, instrument, and timeframe:
+
+| Instrument | TF | Time | LineBreak | Renko | HeikenAshi |
+|------------|-----|------|-----------|-------|------------|
+| EURUSD | 15m | 0.000 | 0.095 | 0.149 | 0.000 |
+| EURUSD | 1h | 0.000 | 0.125 | 0.191 | 0.000 |
+| XAUUSD | 15m | 0.000 | 0.101 | 0.179 | 0.000 |
+| XAUUSD | 1h | 0.000 | 0.127 | 0.223 | 0.000 |
+| BTCUSD | 15m | 0.000 | 0.099 | 0.156 | 0.000 |
+| BTCUSD | 1h | 0.000 | 0.127 | 0.178 | 0.000 |
+| USTEC | 15m | 0.000 | 0.089 | 0.139 | 0.000 |
+| USTEC | 1h | 0.000 | 0.115 | 0.163 | 0.000 |
+
+Transition lag diagnostics:
+
+| Instrument | TF | ChartType | MedianLagBars | MissedTransitions | TransitionCount |
+|------------|-----|-----------|--------------|-------------------|-----------------|
+| EURUSD | 15m | LineBreak | 2.0 | 3 | 904 |
+| EURUSD | 15m | Renko | 2.0 | 5 | 904 |
+| BTCUSD | 1h | LineBreak | 5.0 | 1 | 326 |
+| USTEC | 15m | LineBreak | 3.0 | 1 | 855 |
+
+Bootstrap (n=4 instruments):
+- 15m LineBreak AbsoluteHybridExcessVsTime: mean 0.096, CI [0.091, 0.100]
+- 1h Renko AbsoluteHybridExcessVsTime: mean 0.189, CI [0.170, 0.212]
+
+Verdict: SupportCount = 0/4 for all combinations. WithinBounds = False for all event chart rows.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+Hybrid rates exceed 0.05 on all 4 instruments at both timeframes (8.9-22.3%). Median lag is within bounds (≤2 bars) for most combinations but BTCUSD 1h LineBreak exceeds at 5.0 bars. The boundary cost is structural — event charts emit bars at irregular intervals that do not align with time-based regime boundaries.
+
+### Hypothesis-Agnostic Observations
+
+- Event charts miss only 0-3 transitions per combination (0-1% of total), showing high coverage despite boundary cost
+- Renko hybrid rates are consistently higher than LineBreak (by 4-10pp), reflecting Renko's different event generation mechanism
+- Max lag values are extremely large for some combinations (USTEC 15m LineBreak: 3,376 bars), reflecting rare events where the chart type took very long to confirm a transition
+- Heiken Ashi inherits the time-bar regime timeline perfectly (1:1 timestamp mapping)
+
+---
+
+## EXP-003-TF — Timeframe Replication: Noise Filtering & Statistical Robustness
+
+**Status**: REFUTED
+**Date**: 2026-05-17
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Chart Types**: Time Bars (15m, 1h), Line Break (level 3), Renko (ATR 14), Heiken Ashi
+
+### Hypothesis Tests
+
+1. **Hypothesis**: At 20% noise level, Line Break or Renko has ≥25% lower relative drift than same-timeframe time bars in at least 2 of 3 metrics on at least 3 instruments at each tested timeframe.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Chart Types**: Time Bars (15m, 1h), Line Break (level 3), Renko (ATR 14), Heiken Ashi
+- **Features**: Direction stability (up-fraction drift), Return variance stability, LZ76 complexity stability
+- **Parameter ranges**: Source timeframes 15m and 1h; noise levels 0%, 10%, 20%, 30%; LineBreak level 3; Renko ATR period 14
+- **Exclusions**: No stochastic simulation sweep, no strategy testing, no parameter optimization, no tick-level noise model
+- **Constraints**: Final 30% global holdout excluded before aggregation and perturbation; HA uses HAClose only as distortion diagnostic; deterministic perturbation with instrument-timeframe seed
+
+### Results / Observations
+
+Robustness ranking at 20% noise (InstrumentsWithAtLeast25PctLowerDrift than Time):
+
+| Timeframe | ChartType | Metric | Count (of 4) |
+|-----------|-----------|--------|--------------|
+| 15m | LineBreak | DirectionDrift | 2 |
+| 15m | LineBreak | ReturnVarianceDrift | 1 |
+| 15m | LineBreak | ComplexityDrift | 0 |
+| 15m | Renko | DirectionDrift | 2 |
+| 15m | Renko | ReturnVarianceDrift | 2 |
+| 15m | Renko | ComplexityDrift | 0 |
+| 1h | LineBreak | DirectionDrift | 0 |
+| 1h | LineBreak | ReturnVarianceDrift | 1 |
+| 1h | LineBreak | ComplexityDrift | 1 |
+| 1h | Renko | DirectionDrift | 0 |
+| 1h | Renko | ReturnVarianceDrift | 1 |
+| 1h | Renko | ComplexityDrift | 0 |
+
+Sample drift values at 20% noise, 15m:
+
+| Instrument | ChartType | DirectionDrift | ReturnVarianceDrift | ComplexityDrift |
+|------------|-----------|---------------|---------------------|-----------------|
+| EURUSD | Time | 0.0031 | 0.1098 | 0.0031 |
+| EURUSD | LineBreak | 0.0016 | 0.1286 | 0.0313 |
+| EURUSD | Renko | 0.0002 | 0.0755 | 0.0296 |
+| EURUSD | HeikenAshi | 0.0010 | 0.0178 | 0.0014 |
+
+Perturbation audit: InvalidRows = 0 for all 32 combinations. InvalidPct = 0.0.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+Maximum instrument count for any metric was 2 (DirectionDrift and ReturnVarianceDrift for Renko at 15m), below the ≥3 threshold. Complexity drift is consistently worse for event charts (0 instruments meet threshold). The EXP-003 noise-robustness finding does not replicate at higher timeframes.
+
+### Hypothesis-Agnostic Observations
+
+- Heiken Ashi shows the lowest drift across all metrics, confirming its smoothing effect (uses HAClose as distortion diagnostic)
+- Event charts are more sensitive to source-bar noise in terms of sequence complexity — perturbing close prices changes event-bar boundaries, altering direction sequence structure
+- Drift generally increases monotonically with noise level (0% → 10% → 20% → 30%), confirming graded stress response
+- OHLC repair via High/Low adjustment is fully effective for close-price perturbation
+
+---
+
+## EXP-004-TF — Timeframe Replication: Market Structure Capture Speed & Fidelity
+
+**Status**: REFUTED
+**Date**: 2026-05-17
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Chart Types**: Time Bars (15m, 1h), Line Break (level 3), Renko (ATR 14), Heiken Ashi
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Line Break or Renko median detection latency is ≥30% lower than same-timeframe time-bar baseline on ≥3 instruments, while precision is no more than 10pp higher than time bars.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Chart Types**: Time Bars (15m, 1h), Line Break (level 3), Renko (ATR 14), Heiken Ashi
+- **Features**: Direction changes as reversal signals; ATR-scaled swing reversals (1.5x and 2.0x ATR) as reference; precision, recall, split rate
+- **Parameter ranges**: Source timeframes 15m and 1h; LineBreak level 3; Renko ATR period 14; tolerance window 120 minutes
+- **Exclusions**: No strategy entry/exit testing, no optimisation of reversal thresholds, no predictive model, no bar-index alignment
+- **Constraints**: Final 30% holdout excluded before aggregation; real-price reversal reference; timestamp alignment via CloseTime/SourceCloseTime
+
+### Results / Observations
+
+Speed and precision metrics by instrument, timeframe, and chart type:
+
+| Instrument | TF | ChartType | MedianLatencyMin | Precision | Recall | SplitRate | TotalSignals |
+|------------|-----|-----------|-----------------|-----------|--------|-----------|--------------|
+| EURUSD | 15m | Time | 30.0 | 0.244 | 0.969 | 0.756 | 28,081 |
+| EURUSD | 15m | LineBreak | 15.0 | 0.891 | 0.358 | 0.109 | 2,841 |
+| EURUSD | 15m | Renko | 0.0 | 0.997 | 0.694 | 0.003 | 4,922 |
+| EURUSD | 1h | Time | 0.0 | 0.154 | 0.598 | 0.846 | 6,474 |
+| EURUSD | 1h | Renko | 0.0 | 0.798 | 0.535 | 0.202 | 1,121 |
+| BTCUSD | 15m | Time | 30.0 | 0.247 | 0.982 | 0.753 | 36,966 |
+| BTCUSD | 15m | Renko | 15.0 | 0.985 | 0.612 | 0.015 | 5,769 |
+
+FasterCount (≥30% latency reduction vs Time):
+
+| Timeframe | ChartType | FasterCount (of 4) |
+|-----------|-----------|-------------------|
+| 15m | LineBreak | 4 |
+| 15m | Renko | 4 |
+| 1h | LineBreak | 4 |
+| 1h | Renko | 4 |
+
+Reversal label sensitivity (alt/primary count ratio): 0.63-0.68 across all instruments/timeframes.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+Latency criterion met (FasterCount = 4/4 for all combinations). Precision criterion not met — event chart precision exceeds time bar precision by 35-80pp (far above 10pp bound). Event charts are both faster and more precise, at the cost of lower recall. This is a speed-recall-precision trade-off, not a speed-precision trade-off.
+
+**Audit caveat**: Precision can exceed 1.0 (USTEC 15m Renko = 1.022) due to counting methodology where multiple reversals can match the same signal.
+
+### Hypothesis-Agnostic Observations
+
+- Time bars produce massive signal redundancy (split rate 75-85%), confirming high noise relative to event charts
+- Renko achieves near-zero split rate (0-2%) — almost every signal matches a real reversal
+- LineBreak has lowest recall (16-36%) but high precision (51-90%)
+- 1h timeframe resolution limits latency differentiation — all chart types show 0-minute median latency
+- Reversal labels are stable under threshold variation (alt/primary ratio 0.63-0.68)
+
+---
+
+## EXP-005-TF — Timeframe Replication: Cross-Chart-Type Alignment & Regime Correspondence
+
+**Status**: REFUTED
+**Date**: 2026-05-17
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Chart Types**: Time Bars (15m, 1h), Line Break (level 3), Renko (ATR 14), Heiken Ashi
+
+### Hypothesis Tests
+
+1. **Hypothesis**: In medium- and high-volatility regimes, LB/Renko timestamp-aligned direction agreement is ≥10pp higher than each chart type's agreement with same-timeframe time bars on ≥3 instruments, with paired bootstrap CIs excluding zero.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Chart Types**: Time Bars (15m, 1h), Line Break (level 3), Renko (ATR 14), Heiken Ashi
+- **Features**: Direction labels, timestamp-aligned pairwise agreement (5m primary, 15m sensitivity), volatility tercile regimes, paired bootstrap
+- **Parameter ranges**: Source timeframes 15m and 1h; LineBreak level 3; Renko ATR period 14; tolerance windows 5 and 15 minutes
+- **Exclusions**: No claim that agreement implies profitability, no predictive modelling, no optimisation of tolerance windows, no bar-index alignment
+- **Constraints**: Final 30% holdout excluded before aggregation; no strategy P&L; timestamp alignment via CloseTime/SourceCloseTime; regime labels calibrated on train segment
+
+### Results / Observations
+
+Pairwise agreement at 5-minute tolerance:
+
+| Instrument | TF | Pair | Agreement | OverlapRate |
+|------------|-----|------|-----------|-------------|
+| EURUSD | 15m | LB<->Renko | 1.000 | 0.499 |
+| EURUSD | 15m | LB<->Time | 0.986 | 1.000 |
+| EURUSD | 15m | Renko<->Time | 0.990 | 1.000 |
+| EURUSD | 15m | Time<->HA | 0.656 | 1.000 |
+| BTCUSD | 15m | LB<->Renko | 1.000 | 0.498 |
+| BTCUSD | 15m | LB<->Time | 0.991 | 1.000 |
+| USTEC | 1h | LB<->Renko | 1.000 | 0.531 |
+| USTEC | 1h | LB<->Time | 0.981 | 1.000 |
+
+Bootstrap CIs for LB_Renko improvement over LB_Time (medium/high regimes, n=8):
+
+| Timeframe | Tolerance | Comparison | Mean | CI Lower | CI Upper |
+|-----------|-----------|------------|------|----------|----------|
+| 15m | 5min | LB_Renko_minus_LB_Time | 0.0108 | 0.0080 | 0.0145 |
+| 15m | 15min | LB_Renko_minus_LB_Time | -0.0009 | -0.0041 | 0.0024 |
+| 1h | 5min | LB_Renko_minus_LB_Time | 0.0215 | 0.0157 | 0.0268 |
+| 1h | 15min | LB_Renko_minus_LB_Time | 0.0215 | 0.0157 | 0.0268 |
+
+Regime-stratified agreement (5-min tolerance, Medium regime):
+
+| Instrument | TF | LB<->Renko | LB<->Time | Renko<->Time | Time<->HA |
+|------------|-----|-----------|-----------|-------------|-----------|
+| EURUSD | 15m | 1.000 | 0.979 | 0.991 | 0.658 |
+| XAUUSD | 15m | 1.000 | 0.989 | 0.990 | 0.654 |
+| BTCUSD | 15m | 1.000 | 0.996 | 0.996 | 0.648 |
+| USTEC | 15m | 1.000 | 0.986 | 0.993 | 0.665 |
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+LB<->Renko agreement improvement over LB<->Time is only 1-2pp (far below 10pp threshold). Bootstrap CI at 5-min tolerance excludes zero (statistically significant) but the effect size is practically negligible. Event charts agree with time bars at 97-99%, nearly as well as they agree with each other (100% on matched events). Overlap is only ~50% at 5-min tolerance.
+
+### Hypothesis-Agnostic Observations
+
+- LB<->Renko agreement is exactly 1.0 across all instruments/timeframes when events align within 5 minutes
+- Overlap rate of ~50% means perfect agreement applies to only half of LB events
+- Time<->HA agreement is consistently ~65%, reflecting HA's different direction formula
+- Agreement patterns are consistent across low, medium, and high volatility regimes
+- Increasing tolerance from 5 to 15 minutes increases overlap to ~73-77% but does not materially change agreement rankings
+
+---
+
+## EXP-006-TF — Timeframe Replication: Heiken Ashi Synthetic Price Distortion Quantification
+
+**Status**: REFUTED
+**Date**: 2026-05-17
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Chart Types**: Time Bars (15m, 1h), Heiken Ashi
+
+### Hypothesis Tests
+
+1. **Hypothesis**: On all 4 instruments at both timeframes, absolute HA close-to-close return volatility is ≥30% lower than real same-timeframe return volatility, and median absolute HA return magnitude is ≥20% lower than real return magnitude.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Chart Types**: Time Bars (15m, 1h), Heiken Ashi
+- **Features**: HAClose vs RealClose returns at identical CloseTime, volatility compression, median absolute return compression, direction change compression, regime-stratified compression, block bootstrap (n=1000, block size 100)
+- **Parameter ranges**: Source timeframes 15m and 1h; Heiken Ashi generated from aggregated bars; no configurable parameters
+- **Exclusions**: No Line Break or Renko analysis, no strategy backtesting, no predictive modelling, no claim that lower HA volatility is improved risk
+- **Constraints**: Final 30% holdout excluded before aggregation; HAClose returns used only for distortion diagnostics; regime labels calibrated on train segment
+
+### Results / Observations
+
+Volatility compression (30% threshold required):
+
+| Instrument | TF | RealVolatility | HAVolatility | VolatilityCompression | Meets 30%? |
+|------------|-----|---------------|-------------|----------------------|------------|
+| EURUSD | 15m | 0.000492 | 0.000362 | 0.265 | NO |
+| EURUSD | 1h | 0.001014 | 0.000751 | 0.259 | NO |
+| XAUUSD | 15m | 0.000948 | 0.000710 | 0.251 | NO |
+| XAUUSD | 1h | 0.001957 | 0.001470 | 0.249 | NO |
+| BTCUSD | 15m | 0.002888 | 0.002166 | 0.250 | NO |
+| BTCUSD | 1h | 0.005900 | 0.004516 | 0.235 | NO |
+| USTEC | 15m | 0.001364 | 0.001013 | 0.258 | NO |
+| USTEC | 1h | 0.002775 | 0.002096 | 0.245 | NO |
+
+Median absolute return compression (20% threshold required):
+
+| Instrument | TF | RealMAD | HAMAD | MADCompression | Meets 20%? |
+|------------|-----|---------|-------|----------------|------------|
+| EURUSD | 15m | 0.000205 | 0.000153 | 0.253 | YES |
+| EURUSD | 1h | 0.000447 | 0.000338 | 0.245 | YES |
+| XAUUSD | 15m | 0.000405 | 0.000298 | 0.264 | YES |
+| XAUUSD | 1h | 0.000861 | 0.000661 | 0.233 | YES |
+| BTCUSD | 15m | 0.001186 | 0.000846 | 0.286 | YES |
+| BTCUSD | 1h | 0.002352 | 0.001777 | 0.244 | YES |
+| USTEC | 15m | 0.000438 | 0.000327 | 0.253 | YES |
+| USTEC | 1h | 0.000933 | 0.000710 | 0.240 | YES |
+
+Direction change compression: 27-29% across all instruments/timeframes.
+
+Regime stratification (15m, VolatilityCompression):
+
+| Instrument | Low | Medium | High |
+|------------|-----|--------|------|
+| EURUSD | 0.272 | 0.261 | 0.259 |
+| XAUUSD | 0.252 | 0.253 | 0.253 |
+| BTCUSD | 0.270 | 0.271 | 0.257 |
+| USTEC | 0.267 | 0.266 | 0.255 |
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+Volatility compression threshold (≥30%) not met on any instrument (range: 23.5-26.5%). Median return compression threshold (≥20%) met on all instruments (range: 23.3-28.6%). Because both thresholds must be met, the hypothesis is refuted. Compression is consistent across instruments (23-27%) and timeframes (no material 15m vs 1h difference).
+
+### Hypothesis-Agnostic Observations
+
+- Volatility compression varies by only 0.6pp across forex, commodity, crypto, and index — a structural property of the HA formula
+- HA direction change frequency is 27-29% lower, confirming trend smoothing
+- Compression is slightly higher in low-volatility regimes for most instruments
+- The practical conclusion remains valid: HA compresses return magnitude by 23-29%, making HA-price-derived returns unsuitable for strategy evaluation
