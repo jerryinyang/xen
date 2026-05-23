@@ -1,0 +1,83 @@
+{
+  "experiment_id": "EXP-012",
+  "title": "ICT Data Readiness and Feasibility",
+  "verdict": "SUPPORTED",
+  "source_timezone_assumption": "UTC",
+  "target_timezone": "America/New_York",
+  "family_coverage_threshold": 0.8,
+  "coverage_denominator_note": "Coverage ratios are computed on Monday-Friday dates only. Sunday and Saturday entries (present in FX/CFD feeds from ~17:00 ET Sunday) are excluded because they carry zero macro-window bars and would inflate the denominator. US market holidays that fall on weekdays remain in the denominator.",
+  "close_time_window_boundary_assumption": "MacroWindow membership is assigned by CloseTimeNY minute. A bar with CloseTime at the window StartMinute is the first bar of that window (e.g., CloseTime=07:50 ET \u2192 first bar of AM1). Downstream experiments using OpenTime-based window membership will have a 1-minute boundary offset relative to this experiment.",
+  "readiness_summary": [
+    {
+      "Instrument": "EURUSD",
+      "NYConversionAssumption": "Naive CloseTime treated as UTC",
+      "MacroFamilyCoveragePass": true,
+      "CostProxyRequired": true
+    },
+    {
+      "Instrument": "XAUUSD",
+      "NYConversionAssumption": "Naive CloseTime treated as UTC",
+      "MacroFamilyCoveragePass": true,
+      "CostProxyRequired": true
+    },
+    {
+      "Instrument": "BTCUSD",
+      "NYConversionAssumption": "Naive CloseTime treated as UTC",
+      "MacroFamilyCoveragePass": true,
+      "CostProxyRequired": true
+    },
+    {
+      "Instrument": "USTEC",
+      "NYConversionAssumption": "Naive CloseTime treated as UTC",
+      "MacroFamilyCoveragePass": true,
+      "CostProxyRequired": true
+    }
+  ],
+  "per_window_below_threshold": [],
+  "cross_segment_coverage_gaps": [],
+  "cost_fields_present": [
+    {
+      "Field": "Bid",
+      "AvailableInTimeBarSchema": false
+    },
+    {
+      "Field": "Ask",
+      "AvailableInTimeBarSchema": false
+    },
+    {
+      "Field": "Spread",
+      "AvailableInTimeBarSchema": false
+    },
+    {
+      "Field": "Commission",
+      "AvailableInTimeBarSchema": false
+    },
+    {
+      "Field": "Slippage",
+      "AvailableInTimeBarSchema": false
+    }
+  ],
+  "cost_proxy_scenarios": [
+    {
+      "Scenario": "ZERO_COST_REFERENCE",
+      "Description": "Reference-only diagnostic with no transaction-cost haircut.",
+      "SpreadBpsPerSide": 0.0,
+      "SlippageBpsPerSide": 0.0,
+      "CommissionBpsRoundTrip": 0.0
+    },
+    {
+      "Scenario": "LIGHT_COST_PROXY",
+      "Description": "Low-friction placeholder until instrument-specific broker data exists.",
+      "SpreadBpsPerSide": 0.5,
+      "SlippageBpsPerSide": 0.25,
+      "CommissionBpsRoundTrip": 0.5
+    },
+    {
+      "Scenario": "HEAVY_COST_PROXY",
+      "Description": "Stress scenario for later robustness and execution-sensitivity checks.",
+      "SpreadBpsPerSide": 1.0,
+      "SlippageBpsPerSide": 0.5,
+      "CommissionBpsRoundTrip": 1.0
+    }
+  ]
+}
