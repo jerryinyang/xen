@@ -15,10 +15,10 @@
 | EXP-005-TF | Timeframe Replication: Cross-Chart-Type Alignment & Regime Correspondence | REFUTED | LB<->Renko agreement 100% on matched events but only 50% overlap; improvement over Time bars only 1-2pp (need ≥10pp) | 2026-05-17 |
 | EXP-006-TF | Timeframe Replication: Heiken Ashi Synthetic Price Distortion Quantification | REFUTED | Volatility compression 23-27% (need ≥30%); return compression 23-29% meets ≥20% but both thresholds required | 2026-05-17 |
 | EXP-007 | Multi-State Signal-Quality Baseline | SUPPORTED | Measurement gate passed via 15m Renko FE/AE and LineBreak AE differentiation; FE/AE carry forward, precision/run-continuation do not | 2026-05-17 |
-| EXP-008 | Renko as a Precision Gate Over Time-Bar Signals | PLANNED | Scope and analysis plan created; tests 1-minute and 15-minute Renko-confirmed time-bar signals | 2026-05-17 |
-| EXP-009 | Heiken Ashi Direction as a Signal Generator, Evaluated on Real Prices | PLANNED | Scope and analysis plan created; tests HA direction changes as real-price signal candidates | 2026-05-17 |
-| EXP-010 | Line Break as a Confirmation Layer Over Renko Signals | PLANNED | Scope and analysis plan created; tests Line Break-confirmed Renko quality and coverage cost | 2026-05-17 |
-| EXP-011 | Event-Native Volatility Regime Detection | PLANNED | Scope and analysis plan created; tests fixed Renko-native regime features without parameter search | 2026-05-17 |
+| EXP-008 | Renko as a Precision Gate Over Time-Bar Signals | REFUTED | Renko confirmation lowers AE on 4/4 instruments but also lowers FE; primary log FE/AE improves on only USTEC | 2026-05-17 |
+| EXP-009 | Heiken Ashi Direction as a Signal Generator, Evaluated on Real Prices | REFUTED | HA cuts 15m direction changes to 48-49% of time-bar count but log FE/AE improves on 0/4 instruments | 2026-05-17 |
+| EXP-010 | Line Break as a Confirmation Layer Over Renko Signals | REFUTED | LB confirms 53-63% of 15m Renko signals; primary log FE/AE improves on only BTCUSD, not 3/4 instruments | 2026-05-17 |
+| EXP-011 | Event-Native Volatility Regime Detection | REFUTED | Fixed Renko-native features show high hybrid rates (0.56-0.79 at 15m); no feature supports regime replacement | 2026-05-17 |
 
 <!-- 
 New experiments are added as they are completed.

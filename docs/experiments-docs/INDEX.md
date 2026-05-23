@@ -777,3 +777,180 @@ EXP-007 supports the measurement-gate hypothesis because the pre-specified proce
 - FE60 and AE60 should carry forward as separate primary metrics for Block B; combining them would hide the main trade-off.
 - Signal-level precision and run continuation did not differentiate chart types strongly enough to drive downstream experiments.
 - Missing-signal states are large enough that every downstream event-chart signal-quality experiment must report coverage cost explicitly.
+
+---
+
+## EXP-008 - Renko as a Precision Gate Over Time-Bar Signals
+
+**Status**: REFUTED
+**Date**: 2026-05-17
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: Time Bars, Renko ATR-14
+
+### Hypothesis Tests
+
+1. **Hypothesis**: At the 15-minute source timeframe, time-bar direction signals confirmed by a same-or-prior Renko ATR-14 emission within a fixed tolerance window show a better AE-relative-to-FE trade-off than the full set of time-bar direction signals, after accounting for Renko's coverage cost.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: Time Bars as candidate signals, Renko ATR-14 as confirmation gate
+- **Features**: Time-bar direction signals, Renko `SourceCloseTime` confirmation, FE60, AE60, log FE/AE, coverage, coverage-adjusted outcomes, raw Renko comparator
+- **Parameter ranges**: 1-minute exploratory and 15-minute confirmatory source timeframes; confirmation windows 5, 15, and 30 minutes; 15-minute window is primary
+- **Exclusions**: No strategy P&L, no parameter optimization, no tick-level data, no Line Break or Heiken Ashi analysis, no best-timeframe selection
+- **Constraints**: Final 30% global holdout excluded before aggregation/generation; Renko confirmation must be same-or-prior; all outcomes use real 1-minute prices
+
+### Results / Observations
+
+- Primary 15-minute Renko confirmation coverage: BTCUSD `0.246`, EURUSD `0.282`, USTEC `0.287`, XAUUSD `0.272`.
+- Confirmed-minus-all-time log FE/AE mean differences: BTCUSD `-0.032` with CI including zero; EURUSD `-0.073` with CI excluding zero negatively; USTEC `+0.042` with CI excluding zero positively; XAUUSD `-0.015` with CI including zero.
+- Confirmed-minus-all-time AE60 is lower on all four instruments: BTCUSD `-0.598`, EURUSD `-0.157`, USTEC `-0.296`, XAUUSD `-0.262`; all CIs exclude zero.
+- Confirmed-minus-all-time FE60 is lower on BTCUSD (`-0.249`), EURUSD (`-0.308`), and XAUUSD (`-0.216`) with CIs excluding zero; USTEC is inconclusive (`-0.136`, CI includes zero).
+- Confirmed-minus-raw-Renko log FE/AE CIs include zero on all four instruments.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+The primary criterion required log FE/AE improvement on at least 3 of 4 instruments. Only USTEC shows a positive significant log-ratio improvement, while EURUSD worsens significantly. Renko confirmation reduces AE, but it also compresses FE and discards about 71-75% of time-bar signals.
+
+### Hypothesis-Agnostic Observations
+
+- Renko confirmation behaves more like a magnitude-compression gate than a signal-quality gate.
+- The AE reduction is real and consistent, but it is not enough to justify the coverage cost under the approved FE/AE criteria.
+- Future Renko-gating work would need to explicitly scope an AE-control objective with an allowed FE sacrifice.
+
+---
+
+## EXP-009 - Heiken Ashi Direction as a Signal Generator, Evaluated on Real Prices
+
+**Status**: REFUTED
+**Date**: 2026-05-17
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: Time Bars, Heiken Ashi
+
+### Hypothesis Tests
+
+1. **Hypothesis**: At the 15-minute source timeframe, Heiken Ashi direction changes evaluated on real prices select a subset of the time-bar signal population with a better AE-relative-to-FE trade-off than raw time-bar direction changes.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: 15-minute Time Bars and Heiken Ashi
+- **Features**: Time-bar direction changes, HA direction changes, FE60, AE60, log FE/AE, coverage-adjusted FE60/AE60, direction-change alignment
+- **Parameter ranges**: 15-minute source timeframe only; HA has no configurable parameter
+- **Exclusions**: No strategy P&L, no HA construction-price returns, no Renko or Line Break data, no parameter variation, no 1-minute analysis
+- **Constraints**: Final 30% global holdout excluded before aggregation; HA prices define signal direction only; all outcomes use real 1-minute time-bar prices
+
+### Results / Observations
+
+- HA/time-bar direction-change count ratios: EURUSD `0.493`, XAUUSD `0.484`, BTCUSD `0.492`, USTEC `0.477`.
+- HA direction changes aligned to same-direction time-bar direction changes within 15 minutes at shares of `0.866-0.895`.
+- HA-minus-time log FE/AE mean differences: BTCUSD `-0.040`, EURUSD `-0.017`, USTEC `+0.013`, XAUUSD `+0.012`; all CIs include zero.
+- HA-minus-time FE60 has one significant positive result: XAUUSD `+0.034`, CI `[+0.019, +0.397]`.
+- HA-minus-time AE60 has no instrument with a CI excluding zero.
+- Coverage by regime ranges from `0.436` to `0.534`.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+The primary criterion required log FE/AE improvement on at least 3 of 4 instruments with CIs excluding zero. HA achieved 0 of 4. HA smoothing reduces signal frequency but does not select a consistently better AE-relative-to-FE subset.
+
+### Hypothesis-Agnostic Observations
+
+- HA is a stronger 15-minute direction-change filter than expected from the design rationale, cutting direction-change counts by about half.
+- HA remains better framed as a smoothing descriptor or future time-bar-native feature, not as a standalone signal generator.
+- FE60 and AE60 should continue to be reported separately because isolated FE movement did not translate into a log-ratio finding.
+
+---
+
+## EXP-010 - Line Break as a Confirmation Layer Over Renko Signals
+
+**Status**: REFUTED
+**Date**: 2026-05-17
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: Renko ATR-14, Line Break level 3
+
+### Hypothesis Tests
+
+1. **Hypothesis**: At the 15-minute source timeframe, Renko signals confirmed by a same-or-prior Line Break level 3 emission show a better AE-relative-to-FE trade-off than the full Renko signal set, after accounting for the additional coverage reduction imposed by Line Break.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: Renko ATR-14 primary signals, Line Break level 3 confirmation layer
+- **Features**: Renko `SourceCloseTime` signals, same-or-prior Line Break confirmation, FE60, AE60, log FE/AE, coverage, coverage-adjusted outcomes
+- **Parameter ranges**: 1-minute exploratory and 15-minute confirmatory source timeframes; confirmation windows 5, 15, and 30 minutes; 15-minute window is primary
+- **Exclusions**: No strategy P&L, no time-bar or HA primary signals, no parameter optimization, no best-timeframe selection
+- **Constraints**: Final 30% global holdout excluded; outcomes use real 1-minute prices at Renko signal timestamps; Renko and Line Break construction prices are not used for returns or excursions
+
+### Results / Observations
+
+- Primary 15-minute Line Break confirmation coverage: BTCUSD `0.535`, EURUSD `0.626`, USTEC `0.605`, XAUUSD `0.618`.
+- Confirmed-minus-all-Renko log FE/AE mean differences: BTCUSD `+0.057` with CI `[+0.010, +0.183]`; EURUSD `-0.059`, USTEC `+0.013`, XAUUSD `-0.020`, all with CIs including zero.
+- Confirmed-minus-all-Renko FE60 is significantly lower on EURUSD (`-0.204`), USTEC (`-0.189`), and XAUUSD (`-0.153`).
+- Confirmed-minus-all-Renko AE60 is significantly lower on USTEC (`-0.183`) and XAUUSD (`-0.128`).
+- Confirmed-minus-non-confirmed AE60 is lower on all four instruments (`-0.299` to `-0.473`), but log FE/AE is mixed.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+The primary criterion required log FE/AE improvement versus all Renko on at least 3 of 4 instruments. Only BTCUSD meets that criterion. Line Break confirmation selects lower-AE Renko subsets, but FE also declines and the ratio advantage does not generalize.
+
+### Hypothesis-Agnostic Observations
+
+- Line Break confirmation acts as a coverage selector, not a reliable quality gate.
+- Confirmed signals are lower adverse-excursion episodes, but not consistently better AE-relative-to-FE episodes.
+- Same-timestamp Renko emissions are material and remain counted as emitted signal rows under the approved denominator policy.
+
+---
+
+## EXP-011 - Event-Native Volatility Regime Detection
+
+**Status**: REFUTED
+**Date**: 2026-05-17
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: Renko ATR-14, Time Bars
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Volatility-regime labels derived from Renko event density, source-bar count per brick, and brick-to-ATR ratio identify Renko regime states with lower boundary cost and fewer missed transitions than time-bar-derived regime labels applied to Renko events.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: Renko ATR-14 event-native features, time-bar volatility regime reference
+- **Features**: 60-minute Renko event density, 60-minute median source count per brick, brick-to-ATR ratio, train-frozen terciles, hybrid rate, missed-transition rate, agreement, FE60/AE60 strata
+- **Parameter ranges**: 1-minute and 15-minute source timeframes; Renko ATR period 14; terciles only
+- **Exclusions**: No strategy P&L, no parameter optimization, no clustering, no quartiles/custom bins, no feature weights, no composite scoring, no post-hoc best-feature selection
+- **Constraints**: Final 30% global holdout excluded; tercile boundaries computed on train segment only; all signal-quality outcomes use real 1-minute prices
+
+### Results / Observations
+
+- 15-minute hybrid rates:
+  - Event density: `0.564-0.659`
+  - Median source count: `0.739-0.750`
+  - Brick-to-ATR: `0.750-0.788`
+- 15-minute missed-transition rates:
+  - Event density: `0.383-0.759`
+  - Median source count: `0.448-0.491`
+  - Brick-to-ATR: `0.324-0.407`
+- 15-minute agreement with time-bar regimes:
+  - Event density: up to `0.436`
+  - Median source count: `0.250-0.261`
+  - Brick-to-ATR: `0.211-0.250`
+- Train-frozen boundaries were produced for all feature/instrument/timeframe combinations. Some discrete features have tied terciles, including 1-minute `BrickToATR` with Q1=Q2=`1.0`.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+No pre-fixed Renko-native feature provides a consistent lower-boundary-cost regime label. Brick-to-ATR has the lowest missed-transition rates, but its hybrid disagreement is high. Event density has lower hybrid rates than the other features in some cases, but missed-transition rates are inconsistent and can exceed 0.70.
+
+### Hypothesis-Agnostic Observations
+
+- Renko-native features describe event-generation mechanics more than canonical volatility regimes.
+- Time-bar-derived volatility regimes should remain the default regime frame for Renko signal analysis.
+- Renko-native features may still be useful as descriptive covariates, but not as volatility-regime replacements under the tested criteria.
