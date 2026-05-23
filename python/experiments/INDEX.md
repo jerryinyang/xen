@@ -19,6 +19,23 @@
 | EXP-009 | Heiken Ashi Direction as a Signal Generator, Evaluated on Real Prices | REFUTED | HA cuts 15m direction changes to 48-49% of time-bar count but log FE/AE improves on 0/4 instruments | 2026-05-17 |
 | EXP-010 | Line Break as a Confirmation Layer Over Renko Signals | REFUTED | LB confirms 53-63% of 15m Renko signals; primary log FE/AE improves on only BTCUSD, not 3/4 instruments | 2026-05-17 |
 | EXP-011 | Event-Native Volatility Regime Detection | REFUTED | Fixed Renko-native features show high hybrid rates (0.56-0.79 at 15m); no feature supports regime replacement | 2026-05-17 |
+| EXP-012 | ICT Data Readiness and Feasibility | PLANNED | Scope and analysis plan created for Phase 003 data-readiness gate | 2026-05-23 |
+| EXP-013 | NY Macro Window Characterization | PLANNED | Scope and analysis plan created for H1 macro-window characterization | 2026-05-23 |
+| EXP-014 | PDH PDL ONH ONL Liquidity Level Reproducibility | PLANNED | Scope and analysis plan created for H2 liquidity-level prerequisite | 2026-05-23 |
+| EXP-015 | Prior High Low Sweep Reversal Behavior | PLANNED | Scope and analysis plan created for H2 sweep-only event study | 2026-05-23 |
+| EXP-016 | Macro Window Interaction With Sweep Outcomes | PLANNED | Scope and analysis plan created for H2 macro-context interaction | 2026-05-23 |
+| EXP-017 | Premium Discount Filter Impact on Sweep Quality | PLANNED | Scope and analysis plan created for premium/discount filter test | 2026-05-23 |
+| EXP-018 | Displacement Confirmation Added to Sweeps | PLANNED | Scope and analysis plan created for H3 displacement confirmation | 2026-05-23 |
+| EXP-019 | Micro Swing Break Confirmation After Sweep | PLANNED | Scope and analysis plan created for H3 swing-break variant | 2026-05-23 |
+| EXP-020 | FVG IFVG Detection Reproducibility | PLANNED | Scope and analysis plan created for H4 FVG/IFVG prerequisite | 2026-05-23 |
+| EXP-021 | IFVG Confirmation Entry Quality | PLANNED | Scope and analysis plan created for H4 IFVG entry-quality test | 2026-05-23 |
+| EXP-022 | Objective Breaker Candidate Reproducibility | PLANNED | Scope and analysis plan created for H5 breaker prerequisite | 2026-05-23 |
+| EXP-023 | Breaker Confirmation Trade Quality | PLANNED | Scope and analysis plan created for H5 breaker confirmation test | 2026-05-23 |
+| EXP-024 | Second Candle Open Execution Timing | PLANNED | Scope and analysis plan created for execution-timing rule test | 2026-05-23 |
+| EXP-025 | Fixed 1 to 2 Risk Reward Justification | PLANNED | Scope and analysis plan created for H6 risk/reward validation | 2026-05-23 |
+| EXP-026 | Incremental ICT Component Ablation | PLANNED | Scope and analysis plan created for component contribution table | 2026-05-23 |
+| EXP-027 | Predeclared Full ICT Model Analysis-Set Test | PLANNED | Scope and analysis plan created for gated full-model test | 2026-05-23 |
+| EXP-028 | ICT Candidate Robustness and Falsification | PLANNED | Scope and analysis plan created for robustness/falsification checks | 2026-05-23 |
 
 <!-- 
 New experiments are added as they are completed.
