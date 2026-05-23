@@ -22,7 +22,7 @@ Save to: `python/experiments/<EXP-ID>/analysis-plan.md`
 - **Method**: <name>
 - **Why this method**: <justification, especially re: simplicity>
 - **Simpler alternative considered**: <what and why it doesn't suffice, or is equivalent>
-- **Assumptions**: <what this method assumes; whether it holds for chart-type time-series data>
+- **Assumptions**: <what this method assumes; whether it holds for time-ordered financial data>
 - **Expected output**: <what this step produces>
 
 ### Step 2: ...

@@ -5,6 +5,8 @@
 | Checkpoint | Status | Key Synthesis | Document |
 | --- | --- | --- | --- |
 | 2026-05-14-001-chart-type-validation | COMPLETED | Phase 1 validates time bars as the master timeline for 1-minute-source analysis; higher-timeframe robustness remains a Phase 1B bridge item before Phase 2 signal-quality characterization. | [retrospective.md](checkpoints/2026-05-14-001-chart-type-validation/retrospective.md) |
+| 2026-05-16-001-signal-quality-classification | COMPLETED | Phase 2 validates the FE/AE measurement framework but refutes the event-chart signal-quality path; broad event-chart strategy exploration is not justified without a new narrower thesis. | [retrospective.md](checkpoints/2026-05-16-001-signal-quality-classification/retrospective.md) |
+| 2026-05-23-003-ict-one-setup-timebar-validation | ACTIVE | Starts a separate time-bar-native ICT thesis; prior event-chart hypotheses and infrastructure do not carry forward except for the canonical time-bar timeline and research governance. | [design.md](checkpoints/2026-05-23-003-ict-one-setup-timebar-validation/design.md) |
 
 
 ## EXP-001 — Information Density & Ghost Bar Comparison

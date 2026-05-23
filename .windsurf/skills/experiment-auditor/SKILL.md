@@ -26,29 +26,38 @@ Validate whether the implementation and results can be trusted. Report findings 
 
 1. Check scope compliance:
    - implementation matches the plan exactly;
-   - features, instruments, levels, filters, and budgets match the scope;
+   - features, instruments, parameters, filters, and budgets match the scope;
    - no undocumented extra analyses were added.
 2. Check data handling:
    - final 30 percent global holdout is excluded;
-   - chronological ordering uses `CloseTime` (time bars) or `SourceCloseTime` (chart-type bars);
-   - cross-chart-type alignment uses timestamps, never bar indices;
-   - synthetic price discipline: HA returns use `RealClose`, never `HAClose`; Renko/Line Break signal returns use real prices aligned through `SourceCloseTime`;
+   - chronological ordering uses `CloseTime`, event timestamp, or `SourceCloseTime` as appropriate;
+   - cross-view alignment uses timestamps, never bar indices;
+   - real-price outcome discipline: strategy, signal-return, and excursion metrics use scoped real time-bar prices. If chart types are in scope, HA returns use `RealClose`, never `HAClose`; Renko/Line Break signal returns use real prices aligned through `SourceCloseTime`;
    - NaN and missing values are handled explicitly.
 3. Check code correctness:
    - formulas, joins, groupings, lag logic, and indices are correct;
    - edge cases are handled;
    - public functions have useful type hints and docstrings;
    - random processes are deterministic.
-4. Check numerical outputs:
+4. Check code standards against `experiment-developer/references/code-conventions.md`:
+   - organization follows the sample structure;
+   - output directories are created only in orchestration;
+   - large Parquet loads are lazy, column-pruned where practical, sorted before
+     holdout slicing, and collected only after the first-70-percent cut;
+   - plotting converts only aggregated or deterministically sampled data to
+     pandas;
+   - heavy loads/generator passes are not repeated solely for plotting;
+   - logging/output is concise and traceable.
+5. Check numerical outputs:
    - spot-check selected calculations manually or with small samples;
    - verify ranges, counts, p-values, intervals, and effect signs;
    - compare plots against tabular outputs when possible.
-5. Check statistical assumptions:
+6. Check statistical assumptions:
    - sample sizes are sufficient;
    - outliers and dependence risks are acknowledged;
    - chosen methods still fit the data produced.
-6. Check result plausibility against project value ranges and schemas from the references.
-7. Check chart-type generator determinism: same input + same parameters = same output.
+7. Check result plausibility against project value ranges and schemas from the references.
+8. Check derived-view determinism: same input + same parameters = same output, unless the approved scope explicitly requires seeded randomness.
 
 ## Report
 
@@ -67,7 +76,9 @@ Include exact file paths, functions, result files, and reproduction notes for ea
 - Do not reinterpret results as final conclusions; leave that to `experiment-quant-analyst`.
 - Do not expand the experiment scope.
 - Do not inspect the final 30 percent global holdout.
-- Prefer concrete evidence over broad style feedback.
+- Prefer concrete evidence over broad style feedback, but treat code-standard
+  violations that can change correctness, memory footprint, reproducibility, or
+  governance enforcement as audit findings.
 
 ## References
 

@@ -26,13 +26,13 @@ Validate whether the implementation and results can be trusted. Report findings 
 
 1. Check scope compliance:
    - implementation matches the plan exactly;
-   - features, instruments, levels, filters, and budgets match the scope;
+   - features, instruments, parameters, filters, and budgets match the scope;
    - no undocumented extra analyses were added.
 2. Check data handling:
    - final 30 percent global holdout is excluded;
-   - chronological ordering uses `CloseTime` (time bars) or `SourceCloseTime` (chart-type bars);
-   - cross-chart-type alignment uses timestamps, never bar indices;
-   - synthetic price discipline: HA returns use `RealClose`, never `HAClose`; Renko/Line Break signal returns use real prices aligned through `SourceCloseTime`;
+   - chronological ordering uses `CloseTime`, event timestamp, or `SourceCloseTime` as appropriate;
+   - cross-view alignment uses timestamps, never bar indices;
+   - real-price outcome discipline: strategy, signal-return, and excursion metrics use scoped real time-bar prices. If chart types are in scope, HA returns use `RealClose`, never `HAClose`; Renko/Line Break signal returns use real prices aligned through `SourceCloseTime`;
    - NaN and missing values are handled explicitly.
 3. Check code correctness:
    - formulas, joins, groupings, lag logic, and indices are correct;
@@ -57,7 +57,7 @@ Validate whether the implementation and results can be trusted. Report findings 
    - outliers and dependence risks are acknowledged;
    - chosen methods still fit the data produced.
 7. Check result plausibility against project value ranges and schemas from the references.
-8. Check chart-type generator determinism: same input + same parameters = same output.
+8. Check derived-view determinism: same input + same parameters = same output, unless the approved scope explicitly requires seeded randomness.
 
 ## Report
 

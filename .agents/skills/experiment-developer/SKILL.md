@@ -28,8 +28,9 @@ Translate an approved scope and analysis plan into Python code. Implement only t
    - avoid notebooks unless the user or plan explicitly requires them.
 3. Load data with the standard project pattern from `code-conventions.md`.
 4. Exclude the final 30 percent global holdout before analysis.
-5. Preserve chronological ordering by `CloseTime` (time bars) or `SourceCloseTime` (chart-type bars).
-6. For cross-chart-type comparisons, align by timestamp — never by bar index.
+5. Preserve chronological ordering by `CloseTime` (time bars), event timestamp,
+   or `SourceCloseTime` (chart-type bars).
+6. For cross-view comparisons, align by timestamp — never by bar index.
 7. Apply only filters approved in the scope.
 8. Write focused, typed functions for reusable computations.
 9. Save plots under `python/experiments/<ID>/plots/`.
@@ -60,7 +61,9 @@ Translate an approved scope and analysis plan into Python code. Implement only t
   convert millions of rows just to plot.
 - Handle empty inputs, NaN values, insufficient sample size, and divide-by-zero cases.
 - Use deterministic seeds when randomness is required.
-- For chart-type generators, same input + same parameters must produce identical output.
+- For derived-view generators and feature builders, same input + same
+  parameters must produce identical output unless the approved scope explicitly
+  requires seeded randomness.
 - Never use synthetic chart prices for strategy P&L or signal-quality return
   evaluation. Heiken Ashi strategy returns use `RealOpen`, `RealHigh`,
   `RealLow`, `RealClose`; Renko and Line Break signals align through

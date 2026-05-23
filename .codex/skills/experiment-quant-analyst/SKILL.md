@@ -34,7 +34,7 @@ Create `python/experiments/<ID>/analysis-plan.md`.
    - question answered;
    - reason it is sufficient;
    - simpler alternative considered;
-   - assumptions and whether they fit chart-type bar sequence data;
+   - assumptions and whether they fit time-ordered financial data;
    - expected table, metric, or plot.
 6. Define plots that answer specific sub-questions. Include distribution, relationship, and sequence context plots when relevant.
 7. Predefine interpretation criteria before results exist:
@@ -66,15 +66,17 @@ Create `python/experiments/<ID>/results.md`.
 - Do not add methods outside the approved scope without routing back to the pipeline.
 - Prefer robust, explainable analyses over complex modeling.
 - Be explicit when assumptions are weak or violated.
-- Never compute strategy P&L from synthetic chart prices. Heiken Ashi strategy,
-  signal-quality, and return-evaluation metrics use
-  RealOpen/RealHigh/RealLow/RealClose; Renko and Line Break signals align
-  through SourceCloseTime to real time-bar prices.
+- Strategy, signal-quality, and return-evaluation metrics use real time-bar
+  prices unless the approved scope explicitly defines a non-tradable diagnostic.
+  Never compute strategy P&L from synthetic chart prices. If Heiken Ashi is in
+  scope, strategy metrics use RealOpen/RealHigh/RealLow/RealClose. If Renko or
+  Line Break is in scope, signals align through SourceCloseTime to real
+  time-bar prices.
 - For explicitly scoped Heiken Ashi synthetic-price distortion diagnostics,
   `HAClose` returns may be planned only as non-tradable diagnostic metrics and
   must be compared against real prices at identical `CloseTime`.
-- Align cross-chart-type comparisons by timestamp (CloseTime/SourceCloseTime), never by bar index.
-- Acknowledge that different chart types produce different numbers of bars for the same time period.
+- Align cross-view comparisons by timestamp (CloseTime, event timestamp, or SourceCloseTime), never by bar index.
+- Acknowledge that different event definitions or data views may produce different observation counts for the same time period.
 
 ## References
 

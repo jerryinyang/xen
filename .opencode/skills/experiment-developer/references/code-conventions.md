@@ -26,7 +26,7 @@ from pathlib import Path
 
 DATA_DIR = Path("data")
 
-# Load time bars — baseline for all comparisons.
+# Load time bars — canonical base data for all experiments.
 # Sort before slicing so the first 70% is chronological, not physical row order.
 timebars_path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
 scan = pl.scan_parquet(timebars_path).sort("CloseTime")
@@ -49,12 +49,13 @@ lb_bars = generate_linebreak(analysis_set, level=3)
 
 **Important**:
 - `Direction` is an **int32 column** (`+1` for Up, `-1` for Down). Handle accordingly.
-- Use `CloseTime` for temporal ordering of time bars, `SourceCloseTime` for chart-type bars.
+- Use `CloseTime` for temporal ordering of time bars, event timestamps for
+  time-bar-native events, and `SourceCloseTime` for chart-type bars.
 - Apply the global holdout split in the lazy plan before collecting analysis rows. Do not `read_parquet()` the full dataset for experiments unless the approved plan explicitly permits it.
 - Do not call `.unique()` in loaders unless the scope requires deduplication and the code reports pre/post row counts. Silent dedupe changes the 70% analysis boundary.
-- For cross-chart-type comparisons, align by timestamp — never by bar index.
-- Strategy P&L must use real prices. Heiken Ashi returns use `RealClose` (never `HAClose`); Renko and Line Break signals use `SourceCloseTime` to align to real time-bar prices.
-- Chart-type generators are deterministic: same input + same parameters = same output.
+- For cross-view comparisons, align by timestamp — never by bar index.
+- Strategy P&L and signal outcomes must use real prices. Heiken Ashi returns use `RealClose` (never `HAClose`); Renko and Line Break signals use `SourceCloseTime` to align to real time-bar prices.
+- Derived-view generators and feature builders are deterministic: same input + same parameters = same output, unless the approved scope explicitly requires seeded randomness.
 
 ---
 
@@ -222,7 +223,7 @@ total_rows = int(scan.select(pl.len()).collect().item())
 analysis_cutoff = int(total_rows * 0.7)
 df = scan.slice(0, analysis_cutoff).collect()
 
-# Generate chart types on-demand if needed
+# Generate derived views on-demand if needed
 # lb_bars = generate_linebreak(df, level=3)
 # renko_bars = generate_renko(df, atr_period=14)
 # ha_candles = generate_heiken_ashi(df)
@@ -260,9 +261,15 @@ style reference. Current expectations:
 - Use concise progress logging. Prefer `logging.getLogger(__name__)` for new
   code; `print()` is acceptable only for short manual-run summaries in legacy
   experiment scripts.
+- Resolve input files dynamically from `DATA_DIR` unless the approved scope
+  pins exact files for reproducibility. If exact files are pinned, fail loudly
+  when they are missing.
 - Use lazy Polars scans for large Parquet inputs, select only required columns,
   sort by the governing timestamp before slicing, and collect only the analysis
   set.
+- Reuse already-loaded/generated analysis data for plots by returning bounded
+  plot inputs from the analysis pass. Do not run a second full load/generation
+  pass just to build visualisations.
 - Avoid row-wise Python loops over large arrays when Polars, NumPy, or
   `searchsorted` can express the computation directly.
 - Bound plotting memory by aggregating first or by deterministic sampling with a
@@ -270,10 +277,32 @@ style reference. Current expectations:
 - For zero-baseline metrics, do not report percentage improvement. Emit absolute
   differences or a separate metric kind so plots and threshold tables remain
   finite and interpretable.
-- For event charts that can emit multiple rows at the same `SourceCloseTime`,
+- For event streams that can emit multiple rows at the same timestamp,
   define whether same-source rows are excluded, merged, or counted before
   computing rates. Do not let zero-duration duplicate-source rows silently
   dominate denominators.
+- Heiken Ashi `HAClose` returns are allowed only for approved synthetic-price
+  distortion diagnostics. Label them as non-tradable and keep them separate from
+  strategy returns, signal validation, and P&L.
+
+### Self-Check Before Completion
+
+Before marking an experiment implementation complete, verify:
+
+1. Imports/path setup/constants/helper sections match the sample organization.
+2. Output directories are created in `main()` or orchestration only.
+3. Every large Parquet read uses lazy scan -> timestamp sort -> first-70% slice
+   -> collect, with column projection when possible.
+4. No loader uses `.unique()` without scope approval and pre/post row counts.
+5. Plotting inputs are aggregated or deterministically sampled before pandas
+   conversion.
+6. Expensive generated chart data is not recomputed for plotting if the
+   analysis pass already computed it.
+7. Zero-baseline ratios are finite or explicitly marked undefined.
+8. Duplicate-source or duplicate-event timestamp denominators are explicitly defined when relevant.
+9. Logging/output is concise and progress-oriented.
+10. Any HA synthetic returns are scope-approved diagnostics, not tradable
+    returns.
 
 ---
 
@@ -306,6 +335,6 @@ def safe_computation(data: np.ndarray) -> float:
 | Magic numbers in thresholds | Undocumented assumptions | Derive from data or document explicitly |
 | Lines > 100 characters | Readability | Break into multiple lines |
 | Functions > 30 lines | Complexity | Split into sub-functions |
-| Using synthetic chart prices for P&L | Incorrect P&L | Use real prices aligned by `CloseTime` or `SourceCloseTime` |
-| Aligning chart types by bar count | Look-ahead bias | Always align by timestamp (CloseTime/SourceCloseTime) |
-| Assuming same bar count across chart types | Logical error | Different chart types produce different bar counts for same period |
+| Using synthetic chart prices for P&L | Incorrect P&L | Use real prices aligned by `CloseTime`, event timestamp, or `SourceCloseTime` |
+| Aligning data views by bar count | Look-ahead bias | Always align by timestamp (`CloseTime`, event timestamp, or `SourceCloseTime`) |
+| Assuming same event count across data views | Logical error | Different event definitions can produce different counts for the same period |

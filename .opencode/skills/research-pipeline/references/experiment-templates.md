@@ -21,13 +21,13 @@ Save to: `python/experiments/<EXP-ID>/scope.md`
 
 ## Scope Boundaries
 
-- **Chart Types**: <Time, LineBreak, Renko, Heiken Ashi — which are included>
-- **Chart Type Parameters**: <LineBreak level(s), Renko ATR period(s), time bar timeframe(s)>
+- **Data Views**: <Time bars, derived feature tables, or chart types if explicitly included>
+- **Parameters**: <timeframe(s), windows, thresholds, chart-type parameters, or other scoped constants>
 - **Instruments**: <EURUSD, XAUUSD, BTCUSD, USTEC — which and why>
 - **Time range**: Full dataset with nested chronological split. First 70% = analysis set (split 70/30 for train/test); final 30% = global holdout (never used).
 - **Global holdout**: The final 30% of the full dataset must not be loaded, inspected, or used in any capacity.
-- **Look-ahead bias prevention**: Chart-type generators process data sequentially. Analysis must respect SourceCloseTime for temporal alignment.
-- **Synthetic price discipline**: No strategy P&L from Heiken Ashi prices or Renko brick prices. All returns use RealClose or time-bar Close aligned by timestamp.
+- **Look-ahead bias prevention**: Features and events use only data available at or before the event timestamp. Chart-type generators, if in scope, process data sequentially and use `SourceCloseTime` for temporal alignment.
+- **Real-price outcome discipline**: Strategy and signal-return metrics use time-bar OHLC prices aligned by timestamp. No strategy P&L from Heiken Ashi prices or Renko brick prices. HA synthetic returns are allowed only for explicitly scoped, non-tradable distortion diagnostics.
 - **Exclusions**: <what is explicitly NOT in scope>
 
 ## Success / Failure Criteria
@@ -87,10 +87,10 @@ Save to: `python/experiments/<EXP-ID>/analysis-plan.md`
 - **Method**: <name of statistical/computational method>
 - **Why this method**: <justification, especially re: simplicity>
 - **Simpler alternative considered**: <what and why it doesn't suffice, or is equivalent>
-- **Assumptions**: <what this method assumes; whether it holds for chart-type comparison data>
-  - **Temporal structure**: Data has chronological ordering by CloseTime/SourceCloseTime
-  - **Cross-chart alignment**: Comparisons are by timestamp, not bar index
-  - **Synthetic prices**: HA prices and Renko brick prices are not used for strategy P&L; real prices are used for alignment
+- **Assumptions**: <what this method assumes; whether it holds for time-ordered financial data>
+  - **Temporal structure**: Data has chronological ordering by `CloseTime` or event timestamp.
+  - **Cross-view alignment**: Comparisons are by timestamp, not bar index.
+  - **Real-price outcomes**: Strategy and signal metrics use real time-bar prices. Synthetic chart prices appear only in explicit non-tradable diagnostics.
 - **Expected output**: <what this step produces — a number, a plot, a table>
 
 ### Step 2: ...
@@ -112,22 +112,23 @@ Save to: `python/experiments/<EXP-ID>/analysis-plan.md`
 - Visualisations: <planned> / <budget>
 - New modules: <planned> / <budget>
 
-## Chart-Type Comparison Considerations
+## Data-View Comparison Considerations
 
-### Cross-Chart Alignment
-- Different chart types produce different numbers of bars for the same time period
-- Always align by timestamp (SourceCloseTime), never by bar index
-- Report alignment rates: what fraction of chart-type events have a matching time-bar event within a tolerance window
+### Cross-View Alignment
+- Different data views or event detectors may produce different numbers of observations for the same time period.
+- Always align by timestamp (`CloseTime`, event timestamp, or `SourceCloseTime`), never by bar index.
+- Report alignment or coverage rates where event detectors emit sparse events.
 
-### Synthetic Price Discipline
-- Never compute strategy P&L from Heiken Ashi HA prices or Renko brick prices
-- Use RealClose for all return calculations involving Heiken Ashi
-- For Line Break and Renko, use SourceCloseTime-aligned time-bar prices
+### Real-Price Outcome Discipline
+- Compute strategy P&L, signal returns, and excursion outcomes from real time-bar prices.
+- Never compute strategy P&L from Heiken Ashi HA prices or Renko brick prices.
+- Use `HAClose` returns only when the approved scope is an HA synthetic-price distortion diagnostic and labels them non-tradable.
+- For Line Break and Renko, use `SourceCloseTime`-aligned time-bar prices.
 
-### Bar Density Differences
-- Chart types have vastly different bar counts (e.g., Renko may produce 10-50x fewer bars than 1-minute time bars)
-- Statistical comparison must account for different sample sizes
-- Consider density-normalised metrics where appropriate
+### Event Density Differences
+- Event detectors may emit far fewer observations than the time-bar baseline.
+- Statistical comparison must account for different sample sizes and coverage.
+- Consider density-normalised metrics where appropriate.
 
 ### Regime Stratification
 - Consider analyzing low/medium/high volatility regimes separately

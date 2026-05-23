@@ -47,7 +47,7 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | Direction | {+1, -1} | [<min>, <max>] | YES/NO |
 | RealClose returns | ℝ (check for extreme outliers) | [<min>, <max>] | YES/NO |
 | TickVolume / SourceCount | ≥ 0 | [<min>, <max>] | YES/NO |
-| SourceCloseTime | Monotonically increasing | [<first>, <last>] | YES/NO |
+| Event timestamps | Monotonically increasing where required | [<first>, <last>] | YES/NO |
 
 ### Statistical Sanity
 
@@ -121,13 +121,13 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | Silent deduplication drift | Any `.unique()` in loaders | Require a scope reason and pre/post row-count reporting |
 | Zero-baseline percentage improvement | Any `(baseline - value) / baseline` | When baseline is zero, emit absolute difference or mark the relative metric undefined |
 | String/numeric confusion | `Direction` column comparisons | Verify `Direction` is `+1/-1` (int), not string |
-| Look-ahead bias | Temporal ordering code | Verify `CloseTime` or `SourceCloseTime` used for sorting, never bar index |
+| Look-ahead bias | Temporal ordering code | Verify `CloseTime`, event timestamp, or `SourceCloseTime` used for sorting/alignment, never bar index |
 | Synthetic price returns | Any return computation on HA or Renko-derived signals | Verify strategy/P&L/signal returns use real time-matched prices, never `HAClose` or Renko brick prices. `HAClose` returns are allowed only for explicit HA distortion diagnostics labelled non-tradable. |
-| Cross-chart-type alignment | Any comparison across chart types | Verify alignment by timestamp, not by bar count or index |
-| Chart-type generator determinism | Any generator output | Verify same input + parameters produces identical output |
+| Cross-view alignment | Any comparison across event sets or data views | Verify alignment by timestamp, not by bar count or index |
+| Derived-view determinism | Any generator or feature-builder output | Verify same input + parameters produces identical output, or fixed seed if randomness is scoped |
 | Division by zero | Any ratio computation | Check for denominator > 0 guard |
 | Wrong sample size in CI | Bootstrap or statistical test calls | Verify the `n=` passed matches actual data size |
-| Duplicate-source event denominator bias | Renko or other event charts with repeated `SourceCloseTime` | Verify zero-duration same-source rows are excluded, merged, or explicitly counted by design |
+| Duplicate-event denominator bias | Event streams with repeated timestamps | Verify duplicate rows are excluded, merged, or explicitly counted by design |
 
 ### Value Range Reference
 
@@ -138,7 +138,7 @@ Use these ranges for plausibility checks (from `_pipeline-config.md` and `datase
 | `Open`, `High`, `Low`, `Close` | Time bars, LB, Renko | Positive real (price domain) | OHLC prices, typical forex/commodity range |
 | `HAOpen`, `HAHigh`, `HALow`, `HAClose` | Heiken Ashi | real-valued | Synthetic prices — never use for strategy P&L |
 | `RealOpen`, `RealHigh`, `RealLow`, `RealClose` | Heiken Ashi | Positive real (price domain) | Actual prices, use for returns |
-| `Direction` | All chart types | {+1, -1} | Up or Down, int32 |
+| `Direction` | Directional features/events | {+1, -1} | Up or Down, int32 when present |
 | `Level` | Line Break | Positive int | Line Break level parameter (default: 3) |
 | `BrickSize` | Renko | Positive real | ATR-derived brick size |
 | `ATRPeriod` | Renko | Positive int | ATR period used (default: 14) |
@@ -153,7 +153,7 @@ Use these ranges for plausibility checks (from `_pipeline-config.md` and `datase
 
 | Experiment Complexity | Audit Depth |
 |----------------------|-------------|
-| Descriptive / EDA (0-1 tests, 2-4 plots) | Light: check holdout exclusion, synthetic price discipline, value ranges, scope compliance |
+| Descriptive / EDA (0-1 tests, 2-4 plots) | Light: check holdout exclusion, real-price outcome discipline, value ranges, scope compliance |
 | Single hypothesis test (1-2 tests, 2-3 plots) | Standard: all dimensions, check timestamp alignment |
-| Comparative across chart types (2-4 tests, 3-5 plots) | Thorough: all dimensions + cross-chart-type consistency and alignment |
-| Multi-feature relationship (2-3 tests, 3-5 plots) | Thorough: all dimensions + interaction checks, synthetic price and alignment checks |
+| Comparative across data views (2-4 tests, 3-5 plots) | Thorough: all dimensions + cross-view consistency and alignment |
+| Multi-feature relationship (2-3 tests, 3-5 plots) | Thorough: all dimensions + interaction checks, real-price outcome and alignment checks |

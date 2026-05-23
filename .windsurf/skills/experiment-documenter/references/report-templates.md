@@ -15,7 +15,7 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 
 **Date**: <completion date>
 **Instruments**: <which>
-**Feature Categories**: <which (Time Bars, Line Break, Renko, Heiken Ashi)>
+**Data Views / Feature Categories**: <which, e.g. time bars, macro windows, sweeps, chart types if scoped>
 
 ---
 
@@ -118,7 +118,7 @@ This is the authoritative detailed catalog of all experiments. Append each exper
 **Status**: COMPLETED / INCONCLUSIVE / FAILED
 **Date**: YYYY-MM-DD
 **Instruments**: <which>
-**Feature Categories**: <which (Time Bars, Line Break, Renko, Heiken Ashi)>
+**Data Views / Feature Categories**: <which>
 
 ### Hypothesis Tests
 
@@ -128,8 +128,8 @@ This is the authoritative detailed catalog of all experiments. Append each exper
 ### Scope
 
 - **Instruments**: <tested instruments>
-- **Feature Categories**: <which categories used>
-- **Features**: <specific Xen features used — e.g., Direction, SourceCount, RealClose returns, etc.>
+- **Data Views / Feature Categories**: <which categories used>
+- **Features**: <specific Xen features used, e.g. macro-window flag, sweep event, Direction, SourceCount, RealClose returns>
 - **Parameter ranges**: <ranges tested>
 - **Exclusions**: <what was explicitly excluded>
 - **Constraints**: <key assumptions and constraints>
@@ -171,11 +171,11 @@ This is the authoritative detailed catalog of all experiments. Append each exper
 
 **Hypothesis REFUTED.**
 
-The data shows no evidence that Line Break direction agreement predicts
-next-bar RealClose return (Spearman ρ = 0.02, 95% CI [-0.01, 0.05],
+The data shows no evidence that the scoped signal predicts
+next-bar RealClose return (Spearman rho = 0.02, 95% CI [-0.01, 0.05],
 p = 0.18). The effect, if it exists, is smaller than our minimum
 detectable effect size of 0.10 given our sample of 14,233 valid EURUSD
-chart-type events.
+events.
 
 This means that direction agreement does not reliably predict subsequent
 bar returns in this dataset. We should deprioritise this line of research

@@ -37,7 +37,7 @@ Every experiment must have a single hypothesis, defined boundaries, success/fail
 | Check | What to Verify |
 |-------|---------------|
 | Single question | Does the experiment answer exactly one question? No compound questions. |
-| Defined boundaries | Are chart types, instruments, timeframes, and exclusions all explicitly stated? |
+| Defined boundaries | Are data views, instruments, timeframes, parameters, and exclusions all explicitly stated? |
 | Concrete criteria | Are success/failure conditions measurable, not subjective? |
 | Budget respected | Count actual tests, plots, modules vs budgeted limits. |
 | No scope creep | Does the artifact stay within the stated scope and not add "bonus" analyses? |
@@ -49,8 +49,8 @@ Every experiment must have a single hypothesis, defined boundaries, success/fail
 | Data-driven | Do conclusions emerge from data, not assumptions or preconceptions? |
 | Non-conformational | Is data forced into predefined shapes or models, or does the analysis adapt to what the data shows? |
 | Non-parametric | Are distribution-free methods used by default? If parametric, is there non-parametric cross-validation? |
-| Synthetic price discipline | Are strategy returns always computed from real time-matched prices, never from Heiken Ashi prices or Renko brick prices? |
-| Timestamp alignment | Are cross-chart-type comparisons always aligned by timestamp, never by bar count? |
+| Real-price outcome discipline | Are strategy returns, signal returns, and excursion outcomes computed from real time-matched prices unless explicitly scoped as non-tradable diagnostics? |
+| Timestamp alignment | Are cross-view comparisons always aligned by timestamp, never by bar count or row index? |
 
 ### 5. OOS Holdout Rule
 
@@ -64,25 +64,25 @@ The final 30% of the dataset is a global holdout — never loaded, inspected, or
 
 ### 6. Look-Ahead Bias Prevention
 
-Chart-type generators process data sequentially. Analysis must respect this.
+Event and feature generation must use only information available at or before the event timestamp. Chart-type generators, when in scope, must process data sequentially.
 
 | Check | What to Verify |
 |-------|---------------|
 | Sequential generation | Do generators use only data available at or before each bar's timestamp? |
 | No future data | Does any analysis use data from after the event timestamp? |
-| SourceCloseTime alignment | For chart-type events, is SourceCloseTime used for temporal alignment? |
-| Bar-index alignment ban | Are cross-chart-type comparisons aligned by timestamp, not by bar count? |
+| Event timestamp alignment | Are event timestamps, `CloseTime`, or `SourceCloseTime` used for temporal alignment as appropriate? |
+| Bar-index alignment ban | Are cross-view comparisons aligned by timestamp, not by bar count? |
 
-### 7. Synthetic Price Discipline
+### 7. Real-Price and Synthetic-Price Discipline
 
-Heiken Ashi prices and Renko brick prices are synthetic chart-construction prices. Strategy P&L must use real time-matched prices.
+Strategy P&L, signal returns, and excursion outcomes must use real time-matched prices. Heiken Ashi prices and Renko brick prices are synthetic chart-construction prices and are prohibited for strategy P&L.
 
 | Check | What to Verify |
 |-------|---------------|
-| No HA returns | Are strategy returns computed from RealClose (or time-bar Close), never from HA-Close? |
-| No HA signal validation via HA prices | Are signal quality metrics (like continuation, reversal) computed on real prices, not HA prices? |
-| No Renko brick P&L | Are Renko signal returns computed from time-matched real prices, never from brick open/close levels? |
-| Real price columns used | Does the code explicitly use RealOpen/RealHigh/RealLow/RealClose for all return calculations? |
+| Real prices used | Are strategy and signal outcomes computed from time-bar OHLC prices? |
+| No HA returns | If Heiken Ashi is in scope, are strategy returns computed from RealClose (or time-bar Close), never from HA-Close? |
+| No HA signal validation via HA prices | If Heiken Ashi is in scope, are signal quality metrics computed on real prices, not HA prices? |
+| No Renko brick P&L | If Renko is in scope, are Renko signal returns computed from time-matched real prices, never from brick open/close levels? |
 
 ---
 
@@ -94,19 +94,19 @@ Heiken Ashi prices and Renko brick prices are synthetic chart-construction price
 |-------|-----------|
 | Hypothesis quality | Is it testable, falsifiable, specific? No weasel words. |
 | Success criteria | Are they concrete and measurable, not subjective judgments? |
-| Chart types defined | Are all chart types, their parameters, and timeframes explicitly stated? |
+| Data views defined | Are all data views, feature families, parameters, and timeframes explicitly stated? |
 | Scope boundaries | Are instruments, time range, and exclusions all explicit? |
 | Complexity budget | Does it match the scope? Is it realistic? |
 | Holdout exclusion | Does the scope explicitly exclude the global holdout? |
-| Synthetic price rule | If Heiken Ashi or Renko is in scope, does the scope explicitly state that strategy P&L uses real prices? |
+| Real-price outcome rule | Does the scope explicitly state what prices are used for returns, excursions, P&L, stops, and targets? |
 
 ### Analysis Plan (analysis-plan.md)
 
 | Check | Questions |
 |-------|-----------|
 | Method justification | Is each method choice justified with "why this method" and "simpler alternative considered"? |
-| Assumptions listed | Does each method document its assumptions and whether they hold for chart-type comparison data? |
-| Cross-chart alignment | Does the plan specify how chart types are aligned (by timestamp, not bar count)? |
+| Assumptions listed | Does each method document its assumptions and whether they hold for time-ordered financial data? |
+| Cross-view alignment | Does the plan specify how data views or event sets are aligned by timestamp, not bar count? |
 | Visualisation plan | Are plots purposeful (answering specific sub-questions), not decorative? |
 | Interpretation guide | Are outcomes pre-defined (if X then Y because Z) to prevent post-hoc rationalisation? |
 | Budget compliance | Do total tests, plots, modules stay within the complexity budget? |
@@ -118,8 +118,8 @@ Heiken Ashi prices and Renko brick prices are synthetic chart-construction price
 | Plan compliance | Does the code implement exactly what the analysis plan specifies — nothing more, nothing less? |
 | Holdout exclusion | Is only the first 70% of time-ordered data loaded? No code path accesses the holdout. |
 | Look-ahead bias prevention | Is all temporal ordering by CloseTime/SourceCloseTime? No use of future data relative to event time. |
-| Synthetic price check | Are returns computed from real prices, never HA prices or Renko brick prices? |
-| Timestamp alignment | Are cross-chart-type comparisons aligned by timestamp, not bar index? |
+| Real-price outcome check | Are returns and excursions computed from real prices unless explicitly scoped as non-tradable diagnostics? |
+| Timestamp alignment | Are cross-view comparisons aligned by timestamp, not bar index? |
 | Type safety | Are type hints on all public functions? Are types consistent? |
 | NaN handling | Is NaN handling explicit — no silent propagation? |
 | Edge cases | Are empty DataFrames, single-element arrays, division by zero handled? |
@@ -127,7 +127,12 @@ Heiken Ashi prices and Renko brick prices are synthetic chart-construction price
 | No magic numbers | Are all thresholds derived from data or documented? |
 | Code quality | PEP 8, docstrings, descriptive names, ~30 line function limit? |
 | Data loading | Is Polars/Parquet used correctly? Are columns properly selected before `collect()`? |
-| Generator determinism | If chart-type generators are called, are they deterministic? No random seeds? |
+| Organization | Are imports, path setup, constants, I/O helpers, computation helpers, plotting helpers, orchestration, and `main()` clearly separated? |
+| Import side effects | Does module import avoid creating directories, writing files, loading data, or plotting? |
+| Logging/output | Is manual-run output concise and traceable, with helper functions returning data instead of printing? |
+| Plot memory | Are plot inputs aggregated or sampled before pandas conversion? |
+| Repeated heavy work | Does plotting reuse analysis outputs instead of reloading or regenerating large datasets? |
+| Derived-view determinism | If generators or feature builders are called, are they deterministic or explicitly seeded? |
 
 ### Audit Report (audit.md)
 
@@ -138,8 +143,8 @@ Heiken Ashi prices and Renko brick prices are synthetic chart-construction price
 | Severity classification | Are issues classified as Critical, Warning, or Info appropriately? |
 | Numerical validation | Are spot checks, boundary checks, statistical sanity checks included? |
 | Scope compliance | Does the audit verify that code matches the analysis plan? |
-| Synthetic price audit | Does audit verify that no strategy P&L uses HA prices or Renko brick prices? |
-| Timestamp alignment audit | Does audit verify cross-chart-type alignment by timestamp? |
+| Real-price outcome audit | Does audit verify that strategy and signal outcomes use scoped real prices? |
+| Timestamp alignment audit | Does audit verify cross-view alignment by timestamp? |
 
 ### Results Interpretation (results.md)
 
@@ -150,7 +155,7 @@ Heiken Ashi prices and Renko brick prices are synthetic chart-construction price
 | No overreaching | If effect sizes are small, does it say so? No inflating weak findings. |
 | Verdict supported | Is the SUPPORTED/REFUTED/INCONCLUSIVE conclusion justified by the evidence? |
 | Next steps reasonable | Are follow-up suggestions specific new experiments, not scope extensions? |
-| Synthetic price results | If Heiken Ashi or Renko is involved, are all strategy P&L metrics computed on real prices? |
+| Real-price outcome results | Are all strategy P&L and signal metrics computed on scoped real prices? |
 
 ### Final Report (report.md)
 
@@ -184,7 +189,10 @@ Allow up to 2 revision cycles.
 Fundamental, unfixable issues. Examples:
 - Holdout contamination (data from the 30% reserve was used)
 - Look-ahead bias (using data from after the event timestamp when analyzing an event)
-- Synthetic price violation (computing strategy P&L from Heiken Ashi prices or Renko brick prices instead of real prices)
+- Synthetic price violation (computing strategy P&L from Heiken Ashi prices or
+  Renko brick prices instead of real prices; `HAClose` diagnostic returns are
+  allowed only for explicitly scoped HA distortion experiments that label them
+  non-tradable)
 - Bar-index alignment (comparing chart types by bar index instead of timestamp)
 - Scope creep beyond what can be fixed with revision
 - Method fundamentally violates core constraints (e.g., assumes normality with no cross-validation)
