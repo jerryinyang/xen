@@ -104,12 +104,12 @@ def load_analysis_timebars(
 ) -> tuple[pl.DataFrame, int, int, int, list[Path]]:
     """Load only the holdout-excluded analysis rows for one instrument."""
     paths = instrument_timebar_paths(instrument)
-    sorted_df = pl.scan_parquet(paths).select(TIMEBAR_COLUMNS).sort("CloseTime").collect()
-    total_rows = len(sorted_df)
+    scan = pl.scan_parquet(paths).select(TIMEBAR_COLUMNS)
+    total_rows = int(scan.select(pl.len()).collect().item())
     analysis_rows = int(total_rows * ANALYSIS_FRACTION)
     if analysis_rows <= 0:
         return pl.DataFrame({column: [] for column in TIMEBAR_COLUMNS}), 0, 0, total_rows, paths
-    analysis_df = sorted_df.slice(0, analysis_rows)
+    analysis_df = scan.sort("CloseTime").slice(0, analysis_rows).collect()
     train_rows = int(analysis_rows * TRAIN_FRACTION)
     return analysis_df, analysis_rows, train_rows, total_rows, paths
 

@@ -1,0 +1,42 @@
+{
+  "experiment_id": "EXP-013",
+  "title": "NY Macro Window Characterization",
+  "bootstrap_reps": 10000,
+  "bootstrap_seed": "per-comparison (derived from instrument+segment+control)",
+  "random_controls_per_window": 100,
+  "primary_effect_threshold_atr": 0.1,
+  "macro_boundary_note": "Macro-window membership follows EXP-012: CloseTimeNY at the start minute is the first bar of the window, and end minute is excluded.",
+  "random_control_note": "RandomControl (draw 0) is a single session-bounded random draw [07:00\u201317:00 NY] used for bootstrap. RandomMean (mean of 100 draws) is a diagnostic only.",
+  "adjacent_overlap_note": "Adjacent windows that overlap another macro spec are excluded (affects PM2/PM3/PM4 cluster). AdjacentMean averages only non-contaminated neighbours.",
+  "secondary_sweep_note": "Sweep = window max High > level AND window last Close < level (high sweep) or window min Low < level AND window last Close > level (low sweep). PDH/PDL are eligible all day; ONH/ONL are counted only for windows starting at or after 09:30 NY to avoid using levels unavailable at earlier window starts.",
+  "support_summary": {
+    "instrument_support": [
+      {
+        "Instrument": "EURUSD",
+        "TrainPass": false,
+        "TestPass": false,
+        "InstrumentPass": false
+      },
+      {
+        "Instrument": "XAUUSD",
+        "TrainPass": false,
+        "TestPass": false,
+        "InstrumentPass": false
+      },
+      {
+        "Instrument": "BTCUSD",
+        "TrainPass": false,
+        "TestPass": false,
+        "InstrumentPass": false
+      },
+      {
+        "Instrument": "USTEC",
+        "TrainPass": false,
+        "TestPass": false,
+        "InstrumentPass": false
+      }
+    ],
+    "supporting_instruments": 0,
+    "phase_support": false
+  }
+}

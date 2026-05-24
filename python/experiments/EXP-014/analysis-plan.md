@@ -8,7 +8,7 @@ Verify that PDH/PDL and ONH/ONL liquidity levels can be computed reproducibly fr
 
 ### Step 1: Eligible Date Construction
 
-- **Method**: Use EXP-012-approved NY conversion to group bars by NY date, exclude the global holdout, and identify dates with enough prior-day and overnight bars to compute levels.
+- **Method**: Use EXP-012-approved NY conversion to group bars by NY date, exclude the global holdout, and identify weekday dates with enough prior observed weekday and overnight bars to compute levels.
 - **Why this method**: Liquidity levels must be defined before event outcomes are inspected.
 - **Simpler alternative considered**: Using calendar days without coverage checks would silently create unreliable levels.
 - **Assumptions**: Available bars represent the observed session; missing bars are classified rather than imputed.
@@ -16,7 +16,7 @@ Verify that PDH/PDL and ONH/ONL liquidity levels can be computed reproducibly fr
 
 ### Step 2: Level Computation and Reproducibility Checks
 
-- **Method**: Compute PDH/PDL from the prior completed NY date and ONH/ONL from 17:00-09:30 NY time ending on the event date; rerun the computation to confirm deterministic equality.
+- **Method**: Compute PDH/PDL from the prior observed weekday NY date and ONH/ONL from 17:00 NY on the prior calendar date through 09:30 NY on the event date using CloseTimeNY boundary membership; rerun the computation to confirm deterministic equality.
 - **Why this method**: It preserves the planning spec's initial liquidity levels and avoids unsupported swing/equal-high assumptions.
 - **Simpler alternative considered**: Adding swing levels now would exceed the H2 prerequisite scope.
 - **Assumptions**: Session caveats are acceptable only when documented by instrument.

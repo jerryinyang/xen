@@ -956,3 +956,139 @@ No pre-fixed Renko-native feature provides a consistent lower-boundary-cost regi
 - Renko-native features describe event-generation mechanics more than canonical volatility regimes.
 - Time-bar-derived volatility regimes should remain the default regime frame for Renko signal analysis.
 - Renko-native features may still be useful as descriptive covariates, but not as volatility-regime replacements under the tested criteria.
+
+---
+
+## EXP-012 - ICT Data Readiness and Feasibility
+
+**Status**: SUPPORTED
+**Date**: 2026-05-23
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, NY Macro Windows, Data Readiness
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The available 1-minute time-bar datasets are sufficient for deterministic NY-time ICT macro-window research if timezone conversion, session coverage, missing-bar rates, and cost assumptions can be documented without using unavailable data.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: 1-minute time-bar inventory, NY-time macro-window coverage, missing-bar diagnostics, active-session summaries, cost-field availability
+- **Features**: `CloseTime` ordering, train/test segment counts inside the analysis set, fixed macro windows AM1-AM5 and PM1-PM4, family-level coverage ratios, missing-bar rates within observed daily spans, schema-based cost-field availability
+- **Parameter ranges**: UTC-to-`America/New_York` conversion assumption; macro windows AM1 `07:50-08:10`, AM2 `08:50-09:10`, AM3 `09:50-10:10`, AM4 `10:50-11:10`, AM5 `11:50-12:10`, PM1 `13:20-13:40`, PM2 `14:50-15:10`, PM3 `15:15-15:45`, PM4 `15:50-16:10`
+- **Exclusions**: No event-chart inputs, no ICT signal generation, no parameter tuning, no tick or bid/ask data, no cost haircut applied to outcomes
+- **Constraints**: Final 30% global holdout excluded from approved analysis; all timing aligned on `CloseTime`; cost assumptions recorded only as proxy scenarios
+
+### Results / Observations
+
+- All `16` macro-family coverage rows in `python/experiments/EXP-012/results/macro_family_coverage_summary.csv` exceed the scoped `0.80` threshold.
+- Lowest family coverage: `USTEC Test PM = 0.9459`; highest family coverage: `BTCUSD Test PM = 0.9995`.
+- Missing-bar rates within observed daily spans range from `0.0052` (`EURUSD Test`) to `0.0414` (`XAUUSD Train`).
+- `python/experiments/EXP-012/results/cost_data_availability.csv` reports `False` for `Bid`, `Ask`, `Spread`, `Commission`, and `Slippage`; proxy scenarios were written to `python/experiments/EXP-012/results/cost_proxy_scenarios.json`.
+- The rerun audit confirms `load_analysis_timebars()` computes row count lazily and collects only the holdout-excluded sorted analysis slice.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+The experiment meets the scoped support condition. All four instruments can be converted to New York time under the documented UTC assumption, each clears the `>= 80%` macro-family coverage threshold in both train and test, missing-bar behavior is quantified, and cost assumptions are recorded through explicit proxy scenarios.
+
+### Hypothesis-Agnostic Observations
+
+- PM coverage is consistently weaker than AM coverage for `USTEC` and `XAUUSD`, even though all family ratios remain above the scoped threshold.
+- The current repository time-bar schema is sufficient for macro-window presence studies but not for observed transaction-cost modeling; later ICT experiments need proxy costs or new data.
+
+---
+
+## EXP-014 - PDH PDL ONH ONL Liquidity Level Reproducibility
+
+**Status**: SUPPORTED
+**Date**: 2026-05-24
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, Liquidity Levels
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Previous-day and overnight high/low liquidity levels can be computed reproducibly from available time bars without exchange-calendar or preferred-data assumptions that are absent from the repository.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: PDH/PDL from prior observed weekday NY date; ONH/ONL from 17:00 prior calendar date through 09:30 event date
+- **Features**: `PDH`, `PDL`, `ONH`, `ONL`, prior date, overnight bar count, missing-level reason, train/test readiness
+- **Parameter ranges**: Availability threshold `0.80`; minimum all-level dates per train/test segment `50`
+- **Exclusions**: No sweep outcome test, no full ICT model, no swing/equal-high levels, no event-chart features, no parameter tuning
+- **Constraints**: Final 30% global holdout excluded; NY-time conversion uses EXP-012 convention; missing levels are classified rather than imputed
+
+### Results / Observations
+
+| Instrument | Train All-Level Availability | Test All-Level Availability | Instrument Pass |
+| --- | ---: | ---: | --- |
+| BTCUSD | 475/478 = 0.994 | 163/163 = 1.000 | True |
+| EURUSD | 427/430 = 0.993 | 183/185 = 0.989 | True |
+| USTEC | 425/428 = 0.993 | 184/185 = 0.995 | True |
+| XAUUSD | 425/428 = 0.993 | 182/183 = 0.995 | True |
+
+- Deterministic rerun equality: `True`.
+- Missing reasons are classified as `NO_PRIOR_WEEKDAY`, `NO_OVERNIGHT_BARS`, or the combined first-row case.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+All four instruments meet the predefined reproducibility, availability, and train/test count thresholds. EXP-015 can inherit these liquidity-level definitions.
+
+### Hypothesis-Agnostic Observations
+
+- The prior observed weekday convention materially changes Monday PDH/PDL values versus a calendar-day convention for instruments with weekend data.
+- Missing-level loss is small and explicit, making downstream sweep denominators auditable.
+
+---
+
+## EXP-013 - NY Macro Window Characterization
+
+**Status**: REFUTED
+**Date**: 2026-05-24
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, NY Macro Windows, Adjacent Controls, Random Controls
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Predefined NY macro windows have statistically different range, absolute return, sweep frequency, displacement frequency, or forward-return shape than adjacent and randomized control windows on the available instruments.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: Fixed EXP-012 macro windows, adjacent equal-duration controls, deterministic same-day session-bounded random controls
+- **Features**: ATR-normalized true range, absolute close return, sweep frequency, displacement frequency, 10/20/60-minute forward returns
+- **Parameter ranges**: 100 deterministic random controls per instrument/date/window; primary effect threshold `0.10 ATR`; bootstrap reps `10,000`
+- **Exclusions**: No optimized macro windows, no full ICT model, no event-chart features, no cost-sensitive P&L
+- **Constraints**: Final 30% global holdout excluded; ATR uses values known before the window start; ONH/ONL excluded before 09:30 for sweep diagnostics
+
+### Results / Observations
+
+| Instrument | Segment | AdjacentMean Mean Diff | RandomControl Mean Diff | Primary Pass |
+| --- | --- | ---: | ---: | --- |
+| BTCUSD | Test | -0.3547 | -0.3804 | False |
+| BTCUSD | Train | -0.3738 | -0.2965 | False |
+| EURUSD | Test | 0.1791 | -0.0742 | False |
+| EURUSD | Train | 0.0769 | -0.2910 | False |
+| USTEC | Test | -0.2300 | -0.3944 | False |
+| USTEC | Train | -0.5281 | -0.7439 | False |
+| XAUUSD | Test | -0.0026 | -0.1532 | False |
+| XAUUSD | Train | -0.1757 | -0.5790 | False |
+
+- Supporting instruments: `0/4`.
+- Macro observation date counts are adequate in train and test for all instruments.
+- Macro-window sweep frequency is `0.0` for all instruments under the scoped window-level reclaim definition.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+The primary criterion required the macro-window ATR-normalized range to beat both adjacent and randomized controls on at least 3 of 4 instruments with CIs excluding zero and median effect at least `0.10 ATR`. No instrument meets that rule.
+
+### Hypothesis-Agnostic Observations
+
+- Fixed macro windows should not be treated as a standalone range-expansion filter under the tested control design.
+- Direct sweep behavior still needs EXP-015 because this H1 refutation does not test failed-breakout outcomes.

@@ -1,0 +1,29 @@
+EXP-013 NY Macro Window Characterization
+Boundary convention: CloseTimeNY start minute is included; end minute is excluded.
+Primary metric: macro window true range divided by ATR14 of bar before window start.
+Random control: draw 0 from session-bounded pool [07:00–17:00 NY]. Adjacent windows overlapping other macro specs are excluded.
+Sweep: window max High > level AND last Close reclaims (or vice versa for lows). ONH/ONL excluded before 09:30 NY to prevent look-ahead.
+
+Primary effects:
+- BTCUSD Test vs AdjacentMean: mean=-0.3547, mean_CI=[-0.5434, -0.1621], median=-0.4306, n=1304, pass=False
+- BTCUSD Train vs AdjacentMean: mean=-0.3738, mean_CI=[-0.5197, -0.2275], median=-0.4176, n=3805, pass=False
+- EURUSD Test vs AdjacentMean: mean=0.1791, mean_CI=[-0.0727, 0.4136], median=0.1075, n=1461, pass=False
+- EURUSD Train vs AdjacentMean: mean=0.0769, mean_CI=[-0.0583, 0.2102], median=0.0426, n=3423, pass=False
+- USTEC Test vs AdjacentMean: mean=-0.2300, mean_CI=[-0.4496, -0.0023], median=-0.0328, n=1432, pass=False
+- USTEC Train vs AdjacentMean: mean=-0.5281, mean_CI=[-0.6731, -0.3818], median=-0.3056, n=3350, pass=False
+- XAUUSD Test vs AdjacentMean: mean=-0.0026, mean_CI=[-0.1737, 0.1659], median=-0.0937, n=1436, pass=False
+- XAUUSD Train vs AdjacentMean: mean=-0.1757, mean_CI=[-0.2862, -0.0611], median=-0.1288, n=3369, pass=False
+- BTCUSD Test vs RandomControl: mean=-0.3804, mean_CI=[-0.5853, -0.1745], median=-0.1340, n=1467, pass=False
+- BTCUSD Train vs RandomControl: mean=-0.2965, mean_CI=[-0.4411, -0.1559], median=-0.1748, n=4276, pass=False
+- EURUSD Test vs RandomControl: mean=-0.0742, mean_CI=[-0.3375, 0.1726], median=0.1902, n=1641, pass=False
+- EURUSD Train vs RandomControl: mean=-0.2910, mean_CI=[-0.4458, -0.1373], median=0.0838, n=3852, pass=False
+- USTEC Test vs RandomControl: mean=-0.3944, mean_CI=[-0.6329, -0.1568], median=0.0173, n=1597, pass=False
+- USTEC Train vs RandomControl: mean=-0.7439, mean_CI=[-0.9031, -0.5853], median=-0.1768, n=3741, pass=False
+- XAUUSD Test vs RandomControl: mean=-0.1532, mean_CI=[-0.3553, 0.0460], median=-0.0143, n=1605, pass=False
+- XAUUSD Train vs RandomControl: mean=-0.5790, mean_CI=[-0.7270, -0.4380], median=-0.1541, n=3772, pass=False
+
+Support summary:
+- EURUSD: train_pass=False, test_pass=False, instrument_pass=False
+- XAUUSD: train_pass=False, test_pass=False, instrument_pass=False
+- BTCUSD: train_pass=False, test_pass=False, instrument_pass=False
+- USTEC: train_pass=False, test_pass=False, instrument_pass=False

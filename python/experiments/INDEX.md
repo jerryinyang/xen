@@ -19,9 +19,9 @@
 | EXP-009 | Heiken Ashi Direction as a Signal Generator, Evaluated on Real Prices | REFUTED | HA cuts 15m direction changes to 48-49% of time-bar count but log FE/AE improves on 0/4 instruments | 2026-05-17 |
 | EXP-010 | Line Break as a Confirmation Layer Over Renko Signals | REFUTED | LB confirms 53-63% of 15m Renko signals; primary log FE/AE improves on only BTCUSD, not 3/4 instruments | 2026-05-17 |
 | EXP-011 | Event-Native Volatility Regime Detection | REFUTED | Fixed Renko-native features show high hybrid rates (0.56-0.79 at 15m); no feature supports regime replacement | 2026-05-17 |
-| EXP-012 | ICT Data Readiness and Feasibility | PLANNED | Scope and analysis plan created for Phase 003 data-readiness gate | 2026-05-23 |
-| EXP-013 | NY Macro Window Characterization | PLANNED | Scope and analysis plan created for H1 macro-window characterization | 2026-05-23 |
-| EXP-014 | PDH PDL ONH ONL Liquidity Level Reproducibility | PLANNED | Scope and analysis plan created for H2 liquidity-level prerequisite | 2026-05-23 |
+| EXP-012 | ICT Data Readiness and Feasibility | SUPPORTED | All 4 instruments clear macro-family coverage thresholds; NY-time assumptions and cost proxies are documented | 2026-05-23 |
+| EXP-014 | PDH PDL ONH ONL Liquidity Level Reproducibility | SUPPORTED | All 4 instruments pass deterministic PDH/PDL and ONH/ONL readiness thresholds | 2026-05-24 |
+| EXP-013 | NY Macro Window Characterization | REFUTED | Fixed macro windows support 0/4 instruments versus adjacent and random controls | 2026-05-24 |
 | EXP-015 | Prior High Low Sweep Reversal Behavior | PLANNED | Scope and analysis plan created for H2 sweep-only event study | 2026-05-23 |
 | EXP-016 | Macro Window Interaction With Sweep Outcomes | PLANNED | Scope and analysis plan created for H2 macro-context interaction | 2026-05-23 |
 | EXP-017 | Premium Discount Filter Impact on Sweep Quality | PLANNED | Scope and analysis plan created for premium/discount filter test | 2026-05-23 |
@@ -39,5 +39,6 @@
 
 <!-- 
 New experiments are added as they are completed.
+Planned Phase 003 rows are ordered by execution dependency; EXP IDs remain stable.
 Format: | EXP-NNN | Title | INCONCLUSIVE/FAILED/PARTIALLY_SUPPORTED/REFUTED/PLANNED | One-line finding | YYYY-MM-DD |
 -->

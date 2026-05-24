@@ -20,6 +20,7 @@ Test H1: whether fixed NY macro windows have different time-bar behavior than ad
 - **Why this method**: The primary metric directly tests volatility/range behavior while secondary metrics preserve the source-spec H1 context.
 - **Simpler alternative considered**: Treating all metrics as equal would invite metric shopping.
 - **Assumptions**: ATR_14 uses only prior completed bars.
+- **Secondary definitions**: Secondary frequencies use one window observation as the denominator. Sweep frequency is a descriptive flag using EXP-014 PDH/PDL/ONH/ONL levels known by the window start; ONH/ONL are unavailable before 09:30 NY. Displacement frequency is a descriptive flag for any bar in the window whose true range exceeds the prior rolling 100-bar 80th percentile and whose close location is in the top or bottom 25 percent of the candle range. Forward returns use the pre-window close as baseline and the first available close at or after 10/20/60 minutes after the window end.
 - **Expected output**: Metric summary table by window type, instrument, and segment.
 
 ### Step 3: Non-Parametric Comparison

@@ -17,7 +17,7 @@ Can previous-day and overnight high/low liquidity levels be computed reproducibl
 - **Look-ahead bias prevention**: Features and events use only bars with `CloseTime` at or before the event timestamp.
 - **Real-price outcome discipline**: All outcomes use real time-bar OHLC prices aligned by timestamp.
 - **Exclusions**: No full ICT model, no parameter tuning against outcomes, no event-chart features, no tick/1-second/bid-ask data unless explicitly identified as unavailable or proxied.
-- **Parameters**: PDH/PDL from the prior completed NY date using all observed bars for that date in the analysis set; ONH/ONL from 17:00-09:30 NY time ending on the event date where bars exist; for instruments without clean session boundaries, record the observed-session caveat and compute levels from available bars only; no swing/equal-high levels.
+- **Parameters**: PDH/PDL from the prior observed weekday NY date using all observed bars for that date in the analysis set; ONH/ONL from 17:00 NY on the prior calendar date through 09:30 NY on the event date where bars exist, using CloseTimeNY boundary membership; for instruments without clean session boundaries, record the observed-session caveat and compute levels from available bars only; no swing/equal-high levels.
 
 ## Success / Failure Criteria
 
