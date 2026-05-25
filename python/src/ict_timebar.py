@@ -286,3 +286,33 @@ def format_minute_of_day(minute_of_day: int) -> str:
     hour = minute_of_day // 60
     minute = minute_of_day % 60
     return f"{hour:02d}:{minute:02d}"
+
+
+def compute_price_precision_step(frame: pl.DataFrame) -> float:
+    """Return the smallest positive close-to-close price increment observed.
+
+    The precision proxy is deliberately computed from consecutive Close prices
+    rather than all OHLC values. Close-to-close differences capture stable
+    tick-level observations without high/low wick noise. ATR typically dominates
+    the sweep buffer; this floor matters mainly during early ATR-null bars and
+    low-volatility periods where ATR is zero or missing.
+
+    Parameters
+    ----------
+    frame : pl.DataFrame
+        Time-bar frame for a single instrument.
+
+    Returns
+    -------
+    float
+        Smallest positive close-to-close price difference; falls back to 1e-5
+        when no positive differences exist.
+    """
+    import numpy as np
+
+    closes = frame.sort("CloseTime")["Close"].to_numpy()
+    diffs = np.diff(closes)
+    positive = diffs[diffs > 0]
+    if positive.size == 0:
+        return 1e-5
+    return float(np.min(positive))

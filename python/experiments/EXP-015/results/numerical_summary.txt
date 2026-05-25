@@ -1,0 +1,13 @@
+EXP-015 Prior High Low Sweep Reversal Behavior
+Verdict: AGAINST
+Supporting instruments: 1/4
+
+Primary effects (Sweep minus Breach 60m 1R-before-stop probability):
+- EURUSD Train: sweep_n=236, sweep_mean=0.504, breach_n=341, breach_mean=0.566, diff=-0.061, CI=[-0.145, 0.021], count_pass=True, supports=False
+- EURUSD Test: sweep_n=84, sweep_mean=0.607, breach_n=142, breach_mean=0.472, diff=0.134, CI=[0.001, 0.267], count_pass=True, supports=True
+- XAUUSD Train: sweep_n=249, sweep_mean=0.470, breach_n=361, breach_mean=0.482, diff=-0.012, CI=[-0.092, 0.068], count_pass=True, supports=False
+- XAUUSD Test: sweep_n=116, sweep_mean=0.491, breach_n=131, breach_mean=0.519, diff=-0.029, CI=[-0.151, 0.095], count_pass=True, supports=False
+- BTCUSD Train: sweep_n=354, sweep_mean=0.480, breach_n=336, breach_mean=0.521, diff=-0.041, CI=[-0.114, 0.034], count_pass=True, supports=False
+- BTCUSD Test: sweep_n=86, sweep_mean=0.453, breach_n=142, breach_mean=0.570, diff=-0.117, CI=[-0.250, 0.018], count_pass=True, supports=False
+- USTEC Train: sweep_n=333, sweep_mean=0.477, breach_n=330, breach_mean=0.467, diff=0.010, CI=[-0.067, 0.086], count_pass=True, supports=False
+- USTEC Test: sweep_n=144, sweep_mean=0.444, breach_n=144, breach_mean=0.396, diff=0.048, CI=[-0.062, 0.160], count_pass=True, supports=False

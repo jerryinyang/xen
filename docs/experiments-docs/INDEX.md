@@ -1045,6 +1045,59 @@ All four instruments meet the predefined reproducibility, availability, and trai
 
 ---
 
+## EXP-015 - Prior High Low Sweep Reversal Behavior
+
+**Status**: REFUTED
+**Date**: 2026-05-25
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, Liquidity Sweeps, PDH/PDL, ONH/ONL
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Failed breakouts beyond PDH/PDL or ONH/ONL show measurable opposite-direction behavior compared with non-failed breaches, using real time-bar prices and predeclared risk units.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: Prior-day high/low, overnight high/low, first-touch sweep/breach events, forward real-price excursions
+- **Features**: `PDH`, `PDL`, `ONH`, `ONL`, `EventType`, `Side`, `Risk1R`, `MFE_R`, `MAE_R`, `Hit1R`, `Hit2R`, time-to-target, time-to-stop
+- **Parameter ranges**: Buffer `max(price_precision_step, 0.05 * ATR14Prior)`; horizons `30`, `60`, and `120` minutes; ONH/ONL eligible only at or after 09:30 NY
+- **Exclusions**: No full ICT model, no macro-window filter, no premium/discount filter, no displacement, no IFVG, no breaker, no event-chart features, no tick or bid/ask data
+- **Constraints**: Final 30% global holdout excluded; outcomes use real 1-minute OHLC prices; features use only information available at or before event `CloseTime`
+
+### Results / Observations
+
+Primary outcome: sweep minus breach 60-minute 1R-before-stop probability.
+
+| Instrument | Segment | Sweep N | Breach N | Sweep Mean | Breach Mean | Bootstrap Diff | 95% CI | Supports Primary |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| EURUSD | Train | 236 | 341 | 0.504 | 0.566 | -0.061 | [-0.145, 0.021] | False |
+| EURUSD | Test | 84 | 142 | 0.607 | 0.472 | +0.134 | [0.001, 0.267] | True |
+| XAUUSD | Train | 249 | 361 | 0.470 | 0.482 | -0.012 | [-0.092, 0.068] | False |
+| XAUUSD | Test | 116 | 131 | 0.491 | 0.519 | -0.029 | [-0.151, 0.095] | False |
+| BTCUSD | Train | 354 | 336 | 0.480 | 0.521 | -0.041 | [-0.114, 0.034] | False |
+| BTCUSD | Test | 86 | 142 | 0.453 | 0.570 | -0.117 | [-0.250, 0.018] | False |
+| USTEC | Train | 333 | 330 | 0.477 | 0.467 | +0.010 | [-0.067, 0.086] | False |
+| USTEC | Test | 144 | 144 | 0.444 | 0.396 | +0.048 | [-0.063, 0.160] | False |
+
+- Supporting instruments: `1/4`.
+- Test sweep counts pass the event-count gate for all instruments: EURUSD `89`, XAUUSD `131`, BTCUSD `93`, USTEC `160`.
+- Test-segment weighted 60-minute MFE_R means are lower for sweeps than breaches on all instruments: EURUSD `6.788` vs `29.085`, XAUUSD `7.543` vs `30.957`, BTCUSD `8.505` vs `34.251`, USTEC `6.763` vs `29.680`.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+The predefined support rule required at least 3 instruments with adequate event counts and positive confidence intervals excluding zero. EXP-015 finds support on only EURUSD Test, while XAUUSD and BTCUSD are negative in test and USTEC crosses zero.
+
+### Hypothesis-Agnostic Observations
+
+- Sweep-only behavior is a weak standalone ICT component in the available data.
+- Adequate event counts mean the failure is not a sample-size gate failure.
+- Sweeps often have lower favorable and adverse excursion than breaches, suggesting a lower-movement rejection profile rather than broad directional edge.
+
+---
+
 ## EXP-013 - NY Macro Window Characterization
 
 **Status**: REFUTED
@@ -1091,4 +1144,4 @@ The primary criterion required the macro-window ATR-normalized range to beat bot
 ### Hypothesis-Agnostic Observations
 
 - Fixed macro windows should not be treated as a standalone range-expansion filter under the tested control design.
-- Direct sweep behavior still needs EXP-015 because this H1 refutation does not test failed-breakout outcomes.
+- Direct sweep behavior was tested separately in EXP-015 because this H1 refutation did not test failed-breakout outcomes.

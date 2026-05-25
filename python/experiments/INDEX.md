@@ -22,7 +22,7 @@
 | EXP-012 | ICT Data Readiness and Feasibility | SUPPORTED | All 4 instruments clear macro-family coverage thresholds; NY-time assumptions and cost proxies are documented | 2026-05-23 |
 | EXP-014 | PDH PDL ONH ONL Liquidity Level Reproducibility | SUPPORTED | All 4 instruments pass deterministic PDH/PDL and ONH/ONL readiness thresholds | 2026-05-24 |
 | EXP-013 | NY Macro Window Characterization | REFUTED | Fixed macro windows support 0/4 instruments versus adjacent and random controls | 2026-05-24 |
-| EXP-015 | Prior High Low Sweep Reversal Behavior | PLANNED | Scope and analysis plan created for H2 sweep-only event study | 2026-05-23 |
+| EXP-015 | Prior High Low Sweep Reversal Behavior | REFUTED | Sweep-only failed-breakout behavior supports only EURUSD Test; 1/4 instruments meet the primary criterion | 2026-05-25 |
 | EXP-016 | Macro Window Interaction With Sweep Outcomes | PLANNED | Scope and analysis plan created for H2 macro-context interaction | 2026-05-23 |
 | EXP-017 | Premium Discount Filter Impact on Sweep Quality | PLANNED | Scope and analysis plan created for premium/discount filter test | 2026-05-23 |
 | EXP-018 | Displacement Confirmation Added to Sweeps | PLANNED | Scope and analysis plan created for H3 displacement confirmation | 2026-05-23 |
