@@ -23,7 +23,7 @@
 | EXP-014 | PDH PDL ONH ONL Liquidity Level Reproducibility | SUPPORTED | All 4 instruments pass deterministic PDH/PDL and ONH/ONL readiness thresholds | 2026-05-24 |
 | EXP-013 | NY Macro Window Characterization | REFUTED | Fixed macro windows support 0/4 instruments versus adjacent and random controls | 2026-05-24 |
 | EXP-015 | Prior High Low Sweep Reversal Behavior | REFUTED | Sweep-only failed-breakout behavior supports only EURUSD Test; 1/4 instruments meet the primary criterion | 2026-05-25 |
-| EXP-016 | Macro Window Interaction With Sweep Outcomes | PLANNED | Scope and analysis plan created for H2 macro-context interaction | 2026-05-23 |
+| EXP-016 | Macro Window Interaction With Sweep Outcomes | INCONCLUSIVE | Matched macro-context comparison is underpowered; 0/4 instruments meet train/test inside and matched-outside event floors | 2026-05-25 |
 | EXP-017 | Premium Discount Filter Impact on Sweep Quality | PLANNED | Scope and analysis plan created for premium/discount filter test | 2026-05-23 |
 | EXP-018 | Displacement Confirmation Added to Sweeps | PLANNED | Scope and analysis plan created for H3 displacement confirmation | 2026-05-23 |
 | EXP-019 | Micro Swing Break Confirmation After Sweep | PLANNED | Scope and analysis plan created for H3 swing-break variant | 2026-05-23 |

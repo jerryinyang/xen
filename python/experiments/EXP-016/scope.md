@@ -21,9 +21,9 @@ Are sweep outcomes materially different inside macro windows versus outside macr
 
 ## Success / Failure Criteria
 
-- **Evidence FOR**: inside-macro sweeps improve the primary sweep outcome by >= 5 percentage points or reduce median MAE by >= 0.25R on at least 3 instruments while retaining >= 50 inside-window sweep events per train/test segment.
+- **Evidence FOR**: inside-macro sweeps improve the primary sweep outcome by >= 5 percentage points or reduce median MAE by >= 0.25R on at least 3 instruments while retaining >= 50 inside-window sweep events and >= 50 matched outside-window comparator events per train/test segment.
 - **Evidence AGAINST**: macro filtering gives no improvement or only reduces sample size.
-- **Inconclusive**: macro-window sweep counts are below the event-count floor.
+- **Inconclusive**: macro-window sweep counts or matched outside-window comparator counts are below the event-count floor.
 
 ## Prerequisites and Sequencing
 

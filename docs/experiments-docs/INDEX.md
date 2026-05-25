@@ -1000,6 +1000,55 @@ The experiment meets the scoped support condition. All four instruments can be c
 
 ---
 
+## EXP-013 - NY Macro Window Characterization
+
+**Status**: REFUTED
+**Date**: 2026-05-24
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, NY Macro Windows, Adjacent Controls, Random Controls
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Predefined NY macro windows have statistically different range, absolute return, sweep frequency, displacement frequency, or forward-return shape than adjacent and randomized control windows on the available instruments.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: Fixed EXP-012 macro windows, adjacent equal-duration controls, deterministic same-day session-bounded random controls
+- **Features**: ATR-normalized true range, absolute close return, sweep frequency, displacement frequency, 10/20/60-minute forward returns
+- **Parameter ranges**: 100 deterministic random controls per instrument/date/window; primary effect threshold `0.10 ATR`; bootstrap reps `10,000`
+- **Exclusions**: No optimized macro windows, no full ICT model, no event-chart features, no cost-sensitive P&L
+- **Constraints**: Final 30% global holdout excluded; ATR uses values known before the window start; ONH/ONL excluded before 09:30 for sweep diagnostics
+
+### Results / Observations
+
+| Instrument | Segment | AdjacentMean Mean Diff | RandomControl Mean Diff | Primary Pass |
+| --- | --- | ---: | ---: | --- |
+| BTCUSD | Test | -0.3547 | -0.3804 | False |
+| BTCUSD | Train | -0.3738 | -0.2965 | False |
+| EURUSD | Test | 0.1791 | -0.0742 | False |
+| EURUSD | Train | 0.0769 | -0.2910 | False |
+| USTEC | Test | -0.2300 | -0.3944 | False |
+| USTEC | Train | -0.5281 | -0.7439 | False |
+| XAUUSD | Test | -0.0026 | -0.1532 | False |
+| XAUUSD | Train | -0.1757 | -0.5790 | False |
+
+- Supporting instruments: `0/4`.
+- Macro observation date counts are adequate in train and test for all instruments.
+- Macro-window sweep frequency is `0.0` for all instruments under the scoped window-level reclaim definition.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+The primary criterion required the macro-window ATR-normalized range to beat both adjacent and randomized controls on at least 3 of 4 instruments with CIs excluding zero and median effect at least `0.10 ATR`. No instrument meets that rule.
+
+### Hypothesis-Agnostic Observations
+
+- Fixed macro windows should not be treated as a standalone range-expansion filter under the tested control design.
+- Direct sweep behavior was tested separately in EXP-015 because this H1 refutation did not test failed-breakout outcomes.
+
+
 ## EXP-014 - PDH PDL ONH ONL Liquidity Level Reproducibility
 
 **Status**: SUPPORTED
@@ -1098,50 +1147,52 @@ The predefined support rule required at least 3 instruments with adequate event 
 
 ---
 
-## EXP-013 - NY Macro Window Characterization
+## EXP-016 - Macro Window Interaction With Sweep Outcomes
 
-**Status**: REFUTED
-**Date**: 2026-05-24
+**Status**: INCONCLUSIVE
+**Date**: 2026-05-25
 **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
-**Feature Categories**: 1-minute Time Bars, NY Macro Windows, Adjacent Controls, Random Controls
+**Feature Categories**: 1-minute Time Bars, NY Macro Windows, Liquidity Sweeps
 
 ### Hypothesis Tests
 
-1. **Hypothesis**: Predefined NY macro windows have statistically different range, absolute return, sweep frequency, displacement frequency, or forward-return shape than adjacent and randomized control windows on the available instruments.
+1. **Hypothesis**: Sweep outcomes inside predefined macro windows are materially different from sweep outcomes outside macro windows after accounting for event count and instrument coverage.
 
 ### Scope
 
 - **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
-- **Feature Categories**: Fixed EXP-012 macro windows, adjacent equal-duration controls, deterministic same-day session-bounded random controls
-- **Features**: ATR-normalized true range, absolute close return, sweep frequency, displacement frequency, 10/20/60-minute forward returns
-- **Parameter ranges**: 100 deterministic random controls per instrument/date/window; primary effect threshold `0.10 ATR`; bootstrap reps `10,000`
-- **Exclusions**: No optimized macro windows, no full ICT model, no event-chart features, no cost-sensitive P&L
-- **Constraints**: Final 30% global holdout excluded; ATR uses values known before the window start; ONH/ONL excluded before 09:30 for sweep diagnostics
+- **Feature Categories**: EXP-012 macro-window labels; EXP-015 first-touch PDH/PDL and ONH/ONL sweep events; real-price 60-minute outcomes
+- **Features**: `InMacro`, `MacroWindow`, `EventType`, `Side`, `Risk1R`, `Hit1R_60m`, `MAE_R_60m`, matched outside-window controls by instrument/segment/side/NY date
+- **Parameter ranges**: Macro windows AM1-AM5 and PM1-PM4; buffer `max(price_precision_step, 0.05 * ATR14Prior)`; 60-minute 1R-before-stop probability and median MAE
+- **Exclusions**: No full ICT model, no premium/discount filter, no displacement, no IFVG, no breaker, no event-chart features, no tick or bid/ask data
+- **Constraints**: Final 30% global holdout excluded; all outcomes use real 1-minute OHLC prices; support requires at least 50 inside-window sweeps and 50 matched outside-window comparator events per train/test segment
 
 ### Results / Observations
 
-| Instrument | Segment | AdjacentMean Mean Diff | RandomControl Mean Diff | Primary Pass |
-| --- | --- | ---: | ---: | --- |
-| BTCUSD | Test | -0.3547 | -0.3804 | False |
-| BTCUSD | Train | -0.3738 | -0.2965 | False |
-| EURUSD | Test | 0.1791 | -0.0742 | False |
-| EURUSD | Train | 0.0769 | -0.2910 | False |
-| USTEC | Test | -0.2300 | -0.3944 | False |
-| USTEC | Train | -0.5281 | -0.7439 | False |
-| XAUUSD | Test | -0.0026 | -0.1532 | False |
-| XAUUSD | Train | -0.1757 | -0.5790 | False |
+Test-segment matched comparison coverage:
 
-- Supporting instruments: `0/4`.
-- Macro observation date counts are adequate in train and test for all instruments.
-- Macro-window sweep frequency is `0.0` for all instruments under the scoped window-level reclaim definition.
+| Instrument | Inside Sweeps | All Outside Sweeps | Matched Outside Sweeps | Matched Fraction |
+| --- | ---: | ---: | ---: | ---: |
+| EURUSD | 24 | 65 | 2 | 3.1% |
+| XAUUSD | 27 | 104 | 4 | 3.8% |
+| BTCUSD | 21 | 72 | 1 | 1.4% |
+| USTEC | 34 | 126 | 12 | 9.5% |
+
+- Instruments meeting train/test inside and matched-outside floors: `0/4`.
+- All primary threshold-pass flags are false after applying the event/comparator floors.
+- USTEC Test raw HitDiff is `+0.237`, CI `[-0.081, 0.525]`, but the row is non-evaluable because event floors fail.
+- BTCUSD Test has no non-ambiguous matched outside hit observations.
 
 ### Hypothesis-Specific Conclusion
 
-**REFUTED**
+**INCONCLUSIVE**
 
-The primary criterion required the macro-window ATR-normalized range to beat both adjacent and randomized controls on at least 3 of 4 instruments with CIs excluding zero and median effect at least `0.10 ATR`. No instrument meets that rule.
+The matched macro-context comparison cannot evaluate the hypothesis because no instrument meets the required train/test inside and matched-outside event floors. EXP-016 therefore provides no support or refutation for macro-window filtering of sweep outcomes.
 
 ### Hypothesis-Agnostic Observations
 
-- Fixed macro windows should not be treated as a standalone range-expansion filter under the tested control design.
-- Direct sweep behavior was tested separately in EXP-015 because this H1 refutation did not test failed-breakout outcomes.
+- Combining narrow fixed macro windows with same-day, same-side matched outside controls is too sparse under the current sweep definition.
+- Macro-window context should not be promoted as a required filter from EXP-016.
+- Later ICT component experiments should continue as separate component tests; a future macro-context rerun would need a new predeclared control design.
+
+---

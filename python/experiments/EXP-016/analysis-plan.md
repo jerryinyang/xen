@@ -16,10 +16,10 @@ Determine whether EXP-015 sweep outcomes differ inside fixed NY macro windows ve
 
 ### Step 2: Matched Outside-Window Baseline
 
-- **Method**: Compare inside-window sweeps to outside-window sweeps matched by instrument, side, segment, and NY date where possible; unmatched outside sweeps remain in a sensitivity summary.
+- **Method**: Compare inside-window sweeps to outside-window sweeps matched by instrument, side, segment, and NY date where possible; unmatched outside sweeps remain in a sensitivity summary. Treat an instrument/segment as non-evaluable unless it has at least 50 inside-window sweeps and at least 50 matched outside-window comparator sweeps.
 - **Why this method**: Matching reduces session and date-level confounding.
 - **Simpler alternative considered**: All outside-window sweeps are a noisy control because sweep behavior can vary by date.
-- **Assumptions**: Matching may reduce sample size and must be reported before interpretation.
+- **Assumptions**: Matching may reduce sample size and must be reported before interpretation; comparator counts below the event floor cannot support a FOR or AGAINST verdict.
 - **Expected output**: Matched and unmatched baseline tables.
 
 ### Step 3: Primary Outcome Comparison
@@ -39,9 +39,9 @@ Determine whether EXP-015 sweep outcomes differ inside fixed NY macro windows ve
 
 ## Interpretation Guide
 
-- Support: inside-macro sweeps improve the primary outcome by >= 5 percentage points or median MAE by >= 0.25R on at least 3 instruments with event floors met.
+- Support: inside-macro sweeps improve the primary outcome by >= 5 percentage points or median MAE by >= 0.25R on at least 3 instruments with inside and matched-outside event floors met in both train and test.
 - Against: macro filtering adds no improvement or mostly removes sample.
-- Inconclusive: inside-window sweep counts are below floor.
+- Inconclusive: inside-window sweep counts or matched-outside comparator counts are below floor.
 
 ## Complexity Check
 
