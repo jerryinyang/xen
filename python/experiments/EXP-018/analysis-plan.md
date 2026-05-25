@@ -22,13 +22,13 @@ Test H3 using one deterministic candle/body displacement definition after EXP-01
 - **Assumptions**: Events without enough forward bars are excluded with reason codes.
 - **Expected output**: Outcome table by entry proxy and instrument.
 
-### Step 3: Sweep-Only Versus Displacement Comparison
+### Step 3: Sweep-Only Versus Displacement Comparison (PRIMARY)
 
-- **Method**: Bootstrap differences in 60-minute expectancy in R and 1R-before-stop probability; report retained-event percentage first.
-- **Why this method**: It measures benefit after sample-size loss.
-- **Simpler alternative considered**: Mean expectancy alone is sensitive to outliers.
-- **Assumptions**: Interpretation requires both train and test direction, not train-only improvement.
-- **Expected output**: Effect-size and count table.
+- **Method**: Nested-subset bootstrap on the FULL EXP-015 sweep population: compute mean Hit1R_60m and median MAE_R_60m on (a) all sweeps and (b) the displacement-confirmed subset. Each bootstrap resample draws from the full baseline and recomputes the confirmed-subset statistic inside the resample, preserving the subset/superset dependence. Report retained-event percentage first.
+- **Why this method**: The scope asks whether *adding* displacement improves outcomes versus sweep-only. That requires comparing the confirmed-sweep outcome distribution against the full sweep population, not against the same confirmed events entered at sweep close.
+- **Criterion form**: Bootstrap CI95-low must clear the predeclared threshold (Hit1R: 0.05; median MAE improvement: 0.25R) before `*CriterionMet` is True. CI95-high below the threshold counts as refutation on that metric. Point estimates alone are insufficient.
+- **Secondary diagnostic**: A paired DisplacementClose-vs-SweepClose bootstrap on the same displacement-confirmed events is retained as a delay-cost diagnostic. It does NOT drive the verdict.
+- **Expected output**: `filter_effects.csv` (primary), `primary_effects.csv` (paired delay-cost diagnostic), and a count table.
 
 ## Visualisations
 
@@ -39,7 +39,7 @@ Test H3 using one deterministic candle/body displacement definition after EXP-01
 
 ## Interpretation Guide
 
-- Support: displacement improves expectancy in R or 1R-before-stop probability by scoped thresholds on at least 3 instruments with event floors met.
+- Support: displacement improves 60-minute expectancy by >= 0.05R or 1R-before-stop probability by >= 5 percentage points on at least 3 instruments with event floors met.
 - Against: entries are delayed without quality improvement or samples collapse.
 - Inconclusive: train improvement does not persist in test.
 

@@ -21,7 +21,7 @@ Does adding deterministic displacement improve sweep-only outcomes?
 
 ## Success / Failure Criteria
 
-- **Evidence FOR**: sweep plus displacement improves 60-minute expectancy in R or 1R-before-stop probability by >= 5 percentage points on at least 3 instruments while retaining >= 50 confirmed events per train/test segment.
+- **Evidence FOR**: sweep plus displacement improves 60-minute expectancy by >= 0.05R or 1R-before-stop probability by >= 5 percentage points on at least 3 instruments while retaining >= 50 confirmed events per train/test segment.
 - **Evidence AGAINST**: confirmation delays entries without improving quality, or reduces samples below threshold.
 - **Inconclusive**: improvement appears on train but not test.
 

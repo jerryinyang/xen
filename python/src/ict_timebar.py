@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import pandas as pd
 import polars as pl
 
@@ -308,11 +309,124 @@ def compute_price_precision_step(frame: pl.DataFrame) -> float:
         Smallest positive close-to-close price difference; falls back to 1e-5
         when no positive differences exist.
     """
-    import numpy as np
-
     closes = frame.sort("CloseTime")["Close"].to_numpy()
     diffs = np.diff(closes)
     positive = diffs[diffs > 0]
     if positive.size == 0:
         return 1e-5
     return float(np.min(positive))
+
+
+def _walk_target_stop(
+    highs: np.ndarray,
+    lows: np.ndarray,
+    target: float,
+    stop: float,
+    is_bearish: bool,
+) -> tuple[bool, bool, bool, int, int]:
+    """Return first target/stop hit state for ordered forward bars."""
+    for idx, (high, low) in enumerate(zip(highs, lows)):
+        target_hit = bool(low <= target) if is_bearish else bool(high >= target)
+        stop_hit = bool(high >= stop) if is_bearish else bool(low <= stop)
+        if target_hit and stop_hit:
+            return False, False, True, idx, idx
+        if target_hit:
+            return True, False, False, idx, -1
+        if stop_hit:
+            return False, True, False, -1, idx
+    return False, False, False, -1, -1
+
+
+def _empty_outcome(horizon_minutes: int) -> dict[str, Any]:
+    """Return NaN outcome metrics for one horizon."""
+    suffix = f"_{horizon_minutes}m"
+    out: dict[str, Any] = {
+        f"MFE_R{suffix}": np.nan,
+        f"MAE_R{suffix}": np.nan,
+        f"Return_R{suffix}": np.nan,
+        f"Hit1R{suffix}": np.nan,
+        f"Hit2R{suffix}": np.nan,
+    }
+    if horizon_minutes == 60:
+        out.update(
+            {
+                "Ambiguous60": False,
+                "TimeToTarget1R_60m": np.nan,
+                "TimeToStop_60m": np.nan,
+            }
+        )
+    return out
+
+
+def compute_real_price_outcome(
+    event: pd.Series,
+    bars: pd.DataFrame,
+    horizon_minutes: int = 60,
+) -> dict[str, Any]:
+    """Compute real-price MFE/MAE and target-hit outcomes after an entry.
+
+    The event must contain `EntryTime`, `Entry`, `Stop`, `Risk1R`, and `Side`.
+    `Side == "High"` is treated as bearish, matching EXP-015 sweep semantics.
+    Forward bars are selected by `CloseTime > EntryTime`, so no bar that closes
+    at or before the entry timestamp can influence the outcome.
+    """
+    suffix = f"_{horizon_minutes}m"
+    if bars.empty:
+        return _empty_outcome(horizon_minutes)
+
+    entry = float(event["Entry"])
+    stop = float(event["Stop"])
+    risk = float(event["Risk1R"])
+    if not np.isfinite(risk) or risk <= 0.0:
+        return _empty_outcome(horizon_minutes)
+
+    entry_time = pd.Timestamp(event["EntryTime"])
+    entry_ns = int(entry_time.value)
+    close_ns = bars["CloseTime"].values.astype(np.int64)
+    start_idx = int(np.searchsorted(close_ns, entry_ns, side="right"))
+    end_ns = entry_ns + horizon_minutes * 60 * 10**9
+    end_idx = int(np.searchsorted(close_ns, end_ns, side="right"))
+    highs = bars["High"].to_numpy(dtype=float)[start_idx:end_idx]
+    lows = bars["Low"].to_numpy(dtype=float)[start_idx:end_idx]
+    if highs.size == 0:
+        return _empty_outcome(horizon_minutes)
+
+    is_bearish = event["Side"] == "High"
+    mfe = entry - float(np.min(lows)) if is_bearish else float(np.max(highs)) - entry
+    mae = float(np.max(highs)) - entry if is_bearish else entry - float(np.min(lows))
+    end_close = float(bars["Close"].to_numpy(dtype=float)[end_idx - 1])
+    realized = entry - end_close if is_bearish else end_close - entry
+    target_1r = entry - risk if is_bearish else entry + risk
+    target_2r = entry - 2.0 * risk if is_bearish else entry + 2.0 * risk
+    hit_1r, _, amb_1r, target_idx, stop_idx = _walk_target_stop(
+        highs, lows, target_1r, stop, is_bearish
+    )
+    hit_2r, _, amb_2r, _, _ = _walk_target_stop(
+        highs, lows, target_2r, stop, is_bearish
+    )
+
+    out: dict[str, Any] = {
+        f"MFE_R{suffix}": max(0.0, mfe) / risk,
+        f"MAE_R{suffix}": max(0.0, mae) / risk,
+        f"Return_R{suffix}": realized / risk,
+        f"Hit1R{suffix}": np.nan if amb_1r else float(hit_1r),
+        f"Hit2R{suffix}": np.nan if amb_2r else float(hit_2r),
+    }
+    if horizon_minutes == 60:
+        ns_per_min = 60 * 10**9
+        out.update(
+            {
+                "Ambiguous60": bool(amb_1r),
+                "TimeToTarget1R_60m": (
+                    float(close_ns[start_idx + target_idx] - entry_ns) / ns_per_min
+                    if target_idx >= 0
+                    else np.nan
+                ),
+                "TimeToStop_60m": (
+                    float(close_ns[start_idx + stop_idx] - entry_ns) / ns_per_min
+                    if stop_idx >= 0
+                    else np.nan
+                ),
+            }
+        )
+    return out

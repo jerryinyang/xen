@@ -22,13 +22,13 @@ Validate that three-candle FVGs and close-through IFVG inversions can be detecte
 - **Assumptions**: One FVG can have one first inversion timestamp; duplicate overlaps are counted but flagged.
 - **Expected output**: Lifecycle table and IFVG count table.
 
-### Step 3: Reproducibility and Sample Adequacy
+### Step 3: Reproducibility, Base Rate, and Sample Adequacy
 
-- **Method**: Rerun detection with the same input/config and verify identical event IDs, bounds, and timestamps; compare counts against scoped floors.
-- **Why this method**: EXP-021 depends on deterministic IFVG events.
-- **Simpler alternative considered**: Manual spot checks alone are insufficient for reproducibility.
-- **Assumptions**: Deterministic input ordering by `CloseTime`.
-- **Expected output**: Reproducibility digest and readiness verdict by instrument.
+- **Method (reproducibility)**: Run two invariance checks per instrument and compare SHA-256 digests of FVG identity columns. (a) Fresh disk reload via `load_analysis_timebars` builds an independent in-memory frame and reruns detection. (b) The input rows are shuffled with a fixed seed, re-sorted by `CloseTime`, and detection is rerun. Both digests must match the first pass. A same-process repeat of `detect_fvgs` on identical inputs is not a meaningful reproducibility test and is not used.
+- **Method (base rate)**: Report `IFVGRate = IFVG_N / FVG_N` per instrument/segment. When `IFVGRate >= 0.5`, IFVG inversion is no longer a discriminating event under the current parameterisation; the instrument is flagged as `Tautological` and cannot pass the readiness gate even if FVG/IFVG counts clear the floors.
+- **Method (sample adequacy)**: Compare counts against the scoped floors (`>= 100` FVGs, `>= 50` IFVGs per usable instrument/segment). Floors are intentionally low; the tautology check is what actually gates readiness on this 1-minute dataset.
+- **Why this method**: EXP-021 depends on deterministic IFVG events *and* on IFVG being a selective signal. The original check tested neither.
+- **Expected output**: Reproducibility digest table (with `FreshReloadMatches`, `ShuffledResortMatches`), count/readiness/tautology table, and a verdict by instrument.
 
 ## Visualisations
 

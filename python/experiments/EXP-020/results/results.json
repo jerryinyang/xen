@@ -1,0 +1,203 @@
+{
+  "experiment_id": "EXP-020",
+  "title": "FVG IFVG Detection Reproducibility",
+  "atr_period": 14,
+  "atr_size_coefficient": 0.02,
+  "lifecycle_bars": 120,
+  "price_precision_steps": {
+    "EURUSD": 9.999999999843467e-06,
+    "XAUUSD": 0.009999999999763531,
+    "BTCUSD": 0.00999999999476131,
+    "USTEC": 0.049999999999272404
+  },
+  "definition": "Bearish FVG: High[i] < Low[i-2]. Bullish FVG: Low[i] > High[i-2]. Minimum size is max(price_precision_step, 0.02 * prior ATR14). IFVG requires a later close through the opposite side within the 120-bar lifecycle window.",
+  "verdict_summary": {
+    "verdict": "INCONCLUSIVE",
+    "instruments_passing": 0,
+    "reproducible_instruments": 4,
+    "fvg_common_ifvg_sparse_instruments": 0,
+    "tautological_instruments": 4,
+    "per_instrument": [
+      {
+        "Instrument": "EURUSD",
+        "Reproducible": true,
+        "TrainReady": false,
+        "TestReady": false,
+        "Tautological": true,
+        "FVGCommonIFVGSparse": false,
+        "Pass": false
+      },
+      {
+        "Instrument": "XAUUSD",
+        "Reproducible": true,
+        "TrainReady": false,
+        "TestReady": false,
+        "Tautological": true,
+        "FVGCommonIFVGSparse": false,
+        "Pass": false
+      },
+      {
+        "Instrument": "BTCUSD",
+        "Reproducible": true,
+        "TrainReady": false,
+        "TestReady": false,
+        "Tautological": true,
+        "FVGCommonIFVGSparse": false,
+        "Pass": false
+      },
+      {
+        "Instrument": "USTEC",
+        "Reproducible": true,
+        "TrainReady": false,
+        "TestReady": false,
+        "Tautological": true,
+        "FVGCommonIFVGSparse": false,
+        "Pass": false
+      }
+    ]
+  },
+  "count_readiness": [
+    {
+      "Instrument": "EURUSD",
+      "Segment": "Train",
+      "FVG_N": 167956,
+      "IFVG_N": 142897,
+      "IFVGRate": 0.8508002095786992,
+      "FVGFloorMet": true,
+      "IFVGFloorMet": true,
+      "Tautological": true,
+      "ReadyForIFVGStudy": false
+    },
+    {
+      "Instrument": "EURUSD",
+      "Segment": "Test",
+      "FVG_N": 76629,
+      "IFVG_N": 65339,
+      "IFVGRate": 0.852666744966005,
+      "FVGFloorMet": true,
+      "IFVGFloorMet": true,
+      "Tautological": true,
+      "ReadyForIFVGStudy": false
+    },
+    {
+      "Instrument": "XAUUSD",
+      "Segment": "Train",
+      "FVG_N": 159880,
+      "IFVG_N": 136283,
+      "IFVGRate": 0.8524080560420315,
+      "FVGFloorMet": true,
+      "IFVGFloorMet": true,
+      "Tautological": true,
+      "ReadyForIFVGStudy": false
+    },
+    {
+      "Instrument": "XAUUSD",
+      "Segment": "Test",
+      "FVG_N": 67340,
+      "IFVG_N": 57348,
+      "IFVGRate": 0.8516186516186516,
+      "FVGFloorMet": true,
+      "IFVGFloorMet": true,
+      "Tautological": true,
+      "ReadyForIFVGStudy": false
+    },
+    {
+      "Instrument": "BTCUSD",
+      "Segment": "Train",
+      "FVG_N": 194892,
+      "IFVG_N": 165839,
+      "IFVGRate": 0.8509276932865382,
+      "FVGFloorMet": true,
+      "IFVGFloorMet": true,
+      "Tautological": true,
+      "ReadyForIFVGStudy": false
+    },
+    {
+      "Instrument": "BTCUSD",
+      "Segment": "Test",
+      "FVG_N": 86626,
+      "IFVG_N": 73784,
+      "IFVGRate": 0.8517535151109367,
+      "FVGFloorMet": true,
+      "IFVGFloorMet": true,
+      "Tautological": true,
+      "ReadyForIFVGStudy": false
+    },
+    {
+      "Instrument": "USTEC",
+      "Segment": "Train",
+      "FVG_N": 146930,
+      "IFVG_N": 123908,
+      "IFVGRate": 0.8433131423126659,
+      "FVGFloorMet": true,
+      "IFVGFloorMet": true,
+      "Tautological": true,
+      "ReadyForIFVGStudy": false
+    },
+    {
+      "Instrument": "USTEC",
+      "Segment": "Test",
+      "FVG_N": 61946,
+      "IFVG_N": 52163,
+      "IFVGRate": 0.8420721273367127,
+      "FVGFloorMet": true,
+      "IFVGFloorMet": true,
+      "Tautological": true,
+      "ReadyForIFVGStudy": false
+    }
+  ],
+  "reproducibility": [
+    {
+      "Instrument": "EURUSD",
+      "SampleBars": 50000,
+      "FirstPassN": 13263,
+      "FreshReloadN": 13263,
+      "ShuffledResortN": 13263,
+      "FirstDigest": "947088e7c5f1e8653443728267c8782d4a951f7cf2a7ef6e8266ae70731507f8",
+      "FreshReloadDigest": "947088e7c5f1e8653443728267c8782d4a951f7cf2a7ef6e8266ae70731507f8",
+      "ShuffledResortDigest": "947088e7c5f1e8653443728267c8782d4a951f7cf2a7ef6e8266ae70731507f8",
+      "FreshReloadMatches": true,
+      "ShuffledResortMatches": true,
+      "Reproducible": true
+    },
+    {
+      "Instrument": "XAUUSD",
+      "SampleBars": 50000,
+      "FirstPassN": 13655,
+      "FreshReloadN": 13655,
+      "ShuffledResortN": 13655,
+      "FirstDigest": "81f090c7ea5f9faaf123ac62e93842cba81082ba06de8c38477ae6b7a4fcdb6f",
+      "FreshReloadDigest": "81f090c7ea5f9faaf123ac62e93842cba81082ba06de8c38477ae6b7a4fcdb6f",
+      "ShuffledResortDigest": "81f090c7ea5f9faaf123ac62e93842cba81082ba06de8c38477ae6b7a4fcdb6f",
+      "FreshReloadMatches": true,
+      "ShuffledResortMatches": true,
+      "Reproducible": true
+    },
+    {
+      "Instrument": "BTCUSD",
+      "SampleBars": 50000,
+      "FirstPassN": 13319,
+      "FreshReloadN": 13319,
+      "ShuffledResortN": 13319,
+      "FirstDigest": "264f17753a7f3fdb08d25b17dfe2d13e78cea2a82947c656b20777bb3cc99324",
+      "FreshReloadDigest": "264f17753a7f3fdb08d25b17dfe2d13e78cea2a82947c656b20777bb3cc99324",
+      "ShuffledResortDigest": "264f17753a7f3fdb08d25b17dfe2d13e78cea2a82947c656b20777bb3cc99324",
+      "FreshReloadMatches": true,
+      "ShuffledResortMatches": true,
+      "Reproducible": true
+    },
+    {
+      "Instrument": "USTEC",
+      "SampleBars": 50000,
+      "FirstPassN": 12691,
+      "FreshReloadN": 12691,
+      "ShuffledResortN": 12691,
+      "FirstDigest": "45822a073f727fe61f1b0f8b98bca514710efce6d89b41d09e2711a703cbe149",
+      "FreshReloadDigest": "45822a073f727fe61f1b0f8b98bca514710efce6d89b41d09e2711a703cbe149",
+      "ShuffledResortDigest": "45822a073f727fe61f1b0f8b98bca514710efce6d89b41d09e2711a703cbe149",
+      "FreshReloadMatches": true,
+      "ShuffledResortMatches": true,
+      "Reproducible": true
+    }
+  ]
+}

@@ -21,8 +21,8 @@ Does requiring a micro swing break after sweep improve signal quality beyond sim
 
 ## Success / Failure Criteria
 
-- **Evidence FOR**: micro swing break improves primary outcome versus EXP-018 displacement by >= 0.25R or materially lowers MAE on at least 3 instruments.
-- **Evidence AGAINST**: no improvement, excessive delay, or sparse events.
+- **Evidence FOR**: micro swing break improves 60-minute expectancy versus EXP-018 displacement by >= 0.25R or lowers median 60-minute MAE by >= 0.25R on at least 3 instruments, with >= 50 confirmed swing-break events per train/test segment.
+- **Evidence AGAINST**: no improvement, median confirmation delay > 60 bars on at least 3 instruments, or < 50 confirmed swing-break events in train or test on at least 3 instruments.
 - **Inconclusive**: definition is reproducible but effects conflict across instruments.
 
 ## Prerequisites and Sequencing

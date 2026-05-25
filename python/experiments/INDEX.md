@@ -24,10 +24,10 @@
 | EXP-013 | NY Macro Window Characterization | REFUTED | Fixed macro windows support 0/4 instruments versus adjacent and random controls | 2026-05-24 |
 | EXP-015 | Prior High Low Sweep Reversal Behavior | REFUTED | Sweep-only failed-breakout behavior supports only EURUSD Test; 1/4 instruments meet the primary criterion | 2026-05-25 |
 | EXP-016 | Macro Window Interaction With Sweep Outcomes | INCONCLUSIVE | Matched macro-context comparison is underpowered; 0/4 instruments meet train/test inside and matched-outside event floors | 2026-05-25 |
-| EXP-017 | Premium Discount Filter Impact on Sweep Quality | PLANNED | Scope and analysis plan created for premium/discount filter test | 2026-05-23 |
-| EXP-018 | Displacement Confirmation Added to Sweeps | PLANNED | Scope and analysis plan created for H3 displacement confirmation | 2026-05-23 |
-| EXP-019 | Micro Swing Break Confirmation After Sweep | PLANNED | Scope and analysis plan created for H3 swing-break variant | 2026-05-23 |
-| EXP-020 | FVG IFVG Detection Reproducibility | PLANNED | Scope and analysis plan created for H4 FVG/IFVG prerequisite | 2026-05-23 |
+| EXP-017 | Premium Discount Filter Impact on Sweep Quality | INCONCLUSIVE | midpoint filter retained 86-96% of test sweeps but improved neither Hit1R nor median MAE on any instrument | 2026-05-25 |
+| EXP-018 | Displacement Confirmation Added to Sweeps | INCONCLUSIVE | displacement confirmation retained 82-87% of test sweeps but no instrument cleared the interval-based improvement thresholds | 2026-05-25 |
+| EXP-019 | Micro Swing Break Confirmation After Sweep | INCONCLUSIVE | causal swing-break kept adequate counts and acceptable delays but did not beat EXP-018 displacement on any instrument | 2026-05-25 |
+| EXP-020 | FVG IFVG Detection Reproducibility | INCONCLUSIVE | FVG/IFVG detection is deterministic on 4/4 instruments, but IFVG inversion is tautological at ~84-85% of FVGs | 2026-05-25 |
 | EXP-021 | IFVG Confirmation Entry Quality | PLANNED | Scope and analysis plan created for H4 IFVG entry-quality test | 2026-05-23 |
 | EXP-022 | Objective Breaker Candidate Reproducibility | PLANNED | Scope and analysis plan created for H5 breaker prerequisite | 2026-05-23 |
 | EXP-023 | Breaker Confirmation Trade Quality | PLANNED | Scope and analysis plan created for H5 breaker confirmation test | 2026-05-23 |

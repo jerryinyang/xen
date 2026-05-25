@@ -1,0 +1,19 @@
+EXP-017 Premium Discount Filter Impact on Sweep Quality
+Verdict: INCONCLUSIVE
+Instruments passing: 0/4 (retention floor met: 4/4)
+
+Test-segment primary effects (filtered minus all sweeps):
+- EURUSD: filtered=84/89 (94.4%), hit_diff=-0.007 CI=[-0.029, 0.015], mae_impr=-0.086 CI=[-0.785, 0.640], floor=True, hit_pass=False, mae_pass=False
+- XAUUSD: filtered=121/131 (92.4%), hit_diff=-0.001 CI=[-0.026, 0.024], mae_impr=0.000 CI=[-0.885, 0.378], floor=True, hit_pass=False, mae_pass=False
+- BTCUSD: filtered=89/93 (95.7%), hit_diff=-0.014 CI=[-0.041, 0.008], mae_impr=0.052 CI=[-0.073, 0.354], floor=True, hit_pass=False, mae_pass=False
+- USTEC: filtered=138/160 (86.2%), hit_diff=-0.036 CI=[-0.072, -0.004], mae_impr=0.185 CI=[-0.672, 0.591], floor=True, hit_pass=False, mae_pass=False
+
+Retention by side (test segment):
+- BTCUSD High: filtered=50/51 (98.0%), midpoint_missing=0
+- BTCUSD Low: filtered=39/42 (92.9%), midpoint_missing=0
+- EURUSD High: filtered=42/44 (95.5%), midpoint_missing=0
+- EURUSD Low: filtered=42/45 (93.3%), midpoint_missing=0
+- USTEC High: filtered=78/83 (94.0%), midpoint_missing=0
+- USTEC Low: filtered=60/77 (77.9%), midpoint_missing=0
+- XAUUSD High: filtered=77/80 (96.2%), midpoint_missing=0
+- XAUUSD Low: filtered=44/51 (86.3%), midpoint_missing=0

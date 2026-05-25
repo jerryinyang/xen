@@ -1196,3 +1196,195 @@ The matched macro-context comparison cannot evaluate the hypothesis because no i
 - Later ICT component experiments should continue as separate component tests; a future macro-context rerun would need a new predeclared control design.
 
 ---
+
+## EXP-017 - Premium Discount Filter Impact on Sweep Quality
+
+**Status**: INCONCLUSIVE
+**Date**: 2026-05-25
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, Prior-Day Midpoint, Liquidity Sweeps
+
+### Hypothesis Tests
+
+1. **Hypothesis**: A previous-day midpoint premium/discount filter improves sweep quality enough to justify the sample-size cost.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: EXP-014 prior-day midpoint derived from `PDH`/`PDL`; EXP-015 first-touch sweep events; real-price 60-minute outcomes
+- **Features**: `Midpoint`, `PassMidpointFilter`, `Hit1R_60m`, `MAE_R_60m`, retention by side and segment
+- **Parameter ranges**: High-side sweeps require `Close > midpoint`; low-side sweeps require `Close < midpoint`; unchanged EXP-015 stop/risk/horizon definitions
+- **Exclusions**: No VWAP or distance-from-open filters, no macro filter, no displacement, no IFVG, no breaker, no event-chart features
+- **Constraints**: Final 30% global holdout excluded through approved prerequisite artifacts; outcomes use real 1-minute prices inherited from EXP-015
+
+### Results / Observations
+
+Test-segment primary effects (`filtered - all sweeps`):
+
+| Instrument | Retention | Hit Diff | 95% CI | Median MAE Improvement | 95% CI |
+| --- | ---: | ---: | --- | ---: | --- |
+| EURUSD | 84/89 = 94.4% | -0.007 | [-0.029, 0.015] | -0.086R | [-0.785, 0.640] |
+| XAUUSD | 121/131 = 92.4% | -0.001 | [-0.026, 0.024] | 0.000R | [-0.885, 0.378] |
+| BTCUSD | 89/93 = 95.7% | -0.014 | [-0.041, 0.008] | +0.052R | [-0.073, 0.354] |
+| USTEC | 138/160 = 86.2% | -0.036 | [-0.072, -0.004] | +0.185R | [-0.672, 0.591] |
+
+- Instruments passing support thresholds: `0/4`.
+- Instruments meeting retention floors: `4/4`.
+
+### Hypothesis-Specific Conclusion
+
+**INCONCLUSIVE**
+
+The midpoint filter does not achieve the predeclared support rule on any instrument, but the result is better described as inconclusive than cleanly negative because retention is high and several MAE intervals remain wide rather than decisively harmful.
+
+### Hypothesis-Agnostic Observations
+
+- The midpoint rule is a low-cost filter in this dataset, not a high-value one.
+- USTEC is the clearest negative case because test hit rate worsens while retention remains high.
+- Any future location-filter work should test one tighter rule at a time rather than expanding the filter family inside this scope.
+
+---
+
+## EXP-018 - Displacement Confirmation Added to Sweeps
+
+**Status**: INCONCLUSIVE
+**Date**: 2026-05-25
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, Liquidity Sweeps, Displacement Confirmation
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Adding a deterministic displacement candle after a sweep improves sweep-only outcomes enough to offset delayed confirmation and fewer signals.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: EXP-015 sweep events; 1-minute candle-body displacement confirmation; real-price 60-minute outcomes
+- **Features**: `BodyMedian100Prior`, close-location quartile, `DelayBars`, `Hit1R_60m`, `Return_R_60m`, `MAE_R_60m`
+- **Parameter ranges**: First confirming candle within 10 bars; body size `>= 1.5x` prior 100-bar median absolute body; entry proxies `SweepClose`, `DisplacementClose`, `NextOpen`
+- **Exclusions**: No swing-break logic, no IFVG/breaker logic, no full ICT model, no event-chart features
+- **Constraints**: Final 30% global holdout excluded; all outcomes use real 1-minute OHLC prices
+
+### Results / Observations
+
+Test-segment confirmed-versus-all-sweep effects:
+
+| Instrument | Confirmed Retention | Hit Diff | 95% CI | Median MAE Improvement | 95% CI |
+| --- | ---: | ---: | --- | ---: | --- |
+| EURUSD | 77/89 = 86.5% | +0.023 | [-0.018, 0.068] | +0.405R | [-0.365, 1.361] |
+| XAUUSD | 112/131 = 85.5% | +0.024 | [-0.013, 0.063] | +0.345R | [-0.000, 1.128] |
+| BTCUSD | 81/93 = 87.1% | +0.027 | [-0.012, 0.068] | +0.052R | [-0.326, 0.466] |
+| USTEC | 132/160 = 82.5% | +0.001 | [-0.036, 0.039] | +0.404R | [-0.164, 1.180] |
+
+- Instruments passing support thresholds: `0/4`.
+- Instruments refuting on both metrics: `0/4`.
+- Paired delay-cost diagnostic is negative on EURUSD and XAUUSD test when comparing `DisplacementClose` to `SweepClose`.
+
+### Hypothesis-Specific Conclusion
+
+**INCONCLUSIVE**
+
+The displacement-confirmed subset sometimes looks slightly cleaner than the full sweep population, but no test interval clears the predeclared support bar and the paired delay-cost diagnostic is often negative. The evidence does not justify promoting displacement confirmation as a validated improvement.
+
+### Hypothesis-Agnostic Observations
+
+- Displacement confirmation preserves most sweeps, so the failure is not a sample-collapse problem.
+- Waiting for confirmation can consume much of any quality gain the filter appears to create.
+- H3 should be interpreted jointly with EXP-019 rather than assuming displacement is the default confirmation path.
+
+---
+
+## EXP-019 - Micro Swing Break Confirmation After Sweep
+
+**Status**: INCONCLUSIVE
+**Date**: 2026-05-25
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, Liquidity Sweeps, Causal Swing Breaks
+
+### Hypothesis Tests
+
+1. **Hypothesis**: A micro swing break after a sweep improves signal quality beyond the simpler displacement definition.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: EXP-015 sweep events; two-left/two-right causal swing pivots; comparison to EXP-018 displacement baseline
+- **Features**: `SwingPrice`, `SwingUsableTime`, `BreakTime`, `DelayBars`, `Return_R_60m`, `MAE_R_60m`, matched paired effects
+- **Parameter ranges**: High-side sweeps require a later close below the latest usable swing low; low-side sweeps require a later close above the latest usable swing high
+- **Exclusions**: No candle/body displacement combination, no IFVG/breaker logic, no event-chart features, no full ICT model
+- **Constraints**: Final 30% global holdout excluded; all outcomes use real 1-minute OHLC prices; support requires `>= 50` matched test events and no excessive median delay
+
+### Results / Observations
+
+Test-segment paired effects versus EXP-018 displacement:
+
+| Instrument | Matched N | Return Diff | 95% CI | Median MAE Improvement | 95% CI |
+| --- | ---: | ---: | --- | ---: | --- |
+| EURUSD | 77 | +0.252R | [-7.542, 7.186] | +0.114R | [-0.097, 0.276] |
+| XAUUSD | 112 | +0.630R | [-16.675, 16.508] | +0.404R | [0.022, 0.642] |
+| BTCUSD | 81 | +1.477R | [-4.050, 9.390] | +0.157R | [0.000, 0.471] |
+| USTEC | 132 | +18.153R | [-4.762, 58.643] | +0.597R | [0.186, 1.076] |
+
+- Instruments passing support thresholds: `0/4`.
+- Instruments refuting on both metrics: `0/4`.
+- Instruments flagged for excessive median delay: `0/4`.
+- Audit note: one confirmed BTCUSD cross-segment case is grouped under the sweep segment, but the measured effect on the verdict is immaterial.
+
+### Hypothesis-Specific Conclusion
+
+**INCONCLUSIVE**
+
+The causal swing-break variant is reproducible and keeps adequate counts, but it does not show a validated improvement over EXP-018 displacement on the predeclared interval-based criteria. The evidence is positive in places, especially on MAE, but not strong enough to support the hypothesis.
+
+### Hypothesis-Agnostic Observations
+
+- Causal swing confirmation is operationally feasible on this dataset; sparsity and excessive delay are not the blocking issues.
+- The main problem is uncertainty: the paired intervals are too wide to justify promotion of the variant.
+- H3 remains unresolved after both completed confirmation variants.
+
+---
+
+## EXP-020 - FVG IFVG Detection Reproducibility
+
+**Status**: INCONCLUSIVE
+**Date**: 2026-05-25
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, FVG Zones, IFVG Lifecycle
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Three-candle FVGs and close-through IFVG inversions can be detected reproducibly with stable sample sizes on available time bars.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: Three-candle FVG detection, 120-bar lifecycle tracking, IFVG close-through inversion
+- **Features**: `FVGSize`, `ATR14Prior`, `LifecycleState`, `IsIFVG`, reproducibility digests, count/readiness flags
+- **Parameter ranges**: Bearish `High[i] < Low[i-2]`; bullish `Low[i] > High[i-2]`; minimum size `max(price_precision_step, 0.02 * ATR14Prior)`; lifecycle `120` bars
+- **Exclusions**: No profitability claims, no sweep/entry linkage, no event-chart features, no parameter tuning inside this scope
+- **Constraints**: Final 30% global holdout excluded; IFVG readiness requires both count floors and a non-tautological inversion rate
+
+### Results / Observations
+
+- Reproducibility checks pass on `4/4` instruments: fresh reload and shuffled-resort digests all match first-pass digests.
+- Every instrument and segment exceeds the count floors by large margins.
+- IFVG rates are uniformly high:
+  - EURUSD Train/Test: `0.851` / `0.853`
+  - XAUUSD Train/Test: `0.852` / `0.852`
+  - BTCUSD Train/Test: `0.851` / `0.852`
+  - USTEC Train/Test: `0.843` / `0.842`
+- All `ReadyForIFVGStudy` flags are `False` because every row is tautological under the predeclared `IFVGRate >= 0.50` gate.
+
+### Hypothesis-Specific Conclusion
+
+**INCONCLUSIVE**
+
+The experiment supports the narrow mechanical claim that FVG/IFVG detection is deterministic and abundant, but it does not clear the downstream readiness gate for IFVG-entry studies. Under the current rule set, inversion happens too often to serve as a selective confirmation event.
+
+### Hypothesis-Agnostic Observations
+
+- The detector itself is usable; the selectivity problem is conceptual rather than mechanical.
+- EXP-021 should not proceed unchanged because its prerequisite confirmation event is not discriminating enough.
+- Any IFVG follow-up must tighten one explicit parameter or lifecycle rule in a fresh scope.
+
+---

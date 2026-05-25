@@ -24,11 +24,12 @@ Test whether a causally confirmed micro swing break after a sweep improves signa
 
 ### Step 3: Comparison to EXP-018 Baseline
 
-- **Method**: Compare swing-break outcomes to the EXP-018 displacement baseline using the same stop/risk, entry proxy, and 60-minute primary outcome definitions.
+- **Method**: Compare swing-break outcomes to the EXP-018 displacement baseline using the same stop/risk, entry proxy, and 60-minute primary outcome definitions. Return is compared using a paired *mean* bootstrap; MAE is compared using a paired *median* bootstrap (the scope criterion is stated on the median).
 - **Why this method**: The question is whether the swing-break variant adds value beyond simpler displacement.
+- **Criterion form**: A metric passes only when its bootstrap CI95-low clears the predeclared threshold (Return: 0.25R; median MAE improvement: 0.25R). A metric refutes when CI95-high is strictly below the threshold. Point estimates alone are insufficient. The retention floor is keyed off `MatchedN` — the actual sample feeding the bootstrap — not the raw swing-break count.
+- **Cross-segment behaviour**: Usable swings from Train may confirm a Test break (and vice versa), matching production behaviour. The break event's segment is the break candle's segment; cross-segment cases are flagged.
 - **Simpler alternative considered**: Comparing only to sweep-only would duplicate EXP-018.
-- **Assumptions**: Baseline choice is fixed before execution.
-- **Expected output**: Effect-size table for swing-break versus candle/body displacement.
+- **Expected output**: Effect-size table with `MatchedN`, point estimate, CI95, and `*CriterionMet` / `*Refutes` flags per instrument/segment.
 
 ## Visualisations
 
@@ -39,8 +40,8 @@ Test whether a causally confirmed micro swing break after a sweep improves signa
 
 ## Interpretation Guide
 
-- Support: swing-break improves the primary outcome by >= 0.25R or materially lowers MAE on at least 3 instruments without look-ahead or sparse counts.
-- Against: no improvement, excessive delay, or sparse events.
+- Support: swing-break improves 60-minute expectancy by >= 0.25R or lowers median 60-minute MAE by >= 0.25R on at least 3 instruments, with >= 50 confirmed swing-break events per train/test segment.
+- Against: no improvement, median confirmation delay > 60 bars on at least 3 instruments, or < 50 confirmed swing-break events in train or test on at least 3 instruments.
 - Inconclusive: reproducible definition but conflicting instrument effects.
 
 ## Complexity Check

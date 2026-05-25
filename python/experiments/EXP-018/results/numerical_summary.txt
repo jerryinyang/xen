@@ -1,0 +1,19 @@
+EXP-018 Displacement Confirmation Added to Sweeps
+Verdict: INCONCLUSIVE
+Instruments passing: 0/4; refuting: 0/4; retention floor met: 4/4
+
+Test-segment filter effects (confirmed vs all EXP-015 sweeps):
+- EURUSD: confirmed=77/89 (86.5%), hit_diff=0.023 CI=[-0.018, 0.068], mae_impr=0.405 CI=[-0.365, 1.361], floor=True, hit_pass=False, mae_pass=False
+- XAUUSD: confirmed=112/131 (85.5%), hit_diff=0.024 CI=[-0.013, 0.063], mae_impr=0.345 CI=[-0.000, 1.128], floor=True, hit_pass=False, mae_pass=False
+- BTCUSD: confirmed=81/93 (87.1%), hit_diff=0.027 CI=[-0.012, 0.068], mae_impr=0.052 CI=[-0.326, 0.466], floor=True, hit_pass=False, mae_pass=False
+- USTEC: confirmed=132/160 (82.5%), hit_diff=0.001 CI=[-0.036, 0.039], mae_impr=0.404 CI=[-0.164, 1.180], floor=True, hit_pass=False, mae_pass=False
+
+Test-segment paired delay-cost (DisplacementClose - SweepClose):
+- EURUSD DisplacementClose: n=77, return_diff=-3.567 CI=[-8.745, 0.302], hit_diff=-0.159 CI=[-0.304, -0.014]
+- EURUSD NextOpen: n=76, return_diff=-3.211 CI=[-9.625, 0.784], hit_diff=-0.130 CI=[-0.275, 0.000]
+- XAUUSD DisplacementClose: n=112, return_diff=-6.639 CI=[-18.176, 0.109], hit_diff=-0.140 CI=[-0.269, -0.011]
+- XAUUSD NextOpen: n=112, return_diff=-2.953 CI=[-8.103, 0.531], hit_diff=-0.140 CI=[-0.280, 0.000]
+- BTCUSD DisplacementClose: n=81, return_diff=-1.223 CI=[-8.504, 4.863], hit_diff=0.015 CI=[-0.152, 0.182]
+- BTCUSD NextOpen: n=81, return_diff=-2.206 CI=[-11.696, 5.333], hit_diff=0.015 CI=[-0.152, 0.182]
+- USTEC DisplacementClose: n=132, return_diff=-19.368 CI=[-60.559, 3.393], hit_diff=-0.047 CI=[-0.170, 0.075]
+- USTEC NextOpen: n=132, return_diff=-2.863 CI=[-9.810, 2.454], hit_diff=-0.075 CI=[-0.196, 0.047]
