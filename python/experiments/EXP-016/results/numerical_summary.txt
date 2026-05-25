@@ -1,0 +1,15 @@
+EXP-016 Macro Window Interaction With Sweep Outcomes
+Verdict: INCONCLUSIVE
+Instruments passing: 0/4 (floor met: 0/4)
+
+Primary effects (test segment, inside minus outside):
+- EURUSD: inside_n=24, matched_outside_n=2, hit_diff=-0.409 CI=[nan,nan], mae_impr=-2.137 CI=[-6.863,5.549], inside_floor=False, outside_floor=False, hit_pass=False, mae_pass=False
+- XAUUSD: inside_n=27, matched_outside_n=4, hit_diff=0.083 CI=[-0.583,0.542], mae_impr=-0.321 CI=[-2.436,14.990], inside_floor=False, outside_floor=False, hit_pass=False, mae_pass=False
+- BTCUSD: inside_n=21, matched_outside_n=1, hit_diff=nan CI=[nan,nan], mae_impr=5.488 CI=[nan,nan], inside_floor=False, outside_floor=False, hit_pass=False, mae_pass=False
+- USTEC: inside_n=34, matched_outside_n=12, hit_diff=0.237 CI=[-0.081,0.525], mae_impr=0.119 CI=[-2.395,4.755], inside_floor=False, outside_floor=False, hit_pass=False, mae_pass=False
+
+Matching sensitivity (test segment):
+- EURUSD: all_outside=65, matched=2 (3.1%)
+- XAUUSD: all_outside=104, matched=4 (3.8%)
+- BTCUSD: all_outside=72, matched=1 (1.4%)
+- USTEC: all_outside=126, matched=12 (9.5%)
