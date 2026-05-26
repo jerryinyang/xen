@@ -1,0 +1,39 @@
+EXP-024 Second Candle Open Execution Timing
+Verdict: FOR
+Instruments passing: 4/4
+
+Outcome summary:
+  EURUSD Train ConfirmationClose: N=212, Feasible=208, RiskFiltered=4, ReturnN=208, ReturnR=-0.329, MAE_R=4.465, Hit1R=0.352, Slippage_R=0.000
+  EURUSD Train ImmediateNextOpen: N=212, Feasible=209, RiskFiltered=3, ReturnN=209, ReturnR=0.060, MAE_R=3.872, Hit1R=0.342, Slippage_R=0.005
+  EURUSD Train SecondCandleOpen: N=212, Feasible=212, RiskFiltered=0, ReturnN=212, ReturnR=0.178, MAE_R=4.351, Hit1R=0.322, Slippage_R=0.128
+  EURUSD Train FirstRetest: N=147, Feasible=145, RiskFiltered=2, ReturnN=145, ReturnR=-0.846, MAE_R=5.079, Hit1R=0.370, Slippage_R=-0.692
+  EURUSD Test ConfirmationClose: N=77, Feasible=75, RiskFiltered=2, ReturnN=75, ReturnR=-0.823, MAE_R=4.024, Hit1R=0.391, Slippage_R=0.000
+  EURUSD Test ImmediateNextOpen: N=77, Feasible=76, RiskFiltered=1, ReturnN=76, ReturnR=-3.309, MAE_R=7.298, Hit1R=0.406, Slippage_R=-0.035
+  EURUSD Test SecondCandleOpen: N=77, Feasible=76, RiskFiltered=1, ReturnN=76, ReturnR=-1.405, MAE_R=5.213, Hit1R=0.314, Slippage_R=0.075
+  EURUSD Test FirstRetest: N=49, Feasible=48, RiskFiltered=1, ReturnN=48, ReturnR=1.123, MAE_R=6.423, Hit1R=0.395, Slippage_R=-0.811
+  XAUUSD Train ConfirmationClose: N=244, Feasible=240, RiskFiltered=4, ReturnN=240, ReturnR=-0.078, MAE_R=3.660, Hit1R=0.271, Slippage_R=0.000
+  XAUUSD Train ImmediateNextOpen: N=244, Feasible=240, RiskFiltered=4, ReturnN=240, ReturnR=-0.590, MAE_R=4.024, Hit1R=0.274, Slippage_R=-0.009
+  XAUUSD Train SecondCandleOpen: N=244, Feasible=241, RiskFiltered=3, ReturnN=241, ReturnR=1.079, MAE_R=3.755, Hit1R=0.271, Slippage_R=-0.001
+  XAUUSD Train FirstRetest: N=154, Feasible=152, RiskFiltered=2, ReturnN=152, ReturnR=-0.522, MAE_R=4.744, Hit1R=0.301, Slippage_R=-0.449
+  XAUUSD Test ConfirmationClose: N=112, Feasible=109, RiskFiltered=3, ReturnN=109, ReturnR=-0.551, MAE_R=6.865, Hit1R=0.266, Slippage_R=0.000
+  XAUUSD Test ImmediateNextOpen: N=112, Feasible=110, RiskFiltered=2, ReturnN=110, ReturnR=1.016, MAE_R=6.032, Hit1R=0.250, Slippage_R=0.040
+  XAUUSD Test SecondCandleOpen: N=112, Feasible=111, RiskFiltered=1, ReturnN=111, ReturnR=0.488, MAE_R=4.783, Hit1R=0.230, Slippage_R=-0.058
+  XAUUSD Test FirstRetest: N=74, Feasible=71, RiskFiltered=3, ReturnN=71, ReturnR=-0.250, MAE_R=5.538, Hit1R=0.246, Slippage_R=-0.371
+  BTCUSD Train ConfirmationClose: N=344, Feasible=342, RiskFiltered=2, ReturnN=342, ReturnR=-0.208, MAE_R=4.054, Hit1R=0.238, Slippage_R=0.000
+  BTCUSD Train ImmediateNextOpen: N=344, Feasible=343, RiskFiltered=1, ReturnN=343, ReturnR=-0.261, MAE_R=4.426, Hit1R=0.241, Slippage_R=0.003
+  BTCUSD Train SecondCandleOpen: N=344, Feasible=341, RiskFiltered=3, ReturnN=341, ReturnR=-0.611, MAE_R=4.645, Hit1R=0.240, Slippage_R=-0.039
+  BTCUSD Train FirstRetest: N=231, Feasible=224, RiskFiltered=7, ReturnN=224, ReturnR=0.492, MAE_R=4.096, Hit1R=0.252, Slippage_R=-0.372
+  BTCUSD Test ConfirmationClose: N=81, Feasible=81, RiskFiltered=0, ReturnN=81, ReturnR=-0.055, MAE_R=2.795, Hit1R=0.278, Slippage_R=0.000
+  BTCUSD Test ImmediateNextOpen: N=81, Feasible=81, RiskFiltered=0, ReturnN=81, ReturnR=-0.053, MAE_R=2.732, Hit1R=0.278, Slippage_R=-0.004
+  BTCUSD Test SecondCandleOpen: N=81, Feasible=81, RiskFiltered=0, ReturnN=81, ReturnR=-2.670, MAE_R=5.327, Hit1R=0.273, Slippage_R=-0.432
+  BTCUSD Test FirstRetest: N=54, Feasible=54, RiskFiltered=0, ReturnN=54, ReturnR=-0.835, MAE_R=3.908, Hit1R=0.288, Slippage_R=-0.394
+  USTEC Train ConfirmationClose: N=305, Feasible=305, RiskFiltered=0, ReturnN=305, ReturnR=0.482, MAE_R=5.401, Hit1R=0.301, Slippage_R=0.000
+  USTEC Train ImmediateNextOpen: N=305, Feasible=304, RiskFiltered=1, ReturnN=304, ReturnR=-1.184, MAE_R=5.991, Hit1R=0.302, Slippage_R=0.004
+  USTEC Train SecondCandleOpen: N=305, Feasible=301, RiskFiltered=4, ReturnN=301, ReturnR=-0.605, MAE_R=4.779, Hit1R=0.274, Slippage_R=-0.189
+  USTEC Train FirstRetest: N=206, Feasible=203, RiskFiltered=3, ReturnN=203, ReturnR=-1.256, MAE_R=5.781, Hit1R=0.346, Slippage_R=-0.649
+  USTEC Test ConfirmationClose: N=132, Feasible=130, RiskFiltered=2, ReturnN=130, ReturnR=-0.524, MAE_R=4.797, Hit1R=0.220, Slippage_R=0.000
+  USTEC Test ImmediateNextOpen: N=132, Feasible=131, RiskFiltered=1, ReturnN=131, ReturnR=-0.157, MAE_R=5.216, Hit1R=0.210, Slippage_R=0.003
+  USTEC Test SecondCandleOpen: N=132, Feasible=131, RiskFiltered=1, ReturnN=131, ReturnR=0.718, MAE_R=3.428, Hit1R=0.200, Slippage_R=-0.158
+  USTEC Test FirstRetest: N=90, Feasible=90, RiskFiltered=0, ReturnN=90, ReturnR=0.045, MAE_R=2.955, Hit1R=0.299, Slippage_R=-0.215
+
+Missing forward bars:

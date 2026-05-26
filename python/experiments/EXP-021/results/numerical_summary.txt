@@ -1,0 +1,47 @@
+EXP-021 IFVG Confirmation Entry Quality
+Verdict: AGAINST
+Instruments passing: 0/4
+
+Waterfall (instrument, segment, sweep->displacement->IFVG->2ndCandle):
+  EURUSD Train: 251 -> 212 -> 212 -> 212 (floor_met=True)
+  EURUSD Test: 89 -> 77 -> 77 -> 77 (floor_met=True)
+  XAUUSD Train: 271 -> 244 -> 244 -> 244 (floor_met=True)
+  XAUUSD Test: 131 -> 112 -> 112 -> 112 (floor_met=True)
+  BTCUSD Train: 371 -> 345 -> 344 -> 344 (floor_met=True)
+  BTCUSD Test: 93 -> 81 -> 81 -> 81 (floor_met=True)
+  USTEC Train: 355 -> 305 -> 305 -> 305 (floor_met=True)
+  USTEC Test: 160 -> 132 -> 132 -> 132 (floor_met=True)
+
+Expectancy summary:
+  EURUSD Train SweepClose: N=212, Feasible=212, RiskFiltered=0, ReturnN=212, ReturnR=1.038, DrawdownAdjR=-5.286, MAE_R=6.324, Hit1R=0.520
+  EURUSD Train DisplacementClose: N=212, Feasible=209, RiskFiltered=3, ReturnN=209, ReturnR=0.175, DrawdownAdjR=-5.386, MAE_R=5.561, Hit1R=0.429
+  EURUSD Train IFVGClose: N=212, Feasible=208, RiskFiltered=4, ReturnN=208, ReturnR=-0.329, DrawdownAdjR=-4.794, MAE_R=4.465, Hit1R=0.352
+  EURUSD Train SecondCandleOpen: N=212, Feasible=209, RiskFiltered=3, ReturnN=209, ReturnR=0.060, DrawdownAdjR=-3.812, MAE_R=3.872, Hit1R=0.342
+  EURUSD Test SweepClose: N=77, Feasible=77, RiskFiltered=0, ReturnN=77, ReturnR=0.791, DrawdownAdjR=-5.624, MAE_R=6.415, Hit1R=0.630
+  EURUSD Test DisplacementClose: N=77, Feasible=77, RiskFiltered=0, ReturnN=77, ReturnR=-2.776, DrawdownAdjR=-10.600, MAE_R=7.825, Hit1R=0.486
+  EURUSD Test IFVGClose: N=77, Feasible=75, RiskFiltered=2, ReturnN=75, ReturnR=-0.823, DrawdownAdjR=-4.846, MAE_R=4.024, Hit1R=0.391
+  EURUSD Test SecondCandleOpen: N=77, Feasible=76, RiskFiltered=1, ReturnN=76, ReturnR=-3.309, DrawdownAdjR=-10.606, MAE_R=7.298, Hit1R=0.406
+  XAUUSD Train SweepClose: N=244, Feasible=244, RiskFiltered=0, ReturnN=244, ReturnR=1.933, DrawdownAdjR=-3.872, MAE_R=5.804, Hit1R=0.478
+  XAUUSD Train DisplacementClose: N=244, Feasible=242, RiskFiltered=2, ReturnN=242, ReturnR=1.448, DrawdownAdjR=-1.932, MAE_R=3.380, Hit1R=0.447
+  XAUUSD Train IFVGClose: N=244, Feasible=240, RiskFiltered=4, ReturnN=240, ReturnR=-0.078, DrawdownAdjR=-3.738, MAE_R=3.660, Hit1R=0.271
+  XAUUSD Train SecondCandleOpen: N=244, Feasible=240, RiskFiltered=4, ReturnN=240, ReturnR=-0.590, DrawdownAdjR=-4.614, MAE_R=4.024, Hit1R=0.274
+  XAUUSD Test SweepClose: N=112, Feasible=112, RiskFiltered=0, ReturnN=112, ReturnR=0.623, DrawdownAdjR=-6.120, MAE_R=6.742, Hit1R=0.515
+  XAUUSD Test DisplacementClose: N=112, Feasible=110, RiskFiltered=2, ReturnN=110, ReturnR=-0.586, DrawdownAdjR=-6.006, MAE_R=5.420, Hit1R=0.419
+  XAUUSD Test IFVGClose: N=112, Feasible=109, RiskFiltered=3, ReturnN=109, ReturnR=-0.551, DrawdownAdjR=-7.417, MAE_R=6.865, Hit1R=0.266
+  XAUUSD Test SecondCandleOpen: N=112, Feasible=110, RiskFiltered=2, ReturnN=110, ReturnR=1.016, DrawdownAdjR=-5.016, MAE_R=6.032, Hit1R=0.250
+  BTCUSD Train SweepClose: N=345, Feasible=345, RiskFiltered=0, ReturnN=345, ReturnR=-0.984, DrawdownAdjR=-7.406, MAE_R=6.422, Hit1R=0.498
+  BTCUSD Train DisplacementClose: N=345, Feasible=340, RiskFiltered=5, ReturnN=340, ReturnR=-0.437, DrawdownAdjR=-5.156, MAE_R=4.720, Hit1R=0.390
+  BTCUSD Train IFVGClose: N=344, Feasible=342, RiskFiltered=2, ReturnN=342, ReturnR=-0.208, DrawdownAdjR=-4.261, MAE_R=4.054, Hit1R=0.238
+  BTCUSD Train SecondCandleOpen: N=344, Feasible=343, RiskFiltered=1, ReturnN=343, ReturnR=-0.261, DrawdownAdjR=-4.687, MAE_R=4.426, Hit1R=0.241
+  BTCUSD Test SweepClose: N=81, Feasible=81, RiskFiltered=0, ReturnN=81, ReturnR=0.032, DrawdownAdjR=-8.041, MAE_R=8.074, Hit1R=0.480
+  BTCUSD Test DisplacementClose: N=81, Feasible=79, RiskFiltered=2, ReturnN=79, ReturnR=0.534, DrawdownAdjR=-4.000, MAE_R=4.534, Hit1R=0.521
+  BTCUSD Test IFVGClose: N=81, Feasible=81, RiskFiltered=0, ReturnN=81, ReturnR=-0.055, DrawdownAdjR=-2.850, MAE_R=2.795, Hit1R=0.278
+  BTCUSD Test SecondCandleOpen: N=81, Feasible=81, RiskFiltered=0, ReturnN=81, ReturnR=-0.053, DrawdownAdjR=-2.784, MAE_R=2.732, Hit1R=0.278
+  USTEC Train SweepClose: N=305, Feasible=305, RiskFiltered=0, ReturnN=305, ReturnR=-0.795, DrawdownAdjR=-7.534, MAE_R=6.739, Hit1R=0.498
+  USTEC Train DisplacementClose: N=305, Feasible=299, RiskFiltered=6, ReturnN=299, ReturnR=-0.355, DrawdownAdjR=-5.241, MAE_R=4.887, Hit1R=0.423
+  USTEC Train IFVGClose: N=305, Feasible=305, RiskFiltered=0, ReturnN=305, ReturnR=0.482, DrawdownAdjR=-4.919, MAE_R=5.401, Hit1R=0.301
+  USTEC Train SecondCandleOpen: N=305, Feasible=304, RiskFiltered=1, ReturnN=304, ReturnR=-1.184, DrawdownAdjR=-7.176, MAE_R=5.991, Hit1R=0.302
+  USTEC Test SweepClose: N=132, Feasible=132, RiskFiltered=0, ReturnN=132, ReturnR=-0.069, DrawdownAdjR=-8.052, MAE_R=7.983, Hit1R=0.445
+  USTEC Test DisplacementClose: N=132, Feasible=129, RiskFiltered=3, ReturnN=129, ReturnR=-2.414, DrawdownAdjR=-10.620, MAE_R=8.206, Hit1R=0.430
+  USTEC Test IFVGClose: N=132, Feasible=130, RiskFiltered=2, ReturnN=130, ReturnR=-0.524, DrawdownAdjR=-5.321, MAE_R=4.797, Hit1R=0.220
+  USTEC Test SecondCandleOpen: N=132, Feasible=131, RiskFiltered=1, ReturnN=131, ReturnR=-0.157, DrawdownAdjR=-5.372, MAE_R=5.216, Hit1R=0.210

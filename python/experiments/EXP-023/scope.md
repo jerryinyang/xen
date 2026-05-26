@@ -17,11 +17,11 @@ Does breaker confirmation improve trade quality beyond sweep plus displacement o
 - **Look-ahead bias prevention**: Features and events use only bars with `CloseTime` at or before the event timestamp.
 - **Real-price outcome discipline**: All outcomes use real time-bar OHLC prices aligned by timestamp.
 - **Exclusions**: No full ICT model, no parameter tuning against outcomes, no event-chart features, no tick/1-second/bid-ask data unless explicitly identified as unavailable or proxied.
-- **Parameters**: Use the single breaker candidate selected by EXP-022. The pre-breaker baseline must be predeclared before execution as either the approved displacement baseline from EXP-018/EXP-019 or the approved IFVG baseline from EXP-021; no post-hoc "best baseline" selection. Report expectancy, drawdown proxy, trade count, and average R.
+- **Parameters**: Use the single breaker candidate selected by EXP-022. The pre-breaker baseline must be predeclared before execution as either the approved displacement baseline from EXP-018/EXP-019 or the approved IFVG baseline from EXP-021; no post-hoc "best baseline" selection. Report expectancy, drawdown proxy, trade count, and average R. Baseline and breaker entries keep the original EXP-015 stop. If the inherited stop distance for an entry falls below the original EXP-015 `Buffer`, count it in retention diagnostics but exclude it from R-based outcome and bootstrap summaries as infeasible under the inherited-stop convention.
 
 ## Success / Failure Criteria
 
-- **Evidence FOR**: breaker confirmation improves expectancy or drawdown-adjusted return on at least 3 instruments while retaining >= 50 breaker-confirmed events per train/test segment.
+- **Evidence FOR**: breaker confirmation improves expectancy or drawdown-adjusted return on at least 3 instruments while retaining >= 50 risk-feasible breaker-confirmed events per train/test segment.
 - **Evidence AGAINST**: win rate improves only by reducing samples, expectancy does not improve, or drawdown worsens.
 - **Inconclusive**: candidate is valid but event count is too low.
 
@@ -37,7 +37,7 @@ Requires EXP-022 plus the baseline experiment named in the implementation config
 
 ## Data Requirements
 
-Use sorted 1-minute bars by `CloseTime` for each available instrument. Convert timestamps to New York time where scoped. Apply the nested chronological split before any feature, event, or outcome analysis, and never materialize the final 30 percent holdout.
+Use sorted 1-minute bars by `CloseTime` for each available instrument. Convert timestamps to New York time where scoped. Apply the nested chronological split before any feature, event, or outcome analysis, and never materialize the final 30 percent holdout. Carry the original EXP-015 sweep `Buffer` forward as the minimum feasible inherited risk denominator for all delayed-entry R-multiple calculations.
 
 ## Suggested Direction
 

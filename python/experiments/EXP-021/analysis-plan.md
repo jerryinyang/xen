@@ -16,7 +16,7 @@ Test H4: whether IFVG confirmation improves entry quality enough to offset later
 
 ### Step 2: Fixed Entry Timestamp Comparison
 
-- **Method**: For each eligible chain, compute outcomes for sweep rejection close, displacement confirmation close, IFVG close, and second-candle-open after IFVG close. Include retest only if a deterministic rule was frozen before execution.
+- **Method**: For each eligible chain, compute outcomes for sweep rejection close, displacement confirmation close, IFVG close, and second-candle-open after IFVG close. Include retest only if a deterministic rule was frozen before execution. If a delayed entry keeps the inherited EXP-015 stop but the resulting `Risk1R` falls below the original sweep `Buffer`, mark that row as risk-infeasible and exclude it from R-based outcome summaries while still counting it in eligibility diagnostics.
 - **Why this method**: It tests whether IFVG timing improves entry quality rather than only reducing samples.
 - **Simpler alternative considered**: Comparing IFVG entries to no baseline would not test improvement.
 - **Assumptions**: All entries use the same stop/risk convention except where IFVG zone stop is explicitly the scoped stop.
@@ -24,7 +24,7 @@ Test H4: whether IFVG confirmation improves entry quality enough to offset later
 
 ### Step 3: IFVG Versus Simpler Entries
 
-- **Method**: Bootstrap differences in expectancy in R, drawdown proxy, MAE, and 1R/2R-before-stop probabilities for IFVG entries versus the simpler baseline entries.
+- **Method**: Bootstrap differences in expectancy in R, drawdown proxy, MAE, and 1R/2R-before-stop probabilities for IFVG entries versus the simpler baseline entries using only risk-feasible rows. Report risk-filtered counts by instrument, segment, and proxy before interpreting the bootstrap outputs.
 - **Why this method**: H4 is about entry quality after delayed confirmation.
 - **Simpler alternative considered**: Win rate alone can improve by discarding hard cases.
 - **Assumptions**: Event counts are reported before interpreting expectancy.
@@ -39,7 +39,7 @@ Test H4: whether IFVG confirmation improves entry quality enough to offset later
 
 ## Interpretation Guide
 
-- Support: IFVG-confirmed entries improve expectancy or drawdown-adjusted return on at least 3 instruments with >= 50 IFVG-confirmed events per train/test segment.
+- Support: IFVG-confirmed entries improve expectancy or drawdown-adjusted return on at least 3 instruments with >= 50 risk-feasible IFVG-confirmed events per train/test segment.
 - Against: later entries degrade R distribution or sample size dominates.
 - Inconclusive: too few IFVG confirmations after prerequisites.
 

@@ -16,7 +16,7 @@ Isolate whether the ICT second-candle-open execution rule improves or degrades e
 
 ### Step 2: Entry Timing Simulation
 
-- **Method**: Compute confirmation-close proxy, immediate next-open, second-candle-open, and first deterministic retest entry outcomes using the same stop/target rules and real time-bar prices.
+- **Method**: Compute confirmation-close proxy, immediate next-open, second-candle-open, and first deterministic retest entry outcomes using the same stop/target rules and real time-bar prices. If a timing variant's inherited stop distance falls below the carried-forward minimum feasible risk from the confirmation source, mark that row as risk-infeasible and exclude it from R-based outcome and slippage summaries while retaining it in timing diagnostics.
 - **Why this method**: It directly tests the execution timing claim from the planning spec.
 - **Simpler alternative considered**: Comparing only next-open to second-open would omit the confirmation-close diagnostic.
 - **Assumptions**: Retest is considered only after confirmation and before invalidation.
@@ -24,7 +24,7 @@ Isolate whether the ICT second-candle-open execution rule improves or degrades e
 
 ### Step 3: Timing Quality Comparison
 
-- **Method**: Bootstrap differences in expectancy, MAE, hit rate, and entry slippage proxy relative to confirmation close.
+- **Method**: Bootstrap differences in expectancy, MAE, hit rate, and entry slippage proxy relative to confirmation close using only risk-feasible rows. Report risk-filtered counts by instrument, segment, and timing rule before interpreting the bootstrap outputs.
 - **Why this method**: It measures both signal quality and practical entry degradation.
 - **Simpler alternative considered**: Entry price comparison alone would not measure trade outcome.
 - **Assumptions**: Event counts are identical across entry variants except where later entries lack enough forward bars.
@@ -39,7 +39,7 @@ Isolate whether the ICT second-candle-open execution rule improves or degrades e
 
 ## Interpretation Guide
 
-- Support: second-candle-open has equal or better expectancy/MAE on at least 3 instruments without worse slippage proxy.
+- Support: second-candle-open has equal or better expectancy/MAE on at least 3 instruments without worse slippage proxy and with >= 50 risk-feasible confirmation-close and second-candle-open comparisons per train/test segment.
 - Against: second-candle-open degrades entry price, R distribution, or hit rate.
 - Inconclusive: differences are small with intervals crossing zero.
 

@@ -16,7 +16,7 @@ Test H5: whether one EXP-022-approved breaker confirmation improves trade qualit
 
 ### Step 2: Outcome Measurement
 
-- **Method**: Compute expectancy in R, average R, drawdown proxy, win rate, MAE, and trade count for baseline versus breaker-confirmed entries using real time-bar prices.
+- **Method**: Compute expectancy in R, average R, drawdown proxy, win rate, MAE, and trade count for baseline versus breaker-confirmed entries using real time-bar prices. If a baseline or breaker entry keeps the inherited stop but `Risk1R` falls below the original sweep `Buffer`, mark the row as risk-infeasible and exclude it from R-based outcome summaries while retaining it in retention diagnostics.
 - **Why this method**: The source H5 claim is about trade quality, not merely win rate.
 - **Simpler alternative considered**: Counts-only validation was already handled in EXP-022.
 - **Assumptions**: Stops and targets remain unchanged from the baseline unless the breaker zone is the predeclared stop anchor.
@@ -24,7 +24,7 @@ Test H5: whether one EXP-022-approved breaker confirmation improves trade qualit
 
 ### Step 3: Contribution Assessment
 
-- **Method**: Bootstrap differences in expectancy and drawdown proxy; report event retention and win-rate changes as secondary.
+- **Method**: Bootstrap differences in expectancy and drawdown proxy using only risk-feasible rows; report event retention, risk-filtered counts, and win-rate changes as secondary.
 - **Why this method**: It distinguishes true contribution from sample-size pruning.
 - **Simpler alternative considered**: Profit factor alone is unstable with sparse samples.
 - **Assumptions**: Event floors must be met before claiming support.
@@ -39,7 +39,7 @@ Test H5: whether one EXP-022-approved breaker confirmation improves trade qualit
 
 ## Interpretation Guide
 
-- Support: breaker confirmation improves expectancy or drawdown-adjusted return on at least 3 instruments while retaining >= 50 breaker-confirmed events per train/test segment.
+- Support: breaker confirmation improves expectancy or drawdown-adjusted return on at least 3 instruments while retaining >= 50 risk-feasible breaker-confirmed events per train/test segment.
 - Against: win rate improves only through sample reduction, expectancy fails, or drawdown worsens.
 - Inconclusive: breaker is reproducible but event count is too low.
 

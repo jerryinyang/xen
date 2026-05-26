@@ -1387,4 +1387,200 @@ The experiment supports the narrow mechanical claim that FVG/IFVG detection is d
 - EXP-021 should not proceed unchanged because its prerequisite confirmation event is not discriminating enough.
 - Any IFVG follow-up must tighten one explicit parameter or lifecycle rule in a fresh scope.
 
+
+## EXP-021 - IFVG Confirmation Entry Quality
+
+**Status**: REFUTED
+**Date**: 2026-05-26
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, Sweep and Displacement Event Chains, IFVG Confirmation Timing
+
+### Hypothesis Tests
+
+1. **Hypothesis**: IFVG confirmation improves entry quality enough to offset later entry timing and fewer signals.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: EXP-015 sweep events, EXP-018 displacement prerequisite, EXP-020 IFVG confirmation, fixed entry timestamps
+- **Features**: sweep-close, displacement-close, IFVG-close, second-candle-open outcomes; feasible-risk counts; bootstrap expectancy, drawdown-adjusted return, MAE, and hit-rate diagnostics
+- **Parameter ranges**: 60-minute outcome horizon; IFVG side follows sweep side; feasible delayed-entry risk requires `Risk1R >= EXP-015 Buffer`; event floor `>= 50` feasible IFVG events per train/test segment
+- **Exclusions**: No retest unless predeclared, no alternative IFVG rule, no post-hoc confirmation redesign inside this scope
+- **Constraints**: Final 30% global holdout excluded; real-price outcome discipline; infeasible delayed-entry rows remain in chain counts but not in R-based summaries
+
+### Results / Observations
+
+- The rerun resolves the denominator-collapse issue cleanly:
+  - `53 / 6030` delayed-entry rows are flagged `RiskFeasible=False`
+  - all infeasible rows have null R-based outcomes
+  - feasible `Return_R_60m` values range from `-288.0000` to `276.8245`
+- IFVG confirmation retains almost the full displacement set:
+  - counts are identical on `7/8` displacement-to-IFVG rows
+  - BTCUSD Train is the only drop, from `345` to `344`
+- Every instrument still clears the feasible-event floor in both train and test:
+  - EURUSD `208 / 75`
+  - XAUUSD `240 / 109`
+  - BTCUSD `342 / 81`
+  - USTEC `305 / 130`
+- The stored verdict is `AGAINST`, with `0/4` instruments passing the predeclared support rule.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+After the feasible-risk guard is applied, IFVG confirmation still fails to improve test-segment return or drawdown-adjusted quality against both simpler baselines on any instrument. The broad H4 claim is therefore refuted under the frozen IFVG rule set.
+
+### Hypothesis-Agnostic Observations
+
+- The rerun changed trust, not direction: the negative result persists after the normalization fix.
+- The near-perfect displacement-to-IFVG retention reinforces EXP-020's concern that the current IFVG rule is not very selective.
+- Any future IFVG work should start by redefining the prerequisite confirmation event, not by reinterpreting this result.
+
+---
+
+---
+
+## EXP-022 - Objective Breaker Candidate Reproducibility
+
+**Status**: SUPPORTED
+**Date**: 2026-05-26
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, Displacement-Confirmed Sweeps, Breaker Candidate Definitions
+
+### Hypothesis Tests
+
+1. **Hypothesis**: At least one objective breaker candidate can be defined reproducibly with enough occurrences to justify outcome testing.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: Candidate A last-opposite-candle order-block proxy; Candidate B causal swing-break breaker
+- **Features**: post-displacement breaker boundary, confirmation timestamp, invalidation reason, ambiguity count, retention rate, reproducibility digests
+- **Parameter ranges**: Candidate A lookback `30` bars; Candidate B swing window `2` bars left/right; confirmation delay cap `120` bars; readiness floor `>= 50` events per instrument-segment
+- **Exclusions**: No profitability or trade-quality comparison, no post-hoc candidate selection by outcomes, no event-chart features
+- **Constraints**: Final 30% global holdout excluded; candidate selection based on deterministic rerun equality, occurrence floors, and ambiguity only
+
+### Results / Observations
+
+- Both candidates are reproducible on `4/4` instruments; fresh-reload and second-pass digests match for every instrument.
+- Candidate A clears the train/test floor in every instrument-segment:
+  - EURUSD `140 / 54`
+  - XAUUSD `172 / 79`
+  - BTCUSD `239 / 66`
+  - USTEC `205 / 86`
+- Candidate B clears all train floors but misses the test floor on EURUSD and BTCUSD:
+  - EURUSD `99 / 40`
+  - XAUUSD `119 / 55`
+  - BTCUSD `181 / 49`
+  - USTEC `151 / 58`
+- Ambiguity is `0` for every candidate, instrument, and segment row.
+- `selection.json` records `CandidateA` as the only eligible candidate.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+The scoped readiness criterion is satisfied because Candidate A is deterministic and clears the `>= 50` event floor in both train and test on all four instruments. Candidate B remains reproducible but does not qualify broadly enough for the downstream outcome test.
+
+### Hypothesis-Agnostic Observations
+
+- The blocker for Candidate B is sample availability, not ambiguity or nondeterminism.
+- EXP-023 later used Candidate A exactly as scoped, but the completed outcome test still failed broad cross-instrument support.
+
+---
+
+
+## EXP-023 - Breaker Confirmation Trade Quality
+
+**Status**: REFUTED
+**Date**: 2026-05-26
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, Displacement Baseline, Candidate A Breaker Confirmation
+
+### Hypothesis Tests
+
+1. **Hypothesis**: One objective breaker confirmation improves trade quality beyond a predeclared pre-breaker baseline.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: EXP-018 displacement baseline, EXP-022 Candidate A breaker confirmation
+- **Features**: baseline-to-breaker waterfall, feasible-risk counts, R-based expectancy, drawdown-adjusted return, MAE, hit rate, bootstrap contribution tables
+- **Parameter ranges**: 60-minute outcome horizon; Candidate A only; feasible delayed-entry risk requires `Risk1R >= EXP-015 Buffer`; event floor `>= 50` feasible breaker events per train/test segment
+- **Exclusions**: No alternative breaker definitions, no post-hoc baseline switching, no event-chart features
+- **Constraints**: Final 30% global holdout excluded; real-price outcome discipline; infeasible rows remain in retention diagnostics but not in R-based summaries
+
+### Results / Observations
+
+- The rerun resolves the prior denominator issue:
+  - `24 / 2549` rows are flagged `RiskFeasible=False`
+  - all infeasible rows have null R-based outcomes
+  - feasible `Return_R_60m` values range from `-148.8444` to `106.9811`
+- Candidate A remains operationally broad enough for testing:
+  - EURUSD `140 / 54`
+  - XAUUSD `172 / 79`
+  - BTCUSD `239 / 66`
+  - USTEC `205 / 86`
+- Duplicate join keys remain `0` on every baseline-to-breaker row.
+- The stored verdict is `AGAINST`, with `1/4` instruments passing the predeclared support rule; USTEC is the lone clean pass.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+Breaker confirmation under the fixed Candidate A definition does not deliver the broad cross-instrument quality improvement required by the scope. Event floors are met everywhere, but only USTEC passes the return / drawdown / MAE gate.
+
+### Hypothesis-Agnostic Observations
+
+- EXP-022's readiness result still matters: Candidate A is real, deterministic, and count-eligible.
+- The main consistent effect is better trade path control on some instruments, not broad expectancy improvement.
+- Any future breaker work should be explicitly narrower rather than assuming the current cross-instrument claim survived.
+
+---
+
+## EXP-024 - Second Candle Open Execution Timing
+
+**Status**: SUPPORTED
+**Date**: 2026-05-26
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, IFVG Confirmation Events, Post-Confirmation Entry Timing Variants
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The ICT second-candle-open execution rule has equal or better trade quality than simpler post-confirmation entries.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: confirmation-close, immediate-next-open, second-candle-open, first deterministic retest
+- **Features**: feasible-risk counts, R-based expectancy, MAE, hit rate, slippage proxy, bootstrap timing comparisons, missing-forward-bars diagnostics
+- **Parameter ranges**: 60-minute outcome horizon; feasible timing risk requires inherited `Risk1R >= MinRisk1R` from EXP-021; support floor `>= 50` feasible confirmation-close and second-candle-open rows per train/test segment
+- **Exclusions**: No new confirmation filter, no alternative risk anchor, no cost model
+- **Constraints**: Final 30% global holdout excluded; real-price outcome discipline; infeasible rows remain in timing diagnostics but not in R-based or slippage summaries
+
+### Results / Observations
+
+- The rerun resolves the timing denominator issue:
+  - `61 / 5526` rows are flagged `RiskFeasible=False`
+  - all infeasible rows have null R-based outcomes and null `Slippage_R`
+  - `missing_forward_bars.csv` reports `0` missing-forward-bar cases everywhere
+- Every instrument clears the feasible-count gate for both confirmation-close and second-candle-open in train and test:
+  - EURUSD `208 / 212` train, `75 / 76` test
+  - XAUUSD `240 / 241` train, `109 / 111` test
+  - BTCUSD `342 / 341` train, `81 / 81` test
+  - USTEC `305 / 301` train, `130 / 131` test
+- The stored verdict is `FOR`, with `4/4` instruments passing the predeclared non-inferiority rule versus confirmation-close.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+Second-candle-open satisfies the scoped timing criterion: across all four instruments, it does not show statistically worse return, MAE, or slippage than confirmation-close once the feasible-risk guard is enforced.
+
+### Hypothesis-Agnostic Observations
+
+- This is a narrow positive result: the support comes from preservation, not from a universal point-estimate improvement.
+- Hit-rate differences remain small and statistically unresolved.
+- The result isolates timing only and does not rehabilitate the refuted EXP-021 IFVG confirmation layer.
+
 ---

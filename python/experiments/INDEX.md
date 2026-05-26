@@ -28,10 +28,10 @@
 | EXP-018 | Displacement Confirmation Added to Sweeps | INCONCLUSIVE | displacement confirmation retained 82-87% of test sweeps but no instrument cleared the interval-based improvement thresholds | 2026-05-25 |
 | EXP-019 | Micro Swing Break Confirmation After Sweep | INCONCLUSIVE | causal swing-break kept adequate counts and acceptable delays but did not beat EXP-018 displacement on any instrument | 2026-05-25 |
 | EXP-020 | FVG IFVG Detection Reproducibility | INCONCLUSIVE | FVG/IFVG detection is deterministic on 4/4 instruments, but IFVG inversion is tautological at ~84-85% of FVGs | 2026-05-25 |
-| EXP-021 | IFVG Confirmation Entry Quality | PLANNED | Scope and analysis plan created for H4 IFVG entry-quality test | 2026-05-23 |
-| EXP-022 | Objective Breaker Candidate Reproducibility | PLANNED | Scope and analysis plan created for H5 breaker prerequisite | 2026-05-23 |
-| EXP-023 | Breaker Confirmation Trade Quality | PLANNED | Scope and analysis plan created for H5 breaker confirmation test | 2026-05-23 |
-| EXP-024 | Second Candle Open Execution Timing | PLANNED | Scope and analysis plan created for execution-timing rule test | 2026-05-23 |
+| EXP-021 | IFVG Confirmation Entry Quality | REFUTED | IFVG retains nearly the full displacement set but improves neither return nor drawdown enough to pass on any instrument | 2026-05-26 |
+| EXP-022 | Objective Breaker Candidate Reproducibility | SUPPORTED | Candidate A is deterministic on 4/4 instruments and clears the train/test event floor everywhere; Candidate B misses two test floors | 2026-05-26 |
+| EXP-023 | Breaker Confirmation Trade Quality | REFUTED | Candidate A breaker improves trade quality clearly only on USTEC; 1/4 instruments pass despite adequate feasible counts everywhere | 2026-05-26 |
+| EXP-024 | Second Candle Open Execution Timing | SUPPORTED | Second-candle-open clears the feasible-count and non-inferiority gate on 4/4 instruments, but mainly as preservation not universal improvement | 2026-05-26 |
 | EXP-025 | Fixed 1 to 2 Risk Reward Justification | PLANNED | Scope and analysis plan created for H6 risk/reward validation | 2026-05-23 |
 | EXP-026 | Incremental ICT Component Ablation | PLANNED | Scope and analysis plan created for component contribution table | 2026-05-23 |
 | EXP-027 | Predeclared Full ICT Model Analysis-Set Test | PLANNED | Scope and analysis plan created for gated full-model test | 2026-05-23 |

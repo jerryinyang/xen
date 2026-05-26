@@ -1,0 +1,27 @@
+EXP-022 Objective Breaker Candidate Reproducibility
+Selected candidate: CandidateA
+Selection reason: Only eligible candidate
+
+Counts by candidate, instrument, segment:
+  CandidateA EURUSD Train: N=140 (floor=True), ambig=0 (0.00%)
+  CandidateB EURUSD Train: N=99 (floor=True), ambig=0 (0.00%)
+  CandidateA EURUSD Test: N=54 (floor=True), ambig=0 (0.00%)
+  CandidateB EURUSD Test: N=40 (floor=False), ambig=0 (0.00%)
+  CandidateA XAUUSD Train: N=172 (floor=True), ambig=0 (0.00%)
+  CandidateB XAUUSD Train: N=119 (floor=True), ambig=0 (0.00%)
+  CandidateA XAUUSD Test: N=79 (floor=True), ambig=0 (0.00%)
+  CandidateB XAUUSD Test: N=55 (floor=True), ambig=0 (0.00%)
+  CandidateA BTCUSD Train: N=239 (floor=True), ambig=0 (0.00%)
+  CandidateB BTCUSD Train: N=181 (floor=True), ambig=0 (0.00%)
+  CandidateA BTCUSD Test: N=66 (floor=True), ambig=0 (0.00%)
+  CandidateB BTCUSD Test: N=49 (floor=False), ambig=0 (0.00%)
+  CandidateA USTEC Train: N=205 (floor=True), ambig=0 (0.00%)
+  CandidateB USTEC Train: N=151 (floor=True), ambig=0 (0.00%)
+  CandidateA USTEC Test: N=86 (floor=True), ambig=0 (0.00%)
+  CandidateB USTEC Test: N=58 (floor=True), ambig=0 (0.00%)
+
+Reproducibility:
+  EURUSD: CandA=True, CandB=True
+  XAUUSD: CandA=True, CandB=True
+  BTCUSD: CandA=True, CandB=True
+  USTEC: CandA=True, CandB=True

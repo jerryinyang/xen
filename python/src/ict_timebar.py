@@ -377,7 +377,14 @@ def compute_real_price_outcome(
     entry = float(event["Entry"])
     stop = float(event["Stop"])
     risk = float(event["Risk1R"])
-    if not np.isfinite(risk) or risk <= 0.0:
+    min_risk_raw = event.get("MinRisk1R", 0.0)
+    try:
+        min_risk = float(min_risk_raw)
+    except (TypeError, ValueError):
+        min_risk = 0.0
+    if not np.isfinite(min_risk) or min_risk < 0.0:
+        min_risk = 0.0
+    if not np.isfinite(risk) or risk <= 0.0 or risk < min_risk:
         return _empty_outcome(horizon_minutes)
 
     entry_time = pd.Timestamp(event["EntryTime"])

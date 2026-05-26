@@ -1,0 +1,15 @@
+Observe: I used Figure 1’s workflow diagram, focusing only on red or blue arrows with visible arrowheads that connect to rectangular boxes containing the word “Harmonic” or “harmonic.”
+
+Step 1: I excluded the legend and all black arrows/lines, then checked only the red short-term-training arrows and blue long-term-training arrows in the main diagram.
+
+Step 2: I counted the valid arrows connected to “Harmonic long-term monitoring data”: one arrow points into it and one arrow points away from it, giving 2.
+
+Step 3: I counted the valid arrows connected to “Harmonic short-term monitoring data”: one red arrow points away from it. The other outgoing arrow is black, so it is excluded, giving 1.
+
+Step 4: I counted the valid arrows connected to “High-resolution harmonic image with high grayscale”: one valid arrow points into it and one valid arrow points away from it. Its arrow to “Harmonic long-term monitoring data” is not counted again because that arrow was already counted once, giving 2.
+
+Step 5: I counted the valid arrows connected to “Harmonic-dominated user power data”: one valid arrow points into it and two valid arrows point away from it. The remaining incoming arrow is invalid under the prompt rules, giving 3.
+
+Step 6:  Adding the valid arrows gives 2 + 1 + 2 + 3 = 8
+
+Final: 8.
