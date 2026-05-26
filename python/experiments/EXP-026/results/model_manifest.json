@@ -1,0 +1,28 @@
+{
+  "experiment_id": "EXP-026",
+  "title": "Incremental ICT Component Ablation",
+  "selected_components": [
+    "Sweep",
+    "Displacement"
+  ],
+  "exit_variant": "2R",
+  "stop_rule": "EXP-015 original stop (inherited via EXP-018/EXP-021/EXP-024 chain)",
+  "cost_scenario": "LIGHT_COST_PROXY",
+  "candidate_eligible": false,
+  "source_verdict": "INCONCLUSIVE",
+  "selection_rule_version": "positive_lower_ci_v2",
+  "selection_evidence": {
+    "SecondCandleOpen": {
+      "passing_instruments": 0,
+      "required_instruments": 3,
+      "rule": "MeanDiff > 0 and CI_Lo > 0 on test segment"
+    }
+  },
+  "excluded_components": {
+    "IFVG": "Not eligible for candidate selection",
+    "Breaker": "Not eligible for candidate selection",
+    "SecondCandleOpen": "Insufficient positive evidence: 0/3 instruments pass (mean_diff=-0.406)",
+    "RiskModel_2R": "Not eligible for candidate selection"
+  },
+  "notes": "No optional component met the positive lower-CI rule; no full-model candidate selected."
+}

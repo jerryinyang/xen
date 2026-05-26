@@ -1584,3 +1584,189 @@ Second-candle-open satisfies the scoped timing criterion: across all four instru
 - The result isolates timing only and does not rehabilitate the refuted EXP-021 IFVG confirmation layer.
 
 ---
+
+## EXP-025 - Fixed 1 to 2 Risk Reward Justification
+
+**Status**: INCONCLUSIVE
+**Date**: 2026-05-26
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: 1-minute Time Bars, EXP-024 Second-Candle-Open Entries, Alternative Exit Variants
+
+### Hypothesis Tests
+
+1. **Hypothesis**: A fixed `2R` target is justified only if it outperforms simpler target and exit alternatives for the approved entry definition.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: EXP-024 second-candle-open entries, inherited stop anchors, `1R`, `1.5R`, `2R`, `3R`, `TimeStop60`, and `NearestLiquidity` exits
+- **Features**: exit outcome table, realized-R summaries, hit rates, bootstrap `2R` versus alternative comparisons
+- **Parameter ranges**: 60-minute outcome horizon; event floors `>= 100` train and `>= 50` test per instrument; real-price OHLC path only
+- **Exclusions**: no new entry filters, no stop retuning, no event-chart features, no cost model
+- **Constraints**: Final 30% global holdout excluded; real-price outcome discipline; comparator coverage required before interpretation
+
+### Results / Observations
+
+- All four instruments are fully comparable in the test segment:
+  - EURUSD `N_2R=70`
+  - XAUUSD `N_2R=100`
+  - BTCUSD `N_2R=77`
+  - USTEC `N_2R=125`
+- The stored verdict records `0/4` passing instruments and `0/4` dominated instruments.
+- Representative bootstrap rows:
+  - EURUSD `2R vs 1R`: diff `-0.356`, CI `[-0.950, 0.229]`
+  - XAUUSD `2R vs TimeStop60`: diff `-0.707`, CI `[-2.318, 0.981]`
+- Test mean returns show weaker point estimates for `2R` than `TimeStop60` on all four instruments:
+  - EURUSD `-0.815R` vs `-0.297R`
+  - XAUUSD `-0.810R` vs `-0.092R`
+  - BTCUSD `-0.474R` vs `-0.257R`
+  - USTEC `-0.918R` vs `-0.233R`
+
+### Hypothesis-Specific Conclusion
+
+**INCONCLUSIVE**
+
+The broad H6 claim is not supported, but it is not formally refuted by the experiment's own domination rule either. `2R` shows no superiority evidence on any instrument despite full comparator coverage, so it is not positively justified for this entry source.
+
+### Hypothesis-Agnostic Observations
+
+- The result is evidence-based rather than sample-limited: all four instruments clear the comparison floor.
+- `RiskModel_2R` should not be promoted into downstream candidate selection under the current chain.
+
+---
+
+## EXP-026 - Incremental ICT Component Ablation
+
+**Status**: INCONCLUSIVE
+**Date**: 2026-05-26
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: Prior ICT Experiment Outputs, Fixed-Order Component Chain, Bootstrap Contribution Gate
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Validated ICT components contribute measurable net value when combined incrementally, after accounting for sample-size loss.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: sweep baseline, macro filter, premium/discount filter, displacement, IFVG, breaker, second-candle-open execution rule, `2R` risk model
+- **Features**: component eligibility matrix, fixed-order chain-step counts, proxy expectancy, mean return, marginal bootstrap intervals, frozen manifest selection
+- **Parameter ranges**: fixed chain order from Step 1 Sweep through Step 8 `Disp+SCO+2R`; candidate promotion requires positive Test `MeanDiff` and `CI_Lo > 0`
+- **Exclusions**: no new component variants, no reordered chain, no event-chart features
+- **Constraints**: Final 30% global holdout excluded through inherited upstream artifacts; downstream promotion allowed only for manifest-eligible components
+
+### Results / Observations
+
+- The chain is populated rather than empty:
+  - Sweep Test counts: EURUSD `84`, XAUUSD `116`, BTCUSD `86`, USTEC `144`
+  - Displacement Test counts: EURUSD `72`, XAUUSD `105`, BTCUSD `71`, USTEC `115`
+- `bootstrap_marginal.csv` contains `0` Test rows with both `MeanDiff > 0` and `CI_Lo > 0`.
+- Step 7 (`Disp+SCO`) Test rows are negative in point estimate on all four instruments:
+  - EURUSD `-0.419`, CI `[-1.387, 0.539]`
+  - XAUUSD `-0.121`, CI `[-1.578, 1.294]`
+  - BTCUSD `-0.984`, CI `[-2.564, 0.488]`
+  - USTEC `-0.101`, CI `[-1.515, 1.238]`
+- `model_manifest.json` records `selected_components = ["Sweep", "Displacement"]` and `candidate_eligible = false`.
+
+### Hypothesis-Specific Conclusion
+
+**INCONCLUSIVE**
+
+The ablation chain can be measured, but no optional component adds enough robust cross-instrument evidence to justify promotion into a full-model candidate. The phase therefore stops at the baseline pair rather than producing a model-ready chain.
+
+### Hypothesis-Agnostic Observations
+
+- The current phase has a measurable baseline (`Sweep + Displacement`) but no promoted optional layer.
+- The blocker is contribution quality, not missing infrastructure or zero event counts.
+
+---
+
+## EXP-027 - Predeclared Full ICT Model Analysis-Set Test
+
+**Status**: INCONCLUSIVE
+**Date**: 2026-05-26
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: EXP-026 Frozen Model Manifest Gate
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The best predeclared full-model variant survives analysis-set testing only if the upstream ablation produces an eligible candidate first.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: EXP-026 model manifest, gated full-model test contract
+- **Features**: manifest eligibility check, model-verdict payload, early-exit result contract
+- **Parameter ranges**: no downstream trade-performance evaluation unless `candidate_eligible = true`
+- **Exclusions**: no post-hoc candidate promotion, no fallback full-model run, no event-chart features
+- **Constraints**: full-model stage must stop when the upstream ablation gate fails
+
+### Results / Observations
+
+- The embedded EXP-026 manifest records:
+  - `selected_components = ["Sweep", "Displacement"]`
+  - `candidate_eligible = false`
+  - `source_verdict = "INCONCLUSIVE"`
+- `results.json` records:
+  - `criteria = {"ManifestEligible": false}`
+  - `reason = "EXP-026 manifest did not identify an eligible full-model candidate."`
+  - `per_instrument = []`
+- Current valid outputs are the short gate contract only:
+  - `results.json`
+  - `model_verdict.json`
+  - `numerical_summary.txt`
+
+### Hypothesis-Specific Conclusion
+
+**INCONCLUSIVE**
+
+The full-model test never legitimately starts because no eligible candidate exists to test. This is a blocked stage outcome, not a model-performance failure.
+
+### Hypothesis-Agnostic Observations
+
+- The phase respected the ablation gate instead of manufacturing a downstream full-model run from an ineligible manifest.
+
+---
+
+## EXP-028 - ICT Candidate Robustness and Falsification
+
+**Status**: INCONCLUSIVE
+**Date**: 2026-05-26
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Feature Categories**: EXP-027 Candidate Gate, Robustness/Falsification Contract
+
+### Hypothesis Tests
+
+1. **Hypothesis**: A candidate ICT variant is robust only if it first survives the EXP-027 eligibility gate and then remains defensible under the predeclared segment, delay, and cost stresses.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Feature Categories**: EXP-027 candidate gate, robustness contract for segment, delay, and cost stress
+- **Features**: upstream verdict check, early-exit robustness payload
+- **Parameter ranges**: no robustness calculations unless EXP-027 supplies an eligible candidate
+- **Exclusions**: no candidate rescue path, no segment-specific model redesign, no event-chart features
+- **Constraints**: robustness is a falsification stage only after eligibility
+
+### Results / Observations
+
+- `results.json` records:
+  - `verdict = "INCONCLUSIVE"`
+  - `reason = "EXP-027 candidate is not eligible for robustness checks (verdict=INCONCLUSIVE)."`
+  - `output_contract = "early_inconclusive_no_robustness_outputs"`
+- The only valid outputs are:
+  - `results.json`
+  - `numerical_summary.txt`
+- No segment, delay-stress, cost-stress, robustness-summary, or plot artifacts are present.
+
+### Hypothesis-Specific Conclusion
+
+**INCONCLUSIVE**
+
+The robustness question is unreachable because EXP-027 never produced a candidate eligible for falsification. This is an unopened stage, not a failed robustness test.
+
+### Hypothesis-Agnostic Observations
+
+- The pipeline kept the robustness artifact contract honest about what did and did not run.
+
+---

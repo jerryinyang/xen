@@ -32,10 +32,10 @@
 | EXP-022 | Objective Breaker Candidate Reproducibility | SUPPORTED | Candidate A is deterministic on 4/4 instruments and clears the train/test event floor everywhere; Candidate B misses two test floors | 2026-05-26 |
 | EXP-023 | Breaker Confirmation Trade Quality | REFUTED | Candidate A breaker improves trade quality clearly only on USTEC; 1/4 instruments pass despite adequate feasible counts everywhere | 2026-05-26 |
 | EXP-024 | Second Candle Open Execution Timing | SUPPORTED | Second-candle-open clears the feasible-count and non-inferiority gate on 4/4 instruments, but mainly as preservation not universal improvement | 2026-05-26 |
-| EXP-025 | Fixed 1 to 2 Risk Reward Justification | PLANNED | Scope and analysis plan created for H6 risk/reward validation | 2026-05-23 |
-| EXP-026 | Incremental ICT Component Ablation | PLANNED | Scope and analysis plan created for component contribution table | 2026-05-23 |
-| EXP-027 | Predeclared Full ICT Model Analysis-Set Test | PLANNED | Scope and analysis plan created for gated full-model test | 2026-05-23 |
-| EXP-028 | ICT Candidate Robustness and Falsification | PLANNED | Scope and analysis plan created for robustness/falsification checks | 2026-05-23 |
+| EXP-025 | Fixed 1 to 2 Risk Reward Justification | INCONCLUSIVE | 2R shows superiority on 0/4 instruments despite full comparator coverage; not justified for the EXP-024 entry source | 2026-05-26 |
+| EXP-026 | Incremental ICT Component Ablation | INCONCLUSIVE | no optional ICT component clears the positive lower-CI ablation gate; no full-model candidate selected | 2026-05-26 |
+| EXP-027 | Predeclared Full ICT Model Analysis-Set Test | INCONCLUSIVE | EXP-026 leaves the manifest ineligible, so the full-model test stops at the gate | 2026-05-26 |
+| EXP-028 | ICT Candidate Robustness and Falsification | INCONCLUSIVE | EXP-027 never produces an eligible candidate, so robustness checks do not run | 2026-05-26 |
 
 <!-- 
 New experiments are added as they are completed.
