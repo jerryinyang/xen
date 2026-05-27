@@ -36,9 +36,12 @@
 | EXP-026 | Incremental ICT Component Ablation | INCONCLUSIVE | no optional ICT component clears the positive lower-CI ablation gate; no full-model candidate selected | 2026-05-26 |
 | EXP-027 | Predeclared Full ICT Model Analysis-Set Test | INCONCLUSIVE | EXP-026 leaves the manifest ineligible, so the full-model test stops at the gate | 2026-05-26 |
 | EXP-028 | ICT Candidate Robustness and Falsification | INCONCLUSIVE | EXP-027 never produces an eligible candidate, so robustness checks do not run | 2026-05-26 |
+| EXP-029 | 15-Minute FVG IFVG Selectivity Check | PLANNED | Phase 004A pre-phase: test whether 15-minute FVG/IFVG inversion rate materially drops versus the Phase 003 1-minute baseline | 2026-05-27 |
+| EXP-030 | 15-Minute Sweep Reversal Behavior | PLANNED | Phase 004A pre-phase: test whether PDH/PDL and ONH/ONL sweep reversal behavior changes at 15-minute resolution | 2026-05-27 |
+| EXP-031 | 15-Minute USTEC Breaker Chain | PLANNED | Phase 004A pre-phase: test whether the USTEC Candidate A breaker positive survives at 15-minute resolution | 2026-05-27 |
 
 <!-- 
 New experiments are added as they are completed.
-Planned Phase 003 rows are ordered by execution dependency; EXP IDs remain stable.
+Planned rows are ordered by execution dependency; EXP IDs remain stable.
 Format: | EXP-NNN | Title | INCONCLUSIVE/FAILED/PARTIALLY_SUPPORTED/REFUTED/PLANNED | One-line finding | YYYY-MM-DD |
 -->
