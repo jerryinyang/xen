@@ -114,6 +114,8 @@ If 15-minute results are promising and count-eligible, the reflection may open a
 
 IDs below assume the pre-phase reflection authorizes Phase 004B branch execution without changing the dependency order. If the directive is modify, redesign, reframe, or close, IDs and scopes are adjusted in the reflection document before any of these are created.
 
+**Post-EXP-032 supersession:** The roadmap below is historical. The amended reflection §10 closes Branch A after EXP-032 and renumbers the remaining Branch B work as EXP-033 (rule-family readiness survey), EXP-034 (entry-quality test if readiness passes), and EXP-035 (stress/robustness if EXP-034 supports). Optional convergence is deactivated for this phase.
+
 | Candidate ID | Branch | Question | Decision Use |
 | --- | --- | --- | --- |
 | EXP-032 | USTEC breaker | Does the USTEC Candidate A breaker advantage survive time, direction, session, volatility-regime, and level-family segmentation without being concentrated in one narrow pocket? Temporal stability across contiguous analysis-set half-periods is the primary pass/fail criterion; all other dimensions are secondary descriptives. | Fast falsification of the Phase 003 local positive. |

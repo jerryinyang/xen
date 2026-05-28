@@ -1,0 +1,582 @@
+{
+  "experiment_id": "EXP-030",
+  "title": "15-Minute Sweep Reversal Behavior",
+  "period_minutes": 15,
+  "buffer_atr_coefficient": 0.05,
+  "horizons_minutes": [
+    30,
+    60,
+    120
+  ],
+  "primary_horizon": 60,
+  "bootstrap_reps": 10000,
+  "bootstrap_seed": 42,
+  "min_sweep_events": 100,
+  "price_precision_steps": {
+    "EURUSD": 9.999999999843467e-06,
+    "XAUUSD": 0.009999999999763531,
+    "BTCUSD": 0.00999999999839929,
+    "USTEC": 0.040000000000873115
+  },
+  "coverage_diagnostics": {
+    "EURUSD": {
+      "source_bars_in": 872242,
+      "aggregated_bars_out": 55230,
+      "expected_full_windows": 58149,
+      "dropped_partial_window_bars": 43792
+    },
+    "XAUUSD": {
+      "source_bars_in": 830671,
+      "aggregated_bars_out": 54143,
+      "expected_full_windows": 55378,
+      "dropped_partial_window_bars": 18526
+    },
+    "BTCUSD": {
+      "source_bars_in": 1088960,
+      "aggregated_bars_out": 71202,
+      "expected_full_windows": 72597,
+      "dropped_partial_window_bars": 20930
+    },
+    "USTEC": {
+      "source_bars_in": 830541,
+      "aggregated_bars_out": 54787,
+      "expected_full_windows": 55369,
+      "dropped_partial_window_bars": 8736
+    }
+  },
+  "verdict_summary": {
+    "verdict": "INCONCLUSIVE",
+    "floors_failing": 0,
+    "new_positive_instruments": [],
+    "eurusd_replicates_tighter_or_stronger": false,
+    "all_ci_includes_zero": false,
+    "per_instrument": [
+      {
+        "Instrument": "EURUSD",
+        "FloorMet": true,
+        "TestPointDiff": -0.14544513457556935,
+        "TestCILow": -0.2553592995169082,
+        "TestCIHigh": -0.03596230158730176,
+        "TestExcludesZero": true,
+        "EXP015Positive": true,
+        "NewPositiveVsEXP015": false,
+        "EURUSDReplicatesTighterOrStronger": false
+      },
+      {
+        "Instrument": "XAUUSD",
+        "FloorMet": true,
+        "TestPointDiff": 0.010570555272542026,
+        "TestCILow": -0.10052640516216677,
+        "TestCIHigh": 0.12209203599932078,
+        "TestExcludesZero": false,
+        "EXP015Positive": false,
+        "NewPositiveVsEXP015": false,
+        "EURUSDReplicatesTighterOrStronger": false
+      },
+      {
+        "Instrument": "BTCUSD",
+        "FloorMet": true,
+        "TestPointDiff": -0.15406016344983486,
+        "TestCILow": -0.2659537471744045,
+        "TestCIHigh": -0.04651364980003475,
+        "TestExcludesZero": true,
+        "EXP015Positive": false,
+        "NewPositiveVsEXP015": false,
+        "EURUSDReplicatesTighterOrStronger": false
+      },
+      {
+        "Instrument": "USTEC",
+        "FloorMet": true,
+        "TestPointDiff": 0.04586350669299977,
+        "TestCILow": -0.056835637480798784,
+        "TestCIHigh": 0.14900153609831024,
+        "TestExcludesZero": false,
+        "EXP015Positive": false,
+        "NewPositiveVsEXP015": false,
+        "EURUSDReplicatesTighterOrStronger": false
+      }
+    ]
+  },
+  "counts": [
+    {
+      "Instrument": "EURUSD",
+      "Segment": "Train",
+      "SweepCount": 327,
+      "BreachCount": 456,
+      "RiskFeasibleSweepCount": 327,
+      "FloorMet": true
+    },
+    {
+      "Instrument": "EURUSD",
+      "Segment": "Test",
+      "SweepCount": 126,
+      "BreachCount": 195,
+      "RiskFeasibleSweepCount": 126,
+      "FloorMet": true
+    },
+    {
+      "Instrument": "XAUUSD",
+      "Segment": "Train",
+      "SweepCount": 330,
+      "BreachCount": 464,
+      "RiskFeasibleSweepCount": 330,
+      "FloorMet": true
+    },
+    {
+      "Instrument": "XAUUSD",
+      "Segment": "Test",
+      "SweepCount": 152,
+      "BreachCount": 173,
+      "RiskFeasibleSweepCount": 152,
+      "FloorMet": true
+    },
+    {
+      "Instrument": "BTCUSD",
+      "Segment": "Train",
+      "SweepCount": 427,
+      "BreachCount": 469,
+      "RiskFeasibleSweepCount": 427,
+      "FloorMet": true
+    },
+    {
+      "Instrument": "BTCUSD",
+      "Segment": "Test",
+      "SweepCount": 142,
+      "BreachCount": 175,
+      "RiskFeasibleSweepCount": 142,
+      "FloorMet": true
+    },
+    {
+      "Instrument": "USTEC",
+      "Segment": "Train",
+      "SweepCount": 416,
+      "BreachCount": 543,
+      "RiskFeasibleSweepCount": 416,
+      "FloorMet": true
+    },
+    {
+      "Instrument": "USTEC",
+      "Segment": "Test",
+      "SweepCount": 147,
+      "BreachCount": 259,
+      "RiskFeasibleSweepCount": 147,
+      "FloorMet": true
+    }
+  ],
+  "primary_bootstrap": [
+    {
+      "Instrument": "EURUSD",
+      "Segment": "Train",
+      "PointDiff": -0.12370263442800433,
+      "CILow": -0.19517863587152656,
+      "CIHigh": -0.05353085528690007,
+      "SweepN": 327,
+      "BreachN": 456
+    },
+    {
+      "Instrument": "EURUSD",
+      "Segment": "Test",
+      "PointDiff": -0.14544513457556935,
+      "CILow": -0.2553592995169082,
+      "CIHigh": -0.03596230158730176,
+      "SweepN": 126,
+      "BreachN": 195
+    },
+    {
+      "Instrument": "XAUUSD",
+      "Segment": "Train",
+      "PointDiff": -0.06220020106276031,
+      "CILow": -0.1322849346546029,
+      "CIHigh": 0.007887404854229443,
+      "SweepN": 330,
+      "BreachN": 464
+    },
+    {
+      "Instrument": "XAUUSD",
+      "Segment": "Test",
+      "PointDiff": 0.010570555272542026,
+      "CILow": -0.10052640516216677,
+      "CIHigh": 0.12209203599932078,
+      "SweepN": 152,
+      "BreachN": 173
+    },
+    {
+      "Instrument": "BTCUSD",
+      "Segment": "Train",
+      "PointDiff": -0.11982457690778137,
+      "CILow": -0.1810127700941187,
+      "CIHigh": -0.056443180813927796,
+      "SweepN": 427,
+      "BreachN": 469
+    },
+    {
+      "Instrument": "BTCUSD",
+      "Segment": "Test",
+      "PointDiff": -0.15406016344983486,
+      "CILow": -0.2659537471744045,
+      "CIHigh": -0.04651364980003475,
+      "SweepN": 142,
+      "BreachN": 175
+    },
+    {
+      "Instrument": "USTEC",
+      "Segment": "Train",
+      "PointDiff": -0.04364942819552675,
+      "CILow": -0.10833114057281655,
+      "CIHigh": 0.022610818743041987,
+      "SweepN": 416,
+      "BreachN": 543
+    },
+    {
+      "Instrument": "USTEC",
+      "Segment": "Test",
+      "PointDiff": 0.04586350669299977,
+      "CILow": -0.056835637480798784,
+      "CIHigh": 0.14900153609831024,
+      "SweepN": 147,
+      "BreachN": 259
+    }
+  ],
+  "secondary_bootstrap": [
+    {
+      "Metric": "MAE_R_60m",
+      "Instrument": "EURUSD",
+      "PointDiff": -3.992454850532735,
+      "CILow": -4.801367826246934,
+      "CIHigh": -3.2444691241653243
+    },
+    {
+      "Metric": "MAE_R_60m",
+      "Instrument": "XAUUSD",
+      "PointDiff": -5.778305104021871,
+      "CILow": -6.871499204752988,
+      "CIHigh": -4.787260247928121
+    },
+    {
+      "Metric": "MAE_R_60m",
+      "Instrument": "BTCUSD",
+      "PointDiff": -4.853782004291871,
+      "CILow": -5.892855839182514,
+      "CIHigh": -3.886373730176583
+    },
+    {
+      "Metric": "MAE_R_60m",
+      "Instrument": "USTEC",
+      "PointDiff": -5.7007261649668735,
+      "CILow": -6.786231284675263,
+      "CIHigh": -4.7227881083947185
+    },
+    {
+      "Metric": "MFE_R_60m",
+      "Instrument": "EURUSD",
+      "PointDiff": -5.0748213604189605,
+      "CILow": -5.921391048934126,
+      "CIHigh": -4.255628328372208
+    },
+    {
+      "Metric": "MFE_R_60m",
+      "Instrument": "XAUUSD",
+      "PointDiff": -4.7119563076221365,
+      "CILow": -5.592233438360617,
+      "CIHigh": -3.8916043178892097
+    },
+    {
+      "Metric": "MFE_R_60m",
+      "Instrument": "BTCUSD",
+      "PointDiff": -4.46645154197559,
+      "CILow": -5.3209523955006865,
+      "CIHigh": -3.6613910463391957
+    },
+    {
+      "Metric": "MFE_R_60m",
+      "Instrument": "USTEC",
+      "PointDiff": -6.435258465687187,
+      "CILow": -7.714626365191599,
+      "CIHigh": -5.318688777945934
+    },
+    {
+      "Metric": "Return_R_60m",
+      "Instrument": "EURUSD",
+      "PointDiff": -0.8865837726033025,
+      "CILow": -1.8168502693126016,
+      "CIHigh": 0.05572626379221116
+    },
+    {
+      "Metric": "Return_R_60m",
+      "Instrument": "XAUUSD",
+      "PointDiff": 0.8812130516983988,
+      "CILow": -0.22992035371103473,
+      "CIHigh": 1.9888613311366
+    },
+    {
+      "Metric": "Return_R_60m",
+      "Instrument": "BTCUSD",
+      "PointDiff": 0.20242369628433382,
+      "CILow": -0.7708312572190037,
+      "CIHigh": 1.2030255004283554
+    },
+    {
+      "Metric": "Return_R_60m",
+      "Instrument": "USTEC",
+      "PointDiff": -0.3960486372630645,
+      "CILow": -1.5472878481495094,
+      "CIHigh": 0.8060198533047838
+    }
+  ],
+  "horizon_bootstrap": [
+    {
+      "HorizonMin": 30,
+      "Instrument": "EURUSD",
+      "PointDiff": -0.16063254719037445,
+      "CILow": -0.22066304474185153,
+      "CIHigh": -0.10089757981312758
+    },
+    {
+      "HorizonMin": 30,
+      "Instrument": "XAUUSD",
+      "PointDiff": -0.10535289082001881,
+      "CILow": -0.16286040831888582,
+      "CIHigh": -0.04615132833125909
+    },
+    {
+      "HorizonMin": 30,
+      "Instrument": "BTCUSD",
+      "PointDiff": -0.17941711111244427,
+      "CILow": -0.2320094698446789,
+      "CIHigh": -0.1275864344549965
+    },
+    {
+      "HorizonMin": 30,
+      "Instrument": "USTEC",
+      "PointDiff": -0.06215085413119026,
+      "CILow": -0.11623427158058575,
+      "CIHigh": -0.007702013391790822
+    },
+    {
+      "HorizonMin": 60,
+      "Instrument": "EURUSD",
+      "PointDiff": -0.13059273144717143,
+      "CILow": -0.19169318627664678,
+      "CIHigh": -0.07090562651670379
+    },
+    {
+      "HorizonMin": 60,
+      "Instrument": "XAUUSD",
+      "PointDiff": -0.03777812947363118,
+      "CILow": -0.09664518124725734,
+      "CIHigh": 0.02210684200303579
+    },
+    {
+      "HorizonMin": 60,
+      "Instrument": "BTCUSD",
+      "PointDiff": -0.13102401507016143,
+      "CILow": -0.18475945934595978,
+      "CIHigh": -0.07721785442176056
+    },
+    {
+      "HorizonMin": 60,
+      "Instrument": "USTEC",
+      "PointDiff": -0.01578043010918395,
+      "CILow": -0.06995001836427005,
+      "CIHigh": 0.039088926730415086
+    },
+    {
+      "HorizonMin": 120,
+      "Instrument": "EURUSD",
+      "PointDiff": -0.09955025647732385,
+      "CILow": -0.1603569067236293,
+      "CIHigh": -0.03922550023976639
+    },
+    {
+      "HorizonMin": 120,
+      "Instrument": "XAUUSD",
+      "PointDiff": 0.002769604845729412,
+      "CILow": -0.05644634520067047,
+      "CIHigh": 0.06298908703752991
+    },
+    {
+      "HorizonMin": 120,
+      "Instrument": "BTCUSD",
+      "PointDiff": -0.08637146268155282,
+      "CILow": -0.14180642461619686,
+      "CIHigh": -0.032563577243576315
+    },
+    {
+      "HorizonMin": 120,
+      "Instrument": "USTEC",
+      "PointDiff": 0.003996476114890957,
+      "CILow": -0.05121075760961417,
+      "CIHigh": 0.05909140526476649
+    }
+  ],
+  "exp015_reference_comparison": [
+    {
+      "Instrument": "EURUSD",
+      "Segment": "Train",
+      "PointDiff": -0.12370263442800433,
+      "CILow": -0.19517863587152656,
+      "CIHigh": -0.05353085528690007,
+      "SweepN": 327,
+      "BreachN": 456,
+      "EXP015PointDiff": -0.061461741388737,
+      "EXP015CILow": -0.1445151349470649,
+      "EXP015CIHigh": 0.021045094189572,
+      "EXP015CIExcludesZero": false,
+      "EXP015SupportsPrimary": false,
+      "EXP030CIExcludesZero": true,
+      "EXP030Positive": false,
+      "EXP015Positive": false,
+      "EXP030CIWidth": 0.1416477805846265,
+      "EXP015CIWidth": 0.1655602291366369,
+      "NewPositiveVsEXP015": false,
+      "EURUSDReplicatesTighterOrStronger": false
+    },
+    {
+      "Instrument": "EURUSD",
+      "Segment": "Test",
+      "PointDiff": -0.14544513457556935,
+      "CILow": -0.2553592995169082,
+      "CIHigh": -0.03596230158730176,
+      "SweepN": 126,
+      "BreachN": 195,
+      "EXP015PointDiff": 0.1344462608987257,
+      "EXP015CILow": 0.0005030181086519,
+      "EXP015CIHigh": 0.2674379610999329,
+      "EXP015CIExcludesZero": true,
+      "EXP015SupportsPrimary": true,
+      "EXP030CIExcludesZero": true,
+      "EXP030Positive": false,
+      "EXP015Positive": true,
+      "EXP030CIWidth": 0.21939699792960646,
+      "EXP015CIWidth": 0.266934942991281,
+      "NewPositiveVsEXP015": false,
+      "EURUSDReplicatesTighterOrStronger": false
+    },
+    {
+      "Instrument": "XAUUSD",
+      "Segment": "Train",
+      "PointDiff": -0.06220020106276031,
+      "CILow": -0.1322849346546029,
+      "CIHigh": 0.007887404854229443,
+      "SweepN": 330,
+      "BreachN": 464,
+      "EXP015PointDiff": -0.012128450644684,
+      "EXP015CILow": -0.0923096819410606,
+      "EXP015CIHigh": 0.0683509661916363,
+      "EXP015CIExcludesZero": false,
+      "EXP015SupportsPrimary": false,
+      "EXP030CIExcludesZero": false,
+      "EXP030Positive": false,
+      "EXP015Positive": false,
+      "EXP030CIWidth": 0.14017233950883234,
+      "EXP015CIWidth": 0.1606606481326969,
+      "NewPositiveVsEXP015": false,
+      "EURUSDReplicatesTighterOrStronger": false
+    },
+    {
+      "Instrument": "XAUUSD",
+      "Segment": "Test",
+      "PointDiff": 0.010570555272542026,
+      "CILow": -0.10052640516216677,
+      "CIHigh": 0.12209203599932078,
+      "SweepN": 152,
+      "BreachN": 173,
+      "EXP015PointDiff": -0.0292742103185048,
+      "EXP015CILow": -0.1510923927349303,
+      "EXP015CIHigh": 0.0946959726243747,
+      "EXP015CIExcludesZero": false,
+      "EXP015SupportsPrimary": false,
+      "EXP030CIExcludesZero": false,
+      "EXP030Positive": false,
+      "EXP015Positive": false,
+      "EXP030CIWidth": 0.22261844116148755,
+      "EXP015CIWidth": 0.24578836535930498,
+      "NewPositiveVsEXP015": false,
+      "EURUSDReplicatesTighterOrStronger": false
+    },
+    {
+      "Instrument": "BTCUSD",
+      "Segment": "Train",
+      "PointDiff": -0.11982457690778137,
+      "CILow": -0.1810127700941187,
+      "CIHigh": -0.056443180813927796,
+      "SweepN": 427,
+      "BreachN": 469,
+      "EXP015PointDiff": -0.040792690677966,
+      "EXP015CILow": -0.1142630145278451,
+      "EXP015CIHigh": 0.0338995661824051,
+      "EXP015CIExcludesZero": false,
+      "EXP015SupportsPrimary": false,
+      "EXP030CIExcludesZero": true,
+      "EXP030Positive": false,
+      "EXP015Positive": false,
+      "EXP030CIWidth": 0.1245695892801909,
+      "EXP015CIWidth": 0.14816258071025018,
+      "NewPositiveVsEXP015": false,
+      "EURUSDReplicatesTighterOrStronger": false
+    },
+    {
+      "Instrument": "BTCUSD",
+      "Segment": "Test",
+      "PointDiff": -0.15406016344983486,
+      "CILow": -0.2659537471744045,
+      "CIHigh": -0.04651364980003475,
+      "SweepN": 142,
+      "BreachN": 175,
+      "EXP015PointDiff": -0.1172425319358008,
+      "EXP015CILow": -0.249754339993449,
+      "EXP015CIHigh": 0.0180232558139533,
+      "EXP015CIExcludesZero": false,
+      "EXP015SupportsPrimary": false,
+      "EXP030CIExcludesZero": true,
+      "EXP030Positive": false,
+      "EXP015Positive": false,
+      "EXP030CIWidth": 0.21944009737436976,
+      "EXP015CIWidth": 0.2677775958074023,
+      "NewPositiveVsEXP015": false,
+      "EURUSDReplicatesTighterOrStronger": false
+    },
+    {
+      "Instrument": "USTEC",
+      "Segment": "Train",
+      "PointDiff": -0.04364942819552675,
+      "CILow": -0.10833114057281655,
+      "CIHigh": 0.022610818743041987,
+      "SweepN": 416,
+      "BreachN": 543,
+      "EXP015PointDiff": 0.009707401037401,
+      "EXP015CILow": -0.0673498498498498,
+      "EXP015CIHigh": 0.0861322686322686,
+      "EXP015CIExcludesZero": false,
+      "EXP015SupportsPrimary": false,
+      "EXP030CIExcludesZero": false,
+      "EXP030Positive": false,
+      "EXP015Positive": false,
+      "EXP030CIWidth": 0.13094195931585853,
+      "EXP015CIWidth": 0.1534821184821184,
+      "NewPositiveVsEXP015": false,
+      "EURUSDReplicatesTighterOrStronger": false
+    },
+    {
+      "Instrument": "USTEC",
+      "Segment": "Test",
+      "PointDiff": 0.04586350669299977,
+      "CILow": -0.056835637480798784,
+      "CIHigh": 0.14900153609831024,
+      "SweepN": 147,
+      "BreachN": 259,
+      "EXP015PointDiff": 0.0484291666666666,
+      "EXP015CILow": -0.0625,
+      "EXP015CIHigh": 0.1597222222222222,
+      "EXP015CIExcludesZero": false,
+      "EXP015SupportsPrimary": false,
+      "EXP030CIExcludesZero": false,
+      "EXP030Positive": false,
+      "EXP015Positive": false,
+      "EXP030CIWidth": 0.20583717357910902,
+      "EXP015CIWidth": 0.2222222222222222,
+      "NewPositiveVsEXP015": false,
+      "EURUSDReplicatesTighterOrStronger": false
+    }
+  ]
+}

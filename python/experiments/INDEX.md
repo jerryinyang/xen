@@ -36,9 +36,11 @@
 | EXP-026 | Incremental ICT Component Ablation | INCONCLUSIVE | no optional ICT component clears the positive lower-CI ablation gate; no full-model candidate selected | 2026-05-26 |
 | EXP-027 | Predeclared Full ICT Model Analysis-Set Test | INCONCLUSIVE | EXP-026 leaves the manifest ineligible, so the full-model test stops at the gate | 2026-05-26 |
 | EXP-028 | ICT Candidate Robustness and Falsification | INCONCLUSIVE | EXP-027 never produces an eligible candidate, so robustness checks do not run | 2026-05-26 |
-| EXP-029 | 15-Minute FVG IFVG Selectivity Check | PLANNED | Phase 004A pre-phase: test whether 15-minute FVG/IFVG inversion rate materially drops versus the Phase 003 1-minute baseline | 2026-05-27 |
-| EXP-030 | 15-Minute Sweep Reversal Behavior | PLANNED | Phase 004A pre-phase: test whether PDH/PDL and ONH/ONL sweep reversal behavior changes at 15-minute resolution | 2026-05-27 |
-| EXP-031 | 15-Minute USTEC Breaker Chain | PLANNED | Phase 004A pre-phase: test whether the USTEC Candidate A breaker positive survives at 15-minute resolution | 2026-05-27 |
+| EXP-029 | 15-Minute FVG IFVG Selectivity Check | REFUTED | 120-bar IFVG rate 83–86% at 15m replicates 1m baseline on all 4 instruments; lifecycle window length (not resolution) drives the high inversion rate | 2026-05-27 |
+| EXP-030 | 15-Minute Sweep Reversal Behavior | INCONCLUSIVE | No positive sweep edge at 15m; EURUSD partial positive reverses (−0.145, CI excludes zero); BTCUSD consistently negative; counts adequate on all instruments | 2026-05-27 |
+| EXP-031 | 15-Minute USTEC Breaker Chain | INCONCLUSIVE | Breaker-minus-baseline Return_R test +1.84R CI [0.56, 3.64] (same direction as EXP-023); test magnitude at 44% of 1m reference, narrowly below 50% threshold; MAE reduction confirmed | 2026-05-27 |
+| EXP-032 | 1-Hour USTEC Candidate A Breaker Magnitude Gate | REFUTED | 1h breaker effect remains positive but test diff +0.116R is far below the +0.918R hard gate; amended reflection closes Branch A with no candidate manifest | 2026-05-27 |
+| EXP-033 | 15-Minute IFVG Rule Family Readiness Survey | REFUTED | No predeclared IFVG/FVG rule family passes readiness on >=2 instruments; Branch B closes with selectivity-gated no-go | 2026-05-27 |
 
 <!-- 
 New experiments are added as they are completed.

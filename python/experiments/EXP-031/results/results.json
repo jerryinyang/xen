@@ -1,0 +1,238 @@
+{
+  "experiment_id": "EXP-031",
+  "title": "15-Minute USTEC Breaker Chain",
+  "instrument": "USTEC",
+  "period_minutes": 15,
+  "buffer_atr_coefficient": 0.05,
+  "max_confirmation_bars_15m": 10,
+  "max_breaker_delay_15m": 120,
+  "cand_a_lookback_bars_15m": 30,
+  "primary_horizon_minutes": 60,
+  "bootstrap_reps": 10000,
+  "bootstrap_seed": 42,
+  "min_events_per_segment": 50,
+  "retention_limit": 0.3,
+  "price_precision_step": 0.040000000000873115,
+  "coverage_diagnostics": {
+    "source_bars_in": 830541,
+    "aggregated_bars_out": 54787,
+    "expected_full_windows": 55369,
+    "dropped_partial_window_bars": 8736
+  },
+  "verdict_summary": {
+    "verdict": "INCONCLUSIVE",
+    "reason": "TEST_POSITIVE_BUT_BELOW_EXP023_50PCT_REFERENCE_BAND",
+    "test_point_diff": 1.8357017074238544,
+    "test_ci_low": 0.5595227114227853,
+    "test_ci_high": 3.636417116936987,
+    "train_point_diff": 0.5166637834789476,
+    "exp023_test_point_diff": 4.175652007396571,
+    "same_direction_as_exp023": true,
+    "within_50pct_or_stronger": false,
+    "train_improves": true,
+    "test_excludes_zero_same_direction": true,
+    "breaker_train_floor_met": true,
+    "breaker_test_floor_met": true,
+    "resolution_cost_limited": false,
+    "retention": {
+      "exp023_ustec_displacement_count_1m": 437,
+      "exp031_ustec_displacement_count_15m": 463,
+      "retention_ratio": 1.0594965675057209,
+      "resolution_cost_limited": false,
+      "by_segment": [
+        {
+          "Segment": "Train",
+          "EXP023DisplacementCount1m": 305,
+          "EXP031DisplacementCount15m": 339,
+          "RetentionRatio": 1.1114754098360655,
+          "ResolutionCostLimited": false
+        },
+        {
+          "Segment": "Test",
+          "EXP023DisplacementCount1m": 132,
+          "EXP031DisplacementCount15m": 124,
+          "RetentionRatio": 0.9393939393939394,
+          "ResolutionCostLimited": false
+        }
+      ]
+    }
+  },
+  "waterfall": [
+    {
+      "Segment": "Train",
+      "SweepCount": 399,
+      "DisplacementCount": 339,
+      "BreakerLabeledCount": 224,
+      "RiskFeasibleBaselineCount": 331,
+      "RiskFeasibleBreakerCount": 219,
+      "BreakerFloorMet": true
+    },
+    {
+      "Segment": "Test",
+      "SweepCount": 145,
+      "DisplacementCount": 124,
+      "BreakerLabeledCount": 79,
+      "RiskFeasibleBaselineCount": 120,
+      "RiskFeasibleBreakerCount": 78,
+      "BreakerFloorMet": true
+    }
+  ],
+  "outcome_summary": [
+    {
+      "Segment": "Train",
+      "EventClass": "Baseline",
+      "TradeCount": 339,
+      "RiskFeasibleCount": 331,
+      "MeanReturn_R": -0.0029300062342834297,
+      "MeanMAE_R": 1.3499032196011638,
+      "MeanMFE_R": 1.4260528308925629,
+      "WinRateHit1R": 0.23006134969325154
+    },
+    {
+      "Segment": "Train",
+      "EventClass": "Breaker",
+      "TradeCount": 224,
+      "RiskFeasibleCount": 219,
+      "MeanReturn_R": 0.5137337772446642,
+      "MeanMAE_R": 0.6706950412532563,
+      "MeanMFE_R": 1.56604674639852,
+      "WinRateHit1R": 0.3211009174311927
+    },
+    {
+      "Segment": "Test",
+      "EventClass": "Baseline",
+      "TradeCount": 124,
+      "RiskFeasibleCount": 120,
+      "MeanReturn_R": 0.5826903062296108,
+      "MeanMAE_R": 2.1920787585523085,
+      "MeanMFE_R": 3.268981359020756,
+      "WinRateHit1R": 0.20869565217391303
+    },
+    {
+      "Segment": "Test",
+      "EventClass": "Breaker",
+      "TradeCount": 79,
+      "RiskFeasibleCount": 78,
+      "MeanReturn_R": 2.4183920136534653,
+      "MeanMAE_R": 0.8613067953386281,
+      "MeanMFE_R": 4.193764578630483,
+      "WinRateHit1R": 0.28
+    }
+  ],
+  "primary_bootstrap": [
+    {
+      "Segment": "Train",
+      "BaselineMean": -0.0029300062342834297,
+      "BreakerMean": 0.5137337772446642,
+      "Diff": 0.5166637834789476,
+      "CILow": 0.2347729323074388,
+      "CIHigh": 0.836903936750853,
+      "N": 331,
+      "BreakerN": 219
+    },
+    {
+      "Segment": "Test",
+      "BaselineMean": 0.5826903062296108,
+      "BreakerMean": 2.4183920136534653,
+      "Diff": 1.8357017074238544,
+      "CILow": 0.5595227114227853,
+      "CIHigh": 3.636417116936987,
+      "N": 120,
+      "BreakerN": 78
+    }
+  ],
+  "secondary_bootstrap": [
+    {
+      "Metric": "MAE_R_60m",
+      "Segment": "Train",
+      "BaselineMean": 1.3499032196011638,
+      "BreakerMean": 0.6706950412532563,
+      "Diff": -0.6792081783479075,
+      "CILow": -1.0197567361879019,
+      "CIHigh": -0.40722068375003345
+    },
+    {
+      "Metric": "MAE_R_60m",
+      "Segment": "Test",
+      "BaselineMean": 2.1920787585523085,
+      "BreakerMean": 0.8613067953386281,
+      "Diff": -1.3307719632136803,
+      "CILow": -2.9693328081906163,
+      "CIHigh": -0.30632219061983973
+    },
+    {
+      "Metric": "Return_R_60m",
+      "Segment": "Train",
+      "BaselineMean": -0.0029300062342834297,
+      "BreakerMean": 0.5137337772446642,
+      "Diff": 0.5166637834789476,
+      "CILow": 0.2347729323074388,
+      "CIHigh": 0.836903936750853
+    },
+    {
+      "Metric": "Return_R_60m",
+      "Segment": "Test",
+      "BaselineMean": 0.5826903062296108,
+      "BreakerMean": 2.4183920136534653,
+      "Diff": 1.8357017074238544,
+      "CILow": 0.5595227114227853,
+      "CIHigh": 3.636417116936987
+    }
+  ],
+  "exp023_reference_comparison": [
+    {
+      "Segment": "Train",
+      "BaselineMean": -0.0029300062342834297,
+      "BreakerMean": 0.5137337772446642,
+      "Diff": 0.5166637834789476,
+      "CILow": 0.2347729323074388,
+      "CIHigh": 0.836903936750853,
+      "N": 331,
+      "BreakerN": 219,
+      "EXP023PointDiff": 0.3340506320500642,
+      "EXP023CILow": -1.0847464870700494,
+      "EXP023CIHigh": 1.795272214079912,
+      "EXP023CIExcludesZero": false,
+      "SameDirectionAsEXP023": true,
+      "Within50PctOrStronger": true
+    },
+    {
+      "Segment": "Test",
+      "BaselineMean": 0.5826903062296108,
+      "BreakerMean": 2.4183920136534653,
+      "Diff": 1.8357017074238544,
+      "CILow": 0.5595227114227853,
+      "CIHigh": 3.636417116936987,
+      "N": 120,
+      "BreakerN": 78,
+      "EXP023PointDiff": 4.175652007396571,
+      "EXP023CILow": 0.0655322658725774,
+      "EXP023CIHigh": 8.88082048334726,
+      "EXP023CIExcludesZero": true,
+      "SameDirectionAsEXP023": true,
+      "Within50PctOrStronger": false
+    }
+  ],
+  "retention_vs_exp023": {
+    "exp023_ustec_displacement_count_1m": 437,
+    "exp031_ustec_displacement_count_15m": 463,
+    "retention_ratio": 1.0594965675057209,
+    "resolution_cost_limited": false,
+    "by_segment": [
+      {
+        "Segment": "Train",
+        "EXP023DisplacementCount1m": 305,
+        "EXP031DisplacementCount15m": 339,
+        "RetentionRatio": 1.1114754098360655,
+        "ResolutionCostLimited": false
+      },
+      {
+        "Segment": "Test",
+        "EXP023DisplacementCount1m": 132,
+        "EXP031DisplacementCount15m": 124,
+        "RetentionRatio": 0.9393939393939394,
+        "ResolutionCostLimited": false
+      }
+    ]
+  }
+}

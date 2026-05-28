@@ -2,9 +2,9 @@
 
 ## Active Checkpoint
 
-| Checkpoint | Status | Focus | Document |
+| Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-05-26-004-ustec-breaker-ifvg-selectivity | ACTIVE | Phase 004 starts with a mandatory 15-minute timeframe pre-phase and reflection gate, then conditionally explores USTEC Candidate A breaker validation and IFVG/FVG selectivity redesign before any future holdout validation. | [design.md](checkpoints/2026-05-26-004-ustec-breaker-ifvg-selectivity/design.md) |
+| None | — | No active checkpoint. Phase 004 closed 2026-05-28 with both branches no-go and the ICT-as-alpha thesis closed. Phase 005 design pending; it should start from a new (non-ICT) thesis rather than continue the ICT chain. | — |
 
 ## Checkpoint Retrospectives
 
@@ -13,6 +13,7 @@
 | 2026-05-14-001-chart-type-validation | COMPLETED | Phase 1 validates time bars as the master timeline for 1-minute-source analysis; higher-timeframe robustness remains a Phase 1B bridge item before Phase 2 signal-quality characterization. | [retrospective.md](checkpoints/2026-05-14-001-chart-type-validation/retrospective.md) |
 | 2026-05-16-001-signal-quality-classification | COMPLETED | Phase 2 validates the FE/AE measurement framework but refutes the event-chart signal-quality path; broad event-chart strategy exploration is not justified without a new narrower thesis. | [retrospective.md](checkpoints/2026-05-16-001-signal-quality-classification/retrospective.md) |
 | 2026-05-23-003-ict-one-setup-timebar-validation | COMPLETED | Phase 003 translates the ICT setup into deterministic time-bar components, but no optional component earns full-model promotion; the broad ICT chain is blocked before holdout or robustness validation. | [retrospective.md](checkpoints/2026-05-23-003-ict-one-setup-timebar-validation/retrospective.md) |
+| 2026-05-26-004-ustec-breaker-ifvg-selectivity | COMPLETED | Phase 004 closes both narrow ICT continuations: the USTEC Candidate A breaker is microstructure-sensitive (Return_R decays 1m +4.18R → 15m +1.84R → 1h +0.12R), and IFVG non-selectivity is intrinsic to the lifecycle-windowed three-candle definition (0/5 rule families pass readiness on ≥2 instruments). EURUSD sweep deferral invalidated at 15m. No candidate manifest; holdout intact. Closes the ICT-as-alpha thesis; Phase 005 should start from a new thesis. | [retrospective.md](checkpoints/2026-05-26-004-ustec-breaker-ifvg-selectivity/retrospective.md) |
 
 
 ## EXP-001 — Information Density & Ghost Bar Comparison
@@ -1776,3 +1777,265 @@ The robustness question is unreachable because EXP-027 never produced a candidat
 - The pipeline kept the robustness artifact contract honest about what did and did not run.
 
 ---
+
+## EXP-029 — 15-Minute FVG IFVG Selectivity Check
+
+**Status**: REFUTED
+**Date**: 2026-05-27
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Phase**: 004A Pre-Phase
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Applying the EXP-020 three-candle FVG and 120-bar close-through IFVG rules unchanged to synthetic 15-minute bars produces an IFVG inversion rate materially below the Phase 003 1-minute baseline of 84–85% on at least two of four instruments.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Data**: 1-minute analysis-set bars (holdout excluded before aggregation) resampled to synthetic 15-minute OHLC via `python/src/bar_aggregator.py`
+- **Features**: IFVG inversion rate (120-bar primary, 8-bar sensitivity), FVG/IFVG counts, SHA-256 reproducibility digests, block bootstrap (n=2,000, block=50)
+- **Lifecycle windows**: 120 15-minute bars (direct EXP-020 transfer); 8 15-minute bars (≈120-minute elapsed, lifecycle sensitivity)
+- **Exclusions**: no return outcomes, no rule redesign, no parameter tuning, no chart-type features
+
+### Results / Observations
+
+Primary 120-bar IFVG inversion rate by instrument (combined train/test):
+
+| Instrument | IFVGRate | Bootstrap 95% CI | Near 1m Baseline? |
+|------------|----------|-----------------|-------------------|
+| EURUSD | 0.854 | [0.846, 0.865] | YES |
+| XAUUSD | 0.836 | [0.825, 0.846] | YES |
+| BTCUSD | 0.832 | [0.823, 0.842] | YES |
+| USTEC | 0.848 | [0.837, 0.859] | YES |
+
+8-bar lifecycle sensitivity rates: 0.454–0.479 across all instruments (≈38pp below 120-bar rates).
+
+FVG counts: 3,391–9,283 per segment. All count floors met. Detection fully reproducible on all 4 instruments.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+The 120-bar IFVG inversion rate at 15-minute resolution replicates the Phase 003 1-minute baseline within 2pp on all four instruments. The FOR criterion (rate < 50% on ≥ 2 instruments) is not met; the AGAINST criterion (rate near baseline on ≥ 3 instruments) is met.
+
+### Hypothesis-Agnostic Observations
+
+- The ~38pp gap between 120-bar (83–86%) and 8-bar (45–48%) rates is consistent across all four instruments, confirming that lifecycle window duration — not FVG rule permissiveness — drives the high inversion rate.
+- Timeframe change alone does not solve IFVG selectivity; Branch B must pursue a rule-level redesign (shorter lifecycle or stricter qualification).
+- `python/src/bar_aggregator.py` is a new shared module providing deterministic clock-aligned OHLC resampling, reused by EXP-030 and EXP-031.
+
+---
+
+## EXP-030 — 15-Minute Sweep Reversal Behavior
+
+**Status**: INCONCLUSIVE
+**Date**: 2026-05-27
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Phase**: 004A Pre-Phase
+
+### Hypothesis Tests
+
+1. **Hypothesis**: First-touch PDH/PDL/ONH/ONL failed-breakout sweeps detected on synthetic 15-minute bars show measurably different or stronger opposite-direction behavior versus non-failed breaches than the EXP-015 1-minute baseline, on at least one of four instruments.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Data**: Synthetic 15-minute OHLC for sweep/breach detection; real 1-minute prices for all outcomes
+- **Features**: Sweep/breach first-touch events per NYDate, 1R-before-stop probability at 30/60/120 minutes (primary: 60m), MAE_R, MFE_R, Return_R
+- **Levels**: PDH/PDL/ONH/ONL inherited from EXP-014 (resolution-independent)
+- **Buffer**: `max(price_precision_step, 0.05 × ATR_14_15m)`
+- **Exclusions**: no ICT model, no filters, no parameter tuning against outcomes
+
+### Results / Observations
+
+Primary sweep-minus-breach Hit1R_60m (test segment):
+
+| Instrument | EXP-030 Test Diff | 95% CI | EXP-015 1m Test | Direction Change |
+|------------|------------------|--------|----------------|-----------------|
+| EURUSD | −0.145 | [−0.255, −0.036] | +0.134 [+0.001, +0.267] | **REVERSED** |
+| XAUUSD | +0.011 | [−0.101, +0.122] | −0.029 [−0.151, +0.095] | No (near zero) |
+| BTCUSD | −0.154 | [−0.266, −0.047] | −0.117 [−0.250, +0.018] | No (consistent) |
+| USTEC | +0.046 | [−0.057, +0.149] | +0.048 [−0.063, +0.160] | No (stable null) |
+
+All 8 instrument-segment floors (≥100 sweep events) met. Verdict is INCONCLUSIVE by criteria; no new positive instrument; EURUSD does not replicate.
+
+### Hypothesis-Specific Conclusion
+
+**INCONCLUSIVE**
+
+No instrument shows a new positive sweep advantage at 15-minute resolution, and the EXP-015 EURUSD partial positive reverses direction. BTCUSD and EURUSD sweeps consistently underperform breaches with CIs excluding zero negatively. XAUUSD and USTEC remain null at both resolutions.
+
+### Hypothesis-Agnostic Observations
+
+- The EURUSD reversal is a resolution-timing artefact: the 15-minute confirmation bar incorporates the post-sweep reversal price action within its body, compressing the outcome window.
+- BTCUSD shows the most consistent signal (both segments negative, CIs excluding zero), suggesting sweeps are structurally weaker than breaches at 15-minute resolution.
+- USTEC and XAUUSD results are stable across timeframes — neither shows sweep behavior at any tested resolution.
+- The EURUSD deferred positive from Phase 003 is functionally closed at 15-minute resolution; any future sweep work must address resolution-timing explicitly.
+
+---
+
+## EXP-031 — 15-Minute USTEC Breaker Chain
+
+**Status**: INCONCLUSIVE
+**Date**: 2026-05-27
+**Instruments**: USTEC only
+**Phase**: 004A Pre-Phase
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The EXP-022 Candidate A breaker confirmation applied to USTEC sweep-plus-displacement events detected on synthetic 15-minute bars improves trade-quality expectancy versus the displacement-only baseline at a magnitude comparable to or stronger than the EXP-023 1-minute USTEC point estimate.
+
+### Scope
+
+- **Instruments**: USTEC only
+- **Data**: Synthetic 15-minute OHLC for detection chain; real 1-minute prices for outcomes
+- **Chain**: EXP-015 sweep → EXP-018 displacement (1.5× body median, close-location) → EXP-022 Candidate A (last opposite candle OB, first close-through within 120 bars)
+- **Entry**: Displacement-close at 15-minute resolution (canonical EXP-023 timing)
+- **Outcomes**: Return_R, MAE_R, MFE_R, Hit1R at 60 minutes on real 1-minute prices
+- **Exclusions**: no second-candle-open, no segmentation, no cost stress, no Candidate B
+
+### Results / Observations
+
+Event waterfall: Sweep 399/145 → Displacement 339/124 → Breaker 224/79 → Feasible 219/78 (train/test).
+Retention vs EXP-023 1m: ratio 1.059 (15m finds slightly more events). Both floors met.
+
+Primary bootstrap (breaker minus baseline Return_R_60m):
+
+| Segment | Baseline | Breaker | Diff | 95% CI | EXP-023 Ref | ≥ 50% of EXP-023 |
+|---------|---------|---------|------|--------|------------|-----------------|
+| Train | −0.003R | +0.514R | +0.517R | [+0.235, +0.837] | +0.334R | YES |
+| Test | +0.583R | +2.418R | +1.836R | [+0.560, +3.636] | +4.176R | NO (44%) |
+
+MAE reduction: Train −0.679R [−1.093, −0.296]; Test −1.331R [−2.629, −0.165]. Both CIs exclude zero.
+
+### Hypothesis-Specific Conclusion
+
+**INCONCLUSIVE** (TEST_POSITIVE_BUT_BELOW_EXP023_50PCT_REFERENCE_BAND)
+
+Both train and test CIs exclude zero positively. Direction is consistent with EXP-023. The test magnitude (1.84R) is at 44% of EXP-023's test point (4.18R), narrowly below the predeclared 50% comparability threshold. The FOR criterion is not met; the AGAINST criterion is not triggered (no sign reversal). Verdict is INCONCLUSIVE.
+
+### Hypothesis-Agnostic Observations
+
+- The USTEC Candidate A breaker positive is directionally preserved at 15-minute resolution. The Phase 003 local positive is not a 1-minute resolution artifact.
+- The 15-minute train CI [0.235, 0.837] is sharper and more definitively positive than EXP-023's 1-minute train CI [−1.085, 1.795].
+- MAE reduction is the most structurally coherent finding: the breaker selects events with approximately half the drawdown of the displacement baseline (both segments, CIs excluding zero).
+- EXP-023's test point (4.18R) was itself an imprecise estimate (wide CI [0.07, 8.88]); the 44% vs 50% distinction may not be practically meaningful.
+- Phase 004B Branch A (USTEC breaker) was supported to proceed after EXP-031, but this directive is superseded by EXP-032 and the amended reflection: Branch A is now closed with no candidate manifest.
+
+---
+
+## EXP-032 — 1-Hour USTEC Candidate A Breaker Magnitude Gate
+
+**Status**: REFUTED
+**Date**: 2026-05-27
+**Instruments**: USTEC only
+**Phase**: 004B Branch A conditional 1-hour extension
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The USTEC Candidate A breaker chain, applied to synthetic 1-hour bars with elapsed-time-scaled definitions, preserves the EXP-031 15-minute positive direction and reaches the predeclared minimum magnitude before Branch A is allowed to proceed to temporal segmentation.
+
+### Scope
+
+- **Instruments**: USTEC only
+- **Data**: Synthetic 1-hour OHLC for sweep, displacement, and Candidate A breaker detection; real 1-minute prices for outcomes
+- **Chain**: EXP-015 sweep -> EXP-018 displacement -> EXP-022 Candidate A breaker, with elapsed-time-scaled constants
+- **Constants**: 60-minute aggregation; 25-bar body median; 3-bar max displacement confirmation; 8-bar Candidate A lookback; 30-bar breaker lifecycle
+- **Outcomes**: Return_R_60m, MAE_R_60m, MFE_R_60m, Hit1R_60m, Hit2R_60m, 60-minute log return
+- **Exclusions**: no segmentation, controls, cost stress, stop perturbation, Branch B IFVG logic, Candidate B, or instruments other than USTEC
+- **Constraints**: final 30 percent global holdout excluded before aggregation; outcomes use real 1-minute OHLC strictly after the confirming 1-hour displacement candle close
+
+### Results / Observations
+
+Event waterfall:
+
+| Segment | Sweeps | Displacement | Breaker-Labeled | Feasible Breaker | Floor >= 50 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Train | 417 | 189 | 144 | 143 | PASS |
+| Test | 147 | 74 | 62 | 62 | PASS |
+
+Primary bootstrap (breaker minus displacement baseline Return_R_60m):
+
+| Segment | Baseline | Breaker | Diff | 95% CI | EXP-031 50% Gate | Meets Gate |
+| --- | ---: | ---: | ---: | --- | ---: | --- |
+| Train | +0.103R | +0.320R | +0.216R | [+0.144, +0.298] | +0.258R | NO |
+| Test | +0.162R | +0.278R | +0.116R | [+0.039, +0.220] | +0.918R | NO |
+
+Retention vs EXP-031: displacement `263 / 463 = 0.568`; feasible breaker `205 / 297 = 0.690`. The 30 percent retention failure rule is not triggered.
+
+Secondary MAE_R_60m:
+
+| Segment | Baseline MAE | Breaker MAE | Diff | 95% CI |
+| --- | ---: | ---: | ---: | --- |
+| Train | 0.481R | 0.324R | -0.157R | [-0.226, -0.096] |
+| Test | 0.470R | 0.311R | -0.159R | [-0.327, -0.029] |
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+Counts and positive direction survive, but the binding magnitude gate fails. The test Return_R_60m diff is +0.116R versus the required +0.918R, only about 6 percent of EXP-031's 15-minute test effect. Per scope, Branch A stops before EXP-033 unless a new reflection explicitly reframes the branch with weaker claims.
+
+### Hypothesis-Agnostic Observations
+
+- The 1-hour Candidate A breaker still filters adverse excursion: MAE_R improves by about -0.16R in both segments with CIs excluding zero.
+- The failure is magnitude-based, not count-based; retention remains above the predeclared 30 percent floor.
+- The 15-minute USTEC positive does not strengthen at 1-hour resolution. The higher-timeframe structural path is weaker than required for candidate validation.
+- The amended reflection closes Branch A after rejecting weaker reframe options; no automatic temporal segmentation or follow-on Branch A experiment is scoped.
+
+---
+
+## EXP-033 — 15-Minute IFVG Rule Family Readiness Survey
+
+**Status**: REFUTED
+**Date**: 2026-05-27
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Phase**: 004B Branch B IFVG selectivity redesign
+
+### Hypothesis Tests
+
+1. **Hypothesis**: At least one of five predeclared IFVG/FVG rule-family modifications applied independently to the EXP-020/EXP-029 15-minute FVG/IFVG detector is deterministic, count-eligible, materially less tautological than the 84-85% baseline, meaningfully selective, and delay-bounded on at least two of four instruments in both train and test segments.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Data**: 1-minute analysis-set bars with the final 30% global holdout excluded before synthetic 15-minute OHLC aggregation
+- **Rule families**: R1 stricter FVG size (`0.10 * ATR14`), R2 shorter lifecycle (24 bars), R3 displacement-qualified FVG creation, R4 mitigation-before-inversion, R5 zone-location near a swept PDH/PDL/ONH/ONL level
+- **Readiness checks**: reproducibility digest, FVG/IFVG count floor, inversion-rate band `[0.55, 0.75]`, selectivity ratio `<= 0.80`, median delay `<= 24` bars, finite non-zero denominators
+- **Exclusions**: no return, MAE, MFE, hit-rate, cost, P&L, parameter tuning, rule combinations, segmentation, or non-15-minute timeframe analysis
+
+### Results / Observations
+
+Baseline 15-minute FVG/IFVG counts replicated EXP-029:
+
+| Instrument | Train FVG | Train IFVG Rate | Test FVG | Test IFVG Rate |
+| --- | ---: | ---: | ---: | ---: |
+| EURUSD | 8,583 | 0.853 | 3,683 | 0.857 |
+| XAUUSD | 7,702 | 0.842 | 3,391 | 0.821 |
+| BTCUSD | 9,283 | 0.826 | 4,129 | 0.845 |
+| USTEC | 8,266 | 0.848 | 3,483 | 0.846 |
+
+Rule-family outcomes:
+
+| Rule | Main Result | Binding Failure |
+| --- | --- | --- |
+| R1 stricter size | Retained 79-83% of baseline FVGs; inversion rates 0.81-0.85 | inversion band and mostly selectivity |
+| R2 shorter lifecycle | Inversion rates 0.64-0.68 in all cells | FVG-count selectivity ratio = 1.0 |
+| R3 displacement-qualified | Retained 16-22% of FVGs; BTCUSD Train passed all six checks | inversion band in Test and most other cells |
+| R4 mitigation-before-inversion | Inversion rates 0.81-0.85; FVG count unchanged | inversion band and selectivity |
+| R5 zone-location | Retained 11-17% of FVGs | inversion band |
+
+All 40 reproducibility digests matched. `verdict.json` records `rules_in_contention = []`, `selected_rule = null`, and `qualifying_instruments_per_rule = {R1: [], R2: [], R3: [], R4: [], R5: []}`.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+No rule family passed all six readiness checks on at least two instruments in both train and test segments. The predeclared aggregate verdict is "Branch B closes at EXP-033 with selectivity-gated no-go"; no EXP-034 entry-quality scope is authorized from this rule menu.
+
+### Hypothesis-Agnostic Observations
+
+- The high 120-bar IFVG inversion rate appears structural to the lifecycle-windowed three-candle FVG definition; rules that narrow FVG count generally preserve near-baseline inversion rates.
+- Shorter lifecycle is the only tested modification that reliably moves inversion rate into the readiness band, but it does not reduce FVG count under the EXP-033 selectivity denominator.
+- Displacement-qualified FVG creation is the closest single-rule candidate: it creates meaningful FVG selectivity, but its inversion rate remains just above the predeclared upper band in almost every segment.
+- With EXP-032 closing Branch A and EXP-033 closing Branch B, Phase 004 has no eligible candidate manifest before holdout.

@@ -1,0 +1,291 @@
+{
+  "experiment_id": "EXP-032",
+  "title": "1-Hour USTEC Candidate A Breaker Magnitude Gate",
+  "instrument": "USTEC",
+  "period_minutes": 60,
+  "buffer_atr_coefficient": 0.05,
+  "max_confirmation_bars_1h": 3,
+  "body_median_window_1h": 25,
+  "max_breaker_delay_1h": 30,
+  "cand_a_lookback_bars_1h": 8,
+  "primary_horizon_minutes": 60,
+  "bootstrap_reps": 10000,
+  "bootstrap_seed": 42,
+  "min_events_per_segment": 50,
+  "retention_limit": 0.3,
+  "price_precision_step": 0.049999999999272404,
+  "coverage_diagnostics": {
+    "source_bars_in": 830541,
+    "aggregated_bars_out": 13228,
+    "expected_full_windows": 13842,
+    "dropped_partial_window_bars": 36861
+  },
+  "verdict_summary": {
+    "verdict": "AGAINST",
+    "reason": "TEST_BELOW_EXP031_50PCT_MAGNITUDE_GATE",
+    "test_point_diff": 0.11649379097327964,
+    "test_ci_low": 0.039078321353225635,
+    "test_ci_high": 0.2203410249296431,
+    "train_point_diff": 0.21604698707359196,
+    "exp031_test_point_diff": 1.8357017074238544,
+    "exp031_half_magnitude_gate": 0.9178508537119272,
+    "exp023_test_point_diff": 4.175652007396571,
+    "exp023_half_reference_nonbinding": 2.0878260036982854,
+    "train_point_positive": true,
+    "test_point_positive": true,
+    "test_ci_excludes_zero_positive": true,
+    "meets_exp031_half_gate": false,
+    "meets_exp023_half_reference_nonbinding": false,
+    "breaker_train_floor_met": true,
+    "breaker_test_floor_met": true,
+    "resolution_cost_limited": false,
+    "retention": {
+      "exp031_displacement_count_15m": 463,
+      "exp032_displacement_count_1h": 263,
+      "displacement_retention_ratio": 0.5680345572354212,
+      "exp031_feasible_breaker_count_15m": 297,
+      "exp032_feasible_breaker_count_1h": 205,
+      "feasible_breaker_retention_ratio": 0.6902356902356902,
+      "resolution_cost_limited": false,
+      "by_segment": [
+        {
+          "Segment": "Train",
+          "EXP031DisplacementCount15m": 339,
+          "EXP032DisplacementCount1h": 189,
+          "DisplacementRetentionRatio": 0.5575221238938053,
+          "EXP031FeasibleBreakerCount15m": 219,
+          "EXP032FeasibleBreakerCount1h": 143,
+          "FeasibleBreakerRetentionRatio": 0.6529680365296804,
+          "ResolutionCostLimited": false
+        },
+        {
+          "Segment": "Test",
+          "EXP031DisplacementCount15m": 124,
+          "EXP032DisplacementCount1h": 74,
+          "DisplacementRetentionRatio": 0.5967741935483871,
+          "EXP031FeasibleBreakerCount15m": 78,
+          "EXP032FeasibleBreakerCount1h": 62,
+          "FeasibleBreakerRetentionRatio": 0.7948717948717948,
+          "ResolutionCostLimited": false
+        }
+      ]
+    }
+  },
+  "waterfall": [
+    {
+      "Segment": "Train",
+      "SweepCount": 417,
+      "DisplacementCount": 189,
+      "BreakerLabeledCount": 144,
+      "RiskFeasibleBaselineCount": 188,
+      "RiskFeasibleBreakerCount": 143,
+      "BreakerFloorMet": true
+    },
+    {
+      "Segment": "Test",
+      "SweepCount": 147,
+      "DisplacementCount": 74,
+      "BreakerLabeledCount": 62,
+      "RiskFeasibleBaselineCount": 74,
+      "RiskFeasibleBreakerCount": 62,
+      "BreakerFloorMet": true
+    }
+  ],
+  "outcome_summary": [
+    {
+      "Segment": "Train",
+      "EventClass": "Baseline",
+      "TradeCount": 189,
+      "RiskFeasibleCount": 188,
+      "MeanReturn_R": 0.10348206282235403,
+      "MeanMAE_R": 0.480571741154895,
+      "MeanMFE_R": 0.5692281928442928,
+      "MeanDrawdownAdjusted_R": -0.377089678332541,
+      "WinRateHit1R": 0.11827956989247312,
+      "WinRateHit2R": 0.0213903743315508,
+      "MeanLogReturn_60m": 0.0005012461702287363
+    },
+    {
+      "Segment": "Train",
+      "EventClass": "Breaker",
+      "TradeCount": 144,
+      "RiskFeasibleCount": 143,
+      "MeanReturn_R": 0.319529049895946,
+      "MeanMAE_R": 0.32358263869265336,
+      "MeanMFE_R": 0.6072945042990385,
+      "MeanDrawdownAdjusted_R": -0.004053588796707346,
+      "WinRateHit1R": 0.1276595744680851,
+      "WinRateHit2R": 0.02112676056338028,
+      "MeanLogReturn_60m": 0.0012875987425202031
+    },
+    {
+      "Segment": "Test",
+      "EventClass": "Baseline",
+      "TradeCount": 74,
+      "RiskFeasibleCount": 74,
+      "MeanReturn_R": 0.16194608217811954,
+      "MeanMAE_R": 0.4695639521189384,
+      "MeanMFE_R": 0.5736509053660447,
+      "MeanDrawdownAdjusted_R": -0.3076178699408189,
+      "WinRateHit1R": 0.041666666666666664,
+      "WinRateHit2R": 0.013513513513513514,
+      "MeanLogReturn_60m": -0.00015224086646362434
+    },
+    {
+      "Segment": "Test",
+      "EventClass": "Breaker",
+      "TradeCount": 62,
+      "RiskFeasibleCount": 62,
+      "MeanReturn_R": 0.2784398731513992,
+      "MeanMAE_R": 0.31093684259834753,
+      "MeanMFE_R": 0.5623221368890409,
+      "MeanDrawdownAdjusted_R": -0.03249696944694836,
+      "WinRateHit1R": 0.04838709677419355,
+      "WinRateHit2R": 0.016129032258064516,
+      "MeanLogReturn_60m": 0.0003562383508131391
+    }
+  ],
+  "primary_bootstrap": [
+    {
+      "Segment": "Train",
+      "BaselineMean": 0.10348206282235403,
+      "BreakerMean": 0.319529049895946,
+      "Diff": 0.21604698707359196,
+      "CILow": 0.14369011056780034,
+      "CIHigh": 0.29765988888287753,
+      "N": 188,
+      "BreakerN": 143
+    },
+    {
+      "Segment": "Test",
+      "BaselineMean": 0.16194608217811954,
+      "BreakerMean": 0.2784398731513992,
+      "Diff": 0.11649379097327964,
+      "CILow": 0.039078321353225635,
+      "CIHigh": 0.2203410249296431,
+      "N": 74,
+      "BreakerN": 62
+    }
+  ],
+  "secondary_bootstrap": [
+    {
+      "Metric": "MAE_R_60m",
+      "Segment": "Train",
+      "BaselineMean": 0.480571741154895,
+      "BreakerMean": 0.32358263869265336,
+      "Diff": -0.15698910246224163,
+      "CILow": -0.22586044427611168,
+      "CIHigh": -0.09581831078082442
+    },
+    {
+      "Metric": "MAE_R_60m",
+      "Segment": "Test",
+      "BaselineMean": 0.4695639521189384,
+      "BreakerMean": 0.31093684259834753,
+      "Diff": -0.1586271095205909,
+      "CILow": -0.3265190080414651,
+      "CIHigh": -0.02860924323718785
+    },
+    {
+      "Metric": "MFE_R_60m",
+      "Segment": "Train",
+      "BaselineMean": 0.5692281928442928,
+      "BreakerMean": 0.6072945042990385,
+      "Diff": 0.038066311454745705,
+      "CILow": -0.021756906024956585,
+      "CIHigh": 0.0967830813921457
+    },
+    {
+      "Metric": "MFE_R_60m",
+      "Segment": "Test",
+      "BaselineMean": 0.5736509053660447,
+      "BreakerMean": 0.5623221368890409,
+      "Diff": -0.011328768477003814,
+      "CILow": -0.10025608123608462,
+      "CIHigh": 0.07256967441004494
+    }
+  ],
+  "reference_comparison": [
+    {
+      "Segment": "Train",
+      "BaselineMean": 0.10348206282235403,
+      "BreakerMean": 0.319529049895946,
+      "Diff": 0.21604698707359196,
+      "CILow": 0.14369011056780034,
+      "CIHigh": 0.29765988888287753,
+      "N": 188,
+      "BreakerN": 143,
+      "EXP031PointDiff": 0.5166637834789476,
+      "EXP031CILow": 0.2347729323074388,
+      "EXP031CIHigh": 0.836903936750853,
+      "EXP031N": 331,
+      "EXP031BreakerN": 219,
+      "EXP023PointDiff": 0.3340506320500642,
+      "EXP023CILow": -1.0847464870700494,
+      "EXP023CIHigh": 1.795272214079912,
+      "EXP023CIExcludesZero": false,
+      "SameDirectionAsEXP031": true,
+      "EXP031HalfMagnitudeGate": 0.2583318917394738,
+      "MeetsEXP031HalfGate": false,
+      "SameDirectionAsEXP023": true,
+      "EXP023HalfReference": 0.1670253160250321,
+      "MeetsEXP023HalfReference": true
+    },
+    {
+      "Segment": "Test",
+      "BaselineMean": 0.16194608217811954,
+      "BreakerMean": 0.2784398731513992,
+      "Diff": 0.11649379097327964,
+      "CILow": 0.039078321353225635,
+      "CIHigh": 0.2203410249296431,
+      "N": 74,
+      "BreakerN": 62,
+      "EXP031PointDiff": 1.8357017074238544,
+      "EXP031CILow": 0.5595227114227853,
+      "EXP031CIHigh": 3.636417116936987,
+      "EXP031N": 120,
+      "EXP031BreakerN": 78,
+      "EXP023PointDiff": 4.175652007396571,
+      "EXP023CILow": 0.0655322658725774,
+      "EXP023CIHigh": 8.88082048334726,
+      "EXP023CIExcludesZero": true,
+      "SameDirectionAsEXP031": true,
+      "EXP031HalfMagnitudeGate": 0.9178508537119272,
+      "MeetsEXP031HalfGate": false,
+      "SameDirectionAsEXP023": true,
+      "EXP023HalfReference": 2.0878260036982854,
+      "MeetsEXP023HalfReference": false
+    }
+  ],
+  "retention_vs_exp031": {
+    "exp031_displacement_count_15m": 463,
+    "exp032_displacement_count_1h": 263,
+    "displacement_retention_ratio": 0.5680345572354212,
+    "exp031_feasible_breaker_count_15m": 297,
+    "exp032_feasible_breaker_count_1h": 205,
+    "feasible_breaker_retention_ratio": 0.6902356902356902,
+    "resolution_cost_limited": false,
+    "by_segment": [
+      {
+        "Segment": "Train",
+        "EXP031DisplacementCount15m": 339,
+        "EXP032DisplacementCount1h": 189,
+        "DisplacementRetentionRatio": 0.5575221238938053,
+        "EXP031FeasibleBreakerCount15m": 219,
+        "EXP032FeasibleBreakerCount1h": 143,
+        "FeasibleBreakerRetentionRatio": 0.6529680365296804,
+        "ResolutionCostLimited": false
+      },
+      {
+        "Segment": "Test",
+        "EXP031DisplacementCount15m": 124,
+        "EXP032DisplacementCount1h": 74,
+        "DisplacementRetentionRatio": 0.5967741935483871,
+        "EXP031FeasibleBreakerCount15m": 78,
+        "EXP032FeasibleBreakerCount1h": 62,
+        "FeasibleBreakerRetentionRatio": 0.7948717948717948,
+        "ResolutionCostLimited": false
+      }
+    ]
+  }
+}
