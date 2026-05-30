@@ -14,6 +14,8 @@ does not enforce or check that — callers are responsible.
 """
 from __future__ import annotations
 
+import math
+
 import polars as pl
 
 
@@ -23,6 +25,7 @@ SECONDS_PER_MINUTE = 60
 def aggregate_ohlc(
     bars_1m: pl.DataFrame,
     period_minutes: int = 15,
+    min_coverage: float | None = None,
 ) -> pl.DataFrame:
     """Resample 1-minute OHLC bars to N-minute clock-aligned OHLC bars.
 
@@ -34,8 +37,21 @@ def aggregate_ohlc(
         TickVolume = sum 1-minute TickVolume (when present)
 
     The window boundary is set by truncating each bar's `CloseTime` to the
-    period grid. A window is retained only when it contains exactly
-    `period_minutes` 1-minute bars; partial windows at the tail are dropped.
+    period grid. Window retention is governed by ``min_coverage``:
+
+    - ``min_coverage is None`` (default): a window is retained only when it
+      contains exactly ``period_minutes`` 1-minute bars. This is the original,
+      strict behavior and is preserved bit-for-bit for callers that do not pass
+      the argument (EXP-029/030/031/033).
+    - ``0 < min_coverage <= 1``: a window is retained when it contains at least
+      ``ceil(min_coverage * period_minutes)`` 1-minute bars. This tolerant mode
+      keeps substantially-complete windows that the strict rule would drop
+      around session gaps and low-liquidity periods. Partial windows have
+      understated High/Low; callers must account for the coverage/feature
+      trade-off (see EXP-034 §"Coverage feature-interaction stability").
+
+    Partial windows at the tail that fall below the retention threshold are
+    dropped in both modes.
 
     Parameters
     ----------
@@ -45,6 +61,11 @@ def aggregate_ohlc(
         and is summed when present.
     period_minutes : int, default 15
         Number of source minutes per aggregated bar. Must be at least 2.
+    min_coverage : float or None, default None
+        Minimum source-bar coverage fraction for window retention. ``None``
+        means exactly ``period_minutes`` bars (strict). A value in ``(0, 1]``
+        retains windows with at least ``ceil(min_coverage * period_minutes)``
+        bars.
 
     Returns
     -------
@@ -55,6 +76,10 @@ def aggregate_ohlc(
     """
     if period_minutes < 2:
         raise ValueError(f"period_minutes must be >= 2, got {period_minutes}")
+    if min_coverage is not None and not (0.0 < min_coverage <= 1.0):
+        raise ValueError(
+            f"min_coverage must be in (0, 1] or None, got {min_coverage}"
+        )
     if bars_1m.is_empty():
         return bars_1m.clear()
 
@@ -87,10 +112,16 @@ def aggregate_ohlc(
     if has_volume:
         agg_exprs.append(pl.sum("TickVolume").alias("TickVolume"))
 
+    if min_coverage is None:
+        retained = pl.col("SourceBars") == period_minutes
+    else:
+        min_bars = max(2, math.ceil(min_coverage * period_minutes))
+        retained = pl.col("SourceBars") >= min_bars
+
     aggregated = (
         bucketed.group_by("_Bucket")
         .agg(agg_exprs)
-        .filter(pl.col("SourceBars") == period_minutes)
+        .filter(retained)
         .drop("_Bucket")
         .sort("CloseTime")
     )

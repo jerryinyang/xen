@@ -41,6 +41,9 @@
 | EXP-031 | 15-Minute USTEC Breaker Chain | INCONCLUSIVE | Breaker-minus-baseline Return_R test +1.84R CI [0.56, 3.64] (same direction as EXP-023); test magnitude at 44% of 1m reference, narrowly below 50% threshold; MAE reduction confirmed | 2026-05-27 |
 | EXP-032 | 1-Hour USTEC Candidate A Breaker Magnitude Gate | REFUTED | 1h breaker effect remains positive but test diff +0.116R is far below the +0.918R hard gate; amended reflection closes Branch A with no candidate manifest | 2026-05-27 |
 | EXP-033 | 15-Minute IFVG Rule Family Readiness Survey | REFUTED | No predeclared IFVG/FVG rule family passes readiness on >=2 instruments; Branch B closes with selectivity-gated no-go | 2026-05-27 |
+| EXP-034 | Prior-Range Location Readiness and Shared Aggregation-Coverage Rule | SUPPORTED | Strict 1h/4h Prior-Range Location passes row, episode, determinism, and denominator checks on all 4 instruments; strict aggregation is canonical | 2026-05-29 |
+| EXP-035 | Market Bias (CEREBR) Deterministic Port and State-Episode Readiness | SUPPORTED (conditional) | Port deterministic + warmup-convergent everywhere; episode readiness passes only on 1h/tolerant (BTCUSD, USTEC); single-instrument under canonical strict; all 4h and EURUSD/XAUUSD fail episode floor; deterministic-only fidelity (no Pine reference) | 2026-05-29 |
+| EXP-036 | Prior-Range Location Executable State-Aligned Return Test | REFUTED | No next-bar cell passes both neutral and matched-control gates; 4-bar both-contrast pass occurs only on XAUUSD 1h, below the >=2-instrument threshold | 2026-05-29 |
 
 <!-- 
 New experiments are added as they are completed.

@@ -1,0 +1,29 @@
+{
+  "verdict_text": "Market Bias READY: >=2 distinct instruments pass sign-only readiness on cell(s) ['1h/tolerant'] (deterministic re-implementation of the published Pine formula); advances to mid-phase reflection.",
+  "passes_readiness": true,
+  "passing_instruments_per_cell": {
+    "1h/strict": [
+      "BTCUSD"
+    ],
+    "1h/tolerant": [
+      "BTCUSD",
+      "USTEC"
+    ],
+    "4h/strict": [],
+    "4h/tolerant": []
+  },
+  "reference": {
+    "reference_available": false,
+    "claim": "deterministic re-implementation of the published Pine formula",
+    "caveat": "No exported TradingView reference series present; Pine-equivalence is not claimed. Any later negative Market Bias return result must carry this unverified-fidelity caveat.",
+    "reference_files": []
+  },
+  "thresholds": {
+    "warmup_floor": 300,
+    "min_rows_train": 100,
+    "min_rows_test": 50,
+    "min_episodes_train": 30,
+    "min_episodes_test": 15,
+    "collapse_share": 0.95
+  }
+}

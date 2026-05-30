@@ -1,0 +1,37 @@
+{
+  "verdict_text": "Prior-Range Location READY: >=2 distinct instruments pass on timeframe(s) ['1h', '4h']; advances to mid-phase reflection.",
+  "passes_readiness": true,
+  "canonical_aggregation_per_timeframe": {
+    "1h": {
+      "aggregation": "strict",
+      "passing_instruments": [
+        "EURUSD",
+        "XAUUSD",
+        "BTCUSD",
+        "USTEC"
+      ],
+      "status": "ready"
+    },
+    "4h": {
+      "aggregation": "strict",
+      "passing_instruments": [
+        "EURUSD",
+        "XAUUSD",
+        "BTCUSD",
+        "USTEC"
+      ],
+      "status": "ready"
+    }
+  },
+  "thresholds": {
+    "lookback_bars": 20,
+    "bucket_bottom_max": 0.2,
+    "bucket_top_min": 0.8,
+    "min_rows_train": 100,
+    "min_rows_test": 50,
+    "min_episodes_train": 30,
+    "min_episodes_test": 15,
+    "stability_threshold": 0.95,
+    "tolerant_coverage": 0.9
+  }
+}

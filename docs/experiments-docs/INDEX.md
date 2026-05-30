@@ -1,10 +1,10 @@
 # Experiments Index (Comprehensive)
 
-## Active Checkpoint
+## Current Checkpoint Status
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| None | — | No active checkpoint. Phase 004 closed 2026-05-28 with both branches no-go and the ICT-as-alpha thesis closed. Phase 005 design pending; it should start from a new (non-ICT) thesis rather than continue the ICT chain. | — |
+| 2026-05-28-005-htf-state-descriptor-differentiation | COMPLETED | Phase 005 closes the higher-timeframe state-descriptor thesis before holdout. Prior-Range Location passes readiness but fails the matched-control return gate; Market Bias is deterministic but a canonical strict readiness no-go; contingents are not activated because no directional source survived. No EXP-038 robustness path or candidate manifest exists. Phase 006 is not yet designed. | [design.md](checkpoints/2026-05-28-005-htf-state-descriptor-differentiation/design.md) · [mid-phase-reflection.md](checkpoints/2026-05-28-005-htf-state-descriptor-differentiation/mid-phase-reflection.md) · [retrospective.md](checkpoints/2026-05-28-005-htf-state-descriptor-differentiation/retrospective.md) |
 
 ## Checkpoint Retrospectives
 
@@ -14,6 +14,7 @@
 | 2026-05-16-001-signal-quality-classification | COMPLETED | Phase 2 validates the FE/AE measurement framework but refutes the event-chart signal-quality path; broad event-chart strategy exploration is not justified without a new narrower thesis. | [retrospective.md](checkpoints/2026-05-16-001-signal-quality-classification/retrospective.md) |
 | 2026-05-23-003-ict-one-setup-timebar-validation | COMPLETED | Phase 003 translates the ICT setup into deterministic time-bar components, but no optional component earns full-model promotion; the broad ICT chain is blocked before holdout or robustness validation. | [retrospective.md](checkpoints/2026-05-23-003-ict-one-setup-timebar-validation/retrospective.md) |
 | 2026-05-26-004-ustec-breaker-ifvg-selectivity | COMPLETED | Phase 004 closes both narrow ICT continuations: the USTEC Candidate A breaker is microstructure-sensitive (Return_R decays 1m +4.18R → 15m +1.84R → 1h +0.12R), and IFVG non-selectivity is intrinsic to the lifecycle-windowed three-candle definition (0/5 rule families pass readiness on ≥2 instruments). EURUSD sweep deferral invalidated at 15m. No candidate manifest; holdout intact. Closes the ICT-as-alpha thesis; Phase 005 should start from a new thesis. | [retrospective.md](checkpoints/2026-05-26-004-ustec-breaker-ifvg-selectivity/retrospective.md) |
+| 2026-05-28-005-htf-state-descriptor-differentiation | COMPLETED | Phase 005 closes the higher-timeframe state-descriptor thesis: Prior-Range Location was count-eligible but failed replicated neutral-plus-control return differentiation, Market Bias failed canonical strict episode readiness, contingents were not activated, and no robustness path or candidate manifest exists. Holdout intact. | [retrospective.md](checkpoints/2026-05-28-005-htf-state-descriptor-differentiation/retrospective.md) |
 
 
 ## EXP-001 — Information Density & Ghost Bar Comparison
@@ -2031,7 +2032,7 @@ All 40 reproducibility digests matched. `verdict.json` records `rules_in_content
 
 **REFUTED**
 
-No rule family passed all six readiness checks on at least two instruments in both train and test segments. The predeclared aggregate verdict is "Branch B closes at EXP-033 with selectivity-gated no-go"; no EXP-034 entry-quality scope is authorized from this rule menu.
+No rule family passed all six readiness checks on at least two instruments in both train and test segments. The predeclared aggregate verdict is "Branch B closes at EXP-033 with selectivity-gated no-go"; no follow-on entry-quality scope is authorized from this rule menu.
 
 ### Hypothesis-Agnostic Observations
 
@@ -2039,3 +2040,135 @@ No rule family passed all six readiness checks on at least two instruments in bo
 - Shorter lifecycle is the only tested modification that reliably moves inversion rate into the readiness band, but it does not reduce FVG count under the EXP-033 selectivity denominator.
 - Displacement-qualified FVG creation is the closest single-rule candidate: it creates meaningful FVG selectivity, but its inversion rate remains just above the predeclared upper band in almost every segment.
 - With EXP-032 closing Branch A and EXP-033 closing Branch B, Phase 004 has no eligible candidate manifest before holdout.
+
+---
+
+## EXP-034 — Prior-Range Location Readiness and Shared Aggregation-Coverage Rule
+
+**Status**: SUPPORTED
+**Date**: 2026-05-29
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Data Views / Feature Categories**: 1-minute time bars aggregated to strict and tolerant `1h`/`4h` real OHLC; Prior-Range Location buckets
+
+### Hypothesis Tests
+
+1. **Hypothesis**: On `1h` and `4h` real-price bars aggregated from holdout-excluded 1-minute data, the Prior-Range Location descriptor over the prior 20 completed same-timeframe bars, bucketed at bottom `<=0.20`, middle `(0.20,0.80)`, and top `>=0.80`, produces deterministic states whose top, middle, and bottom buckets each meet row and independent-episode floors on at least two distinct instruments in both train and test segments, and the shared strict-vs-tolerant aggregation rule is decidable by coverage and feature-stability checks.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Data Views / Feature Categories**: holdout-excluded 1-minute time bars; deterministic `1h` and `4h` real OHLC aggregation; Prior-Range Location readiness
+- **Features**: `range_location = (Close - prior_low) / (prior_high - prior_low)`, prior 20-bar high/low shifted one bar, outside-range flag, bottom/middle/top buckets, independent bucket episodes
+- **Parameter ranges**: fixed lookback `20`; fixed buckets `0.20/0.80`; strict aggregation and tolerant `min_coverage=0.90`; no parameter sweep
+- **Exclusions**: no return, FE/AE, hit-rate, P&L, matched-control test, `1d`, other descriptors, chart-type generators, or coverage-tolerance sweep
+- **Constraints**: final 30 percent global holdout excluded before aggregation; timestamp alignment by `CloseTime`; denominator validity checked; strict-vs-tolerant stability joined by timestamp
+
+### Results / Observations
+
+- `results/verdict.json` records `passes_readiness=true`.
+- Strict aggregation is canonical for both `1h` and `4h`.
+- Passing instruments under strict aggregation: `EURUSD`, `XAUUSD`, `BTCUSD`, and `USTEC` for both `1h` and `4h`.
+- All 32 readiness rows pass determinism, row floor, episode floor, and denominator-valid checks.
+- Strict bucket row counts range from `118` to `7324`; strict independent-episode counts range from `35` to `1244`.
+- Strict dropped-window rates: `1h` ranges `4.44%` to `13.13%`; `4h` ranges `14.10%` to `24.00%`.
+- Tolerant matched-bucket stability passes at `1h` for all instruments, but fails at `EURUSD 4h` (`92.67%`) and `BTCUSD 4h` (`90.72%`).
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+The Prior-Range Location count-eligibility hypothesis is supported. The descriptor passes the predeclared row, episode, determinism, and denominator gates on all four instruments at both scoped timeframes under strict aggregation, exceeding the required `>=2` distinct-instrument threshold.
+
+### Hypothesis-Agnostic Observations
+
+- Strict aggregation is sufficient for this descriptor; tolerant windows are not needed to rescue counts.
+- Tolerant aggregation can materially perturb `4h` bucket assignment for some instruments, so the coverage convenience is not neutral for Prior-Range Location.
+- The result authorizes readiness consideration only. It does not establish executable return differentiation or edge.
+
+---
+
+## EXP-035 — Market Bias (CEREBR) Deterministic Port and State-Episode Readiness
+
+**Status**: SUPPORTED (conditional)
+**Date**: 2026-05-29
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Data Views / Feature Categories**: 1-minute time bars aggregated to strict and tolerant `1h`/`4h` real OHLC; Market Bias sign-only and four-way states
+
+### Hypothesis Tests
+
+1. **Hypothesis**: On holdout-excluded `1h`/`4h` real-price bars, the chart-timeframe Market Bias port (`EMA(OHLC,100) → Heiken-Ashi with the source `xhaopen[1]` recursion → EMA(haopen/haclose,100) → osc_bias = 100·(c2−o2)`, `osc_smooth = EMA(osc_bias,7)`) is deterministic under shuffle-then-resort with a convergent two-seeding warmup, and its sign-only states meet row and independent-episode floors on at least two distinct instruments in both train and test segments under an admissible aggregation.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Data Views / Feature Categories**: holdout-excluded 1-minute time bars; deterministic `1h`/`4h` real OHLC aggregation (strict and tolerant `0.90`); Market Bias state-episode readiness
+- **Features**: sign-only state (`bull` if `osc_bias > 0` else `bear`, zero-tie carried) as primary; four-way strong/weak bull/bear as secondary diagnostic; independent state episodes; transitions; persistence; `|osc_bias|` quartiles; dominant-state share
+- **Parameter ranges**: fixed `HA_LEN=100`, `HA_LEN2=100`, `OSC_LEN=7`; warmup floor `300`; predeclared two-seeding (Pine-SMA vs cold) convergence rule for `W`; no parameter sweep
+- **Exclusions**: no return, FE/AE, hit-rate, P&L, matched-control test, `1d`, neutral-band return construct, multi-timeframe Pine mode, or parameter tuning
+- **Constraints**: final 30% global holdout excluded before aggregation; causal EMAs; chart-timeframe collapse (no Pine repaint path); segment assignment by `CloseTime`; deterministic-only fidelity claim (no exported TradingView reference series present)
+
+### Results / Observations
+
+- Critical no-collapse bug (`np.isnan(value) is False` inversion) found in post-execution audit, patched to `np.isfinite(dominant_share) and dominant_share <= 0.95`, experiment rerun; re-audit PASS on regenerated outputs.
+- `results/verdict.json` records `passes_readiness=true` on cell `1h/tolerant` = `[BTCUSD, USTEC]`; `1h/strict=[BTCUSD]` (single instrument); `4h/strict=[]`; `4h/tolerant=[]`.
+- All 32 rows pass determinism (`Check1`) and warmup convergence (`Check2`); `W` ranges `300–405`.
+- The independent-episode floor (`Check4`) is the binding constraint, failing 25 of 32 rows.
+- Every `4h` cell fails the episode floor (train sign-episodes `4–9`); `EURUSD`/`XAUUSD` fall just short at `1h` (`24–28` train episodes vs the `30` floor).
+- No state collapse: `DominantShare` ranges `0.501–0.774`.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED (conditional)**
+
+The port is deterministic and warmup-convergent on all instruments and timeframes, and sign-only states are count-eligible on `BTCUSD` and `USTEC` at `1h` under tolerant aggregation, meeting the predeclared `>= 2`-distinct-instrument rule at `>= 1` timeframe under an admissible aggregation. The support is narrow and aggregation-dependent.
+
+### Hypothesis-Agnostic Observations
+
+- Readiness is aggregation-dependent: under the strict rule EXP-034 selected as canonical, Market Bias has a single passing instrument (inconclusive). The mid-phase reflection inherits a phase-level aggregation-canonicity decision.
+- Readiness is instrument-concentrated: only the higher-turnover `BTCUSD`/`USTEC` reach the episode floor; the double-`EMA(100)` smoothing produces long, rarely-flipping states that starve FX/gold and all `4h` cells of transitions.
+- Fidelity is unverified: deterministic re-implementation only; no Pine reference series exists, so any later negative Market Bias return result must carry the unverified-fidelity caveat.
+- The result authorizes readiness consideration only; it establishes the descriptor can be return-tested on a specific cell, not that it carries edge.
+
+---
+
+## EXP-036 — Prior-Range Location Executable State-Aligned Return Test
+
+**Status**: REFUTED
+**Date**: 2026-05-29
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Data Views / Feature Categories**: 1-minute time bars aggregated to strict `1h`/`4h` real OHLC; Prior-Range Location return test
+
+### Hypothesis Tests
+
+1. **Hypothesis**: On holdout-excluded `1h` and `4h` strict-aggregated real-price bars, the Prior-Range Location descriptor's executable direction-adjusted next-bar log return, with top bucket (`>=0.80`) traded long and bottom bucket (`<=0.20`) traded short, exceeds both its own measured middle-bucket neutral baseline and a matched same-timeframe prior-bar-momentum-sign control, with episode-level bootstrap CIs and train/test sign preservation on at least two distinct instruments. The single predeclared 4-bar hold can identify horizon-dependent state differentiation only if it passes both contrasts on at least two distinct instruments.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Data Views / Feature Categories**: holdout-excluded 1-minute time bars; strict `1h` and `4h` real OHLC aggregation; Prior-Range Location buckets
+- **Features**: `range_location = (Close - prior_low) / (prior_high - prior_low)`, prior 20 completed same-timeframe bars shifted one bar, clipped bottom/middle/top buckets, top -> long, bottom -> short, middle as measured neutral baseline
+- **Parameter ranges**: fixed lookback `20`; fixed buckets `0.20/0.80`; strict aggregation only; next-bar primary and fixed 4-bar secondary; no parameter sweep
+- **Exclusions**: no tolerant aggregation, no `1d`, no reversal framing, no cost/slippage/spread model, no stops/targets/sizing, no other descriptor, no robustness perturbation, no holdout access
+- **Constraints**: final 30 percent global holdout excluded before aggregation; all outcomes use real `Open`/`Close`; forward returns enter at next bar open; inference uses independent state episodes
+
+### Results / Observations
+
+- All 32 `(instrument, timeframe, segment, horizon)` rows are adjudicable for both neutral and control contrasts.
+- Minimum post-filter train state count is `326` rows / `89` episodes; minimum test state count is `118` rows / `35` episodes.
+- Next-bar `next_bar_neutral_and_control` is empty for both `1h` and `4h`.
+- No next-bar test-segment `Delta_neutral` CI has lower bound above zero.
+- The only next-bar matched-control positive test cell is `XAUUSD 1h`: `Delta_control = +0.000153`, CI `[+0.000052, +0.000252]`.
+- The only 4-bar cell passing both contrasts is `XAUUSD 1h`: `Delta_neutral = +0.000482`, CI `[+0.000088, +0.000855]`; `Delta_control = +0.000317`, CI `[+0.000040, +0.000571]`.
+- `4h` gap-spanning entry shares range from `20.6%` to `25.2%`; this is a scoped executability caveat, not a primary verdict input.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+Prior-Range Location fails the predeclared matched-control replication gate. The next-bar primary has zero instruments passing both `Delta_neutral` and `Delta_control`, and the 4-bar secondary has only one passing instrument, below the `>=2` distinct-instrument threshold.
+
+### Hypothesis-Agnostic Observations
+
+- The failure is not count-driven; every scoped contrast remains adjudicable after return filtering.
+- The localized `XAUUSD 1h` 4-bar positive is insufficient for the phase gate but indicates the descriptor is not uniformly inert.
+- With Market Bias already a readiness-gated no-go under canonical strict aggregation, Phase 005 has no surviving directional state-descriptor candidate from its authorized path.
