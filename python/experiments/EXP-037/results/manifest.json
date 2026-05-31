@@ -1,0 +1,15 @@
+{
+  "experiment": "EXP-037",
+  "phase_spec": "docs/experiments-docs/checkpoints/2026-05-31-006-thesis-qualification-referee-calibration/reference-stack-spec.md",
+  "block_lengths": [
+    20,
+    60,
+    240
+  ],
+  "realizations_per_block": 150,
+  "compute_stopped": 0,
+  "battery_partition": "even seed indices = development; odd seed indices = second_order",
+  "bootstrap_n": 10000,
+  "bootstrap_seed": 42,
+  "holdout_rule": "first 70% only; final 30% global holdout excluded before aggregation"
+}

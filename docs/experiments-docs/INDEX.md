@@ -4,7 +4,7 @@
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-05-31-006-thesis-qualification-referee-calibration | ACTIVE | Phase 006 refreshes Xen in place onto a new object of study: the **referee** that qualifies theses, not any market thesis. Founding thesis H1/H0 — can a qualification system's operating characteristics (FPR, a power *surface*, per-leg pass rates) be measured with enough fidelity that "reject" carries trustworthy meaning? Baseline referee under test = the existing §5.6 closure stack (transcribed/frozen from EXP-036), calibrated as: EXP-037 null calibration (trustworthy FPR + per-leg leak/over-reject) → mid-phase reflection → reflection-gated Stage B power experiments (planned EXP-038 directional-drift, EXP-039 structural-blindness mechanisms; cross-mechanism MDE sensitivity = the H0/H1 verdict). Yields the §5.6 ruling + founding-thesis ruling. Holdout untouched; successor-stack design deferred; no gate loosened pre-calibration. Synthesises `docs/planning/` (problem-statement + charter + state-and-open-decisions). Immediate next artifact: Deliverable #2 (predeclared reference-stack spec). | [design.md](checkpoints/2026-05-31-006-thesis-qualification-referee-calibration/design.md) |
+| 2026-05-31-006-thesis-qualification-referee-calibration | COMPLETED | Phase 006 tested whether the existing EXP-036 referee stack could be assigned a trusted operating profile before any successor-gate design. Deliverable #2 froze the reference stack and calibration spec; EXP-037 validated the harness but the predeclared kappa=0 null failed realism on every realization (`DescriptorPass = 0/450`, `ReturnAutocorrPass = 0/450`), leaving no trusted FPR and no §5.6 passability ruling. The mid-phase reflection authorized an amended-null rerun, but the retrospective closes the checkpoint before EXP-040 because continuing would turn the phase into recursive null-engineering rather than a proportionate research filter. No Stage B, no successor stack, no closed-thesis rescue; holdout intact. | [design.md](checkpoints/2026-05-31-006-thesis-qualification-referee-calibration/design.md) · [mid-phase-reflection.md](checkpoints/2026-05-31-006-thesis-qualification-referee-calibration/mid-phase-reflection.md) · [reference-stack-spec.md](checkpoints/2026-05-31-006-thesis-qualification-referee-calibration/reference-stack-spec.md) · [retrospective.md](checkpoints/2026-05-31-006-thesis-qualification-referee-calibration/retrospective.md) |
 | 2026-05-28-005-htf-state-descriptor-differentiation | COMPLETED | Phase 005 closes the higher-timeframe state-descriptor thesis before holdout. Prior-Range Location passes readiness but fails the matched-control return gate; Market Bias is deterministic but a canonical strict readiness no-go; contingents are not activated because no directional source survived. No EXP-038 robustness path or candidate manifest exists. | [design.md](checkpoints/2026-05-28-005-htf-state-descriptor-differentiation/design.md) · [mid-phase-reflection.md](checkpoints/2026-05-28-005-htf-state-descriptor-differentiation/mid-phase-reflection.md) · [retrospective.md](checkpoints/2026-05-28-005-htf-state-descriptor-differentiation/retrospective.md) |
 
 ## Checkpoint Retrospectives
@@ -16,6 +16,7 @@
 | 2026-05-23-003-ict-one-setup-timebar-validation | COMPLETED | Phase 003 translates the ICT setup into deterministic time-bar components, but no optional component earns full-model promotion; the broad ICT chain is blocked before holdout or robustness validation. | [retrospective.md](checkpoints/2026-05-23-003-ict-one-setup-timebar-validation/retrospective.md) |
 | 2026-05-26-004-ustec-breaker-ifvg-selectivity | COMPLETED | Phase 004 closes both narrow ICT continuations: the USTEC Candidate A breaker is microstructure-sensitive (Return_R decays 1m +4.18R → 15m +1.84R → 1h +0.12R), and IFVG non-selectivity is intrinsic to the lifecycle-windowed three-candle definition (0/5 rule families pass readiness on ≥2 instruments). EURUSD sweep deferral invalidated at 15m. No candidate manifest; holdout intact. Closes the ICT-as-alpha thesis; Phase 005 should start from a new thesis. | [retrospective.md](checkpoints/2026-05-26-004-ustec-breaker-ifvg-selectivity/retrospective.md) |
 | 2026-05-28-005-htf-state-descriptor-differentiation | COMPLETED | Phase 005 closes the higher-timeframe state-descriptor thesis: Prior-Range Location was count-eligible but failed replicated neutral-plus-control return differentiation, Market Bias failed canonical strict episode readiness, contingents were not activated, and no robustness path or candidate manifest exists. Holdout intact. | [retrospective.md](checkpoints/2026-05-28-005-htf-state-descriptor-differentiation/retrospective.md) |
+| 2026-05-31-006-thesis-qualification-referee-calibration | COMPLETED | Phase 006 closes the recursive referee-calibration branch: EXP-037 validated the EXP-036 stack harness but the null failed realism (`DescriptorPass`/`ReturnAutocorrPass` 0/450), no trusted FPR exists, §5.6 remains unanswered by calibration, and no EXP-040 or Stage B work is opened. Holdout intact. | [retrospective.md](checkpoints/2026-05-31-006-thesis-qualification-referee-calibration/retrospective.md) |
 
 
 ## EXP-001 — Information Density & Ghost Bar Comparison
@@ -2173,3 +2174,47 @@ Prior-Range Location fails the predeclared matched-control replication gate. The
 - The failure is not count-driven; every scoped contrast remains adjudicable after return filtering.
 - The localized `XAUUSD 1h` 4-bar positive is insufficient for the phase gate but indicates the descriptor is not uniformly inert.
 - With Market Bias already a readiness-gated no-go under canonical strict aggregation, Phase 005 has no surviving directional state-descriptor candidate from its authorized path.
+
+---
+
+## EXP-037 — Null Calibration of Frozen Reference Stack
+
+**Status**: REFUTED
+**Date**: 2026-05-31
+**Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+**Data Views / Feature Categories**: holdout-excluded 1-minute time bars aggregated to strict `1h`/`4h` real OHLC; frozen EXP-036 Prior-Range Location descriptor + executable return/control streams; dependence-preserving κ=0 null (Phase 006 Part A)
+
+### Hypothesis Tests
+
+1. **Hypothesis**: After the Prior-Range Location descriptor stream is decoupled from the return/control stream while preserving each stream's relevant dependence structure, EXP-037 can estimate the frozen EXP-036 stack's empirical full-stack false-positive rate and per-leg false-pass profile on the second-order calibration holdout for at least one predeclared null block length `L ∈ {20, 60, 240}`.
+
+### Scope
+
+- **Instruments**: EURUSD, XAUUSD, BTCUSD, USTEC
+- **Data Views / Feature Categories**: strict `1h`/`4h` real OHLC aggregation; frozen EXP-036 stack (admissibility layer, E1–E7, verdict ladder) transcribed verbatim into `python/src/referee_calibration.py`
+- **Features**: Prior-Range Location buckets (lookback 20, `0.20`/`0.80`), `d` direction, next-bar and 4-bar real-OHLC log returns, prior-bar momentum-sign control; episode-level two-sample/paired bootstrap (B=10,000, seed 42); k=2 distinct-instrument replication
+- **Parameter ranges**: return-stream mean block lengths `L ∈ {20, 60, 240}`; 150 realizations/block (no downscale); even seed = development battery, odd seed = second-order holdout
+- **Exclusions**: no Stage B power/MDE, no planted effects, no cost/materiality gate at κ=0, no threshold/leg/admissibility change, no tolerant aggregation, no descriptor other than Prior-Range Location, no holdout access
+- **Constraints**: final 30 percent global holdout excluded before aggregation/resampling; real-OHLC returns only; trust attaches only to odd-seed second-order-holdout realizations whose null-validity diagnostics pass
+
+### Results / Observations
+
+- Observed-stack run reproduces EXP-036 field-for-field: `outcome = AGAINST`, `four_bar_neutral_and_control = {1h:[XAUUSD], 4h:[]}`, control adjudicable on all 4 instruments at both timeframes.
+- Null-validity diagnostics: `DescriptorPass = 0/450`, `ReturnAutocorrPass = 0/450`; `CrossCorrPass` 0.21→0.36 with L. `descriptor_max_count_rel_diff` ∈ [0.39, 0.56] (tolerance 0.05); descriptor episode count collapses 35–56% (audit SC-2 reproduction: 978→632 episodes).
+- Trusted FPR envelope: `trusted_denominator = 0` for L = 20, 60, 240; `valid_block_lengths = []`; no trusted FPR exists.
+- Untrusted raw `all_realizations` context only: full-stack `FOR = 0/450` (429 AGAINST, 20 INCONCLUSIVE, 1 STATE_DIFFERENTIATION_ONLY), Wilson upper ≤ 0.049; next-bar cell-level false-pass control 4.7–6.0% > neutral 1.0–2.0% > both 0.3–1.2%.
+- Compute: median ~2.2 s/FSE ≪ 84 s target; 450 FSE ran, `compute_stopped = 0`.
+
+> Note: No interpretation — preserve what the data shows. The raw rates above are untrusted and plausibly downward-biased; they are not an FPR estimate.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED** (predeclared "Evidence AGAINST measurement validity" branch — null-calibration invalidity)
+
+No block length yields trusted second-order-holdout realizations passing the null-validity gates, so no trusted FPR can be reported. The failure is a structural property of the predeclared null construction (descriptor episode-block merging; near-unpassable zero-mismatch autocorr-sign gate), confirmed by audit (verdict PASS, 0 Critical) as a method property, not a code defect or a stack property. The §5.6 question ("is the EXP-036 closure stack passable?") therefore remains **unanswered by trusted calibration**. The mid-phase reflection drafted a possible amended-null rerun, but the Phase 006 retrospective closes the checkpoint before EXP-040; no Stage B, power/MDE, successor-stack, or closed-thesis-rescue inference is made.
+
+### Hypothesis-Agnostic Observations
+
+- The calibration harness, bootstrap, diagnostics, and frozen-battery partition are validated and reusable as-is; a trusted FPR would require a new null construction and return-realism gate, but Phase 006 closes before that recursive calibration work.
+- The matched-control leg shows the highest untrusted cell-level false-pass (~5–6% vs the neutral leg's ~1–2%), plausibly because the control sign retains its own preserved `c·r` (momentum/reversal) structure under descriptor-only decoupling — a construct-validity hypothesis for the reflection, not a trusted finding.
+- The return-side cross-instrument correlation diagnostic partially held, isolating the realism failure to the descriptor resampler and the autocorr-sign gate rather than the return block bootstrap.

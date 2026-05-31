@@ -44,6 +44,7 @@
 | EXP-034 | Prior-Range Location Readiness and Shared Aggregation-Coverage Rule | SUPPORTED | Strict 1h/4h Prior-Range Location passes row, episode, determinism, and denominator checks on all 4 instruments; strict aggregation is canonical | 2026-05-29 |
 | EXP-035 | Market Bias (CEREBR) Deterministic Port and State-Episode Readiness | SUPPORTED (conditional) | Port deterministic + warmup-convergent everywhere; episode readiness passes only on 1h/tolerant (BTCUSD, USTEC); single-instrument under canonical strict; all 4h and EURUSD/XAUUSD fail episode floor; deterministic-only fidelity (no Pine reference) | 2026-05-29 |
 | EXP-036 | Prior-Range Location Executable State-Aligned Return Test | REFUTED | No next-bar cell passes both neutral and matched-control gates; 4-bar both-contrast pass occurs only on XAUUSD 1h, below the >=2-instrument threshold | 2026-05-29 |
+| EXP-037 | Null Calibration of Frozen Reference Stack | REFUTED | Harness validated (reproduces EXP-036 AGAINST) but predeclared kappa=0 null fails realism (DescriptorPass/ReturnAutocorrPass 0/450); no trusted FPR; Phase 006 closed without Stage B | 2026-05-31 |
 
 <!-- 
 New experiments are added as they are completed.

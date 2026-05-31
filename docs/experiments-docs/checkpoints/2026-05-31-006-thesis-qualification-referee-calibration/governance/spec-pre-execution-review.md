@@ -4,97 +4,68 @@
 **Phase:** 006 — Thesis-Qualification Referee Calibration
 **Gate:** Spec-before-experiment (design.md phase gate 1) — the spec must pass this before any EXP-037 scope is written.
 **Date:** 2026-05-31
-**Framework:** `research-pipeline/references/governance-constraints.md` + charter §5 binding constraints.
+**Framework:** `research-pipeline/references/governance-constraints.md` + Phase 006 binding constraints.
 
 ---
 
-## VERDICT: REVISE
+## VERDICT: APPROVE
 
+```text
+VERDICT: APPROVE
+APPROVED_ARTIFACT: docs/experiments-docs/checkpoints/2026-05-31-006-thesis-qualification-referee-calibration/reference-stack-spec.md
+NEXT_STAGE: EXP-037 scope may be created against the frozen reference-stack specification.
 ```
-VERDICT: REVISE
-FAILING_ARTIFACT: reference-stack-spec.md
-REQUIRED_SKILL: (author) — spec revision; then independent re-review
-CYCLES_ALLOWED: 2
-```
 
-The spec is a strong scaffold — faithful, line-cited transcription of the EXP-036 stack; clean admissibility/evidentiary separation (constraint 9); an explicit harness stopping rule (constraint 7); species-tagging (constraint 1). **But it cannot be frozen as a pre-registration in its current form.** Five issues are Critical: if locked as written they would bake in either *incoherent* gate arithmetic (C1/C2), a *self-undermining* null (C3), a *tautological* blind-spot result (C4), or a *post-hoc* founding verdict (C5). Predeclaration is only worth something if what is predeclared is sound; these must be fixed *before* the lock, not patched after.
+The revised specification now satisfies the checkpoint's spec-before-experiment gate. It freezes the EXP-036 evidentiary stack as the primary §5.6 calibration object, keeps admissibility fixed, separates null and power calibration, predeclares the calibration harness degrees of freedom, and gives concrete numeric rules for materiality, null validity, compute budget, synthetic mechanisms, and the H0/H1 founding-thesis verdict.
 
-**Independence caveat.** This review was produced by the same agent that drafted the spec. Treat it as a self-adversarial pass, not an independent gate. The `[REVIEW]` values and this verdict still require Jerry's (or a second reviewer's) sign-off — recorded as m3.
+No experiment code was run during this governance pass.
 
 ---
 
-## Critical issues (block the freeze)
+## Blocking Issues Resolved
 
-### C1 — Economic-materiality cost is charged against a *contrast*, not a strategy P&L (§2.1)
-`Delta_neutral` and `Delta_control` are **differences**, not tradable P&L. The proposed rule `Delta_neutral^net = Delta_neutral − κ` (round-trip cost κ) is a category error:
-- `Delta_control = mean((d − c)·r)` is a difference of two direction strategies that **both** pay κ per round trip, so the realistic cost *differential* is ≈ 0 — subtracting a full κ **over-charges** and will reject economically-real marginal edges.
-- `Delta_neutral` measures "beats the measured middle-bucket drift," not "is profitable." Subtracting κ conflates *superiority over baseline* with *net-of-cost profitability*.
+### C1/C2 — Materiality no longer alters the frozen stack
 
-Constraint 11 / T4 ask for a **minimum economically meaningful effect net of frictions** — that is a property of the **strategy return** `mean(d·r) − κ`, not of the neutral/control contrast.
-**Required fix:** define materiality on the strategy's executable P&L (`mean(d·r)` net of κ) as a **separate** gate with its own predeclared floor; do not shift the transcribed contrasts by κ.
+Resolved. The frozen-stack verdict is computed at κ = 0 exactly as EXP-036 did. Proxy costs and net-surplus floors now form a separate materiality-survival axis over executable strategy return `mean(d·r) - κ - η`. `Delta_neutral`, `Delta_control`, and E5 remain unmodified, so the §5.6 calibration still attaches to the stack that actually issued the prior closures.
 
-### C2 — The materiality rule silently modifies the frozen stack, breaking the §5.6 claim (§0 & Part 1 vs §2.1)
-§0 and Part 1 promise the four new constructs are added **"around the frozen stack, never into it."** §2.1 then rewrites the pass condition (a κ-shifted CI-exclusion test) — which *is* altering evidentiary leg E5. The stack that closed Phases 003–005 had **no** cost gate; calibrating a cost-augmented stack means you are not calibrating *the* existing stack, and the §5.6 ruling ("were the three closures sound?") no longer attaches to the object that issued those closures.
-**Required fix:** the frozen stack's verdict is computed at **κ = 0** (exactly as transcribed) and is the primary calibration object; net-of-cost survival (per C1's separate gate) is reported as an **additional, separately-labelled axis**, never folded into the frozen verdict.
+### C3 — Null preserves episode structure
 
-### C3 — The null construction destroys the episode structure the stack's own inference depends on (§3)
-The proposed null "permutes the descriptor labels relative to returns." But the stack's inference unit is the **episode** = a maximal run of consecutive identical buckets (admissibility layer; floors E1; the two-sample episode bootstrap E4). Permuting bucket labels **randomises run lengths**, changing the *number and size of episodes* — precisely the quantities the floors gate on and the episode bootstrap resamples. A null that alters the episode distribution does **not** "break conditioning while preserving dependence" (charter §3); it changes the test's denominator, and the resulting FPR is for a different inference problem. This corrupts the *trustworthy* half, whose trust the charter stakes on null realism.
-**Required fix:** resample the **joint** `(bucket, return)` process with a dependence-preserving block/stationary bootstrap that breaks the state→return *conditioning* (e.g. by independently block-resampling the return series against a separately block-resampled state series) while leaving each series' own run/episode structure intact; predeclare a diagnostic that the null's **episode-length distribution matches the real series** (per instrument), and fail any null that distorts it.
+Resolved. The null no longer permutes row labels. It independently resamples a descriptor stream and a return/control stream, with descriptor blocks snapped to complete state episodes and return blocks drawn on common cross-instrument time indices. The spec now predeclares episode-count, episode-length, autocorrelation, and cross-correlation diagnostics; failed episode diagnostics invalidate trusted FPR for that null family.
 
-### C4 — Synthetic mechanisms 3–4 (timing, sizing) are not operationalized into the OHLC the stack reads — making EXP-039's blind-spot result tautological (§4)
-The stack's metric is the **next-open → next-close direction-adjusted log return** (and the 4-bar variant). Therefore:
-- **Timing improvement** ("same total move, better entry within the bar window") is *invisible* to an open-to-close metric.
-- **Sizing information** (magnitude without sign-predictability) has **zero** direction-adjusted mean by construction.
+### C4 — Synthetic mechanisms are operationalized or excluded
 
-Planting these and running the unchanged stack yields ≈ 0 power **regardless of the stack's stringency or the planting fidelity**. That conflates the §5.6 question — *is the stack blind to a kind of edge?* (stringency) — with T5 — *is the metric the wrong construct for that edge?* A guaranteed-zero result is not a measurement.
-**Required fix:** for **each** mechanism, predeclare exactly how it manifests in the `(open, high, low, close)` the stack consumes, and predeclare the attribution: a zero-power outcome must be classifiable as *gate stringency* vs *metric construct-mismatch*. Mechanisms the metric provably cannot observe are either re-specified to be observable or dropped from the H0/H1 sensitivity statistic (and reported only as a construct-validity finding).
+Resolved. Each H0/H1 mechanism now has an explicit observable OHLC planting protocol. Pure variants the next-open -> next-close metric cannot observe are labelled construct-validity diagnostics and excluded from the MDE-spread statistic, preventing tautological zero-power results from being treated as measured stack sensitivity.
 
-### C5 — The founding decision rule is unquantified (§4; design Phase Thesis)
-The whole H0/H1 verdict turns on "MDE **stable** vs **moves materially** across the family." §4 says "the spread across mechanisms is the H0/H1 statistic" — it names the statistic but **never defines the cutoff**. With no predeclared threshold, the verdict is decided after seeing the spread: the exact researcher-DoF / forking-path failure the programme exists to eliminate (constraints 7–8; governance constraint 3 "concrete criteria").
-**Required fix:** predeclare (a) the sensitivity metric (e.g. max/min MDE ratio across mechanisms, or CV of MDE), and (b) the **numeric cutoff** separating H1-stable from H0-moves-materially — both fixed before any planting, with the rationale for the cutoff stated.
+### C5 — Founding decision rule is numeric
+
+Resolved. The spec defines per-mechanism MDE as the smallest trusted second-order-holdout magnitude with TPR ≥ 0.80 and Wilson 90% lower bound ≥ 0.60. The H0/H1 sensitivity statistic is `S = max(MDE_m) / min(MDE_m)`, with H1 requiring finite MDEs and `S ≤ 2.0`; H0 follows when the drift anchor is finite but any observable mechanism is undetected at max grid or `S > 2.0`.
 
 ---
 
-## Major issues
+## Major Issues Resolved
 
-### M1 — Reducing the inner bootstrap to B = 2,000 changes the object under test (§2.4 vs E4)
-E4 freezes **B = 10,000** as part of the stack. The compute-budget downscale to B = 2,000 for the calibration loop injects Monte-Carlo noise into the 2.5/97.5 CI endpoints, perturbing pass/fail near the `test_lo > 0` boundary — so the calibrated FPR/power is for a noisier-CI variant, not the frozen stack.
-**Required fix:** keep B = 10,000 (and re-derive the budget around it), **or** predeclare and report the boundary-perturbation induced by B-reduction and demonstrate it is immaterial to FPR.
-
-### M2 — The compute budget is asserted, not derived (§2.4)
-2,000 nulls × (stack run: inner bootstrap × ~16 instrument×tf×contrast cells × block-length grid {20,60,240}) is tens of millions of inner statistic evaluations for Part A alone; "≤ 12 CPU-hours" has no back-of-envelope. Constraints 1 and 6 require the arithmetic *and* a bounded, **stated** budget.
-**Required fix:** show the derivation. If it does not close within budget, the diversity-over-replication downscale must be applied **in the spec now**, not discovered mid-run.
-
-### M3 — "Plant into real *or* null-resampled series" is an unresolved fork (§4)
-Power-on-real conflates the planted effect with any **latent real edge** (the very thing §5.6 interrogates); power-on-null conditions power on the null's realism too. Governance constraint 3 requires a single defined method.
-**Required fix:** choose one and justify; if real, predeclare how latent structure is netted out of the power estimate.
-
-### M4 — "Per-leg false-pass rate" is ill-defined for the aggregate legs (§3 outputs)
-E6 (≥ 2 instruments) is a function of E2/E3/E5 *across* instruments and has no per-cell false-pass meaning; E5 is itself a conjunction. Listing E1/E2/E3/E5/E6 as five comparable "per-leg" rates is not coherent.
-**Required fix:** define per-cell false-pass for the cell-level legs (E1/E2/E3) and a **separate aggregate** false-pass for the E5∧E6 replication conjunction.
-
-### M5 — Second-order holdout partitioned by instrument collides with the k = 2 floor (§2.3)
-Reserving {USTEC, BTCUSD} as the trusted battery leaves **exactly two** instruments, but the qualifying rule is "≥ 2 of N distinct instruments." With N = 2 on the holdout, the only pass is *both* — the "≥2 of 4" behaviour the stack actually uses **cannot be observed** on the trusted set, distorting trusted FPR/power. The spec flags the partition as a review item but misses this interaction.
-**Required fix:** partition on an axis that keeps **N ≥ 3** instruments on the holdout (e.g. by time block and/or seed, retaining all four instruments), or explicitly justify estimating a "≥2 of N" gate on a degenerate N = 2 reserve.
+- **M1:** B remains 10,000 for every calibration evaluation; no reduced-bootstrap variant is substituted for the frozen stack.
+- **M2:** The compute budget is now derived in full-stack equivalents: cap 1,290 FSE / 30 CPU-hours, with a profiling, downscale, and stop rule before long execution.
+- **M3:** Power planting now uses accepted null-resampled series from Part A, not an unresolved "real or null" fork.
+- **M4:** The spec separates representation/adjudicability pass rates, cell-level false-pass rates, both-contrast cell pass, and aggregate E5∧E6 stack-level false-pass rates. E6 is no longer described as a per-cell leg.
+- **M5:** The second-order holdout is partitioned by seed/configuration and retains all four instruments, preserving the stack's `k = 2 of 4` behavior in the trusted battery.
 
 ---
 
-## Minor issues
+## Governance Checks
 
-- **m1 — Block-length authority (§3).** FPR is reported per L ∈ {20,60,240} with no predeclared rule for which L the §5.6 ruling believes. Predeclare a selection diagnostic (e.g. the L whose null best matches the real series' measured dependence) or report the FPR **envelope** as the headline.
-- **m2 — Proxy-cost κ unsigned-off (§2.1).** The four-instrument κ grid remains `[REVIEW]`; XAUUSD/BTCUSD stress values are order-of-magnitude guesses. Blocking sign-off item (independent of C1/C2's structural fix).
-- **m3 — Independence.** Author == reviewer. A second (human) sign-off is required before the spec is frozen, especially on all `[REVIEW]` values.
+- **Holdout discipline:** Approved. The final 30% global market holdout remains excluded before aggregation, resampling, and effect planting.
+- **Admissibility fixed:** Approved. Look-ahead, real-price outcomes, timestamp alignment, train/test split, inference unit, and holdout exclusion are not calibrated or softened.
+- **Species tagging:** Approved. Null calibration remains trustworthy conditional on null diagnostics; power remains fragile and synthetic-family conditioned.
+- **No scalar MDE:** Approved. The spec reports a power surface and uses cross-mechanism MDE sensitivity only for the founding H0/H1 ruling.
+- **Economic materiality:** Approved as proxy-regime reporting, not broker-cost truth. Costs are frozen design proxies and do not alter the frozen-stack verdict.
+- **Compute budget:** Approved with the explicit profile/downscale/stop rule.
+- **Scope:** Approved. The artifact remains a pre-registration spec; it does not create EXP-037 scope, write experiment code, run calibration, re-score closed theses, or access holdout.
 
----
+## Residual Notes
 
-## What is sound (carry forward unchanged)
-- Part 1 transcription with line provenance — faithful, verifiable, correctly frozen.
-- Two-layer admissibility/evidentiary split, with calibration holding admissibility fixed (constraint 9).
-- The harness-DoF **stopping rule** (§2.2): run the fixed family once; sensitivity *is* the finding; no meta-generator. This is the right anti-regress stance.
-- Species-tagging of every error rate (constraint 1) and the second-order-holdout *principle* (constraint 10) — the *principle* is correct; only the *partition axis* (M5) needs rework.
-- Holdout discipline: no path touches the 30% global market reserve (governance constraint 5) — **clean**.
+- The proxy-cost values are governance-frozen modelling proxies, not externally validated transaction-cost estimates.
+- Trust in Part A still depends on passing the predeclared null-realism diagnostics. A failed diagnostic produces an untrusted FPR for that null family, not a silent pass.
+- If EXP-037 profiling breaches the compute budget after the specified downscale, the correct outcome is a compute-infeasibility finding before execution.
 
-## Required before re-review
-Fix C1–C5 (Critical) and M1–M5 (Major); address m1–m3. The most consequential reframings: **(i)** materiality becomes a separate net-of-cost P&L gate at κ=0-frozen-stack-primary (C1+C2); **(ii)** the null preserves episode structure and is validated against it (C3); **(iii)** every mechanism is operationalized into observable OHLC with a stringency-vs-construct attribution (C4); **(iv)** the H0/H1 sensitivity cutoff is predeclared numerically (C5). Then route to an independent reviewer for the freeze.
-
-**No EXP-037 scope may be created until this artifact reaches APPROVE.**
+**Decision:** Deliverable #2 is approved and frozen. EXP-037 may now proceed to Stage 1 scope design against this specification.
