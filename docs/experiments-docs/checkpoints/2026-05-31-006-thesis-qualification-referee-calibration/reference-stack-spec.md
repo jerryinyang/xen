@@ -153,9 +153,11 @@ Trustworthy half. The null must **break the candidate's conditioning relationshi
 
 ---
 
-## Part 4 — Synthetic-effect family for Part B (EXP-038)
+## Part 4 — Synthetic-effect family for Part B (EXP-038 + EXP-039)
 
 Fragile half. Plant effects of **known** magnitude/structure into the real (or null-resampled) series, varied by **mechanism and parameter** (charter §4). The headline is the **sensitivity of apparent MDE to the family**, plus a power **surface** — never a scalar.
+
+Part B is split across experiments so each stays inside the per-experiment complexity budget and asks one falsifiable question (the mid-phase reflection fixes the final grouping off the EXP-037 null profile): **EXP-038** carries mechanism 1 (directional drift) — the canonical, easiest-to-detect case that validates the harness and anchors the MDE comparison; **EXP-039** carries the structural-blindness mechanisms 2–5 and reports how far each diverges from the drift MDE. That cross-mechanism divergence is the H0/H1 statistic. EXP-039 may be split further by the reflection if the budget requires.
 
 **Mechanisms (≤5, enumerated, fixed) [REVIEW]:**
 
@@ -177,10 +179,12 @@ Mechanisms 2–4 are the load-bearing ones: they expose whether the stack is str
 
 | Experiment | Computes | Headline output | Trust |
 |---|---|---|---|
-| **EXP-037** (Part A) | stack FPR + per-leg false-pass under the §3 nulls (× block-length grid) | FPR table + per-leg leak/over-reject profile | trustworthy |
-| **EXP-038** (Part B) | TPR / power surface over §4 family; MDE per mechanism; cross-mechanism sensitivity | power surface + family-sensitivity = the H0/H1 verdict | fragile, conditioned |
+| **EXP-037** (Part A) | stack FPR + per-leg false-pass under the §3 nulls (× block-length grid); also builds the shared harness | FPR table + per-leg leak/over-reject profile | trustworthy |
+| *(mid-phase reflection)* | reads the null/per-leg profile → fixes the Stage B mechanism grouping and targets | Stage B directive | — |
+| **EXP-038** (Part B, drift) | TPR / power surface for the directional-drift mechanism over the §4 parameter axes; anchor MDE | drift power surface + anchor MDE | fragile, conditioned |
+| **EXP-039** (Part B, blind-spot) | per-mechanism power surface + MDE for mechanisms 2–5; divergence from the drift MDE | cross-mechanism MDE sensitivity = the H0/H1 verdict | fragile, conditioned |
 
-Both report results **per proxy-cost regime** (§2.1) for the materiality-adjusted variant, and label every number as development-battery (in-sample) or second-order-holdout (trusted) per §2.3.
+Every power experiment reports results **per proxy-cost regime** (§2.1) for the materiality-adjusted variant, and labels every number as development-battery (in-sample) or second-order-holdout (trusted) per §2.3.
 
 ---
 

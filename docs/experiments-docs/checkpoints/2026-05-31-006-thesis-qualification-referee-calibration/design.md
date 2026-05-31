@@ -102,7 +102,7 @@ The problem statement merges these under one "calibration" banner; this phase sp
 
 ## Founding Experiment Roadmap
 
-The charter's single founding experiment (two-part calibration) is realised through the pipeline as **one pre-registration deliverable plus two experiments**, honouring the one-falsifiable-question-per-experiment rule. The next free experiment ID is `EXP-037` (verified: `python/experiments/INDEX.md` tops out at EXP-036). IDs are never reused; the EXP-037/038 placeholders that appeared in the *closed* Phase 005 design were never instantiated and remain free.
+The charter's single founding experiment (two-part calibration) is realised through the pipeline as **one pre-registration deliverable, a null-calibration experiment, a mid-phase reflection, and a reflection-gated set of power experiments** — honouring the one-falsifiable-question-per-experiment rule and the per-experiment complexity budget. Part B is *not* one monolithic sweep: each planted **mechanism** is a distinct falsifiable question ("is the stack blind to a sizing / timing / risk-filter / marginal edge?"), so the power stage is decomposed, and the exact split is fixed by the mid-phase reflection once the null/per-leg profile is known (mirroring the Phase-005 readiness → reflection → return-test shape). The next free experiment ID is `EXP-037` (verified: `python/experiments/INDEX.md` tops out at EXP-036). IDs are never reused; the EXP-037/038 placeholders that appeared in the *closed* Phase 005 design were never instantiated and remain free.
 
 ### Deliverable #2 — Predeclared reference-stack specification (runs first, no code)
 
@@ -112,19 +112,26 @@ A pre-registration document, governance-reviewed before any EXP-037 scope, that:
 2. drafts the four new constructs — economic-materiality threshold + low/central/stress proxy-cost regimes; harness DoF + explicit stopping rule; frozen battery + second-order holdout; compute budget;
 3. predeclares the null-construction method (block/stationary bootstrap + permutation) and the synthetic-effect family for power (mechanisms × parameters).
 
-This is the immediate next artifact (see *Immediate Next Step*). It is the object both experiments execute against.
+This is the immediate next artifact (see *Immediate Next Step*). It is the object every experiment below executes against.
 
 ### Stage A — Null calibration (trustworthy)
 
 | Candidate ID | Question | Decision use |
 | --- | --- | --- |
-| **EXP-037** | Resampling real series to break the candidate's conditioning relationship while preserving dependence structure, what is the frozen stack's empirical **FPR** at its declared thresholds, and the **false-pass rate of each individual gate leg** (which legs leak, which over-reject)? | Produces the *trustworthy* half of the referee's error profile and the first direct input to the §5.6 ruling: is the stack appropriately strict, or over-rejecting at its declared thresholds? |
+| **EXP-037** | Resampling real series to break the candidate's conditioning relationship while preserving dependence structure, what is the frozen stack's empirical **FPR** at its declared thresholds, and the **false-pass rate of each individual gate leg** (which legs leak, which over-reject)? | Produces the *trustworthy* half of the referee's error profile and the first direct input to the §5.6 ruling: is the stack appropriately strict, or over-rejecting at its declared thresholds? Also builds the shared calibration harness (null resampler + frozen-stack runner) the power stage reuses. |
 
-### Stage B — Power bracketing (fragile, explicitly caveated)
+### Mid-Phase Reflection (gate before any power experiment)
+
+After EXP-037, a reflection document issues a directive before any Stage B scope is written. Mirroring the Phase-005 reflection, it must specify: which planted **mechanisms** earn a power experiment and how they are grouped into experiment IDs; which gate legs the null profile flagged as leaking or over-rejecting (so planting effort targets the legs that matter); the instrument×timeframe cells and proxy-cost regimes carried into Stage B; and confirmation that the synthetic family and stopping rule from Deliverable #2 still hold. No Stage B scope is created before this directive. The split below is the **planned** decomposition; the reflection may regroup it but may not add mechanisms beyond the Deliverable-#2 family or loosen any frozen threshold.
+
+### Stage B — Power bracketing (fragile, explicitly caveated; reflection-gated)
+
+Planned as two experiments so each stays within the per-experiment complexity budget and asks one falsifiable question; the headline H0/H1 statistic (cross-mechanism MDE sensitivity) is assembled across them at the ruling.
 
 | Candidate ID | Question | Decision use |
 | --- | --- | --- |
-| **EXP-038** | Planting synthetic edges across a deliberately diverse family spanning **parameters** (horizon, regime location, magnitude, persistence, cross-unit correlation) and **mechanisms** (directional drift, volatility/risk filtering, timing improvement, sizing information, marginal contribution), how **sensitive is the apparent MDE to the synthetic family**, and what is the **power surface** conditioned on (effect structure × regime × replication breadth × horizon)? | The sensitivity result **is** the H0/H1 verdict (§ Phase Thesis). The headline is *not* "the MDE"; a large sensitivity is the finding, not a nuisance to average away. |
+| **EXP-038** | For the **directional-drift** mechanism, what is the stack's power **surface** conditioned on (magnitude × regime location × replication breadth × horizon × persistence/decay), and what is the apparent MDE? | The canonical, easiest-to-detect mechanism: validates the harness can detect a real planted edge at all, and exercises every parameter axis (including the constraint-5 decay axis). A stack that misses *this* is over-strict; the MDE here anchors the sensitivity comparison. |
+| **EXP-039** | For the **structural-blindness** mechanisms — volatility/risk filtering, timing improvement, sizing information, and marginal contribution beyond the naive control — what is the per-mechanism power surface and MDE, and **how far do they diverge from the directional-drift MDE**? | This divergence **is** the H0/H1 verdict (§ Phase Thesis): large cross-mechanism sensitivity = H0 (the empirical MDE is family-dependent, not a property of the stack); it also directly answers whether the stack is structurally blind to a *kind* of edge. May be split further by the reflection if the complexity budget requires. |
 
 ### Ruling (after Stage B)
 
@@ -176,6 +183,7 @@ Each traces to a failure mode of the problem statement and exists to stop the su
 6. **Do-not-loosen gate.** No gate threshold or leg is changed this phase. Relaxation is deferred to a post-ruling successor design and may never be motivated by theses having failed (constraint 13).
 7. **Holdout gate.** No Phase 006 work inspects or spends the final 30% global market holdout.
 8. **§5.6-measures-the-referee gate.** Outputs are properties of the stack. No closed thesis is re-run, re-scored, or rescued (C1).
+9. **Reflection-before-power gate.** No Stage B (power) scope is created until the mid-phase reflection issues its directive off the EXP-037 null/per-leg profile. The reflection may regroup the planned EXP-038/EXP-039 split but may not add mechanisms beyond the Deliverable-#2 family, nor loosen any frozen threshold (constraint 13).
 
 ## Methods Standards
 
@@ -193,12 +201,12 @@ Per experiment:
 
 - Maximum statistical test families: 3.
 - Maximum primary plots: 4 (for the power surface, bounded conditioned slices — never an unbounded grid dump).
-- Maximum new reusable modules: 1, and only if existing modules cannot support the scope cleanly. The natural new module is a **calibration harness** under `python/src/` (null resampler + synthetic-effect planter + the frozen-stack runner), shared by EXP-037 and EXP-038; it is built once.
+- Maximum new reusable modules: 1, and only if existing modules cannot support the scope cleanly. The natural new module is a **calibration harness** under `python/src/` (null resampler + synthetic-effect planter + the frozen-stack runner), built once in EXP-037 and reused by every Stage B power experiment.
 - Never materialise the holdout or unbounded detail tables for plotting.
 
 For the checkpoint:
 
-- One pre-registration deliverable (#2) + two experiments (EXP-037 null, EXP-038 power) + one ruling (#4).
+- One pre-registration deliverable (#2) + EXP-037 (null calibration) + a mid-phase reflection + a reflection-gated Stage B (planned: EXP-038 directional-drift power, EXP-039 structural-blindness mechanisms; the reflection may split EXP-039 further) + one ruling (#4). Decomposing Part B per-mechanism is what keeps each experiment inside the 3-test-family / 4-plot budget; a single all-mechanisms power sweep would breach it.
 - The compute budget (constraint 6 / D7) is fixed in Deliverable #2 and bounds bootstrap replications × effect families × stack legs × instruments up front; exceeding it is a flagged design failure, not an absorbed cost.
 - No successor-stack implementation, no gate-threshold change, and no holdout access in this checkpoint.
 
