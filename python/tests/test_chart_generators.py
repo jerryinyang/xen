@@ -55,7 +55,9 @@ def stream_renko(time_bars: pl.DataFrame, atr_period: int) -> pl.DataFrame:
     generator = RenkoGenerator(atr_period=atr_period)
     rows = []
     for r in time_bars.sort("CloseTime").iter_rows(named=True):
-        rows.extend(generator.update(r["OpenTime"], r["CloseTime"], r["High"], r["Low"], r["Close"]))
+        rows.extend(
+            generator.update(r["OpenTime"], r["CloseTime"], r["High"], r["Low"], r["Close"])
+        )
     return pl.DataFrame(rows).select(generate_renko(time_bars, atr_period=atr_period).columns)
 
 
