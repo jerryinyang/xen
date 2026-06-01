@@ -17,7 +17,7 @@ Validate whether the implementation and results can be trusted. Report findings 
    - `python/experiments/<ID>/scope.md`
    - `python/experiments/<ID>/analysis-plan.md`
    - `python/experiments/<ID>/code/`
-   - relevant modified files in `python/src/`
+   - relevant modified files in `python/src/xen/`
    - `python/experiments/<ID>/results/`
 4. Read the bundled audit checklists in this skill's `references` directory.
    If needed, locate the file ending with `/experiment-auditor/references/audit-checklists.md`.

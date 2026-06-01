@@ -1,19 +1,36 @@
-# Xen: Event-Based Price Aggregation Research Framework
+# Xen Data-Layer Architecture
 
-## Design Philosophy
+## Purpose
 
-**The purpose of Xen is empirical comparison, not selection.** This research compares event-based price aggregation methods (Line Break, Renko, Heiken Ashi) against traditional time bars to understand their trading-relevant characteristics: volatility representation, trend regime classification, noise filtering, and market structure capture. The goal is not to crown a "best" chart type, but to validate strengths, expose weaknesses, and build strategies around validated observations.
+The Xen data layer is **thesis-agnostic core infrastructure** for intraday-trading
+research. It provides a deterministic, auditable foundation that any experiment can
+build on, independent of the particular thesis under test:
+
+1. **Data collection (cAlgo):** completed 1-minute OHLC time bars are collected from
+   cTrader and stored as the base dataset.
+2. **Chart-type generation (Python, on demand):** deterministic generators transform
+   the 1-minute base into derived views — Line Break, Renko, Heiken Ashi — for
+   experiments that need them. Traditional time bars (1-minute and clock-aligned
+   resamples) are the default view.
+
+This document specifies that data layer only. It does **not** prescribe what to study
+with it: feature extraction, comparison, signal construction, and strategy validation
+are thesis-specific and live under `python/experiments/`.
+
+> This architecture originated in a prior chart-type research thesis. That thesis is
+> closed; the data layer it produced is retained as neutral infrastructure for any
+> intraday-trading research.
 
 **Guiding principles:**
 
 - **Deterministic generation**: All chart-type transformations must produce identical output from identical input, whether run in batch or streaming mode. No random seeds, no path-dependent state leaks.
 - **Streaming compatibility**: Every generator must be implementable as a stateful streaming function that can process 1-minute bars sequentially. This ensures live deployability and prevents look-ahead bias.
 - **Synthetic price discipline**: Heiken Ashi prices and Renko brick prices are not directly tradable prices. Any signal generated on a synthetic or transformed chart type must have returns evaluated on time-matched traditional bar prices.
-- **Separation of aggregation and analysis**: The cAlgo robot collects raw data. Python transforms and analyses. Neither layer assumes the other's internals.
+- **Separation of collection and analysis**: The cAlgo robot collects raw data. Python transforms and analyses. Neither layer assumes the other's internals.
 
 ## Confirmed Architecture Decisions
 
-These decisions are binding for the initial Xen implementation:
+These decisions are binding for the Xen data layer:
 
 | Decision | Resolution | Rationale |
 | --- | --- | --- |
@@ -23,7 +40,7 @@ These decisions are binding for the initial Xen implementation:
 | Renko source mode | Generate Renko from 1-minute time bars, not ticks. | Accepts the fidelity trade-off to avoid raw tick storage and processing overhead. |
 | Adaptive epsilon filtering | Excluded. | Epsilon filtering was relevant only to tick-level processing, which Xen does not do. |
 | cAlgo output authority | cAlgo writes base 1-minute bars; Python owns chart transformations and experiment analysis. | Keeps collection simple and makes batch/live generation logic auditable. |
-| Initial instrument set | EURUSD, XAUUSD, BTCUSD, USTEC. | This remains the default until experiment observations justify specialization. |
+| Default instrument set | EURUSD, XAUUSD, BTCUSD, USTEC. | A liquid, diverse default; experiments may narrow to subsets. |
 
 ## Generated Data Persistence Policy
 
@@ -63,26 +80,12 @@ data/
 │  • Each generator output includes: chart-type bars + mapping to real        │
 │    price/time coordinates for return evaluation                             │
 │  • All generators must be deterministic and streaming-compatible           │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  STAGE 3: FEATURE EXTRACTION (Python)                                       │
-│  • Extract comparable statistical features from each chart type             │
-│  • Volatility features: realised volatility, range, CV across regimes       │
-│  • Trend/regime features: trend direction, regime labels                   │
-│  • Structural features: swing detection per chart type                      │
-│  • Noise features: signal-to-noise ratio, relevant bar statistics          │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  STAGE 4: CROSS-CHART-TYPE COMPARISON (Python)                              │
-│  • Statistical comparison of features across chart types                    │
-│  • Hypothesis-driven experiments: volatility, regimes, structure, noise    │
-│  • Timeframe as a hyperparameter dimension                                 │
-│  • Non-parametric methods: bootstrap, permutation, KS tests                 │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  STAGE 5: STRATEGY VALIDATION (Python)                                       │
-│  • Strategy signals derived from chart-type observations                    │
-│  • All returns evaluated on time-matched traditional bar prices            │
-│  • No strategy returns from synthetic chart-type prices                     │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+Everything downstream of Stage 2 — feature extraction, cross-view comparison,
+signal construction, and strategy validation — is **thesis-specific**. Those steps
+are defined per experiment under `python/experiments/`, not by this data layer.
 
 ---
 
@@ -230,69 +233,17 @@ Generators operate on completed 1-minute time bars. This is an intentional perfo
 
 ---
 
-### Stage 3: Feature Extraction (Python)
+## Synthetic-Price Discipline
 
-Extract comparable features from each chart type. Features must be **chart-type-agnostic** in concept but **chart-type-specific** in computation.
+This is a data-layer constraint, not a thesis choice: any signal derived from a
+synthetic or transformed chart type must have its returns evaluated on
+**time-matched traditional bar prices**.
 
-**Statistical features (per chart type):**
-- Return statistics: mean, standard deviation, skewness, kurtosis of real-price returns aligned to chart-type events
-- Range statistics: bar range distribution, VWAP proxy only if volume data exists
-- Volatility features: realised volatility, range/volatility ratio
-- Distributional properties: normality tests, tail behavior
+- Heiken Ashi signals → evaluate returns on `RealClose` at the corresponding timestamp.
+- Line Break signals → evaluate returns on `SourceCloseTime`-aligned real prices.
+- Renko signals → evaluate returns on `SourceCloseTime`-aligned real prices.
 
-**Regime/trend features (per chart type):**
-- Trend direction: fraction of up-bars/lines/bricks
-- Trend duration: average run length of consecutive direction bars
-- Regime labels: volatility regime classification (tercile-based or ATR-based)
-- Smoothness: how well the chart type represents the "true" trend vs noise
-
-**Structural features (per chart type):**
-- Swing detection: local extrema identification (configurable threshold method)
-- Structure labels: HH/HL/LH/LL or equivalent direction labels
-- Pattern frequency: rate of detected patterns per unit time
-
-**Noise/features (per chart type):**
-- Ghost bar rate: fraction of bars with near-zero range (economically empty)
-- Information density: entropy or variance per bar vs per unit time
-- Temporal distortion: how much real time is compressed/expanded per bar
-
-**Cross-chart-type features:**
-- Alignment rate: fraction of chart-type events that align with time-bar events
-- Resolution trade-off: detection latency vs. false positive rate across chart types
-- Volatility regime correspondence: do chart types agree on regime labels?
-
----
-
-### Stage 4: Cross-Chart-Type Comparison (Python)
-
-Experiments compare chart types on trading-relevant characteristics. Each experiment follows the Xen research pipeline (scope → analysis plan → implementation → governance → execution → audit → interpretation → documentation).
-
-**Experiment dimensions:**
-
-| Dimension | Values | Notes |
-|-----------|--------|-------|
-| Chart type | Time, LineBreak, Renko, Heiken Ashi | Four levels for comparison |
-| Instrument | EURUSD, XAUUSD, BTCUSD, USTEC | May narrow to subset based on observations |
-| Timeframe | 1min, 15min, 1h, 4h, 1d | For time bars; other chart types use source timeframe |
-| Level/period | LineBreak level (3, 5), Renko ATR period (14, 21) | Chart-type-specific parameters |
-
-**Comparative structure:**
-- For each experiment, time bars are the baseline
-- Each chart type is compared against time bars on the same instrument/timeframe
-- Cross-timeframe comparisons explore whether chart-type advantages vary by timeframe
-
----
-
-### Stage 5: Strategy Validation (Python)
-
-Strategy signals may be derived from any chart type, but returns are always evaluated on **time-matched traditional bar prices**.
-
-**Synthetic price discipline:**
-- Heiken Ashi signals → evaluate returns on `RealClose` at the corresponding timestamp
-- Line Break signals → evaluate returns on `SourceCloseTime` aligned real prices
-- Renko signals → evaluate returns on `SourceCloseTime` aligned real prices
-
-This ensures that any positive finding is economically meaningful and not an artifact of synthetic chart prices.
+This keeps any positive finding economically meaningful rather than an artifact of synthetic chart prices.
 
 ---
 
@@ -302,13 +253,11 @@ All free parameters are classified and owned:
 
 | Parameter | Type | Derivation Method | Update Frequency |
 |-----------|------|-------------------|------------------|
-| `TimeBarInterval` | Governance | Research decision; default 1 minute | Per experiment or quarterly |
+| `TimeBarInterval` | Governance | Research decision; default 1 minute | Per experiment |
 | LineBreak `level` | Governance | Research decision; default 3 | Per experiment |
 | Renko `atr_period` | Governance | Research decision; default 14 | Per experiment |
-| Swing detection threshold | Governance | Research decision per chart type | Per experiment |
-| Regime classification method | Governance | Research decision | Per experiment |
 
-**No parameter may be tuned against out-of-sample strategy returns during Phase 1 (characterisation).** Parameter sensitivity experiments are explicit research questions, not optimisation targets.
+Generator parameters are research decisions fixed per experiment scope; they are never tuned against out-of-sample strategy returns. Parameter-sensitivity studies are explicit research questions, not optimisation targets.
 
 ---
 
@@ -320,15 +269,13 @@ All free parameters are classified and owned:
 | **Deterministic output** | Given the same input data and parameters, generators produce identical output. No random seeds. |
 | **Synthetic price discipline** | Heiken Ashi and Renko chart prices are never used for strategy P&L. All returns use time-matched real prices. |
 | **Streaming compatibility** | Every generator must be implementable as a stateful streaming function. |
-| **Time-matched returns** | Cross-chart-type comparisons use the same chronological time periods. Charts are aligned by timestamps, not by bar count. |
-| **Non-parametric by default** | Distribution-free methods first. Parametric only with cross-validation. |
+| **Time-matched returns** | Cross-view comparisons use the same chronological time periods. Charts are aligned by timestamps, not by bar count. |
 | **Separation of collection and analysis** | cAlgo collects raw data only. All chart-type generation and analysis happens in Python. |
 
 ---
 
-## What This Architecture Is Not
+## What This Data Layer Is Not
 
-- **Not a trading system:** Xen is a research framework. The cAlgo robot is a data collector, not a strategy executor.
-- **Not a multi-stream pipeline:** Unlike TriLattice, Xen does not maintain parallel streams with cross-validation. Each chart type is independently generated and compared.
-- **Not a parameter optimizer:** Parameters are research decisions or derived from data, never tuned against out-of-sample returns during Phase 1.
-- **Not biased toward any chart type:** The research goal is empirical characterisation. No chart type starts with assumed superiority.
+- **Not a trading system:** the cAlgo robot is a data collector, not a strategy executor.
+- **Not a parameter optimizer:** generator parameters are research decisions or derived from data, never tuned against out-of-sample returns.
+- **Not tied to any single thesis:** no chart type is assumed superior. Which views matter, and what to measure, is decided per experiment — not by this layer.

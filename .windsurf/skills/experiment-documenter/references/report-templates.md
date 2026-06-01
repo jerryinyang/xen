@@ -15,7 +15,7 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 
 **Date**: <completion date>
 **Instruments**: <which>
-**Data Views / Feature Categories**: <which, e.g. time bars, macro windows, sweeps, chart types if scoped>
+**Data Views / Feature Categories**: <which, e.g. time bars, session windows, event definitions, chart types if scoped>
 
 ---
 
@@ -129,7 +129,7 @@ This is the authoritative detailed catalog of all experiments. Append each exper
 
 - **Instruments**: <tested instruments>
 - **Data Views / Feature Categories**: <which categories used>
-- **Features**: <specific Xen features used, e.g. macro-window flag, sweep event, Direction, SourceCount, RealClose returns>
+- **Features**: <specific features used, e.g. session-window flag, event flag, Direction, SourceCount, RealClose returns>
 - **Parameter ranges**: <ranges tested>
 - **Exclusions**: <what was explicitly excluded>
 - **Constraints**: <key assumptions and constraints>

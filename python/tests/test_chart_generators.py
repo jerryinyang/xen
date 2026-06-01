@@ -3,10 +3,11 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 
 import polars as pl
+import pytest
 
-from heiken_ashi_generator import HeikenAshiGenerator, generate_heiken_ashi
-from linebreak_generator import LineBreakGenerator, generate_linebreak
-from renko_generator import RenkoGenerator, generate_renko
+from xen.heiken_ashi_generator import HeikenAshiGenerator, generate_heiken_ashi
+from xen.linebreak_generator import LineBreakGenerator, generate_linebreak
+from xen.renko_generator import RenkoGenerator, generate_renko
 
 
 def sample_bars(closes: list[float]) -> pl.DataFrame:
@@ -35,23 +36,26 @@ def sample_bars(closes: list[float]) -> pl.DataFrame:
 
 def stream_heiken_ashi(time_bars: pl.DataFrame) -> pl.DataFrame:
     generator = HeikenAshiGenerator()
-    rows = [generator.update(row) for row in time_bars.sort("CloseTime").iter_rows(named=True)]
+    rows = [
+        generator.update(r["OpenTime"], r["CloseTime"], r["Open"], r["High"], r["Low"], r["Close"])
+        for r in time_bars.sort("CloseTime").iter_rows(named=True)
+    ]
     return pl.DataFrame(rows).select(generate_heiken_ashi(time_bars).columns)
 
 
 def stream_linebreak(time_bars: pl.DataFrame, level: int) -> pl.DataFrame:
     generator = LineBreakGenerator(level=level)
     rows = []
-    for row in time_bars.sort("CloseTime").iter_rows(named=True):
-        rows.extend(generator.update(row))
+    for r in time_bars.sort("CloseTime").iter_rows(named=True):
+        rows.extend(generator.update(r["OpenTime"], r["CloseTime"], r["Open"], r["Close"]))
     return pl.DataFrame(rows).select(generate_linebreak(time_bars, level=level).columns)
 
 
 def stream_renko(time_bars: pl.DataFrame, atr_period: int) -> pl.DataFrame:
     generator = RenkoGenerator(atr_period=atr_period)
     rows = []
-    for row in time_bars.sort("CloseTime").iter_rows(named=True):
-        rows.extend(generator.update(row))
+    for r in time_bars.sort("CloseTime").iter_rows(named=True):
+        rows.extend(generator.update(r["OpenTime"], r["CloseTime"], r["High"], r["Low"], r["Close"]))
     return pl.DataFrame(rows).select(generate_renko(time_bars, atr_period=atr_period).columns)
 
 
@@ -98,13 +102,19 @@ def test_batch_matches_streaming_stateful_updates() -> None:
     assert_same_frame(generate_renko(bars, atr_period=3), stream_renko(bars, atr_period=3))
 
 
-def test_generators_sort_by_close_time_before_processing() -> None:
+def test_generators_reject_unsorted_input() -> None:
     bars = sample_bars([100.0, 101.0, 102.0, 100.0, 98.0, 103.0])
     shuffled = bars[[2, 0, 5, 1, 4, 3]]
 
-    assert_same_frame(generate_heiken_ashi(bars), generate_heiken_ashi(shuffled))
-    assert_same_frame(generate_linebreak(bars, level=2), generate_linebreak(shuffled, level=2))
-    assert_same_frame(generate_renko(bars, atr_period=3), generate_renko(shuffled, atr_period=3))
+    # Generators are sequential and must not silently reorder/corrupt out-of-order
+    # input — they fail loud instead. Callers are responsible for pre-sorting.
+    for call in (
+        lambda: generate_heiken_ashi(shuffled),
+        lambda: generate_linebreak(shuffled, level=2),
+        lambda: generate_renko(shuffled, atr_period=3),
+    ):
+        with pytest.raises(ValueError, match="sorted by CloseTime"):
+            call()
 
 
 def test_linebreak_uses_level_window_for_reversal() -> None:

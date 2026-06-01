@@ -17,14 +17,14 @@ Translate an approved scope and analysis plan into Python code. Implement only t
 4. Read `python/experiments/<ID>/analysis-plan.md`.
 5. Read the bundled code conventions in this skill's `references` directory.
    If needed, locate the file ending with `/experiment-developer/references/code-conventions.md`.
-6. Inspect existing `python/src/` modules before creating new abstractions.
+6. Inspect existing `python/src/xen/` modules before creating new abstractions.
 
 ## Implementation Workflow
 
 1. Map every analysis-plan requirement to code.
 2. Decide file placement:
    - use `python/experiments/<ID>/code/run_experiment.py` for experiment orchestration;
-   - use `python/src/` only for reusable functions likely to serve multiple experiments;
+   - use `python/src/xen/` (the installed `xen` package) only for reusable functions likely to serve multiple experiments;
    - avoid notebooks unless the user or plan explicitly requires them.
 3. Load data with the standard project pattern from `code-conventions.md`.
 4. Exclude the final 30 percent global holdout before analysis.

@@ -11,7 +11,7 @@ All paths are relative to the project root (`{project-root}`).
 | Resource | Path |
 |----------|------|
 | Experiment Directory | `python/experiments/<EXP-ID>/` |
-| Analysis Modules | `python/src/` |
+| Analysis Package (`xen`) | `python/src/xen/` |
 | Data Files | `data/` |
 | Experiment Index (brief) | `python/experiments/INDEX.md` |
 | Comprehensive Index | `docs/experiments-docs/INDEX.md` |
@@ -69,9 +69,9 @@ Derived data is generated from 1-minute time bars. It is not stored persistently
 
 | Generator | Module | Parameters |
 |-----------|--------|------------|
-| Line Break | `python/src/linebreak_generator.py` | `level` (default: 3) |
-| Renko | `python/src/renko_generator.py` | `atr_period` (default: 14); generated from 1-minute source bars |
-| Heiken Ashi | `python/src/heiken_ashi_generator.py` | None |
+| Line Break | `python/src/xen/linebreak_generator.py` | `level` (default: 3) |
+| Renko | `python/src/xen/renko_generator.py` | `atr_period` (default: 14); generated from 1-minute source bars |
+| Heiken Ashi | `python/src/xen/heiken_ashi_generator.py` | None |
 
 Chart-type generators are optional derived views. Each chart-type generator produces DataFrames with a `SourceCloseTime` column (or equivalent) linking chart-type events to real-time coordinates for return evaluation.
 
@@ -271,10 +271,11 @@ Before creating new modules, check these existing reusable functions:
 
 | Module | Path | Purpose |
 |--------|------|---------|
-| Optional chart-type generators | `python/src/linebreak_generator.py` | Line Break bar generation |
-| Optional chart-type generators | `python/src/renko_generator.py` | Renko brick generation |
-| Optional chart-type generators | `python/src/heiken_ashi_generator.py` | Heiken Ashi candle generation |
-| *(More to be added as analysis modules are developed)* | `python/src/` | Reusable analysis code |
+| Chart-type generator | `xen.linebreak_generator` | Line Break bar generation |
+| Chart-type generator | `xen.renko_generator` | Renko brick generation |
+| Chart-type generator | `xen.heiken_ashi_generator` | Heiken Ashi candle generation |
+| OHLC resampling | `xen.bar_aggregator` | N-minute clock-aligned OHLC aggregation |
+| *(More to be added as analysis modules are developed)* | `python/src/xen/` | Reusable analysis code |
 
 ---
 

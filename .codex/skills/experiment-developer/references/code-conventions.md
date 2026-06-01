@@ -15,14 +15,12 @@ safe.
 Experiment EXP-XXX: <Title>
 Implements the analysis plan from analysis-plan.md.
 """
-import sys
-sys.path.insert(0, "python/src")
+from pathlib import Path
 
 import numpy as np
 import polars as pl
 import matplotlib.pyplot as plt
 import seaborn as sns
-from pathlib import Path
 
 DATA_DIR = Path("data")
 
@@ -39,8 +37,9 @@ train_cutoff = int(analysis_cutoff * 0.7)
 train_set = analysis_set.slice(0, train_cutoff)
 test_set = analysis_set.slice(train_cutoff, analysis_cutoff - train_cutoff)
 
-# Generate chart types on-demand from the scoped source data
-from linebreak_generator import generate_linebreak
+# Generate chart types on-demand from the scoped source data.
+# `xen` is installed editable (`uv pip install -e .` in python/), so no sys.path hack.
+from xen.linebreak_generator import generate_linebreak
 lb_bars = generate_linebreak(analysis_set, level=3)
 
 # Apply experiment-specific filtering from scope document
@@ -63,23 +62,28 @@ lb_bars = generate_linebreak(analysis_set, level=3)
 
 Check these modules before creating new reusable functions:
 
-| Module | Path | Key Functions |
-|--------|------|--------------|
-| Line Break Generator | `python/src/linebreak_generator.py` | `generate_linebreak()` |
-| Renko Generator | `python/src/renko_generator.py` | `generate_renko()` |
-| Heiken Ashi Generator | `python/src/heiken_ashi_generator.py` | `generate_heiken_ashi()` |
-| Correlation | `python/src/correlation.py` | `compute_spearman_with_bootstrap()`, `compute_pearson()` |
-| Mean Reversion | `python/src/mean_reversion.py` | `compute_hurst_exponent()`, `test_mean_reversion()` |
-| Regression | `python/src/regression.py` | `rank_regression()`, `compute_effect_sizes()` |
+| Module | Import | Key Functions |
+|--------|--------|--------------|
+| Line Break Generator | `xen.linebreak_generator` | `generate_linebreak()`, `LineBreakGenerator` |
+| Renko Generator | `xen.renko_generator` | `generate_renko()`, `RenkoGenerator` |
+| Heiken Ashi Generator | `xen.heiken_ashi_generator` | `generate_heiken_ashi()`, `HeikenAshiGenerator` |
+| OHLC Resampling | `xen.bar_aggregator` | `aggregate_ohlc()`, `coverage_summary()` |
 
+The data-layer generators above (also re-exported from the `xen` package root,
+e.g. `from xen import generate_renko`) are the only reusable modules guaranteed
+to exist on a fresh base. Optional indicator ports live under `xen.indicators`.
+Reusable analysis helpers introduced by experiments belong in `python/src/xen/`.
 If a function you need already exists, import and use it. Do not re-implement.
 
 **Xen Data Access Pattern**:
 ```python
 from pathlib import Path
-from linebreak_generator import generate_linebreak
-from renko_generator import generate_renko
-from heiken_ashi_generator import generate_heiken_ashi
+
+import polars as pl
+
+from xen.linebreak_generator import generate_linebreak
+from xen.renko_generator import generate_renko
+from xen.heiken_ashi_generator import generate_heiken_ashi
 
 DATA_DIR = Path("data")
 
@@ -200,17 +204,16 @@ def plot_<name>(
 Experiment EXP-XXX: <Title>
 Implements the analysis plan from analysis-plan.md.
 """
-import sys
-sys.path.insert(0, "python/src")
+from pathlib import Path
 
 import numpy as np
 import polars as pl
 import matplotlib.pyplot as plt
 import seaborn as sns
-from pathlib import Path
-from linebreak_generator import generate_linebreak
-from renko_generator import generate_renko
-from heiken_ashi_generator import generate_heiken_ashi
+
+from xen.linebreak_generator import generate_linebreak
+from xen.renko_generator import generate_renko
+from xen.heiken_ashi_generator import generate_heiken_ashi
 
 # === 1. Load data ===
 DATA_DIR = Path("data")
@@ -249,8 +252,7 @@ df = scan.slice(0, analysis_cutoff).collect()
 
 ## Organisation, Logging, and Performance Standards
 
-Use the sample experiments under `.ignore/samples/python/experiments` as the
-style reference. Current expectations:
+Current expectations:
 
 - Put imports first, then path setup, constants, small I/O helpers, pure
   computation helpers, plotting helpers, orchestration, and `main()`.

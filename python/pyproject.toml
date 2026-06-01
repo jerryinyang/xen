@@ -1,7 +1,7 @@
 [project]
-name = "python"
+name = "xen"
 version = "0.1.0"
-description = "Add your description here"
+description = "Thesis-agnostic data-layer infrastructure for intraday-trading research (chart-type generators and OHLC resampling)."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -12,3 +12,22 @@ dependencies = [
     "pyarrow>=24.0.0",
     "seaborn>=0.13.2",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/xen"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
