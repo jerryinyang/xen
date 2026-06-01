@@ -33,12 +33,50 @@ is tangible evidence:
    look-ahead and determinism probes run on a bounded leading window instead of
    pure-Python million-row loops.
 
+### Post-completion revision (rev. 3)
+
+VAL-001 was first executed and approved under rev. 2. A post-completion review
+found three detection-power gaps. By explicit governance decision the experiment
+is re-run in place (same ID, rev. 3) rather than as a new VAL; pre- and
+post-execution governance still apply.
+
+1. **Detection-power coverage (gap 1)** — rev. 2 carried negative controls for
+   only 8 of its check types; the base time-bar integrity checks (null /
+   strictly-increasing / unique `CloseTime`, OHLC validity, OHLC nullity) and
+   several chart/HA/resample alignment sub-checks had no evidence they can fail.
+   rev. 3 adds a negative control for every data-integrity and alignment check,
+   so each PASS is backed by a matching injected-fault detection. Pure
+   availability/IO defensive checks (Parquet readability, file presence,
+   non-empty analysis slice) are exercised by their own construction and are
+   named as explicit exclusions rather than left silently unguarded.
+2. **Determinism control (gap 2)** — rev. 2's determinism control only proved
+   `DataFrame.equals` returns False for two different frames; it never ran a
+   non-deterministic generator through the determinism check. rev. 3 routes an
+   actually non-deterministic generator (output differs between regenerations of
+   identical input) through `determinism_failures`, so the control tests the
+   check, not the comparison primitive.
+3. **Look-ahead coverage (gap 3)** — rev. 2 probed prefix stability only on the
+   leading window of each slice. rev. 3 probes head, middle, and tail windows
+   with additional cut points, and the hypothesis no longer claims structural
+   no-look-ahead for "any scoped row": that claim is scoped to the probe
+   windows, while full-output timestamp alignment remains checked on every
+   emitted row.
+
+A separate manual review compared the Line Break and Renko implementations
+against their `architecture.md` algorithm specifications (gap 4) and found no
+correctness defect. Automated generator value-correctness remains out of scope:
+the generators are deterministic and the run is reproducible, so downstream
+consumers can replicate any result rather than depend on a value oracle here. No
+new positive value-correctness check is added.
+
 ## Hypothesis
 
 The available Xen data architecture preserves temporal alignment across scoped
-time-bar, timeframe, and chart-type views, with no row-level evidence of
-look-ahead bias when every derived view is generated only from the first 70% of
-each chronologically ordered base dataset.
+time-bar, timeframe, and chart-type views — exhibiting no future-timestamp or
+cross-view misalignment in any emitted row, and no structural look-ahead in
+prefix-stability probes positioned at the head, middle, and tail of the analysis
+slice — when every derived view is generated only from the first 70% of each
+chronologically ordered base dataset.
 
 ## Question
 
@@ -70,18 +108,33 @@ row?
   generator, `generate(source[:k])` must be an exact prefix of
   `generate(source)` at several cut points `k`. A generator that consults any
   future source row produces different rows near the cut, so this property
-  falsifies look-ahead by comparing two genuinely different inputs. Streaming /
+  falsifies look-ahead by comparing two genuinely different inputs. The probe is
+  run on bounded windows positioned at the **head, middle, and tail** of each
+  analysis slice (not only the leading rows), each at multiple cut points, so
+  positional coverage spans the slice rather than its prefix alone. Full-output
+  timestamp-alignment checks (no future `SourceCloseTime`, mapping to source,
+  `CloseTime == SourceCloseTime`) still run on every emitted row. Streaming /
   batch API equivalence is already covered by the `xen` package unit tests and
   is not re-run at experiment scale. Determinism (identical output on
   re-generation) is checked separately.
 - **Resampling ground truth**: Timeframe resamples are validated against an
   independent pandas resampling oracle and a hand-anchored golden fixture, never
   against a copy of the production bucket logic.
-- **Detection power (negative controls)**: The validation injects deliberately
-  corrupted inputs — a look-ahead generator, future / unmapped / shifted
-  timestamps, corrupted real prices, dropped resample rows — and requires the
-  matching check to report a failure. A negative control that is not detected is
-  recorded as a FAIL.
+- **Detection power (negative controls)**: Every data-integrity and alignment
+  check must have at least one matching negative control: the validation injects
+  a deliberately corrupted input and requires that exact check function to report
+  a failure. This covers base time-bar integrity (null / non-increasing /
+  duplicate `CloseTime`, invalid OHLC, null OHLC), resample oracle agreement and
+  the resample output-side checks (future timestamp, strict source-bar count,
+  unique `CloseTime`), the sparse-chart alignment checks (missing / null /
+  future source time, `CloseTime != SourceCloseTime`, negative and
+  first-event-zero `SourceCount`), Heiken Ashi real-price and row/source-count
+  checks, the chart schema check, an actually non-deterministic generator routed
+  through the determinism check, and the look-ahead generator routed through
+  prefix stability. A negative control that is not detected is recorded as a
+  FAIL. Pure availability/IO defensive checks (Parquet readability, file
+  presence, non-empty analysis slice) are exercised by their own construction and
+  are not assigned controls.
 - **Duplicate-source event denominator**: Line Break and Renko checks count every
   emitted chart row as a row-level validation denominator. Distinct
   `SourceCloseTime` counts are reported separately. Same-source duplicate rows
@@ -111,9 +164,10 @@ row?
     the scoped source timeframe, never beyond the analysis-set maximum
     timestamp, with `CloseTime == SourceCloseTime` and valid `SourceCount`;
   - Heiken Ashi rows preserve real OHLC values at the same source `CloseTime`;
-  - every chart-type generator satisfies prefix stability (no look-ahead) and
-    deterministic regeneration;
-  - every negative control is detected (the corresponding check reports a
+  - every chart-type generator satisfies prefix stability (no look-ahead) at the
+    head, middle, and tail probe windows, and deterministic regeneration;
+  - every data-integrity and alignment check has at least one negative control,
+    and every negative control is detected (the corresponding check reports a
     failure on the corrupted input).
 - **Evidence AGAINST**: Any critical check fails for any scoped row — timestamp-
   order violations, OHLC integrity failures, resample disagreement with the

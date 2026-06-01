@@ -55,11 +55,14 @@ LINEBREAK_LEVEL = 3
 RENKO_ATR_PERIOD = 14
 
 # Engineering bounds for the look-ahead / determinism probes. No-look-ahead and
-# determinism are *structural* properties of a sequential generator, so a bounded
-# leading window is representative and keeps cost finite on multi-million-row
-# inputs. These are harness bounds, not data-derived thresholds.
+# determinism are *structural* properties of a sequential generator, so bounded
+# windows are representative and keep cost finite on multi-million-row inputs.
+# rev. 3 places probe windows at several positions across the slice (not only the
+# head) and uses more cut points. These are harness bounds, not data-derived
+# thresholds.
 PREFIX_WINDOW_ROWS = 150_000
-PREFIX_FRACTIONS = (0.5, 0.95)
+PREFIX_WINDOW_POSITIONS = ("head", "middle", "tail")
+PREFIX_FRACTIONS = (0.34, 0.67, 0.95)
 DETERMINISM_ROWS = 50_000
 
 # Chart generators build output from Python ``datetime`` objects, so their
@@ -312,6 +315,23 @@ def resample_failures(production: pl.DataFrame, oracle: pl.DataFrame) -> dict[st
     }
 
 
+def resample_output_failures(
+    timeframe: pl.DataFrame, period_minutes: int, source_max: Any
+) -> dict[str, int]:
+    """Output-side resample integrity: no future close, strict source-bar count, unique close."""
+    duplicate = timeframe.height - int(timeframe.select(pl.col("CloseTime").n_unique()).item())
+    return {
+        "future_timestamp": timeframe.filter(pl.col("CloseTime") > source_max).height,
+        "wrong_sourcebars": timeframe.filter(pl.col("SourceBars") != period_minutes).height,
+        "duplicate_close_time": duplicate,
+    }
+
+
+def schema_failures(actual_columns: list[str], expected_columns: list[str]) -> int:
+    """Return 1 if the produced columns do not exactly match the expected schema."""
+    return 0 if actual_columns == expected_columns else 1
+
+
 def sparse_chart_failures(
     batch: pl.DataFrame, source_times: pl.DataFrame, source_max: Any
 ) -> dict[str, int]:
@@ -361,6 +381,29 @@ def ha_failures(batch: pl.DataFrame, source: pl.DataFrame) -> dict[str, int]:
         "real_price_mismatch": real_mismatch,
         "source_count_ne_one": batch.filter(pl.col("SourceCount") != 1).height,
     }
+
+
+def positioned_windows(
+    source: pl.DataFrame, window_rows: int, positions: tuple[str, ...]
+) -> dict[str, pl.DataFrame]:
+    """Bounded probe windows for structural look-ahead checks.
+
+    When the slice fits within ``window_rows`` the whole slice is a single
+    ``full`` window (positions would be identical, so they are not duplicated).
+    Otherwise one window per requested position gives coverage across the slice
+    (head/middle/tail) rather than only its leading rows.
+    """
+    n = source.height
+    if n <= window_rows:
+        return {"full": source}
+    windows: dict[str, pl.DataFrame] = {}
+    if "head" in positions:
+        windows["head"] = source.head(window_rows)
+    if "middle" in positions:
+        windows["middle"] = source.slice((n - window_rows) // 2, window_rows)
+    if "tail" in positions:
+        windows["tail"] = source.tail(window_rows)
+    return windows
 
 
 def prefix_stability_failures(
@@ -538,23 +581,24 @@ def validate_timeframe(
     )
 
     source_max = source_1m.select(pl.max("CloseTime")).item()
+    out = resample_output_failures(timeframe, period_minutes, source_max)
     add_check(
         checks, instrument=data.instrument, source_file=data.source_file, source_timeframe=label,
         view="timeframe", check="resample_no_future_timestamp",
-        failures=timeframe.filter(pl.col("CloseTime") > source_max).height,
+        failures=out["future_timestamp"],
         denominator=timeframe.height, detail="rows_after_source_analysis_max",
     )
     add_check(
         checks, instrument=data.instrument, source_file=data.source_file, source_timeframe=label,
         view="timeframe", check="resample_strict_sourcebars",
-        failures=timeframe.filter(pl.col("SourceBars") != period_minutes).height,
+        failures=out["wrong_sourcebars"],
         denominator=timeframe.height, detail=f"rows_with_sourcebars_not_{period_minutes}",
     )
-    duplicate = timeframe.height - int(timeframe.select(pl.col("CloseTime").n_unique()).item())
     add_check(
         checks, instrument=data.instrument, source_file=data.source_file, source_timeframe=label,
-        view="timeframe", check="resample_close_time_unique", failures=duplicate,
-        denominator=timeframe.height, detail=f"duplicate_resampled_close_time_rows={duplicate}",
+        view="timeframe", check="resample_close_time_unique", failures=out["duplicate_close_time"],
+        denominator=timeframe.height,
+        detail=f"duplicate_resampled_close_time_rows={out['duplicate_close_time']}",
     )
 
 
@@ -570,7 +614,7 @@ def validate_chart_view(
     add_check(
         checks, instrument=data.instrument, source_file=data.source_file,
         source_timeframe=source_timeframe, view=chart.name, check="chart_schema_expected",
-        failures=0 if batch.columns == chart.columns else 1, denominator=1,
+        failures=schema_failures(batch.columns, chart.columns), denominator=1,
         detail=f"columns={batch.columns}",
     )
     _record_chart_alignment(data, source, source_timeframe, chart, batch, checks)
@@ -623,15 +667,17 @@ def _record_lookahead_and_determinism(
     chart: ChartSpec,
     checks: list[ValidationCheck],
 ) -> None:
-    window = source.head(PREFIX_WINDOW_ROWS)
-    stability = prefix_stability_failures(window, chart.batch_generator)
-    add_check(
-        checks, instrument=data.instrument, source_file=data.source_file,
-        source_timeframe=source_timeframe, view=chart.name, check="no_lookahead_prefix_stability",
-        failures=stability["failures"], denominator=stability["cuts"],
-        detail=f"diverged_cuts={stability['failures']}, compared_cuts={stability['cuts']}, "
-        f"window_rows={window.height}",
-    )
+    windows = positioned_windows(source, PREFIX_WINDOW_ROWS, PREFIX_WINDOW_POSITIONS)
+    for position, window in windows.items():
+        stability = prefix_stability_failures(window, chart.batch_generator)
+        add_check(
+            checks, instrument=data.instrument, source_file=data.source_file,
+            source_timeframe=source_timeframe, view=chart.name,
+            check=f"no_lookahead_prefix_stability_{position}",
+            failures=stability["failures"], denominator=stability["cuts"],
+            detail=f"position={position}, diverged_cuts={stability['failures']}, "
+            f"compared_cuts={stability['cuts']}, window_rows={window.height}",
+        )
     determinism = determinism_failures(source.head(DETERMINISM_ROWS), chart.batch_generator)
     add_check(
         checks, instrument=data.instrument, source_file=data.source_file,
@@ -737,10 +783,37 @@ def _record_nc(
 def run_negative_controls(
     checks: list[ValidationCheck], results: list[NegativeControl]
 ) -> None:
+    """Inject a fault for every data-integrity / alignment check (see analysis plan Step 6).
+
+    Each control corrupts a deterministic synthetic input and routes it through the
+    same check function used on real data, requiring that function to report a
+    failure. A control whose fault is not detected is a FAIL. Pure availability/IO
+    defensive checks (Parquet readability, file presence, non-empty slice) are
+    exercised by their own construction and are not assigned controls.
+    """
     src = synthetic_source(240)
     unit = pl.Datetime(CANONICAL_TIME_UNIT)
     source_times = src.select("CloseTime").unique()
     source_max = src.select(pl.max("CloseTime")).item()
+
+    # Base time-bar integrity detection (via base_timebar_failures)
+    null_ct = src.with_columns(_override_first("CloseTime", None, unit))
+    _record_nc(checks, results, "base_null_close_time", "close_time_not_null",
+               base_timebar_failures(null_ct)["null_close_time"])
+    backwards = src.with_columns(
+        _override_first("CloseTime", source_max + timedelta(minutes=999), unit)
+    )
+    _record_nc(checks, results, "base_non_increasing_close_time", "close_time_strictly_increasing",
+               base_timebar_failures(backwards)["non_increasing_close_time"])
+    dup_ct = src.with_columns(_override_first("CloseTime", src["CloseTime"][1], unit))
+    _record_nc(checks, results, "base_duplicate_close_time", "close_time_unique",
+               base_timebar_failures(dup_ct)["duplicate_close_time"])
+    bad_ohlc = src.with_columns(_override_first("High", -1.0e9))
+    _record_nc(checks, results, "base_invalid_ohlc", "ohlc_relationship_valid",
+               base_timebar_failures(bad_ohlc)["invalid_ohlc"])
+    null_ohlc = src.with_columns(_override_first("Open", None, src.schema["Open"]))
+    _record_nc(checks, results, "base_null_ohlc", "ohlc_not_null",
+               base_timebar_failures(null_ohlc)["null_ohlc"])
 
     # Resample oracle detection
     production15 = aggregate_ohlc(src, 15)
@@ -753,7 +826,22 @@ def run_negative_controls(
     _record_nc(checks, results, "resample_dropped_row", "resample_matches_independent_oracle",
                fails["rows_only_in_oracle"])
 
-    # Sparse-chart timestamp detection (use Renko output)
+    # Resample output-side detection (via resample_output_failures)
+    future_rs = production15.with_columns(
+        _override_first("CloseTime", source_max + timedelta(minutes=999), unit)
+    )
+    _record_nc(checks, results, "resample_future_timestamp", "resample_no_future_timestamp",
+               resample_output_failures(future_rs, 15, source_max)["future_timestamp"])
+    wrong_sb = production15.with_columns(
+        _override_first("SourceBars", 99, production15.schema["SourceBars"])
+    )
+    _record_nc(checks, results, "resample_wrong_sourcebars", "resample_strict_sourcebars",
+               resample_output_failures(wrong_sb, 15, source_max)["wrong_sourcebars"])
+    dup_rs = production15.with_columns(_override_first("CloseTime", production15["CloseTime"][1], unit))
+    _record_nc(checks, results, "resample_duplicate_close_time", "resample_close_time_unique",
+               resample_output_failures(dup_rs, 15, source_max)["duplicate_close_time"])
+
+    # Sparse-chart timestamp / source-count detection (use Renko output)
     renko = generate_renko(src, atr_period=RENKO_ATR_PERIOD)
     future = renko.with_columns(
         _override_first("SourceCloseTime", source_max + timedelta(minutes=9), unit)
@@ -765,25 +853,58 @@ def run_negative_controls(
     )
     _record_nc(checks, results, "chart_unmapped_source_time", "chart_source_time_maps_to_source",
                sparse_chart_failures(unmapped, source_times, source_max)["missing_source"])
+    null_src = renko.with_columns(_override_first("SourceCloseTime", None, unit))
+    _record_nc(checks, results, "chart_null_source_time", "chart_source_time_not_null",
+               sparse_chart_failures(null_src, source_times, source_max)["null_source"])
     shifted_close = renko.with_columns(
         _override_first("CloseTime", source_max - timedelta(minutes=1), unit)
     )
     _record_nc(checks, results, "chart_close_ne_source", "chart_close_time_equals_source_time",
                sparse_chart_failures(shifted_close, source_times, source_max)["close_ne_source"])
+    neg_count = renko.with_columns(_override_first("SourceCount", -5, renko.schema["SourceCount"]))
+    _record_nc(checks, results, "chart_source_count_negative", "chart_source_count_non_negative",
+               sparse_chart_failures(neg_count, source_times, source_max)["source_count_negative"])
+    zero_first = renko.with_columns(_override_first("SourceCount", 0, renko.schema["SourceCount"]))
+    _record_nc(checks, results, "chart_first_event_source_count_zero",
+               "chart_first_event_source_count_positive",
+               sparse_chart_failures(zero_first, source_times, source_max)
+               ["first_event_source_count_lt_one"])
 
-    # Heiken Ashi real-price detection
+    # Chart schema detection (via schema_failures)
+    _record_nc(checks, results, "chart_schema_mismatch", "chart_schema_expected",
+               schema_failures(renko.drop("BrickSize").columns, RENKO_COLUMNS))
+
+    # Heiken Ashi real-price / alignment detection (via ha_failures)
     ha = generate_heiken_ashi(src)
     bad_real = ha.with_columns(_override_first("RealClose", -1.0))
     _record_nc(checks, results, "ha_real_price_corruption", "ha_real_prices_match_source",
                ha_failures(bad_real, src)["real_price_mismatch"])
+    _record_nc(checks, results, "ha_dropped_row", "ha_row_count_matches_source",
+               ha_failures(ha.slice(1), src)["row_count_mismatch"])
+    ha_unmapped = ha.with_columns(
+        _override_first("CloseTime", source_max + timedelta(minutes=999), unit)
+    )
+    _record_nc(checks, results, "ha_unmapped_close_time", "ha_close_time_maps_to_source",
+               ha_failures(ha_unmapped, src)["missing_source"])
+    ha_count = ha.with_columns(_override_first("SourceCount", 2, ha.schema["SourceCount"]))
+    _record_nc(checks, results, "ha_source_count_ne_one", "ha_source_count_one",
+               ha_failures(ha_count, src)["source_count_ne_one"])
 
     # Look-ahead generator caught by prefix stability (the headline control)
     _record_nc(checks, results, "lookahead_generator", "no_lookahead_prefix_stability",
                prefix_stability_failures(src, lookahead_demo_generator)["failures"])
 
-    # Determinism check sensitivity: a perturbed regeneration must be flagged
-    perturbed = 0 if ha.equals(ha.with_columns((pl.col("HAClose") + 1.0).alias("HAClose"))) else 1
-    _record_nc(checks, results, "determinism_sensitivity", "deterministic_regeneration", perturbed)
+    # Determinism: an ACTUALLY non-deterministic generator must be flagged. A
+    # mutable call counter guarantees the two regenerations differ, so this tests
+    # determinism_failures itself, not the `equals` primitive.
+    call_state = {"calls": 0}
+
+    def nondeterministic_generator(frame: pl.DataFrame) -> pl.DataFrame:
+        call_state["calls"] += 1
+        return frame.with_columns(pl.lit(call_state["calls"]).cast(pl.Int64).alias("_call"))
+
+    _record_nc(checks, results, "determinism_sensitivity", "deterministic_regeneration",
+               determinism_failures(src, nondeterministic_generator))
 
 
 def validate_resample_golden(checks: list[ValidationCheck]) -> None:
@@ -943,6 +1064,7 @@ def run_validation() -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, dict[str
         "linebreak_level": LINEBREAK_LEVEL,
         "renko_atr_period": RENKO_ATR_PERIOD,
         "prefix_window_rows": PREFIX_WINDOW_ROWS,
+        "prefix_window_positions": list(PREFIX_WINDOW_POSITIONS),
         "prefix_fractions": list(PREFIX_FRACTIONS),
         "determinism_rows": DETERMINISM_ROWS,
         "holdout_rule": "first 70 percent analysis slice only",

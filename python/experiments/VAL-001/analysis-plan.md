@@ -85,20 +85,22 @@ final 30% global holdout from every loaded and generated view.
 
 ### Step 5: No-Look-Ahead via Prefix Stability + Determinism
 
-- **Method**: For each chart-type generator and source timeframe, take a bounded
-  leading window and assert that `generate(source[:k])` is an exact prefix of
-  `generate(source)` at several cut points `k` (`equals` comparison on the first
-  `len(prefix)` rows). Separately, assert that two regenerations of the same
-  slice are byte-identical.
+- **Method**: For each chart-type generator and source timeframe, take bounded
+  windows positioned at the **head, middle, and tail** of the analysis slice and,
+  in each window, assert that `generate(window[:k])` is an exact prefix of
+  `generate(window)` at several cut points `k` (`equals` comparison on the first
+  `len(prefix)` rows). Positioning windows across the slice — not only at its
+  head — gives positional coverage beyond the leading rows. Separately, assert
+  that two regenerations of the same slice are byte-identical.
 - **Why this method**: Prefix stability is the operational definition of "no
   look-ahead": if a generator used any future row, giving it more future data
   would change earlier emitted rows. It compares two genuinely different inputs,
   unlike the previous batch-vs-streaming replay, which re-ran the same loop the
   batch path already used and therefore passed by construction. Streaming/batch
   API equivalence is already covered by the `xen` package unit tests.
-- **Why a bounded window**: No-look-ahead and determinism are structural
-  properties of a sequential generator, so a representative leading window
-  falsifies them without a pure-Python pass over millions of rows. Per-row
+- **Why bounded windows**: No-look-ahead and determinism are structural
+  properties of a sequential generator, so representative windows at several
+  positions falsify them without a pure-Python pass over millions of rows. Per-row
   alignment properties (Step 4) are still checked on the full generated output.
 - **Simpler alternative considered**: Re-running the batch-vs-streaming replay.
   Rejected as tautological. Spot-checking sampled rows was also rejected as
@@ -110,18 +112,33 @@ final 30% global holdout from every loaded and generated view.
 
 ### Step 6: Negative Controls (detection power)
 
-- **Method**: On a deterministic synthetic series, inject faults and require the
-  matching check function to report a failure: (a) a look-ahead generator that
-  encodes the next bar's value, checked by prefix stability; (b) future,
-  unmapped, and `CloseTime != SourceCloseTime` chart timestamps; (c) a corrupted
-  Heiken Ashi real price; (d) a corrupted resample value and a dropped resample
-  row, checked by the oracle; (e) a perturbed regeneration, checked by the
-  determinism comparison. A control whose injected fault is *not* detected is
-  recorded as a FAIL.
-- **Why this method**: A suite where every assertion passes by construction gives
-  false confidence. Negative controls demonstrate that each check can actually
-  fail for the fault it guards against, so a clean run on real data is
-  meaningful.
+- **Method**: On a deterministic synthetic series, inject a fault for **every
+  data-integrity and alignment check** and require that exact check function to
+  report a failure:
+  - base time bars (`base_timebar_failures`): null `CloseTime`, a non-increasing
+    `CloseTime`, a duplicate `CloseTime`, an invalid OHLC row (High below
+    max(Open, Close)), and a null OHLC value;
+  - resample: a corrupted OHLC value and a dropped row through the oracle
+    comparison, plus a future resample `CloseTime`, a wrong `SourceBars` count,
+    and a duplicate resample `CloseTime` through the output-side checks;
+  - sparse charts (`sparse_chart_failures`, on Renko output): future, unmapped,
+    and `CloseTime != SourceCloseTime` timestamps, a null `SourceCloseTime`, a
+    negative `SourceCount`, and a zero `SourceCount` on a first event;
+  - Heiken Ashi (`ha_failures`): a corrupted real price, a dropped row
+    (row-count mismatch), an unmapped `CloseTime`, and a `SourceCount != 1`;
+  - chart schema: a renamed/dropped output column through the schema check;
+  - look-ahead: a generator that encodes the next bar's value, through prefix
+    stability;
+  - determinism: an **actually non-deterministic generator** (output differs
+    between two regenerations of identical input) routed through
+    `determinism_failures` — this tests the determinism check itself, not the
+    `equals` primitive.
+
+  A control whose injected fault is *not* detected is recorded as a FAIL.
+- **Why this method**: A suite where assertions pass by construction gives false
+  confidence. rev. 3 requires a negative control for *every* data-integrity and
+  alignment check (not a subset), so each PASS on real data is backed by proof
+  that the same check fails on a representative injected fault.
 - **Simpler alternative considered**: Trusting the positive checks without
   controls. Rejected — that was the core weakness of the prior design.
 - **Expected output**: `negative_controls.csv` plus one `negative_control` row
@@ -166,8 +183,8 @@ final 30% global holdout from every loaded and generated view.
   no scoped view is inconclusive, the validation supports the
   architecture-readiness hypothesis. Each PASS now reflects an independent
   property — agreement with the pandas oracle, prefix stability against a
-  different input, deterministic regeneration, and timestamp mapping — rather
-  than a check that could only pass.
+  different input at head/middle/tail windows, deterministic regeneration, and
+  timestamp mapping — rather than a check that could only pass.
 - If any critical check reports FAIL, the validation contradicts the hypothesis:
   a resample disagrees with the oracle, a generator violates prefix stability
   (look-ahead), regeneration is non-deterministic, or a row violates a

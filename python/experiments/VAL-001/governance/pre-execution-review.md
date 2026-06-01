@@ -1,131 +1,83 @@
 VERDICT: APPROVE
 
-# Pre-Execution Governance Review: VAL-001 (rev. 2)
+# Pre-Execution Governance Review: VAL-001 (rev. 3)
 
-This supersedes the rev. 1 review. The artifacts were revised before first
-execution (no `results/` produced) to remove checks that passed by construction
-and to add detection-power evidence, per an independent pre-run assessment.
+This supersedes the rev. 2 review (retained in git history). VAL-001 was
+previously executed and approved under rev. 2; a post-completion review found
+three detection-power gaps. By explicit user/governance decision the experiment
+is re-run **in place** (same ID) as rev. 3 rather than as a new VAL. The
+re-execution still passes through this pre-execution gate and the Stage 8 gate.
 
 ## Reviewed Artifacts
 
-- `python/experiments/VAL-001/scope.md`
-- `python/experiments/VAL-001/analysis-plan.md`
-- `python/experiments/VAL-001/code/run_experiment.py`
+- `python/experiments/VAL-001/scope.md` (rev. 3)
+- `python/experiments/VAL-001/analysis-plan.md` (rev. 3)
+- `python/experiments/VAL-001/code/run_experiment.py` (rev. 3)
 
-## What Changed Since rev. 1
+## What Changed Since rev. 2
 
-- **No-look-ahead** is now tested by **prefix stability** (`generate(source[:k])`
-  must be an exact prefix of `generate(source)`), which compares two different
-  inputs, instead of the previous batch-vs-streaming replay that re-ran the same
-  loop and therefore could not fail. Determinism is checked separately.
-- **Resampling** is validated against an **independent pandas oracle** plus a
-  hand-anchored golden fixture, replacing the prior reimplementation of the
-  production bucket formula.
-- **Negative controls** were added: injected look-ahead, future/unmapped/shifted
-  timestamps, corrupted real prices, corrupted/dropped resample rows, and a
-  perturbed regeneration. Each must be detected; an undetected control is a FAIL.
-- Comparisons are **vectorised** (Polars joins / `equals`, pandas C-resample);
-  look-ahead and determinism probes use a bounded leading window instead of
-  pure-Python million-row loops.
-- 1-minute, 15-minute, and 60-minute chart builds are all retained.
+- **Detection-power coverage (gap 1)** — rev. 2 carried negative controls for
+  only 8 check types. rev. 3 adds a negative control for **every**
+  data-integrity and alignment check: base time-bar integrity (null /
+  non-increasing / duplicate `CloseTime`, invalid OHLC, null OHLC) via
+  `base_timebar_failures`; the three resample output-side checks (future
+  timestamp, wrong source-bar count, duplicate close) via the newly extracted
+  `resample_output_failures`; the remaining sparse-chart checks (null source
+  time, negative `SourceCount`, first-event zero `SourceCount`); the remaining
+  Heiken Ashi checks (row-count mismatch, unmapped close, `SourceCount != 1`);
+  and the chart schema check via the newly extracted `schema_failures`. Pure
+  availability/IO defensive checks (Parquet readability, file presence, non-empty
+  slice) are named exclusions, not silently unguarded.
+- **Determinism control (gap 2)** — the rev. 2 control only proved
+  `DataFrame.equals` returns False for two different frames. rev. 3 routes an
+  actually non-deterministic generator (a mutable call counter makes the two
+  regenerations differ) through `determinism_failures`, so the control tests the
+  determinism check itself.
+- **Look-ahead coverage (gap 3)** — rev. 2 probed prefix stability on the
+  leading window only. rev. 3 probes `head`, `middle`, and `tail` windows
+  (`positioned_windows`) at three cut points (`PREFIX_FRACTIONS = 0.34, 0.67,
+  0.95`). Slices that fit within `PREFIX_WINDOW_ROWS` collapse to a single
+  `full` window (no redundant duplication). The hypothesis was reworded to scope
+  the structural no-look-ahead claim to the probe windows while full-output
+  timestamp alignment remains checked on every emitted row.
+- A manual generator-correctness review (gap 4) compared the Line Break and
+  Renko implementations against `architecture.md` and found no defect; no new
+  positive check was added, on the documented rationale that deterministic +
+  reproducible generation lets downstream consumers replicate any result.
 
-Two latent defects (present in rev. 1, never caught because governance is a
-static review) were found and fixed during pre-run verification on synthetic
-data:
+## Governance Checks
 
-1. **Datetime-unit mismatch** — chart generators emit microsecond timestamps
-   (built from Python `datetime`) while Parquet bars load as nanoseconds; the
-   rev. 1 alignment joins would have raised `SchemaError` on the real data.
-   Fixed by normalising all cross-compared frames to one canonical unit
-   (`to_canonical_time`).
-2. **`SourceCount` check** — rev. 1 flagged `SourceCount <= 0`, but a value of 0
-   is legitimate for a same-source duplicate Renko brick. Replaced with
-   non-negativity plus a "first event per `SourceCloseTime` must be >= 1" check,
-   which passes for correct generators and would have FAILed real volatile data
-   under the old rule.
+| Constraint | Verdict | Evidence |
+|------------|---------|----------|
+| Single question / scope discipline | PASS | Still one question (temporal-integrity readiness). Coverage strengthened, not expanded; no strategy/return/P&L claims added. |
+| Holdout rule | PASS | Loader unchanged: lazy `pl.len()` → `sort("CloseTime")` → `slice(0, int(0.7*total))` → collect. New probe windows operate on the analysis-slice frame; `tail` windows sit inside the first 70%, never the holdout. |
+| Look-ahead prevention | PASS | Multi-position prefix stability + full-output timestamp alignment on every emitted row. |
+| Real-price discipline | PASS | No returns, P&L, stops, targets, or signal outcomes. Synthetic prices validated only as data-layer fields. |
+| Detection power | PASS | A negative control for every data-integrity/alignment check; an undetected control is a FAIL. Verified on synthetic data (23/23 detected). |
+| Statistical assumptions | PASS | No parametric/normality/stationarity/i.i.d. assumptions; deterministic checks only. |
+| Complexity budget | PASS | 0 statistical tests / 0; 2 plots / 2; 0 new modules / 0. New pure helpers live inside the experiment script, not in `python/src`. |
+| Code conventions | PASS | Organization preserved (new pure checks in the checks section, `positioned_windows` beside the prefix probe). No import side effects; output dirs created only in `main()`. Probe bounds documented as harness constants, not data-derived thresholds. |
 
-## Scope Review
+## Static + Synthetic Verification Performed
 
-- Single question: PASS. Still one question — whether the data architecture
-  preserves temporal alignment with no look-ahead. Negative controls strengthen
-  the same question rather than adding a new one.
-- Data boundaries: PASS. Instruments, timeframes (1/15/60), chart types, and
-  generator parameters are explicit.
-- Global holdout: PASS. First-70% analysis slice only; final 30% never collected.
-- Event denominators: PASS. Emitted rows counted; same-source duplicates and the
-  `SourceCount == 0` semantics are documented and not silently deduplicated.
-- Real-price discipline: PASS. No P&L, returns, stops, or targets in scope.
-- Detection power: PASS. Scope now requires every negative control to be
-  detected, with an undetected control treated as a FAIL.
-- Checkpoint alignment: PASS with note. No active checkpoint; framed as a
-  pre-thesis architecture-readiness gate.
+- `py_compile`: clean. `ruff check`: clean. `xen` unit tests: 8/8 pass.
+- Synthetic-only pre-run verification (no real data, no holdout, no `results/`
+  written): `run_negative_controls` produced **23/23 detected** controls, the
+  golden fixture passed, and there were **0 FAIL / 0 INCONCLUSIVE** rows.
+- False-positive check: the real Renko, Line Break, and Heiken Ashi generators
+  satisfy prefix stability at head/middle/tail windows (0 diverged cuts), so the
+  broadened probe does not falsely flag correct generators.
 
-## Analysis Plan Review
+## Notes for Execution
 
-- Method choice: PASS. Prefix stability is the operational definition of
-  no-look-ahead; the pandas oracle and golden fixture are independent ground
-  truth; negative controls justify the detection-power claim. Each method states
-  why, the simpler alternative considered, and assumptions.
-- Statistical assumptions: PASS. No parametric, stationarity, normality, or
-  i.i.d. assumptions. The periods 15/60 dividing the day evenly is stated and is
-  confirmed by the golden fixture and zero oracle disagreement on clean data.
-- Cross-view alignment: PASS. `CloseTime` for time bars and resamples,
-  `SourceCloseTime` for Line Break and Renko; no bar-index comparisons.
-- Look-ahead prevention: PASS. Prefix stability on a bounded leading window is
-  justified by the structural nature of the property; full-output per-row
-  alignment is still checked on the entire generated output.
-- Complexity budget: PASS. 0 statistical tests, 2 plots, 0 new code modules. The
-  pandas oracle and negative controls are deterministic checks, not statistical
-  tests, and live inside the experiment script (no new `python/src` module).
-
-## Implementation Review
-
-- Plan compliance: PASS. Inventory, base checks, oracle-based resample checks,
-  chart alignment, prefix-stability + determinism, negative controls, golden
-  fixture, result tables, and two bounded plots are all implemented.
-- Holdout exclusion: PASS. `scan.sort("CloseTime").slice(0, analysis_rows)
-  .collect()` then `to_canonical_time`; derived views generated only from that
-  slice. No code path reads beyond the 70% cutoff.
-- Look-ahead prevention: PASS. Prefix stability compares full vs prefix
-  generations; all `SourceCloseTime`/`CloseTime` comparisons are timestamp-based.
-- Detection power: PASS. Eight negative controls run on a deterministic synthetic
-  series; all were detected during verification (see Static Checks).
-- Import side effects: PASS. Output directories created in `main()`/orchestration.
-- Plot memory: PASS. Plots consume aggregated status and density summaries; the
-  full generated chart is produced once and reused for alignment and density.
-- Logging/output: PASS. Concise `logging`; helpers return data.
-- Duplicate-source events: PASS. Counted and reported, not deduplicated;
-  `SourceCount == 0` handled correctly.
-- Edge cases: PASS. Empty charts yield INCONCLUSIVE via zero denominators;
-  oracle/anti-joins handle empty frames; NaN-free OHLC checks are explicit.
-- Static checks: PASS. `ruff check` clean; `py_compile` clean; `xen` package
-  unit tests pass (8/8). Synthetic verification: pandas oracle vs `aggregate_ohlc`
-  produced zero disagreement on clean data; the golden fixture passed; all eight
-  negative controls were detected; a full synthetic instrument pass produced 92
-  PASS / 0 FAIL with the only INCONCLUSIVE rows being a 60-minute Renko ATR
-  warm-up artifact that does not occur at real 60-minute data volume. The
-  generated `__pycache__` was removed and no `results/` files were created.
-
-## Code-Standards Self-Check
-
-- Organization: PASS. Imports → path setup → constants → dataclasses → small
-  helpers → pure checks → loading → orchestration → negative controls → output →
-  `main()`.
-- Lazy loading and holdout exclusion: PASS.
-- Bounded plotting/data conversion: PASS.
-- Concise logging/output: PASS.
-- Zero-baseline handling: PASS. No percentage-improvement or zero-baseline ratio.
-- Temporal alignment rules: PASS. Timestamp-based throughout; canonical-unit
-  normalisation documented.
-- Synthetic-price discipline: PASS. No returns or P&L from any prices.
-- Duplicate-source event denominators: PASS.
-- Magic numbers: PASS with note. `PREFIX_WINDOW_ROWS`, `PREFIX_FRACTIONS`, and
-  `DETERMINISM_ROWS` are documented harness bounds (structural properties are
-  size-independent), not data-derived thresholds.
-
-## Note for Execution
-
-The run is generation-bound (it generates each chart type once over the full
-1-minute analysis slice for four instruments, plus bounded prefix/determinism
-probes), so expect a runtime on the order of a few minutes rather than a quick
-check.
+- Re-running **overwrites** the rev. 2 `results/` and `plots/`. The post-execution
+  artifacts (`audit.md`, `results.md`, `report.md`, both INDEX entries, and the
+  post-experiment review) describe the rev. 2 run and must be regenerated in
+  Stages 5–8 after re-execution.
+- Expected structure after re-run: 98 checks per real instrument
+  (BTCUSD/EURUSD/USTEC/XAUUSD) and 24 synthetic checks (23 negative controls +
+  1 golden fixture), all PASS — i.e. ~416 PASS / 0 FAIL / 0 INCONCLUSIVE. The
+  1-minute view gains head/middle/tail prefix checks; 15m/60m use a single
+  `full` window because the slice fits within `PREFIX_WINDOW_ROWS`.
+- Runtime increases relative to rev. 2 because the 1-minute generators are now
+  probed at three positions; expect roughly several extra minutes.
