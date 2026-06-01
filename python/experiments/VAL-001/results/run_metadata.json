@@ -1,0 +1,24 @@
+{
+  "data_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data",
+  "determinism_rows": 50000,
+  "experiment_id": "VAL-001",
+  "holdout_rule": "first 70 percent analysis slice only",
+  "linebreak_level": 3,
+  "prefix_fractions": [
+    0.5,
+    0.95
+  ],
+  "prefix_window_rows": 150000,
+  "renko_atr_period": 14,
+  "source_files": [
+    "timebars_btcusd_20230102_000000_20260514_203813.parquet",
+    "timebars_eurusd_20230102_000000_20260514_203330.parquet",
+    "timebars_ustec_20230102_230000_20260514_204410.parquet",
+    "timebars_xauusd_20230102_230200_20260514_204148.parquet"
+  ],
+  "source_timeframes": [
+    1,
+    15,
+    60
+  ]
+}

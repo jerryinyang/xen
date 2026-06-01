@@ -23,6 +23,7 @@ from typing import Any, Callable
 
 import matplotlib.pyplot as plt
 import polars as pl
+from tqdm.auto import tqdm
 
 from xen.bar_aggregator import aggregate_ohlc
 from xen.heiken_ashi_generator import HA_COLUMNS, generate_heiken_ashi
@@ -69,6 +70,7 @@ DETERMINISM_ROWS = 50_000
 # this conversion is lossless for this data.
 CANONICAL_TIME_UNIT = "us"
 TIME_COLUMNS = ("OpenTime", "CloseTime", "SourceCloseTime")
+SECTION_WIDTH = 78
 
 
 @dataclass(frozen=True)
@@ -167,7 +169,25 @@ def add_check(
 
 
 def configure_logging() -> None:
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+
+def log_section(title: str) -> None:
+    LOGGER.info("")
+    LOGGER.info("=" * SECTION_WIDTH)
+    LOGGER.info(title)
+    LOGGER.info("=" * SECTION_WIDTH)
+
+
+def log_subsection(title: str) -> None:
+    LOGGER.info("")
+    LOGGER.info("-" * SECTION_WIDTH)
+    LOGGER.info(title)
+    LOGGER.info("-" * SECTION_WIDTH)
+
+
+def log_kv(label: str, value: Any) -> None:
+    LOGGER.info("%-18s %s", f"{label}:", value)
 
 
 def ensure_output_dirs() -> None:
@@ -431,7 +451,8 @@ def load_analysis_data(path: Path, checks: list[ValidationCheck]) -> AnalysisDat
     train_rows = int(analysis_rows * 0.7)
     test_rows = analysis_rows - train_rows
     analysis_start, analysis_end = frame.select(
-        pl.first("CloseTime"), pl.last("CloseTime")
+        pl.first("CloseTime").alias("analysis_start"),
+        pl.last("CloseTime").alias("analysis_end"),
     ).row(0)
 
     actual_symbols = frame.select(pl.col("Symbol").n_unique()).item()
@@ -928,11 +949,14 @@ def run_validation() -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, dict[str
     }
 
     # Detection-power evidence runs first so it is present even on an empty data dir.
+    log_subsection("Detection-power controls")
     validate_resample_golden(checks)
     run_negative_controls(checks, negatives)
 
     files = list_timebar_files()
     metadata["source_files"] = [path.name for path in files]
+    log_subsection("Holdout-safe instrument validation")
+    log_kv("Source files", len(files))
     if not files:
         add_check(
             checks, instrument="ALL", source_file="data/timebars", source_timeframe="1m",
@@ -944,22 +968,39 @@ def run_validation() -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, dict[str
             negative_controls_to_frame(negatives), metadata,
         )
 
-    for path in files:
+    for path in tqdm(files, desc="Instruments", unit="file", dynamic_ncols=True):
         data = load_analysis_data(path, checks)
         if data is None:
             continue
-        LOGGER.info("Validating %s from %s", data.instrument, data.source_file)
+        tqdm.write(
+            f"{data.instrument}: {data.analysis_rows:,} analysis rows "
+            f"({data.analysis_start} -> {data.analysis_end})"
+        )
         validate_base_timebars(data, checks)
 
         timeframe_frames: dict[int, pl.DataFrame] = {}
-        for period_minutes in SOURCE_TIMEFRAMES:
+        for period_minutes in tqdm(
+            SOURCE_TIMEFRAMES,
+            desc=f"{data.instrument} timeframes",
+            unit="tf",
+            leave=False,
+            dynamic_ncols=True,
+        ):
             timeframe = aggregate_timeframe(data.frame, period_minutes)
             timeframe_frames[period_minutes] = timeframe
             validate_timeframe(data, data.frame, timeframe, period_minutes, checks)
 
-        for period_minutes, source in timeframe_frames.items():
-            for chart in chart_specs():
-                validate_chart_view(data, source, f"{period_minutes}m", chart, checks, densities)
+        with tqdm(
+            total=len(timeframe_frames) * len(chart_specs()),
+            desc=f"{data.instrument} chart views",
+            unit="view",
+            leave=False,
+            dynamic_ncols=True,
+        ) as chart_progress:
+            for period_minutes, source in timeframe_frames.items():
+                for chart in chart_specs():
+                    validate_chart_view(data, source, f"{period_minutes}m", chart, checks, densities)
+                    chart_progress.update(1)
 
     return (
         checks_to_frame(checks), densities_to_frame(densities),
@@ -970,22 +1011,36 @@ def run_validation() -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, dict[str
 def main() -> None:
     configure_logging()
     ensure_output_dirs()
+    log_section("VAL-001 Data Architecture Validation")
+    log_kv("Data directory", DATA_DIR)
+    log_kv("Results", RESULTS_DIR)
+    log_kv("Plots", PLOTS_DIR)
+    log_kv("Holdout rule", "first 70 percent analysis slice only")
+
     checks_df, densities_df, negatives_df, metadata = run_validation()
+
+    log_subsection("Writing artifacts")
     write_outputs(checks_df, densities_df, negatives_df, metadata)
 
     failures = checks_df.filter(pl.col("status") == "FAIL").height
     inconclusive = checks_df.filter(pl.col("status") == "INCONCLUSIVE").height
     missed_controls = negatives_df.filter(~pl.col("detected")).height if negatives_df.height else 0
-    LOGGER.info("Wrote validation outputs to %s", RESULTS_DIR)
-    LOGGER.info(
-        "Checks: %s failures, %s inconclusive; negative controls missed: %s",
-        failures, inconclusive, missed_controls,
-    )
+
+    log_subsection("Run summary")
+    log_kv("Output directory", RESULTS_DIR)
+    log_kv("Validation checks", checks_df.height)
+    log_kv("Failures", failures)
+    log_kv("Inconclusive", inconclusive)
+    log_kv("Negative controls", negatives_df.height)
+    log_kv("Missed controls", missed_controls)
 
     if failures:
+        log_kv("Exit status", "FAIL")
         raise SystemExit(1)
     if inconclusive:
+        log_kv("Exit status", "INCONCLUSIVE")
         raise SystemExit(2)
+    log_kv("Exit status", "PASS")
 
 
 if __name__ == "__main__":
