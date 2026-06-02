@@ -94,18 +94,22 @@ Expected artifact: `python/experiments/<ID>/code/run_experiment.py`.
 
 Require the implementation response to include a code-standards self-check
 against `experiment-developer/references/code-conventions.md`, specifically:
-organization, lazy loading and holdout exclusion, bounded plotting/data
-conversion, concise logging/output, zero-baseline handling, and any
-scope-specific temporal alignment, synthetic-price, or duplicate-source
-event-denominator rules.
+organization and sectioning, lazy loading and holdout exclusion, bounded
+plotting/data conversion, `tqdm` progress for long loops, concise
+logging/output, safe Polars/vectorized performance choices, zero-baseline
+handling, and any scope-specific temporal alignment, synthetic-price, or
+duplicate-source event-denominator rules.
 
 Before approving implementation, verify that the code follows the project code
 conventions: imports before path setup and constants, output directories created
 only in orchestration, lazy chronological holdout slicing, bounded memory use,
-concise logging, no silent deduplication, no full-data collection before
-holdout exclusion, no repeated heavy loads/generation for plotting when the
-analysis pass already has the data, and finite handling for zero-baseline
-metrics.
+clear VAL-001-style sectioning for non-trivial scripts, `tqdm` progress for
+long-running outer loops, concise logging, no silent deduplication, no
+full-data collection before holdout exclusion, no repeated heavy
+loads/generation for plotting when the analysis pass already has the data,
+finite handling for zero-baseline metrics, and no optimization that changes
+sample membership, temporal ordering, denominators, metric definitions,
+statistical interpretation, or streaming/causal semantics.
 
 ## Stage 4: Pre-Execution Governance
 
@@ -116,9 +120,12 @@ Also review the implementation against the developer code conventions and the
 active checkpoint `design.md`. Code that creates output directories at import
 time, reads or materializes large inputs before the holdout split, converts full
 large analysis sets to pandas for plotting, silently deduplicates loader rows,
-uses noisy helper-level `print()` output, or repeats heavy data loads for plots
-must receive `REVISE`. If chart-type events are in scope, code that does not
-define duplicate-source event denominators must also receive `REVISE`.
+uses noisy helper-level `print()` output, lacks progress tracking for
+multi-minute or multi-iteration loops, keeps avoidable Python row loops over
+large frames, vectorizes sequential logic in a way that violates causal or
+streaming semantics, or repeats heavy data loads for plots must receive
+`REVISE`. If chart-type events are in scope, code that does not define
+duplicate-source event denominators must also receive `REVISE`.
 Scope criteria that are mathematically unattainable, compare percentage
 improvement against a zero baseline, or leave scoped event denominators
 undefined must also receive `REVISE`.
@@ -223,6 +230,9 @@ Report: python/experiments/<ID>/report.md
   use `SourceCloseTime` when aligning to real time. Never use bar indices for
   temporal alignment across different data views.
 - Do not use information after the event timestamp when analyzing an event.
+- Do not accept performance optimizations that compromise correctness,
+  accuracy, data integrity, reliability, research interpretation, temporal
+  causality, or streamed-data validity.
 - Respect the scope's filtering and time range boundaries.
 - Do not expand scope after approval. Create a new experiment for follow-up questions.
 - Flag phase misalignment with checkpoint objectives before proceeding.

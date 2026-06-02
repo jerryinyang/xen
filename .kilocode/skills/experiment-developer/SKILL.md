@@ -34,9 +34,15 @@ Translate an approved scope and analysis plan into Python code. Implement only t
 7. Apply only filters approved in the scope.
 8. Write focused, typed functions for reusable computations.
 9. Save plots under `python/experiments/<ID>/plots/`.
-9. Save machine-readable outputs under `python/experiments/<ID>/results/` when practical.
-10. Keep stdout concise and useful for manual execution.
-11. Run a code-standards self-check before completion using the bundled
+10. Save machine-readable outputs under `python/experiments/<ID>/results/` when practical.
+11. Keep stdout concise and useful for manual execution.
+12. Add `tqdm` progress tracking for long-running outer loops or repeated
+    iterations, using clean descriptions and no noisy per-row output.
+13. Use safe performance and memory optimizations suitable for large datasets:
+    efficient Polars lazy plans, column projection, aggregation before
+    collection where possible, bounded plotting data, and vectorized
+    Polars/NumPy logic when it is causally equivalent.
+14. Run a code-standards self-check before completion using the bundled
     `code-conventions.md`; fix any violations unless the approved plan
     explicitly requires the exception.
 
@@ -47,14 +53,30 @@ Translate an approved scope and analysis plan into Python code. Implement only t
 - Return data from functions; keep file I/O in orchestration code.
 - Put imports first, then path setup, constants, small I/O helpers, pure
   computation helpers, plotting helpers, orchestration, and `main()`.
+- Section non-trivial scripts with VAL-001-style separators so manual review
+  can quickly distinguish constants, helpers, pure checks, plotting/output,
+  orchestration, and `main()`.
 - Create `plots/` and `results/` directories inside orchestration, not during
   module import.
 - Prefer `logging.getLogger(__name__)` for new scripts. Legacy `print()` is
   acceptable only for concise manual-run summaries from `main()` or
   orchestration-level progress messages.
+- Use `tqdm.auto.tqdm` for expensive loops over files, instruments, chart views,
+  validation windows, parameter grids, or simulations. Use `tqdm.write()` or
+  logging for occasional status lines; helper functions stay quiet.
 - Use lazy Polars scans for large Parquet inputs, select only needed columns,
   sort by the governing timestamp before slicing, and collect only the analysis
   set.
+- Prefer Polars expressions, joins, group/window operations, and NumPy
+  vectorization over Python row loops for large frames when the replacement is
+  causally equivalent and preserves streaming semantics.
+- Keep explicit loops when the logic is genuinely sequential or stateful, such
+  as chart generation, causal streaming validation, or bounded prefix probes.
+  Bound the work and report the bounds.
+- Do not optimize by changing sample membership, temporal ordering,
+  denominators, metric definitions, or statistical interpretation. In
+  particular, do not introduce look-ahead bias, batch-only streamed-data
+  violations, silent sampling, or silent deduplication.
 - Do not reload or regenerate large data solely for plotting when the analysis
   pass can return the sampled or aggregated plot inputs.
 - Convert to pandas only after aggregation or deterministic sampling; do not

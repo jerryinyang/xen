@@ -41,9 +41,17 @@ Validate whether the implementation and results can be trusted. Report findings 
    - random processes are deterministic.
 4. Check code standards against `experiment-developer/references/code-conventions.md`:
    - organization follows the sample structure;
+   - non-trivial scripts use clear VAL-001-style sections;
    - output directories are created only in orchestration;
    - large Parquet loads are lazy, column-pruned where practical, sorted before
      holdout slicing, and collected only after the first-70-percent cut;
+   - Polars, NumPy, or other vectorized operations replace Python row loops
+     where the replacement is causally equivalent;
+   - any remaining heavy loops are genuinely sequential/stateful, bounded, and
+     tracked with `tqdm` progress;
+   - performance optimizations do not change sample membership, temporal
+     ordering, denominators, metric definitions, statistical interpretation, or
+     streaming semantics;
    - plotting converts only aggregated or deterministically sampled data to
      pandas;
    - heavy loads/generator passes are not repeated solely for plotting;
@@ -79,6 +87,10 @@ Include exact file paths, functions, result files, and reproduction notes for ea
 - Prefer concrete evidence over broad style feedback, but treat code-standard
   violations that can change correctness, memory footprint, reproducibility, or
   governance enforcement as audit findings.
+- Treat unsafe optimizations as correctness issues, not style issues. Examples
+  include vectorized code that uses future rows, batch-only methods presented as
+  streaming-safe, silent sampling/deduplication, altered denominators, or
+  optimized joins/windows that no longer match the approved temporal alignment.
 
 ## References
 

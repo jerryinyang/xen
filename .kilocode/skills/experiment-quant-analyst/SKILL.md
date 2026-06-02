@@ -41,8 +41,12 @@ Create `python/experiments/<ID>/analysis-plan.md`.
    - supports the hypothesis if...
    - contradicts the hypothesis if...
    - inconclusive if...
-8. Confirm the plan fits the complexity budget.
-9. Use the bundled interpretation guides for the output structure.
+8. Define implementation safety constraints needed by `experiment-developer`:
+   timestamp ordering, denominators, zero-baseline behavior, bounded iteration
+   counts, progress expectations for long loops, and where Polars/NumPy
+   vectorization is safe or where sequential logic must remain explicit.
+9. Confirm the plan fits the complexity budget.
+10. Use the bundled interpretation guides for the output structure.
    If needed, locate the file ending with `/experiment-quant-analyst/references/interpretation-guides.md`.
 
 ## Interpretation Mode

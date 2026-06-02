@@ -84,6 +84,19 @@ Strategy P&L, signal returns, and excursion outcomes must use real time-matched 
 | No HA signal validation via HA prices | If Heiken Ashi is in scope, are signal quality metrics computed on real prices, not HA prices? |
 | No Renko brick P&L | If Renko is in scope, are Renko signal returns computed from time-matched real prices, never from brick open/close levels? |
 
+### 8. Safe Performance and Memory Optimization
+
+Large-dataset code must be proactively efficient, but never by changing the
+research question or temporal semantics.
+
+| Check | What to Verify |
+|-------|---------------|
+| Efficient Polars use | Are filters/projections pushed into lazy scans, with aggregation before collection where possible? |
+| Bounded memory | Are plotting inputs, iteration outputs, and intermediate frames bounded or written once rather than accumulated unbounded? |
+| Safe vectorization | Do vectorized joins, windows, or NumPy operations preserve the same sample membership, denominators, and timestamps as the explicit method? |
+| No causality breach | Does optimization avoid future rows, batch-only shortcuts presented as streaming-safe, and look-ahead bias? |
+| Progress visibility | Do multi-file, multi-instrument, parameter-grid, validation-window, or simulation loops show `tqdm` progress without noisy row-level logging? |
+
 ---
 
 ## Artifact-Specific Checks
@@ -128,11 +141,15 @@ Strategy P&L, signal returns, and excursion outcomes must use real time-matched 
 | Code quality | PEP 8, docstrings, descriptive names, ~30 line function limit? |
 | Data loading | Is Polars/Parquet used correctly? Are columns properly selected before `collect()`? |
 | Organization | Are imports, path setup, constants, I/O helpers, computation helpers, plotting helpers, orchestration, and `main()` clearly separated? |
+| Sectioning | Are non-trivial scripts sectioned in the VAL-001 style so constants, helpers, checks, plotting/output, orchestration, and `main()` are easy to review? |
 | Import side effects | Does module import avoid creating directories, writing files, loading data, or plotting? |
 | Logging/output | Is manual-run output concise and traceable, with helper functions returning data instead of printing? |
+| Progress tracking | Do long-running outer loops use `tqdm` or equivalent progress without per-row noise? |
 | Plot memory | Are plot inputs aggregated or sampled before pandas conversion? |
 | Repeated heavy work | Does plotting reuse analysis outputs instead of reloading or regenerating large datasets? |
 | Derived-view determinism | If generators or feature builders are called, are they deterministic or explicitly seeded? |
+| Safe optimization | Do performance improvements preserve correctness, sample membership, temporal ordering, denominators, metric definitions, and streaming semantics? |
+| Vectorization discipline | Are Python row loops replaced where safely possible, while genuinely sequential logic remains sequential and bounded? |
 
 ### Audit Report (audit.md)
 
@@ -193,6 +210,9 @@ Fundamental, unfixable issues. Examples:
   Renko brick prices instead of real prices; `HAClose` diagnostic returns are
   allowed only for explicitly scoped HA distortion experiments that label them
   non-tradable)
+- Unsafe optimization (vectorized or cached implementation changes sample
+  membership, temporal ordering, denominators, metric definitions,
+  interpretation, or streaming/causal semantics)
 - Bar-index alignment (comparing chart types by bar index instead of timestamp)
 - Scope creep beyond what can be fixed with revision
 - Method fundamentally violates core constraints (e.g., assumes normality with no cross-validation)

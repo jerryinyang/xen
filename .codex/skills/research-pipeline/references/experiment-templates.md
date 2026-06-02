@@ -55,11 +55,10 @@ from pathlib import Path
 DATA_DIR = Path("data")
 path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
 
-bars = (
-    pl.scan_parquet(path)
-    .sort("CloseTime")
-    .collect()
-)
+scan = pl.scan_parquet(path).sort("CloseTime")
+total_rows = int(scan.select(pl.len()).collect().item())
+analysis_cutoff = int(total_rows * 0.7)
+bars = scan.slice(0, analysis_cutoff).collect()
 ```
 
 ## Suggested Direction
@@ -119,6 +118,18 @@ Save to: `python/experiments/<EXP-ID>/analysis-plan.md`
 - Always align by timestamp (`CloseTime`, event timestamp, or `SourceCloseTime`), never by bar index.
 - Report alignment or coverage rates where event detectors emit sparse events.
 
+### Implementation Safety and Performance
+- Use lazy Polars scans, column projection, and aggregation before collection
+  where possible.
+- Use `tqdm` progress tracking for long-running file, instrument, chart-view,
+  parameter-grid, validation-window, or simulation loops.
+- Replace Python row loops with Polars/NumPy/vectorized logic only when the
+  replacement preserves temporal causality and streaming semantics.
+- Keep genuinely sequential logic explicit and bounded.
+- Do not optimize by changing sample membership, temporal ordering,
+  denominators, metric definitions, statistical interpretation, or
+  reproducibility.
+
 ### Real-Price Outcome Discipline
 - Compute strategy P&L, signal returns, and excursion outcomes from real time-bar prices.
 - Never compute strategy P&L from Heiken Ashi HA prices or Renko brick prices.
@@ -164,6 +175,9 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | <file> | Synthetic price discipline | PASS/FAIL | <verify no strategy P&L computed from HA prices or Renko brick prices> |
 | <file> | Chart-type alignment | PASS/FAIL | <verify alignment by timestamp, not bar index> |
 | <file> | Generator determinism | PASS/FAIL | <verify generators produce identical output from identical input> |
+| <file> | Safe optimization | PASS/FAIL | <verify performance choices preserve causality, denominators, and interpretation> |
+| <file> | Progress tracking | PASS/FAIL | <verify long-running loops use tqdm or equivalent clean progress> |
+| <file> | Logging/output | PASS/FAIL | <verify output is concise and traceable> |
 | <file> | Docstrings | PASS/FAIL | <details> |
 
 ## Numerical Validation

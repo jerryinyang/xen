@@ -306,7 +306,11 @@ If an experiment needs more, it should be **split into multiple experiments**.
 - **Real-price outcome discipline**: Use real time-bar prices for strategy, signal-quality, and return outcomes. If Heiken Ashi or Renko is in scope, never use HA prices or Renko brick prices for strategy P&L. `HAClose` returns are allowed only for explicitly scoped, non-tradable HA distortion diagnostics.
 - **Timestamp alignment**: Cross-view comparisons align by timestamp (`CloseTime` or `SourceCloseTime`), never by bar index
 - **Organization**: imports -> path setup -> constants -> I/O helpers -> pure computation -> plotting -> orchestration -> `main()`
+- **Sectioning**: non-trivial scripts use VAL-001-style separators for constants, dataclasses/types, helpers, pure checks/computation, plotting/output, orchestration, and `main()`
 - **Import side effects**: no directory creation, file writes, data loads, or plotting at module import time
 - **Logging/output**: concise progress output; helper functions return data instead of printing
-- **Performance**: lazy Polars scans, timestamp sort before first-70-percent slicing, column projection where practical, and bounded pandas conversions for plots
+- **Progress tracking**: use `tqdm` for long-running outer loops over files, instruments, chart views, parameter grids, validation windows, or simulations
+- **Performance**: lazy Polars scans, timestamp sort before first-70-percent slicing, column projection where practical, aggregation before collection where possible, efficient joins/window expressions, and bounded pandas conversions for plots
 - **Plot reuse**: do not rerun heavy loads or chart generation solely for plotting when the analysis pass can return bounded plot inputs
+- **Safe optimization**: computational optimizations must not change sample membership, temporal ordering, denominators, metric definitions, statistical interpretation, reproducibility, or streaming/causal semantics
+- **Vectorization discipline**: replace Python row loops with Polars/NumPy/vectorized logic only when the replacement is causally equivalent; keep genuinely sequential algorithms explicit and bounded

@@ -29,6 +29,8 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | <file> | Holdout exclusion | PASS/FAIL | <details> |
 | <file> | Loader ordering | PASS/FAIL | Lazy scan sorts by timestamp before slicing first 70%; no full holdout collection. |
 | <file> | Memory/performance | PASS/FAIL | Large inputs stay lazy/column-pruned; plotting samples or aggregates before pandas conversion. |
+| <file> | Safe optimization | PASS/FAIL | Vectorization/performance changes preserve sample membership, temporal causality, denominators, and interpretation. |
+| <file> | Progress tracking | PASS/FAIL | Long-running loops use `tqdm` or equivalent progress without noisy per-row output. |
 | <file> | Logging/output | PASS/FAIL | Manual-run output is concise and failures are traceable. |
 | <file> | Organization/import side effects | PASS/FAIL | Imports/path/constants/helpers/orchestration follow sample structure; no output directories are created at import time. |
 | <file> | Plot data reuse | PASS/FAIL | Heavy data loads and chart generation are not repeated solely for visualisations. |
@@ -118,6 +120,9 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | Import-time side effects | Module-level `mkdir()`, file writes, plotting setup with filesystem effects | Move effects into `main()` or orchestration |
 | Repeated heavy analysis pass | Loading/generating the same large data again for plots | Return bounded plot inputs from the analysis pass |
 | Unbounded pandas conversion | `.to_pandas()` on full analysis/event sets | Aggregate or deterministically sample first |
+| Unbounded Python row loop | `iter_rows()`, row-wise `for`, or per-row Python callbacks on large frames | Use Polars/NumPy/vectorized logic when it is causally equivalent |
+| Unsafe vectorized shortcut | Batch vectorization of sequential or streaming logic | Verify each row uses only information available at or before its timestamp |
+| Missing long-run progress | Multi-file, multi-instrument, parameter-grid, or repeated validation loops | Wrap expensive outer loops in `tqdm` and keep helper functions quiet |
 | Silent deduplication drift | Any `.unique()` in loaders | Require a scope reason and pre/post row-count reporting |
 | Zero-baseline percentage improvement | Any `(baseline - value) / baseline` | When baseline is zero, emit absolute difference or mark the relative metric undefined |
 | String/numeric confusion | `Direction` column comparisons | Verify `Direction` is `+1/-1` (int), not string |
