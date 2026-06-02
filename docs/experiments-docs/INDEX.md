@@ -14,9 +14,180 @@
 
 
 
+## EXP-001 — Synthetic Substrate Validation
+
+**Status**: SUPPORTED
+**Date**: 2026-06-02
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 1-minute time bars resampled to 5m (strict), 1h and 4h (`min_coverage=0.90`) OHLC domains via `xen.bar_aggregator.aggregate_ohlc`
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The known-null generators produce no oracle-recoverable edge, and the known-positive generator carries the planted oracle-recoverable net edge, on real analysis-set prices for each of the 5m, 1h, and 4h domains.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from the first-70% 1-minute analysis slice. No chart-type views.
+- **Features**: Close-to-Close next-step real returns; oracle state-following positions; known-null (bar-permutation, random-signal) and known-positive (state-aligned drift) generators; P0 aggregation-integrity checks with negative controls; coverage retention grid.
+- **Parameter ranges**: domains {5, 60, 240} min; coverage grid {strict, 0.90, 0.80}; net edge grid `m ∈ {0, 0.5, 1, 2, 4, 8, 12, 16, 24, 32}` bps; 200 null draws/generator, 100 positive draws/edge.
+- **Exclusions**: final 30% global holdout, chart-type signals, referee operating-characteristic measurement, Donchian/MA dogfood, parameter tuning, bid/ask spread estimation, data-inferred costs.
+- **Constraints**: first-70% analysis slice only; shared `CloseTime` split across domains; fixed seeds; real-price outcome discipline; closed-form injection `delta = m + cost`.
+
+### Results / Observations
+
+- `p0_aggregation_checks.csv`: 56/56 PASS at {5, 240} min (4 instruments), including all 4 negative controls detected per period; 0 oracle OHLC mismatches.
+- `run_metadata.json`: `overall_status: PASS`, `p0_pass: true`, `substrate_pass: true`, `inconclusive_cells: 0`, `underpowered_cells: 5`.
+- Known-null cells (24): mean gross oracle effect ∈ [−0.087, +0.103] bps, every percentile CI brackets zero (200 draws/cell).
+- Known-positive recovery: all non-zero cells recover planted `m` within `max(0.5 bps, 15% of m)`; high-sample domains recover to <0.01 bps (e.g. EURUSD/5m m=32 → 32.0005).
+- `underpowered_cells.csv`: 5 per-cell INCONCLUSIVE cells, all 4h — BTCUSD m=1,2; USTEC m=1,2; XAUUSD m=1 — recovered mean but across-draw CI straddles zero; all below the 4h materiality threshold (3.0 bps).
+- `analysis_metadata.csv`: post-slice analysis rows reproduce VAL-001 exactly (BTCUSD 1,088,960; EURUSD 872,242; USTEC 830,541; XAUUSD 830,671).
+- Coverage retention worsens 5m→4h and improves as `min_coverage` relaxes; 4h/0.90 dropped-window fraction 0.025–0.131.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+Every P0 check passes, every known-null is indistinguishable from zero, and every known-positive recovers the planted edge within tolerance; the only shortfalls are five 4h sub-material cells, classified by the predeclared §11/D-prec criteria as under-powered (INCONCLUSIVE), not failures. The substrate gate is PASS, so EXP-002/003 may build on it.
+
+### Hypothesis-Agnostic Observations
+
+- 4h effective sample (~2,700–4,400 returns/instrument) bounds attainable precision; EXP-003's 4h power curve near materiality will carry wide CIs.
+- Two structurally different nulls agreeing at ≈0 makes accidental recoverable structure implausible.
+- The known-positive "significance" leg measures across-draw recovery precision, not single-series detectability — the latter is EXP-003's measurement.
+
+---
+
+## EXP-002 — Referee Golden-Fixture Correctness
+
+**Status**: SUPPORTED
+**Date**: 2026-06-02
+**Instruments**: EURUSD label only (fixture diagnostics; no market data read)
+**Data Views / Feature Categories**: Deterministic in-memory return-space golden fixtures; EXP-001 dependency metadata
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The minimal baseline referee and the 5-check gate-stack referee reproduce predeclared hand-computed verdicts on deterministic golden fixtures, while the gate stack records every leg independently.
+
+### Scope
+
+- **Instruments**: EURUSD label only (referee-logic test, not market behaviour).
+- **Data Views / Feature Categories**: five deterministic return-space fixtures (positive oracle, null/negative, one-sided readiness, sub-material, naive-equivalent).
+- **Features**: minimal-baseline and gate-stack verdicts; L1–L5 leg states; block-bootstrap CI; cost/materiality application.
+- **Parameter ranges**: `alpha = 0.05`; `n_bootstrap = 1000`; EURUSD/5m cost 1.0 bps, materiality 0.5 bps.
+- **Exclusions**: FPR/TPR/MDE measurement, real candidates, parameter tuning, chart-type signals, any raw Parquet load, holdout.
+- **Constraints**: EXP-001 must record `overall_status == PASS`; fixed deterministic seeds; gate stack must evaluate all five legs without short-circuit.
+
+### Results / Observations
+
+- `golden_fixture_results.csv`: 10/10 verdict checks PASS. positive_oracle (min PASS/gate PASS, +6.0 net), null_negative_edge (REJECT/REJECT, −3.0), readiness_one_sided (PASS/REJECT, +7.0), materiality_too_small (PASS/REJECT, +0.2), naive_equivalent (PASS/REJECT, +1.667). Gate effect = minimal effect − 1.0 bps cost in every row.
+- `leg_exposure_matrix.csv`: 25/25 leg-exposure checks PASS; all five legs recorded for every fixture (no short-circuit).
+- Leg isolation: L1 via readiness_one_sided (0 down-episodes), L5 via materiality_too_small, L3 via naive_equivalent (`ci_vs_naive_lower = 0`), L3+L5 via null_negative_edge, all-pass via positive_oracle.
+- `run_metadata.json`: `overall_status: PASS`. Independent reproduction matched all rows bit-for-bit.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+Both referees reproduce every predeclared golden-fixture verdict and the gate stack exposes all five legs without short-circuiting, satisfying the scope's Evidence-FOR criteria; the referee logic is approved for EXP-003.
+
+### Hypothesis-Agnostic Observations
+
+- The `materiality_too_small` minimal row reports a degenerate `effective_n = 0.9` (block-length capped at the limit) because its series is constant to floating-point dust; deterministic, immaterial to the verdict, and impossible on real returns.
+- The same data yielding minimal-PASS but gate-REJECT (readiness_one_sided, materiality_too_small) cleanly demonstrates what each extra gate leg buys over the minimal baseline.
+
+---
+
+## EXP-003 — Referee Operating-Characteristic Calibration (Keystone)
+
+**Status**: SUPPORTED
+**Date**: 2026-06-02
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 1-minute time bars resampled to 5m (strict), 1h and 4h (`min_coverage=0.90`) OHLC domains
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The 5-check gate stack has a measurable empirical economic MDE at FPR ≤ α₀ = 0.05 on each domain, and its operating characteristics can be compared against the minimal baseline referee without touching the global holdout.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from the first-70% analysis slice; no chart-type views.
+- **Features**: paired known-null (bar-permutation, random-signal) and known-positive (state-aligned drift) draws; minimal-baseline and gate-stack verdicts with all five legs; block-bootstrap CIs; Wilson-interval FPR/TPR; empirical MDE.
+- **Parameter ranges**: α grid {0.10, 0.05, 0.01}; edge grid {0,0.5,1,2,4,8,12,16,24,32} bps; 500 null draws/generator (n=4000/cell pooled over instruments), 500 positive draws/edge (n=2000/cell), 1000 inner bootstrap resamples/verdict.
+- **Exclusions**: Donchian/MA dogfood interpretation, referee redesign, loss-function tuning, walk-forward, chart-type candidates, parameter optimization, holdout.
+- **Constraints**: EXP-001 and EXP-002 must PASS; first-70% slice only; shared `CloseTime` split across domains; real-price `Close` outcomes; block length on train only; identical (paired) draws to both referees.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: COMPLETE`, `measurements_produced: true`, `mde_cells: 18`, `mde_status_counts: {PASS: 18}`.
+- Gate-stack FPR = 0.0 (0/4000) at every domain and every α (`fpr_summary.csv`); minimal-baseline FPR ≈ α and ≤ α (e.g. 1h: 0.005 / 0.0248 / 0.0493 at α = 0.01 / 0.05 / 0.10).
+- Empirical MDE at α = 0.05 (`mde_summary.csv`): gate stack 1.0 (5m) / 4.0 (1h) / 12.0 (4h) bps; minimal baseline 0.5 / 0.5 / 2.0 bps. Gate MDE identical across the α grid; minimal-baseline 4h MDE moves 4.0 → 2.0 → 1.0 across α = 0.01 / 0.05 / 0.10.
+- Per-leg null pass rates (α = 0.05, all domains): L1 = L2 = 1.000, L3 = L4 = L5 = 0.000. Near the MDE, L5 is the lagging leg (4h m=2 → L5 = 0.006; 1h m=2 → L5 = 0.371; 4h m=12 → L5 = 0.935; 1h m=4 → L5 = 0.977).
+- TPR monotone non-decreasing to 1.0 across the grid (`tpr_summary.csv`); all 18 cells meet FPR half-width ≤ 0.03 and TPR half-width ≤ 0.05.
+- Effective N (blocks) reported per cell (e.g. BTCUSD 4h ≈ 1335). An independent end-to-end reproduction of a BTCUSD/4h cell matched `draw_verdicts.csv` bit-for-bit.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+Both referees have a usable-precision operating-characteristic map on all three domains; all 18 cells yield a finite MDE at controlled FPR (Evidence-FOR criteria met). The measured keystone result is the per-domain stringency↔sensitivity trade-off: the gate stack drives FPR from ≈ α to 0 at the cost of a 2–8× larger economic MDE.
+
+### Hypothesis-Agnostic Observations
+
+- L5 materiality dominates the gate stack's false negatives and sets its MDE, making the gate MDE α-invariant; the α grid moves only the minimal baseline's MDE.
+- Per-domain rates pool four instruments of heterogeneous cost (1–10 bps) and dispersion, so each MDE is a domain aggregate; per-instrument MDEs could be lower (relevant to EXP-004).
+- Whether the gate MDE sits above where plausibly-real edges live (structural blindness) is not decided here — it needs the EXP-004 dogfood anchor. The 4h gate MDE (12 bps) exceeds the 4h materiality threshold (3 bps).
+
+---
+
+## EXP-004 — Real Dogfood Consistency Anchor
+
+**Status**: SUPPORTED
+**Date**: 2026-06-02
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 1-minute time bars resampled to 5m (strict), 1h and 4h (`min_coverage=0.90`) OHLC domains; no chart-type views
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Real Donchian-channel breakout (lookback 20) and MA-crossover (fast 20, slow 50) verdicts are consistent with where their measured net effect sizes fall on the calibrated per-domain MDE map from EXP-003.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from the first-70% analysis slice; no chart-type views.
+- **Features**: fixed Donchian(20) breakout and MA(20,50) crossover positions; minimal-baseline (gross) and 5-check gate-stack (net-of-cost) referee verdicts at α=0.05; block-bootstrap effect CIs; consistency vs the EXP-003 MDE map.
+- **Parameter ranges**: α=0.05; 1000 inner block-bootstrap resamples/verdict; Donchian lookback 20; MA fast 20 / slow 50; fixed and untuned.
+- **Exclusions**: final 30% global holdout, parameter optimization, strategy improvement, chart-type candidates, stop/target logic, walk-forward, and any revision of referee rules based on dogfood results.
+- **Constraints**: EXP-003 MDE artifact must exist (cell inconclusive where MDE missing/imprecise); first-70% slice only; shared 1-minute `CloseTime` train/test boundary across domains; real domain `Close` outcomes with flat scoped costs; look-ahead-safe positions (Donchian prior windows, MA closes at bar `t`), evaluated on `t→t+1` returns.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: PASS`, α=0.05, 1000 bootstrap resamples, Donchian 20, MA 20/50.
+- `dogfood_consistency.csv`: 48/48 cells `consistency_status = PASS`, all `reason = matched_reject`; 0 FAIL, 0 INCONCLUSIVE.
+- `dogfood_effects.csv`: all 48 verdicts REJECT (both referees). Gate-stack (net) effects range −12.199 (BTCUSD/4h/MA) to +0.045 (EURUSD/4h/Donchian) bps; minimal-baseline (gross) effects range ≈ [−2.20, +1.32] bps with every CI bracketing or below zero (e.g. XAUUSD/4h/MA +1.317 [−1.445, +4.035]; USTEC/1h/Donchian +0.226 [−0.178, +0.680]).
+- EXP-003 α=0.05 MDE map (loaded, audit-verified): gate stack 1.0/4.0/12.0 bps and minimal baseline 0.5/0.5/2.0 bps for 5m/1h/4h; grid uncertainty 0.25/1.0/2.0 (gate) and 0.25/0.25/0.5 (minimal). Every measured effect sits below its domain MDE.
+- Effective N: 5m ~49,608–65,144; 1h ~4,155–5,430; 4h ~902–1,335. `block_length = 1` for all 48 cells.
+- Cost accounting verified: minimal(gross) − gate(net) effect = cost × active-bar fraction (exact per-instrument cost for always-active MA; in `[0, cost]` for frequently-flat Donchian).
+- `analysis_metadata.csv`: per-instrument `analysis_end` precedes each source file's end date, confirming the final 30% holdout was not loaded.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+Every cell meets the predeclared Evidence-FOR criterion — a reject with the measured effect below its domain MDE — with no Evidence-AGAINST and no inconclusive cells, so real Donchian/MA verdicts agree with their positions on the EXP-003 calibrated MDE map (48/48 consistent) and no synthetic-vs-real DGP gap is surfaced.
+
+### Hypothesis-Agnostic Observations
+
+- The dogfood set is a **null/lower anchor** for H-keystone: untuned Donchian/MA carry no statistically positive edge even gross of cost, so they locate simple intraday edges at ≈0 beneath every per-domain MDE; this is consistent with the gate stack's rejections (true negatives) but does not, on its own, resolve whether the gate MDE sits above genuinely weak real edges — structural blindness is bounded, not closed.
+- The gate stack's systematic negativity is mechanical (cost charged to active bars), not a negative edge; the gross minimal-baseline read is the cleaner edge test and is also non-positive.
+- `block_length = 1` across all cells means per-bar Donchian/MA strategy returns showed negligible autocorrelation, so the stationary bootstrap reduced to i.i.d. resampling and effective N equals the raw test-bar count.
+
+---
+
 ## VAL-001 - Data Architecture Temporal Integrity Validation
 
-**Status**: COMPLETED (rev. 3)
+**Status**: SUPPORTED (rev. 3)
 **Date**: 2026-06-01
 **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
 **Data Views / Feature Categories**: 1-minute time bars; 15-minute and 60-minute OHLC resamples; Line Break level 3; Renko ATR period 14; Heiken Ashi
