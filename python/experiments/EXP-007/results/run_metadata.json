@@ -1,0 +1,46 @@
+{
+  "alpha0": 0.05,
+  "dependencies": {
+    "exp001_status": "PASS",
+    "exp003_status": "COMPLETE",
+    "exp006_status": "COMPLETE",
+    "exp006_strict_reference_pass": "True"
+  },
+  "domain_materiality_bps": {
+    "1h": 1.5,
+    "4h": 3.0,
+    "5m": 0.5
+  },
+  "experiment_id": "EXP-007",
+  "fpr_half_width_target": 0.03,
+  "gate_draw_rows": 216000,
+  "headline_verdict_at_alpha0": {
+    "1h": "EVIDENCE_AGAINST_NO_STRUCTURAL_GAIN",
+    "4h": "EVIDENCE_AGAINST_NO_STRUCTURAL_GAIN",
+    "5m": "EVIDENCE_AGAINST_NO_STRUCTURAL_GAIN"
+  },
+  "lenient_definition": "ci_lower_bps > 0.0",
+  "measurements_produced": true,
+  "overall_status": "COMPLETE",
+  "positive_edge_grid_bps": [
+    0.0,
+    0.5,
+    1.0,
+    2.0,
+    4.0,
+    8.0,
+    12.0,
+    16.0,
+    24.0,
+    32.0
+  ],
+  "power_target": 0.8,
+  "predeclaration": {
+    "confirmation_source": "pre-execution-review.md",
+    "predeclaration_confirmed": "true"
+  },
+  "structural_equivalence_pass": true,
+  "submaterial_definition": "effect_bps < materiality_bps(domain)",
+  "submaterial_limit": 0.5,
+  "tpr_half_width_target": 0.05
+}

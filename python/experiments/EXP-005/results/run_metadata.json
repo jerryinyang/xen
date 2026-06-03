@@ -1,0 +1,63 @@
+{
+  "candidate_construction": {
+    "alpha0": 0.05,
+    "alpha_grid": [
+      0.1,
+      0.05,
+      0.01
+    ],
+    "bootstrap_resamples": 1000,
+    "edge_multipliers": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "headline_multiplier": 1.0,
+    "null_draws_per_generator": 500,
+    "null_generators": [
+      "raw_returns",
+      "bar_permutation"
+    ],
+    "p_active": 0.8,
+    "positive_draws_per_edge": 500,
+    "q_match": 0.75
+  },
+  "candidate_sanity": {
+    "active_rate_ok": true,
+    "match_rate_ok": true,
+    "overall_active_rate": 0.7999970834552063,
+    "overall_match_rate": 0.7500047078835974,
+    "sanity_pass": true
+  },
+  "dependencies": {
+    "exp001_status": "PASS",
+    "exp003_status": "COMPLETE"
+  },
+  "detection_status_counts": {
+    "DETECTED_FLOOR": 3
+  },
+  "domain_status": {
+    "1h": "DETECTED_FLOOR",
+    "4h": "DETECTED_FLOOR",
+    "5m": "DETECTED_FLOOR"
+  },
+  "experiment_id": "EXP-005",
+  "gate_mde_map_bps": {
+    "1h": 4.0,
+    "4h": 12.0,
+    "5m": 1.0
+  },
+  "inconclusive_domains_missing_mde": [],
+  "measurements_produced": true,
+  "overall_status": "COMPLETE",
+  "predeclaration": {
+    "confirmation_source": "pre-execution-review.md",
+    "predeclaration_confirmed": "true"
+  },
+  "reportable_domains": [
+    "1h",
+    "4h",
+    "5m"
+  ]
+}

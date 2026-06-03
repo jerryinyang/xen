@@ -40,6 +40,19 @@ Frozen for the phase. Changing any requires a new predeclared design (meta-Goodh
 
 **⚠ Operator-confirmation items.** The near-MDE construction (D-nearMDE), the lenient-L5 definition (D-lenientL5), and the loss-function form (D-loss) are set here as defensible defaults. To preserve the predeclaration freeze (the §2 heading: *frozen before any measurement is read*), **operator confirmation or override of all three must be recorded before EXP-005 executes — i.e., before any Phase 002 measurement exists.** Any change after EXP-005 begins requires a **new dated design amendment authored before the dependent experiment's results are read**, and that amendment may reference only predeclared reasoning, never earlier Phase 002 results (EXP-005/EXP-006 outcomes in particular). This closes the outcome-aware path in which D-lenientL5 (read at the EXP-007 gate) or D-loss (read at the EXP-011 gate) could otherwise be tuned against already-visible EXP-005/EXP-006 results. Once an item's experiment runs, it is frozen for the phase.
 
+### ⚠ Erratum 2026-06-03 — D-lenientL5 "distinct mechanism" framing corrected (frozen-harness clarification)
+
+**Status:** dated amendment, §2 ⚠-compliant. **Derived solely from Phase 001 artifacts** — the frozen `xen.referee_calibration.gate_stack_row` and the EXP-003 draws — references **no Phase 002 measurement** (no EXP-005/EXP-006/EXP-007 outcome), and was **authored before any EXP-006 or EXP-007 result existed**. **It changes no predeclared object:** the lenient-L5 definition stays `L5_lenient = ci_lower_bps > 0`, and H-lenient (§4) stays exactly as written and falsifiable.
+
+**What is corrected.** The D-lenientL5 row above frames the lenient variant as a *mechanism* change ("not merely a smaller number… structurally distinct from EXP-006's threshold-magnitude sweep") and describes the strict leg as a *point-estimate exceeds cost + materiality buffer* requirement. **Both descriptions are inconsistent with the frozen code, which governs.** In the frozen harness, strict L5 is `ci_lower_bps > materiality_bps` (a CI-lower-bound test, not a point-estimate test) and L3 already requires `ci_lower_bps > 0`. Two exact consequences follow on the shared draws (verified across all 216,000 frozen gate-stack rows, 0 exceptions):
+
+1. **Lenient L5 ≡ EXP-006 `τ=0` endpoint.** EXP-006 sweeps `L5_τ = ci_lower_bps > τ`, `τ = mult × materiality_bps`; at `mult=0` this is exactly `ci_lower_bps > 0`. The lenient leg therefore lies *on* the EXP-006 threshold frontier (its zero-buffer endpoint) and **cannot strictly improve beyond it**.
+2. **Lenient gate ≡ gate with L5 removed.** Because L3 already enforces `ci_lower_bps > 0`, `L1∧L2∧L3∧L4∧(ci_lower>0) = L1∧L2∧L3∧L4`. Maximal L5 leniency equals dropping L5, with L3 the binding net-positivity gate.
+
+So the lenient leg is the `τ→0` magnitude limit of the *same* CI-lower-bound mechanism — not a structurally distinct one. **H-lenient's structural-gain branch is consequently expected to resolve FALSIFIED** (a legitimate predeclared finding). EXP-007's attainable, non-redundant deliverable is therefore (a) the lenient operating characteristics at Phase-002 precision, (b) the **economically sub-material pass-rate** accounting at the lenient MDE (not produced by EXP-006, required by D-lenientL5's materiality caveat), and (c) numerical **verdict-level** confirmation of the two equivalences above.
+
+**Downstream obligation.** Synthesis experiments — **EXP-011 in particular** — must cite this erratum and describe the lenient variant as the **EXP-006 zero-buffer threshold endpoint plus sub-material accounting**, *not* as a mechanism-level sensitivity gain. Full reasoning: EXP-007 `scope.md` → "Predeclared Structural Relationship", and `docs/code-reviews/2026-06-03-exp-006-007-review-validation.md` (validates adversarial-review finding F04).
+
 ---
 
 ## 3. Definitions (additions to Phase 001 §3)

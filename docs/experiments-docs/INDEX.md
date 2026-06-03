@@ -4,7 +4,7 @@
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-06-03-002-referee-refinement-and-stringency | ACTIVE (design complete) | Close the open keystone (EXP-005 near-MDE realistic-candidate anchor); characterize the L5 stringency lever (EXP-006 threshold sweep, EXP-007 lenient variant); sharpen the map (EXP-008 per-instrument MDE, EXP-009 broadened dogfood); stress-test inference (EXP-010 split protocols); synthesize a *recommended* operating point under a predeclared loss (EXP-011). Characterization phase — recommends, does not adopt. | [design.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/design.md) |
+| 2026-06-03-002-referee-refinement-and-stringency | ACTIVE (design complete; EXP-005/006 supported; EXP-007 refuted as expected) | Keystone spine item closed for the scoped realistic candidate (EXP-005); L5 threshold frontier measured (EXP-006); lenient-L5 structural-gain claim refuted because lenient equals the EXP-006 zero-buffer endpoint and drop-L5 (EXP-007). Next sharpen the map (EXP-008 per-instrument MDE, EXP-009 broadened dogfood), stress-test inference (EXP-010 split protocols), and synthesize a *recommended* operating point under a predeclared loss (EXP-011). Characterization phase — recommends, does not adopt. | [design.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/design.md) |
 | 2026-06-01-001-thesis-qualification-calibration | COMPLETED | Build the 5-check gate-stack referee + calibration harness; measure per-domain (5m/1h/4h) FPR/TPR/economic-MDE for it and a minimal baseline (EXP-001→004). | [design.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/design.md) · [retrospective.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/retrospective.md) |
 
 
@@ -184,6 +184,145 @@ Every cell meets the predeclared Evidence-FOR criterion — a reject with the me
 - The dogfood set is a **null/lower anchor** for H-keystone: untuned Donchian/MA carry no statistically positive edge even gross of cost, so they locate simple intraday edges at ≈0 beneath every per-domain MDE; this is consistent with the gate stack's rejections (true negatives) but does not, on its own, resolve whether the gate MDE sits above genuinely weak real edges — structural blindness is bounded, not closed.
 - The gate stack's systematic negativity is mechanical (cost charged to active bars), not a negative edge; the gross minimal-baseline read is the cleaner edge test and is also non-positive.
 - `block_length = 1` across all cells means per-bar Donchian/MA strategy returns showed negligible autocorrelation, so the stationary bootstrap reduced to i.i.d. resampling and effective N equals the raw test-bar count.
+
+---
+
+## EXP-005 — Near-MDE Realistic-Candidate Detection Anchor
+
+**Status**: SUPPORTED
+**Date**: 2026-06-03
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 1-minute time bars resampled to 5m (strict), 1h and 4h (`min_coverage=0.90`) OHLC domains; no chart-type views
+
+### Hypothesis Tests
+
+1. **Hypothesis**: On each scoped domain, the frozen Phase 001 5-check gate stack detects an imperfect realistic candidate whose expected net real-price edge is at least the EXP-003 gate-stack MDE, with pooled-domain TPR >= 0.80 at `FPR <= alpha0 = 0.05`.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from the first-70% analysis slice; no chart-type views.
+- **Features**: latent state `S_t in {-1,+1}`; imperfect candidate `C_t in {-1,0,+1}` with `p_active=0.80` and `q_match=0.75`; paired null draws (raw returns and bar-permutation); known-positive latent-state drift calibrated so the candidate's expected all-eligible-row net edge equals the target edge; minimal-baseline and gate-stack verdicts; Wilson FPR/TPR summaries; pooled-domain and per-instrument detection rows.
+- **Parameter ranges**: alpha grid `{0.10, 0.05, 0.01}` with primary `alpha0=0.05`; EXP-003 gate MDE map at alpha0 = 5m `1.0`, 1h `4.0`, 4h `12.0` bps; edge multipliers `{0.5, 1.0, 1.5, 2.0}`; 500 positive draws per edge/instrument/domain; 500 null draws per null generator/instrument/domain; 1000 bootstrap resamples/verdict.
+- **Exclusions**: final 30% global holdout, chart-type signals, real strategy tuning, loss-function tuning, referee redesign, threshold sweeping, lenient-L5 variants, walk-forward validation, stop/target logic, bid/ask spread estimation, and any use of Phase 002 outcomes to alter the candidate construction.
+- **Constraints**: EXP-001 PASS and EXP-003 COMPLETE + finite MDE artifacts required; Phase 002 predeclaration confirmation recorded before measurement; first-70% slice only; shared 1-minute `CloseTime` train/test boundary across domains; real domain `Close` outcomes plus predeclared known-positive drift; frozen `xen.referee_calibration` harness reused unchanged.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: COMPLETE`, `measurements_produced: true`, dependencies `{exp001_status: PASS, exp003_status: COMPLETE}`, `candidate_sanity.sanity_pass: true`, `domain_status: {5m: DETECTED_FLOOR, 1h: DETECTED_FLOOR, 4h: DETECTED_FLOOR}`.
+- Candidate construction sanity passed: overall active rate `0.799997`, active match rate `0.750005`; per-cell active-rate range `0.798518` to `0.800561`; per-cell match-rate range `0.749482` to `0.750623`; positive calibration absolute error range `0.000005` to `0.129769` bps.
+- Gate-stack pooled FPR at `alpha0=0.05` is `0/4000` in every domain, Wilson half-width `0.000480`; minimal-baseline diagnostic FPR is `0.02375` (5m), `0.02350` (1h), and `0.02500` (4h).
+- Gate-stack pooled TPR at `1.0 x` MDE: 5m `1.0000` (2000/2000, half-width `0.000959`), 1h `0.9850` (1970/2000, half-width `0.005403`), 4h `0.9465` (1893/2000, half-width `0.009890`).
+- Gate-stack TPR at `0.5 x` MDE remains below target: 5m `0.024`, 1h `0.371`, 4h `0.502`; at `1.5 x` and `2.0 x` it is effectively saturated in all domains.
+- All 12 per-instrument headline rows at `1.0 x` MDE classify `DETECTED_FLOOR` with `under_powered=false`; weakest headline cell is BTCUSD/4h with TPR `0.828` and half-width `0.0330`.
+- Audit verdict PASS: result tables internally consistent; independent recomputation of FPR/TPR summaries from 216,000 verdict rows found zero mismatches; no critical or warning issues.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+The frozen gate stack detects the predeclared imperfect realistic candidate at each domain's EXP-003 MDE while controlling FPR. EXP-005 therefore closes the Phase 001 open keystone for this candidate class: the oracle-calibrated MDE map is an honest detection floor here, not evidence of structural blindness.
+
+### Hypothesis-Agnostic Observations
+
+- The strict gate remains conservative: zero pooled null passes for the gate stack, while the minimal baseline sits near nominal but below `alpha0`.
+- The exact-MDE pass does not imply reliable detection below the MDE; all three `0.5 x` rows fail the TPR target, especially 5m (`0.024`).
+- The pooled-domain pass is not masking an instrument-level headline failure under the approved precision rule, but EXP-008 remains needed because EXP-005 does not estimate per-instrument MDE.
+- `block_length = 1` across all verdict rows means the stationary bootstrap reduced to i.i.d. resampling under the frozen estimator; this does not invalidate EXP-005 but preserves the value of EXP-010 split/dependence stress testing.
+
+---
+
+## EXP-006 — L5 Materiality Threshold Sweep
+
+**Status**: SUPPORTED
+**Date**: 2026-06-03
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (pooled by domain through EXP-003 draw artifacts)
+**Data Views / Feature Categories**: EXP-003 draw-level gate-stack verdicts for 5m, 1h, and 4h OHLC domains; no chart-type views
+
+### Hypothesis Tests
+
+1. **Hypothesis / exploratory question**: How do the frozen gate stack's FPR and economic MDE vary as the L5 materiality threshold magnitude is swept per domain?
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD, pooled by domain to match EXP-003.
+- **Data Views / Feature Categories**: EXP-003 verdict-level artifacts only; no new market-data measurement.
+- **Features**: Gate-stack draw pass states, L1-L4 leg states, `ci_lower_bps`, `materiality_bps`, swept `L5_tau = ci_lower_bps > tau_bps`, Wilson FPR/TPR, grid-defined MDE.
+- **Parameter ranges**: Domains `{5m, 1h, 4h}`; alpha grid `{0.10, 0.05, 0.01}`; threshold multipliers `{0.00, 0.25, 0.50, 0.75, 1.00, 1.50, 2.00}`; EXP-003 planted-edge grid including `0.0` through `32.0` bps.
+- **Exclusions**: Lenient-L5 mechanism from EXP-007, near-MDE realistic candidates, per-instrument MDE de-pooling, loss-function selection, threshold adoption, chart-type signals, and referee redesign.
+- **Constraints**: EXP-001 PASS and EXP-003 COMPLETE required; result-level post-processing preferred; final 30% global holdout never loaded; L1-L4, costs, materiality constants, sample membership, denominators, and real-price EXP-003 outcomes unchanged.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: COMPLETE`, `measurements_produced: true`, `strict_reference_pass: true`, `gate_draw_rows: 216000`, 7 threshold multipliers.
+- `strict_reference_check.csv`: 9/9 domain/alpha rows matched EXP-003 exactly; `draw_mismatch_count = 0` and `mde_match = true` for every row.
+- `threshold_draw_verdicts.csv`: 1,512,000 rows (`216,000 x 7`).
+- `threshold_fpr_summary.csv`: every domain/alpha/threshold cell has FPR `0/4000`, Wilson half-width `0.000480`.
+- `threshold_mde_summary.csv`: 63/63 rows `status = PASS`.
+- At `alpha0=0.05`, strict `tau=1.0` MDEs were 5m `1.0`, 1h `4.0`, and 4h `12.0` bps; zero-buffer `tau=0.0` MDEs were 5m `0.5`, 1h `2.0`, and 4h `8.0` bps.
+- At `alpha0=0.05`, high-threshold `tau=2.0` MDEs rose to 5m `2.0`, 1h `8.0`, and 4h `16.0` bps.
+- TPR at the alpha0 zero-buffer MDE was 5m `1.000` at `0.5` bps, 1h `0.924` at `2.0` bps, and 4h `0.902` at `8.0` bps.
+- Audit verdict PASS: no critical or warning issues; independent CSV aggregation verified row counts, denominators, strict-reference equality, and selected FPR/TPR rates.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+The exploratory measurement delivered the scoped L5 lever curve with usable precision in every cell. Lower L5 thresholds reduced MDE without increasing pooled FPR on the EXP-003 draw substrate, and the strict `tau=1.0` rows reproduced EXP-003 exactly.
+
+### Hypothesis-Agnostic Observations
+
+- L5 threshold magnitude is a practical stringency lever, but EXP-006 does not adopt an operating point.
+- The zero-buffer endpoint is the key input to EXP-007 and EXP-011.
+- FPR staying zero likely reflects other gate legs remaining restrictive on the scoped null generators; fresh-draw adoption remains a later-phase decision.
+- Results are pooled by domain, so EXP-008 remains necessary for instrument-level heterogeneity.
+
+---
+
+## EXP-007 — Lenient-L5 Referee Variant
+
+**Status**: REFUTED
+**Date**: 2026-06-03
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (pooled by domain through EXP-003/EXP-006 draw artifacts)
+**Data Views / Feature Categories**: EXP-003 gate-stack draw verdicts plus EXP-006 threshold frontier artifacts for 5m, 1h, and 4h OHLC domains; no chart-type views
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The predeclared lenient L5 variant lowers the gate stack's economic MDE relative to the frozen strict gate while holding `FPR <= alpha0 = 0.05`, beyond what is achieved by the EXP-006 threshold-magnitude frontier.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD, pooled by domain to match EXP-003 and EXP-006.
+- **Data Views / Feature Categories**: EXP-003 draw-level verdict artifacts and EXP-006 threshold-frontier artifacts; no new market-data measurement.
+- **Features**: `L5_lenient = ci_lower_bps > 0.0`, unchanged L1-L4, strict and lenient pass states, verdict-level equality against EXP-006 `tau=0`, Wilson FPR/TPR, grid-defined MDE, and economically sub-material pass rates.
+- **Parameter ranges**: Domains `{5m, 1h, 4h}`; alpha grid `{0.10, 0.05, 0.01}`; EXP-003 planted-edge grid; EXP-006 threshold frontier for comparison.
+- **Exclusions**: Adoption/freezing of the lenient variant, loss-function selection, changing L1-L4, changing costs/materiality constants, adding thresholds after reading EXP-006, chart-type signals, and referee redesign.
+- **Constraints**: EXP-001 PASS, EXP-003 COMPLETE, and EXP-006 COMPLETE with `strict_reference_pass = true`; final 30% global holdout never loaded; real-price EXP-003 outcomes reused unchanged; sub-material denominator is lenient positive passes per domain/alpha/edge.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: COMPLETE`, `measurements_produced: true`, `structural_equivalence_pass: true`, headline alpha0 verdict `EVIDENCE_AGAINST_NO_STRUCTURAL_GAIN` for 5m, 1h, and 4h.
+- `lenient_draw_verdicts.csv`: 216,000 rows.
+- `structural_equivalence_check.csv`: 9/9 rows have `lenient_vs_dropl5_mismatch = 0`, `lenient_vs_exp006_tau0_mismatch = 0`, `lenient_vs_exp006_tau0_unmatched = 0`, `draws_match_dropl5 = true`, `draws_match_exp006_tau0 = true`, and `lenient_eq_tau0_mde = true`.
+- `lenient_fpr_summary.csv`: lenient FPR `0/4000` in every domain/alpha row, Wilson half-width `0.000480`.
+- At `alpha0=0.05`, lenient MDEs were 5m `0.5`, 1h `2.0`, and 4h `8.0` bps versus strict `1.0`, `4.0`, and `12.0` bps. These lenient MDEs equal the EXP-006 zero-buffer and best acceptable frontier MDEs.
+- At the alpha0 lenient MDE, TPR was 5m `1.000` (`2000/2000`), 1h `0.924` (`1848/2000`), and 4h `0.902` (`1804/2000`).
+- At the alpha0 lenient MDE, economically sub-material pass rates were 5m `0.4965`, 1h `0.054654`, and 4h `0.0`.
+- `lenient_vs_frontier.csv`: all 9 domain/alpha rows have `improves_beyond_frontier = false` and `verdict = EVIDENCE_AGAINST_NO_STRUCTURAL_GAIN`.
+- Audit verdict PASS: no critical or warning issues; independent CSV aggregation verified row counts, denominators, structural-equivalence counts, and selected FPR/TPR/sub-material rates.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+Lenient L5 controlled FPR and lowered strict MDE, but it did not lower MDE beyond the EXP-006 threshold frontier. It exactly matched EXP-006 `tau=0` and drop-L5 at the verdict and MDE levels, so H-lenient's structural-gain claim is refuted by the predeclared Evidence-AGAINST criterion.
+
+### Hypothesis-Agnostic Observations
+
+- The useful object for synthesis is the EXP-006 zero-buffer endpoint plus EXP-007's sub-material accounting, not a distinct lenient-L5 mechanism.
+- The 5m sub-material rate at the lenient MDE (`0.4965`) is just below the `0.50` cutoff, so 5m zero-buffer sensitivity should be treated cautiously in EXP-011.
+- Because L3 already requires `ci_lower_bps > 0`, removing L5's materiality buffer makes L5 redundant under the frozen harness.
+- No Phase 002 result adopts or freezes a new referee; Phase 003 fresh-draw ratification remains required for any operating-point change.
 
 ---
 
