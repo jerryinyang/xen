@@ -4,13 +4,15 @@
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-06-01-001-thesis-qualification-calibration | ACTIVE (design complete) | Build the 5-check gate-stack referee + calibration harness; measure per-domain (5m/1h/4h) FPR/TPR/economic-MDE for it and a minimal baseline (EXP-001→004). | [design.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/design.md) |
+| 2026-06-03-002-referee-refinement-and-stringency | ACTIVE (design complete) | Close the open keystone (EXP-005 near-MDE realistic-candidate anchor); characterize the L5 stringency lever (EXP-006 threshold sweep, EXP-007 lenient variant); sharpen the map (EXP-008 per-instrument MDE, EXP-009 broadened dogfood); stress-test inference (EXP-010 split protocols); synthesize a *recommended* operating point under a predeclared loss (EXP-011). Characterization phase — recommends, does not adopt. | [design.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/design.md) |
+| 2026-06-01-001-thesis-qualification-calibration | COMPLETED | Build the 5-check gate-stack referee + calibration harness; measure per-domain (5m/1h/4h) FPR/TPR/economic-MDE for it and a minimal baseline (EXP-001→004). | [design.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/design.md) · [retrospective.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/retrospective.md) |
 
 
 ## Checkpoint Retrospectives
 
 | Checkpoint | Status | Key Synthesis | Document |
 | --- | --- | --- | --- |
+| 2026-06-01-001-thesis-qualification-calibration | COMPLETED (4/4 EXP SUPPORTED) | Referee operating characteristics measured (design's success deliverable met): gate-stack FPR=0 at all domains/α vs minimal FPR≈α, bought with 2–8× economic MDE (net 1/4/12 bps on 5m/1h/4h); L5 materiality is the binding, α-invariant leg. H-keystone is **bounded, not closed** — EXP-004 dogfood is a null anchor (untuned Donchian/MA carry ~0 edge below every MDE), so structural blindness is true-negative-confirmed but the gate's detection of a weak *real* edge near the MDE is untested. Next: EXP-005 near-MDE detection anchor. | [retrospective.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/retrospective.md) |
 
 
 
