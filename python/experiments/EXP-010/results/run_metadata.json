@@ -1,0 +1,54 @@
+{
+  "alpha0": 0.05,
+  "alpha_grid": [
+    0.1,
+    0.05,
+    0.01
+  ],
+  "bootstrap_resamples": 1000,
+  "dependencies": {
+    "exp001_status": "PASS",
+    "exp003_status": "COMPLETE"
+  },
+  "experiment_id": "EXP-010",
+  "fold_boundary_source": "shared_1m_closetime_mapped_per_domain",
+  "hsplit_verdict_by_domain": {
+    "1h": "FALSIFIED",
+    "4h": "FALSIFIED",
+    "5m": "SUPPORTED"
+  },
+  "material_abs_floor_bps": 0.5,
+  "material_rel_fraction": 0.2,
+  "measurements_produced": true,
+  "multi_fold_aggregation": "per_fold_disjoint_pooled_oos",
+  "n_workers": 10,
+  "null_draws_per_generator": 250,
+  "null_generators": [
+    "bar_permutation",
+    "random_signal"
+  ],
+  "overall_status": "COMPLETE",
+  "positive_draws_per_edge": 250,
+  "positive_edges_bps": [
+    0.5,
+    1.0,
+    2.0,
+    4.0,
+    8.0,
+    12.0,
+    16.0,
+    24.0,
+    32.0
+  ],
+  "power_target": 0.8,
+  "protocols": [
+    "single",
+    "walk_forward",
+    "purged_cv"
+  ],
+  "purge_bars": 1,
+  "purged_cv_folds": 5,
+  "reference_reproduction_pass": true,
+  "walk_forward_folds": 5,
+  "walk_forward_warmup_fraction": 0.5
+}
