@@ -4,7 +4,7 @@
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-06-03-002-referee-refinement-and-stringency | ACTIVE (design complete; EXP-005/006 supported; EXP-007 refuted as expected) | Keystone spine item closed for the scoped realistic candidate (EXP-005); L5 threshold frontier measured (EXP-006); lenient-L5 structural-gain claim refuted because lenient equals the EXP-006 zero-buffer endpoint and drop-L5 (EXP-007). Next sharpen the map (EXP-008 per-instrument MDE, EXP-009 broadened dogfood), stress-test inference (EXP-010 split protocols), and synthesize a *recommended* operating point under a predeclared loss (EXP-011). Characterization phase — recommends, does not adopt. | [design.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/design.md) |
+| 2026-06-03-002-referee-refinement-and-stringency | ACTIVE (design complete; EXP-005/006/008/009/011 supported; EXP-007 refuted; EXP-010 partially refuted) | Keystone spine item closed for the scoped realistic candidate (EXP-005); L5 threshold frontier measured (EXP-006); lenient-L5 structural-gain claim refuted because lenient equals the EXP-006 zero-buffer endpoint and drop-L5 (EXP-007); per-instrument MDE heterogeneity found in EURUSD/XAUUSD slower-domain cells (EXP-008); broadened simple-strategy dogfood stayed below every domain MDE (EXP-009); split robustness held on 5m but walk-forward materially raised 1h/4h MDE (EXP-010); predeclared-loss synthesis recommends tau 0.75/0.25/0.5 on 5m/1h/4h, with adoption deferred to Phase 003 fresh draws (EXP-011). Characterization phase - recommends, does not adopt. | [design.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/design.md) |
 | 2026-06-01-001-thesis-qualification-calibration | COMPLETED | Build the 5-check gate-stack referee + calibration harness; measure per-domain (5m/1h/4h) FPR/TPR/economic-MDE for it and a minimal baseline (EXP-001→004). | [design.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/design.md) · [retrospective.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/retrospective.md) |
 
 
@@ -323,6 +323,194 @@ Lenient L5 controlled FPR and lowered strict MDE, but it did not lower MDE beyon
 - The 5m sub-material rate at the lenient MDE (`0.4965`) is just below the `0.50` cutoff, so 5m zero-buffer sensitivity should be treated cautiously in EXP-011.
 - Because L3 already requires `ci_lower_bps > 0`, removing L5's materiality buffer makes L5 redundant under the frozen harness.
 - No Phase 002 result adopts or freezes a new referee; Phase 003 fresh-draw ratification remains required for any operating-point change.
+
+---
+
+## EXP-008 - Per-Instrument MDE De-Pooling
+
+**Status**: SUPPORTED
+**Date**: 2026-06-04
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: EXP-003 gate-stack draw verdicts for 5m, 1h, and 4h OHLC domains, de-pooled by instrument; no chart-type views
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Per-instrument gate-stack economic MDEs differ materially from the Phase 001 four-instrument pooled domain MDEs, where material means `|per_instrument_MDE - pooled_MDE| >= max(0.5 bps, 20% of pooled_MDE)` at `alpha0 = 0.05`.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: EXP-003 verdict-level artifacts only; no new market-data measurement.
+- **Features**: Gate-stack draw pass states, per-instrument Wilson FPR/TPR, grid-defined per-instrument MDE, pooled-vs-instrument material-difference flag.
+- **Parameter ranges**: Domains `{5m, 1h, 4h}`; alpha grid `{0.10, 0.05, 0.01}`; primary `alpha0=0.05`; EXP-003 edge grid; TPR target `0.80`; frozen material margin `max(0.5 bps, 20% of pooled_MDE)`.
+- **Exclusions**: Fresh draw generation, new market-data measurement, chart-type signals, referee redesign, strategy candidates, split-protocol comparison, loss-function selection, and operating-point adoption.
+- **Constraints**: EXP-001 PASS and EXP-003 COMPLETE required; final 30% global holdout never loaded; EXP-003 sample membership, denominators, costs, materiality, and real-price outcomes reused unchanged.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: COMPLETE`, `measurements_produced: true`, `gate_draw_rows: 216000`, `hpool_rollup: {hpool_verdict: SUPPORTED, reportable_cells_alpha0: 12, material_cells_alpha0: 3}`.
+- `per_instrument_mde_summary.csv`: 36/36 instrument/domain/alpha rows `status = PASS`.
+- At `alpha0=0.05`, gate FPR was `0/1000` in every instrument/domain cell, Wilson half-width `0.001913`; TPR rows used `n=500`, max Wilson half-width `0.043182`.
+- Material alpha0 differences:
+  - EURUSD/1h: per-instrument MDE `2.0` bps vs pooled `4.0` bps; delta `-2.0`; margin `0.8`.
+  - EURUSD/4h: per-instrument MDE `8.0` bps vs pooled `12.0` bps; delta `-4.0`; margin `2.4`.
+  - XAUUSD/4h: per-instrument MDE `8.0` bps vs pooled `12.0` bps; delta `-4.0`; margin `2.4`.
+- All 5m per-instrument MDEs equaled the pooled 5m MDE of `1.0` bps.
+- Audit verdict PASS: independent regrouping from EXP-003 draw verdicts found 0 FPR mismatches and 0 TPR mismatches.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+The predeclared Evidence-FOR criterion is met because at least one reportable per-instrument cell differs materially from the pooled MDE. The pooled EXP-003 MDE map masks lower per-instrument MDEs in EURUSD/1h and EURUSD/XAUUSD 4h.
+
+### Hypothesis-Agnostic Observations
+
+- 5m shows no visible per-instrument heterogeneity at the EXP-003 grid resolution.
+- The material differences are in the lower-MDE direction, making the pooled map conservative for those cells rather than overly permissive.
+- EXP-008 sharpens the map for EXP-011 but does not adopt per-instrument thresholds.
+
+---
+
+## EXP-009 - Broadened Untuned Strategy Effect-Size Distribution
+
+**Status**: SUPPORTED
+**Date**: 2026-06-04
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 1-minute time bars resampled to 5m, 1h, and 4h OHLC domains; six fixed untuned simple strategy families; no chart-type views
+
+### Hypothesis Tests
+
+1. **Hypothesis / exploratory question**: Where do the net and gross effect sizes of a broadened set of untuned, fixed-parameter simple strategies sit relative to each domain's EXP-003 MDE?
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from the first-70% analysis slice; no chart-type views.
+- **Features**: Donchian(20), MA(20/50), RSI(14), Bollinger(20, 2.0), MACD(12,26,9), ROC(20) positions; frozen minimal-baseline and gate-stack referee effects; MDE location classification; domain/family distribution summaries.
+- **Parameter ranges**: Domains `{5m, 1h, 4h}`; alpha grid `{0.10, 0.05, 0.01}`; primary `alpha0=0.05`; 1000 bootstrap resamples; fixed strategy parameters as named.
+- **Exclusions**: Strategy tuning, ensembling, stops/targets, chart-type signals, per-instrument MDE estimation, split-protocol variation, loss-function selection, referee redesign, and any per-strategy qualification verdict.
+- **Constraints**: EXP-003 COMPLETE and EXP-004 PASS required; first-70% analysis slice only; shared `CloseTime` split; `t -> t+1` real `Close` returns; all warmup/NaN positions flat, not dropped.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: COMPLETE`, `measurements_produced: true`, dependencies `{exp003_status: COMPLETE, exp004_status: PASS}`.
+- `strategy_verdicts.csv`: 432 rows = 6 strategies x 4 instruments x 3 domains x 2 referees x 3 alphas.
+- `strategy_effects.csv`: 144 alpha0 effect rows; 72 gate-stack rows.
+- Gate-stack MDE location: 72/72 cells `below_MDE`; 0 `near_MDE`; 0 `at_or_above_MDE`.
+- Domain gate-stack net-effect summaries:
+  - 5m median `-1.018395` bps, IQR `[-3.007847, -0.406185]`, range `[-9.987340, -0.069953]`.
+  - 1h median `-0.998325` bps, IQR `[-2.878832, -0.383782]`, range `[-10.949345, -0.080834]`.
+  - 4h median `-0.952547` bps, IQR `[-2.318087, -0.098853]`, range `[-13.029254, +0.045022]`.
+- Largest positive gate-stack point estimate: EURUSD/4h Donchian(20) `+0.045022` bps, CI `[-0.390681, +0.514643]`, below 4h gate MDE `12.0` bps.
+- Effective N ranged from `902` to `65144`; `block_length = 1` for all 72 gate cells.
+- Audit verdict PASS: no critical or warning issues; output dimensions, ranges, causal indicator construction, and real-price discipline verified.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED (measurement delivered)**
+
+EXP-009 is exploratory, but its scoped deliverable was produced. The broadened fixed simple-strategy distribution sits below every domain MDE, strengthening the EXP-004 lower/null anchor rather than surfacing a near-MDE real candidate.
+
+### Hypothesis-Agnostic Observations
+
+- Simple untuned standalone strategies remain a lower/null anchor after broadening from 2 to 6 strategy definitions.
+- Cost-applied net effects are frequently negative, especially active BTCUSD trend/momentum cells.
+- The result does not refute tuned, ensemble, or incremental-information candidates; those require new predeclared scopes.
+
+---
+
+## EXP-010 - Split-Protocol Robustness of the Referee
+
+**Status**: PARTIALLY REFUTED
+**Date**: 2026-06-04
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (pooled by domain)
+**Data Views / Feature Categories**: 1-minute time bars resampled to 5m, 1h, and 4h OHLC domains; regenerated known-null and known-positive referee-calibration draws; no chart-type views
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Alternative within-analysis-set split protocols - anchored walk-forward and purged/embargoed CV - do not materially change the frozen referee's pooled-by-domain gate-stack FPR and economic MDE versus the mandated single chronological split.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD, pooled by domain to match EXP-003.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from the first-70% analysis slice; no chart-type views.
+- **Features**: Single chronological split, anchored walk-forward K=5, purged/embargoed CV K=5, regenerated known-null and known-positive draws, frozen minimal-baseline and gate-stack verdicts, Wilson FPR/TPR, grid MDE, reference-reproduction check.
+- **Parameter ranges**: Alpha grid `{0.10, 0.05, 0.01}`; primary `alpha0=0.05`; EXP-003 edge grid; 250 null draws per null generator; 250 positive draws per edge; 1000 bootstrap resamples; walk-forward K=5; purged CV K=5; purge 1 bar; embargo `max(1, block_length)`.
+- **Exclusions**: Protocol adoption, per-instrument de-pooling, broadened strategy set, near-MDE candidate, L5 threshold/lenient variants, referee redesign, chart-type signals, and holdout use.
+- **Constraints**: EXP-001 PASS and EXP-003 COMPLETE required; all protocols operate only within the first-70% analysis set; fold boundaries mapped from shared 1-minute `CloseTime`; referee costs/materiality/legs/bootstrap frozen.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: COMPLETE`, `measurements_produced: true`, `reference_reproduction_pass: true`, `hsplit_verdict_by_domain: {5m: SUPPORTED, 1h: FALSIFIED, 4h: FALSIFIED}`.
+- `protocol_draw_verdicts.csv`: 594,000 rows, matching the scoped draw/protocol/referee/alpha budget.
+- `reference_reproduction_check.csv`: 9/9 domain/alpha rows have `fpr_consistent = true` and `mde_consistent = true`.
+- At `alpha0=0.05`, gate FPR was `0/2000` for every domain/protocol, Wilson half-width `0.000959`.
+- At `alpha0=0.05`, gate MDEs:
+  - 5m: single `1.0`, walk-forward `1.0`, purged CV `1.0` bps.
+  - 1h: single `4.0`, walk-forward `8.0`, purged CV `4.0` bps.
+  - 4h: single `12.0`, walk-forward `24.0`, purged CV `12.0` bps.
+- `protocol_comparison.csv`: walk-forward material on 1h (delta `+4.0` vs margin `0.8`) and 4h (delta `+12.0` vs margin `2.4`); purged CV non-material on all domains; 5m non-material for both alternatives.
+- Audit verdict PASS: streamed verdict counts reconciled to summaries with 0 FPR mismatches; no critical or warning issues.
+
+### Hypothesis-Specific Conclusion
+
+**PARTIALLY REFUTED**
+
+H-split is supported on 5m but falsified on 1h and 4h. Anchored walk-forward materially increases economic MDE on slower domains while FPR remains controlled, so the split protocol can move measured sensitivity under the frozen criterion.
+
+### Hypothesis-Agnostic Observations
+
+- Purged CV matching single split suggests the measured robustness issue is specific to anchored walk-forward, not any alternative split protocol.
+- The single-split reference reproduction makes the protocol deltas interpretable.
+- EXP-010 supplies robustness context for EXP-011; it does not recommend changing the split protocol.
+
+---
+
+## EXP-011 - Predeclared-Loss Operating-Point Synthesis & Recommendation
+
+**Status**: SUPPORTED (recommendation delivered)
+**Date**: 2026-06-04
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (pooled by domain through upstream calibration artifacts)
+**Data Views / Feature Categories**: Result-level artifacts from EXP-003, EXP-005, EXP-006, EXP-007, EXP-008, EXP-009, and EXP-010; no market-data or chart-type views loaded
+
+### Hypothesis Tests
+
+1. **Hypothesis / exploratory question**: Given three loss functions predeclared in full, which L5 threshold multiplier on the frozen EXP-006 tau-frontier should Phase 002 recommend per domain, and is that recommendation robust across Loss A/B/C?
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD, pooled by domain for headline recommendation.
+- **Data Views / Feature Categories**: Frozen result-level artifacts only; no raw market data, no chart-type views, no new draws, and no referee rerun.
+- **Features**: EXP-006 tau-frontier MDE/FPR/TPR; EXP-003 draw-level effect estimates for sub-material reconstruction; EXP-007 tau=0 sub-material check; EXP-008 per-instrument overlay; EXP-009 real-effect location overlay; EXP-010 split overlay; EXP-005 non-blindness context.
+- **Parameter ranges**: Domains `{5m, 1h, 4h}`; primary `alpha0=0.05`; tau frontier `{0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0}` times materiality; materiality buffers 0.5/1.5/3.0 bps; Loss A/B/C fixed as in `scope.md`.
+- **Exclusions**: Adoption/freezing of a new referee, loss reweighting, new thresholds, per-instrument headline recommendations, walk-forward re-selection, chart-type signals, and incremental-information candidate design.
+- **Constraints**: EXP-003/005/006/007/008/009/010 dependency tokens complete; final 30% global holdout never loaded; result tables inherit real-price `Close` outcome discipline from upstream calibration experiments; EXP-011 recommendation is a Phase 002 recommendation only.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: COMPLETE`, `measurements_produced: true`, `submaterial_repro_check: true`, `inconclusive_domains: []`, and all dependency tokens `COMPLETE`.
+- `decision_table.csv`: 21 rows = 3 domains x 7 tau multipliers; every row reportable with FPR Wilson upper `0.000959478516832434`.
+- `sub_material_by_tau.csv`: 210 rows; audit confirmed the decision-table `sub_rate` values match the reconstructed operating-MDE rows.
+- `recommendation.csv`:
+  - 5m: headline tau `0.75`, MDE `0.5` bps, sub-material rate `0.39759036144578314`, Loss A/B `0.75`, Loss C `0.25`, `LOSS_SENSITIVE`, driver `sub_material`.
+  - 1h: headline tau `0.25`, MDE `2.0` bps, sub-material rate `0.026223776223776224`, Loss A/B `0.25`, Loss C `0.0`, `ROBUST`.
+  - 4h: headline tau `0.5`, MDE `8.0` bps, sub-material rate `0.0`, Loss A/B `0.5`, Loss C `0.0`, `LOSS_SENSITIVE`, driver `blind_band`.
+- `adoption_rule.json`: EXP-005 detection `DETECTED_FLOOR` for all domains; EXP-009 `n_at_or_above_mde = 0` for every domain; per-instrument material overlays on EURUSD/1h and EURUSD/XAUUSD 4h; walk-forward materiality false on 5m and true on 1h/4h.
+- Audit verdict PASS: independent loss recomputation matched all saved Loss A/B/C selections and recommendations; no critical or warning issues.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED (recommendation delivered)**
+
+EXP-011 has no pass/fail hypothesis, but its scoped deliverable is complete. The primary predeclared loss recommends tau `0.75` (5m), `0.25` (1h), and `0.5` (4h); 1h is cross-loss robust, while 5m and 4h are loss-sensitive. No operating point is adopted in Phase 002.
+
+### Hypothesis-Agnostic Observations
+
+- The strict gate is already an honest detection floor on the EXP-005 scoped realistic candidate, so sub-strict tau recommendations are sensitivity-headroom choices, not corrections for demonstrated blindness.
+- EXP-009 found no scoped untuned strategy effect at or above any domain MDE, so the recommendation affects calibration sensitivity more than a currently observed real candidate.
+- 1h and 4h require stricter Phase 003 ratification because EXP-010 found material walk-forward MDE increases there.
+- Per-instrument overlays suggest pooled recommendations may mask lower achievable sensitivity in EURUSD/1h and EURUSD/XAUUSD 4h.
 
 ---
 
