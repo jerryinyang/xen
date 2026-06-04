@@ -1,0 +1,90 @@
+# Experiment Report: EXP-011 - Predeclared-Loss Operating-Point Synthesis & Recommendation
+
+## Status: SUPPORTED (recommendation delivered)
+
+**Date**: 2026-06-04
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (pooled by domain through upstream calibration artifacts)
+**Data Views / Feature Categories**: Result-level artifacts from EXP-003, EXP-005, EXP-006, EXP-007, EXP-008, EXP-009, and EXP-010; no market-data or chart-type views loaded
+
+---
+
+## Question
+
+Given a fully predeclared loss family, which L5 threshold multiplier on the frozen EXP-006 tau-frontier should Phase 002 recommend per domain, and is that recommendation robust across three loss specifications?
+
+## Hypothesis
+
+EXP-011 is exploratory and has no SUPPORTED/REFUTED hypothesis. Its success criterion is delivery of a per-domain recommended operating point, a cross-loss robustness verdict, and a conditional adoption rule for Phase 003.
+
+## Method Summary
+
+EXP-011 reads frozen result-level artifacts only. It builds a 21-row decision table over the 3 domains and 7 tau multipliers, reconstructs sub-material pass rates by draw key, evaluates the three predeclared losses, then reports the primary Loss A recommendation with Loss B/C robustness. No market data is loaded and no referee is re-run.
+
+## Key Findings
+
+### Finding 1: Primary recommendations move below strict tau = 1.0
+
+Loss A selected lower-than-strict thresholds in all domains:
+
+| Domain | Headline tau* | MDE at tau* | Sub-material rate | Verdict |
+|--------|---------------|-------------|-------------------|---------|
+| 5m | 0.75 | 0.5 bps | 0.39759036144578314 | LOSS_SENSITIVE |
+| 1h | 0.25 | 2.0 bps | 0.026223776223776224 | ROBUST |
+| 4h | 0.5 | 8.0 bps | 0.0 | LOSS_SENSITIVE |
+
+![MDE frontier](plots/mde_vs_tau_frontier.png)
+
+### Finding 2: Only 1h is robust across all three losses
+
+The cross-loss selections were:
+
+- 5m: Loss A/B `0.75`, Loss C `0.25` - loss-sensitive, driven by the sub-material term.
+- 1h: Loss A/B `0.25`, Loss C `0.0` - robust by the one-grid-step rule.
+- 4h: Loss A/B `0.5`, Loss C `0.0` - loss-sensitive, driven by blind-band trade-off.
+
+![Cross-loss consistency](plots/consistency_matrix.png)
+
+### Finding 3: Adoption is conditioned by split and instrument overlays
+
+The rule recorded in `adoption_rule.json` defers adoption to Phase 003 fresh draws. EXP-005 says the strict gate is already an honest detection floor on all domains, so the lower tau recommendations are sensitivity-headroom recommendations, not blindness repairs. EXP-010 flags walk-forward materiality on 1h/4h, and EXP-008 flags material per-instrument overlays for EURUSD/1h and EURUSD/XAUUSD 4h.
+
+![Adoption overlay](plots/adoption_overlay.png)
+
+## Conclusion
+
+**Recommendation delivered.**
+
+EXP-011 satisfies the Phase 002 synthesis deliverable: it recommends `tau = 0.75` for 5m, `tau = 0.25` for 1h, and `tau = 0.5` for 4h under the primary predeclared loss. The 1h recommendation is robust across losses; 5m and 4h are loss-sensitive and must carry that caveat into Phase 003.
+
+This does not adopt or freeze any new referee. The conditional rule is: adopt a recommended tau* only if fresh Phase 003 synthetic draws reconfirm FPR Wilson upper `<= 0.05`, `sub <= 0.50` at the operating MDE, and EXP-005-style realistic-candidate TPR `>= 0.80`; otherwise retain strict `tau = 1.0`.
+
+## Limitations
+
+- The recommendation uses shared Phase 002 synthetic draws; Goodhart-sensitive adoption is deferred to fresh Phase 003 draws.
+- EXP-009 found no scoped untuned strategy effect at or above any domain MDE, so the recommendation currently affects sensitivity headroom rather than a known real candidate.
+- 1h and 4h are split-sensitive under EXP-010 anchored walk-forward.
+- Per-instrument MDE heterogeneity is an overlay only, not a per-instrument recommendation.
+
+## Implications for Future Research
+
+- Phase 002 can close with a concrete recommendation and rule, while leaving adoption to Phase 003.
+- Phase 003 should treat 1h/4h as stricter adoption cases because of walk-forward sensitivity.
+- The next design phase can move from referee operating-point selection toward the incremental-information unit without changing the Phase 002 record.
+
+## Recommended Next Experiments
+
+1. **Phase 003 decision phase**: ratify or reject the EXP-011 tau recommendations on fresh synthetic draws.
+2. **Phase 003 design seed**: specify the incremental-information / ensemble candidate unit after the referee decision is settled.
+
+## Artifacts
+
+| Artifact | Path |
+|----------|------|
+| Scope | [scope.md](scope.md) |
+| Analysis Plan | [analysis-plan.md](analysis-plan.md) |
+| Code | [code/](code/) |
+| Audit | [audit.md](audit.md) |
+| Results | [results.md](results.md) |
+| Governance Reviews | [governance/](governance/) |
+| Raw Results | [results/](results/) |
+| Plots | [plots/](plots/) |

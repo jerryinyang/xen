@@ -1,0 +1,68 @@
+{
+  "alpha0": 0.05,
+  "consistency_by_domain": {
+    "1h": "ROBUST",
+    "4h": "LOSS_SENSITIVE",
+    "5m": "LOSS_SENSITIVE"
+  },
+  "dependency_tokens": {
+    "EXP-003": "COMPLETE",
+    "EXP-005": "COMPLETE",
+    "EXP-006": "COMPLETE",
+    "EXP-007": "COMPLETE",
+    "EXP-008": "COMPLETE",
+    "EXP-009": "COMPLETE",
+    "EXP-010": "COMPLETE"
+  },
+  "experiment_id": "EXP-011",
+  "frontier_multipliers": [
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0,
+    1.5,
+    2.0
+  ],
+  "gd_edges": {
+    "1h": [
+      2.0,
+      4.0
+    ],
+    "4h": [
+      4.0,
+      8.0,
+      12.0
+    ],
+    "5m": [
+      0.5,
+      1.0,
+      2.0
+    ]
+  },
+  "inconclusive_domains": [],
+  "materiality_bps": {
+    "1h": 1.5,
+    "4h": 3.0,
+    "5m": 0.5
+  },
+  "materiality_limited_by_domain": {
+    "1h": false,
+    "4h": false,
+    "5m": false
+  },
+  "mde_by_domain": {
+    "1h": 2.0,
+    "4h": 8.0,
+    "5m": 0.5
+  },
+  "measurements_produced": true,
+  "overall_status": "COMPLETE",
+  "recommendation_by_domain": {
+    "1h": 0.25,
+    "4h": 0.5,
+    "5m": 0.75
+  },
+  "submaterial_limit": 0.5,
+  "submaterial_repro_check": true
+}
