@@ -1,0 +1,68 @@
+{
+  "alpha0": 0.05,
+  "alpha_grid": [
+    0.1,
+    0.05,
+    0.01
+  ],
+  "bootstrap_resamples": 1000,
+  "dependencies": {
+    "exp003_status": "COMPLETE",
+    "exp004_status": "PASS"
+  },
+  "experiment_id": "EXP-009",
+  "mde_map_alpha0": {
+    "1h|gate_stack": {
+      "mde_bps": 4.0,
+      "mde_grid_uncertainty_bps": 1.0
+    },
+    "1h|minimal_baseline": {
+      "mde_bps": 0.5,
+      "mde_grid_uncertainty_bps": 0.25
+    },
+    "4h|gate_stack": {
+      "mde_bps": 12.0,
+      "mde_grid_uncertainty_bps": 2.0
+    },
+    "4h|minimal_baseline": {
+      "mde_bps": 2.0,
+      "mde_grid_uncertainty_bps": 0.5
+    },
+    "5m|gate_stack": {
+      "mde_bps": 1.0,
+      "mde_grid_uncertainty_bps": 0.25
+    },
+    "5m|minimal_baseline": {
+      "mde_bps": 0.5,
+      "mde_grid_uncertainty_bps": 0.25
+    }
+  },
+  "measurements_produced": true,
+  "overall_status": "COMPLETE",
+  "strategies": {
+    "bollinger_20_2": {
+      "num_std": 2.0,
+      "window": 20
+    },
+    "donchian_20": {
+      "lookback": 20
+    },
+    "ma_20_50": {
+      "fast": 20,
+      "slow": 50
+    },
+    "macd_12_26_9": {
+      "fast": 12,
+      "signal": 9,
+      "slow": 26
+    },
+    "roc_20": {
+      "period": 20
+    },
+    "rsi_14": {
+      "high": 70.0,
+      "low": 30.0,
+      "period": 14
+    }
+  }
+}
