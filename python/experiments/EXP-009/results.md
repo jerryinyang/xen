@@ -2,7 +2,7 @@
 
 ## Summary
 
-EXP-009 is measurement-complete. Across the broadened fixed, untuned six-strategy set, every gate-stack net-effect cell is below its EXP-003 pooled domain gate MDE. The result strengthens the EXP-004 null/lower anchor: simple untuned real-price strategies remain well below the calibrated gate detection floor.
+EXP-009 is measurement-complete. Across the broadened fixed, untuned six-strategy set, every gate-stack net-effect cell is below its EXP-003 pooled domain gate MDE. The result strengthens the EXP-004 lower anchor: simple untuned real-price strategies remain well below the calibrated gate detection floor. Crucially, "below_MDE" here is not "small positive edge under the floor" — domain median net effects are roughly -1 bps and most cells are net-negative after cost, so the set is a *lower* anchor (net losers), not a near-detection null.
 
 ## Detailed Findings
 

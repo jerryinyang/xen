@@ -4,7 +4,7 @@
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-06-03-002-referee-refinement-and-stringency | ACTIVE (design complete; EXP-005/006/008/009/011 supported; EXP-007 refuted; EXP-010 partially refuted) | Keystone spine item closed for the scoped realistic candidate (EXP-005); L5 threshold frontier measured (EXP-006); lenient-L5 structural-gain claim refuted because lenient equals the EXP-006 zero-buffer endpoint and drop-L5 (EXP-007); per-instrument MDE heterogeneity found in EURUSD/XAUUSD slower-domain cells (EXP-008); broadened simple-strategy dogfood stayed below every domain MDE (EXP-009); split robustness held on 5m but walk-forward materially raised 1h/4h MDE (EXP-010); predeclared-loss synthesis recommends tau 0.75/0.25/0.5 on 5m/1h/4h, with adoption deferred to Phase 003 fresh draws (EXP-011). Characterization phase - recommends, does not adopt. | [design.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/design.md) |
+| 2026-06-03-002-referee-refinement-and-stringency | ACTIVE (design complete; EXP-005/006/008 supported; EXP-009 measurement complete; EXP-011 recommendation delivered; EXP-007 refuted; EXP-010 partially refuted) | Keystone spine item closed for the scoped realistic candidate (EXP-005); L5 threshold frontier measured (EXP-006); lenient-L5 structural-gain claim refuted because lenient equals the EXP-006 zero-buffer endpoint and drop-L5 (EXP-007); per-instrument MDE heterogeneity found in EURUSD/XAUUSD slower-domain cells (EXP-008); broadened simple-strategy dogfood stayed below every domain MDE (EXP-009); split robustness held on 5m/1h with only 4h falsified — and there the more-OOS protocols detect a lower MDE (EXP-010, corrected 2026-06-04: the original 1h/4h walk-forward MDE inflation was a multi-fold CI artifact); predeclared-loss synthesis recommends tau 0.75/0.25/0.5 on 5m/1h/4h, with adoption deferred to Phase 003 fresh draws (EXP-011). Characterization phase - recommends, does not adopt. | [design.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/design.md) |
 | 2026-06-01-001-thesis-qualification-calibration | COMPLETED | Build the 5-check gate-stack referee + calibration harness; measure per-domain (5m/1h/4h) FPR/TPR/economic-MDE for it and a minimal baseline (EXP-001→004). | [design.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/design.md) · [retrospective.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/retrospective.md) |
 
 
@@ -374,7 +374,7 @@ The predeclared Evidence-FOR criterion is met because at least one reportable pe
 
 ## EXP-009 - Broadened Untuned Strategy Effect-Size Distribution
 
-**Status**: SUPPORTED
+**Status**: MEASUREMENT COMPLETE (exploratory)
 **Date**: 2026-06-04
 **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
 **Data Views / Feature Categories**: 1-minute time bars resampled to 5m, 1h, and 4h OHLC domains; six fixed untuned simple strategy families; no chart-type views
@@ -408,13 +408,13 @@ The predeclared Evidence-FOR criterion is met because at least one reportable pe
 
 ### Hypothesis-Specific Conclusion
 
-**SUPPORTED (measurement delivered)**
+**MEASUREMENT COMPLETE (exploratory)**
 
-EXP-009 is exploratory, but its scoped deliverable was produced. The broadened fixed simple-strategy distribution sits below every domain MDE, strengthening the EXP-004 lower/null anchor rather than surfacing a near-MDE real candidate.
+EXP-009 is exploratory, but its scoped deliverable was produced. The broadened fixed simple-strategy distribution sits below every domain MDE, strengthening the EXP-004 lower anchor rather than surfacing a near-MDE real candidate. The cells are mostly **net-negative** after cost (medians ~ -1 bps), so this is a lower anchor of net losers, not small positive edges sitting just under the floor.
 
 ### Hypothesis-Agnostic Observations
 
-- Simple untuned standalone strategies remain a lower/null anchor after broadening from 2 to 6 strategy definitions.
+- Simple untuned standalone strategies remain a lower anchor (mostly net-negative after cost) after broadening from 2 to 6 strategy definitions.
 - Cost-applied net effects are frequently negative, especially active BTCUSD trend/momentum cells.
 - The result does not refute tuned, ensemble, or incremental-information candidates; those require new predeclared scopes.
 
@@ -442,34 +442,36 @@ EXP-009 is exploratory, but its scoped deliverable was produced. The broadened f
 
 ### Results / Observations
 
-- `run_metadata.json`: `overall_status: COMPLETE`, `measurements_produced: true`, `reference_reproduction_pass: true`, `hsplit_verdict_by_domain: {5m: SUPPORTED, 1h: FALSIFIED, 4h: FALSIFIED}`.
+> **Corrected 2026-06-04 (adversarial review F01).** The original multi-fold wrapper combined folds by concatenating per-fold bootstrap-mean distributions, giving multi-fold protocols a per-fold-sized CI on a pooled-OOS estimate and spuriously inflating walk-forward MDE on 1h/4h. The wrapper now uses a test-size-weighted, per-resample average of per-fold bootstrap means (stratified pooled-OOS bootstrap); single-fold is bit-identical to the frozen referee. The numbers below are the corrected re-run.
+
+- `run_metadata.json`: `overall_status: COMPLETE`, `measurements_produced: true`, `reference_reproduction_pass: true`, `hsplit_verdict_by_domain: {5m: SUPPORTED, 1h: SUPPORTED, 4h: FALSIFIED}`.
 - `protocol_draw_verdicts.csv`: 594,000 rows, matching the scoped draw/protocol/referee/alpha budget.
 - `reference_reproduction_check.csv`: 9/9 domain/alpha rows have `fpr_consistent = true` and `mde_consistent = true`.
 - At `alpha0=0.05`, gate FPR was `0/2000` for every domain/protocol, Wilson half-width `0.000959`.
 - At `alpha0=0.05`, gate MDEs:
   - 5m: single `1.0`, walk-forward `1.0`, purged CV `1.0` bps.
-  - 1h: single `4.0`, walk-forward `8.0`, purged CV `4.0` bps.
-  - 4h: single `12.0`, walk-forward `24.0`, purged CV `12.0` bps.
-- `protocol_comparison.csv`: walk-forward material on 1h (delta `+4.0` vs margin `0.8`) and 4h (delta `+12.0` vs margin `2.4`); purged CV non-material on all domains; 5m non-material for both alternatives.
-- Audit verdict PASS: streamed verdict counts reconciled to summaries with 0 FPR mismatches; no critical or warning issues.
+  - 1h: single `4.0`, walk-forward `4.0`, purged CV `4.0` bps.
+  - 4h: single `12.0`, walk-forward `8.0`, purged CV `8.0` bps.
+- `protocol_comparison.csv`: 5m and 1h non-material for both alternatives; 4h walk-forward and purged CV both material with delta `-4.0` vs margin `2.4` (lower MDE — more OOS rows).
+- Matched-draw CI widths now decrease with `effective_n` (single 2.57 @1056 > walk-forward 1.74 @1760 > purged-CV 1.24 @3515), confirming the artifact is fixed. Re-audit verdict PASS.
 
 ### Hypothesis-Specific Conclusion
 
 **PARTIALLY REFUTED**
 
-H-split is supported on 5m but falsified on 1h and 4h. Anchored walk-forward materially increases economic MDE on slower domains while FPR remains controlled, so the split protocol can move measured sensitivity under the frozen criterion.
+H-split is SUPPORTED on 5m and 1h and FALSIFIED only on 4h. Unlike the original run, the falsification is a single domain and points the other way: the more-OOS alternative protocols (walk-forward ~0.5n, purged CV ~all n) detect a one-grid-step smaller edge than the conservative single split (~0.3n OOS) at the data-poorest domain. This is an OOS-sample-size effect (adversarial-review F02), not a referee-logic change, and FPR stays controlled.
 
 ### Hypothesis-Agnostic Observations
 
-- Purged CV matching single split suggests the measured robustness issue is specific to anchored walk-forward, not any alternative split protocol.
-- The single-split reference reproduction makes the protocol deltas interpretable.
-- EXP-010 supplies robustness context for EXP-011; it does not recommend changing the split protocol.
+- Walk-forward and purged CV agree at 4h, so the effect tracks OOS sample size, not a specific protocol; a common-OOS-window ablation would isolate it (out of predeclared scope).
+- The single-split reference reproduction (bit-identical to the frozen referee) makes the protocol deltas interpretable; a multi-fold-specific check (CI scales with pooled-OOS size) is now a standing audit requirement.
+- EXP-010 supplies corrected robustness context for EXP-011: 5m/1h split-robust, 4h split-sensitive in the more-sensitive direction.
 
 ---
 
 ## EXP-011 - Predeclared-Loss Operating-Point Synthesis & Recommendation
 
-**Status**: SUPPORTED (recommendation delivered)
+**Status**: RECOMMENDATION DELIVERED (exploratory)
 **Date**: 2026-06-04
 **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (pooled by domain through upstream calibration artifacts)
 **Data Views / Feature Categories**: Result-level artifacts from EXP-003, EXP-005, EXP-006, EXP-007, EXP-008, EXP-009, and EXP-010; no market-data or chart-type views loaded
@@ -496,12 +498,12 @@ H-split is supported on 5m but falsified on 1h and 4h. Anchored walk-forward mat
   - 5m: headline tau `0.75`, MDE `0.5` bps, sub-material rate `0.39759036144578314`, Loss A/B `0.75`, Loss C `0.25`, `LOSS_SENSITIVE`, driver `sub_material`.
   - 1h: headline tau `0.25`, MDE `2.0` bps, sub-material rate `0.026223776223776224`, Loss A/B `0.25`, Loss C `0.0`, `ROBUST`.
   - 4h: headline tau `0.5`, MDE `8.0` bps, sub-material rate `0.0`, Loss A/B `0.5`, Loss C `0.0`, `LOSS_SENSITIVE`, driver `blind_band`.
-- `adoption_rule.json`: EXP-005 detection `DETECTED_FLOOR` for all domains; EXP-009 `n_at_or_above_mde = 0` for every domain; per-instrument material overlays on EURUSD/1h and EURUSD/XAUUSD 4h; walk-forward materiality false on 5m and true on 1h/4h.
-- Audit verdict PASS: independent loss recomputation matched all saved Loss A/B/C selections and recommendations; no critical or warning issues.
+- `adoption_rule.json` (re-run, data-derived caveats): EXP-005 detection `DETECTED_FLOOR` for all domains; EXP-009 `n_at_or_above_mde = 0` for every domain; per-instrument material overlays on EURUSD (1h) and EURUSD/XAUUSD (4h); walk-forward materiality false on 5m and 1h and true on 4h (corrected EXP-010). `run_metadata.method_notes` records the Loss C zero-FPR degeneracy and the Loss A MDE-before-sub-material trade; `scoped_overlays_complete = true`.
+- Re-audit verdict PASS: independent loss recomputation matched all saved Loss A/B/C selections; deps hard-gated; sub-material tau=0 reproduction PASS.
 
 ### Hypothesis-Specific Conclusion
 
-**SUPPORTED (recommendation delivered)**
+**RECOMMENDATION DELIVERED (exploratory)**
 
 EXP-011 has no pass/fail hypothesis, but its scoped deliverable is complete. The primary predeclared loss recommends tau `0.75` (5m), `0.25` (1h), and `0.5` (4h); 1h is cross-loss robust, while 5m and 4h are loss-sensitive. No operating point is adopted in Phase 002.
 
@@ -509,7 +511,8 @@ EXP-011 has no pass/fail hypothesis, but its scoped deliverable is complete. The
 
 - The strict gate is already an honest detection floor on the EXP-005 scoped realistic candidate, so sub-strict tau recommendations are sensitivity-headroom choices, not corrections for demonstrated blindness.
 - EXP-009 found no scoped untuned strategy effect at or above any domain MDE, so the recommendation affects calibration sensitivity more than a currently observed real candidate.
-- 1h and 4h require stricter Phase 003 ratification because EXP-010 found material walk-forward MDE increases there.
+- Under the corrected EXP-010, only **4h** requires stricter Phase 003 ratification for split sensitivity (1h is now split-robust); the 4h shift is toward a lower MDE under more-OOS protocols.
+- Loss C is a weak corroborator on the zero-FPR substrate (monotone toward the lenient endpoint), and Loss A can recommend a tau* with a non-trivial sub-material rate (5m) — read tau* with its sub_rate.
 - Per-instrument overlays suggest pooled recommendations may mask lower achievable sensitivity in EURUSD/1h and EURUSD/XAUUSD 4h.
 
 ---

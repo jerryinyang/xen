@@ -1,6 +1,6 @@
 # Experiment Report: EXP-009 - Broadened Untuned Strategy Effect-Size Distribution
 
-## Status: SUPPORTED
+## Status: MEASUREMENT COMPLETE (exploratory)
 
 **Date**: 2026-06-04
 **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
@@ -28,9 +28,9 @@ All 72 gate-stack alpha0 cells classify as `below_MDE`. No strategy/instrument/d
 
 ![Effect forest vs MDE](plots/effect_forest_vs_mde.png)
 
-### Finding 2: The Distribution Is a Lower/Null Anchor
+### Finding 2: The Distribution Is a Lower Anchor (Mostly Net-Negative, Not Sub-Floor Positive)
 
-Domain medians are all near -1 bps net of cost:
+Domain medians are all near -1 bps net of cost. Note these cells are predominantly **net-negative** after cost, not small positive edges sitting just under the detection floor — "below_MDE" here means the cost-applied edge does not reach the positive detection threshold, and for most cells it is negative:
 
 - 5m: median `-1.018395` bps, range `[-9.987340, -0.069953]`.
 - 1h: median `-0.998325` bps, range `[-10.949345, -0.080834]`.
@@ -44,9 +44,9 @@ The largest positive gate-stack effect is EURUSD/4h Donchian(20), `+0.045022` bp
 
 ## Conclusion
 
-**Exploratory measurement SUPPORTED.**
+**Exploratory measurement complete.** (No pass/fail hypothesis — see scope.)
 
-The scoped measurement was delivered, and it strengthens the EXP-004 lower/null anchor: a broader fixed simple-strategy set still sits below every calibrated domain MDE. EXP-009 does not qualify, tune, adopt, or reject any strategy; it records where simple untuned real-price effects actually fall.
+The scoped measurement was delivered, and it strengthens the EXP-004 lower anchor: a broader fixed simple-strategy set still sits below every calibrated domain MDE — and, more strongly, most cells are net-negative after cost rather than positive-but-undetected. EXP-009 does not qualify, tune, adopt, or reject any strategy; it records where simple untuned real-price effects actually fall.
 
 ## Limitations
 

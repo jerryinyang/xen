@@ -93,4 +93,23 @@ None.
 
 ## Re-Audit Requirements
 
-None.
+None for the original run.
+
+## Re-Audit Addendum (2026-06-04, adversarial-review corrections F07/F08)
+
+Two code-correctness fixes were applied and the experiment re-run:
+
+- `within_grid_resolution` now uses the **full local grid spacing** (`grid_full_step`)
+  instead of the half-step MDE uncertainty, matching analysis-plan Step 5. This does not
+  change any flag value (the only non-zero deltas are one-grid-step material cells, for
+  which `|delta|` equals the spacing under both the old and new band, so `within_grid`
+  stays `false`).
+- A `tpr_monotone` column was added to `per_instrument_mde_summary.csv`; all 36 cells
+  report `true`.
+
+The frozen predeclared material margin is **unchanged**. Re-run reproduces the original
+numeric result exactly: H-pool SUPPORTED, 12/12 reportable at alpha0, 3 material cells
+(EURUSD/1h, EURUSD/4h, XAUUSD/4h). Verdict remains **PASS**. The review additionally
+notes (interpretation, not a defect) that the frozen margin is below one grid step, so
+"material" here means "differs by >= one grid point" — recorded in results.md/report.md
+Limitations.

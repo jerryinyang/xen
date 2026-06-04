@@ -17,7 +17,7 @@ EXP-009 completed the approved exploratory measurement. The audit passed with no
 | Audit adequacy | PASS | `audit.md` checks frozen-harness reuse, real-price returns, causal indicator construction, fixed untuned parameters, output dimensions, and effect ranges. |
 | Results interpretation | PASS | `results.md` uses `MEASUREMENT COMPLETE`, reports all 72 gate cells below MDE, and avoids strategy adoption or tuning claims. |
 | Final report | PASS | `report.md` is concise, includes key plots, identifies limitations, and keeps follow-ups as new scopes. |
-| Index updates | PASS | Brief and comprehensive indexes record the exploratory measurement as supported/delivered and summarize the below-MDE distribution. |
+| Index updates | PASS | Brief and comprehensive indexes record the exploratory measurement as `MEASUREMENT COMPLETE` / delivered and summarize the below-MDE distribution. |
 | Phase alignment | PASS | Finding supplies optional/context input for EXP-011 and does not alter the core EXP-005/006/007/008 spine. |
 | Governance constraints | PASS | No holdout use, no chart-type/synthetic-price issue, no parameter tuning, no overreach beyond fixed simple strategies. |
 
@@ -33,7 +33,7 @@ None.
 
 ### Info
 
-1. The status `SUPPORTED` in the indexes means the scoped exploratory measurement was delivered, not that any strategy hypothesis was proven.
+1. The status `MEASUREMENT COMPLETE` in the indexes means the scoped exploratory measurement was delivered, not that any strategy hypothesis was proven.
 2. Future tuned or incremental-information candidates require separate predeclared scopes.
 
 ## Decision

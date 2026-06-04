@@ -1,10 +1,17 @@
 # Experiment Report: EXP-011 - Predeclared-Loss Operating-Point Synthesis & Recommendation
 
-## Status: SUPPORTED (recommendation delivered)
+## Status: RECOMMENDATION DELIVERED (exploratory)
 
-**Date**: 2026-06-04
+**Date**: 2026-06-04 (re-run after EXP-010 estimator correction; dependencies hard-gated)
 **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (pooled by domain through upstream calibration artifacts)
 **Data Views / Feature Categories**: Result-level artifacts from EXP-003, EXP-005, EXP-006, EXP-007, EXP-008, EXP-009, and EXP-010; no market-data or chart-type views loaded
+
+> **Re-run note (2026-06-04 adversarial review).** EXP-011 was re-run after the EXP-010
+> multi-fold estimator correction. The headline tau* recommendations are **unchanged**
+> (they depend only on the EXP-006 tau-frontier), but the adoption caveats are now
+> **derived from the corrected EXP-010 overlay** rather than a hardcoded string: 1h is now
+> **split-robust** (only 4h carries a walk-forward caveat). All scoped context
+> dependencies (EXP-005/008/009/010) are now hard-gated to COMPLETE.
 
 ---
 
@@ -44,9 +51,27 @@ The cross-loss selections were:
 
 ![Cross-loss consistency](plots/consistency_matrix.png)
 
-### Finding 3: Adoption is conditioned by split and instrument overlays
+### Finding 3: Adoption is conditioned by split and instrument overlays (data-derived)
 
-The rule recorded in `adoption_rule.json` defers adoption to Phase 003 fresh draws. EXP-005 says the strict gate is already an honest detection floor on all domains, so the lower tau recommendations are sensitivity-headroom recommendations, not blindness repairs. EXP-010 flags walk-forward materiality on 1h/4h, and EXP-008 flags material per-instrument overlays for EURUSD/1h and EURUSD/XAUUSD 4h.
+The rule recorded in `adoption_rule.json` defers adoption to Phase 003 fresh draws and now
+composes its caveats from the loaded overlays rather than a static narrative. EXP-005 says
+the strict gate is already an honest detection floor on all domains, so the lower tau
+recommendations are sensitivity-headroom recommendations, not blindness repairs. Under the
+corrected EXP-010, **only 4h carries a walk-forward split caveat** (5m and 1h are
+split-robust); EXP-008 flags material per-instrument overlays for EURUSD (1h) and
+EURUSD/XAUUSD (4h).
+
+### Finding 4: How to read the cross-loss verdict
+
+- **Loss C is a weak corroborator on this substrate.** With FPR == 0 for every tau, Loss C
+  reduces to minimising missed material edges (mean 1-TPR), which is monotone toward the
+  lenient endpoint; it does not independently price sub-material admissions. The
+  ROBUST/LOSS_SENSITIVE verdict therefore largely reflects how far Loss A/B sit from
+  maximal leniency, and should be read with that caveat (`run_metadata.method_notes`).
+- **Loss A minimises MDE before sub-material.** A recommended tau* can carry a sizeable
+  operating sub-material rate — at 5m, tau*=0.75 hits MDE 0.5 bps (= materiality) but with
+  a `0.398` sub-material pass rate at that edge (under the 0.50 cap, but not negligible).
+  Read each tau* together with its sub_rate.
 
 ![Adoption overlay](plots/adoption_overlay.png)
 
@@ -62,13 +87,14 @@ This does not adopt or freeze any new referee. The conditional rule is: adopt a 
 
 - The recommendation uses shared Phase 002 synthetic draws; Goodhart-sensitive adoption is deferred to fresh Phase 003 draws.
 - EXP-009 found no scoped untuned strategy effect at or above any domain MDE, so the recommendation currently affects sensitivity headroom rather than a known real candidate.
-- 1h and 4h are split-sensitive under EXP-010 anchored walk-forward.
+- Under the corrected EXP-010, only **4h** is split-sensitive (and in the more-sensitive direction); 5m and 1h are split-robust.
+- Loss C is a weak corroborator on the zero-FPR substrate; Loss A can recommend a tau* with a non-trivial sub-material rate (5m). Read tau* with its sub_rate and the cross-loss caveat.
 - Per-instrument MDE heterogeneity is an overlay only, not a per-instrument recommendation.
 
 ## Implications for Future Research
 
 - Phase 002 can close with a concrete recommendation and rule, while leaving adoption to Phase 003.
-- Phase 003 should treat 1h/4h as stricter adoption cases because of walk-forward sensitivity.
+- Phase 003 should treat 4h as a stricter adoption case because of EXP-010 split sensitivity (1h is now split-robust under the corrected estimator).
 - The next design phase can move from referee operating-point selection toward the incremental-information unit without changing the Phase 002 record.
 
 ## Recommended Next Experiments

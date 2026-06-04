@@ -130,12 +130,17 @@ def _key(*parts: Any) -> tuple:
 # Step 1 — dependency + precision gating
 # --------------------------------------------------------------------------- #
 def gate_dependencies() -> dict[str, str]:
-    """Assert upstream completion tokens; core deps hard-fail, context deps soft.
+    """Assert upstream completion tokens for every scoped input (hard gate).
 
-    EXP-003/006/007 feed every domain and the reproduction gate -> hard failure if
-    missing/incomplete. EXP-005/008/009/010 are overlay/context only -> recorded,
-    not fatal (a missing context artifact degrades the adoption overlay, never the
-    headline recommendation).
+    EXP-003/006/007 feed every domain and the reproduction gate. EXP-005/008/009/010
+    feed the predeclared adoption overlays/caveats. The scope's Data Requirements
+    require each upstream ``run_metadata.json`` completion token to be checked before
+    its values are read, so a missing or incomplete artifact must NOT be silently
+    consumed while the run is still stamped COMPLETE (2026-06-04 adversarial review
+    F05): every scoped input is therefore hard-gated to ``overall_status == COMPLETE``
+    here. The headline Loss A recommendation still depends only on EXP-003/006/007,
+    but emitting it without the predeclared EXP-005/008/009/010 adoption caveats is a
+    governance gap, so those are required too.
     """
     m3, m6, m7 = _load_json(EXP003_META), _load_json(EXP006_META), _load_json(EXP007_META)
     if m3.get("overall_status") != "COMPLETE":
@@ -152,11 +157,18 @@ def gate_dependencies() -> dict[str, str]:
     }
     for exp, meta in (("EXP-005", EXP005_META), ("EXP-008", EXP008_META),
                       ("EXP-009", EXP009_META), ("EXP-010", EXP010_META)):
-        try:
-            tokens[exp] = _load_json(meta).get("overall_status", "MISSING")
-        except FileNotFoundError:
-            tokens[exp] = "MISSING"
-            logger.warning("%s metadata missing; its overlay will be omitted.", exp)
+        if not meta.exists():
+            raise FileNotFoundError(
+                f"{exp} metadata missing ({meta}); its predeclared overlay is a scoped "
+                f"input and cannot be silently omitted from a COMPLETE EXP-011 run."
+            )
+        status = _load_json(meta).get("overall_status", "MISSING")
+        if status != "COMPLETE":
+            raise RuntimeError(
+                f"{exp} not COMPLETE (overall_status={status!r}); refusing to consume an "
+                f"incomplete scoped overlay artifact."
+            )
+        tokens[exp] = status
     return tokens
 
 
@@ -435,27 +447,61 @@ def build_overlays(tokens: dict[str, str]) -> dict[str, Any]:
     return overlays
 
 
-ADOPTION_RULE_TEMPLATE = (
+ADOPTION_RULE_BASE = (
     "Adopt tau* for domain {domain} only if, on FRESH Phase 003 synthetic draws, all hold: "
     "(i) FPR(d, tau*) Wilson upper <= alpha0=0.05; (ii) sub(d, tau*) <= 0.50 at the operating "
     "MDE; (iii) an EXP-005-style realistic candidate carrying an edge >= MDE(d, tau*) is detected "
     "with TPR >= 0.80. If any condition fails on fresh draws, retain the frozen strict reference "
-    "tau=1.0 for that domain. Caveats: 1h/4h MDE roughly doubles under walk-forward (EXP-010) so "
-    "the recommendation is conditional on the single chronological split; the strict gate is "
-    "already an honest detection floor on all domains (EXP-005 DETECTED_FLOOR), so any sub-tau=1.0 "
-    "recommendation is a sensitivity-headroom choice, not a blindness remedy."
+    "tau=1.0 for that domain."
 )
 
 
+def _domain_caveats(dom: str, overlays: dict[str, Any]) -> str:
+    """Compose the per-domain adoption caveats FROM the loaded overlay data.
+
+    The split caveat is derived from the EXP-010 ``walk_forward_material`` overlay
+    rather than asserted as a static narrative (2026-06-04 adversarial review F06): if
+    the corrected EXP-010 estimator shows the domain is split-robust, the rule must say
+    so instead of repeating an MDE-doubling claim that no longer holds.
+    """
+    parts: list[str] = []
+    wf_material = overlays.get("walk_forward_material", {}).get(dom)
+    if wf_material is True:
+        parts.append(
+            "Split caveat: EXP-010 found this domain's gate MDE shifts materially under "
+            "anchored walk-forward, so re-confirm under walk-forward before adoption."
+        )
+    elif wf_material is False:
+        parts.append(
+            "Split note: EXP-010 (corrected pooled-OOS estimator) found this domain's gate "
+            "MDE split-robust across single / walk-forward / purged-CV protocols."
+        )
+    pi = overlays.get("per_instrument_material", {}).get(dom) or []
+    if pi:
+        parts.append(
+            f"Per-instrument caveat: EXP-008 flags material per-instrument MDE heterogeneity "
+            f"for {', '.join(pi)}; the headline is pooled-by-domain."
+        )
+    if overlays.get("domain_status_exp005", {}).get(dom) == "DETECTED_FLOOR":
+        parts.append(
+            "Non-blindness: EXP-005 shows the strict gate is already an honest detection floor "
+            "here, so any sub-tau=1.0 recommendation is a sensitivity-headroom choice, not a "
+            "blindness remedy."
+        )
+    return " ".join(parts)
+
+
 def build_adoption_rule(results: dict[str, dict[str, Any]], overlays: dict[str, Any]) -> dict[str, Any]:
-    """Attach the predeclared conditional adoption rule + overlay flags per domain."""
+    """Attach the predeclared conditional adoption rule + data-derived caveats per domain."""
     rule: dict[str, Any] = {}
     for dom in DOMAINS:
         res = results[dom]
+        caveats = _domain_caveats(dom, overlays)
         rule[dom] = {
             "recommended_tau_multiplier": res.get("tau_star_headline"),
             "status": res["status"],
-            "conditional_adoption_rule": ADOPTION_RULE_TEMPLATE.format(domain=dom),
+            "conditional_adoption_rule": (ADOPTION_RULE_BASE.format(domain=dom)
+                                          + (f" {caveats}" if caveats else "")),
             "per_instrument_material": overlays.get("per_instrument_material", {}).get(dom),
             "walk_forward_material": overlays.get("walk_forward_material", {}).get(dom),
             "exp005_detection": overlays.get("domain_status_exp005", {}).get(dom),
@@ -688,6 +734,20 @@ def main() -> None:
             d: results[d].get("materiality_limited") for d in DOMAINS
         },
         "inconclusive_domains": inconclusive,
+        "scoped_overlays_complete": True,  # all context deps hard-gated COMPLETE (F05)
+        "method_notes": {
+            "loss_c_degeneracy": (
+                "On the null substrate FPR == 0 for every tau, so Loss C reduces to "
+                "minimising mean(1-TPR) over the material band and is monotone toward the "
+                "lenient endpoint; it corroborates Loss A/B weakly and should not be read as "
+                "an independent vote for low tau (2026-06-04 adversarial review F09)."
+            ),
+            "loss_a_submaterial": (
+                "Loss A minimises MDE before the sub-material tie-break, so a recommended tau* "
+                "can carry a sizeable sub-material pass rate at its operating MDE (e.g. 5m) as "
+                "long as it stays <= 0.50; read tau* together with its sub_rate (F10)."
+            ),
+        },
     })
 
     plot_loss_curves(rows_by_domain, results, PLOTS_DIR / "loss_vs_tau.png")

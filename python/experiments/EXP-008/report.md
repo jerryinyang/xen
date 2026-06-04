@@ -50,9 +50,22 @@ EXP-008 shows that the pooled EXP-003 domain MDE map masks some instrument-level
 
 ## Limitations
 
+- **"Material" resolves only to one grid step.** The frozen margin (0.8 bps at 1h,
+  2.4 bps at 4h) is below one geometric grid step, so on this discrete grid a "material"
+  cell is one that lands on a different grid point; all three are exactly one step below
+  pooled. The verdict is presence-of-heterogeneity, not magnitude. It is robust (the
+  per-instrument TPR crossings have Wilson lower bounds above 0.80), but the margin is
+  not a finely-calibrated threshold.
 - MDE values are grid-defined and should not be read as continuous thresholds.
 - The experiment reuses EXP-003 oracle-style synthetic draw verdicts, not real strategies.
 - Material differences are descriptive; operating-point decisions remain out of scope.
+
+## Post-results correction (2026-06-04 adversarial review)
+
+Code corrected without changing the frozen margin or any numeric verdict: the
+`within_grid_resolution` flag now uses the full local grid spacing (plan Step 5), and a
+`tpr_monotone` column was added (all cells monotone). Re-run reproduces H-pool SUPPORTED
+with the same three material cells.
 
 ## Implications for Future Research
 

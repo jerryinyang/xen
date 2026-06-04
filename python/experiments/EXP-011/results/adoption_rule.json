@@ -1,6 +1,6 @@
 {
   "1h": {
-    "conditional_adoption_rule": "Adopt tau* for domain 1h only if, on FRESH Phase 003 synthetic draws, all hold: (i) FPR(d, tau*) Wilson upper <= alpha0=0.05; (ii) sub(d, tau*) <= 0.50 at the operating MDE; (iii) an EXP-005-style realistic candidate carrying an edge >= MDE(d, tau*) is detected with TPR >= 0.80. If any condition fails on fresh draws, retain the frozen strict reference tau=1.0 for that domain. Caveats: 1h/4h MDE roughly doubles under walk-forward (EXP-010) so the recommendation is conditional on the single chronological split; the strict gate is already an honest detection floor on all domains (EXP-005 DETECTED_FLOOR), so any sub-tau=1.0 recommendation is a sensitivity-headroom choice, not a blindness remedy.",
+    "conditional_adoption_rule": "Adopt tau* for domain 1h only if, on FRESH Phase 003 synthetic draws, all hold: (i) FPR(d, tau*) Wilson upper <= alpha0=0.05; (ii) sub(d, tau*) <= 0.50 at the operating MDE; (iii) an EXP-005-style realistic candidate carrying an edge >= MDE(d, tau*) is detected with TPR >= 0.80. If any condition fails on fresh draws, retain the frozen strict reference tau=1.0 for that domain. Split note: EXP-010 (corrected pooled-OOS estimator) found this domain's gate MDE split-robust across single / walk-forward / purged-CV protocols. Per-instrument caveat: EXP-008 flags material per-instrument MDE heterogeneity for EURUSD; the headline is pooled-by-domain. Non-blindness: EXP-005 shows the strict gate is already an honest detection floor here, so any sub-tau=1.0 recommendation is a sensitivity-headroom choice, not a blindness remedy.",
     "exp005_detection": "DETECTED_FLOOR",
     "exp009_n_at_or_above_mde": 0,
     "per_instrument_material": [
@@ -8,10 +8,10 @@
     ],
     "recommended_tau_multiplier": 0.25,
     "status": "RECOMMENDED",
-    "walk_forward_material": true
+    "walk_forward_material": false
   },
   "4h": {
-    "conditional_adoption_rule": "Adopt tau* for domain 4h only if, on FRESH Phase 003 synthetic draws, all hold: (i) FPR(d, tau*) Wilson upper <= alpha0=0.05; (ii) sub(d, tau*) <= 0.50 at the operating MDE; (iii) an EXP-005-style realistic candidate carrying an edge >= MDE(d, tau*) is detected with TPR >= 0.80. If any condition fails on fresh draws, retain the frozen strict reference tau=1.0 for that domain. Caveats: 1h/4h MDE roughly doubles under walk-forward (EXP-010) so the recommendation is conditional on the single chronological split; the strict gate is already an honest detection floor on all domains (EXP-005 DETECTED_FLOOR), so any sub-tau=1.0 recommendation is a sensitivity-headroom choice, not a blindness remedy.",
+    "conditional_adoption_rule": "Adopt tau* for domain 4h only if, on FRESH Phase 003 synthetic draws, all hold: (i) FPR(d, tau*) Wilson upper <= alpha0=0.05; (ii) sub(d, tau*) <= 0.50 at the operating MDE; (iii) an EXP-005-style realistic candidate carrying an edge >= MDE(d, tau*) is detected with TPR >= 0.80. If any condition fails on fresh draws, retain the frozen strict reference tau=1.0 for that domain. Split caveat: EXP-010 found this domain's gate MDE shifts materially under anchored walk-forward, so re-confirm under walk-forward before adoption. Per-instrument caveat: EXP-008 flags material per-instrument MDE heterogeneity for EURUSD, XAUUSD; the headline is pooled-by-domain. Non-blindness: EXP-005 shows the strict gate is already an honest detection floor here, so any sub-tau=1.0 recommendation is a sensitivity-headroom choice, not a blindness remedy.",
     "exp005_detection": "DETECTED_FLOOR",
     "exp009_n_at_or_above_mde": 0,
     "per_instrument_material": [
@@ -23,7 +23,7 @@
     "walk_forward_material": true
   },
   "5m": {
-    "conditional_adoption_rule": "Adopt tau* for domain 5m only if, on FRESH Phase 003 synthetic draws, all hold: (i) FPR(d, tau*) Wilson upper <= alpha0=0.05; (ii) sub(d, tau*) <= 0.50 at the operating MDE; (iii) an EXP-005-style realistic candidate carrying an edge >= MDE(d, tau*) is detected with TPR >= 0.80. If any condition fails on fresh draws, retain the frozen strict reference tau=1.0 for that domain. Caveats: 1h/4h MDE roughly doubles under walk-forward (EXP-010) so the recommendation is conditional on the single chronological split; the strict gate is already an honest detection floor on all domains (EXP-005 DETECTED_FLOOR), so any sub-tau=1.0 recommendation is a sensitivity-headroom choice, not a blindness remedy.",
+    "conditional_adoption_rule": "Adopt tau* for domain 5m only if, on FRESH Phase 003 synthetic draws, all hold: (i) FPR(d, tau*) Wilson upper <= alpha0=0.05; (ii) sub(d, tau*) <= 0.50 at the operating MDE; (iii) an EXP-005-style realistic candidate carrying an edge >= MDE(d, tau*) is detected with TPR >= 0.80. If any condition fails on fresh draws, retain the frozen strict reference tau=1.0 for that domain. Split note: EXP-010 (corrected pooled-OOS estimator) found this domain's gate MDE split-robust across single / walk-forward / purged-CV protocols. Non-blindness: EXP-005 shows the strict gate is already an honest detection floor here, so any sub-tau=1.0 recommendation is a sensitivity-headroom choice, not a blindness remedy.",
     "exp005_detection": "DETECTED_FLOOR",
     "exp009_n_at_or_above_mde": 0,
     "per_instrument_material": [],

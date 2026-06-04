@@ -41,8 +41,8 @@ EXP-011 delivered the Phase 002 synthesis recommendation under the predeclared l
   - EXP-005 `DETECTED_FLOOR` for 5m, 1h, and 4h.
   - EXP-009 `n_at_or_above_mde = 0` for every domain.
   - EXP-008 material per-instrument overlays for EURUSD/1h and EURUSD/XAUUSD 4h.
-  - EXP-010 walk-forward materiality `false` for 5m and `true` for 1h/4h.
-- **Interpretation**: Lower tau is not a remedy for demonstrated strict-gate blindness, because EXP-005 already showed the strict gate is an honest detection floor on the scoped candidate. For 1h/4h, any Phase 003 adoption should explicitly re-confirm the recommendation under walk-forward conditions and consider per-instrument masking.
+  - EXP-010 walk-forward materiality `false` for 5m and 1h and `true` for 4h (corrected estimator; 1h is now split-robust, and the 4h shift is toward a *lower* MDE under more-OOS protocols).
+- **Interpretation**: Lower tau is not a remedy for demonstrated strict-gate blindness, because EXP-005 already showed the strict gate is an honest detection floor on the scoped candidate. For 4h, any Phase 003 adoption should explicitly re-confirm the recommendation under walk-forward conditions; for all domains, consider per-instrument masking. The adoption caveats are now composed from the loaded overlays, not asserted as a fixed narrative.
 
 ## Hypothesis Verdict
 
@@ -53,9 +53,11 @@ EXP-011 has no SUPPORTED/REFUTED hypothesis. Its scoped success criterion was to
 ## Limitations
 
 - The recommendation is computed on shared Phase 002 draws and is explicitly not an adoption decision.
-- Loss C can prefer lower tau values because it integrates missed material edges but does not directly price sub-material admissions; this drives the 5m and 4h loss sensitivity.
-- The 1h and 4h recommendations are conditional on the single chronological split; EXP-010 found material walk-forward MDE increases on those domains.
+- Loss C can prefer lower tau values because it integrates missed material edges but does not directly price sub-material admissions; this drives the 5m and 4h loss sensitivity. On this zero-FPR substrate Loss C is monotone toward the lenient endpoint, so it is a **weak independent corroborator** — the cross-loss verdict largely reflects how far Loss A/B sit from maximal leniency (`run_metadata.method_notes.loss_c_degeneracy`).
+- Loss A minimises MDE before the sub-material tie-break, so a tau* can carry a non-trivial operating sub-material rate (5m tau*=0.75 has sub=0.398 under the 0.50 cap). Read tau* with its sub_rate (`run_metadata.method_notes.loss_a_submaterial`).
+- Under the corrected EXP-010 estimator, only the **4h** recommendation is conditional on the single chronological split; 5m and 1h are split-robust. The 4h shift is toward a lower MDE (more-OOS protocols), an OOS-sample-size effect.
 - Per-instrument overlays are caveats, not headline re-selection inputs.
+- All scoped context dependencies (EXP-005/008/009/010) are hard-gated to COMPLETE; a missing/incomplete overlay now fails the run rather than silently producing a recommendation without its predeclared caveats.
 
 ## Alternative Explanations
 
@@ -65,5 +67,5 @@ EXP-011 has no SUPPORTED/REFUTED hypothesis. Its scoped success criterion was to
 ## Recommended Next Steps
 
 1. In Phase 003, ratify any proposed tau* on fresh synthetic draws using the recorded conditional adoption rule: FPR Wilson upper `<= 0.05`, `sub <= 0.50` at the operating MDE, and EXP-005-style TPR `>= 0.80`.
-2. Re-check 1h and 4h recommendations under walk-forward before any adoption, because EXP-010 materially raised their MDE under that protocol.
+2. Re-check the 4h recommendation under walk-forward before any adoption, because corrected EXP-010 found a material 4h split shift toward a lower MDE under more-OOS protocols; 5m and 1h are split-robust.
 3. Keep EXP-011 as a recommendation artifact only; do not freeze a new referee inside Phase 002.

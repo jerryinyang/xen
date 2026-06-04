@@ -2,9 +2,18 @@
 
 ## Status: PARTIALLY REFUTED
 
-**Date**: 2026-06-04
+**Date**: 2026-06-04 (re-run under corrected multi-fold estimator)
 **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (pooled by domain)
 **Data Views / Feature Categories**: 1-minute time bars resampled to 5m, 1h, and 4h OHLC domains; regenerated known-null and known-positive referee-calibration draws; no chart-type views
+
+> **Correction note (2026-06-04 adversarial review F01).** The original run combined
+> multi-fold draws by concatenating per-fold bootstrap-mean distributions, which gave
+> multi-fold protocols an artificially wide CI (per-fold sized) on a pooled-OOS estimate
+> and spuriously inflated walk-forward MDE on 1h and 4h. The wrapper now uses a
+> test-size-weighted, per-resample average of per-fold bootstrap means (stratified
+> pooled-OOS bootstrap); the single-split arm stays bit-identical to the frozen referee.
+> Under the corrected estimator **1h is split-robust** and the only falsified domain is
+> **4h**, where alternative protocols now give a *lower* MDE (more OOS rows).
 
 ---
 
@@ -18,7 +27,7 @@ H-split: anchored walk-forward and purged/embargoed CV do not materially change 
 
 ## Method Summary
 
-EXP-010 regenerated EXP-003-style null and positive draws with a reduced draw budget held constant across protocols. It evaluated the frozen referees under single split, anchored walk-forward, and purged/embargoed CV. Fold boundaries were mapped from shared 1-minute `CloseTime` coordinates into each domain, and the amended multi-fold wrapper evaluated the referee per fold with disjoint fold train/test sets before combining one verdict per draw.
+EXP-010 regenerated EXP-003-style null and positive draws with a reduced draw budget held constant across protocols. It evaluated the frozen referees under single split, anchored walk-forward, and purged/embargoed CV. Fold boundaries were mapped from shared 1-minute `CloseTime` coordinates into each domain, and the multi-fold wrapper evaluated the referee per fold with disjoint fold train/test sets, then combined one verdict per draw by **test-size-weighting the per-fold bootstrap means into a stratified bootstrap of the pooled OOS mean** (corrected estimator; see correction note).
 
 ## Key Findings
 
@@ -32,14 +41,15 @@ At `alpha0=0.05`, gate-stack FPR was `0/2000` for every domain/protocol, with Wi
 
 ![FPR by protocol](plots/fpr_by_protocol.png)
 
-### Finding 3: Walk-Forward Materially Raised MDE on 1h and 4h
+### Finding 3: 5m/1h Split-Robust; 4h Alternative Protocols Detect a Smaller Edge
 
-Anchored walk-forward changed MDE materially on slower domains:
+Under the corrected estimator, at alpha0:
 
-- 1h: single `4.0` bps -> walk-forward `8.0` bps; margin `0.8` bps.
-- 4h: single `12.0` bps -> walk-forward `24.0` bps; margin `2.4` bps.
+- 5m: single / walk-forward / purged CV all `1.0` bps — robust.
+- 1h: single / walk-forward / purged CV all `4.0` bps — robust (the original run's walk-forward `8.0` was the concatenation artifact).
+- 4h: single `12.0` bps; walk-forward and purged CV both `8.0` bps (delta `-4.0`, margin `2.4`) — material, in the *more-sensitive* direction.
 
-Purged CV matched the single split on all domains, and 5m stayed at `1.0` bps under every protocol.
+The 4h shift is toward better detection: the alternative protocols pool more out-of-sample rows than the single split's last-30% window, and 4h is the data-poorest domain, so the single-split MDE is the most conservative. Both alternative protocols agree at `8.0`, consistent with an OOS-sample-size effect (F02), not referee instability or FPR inflation (FPR stays `0/2000`).
 
 ![MDE by protocol](plots/mde_by_protocol.png)
 
@@ -47,7 +57,7 @@ Purged CV matched the single split on all domains, and 5m stayed at `1.0` bps un
 
 **Hypothesis PARTIALLY REFUTED.**
 
-H-split is supported on 5m, but falsified on 1h and 4h because anchored walk-forward materially increases the gate-stack economic MDE while FPR remains controlled. The split protocol itself can move measured sensitivity on slower domains. EXP-010 does not recommend a split change; it supplies robustness context for EXP-011.
+H-split is SUPPORTED on 5m and 1h. It is FALSIFIED on 4h, but the falsification is now a single domain and points the *opposite* way to the original run: the more-OOS alternative protocols detect a one-grid-step smaller edge than the conservative single split. This is best read as a protocol-plus-OOS-window sensitivity (F02) rather than the referee logic moving. EXP-010 does not recommend a split change; it supplies corrected robustness context for EXP-011.
 
 ## Limitations
 
@@ -57,8 +67,8 @@ H-split is supported on 5m, but falsified on 1h and 4h because anchored walk-for
 
 ## Implications for Future Research
 
-- EXP-011 should treat 1h/4h walk-forward MDE sensitivity as a robustness penalty or context item.
-- Purged CV matching single split suggests the issue is specific to anchored walk-forward, not any alternative split protocol.
+- EXP-011 should treat 5m/1h as split-robust and 4h as split-sensitive in the *more-sensitive* direction (alternative protocols detect a smaller edge).
+- Walk-forward and purged CV agree at 4h, so the effect is not specific to one protocol; it tracks OOS sample size (F02). A common-OOS-window ablation would separate protocol mechanics from sample size and is a candidate for a future scoped experiment.
 
 ## Recommended Next Experiments
 

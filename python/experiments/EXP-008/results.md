@@ -35,8 +35,29 @@ The predeclared Evidence-FOR criterion is met: at least one reportable `instrume
 
 ## Limitations
 
+- **The "material" criterion resolves only to one grid step.** The frozen margin
+  `max(0.5, 20% of pooled)` is 0.8 bps at 1h and 2.4 bps at 4h, both smaller than one
+  geometric grid step (2.0 and 4.0 bps). On this discrete edge grid, "material" is
+  therefore operationally equivalent to "the per-instrument MDE lands on a different
+  grid point", and all three material cells are exactly one grid step below pooled. The
+  verdict establishes the **presence** of per-instrument heterogeneity, not its
+  magnitude. It is well-founded — the per-instrument TPR crossings are genuine, not
+  marginal (EURUSD/1h TPR 0.858 [0.825, 0.886] at edge 2.0; EURUSD/4h 1.000 at 8.0;
+  XAUUSD/4h 0.942 [0.918, 0.959] at 8.0, all with Wilson lower bounds above 0.80) — but
+  the margin itself carries no sub-grid resolving power and should not be read as a
+  finely-calibrated materiality threshold.
 - The MDEs remain grid-defined; differences inside a grid step should not be over-interpreted.
 - The experiment reprocesses EXP-003 oracle-style draw verdicts. It does not test real candidate strategies or adopt per-instrument operating points.
+
+## Post-results correction (2026-06-04 adversarial review)
+
+The code was corrected (no change to the frozen predeclared margin or to any numeric
+verdict): the `within_grid_resolution` flag now uses the full local grid spacing rather
+than the half-step MDE uncertainty (matching analysis-plan Step 5), and a `tpr_monotone`
+column was added to `per_instrument_mde_summary.csv` to fulfil the plan's promise to
+report any non-monotonicity. On re-run, H-pool remains **SUPPORTED** (12/12 reportable,
+3 material), every cell reports `tpr_monotone = true`, and the material cells are
+unchanged.
 
 ## Alternative Explanations
 

@@ -225,6 +225,23 @@ def grid_half_step(edge_bps: float) -> float:
     return min(left, right) / 2.0
 
 
+def grid_full_step(edge_bps: float) -> float:
+    """Smaller neighbouring gap (the full local grid spacing) around ``edge_bps``.
+
+    Used for the ``within_grid_resolution`` band so that the guard tests against the
+    plan's "local grid spacing" (analysis-plan.md Step 5), not the half-step MDE
+    uncertainty. ``grid_half_step`` remains the published MDE-uncertainty convention
+    reused from EXP-003 / by downstream experiments.
+    """
+    grid = sorted(float(value) for value in EDGE_GRID_BPS)
+    if edge_bps not in grid:
+        return math.nan
+    index = grid.index(edge_bps)
+    left = grid[index] - grid[index - 1] if index > 0 else grid[1] - grid[0]
+    right = grid[index + 1] - grid[index] if index < len(grid) - 1 else left
+    return float(min(left, right))
+
+
 def per_instrument_mde(
     fpr_rows: list[dict[str, Any]], tpr_rows: list[dict[str, Any]]
 ) -> list[dict[str, Any]]:
@@ -257,6 +274,17 @@ def per_instrument_mde(
         mde_bps = math.nan
         grid_uncertainty = math.nan
         tpr_half_width = math.nan
+        # Plan Step 4 promised to report any non-monotonicity beyond Monte-Carlo
+        # precision rather than silently picking the first crossing. A drop is a
+        # violation only if it exceeds the two cells' combined Wilson half-widths.
+        cell_tpr = sorted(tpr_idx[key], key=lambda item: float(item["edge_bps"]))
+        tpr_monotone = True
+        for prev_row, next_row in zip(cell_tpr, cell_tpr[1:]):
+            drop = float(prev_row["tpr"]) - float(next_row["tpr"])
+            tol = float(prev_row["wilson_half_width"]) + float(next_row["wilson_half_width"])
+            if drop > tol:
+                tpr_monotone = False
+                break
         if fpr is None:
             status = "INCONCLUSIVE_MISSING_FPR"
         elif fpr["wilson_half_width"] > FPR_HALF_WIDTH_TARGET:
@@ -286,6 +314,7 @@ def per_instrument_mde(
                 "mde_bps": mde_bps,
                 "mde_grid_uncertainty_bps": grid_uncertainty,
                 "tpr_wilson_half_width_at_mde": tpr_half_width,
+                "tpr_monotone": tpr_monotone,
                 "status": status,
             }
         )
@@ -342,7 +371,6 @@ def compare_to_pool(
         alpha = float(row["alpha"])
         pool = pooled.get((domain, alpha))
         pooled_mde = pool["mde_bps"] if pool else math.nan
-        pooled_unc = pool["mde_grid_uncertainty_bps"] if pool else math.nan
         inst_mde = float(row["mde_bps"])
         reportable = row["status"] == "PASS" and math.isfinite(pooled_mde)
         delta = inst_mde - pooled_mde if reportable else math.nan
@@ -351,10 +379,14 @@ def compare_to_pool(
             if math.isfinite(pooled_mde)
             else math.nan
         )
-        inst_unc = row["mde_grid_uncertainty_bps"]
+        # within_grid_resolution uses the full local grid spacing (plan Step 5
+        # "local grid spacing"), not the half-step MDE uncertainty, so a sub-grid
+        # difference is judged against the real grid resolution.
+        inst_full = grid_full_step(inst_mde) if math.isfinite(inst_mde) else math.nan
+        pooled_full = grid_full_step(pooled_mde) if math.isfinite(pooled_mde) else math.nan
         grid_band = max(
-            inst_unc if isinstance(inst_unc, float) and math.isfinite(inst_unc) else 0.0,
-            pooled_unc if math.isfinite(pooled_unc) else 0.0,
+            inst_full if math.isfinite(inst_full) else 0.0,
+            pooled_full if math.isfinite(pooled_full) else 0.0,
         )
         material = bool(reportable and abs(delta) >= margin)
         within_grid = bool(reportable and abs(delta) < grid_band)

@@ -15,9 +15,10 @@ Two design properties (both required by the EXP-010 scope / analysis plan and th
    another fold). :func:`evaluate_partition_referees` now evaluates the frozen
    gate **per fold** — block length on that fold's own (disjoint) train, bootstrap
    on that fold's own test — and combines fold outputs by pooling the
-   out-of-sample returns (each row once) and concatenating the per-fold
-   bootstrap-mean distributions. No row ever informs the block length or
-   train-stability mean of a fold in which it is scored out-of-sample. For the
+   out-of-sample returns (each row once) and taking a **test-size-weighted, per-resample
+   average** of the per-fold bootstrap-mean distributions (a stratified bootstrap of
+   the pooled OOS mean; see :func:`_weighted_combine`). No row ever informs the block
+   length or train-stability mean of a fold in which it is scored out-of-sample. For the
    single contiguous fold this reduces **exactly** to the frozen
    ``evaluate_referees`` (the reference-reproduction anchor).
 
@@ -164,6 +165,33 @@ def _mean_or(values: np.ndarray, default: float) -> float:
     return float(np.mean(finite)) if len(finite) else default
 
 
+def _weighted_combine(means_parts: list[np.ndarray], counts: list[int]) -> np.ndarray:
+    """Stratified pooled-OOS bootstrap: per-resample, size-weighted fold means.
+
+    Each fold contributes one block-bootstrap mean distribution computed on its own
+    disjoint out-of-sample test rows with its own block length. Averaging those
+    distributions *per resample* with population weights ``n_fold / sum(n_fold)``
+    yields bootstrap replicates of the **pooled** OOS mean, so the combined CI scales
+    with the pooled OOS size (``~1/sqrt(N_oos)``) rather than the smaller per-fold size.
+
+    This replaces the earlier (2026-06-03 amendment) rule that *concatenated* the
+    per-fold mean distributions: concatenation estimates the variability of a single
+    fold-sized mean, which inflated multi-fold CIs and produced a spurious walk-forward
+    MDE increase even though the pooled estimate and ``effective_n`` used all OOS rows
+    (2026-06-04 adversarial review F01). For a single contiguous fold this returns that
+    fold's means unchanged, so the wrapper stays bit-identical to the frozen
+    ``evaluate_referees`` (the reference-reproduction anchor).
+    """
+    pairs = [(m, c) for m, c in zip(means_parts, counts) if c > 0 and len(m) > 0]
+    if not pairs:
+        return np.empty(0, dtype=float)
+    length = min(len(m) for m, _ in pairs)
+    matrix = np.vstack([m[:length] for m, _ in pairs])
+    weights = np.array([c for _, c in pairs], dtype=float)
+    weights = weights / weights.sum()
+    return (weights[:, None] * matrix).sum(axis=0)
+
+
 def _gate_rows(
     *,
     core: dict[str, Any],
@@ -247,8 +275,9 @@ def evaluate_partition_referees(
 
     - the **effect** and ``effective_n`` use the pooled out-of-sample returns
       (each row once),
-    - the **CI** is taken over the concatenation of the per-fold bootstrap-mean
-      distributions,
+    - the **CI** is taken over a test-size-weighted, per-resample average of the
+      per-fold bootstrap-mean distributions (stratified bootstrap of the pooled OOS
+      mean, so the CI width tracks the pooled OOS size, not the per-fold size),
     - **L1** episode counts are summed per fold (no seam artifacts),
     - **L4** uses the size-weighted in-sample mean over all fold trains and the
       pooled out-of-sample mean,
@@ -285,6 +314,9 @@ def evaluate_partition_referees(
     neutral_parts: list[np.ndarray] = []
     naive_parts: list[np.ndarray] = []
     min_parts: list[np.ndarray] = []
+    neu_counts: list[int] = []
+    nai_counts: list[int] = []
+    min_counts: list[int] = []
     net_oos_parts: list[np.ndarray] = []
     diff_oos_parts: list[np.ndarray] = []
     gross_oos_parts: list[np.ndarray] = []
@@ -315,6 +347,11 @@ def evaluate_partition_referees(
         neutral_parts.append(neutral_means)
         naive_parts.append(naive_means)
         min_parts.append(min_means)
+        # Per-fold finite OOS counts are the population weights for the stratified
+        # pooled-OOS combination (F01 fix); they match the rows each bootstrap saw.
+        neu_counts.append(len(finite_values(net_te)))
+        nai_counts.append(len(finite_values(diff_te)))
+        min_counts.append(len(finite_values(gross_te)))
         net_oos_parts.append(net_te)
         diff_oos_parts.append(diff_te)
         gross_oos_parts.append(gross_te)
@@ -337,10 +374,10 @@ def evaluate_partition_referees(
     net_oos_mean = _mean_or(net_oos, float("-inf"))
 
     gate_core = {
-        "neutral_means": _concat(neutral_parts),
+        "neutral_means": _weighted_combine(neutral_parts, neu_counts),
         "neutral_mean": _mean_or(net_oos, float("nan")),
         "n_neu": len(net_oos),
-        "naive_means": _concat(naive_parts),
+        "naive_means": _weighted_combine(naive_parts, nai_counts),
         "naive_mean": _mean_or(diff_oos, float("nan")),
         "n_nai": len(diff_oos),
         "block_length": gate_block,
@@ -354,7 +391,7 @@ def evaluate_partition_referees(
         "l4": bool(net_train_mean > 0.0 and net_oos_mean > 0.0),
     }
     minimal_core = {
-        "means": _concat(min_parts),
+        "means": _weighted_combine(min_parts, min_counts),
         "sample_mean": _mean_or(gross_oos, float("nan")),
         "n": len(gross_oos),
         "block_length": min_block,
