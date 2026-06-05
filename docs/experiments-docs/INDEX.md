@@ -4,7 +4,7 @@
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-06-04-003-ratification-and-incremental-unit | ACTIVE (design complete; execution begins at EXP-012) | **Framework-conclusion phase.** Track A: ratify the EXP-011-recommended loose operating point (tau 0.75/0.25/0.5) on **fresh** synthetic draws — new seeds, never the holdout — and adopt per domain or fall back to strict (4h split-gated via corrected EXP-010) (EXP-012). Track B: build + validate the incremental-information / portfolio-fitness unit via a substrate→logic→calibration chain with a redundancy null as the binding control (EXP-013→014→015). Assemble + freeze the concluded "two referees + fitness check" suite and demonstrate it on real dogfood (EXP-016). Strict referee already validated/usable; Phase 004 = first real signal exploration with the frozen suite. | [design.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/design.md) |
+| 2026-06-04-003-ratification-and-incremental-unit | ACTIVE (EXP-012-016 reviewed; amendment [A1](checkpoints/2026-06-04-003-ratification-and-incremental-unit/amendments/2026-06-04-A1-incremental-unit-corrections.md) issued and Track B re-validated; `retrospective.md` pending) | **Framework-conclusion attempt did not reach FULL_FRAMEWORK_CONCLUDED (outcome: PARTIAL_SUCCESS).** Track A succeeded: EXP-012 ratified and adopted the EXP-011 loose point on fresh seeds for 5m/1h/4h. Track B validated the substrate and logic gates (EXP-013/014) but EXP-015 refuted portfolio-fitness calibration because every domain had qualifying dependence cells with no finite MDE. EXP-016 correctly blocked before composition measurement because the incremental unit was not COMPLETE and the dogfood reference book was undefined. **Adversarial review (amendment A1) corrected the incremental inference layer (F04 contiguous-series block length), the EXP-013 redundancy verdict (F01 across-draw distribution + `UNDER_POWERED` class), and EXP-015 diagnosability (F03 per-leg/per-instrument tables); EXP-013→014→015 re-validated 2026-06-04/05 — direction unchanged: Track A SUPPORTED, Track B substrate/logic PASS (EXP-013 PASS with 3 cells now `UNDER_POWERED`; EXP-014 PASS, `effective_n` episode-aware), EXP-015 REFUTED with the failure attributed to the L2 standalone-significance leg driven by BTCUSD.** Phase 004 signal exploration remains blocked unless the operator records a standalone-only rescope or starts a new incremental-unit follow-up; the phase `retrospective.md` is to be authored next (re-validation reruns complete). | [design.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/design.md) |
 | 2026-06-03-002-referee-refinement-and-stringency | COMPLETED (7/7 EXP executed, governance-APPROVED; retrospective written 2026-06-04) | Keystone spine item closed for the scoped realistic candidate (EXP-005); L5 threshold frontier measured (EXP-006); lenient-L5 structural-gain claim refuted because lenient equals the EXP-006 zero-buffer endpoint and drop-L5 (EXP-007); per-instrument MDE heterogeneity found in EURUSD/XAUUSD slower-domain cells (EXP-008); broadened simple-strategy dogfood stayed below every domain MDE (EXP-009); split robustness held on 5m/1h with only 4h falsified — and there the more-OOS protocols detect a lower MDE (EXP-010, corrected 2026-06-04: the original 1h/4h walk-forward MDE inflation was a multi-fold CI artifact); predeclared-loss synthesis recommends tau 0.75/0.25/0.5 on 5m/1h/4h, with adoption deferred to Phase 003 fresh draws (EXP-011). Characterization phase - recommends, does not adopt. | [design.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/design.md) · [retrospective.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/retrospective.md) |
 | 2026-06-01-001-thesis-qualification-calibration | COMPLETED | Build the 5-check gate-stack referee + calibration harness; measure per-domain (5m/1h/4h) FPR/TPR/economic-MDE for it and a minimal baseline (EXP-001→004). | [design.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/design.md) · [retrospective.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/retrospective.md) |
 
@@ -516,6 +516,225 @@ EXP-011 has no pass/fail hypothesis, but its scoped deliverable is complete. The
 - Under the corrected EXP-010, only **4h** requires stricter Phase 003 ratification for split sensitivity (1h is now split-robust); the 4h shift is toward a lower MDE under more-OOS protocols.
 - Loss C is a weak corroborator on the zero-FPR substrate (monotone toward the lenient endpoint), and Loss A can recommend a tau* with a non-trivial sub-material rate (5m) — read tau* with its sub_rate.
 - Per-instrument overlays suggest pooled recommendations may mask lower achievable sensitivity in EURUSD/1h and EURUSD/XAUUSD 4h.
+
+---
+
+## EXP-012 - Fresh-Draw Loose Referee Ratification
+
+**Status**: SUPPORTED
+**Date**: 2026-06-04
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 1-minute time bars resampled to 5m, 1h, and 4h OHLC domains; fresh synthetic known-null and known-positive draws; no chart-type views
+
+### Hypothesis Tests
+
+1. **Hypothesis**: On each domain, the EXP-011-recommended loose operating point reproduces its Phase 002 operating characteristics on fresh synthetic draws: gate FPR <= alpha0 at D-prec precision, MDE within one edge-grid step of Phase 002, sub-material pass rate within tolerance and below the 0.50 ceiling, and for 4h, split-protocol agreement.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from the first-70% analysis slice; no chart-type views.
+- **Features**: fresh known-null and known-positive draws, fixed EXP-011 tau point, loose and strict referee verdicts, FPR/TPR/MDE summaries, sub-material pass-rate reconstruction, 4h single-vs-anchored-walk-forward split gate.
+- **Parameter ranges**: tau multipliers 5m `0.75`, 1h `0.25`, 4h `0.5`; alpha grid `{0.10, 0.05, 0.01}`; primary `alpha0=0.05`; 500 null draws per generator, 500 positive draws per edge; edge grid `{0.5,1,2,4,8,12,16,24,32}` bps.
+- **Exclusions**: tau re-selection, threshold tuning, real candidate signals, chart-type candidates, bid/ask spread inference, and global holdout use.
+- **Constraints**: EXP-001 PASS and EXP-003/EXP-010/EXP-011 COMPLETE required; first-70% slice only; real domain `Close` returns; fresh seed payloads disjoint from Phase 001/002 inputs.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: COMPLETE`, `measurements_produced: true`, dependencies `{EXP-001: PASS, EXP-003: COMPLETE, EXP-010: COMPLETE, EXP-011: COMPLETE}`.
+- Fresh seed check: `payload_overlap_count = 0`; 6 benign 32-bit integer collisions versus about 7.1 expected by chance.
+- `adoption_decisions.csv`: all domains `ADOPT_LOOSE`.
+- At `alpha0=0.05`, loose FPR = `0/4000` in 5m, 1h, and 4h; Wilson half-width `0.000479739`.
+- Fresh loose MDEs exactly match Phase 002: 5m `0.5`, 1h `2.0`, 4h `8.0` bps.
+- Sub-material rates: 5m `0.3991389913899139` vs Phase 002 `0.39759036144578314`; 1h `0.027469316189362946` vs `0.026223776223776224`; 4h `0.0` vs `0.0`.
+- 4h split gate: single and anchored walk-forward loose MDE both `8.0` bps, FPR both `0.0`, `protocols_agree = true`.
+- Audit verdict PASS: no critical or warning issues.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+All three domains satisfy the frozen adoption rule. Phase 003 adopts the EXP-011 loose referee point for 5m/1h/4h rather than falling back to strict.
+
+### Hypothesis-Agnostic Observations
+
+- The fresh-draw ratification addresses synthetic seed-selection Goodhart risk, not fresh market-regime risk.
+- 5m still carries a material sub-material pass rate (~0.40), but it stayed within the predeclared adoption rule and below the 0.50 ceiling.
+- Later candidate screens can report strict plus adopted-loose outputs, but programme-level multiplicity remains outside this suite.
+
+---
+
+## EXP-013 - Incremental Substrate Validation
+
+**Status**: SUPPORTED — re-validated 2026-06-04 under amendment [A1](checkpoints/2026-06-04-003-ratification-and-incremental-unit/amendments/2026-06-04-A1-incremental-unit-corrections.md) (F01 across-draw redundancy verdict + `UNDER_POWERED` class; F04 contiguous-series block length). Remains PASS with three high-cost cells reclassified `UNDER_POWERED`. Numbers below reflect the rerun.
+**Date**: 2026-06-04
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 1-minute time bars resampled to 5m, 1h, and 4h OHLC domains; seeded R/C incremental known-truth substrate
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The incremental substrate recovers a planted marginal edge within `max(0.5 bps, 15% of m)` and reads no phantom positive incremental edge for the redundancy null where R and C share structure but C adds no marginal edge.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from the first-70% analysis slice.
+- **Features**: seeded blockwise latent state, R-only/C-change/overlap/inactive masks, model-free marginal net P&L, positive planted marginal edge, redundancy null, bootstrap intervals, denominator and cost accounting.
+- **Parameter ranges**: episode lengths 5m `24`, 1h `8`, 4h `4`; 100 positive draws per edge; 100 redundancy draws; inherited edge grid `{0.5,1,2,4,8,12,16,24,32}` bps.
+- **Exclusions**: incremental MDE calibration, golden fixtures, real candidate signals, chart-type candidates, linear residualization as qualifying evidence, and global holdout use.
+- **Constraints**: EXP-001 PASS and Track B predeclaration token required; first-70% slice only; real domain `Close` returns; denominator is rows where C changes the combined book relative to R-alone.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: PASS`, `measurements_produced: true`, `recovery_fail: false`, `phantom_edge: false`, `powered_null_cells: 9`, `insufficient_return_cells: 0`, `redundancy_verdict_basis: across_draw_distribution`.
+- `positive_recovery.csv`: 108/108 cells PASS. Maximum absolute recovery error `0.39608151988927` bps, below tolerance.
+- `redundancy_null.csv`: 8 `PASS`, 3 `UNDER_POWERED` (BTCUSD/1h, BTCUSD/4h, USTEC/4h), 1 `NULL_COST_DOMINATED` (XAUUSD/4h); 0 `PHANTOM_EDGE`.
+- Verdict basis is the across-draw distribution (F01): the most positive across-draw mean across all 12 cells is `-0.041182` bps, so no cell has even a positive point estimate; the 3 `UNDER_POWERED` cells have across-draw CI half-width ≥ materiality.
+- `substrate_integrity.csv`: C-change denominator fraction range `0.24983388704318937` to `0.2504520795660036`.
+- Audit verdict PASS: no critical or warning issues.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+The Track B incremental substrate is validated. It recovers planted marginal edge and does not manufacture positive incremental evidence from shared R-C structure.
+
+### Hypothesis-Agnostic Observations
+
+- The redundancy-null cells read negative (cost drag) under the confirmed incremental cost model, not as phantom positives; one cell (XAUUSD/4h) is adequately-powered cost-dominated, and three (BTCUSD/1h, BTCUSD/4h, USTEC/4h) are under-powered (CI too wide to bound a phantom) and disclosed rather than passed.
+- The substrate gate passes, but later calibration still needs to prove finite MDE under dependence stress.
+
+---
+
+## EXP-014 - Incremental Referee Golden-Fixture Correctness
+
+**Status**: SUPPORTED — re-validated 2026-06-04 under amendment [A1](checkpoints/2026-06-04-003-ratification-and-incremental-unit/amendments/2026-06-04-A1-incremental-unit-corrections.md) (F04 contiguous-series block length): 7/7 verdicts and 35/35 leg states reproduced unchanged; `effective_n` now episode-aware (`276.9` on `all_pass`); EXP-013 dependency re-confirmed PASS.
+**Date**: 2026-06-04
+**Instruments**: Fixture labels only; no market data read
+**Data Views / Feature Categories**: Deterministic in-memory return-space and R/C position fixtures
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The incremental referee reproduces predeclared hand-computed verdicts on deterministic golden fixtures, exposes all gate legs without short-circuiting, and correctly generalizes L3 from naive control to reference control.
+
+### Scope
+
+- **Instruments**: Fixture labels only.
+- **Data Views / Feature Categories**: deterministic fixture arrays; no Parquet market-data load.
+- **Features**: seven fixture verdicts, L1-L5 expected states, no-short-circuit leg exposure, L3 reference-control isolation.
+- **Parameter ranges**: primary `alpha0=0.05`; 1000 bootstrap resamples; fixtures `all_pass_incremental`, L1-L5 fail fixtures, and `redundant_shared_structure`.
+- **Exclusions**: MDE calibration, dependence-grid measurement, real candidate signals, chart-type candidates, and global holdout use.
+- **Constraints**: EXP-013 PASS and Track B predeclaration token required.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: PASS`, `verdicts_reproduced: true`, `leg_states_reproduced: true`, `all_legs_exposed_no_short_circuit: true`.
+- `fixture_results.csv`: 7/7 fixture verdicts match expected.
+- `leg_exposure_matrix.csv`: 35/35 L1-L5 checks PASS; all legs exposed for every fixture.
+- `l3_reference_control_fail` rejects despite standalone-looking edge, isolating the incremental-beyond-R requirement.
+- Audit verdict PASS: no critical or warning issues.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+The incremental referee logic is correct under the confirmed leg mapping and may be used for EXP-015 calibration.
+
+### Hypothesis-Agnostic Observations
+
+- This experiment validates logic wiring only; it does not measure operating characteristics.
+- The fixture suite should remain a regression target if the incremental unit is revised.
+
+---
+
+## EXP-015 - Incremental Referee Portfolio-Fitness Calibration
+
+**Status**: REFUTED — re-validated 2026-06-05 under amendment [A1](checkpoints/2026-06-04-003-ratification-and-incremental-unit/amendments/2026-06-04-A1-incremental-unit-corrections.md) (F03 per-leg + per-instrument diagnostics; F04 no-op for the per-row grid). Outcome stands REFUTED; the failure is now attributed to the L2 standalone-significance leg driven by BTCUSD. Numbers below reflect the rerun.
+**Date**: 2026-06-04
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 1-minute time bars resampled to 5m, 1h, and 4h OHLC domains; incremental R/C dependence-grid known-truth draws
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The incremental referee has a finite portfolio-fitness MDE at FPR <= `alpha0` on each domain, and redundancy-null FPR remains controlled under the checkpoint's R-C dependence grid.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from the first-70% analysis slice.
+- **Features**: redundancy-null FPR, positive TPR/MDE, rho/overlap/lag/reference-strength dependence grid, construction diagnostics, denominator summaries, worst-case domain MDE rule.
+- **Parameter ranges**: rho labels `{independent, moderate, high}`; overlap `{low, medium, high}`; lag `{synchronous, c_lags_r_1, c_leads_r_1}`; reference strength `{null_R, R_at_strict_mde}`; alpha grid `{0.10, 0.05, 0.01}`; edge grid `{0.5,1,2,4,8,12,16,24,32}` bps.
+- **Exclusions**: real candidate signals, chart-type candidates, re-tuning estimator or leg mapping, standalone referee ratification, suite integration, and global holdout use.
+- **Constraints**: EXP-013 PASS, EXP-014 PASS, and EXP-003 strict MDE map required; first-70% slice only; real domain `Close` returns; construction-invalid cells reported explicitly.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: REFUTED`, dependencies `{EXP-013: PASS, EXP-014: PASS, EXP-003: FOUND}`.
+- `domain_mde_summary.csv`:
+  - 5m: finite MDE cells `41`, failing cells `1`, construction-invalid/underpowered cells `12`, status `REFUTED`.
+  - 1h: finite MDE cells `40`, failing cells `2`, construction-invalid/underpowered cells `12`, status `REFUTED`.
+  - 4h: finite MDE cells `40`, failing cells `2`, construction-invalid/underpowered cells `12`, status `REFUTED`.
+- Failing cells are all synchronous high-overlap `null_R` contexts: high rho/high overlap on 5m; moderate and high rho/high overlap on 1h and 4h.
+- Accepted-cell FPR is controlled: max FPR `0.0` on 5m and `0.01` on 1h/4h; no cell exceeds `alpha0 = 0.05`.
+- `construction_diagnostics.csv`: 12 construction-invalid cells per domain, all high-rho low/medium-overlap combinations marked `target_rho_infeasible_for_overlap`.
+- F03 attribution (`leg_pass_rates.csv`, `tpr_by_instrument.csv`): in every failing cell the verdict pass rate equals the L2 standalone-significance pass rate (5m/high `0.75`, 1h/mod `0.784`, 1h/high `0.716`, 4h/mod `0.63`, 4h/high `0.382`) with L1/L4/L5 at `1.0` and L3 ≥ `0.97`; BTCUSD's standalone TPR is `0.0`–`0.136` at the 32 bps ceiling versus the other instruments at/near `1.0`, holding the pooled rate below the `0.80` power floor.
+- Worst finite PASS-cell MDEs are 5m `32.0`, 1h `24.0`, 4h `32.0` bps, but these are not adoptable because failing cells exist.
+- Audit verdict PASS: results are valid for interpretation; no critical or warning issues.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+The incremental referee controls FPR in accepted cells but fails the finite-MDE requirement in every domain. The Track B portfolio-fitness unit is not validated and cannot be frozen for Phase 004 use.
+
+### Hypothesis-Agnostic Observations
+
+- The refutation is sensitivity-driven, not false-positive-driven, and is localized to the L2 leg / BTCUSD by the F03 diagnostics — not a substrate or logic defect.
+- EXP-013 and EXP-014 still stand: the substrate and logic are valid, but this calibrated operating point fails under dependence stress.
+- Phase 003 cannot reach FULL_FRAMEWORK_CONCLUDED without a new incremental-unit follow-up or an explicit standalone-only rescope.
+
+---
+
+## EXP-016 - Assembled Suite Composition Anchor
+
+**Status**: BLOCKED
+**Date**: 2026-06-04
+**Instruments**: Not measured
+**Data Views / Feature Categories**: Blocker manifest only; no suite-composition measurement produced
+
+### Hypothesis Tests
+
+1. **Exploratory question**: Does the assembled strict, ratified-loose, and incremental suite wire both reject and pass paths end to end on the EXP-009 dogfood negative path and a synthetic positive suite-level fixture?
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD for the planned dogfood path; not measured in the blocked run.
+- **Data Views / Feature Categories**: planned 5m/1h/4h dogfood domains and synthetic positive fixture; blocked run emits only dependency and blocker manifests.
+- **Features**: suite dependency manifest, dogfood reference-book precondition, positive fixture precondition, blocker report.
+- **Parameter ranges**: not measured.
+- **Exclusions**: inventing the dogfood reference book, changing EXP-012 adoption decisions, changing EXP-015 calibration, real signal exploration, chart-type candidates, and global holdout use.
+- **Constraints**: EXP-009 COMPLETE, EXP-012 COMPLETE, EXP-015 COMPLETE, and `inputs/dogfood_reference_book.csv` required before measurement.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: BLOCKED`, `measurements_produced: false`.
+- `dependency_manifest.csv`: EXP-009 COMPLETE, EXP-012 COMPLETE, EXP-015 metadata `REFUTED`, upstream result files found, dogfood reference book MISSING.
+- `blocker_report.csv`: two blockers:
+  - EXP-015 `overall_status='REFUTED'`, required `COMPLETE`.
+  - missing `python/experiments/EXP-016/inputs/dogfood_reference_book.csv`.
+- No suite manifest, expected-output matrix, positive fixture, standalone verdicts, incremental verdicts, or composition summary was produced.
+- Audit verdict PASS for blocked-state handling.
+
+### Hypothesis-Specific Conclusion
+
+**INCONCLUSIVE / BLOCKED**
+
+The composition question is unanswered. EXP-016 correctly stopped before measurement because the suite was not assembleable under the approved scope.
+
+### Hypothesis-Agnostic Observations
+
+- The blocked result confirms governance discipline: the script does not invent an undefined dogfood reference book and does not proceed after EXP-015 refutes the incremental unit.
+- Phase 003 cannot be reported as full-framework concluded from the current EXP-016 artifact set.
 
 ---
 
