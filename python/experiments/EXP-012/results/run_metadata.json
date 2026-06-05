@@ -1,0 +1,96 @@
+{
+  "adoption_verdict_by_domain": {
+    "1h": "ADOPT_LOOSE",
+    "4h": "ADOPT_LOOSE",
+    "5m": "ADOPT_LOOSE"
+  },
+  "alpha0": 0.05,
+  "alpha_grid": [
+    0.1,
+    0.05,
+    0.01
+  ],
+  "bootstrap_resamples": 1000,
+  "dependencies": {
+    "EXP-001": "PASS",
+    "EXP-003": "COMPLETE",
+    "EXP-010": "COMPLETE",
+    "EXP-011": "COMPLETE"
+  },
+  "experiment_id": "EXP-012",
+  "fpr_half_width_target": 0.03,
+  "fresh_seed_disjointness": {
+    "benign_int_collision_count": 6,
+    "disjoint": true,
+    "expected_int_collisions": 7.099180016666651,
+    "fresh_namespace": "EXP-012|fresh",
+    "fresh_seed_count": 66000,
+    "payload_overlap_count": 0,
+    "prior_namespaces": [
+      "EXP-001",
+      "EXP-002",
+      "EXP-003",
+      "EXP-005",
+      "EXP-006",
+      "EXP-007",
+      "EXP-010"
+    ],
+    "prior_seed_count": 461981,
+    "seed_space_bits": 32
+  },
+  "mde_grid_step_tol": 1,
+  "measurements_produced": true,
+  "n_workers": 10,
+  "null_draws_per_generator": 500,
+  "null_generators": [
+    "bar_permutation",
+    "random_signal"
+  ],
+  "operating_points": {
+    "1h": {
+      "materiality_bps": 1.5,
+      "phase002_mde_bps": 2.0,
+      "phase002_sub_rate": 0.026223776223776224,
+      "tau_bps": 0.375,
+      "tau_multiplier": 0.25
+    },
+    "4h": {
+      "materiality_bps": 3.0,
+      "phase002_mde_bps": 8.0,
+      "phase002_sub_rate": 0.0,
+      "tau_bps": 1.5,
+      "tau_multiplier": 0.5
+    },
+    "5m": {
+      "materiality_bps": 0.5,
+      "phase002_mde_bps": 0.5,
+      "phase002_sub_rate": 0.39759036144578314,
+      "tau_bps": 0.375,
+      "tau_multiplier": 0.75
+    }
+  },
+  "overall_status": "COMPLETE",
+  "positive_draws_per_edge": 500,
+  "positive_edges_bps": [
+    0.5,
+    1.0,
+    2.0,
+    4.0,
+    8.0,
+    12.0,
+    16.0,
+    24.0,
+    32.0
+  ],
+  "power_target": 0.8,
+  "split_gate_reference_reproduction": {
+    "consistent": true,
+    "main_4h_loose_mde_bps": 8.0,
+    "split_single_4h_loose_mde_bps": 8.0
+  },
+  "submaterial_ceiling": 0.5,
+  "submaterial_tol": 0.1,
+  "tpr_half_width_target": 0.05,
+  "walk_forward_folds": 5,
+  "walk_forward_warmup_fraction": 0.5
+}
