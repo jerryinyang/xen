@@ -1,0 +1,36 @@
+{
+  "all_legs_exposed_no_short_circuit": true,
+  "alpha": 0.05,
+  "bootstrap_resamples": 1000,
+  "dependencies": {
+    "EXP-013": "PASS"
+  },
+  "experiment_id": "EXP-014",
+  "fixtures": [
+    "all_pass_incremental",
+    "l1_readiness_fail",
+    "l2_significance_fail",
+    "l3_reference_control_fail",
+    "l4_cross_market_fail",
+    "l5_materiality_fail",
+    "redundant_shared_structure"
+  ],
+  "leg_mapping": {
+    "L1_readiness": "incremental denominator effective-n and up/down episodes",
+    "L2_significance": "standalone candidate net edge CI lower > 0",
+    "L3_reference_control": "incremental-beyond-R edge CI lower > 0",
+    "L4_cross_market": "no material sign reversal across the two segments",
+    "L5_materiality": "incremental edge point estimate > materiality buffer"
+  },
+  "leg_states_reproduced": true,
+  "measurements_produced": true,
+  "n_fixtures": 7,
+  "n_leg_checks": 35,
+  "overall_status": "PASS",
+  "predeclaration_gate": {
+    "confirmed": true,
+    "source": "pre-execution-review.md",
+    "token": "PHASE003-TRACKB-PREDECLARATION-CONFIRMED"
+  },
+  "verdicts_reproduced": true
+}
