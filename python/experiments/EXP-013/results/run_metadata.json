@@ -1,0 +1,57 @@
+{
+  "cost_dominated_null_cells": [
+    "XAUUSD/4h"
+  ],
+  "experiment_id": "EXP-013",
+  "insufficient_return_cells": 0,
+  "measurements_produced": true,
+  "overall_status": "PASS",
+  "phantom_edge": false,
+  "powered_null_cells": 9,
+  "recovery_fail": false,
+  "redundancy_verdict_basis": "across_draw_distribution",
+  "substrate_manifest": {
+    "alpha": 0.05,
+    "bootstrap_resamples": 1000,
+    "denominator": "bars where combined position differs from R-alone (m != 0)",
+    "episode_lengths": {
+      "1h": 8,
+      "4h": 4,
+      "5m": 24
+    },
+    "estimator": "model_free_marginal_net_pnl",
+    "exp001_status": "PASS",
+    "incremental_cost_model": "amortised per-episode round-trip = cost_bps / episode_length",
+    "mask_target_fraction": 0.25,
+    "masks": [
+      "R_only",
+      "C_change",
+      "overlap",
+      "inactive"
+    ],
+    "position_bound": 1.0,
+    "positive_draws_per_edge": 100,
+    "positive_edges_bps": [
+      0.5,
+      1.0,
+      2.0,
+      4.0,
+      8.0,
+      12.0,
+      16.0,
+      24.0,
+      32.0
+    ],
+    "predeclaration_gate": {
+      "confirmed": true,
+      "source": "pre-execution-review.md",
+      "token": "PHASE003-TRACKB-PREDECLARATION-CONFIRMED"
+    },
+    "redundancy_draws": 100
+  },
+  "underpowered_null_cells": [
+    "BTCUSD/1h",
+    "BTCUSD/4h",
+    "USTEC/4h"
+  ]
+}
