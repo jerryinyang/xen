@@ -4,7 +4,8 @@
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-06-04-003-ratification-and-incremental-unit | ACTIVE (EXP-012-016 reviewed; amendment [A1](checkpoints/2026-06-04-003-ratification-and-incremental-unit/amendments/2026-06-04-A1-incremental-unit-corrections.md) issued and Track B re-validated; `retrospective.md` pending) | **Framework-conclusion attempt did not reach FULL_FRAMEWORK_CONCLUDED (outcome: PARTIAL_SUCCESS).** Track A succeeded: EXP-012 ratified and adopted the EXP-011 loose point on fresh seeds for 5m/1h/4h. Track B validated the substrate and logic gates (EXP-013/014) but EXP-015 refuted portfolio-fitness calibration because every domain had qualifying dependence cells with no finite MDE. EXP-016 correctly blocked before composition measurement because the incremental unit was not COMPLETE and the dogfood reference book was undefined. **Adversarial review (amendment A1) corrected the incremental inference layer (F04 contiguous-series block length), the EXP-013 redundancy verdict (F01 across-draw distribution + `UNDER_POWERED` class), and EXP-015 diagnosability (F03 per-leg/per-instrument tables); EXP-013→014→015 re-validated 2026-06-04/05 — direction unchanged: Track A SUPPORTED, Track B substrate/logic PASS (EXP-013 PASS with 3 cells now `UNDER_POWERED`; EXP-014 PASS, `effective_n` episode-aware), EXP-015 REFUTED with the failure attributed to the L2 standalone-significance leg driven by BTCUSD.** Phase 004 signal exploration remains blocked unless the operator records a standalone-only rescope or starts a new incremental-unit follow-up; the phase `retrospective.md` is to be authored next (re-validation reruns complete). | [design.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/design.md) |
+| 2026-06-05-003b-incremental-unit-redesign | COMPLETED — REVISED_UNIT_VALIDATED (EXP-017-019 executed and post-governance APPROVED 2026-06-05; retrospective written 2026-06-05) | **Track B follow-up succeeded.** EXP-017 validated the revised incremental-referee logic (7/7 fixture verdicts, 28/28 retained-leg checks, L2 absent). EXP-018 validated the revised portfolio-fitness unit on the construction-accepted dependence grid: FPR controlled in 126/126 accepted cells, finite worst-case MDEs 12/16/32 bps on 5m/1h/4h, and the EXP-015 synchronous/high-overlap/null_R stress corner passes in every domain; 36 infeasible high-rho/low-overlap cells are disclosed as construction-invalid. EXP-019 exercised both assembled-suite paths: EXP-009 dogfood rejects and synthetic positive passes across all domains. The concluded suite is now **{frozen strict gate stack, EXP-012 ratified-loose referee, EXP-018 revised incremental/fitness unit}**. Phase 004 may open after its mandatory programme-level multiplicity registry precondition is documented. **Not a new programme phase — a revision; Phase 004 remains reserved for signal exploration.** | [design.md](checkpoints/2026-06-05-003b-incremental-unit-redesign/design.md) · [retrospective.md](checkpoints/2026-06-05-003b-incremental-unit-redesign/retrospective.md) |
+| 2026-06-04-003-ratification-and-incremental-unit | COMPLETED — PARTIAL_SUCCESS (EXP-012-016 executed and reviewed; amendment [A1](checkpoints/2026-06-04-003-ratification-and-incremental-unit/amendments/2026-06-04-A1-incremental-unit-corrections.md) applied and Track B re-validated; retrospective written 2026-06-05) | **Framework-conclusion attempt did not reach FULL_FRAMEWORK_CONCLUDED (outcome: PARTIAL_SUCCESS).** Track A succeeded: EXP-012 ratified and adopted the EXP-011 loose point on fresh seeds for 5m/1h/4h. Track B validated the substrate and logic gates (EXP-013/014) but EXP-015 refuted portfolio-fitness calibration because every domain had qualifying dependence cells with no finite MDE. EXP-016 correctly blocked before composition measurement because the incremental unit was not COMPLETE and the dogfood reference book was undefined. **Adversarial review (amendment A1) corrected the incremental inference layer (F04 contiguous-series block length), the EXP-013 redundancy verdict (F01 across-draw distribution + `UNDER_POWERED` class), and EXP-015 diagnosability (F03 per-leg/per-instrument tables); EXP-013→014→015 re-validated 2026-06-04/05 — direction unchanged: Track A SUPPORTED, Track B substrate/logic PASS (EXP-013 PASS with 3 cells now `UNDER_POWERED`; EXP-014 PASS, `effective_n` episode-aware), EXP-015 REFUTED with the failure attributed to the L2 standalone-significance leg driven by BTCUSD.** The concluded suite ships as **two referees only** (frozen strict + ratified-loose); the incremental/fitness unit is carried to a follow-up. **Operator decision recorded 2026-06-05 (retrospective §11): Path B — open a new incremental-unit follow-up checkpoint and fix the L2/BTCUSD calibration failure (and resolve the A1/F02 L4/L5 freeze precondition) before Phase 004**, rather than rescoping Phase 004 to standalone-only. Phase 004 stays blocked until that follow-up delivers a validated+calibrated incremental unit. | [design.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/design.md) · [retrospective.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/retrospective.md) |
 | 2026-06-03-002-referee-refinement-and-stringency | COMPLETED (7/7 EXP executed, governance-APPROVED; retrospective written 2026-06-04) | Keystone spine item closed for the scoped realistic candidate (EXP-005); L5 threshold frontier measured (EXP-006); lenient-L5 structural-gain claim refuted because lenient equals the EXP-006 zero-buffer endpoint and drop-L5 (EXP-007); per-instrument MDE heterogeneity found in EURUSD/XAUUSD slower-domain cells (EXP-008); broadened simple-strategy dogfood stayed below every domain MDE (EXP-009); split robustness held on 5m/1h with only 4h falsified — and there the more-OOS protocols detect a lower MDE (EXP-010, corrected 2026-06-04: the original 1h/4h walk-forward MDE inflation was a multi-fold CI artifact); predeclared-loss synthesis recommends tau 0.75/0.25/0.5 on 5m/1h/4h, with adoption deferred to Phase 003 fresh draws (EXP-011). Characterization phase - recommends, does not adopt. | [design.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/design.md) · [retrospective.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/retrospective.md) |
 | 2026-06-01-001-thesis-qualification-calibration | COMPLETED | Build the 5-check gate-stack referee + calibration harness; measure per-domain (5m/1h/4h) FPR/TPR/economic-MDE for it and a minimal baseline (EXP-001→004). | [design.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/design.md) · [retrospective.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/retrospective.md) |
 
@@ -13,6 +14,8 @@
 
 | Checkpoint | Status | Key Synthesis | Document |
 | --- | --- | --- | --- |
+| 2026-06-05-003b-incremental-unit-redesign | COMPLETED — **REVISED_UNIT_VALIDATED** (EXP-017-019 executed, pre+post governance APPROVE; pre-execution amendment B1 applied before any results) | **The framework conclusion is completed — Phase 004 unlocks.** Phase 003b removed the **L2 standalone-significance leg** that A1/F03 diagnosed as the EXP-015/BTCUSD refutation cause, leaving the portfolio-fitness gate `L1 ∧ L3 ∧ L4′ ∧ L5` (strict-L5 binding, L3 its precondition), and resolved the A1/F02 L4′/L5 freeze precondition by operator decision. Predeclared once, measured once (D-no-retune held; B1 changed no predeclared object). **EXP-017** SUPPORTED: 7/7 fixture verdicts, 28/28 retained-leg states, L2 absent 7/7, former-L2-fail fixture now passes. **EXP-018** SUPPORTED (the claim EXP-015 refuted, now holding): 126/126 construction-accepted cells PASS, FPR 0.0–0.004, finite worst-case MDEs 12/16/32 bps on 5m/1h/4h, EXP-015 synchronous/high-overlap/null_R corner PASS across all ρ in every domain; 36 high-ρ/low-overlap cells disclosed as construction-invalid. **EXP-019** SUPPORTED: dogfood rejects across all domains (0 strict/loose/incremental passes); nonredundant synthetic positive passes all three components in every domain. Concluded suite **{frozen strict gate stack, EXP-012 ratified-loose referee, EXP-018 validated revised incremental/fitness unit}** is frozen — D-adopt (P3) satisfied. **Honest caveat:** the incremental screen is the coarsest (12/16/32 vs strict 1/4/12 and loose 0.5/2/8) — correct portfolio-fitness semantics bought at a higher detection floor; validation is on synthetic dependence draws, not real candidates or fresh regimes (holdout sealed). **Phase 004 unlocks behind its mandatory programme-level multiplicity-registry precondition (P3-§11).** | [retrospective.md](checkpoints/2026-06-05-003b-incremental-unit-redesign/retrospective.md) |
+| 2026-06-04-003-ratification-and-incremental-unit | COMPLETED — **PARTIAL_SUCCESS** (EXP-012-016 executed; amendment A1 applied + Track B re-validated 2026-06-04/05) | **Two referees concluded; the fitness check is not.** Track A: EXP-012 ratified the EXP-011 loose point on fresh disjoint seeds (`payload_overlap_count=0`) and **adopted** τ 0.75/0.25/0.5 on 5m/1h/4h — FPR 0/4000, fresh MDEs reproduce Phase 002 to the grid (0.5/2/8 bps), 4h split gate agrees; the meta-Goodhart freeze Phase 002 deferred is now executed. Track B mirrored EXP-001→003: substrate PASS (EXP-013: 108/108 recovery, no phantom; 3 cells honestly `UNDER_POWERED` under A1/F01) and logic PASS (EXP-014: 7/7 verdicts, L3→reference-control, episode-aware `effective_n`), but the keystone **REFUTED** (EXP-015): FPR controlled yet no finite MDE in any domain, attributed by A1/F03 diagnostics to the **L2 standalone-significance leg driven by BTCUSD** (standalone TPR 0.0–0.136 at the 32 bps ceiling). EXP-016 correctly BLOCKED (refuted dependency + undefined dogfood book). Adversarial review (A1: F01 across-draw redundancy verdict, F03 diagnostics, F04 contiguous block length, F02 leg-conservatism freeze precondition) made passing *harder* and did not flip any verdict. Against §9 this is **PARTIAL_SUCCESS** — the suite ships as two referees only; the incremental unit goes to a follow-up. **Operator decision (2026-06-05, §11): Path B — open an incremental-unit follow-up checkpoint and fix the L2/BTCUSD failure (+ A1/F02 L4/L5 freeze precondition) before Phase 004**; Phase 004 stays blocked until that follow-up validates+calibrates the unit. | [retrospective.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/retrospective.md) |
 | 2026-06-03-002-referee-refinement-and-stringency | COMPLETED (7/7 EXP executed; §9 a–d met + EXP-009/010 delivered) | **Keystone CLOSED: the strict gate is an honest detection floor, not structurally blind** — EXP-005's realistic near-MDE candidate is detected on every domain (TPR 1.000/0.985/0.947 at 1.0× MDE, FPR=0; all 12 per-instrument rows DETECTED_FLOOR), though detection below the MDE is unreliable (0.5× MDE TPR 0.024/0.371/0.502). The L5 stringency lever is one-dimensional (EXP-006 frontier; lenient L5 ≡ τ=0 ≡ drop-L5, EXP-007 REFUTED) and lower τ buys MDE partly with sub-material passes (5m ≈0.50 at zero-buffer). Pooled map is conservative — per-instrument MDEs only lower (EXP-008: EURUSD/1h, EURUSD+XAUUSD/4h). Untuned simple strategies remain net losers below every MDE (EXP-009). Split-robust on 5m/1h; 4h toward a *lower* MDE under more-OOS protocols (EXP-010, corrected). EXP-011 recommends τ 0.75/0.25/0.5 (1h robust, 5m/4h loss-sensitive); **nothing adopted** — fresh-draw ratification is Phase 003. Framework characterization concluded; finalization (freeze) deferred. | [retrospective.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/retrospective.md) |
 | 2026-06-01-001-thesis-qualification-calibration | COMPLETED (4/4 EXP SUPPORTED) | Referee operating characteristics measured (design's success deliverable met): gate-stack FPR=0 at all domains/α vs minimal FPR≈α, bought with 2–8× economic MDE (net 1/4/12 bps on 5m/1h/4h); L5 materiality is the binding, α-invariant leg. H-keystone is **bounded, not closed** — EXP-004 dogfood is a null anchor (untuned Donchian/MA carry ~0 edge below every MDE), so structural blindness is true-negative-confirmed but the gate's detection of a weak *real* edge near the MDE is untested. Next: EXP-005 near-MDE detection anchor. | [retrospective.md](checkpoints/2026-06-01-001-thesis-qualification-calibration/retrospective.md) |
 
@@ -735,6 +738,137 @@ The composition question is unanswered. EXP-016 correctly stopped before measure
 
 - The blocked result confirms governance discipline: the script does not invent an undefined dogfood reference book and does not proceed after EXP-015 refutes the incremental unit.
 - Phase 003 cannot be reported as full-framework concluded from the current EXP-016 artifact set.
+
+---
+
+## EXP-017 - Revised Incremental Referee Golden-Fixture Correctness
+
+**Status**: SUPPORTED
+**Date**: 2026-06-05
+**Instruments**: Fixture labels only; no market data read
+**Data Views / Feature Categories**: Seeded-deterministic in-memory return-space and R/C position fixtures
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The revised incremental referee, with L2 removed and retained legs L1, L3, L4', and strict L5, reproduces predeclared fixture verdicts, exposes every retained leg without short-circuiting, omits L2 from gate output, and verifies the former standalone-L2 failure fixture now passes under the revised formula.
+
+### Scope
+
+- **Instruments**: Fixture labels only; not a market-behavior experiment.
+- **Data Views / Feature Categories**: Deterministic return-space and R/C position fixtures; no market Parquet load.
+- **Features**: seven fixture verdicts, retained-leg states for L1/L3/L4'/L5, L2-absence checks, legacy-L2 diagnostic, mismatch report.
+- **Parameter ranges**: `alpha = 0.05`, 1000 bootstrap resamples, revised gate `L1 and L3 and L4_prime and strict_L5; L2 absent`.
+- **Exclusions**: Operating-characteristic calibration, MDE measurement, real candidate signals, chart-type candidates, and global holdout use.
+- **Constraints**: EXP-013 PASS, EXP-014 PASS, and active Phase 003b design confirmations required; fixtures are seeded-deterministic rather than closed-form analytic.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: PASS`, `verdicts_reproduced: true`, `retained_leg_states_reproduced: true`, `all_retained_legs_exposed_no_short_circuit: true`, `l2_absent_from_revised_gate_output: true`.
+- `fixture_results.csv`: 7/7 fixture verdicts PASS; `mismatch_details.csv` is empty.
+- `leg_exposure_matrix.csv`: 28/28 retained-leg checks PASS, all retained legs exposed.
+- `l2_absence_check.csv`: 7/7 PASS; emitted revised-gate legs contain L1, L3, L4', L5, and supporting numeric fields only.
+- `l2_absent_former_standalone_fail`: legacy L2 diagnostic fails (`legacy_l2_pass_diagnostic = false`, `legacy_l2_ci_lower_bps = -3.3855586505512987`) while revised verdict PASS.
+- Audit verdict PASS: no critical or warning issues.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+EXP-017 validates the revised incremental-referee logic gate. It confirms L2 removal, retained-leg exposure, and expected fixture behavior, so EXP-018 may use EXP-017 as a PASS dependency.
+
+### Hypothesis-Agnostic Observations
+
+- This is a logic correctness gate only; it does not measure false-positive risk, power, or MDE.
+- The fixture suite should remain the regression test for any future change to `revised_incremental_gate_row()`.
+
+---
+
+## EXP-018 - Revised Incremental Referee Portfolio-Fitness Calibration
+
+**Status**: SUPPORTED
+**Date**: 2026-06-05
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 1-minute time bars resampled to 5m, 1h, and 4h OHLC domains; seeded R/C dependence-grid known-truth draws
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The revised incremental referee has a finite portfolio-fitness MDE at FPR <= `alpha0` on each domain across the construction-accepted unchanged P3-D-dependence grid, and redundancy-null FPR remains controlled at the synchronous/high-overlap/null_R corner where EXP-015 failed.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from the first-70% analysis slice; no chart-type candidates.
+- **Features**: redundancy-null FPR, positive-edge TPR/MDE, retained-leg pass rates, per-instrument TPR, denominator summaries, construction diagnostics, explicit binding-corner summary.
+- **Parameter ranges**: rho `{independent, moderate, high}`; overlap `{low, medium, high}`; lag `{synchronous, c_lags_r_1, c_leads_r_1}`; reference strength `{null_R, R_at_strict_mde}`; alpha grid `{0.10, 0.05, 0.01}`; edge grid `{0.5,1,2,4,8,12,16,24,32}` bps; 125 draws per instrument/cell.
+- **Exclusions**: Real candidate signals, chart-type candidates, retuning the revised gate, changing strict or ratified-loose referees, suite integration, and global holdout use.
+- **Constraints**: EXP-013 PASS, EXP-017 PASS, and EXP-003 strict MDE map required; headline domain MDE is worst-case finite accepted-cell MDE.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: COMPLETE`; domain statuses all `SUPPORTED_WITH_UNDERPOWERED_CELLS`; domain MDEs 5m `12.0`, 1h `16.0`, 4h `32.0` bps.
+- `construction_diagnostics.csv`: 810,000 construction rows; 630,000 accepted and 180,000 invalid. Invalid reason is `target_rho_infeasible_for_overlap`.
+- `fpr_summary.csv`: 126 accepted cells PASS, 36 construction-invalid cells; accepted-cell FPR range `0.0` to `0.004`, max FPR Wilson half-width `0.006684203250090802`.
+- `cell_mde_summary.csv`: 126 PASS cells, 36 CONSTRUCTION_INVALID cells; 0 FPR or no-finite-MDE failures.
+- `domain_mde_summary.csv`: each domain has 42 finite MDE cells, 0 failing cells, 12 construction-invalid/underpowered cells, total 54 cells.
+- `binding_corner_summary.csv`: all nine synchronous/high-overlap/null_R corner rows PASS. Moderate/high-rho stress MDEs are 5m `1.0`, 1h `8.0`, and 4h `24.0` bps.
+- Audit recomputation: FPR and TPR counts from `draw_verdicts.csv` match summary files with 0 mismatches; domain MDE recomputation matches `domain_mde_summary.csv`.
+- Audit verdict PASS: no critical or warning issues.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+The revised incremental / portfolio-fitness unit validates on every construction-accepted dependence-grid cell. FPR is controlled, finite MDEs exist in all domains, and the explicit EXP-015 stress corner now passes.
+
+### Hypothesis-Agnostic Observations
+
+- The validated revised-unit MDE map is materially conservative: 12/16/32 bps on 5m/1h/4h.
+- The 36 disclosed non-PASS cells are construction-infeasible high-rho/low-overlap contexts, not failed inference cells.
+- The EXP-015 refutation was repaired by removing standalone L2; the revised unit now tests portfolio fitness, not standalone C significance.
+
+---
+
+## EXP-019 - Assembled Suite Composition Anchor
+
+**Status**: SUPPORTED
+**Date**: 2026-06-05
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD for dogfood path; EURUSD fixture label for synthetic positive path
+**Data Views / Feature Categories**: 5m, 1h, and 4h OHLC domains for dogfood path; deterministic synthetic positive fixture for pass path
+
+### Hypothesis Tests
+
+1. **Exploratory integration claim**: Conditional on EXP-018 validation and the confirmed dogfood reference book, the assembled suite of frozen strict referee, EXP-012 ratified-loose referee, and EXP-018 revised incremental unit composes end to end on both the EXP-009 dogfood negative path and a synthetic positive suite-level fixture.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD for real dogfood path; EURUSD fixture label for synthetic positive path.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from the first-70% analysis slice for dogfood; in-memory synthetic arrays for positive fixture.
+- **Features**: strict and loose/fallback standalone verdicts, revised incremental verdicts, dogfood reference-book manifest, suite manifest, expected-output matrix, positive fixture manifest, composition summary.
+- **Parameter ranges**: strict MDEs 1/4/12 bps; EXP-012 effective loose MDEs 0.5/2/8 bps; EXP-018 revised incremental MDEs 12/16/32 bps on 5m/1h/4h; dogfood reference book `donchian_20`; candidates `ma_20_50`, `rsi_14`, `bollinger_20_2`, `macd_12_26_9`, `roc_20`.
+- **Exclusions**: New real signal exploration, chart-type candidates, suite retuning, changing upstream adoption decisions, programme-level multiplicity control, and global holdout use.
+- **Constraints**: EXP-009 COMPLETE, EXP-012 COMPLETE, EXP-018 COMPLETE with finite domain MDEs, and predeclared dogfood reference book required before measurement.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: COMPLETE`; all six domain/path statuses expected.
+- `dependency_manifest.csv`: EXP-009, EXP-012, and EXP-018 metadata COMPLETE; strict MDE map, dogfood artifacts, adoption decisions, EXP-018 domain MDE summary, dogfood reference book, and dogfood reference manifest FOUND.
+- `suite_manifest.csv`: strict MDEs 1/4/12 bps, ratified-loose effective MDEs 0.5/2/8 bps, revised incremental MDEs 12/16/32 bps on 5m/1h/4h.
+- `suite_composition_summary.csv`: dogfood negative path has 0 strict passes, 0 loose/fallback passes, 0 incremental passes in every domain; status `REJECT_PATH_EXERCISED` for 5m/1h/4h.
+- `suite_composition_summary.csv`: synthetic positive path has 1 strict pass, 1 loose/fallback pass, 1 incremental pass in every domain; status `PASS_PATH_EXERCISED` for 5m/1h/4h.
+- `positive_fixture_manifest.csv`: 3/3 rows `nonredundancy_ok = true`, active overlap fraction `0.0`, signed R-C rho near zero.
+- Audit verdict PASS: no critical or warning issues. Audit notes a stale earlier `blocker_report.csv`, superseded by current completed metadata and manifests.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+The assembled suite composes end to end. The dogfood negative path rejects across all domains, and the synthetic positive path passes strict, ratified-loose, and revised incremental components across all domains.
+
+### Hypothesis-Agnostic Observations
+
+- EXP-019 is an integration anchor, not Phase 004 signal exploration.
+- The concluded suite can now be recorded as `{frozen strict gate stack, EXP-012 ratified-loose referee, EXP-018 revised incremental / fitness unit}`.
+- Phase 004 remains gated on documenting the programme-level multiplicity registry before real candidate screening begins.
 
 ---
 

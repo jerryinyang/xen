@@ -1,0 +1,128 @@
+{
+  "alignment": "Rows align by instrument, domain, and CloseTime to EXP-019 next-step return rows from the first 70% analysis slice.",
+  "candidate_families": [
+    "ma_20_50",
+    "rsi_14",
+    "bollinger_20_2",
+    "macd_12_26_9",
+    "roc_20"
+  ],
+  "csv_path": "python/experiments/EXP-019/inputs/dogfood_reference_book.csv",
+  "decision": "D-dogfood-book",
+  "decision_date": "2026-06-05",
+  "decision_source": "operator confirmation in Codex session: use donchian_20",
+  "decision_status": "CONFIRMED",
+  "holdout_policy": "Generated with load_analysis_data(), which slices source timebars to the first 70% analysis set before domain construction; final 30% global holdout is not loaded into the output.",
+  "parameters": {
+    "lookback": 20
+  },
+  "position_generator": "xen.referee_calibration.donchian_breakout_positions",
+  "reference_description": "EXP-009 Donchian(20) breakout positions used as the standing reference book R for EXP-019.",
+  "reference_family": "donchian_20",
+  "required_columns": [
+    "instrument",
+    "domain",
+    "CloseTime",
+    "reference_position"
+  ],
+  "row_count": 793176,
+  "row_counts": [
+    {
+      "domain": "5m",
+      "flat_rows": 194549,
+      "instrument": "BTCUSD",
+      "long_rows": 12026,
+      "rows": 216981,
+      "short_rows": 10406
+    },
+    {
+      "domain": "1h",
+      "flat_rows": 16602,
+      "instrument": "BTCUSD",
+      "long_rows": 881,
+      "rows": 18141,
+      "short_rows": 658
+    },
+    {
+      "domain": "4h",
+      "flat_rows": 4023,
+      "instrument": "BTCUSD",
+      "long_rows": 249,
+      "rows": 4424,
+      "short_rows": 152
+    },
+    {
+      "domain": "5m",
+      "flat_rows": 150296,
+      "instrument": "EURUSD",
+      "long_rows": 10919,
+      "rows": 171220,
+      "short_rows": 10005
+    },
+    {
+      "domain": "1h",
+      "flat_rows": 12728,
+      "instrument": "EURUSD",
+      "long_rows": 821,
+      "rows": 14349,
+      "short_rows": 800
+    },
+    {
+      "domain": "4h",
+      "flat_rows": 3118,
+      "instrument": "EURUSD",
+      "long_rows": 194,
+      "rows": 3515,
+      "short_rows": 203
+    },
+    {
+      "domain": "5m",
+      "flat_rows": 145421,
+      "instrument": "USTEC",
+      "long_rows": 11427,
+      "rows": 165646,
+      "short_rows": 8798
+    },
+    {
+      "domain": "1h",
+      "flat_rows": 12089,
+      "instrument": "USTEC",
+      "long_rows": 1092,
+      "rows": 13841,
+      "short_rows": 660
+    },
+    {
+      "domain": "4h",
+      "flat_rows": 2587,
+      "instrument": "USTEC",
+      "long_rows": 275,
+      "rows": 3006,
+      "short_rows": 144
+    },
+    {
+      "domain": "5m",
+      "flat_rows": 145993,
+      "instrument": "XAUUSD",
+      "long_rows": 10599,
+      "rows": 165190,
+      "short_rows": 8598
+    },
+    {
+      "domain": "1h",
+      "flat_rows": 12384,
+      "instrument": "XAUUSD",
+      "long_rows": 893,
+      "rows": 13853,
+      "short_rows": 576
+    },
+    {
+      "domain": "4h",
+      "flat_rows": 2645,
+      "instrument": "XAUUSD",
+      "long_rows": 248,
+      "rows": 3010,
+      "short_rows": 117
+    }
+  ],
+  "source_experiment": "EXP-009"
+}

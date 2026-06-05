@@ -1,0 +1,35 @@
+{
+  "all_retained_legs_exposed_no_short_circuit": true,
+  "alpha": 0.05,
+  "bootstrap_resamples": 1000,
+  "dependencies": {
+    "EXP-013": "PASS",
+    "EXP-014": "PASS",
+    "active design": "CONFIRMED"
+  },
+  "experiment_id": "EXP-017",
+  "fixtures": [
+    "all_pass_revised",
+    "l1_readiness_fail",
+    "l2_absent_former_standalone_fail",
+    "l3_reference_control_fail",
+    "l4_material_sign_reversal_fail",
+    "l5_strict_materiality_fail",
+    "redundant_shared_structure"
+  ],
+  "l2_absent_from_revised_gate_output": true,
+  "leg_mapping": {
+    "L1_readiness": "incremental denominator effective-n and up/down episodes",
+    "L2": "absent from revised gate output",
+    "L3_reference_control": "incremental-beyond-R CI lower > 0",
+    "L4_no_material_sign_reversal": "no material train/test sign reversal",
+    "L5_strict_materiality": "incremental CI lower > materiality"
+  },
+  "legacy_l2_diagnostic_reproduced": true,
+  "measurements_produced": true,
+  "n_fixtures": 7,
+  "n_retained_leg_checks": 28,
+  "overall_status": "PASS",
+  "retained_leg_states_reproduced": true,
+  "verdicts_reproduced": true
+}

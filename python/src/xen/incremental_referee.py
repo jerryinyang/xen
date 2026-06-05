@@ -366,22 +366,32 @@ def incremental_gate_core(
     seed: int,
     split_index: int | None = None,
     episode_length: int | None = None,
+    compute_standalone: bool = True,
 ) -> dict[str, Any]:
     """Alpha-independent incremental-referee state for one (R, C) evaluation.
 
-    Computes (i) the standalone candidate net series (for L2 significance), (ii) the
-    marginal net series beyond R (for L3 reference-control, L5 materiality, effect),
-    and the alpha-free L1 readiness / L4 cross-market legs on the incremental
-    position. Bootstrap-mean distributions are computed once and reused across the
-    alpha grid by :func:`incremental_gate_row`.
+    Computes (i) the standalone candidate net series (for the legacy L2 significance
+    leg), (ii) the marginal net series beyond R (for L3 reference-control, L5
+    materiality, effect), and the alpha-free L1 readiness / L4 cross-market legs on
+    the incremental position. Bootstrap-mean distributions are computed once and
+    reused across the alpha grid by :func:`incremental_gate_row`.
+
+    ``compute_standalone`` (adversarial-review F07) controls the standalone (L2)
+    bootstrap. The Phase 003b **revised** gate removes L2, so revised-only callers
+    (EXP-018/019) pass ``compute_standalone=False`` to skip a per-draw 1000-resample
+    bootstrap whose output the revised row discards (governance section 1, "no
+    unnecessary computation"). This changes **only** whether the standalone series is
+    built and resampled; the marginal estimator, contiguous block length, L1/L4 legs,
+    and the incremental bootstrap (``seed + 1``) are byte-for-byte identical because
+    every bootstrap draws from its own explicitly-seeded RNG. When skipped, the
+    ``standalone_*`` keys are returned as empty/NaN so the legacy
+    :func:`incremental_gate_row` (which still reads them, e.g. EXP-014/EXP-017's L2
+    diagnostic) keeps the default ``compute_standalone=True``.
     """
     spec = DOMAIN_SPECS[domain]
     cost_bps = cost_bps_for(instrument, domain)
     materiality_bps = materiality_bps_for(domain)
     ep_len = episode_length if episode_length is not None else EPISODE_LENGTHS[domain]
-
-    # Standalone candidate net series (L2): C judged on its own, frozen cost model.
-    standalone = strategy_return_bps(scoped_returns, c_positions, cost_bps=cost_bps)
 
     # Marginal (incremental) net series on the denominator (L3 / L5 / effect).
     marginal = marginal_net_series(
@@ -434,12 +444,17 @@ def incremental_gate_core(
         or (inc_train_mean < -eps and inc_test_mean > eps)
     )
 
-    # Standalone bootstrap for L2 significance (frozen split convention).
-    s_cut = resolve_split_index(len(standalone), split_index)
-    s_block = estimate_block_length(standalone[:s_cut])
-    s_means, s_mean, s_n = block_bootstrap_means(
-        standalone[s_cut:], n_resamples=n_bootstrap, block_length=s_block, seed=seed + 2
-    )
+    # Standalone bootstrap for the legacy L2 significance leg (frozen split
+    # convention). Skipped for revised-only callers (F07); see the docstring.
+    if compute_standalone:
+        standalone = strategy_return_bps(scoped_returns, c_positions, cost_bps=cost_bps)
+        s_cut = resolve_split_index(len(standalone), split_index)
+        s_block = estimate_block_length(standalone[:s_cut])
+        s_means, s_mean, s_n = block_bootstrap_means(
+            standalone[s_cut:], n_resamples=n_bootstrap, block_length=s_block, seed=seed + 2
+        )
+    else:
+        s_means, s_mean, s_n = np.empty(0, dtype=float), float("nan"), 0
     return {
         "inc_means": inc_means,
         "inc_mean": inc_mean,
@@ -517,6 +532,48 @@ def incremental_gate_row(core: dict[str, Any], *, alpha: float) -> dict[str, Any
     }
 
 
+def revised_incremental_gate_row(core: dict[str, Any], *, alpha: float) -> dict[str, Any]:
+    """Assemble the Phase 003b revised incremental-referee row.
+
+    The revised portfolio-fitness unit changes leg composition only:
+    - L2 standalone-C significance is removed from the gate output.
+    - L3 remains incremental-beyond-R CI lower bound > 0.
+    - L4' keeps the accepted no-material-sign-reversal form from ``core["l4"]``.
+    - L5 becomes strict incremental materiality: CI lower bound > materiality.
+
+    The marginal estimator, contiguous block-length rule, bootstrap distributions,
+    readiness leg, and no-material-sign-reversal calculation are intentionally reused
+    unchanged from ``incremental_gate_core``.
+    """
+    ci_inc = ci_from_means(core["inc_mean"], core["inc_means"], core["inc_n"], alpha=alpha)
+    l1, l4 = core["l1"], core["l4"]
+    l3 = bool(np.isfinite(ci_inc.lower) and ci_inc.lower > 0.0)
+    l5 = bool(np.isfinite(ci_inc.lower) and ci_inc.lower > core["materiality_bps"])
+    passed = bool(l1 and l3 and l4 and l5)
+    leg_results = {
+        "L1_readiness": l1,
+        "L3_reference_control": l3,
+        "L4_no_material_sign_reversal": l4,
+        "L5_strict_materiality": l5,
+        "materiality_bps": core["materiality_bps"],
+        "incremental_ci_lower_bps": ci_inc.lower,
+        "denominator_count": core["denominator_count"],
+    }
+    return {
+        "referee": "revised_incremental_gate",
+        "alpha": alpha,
+        "verdict": "PASS" if passed else "REJECT",
+        "passed": passed,
+        "incremental_edge_bps": ci_inc.mean,
+        "incremental_ci_lower_bps": ci_inc.lower,
+        "incremental_ci_upper_bps": ci_inc.upper,
+        "effective_n": core["effective_n"],
+        "block_length": core["inc_block"],
+        "denominator_count": core["denominator_count"],
+        "leg_results": json.dumps(leg_results, sort_keys=True),
+    }
+
+
 def incremental_gate_verdict(
     scoped_returns: np.ndarray,
     r_positions: np.ndarray,
@@ -543,3 +600,38 @@ def incremental_gate_verdict(
         episode_length=episode_length,
     )
     return incremental_gate_row(core, alpha=alpha)
+
+
+def revised_incremental_gate_verdict(
+    scoped_returns: np.ndarray,
+    r_positions: np.ndarray,
+    c_positions: np.ndarray,
+    *,
+    instrument: str,
+    domain: str,
+    alpha: float,
+    n_bootstrap: int,
+    seed: int,
+    split_index: int | None = None,
+    episode_length: int | None = None,
+    compute_standalone: bool = False,
+) -> dict[str, Any]:
+    """Single-alpha revised incremental-referee verdict (core + row wrapper).
+
+    Defaults to ``compute_standalone=False`` (F07): the revised gate has no L2 leg,
+    so the standalone bootstrap is skipped by default. The marginal/L3/L5/L1/L4
+    outputs are unchanged by this flag.
+    """
+    core = incremental_gate_core(
+        scoped_returns,
+        r_positions,
+        c_positions,
+        instrument=instrument,
+        domain=domain,
+        n_bootstrap=n_bootstrap,
+        seed=seed,
+        split_index=split_index,
+        episode_length=episode_length,
+        compute_standalone=compute_standalone,
+    )
+    return revised_incremental_gate_row(core, alpha=alpha)

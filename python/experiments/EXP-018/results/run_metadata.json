@@ -1,0 +1,139 @@
+{
+  "alpha0": 0.05,
+  "alpha_grid": [
+    0.1,
+    0.05,
+    0.01
+  ],
+  "binding_corner": {
+    "lag_label": "synchronous",
+    "overlap_label": "high",
+    "reference_strength": "null_R"
+  },
+  "binding_corner_status": {
+    "1h|rho=high": {
+      "a1f03_exp015_stress": true,
+      "cell_status": "PASS",
+      "fpr_status": "PASS"
+    },
+    "1h|rho=independent": {
+      "a1f03_exp015_stress": false,
+      "cell_status": "PASS",
+      "fpr_status": "PASS"
+    },
+    "1h|rho=moderate": {
+      "a1f03_exp015_stress": true,
+      "cell_status": "PASS",
+      "fpr_status": "PASS"
+    },
+    "4h|rho=high": {
+      "a1f03_exp015_stress": true,
+      "cell_status": "PASS",
+      "fpr_status": "PASS"
+    },
+    "4h|rho=independent": {
+      "a1f03_exp015_stress": false,
+      "cell_status": "PASS",
+      "fpr_status": "PASS"
+    },
+    "4h|rho=moderate": {
+      "a1f03_exp015_stress": true,
+      "cell_status": "PASS",
+      "fpr_status": "PASS"
+    },
+    "5m|rho=high": {
+      "a1f03_exp015_stress": true,
+      "cell_status": "PASS",
+      "fpr_status": "PASS"
+    },
+    "5m|rho=independent": {
+      "a1f03_exp015_stress": false,
+      "cell_status": "PASS",
+      "fpr_status": "PASS"
+    },
+    "5m|rho=moderate": {
+      "a1f03_exp015_stress": true,
+      "cell_status": "PASS",
+      "fpr_status": "PASS"
+    }
+  },
+  "bootstrap_resamples": 1000,
+  "dependencies": {
+    "EXP-003": "FOUND",
+    "EXP-013": "PASS",
+    "EXP-017": "PASS"
+  },
+  "domain_mde_bps": {
+    "1h": 16.0,
+    "4h": 32.0,
+    "5m": 12.0
+  },
+  "domain_status": {
+    "1h": "SUPPORTED_WITH_UNDERPOWERED_CELLS",
+    "4h": "SUPPORTED_WITH_UNDERPOWERED_CELLS",
+    "5m": "SUPPORTED_WITH_UNDERPOWERED_CELLS"
+  },
+  "experiment_id": "EXP-018",
+  "lag_labels": [
+    "synchronous",
+    "c_lags_r_1",
+    "c_leads_r_1"
+  ],
+  "measurements_produced": true,
+  "n_workers": 10,
+  "null_draws_per_instrument_cell": 125,
+  "overall_status": "COMPLETE",
+  "overlap_band": 0.05,
+  "overlap_targets": {
+    "high": 0.8,
+    "low": 0.2,
+    "medium": 0.5
+  },
+  "positive_draws_per_edge_per_instrument_cell": 125,
+  "positive_edges_bps": [
+    0.5,
+    1.0,
+    2.0,
+    4.0,
+    8.0,
+    12.0,
+    16.0,
+    24.0,
+    32.0
+  ],
+  "reference_strengths": [
+    "null_R",
+    "R_at_strict_mde"
+  ],
+  "retained_leg_columns": [
+    "L1_readiness",
+    "L3_reference_control",
+    "L4_no_material_sign_reversal",
+    "L5_strict_materiality"
+  ],
+  "revised_gate_formula": "L1 and L3 and L4_prime and strict_L5; L2 absent",
+  "rho_bands": {
+    "high": [
+      0.75,
+      0.85
+    ],
+    "independent": [
+      -0.05,
+      0.05
+    ],
+    "moderate": [
+      0.35,
+      0.45
+    ]
+  },
+  "rho_targets": {
+    "high": 0.8,
+    "independent": 0.0,
+    "moderate": 0.4
+  },
+  "strict_mde_map_alpha0": {
+    "1h": 4.0,
+    "4h": 12.0,
+    "5m": 1.0
+  }
+}
