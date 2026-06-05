@@ -1,0 +1,80 @@
+{
+  "alpha0": 0.05,
+  "alpha_grid": [
+    0.1,
+    0.05,
+    0.01
+  ],
+  "bootstrap_resamples": 1000,
+  "dependencies": {
+    "EXP-003": "FOUND",
+    "EXP-013": "PASS",
+    "EXP-014": "PASS"
+  },
+  "domain_mde_bps": {
+    "1h": 24.0,
+    "4h": 32.0,
+    "5m": 32.0
+  },
+  "domain_status": {
+    "1h": "REFUTED",
+    "4h": "REFUTED",
+    "5m": "REFUTED"
+  },
+  "experiment_id": "EXP-015",
+  "lag_labels": [
+    "synchronous",
+    "c_lags_r_1",
+    "c_leads_r_1"
+  ],
+  "measurements_produced": true,
+  "n_workers": 10,
+  "null_draws_per_instrument_cell": 125,
+  "overall_status": "REFUTED",
+  "overlap_band": 0.05,
+  "overlap_targets": {
+    "high": 0.8,
+    "low": 0.2,
+    "medium": 0.5
+  },
+  "positive_draws_per_edge_per_instrument_cell": 125,
+  "positive_edges_bps": [
+    0.5,
+    1.0,
+    2.0,
+    4.0,
+    8.0,
+    12.0,
+    16.0,
+    24.0,
+    32.0
+  ],
+  "reference_strengths": [
+    "null_R",
+    "R_at_strict_mde"
+  ],
+  "rho_bands": {
+    "high": [
+      0.75,
+      0.85
+    ],
+    "independent": [
+      -0.05,
+      0.05
+    ],
+    "moderate": [
+      0.35,
+      0.45
+    ]
+  },
+  "rho_targets": {
+    "high": 0.8,
+    "independent": 0.0,
+    "moderate": 0.4
+  },
+  "strict_mde_map_alpha0": {
+    "1h": 4.0,
+    "4h": 12.0,
+    "5m": 1.0
+  }
+}
