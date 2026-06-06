@@ -3,7 +3,7 @@
 **Checkpoint type:** **Infrastructure** — *not* an experiment phase. There is no falsifiable market hypothesis and no holdout measurement of a thesis. INFR-001 is governed as an **operator-reviewed design + build**, gated by **transcription and integration validation** (VAL-class), not by per-hypothesis pre/post-execution governance verdicts. It does **not** flow through the 8-stage experiment pipeline.
 
 **Date finalised:** 2026-06-06 (revised 2026-06-06 to correct the execution model — see §0).
-**Status:** DESIGN — scope locked by operator decisions 2026-06-06 (D-seq, D-engine, D-port, D-vehicle, D-exec, D-parity, D-cost below).
+**Status:** **COMPLETE — all four §6 acceptance gates PASS (2026-06-06)** via VAL-002. Scope was locked by operator decisions 2026-06-06 (D-seq, D-engine, D-port, D-vehicle, D-exec, D-parity, D-cost below); closure recorded in [retrospective.md](retrospective.md).
 **Sequencing:** This is **Task A** and the **sole current focus**. **Phase 004, AVWAP, and all signal exploration are hard-blocked until INFR-001 completes.**
 
 **Provenance.** Phase 003b concluded the framework-construction programme and unlocked Phase 004 behind its mandatory programme-level multiplicity-registry precondition (P3-§11). Before opening Phase 004, the operator directs a prior infrastructure task: build and integrate a **cTrader execution branch** into the research pipeline, proven end-to-end against the existing Python validation suite using **MA crossover** as a known-truth test vehicle. The frozen qualification suite — `{strict gate stack, EXP-012 ratified-loose referee, EXP-018 revised incremental/fitness unit}` — is carried in **untouched**.

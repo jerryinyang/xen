@@ -12,6 +12,13 @@ build on, independent of the particular thesis under test:
    the 1-minute base into derived views — Line Break, Renko, Heiken Ashi — for
    experiments that need them. Traditional time bars (1-minute and clock-aligned
    resamples) are the default view.
+3. **Strategy-host generation (cTrader branch):** strategies run as **real cAlgo
+   robots inside cTrader's engine**, resample internally to the trading domain, and
+   emit signal/position/event/trade datasets carrying the real OHLC the strategy
+   executed on. Python ingests and validates only — it never generates strategy
+   signals. The ported C# generators are validated **once by transcription** against
+   their Python reference, then run in-engine; a run is admitted to experiments by
+   **behavioral reproduction** through the frozen suite, not byte-parity.
 
 This document specifies that data layer only. It does **not** prescribe what to study
 with it: feature extraction, comparison, signal construction, and strategy validation
@@ -26,7 +33,7 @@ are thesis-specific and live under `python/experiments/`.
 - **Deterministic generation**: All chart-type transformations must produce identical output from identical input, whether run in batch or streaming mode. No random seeds, no path-dependent state leaks.
 - **Streaming compatibility**: Every generator must be implementable as a stateful streaming function that can process 1-minute bars sequentially. This ensures live deployability and prevents look-ahead bias.
 - **Synthetic price discipline**: Heiken Ashi prices and Renko brick prices are not directly tradable prices. Any signal generated on a synthetic or transformed chart type must have returns evaluated on time-matched traditional bar prices.
-- **Separation of collection and analysis**: The cAlgo robot collects raw data. Python transforms and analyses. Neither layer assumes the other's internals.
+- **Separation of collection, generation, and analysis**: The cAlgo robot collects raw data and, in strategy-host mode, runs strategies in cTrader's engine and emits their datasets. Python is the validation/analysis layer; it ingests emitted runs and never generates strategy signals. Only signal-generation code (chart types, indicators) is ported to C# so cAlgos compute signals natively in-engine; those ports are transcription-validated once against the Python reference.
 
 ## Confirmed Architecture Decisions
 
@@ -39,8 +46,9 @@ These decisions are binding for the Xen data layer:
 | Generated-data persistence | Persist only frequently reused canonical variants under `data/<chart_type>/` after they prove useful. | Avoids unnecessary storage while allowing practical acceleration for stable variants. |
 | Renko source mode | Generate Renko from 1-minute time bars, not ticks. | Accepts the fidelity trade-off to avoid raw tick storage and processing overhead. |
 | Adaptive epsilon filtering | Excluded. | Epsilon filtering was relevant only to tick-level processing, which Xen does not do. |
-| cAlgo output authority | cAlgo writes base 1-minute bars; Python owns chart transformations and experiment analysis. | Keeps collection simple and makes batch/live generation logic auditable. |
+| cAlgo output authority | cAlgo writes base 1-minute bars and, in strategy-host mode, runs strategies in cTrader's engine and emits their datasets; Python ingests and validates. Ported C# generators are transcription-validated once against the Python reference, then run in-engine. | Realtime-parity generation in cTrader with validation kept in Python. |
 | Default instrument set | EURUSD, XAUUSD, BTCUSD, USTEC. | A liquid, diverse default; experiments may narrow to subsets. |
+| Strategy-host holdout fence | C# strategy output requires explicit `AnalysisEndUtc` and emits no row with `SourceCloseTime >= AnalysisEndUtc`; Python validation reapplies the chronological split. | Prevents accidental final-holdout generation or qualification leakage. |
 
 ## Generated Data Persistence Policy
 
@@ -80,12 +88,20 @@ data/
 │  • Each generator output includes: chart-type bars + mapping to real        │
 │    price/time coordinates for return evaluation                             │
 │  • All generators must be deterministic and streaming-compatible           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  STAGE 3: STRATEGY-HOST GENERATION (cTrader engine; Python validates)      │
+│  • Strategies run as real cAlgo robots in cTrader's engine                  │
+│  • Resample 1-minute bars internally to the trading domain                  │
+│  • Emit positions (with real OHLC), events, diagnostic trades, metadata     │
+│  • Enforce AnalysisEndUtc before output emission                            │
+│  • Admit runs to experiments by behavioral suite reproduction               │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Everything downstream of Stage 2 — feature extraction, cross-view comparison,
-signal construction, and strategy validation — is **thesis-specific**. Those steps
-are defined per experiment under `python/experiments/`, not by this data layer.
+Everything downstream of these generation stages — feature extraction, cross-view
+comparison, signal construction, and strategy validation — is **thesis-specific**.
+Those steps are defined per experiment under `python/experiments/`, not by this
+data layer.
 
 ---
 
@@ -112,6 +128,17 @@ are defined per experiment under `python/experiments/`, not by this data layer.
 | `TimeBarInterval` | 1 | Bar interval in minutes for base time bars |
 
 No tick-level cleansing or adaptive epsilon filter is part of the Xen data collector.
+
+**Strategy-host modes:** the same cAlgo assembly exposes a `Mode` parameter. The
+default `TimeBars` mode preserves the 1-minute collector. `StrategyHost` mode runs
+a strategy in cTrader's engine bar-by-bar, resamples internally to the configured
+domain, enforces an explicit `AnalysisEndUtc`, and writes a strategy-run dataset
+(positions with real OHLC, events, diagnostic trade blotter, run metadata) under
+`data/strategy_runs/`. Setting `Source Parquet Path` replays the same strategy over
+a fixed time-bar file as a deterministic developer smoke path. `StrategyHostParity`
+mode writes the generator/indicator/MA CSV family used as a developer **transcription
+smoke**; the binding validation is **behavioral suite reproduction** (VAL-002), not
+byte-parity.
 
 ---
 
