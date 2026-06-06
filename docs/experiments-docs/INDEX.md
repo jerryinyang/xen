@@ -1,5 +1,11 @@
 # Experiments Index (Comprehensive)
 
+## Current Infrastructure Tasks
+
+| Task | Status | Focus | Document |
+| --- | --- | --- | --- |
+| **INFR-001 — cTrader Branch & Strategy-Host Integration** (2026-06-06) | DESIGN — scope locked by operator decisions 2026-06-06 (D-seq, D-engine, D-port, D-vehicle, D-oracle) | **Task A and the sole current focus. AVWAP / Phase 004 / all signal exploration are hard-blocked until INFR-001 completes.** Three pillars: (1) generic streaming signal-adapter framework (Python reference + C# host, not AVWAP-specific); (2) full C# port of the validated generator/indicator library — `linebreak`, `renko`, `heiken_ashi`, `bar_aggregator`, `market_bias` — each with a VAL-class parity proof against its Python reference oracle; (3) end-to-end integration proven by running MA crossover through the new substrate and confirming the frozen suite reproduces the EXP-004/009 verdict. Frozen qualification suite `{strict gate stack, EXP-012 ratified-loose referee, EXP-018 revised incremental/fitness unit}` carried in untouched. **Not** an experiment phase; governed by parity + integration validation (VAL-class), not per-hypothesis pre/post governance. | [design.md](checkpoints/2026-06-06-INFR-001-ctrader-branch-integration/design.md) |
+
 ## Current Checkpoint Status
 
 | Checkpoint | Status | Focus | Documents |
