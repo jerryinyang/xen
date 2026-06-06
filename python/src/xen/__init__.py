@@ -16,6 +16,10 @@ from xen.heiken_ashi_generator import HeikenAshiGenerator, generate_heiken_ashi
 from xen.linebreak_generator import LineBreakGenerator, generate_linebreak
 from xen.renko_generator import RenkoGenerator, generate_renko
 
+# Note: `xen.signals` is the validation/ingestion side of the cTrader strategy
+# branch (design.md v2); it is imported directly where needed (e.g. VAL-002), not
+# re-exported here, because Python does not generate strategy signals.
+
 __all__ = [
     "aggregate_ohlc",
     "coverage_summary",

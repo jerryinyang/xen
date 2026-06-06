@@ -1,3 +1,4 @@
+# noqa: E741
 """Deterministic chart-timeframe port of the Market Bias (CEREBR) indicator.
 
 Source: ``xen/indicators/sources`` (TradingView Pine v5, MPL-2.0,
@@ -85,18 +86,14 @@ def _ema(values: np.ndarray, length: int, seed: str) -> np.ndarray:
         start = 1
     for i in range(start, n):
         prev = out[i - 1]
-        out[i] = (
-            values[i]
-            if not np.isfinite(prev)
-            else alpha * values[i] + (1.0 - alpha) * prev
-        )
+        out[i] = values[i] if not np.isfinite(prev) else alpha * values[i] + (1.0 - alpha) * prev
     return out
 
 
 def _heiken_ashi(
     o: np.ndarray,
     h: np.ndarray,
-    l: np.ndarray,
+    l: np.ndarray,  # noqa: E741
     c: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Source HA transform on smoothed OHLC, returning (haopen, haclose).
@@ -124,7 +121,7 @@ def _heiken_ashi(
 def _oscillator(
     o: np.ndarray,
     h: np.ndarray,
-    l: np.ndarray,
+    l: np.ndarray,  # noqa: E741
     c: np.ndarray,
     seed: str,
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -211,7 +208,7 @@ def compute_market_bias(bars: pl.DataFrame, seed: str = "sma") -> pl.DataFrame:
         )
     o = bars["Open"].to_numpy().astype(float)
     h = bars["High"].to_numpy().astype(float)
-    l = bars["Low"].to_numpy().astype(float)
+    l = bars["Low"].to_numpy().astype(float)  # noqa: E741
     c = bars["Close"].to_numpy().astype(float)
     osc_bias, osc_smooth = _oscillator(o, h, l, c, seed)
     sign_state = _sign_states(osc_bias)
@@ -224,9 +221,7 @@ def compute_market_bias(bars: pl.DataFrame, seed: str = "sma") -> pl.DataFrame:
     )
 
 
-def convergence_warmup(
-    bars: pl.DataFrame, floor: int = WARMUP_FLOOR
-) -> dict[str, int | bool]:
+def convergence_warmup(bars: pl.DataFrame, floor: int = WARMUP_FLOOR) -> dict[str, int | bool]:
     """Determine the two-seeding warmup length.
 
     Runs the full pipeline under both the SMA seed and the cold seed and finds
@@ -251,9 +246,7 @@ def convergence_warmup(
     sma = compute_market_bias(bars, seed="sma")["four_way_state"].to_numpy()
     cold = compute_market_bias(bars, seed="cold")["four_way_state"].to_numpy()
     n = sma.shape[0]
-    both_defined = np.array(
-        [sma[i] is not None and cold[i] is not None for i in range(n)]
-    )
+    both_defined = np.array([sma[i] is not None and cold[i] is not None for i in range(n)])
     differ = np.array([both_defined[i] and sma[i] != cold[i] for i in range(n)])
     if differ.any():
         last_diff = int(np.flatnonzero(differ).max())
