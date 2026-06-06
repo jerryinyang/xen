@@ -1,27 +1,107 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using cAlgo.API;
 using Parquet;
 using Parquet.Data;
 using Parquet.Schema;
+using Xen.StrategyHost;
 
 namespace cAlgo.Robots;
+
+public enum XenMode
+{
+    StrategyHost,
+    TimeBars,
+    StrategyHostParity
+}
 
 [Robot(AccessRights = AccessRights.FullAccess, AddIndicators = false, DefaultTimeFrame="Minute")]
 public class Xen : Robot
 {
     private const string OutputDirectory = "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/timebars";
+    private const string StrategyRunOutputDirectory = "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/strategy_runs";
     private const int BatchSize = 20000;
 
+    [Parameter("Mode", DefaultValue = XenMode.StrategyHost)]
+    public XenMode Mode { get; set; } = XenMode.StrategyHost;
+
+    [Parameter("Collect & Store Time Bars", DefaultValue = false)]
+    public bool CollectTimeBars { get; set; }
+
+    [Parameter("Analysis End UTC", DefaultValue = "")]
+    public string AnalysisEndUtc { get; set; } = "";
+
+    [Parameter("Strategy Output Directory", DefaultValue = StrategyRunOutputDirectory)]
+    public string StrategyOutputDirectory { get; set; } = StrategyRunOutputDirectory;
+
+    [Parameter("Source Parquet Path", DefaultValue = "")]
+    public string SourceParquetPath { get; set; } = "";
+
+    [Parameter("Domain Minutes", DefaultValue = 5)]
+    public int DomainMinutes { get; set; } = 5;
+
+    [Parameter("Strict Coverage", DefaultValue = true)]
+    public bool StrictCoverage { get; set; } = true;
+
+    [Parameter("Min Coverage", DefaultValue = 0.9)]
+    public double MinCoverage { get; set; } = 0.9;
+
+    [Parameter("Fast MA", DefaultValue = 20)]
+    public int FastMa { get; set; } = 20;
+
+    [Parameter("Slow MA", DefaultValue = 50)]
+    public int SlowMa { get; set; } = 50;
+
     private TimeBarParquetWriter? _writer;
+    private BarAggregator? _strategyAggregator;
+    private MovingAverageCrossoverModel? _strategyModel;
+    private HoldoutFence? _strategyFence;
+    private StrategyRunParquetWriter? _strategyWriter;
     private DateTime? _lastCloseTime;
     private long _capturedBars;
+    private long _strategySourceBars;
+    private long _strategyDomainBars;
+    private bool _stoppingAtFence;
+    private bool _strategyFixedRunCompleted;
+    private bool _strategyHostReady;
+    private string? _parityExportDirectory;
 
     protected override void OnStart()
     {
         if (Bars.TimeFrame != TimeFrame.Minute)
             throw new InvalidOperationException("Xen must run on a 1-minute chart.");
+
+        if (IsStrategyHostParityMode())
+        {
+            RunStrategyHostParityExport();
+            Stop();
+            return;
+        }
+
+        if (IsStrategyHostMode())
+        {
+            try
+            {
+                StartStrategyHost();
+            }
+            catch (Exception ex)
+            {
+                Print("Xen strategy host failed to start: {0}", ex.Message);
+                Stop();
+            }
+            return;
+        }
+
+        if (!CollectTimeBars)
+        {
+            Print(
+                "Xen: time-bar collection disabled (Collect & Store Time Bars = false) for {0}. No data written.",
+                SymbolName);
+            Stop();
+            return;
+        }
 
         _writer = new TimeBarParquetWriter(OutputDirectory, SymbolName, Server.Time, DateTime.UtcNow, BatchSize);
         Print("Xen started for {0}. Collecting completed 1-minute bars.", SymbolName);
@@ -29,18 +109,53 @@ public class Xen : Robot
 
     protected override void OnBar()
     {
-        CaptureCompletedBar();
+        if (IsStrategyHostParityMode())
+            return;
+        if (IsStrategyHostMode())
+        {
+            if (_strategyHostReady)
+                RunStrategyHostOnCompletedBar();
+        }
+        else
+            CaptureCompletedBar();
     }
 
     protected override void OnStop()
     {
         try
         {
-            _writer?.Dispose();
+            if (IsStrategyHostMode())
+            {
+                if (!_stoppingAtFence && !_strategyFixedRunCompleted)
+                    FlushStrategyDomainBars();
+                _strategyWriter?.Dispose();
+            }
+            else
+            {
+                _writer?.Dispose();
+            }
         }
         finally
         {
-            Print("Xen stopped for {0}. Captured {1} completed bars.", SymbolName, _capturedBars);
+            if (IsStrategyHostMode())
+            {
+                Print(
+                    "Xen strategy host stopped for {0}. Source bars={1}, domain bars={2}.",
+                    SymbolName,
+                    _strategySourceBars,
+                    _strategyDomainBars);
+            }
+            else if (IsStrategyHostParityMode())
+            {
+                Print(
+                    "Xen strategy-host parity export stopped for {0}. Output={1}",
+                    SymbolName,
+                    _parityExportDirectory ?? "");
+            }
+            else
+            {
+                Print("Xen stopped for {0}. Captured {1} completed bars.", SymbolName, _capturedBars);
+            }
         }
     }
 
@@ -74,6 +189,181 @@ public class Xen : Robot
             Convert.ToInt64(Bars.TickVolumes[index])));
         _lastCloseTime = closeTime;
         _capturedBars++;
+    }
+
+    private void StartStrategyHost()
+    {
+        if (!TryParseAnalysisEndUtc(AnalysisEndUtc, out var analysisEndUtc))
+            throw new InvalidOperationException("Analysis End UTC must be explicit, e.g. 2026-01-01T00:00:00Z.");
+
+        var minCoverage = StrictCoverage ? (double?)null : MinCoverage;
+        var domain = DomainLabel(DomainMinutes);
+        _strategyFence = new HoldoutFence(analysisEndUtc);
+        _strategyAggregator = new BarAggregator(DomainMinutes, minCoverage);
+        _strategyModel = new MovingAverageCrossoverModel(FastMa, SlowMa);
+        _strategyWriter = new StrategyRunParquetWriter(
+            StrategyOutputDirectory,
+            _strategyModel.StrategyName,
+            SymbolName,
+            domain,
+            _strategyFence,
+            new Dictionary<string, object?>
+            {
+                ["domain_minutes"] = DomainMinutes,
+                ["strict_coverage"] = StrictCoverage,
+                ["min_coverage"] = minCoverage,
+                ["fast_ma"] = FastMa,
+                ["slow_ma"] = SlowMa
+            });
+
+        _strategyHostReady = true;
+
+        Print(
+            "Xen strategy host started for {0} {1}; AnalysisEndUtc={2:o}; output={3}",
+            SymbolName,
+            domain,
+            _strategyFence.AnalysisEndUtc,
+            _strategyWriter.RunDirectory);
+
+        if (!string.IsNullOrWhiteSpace(SourceParquetPath))
+        {
+            RunFixedParquetStrategyHost(domain);
+            Stop();
+        }
+    }
+
+    private void RunStrategyHostOnCompletedBar()
+    {
+        if (_strategyAggregator is null || _strategyFence is null)
+            throw new InvalidOperationException("Xen strategy host was not initialised.");
+
+        var index = Bars.Count - 2;
+        if (index < 0)
+            return;
+
+        var openTime = Bars.OpenTimes[index];
+        var closeTime = openTime.AddMinutes(1);
+
+        if (_lastCloseTime.HasValue && closeTime <= _lastCloseTime.Value)
+            throw new InvalidOperationException("Bar CloseTime is not strictly increasing.");
+        _lastCloseTime = closeTime;
+
+        if (_strategyFence.ShouldStopBeforeProcessing(closeTime))
+        {
+            _stoppingAtFence = true;
+            FlushStrategyDomainBars();
+            Stop();
+            return;
+        }
+
+        var bar = new TimeBar(
+            SymbolName,
+            openTime,
+            closeTime,
+            Bars.OpenPrices[index],
+            Bars.HighPrices[index],
+            Bars.LowPrices[index],
+            Bars.ClosePrices[index],
+            Convert.ToInt64(Bars.TickVolumes[index]));
+
+        if (bar.High < Math.Max(bar.Open, bar.Close) || bar.Low > Math.Min(bar.Open, bar.Close))
+            throw new InvalidOperationException("Bar OHLC integrity check failed.");
+
+        _strategySourceBars++;
+        ProcessStrategyDomainBars(_strategyAggregator.Update(bar));
+    }
+
+    private void FlushStrategyDomainBars()
+    {
+        if (_strategyAggregator is null)
+            return;
+        ProcessStrategyDomainBars(_strategyAggregator.Flush());
+    }
+
+    private void ProcessStrategyDomainBars(IEnumerable<TimeBar> bars)
+    {
+        if (_strategyModel is null || _strategyFence is null || _strategyWriter is null)
+            throw new InvalidOperationException("Xen strategy host was not initialised.");
+
+        var domain = DomainLabel(DomainMinutes);
+        foreach (var bar in bars)
+        {
+            if (_strategyFence.ShouldStopBeforeProcessing(bar.CloseTime))
+                return;
+            var update = _strategyModel.OnBar(bar, domain);
+            _strategyWriter.Append(update);
+            _strategyDomainBars++;
+        }
+    }
+
+    private void RunFixedParquetStrategyHost(string domain)
+    {
+        if (_strategyAggregator is null || _strategyModel is null || _strategyFence is null || _strategyWriter is null)
+            throw new InvalidOperationException("Xen strategy host was not initialised.");
+
+        var sourceBars = TimeBarParquetReader.ReadBefore(SourceParquetPath, _strategyFence);
+        var runner = new StrategyHostRunner(_strategyAggregator, _strategyModel, _strategyFence, domain);
+        var updates = runner.Run(sourceBars);
+        foreach (var update in updates)
+            _strategyWriter.Append(update);
+
+        _strategySourceBars = sourceBars.Count;
+        _strategyDomainBars = updates.Count;
+        _strategyFixedRunCompleted = true;
+    }
+
+    private void RunStrategyHostParityExport()
+    {
+        if (!TryParseAnalysisEndUtc(AnalysisEndUtc, out var analysisEndUtc))
+            throw new InvalidOperationException("Analysis End UTC must be explicit, e.g. 2026-01-01T00:00:00Z.");
+        if (string.IsNullOrWhiteSpace(SourceParquetPath))
+            throw new InvalidOperationException("Source Parquet Path is required for StrategyHostParity mode.");
+
+        var stamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+        _parityExportDirectory = Path.Combine(
+            StrategyOutputDirectory,
+            $"parity_{SanitizeLabel(SymbolName)}_{stamp}");
+        StrategyHostParityExporter.Export(SourceParquetPath, _parityExportDirectory, analysisEndUtc);
+        Print(
+            "Xen strategy-host parity export completed for {0}; AnalysisEndUtc={1:o}; output={2}",
+            SymbolName,
+            analysisEndUtc,
+            _parityExportDirectory);
+    }
+
+    private bool IsStrategyHostMode()
+    {
+        return Mode == XenMode.StrategyHost;
+    }
+
+    private bool IsStrategyHostParityMode()
+    {
+        return Mode == XenMode.StrategyHostParity;
+    }
+
+    private static bool TryParseAnalysisEndUtc(string value, out DateTime result)
+    {
+        return DateTime.TryParse(
+            value,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+            out result);
+    }
+
+    private static string DomainLabel(int domainMinutes)
+    {
+        return domainMinutes switch
+        {
+            5 => "5m",
+            60 => "1h",
+            240 => "4h",
+            _ => $"{domainMinutes}m"
+        };
+    }
+
+    private static string SanitizeLabel(string value)
+    {
+        return value.ToLowerInvariant().Replace(" ", "_").Replace("(", "").Replace(")", "");
     }
 
     private sealed class TimeBarParquetWriter : IDisposable
