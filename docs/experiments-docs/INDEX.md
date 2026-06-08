@@ -10,7 +10,7 @@
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-06-07-004-avwap-signal-exploration | ACTIVE — Phase 004 design opened; EXP-020 scoped; no candidate result exists. | **First real signal-exploration phase.** The mandatory programme-level multiplicity/file-drawer registry is now documented in `docs/signal-registry/multiplicity-registry.md`, and Batch 004-A registers only `CF-AVWAP-001` (Anchored VWAP on regime pivots). The phase decomposes AVWAP into substrate readiness (EXP-020), fixed-horizon reaction study (EXP-021 planned), original band-target/trend-change lifetime move study (EXP-022 planned), then cTrader/frozen-suite candidate screening plus the original metric book (EXP-023 planned) only if the component gates support proceeding. | [design.md](checkpoints/2026-06-07-004-avwap-signal-exploration/design.md) |
+| 2026-06-07-004-avwap-signal-exploration | ACTIVE — Phase 004 design opened; EXP-020 SUPPORTED_FULL; no full candidate screen exists. | **First real signal-exploration phase.** The mandatory programme-level multiplicity/file-drawer registry is now documented in `docs/signal-registry/multiplicity-registry.md`, and Batch 004-A registers only `CF-AVWAP-001` (Anchored VWAP on regime pivots). EXP-020 validated the first-branch substrate across all three domains; the phase now proceeds to fixed-horizon reaction study (EXP-021 planned) and original band-target/trend-change lifetime move study (EXP-022 planned), then cTrader/frozen-suite candidate screening plus the original metric book (EXP-023 planned) only if the component gates support proceeding. | [design.md](checkpoints/2026-06-07-004-avwap-signal-exploration/design.md) |
 | 2026-06-05-003b-incremental-unit-redesign | COMPLETED — REVISED_UNIT_VALIDATED (EXP-017-019 executed and post-governance APPROVED 2026-06-05; retrospective written 2026-06-05) | **Track B follow-up succeeded.** EXP-017 validated the revised incremental-referee logic (7/7 fixture verdicts, 28/28 retained-leg checks, L2 absent). EXP-018 validated the revised portfolio-fitness unit on the construction-accepted dependence grid: FPR controlled in 126/126 accepted cells, finite worst-case MDEs 12/16/32 bps on 5m/1h/4h, and the EXP-015 synchronous/high-overlap/null_R stress corner passes in every domain; 36 infeasible high-rho/low-overlap cells are disclosed as construction-invalid. EXP-019 exercised both assembled-suite paths: EXP-009 dogfood rejects and synthetic positive passes across all domains. The concluded suite is now **{frozen strict gate stack, EXP-012 ratified-loose referee, EXP-018 revised incremental/fitness unit}**. Phase 004 may open after its mandatory programme-level multiplicity registry precondition is documented. **Not a new programme phase — a revision; Phase 004 remains reserved for signal exploration.** | [design.md](checkpoints/2026-06-05-003b-incremental-unit-redesign/design.md) · [retrospective.md](checkpoints/2026-06-05-003b-incremental-unit-redesign/retrospective.md) |
 | 2026-06-04-003-ratification-and-incremental-unit | COMPLETED — PARTIAL_SUCCESS (EXP-012-016 executed and reviewed; amendment [A1](checkpoints/2026-06-04-003-ratification-and-incremental-unit/amendments/2026-06-04-A1-incremental-unit-corrections.md) applied and Track B re-validated; retrospective written 2026-06-05) | **Framework-conclusion attempt did not reach FULL_FRAMEWORK_CONCLUDED (outcome: PARTIAL_SUCCESS).** Track A succeeded: EXP-012 ratified and adopted the EXP-011 loose point on fresh seeds for 5m/1h/4h. Track B validated the substrate and logic gates (EXP-013/014) but EXP-015 refuted portfolio-fitness calibration because every domain had qualifying dependence cells with no finite MDE. EXP-016 correctly blocked before composition measurement because the incremental unit was not COMPLETE and the dogfood reference book was undefined. **Adversarial review (amendment A1) corrected the incremental inference layer (F04 contiguous-series block length), the EXP-013 redundancy verdict (F01 across-draw distribution + `UNDER_POWERED` class), and EXP-015 diagnosability (F03 per-leg/per-instrument tables); EXP-013→014→015 re-validated 2026-06-04/05 — direction unchanged: Track A SUPPORTED, Track B substrate/logic PASS (EXP-013 PASS with 3 cells now `UNDER_POWERED`; EXP-014 PASS, `effective_n` episode-aware), EXP-015 REFUTED with the failure attributed to the L2 standalone-significance leg driven by BTCUSD.** The concluded suite ships as **two referees only** (frozen strict + ratified-loose); the incremental/fitness unit is carried to a follow-up. **Operator decision recorded 2026-06-05 (retrospective §11): Path B — open a new incremental-unit follow-up checkpoint and fix the L2/BTCUSD calibration failure (and resolve the A1/F02 L4/L5 freeze precondition) before Phase 004**, rather than rescoping Phase 004 to standalone-only. Phase 004 stays blocked until that follow-up delivers a validated+calibrated incremental unit. | [design.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/design.md) · [retrospective.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/retrospective.md) |
 | 2026-06-03-002-referee-refinement-and-stringency | COMPLETED (7/7 EXP executed, governance-APPROVED; retrospective written 2026-06-04) | Keystone spine item closed for the scoped realistic candidate (EXP-005); L5 threshold frontier measured (EXP-006); lenient-L5 structural-gain claim refuted because lenient equals the EXP-006 zero-buffer endpoint and drop-L5 (EXP-007); per-instrument MDE heterogeneity found in EURUSD/XAUUSD slower-domain cells (EXP-008); broadened simple-strategy dogfood stayed below every domain MDE (EXP-009); split robustness held on 5m/1h with only 4h falsified — and there the more-OOS protocols detect a lower MDE (EXP-010, corrected 2026-06-04: the original 1h/4h walk-forward MDE inflation was a multi-fold CI artifact); predeclared-loss synthesis recommends tau 0.75/0.25/0.5 on 5m/1h/4h, with adoption deferred to Phase 003 fresh draws (EXP-011). Characterization phase - recommends, does not adopt. | [design.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/design.md) · [retrospective.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/retrospective.md) |
@@ -925,3 +925,49 @@ The current data layer passed the temporal-integrity readiness gate. The conclus
 - Changes to data-loading conventions, chart generators, or `aggregate_ohlc()` should trigger a new VAL rerun before dependent research uses the changed layer.
 - rev. 3 hardened the suite's detection power: every base-integrity, resample, sparse-chart, Heiken Ashi, schema, look-ahead, and determinism check now has a matching negative control, and look-ahead is probed at the head/middle/tail of each slice. Byte-identical reproduction of rev. 2 generator outputs confirms deterministic generation; future VAL reruns should keep this control-per-check standard.
 - The Line Break and Renko generators were manually verified against `architecture.md`; note Xen Renko intentionally differs from classic TradingView Renko (SMA-of-TR ATR, 1-brick symmetric reversal, first-close anchor).
+
+---
+
+## EXP-020 — AVWAP Event-Substrate Readiness
+
+**Status**: SUPPORTED_FULL
+**Date**: 2026-06-08
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 1-minute time bars resampled to 5m (strict), 1h and 4h (`min_coverage=0.90`) OHLC domains; registered CF-AVWAP-001 first-branch AVWAP state machine; no chart-type views
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The Phase 004 Batch 004-A AVWAP definition can be implemented as a deterministic, look-ahead-safe event substrate with usable bounce-event coverage on at least one predeclared domain, without touching the global holdout.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from the first-70% analysis slice. No chart-type views.
+- **Features**: Sequential state machine: MA(20,50) regime detector, viable-pivot anchor selection, anchored VWAP (typical price weighted by TickVolume^0.75), MAD band (multiplier 1.0), arm/trigger bounce logic, invariant checks, deterministic replay, event-coverage readiness classification.
+- **Parameter ranges**: fast MA 20, slow MA 50; TickVolume exponent 0.75; band multiplier 1.0; domains 5m/1h/4h; readiness thresholds: ≥30 total events, ≥8 per direction, ≥3 reportable instruments per domain.
+- **Exclusions**: Market-edge claims, frozen-suite screening, cTrader strategy-host runs, alternative regime detectors, volume/band sweeps, exits/stops/targets, chart-type signals, parameter changes after results.
+- **Constraints**: First-70% slice only; CloseTime ordering; sequential look-ahead-safe state machine; no returns, P&L, or excursion computation; zero-weight TickVolume skipped without division-by-zero; zero denominators reported as null.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: SUPPORTED_FULL`, `ready_domain_count: 3`, `ready_domains: [5m, 1h, 4h]`, `invariants_ok: true`, `determinism_pass: true`, `holdout_violation_count: 0`, `total_events: 20911`.
+- `domain_readiness.csv`: all three domains ready (4/4 reportable instruments each).
+- `event_coverage.csv`: all 12 cells reportable. 5m: 4,327–5,978 events per instrument (density ~260–276 per 10k bars). 1h: 287–421 events (density ~207–242). 4h: 61–109 events (density ~199–246).
+- `direction_balance.csv`: bull fractions 0.46–0.56 across all 12 cells; widest gap EURUSD/4h (39 bull, 31 bear).
+- `invariant_checks.csv`: 192/192 checks PASS with 0 violations (16 checks × 12 cells).
+- `determinism_check.csv`: 12/12 cells match event hashes and regime hashes between main and replay pass.
+- `analysis_metadata.csv`: each instrument at exactly 70.00% analysis rows (BTCUSD 1,088,960/1,555,658; EURUSD 872,242/1,246,061; USTEC 830,541/1,186,488; XAUUSD 830,671/1,186,674).
+- Audit: PASS, 0 critical, 0 warnings, 1 info note (EURUSD/4h moderate direction imbalance — both directions still reportable).
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED_FULL**
+
+All Evidence-FOR criteria are met: all invariant checks pass for every instrument/domain (0 violations across 192 checks), deterministic replay produces identical event tables and summary hashes (12/12 cells match), and all three domains are ready (4/4 reportable instruments). EXP-021 and EXP-022 may scope reaction and lifetime-move studies on any subset of the ready domains.
+
+### Hypothesis-Agnostic Observations
+
+- Event density is consistent across instruments and domains, with 5m providing the highest absolute counts.
+- Direction balance is reasonable across all 12 cells; no domain or instrument shows degenerate single-direction coverage.
+- The AVWAP state machine's re-arm sequencing is validated by the `rearm_monotonic` invariant (0 violations), confirming that the scope's arm/trigger/re-arm discipline is correctly implemented.
+- The moderate EURUSD/4h direction gap (0.557 bull fraction) is a descriptive note for EXP-021 scoping, not a correctness issue.

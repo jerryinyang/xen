@@ -1,6 +1,6 @@
 # Phase 004 Multiplicity Registry
 
-**Status:** ACTIVE - Batch 004-A registered, no real candidate screened.
+**Status:** ACTIVE - Batch 004-A registered; EXP-020 substrate gate supported; no full candidate screened.
 **Opened:** 2026-06-07
 **Governing phase:** `docs/experiments-docs/checkpoints/2026-06-07-004-avwap-signal-exploration/design.md`
 
@@ -50,18 +50,18 @@ registry update before measurement.
 
 | Candidate ID | Family | Hypothesis | EXP-ID | Status | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `CF-AVWAP-001/HYP-001` | Anchored VWAP on regime pivots | The frozen AVWAP definition can be built as a deterministic, look-ahead-safe event substrate with usable event coverage. | EXP-020 | SCOPED | Readiness/substrate experiment; not a market-edge claim. |
+| `CF-AVWAP-001/HYP-001` | Anchored VWAP on regime pivots | The frozen AVWAP definition can be built as a deterministic, look-ahead-safe event substrate with usable event coverage. | EXP-020 | SCREENED | SUPPORTED_FULL: readiness/substrate experiment supported on all three domains; not a market-edge claim; clears EXP-021/022 scoping. |
 | `CF-AVWAP-001/HYP-002` | Anchored VWAP on regime pivots | AVWAP bounce events have better fixed-horizon direction-signed real-price reaction than matched non-event controls. | EXP-021 | PLANNED | Blocked until EXP-020 is supported or governance narrows domains; metric family is fixed in `candidate-families/avwap.md`. |
 | `CF-AVWAP-001/HYP-003` | Anchored VWAP on regime pivots | Under the original band-target/trend-change lifetime definition, AVWAP bounces produce favorable completed-move outcomes. | EXP-022 | PLANNED | Blocked until EXP-020 is supported or governance narrows domains; lifetime metric family is fixed in `candidate-families/avwap.md`. |
 | `CF-AVWAP-001/HYP-004` | Anchored VWAP on regime pivots | The baseline AVWAP signal can pass standalone or portfolio-fitness qualification under the frozen suite while reporting the original strategy metric book. | EXP-023 | PLANNED | Blocked until EXP-021 and EXP-022 are complete or governance records why one reaction operationalization is sufficient. |
 
 ## File-Drawer Ledger
 
-No Phase 004 real candidate results exist yet.
+No Phase 004 full candidate-screening result exists yet. Component results are recorded below.
 
 | Date | Candidate ID | EXP-ID | Result | Disposition |
 | --- | --- | --- | --- | --- |
-| 2026-06-07 | `CF-AVWAP-001/HYP-001` | EXP-020 | Not run | Initial scope and analysis plan only. |
+| 2026-06-08 | `CF-AVWAP-001/HYP-001` | EXP-020 | SUPPORTED_FULL | Substrate readiness supported: all 12 cells reportable, all three domains ready, zero invariant violations, deterministic replay. Proceed to EXP-021/022 component scopes; no market-edge claim. |
 
 ## Amendment Rules
 

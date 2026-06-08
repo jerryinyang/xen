@@ -1,0 +1,91 @@
+{
+  "experiment_id": "EXP-020",
+  "title": "AVWAP Event-Substrate Readiness",
+  "generated_at": "2026-06-08T01:07:07.874670+00:00",
+  "overall_status": "SUPPORTED_FULL",
+  "ready_domain_count": 3,
+  "ready_domains": [
+    "5m",
+    "1h",
+    "4h"
+  ],
+  "invariants_ok": true,
+  "invariant_failure_count": 0,
+  "failed_invariant_checks": [],
+  "determinism_pass": true,
+  "holdout_violation_count": 0,
+  "total_events": 20911,
+  "total_regimes": 18192,
+  "instruments": [
+    "BTCUSD",
+    "EURUSD",
+    "USTEC",
+    "XAUUSD"
+  ],
+  "domains": [
+    "5m",
+    "1h",
+    "4h"
+  ],
+  "readiness": {
+    "5m": {
+      "domain": "5m",
+      "n_instruments": 4,
+      "reportable_instruments": 4,
+      "reportable_list": "BTCUSD,EURUSD,USTEC,XAUUSD",
+      "ready": true
+    },
+    "1h": {
+      "domain": "1h",
+      "n_instruments": 4,
+      "reportable_instruments": 4,
+      "reportable_list": "BTCUSD,EURUSD,USTEC,XAUUSD",
+      "ready": true
+    },
+    "4h": {
+      "domain": "4h",
+      "n_instruments": 4,
+      "reportable_instruments": 4,
+      "reportable_list": "BTCUSD,EURUSD,USTEC,XAUUSD",
+      "ready": true
+    }
+  },
+  "thresholds": {
+    "min_total_events": 30,
+    "min_direction_events": 8,
+    "ready_min_instruments": 3
+  },
+  "parameters": {
+    "fast_ma": 20,
+    "slow_ma": 50,
+    "avwap_source": "typical_price=(High+Low+Close)/3",
+    "volume_exponent": 0.75,
+    "band_spread": "median_absolute_deviation_from_anchored_avwap_path",
+    "band_multiplier": 1.0,
+    "domain_specs": {
+      "5m": {
+        "period_minutes": 5,
+        "min_coverage": null
+      },
+      "1h": {
+        "period_minutes": 60,
+        "min_coverage": 0.9
+      },
+      "4h": {
+        "period_minutes": 240,
+        "min_coverage": 0.9
+      }
+    }
+  },
+  "registry": {
+    "candidate_family": "CF-AVWAP-001",
+    "multiplicity_registry": "docs/signal-registry/multiplicity-registry.md",
+    "family_spec": "docs/signal-registry/candidate-families/avwap.md",
+    "checkpoint": "docs/experiments-docs/checkpoints/2026-06-07-004-avwap-signal-exploration"
+  },
+  "sample_plot_cell": {
+    "instrument": "BTCUSD",
+    "domain": "5m",
+    "regime_id": 2
+  }
+}
