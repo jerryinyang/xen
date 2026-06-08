@@ -1,0 +1,96 @@
+{
+  "experiment_id": "EXP-021",
+  "title": "AVWAP Bounce Reaction Study",
+  "generated_at": "2026-06-08T02:41:56.320606+00:00",
+  "overall_status": "SUPPORTED",
+  "dependency_gate": {
+    "passed": true,
+    "exp020_status": "SUPPORTED_FULL"
+  },
+  "instruments": [
+    "BTCUSD",
+    "EURUSD",
+    "USTEC",
+    "XAUUSD"
+  ],
+  "domains": [
+    "5m",
+    "1h",
+    "4h"
+  ],
+  "reportable_instruments_by_domain": {
+    "5m": [
+      "BTCUSD",
+      "EURUSD",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "1h": [
+      "BTCUSD",
+      "EURUSD",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "4h": [
+      "BTCUSD",
+      "EURUSD",
+      "USTEC",
+      "XAUUSD"
+    ]
+  },
+  "reportable_domains": [
+    "5m",
+    "1h",
+    "4h"
+  ],
+  "domain_decisions": {
+    "5m": "EVIDENCE_FOR",
+    "1h": "EVIDENCE_FOR",
+    "4h": "EVIDENCE_FOR"
+  },
+  "holm_adjusted_primary_p": {
+    "5m": 0.00029997000299970003,
+    "1h": 0.00029997000299970003,
+    "4h": 0.00029997000299970003
+  },
+  "analysis_end_by_instrument": {
+    "BTCUSD": "2025-06-17 22:38:00",
+    "EURUSD": "2025-05-09 16:55:00",
+    "USTEC": "2025-05-12 04:54:00",
+    "XAUUSD": "2025-05-12 03:35:00"
+  },
+  "parameters": {
+    "horizons": [
+      1,
+      3,
+      6
+    ],
+    "primary_horizon": 3,
+    "max_controls": 5,
+    "min_controls": 3,
+    "exclusion_bars": 6,
+    "control_scope": "same_regime_only",
+    "domain_estimator": "instrument_averaged_equal_weight",
+    "min_reportable_events": 30,
+    "min_direction_events": 8,
+    "domain_min_instruments": 3,
+    "n_bootstrap": 10000,
+    "n_permutation": 10000,
+    "alpha": 0.05,
+    "ci_percentiles": [
+      2.5,
+      97.5
+    ]
+  },
+  "domain_primary_effects": {
+    "5m": 3.805147632508678,
+    "1h": 9.135209560508361,
+    "4h": 37.61069086376369
+  },
+  "registry": {
+    "candidate_family": "CF-AVWAP-001",
+    "hypothesis": "HYP-002",
+    "family_spec": "docs/signal-registry/candidate-families/avwap.md",
+    "checkpoint": "docs/experiments-docs/checkpoints/2026-06-07-004-avwap-signal-exploration"
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "experiment_id": "EXP-022",
+  "title": "AVWAP Original Lifetime Move Study",
+  "generated_at": "2026-06-08T03:09:57.023881+00:00",
+  "overall_status": "SUPPORTED",
+  "dependency_gate": {
+    "passed": true,
+    "exp020_status": "SUPPORTED_FULL"
+  },
+  "instruments": [
+    "BTCUSD",
+    "EURUSD",
+    "USTEC",
+    "XAUUSD"
+  ],
+  "domains": [
+    "5m",
+    "1h",
+    "4h"
+  ],
+  "reportable_instruments_by_domain": {
+    "5m": [
+      "BTCUSD",
+      "EURUSD",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "1h": [
+      "BTCUSD",
+      "EURUSD",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "4h": [
+      "BTCUSD",
+      "EURUSD",
+      "USTEC",
+      "XAUUSD"
+    ]
+  },
+  "reportable_domains": [
+    "5m",
+    "1h",
+    "4h"
+  ],
+  "domain_decisions": {
+    "5m": "EVIDENCE_FOR",
+    "1h": "EVIDENCE_FOR",
+    "4h": "EVIDENCE_FOR"
+  },
+  "holm_adjusted_primary_p": {
+    "5m": 0.00029997000299970003,
+    "1h": 0.00029997000299970003,
+    "4h": 0.00029997000299970003
+  },
+  "analysis_end_by_instrument": {
+    "BTCUSD": "2025-06-17 22:38:00",
+    "EURUSD": "2025-05-09 16:55:00",
+    "USTEC": "2025-05-12 04:54:00",
+    "XAUUSD": "2025-05-12 03:35:00"
+  },
+  "integrity_counters": {
+    "invalid_target_events": 4604,
+    "tie_completions": 0,
+    "events_no_future_bars": 0
+  },
+  "parameters": {
+    "max_controls": 5,
+    "min_controls": 3,
+    "exclusion_bars": 6,
+    "control_scope": "same_regime_only",
+    "min_target_completed": 30,
+    "domain_min_instruments": 3,
+    "localvol_window": 20,
+    "vol_context_bounds": [
+      0.5,
+      2.0
+    ],
+    "unfinished_majority": 0.5,
+    "n_bootstrap": 10000,
+    "n_permutation": 10000,
+    "alpha": 0.05,
+    "ci_percentiles": [
+      2.5,
+      97.5
+    ],
+    "domain_estimator": "instrument_averaged_equal_weight",
+    "primary_statistic": "favorable_target_completion_rate_diff_pp"
+  },
+  "method_notes": {
+    "first_completion": "first completed real domain Close by time; intrabar excluded; vectorized first-hit preserves temporal ordering.",
+    "trend_change": "nearest later opposite-direction MA(20,50) regime confirmation; shared by an event and its same-regime controls.",
+    "control_target_transfer": "event frozen favorable/adverse target distances (log bps) applied to the control close in the same direction.",
+    "permutation": "rate analog of EXP-021 paired sign flip: within each matched set the single event slot is reassigned uniformly among completed moves; preserves observed event/control target-completion denominators; stratified because reassignment never crosses matched sets.",
+    "expectancy_consistency": "target-completion lifetime expectancy (favorable+adverse) drives the FOR/AGAINST consistency check; trend-change expectancy reported separately, not in the decision.",
+    "holdout": "first-70% slice before collection; events/controls re-fenced to the analysis-set end; final 30% global holdout never loaded."
+  },
+  "domain_primary": {
+    "5m": {
+      "rate_diff_pp": 23.935363107802335,
+      "rate_ci": [
+        22.70952488179215,
+        25.144855418391767
+      ],
+      "expectancy_diff_bps": 6.544531268380288,
+      "median_vol_context_ratio": 0.9860198952404376
+    },
+    "1h": {
+      "rate_diff_pp": 21.93234833598159,
+      "rate_ci": [
+        17.186799041764292,
+        26.640523146605112
+      ],
+      "expectancy_diff_bps": 27.04723441265864,
+      "median_vol_context_ratio": 1.0244010770820313
+    },
+    "4h": {
+      "rate_diff_pp": 26.35712144979926,
+      "rate_ci": [
+        17.731878979912373,
+        35.255089871139795
+      ],
+      "expectancy_diff_bps": 79.64260795504673,
+      "median_vol_context_ratio": 0.9869228022048031
+    }
+  },
+  "registry": {
+    "candidate_family": "CF-AVWAP-001",
+    "hypothesis": "HYP-003",
+    "family_spec": "docs/signal-registry/candidate-families/avwap.md",
+    "checkpoint": "docs/experiments-docs/checkpoints/2026-06-07-004-avwap-signal-exploration"
+  }
+}

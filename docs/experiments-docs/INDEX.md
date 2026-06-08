@@ -10,7 +10,7 @@
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-06-07-004-avwap-signal-exploration | ACTIVE — Phase 004 design opened; EXP-020 SUPPORTED_FULL; no full candidate screen exists. | **First real signal-exploration phase.** The mandatory programme-level multiplicity/file-drawer registry is now documented in `docs/signal-registry/multiplicity-registry.md`, and Batch 004-A registers only `CF-AVWAP-001` (Anchored VWAP on regime pivots). EXP-020 validated the first-branch substrate across all three domains; the phase now proceeds to fixed-horizon reaction study (EXP-021 planned) and original band-target/trend-change lifetime move study (EXP-022 planned), then cTrader/frozen-suite candidate screening plus the original metric book (EXP-023 planned) only if the component gates support proceeding. | [design.md](checkpoints/2026-06-07-004-avwap-signal-exploration/design.md) |
+| 2026-06-07-004-avwap-signal-exploration | ACTIVE — Phase 004 design opened; EXP-020 SUPPORTED_FULL; EXP-021 SUPPORTED; EXP-022 next. | **First real signal-exploration phase.** The mandatory programme-level multiplicity/file-drawer registry is now documented in `docs/signal-registry/multiplicity-registry.md`, and Batch 004-A registers only `CF-AVWAP-001` (Anchored VWAP on regime pivots). EXP-020 validated the first-branch substrate across all three domains. EXP-021 confirmed fixed-horizon bounce reaction on all 5m/1h/4h domains (SUPPORTED, all 3 domains EVIDENCE_FOR, effects +3.8/+9.1/+37.6 bps). The phase now proceeds to the band-target/trend-change lifetime move study (EXP-022 planned), then cTrader/frozen-suite candidate screening plus the original metric book (EXP-023 planned) only if the component gates support proceeding. | [design.md](checkpoints/2026-06-07-004-avwap-signal-exploration/design.md) |
 | 2026-06-05-003b-incremental-unit-redesign | COMPLETED — REVISED_UNIT_VALIDATED (EXP-017-019 executed and post-governance APPROVED 2026-06-05; retrospective written 2026-06-05) | **Track B follow-up succeeded.** EXP-017 validated the revised incremental-referee logic (7/7 fixture verdicts, 28/28 retained-leg checks, L2 absent). EXP-018 validated the revised portfolio-fitness unit on the construction-accepted dependence grid: FPR controlled in 126/126 accepted cells, finite worst-case MDEs 12/16/32 bps on 5m/1h/4h, and the EXP-015 synchronous/high-overlap/null_R stress corner passes in every domain; 36 infeasible high-rho/low-overlap cells are disclosed as construction-invalid. EXP-019 exercised both assembled-suite paths: EXP-009 dogfood rejects and synthetic positive passes across all domains. The concluded suite is now **{frozen strict gate stack, EXP-012 ratified-loose referee, EXP-018 revised incremental/fitness unit}**. Phase 004 may open after its mandatory programme-level multiplicity registry precondition is documented. **Not a new programme phase — a revision; Phase 004 remains reserved for signal exploration.** | [design.md](checkpoints/2026-06-05-003b-incremental-unit-redesign/design.md) · [retrospective.md](checkpoints/2026-06-05-003b-incremental-unit-redesign/retrospective.md) |
 | 2026-06-04-003-ratification-and-incremental-unit | COMPLETED — PARTIAL_SUCCESS (EXP-012-016 executed and reviewed; amendment [A1](checkpoints/2026-06-04-003-ratification-and-incremental-unit/amendments/2026-06-04-A1-incremental-unit-corrections.md) applied and Track B re-validated; retrospective written 2026-06-05) | **Framework-conclusion attempt did not reach FULL_FRAMEWORK_CONCLUDED (outcome: PARTIAL_SUCCESS).** Track A succeeded: EXP-012 ratified and adopted the EXP-011 loose point on fresh seeds for 5m/1h/4h. Track B validated the substrate and logic gates (EXP-013/014) but EXP-015 refuted portfolio-fitness calibration because every domain had qualifying dependence cells with no finite MDE. EXP-016 correctly blocked before composition measurement because the incremental unit was not COMPLETE and the dogfood reference book was undefined. **Adversarial review (amendment A1) corrected the incremental inference layer (F04 contiguous-series block length), the EXP-013 redundancy verdict (F01 across-draw distribution + `UNDER_POWERED` class), and EXP-015 diagnosability (F03 per-leg/per-instrument tables); EXP-013→014→015 re-validated 2026-06-04/05 — direction unchanged: Track A SUPPORTED, Track B substrate/logic PASS (EXP-013 PASS with 3 cells now `UNDER_POWERED`; EXP-014 PASS, `effective_n` episode-aware), EXP-015 REFUTED with the failure attributed to the L2 standalone-significance leg driven by BTCUSD.** The concluded suite ships as **two referees only** (frozen strict + ratified-loose); the incremental/fitness unit is carried to a follow-up. **Operator decision recorded 2026-06-05 (retrospective §11): Path B — open a new incremental-unit follow-up checkpoint and fix the L2/BTCUSD calibration failure (and resolve the A1/F02 L4/L5 freeze precondition) before Phase 004**, rather than rescoping Phase 004 to standalone-only. Phase 004 stays blocked until that follow-up delivers a validated+calibrated incremental unit. | [design.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/design.md) · [retrospective.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/retrospective.md) |
 | 2026-06-03-002-referee-refinement-and-stringency | COMPLETED (7/7 EXP executed, governance-APPROVED; retrospective written 2026-06-04) | Keystone spine item closed for the scoped realistic candidate (EXP-005); L5 threshold frontier measured (EXP-006); lenient-L5 structural-gain claim refuted because lenient equals the EXP-006 zero-buffer endpoint and drop-L5 (EXP-007); per-instrument MDE heterogeneity found in EURUSD/XAUUSD slower-domain cells (EXP-008); broadened simple-strategy dogfood stayed below every domain MDE (EXP-009); split robustness held on 5m/1h with only 4h falsified — and there the more-OOS protocols detect a lower MDE (EXP-010, corrected 2026-06-04: the original 1h/4h walk-forward MDE inflation was a multi-fold CI artifact); predeclared-loss synthesis recommends tau 0.75/0.25/0.5 on 5m/1h/4h, with adoption deferred to Phase 003 fresh draws (EXP-011). Characterization phase - recommends, does not adopt. | [design.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/design.md) · [retrospective.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/retrospective.md) |
@@ -971,3 +971,100 @@ All Evidence-FOR criteria are met: all invariant checks pass for every instrumen
 - Direction balance is reasonable across all 12 cells; no domain or instrument shows degenerate single-direction coverage.
 - The AVWAP state machine's re-arm sequencing is validated by the `rearm_monotonic` invariant (0 violations), confirming that the scope's arm/trigger/re-arm discipline is correctly implemented.
 - The moderate EURUSD/4h direction gap (0.557 bull fraction) is a descriptive note for EXP-021 scoping, not a correctness issue.
+
+---
+
+## EXP-021 — AVWAP Bounce Reaction Study
+
+**Status**: SUPPORTED
+**Date**: 2026-06-08
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 5m/1h/4h OHLC domains rebuilt from first-70% analysis slice of 1-minute time bars; EXP-020 AVWAP bounce event substrate (CF-AVWAP-001 first branch)
+
+### Hypothesis Tests
+
+1. **Hypothesis**: AVWAP bounce events from the supported CF-AVWAP-001 first branch show better fixed-horizon direction-signed real-price reaction than matched non-event controls on at least one EXP-020 ready domain, without touching the global holdout.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (all 4).
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domain bars from first-70% analysis slice; EXP-020 events and regime summary. No chart-type views.
+- **Features**: Same-regime matched controls (up to 5, min 3, by nearest anchor age/timestamp, 6-bar exclusion window around triggers), direction-signed log returns at 1/3/6 completed bars, instrument-averaged equal-weight domain effect estimator, regime-cluster bootstrap CI (10k resamples), stratified paired sign-permutation p-value (10k flips), Holm adjustment across 3 domains.
+- **Parameter ranges**: primary horizon 3; secondary 1 and 6; MAX_CONTROLS=5; MIN_CONTROLS=3; EXCLUSION_BARS=6; MIN_REPORTABLE_EVENTS=30; MIN_DIRECTION_EVENTS=8; DOMAIN_MIN_INSTRUMENTS=3; alpha=0.05; N_BOOT=10,000; N_PERM=10,000.
+- **Exclusions**: cTrader strategy-host screening or frozen-suite candidate qualification (EXP-023); lifetime target/trend-change outcomes (EXP-022); full strategy backtests, exits, stops, pyramiding, risk management, or position sizing; alternative AVWAP branches; parameter tuning or horizon selection after reading outcomes; percentage improvement against a zero baseline.
+- **Constraints**: EXP-020 must be SUPPORTED_FULL with ready domains {5m, 1h, 4h}, 0 invariant violations, and deterministic replay match; first-70% slice only; CloseTime ordering; real domain Close outcomes; same-regime matching makes regime_id exact dependence clusters.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: SUPPORTED`, dependency gate PASSED (EXP-020 SUPPORTED_FULL).
+- `domain_reaction_tests.csv`:
+  - 5m: effect +3.8 bps, CI [+3.5, +4.1], n=16,249, Holm p=0.0003, EVIDENCE_FOR.
+  - 1h: effect +9.1 bps, CI [+5.1, +13.3], n=1,207, Holm p=0.0003, EVIDENCE_FOR.
+  - 4h: effect +37.6 bps, CI [+22.3, +52.7], n=246, Holm p=0.0003, EVIDENCE_FOR.
+- All three domains EVIDENCE_FOR. No secondary horizon is negative in any domain (all 1-bar and 6-bar effects positive).
+- All 24 instrument×direction cells have positive mean paired differences at the primary horizon.
+- `control_match_diagnostics.csv`: all 4 instruments reaction-reportable in all 3 domains. Mean controls per reportable event 4.5–5.0. Non-reportable events primarily `insufficient_same_regime_controls`.
+- Audit verdict PASS: 0 critical, 0 warnings, 1 info note (4h effect partly driven by extreme BTCUSD control means).
+- Cash in the analysis set only; holdout never loaded.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+All four Evidence-FOR criteria are met: (1) EXP-020 dependency gate passes; (2) all three domains are reaction-reportable with ≥4 reportable instruments each; (3) all three domains have primary effect > 0 bps, 95% CI lower bound > 0 bps, and Holm-adjusted p ≤ 0.05; (4) no domain has both secondary horizons negative. The fixed-horizon bounce reaction operationalization of CF-AVWAP-001/HYP-002 is supported.
+
+### Hypothesis-Agnostic Observations
+
+- The effect scales with domain (5m < 1h < 4h), consistent with larger per-bar moves at longer horizons.
+- BTCUSD contributes the largest per-instrument effects, especially at 4h where same-regime controls have extreme negative means (−75 to −94 bps over 3 bars), inflating the paired contrast. The equal-weight domain estimator mitigates single-instrument dominance.
+- The same-regime control restriction is binding (costing 8–14 events per 4h direction cell) but all domains still reach full reportability.
+- Secondary horizons (1-bar, 6-bar) are positive and monotonic, ruling out a one-bar fluke or reversal artifact.
+
+## EXP-022 — AVWAP Original Lifetime Move Study
+
+**Status**: SUPPORTED
+**Date**: 2026-06-08
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 5m/1h/4h OHLC domains rebuilt from first-70% analysis slice of 1-minute time bars; EXP-020 AVWAP event substrate (CF-AVWAP-001 first branch); band-target/trend-change lifetime method
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Under the registered band-target/trend-change lifetime definition, AVWAP bounce events from the supported CF-AVWAP-001 first branch produce more favorable completed-move outcomes than matched non-event lifetime analogs on at least one EXP-020 ready domain, without touching the global holdout.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (all 4).
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domain bars from first-70% analysis slice; EXP-020 events and regime summary with frozen favorable/adverse targets at trigger. No chart-type views.
+- **Features**: Same-regime matched controls (up to 5, min 3, by nearest anchor age/timestamp, 6-bar exclusion window around triggers), frozen event target distance transfer to control close (log bps), lifetime completion scan (favorable target, adverse target, trend-change, unfinished), instrument-averaged equal-weight domain rate-difference estimator (pp), regime-cluster bootstrap CI (10k resamples), stratified paired permutation p-value (10k flips), Holm adjustment across 3 domains, volatility-context ratio diagnostic (20-bar MAD of typical-price log returns).
+- **Parameter ranges**: MAX_CONTROLS=5; MIN_CONTROLS=3; EXCLUSION_BARS=6; MIN_TARGET_COMPLETED=30; DOMAIN_MIN_INSTRUMENTS=3; LOCALVOL_WINDOW=20; VOL_CONTEXT_BOUNDS=[0.5, 2.0]; alpha=0.05; N_BOOT=10,000; N_PERM=10,000.
+- **Exclusions**: Fixed-horizon reaction testing (EXP-021); cTrader strategy-host screening or frozen-suite candidate qualification (EXP-023); full strategy backtests, optimized exits, stops, pyramiding, risk management, or position sizing; alternative AVWAP branches; parameter tuning after reading lifetime outcomes; percentage improvement against a zero baseline.
+- **Constraints**: EXP-020 must be SUPPORTED_FULL with ready domains {5m, 1h, 4h}, 0 invariant violations, and deterministic replay match; first-70% slice only; CloseTime ordering; real domain Close outcomes; trend-change is nearest later opposite MA(20,50) regime confirmation; same-regime matching makes regime_id exact dependence clusters; targets frozen at trigger time.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: SUPPORTED`, dependency gate PASSED (EXP-020 SUPPORTED_FULL), all 4/4 instruments reportable in all 3 domains.
+- `domain_lifetime_tests.csv`:
+  - 5m: rate diff +23.9 pp, 95% CI [22.7, 25.1], expectancy diff +6.5 bps, median vol ratio 0.986, Holm p=0.0003, EVIDENCE_FOR.
+  - 1h: rate diff +21.9 pp, 95% CI [17.2, 26.6], expectancy diff +27.0 bps, median vol ratio 1.024, Holm p=0.0003, EVIDENCE_FOR.
+  - 4h: rate diff +26.4 pp, 95% CI [17.7, 35.3], expectancy diff +79.6 bps, median vol ratio 0.987, Holm p=0.0003, EVIDENCE_FOR.
+- All three domains EVIDENCE_FOR. All domains have positive expectancy point estimates.
+- Event favorable rates: 67–69% across domains. Control favorable rates: 42–45%.
+- All median volatility-context ratios within [0.5, 2.0]; unfinished event fraction 0.0 for all domains.
+- `lifetime_observations.csv`: 85,816 rows (events + controls across all cells).
+- `control_lifetime_diagnostics.csv`: 24 instrument×direction rows. Insufficient same-regime controls: range 2–373 (5m dominates, as expected).
+- Integrity counters: 4,604 invalid_target_events (geometrically impossible targets, excluded correctly), 0 tie_completions, 0 events_no_future_bars.
+- Audit verdict PASS: 0 critical, 0 warnings, 2 info notes.
+- Cash in the analysis set only; holdout never loaded.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED**
+
+All predeclared Evidence-FOR criteria are met: (1) EXP-020 dependency gate passes; (2) all three domains are lifetime-reportable with ≥3 of 4 reportable instruments each; (3) all three domains have rate diff > 0 pp, 95% CI lower bound > 0 pp, and Holm-adjusted p ≤ 0.05; (4) all domains have positive expectancy point estimates; (5) no domain is volatility-context-confounded or censored. The original band-target/trend-change lifetime operationalization of CF-AVWAP-001/HYP-003 is supported on all three domains.
+
+### Hypothesis-Agnostic Observations
+
+- The favorable rate advantage is large (22–26 pp) and nearly identical across domains, suggesting the lifetime method captures a genuine event property rather than a domain-specific artifact.
+- Expectancy scales with domain width (6.5 → 27.0 → 79.6 bps for 5m/1h/4h), reflecting larger per-move returns on wider targets.
+- The volatility-context diagnostic (all medians within 0.986–1.024) confirms that matched controls face comparable target difficulty, ruling out a volatility-mismatch confound.
+- The ~4,600 excluded invalid-target events carry useful information: they represent cases where the AVWAP target at trigger time is already beyond the adverse direction, which happens when the A/VWAP band is very narrow or price is very close to the band — this is structural to the first branch's MAD-band construction.
