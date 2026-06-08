@@ -34,7 +34,8 @@ public sealed record StrategyTradeRecord(
     int PreviousPosition,
     int Position,
     double Price,
-    double PositionDelta);
+    double PositionDelta,
+    long TradeSequence = 0);
 
 public sealed record SignalUpdate(
     SignalPositionRecord Position,

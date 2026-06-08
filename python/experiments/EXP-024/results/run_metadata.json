@@ -1,0 +1,47 @@
+{
+  "experiment_id": "EXP-024",
+  "title": "AVWAP Event-Edge Dissipation Decomposition",
+  "overall_status": "COMPLETE",
+  "diagnostic": true,
+  "runs_frozen_suite": false,
+  "dependency_pass": true,
+  "primary_domain": "5m",
+  "horizon_grid": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    8,
+    10,
+    12,
+    16,
+    20,
+    24
+  ],
+  "loose_floor_bps": {
+    "5m": 0.5,
+    "1h": 2.0,
+    "4h": 8.0
+  },
+  "n_boot": 10000,
+  "domain_verdicts": {
+    "5m": "FORK_B_DILUTION",
+    "1h": "INCONCLUSIVE_UNRESOLVED",
+    "4h": "INCONCLUSIVE_UNRESOLVED"
+  },
+  "phase_verdict": "MIXED_OR_INCONCLUSIVE",
+  "event_join_row_count_preserved": true,
+  "event_join_duplicate_rows_beyond_first": 0,
+  "exp021_matched_crosscheck_max_abs_diff_bps": 0.0,
+  "exp021_crosscheck_tolerance_bps": 1e-06,
+  "registry_refs": {
+    "candidate_family": "CF-AVWAP-001",
+    "diagnostic_id": "CF-AVWAP-001/DIAG-001",
+    "registry": "docs/signal-registry/multiplicity-registry.md",
+    "checkpoint": "docs/experiments-docs/checkpoints/2026-06-08-005-avwap-exit-and-branch-exploration"
+  },
+  "generated_utc": "2026-06-08T14:48:23.043949+00:00",
+  "completed_utc": "2026-06-08T14:48:30.530957+00:00"
+}

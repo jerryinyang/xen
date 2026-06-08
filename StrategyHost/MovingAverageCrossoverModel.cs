@@ -8,6 +8,7 @@ public sealed class MovingAverageCrossoverModel : ISignalModel
     private double _slowSum;
     private int _previousPosition;
     private bool _readySeen;
+    private long _tradeSequence;
 
     public MovingAverageCrossoverModel(int fast = 20, int slow = 50, string strategyName = "ma_20_50")
     {
@@ -66,7 +67,8 @@ public sealed class MovingAverageCrossoverModel : ISignalModel
                     _previousPosition,
                     position,
                     bar.Close,
-                    Math.Abs(position - _previousPosition)));  // PositionDelta (diagnostic)
+                    Math.Abs(position - _previousPosition),
+                    _tradeSequence++));
             }
             _readySeen = true;
         }

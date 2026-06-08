@@ -1,0 +1,126 @@
+{
+  "experiment_id": "EXP-025",
+  "title": "AVWAP Line Support/Resistance Direct Test",
+  "generated_at": "2026-06-08T15:59:54.735115+00:00",
+  "overall_status": "INCONCLUSIVE",
+  "dependency_gate": {
+    "passed": true,
+    "exp020_status": "SUPPORTED_FULL",
+    "exp024_documented": true
+  },
+  "instruments": [
+    "BTCUSD",
+    "EURUSD",
+    "USTEC",
+    "XAUUSD"
+  ],
+  "domains": [
+    "5m",
+    "1h",
+    "4h"
+  ],
+  "reportable_instruments_by_domain": {
+    "5m": [
+      "BTCUSD",
+      "EURUSD",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "1h": [
+      "BTCUSD",
+      "EURUSD",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "4h": [
+      "BTCUSD",
+      "EURUSD",
+      "USTEC"
+    ]
+  },
+  "reportable_domains": [
+    "5m",
+    "1h",
+    "4h"
+  ],
+  "domain_decisions": {
+    "5m": "EVIDENCE_AGAINST",
+    "1h": "EVIDENCE_AGAINST",
+    "4h": "INCONCLUSIVE_SPANS_ZERO"
+  },
+  "holm_adjusted_primary_p": {
+    "4h": 1.0,
+    "5m": 1.0,
+    "1h": 1.0
+  },
+  "domain_primary_effects": {
+    "5m": -4.414498029503498,
+    "1h": -16.93717700622507,
+    "4h": -6.765771356214995
+  },
+  "domain_balance": {
+    "5m": {
+      "median_event_abs_close_to_avwap_bps": 2.257529551792697,
+      "median_control_abs_close_to_avwap_bps": 4.251169681272673,
+      "median_abs_proximity_diff_bps": 1.9936401294799757,
+      "balance_broken": false
+    },
+    "1h": {
+      "median_event_abs_close_to_avwap_bps": 9.628441684714904,
+      "median_control_abs_close_to_avwap_bps": 16.205807549093883,
+      "median_abs_proximity_diff_bps": 6.577365864378979,
+      "balance_broken": true
+    },
+    "4h": {
+      "median_event_abs_close_to_avwap_bps": 22.432961536562892,
+      "median_control_abs_close_to_avwap_bps": 50.007626867221504,
+      "median_abs_proximity_diff_bps": 27.57466533065861,
+      "balance_broken": true
+    }
+  },
+  "analysis_end_by_instrument": {
+    "BTCUSD": "2025-06-17 22:38:00",
+    "EURUSD": "2025-05-09 16:55:00",
+    "USTEC": "2025-05-12 04:54:00",
+    "XAUUSD": "2025-05-12 03:35:00"
+  },
+  "parameters": {
+    "line_rejection_horizon": "event_bar_h0",
+    "max_controls": 5,
+    "min_controls": 3,
+    "exclusion_bars": 6,
+    "line_proximity_floor_bps": 1.0,
+    "balance_fail_threshold_bps": 2.0,
+    "domain_estimator": "equal_weight_instrument_mean_of_event_weighted_cell_means",
+    "min_reportable_events": 30,
+    "min_direction_events": 8,
+    "domain_min_instruments": 3,
+    "n_bootstrap": 10000,
+    "n_permutation": 10000,
+    "alpha": 0.05,
+    "ci_percentiles": [
+      2.5,
+      97.5
+    ],
+    "domain_specs": {
+      "5m": {
+        "period_minutes": 5,
+        "min_coverage": null
+      },
+      "1h": {
+        "period_minutes": 60,
+        "min_coverage": 0.9
+      },
+      "4h": {
+        "period_minutes": 240,
+        "min_coverage": 0.9
+      }
+    }
+  },
+  "registry": {
+    "candidate_family": "CF-AVWAP-001",
+    "branch": "CF-AVWAP-001/DIAG-002",
+    "multiplicity_registry": "docs/signal-registry/multiplicity-registry.md",
+    "checkpoint": "docs/experiments-docs/checkpoints/2026-06-08-005-avwap-exit-and-branch-exploration"
+  }
+}

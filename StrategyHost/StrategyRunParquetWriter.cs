@@ -148,7 +148,8 @@ public sealed class StrategyRunParquetWriter : IDisposable
             new DataField<int>("PreviousPosition"),
             new DataField<int>("Position"),
             new DataField<double>("Price"),
-            new DataField<double>("PositionDelta")
+            new DataField<double>("PositionDelta"),
+            new DataField<long>("TradeSequence")
         };
         using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
         using var writer = ParquetWriter.CreateAsync(new ParquetSchema(fields), stream).GetAwaiter().GetResult();
@@ -164,6 +165,7 @@ public sealed class StrategyRunParquetWriter : IDisposable
         groupWriter.WriteColumnAsync(new DataColumn(fields[5], rows.Select(row => row.Position).ToArray())).GetAwaiter().GetResult();
         groupWriter.WriteColumnAsync(new DataColumn(fields[6], rows.Select(row => row.Price).ToArray())).GetAwaiter().GetResult();
         groupWriter.WriteColumnAsync(new DataColumn(fields[7], rows.Select(row => row.PositionDelta).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[8], rows.Select(row => row.TradeSequence).ToArray())).GetAwaiter().GetResult();
     }
 
     private static string Sanitize(string value)

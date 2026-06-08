@@ -10,7 +10,9 @@
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-06-07-004-avwap-signal-exploration | ACTIVE — Phase 004 design opened; EXP-020 SUPPORTED_FULL; EXP-021 SUPPORTED; EXP-022 next. | **First real signal-exploration phase.** The mandatory programme-level multiplicity/file-drawer registry is now documented in `docs/signal-registry/multiplicity-registry.md`, and Batch 004-A registers only `CF-AVWAP-001` (Anchored VWAP on regime pivots). EXP-020 validated the first-branch substrate across all three domains. EXP-021 confirmed fixed-horizon bounce reaction on all 5m/1h/4h domains (SUPPORTED, all 3 domains EVIDENCE_FOR, effects +3.8/+9.1/+37.6 bps). The phase now proceeds to the band-target/trend-change lifetime move study (EXP-022 planned), then cTrader/frozen-suite candidate screening plus the original metric book (EXP-023 planned) only if the component gates support proceeding. | [design.md](checkpoints/2026-06-07-004-avwap-signal-exploration/design.md) |
+| 2026-06-08-006-avwap-evaluation-correction | ACTIVE — design opened 2026-06-08; supersedes Phase 005. | **Fixes the evaluation vehicle Phases 004/005 mis-applied, then re-screens the faithful strategy.** Operator review found EXP-023/024/025 screened/diagnosed a ~6%-active event signal through a per-bar continuous-position referee calibrated only for ≥80%-active series (EXP-005). The strategy position rule was ~faithful; the **yardstick** was wrong. Two gated experiments: **EXP-027** defines + calibrates an event-level evaluation method (per-event expectancy + equity-curve vs buy-hold; EXP-021/022 control/bootstrap/Holm inference; null/control for error control); **EXP-028** re-screens the faithful selective AVWAP strategy under it (only strategy in scope). HYP-001 (line S/R) recorded as open, not in scope. Holdout sealed; no tuning. Root cause: `docs/code-reviews/2026-06-08-avwap-evaluation-framing-divergence-review.md`. | [design.md](checkpoints/2026-06-08-006-avwap-evaluation-correction/design.md) |
+| 2026-06-08-005-avwap-exit-and-branch-exploration | **HALTED 2026-06-08** (was ACTIVE) — superseded by Phase 006 before Stage B/C. Stage A diagnostics (EXP-024 MIXED_OR_INCONCLUSIVE, EXP-025 INCONCLUSIVE) inherited an evaluation-framing defect; EXP-026 `/EXIT` shelved; Stage C deferred. See [retrospective.md](checkpoints/2026-06-08-005-avwap-exit-and-branch-exploration/retrospective.md) and the framing-divergence review. | **Continues `CF-AVWAP-001` after Batch 004-A closed BASELINE_BRANCH_REFUTED.** Three dependent stages. **(A) Diagnosis** (Python-only, no suite, no multiplicity slot): EXP-024 edge-dissipation decomposition completed with diagnostic `MIXED_OR_INCONCLUSIVE` — primary 5m resolves fork (b) entry/position dilution (+0.370 bps best bounded hold < 0.5 bps floor), 1h/4h unresolved due wide CIs, and no domain supports fork (a); EXP-025 direct AVWAP-line S/R test remains pending (gap #4 — never tested directly; EXP-021/022 tested continuation and completion, not reaction-at-line). **(B) EXIT screen**: EXP-026 `CF-AVWAP-001/EXIT` is **not automatically justified by EXP-024 alone**; mixed/inconclusive output requires explicit operator/governance handling before any `/EXIT` screen. **(C) Branch exploration**: `/LB` `/MB` `/ATR` detectors (gaps #2) and new `/ANCHOR` running-extreme-vs-significant-pivot (gap #1). `/ALPHA` `/BAND` parameter sensitivity deferred out of phase. Knife-edge guardrail: exit/detector rules come from structure, predeclared, measured once — no sweep, no post-result reselection. Holdout sealed. | [design.md](checkpoints/2026-06-08-005-avwap-exit-and-branch-exploration/design.md) |
+| 2026-06-07-004-avwap-signal-exploration | COMPLETED — Batch 004-A baseline chain complete: EXP-020 SUPPORTED_FULL; EXP-021 SUPPORTED; EXP-022 SUPPORTED; **EXP-023 REFUTED**. | **First real signal-exploration phase; baseline branch screened to a clean negative.** The mandatory programme-level multiplicity/file-drawer registry is documented in `docs/signal-registry/multiplicity-registry.md`, and Batch 004-A registers only `CF-AVWAP-001` (Anchored VWAP on regime pivots). EXP-020 validated the first-branch substrate across all three domains; EXP-021 confirmed fixed-horizon bounce reaction (all 3 domains EVIDENCE_FOR, +3.8/+9.1/+37.6 bps); EXP-022 confirmed the band-target/trend-change lifetime method (rate diffs +23.9/+21.9/+26.4 pp, Holm p=0.0003). EXP-023 then screened the cTrader strategy-host AVWAP baseline through the **frozen suite** on emitted real prices: 12/12 cells admitted, C# transcription smoke PASS, but **0/12 strict, 0/12 ratified-loose, 0/12 revised-incremental passes → REFUTED** (effects ≪ frozen floors; high favorable-target rate 0.60–0.80 but ~0/negative net expectancy from trend-change exits + cost). This is a **baseline-branch negative, not COMPONENT_REFUTED** of CF-AVWAP-001 (design §8). Next AVWAP work requires new scoped experiments on registered non-baseline branches (LB/MB/ATR/ALPHA/BAND/EXIT), with no in-place baseline tuning. | [design.md](checkpoints/2026-06-07-004-avwap-signal-exploration/design.md) · [retrospective.md](checkpoints/2026-06-07-004-avwap-signal-exploration/retrospective.md) |
 | 2026-06-05-003b-incremental-unit-redesign | COMPLETED — REVISED_UNIT_VALIDATED (EXP-017-019 executed and post-governance APPROVED 2026-06-05; retrospective written 2026-06-05) | **Track B follow-up succeeded.** EXP-017 validated the revised incremental-referee logic (7/7 fixture verdicts, 28/28 retained-leg checks, L2 absent). EXP-018 validated the revised portfolio-fitness unit on the construction-accepted dependence grid: FPR controlled in 126/126 accepted cells, finite worst-case MDEs 12/16/32 bps on 5m/1h/4h, and the EXP-015 synchronous/high-overlap/null_R stress corner passes in every domain; 36 infeasible high-rho/low-overlap cells are disclosed as construction-invalid. EXP-019 exercised both assembled-suite paths: EXP-009 dogfood rejects and synthetic positive passes across all domains. The concluded suite is now **{frozen strict gate stack, EXP-012 ratified-loose referee, EXP-018 revised incremental/fitness unit}**. Phase 004 may open after its mandatory programme-level multiplicity registry precondition is documented. **Not a new programme phase — a revision; Phase 004 remains reserved for signal exploration.** | [design.md](checkpoints/2026-06-05-003b-incremental-unit-redesign/design.md) · [retrospective.md](checkpoints/2026-06-05-003b-incremental-unit-redesign/retrospective.md) |
 | 2026-06-04-003-ratification-and-incremental-unit | COMPLETED — PARTIAL_SUCCESS (EXP-012-016 executed and reviewed; amendment [A1](checkpoints/2026-06-04-003-ratification-and-incremental-unit/amendments/2026-06-04-A1-incremental-unit-corrections.md) applied and Track B re-validated; retrospective written 2026-06-05) | **Framework-conclusion attempt did not reach FULL_FRAMEWORK_CONCLUDED (outcome: PARTIAL_SUCCESS).** Track A succeeded: EXP-012 ratified and adopted the EXP-011 loose point on fresh seeds for 5m/1h/4h. Track B validated the substrate and logic gates (EXP-013/014) but EXP-015 refuted portfolio-fitness calibration because every domain had qualifying dependence cells with no finite MDE. EXP-016 correctly blocked before composition measurement because the incremental unit was not COMPLETE and the dogfood reference book was undefined. **Adversarial review (amendment A1) corrected the incremental inference layer (F04 contiguous-series block length), the EXP-013 redundancy verdict (F01 across-draw distribution + `UNDER_POWERED` class), and EXP-015 diagnosability (F03 per-leg/per-instrument tables); EXP-013→014→015 re-validated 2026-06-04/05 — direction unchanged: Track A SUPPORTED, Track B substrate/logic PASS (EXP-013 PASS with 3 cells now `UNDER_POWERED`; EXP-014 PASS, `effective_n` episode-aware), EXP-015 REFUTED with the failure attributed to the L2 standalone-significance leg driven by BTCUSD.** The concluded suite ships as **two referees only** (frozen strict + ratified-loose); the incremental/fitness unit is carried to a follow-up. **Operator decision recorded 2026-06-05 (retrospective §11): Path B — open a new incremental-unit follow-up checkpoint and fix the L2/BTCUSD calibration failure (and resolve the A1/F02 L4/L5 freeze precondition) before Phase 004**, rather than rescoping Phase 004 to standalone-only. Phase 004 stays blocked until that follow-up delivers a validated+calibrated incremental unit. | [design.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/design.md) · [retrospective.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/retrospective.md) |
 | 2026-06-03-002-referee-refinement-and-stringency | COMPLETED (7/7 EXP executed, governance-APPROVED; retrospective written 2026-06-04) | Keystone spine item closed for the scoped realistic candidate (EXP-005); L5 threshold frontier measured (EXP-006); lenient-L5 structural-gain claim refuted because lenient equals the EXP-006 zero-buffer endpoint and drop-L5 (EXP-007); per-instrument MDE heterogeneity found in EURUSD/XAUUSD slower-domain cells (EXP-008); broadened simple-strategy dogfood stayed below every domain MDE (EXP-009); split robustness held on 5m/1h with only 4h falsified — and there the more-OOS protocols detect a lower MDE (EXP-010, corrected 2026-06-04: the original 1h/4h walk-forward MDE inflation was a multi-fold CI artifact); predeclared-loss synthesis recommends tau 0.75/0.25/0.5 on 5m/1h/4h, with adoption deferred to Phase 003 fresh draws (EXP-011). Characterization phase - recommends, does not adopt. | [design.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/design.md) · [retrospective.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/retrospective.md) |
@@ -21,6 +23,8 @@
 
 | Checkpoint | Status | Key Synthesis | Document |
 | --- | --- | --- | --- |
+| 2026-06-08-005-avwap-exit-and-branch-exploration | **HALTED 2026-06-08** — `HALTED_FRAMING_INVALID` (before Stage B/C; superseded by Phase 006) | **Halted because Stage A diagnosed the signal *within* the wrong evaluation vehicle instead of questioning the vehicle.** EXP-023/024/025 screened/diagnosed a ~6%-active event signal through a per-bar continuous-position referee calibrated only for ≥80%-active series (EXP-005); EXP-023's negative is dominated by ~16× denominator dilution, EXP-024's fork-(b) leg is a per-bar-floor category mismatch, and EXP-025's metric is confounded by the trigger definition (HYP-001 still untested). EXP-021/022 per-event evidence is **not** invalidated. Retained findings: edge is relative-not-absolute; trend-change exits cut losers. Dispositions: EXP-023 SUPERSEDED, EXP-024 RETAINED (fork discounted), EXP-025 INCONCLUSIVE (non-informative for HYP-001); EXP-026 `/EXIT` SHELVED; Stage C deferred. Redirect → Phase 006 (fix evaluation vehicle, then re-screen). Review: `docs/code-reviews/2026-06-08-avwap-evaluation-framing-divergence-review.md`. | [retrospective.md](checkpoints/2026-06-08-005-avwap-exit-and-branch-exploration/retrospective.md) |
+| 2026-06-07-004-avwap-signal-exploration | COMPLETED — **BASELINE_BRANCH_REFUTED** (EXP-020-023 executed; EXP-023 post-governance APPROVE; retrospective written 2026-06-08) | **The first real signal-exploration cycle reached its terminal screen and closed negative for the registered baseline branch.** EXP-020 SUPPORTED_FULL: the AVWAP state machine is deterministic and look-ahead safe, 12/12 cells reportable, 0 invariant failures. EXP-021 SUPPORTED: fixed-horizon bounce reaction positive on all domains (+3.8/+9.1/+37.6 bps, Holm p=0.0003). EXP-022 SUPPORTED: band-target/trend-change lifetime completion advantage positive on all domains (+23.9/+21.9/+26.4 pp, Holm p=0.0003). EXP-023 REFUTED: 12/12 cTrader cells admitted, same-feed Donchian reference aligned, holdout fence and C# smoke PASS, but 0/12 strict, 0/12 ratified-loose, and 0/12 revised-incremental passes; effects far below frozen floors. **Synthesis:** conditional AVWAP event evidence is real in this analysis set, but the untuned baseline position/exit overlay does not qualify as a cost-bearing tradable strategy. This is a baseline-branch negative, not a retirement of `CF-AVWAP-001`; follow-up requires new registered scopes such as EXIT, LB, MB, ATR, ALPHA, or BAND. | [retrospective.md](checkpoints/2026-06-07-004-avwap-signal-exploration/retrospective.md) |
 | 2026-06-05-003b-incremental-unit-redesign | COMPLETED — **REVISED_UNIT_VALIDATED** (EXP-017-019 executed, pre+post governance APPROVE; pre-execution amendment B1 applied before any results) | **The framework conclusion is completed — Phase 004 unlocks.** Phase 003b removed the **L2 standalone-significance leg** that A1/F03 diagnosed as the EXP-015/BTCUSD refutation cause, leaving the portfolio-fitness gate `L1 ∧ L3 ∧ L4′ ∧ L5` (strict-L5 binding, L3 its precondition), and resolved the A1/F02 L4′/L5 freeze precondition by operator decision. Predeclared once, measured once (D-no-retune held; B1 changed no predeclared object). **EXP-017** SUPPORTED: 7/7 fixture verdicts, 28/28 retained-leg states, L2 absent 7/7, former-L2-fail fixture now passes. **EXP-018** SUPPORTED (the claim EXP-015 refuted, now holding): 126/126 construction-accepted cells PASS, FPR 0.0–0.004, finite worst-case MDEs 12/16/32 bps on 5m/1h/4h, EXP-015 synchronous/high-overlap/null_R corner PASS across all ρ in every domain; 36 high-ρ/low-overlap cells disclosed as construction-invalid. **EXP-019** SUPPORTED: dogfood rejects across all domains (0 strict/loose/incremental passes); nonredundant synthetic positive passes all three components in every domain. Concluded suite **{frozen strict gate stack, EXP-012 ratified-loose referee, EXP-018 validated revised incremental/fitness unit}** is frozen — D-adopt (P3) satisfied. **Honest caveat:** the incremental screen is the coarsest (12/16/32 vs strict 1/4/12 and loose 0.5/2/8) — correct portfolio-fitness semantics bought at a higher detection floor; validation is on synthetic dependence draws, not real candidates or fresh regimes (holdout sealed). **Phase 004 unlocks behind its mandatory programme-level multiplicity-registry precondition (P3-§11).** | [retrospective.md](checkpoints/2026-06-05-003b-incremental-unit-redesign/retrospective.md) |
 | 2026-06-04-003-ratification-and-incremental-unit | COMPLETED — **PARTIAL_SUCCESS** (EXP-012-016 executed; amendment A1 applied + Track B re-validated 2026-06-04/05) | **Two referees concluded; the fitness check is not.** Track A: EXP-012 ratified the EXP-011 loose point on fresh disjoint seeds (`payload_overlap_count=0`) and **adopted** τ 0.75/0.25/0.5 on 5m/1h/4h — FPR 0/4000, fresh MDEs reproduce Phase 002 to the grid (0.5/2/8 bps), 4h split gate agrees; the meta-Goodhart freeze Phase 002 deferred is now executed. Track B mirrored EXP-001→003: substrate PASS (EXP-013: 108/108 recovery, no phantom; 3 cells honestly `UNDER_POWERED` under A1/F01) and logic PASS (EXP-014: 7/7 verdicts, L3→reference-control, episode-aware `effective_n`), but the keystone **REFUTED** (EXP-015): FPR controlled yet no finite MDE in any domain, attributed by A1/F03 diagnostics to the **L2 standalone-significance leg driven by BTCUSD** (standalone TPR 0.0–0.136 at the 32 bps ceiling). EXP-016 correctly BLOCKED (refuted dependency + undefined dogfood book). Adversarial review (A1: F01 across-draw redundancy verdict, F03 diagnostics, F04 contiguous block length, F02 leg-conservatism freeze precondition) made passing *harder* and did not flip any verdict. Against §9 this is **PARTIAL_SUCCESS** — the suite ships as two referees only; the incremental unit goes to a follow-up. **Operator decision (2026-06-05, §11): Path B — open an incremental-unit follow-up checkpoint and fix the L2/BTCUSD failure (+ A1/F02 L4/L5 freeze precondition) before Phase 004**; Phase 004 stays blocked until that follow-up validates+calibrates the unit. | [retrospective.md](checkpoints/2026-06-04-003-ratification-and-incremental-unit/retrospective.md) |
 | 2026-06-03-002-referee-refinement-and-stringency | COMPLETED (7/7 EXP executed; §9 a–d met + EXP-009/010 delivered) | **Keystone CLOSED: the strict gate is an honest detection floor, not structurally blind** — EXP-005's realistic near-MDE candidate is detected on every domain (TPR 1.000/0.985/0.947 at 1.0× MDE, FPR=0; all 12 per-instrument rows DETECTED_FLOOR), though detection below the MDE is unreliable (0.5× MDE TPR 0.024/0.371/0.502). The L5 stringency lever is one-dimensional (EXP-006 frontier; lenient L5 ≡ τ=0 ≡ drop-L5, EXP-007 REFUTED) and lower τ buys MDE partly with sub-material passes (5m ≈0.50 at zero-buffer). Pooled map is conservative — per-instrument MDEs only lower (EXP-008: EURUSD/1h, EURUSD+XAUUSD/4h). Untuned simple strategies remain net losers below every MDE (EXP-009). Split-robust on 5m/1h; 4h toward a *lower* MDE under more-OOS protocols (EXP-010, corrected). EXP-011 recommends τ 0.75/0.25/0.5 (1h robust, 5m/4h loss-sensitive); **nothing adopted** — fresh-draw ratification is Phase 003. Framework characterization concluded; finalization (freeze) deferred. | [retrospective.md](checkpoints/2026-06-03-002-referee-refinement-and-stringency/retrospective.md) |
@@ -1068,3 +1072,169 @@ All predeclared Evidence-FOR criteria are met: (1) EXP-020 dependency gate passe
 - Expectancy scales with domain width (6.5 → 27.0 → 79.6 bps for 5m/1h/4h), reflecting larger per-move returns on wider targets.
 - The volatility-context diagnostic (all medians within 0.986–1.024) confirms that matched controls face comparable target difficulty, ruling out a volatility-mismatch confound.
 - The ~4,600 excluded invalid-target events carry useful information: they represent cases where the AVWAP target at trigger time is already beyond the adverse direction, which happens when the A/VWAP band is very narrow or price is very close to the band — this is structural to the first branch's MAD-band construction.
+
+---
+
+## EXP-023 — AVWAP Baseline Candidate Screen
+
+> **SUPERSEDED (framing-corrected) 2026-06-08.** The REFUTED verdict below is valid
+> **only as a per-bar continuous-position screen**, not as a tradability test of the
+> original selective event vehicle: a ~6%-active signal was scored against a per-bar
+> MDE floor calibrated for ≥80%-active series (EXP-005), so the result is dominated
+> by ~16× denominator dilution, not absence of signal. Record retained; conclusion
+> corrected. Re-screened faithfully under an event-level method in **EXP-028**
+> (Phase 006). Review:
+> `docs/code-reviews/2026-06-08-avwap-evaluation-framing-divergence-review.md`.
+
+**Status**: REFUTED → SUPERSEDED (framing-corrected)
+**Date**: 2026-06-08
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: cTrader `Mode=StrategyHost` AVWAP-baseline runs (CF-AVWAP-001/HYP-004 first branch) and aligned Donchian(20) reference on 5m/1h/4h domains, evaluated on emitted real OHLC (`RealClose`); first-70% analysis slice only; no chart-type views
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The registered CF-AVWAP-001 baseline signal can qualify under at least one component of the frozen Phase 004 suite — standalone strict, standalone ratified-loose/fallback, or revised portfolio-fitness against the existing D-dogfood-book Donchian(20) reference — while reporting the original AVWAP strategy metric book, without touching the global holdout.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (all 4 × 3 domains = 12 cells).
+- **Data Views / Feature Categories**: cTrader strategy-host AVWAP-baseline and Donchian(20) outputs (positions/events/trade blotter/metadata); fixed first-70% source-Parquet smoke output only to validate the C# AVWAP port against the `xen.avwap` Python reference. No chart-type views.
+- **Features**: standalone strict gate stack and EXP-012 ratified-loose/strict-fallback referee at α₀=0.05; EXP-018 revised portfolio-fitness unit (`clip(R+C,−1,+1)−R` marginal estimator) vs Donchian(20); original metric book on real `RealClose` (bounce prevalence, executed-entry/non-executed-pyramid counts, favorable/adverse/trend-change/unfinished completions, expectancy, robust mean/MAD and mean/std risk levels, raw-return comparison); same-feed reference identity, holdout-fence, and C#/Python transcription checks.
+- **Parameter ranges**: regime MA(20,50) on domain `RealClose`; AVWAP source `(RealHigh+RealLow+RealClose)/3`; weight `TickVolume**0.75`; MAD band ×1.0; frozen suite settings loaded from artifacts — strict MDE 1/4/12, ratified-loose τ 0.375/0.375/1.5 with MDE 0.5/2/8, revised-incremental MDE 12/16/32 bps (5m/1h/4h); α₀=0.05; n_bootstrap=1000.
+- **Exclusions**: alternative AVWAP branches/detectors/weights/bands; parameter or domain/instrument tuning after reading outcomes; chart-type variants; unregistered exit overlays, stops, targets, trailing exits, sizing, pyramiding, portfolio weighting, risk management; changes to strict/loose/incremental referee logic or the D-dogfood-book reference; execution-realism claims; the final 30% global holdout.
+- **Constraints**: EXP-020 SUPPORTED_FULL (ready {5m,1h,4h}, 0 invariant/holdout violations, deterministic replay), EXP-021/022 SUPPORTED, VAL-002 PASS, EXP-012/018/019 frozen-suite identity — all verified value-based from artifacts; cTrader emits no row at/after `AnalysisEndUtc`; Python ingests/validates only and never regenerates the candidate signal for screening; real `RealClose` return basis; `SourceCloseTime` temporal alignment; zero denominators null/non-reportable.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: REFUTED`, `admitted_cells: 12/12`, `blockers: []`, `smoke_status: [PASS, PASS, PASS]`, `pass_tally: {strict:0, loose:0, incremental:0, suite_pass:0, reportable:12}`.
+- `dependency_manifest.csv`: 34/34 PASS. `csharp_avwap_smoke_checks.csv`: 5m/1h/4h PASS, 0 field mismatch, `max_abs_price_diff=0.0`, event counts 5978/421/109 identical (C# vs `xen.avwap`).
+- `run_manifest.csv`: all 12 `admitted=true`, `same_feed_ok=true`, `feed_max_abs_diff=0.0`, `n_time_mismatch=0`. `holdout_fence_checks.csv`: candidate and reference max `SourceCloseTime` < `AnalysisEndUtc` in every cell.
+- `standalone_suite_verdicts.csv`: 0/12 strict, 0/12 effective-loose. Net effects −1.41 (BTCUSD/4h) to +0.21 bps (EURUSD/4h) vs strict MDE 1/4/12; every `ci_lower` below loose τ (max −0.127, EURUSD/1h).
+- `portfolio_fitness_verdicts.csv`: 0/12 `positive_incremental`; all 12 reportable, `n_reference_unaligned=0`, denominators 155–15,951; incremental edges −11.90 (USTEC/4h) to +6.05 bps (XAUUSD/4h), all ≪ floors 12/16/32; small positive 4h points EURUSD/4h +4.39 (ci_lower +0.31) and XAUUSD/4h +6.05 (ci_lower −3.62) below floor.
+- `strategy_metric_book.csv`: `successful_bounce_rate` 0.605–0.800; `model_net_bps` ~0-to-negative (BTCUSD/5m −0.740, BTCUSD/4h −1.362; EURUSD/4h +0.081); `lifetime_expectancy_bps` mostly negative (BTCUSD/4h −30.3; EURUSD/4h +8.0); `model_robust_ratio` null in all cells (MAD=0; strategy flat ~92.6% of bars, BTCUSD/5m); model mean/std negative vs small positive raw mean/std.
+- `event_trade_diagnostics.csv`: long+short entries reconcile to metric-book `n_entries` per cell (audit cross-check).
+- Audit verdict PASS: 0 critical, 0 warnings, 6 info; independent recomputation of BTCUSD/5m metric-book risk metrics matched bit-exact.
+
+> Note: No interpretation — preserve what the data shows.
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED**
+
+The predeclared Evidence-AGAINST criteria are met in full: all dependency and run-admission checks passed, all 12 instrument/domain cells are reportable against an aligned same-feed Donchian(20) reference, no suite component (strict, ratified-loose/fallback, or revised portfolio-fitness) passes any cell, and both standalone and incremental effects lie below their frozen domain detection floors in every cell. The baseline CF-AVWAP-001/HYP-004 signal does not qualify under the frozen Phase 004 suite on the first-70% analysis set. This is an admissible negative (not BLOCKED/INCONCLUSIVE) and a baseline-branch result, not a COMPONENT_REFUTED retirement of CF-AVWAP-001 (checkpoint `design.md` §8).
+
+### Hypothesis-Agnostic Observations
+
+- Conditional-event evidence (EXP-021 reaction, EXP-022 lifetime) did not carry through to a tradable, always-on, cost-bearing position judged by a stringent frozen referee — a documented gap between conditional event behavior and continuously-held strategy P&L.
+- A 60–80% favorable-target rate co-exists with ~0/negative net expectancy because `successful_bounce_rate` excludes trend-change exits while net expectancy and lifetime returns include them; trend-change exits plus per-active-bar cost erode the edge.
+- The robust mean/MAD risk level is structurally undefined for a strategy flat ~93% of the time (MAD=0) — handled per the scope zero-baseline rule as a null, with the mean/std diagnostic used for the model-vs-raw comparison.
+
+---
+
+## EXP-024 — AVWAP Event-Edge Dissipation Decomposition
+
+> **RETAINED, fork leg discounted (2026-06-08).** The fork-(b) leg compared a
+> cumulative per-event hold return against a per-bar floor — a category mismatch
+> that makes fork (b) near-foreordained and low-information. **Retained findings
+> stand:** the edge is relative-not-absolute (raw hold ~0 vs +3.8 bps EXP-021
+> control-excess on 5m), and trend-change exits cut losers not winners
+> (−2.79/−8.76/−17.59 bps). See the framing-divergence review.
+
+**Status**: MIXED_OR_INCONCLUSIVE (RETAINED; fork leg discounted)
+**Date**: 2026-06-08
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: EXP-020 AVWAP bounce events (CF-AVWAP-001 first branch), EXP-021 fixed-horizon reaction observations, EXP-022 lifetime observations, and 5m/1h/4h real OHLC domain bars rebuilt from the first-70% analysis slice; diagnostic only, no frozen suite
+
+### Hypothesis Tests
+
+1. **Diagnostic fork question**: Between EXP-021's positive fixed-horizon bounce reaction and EXP-023's ~0-to-negative always-on strategy expectancy, is the edge lost to fork (a) a fixable holding/exit problem, or fork (b) entry/position dilution that makes the always-on/bounded-hold overlay the wrong vehicle?
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domain bars rebuilt from first-70% 1-minute analysis slices; EXP-020 `avwap_events.csv`; EXP-021 `reaction_observations.csv` for matched cross-check; EXP-022 event-role `lifetime_observations.csv` for completed lifetime reference.
+- **Features**: direction-signed real-close gross returns over fixed bounded-hold horizons; completed common-set lifetime returns; bounded-vs-lifetime paired contrasts; regime-cluster bootstrap CIs; Holm adjustment across the horizon grid; trend-change return distribution; holding/exposure descriptors; secondary cost attribution.
+- **Parameter ranges**: horizon grid `{1,2,3,4,5,6,8,10,12,16,20,24}` completed domain bars; loose floors 0.5/2/8 bps for 5m/1h/4h; margin `max(0.5 bps, 0.25 x floor)`; primary domain 5m; `N_BOOT=10,000`; `DOMAIN_MIN_COMPLETED=100`.
+- **Exclusions**: frozen qualification suite; cTrader candidate screen; parameter/exit/detector tuning; global holdout; ALPHA/BAND sensitivity; EXP-025 direct line-S/R question.
+- **Constraints**: first-70% analysis slice only; real domain Close returns; no synthetic prices; no percentage improvement over zero baseline; common completed-event denominators for bounded-vs-lifetime contrasts; EXP-020/021/022 substrate consistency required.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status=COMPLETE`, `domain_verdicts={5m:FORK_B_DILUTION, 1h:INCONCLUSIVE_UNRESOLVED, 4h:INCONCLUSIVE_UNRESOLVED}`, `phase_verdict=MIXED_OR_INCONCLUSIVE`, `exp021_matched_crosscheck_max_abs_diff_bps=0.0`, event join row counts preserved, duplicate join rows 0.
+- `domain_reconstruction_check.csv`: 12/12 EXP-020 metadata checks pass.
+- `event_join_diagnostics.csv`: joined event rows 5m 19,242 / 1h 1,360 / 4h 309; completed common-set rows 5m 15,037 / 1h 1,033 / 4h 235; row counts preserved and duplicate join keys 0.
+- `exp021_crosscheck.csv`: exact matched-event return reproduction for EXP-021 horizons `{1,3,6}`; matched event counts 5m 16,249, 1h 1,207, 4h 246/246/244; max row and mean absolute difference 0.0 bps.
+- `fork_verdict.csv`:
+  - 5m: `h*=16`, `g*=+0.370` bps, floor 0.5, CI `[-0.396,+1.164]`, `g_life=+0.058`, `delta=+0.312`, `n=15,037`, verdict `FORK_B_DILUTION`.
+  - 1h: `h*=24`, `g*=+4.248` bps, floor 2.0, CI `[-10.190,+18.417]`, `delta=+6.197`, `n=1,033`, verdict `INCONCLUSIVE_UNRESOLVED`.
+  - 4h: `h*=8`, `g*=+8.137` bps, floor 8.0, CI `[-22.769,+39.747]`, `delta=+16.840`, `n=233`, verdict `INCONCLUSIVE_UNRESOLVED`.
+- `trend_change_returns.csv`: trend-change lifetime means 5m -2.79 bps (`[-3.32,-2.32]`), 1h -8.76 (`[-15.03,-3.24]`), 4h -17.59 (`[-40.38,+3.68]`); negative fractions 65.8%, 56.9%, 54.0%.
+- `holding_exposure.csv`: event prevalence 2.68% / 2.26% / 2.21% of domain bars (5m/1h/4h); reconstructed active-bar fractions 6.17% / 5.73% / 5.67%; pyramid bounces 9,679/19,242 (5m), 636/1,360 (1h), 146/309 (4h).
+- `cost_attribution.csv`: 5m `g*` gross +0.370 bps becomes -4.651 net; 1h +4.248 becomes -0.597; 4h +8.137 becomes +2.793 after mean round-trip costs.
+- Audit verdict PASS: 0 critical, 2 warnings (1h/4h precision; mixed/inconclusive Stage-B handling), 3 info notes.
+
+### Hypothesis-Specific Conclusion
+
+**MIXED_OR_INCONCLUSIVE**
+
+The primary 5m domain resolves to fork (b): bounded-hold gross returns do not reach the loosest suite floor, even before cost. The 1h and 4h domains remain inconclusive because above-floor point estimates have wide CIs that fail the floor-clearance rule. No domain supports fork (a), so EXP-026 `/EXIT` is not automatically justified by EXP-024 alone; any `/EXIT` continuation requires explicit mixed/inconclusive governance handling.
+
+### Hypothesis-Agnostic Observations
+
+- EXP-021's matched event-vs-control reaction and EXP-024's all/completed-event bounded-hold return are different estimands; the corrected cross-check proves the return formula matches on identical rows while showing that the positive matched-control component signal dilutes in the all-event vehicle.
+- Trend-change exits are negative on average, which weakens the simple "holding too long gives back winners" explanation for EXP-023's failure.
+- Sparse exposure (about 5.7-6.2% active bars) and many pyramid bounces contextualize why conditional event evidence can fail to become a cost-bearing always-on strategy.
+
+---
+
+## EXP-025 — AVWAP Line Support/Resistance Direct Test
+
+> **INCONCLUSIVE — non-informative for HYP-001 (2026-06-08).** The event-bar
+> line-rejection metric is structurally confounded: bounce triggers cross AVWAP
+> intrabar by definition, inflating adverse penetration and biasing the metric
+> negative before any data. It did **not** test HYP-001 (line as S/R), which
+> remains untested. Carries zero weight in synthesis. See the framing-divergence
+> review.
+
+**Status**: INCONCLUSIVE (non-informative for HYP-001)
+**Date**: 2026-06-08
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 5m/1h/4h OHLC domains rebuilt from first-70% 1-minute analysis slices via EXP-020 conventions; EXP-020 avwap_events.csv event definitions; same-regime non-event controls with line-proximity matching.
+
+### Hypothesis Tests
+
+1. **Hypothesis**: AVWAP bounce trigger bars from the supported CF-AVWAP-001 first branch show a larger event-bar AVWAP line-rejection score than matched same-regime non-event control bars on at least one EXP-020 ready domain, without touching the global holdout.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD.
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains rebuilt from first-70% 1-minute analysis slices; EXP-020 AVWAP event and regime tables; causal per-bar AVWAP replay for control matching.
+- **Features**: Event-bar line-rejection score (close_rebound_bps - adverse_penetration_bps) with bullish/bearish direction formulas; matched same-regime line-proximate non-event controls (up to 5, min 3); regime-cluster bootstrap CI; stratified paired sign permutation test; Holm adjustment.
+- **Parameter ranges**: Domains {5m, 1h, 4h}; max 5 controls, min 3; line-proximity rule abs(close_to_avwap_bps) <= max(1.0, band_spread_bps); 6-bar exclusion around triggers; 10,000 bootstrap/permutation resamples.
+- **Exclusions**: frozen-suite candidate qualification, cTrader strategy-host generation, EXP-021 fixed-horizon return continuation, EXP-022 lifetime outcomes, EXP-024 bounded-hold decomposition, threshold sweeps, percentage improvement against zero baseline, final 30% global holdout.
+- **Constraints**: dependency gate (EXP-020 SUPPORTED_FULL + EXP-024 documented); domain OHLC rebuilt from exact EXP-020 source files with metadata validation; causal AVWAP replay; event-bar h=0 only; no future returns; event-weighted cell means, equal-weight instrument domain estimator.
+
+### Results / Observations
+
+| Domain | Effect (bps) | CI Low | CI High | n | Holm p | Decision | Balance |
+|--------|-------------|--------|---------|---|--------|----------|---------|
+| 5m | -4.41 | -4.85 | -4.00 | 10,432 | 1.0 | EVIDENCE_AGAINST | OK (1.99 bps) |
+| 1h | -16.94 | -22.12 | -11.77 | 763 | 1.0 | EVIDENCE_AGAINST | Broken (6.58 bps) |
+| 4h | -6.77 | -34.13 | +22.80 | 120 | 1.0 | INCONCLUSIVE_SPANS_ZERO | Broken (27.57 bps) |
+
+- All 24 reportable instrument/domain/direction cells show events with lower (more negative) line-rejection scores than matched controls.
+- 0 events lost to invalid AVWAP or score; all non-reportable events due to <3 line-proximate controls.
+- Domain reconstruction PASS (all 12 cells match EXP-020 metadata exactly).
+- Audit: CONDITIONAL PASS (0 critical, 2 warnings: BTCUSD 5m proximity imbalance masked by domain pooling, 4h bootstrap degenerate clusters).
+
+### Hypothesis-Specific Conclusion
+
+**INCONCLUSIVE**
+
+No domain meets Evidence FOR (all effects are negative). Evidence AGAINST does not apply because the 4h domain CI spans zero. The 5m domain is the cleanest read (unbroken balance, n=10,432, tight CIs) and shows clear EVIDENCE_AGAINST, but the predeclared criteria require all reportable domains to have CI upper bound ≤ 0 for Evidence AGAINST. The negative effect is structurally consistent: bounce triggers cross AVWAP by definition, so adverse intrabar penetration is inherent to the metric design.
+
+### Hypothesis-Agnostic Observations
+
+- The scoped metric likely conflates the trigger definition with the line-rejection signal: a bounce trigger cannot occur without adverse penetration (the intrabar crossover), so the line-rejection score systematically penalizes events versus non-crossing controls.
+- EXP-025 does not invalidate EXP-021/022 positive component evidence (bounce continuation, lifetime outcomes), which test different constructs (regime-gated continuation and completion rather than bar-level line reaction).
+- Phase 005 Stage A now completes with all three diagnostics resolved: EXP-023 REFUTED, EXP-024 MIXED_OR_INCONCLUSIVE, EXP-025 INCONCLUSIVE. No diagnostic provides a clean Stage A positive that automatically justifies Stage B.

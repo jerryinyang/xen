@@ -17,6 +17,13 @@ public enum XenMode
     StrategyHostParity
 }
 
+public enum XenStrategy
+{
+    MaCrossover,
+    AvwapBaseline,
+    Donchian20
+}
+
 [Robot(AccessRights = AccessRights.FullAccess, AddIndicators = false, DefaultTimeFrame="Minute")]
 public class Xen : Robot
 {
@@ -26,6 +33,9 @@ public class Xen : Robot
 
     [Parameter("Mode", DefaultValue = XenMode.StrategyHost)]
     public XenMode Mode { get; set; } = XenMode.StrategyHost;
+
+    [Parameter("Strategy", DefaultValue = XenStrategy.MaCrossover)]
+    public XenStrategy Strategy { get; set; } = XenStrategy.MaCrossover;
 
     [Parameter("Collect & Store Time Bars", DefaultValue = false)]
     public bool CollectTimeBars { get; set; }
@@ -56,7 +66,7 @@ public class Xen : Robot
 
     private TimeBarParquetWriter? _writer;
     private BarAggregator? _strategyAggregator;
-    private MovingAverageCrossoverModel? _strategyModel;
+    private ISignalModel? _strategyModel;
     private HoldoutFence? _strategyFence;
     private StrategyRunParquetWriter? _strategyWriter;
     private DateTime? _lastCloseTime;
@@ -200,21 +210,14 @@ public class Xen : Robot
         var domain = DomainLabel(DomainMinutes);
         _strategyFence = new HoldoutFence(analysisEndUtc);
         _strategyAggregator = new BarAggregator(DomainMinutes, minCoverage);
-        _strategyModel = new MovingAverageCrossoverModel(FastMa, SlowMa);
+        _strategyModel = CreateStrategyModel();
         _strategyWriter = new StrategyRunParquetWriter(
             StrategyOutputDirectory,
             _strategyModel.StrategyName,
             SymbolName,
             domain,
             _strategyFence,
-            new Dictionary<string, object?>
-            {
-                ["domain_minutes"] = DomainMinutes,
-                ["strict_coverage"] = StrictCoverage,
-                ["min_coverage"] = minCoverage,
-                ["fast_ma"] = FastMa,
-                ["slow_ma"] = SlowMa
-            });
+            BuildStrategyParameters(minCoverage));
 
         _strategyHostReady = true;
 
@@ -339,6 +342,45 @@ public class Xen : Robot
     private bool IsStrategyHostParityMode()
     {
         return Mode == XenMode.StrategyHostParity;
+    }
+
+    private ISignalModel CreateStrategyModel()
+    {
+        return Strategy switch
+        {
+            XenStrategy.MaCrossover => new MovingAverageCrossoverModel(FastMa, SlowMa),
+            XenStrategy.AvwapBaseline => new AvwapBounceModel(FastMa, SlowMa),
+            XenStrategy.Donchian20 => new DonchianBreakoutModel(),
+            _ => throw new InvalidOperationException($"Unsupported strategy: {Strategy}")
+        };
+    }
+
+    private IReadOnlyDictionary<string, object?> BuildStrategyParameters(double? minCoverage)
+    {
+        var parameters = new Dictionary<string, object?>
+        {
+            ["strategy"] = Strategy.ToString(),
+            ["domain_minutes"] = DomainMinutes,
+            ["strict_coverage"] = StrictCoverage,
+            ["min_coverage"] = minCoverage
+        };
+        switch (Strategy)
+        {
+            case XenStrategy.MaCrossover:
+                parameters["fast_ma"] = FastMa;
+                parameters["slow_ma"] = SlowMa;
+                break;
+            case XenStrategy.AvwapBaseline:
+                parameters["fast_ma"] = FastMa;
+                parameters["slow_ma"] = SlowMa;
+                parameters["volume_exponent"] = AvwapBounceModel.VolumeExponent;
+                parameters["band_multiplier"] = AvwapBounceModel.BandMultiplier;
+                break;
+            case XenStrategy.Donchian20:
+                parameters["lookback"] = 20;
+                break;
+        }
+        return parameters;
     }
 
     private static bool TryParseAnalysisEndUtc(string value, out DateTime result)

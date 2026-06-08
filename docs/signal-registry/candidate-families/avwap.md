@@ -223,7 +223,13 @@ outcomes in the file-drawer ledger:
   must be specified in a new scope before measurement.
 - `CF-AVWAP-001/XTF`: cross-timeframe relationship and more granular entry
   refinements.
-- `CF-AVWAP-001/EXIT`: Heiken Ashi or price-action exit overlays.
+- `CF-AVWAP-001/EXIT`: exit overlays (time-stop, revised trend-change handling,
+  adverse-band stop, or price-action/Heiken Ashi exits). Phase 005 scopes these
+  from the EXP-024 dissipation diagnostic; concrete rules are predeclared before
+  any screen, never swept.
+- `CF-AVWAP-001/ANCHOR`: significant-pivot anchor (structural swing / ATR-reversal
+  pivot) versus the baseline running-extreme anchor (gaps analysis #1). Registered
+  2026-06-08 (Phase 005); requires a dedicated scope before measurement.
 
 ## Implementation Path
 
