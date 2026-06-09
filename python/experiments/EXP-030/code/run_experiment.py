@@ -53,7 +53,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402  (backend must be set first)
 import numpy as np  # noqa: E402
 import polars as pl  # noqa: E402
-from tqdm.auto import tqdm  # noqa: E402
 
 # --------------------------------------------------------------------------- #
 # Path setup
@@ -123,6 +122,11 @@ FROZEN_FUNCTIONS: tuple[str, ...] = (
     "domain_effect", "build_strata", "bootstrap_effect_distribution",
     "holm_adjust", "decide_label",
 )
+# Pinned expected hash of the concatenated FROZEN_FUNCTIONS sources, computed from
+# the EXP-027 file as committed for the EXP-027/028 close-out (git 5387a3b; the file
+# has no later commits or working-tree edits). Comparing a fresh reload of the same
+# file against itself cannot fail; this pin is the binding freeze check.
+FROZEN_TAIL_EXPECTED_HASH = "e50873d12a9f68d9"
 
 # Predeclared per-instrument cost table (scope §"Cost table"; FROZEN pending the
 # single Stage-4 operator confirmation). c_i is one-way bps of price covering
@@ -200,36 +204,34 @@ def cost_table_hash() -> str:
 # Frozen-inference integrity guard
 # --------------------------------------------------------------------------- #
 def verify_frozen_inference() -> str:
-    """Assert the imported inference functions match the on-disk EXP-027 source.
+    """Assert the imported inference tail matches the PINNED EXP-027 source hash.
 
     Hashes the source of only the named inference-tail functions (not the whole
-    file). Re-loads the EXP-027 file fresh and compares, guarding against an
-    accidentally shadowed/edited module. Aborts ``FROZEN_INFERENCE_MODIFIED`` on
-    any mismatch or missing symbol.
+    file) and compares against ``FROZEN_TAIL_EXPECTED_HASH``, pinned from the
+    EXP-027/028-era file. A fresh-reload self-comparison alone is tautological
+    (both sides read the same on-disk file); the pin is what makes an edit to
+    ``event_method.py`` after EXP-028 detectable. Aborts
+    ``FROZEN_INFERENCE_MODIFIED`` on any mismatch or missing symbol.
 
     Returns
     -------
     str
         16-char hash prefix of the concatenated frozen-function source.
     """
-    ref_mod = _load_module("exp027_event_method_ref", EXP027_METHOD)
-    used_src, ref_src = [], []
+    used_src = []
     for name in FROZEN_FUNCTIONS:
         used_fn = getattr(EM, name, None)
-        ref_fn = getattr(ref_mod, name, None)
-        if used_fn is None or ref_fn is None:
+        if used_fn is None:
             raise ValueError(f"FROZEN_INFERENCE_MODIFIED: function {name} missing")
         used_src.append(inspect.getsource(used_fn))
-        ref_src.append(inspect.getsource(ref_fn))
-    h_used = hashlib.sha256("".join(used_src).encode()).hexdigest()
-    h_ref = hashlib.sha256("".join(ref_src).encode()).hexdigest()
-    if h_used != h_ref:
+    h_used = hashlib.sha256("".join(used_src).encode()).hexdigest()[:16]
+    if h_used != FROZEN_TAIL_EXPECTED_HASH:
         raise ValueError(
-            f"FROZEN_INFERENCE_MODIFIED: inference tail diverges from EXP-027 file "
-            f"(used={h_used[:16]} != ref={h_ref[:16]})."
+            f"FROZEN_INFERENCE_MODIFIED: inference tail diverges from the pinned "
+            f"EXP-027/028 source (got {h_used} != pinned {FROZEN_TAIL_EXPECTED_HASH})."
         )
-    LOGGER.info("Frozen inference tail verified against EXP-027 (hash=%s)", h_used[:16])
-    return h_used[:16]
+    LOGGER.info("Frozen inference tail verified against pinned EXP-027 hash (%s)", h_used)
+    return h_used
 
 
 # --------------------------------------------------------------------------- #
@@ -420,11 +422,25 @@ def reconcile_gross_excess(table: pl.DataFrame) -> dict[str, dict[str, float]]:
     """
     exp028 = pl.read_csv(EXP028_RESULTS / "event_level_results.csv")
     expected = {row["domain"]: float(row["effect_bps"]) for row in exp028.iter_rows(named=True)}
+    expected_n = {row["domain"]: int(row["n_events"]) for row in exp028.iter_rows(named=True)}
     out: dict[str, dict[str, float]] = {}
     for domain in DOMAINS:
         cell = table.filter(pl.col("domain") == domain)
         insts = reportable_instruments(cell)
         cell = cell.filter(pl.col("instrument").is_in(insts))
+        # Row-set / holdout fence: lifetime_observations.csv carries no timestamp column
+        # (only bar indices), so the inherited "first-70% only" claim cannot be checked
+        # against a time boundary directly. The available structural proof is the event
+        # count: the reportable set must match the first-70% EXP-028 run exactly. A
+        # silently regenerated (e.g. full-range) upstream CSV would change this count and
+        # would also break the gross-excess match below.
+        n_used = cell.height
+        if n_used != expected_n[domain]:
+            raise ValueError(
+                f"ROW-SET FENCE FAILED {domain}: reportable event count {n_used} != "
+                f"EXP-028 first-70% count {expected_n[domain]} — inherited holdout fence "
+                f"cannot be trusted (upstream EXP-022 CSV may have been regenerated)."
+            )
         diffs, inst_labels, _d, _r = _cell_arrays(cell, "paired_excess_bps")
         effect = domain_effect(diffs, inst_labels, insts)
         exp = expected[domain]
@@ -434,8 +450,10 @@ def reconcile_gross_excess(table: pl.DataFrame) -> dict[str, dict[str, float]]:
                 f"EXP-028 {exp:.6f} (tol {RECON_TOL_BPS})."
             )
         out[domain] = {"recomputed_excess_bps": effect, "exp028_excess_bps": exp,
-                       "abs_diff_bps": abs(effect - exp)}
-    LOGGER.info("Reconciliation PASS: gross excess reproduces EXP-028 in all domains")
+                       "abs_diff_bps": abs(effect - exp), "n_events_reconciled": n_used,
+                       "exp028_n_events": expected_n[domain]}
+    LOGGER.info("Reconciliation PASS: gross excess + event counts reproduce EXP-028 "
+                "in all domains")
     return out
 
 
@@ -478,6 +496,14 @@ def per_instrument_net(table: pl.DataFrame) -> list[dict[str, Any]]:
     crosses zero). Descriptive only; computed from gross quantities so it cannot
     motivate any cost-model change. A single-instrument regime-cluster bootstrap CI on
     net_cons is reported for context only (the binding verdict is domain-level).
+
+    ``headroom_cons_bps`` and ``net_cons_survives_nonbinding`` (F01 disclosure) expose
+    which instrument x domain cells survive CONSERVATIVE costs *on their own* — the
+    information the equal-weight domain aggregate (dominated by BTCUSD's 16 bps RT)
+    masks. These are explicitly NON-BINDING: the phase verdict remains the equal-weight
+    domain metric, and no single cell is promoted to TRADABLE here (uncontrolled
+    multiplicity). They exist so a domain INCONCLUSIVE/AGAINST is not misread as
+    "no instrument is tradable."
     """
     rows: list[dict[str, Any]] = []
     for inst in INSTRUMENTS:
@@ -488,17 +514,86 @@ def per_instrument_net(table: pl.DataFrame) -> list[dict[str, Any]]:
             gross_abs = float(sub.get_column("lifetime_bps").mean())
             rng = np.random.default_rng(seed_for(EXPERIMENT_ID, "perinst", domain, inst))
             boot = _bootstrap_distribution(sub, "net_cons", [inst], rng)
+            ci_low = float(np.percentile(boot, CI_PERCENTILES[0]))
+            ci_high = float(np.percentile(boot, CI_PERCENTILES[1]))
             rows.append({
                 "instrument": inst, "domain": domain, "n_events": sub.height,
                 "gross_abs_bps": gross_abs,
                 "net_base_bps": float(sub.get_column("net_base").mean()),
                 "net_cons_bps": float(sub.get_column("net_cons").mean()),
-                "net_cons_ci_low": float(np.percentile(boot, CI_PERCENTILES[0])),
-                "net_cons_ci_high": float(np.percentile(boot, CI_PERCENTILES[1])),
+                "net_cons_ci_low": ci_low,
+                "net_cons_ci_high": ci_high,
                 "breakeven_rt_bps": gross_abs,
                 "rt_base_bps": RT_BASE_BPS[inst], "rt_cons_bps": RT_CONS_BPS[inst],
+                "headroom_cons_bps": gross_abs - RT_CONS_BPS[inst],
+                "net_cons_survives_nonbinding": bool(ci_low > 0.0),
             })
     return rows
+
+
+# --------------------------------------------------------------------------- #
+# Non-binding robustness / attribution diagnostics
+# --------------------------------------------------------------------------- #
+def pyramid_net_split(table: pl.DataFrame) -> dict[str, dict[str, Any]]:
+    """Per-domain CONSERVATIVE net split: pyramid legs vs non-pyramid (F05 disclosure).
+
+    Each pyramid bounce bears its own full round trip (nothing amortized across legs),
+    a deliberately conservative charge. This non-binding split exposes how much of a
+    domain's net drag is pyramid-leg cost — relevant on 5m, where pyramid legs are a
+    large share of events. Event-weighted means over all instruments (a raw descriptive
+    split, NOT the equal-weight binding aggregation); never decides the verdict.
+    """
+    out: dict[str, dict[str, Any]] = {}
+    for domain in DOMAINS:
+        cell = table.filter(pl.col("domain") == domain)
+        if cell.height == 0:
+            continue
+        pyr = cell.filter(pl.col("is_pyramid_bounce"))
+        non = cell.filter(~pl.col("is_pyramid_bounce"))
+        out[domain] = {
+            "n_pyramid": pyr.height,
+            "n_nonpyramid": non.height,
+            "pyramid_share": pyr.height / cell.height,
+            "net_cons_pyramid_bps": float(pyr.get_column("net_cons").mean()) if pyr.height else None,
+            "net_cons_nonpyramid_bps": float(non.get_column("net_cons").mean()) if non.height else None,
+            "gross_abs_pyramid_bps": float(pyr.get_column("lifetime_bps").mean()) if pyr.height else None,
+            "gross_abs_nonpyramid_bps": float(non.get_column("lifetime_bps").mean()) if non.height else None,
+        }
+    return out
+
+
+def seed_robustness(table: pl.DataFrame, n_seeds: int = 8) -> dict[str, dict[str, Any]]:
+    """Multi-seed stability of the binding CONSERVATIVE net CI per domain (F06).
+
+    The point estimate is seed-independent (``domain_effect`` uses no RNG); only the
+    regime-cluster bootstrap CI varies with the resample seed. The trivial determinism
+    replay (identical seed) cannot detect CI sensitivity, so this re-runs the binding
+    inference across ``n_seeds`` seeds and records the spread of ci_low/ci_high and
+    whether the verdict-relevant bound keeps its sign. Diagnostic only — the canonical
+    verdict still uses the single ``seed_for`` seed.
+    """
+    out: dict[str, dict[str, Any]] = {}
+    for domain in DOMAINS:
+        cell = table.filter(pl.col("domain") == domain)
+        insts = reportable_instruments(cell)
+        if len(insts) < DOMAIN_MIN_INSTRUMENTS:
+            continue
+        sub = cell.filter(pl.col("instrument").is_in(insts))
+        lows: list[float] = []
+        highs: list[float] = []
+        for k in range(n_seeds):
+            rng = np.random.default_rng(seed_for(EXPERIMENT_ID, "robust", domain, str(k)))
+            boot = _bootstrap_distribution(sub, "net_cons", insts, rng)
+            lows.append(float(np.percentile(boot, CI_PERCENTILES[0])))
+            highs.append(float(np.percentile(boot, CI_PERCENTILES[1])))
+        out[domain] = {
+            "n_seeds": n_seeds,
+            "ci_low_min": min(lows), "ci_low_max": max(lows), "ci_low_range": max(lows) - min(lows),
+            "ci_high_min": min(highs), "ci_high_max": max(highs), "ci_high_range": max(highs) - min(highs),
+            "ci_low_sign_stable": bool(all(x > 0 for x in lows) or all(x <= 0 for x in lows)),
+            "ci_high_sign_stable": bool(all(x > 0 for x in highs) or all(x <= 0 for x in highs)),
+        }
+    return out
 
 
 # --------------------------------------------------------------------------- #
@@ -508,15 +603,18 @@ def phase_outcome(cons_res: dict[str, dict[str, Any]]) -> str:
     """Bind the phase outcome on the CONSERVATIVE net verdicts.
 
     TRADABLE if >=1 domain EVIDENCE_FOR; NOT_TRADABLE if every reportable domain is
-    EVIDENCE_AGAINST with adequate power (EVIDENCE_AGAINST already implies a finite CI
-    excluding positive); else INCONCLUSIVE.
+    EVIDENCE_AGAINST; else INCONCLUSIVE. EVIDENCE_AGAINST is itself the power-bearing
+    condition: ``decide_label`` returns it only when ``CI_high <= 0``, i.e. the
+    regime-cluster bootstrap CI excludes *every* positive net effect; a wide CI that
+    cannot rule out a material positive falls to INCONCLUSIVE_SPANS_ZERO, not AGAINST.
+    Under-powered domains (<3 reportable instruments -> UNDER_POWERED) are excluded
+    from the all-AGAINST test rather than being forced into NOT_TRADABLE.
     """
     verdicts = [cons_res[d].get("verdict") for d in DOMAINS]
     if any(v == "EVIDENCE_FOR" for v in verdicts):
         return "TRADABLE"
-    reportable = [v for v in verdicts if v not in (None, "UNDER_POWERED")]
-    if reportable and all(v == "EVIDENCE_AGAINST" for v in reportable) and \
-            len(reportable) == len([v for v in verdicts if v != "UNDER_POWERED"]):
+    reportable = [v for v in verdicts if v != "UNDER_POWERED"]
+    if reportable and all(v == "EVIDENCE_AGAINST" for v in reportable):
         return "NOT_TRADABLE"
     return "INCONCLUSIVE"
 
@@ -660,12 +758,17 @@ def save_outputs(cons_res, base_res, attr_cons, attr_base, per_inst, metadata) -
     write_rows(RESULTS_DIR / "net_expectancy_results.csv",
                _variant_rows(cons_res, "CONSERVATIVE") + _variant_rows(base_res, "BASE"))
     write_rows(RESULTS_DIR / "net_by_instrument.csv", per_inst)
+    # F07: the companion is NON-BINDING — label its decide_label output
+    # ``companion_label`` (not ``verdict``) and carry an explicit binding=False flag
+    # so a grep for EVIDENCE_FOR cannot be mistaken for a tradability verdict.
     write_rows(RESULTS_DIR / "attribution_companion.csv", [
-        {"domain": d, "variant": "CONSERVATIVE", **{k: attr_cons[d].get(k) for k in
-         ("effect_bps", "ci_low", "ci_high", "holm_p", "verdict")}} for d in DOMAINS
+        {"domain": d, "variant": "CONSERVATIVE", "binding": False,
+         **{k: attr_cons[d].get(k) for k in ("effect_bps", "ci_low", "ci_high", "holm_p")},
+         "companion_label": attr_cons[d].get("verdict")} for d in DOMAINS
     ] + [
-        {"domain": d, "variant": "BASE", **{k: attr_base[d].get(k) for k in
-         ("effect_bps", "ci_low", "ci_high", "holm_p", "verdict")}} for d in DOMAINS])
+        {"domain": d, "variant": "BASE", "binding": False,
+         **{k: attr_base[d].get(k) for k in ("effect_bps", "ci_low", "ci_high", "holm_p")},
+         "companion_label": attr_base[d].get("verdict")} for d in DOMAINS])
     (RESULTS_DIR / "run_metadata.json").write_text(json.dumps(metadata, indent=2, default=str))
     LOGGER.info("Wrote results to %s", RESULTS_DIR)
 
@@ -730,6 +833,8 @@ def main() -> None:
     attr_base = run_variant(table, "net_excess_base", "attr_base")
 
     per_inst = per_instrument_net(table)
+    pyr_split = pyramid_net_split(table)
+    seed_robust = seed_robustness(table)
     replay_ok = replay_one_domain(table, cons_res)
     outcome = phase_outcome(cons_res)
 
@@ -746,6 +851,11 @@ def main() -> None:
                                        "NON-BINDING; never decides the verdict"),
         "dependencies": deps,
         "frozen_inference_hash": frozen_hash,
+        "frozen_inference_expected_hash": FROZEN_TAIL_EXPECTED_HASH,
+        "frozen_inference_evidence": ("pinned hash computed from event_method.py as "
+                                      "committed in 5387a3b (EXP-027/028 close-out); "
+                                      "git shows no later commit or working-tree edit "
+                                      "to that file"),
         "frozen_functions": list(FROZEN_FUNCTIONS),
         "cost_table_oneway_bps": COST_ONEWAY_BPS,
         "cost_table_hash": cost_table_hash(),
@@ -756,10 +866,56 @@ def main() -> None:
         "commute_max_dev_bps": commute,
         "pyramids_included": True,
         "pyramid_split": {"pyramid": diag["n_pyramid"], "non_pyramid": diag["n_nonpyramid"]},
+        "pyramid_net_split": pyr_split,
+        "seed_robustness_net_cons": seed_robust,
         "right_censored_excluded": diag["right_censored_excluded"],
         "determinism_replay_pass": replay_ok,
-        "holdout_fence": "inherited — all rows are EXP-022 first-70% outputs; no new load",
-        "significance": "one-sided bootstrap p (sign-permutation invalid for absolute estimand)",
+        "determinism_replay_note": ("same-seed byte-identical re-run; across-seed CI "
+                                    "stability is reported separately in "
+                                    "seed_robustness_net_cons (F06)"),
+        "holdout_fence": ("inherited — all rows are EXP-022 first-70% outputs; no new load. "
+                          "Verified structurally: per-domain reportable event counts asserted "
+                          "equal to the first-70% EXP-028 run (no timestamp column exists to "
+                          "check a time boundary directly)."),
+        "significance": ("FOR criterion is effectively the bootstrap 95% CI excluding "
+                         "zero (one-sided ~0.025), Holm-screened; boot_p is the bootstrap "
+                         "CDF at zero (CI-equivalent annotation, not a null-calibrated "
+                         "p-value). Sign-permutation invalid for the absolute estimand."),
+        "review_notes": {
+            "binding_metric_caveat": (  # F01
+                "Binding verdict is the EQUAL-WEIGHT cross-instrument domain net (faithful "
+                "to EXP-028 PRIMARY aggregation). For an absolute-P&L question this is "
+                "dominated by the highest-cost instrument: BTCUSD RT_cons=16 bps is 4.0 of "
+                "the 7.5 bps mean drag. A domain INCONCLUSIVE/AGAINST does NOT mean no "
+                "instrument is tradable — see net_by_instrument.csv "
+                "net_cons_survives_nonbinding (e.g. EURUSD-4h net_cons CI excludes zero). "
+                "No single cell is promoted to TRADABLE here (uncontrolled multiplicity); "
+                "the per-instrument table is descriptive. A pre-registered per-cell test "
+                "with multiplicity control is a future-experiment change, not a post-result "
+                "edit (anti-tuning fence)."
+            ),
+            "power_note_4h": (  # F03
+                "4h is power-limited for the absolute estimand (per-instrument n=36-70; "
+                "CONSERVATIVE domain CI half-width ~17 bps). INCONCLUSIVE_SPANS_ZERO there "
+                "reflects non-resolution, not a positive signal; the phase outcome turns on "
+                "the weakest-powered domain. See seed_robustness_net_cons. A predeclared "
+                "numeric resolvable-effect threshold for AGAINST is recorded as a "
+                "future-experiment change (not retrofitted post-result)."
+            ),
+            "binding_vs_companion_warning": (  # F04
+                "The NON-BINDING net matched-control excess (attribution_companion.csv) is "
+                "EVIDENCE_FOR on 1h/4h CONSERVATIVE (holm_p~0.003) while the BINDING absolute "
+                "net is AGAINST/INCONCLUSIVE. The verdict's direction rests on the predeclared "
+                "absolute-vs-relative choice (controls are counterfactual, never traded). The "
+                "companion's FOR must NOT be read as tradability."
+            ),
+            "for_gate_note": (  # F07
+                "The binding FOR gate is effectively CI_low>0 at the 2.5th percentile "
+                "(one-sided ~0.025), which subsumes boot_p<=0.05; boot_p is a redundant "
+                "annotation and its percentile-bootstrap calibration is asserted, not "
+                "validated. No FOR was reached this run, so it decided nothing."
+            ),
+        },
         "parameters": {"domains": list(DOMAINS), "instruments": list(INSTRUMENTS),
                        "alpha": ALPHA, "n_boot": N_BOOT, "ci_percentiles": list(CI_PERCENTILES),
                        "min_reportable_events": MIN_REPORTABLE_EVENTS,
