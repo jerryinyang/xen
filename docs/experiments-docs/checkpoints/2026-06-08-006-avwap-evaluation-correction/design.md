@@ -159,10 +159,39 @@ registry reflects the method and EXP-IDs.
 - Any change to the frozen per-bar suite or its calibration.
 - Any use of the global holdout.
 
-## 9. Immediate next step
+## 9. Amended phase plan (EXP-029 appended 2026-06-09)
 
-1. Amend `docs/signal-registry/multiplicity-registry.md` (Phase 006 batch; halt +
-   supersession record; EXP-027/028 registration).
-2. Run the research pipeline for **EXP-027** (Stage 1 scope first): the
-   event-level evaluation method definition + calibration is the binding gate.
-3. Hold EXP-028 until EXP-027 is validated.
+An omission was identified in EXP-028's implementation: it was designed as a Python
+re-analysis of upstream artifacts (EXP-020 events, EXP-022 lifetimes) and did **not**
+reuse EXP-023's C# `StrategyHost` code or run on cTrader via per-bar streaming.
+See `EXP-028-omission.md` in this checkpoint directory.
+
+A new experiment **EXP-029** is added to close this gap:
+
+| Experiment | Purpose | Gate |
+|------------|---------|------|
+| EXP-027 | Event-level evaluation method definition + calibration (unchanged) | Binding gate for both EXP-028 and EXP-029 |
+| EXP-028 | Python-only re-analysis of faithful AVWAP strategy under EXP-027 (completed) | EXP-027 METHOD_VALID |
+| **EXP-029** | cTrader per-bar streaming parity: run corrected C# strategy on cTrader, evaluate through EXP-027, confirm parity with EXP-028 | EXP-027 METHOD_VALID + EXP-028 results |
+
+EXP-027 and EXP-028 proceeded as designed (both complete). EXP-029 runs after
+EXP-028 results are available (for comparison) and EXP-027 is METHOD_VALID (for the
+inference tail).
+
+## 10. Updated next steps (as of 2026-06-09 amendment)
+
+EXP-027 is **METHOD_VALID** and EXP-028 is **EVAL_SUPPORTED** (both complete). The
+remaining Phase 006 work is the cTrader parity confirmation (EXP-029):
+
+1. Amend `docs/signal-registry/multiplicity-registry.md` (Phase 006 batch) to
+   register **EXP-029** as a parity confirmation of `CF-AVWAP-001/HYP-004-R`
+   (0 new candidate-family slots) and to bring the EXP-027/028 statuses current.
+2. Correct `StrategyHost/AvwapBounceModel.cs` so pyramid bounces open and track
+   independent positions (currently `pyramid_skipped`, single concurrent position),
+   and expose `is_pyramid_bounce` on the emitted table EXP-029 consumes.
+3. Run the research pipeline for **EXP-029** (Stage 1 scope already drafted):
+   run the corrected C# strategy on cTrader via per-bar streaming, evaluate through
+   the frozen EXP-027 inference tail, and compare against EXP-028.
+4. Apply the EXP-029 parity disposition: CONSISTENT → EXP-028 upgraded to
+   cTrader-confirmed; INCONSISTENT → EXP-028 downgraded to `EVAL_UNCONFIRMED`
+   pending root-cause.

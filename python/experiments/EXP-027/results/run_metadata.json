@@ -1,0 +1,96 @@
+{
+  "experiment_id": "EXP-027",
+  "title": "Event-Level Evaluation Method: Definition and Sparse-Regime Calibration",
+  "generated_at": "2026-06-09T02:48:02.720188+00:00",
+  "overall_status": "METHOD_VALID",
+  "method_verdict": {
+    "verdict": "METHOD_VALID",
+    "fpr_controlled_primary": true,
+    "bracket_fpr_ok": true,
+    "recovered_domains": [
+      "5m",
+      "1h",
+      "4h"
+    ],
+    "all_domains_recovered": true,
+    "determinism_pass": true,
+    "companion_null_sane": true
+  },
+  "control_matching_equivalence_pass": true,
+  "dependency_gate": {
+    "passed": true,
+    "exp020_status": "SUPPORTED_FULL",
+    "anti_overfitting_fence": "avwap_events.csv outcomes not read"
+  },
+  "instruments": [
+    "BTCUSD",
+    "EURUSD",
+    "USTEC",
+    "XAUUSD"
+  ],
+  "domains": [
+    "5m",
+    "1h",
+    "4h"
+  ],
+  "analysis_end_by_instrument": {
+    "BTCUSD": "2025-06-17 22:38:00",
+    "EURUSD": "2025-05-09 16:55:00",
+    "USTEC": "2025-05-12 04:54:00",
+    "XAUUSD": "2025-05-12 03:35:00"
+  },
+  "parameters": {
+    "p_trig_grid": [
+      0.03,
+      0.06,
+      0.12
+    ],
+    "primary_p_trig": 0.06,
+    "edge_grid_bps": [
+      0.0,
+      1.0,
+      2.0,
+      4.0,
+      8.0,
+      16.0,
+      32.0,
+      64.0
+    ],
+    "alpha_grid": [
+      0.1,
+      0.05,
+      0.01
+    ],
+    "primary_alpha": 0.05,
+    "null_generators": [
+      "placebo_on_real",
+      "block_permuted"
+    ],
+    "n_draws": 500,
+    "n_bootstrap": 1000,
+    "n_permutation": 1000,
+    "horizons": [
+      1,
+      3,
+      6
+    ],
+    "primary_horizon": 3,
+    "max_controls": 5,
+    "min_controls": 3,
+    "exclusion_bars": 6,
+    "pyramid_frac": 0.5,
+    "pyramid_span": 6,
+    "tpr_target": 0.8,
+    "fpr_halfwidth_max": 0.03,
+    "tpr_halfwidth_max": 0.05,
+    "domain_estimator": "instrument_averaged_equal_weight",
+    "control_scope": "same_regime_only",
+    "unit_of_analysis": "per_event"
+  },
+  "registry": {
+    "candidate_family": "CF-AVWAP-001",
+    "registration": "METHOD-001",
+    "checkpoint": "docs/experiments-docs/checkpoints/2026-06-08-006-avwap-evaluation-correction",
+    "anti_overfitting_fence": "real avwap_events.csv outcomes are not read; signal is synthetic"
+  }
+}

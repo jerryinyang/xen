@@ -10,7 +10,7 @@
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-06-08-006-avwap-evaluation-correction | ACTIVE — design opened 2026-06-08; supersedes Phase 005. | **Fixes the evaluation vehicle Phases 004/005 mis-applied, then re-screens the faithful strategy.** Operator review found EXP-023/024/025 screened/diagnosed a ~6%-active event signal through a per-bar continuous-position referee calibrated only for ≥80%-active series (EXP-005). The strategy position rule was ~faithful; the **yardstick** was wrong. Two gated experiments: **EXP-027** defines + calibrates an event-level evaluation method (per-event expectancy + equity-curve vs buy-hold; EXP-021/022 control/bootstrap/Holm inference; null/control for error control); **EXP-028** re-screens the faithful selective AVWAP strategy under it (only strategy in scope). HYP-001 (line S/R) recorded as open, not in scope. Holdout sealed; no tuning. Root cause: `docs/code-reviews/2026-06-08-avwap-evaluation-framing-divergence-review.md`. | [design.md](checkpoints/2026-06-08-006-avwap-evaluation-correction/design.md) |
+| 2026-06-08-006-avwap-evaluation-correction | ACTIVE — design opened 2026-06-08; supersedes Phase 005. Amended 2026-06-09: EXP-028 omission recorded and EXP-029 appended. **All three experiments complete (EXP-027 METHOD_VALID, EXP-028 EVAL_SUPPORTED, EXP-029 CONSISTENT/cTrader-confirmed); phase objective fully satisfied — ready for retrospective.** | **Fixes the evaluation vehicle Phases 004/005 mis-applied, then re-screens the faithful strategy.** Operator review found EXP-023/024/025 screened/diagnosed a ~6%-active event signal through a per-bar continuous-position referee calibrated only for ≥80%-active series (EXP-005). The strategy position rule was ~faithful; the **yardstick** was wrong. Three experiments: **EXP-027** defines + calibrates an event-level evaluation method (METHOD_VALID); **EXP-028** re-screens the faithful AVWAP strategy under it (Python-only; EVAL_SUPPORTED); **EXP-029** closed the cTrader per-bar streaming omission — the corrected C# strategy run on cTrader reproduced EXP-028 PRIMARY excess on all 3 domains (parity **CONSISTENT**; all 5 binding gates pass), upgrading EXP-028 to **cTrader-confirmed**. HYP-001 (line S/R) recorded as open, not in scope. Holdout sealed; no tuning. Root cause: `docs/code-reviews/2026-06-08-avwap-evaluation-framing-divergence-review.md`. Omission (now closed): `checkpoints/2026-06-08-006-avwap-evaluation-correction/EXP-028-omission.md`. | [design.md](checkpoints/2026-06-08-006-avwap-evaluation-correction/design.md) · [EXP-028-omission.md](checkpoints/2026-06-08-006-avwap-evaluation-correction/EXP-028-omission.md) |
 | 2026-06-08-005-avwap-exit-and-branch-exploration | **HALTED 2026-06-08** (was ACTIVE) — superseded by Phase 006 before Stage B/C. Stage A diagnostics (EXP-024 MIXED_OR_INCONCLUSIVE, EXP-025 INCONCLUSIVE) inherited an evaluation-framing defect; EXP-026 `/EXIT` shelved; Stage C deferred. See [retrospective.md](checkpoints/2026-06-08-005-avwap-exit-and-branch-exploration/retrospective.md) and the framing-divergence review. | **Continues `CF-AVWAP-001` after Batch 004-A closed BASELINE_BRANCH_REFUTED.** Three dependent stages. **(A) Diagnosis** (Python-only, no suite, no multiplicity slot): EXP-024 edge-dissipation decomposition completed with diagnostic `MIXED_OR_INCONCLUSIVE` — primary 5m resolves fork (b) entry/position dilution (+0.370 bps best bounded hold < 0.5 bps floor), 1h/4h unresolved due wide CIs, and no domain supports fork (a); EXP-025 direct AVWAP-line S/R test remains pending (gap #4 — never tested directly; EXP-021/022 tested continuation and completion, not reaction-at-line). **(B) EXIT screen**: EXP-026 `CF-AVWAP-001/EXIT` is **not automatically justified by EXP-024 alone**; mixed/inconclusive output requires explicit operator/governance handling before any `/EXIT` screen. **(C) Branch exploration**: `/LB` `/MB` `/ATR` detectors (gaps #2) and new `/ANCHOR` running-extreme-vs-significant-pivot (gap #1). `/ALPHA` `/BAND` parameter sensitivity deferred out of phase. Knife-edge guardrail: exit/detector rules come from structure, predeclared, measured once — no sweep, no post-result reselection. Holdout sealed. | [design.md](checkpoints/2026-06-08-005-avwap-exit-and-branch-exploration/design.md) |
 | 2026-06-07-004-avwap-signal-exploration | COMPLETED — Batch 004-A baseline chain complete: EXP-020 SUPPORTED_FULL; EXP-021 SUPPORTED; EXP-022 SUPPORTED; **EXP-023 REFUTED**. | **First real signal-exploration phase; baseline branch screened to a clean negative.** The mandatory programme-level multiplicity/file-drawer registry is documented in `docs/signal-registry/multiplicity-registry.md`, and Batch 004-A registers only `CF-AVWAP-001` (Anchored VWAP on regime pivots). EXP-020 validated the first-branch substrate across all three domains; EXP-021 confirmed fixed-horizon bounce reaction (all 3 domains EVIDENCE_FOR, +3.8/+9.1/+37.6 bps); EXP-022 confirmed the band-target/trend-change lifetime method (rate diffs +23.9/+21.9/+26.4 pp, Holm p=0.0003). EXP-023 then screened the cTrader strategy-host AVWAP baseline through the **frozen suite** on emitted real prices: 12/12 cells admitted, C# transcription smoke PASS, but **0/12 strict, 0/12 ratified-loose, 0/12 revised-incremental passes → REFUTED** (effects ≪ frozen floors; high favorable-target rate 0.60–0.80 but ~0/negative net expectancy from trend-change exits + cost). This is a **baseline-branch negative, not COMPONENT_REFUTED** of CF-AVWAP-001 (design §8). Next AVWAP work requires new scoped experiments on registered non-baseline branches (LB/MB/ATR/ALPHA/BAND/EXIT), with no in-place baseline tuning. | [design.md](checkpoints/2026-06-07-004-avwap-signal-exploration/design.md) · [retrospective.md](checkpoints/2026-06-07-004-avwap-signal-exploration/retrospective.md) |
 | 2026-06-05-003b-incremental-unit-redesign | COMPLETED — REVISED_UNIT_VALIDATED (EXP-017-019 executed and post-governance APPROVED 2026-06-05; retrospective written 2026-06-05) | **Track B follow-up succeeded.** EXP-017 validated the revised incremental-referee logic (7/7 fixture verdicts, 28/28 retained-leg checks, L2 absent). EXP-018 validated the revised portfolio-fitness unit on the construction-accepted dependence grid: FPR controlled in 126/126 accepted cells, finite worst-case MDEs 12/16/32 bps on 5m/1h/4h, and the EXP-015 synchronous/high-overlap/null_R stress corner passes in every domain; 36 infeasible high-rho/low-overlap cells are disclosed as construction-invalid. EXP-019 exercised both assembled-suite paths: EXP-009 dogfood rejects and synthetic positive passes across all domains. The concluded suite is now **{frozen strict gate stack, EXP-012 ratified-loose referee, EXP-018 revised incremental/fitness unit}**. Phase 004 may open after its mandatory programme-level multiplicity registry precondition is documented. **Not a new programme phase — a revision; Phase 004 remains reserved for signal exploration.** | [design.md](checkpoints/2026-06-05-003b-incremental-unit-redesign/design.md) · [retrospective.md](checkpoints/2026-06-05-003b-incremental-unit-redesign/retrospective.md) |
@@ -1238,3 +1238,175 @@ No domain meets Evidence FOR (all effects are negative). Evidence AGAINST does n
 - The scoped metric likely conflates the trigger definition with the line-rejection signal: a bounce trigger cannot occur without adverse penetration (the intrabar crossover), so the line-rejection score systematically penalizes events versus non-crossing controls.
 - EXP-025 does not invalidate EXP-021/022 positive component evidence (bounce continuation, lifetime outcomes), which test different constructs (regime-gated continuation and completion rather than bar-level line reaction).
 - Phase 005 Stage A now completes with all three diagnostics resolved: EXP-023 REFUTED, EXP-024 MIXED_OR_INCONCLUSIVE, EXP-025 INCONCLUSIVE. No diagnostic provides a clean Stage A positive that automatically justifies Stage B.
+
+---
+
+## EXP-027 — Event-Level Evaluation Method: Definition and Sparse-Regime Calibration
+
+**Status**: METHOD_VALID
+**Date**: 2026-06-09
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: 5m (strict), 1h and 4h (`min_coverage=0.90`) OHLC domains rebuilt from first-70% analysis slice of 1-minute time bars; EXP-020 regime intervals as matched-control scaffolding; no chart-type views
+
+### Hypothesis Tests
+
+1. **Hypothesis**: A predeclared event-level evaluation method — with per-event matched-control expectancy as the binding decision statistic (reusing the EXP-021/022 regime-cluster bootstrap + stratified paired sign-permutation + Holm inference and Evidence-FOR rule), and an exposure-aware equity-curve-vs-buy-hold companion — exhibits controlled false-positive error (empirical FPR ≤ α₀ = 0.05 under known-null sparse event processes) and recovery (a finite empirical event-level MDE at TPR ≥ 0.80 while FPR ≤ α₀) across the 5m / 1h / 4h domains, within a sparse activity envelope bracketing the real AVWAP signal ({~3%, ~6%, ~12%} active).
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (all 4).
+- **Data Views / Feature Categories**: 5m/1h/4h OHLC domains from first-70% analysis slice. No chart-type views.
+- **Features**: Per-event direction-signed log bps matched-control excess; regime-cluster bootstrap CI (1,000 resamples); stratified paired sign-permutation p-value (1,000 flips); Holm adjustment across 3 domains; Evidence-FOR rule (effect > 0 AND CI low > 0 AND Holm p ≤ α); exposure-aware equity-curve vs matched-control baseline companion; two null generators (placebo-on-real, block-permuted-returns); planted-edge additive drift.
+- **Parameter ranges**: Activity grid {0.03, 0.06, 0.12}; primary p_trig=0.06; edge grid {0, 1, 2, 4, 8, 16, 32, 64} bps; α grid {0.10, 0.05, 0.01}, primary α₀=0.05; primary horizon H=3 with secondary H=1, 6; MAX_CONTROLS=5, MIN_CONTROLS=3, EXCLUSION_BARS=6; n_draws=500/cell; n_bootstrap=1,000; n_permutation=1,000; TPR target=0.80; FPR half-width max=0.03; TPR half-width max=0.05.
+- **Exclusions**: Real AVWAP bounce-event outcomes (anti-overfitting fence — only synthetic signals used); frozen per-bar suite as evaluator; equity-curve companion as a pass-gate; any metric/parameter reselection against Phase 006 outcomes; HYP-001, exit overlays, detector/anchor branches, ALPHA/BAND/XTF/MA-DOMAIN sensitivity; activity outside {3%, 12%} (out-of-envelope); percentage improvement against zero baseline.
+- **Constraints**: EXP-020 SUPPORTED_FULL dependency gate; first-70% analysis slice only (final 30% global holdout never loaded); real domain Close outcomes; same-regime control matching; look-ahead-safe placement/matching (timestamp, regime direction, anchor age only); fixed seeds via `seed_for(...)`; deterministic generation with replay check; vectorized control matching equivalence-guarded against EXP-021 reference.
+
+### Results / Observations
+
+- `run_metadata.json`: `overall_status: METHOD_VALID`, `fpr_controlled_primary: true`, `bracket_fpr_ok: true`, `recovered_domains: [5m, 1h, 4h]`, `all_domains_recovered: true`, `determinism_pass: true`, `companion_null_sane: true`, `control_matching_equivalence_pass: true`.
+
+- **FPR summary** (fpr_summary.csv, 54 per-domain cells + 18 family-wise rows):
+  - At α₀=0.05, primary p_trig=0.06: 5m placebo 0.016 [0.008, 0.031], 5m block 0.030 [0.018, 0.049]; 1h placebo 0.018 [0.009, 0.034], 1h block 0.034 [0.021, 0.054]; 4h placebo 0.030 [0.018, 0.049], 4h block 0.034 [0.021, 0.054].
+  - Max per-domain FPR at any α/p_trig/null: 0.042 (1h, placebo, p_trig=0.03, α=0.10); at α₀=0.05: max 0.038.
+  - Family-wise any-domain FPR at α₀=0.05: 0.064 (placebo, p_trig=0.06), 0.094 (block, p_trig=0.06).
+  - All 54 cells precision-ok (max Wilson half-width 0.018, well below 0.03 ceiling).
+  - No systematic FPR increase at higher activity; 5m/placebo/0.12 gives FPR=0.000.
+
+- **TPR / MDE summary** (tpr_summary.csv, mde_summary.csv):
+  - 5m MDE = 1.0 bps (TPR=1.000 [0.992, 1.000], TPR at g=0 = 0.016).
+  - 1h MDE = 4.0 bps (TPR=0.818 [0.782, 0.849], TPR at g=2 = 0.302).
+  - 4h MDE = 32.0 bps (TPR=0.998 [0.989, 1.000], TPR at g=16 = 0.738).
+  - All 9 mde_summary rows recovered=true; all 72 tpr_summary rows precision-ok (max TPR Wilson half-width 0.041, below 0.05 ceiling).
+  - TPR at α=0.01: 5m MDE=1.0, 1h MDE=8.0, 4h MDE=32.0 bps.
+
+- **Equity companion** (equity_companion_summary.csv, 24 rows):
+  - Null advantage rates: 5m 0.358, 1h 0.522, 4h 0.442 (near chance; no systematic false advantage).
+  - Null mean equity advantage negative in all domains: 5m −533 bps, 1h −38 bps, 4h −179 bps.
+  - Under planted edge: advantage rate and mean equity advantage monotonically increasing with g; rate reaches 1.000 at g=1 (5m), g=8 (1h), g=32 (4h).
+  - Sortino-style risk-adjusted ratio tracks the same monotonic pattern.
+
+- **Determinism**: Byte-identical FPR/TPR on a fixed (5m, p_trig=0.06, placebo_on_real) replay cell.
+
+> Note: No interpretation — preserve what the data shows.
+
+### Hypothesis-Specific Conclusion
+
+**METHOD_VALID**
+
+All predeclared Evidence-FOR criteria from scope.md are met: (1) FPR ≤ α₀ = 0.05 in every domain at the primary p_trig=0.06 under both null generators (max per-domain FPR = 0.034 at α₀=0.05; all Wilson upper bounds ≤ 0.054); (2) FPR does not materially exceed α₀ across the {0.03, 0.06, 0.12} bracket (max bracket FPR = 0.038 at α₀=0.05); (3) a finite event-level MDE exists in every domain at p_trig=0.06 (5m: 1 bps, 1h: 4 bps, 4h: 32 bps); (4) determinism replay passes; (5) the equity-curve companion shows no systematic false advantage under null and monotonic edge detection under planted drift. The event-level method is a fit-for-purpose yardstick for the sparse (~6% active) regime. EXP-028 may proceed under this method.
+
+### Hypothesis-Agnostic Observations
+
+- The MDE gradient across domains (5m=1 < 1h=4 < 4h=32 bps) is consistent with the event-count gradient (~20,800 / ~1,750 / ~400 events/draw) — event count, not signal quality, is the binding constraint on power.
+- The 5m MDE of 1 bps is driven by very high event count (~20,800/draw), not signal strength; the 1h and 4h MDEs (4 and 32 bps) are more informative for EXP-028 planning because they better approximate the real event count.
+- The 4h MDE jump from TPR=0.738 at g=16 to TPR=0.998 at g=32 bps means the true MDE lies between 16 and 32 bps — a finer grid ({16, 20, 24, 28, 32}) would improve resolution.
+- The FPR being well below α₀ in many cells (e.g. 0.000 at 5m/0.12 placebo_on_real) reflects conservatism from the Holm adjustment and three-condition Evidence-FOR rule — desirable for a screening yardstick (errs on the side of not declaring false edges), at the cost of slightly reduced power.
+- The two null generators agree within tolerance across all cells, making accidental structure in the placebo-on-real generator an implausible explanation for the FPR control.
+- The method is calibrated only on synthetic substrates; real-signal performance is unknown until EXP-028 (anti-overfitting fence — by design).
+
+---
+
+## EXP-028 — Faithful Selective AVWAP Strategy Re-Screen
+
+**Status**: EVAL_SUPPORTED
+**Date**: 2026-06-09
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: Real 5m (strict), 1h and 4h (`min_coverage=0.90`) OHLC domain bars from first-70% analysis slice; EXP-020 AVWAP bounce events; EXP-022 lifetime completion outcomes; no chart-type views.
+
+### Hypothesis Tests
+
+1. **Hypothesis**: Under the frozen EXP-027 event-level evaluation method, the faithful selective AVWAP strategy — unchanged from the EXP-023 baseline — shows positive event-level edge (per-event matched-control expectancy > 0) on at least one domain (5m, 1h, or 4h), using only the first-70% analysis set and predeclared inference.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (all 4).
+- **Data Views / Feature Categories**: Real 5m/1h/4h OHLC domain bars from first-70% analysis slice; EXP-020 AVWAP events; EXP-022 lifetime observations; EXP-021 reaction observations for secondary-stability inputs.
+- **Features**: PRIMARY (binding): symmetric own-exit matched-control lifetime excess reusing EXP-022 observations (event and control both completed under band-target/trend-change exit). SECONDARY (non-binding): endogenous-exit vs fixed-window control, gated by predeclared placebo-null calibration. Exposure-matched equity companion. Frozen EXP-027 inference tail: regime-cluster bootstrap CI, stratified paired sign-permutation, Holm across 3 domains.
+- **Parameter ranges**: Alpha₀=0.05; N_BOOT=1000; N_PERM=1000; N_PLACEBO_DRAWS=100; MIN_CONTROLS=3; MIN_REPORTABLE_EVENTS=30; MIN_DIRECTION_EVENTS=8; DOMAIN_MIN_INSTRUMENTS=3; fixed seeds with determinism replay.
+- **Exclusions**: The frozen per-bar qualification suite as evaluation vehicle; asymmetric construction as binding gate; sweep/tuning/metric reselection; exit/detector/anchor branches; HYP-001; percentage improvement against zero baseline; costs/stops/sizing.
+- **Constraints**: EXP-020 SUPPORTED_FULL and EXP-027 METHOD_VALID dependency gate; first-70% slice only; CloseTime ordering; real domain Close returns; pyramid bounces included as closer-to-original and absorbed by regime-cluster bootstrap; frozen inference tail hash-guarded against EXP-027 source drift.
+
+### Results / Observations
+
+- `overall_verdict`: EVAL_SUPPORTED. Binding gate PRIMARY symmetric own-exit lifetime excess.
+- PRIMARY per-domain:
+  - 5m: effect +5.78 bps, CI [5.39, 6.13], Holm p=0.003, n=12,795, EVIDENCE_FOR.
+  - 1h: effect +23.38 bps, CI [17.40, 29.32], Holm p=0.003, n=924, EVIDENCE_FOR.
+  - 4h: effect +69.02 bps, CI [46.84, 90.52], Holm p=0.003, n=187, EVIDENCE_FOR.
+- SECONDARY: 1h calibrated (FPR=0.03), EVIDENCE_FOR; 5m/4h NOT_CALIBRATED as expected.
+- Equity companion: all domains advantage_rate=1.0, positive Sortino differences.
+- Fixed-horizon secondary-stability: all h1/h6 excesses positive (no secondary horizon instability).
+- Audit PASS: 0 critical, 0 warnings, 3 info.
+- Pyramid split: 6,785 pyramid / 7,121 non-pyramid (5m/1h/4h combined).
+- Dependency gate PASS (EXP-020 SUPPORTED_FULL, EXP-027 METHOD_VALID).
+- Frozen inference hash PASS, alignment 12/12 cells, reconciliation 0 bad.
+
+> Note: No interpretation — preserve what the data shows.
+
+### Hypothesis-Specific Conclusion
+
+**EVAL_SUPPORTED**
+
+All predeclared Evidence-FOR criteria are met: (1) dependency gate passes; (2) at least one domain (all three) is PRIMARY Evidence-FOR at α₀=0.05 with effect > 0, CI_low > 0, and Holm p ≤ 0.05; (3) secondary-horizon stable (no domain has both h1 and h6 negative). The faithful selective AVWAP strategy shows positive event-level edge on all three domains under the fit-for-purpose, in-envelope EXP-027 method. The EXP-023 negative was a framing/dilution artifact caused by applying a per-bar floor to a ~6%-active event strategy.
+
+> **Caveat (cTrader parity) — RESOLVED 2026-06-09 by EXP-029.** This EVAL_SUPPORTED originally rested on a Python re-analysis of the canonical EXP-020 event substrate, with the faithful strategy not yet executed through its cTrader C# per-bar streaming path. **EXP-029 closed this:** the corrected `AvwapBounceModel.cs` (pyramids opened as independent positions, executed completion serialized) was run on cTrader per-bar streaming and reproduced this PRIMARY excess on all 3 domains (parity CONSISTENT; all 5 binding gates pass, incl. exit-parity match_rate=1.0). EXP-028 is therefore **cTrader-confirmed**. See `checkpoints/2026-06-08-006-avwap-evaluation-correction/EXP-028-omission.md` and the EXP-029 entry below.
+
+### Hypothesis-Agnostic Observations
+
+- The effect increases monotonically 5m < 1h < 4h (+5.78 / +23.38 / +69.02 bps), matching the EXP-021/022 domain gradient and reflecting larger absolute moves over longer holds.
+- The binding PRIMARY gate uses the symmetric construction that EXP-027 actually calibrated; the asymmetric secondary gate is correctly non-binding where uncalibrated (5m FPR=1.0, 4h FPR=0.26).
+- Pyramid bounces (~50% of events) do not drive the result — the regime-cluster bootstrap absorbs within-regime dependence — but including them is faithful to the original concept.
+- This is the first fairly-evaluated positive result for CF-AVWAP-001 under a correct yardstick; the next stage is operator review (FAMILY_REVIEW or robustness/protocol testing).
+- HYP-001 (AVWAP line S/R) remains untested and open.
+
+---
+
+## EXP-029 — cTrader Per-Bar Streaming Parity for Faithful AVWAP Strategy
+
+**Status**: CONSISTENT (parity confirmed — EXP-028 upgraded to cTrader-confirmed)
+**Date**: 2026-06-09
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD
+**Data Views / Feature Categories**: cTrader `Mode=StrategyHost` per-bar streaming output (`positions.parquet`, `avwap_events.parquet`) from the corrected C# `AvwapBounceModel`, on real 5m (strict), 1h and 4h (`min_coverage=0.90`) domain bars resampled in-engine from the 1-minute cTrader feed, first-70% analysis slice; no chart-type views.
+
+### Hypothesis Tests
+
+1. **Hypothesis**: The corrected C# AVWAP strategy (pyramid bounces opened as independent positions; executed completion serialized) running on cTrader via per-bar streaming produces event-level results consistent with the Python-only EXP-028 re-analysis — per-domain PRIMARY verdicts and effect directions agree and effects fall inside the predeclared parity tolerances — confirming the Python re-analysis faithfully represents the cTrader execution path. Same estimand (symmetric own-exit matched-control excess) and same frozen EXP-027 inference (hash `ea261b9ee0a8aca3`) as EXP-028; first-70% analysis set only.
+
+### Scope
+
+- **Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD (all 4).
+- **Data Views / Feature Categories**: cTrader-emitted corrected-model runs (12 cells); PRIMARY estimand rebuilt on the cTrader `RealClose` feed; matched controls rebuilt in Python via imported EXP-021/022 helpers (analysis construct — never a Python signal oracle); regime/anchor/frozen-targets/pyramid tag taken from the C# emission.
+- **Features**: PRIMARY (binding): per-event symmetric own-exit matched-control lifetime excess (`event_lifetime_bps − mean(control_lifetime_bps)`, direction-signed log bps on cTrader `RealClose`). Five predeclared binding parity gates: verdict-match, magnitude-equivalence (F02), count ±10% incl. pyramid split (F04), exit-parity grading of the C# completion code (F01), 5m signal-layer reconciliation vs the EXP-020 substrate (F03). Non-binding: fixed-horizon {1,3,6} secondary-stability (cTrader-feed analog, F07); exposure-matched equity companion.
+- **Parameter ranges**: α₀=0.05; N_BOOT=1000; N_PERM=1000; MIN_CONTROLS=3; MIN_REPORTABLE_EVENTS=30; MIN_DIRECTION_EVENTS=8; DOMAIN_MIN_INSTRUMENTS=3; effect-equiv margin max(2 bps, 25%·|ref|), divergence margin max(2 bps, 50%·|ref|); count tol ±10%/±20%; exit-parity ≥99%; signal-match ≥98% / target rel-diff ≤1e-3; fixed seeds; per-instrument `AnalysisEndUtc` fence (BTCUSD 2025-06-17T22:38Z, EURUSD 2025-05-09T16:55Z, USTEC 2025-05-12T04:54Z, XAUUSD 2025-05-12T03:35Z).
+- **Exclusions**: Any change to the frozen EXP-027 inference; strategy parameter tuning / band sweep / exit redesign / sizing / costs; detector/anchor branches (`/LB`,`/MB`,`/ATR`,`/ANCHOR`), `/ALPHA`,`/BAND`, cross-timeframe variants; HYP-001; the frozen per-bar qualification suite as the vehicle (this is an event-level parity check, not a per-bar re-screen); percentage improvement against a zero baseline.
+- **Constraints**: EXP-027 METHOD_VALID and EXP-028 results present (dependency gate); frozen-inference hash hard-asserted `== ea261b9ee0a8aca3 ==` EXP-028's; estimand evaluated on the same cTrader feed the C# executed on; holdout fence in-robot (`AssertCanEmit`) + Python re-assertion; cross-feed alignment by `SourceCloseTime`, never bar index; real-price `RealClose` returns only.
+
+### Results / Observations
+
+- `overall_parity_disposition`: **CONSISTENT**; per-domain bands 5m/1h/4h all CONSISTENT; no INCONSISTENT domain.
+- PRIMARY per-domain (EXP-029 cTrader vs EXP-028 Python):
+  - 5m: +5.79 bps CI [5.37, 6.18] vs +5.78 [5.39, 6.13]; |Δ|=0.007; Holm p=0.003; n=12,784 vs 12,795; both EVIDENCE_FOR.
+  - 1h: +23.33 bps CI [17.46, 28.91] vs +23.38 [17.40, 29.32]; |Δ|=0.054; Holm p=0.003; n=927 vs 924; both EVIDENCE_FOR.
+  - 4h: +69.02 bps CI [49.32, 90.38] vs +69.02 [46.84, 90.52]; |Δ|=0.000 (bit-identical point estimate, differing CIs); Holm p=0.003; n=187 vs 187; both EVIDENCE_FOR.
+- Binding gates (all domains): verdict-match ✔; magnitude-equivalent ✔ (no magnitude-divergent); count ±10% ✔ (total/bull/bear/pyramid within ±0.5%); exit-parity ✔ (`match_rate`=1.0 on 15,027/1,038/236 events; max bps discrepancy 1.8e-11/1.4e-13/0.0); 5m signal-layer ✔ (per-instrument EXP-020 trigger match 0.9990/0.9978/0.9998/1.0, all ≥0.98; matched-target median rel-diff 0.0).
+- Pyramid split: 6,254/445/84 (EXP-029) vs 6,258/443/84 (EXP-028).
+- Integrity: `frozen_inference_hash`=`ea261b9ee0a8aca3` (== EXP-028, hard-asserted); `control_matching_equivalence_pass`=true; `reconciliation_bad`=0; holdout fence respected (per-cell max `SourceCloseTime` < `AnalysisEndUtc`).
+- Equity companion (non-gating): advantage 5m +20,115 / 1h +5,819 / 4h +3,755 bps; advantage_rate 1.0; positive Sortino differences.
+- Audit PASS: 0 critical, 0 warnings, 4 info.
+
+> Note: No interpretation — preserve what the data shows.
+
+### Hypothesis-Specific Conclusion
+
+**CONSISTENT (parity confirmed).**
+
+All five binding gates hold on all three domains (≥2/3 required) and the 5m signal-layer passes with no INCONSISTENT domain, so under the predeclared disposition rule EXP-028's Python-only EVAL_SUPPORTED is **upgraded to cTrader-confirmed**. The corrected C# strategy executed on cTrader per-bar streaming reproduces EXP-028's per-event excess, verdicts, counts, and pyramid split, with the entry signal (F03), pyramid handling (F04), and executed completion code (F01) all independently graded. The Phase 006 objective is fully satisfied and the EXP-028 omission is closed.
+
+### Hypothesis-Agnostic Observations
+
+- Exit-parity match_rate=1.0 with non-zero residuals (~1e-11/1e-13) shows the C# completion code and the Python `scan_lifetime` are genuinely independent implementations that agree to float precision — a real cross-implementation grade, not a tautology.
+- The 4h PRIMARY point estimate is bit-identical to EXP-028 while 5m/1h differ slightly; audit-verified as cTrader 4h feed coinciding with the local feed for the fenced window (separate code paths, differing CIs), consistent with VAL-002's ≤1.83 bps drift being an upper bound, not a guaranteed difference.
+- Secondary-horizon {1,3,6} numbers intentionally differ from EXP-028 (F07): computed from the cTrader feed and feeding only the non-binding stability guard; the PRIMARY excess is the sole parity object.
+- This is event-level parity, not per-bar-suite tradability: EXP-023's per-bar REFUTED is not overturned, all effects are gross (no costs), and the holdout remains sealed. HYP-001 remains untested and open.
+- Process lesson recorded: a "faithful re-screen" must state its execution path (cTrader per-bar vs Python re-analysis) explicitly in scope, and Stage 4 governance must check it against the lineage the faithfulness clause assumes.
+
