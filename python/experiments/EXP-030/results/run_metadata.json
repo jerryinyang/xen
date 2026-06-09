@@ -1,0 +1,110 @@
+{
+  "experiment": "EXP-030",
+  "title": "Cost-Bearing Tradability of the Faithful Selective AVWAP Strategy",
+  "phase_outcome": "INCONCLUSIVE",
+  "binding_metric": "absolute_net_per_event_expectancy_CONSERVATIVE",
+  "binding_variant": "CONSERVATIVE",
+  "cons_per_domain": {
+    "5m": "EVIDENCE_AGAINST",
+    "1h": "EVIDENCE_AGAINST",
+    "4h": "INCONCLUSIVE_SPANS_ZERO"
+  },
+  "base_per_domain": {
+    "5m": "EVIDENCE_AGAINST",
+    "1h": "INCONCLUSIVE_SPANS_ZERO",
+    "4h": "INCONCLUSIVE_SPANS_ZERO"
+  },
+  "gross_abs_per_domain": {
+    "5m": 0.7640030023372031,
+    "1h": 1.457585714953364,
+    "4h": 10.10038326292118
+  },
+  "attribution_companion_note": "net matched-control excess (controls uncosted) is NON-BINDING; never decides the verdict",
+  "dependencies": {
+    "EXP-028": "EVAL_SUPPORTED",
+    "EXP-029": "CONSISTENT",
+    "EXP-022": "present"
+  },
+  "frozen_inference_hash": "e50873d12a9f68d9",
+  "frozen_functions": [
+    "domain_effect",
+    "build_strata",
+    "bootstrap_effect_distribution",
+    "holm_adjust",
+    "decide_label"
+  ],
+  "cost_table_oneway_bps": {
+    "EURUSD": 0.75,
+    "USTEC": 1.25,
+    "XAUUSD": 1.5,
+    "BTCUSD": 4.0
+  },
+  "cost_table_hash": "ae0c61b87b8e676e",
+  "rt_base_bps": {
+    "EURUSD": 1.5,
+    "USTEC": 2.5,
+    "XAUUSD": 3.0,
+    "BTCUSD": 8.0
+  },
+  "rt_cons_bps": {
+    "EURUSD": 3.0,
+    "USTEC": 5.0,
+    "XAUUSD": 6.0,
+    "BTCUSD": 16.0
+  },
+  "cost_table_operator_confirmation": "CONFIRMED_STAGE4_2026-06-09 \u2014 frozen as predeclared",
+  "reconciliation": {
+    "5m": {
+      "recomputed_excess_bps": 5.778539546952982,
+      "exp028_excess_bps": 5.778539546952982,
+      "abs_diff_bps": 0.0
+    },
+    "1h": {
+      "recomputed_excess_bps": 23.383906125359317,
+      "exp028_excess_bps": 23.383906125359317,
+      "abs_diff_bps": 0.0
+    },
+    "4h": {
+      "recomputed_excess_bps": 69.01565433444729,
+      "exp028_excess_bps": 69.0156543344473,
+      "abs_diff_bps": 1.4210854715202004e-14
+    }
+  },
+  "commute_max_dev_bps": {
+    "5m": 1.7763568394002505e-15,
+    "1h": 3.552713678800501e-15,
+    "4h": 7.105427357601002e-15
+  },
+  "pyramids_included": true,
+  "pyramid_split": {
+    "pyramid": 6785,
+    "non_pyramid": 7121
+  },
+  "right_censored_excluded": 2,
+  "determinism_replay_pass": true,
+  "holdout_fence": "inherited \u2014 all rows are EXP-022 first-70% outputs; no new load",
+  "significance": "one-sided bootstrap p (sign-permutation invalid for absolute estimand)",
+  "parameters": {
+    "domains": [
+      "5m",
+      "1h",
+      "4h"
+    ],
+    "instruments": [
+      "BTCUSD",
+      "EURUSD",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "alpha": 0.05,
+    "n_boot": 1000,
+    "ci_percentiles": [
+      2.5,
+      97.5
+    ],
+    "min_reportable_events": 30,
+    "min_direction_events": 8,
+    "min_controls": 3
+  },
+  "interpretation_bound": "A NOT_TRADABLE result does not overturn the Phase-006 gross edge (different, non-substitutable estimand) and does not say the bounce event has no edge (EXP-021 fixed-horizon reaction is positive). A 5m net-negative is the expected stress case."
+}

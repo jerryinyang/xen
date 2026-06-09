@@ -1,11 +1,12 @@
 # Phase 004 Multiplicity Registry
 
-**Status:** ACTIVE under Phase 006 (evaluation correction). Phase 005 **HALTED 2026-06-08** before Stage B/C — operator review found EXP-023/024/025 inherited an evaluation-framing defect (a ~6%-active event signal screened/diagnosed through a per-bar continuous-position referee calibrated only for ≥80%-active series). Dispositions corrected by **supersede + retain** (no ID reuse, no erasure): EXP-023 SUPERSEDED (framing-corrected), EXP-024 RETAINED (fork leg discounted), EXP-025 INCONCLUSIVE (non-informative for HYP-001); EXP-026 `/EXIT` SHELVED; Stage C deferred. Root-cause review: `docs/code-reviews/2026-06-08-avwap-evaluation-framing-divergence-review.md`. Phase 006 opened to fix the evaluation vehicle (EXP-027) then re-screen the faithful strategy (EXP-028).
+**Status:** ACTIVE under Phase 007 (tradability & edge isolation). Phase 006 **CLOSED 2026-06-09** — `EVAL_SUPPORTED`/cTrader-confirmed: EXP-027 METHOD_VALID, EXP-028 EVIDENCE_FOR on all 3 domains, EXP-029 CONSISTENT parity. Phase 007 opened 2026-06-09 to answer cost-bearing tradability (EXP-030) and entry-vs-exit edge isolation (EXP-031); holdout release (EXP-032) is DEFERRED and hard-gated on EXP-030. Phase 005 **HALTED 2026-06-08** before Stage B/C — operator review found EXP-023/024/025 inherited an evaluation-framing defect (a ~6%-active event signal screened/diagnosed through a per-bar continuous-position referee calibrated only for ≥80%-active series). Dispositions corrected by **supersede + retain** (no ID reuse, no erasure): EXP-023 SUPERSEDED (framing-corrected), EXP-024 RETAINED (fork leg discounted), EXP-025 INCONCLUSIVE (non-informative for HYP-001); EXP-026 `/EXIT` SHELVED; Stage C deferred. Root-cause review: `docs/code-reviews/2026-06-08-avwap-evaluation-framing-divergence-review.md`. Phase 006 opened to fix the evaluation vehicle (EXP-027) then re-screen the faithful strategy (EXP-028).
 **Opened:** 2026-06-07 (Phase 004); extended 2026-06-08 (Phase 005, HALTED); corrected 2026-06-08 (Phase 006)
 **Governing phases:**
 - `docs/experiments-docs/checkpoints/2026-06-07-004-avwap-signal-exploration/design.md`
 - `docs/experiments-docs/checkpoints/2026-06-08-005-avwap-exit-and-branch-exploration/design.md` (HALTED)
-- `docs/experiments-docs/checkpoints/2026-06-08-006-avwap-evaluation-correction/design.md`
+- `docs/experiments-docs/checkpoints/2026-06-08-006-avwap-evaluation-correction/design.md` (COMPLETED 2026-06-09)
+- `docs/experiments-docs/checkpoints/2026-06-09-007-avwap-tradability-and-isolation/design.md`
 
 ## Purpose
 
@@ -117,6 +118,28 @@ The first Phase 004 FULL candidate-screening result now exists (EXP-023, REFUTED
 | `CF-AVWAP-001/MA-DOMAIN`, `CF-AVWAP-001/XTF` | Remain registered; out of Phase 005 scope. |
 
 Negative, blocked, and inconclusive outcomes for any Phase 005 item stay in the file-drawer ledger.
+
+## Phase 007 Batch (Tradability & Edge Isolation)
+
+**Opened:** 2026-06-09
+**Governing phase:** `docs/experiments-docs/checkpoints/2026-06-09-007-avwap-tradability-and-isolation/design.md`
+**Phase 006 close recorded:** `EVAL_SUPPORTED`/cTrader-confirmed (EXP-027 METHOD_VALID; EXP-028 PRIMARY EVIDENCE_FOR on all 3 domains, +5.78/+23.38/+69.02 bps, Holm p=0.003; EXP-029 CONSISTENT parity). All Phase 006 effects are **gross** matched-control excess; tradability and edge attribution are unanswered — that is this batch.
+**Purpose:** (1) determine whether the Phase 006 per-event edge survives a predeclared event-level cost/slippage model (EXP-030); (2) decompose the measured excess into entry-timing vs exit-rule contributions (EXP-031). EXP-030 and EXP-031 are **mutually independent** — neither blocks the other, and EXP-031 is **not cancelled** by an EXP-030 failure (operator decision 2026-06-09: mechanism information is retained regardless of tradability).
+**Slot accounting:** EXP-030 is a **cost-bearing tradability screen** of the already-registered `CF-AVWAP-001/HYP-004-R` baseline — unchanged trade logic, added cost layer only — and consumes **no** new candidate-family slot. EXP-031 is an **edge-decomposition diagnostic** (no candidate-screening slot). **EXP-032 (holdout release) is DEFERRED and NOT registered** — it becomes admissible only if EXP-030 returns tradability EVIDENCE_FOR on ≥1 domain, and requires its own checkpoint and governance before registration.
+
+| ID | EXP-ID | Question | Slot | Status | Gate / Note |
+| --- | --- | --- | --- | --- | --- |
+| `CF-AVWAP-001/HYP-004-T` | EXP-030 | Under a predeclared per-event cost/slippage model (conservative variant binding), does the faithful selective AVWAP strategy retain positive **net** per-event expectancy on ≥1 domain (first-70% analysis set)? | 0 (cost layer on registered HYP-004-R baseline) | SCOPED | **Hard gate for holdout release (EXP-032).** Trade logic identical to EXP-028/029; the only addition is the cost layer. Cost model is event-level (the frozen per-bar suite is NOT the vehicle — EXP-023 trap). A net-negative 5m is an expected, informative outcome, not experiment failure. No cost-model re-selection after reading results. |
+| `CF-AVWAP-001/DIAG-003` | EXP-031 | Of the EXP-028 measured per-event excess, how much is attributable to AVWAP bounce **entry timing** vs the EXP-022 band-target/trend-change **exit rule**? | 0 (diagnostic) | SCOPED | Runs regardless of EXP-030 outcome; does not gate and is not gated by it. Decomposition legs and dominance thresholds predeclared in scope; frozen EXP-027 inference tail; no post-result leg reselection. |
+| — (holdout release) | EXP-032 | *(deferred)* One-shot holdout confirmation of the event-level edge. | — | **DEFERRED / NOT REGISTERED** | Admissible only on EXP-030 EVIDENCE_FOR (≥1 domain); own checkpoint + governance required. The global holdout is never released to confirm a gross edge. |
+
+### Carried, not worked (Phase 007)
+
+| Item | Status |
+| --- | --- |
+| HYP-001 (AVWAP line as direct S/R) | OPEN, explicitly NOT confirmed by EXP-028/029 (design §8); parallel/fallback mechanism branch; not worked this phase. |
+| Stage-C detectors/anchor (`/LB` `/MB` `/ATR` `/ANCHOR`) | DEFERRED; reconsidered via family review if EXP-030 fails. |
+| `/ALPHA` `/BAND` `/XTF` `/MA-DOMAIN` | Remain deferred/registered; no slot consumed. |
 
 ## Amendment Rules
 
