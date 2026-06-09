@@ -138,6 +138,10 @@ public class Xen : Robot
             {
                 if (!_stoppingAtFence && !_strategyFixedRunCompleted)
                     FlushStrategyDomainBars();
+                // EXP-029: serialize the AVWAP per-bounce detail table so the Python
+                // parity harness can rebuild matched controls (no signal oracle).
+                if (_strategyModel is AvwapBounceModel avwapModel)
+                    _strategyWriter?.SetAvwapEventDetails(avwapModel.EventDetails);
                 _strategyWriter?.Dispose();
             }
             else

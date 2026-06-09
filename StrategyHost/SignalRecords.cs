@@ -15,7 +15,13 @@ public sealed record SignalPositionRecord(
     double RealLow,
     double RealClose,
     bool Warmup,
-    bool IsFlat);
+    bool IsFlat,
+    // EXP-029: per-bar regime state, serialized as already-computed model state so
+    // the Python parity harness can rebuild the regime LUT / trend-change boundaries
+    // without re-deriving the AVWAP signal. Default sentinels for non-regime models
+    // (MA/Donchian) keep their emission unchanged.
+    int RegimeId = -1,
+    int RegimeDirection = 0);
 
 public sealed record SignalEventRecord(
     DateTime SourceCloseTime,

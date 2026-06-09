@@ -159,7 +159,19 @@ public sealed record AvwapEventDetail(
     double LowerBandAtTrigger,
     double FavorableTargetAtTrigger,
     double AdverseTargetAtTrigger,
-    int AnchorAgeBars);
+    int AnchorAgeBars,
+    // EXP-029 exit-parity (F01): the C#-executed completion for this bounce's
+    // position, backfilled by MaybeCompletePosition when the position exits. This
+    // lets the Python harness grade the corrected concurrent-completion code against
+    // its own scan_lifetime on the same feed, instead of only re-scanning exits in
+    // Python (which would leave the new C# exit logic ungraded). A position never
+    // completed within the analysis-set fence keeps ExitReason="open" / ExitIdx=-1.
+    int ExitIdx = -1,
+    DateTime ExitTime = default,
+    double ExitClose = double.NaN,
+    string ExitReason = "open",
+    int ExitBars = -1,
+    double ExitLifetimeBps = double.NaN);
 
 public sealed class AvwapBounceModel : ISignalModel
 {
@@ -204,10 +216,11 @@ public sealed class AvwapBounceModel : ISignalModel
     private bool _armed;
     private DateTime _armedTime;
 
-    // Position overlay state.
-    private int _position;
-    private double _favorableTarget = double.NaN;
-    private double _adverseTarget = double.NaN;
+    // Position overlay state. EXP-029 correction: each bounce (including pyramids)
+    // opens its own independently-tracked position with its own frozen targets, and
+    // completion is evaluated per position. EXP-023 held a single position and
+    // recorded `pyramid_skipped` for bounces arriving while a position was active.
+    private readonly List<OpenPosition> _openPositions = new();
     private long _tradeSequence;
 
     public AvwapBounceModel(int fast = 20, int slow = 50, string strategyName = "avwap_baseline")
@@ -254,7 +267,7 @@ public sealed class AvwapBounceModel : ISignalModel
         // Step 2: position completion BEFORE the regime change resets state. The
         // trend-change boundary is the opposite-regime confirmation bar; targets
         // take precedence at that bar (EXP-022 scan_lifetime).
-        MaybeCompletePosition(bar, regimeSign, domain, trades);
+        MaybeCompletePosition(bar, idx, regimeSign, domain, trades);
 
         // Step 3: confirmed regime change (or initial establishment).
         var regimeChanged = regimeSign != 0 && regimeSign != _activeRegime;
@@ -453,9 +466,14 @@ public sealed class AvwapBounceModel : ISignalModel
             domain, _regimeId, direction, _bounceCount, isPyramid,
             _anchorIdx, _anchorTime, _anchorPrice, _armedTime,
             idx, bar.CloseTime, bar.Close, avwap, bandSpread, upper, lower,
-            favorable, adverse, idx - _anchorIdx));
+            favorable, adverse, idx - _anchorIdx,
+            // Open sentinel: ExitTime carries the trigger time (a fence-safe, valid
+            // timestamp) so the Parquet writer never serialises a year-1 default; the
+            // open state is read from ExitIdx=-1 / ExitReason="open" until completion.
+            ExitTime: bar.CloseTime));
+        var eventIndex = _eventDetails.Count - 1;
 
-        var previousPosition = _position;
+        var previousPosition = NetPosition();
         events.Add(new SignalEventRecord(
             bar.CloseTime,
             domain,
@@ -465,80 +483,94 @@ public sealed class AvwapBounceModel : ISignalModel
             previousPosition,
             avwap));
 
-        if (_position == 0)
-        {
-            // Enter one unit in the bounce direction; freeze lifetime targets.
-            _position = direction;
-            _favorableTarget = favorable;
-            _adverseTarget = adverse;
-            trades.Add(new StrategyTradeRecord(
-                bar.CloseTime,
-                domain,
-                StrategyName,
-                direction == 1 ? "enter_long" : "enter_short",
-                previousPosition,
-                _position,
-                bar.Close,
-                Math.Abs(_position - previousPosition),
-                NextTradeSequence()));
-        }
-        else
-        {
-            // Active position: record a non-executed pyramid opportunity (no size add).
-            trades.Add(new StrategyTradeRecord(
-                bar.CloseTime,
-                domain,
-                StrategyName,
-                "pyramid_skipped",
-                _position,
-                _position,
-                bar.Close,
-                0.0,
-                NextTradeSequence()));
-        }
+        // EXP-029 correction: open an independently-tracked position for every bounce,
+        // including pyramids (no `pyramid_skipped`). Each position carries its own
+        // frozen favorable/adverse targets and is completed independently.
+        _openPositions.Add(new OpenPosition(
+            direction, favorable, adverse, eventIndex, idx, bar.Close));
+        trades.Add(new StrategyTradeRecord(
+            bar.CloseTime,
+            domain,
+            StrategyName,
+            direction == 1 ? "enter_long" : "enter_short",
+            previousPosition,
+            NetPosition(),
+            bar.Close,
+            Math.Abs(direction),
+            NextTradeSequence()));
 
         _armed = false;
     }
 
     private void MaybeCompletePosition(
         TimeBar bar,
+        int idx,
         int regimeSign,
         string domain,
         List<StrategyTradeRecord> trades)
     {
-        if (_position == 0)
+        if (_openPositions.Count == 0)
             return;
 
-        var direction = _position;
-        var favorableHit = direction * (bar.Close - _favorableTarget) >= 0.0;
-        var adverseHit = direction * (bar.Close - _adverseTarget) <= 0.0;
+        // EXP-029: evaluate each open position's own-exit (band-target / trend-change)
+        // independently. The trend-change boundary is the opposite-regime confirmation
+        // bar; targets take precedence at that bar (same rule as EXP-022 scan_lifetime).
         var oppositeRegime = regimeSign != 0 && regimeSign != _activeRegime;
+        var net = NetPosition();
+        var survivors = new List<OpenPosition>(_openPositions.Count);
+        foreach (var pos in _openPositions)
+        {
+            var direction = pos.Direction;
+            var favorableHit = direction * (bar.Close - pos.FavorableTarget) >= 0.0;
+            var adverseHit = direction * (bar.Close - pos.AdverseTarget) <= 0.0;
+            string? reason = favorableHit ? "favorable"
+                : adverseHit ? "adverse"
+                : oppositeRegime ? "trend_change"
+                : null;
+            if (reason is null)
+            {
+                survivors.Add(pos);
+                continue;
+            }
+            var previousNet = net;
+            net -= direction;
+            trades.Add(new StrategyTradeRecord(
+                bar.CloseTime,
+                domain,
+                StrategyName,
+                "exit_" + reason,
+                previousNet,
+                net,
+                bar.Close,
+                Math.Abs(direction),
+                NextTradeSequence()));
 
-        string? reason = null;
-        if (favorableHit)
-            reason = "favorable";
-        else if (adverseHit)
-            reason = "adverse";
-        else if (oppositeRegime)
-            reason = "trend_change";
+            // EXP-029 (F01): backfill the C#-executed completion onto this bounce's
+            // event-detail row so the Python harness can grade the corrected
+            // concurrent-completion logic per event (exit bar, reason, signed bps)
+            // against its own scan_lifetime on the same feed. bps uses the same
+            // direction-signed real-close log return EXP-022/Python uses.
+            var bps = 10_000.0 * direction * (Math.Log(bar.Close) - Math.Log(pos.EntryClose));
+            _eventDetails[pos.EventIndex] = _eventDetails[pos.EventIndex] with
+            {
+                ExitIdx = idx,
+                ExitTime = bar.CloseTime,
+                ExitClose = bar.Close,
+                ExitReason = reason,
+                ExitBars = idx - pos.EntryIdx,
+                ExitLifetimeBps = bps,
+            };
+        }
+        _openPositions.Clear();
+        _openPositions.AddRange(survivors);
+    }
 
-        if (reason is null)
-            return;
-
-        var previousPosition = _position;
-        trades.Add(new StrategyTradeRecord(
-            bar.CloseTime,
-            domain,
-            StrategyName,
-            "exit_" + reason,
-            previousPosition,
-            0,
-            bar.Close,
-            Math.Abs(previousPosition),
-            NextTradeSequence()));
-        _position = 0;
-        _favorableTarget = double.NaN;
-        _adverseTarget = double.NaN;
+    private int NetPosition()
+    {
+        var net = 0;
+        foreach (var pos in _openPositions)
+            net += pos.Direction;
+        return net;
     }
 
     private long NextTradeSequence()
@@ -555,18 +587,23 @@ public sealed class AvwapBounceModel : ISignalModel
         List<StrategyTradeRecord> trades)
     {
         var signalValue = warmup || double.IsNaN(avwap) ? double.NaN : bar.Close - avwap;
+        var net = NetPosition();
         var position = new SignalPositionRecord(
             bar.CloseTime,
             domain,
             StrategyName,
-            _position,
+            net,
             signalValue,
             bar.Open,
             bar.High,
             bar.Low,
             bar.Close,
             warmup,
-            _position == 0);
+            net == 0,
+            // EXP-029: serialize per-bar regime state (already-computed model state) so
+            // the Python parity harness rebuilds the regime LUT without a signal oracle.
+            _regimeId,
+            _activeRegime);
         return new SignalUpdate(position, events, trades);
     }
 
@@ -577,4 +614,29 @@ public sealed class AvwapBounceModel : ISignalModel
         double High,
         double Typical,
         double Weight);
+
+    /// <summary>One independently-tracked bounce position with its own frozen targets.</summary>
+    /// <remarks>EXP-029 (F01): also carries the index of its source <see cref="AvwapEventDetail"/>
+    /// row plus the entry bar index/close, so the executed completion can be backfilled
+    /// onto that row for the Python exit-parity grading.</remarks>
+    private sealed class OpenPosition
+    {
+        public OpenPosition(int direction, double favorableTarget, double adverseTarget,
+            int eventIndex, int entryIdx, double entryClose)
+        {
+            Direction = direction;
+            FavorableTarget = favorableTarget;
+            AdverseTarget = adverseTarget;
+            EventIndex = eventIndex;
+            EntryIdx = entryIdx;
+            EntryClose = entryClose;
+        }
+
+        public int Direction { get; }
+        public double FavorableTarget { get; }
+        public double AdverseTarget { get; }
+        public int EventIndex { get; }
+        public int EntryIdx { get; }
+        public double EntryClose { get; }
+    }
 }
