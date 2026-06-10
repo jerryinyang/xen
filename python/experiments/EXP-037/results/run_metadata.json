@@ -1,0 +1,62 @@
+{
+  "experiment_id": "EXP-037",
+  "frozen_tail_hash": "e50873d12a9f68d9",
+  "dependencies": {
+    "EXP-033": "4h b2_eligible",
+    "EXP-030": "present",
+    "EXP-022": "present"
+  },
+  "rt_cons_bps": {
+    "EURUSD": 3.0,
+    "USTEC": 5.0,
+    "XAUUSD": 6.0
+  },
+  "financing_rate_bps_per_day": {
+    "EURUSD": 0.6,
+    "USTEC": 1.2,
+    "XAUUSD": 1.2
+  },
+  "h_candidates": [
+    4,
+    6,
+    8,
+    12
+  ],
+  "h_star": 12,
+  "pyramid_policy": "all_legs",
+  "selection_status": "H_STAR_SELECTED",
+  "boundary_convention": "TEST iff trigger close > 1m train_end_ts; ties->TRAIN (design R1.3)",
+  "boundary_ns": {
+    "EURUSD": 1724624340000000000,
+    "USTEC": 1724634360000000000,
+    "XAUUSD": 1724666160000000000
+  },
+  "n_spill_excluded_from_selection": {
+    "EURUSD": 0,
+    "USTEC": 0,
+    "XAUUSD": 0
+  },
+  "calibration_margins_bps": {
+    "EURUSD": 8.424044959204485,
+    "USTEC": 30.338050016167276,
+    "XAUUSD": 54.15433678662187
+  },
+  "alpha_one_sided": 0.05,
+  "n_boot": 1000,
+  "n_null_calibration": 2000,
+  "binding_rule": "phase-level Holm family over all realized binding one-sided TEST p's (<=4: 3 EXP-037 cells + 1 EXP-038 cell) at alpha=0.05 AND ci_low_1s > m_cell (R1.1/R1.2); adjudicated in G2-gate-review.md \u2014 flags here are PROVISIONAL",
+  "freeze_content_sha256": "2bbbf65ba0a3d9d50ad0c988e3845bdae93edc863756c810ff4f53f3770b0fea",
+  "determinism_replay": {
+    "cell": "TEST/EURUSD",
+    "max_drift": 0.0,
+    "passed": true
+  },
+  "n_route_pass_provisional": 1,
+  "g2_adjudication": "PENDING_PHASE_FAMILY_HOLM (G2-gate-review.md)",
+  "test_verdicts_provisional": {
+    "EURUSD": "ROUTE_PASS_PROVISIONAL",
+    "USTEC": "INCONCLUSIVE_SPANS_ZERO",
+    "XAUUSD": "EVIDENCE_FOR"
+  },
+  "overall_outcome": "ROUTE_PASS_PROVISIONAL_PENDING_PHASE_HOLM"
+}

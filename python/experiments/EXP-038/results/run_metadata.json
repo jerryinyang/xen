@@ -1,0 +1,66 @@
+{
+  "experiment_id": "EXP-038",
+  "registry_id": "CF-AVWAP-001/HYP-004-TI-TEST",
+  "route_label": "TEST-stratum temporal-stability subsample check (R1.7 \u2014 dependent subsample, not independent out-of-sample)",
+  "frozen_tail_hash": "e50873d12a9f68d9",
+  "dependencies": {
+    "EXP-034_verdict": "SEQUENCE_PASS_ALPHA05",
+    "EXP-034_a1_strict_pass": true
+  },
+  "rt_cons_bps": 3.0,
+  "financing_rate_bps_per_day": 0.6,
+  "alpha_one_sided": 0.05,
+  "n_boot": 1000,
+  "n_null_calibration": 2000,
+  "binding_rule": "ci_low_1s > margin (R1.2 calibrated) AND raw boot_p surviving the phase-level Holm family (R1.1; <=4 members) at alpha=0.05 \u2014 adjudicated in G2-gate-review.md; this run's flag is PROVISIONAL",
+  "calibration": {
+    "instrument": "EURUSD",
+    "domain": "4h",
+    "n_test_events": 12,
+    "n_test_clusters": 9,
+    "n_train_events": 27,
+    "sigma_b_bps": 14.376740824722672,
+    "sigma_w_bps": 25.20100137091122,
+    "n_null_replicates": 2000,
+    "fpr_uncorrected": 0.0975,
+    "margin_bps": 3.7800967234599203,
+    "fpr_with_margin": 0.05
+  },
+  "loco_summary": {
+    "n_drops": 9,
+    "all_above_margin": true,
+    "min_ci_low_1s": 13.252681139841428
+  },
+  "train_consistent": true,
+  "nomination_precondition_met": true,
+  "boundary_time": "2024-08-25T22:19:00.000000000",
+  "boundary_rule": "TEST iff trigger close > last TRAIN 1m analysis bar close (ties -> TRAIN)",
+  "source_file": "timebars_eurusd_20230102_000000_20260514_203330.parquet",
+  "analysis_rows_1m": 872242,
+  "train_rows_1m": 610569,
+  "n_full": 39,
+  "n_train": 27,
+  "n_test": 12,
+  "determinism_replay": {
+    "cell": "EURUSD/4h/TEST",
+    "max_drift": 0.0,
+    "passed": true
+  },
+  "test_inference": {
+    "n_events": 12,
+    "n_bull": 3,
+    "n_bear": 9,
+    "n_regimes": 9,
+    "effect_bps": 24.26700147583733,
+    "ci_low": 14.240258814455077,
+    "ci_high": 38.825291697879464,
+    "ci_low_1s": 15.427285199037494,
+    "boot_p": 0.000999000999000999
+  },
+  "binding_pass_provisional": true,
+  "margin_bps": 3.7800967234599203,
+  "verdict": "A1_CELL_TEST_PASS_PROVISIONAL",
+  "descriptive_label": "EVIDENCE_FOR",
+  "phase_outcome": "A1_CELL_TEST_PASS_PROVISIONAL_PENDING_PHASE_HOLM",
+  "g2_adjudication": "PENDING_PHASE_FAMILY_HOLM (G2-gate-review.md)"
+}

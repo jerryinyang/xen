@@ -1,0 +1,982 @@
+{
+  "experiment_id": "EXP-037",
+  "frozen_on_emission": true,
+  "status": "H_STAR_SELECTED",
+  "h_star": 12,
+  "pyramid_policy": "all_legs",
+  "h_candidates": [
+    4,
+    6,
+    8,
+    12
+  ],
+  "calibration_margins_bps": {
+    "EURUSD": 8.424044959204485,
+    "USTEC": 30.338050016167276,
+    "XAUUSD": 54.15433678662187
+  },
+  "train_cutoffs_baridx_disclosure": {
+    "EURUSD": 2461,
+    "USTEC": 2104,
+    "XAUUSD": 2107
+  },
+  "boundary_ns": {
+    "EURUSD": 1724624340000000000,
+    "USTEC": 1724634360000000000,
+    "XAUUSD": 1724666160000000000
+  },
+  "counts": {
+    "EURUSD": {
+      "train": 27,
+      "test": 12
+    },
+    "USTEC": {
+      "train": 25,
+      "test": 11
+    },
+    "XAUUSD": {
+      "train": 34,
+      "test": 8
+    }
+  },
+  "split_median_ns": 1.6973352e+18,
+  "stratum_manifest": [
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 25,
+      "direction": 1,
+      "event_trigger_idx": 1282,
+      "start_idx": 1282,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 28,
+      "direction": -1,
+      "event_trigger_idx": 1341,
+      "start_idx": 1341,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 5,
+      "direction": 1,
+      "event_trigger_idx": 366,
+      "start_idx": 366,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 32,
+      "direction": -1,
+      "event_trigger_idx": 1238,
+      "start_idx": 1238,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 5,
+      "direction": 1,
+      "event_trigger_idx": 359,
+      "start_idx": 359,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 36,
+      "direction": -1,
+      "event_trigger_idx": 1825,
+      "start_idx": 1825,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 38,
+      "direction": -1,
+      "event_trigger_idx": 1848,
+      "start_idx": 1848,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 5,
+      "direction": 1,
+      "event_trigger_idx": 228,
+      "start_idx": 228,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 38,
+      "direction": -1,
+      "event_trigger_idx": 1565,
+      "start_idx": 1565,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 13,
+      "direction": 1,
+      "event_trigger_idx": 658,
+      "start_idx": 658,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 22,
+      "direction": -1,
+      "event_trigger_idx": 739,
+      "start_idx": 739,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 7,
+      "direction": 1,
+      "event_trigger_idx": 456,
+      "start_idx": 456,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 24,
+      "direction": -1,
+      "event_trigger_idx": 1225,
+      "start_idx": 1225,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 33,
+      "direction": 1,
+      "event_trigger_idx": 1499,
+      "start_idx": 1499,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 16,
+      "direction": -1,
+      "event_trigger_idx": 730,
+      "start_idx": 730,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 5,
+      "direction": 1,
+      "event_trigger_idx": 339,
+      "start_idx": 339,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 45,
+      "direction": 1,
+      "event_trigger_idx": 1984,
+      "start_idx": 1984,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 21,
+      "direction": 1,
+      "event_trigger_idx": 657,
+      "start_idx": 657,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 37,
+      "direction": 1,
+      "event_trigger_idx": 1699,
+      "start_idx": 1699,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 45,
+      "direction": 1,
+      "event_trigger_idx": 2070,
+      "start_idx": 2070,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 17,
+      "direction": 1,
+      "event_trigger_idx": 870,
+      "start_idx": 870,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 23,
+      "direction": 1,
+      "event_trigger_idx": 971,
+      "start_idx": 971,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 38,
+      "direction": -1,
+      "event_trigger_idx": 1579,
+      "start_idx": 1579,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 1,
+      "direction": 1,
+      "event_trigger_idx": 102,
+      "start_idx": 102,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 5,
+      "direction": 1,
+      "event_trigger_idx": 335,
+      "start_idx": 335,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 1,
+      "direction": 1,
+      "event_trigger_idx": 63,
+      "start_idx": 63,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 8,
+      "direction": -1,
+      "event_trigger_idx": 361,
+      "start_idx": 361,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 35,
+      "direction": 1,
+      "event_trigger_idx": 1488,
+      "start_idx": 1488,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 26,
+      "direction": -1,
+      "event_trigger_idx": 983,
+      "start_idx": 983,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 16,
+      "direction": -1,
+      "event_trigger_idx": 736,
+      "start_idx": 736,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 11,
+      "direction": 1,
+      "event_trigger_idx": 417,
+      "start_idx": 417,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 29,
+      "direction": 1,
+      "event_trigger_idx": 1328,
+      "start_idx": 1328,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 13,
+      "direction": 1,
+      "event_trigger_idx": 648,
+      "start_idx": 648,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 32,
+      "direction": -1,
+      "event_trigger_idx": 1228,
+      "start_idx": 1228,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 39,
+      "direction": 1,
+      "event_trigger_idx": 1882,
+      "start_idx": 1882,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 27,
+      "direction": 1,
+      "event_trigger_idx": 997,
+      "start_idx": 997,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 35,
+      "direction": 1,
+      "event_trigger_idx": 1577,
+      "start_idx": 1577,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 26,
+      "direction": -1,
+      "event_trigger_idx": 1322,
+      "start_idx": 1322,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 41,
+      "direction": 1,
+      "event_trigger_idx": 1985,
+      "start_idx": 1985,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 38,
+      "direction": -1,
+      "event_trigger_idx": 1864,
+      "start_idx": 1864,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 38,
+      "direction": -1,
+      "event_trigger_idx": 1843,
+      "start_idx": 1843,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 41,
+      "direction": 1,
+      "event_trigger_idx": 1952,
+      "start_idx": 1952,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 33,
+      "direction": 1,
+      "event_trigger_idx": 1575,
+      "start_idx": 1575,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 19,
+      "direction": 1,
+      "event_trigger_idx": 924,
+      "start_idx": 924,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 31,
+      "direction": 1,
+      "event_trigger_idx": 1211,
+      "start_idx": 1211,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 38,
+      "direction": -1,
+      "event_trigger_idx": 1845,
+      "start_idx": 1845,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 11,
+      "direction": 1,
+      "event_trigger_idx": 423,
+      "start_idx": 423,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 12,
+      "direction": -1,
+      "event_trigger_idx": 588,
+      "start_idx": 588,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 28,
+      "direction": -1,
+      "event_trigger_idx": 1344,
+      "start_idx": 1344,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 36,
+      "direction": -1,
+      "event_trigger_idx": 1526,
+      "start_idx": 1526,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 16,
+      "direction": -1,
+      "event_trigger_idx": 714,
+      "start_idx": 714,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 13,
+      "direction": 1,
+      "event_trigger_idx": 656,
+      "start_idx": 656,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 22,
+      "direction": -1,
+      "event_trigger_idx": 1116,
+      "start_idx": 1116,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 2,
+      "direction": -1,
+      "event_trigger_idx": 112,
+      "start_idx": 112,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 3,
+      "direction": 1,
+      "event_trigger_idx": 234,
+      "start_idx": 234,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 16,
+      "direction": -1,
+      "event_trigger_idx": 716,
+      "start_idx": 716,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 37,
+      "direction": 1,
+      "event_trigger_idx": 1702,
+      "start_idx": 1702,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 7,
+      "direction": 1,
+      "event_trigger_idx": 306,
+      "start_idx": 306,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 5,
+      "direction": 1,
+      "event_trigger_idx": 225,
+      "start_idx": 225,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 11,
+      "direction": 1,
+      "event_trigger_idx": 430,
+      "start_idx": 430,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 12,
+      "direction": -1,
+      "event_trigger_idx": 625,
+      "start_idx": 625,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 33,
+      "direction": 1,
+      "event_trigger_idx": 1284,
+      "start_idx": 1284,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 26,
+      "direction": -1,
+      "event_trigger_idx": 1184,
+      "start_idx": 1184,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 41,
+      "direction": 1,
+      "event_trigger_idx": 1748,
+      "start_idx": 1748,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 6,
+      "direction": -1,
+      "event_trigger_idx": 400,
+      "start_idx": 400,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 33,
+      "direction": 1,
+      "event_trigger_idx": 1573,
+      "start_idx": 1573,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 35,
+      "direction": 1,
+      "event_trigger_idx": 1776,
+      "start_idx": 1776,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 38,
+      "direction": -1,
+      "event_trigger_idx": 1861,
+      "start_idx": 1861,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 22,
+      "direction": -1,
+      "event_trigger_idx": 744,
+      "start_idx": 744,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 29,
+      "direction": 1,
+      "event_trigger_idx": 1175,
+      "start_idx": 1175,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 9,
+      "direction": 1,
+      "event_trigger_idx": 399,
+      "start_idx": 399,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 13,
+      "direction": 1,
+      "event_trigger_idx": 652,
+      "start_idx": 652,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 42,
+      "direction": -1,
+      "event_trigger_idx": 1875,
+      "start_idx": 1875,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 9,
+      "direction": 1,
+      "event_trigger_idx": 343,
+      "start_idx": 343,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 7,
+      "direction": 1,
+      "event_trigger_idx": 309,
+      "start_idx": 309,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 5,
+      "direction": 1,
+      "event_trigger_idx": 251,
+      "start_idx": 251,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 31,
+      "direction": 1,
+      "event_trigger_idx": 1428,
+      "start_idx": 1428,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 38,
+      "direction": -1,
+      "event_trigger_idx": 1850,
+      "start_idx": 1850,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 31,
+      "direction": 1,
+      "event_trigger_idx": 1426,
+      "start_idx": 1426,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 33,
+      "direction": 1,
+      "event_trigger_idx": 1286,
+      "start_idx": 1286,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 9,
+      "direction": 1,
+      "event_trigger_idx": 369,
+      "start_idx": 369,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 29,
+      "direction": 1,
+      "event_trigger_idx": 1167,
+      "start_idx": 1167,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 39,
+      "direction": 1,
+      "event_trigger_idx": 1731,
+      "start_idx": 1731,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 33,
+      "direction": 1,
+      "event_trigger_idx": 1518,
+      "start_idx": 1518,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 19,
+      "direction": 1,
+      "event_trigger_idx": 828,
+      "start_idx": 828,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 26,
+      "direction": -1,
+      "event_trigger_idx": 951,
+      "start_idx": 951,
+      "stratum": "TRAIN"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 73,
+      "direction": 1,
+      "event_trigger_idx": 3187,
+      "start_idx": 3187,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 70,
+      "direction": -1,
+      "event_trigger_idx": 3122,
+      "start_idx": 3122,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 55,
+      "direction": 1,
+      "event_trigger_idx": 2442,
+      "start_idx": 2442,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 51,
+      "direction": 1,
+      "event_trigger_idx": 2446,
+      "start_idx": 2446,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 44,
+      "direction": -1,
+      "event_trigger_idx": 2130,
+      "start_idx": 2130,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 48,
+      "direction": -1,
+      "event_trigger_idx": 2285,
+      "start_idx": 2285,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 70,
+      "direction": -1,
+      "event_trigger_idx": 3135,
+      "start_idx": 3135,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 46,
+      "direction": -1,
+      "event_trigger_idx": 2160,
+      "start_idx": 2160,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 65,
+      "direction": 1,
+      "event_trigger_idx": 2894,
+      "start_idx": 2894,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 51,
+      "direction": 1,
+      "event_trigger_idx": 2435,
+      "start_idx": 2435,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 56,
+      "direction": -1,
+      "event_trigger_idx": 2514,
+      "start_idx": 2514,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 57,
+      "direction": 1,
+      "event_trigger_idx": 2645,
+      "start_idx": 2645,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 46,
+      "direction": -1,
+      "event_trigger_idx": 2255,
+      "start_idx": 2255,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 76,
+      "direction": -1,
+      "event_trigger_idx": 3344,
+      "start_idx": 3344,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 47,
+      "direction": 1,
+      "event_trigger_idx": 2318,
+      "start_idx": 2318,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 44,
+      "direction": -1,
+      "event_trigger_idx": 2133,
+      "start_idx": 2133,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 62,
+      "direction": -1,
+      "event_trigger_idx": 2775,
+      "start_idx": 2775,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 70,
+      "direction": -1,
+      "event_trigger_idx": 3130,
+      "start_idx": 3130,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 68,
+      "direction": -1,
+      "event_trigger_idx": 3006,
+      "start_idx": 3006,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 56,
+      "direction": -1,
+      "event_trigger_idx": 2573,
+      "start_idx": 2573,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 59,
+      "direction": 1,
+      "event_trigger_idx": 2576,
+      "start_idx": 2576,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 56,
+      "direction": -1,
+      "event_trigger_idx": 2606,
+      "start_idx": 2606,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 78,
+      "direction": -1,
+      "event_trigger_idx": 3465,
+      "start_idx": 3465,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 51,
+      "direction": 1,
+      "event_trigger_idx": 2437,
+      "start_idx": 2437,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 57,
+      "direction": 1,
+      "event_trigger_idx": 2797,
+      "start_idx": 2797,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 58,
+      "direction": -1,
+      "event_trigger_idx": 2672,
+      "start_idx": 2672,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 46,
+      "direction": -1,
+      "event_trigger_idx": 2153,
+      "start_idx": 2153,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "EURUSD",
+      "regime_id": 70,
+      "direction": -1,
+      "event_trigger_idx": 3137,
+      "start_idx": 3137,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 61,
+      "direction": 1,
+      "event_trigger_idx": 2858,
+      "start_idx": 2858,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "USTEC",
+      "regime_id": 55,
+      "direction": 1,
+      "event_trigger_idx": 2517,
+      "start_idx": 2517,
+      "stratum": "TEST"
+    },
+    {
+      "instrument": "XAUUSD",
+      "regime_id": 51,
+      "direction": 1,
+      "event_trigger_idx": 2440,
+      "start_idx": 2440,
+      "stratum": "TEST"
+    }
+  ],
+  "content_sha256": "2bbbf65ba0a3d9d50ad0c988e3845bdae93edc863756c810ff4f53f3770b0fea"
+}
