@@ -2,7 +2,9 @@
 
 **Checkpoint type:** Research phase design.
 **Date finalized:** 2026-06-09.
-**Status:** ACTIVE — design opened; no Phase 007 result exists.
+**Status:** COMPLETED 2026-06-10 — EXP-030 INCONCLUSIVE (phase read: NOT_TRADABLE,
+holdout gate not passed), EXP-031 ISOLATION_READ_UNRESOLVED. See
+[retrospective.md](retrospective.md).
 **Candidate family:** `CF-AVWAP-001` — Anchored VWAP on regime pivots (continued
 from Phases 004/005/006).
 **Follows:** `2026-06-08-006-avwap-evaluation-correction` (COMPLETED —

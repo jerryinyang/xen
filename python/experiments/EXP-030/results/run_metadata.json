@@ -15,8 +15,8 @@
     "4h": "INCONCLUSIVE_SPANS_ZERO"
   },
   "gross_abs_per_domain": {
-    "5m": 0.7640030023372031,
-    "1h": 1.457585714953364,
+    "5m": 0.7640030023372032,
+    "1h": 1.4575857149533644,
     "4h": 10.10038326292118
   },
   "attribution_companion_note": "net matched-control excess (controls uncosted) is NON-BINDING; never decides the verdict",
@@ -26,6 +26,8 @@
     "EXP-022": "present"
   },
   "frozen_inference_hash": "e50873d12a9f68d9",
+  "frozen_inference_expected_hash": "e50873d12a9f68d9",
+  "frozen_inference_evidence": "pinned hash computed from event_method.py as committed in 5387a3b (EXP-027/028 close-out); git shows no later commit or working-tree edit to that file",
   "frozen_functions": [
     "domain_effect",
     "build_strata",
@@ -57,17 +59,23 @@
     "5m": {
       "recomputed_excess_bps": 5.778539546952982,
       "exp028_excess_bps": 5.778539546952982,
-      "abs_diff_bps": 0.0
+      "abs_diff_bps": 0.0,
+      "n_events_reconciled": 12795,
+      "exp028_n_events": 12795
     },
     "1h": {
       "recomputed_excess_bps": 23.383906125359317,
       "exp028_excess_bps": 23.383906125359317,
-      "abs_diff_bps": 0.0
+      "abs_diff_bps": 0.0,
+      "n_events_reconciled": 924,
+      "exp028_n_events": 924
     },
     "4h": {
-      "recomputed_excess_bps": 69.01565433444729,
+      "recomputed_excess_bps": 69.0156543344473,
       "exp028_excess_bps": 69.0156543344473,
-      "abs_diff_bps": 1.4210854715202004e-14
+      "abs_diff_bps": 0.0,
+      "n_events_reconciled": 187,
+      "exp028_n_events": 187
     }
   },
   "commute_max_dev_bps": {
@@ -80,10 +88,81 @@
     "pyramid": 6785,
     "non_pyramid": 7121
   },
+  "pyramid_net_split": {
+    "5m": {
+      "n_pyramid": 6258,
+      "n_nonpyramid": 6537,
+      "pyramid_share": 0.4890973036342321,
+      "net_cons_pyramid_bps": -7.514721578689473,
+      "net_cons_nonpyramid_bps": -7.50387968625025,
+      "gross_abs_pyramid_bps": 0.7697143433303415,
+      "gross_abs_nonpyramid_bps": 0.862343351840616
+    },
+    "1h": {
+      "n_pyramid": 443,
+      "n_nonpyramid": 481,
+      "pyramid_share": 0.47943722943722944,
+      "net_cons_pyramid_bps": -4.877785323212254,
+      "net_cons_nonpyramid_bps": -8.742887654783058,
+      "gross_abs_pyramid_bps": 3.3095735932662995,
+      "gross_abs_nonpyramid_bps": -0.7179396298350312
+    },
+    "4h": {
+      "n_pyramid": 84,
+      "n_nonpyramid": 103,
+      "pyramid_share": 0.44919786096256686,
+      "net_cons_pyramid_bps": 15.439139777481241,
+      "net_cons_nonpyramid_bps": -12.486231483534665,
+      "gross_abs_pyramid_bps": 24.71294930129077,
+      "gross_abs_nonpyramid_bps": -3.845454784505539
+    }
+  },
+  "seed_robustness_net_cons": {
+    "5m": {
+      "n_seeds": 8,
+      "ci_low_min": -7.073919983099822,
+      "ci_low_max": -7.036070402033874,
+      "ci_low_range": 0.037849581065947824,
+      "ci_high_min": -6.420978263942599,
+      "ci_high_max": -6.358734909793113,
+      "ci_high_range": 0.06224335414948623,
+      "ci_low_sign_stable": true,
+      "ci_high_sign_stable": true
+    },
+    "1h": {
+      "n_seeds": 8,
+      "ci_low_min": -11.513134807606761,
+      "ci_low_max": -10.635308512299016,
+      "ci_low_range": 0.8778262953077451,
+      "ci_high_min": -1.686109794376462,
+      "ci_high_max": -1.1295668906820964,
+      "ci_high_range": 0.5565429036943657,
+      "ci_low_sign_stable": true,
+      "ci_high_sign_stable": true
+    },
+    "4h": {
+      "n_seeds": 8,
+      "ci_low_min": -15.57729569400597,
+      "ci_low_max": -13.73013672957221,
+      "ci_low_range": 1.8471589644337598,
+      "ci_high_min": 18.079697069600737,
+      "ci_high_max": 20.13982260362174,
+      "ci_high_range": 2.0601255340210045,
+      "ci_low_sign_stable": true,
+      "ci_high_sign_stable": true
+    }
+  },
   "right_censored_excluded": 2,
   "determinism_replay_pass": true,
-  "holdout_fence": "inherited \u2014 all rows are EXP-022 first-70% outputs; no new load",
-  "significance": "one-sided bootstrap p (sign-permutation invalid for absolute estimand)",
+  "determinism_replay_note": "same-seed byte-identical re-run; across-seed CI stability is reported separately in seed_robustness_net_cons (F06)",
+  "holdout_fence": "inherited \u2014 all rows are EXP-022 first-70% outputs; no new load. Verified structurally: per-domain reportable event counts asserted equal to the first-70% EXP-028 run (no timestamp column exists to check a time boundary directly).",
+  "significance": "FOR criterion is effectively the bootstrap 95% CI excluding zero (one-sided ~0.025), Holm-screened; boot_p is the bootstrap CDF at zero (CI-equivalent annotation, not a null-calibrated p-value). Sign-permutation invalid for the absolute estimand.",
+  "review_notes": {
+    "binding_metric_caveat": "Binding verdict is the EQUAL-WEIGHT cross-instrument domain net (faithful to EXP-028 PRIMARY aggregation). For an absolute-P&L question this is dominated by the highest-cost instrument: BTCUSD RT_cons=16 bps is 4.0 of the 7.5 bps mean drag. A domain INCONCLUSIVE/AGAINST does NOT mean no instrument is tradable \u2014 see net_by_instrument.csv net_cons_survives_nonbinding (e.g. EURUSD-4h net_cons CI excludes zero). No single cell is promoted to TRADABLE here (uncontrolled multiplicity); the per-instrument table is descriptive. A pre-registered per-cell test with multiplicity control is a future-experiment change, not a post-result edit (anti-tuning fence).",
+    "power_note_4h": "4h is power-limited for the absolute estimand (per-instrument n=36-70; CONSERVATIVE domain CI half-width ~17 bps). INCONCLUSIVE_SPANS_ZERO there reflects non-resolution, not a positive signal; the phase outcome turns on the weakest-powered domain. See seed_robustness_net_cons. A predeclared numeric resolvable-effect threshold for AGAINST is recorded as a future-experiment change (not retrofitted post-result).",
+    "binding_vs_companion_warning": "The NON-BINDING net matched-control excess (attribution_companion.csv) is EVIDENCE_FOR on 1h/4h CONSERVATIVE (holm_p~0.003) while the BINDING absolute net is AGAINST/INCONCLUSIVE. The verdict's direction rests on the predeclared absolute-vs-relative choice (controls are counterfactual, never traded). The companion's FOR must NOT be read as tradability.",
+    "for_gate_note": "The binding FOR gate is effectively CI_low>0 at the 2.5th percentile (one-sided ~0.025), which subsumes boot_p<=0.05; boot_p is a redundant annotation and its percentile-bootstrap calibration is asserted, not validated. No FOR was reached this run, so it decided nothing."
+  },
   "parameters": {
     "domains": [
       "5m",

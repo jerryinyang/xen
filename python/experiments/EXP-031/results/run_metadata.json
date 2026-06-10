@@ -1,0 +1,85 @@
+{
+  "experiment": "EXP-031",
+  "title": "AVWAP Edge Isolation (Entry-Timing vs Exit-Rule)",
+  "phase_outcome": "ISOLATION_READ_UNRESOLVED",
+  "primary_domain": "5m",
+  "primary_horizon": 6,
+  "companion_horizon": 1,
+  "labels_primary_horizon": {
+    "5m": "ENTRY_DOMINANT",
+    "1h": "ENTRY_DOMINANT",
+    "4h": "ENTRY_DOMINANT"
+  },
+  "labels_companion_horizon": {
+    "5m": "EXIT_DOMINANT",
+    "1h": "EXIT_DOMINANT",
+    "4h": "EXIT_DOMINANT"
+  },
+  "h_agreement": {
+    "5m": false,
+    "1h": false,
+    "4h": false
+  },
+  "shares_primary_horizon": {
+    "5m": {
+      "s_entry": 1.5301236426177782,
+      "s_exit": -0.5301236426177783
+    },
+    "1h": {
+      "s_entry": 1.1345460681810227,
+      "s_exit": -0.13454606818102272
+    },
+    "4h": {
+      "s_entry": 1.4058845754126563,
+      "s_exit": -0.4058845754126564
+    }
+  },
+  "xfull_reconciliation_pass": true,
+  "determinism_replay": {
+    "cell": "5m/H=6",
+    "max_drift_bps": 8.881784197001252e-16,
+    "passed": true
+  },
+  "max_additivity_residual_bps": 3.552713678800501e-15,
+  "base_close_mismatches": {
+    "events": 0,
+    "controls": 0
+  },
+  "domain_metadata_cells_checked": 12,
+  "dependencies": {
+    "EXP-028": "EVAL_SUPPORTED",
+    "EXP-029": "CONSISTENT",
+    "EXP-022": "present",
+    "EXP-021": "present",
+    "EXP-020": "present"
+  },
+  "frozen_inference_hash": "ea261b9ee0a8aca3",
+  "dominance_cut": 0.67,
+  "parameters": {
+    "domains": [
+      "5m",
+      "1h",
+      "4h"
+    ],
+    "instruments": [
+      "BTCUSD",
+      "EURUSD",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "horizons": [
+      1,
+      6
+    ],
+    "alpha": 0.05,
+    "n_boot": 1000,
+    "n_perm": 1000,
+    "chunk": 200,
+    "min_controls": 3,
+    "min_reportable_events": 30,
+    "min_direction_events": 8,
+    "recon_abs_tol_bps": 0.05,
+    "recon_rel_tol": 0.005
+  },
+  "scope_bounds": "GROSS mechanism decomposition; costs/slippage out of scope (EXP-030). No horizon sweep; H in {1,6} frozen a priori; H=6 PRIMARY. Holdout never loaded."
+}
