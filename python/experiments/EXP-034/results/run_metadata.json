@@ -1,0 +1,44 @@
+{
+  "experiment_id": "EXP-034",
+  "frozen_tail_hash": "e50873d12a9f68d9",
+  "dependencies": {
+    "EXP-028": "EVAL_SUPPORTED",
+    "EXP-030": "present",
+    "EXP-022": "present"
+  },
+  "rt_cons_bps": {
+    "EURUSD": 3.0,
+    "USTEC": 5.0,
+    "XAUUSD": 6.0,
+    "BTCUSD": 16.0
+  },
+  "financing_rate_bps_per_day": {
+    "EURUSD": 0.6,
+    "USTEC": 1.2,
+    "XAUUSD": 1.2,
+    "BTCUSD": 10.0
+  },
+  "declared_sequence": [
+    "EURUSD/4h",
+    "USTEC/4h",
+    "XAUUSD/1h"
+  ],
+  "alpha_one_sided": 0.05,
+  "binding_rule": "boot_p <= 0.05 AND one-sided 95% lower bound (5th pctile) > 0",
+  "n_boot": 1000,
+  "rebuild_cells_validated": 12,
+  "determinism_replay": {
+    "cell": "EURUSD/4h",
+    "max_drift": 0.0,
+    "passed": true
+  },
+  "a1_strict_pass": true,
+  "g2_admissible": false,
+  "g2_note": "Design \u00a78.4 as amended 2026-06-10: A1 strict pass is necessary-but-not-sufficient (in-sample selection+test); G2 requires a Tier-B TEST-stratum confirmation of the passing cell.",
+  "sequence_verdicts": {
+    "EURUSD/4h": "SEQUENCE_PASS_ALPHA05",
+    "USTEC/4h": "INCONCLUSIVE_SPANS_ZERO",
+    "XAUUSD/1h": "NOT_TESTED_SEQUENCE"
+  },
+  "overall_outcome": "A1_STRICT_PASS_TEST_CONFIRMATION_REQUIRED"
+}

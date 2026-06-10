@@ -1,0 +1,87 @@
+{
+  "experiment_id": "EXP-033",
+  "frozen_on_emission": true,
+  "objective_instruments": [
+    "EURUSD",
+    "USTEC",
+    "XAUUSD"
+  ],
+  "h_grid": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    8,
+    12,
+    24
+  ],
+  "per_domain": {
+    "5m": {
+      "b2_eligible": false,
+      "h_star": null,
+      "h_argmax": 24,
+      "net_max_bps": -3.7196504205750256,
+      "se_at_argmax": 0.4135135543713269,
+      "reason": "grid maximum <= 0 (one-SE rule not applied)",
+      "pyramid_policy": null
+    },
+    "1h": {
+      "b2_eligible": false,
+      "h_star": null,
+      "h_argmax": 6,
+      "net_max_bps": -0.9862551395061008,
+      "se_at_argmax": 2.538569066651226,
+      "reason": "grid maximum <= 0 (one-SE rule not applied)",
+      "pyramid_policy": null
+    },
+    "4h": {
+      "b2_eligible": true,
+      "h_star": 8,
+      "h_argmax": 24,
+      "net_max_bps": 45.79036314248625,
+      "se_at_argmax": 23.813456564132743,
+      "net_at_h_star_bps": 31.299832809788466,
+      "reason": "smallest H within one SE of grid max",
+      "pyramid_policy": "all_legs",
+      "policy_best": "all_legs",
+      "policy_net_bps": 31.299832809788466
+    }
+  },
+  "selection_stability_disclosure": {
+    "5m": {
+      "checked": false,
+      "reason": "domain not B2-eligible"
+    },
+    "1h": {
+      "checked": false,
+      "reason": "domain not B2-eligible"
+    },
+    "4h": {
+      "checked": true,
+      "split_median_ns": 1.698768e+18,
+      "se_scale_bps": 23.813456564132743,
+      "h1_n_events": 47,
+      "h1_h_argmax": 24,
+      "h1_net_max_bps": 53.390326824343894,
+      "h1_net_at_h_star_bps": 25.56982974591457,
+      "h1_policy_nets": {
+        "all_legs": 25.56982974591457,
+        "first_leg_only": 19.82052688439475,
+        "pyramid_legs_only": 27.891351303772794
+      },
+      "h2_n_events": 39,
+      "h2_h_argmax": 12,
+      "h2_net_max_bps": 52.0601482327561,
+      "h2_net_at_h_star_bps": 47.748668636164446,
+      "h2_policy_nets": {
+        "all_legs": 47.748668636164446,
+        "first_leg_only": 47.00793392352716,
+        "pyramid_legs_only": 49.407038897231644
+      },
+      "eligibility_stable": true,
+      "h_star_stable": false,
+      "policy_stable": true
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "experiment_id": "EXP-035",
+  "frozen_tail_hash": "e50873d12a9f68d9",
+  "dependencies": {
+    "EXP-028": "EVAL_SUPPORTED",
+    "EXP-022": "present",
+    "EXP-020": "present"
+  },
+  "train_fraction": 0.7,
+  "rt_cons_bps": {
+    "EURUSD": 3.0,
+    "USTEC": 5.0,
+    "XAUUSD": 6.0,
+    "BTCUSD": 16.0
+  },
+  "financing_rate_bps_per_day": {
+    "EURUSD": 0.6,
+    "USTEC": 1.2,
+    "XAUUSD": 1.2,
+    "BTCUSD": 10.0
+  },
+  "alpha_g1": 0.1,
+  "snr_floor": 1.0,
+  "atr_period": 14,
+  "vol_window_days": 90,
+  "n_boot": 1000,
+  "n_perm": 1000,
+  "determinism_replay": {
+    "cell": "5m/c1_completion",
+    "max_drift": 0.0,
+    "passed": true
+  },
+  "qualified": {
+    "5m/c1_completion": false,
+    "5m/c2_session": false,
+    "5m/c3_vol": false,
+    "1h/c1_completion": false,
+    "1h/c2_session": false,
+    "1h/c3_vol": false,
+    "4h/c1_completion": false,
+    "4h/c2_session": false,
+    "4h/c3_vol": false
+  },
+  "n_qualified": 0,
+  "overall_status": "CHARACTERISATION_DELIVERED"
+}

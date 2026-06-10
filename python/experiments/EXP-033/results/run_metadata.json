@@ -1,0 +1,72 @@
+{
+  "experiment_id": "EXP-033",
+  "frozen_tail_hash": "e50873d12a9f68d9",
+  "dependencies": {
+    "EXP-028": "EVAL_SUPPORTED",
+    "EXP-031": "present",
+    "EXP-022": "present"
+  },
+  "train_fraction": 0.7,
+  "train_cutoffs": {
+    "BTCUSD/5m": 151887,
+    "BTCUSD/1h": 12699,
+    "BTCUSD/4h": 3097,
+    "EURUSD/5m": 119854,
+    "EURUSD/1h": 10045,
+    "EURUSD/4h": 2461,
+    "USTEC/5m": 115952,
+    "USTEC/1h": 9689,
+    "USTEC/4h": 2104,
+    "XAUUSD/5m": 115633,
+    "XAUUSD/1h": 9697,
+    "XAUUSD/4h": 2107
+  },
+  "rt_cons_bps": {
+    "EURUSD": 3.0,
+    "USTEC": 5.0,
+    "XAUUSD": 6.0,
+    "BTCUSD": 16.0
+  },
+  "financing_rate_bps_per_day": {
+    "EURUSD": 0.6,
+    "USTEC": 1.2,
+    "XAUUSD": 1.2,
+    "BTCUSD": 10.0
+  },
+  "n_boot": 1000,
+  "n_perm": 1000,
+  "crossover": {
+    "5m": "STABLE_CROSSOVER",
+    "1h": "STABLE_CROSSOVER",
+    "4h": "UNPOWERED"
+  },
+  "b2_selection": {
+    "5m": {
+      "eligible": false,
+      "h_star": null,
+      "pyramid_policy": null,
+      "h_star_stable": null,
+      "policy_stable": null
+    },
+    "1h": {
+      "eligible": false,
+      "h_star": null,
+      "pyramid_policy": null,
+      "h_star_stable": null,
+      "policy_stable": null
+    },
+    "4h": {
+      "eligible": true,
+      "h_star": 8,
+      "pyramid_policy": "all_legs",
+      "h_star_stable": false,
+      "policy_stable": true
+    }
+  },
+  "determinism_replay": {
+    "cell": "5m/H=6",
+    "max_drift": 0.0,
+    "passed": true
+  },
+  "overall_status": "MEASUREMENT_COMPLETE"
+}
