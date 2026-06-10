@@ -1,0 +1,414 @@
+{
+  "experiment_id": "EXP-032",
+  "registry_id": "CF-AVWAP-001/HOLDOUT-B",
+  "frozen_on_emission": true,
+  "frozen_constants": {
+    "h_star": 12,
+    "pyramid_policy": "all_legs",
+    "rt_cons_bps": 3.0,
+    "financing_rate_bps_per_day": 0.6,
+    "frozen_tail_hash": "e50873d12a9f68d9",
+    "exp037_selection_sha256": "2bbbf65ba0a3d9d50ad0c988e3845bdae93edc863756c810ff4f53f3770b0fea",
+    "n_boot": 1000,
+    "alpha_one_sided": 0.05,
+    "n_null_calibration": 2000
+  },
+  "boundary_ns": 1746809700000000000,
+  "exp037_train_test_boundary_ns": 1724624340000000000,
+  "boundary_convention": "HOLDOUT iff trigger close time > boundary; ties -> analysis (R1.3, entry-bar keyed)",
+  "counts": {
+    "analysis_events_geometry_valid": 50,
+    "analysis_events_reportable": 39,
+    "holdout_events_pre_reportability": 27,
+    "holdout_events_binding": 27,
+    "invalid_geometry_excluded": 27
+  },
+  "holdout_stratum_manifest": [
+    {
+      "regime_id": 79,
+      "direction": 1,
+      "event_trigger_idx": 3594,
+      "start_idx": 3594,
+      "trigger_ns": 1748505600000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 81,
+      "direction": 1,
+      "event_trigger_idx": 3633,
+      "start_idx": 3633,
+      "trigger_ns": 1749441600000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 81,
+      "direction": 1,
+      "event_trigger_idx": 3682,
+      "start_idx": 3682,
+      "trigger_ns": 1750334400000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 84,
+      "direction": -1,
+      "event_trigger_idx": 3811,
+      "start_idx": 3811,
+      "trigger_ns": 1753128000000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 86,
+      "direction": -1,
+      "event_trigger_idx": 3866,
+      "start_idx": 3866,
+      "trigger_ns": 1754294400000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 86,
+      "direction": -1,
+      "event_trigger_idx": 3871,
+      "start_idx": 3871,
+      "trigger_ns": 1754366400000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 87,
+      "direction": 1,
+      "event_trigger_idx": 3899,
+      "start_idx": 3899,
+      "trigger_ns": 1754956800000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 87,
+      "direction": 1,
+      "event_trigger_idx": 3936,
+      "start_idx": 3936,
+      "trigger_ns": 1755676800000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 89,
+      "direction": 1,
+      "event_trigger_idx": 3996,
+      "start_idx": 3996,
+      "trigger_ns": 1756915200000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 91,
+      "direction": 1,
+      "event_trigger_idx": 4031,
+      "start_idx": 4031,
+      "trigger_ns": 1757606400000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 91,
+      "direction": 1,
+      "event_trigger_idx": 4038,
+      "start_idx": 4038,
+      "trigger_ns": 1757707200000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 91,
+      "direction": 1,
+      "event_trigger_idx": 4070,
+      "start_idx": 4070,
+      "trigger_ns": 1758542400000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 92,
+      "direction": -1,
+      "event_trigger_idx": 4081,
+      "start_idx": 4081,
+      "trigger_ns": 1758700800000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 100,
+      "direction": -1,
+      "event_trigger_idx": 4267,
+      "start_idx": 4267,
+      "trigger_ns": 1762502400000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 107,
+      "direction": 1,
+      "event_trigger_idx": 4561,
+      "start_idx": 4561,
+      "trigger_ns": 1769054400000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 109,
+      "direction": 1,
+      "event_trigger_idx": 4646,
+      "start_idx": 4646,
+      "trigger_ns": 1770840000000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 109,
+      "direction": 1,
+      "event_trigger_idx": 4649,
+      "start_idx": 4649,
+      "trigger_ns": 1770883200000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 112,
+      "direction": -1,
+      "event_trigger_idx": 4756,
+      "start_idx": 4756,
+      "trigger_ns": 1773172800000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 112,
+      "direction": -1,
+      "event_trigger_idx": 4759,
+      "start_idx": 4759,
+      "trigger_ns": 1773216000000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 112,
+      "direction": -1,
+      "event_trigger_idx": 4799,
+      "start_idx": 4799,
+      "trigger_ns": 1773979200000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 114,
+      "direction": -1,
+      "event_trigger_idx": 4851,
+      "start_idx": 4851,
+      "trigger_ns": 1775102400000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 115,
+      "direction": 1,
+      "event_trigger_idx": 4869,
+      "start_idx": 4869,
+      "trigger_ns": 1775548800000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 116,
+      "direction": -1,
+      "event_trigger_idx": 4952,
+      "start_idx": 4952,
+      "trigger_ns": 1777305600000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 116,
+      "direction": -1,
+      "event_trigger_idx": 4976,
+      "start_idx": 4976,
+      "trigger_ns": 1777665600000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 116,
+      "direction": -1,
+      "event_trigger_idx": 4978,
+      "start_idx": 4978,
+      "trigger_ns": 1777881600000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 117,
+      "direction": 1,
+      "event_trigger_idx": 4988,
+      "start_idx": 4988,
+      "trigger_ns": 1778025600000000000,
+      "is_pyramid_bounce": false,
+      "n_controls": 5
+    },
+    {
+      "regime_id": 117,
+      "direction": 1,
+      "event_trigger_idx": 5016,
+      "start_idx": 5016,
+      "trigger_ns": 1778616000000000000,
+      "is_pyramid_bounce": true,
+      "n_controls": 5
+    }
+  ],
+  "cluster_layout": [
+    {
+      "direction": -1,
+      "regime_id": 84,
+      "n": 1
+    },
+    {
+      "direction": -1,
+      "regime_id": 86,
+      "n": 2
+    },
+    {
+      "direction": -1,
+      "regime_id": 92,
+      "n": 1
+    },
+    {
+      "direction": -1,
+      "regime_id": 100,
+      "n": 1
+    },
+    {
+      "direction": -1,
+      "regime_id": 112,
+      "n": 3
+    },
+    {
+      "direction": -1,
+      "regime_id": 114,
+      "n": 1
+    },
+    {
+      "direction": -1,
+      "regime_id": 116,
+      "n": 3
+    },
+    {
+      "direction": 1,
+      "regime_id": 79,
+      "n": 1
+    },
+    {
+      "direction": 1,
+      "regime_id": 81,
+      "n": 2
+    },
+    {
+      "direction": 1,
+      "regime_id": 87,
+      "n": 2
+    },
+    {
+      "direction": 1,
+      "regime_id": 89,
+      "n": 1
+    },
+    {
+      "direction": 1,
+      "regime_id": 91,
+      "n": 3
+    },
+    {
+      "direction": 1,
+      "regime_id": 107,
+      "n": 1
+    },
+    {
+      "direction": 1,
+      "regime_id": 109,
+      "n": 2
+    },
+    {
+      "direction": 1,
+      "regime_id": 115,
+      "n": 1
+    },
+    {
+      "direction": 1,
+      "regime_id": 117,
+      "n": 2
+    }
+  ],
+  "calibration": {
+    "instrument": "EURUSD",
+    "domain": "4h",
+    "h_star": 12,
+    "policy": "all_legs",
+    "n_holdout_events": 27,
+    "n_holdout_clusters": 16,
+    "n_dispersion_events": 39,
+    "sigma_b_bps": 57.84644728690524,
+    "sigma_w_bps": 29.976970119428945,
+    "n_null_replicates": 2000,
+    "fpr_uncorrected": 0.0715,
+    "margin_bps": 4.318866864233876,
+    "fpr_with_margin": 0.05
+  },
+  "reconciliation_digest": [
+    {
+      "check": "analysis_4h_vs_exp020_metadata",
+      "passed": true
+    },
+    {
+      "check": "full_4h_prefix_equality",
+      "passed": true
+    },
+    {
+      "check": "exp022_event_keys_and_reportability",
+      "passed": true
+    },
+    {
+      "check": "exp037_reportable_keys",
+      "passed": true
+    },
+    {
+      "check": "exp037_train_test_partition",
+      "passed": true
+    },
+    {
+      "check": "exp037_test_reproduction_anchor",
+      "passed": true
+    },
+    {
+      "check": "seal_only_eurusd_file_opened",
+      "passed": true
+    }
+  ],
+  "files_opened": [
+    {
+      "file": "timebars_eurusd_20230102_000000_20260514_203330.parquet",
+      "purpose": "sanctioned EURUSD full-series read",
+      "total_rows": 1246061,
+      "analysis_rows": 872242,
+      "holdout_rows_materialized": 373819,
+      "rows_materialized": "0..1246060"
+    }
+  ],
+  "environment": {
+    "python": "3.13.1",
+    "numpy": "2.4.6",
+    "polars": "1.41.2"
+  },
+  "content_sha256": "6f874e1af224737ae03881c6d892362d2b61195de66dff1eb10024e0e97fb2e6"
+}

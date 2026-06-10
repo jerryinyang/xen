@@ -1,0 +1,52 @@
+{
+  "experiment_id": "EXP-032",
+  "registry_id": "CF-AVWAP-001/HOLDOUT-B",
+  "frozen_tail_hash": "e50873d12a9f68d9",
+  "exp037_selection_sha256": "2bbbf65ba0a3d9d50ad0c988e3845bdae93edc863756c810ff4f53f3770b0fea",
+  "manifest_content_sha256": "6f874e1af224737ae03881c6d892362d2b61195de66dff1eb10024e0e97fb2e6",
+  "h_star": 12,
+  "pyramid_policy": "all_legs",
+  "rt_cons_bps": 3.0,
+  "financing_rate_bps_per_day": 0.6,
+  "alpha_one_sided": 0.05,
+  "n_boot": 1000,
+  "n_null_calibration": 2000,
+  "margin_bps": 4.318866864233876,
+  "binding_rule": "HOLDOUT_CONFIRMED iff ci_low_1s > m_cell AND boot_p <= 0.05; HOLDOUT_REFUTED iff ci_high < 0; else HOLDOUT_INCONCLUSIVE (family of 1, no Holm)",
+  "binding_verdict": "HOLDOUT_INCONCLUSIVE",
+  "descriptive_label": "INCONCLUSIVE_SPANS_ZERO",
+  "holdout_spent": true,
+  "no_second_read": "holdout_verdict.csv now exists; any rerun of H2 hard-stops (R1.6). Post-verdict rendering and audit read ONLY the persisted artifacts (holdout_events.csv, analysis_fh_nets.csv, holdout_verdict.csv) \u2014 not a second read.",
+  "determinism_replay": {
+    "max_drift": 0.0,
+    "passed": true
+  },
+  "weekend_financing_spotcheck": {
+    "event_trigger_idx": 3594,
+    "entry": "2025-05-29T08:00:00.000000000",
+    "exit": "2025-06-02T12:00:00.000000000",
+    "elapsed_calendar_days": 4.166666666666667,
+    "financing_bps": 2.5
+  },
+  "files_opened": [
+    {
+      "file": "timebars_eurusd_20230102_000000_20260514_203330.parquet",
+      "purpose": "sanctioned EURUSD full-series read",
+      "total_rows": 1246061,
+      "analysis_rows": 872242,
+      "holdout_rows_materialized": 373819,
+      "rows_materialized": "0..1246060"
+    }
+  ],
+  "seal_note": "only the EURUSD timebars file was opened; BTCUSD/USTEC/XAUUSD holdout rows remain sealed",
+  "counts": {
+    "analysis_events_geometry_valid": 50,
+    "analysis_events_reportable": 39,
+    "holdout_events_pre_reportability": 27,
+    "holdout_events_binding": 27,
+    "invalid_geometry_excluded": 27
+  },
+  "n_4h_bars_full": 5024,
+  "n_4h_bars_analysis": 3516,
+  "boundary_close_time": "2025-05-09 16:55:00"
+}
