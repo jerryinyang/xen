@@ -1,0 +1,93 @@
+{
+  "experiment_id": "EXP-040",
+  "frozen_parameters": {
+    "eps_mult": 0.25,
+    "hysteresis_mult": 2.0,
+    "episode_cap_bars": 24,
+    "materiality_pp": 2.0,
+    "delta_range_bw": [
+      1.5,
+      3.5
+    ],
+    "control_spacing_bars": 25,
+    "control_lifetime_bars": 100,
+    "control_line_clearance_bw": 1.0,
+    "speed_lookback_bars": 5,
+    "atr_period": 14,
+    "vol_window_days": 90,
+    "n_boot": 1000,
+    "n_perm": 2000,
+    "alpha": 0.05,
+    "floor_episodes_per_arm": 100,
+    "min_stratum_episodes": 5,
+    "moving_control_arm": "AVWAP(t) + delta*BW(t), same delta draw/grid/lifetime as static arm; descriptive only (design \u00a711/8)"
+  },
+  "episode_accounting": {
+    "total": 5530,
+    "resolved": 5260,
+    "unresolved_excluded": 270,
+    "control_clearance_dropped": 502,
+    "by_arm": {
+      "avwap": 2135,
+      "control": 1338,
+      "control_moving": 2057
+    }
+  },
+  "verdicts": {
+    "1h": "INCONCLUSIVE_SPANS_ZERO",
+    "4h": "BELOW_FLOOR_NO_VERDICT"
+  },
+  "holm_p": {
+    "1h": 0.5847076461769115,
+    "4h": 0.9800099950024987
+  },
+  "overall_verdict": "HYP001_INCONCLUSIVE",
+  "power_statement_before_contrast": true,
+  "censoring_sensitivity": [
+    {
+      "domain": "1h",
+      "delta_pp_all_bounce": 3.0448637666638847,
+      "delta_pp_all_pass": -2.4664634994851258,
+      "n_unresolved_avwap": 95,
+      "n_unresolved_control": 59
+    },
+    {
+      "domain": "4h",
+      "delta_pp_all_bounce": -19.892473118279568,
+      "delta_pp_all_pass": -24.193548387096772,
+      "n_unresolved_avwap": 25,
+      "n_unresolved_control": 10
+    }
+  ],
+  "moving_control_contrast_descriptive": [
+    {
+      "domain": "1h",
+      "delta_m_pp": 3.4080536949389395,
+      "se": 2.5519747161973596,
+      "ci_low": -1.2254272520698717,
+      "ci_high": 8.354814663629213,
+      "n_avwap": 1647,
+      "n_control_moving": 522,
+      "n_strata": 72,
+      "binding": false
+    },
+    {
+      "domain": "4h",
+      "delta_m_pp": 0.09036144578313388,
+      "se": 6.350659305092786,
+      "ci_low": -12.683469698814969,
+      "ci_high": 11.954297777812327,
+      "n_avwap": 166,
+      "n_control_moving": 103,
+      "n_strata": 24,
+      "binding": false
+    }
+  ],
+  "determinism_replay": {
+    "cell": "4h",
+    "max_drift": 0.0,
+    "passed": true
+  },
+  "runtime_seconds": 16.4,
+  "overall_status": "MEASUREMENT_COMPLETE"
+}

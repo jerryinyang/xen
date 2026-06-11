@@ -1,0 +1,72 @@
+{
+  "experiment_id": "EXP-039",
+  "frozen_tail_hash": "e50873d12a9f68d9",
+  "dependencies": {
+    "EXP-020": "present",
+    "EXP-022": "present",
+    "EXP-033": "present"
+  },
+  "domains": [
+    "1h",
+    "4h"
+  ],
+  "surviving_instruments": [
+    "EURUSD",
+    "USTEC",
+    "XAUUSD"
+  ],
+  "train_boundary_convention": "1-minute-row timestamp (train_end_ts, R1.3)",
+  "train_cutoffs": {
+    "BTCUSD/1h": 12710,
+    "BTCUSD/4h": 3088,
+    "EURUSD/1h": 10023,
+    "EURUSD/4h": 2458,
+    "USTEC/1h": 9685,
+    "USTEC/4h": 2103,
+    "XAUUSD/1h": 9695,
+    "XAUUSD/4h": 2107
+  },
+  "train_end_ts": {
+    "BTCUSD/1h": "2024-10-31 14:05:00",
+    "BTCUSD/4h": "2024-10-31 14:05:00",
+    "EURUSD/1h": "2024-08-25 22:19:00",
+    "EURUSD/4h": "2024-08-25 22:19:00",
+    "USTEC/1h": "2024-08-26 01:06:00",
+    "USTEC/4h": "2024-08-26 01:06:00",
+    "XAUUSD/1h": "2024-08-26 09:56:00",
+    "XAUUSD/4h": "2024-08-26 09:56:00"
+  },
+  "rt_cons_bps": {
+    "EURUSD": 3.0,
+    "USTEC": 5.0,
+    "XAUUSD": 6.0,
+    "BTCUSD": 16.0
+  },
+  "financing_rate_bps_per_day": {
+    "EURUSD": 0.6,
+    "USTEC": 1.2,
+    "XAUUSD": 1.2,
+    "BTCUSD": 10.0
+  },
+  "n_boot": 1000,
+  "floors": {
+    "pooled": 30,
+    "per_instrument": 8
+  },
+  "grid_selection": {
+    "1h/E3": 8,
+    "1h/E5": 8,
+    "4h/E3": 8,
+    "4h/E5": 8
+  },
+  "screen_outcome": "FLAT",
+  "n_qualifiers": 0,
+  "rank_reversal": false,
+  "determinism_replay": {
+    "cell": "4h/E4",
+    "max_drift": 0.0,
+    "passed": true
+  },
+  "runtime_seconds": 2.5,
+  "overall_status": "MEASUREMENT_COMPLETE"
+}

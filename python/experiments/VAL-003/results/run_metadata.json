@@ -1,0 +1,52 @@
+{
+  "data_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data",
+  "determinism_rows": 50000,
+  "excluded_analysis_slice_markers": [
+    "analysis70",
+    "analysis_slice",
+    "first70"
+  ],
+  "excluded_existing_universe": [
+    "BTCUSD",
+    "EURUSD",
+    "USTEC",
+    "XAUUSD"
+  ],
+  "experiment_id": "VAL-003",
+  "holdout_rule": "first 70 percent analysis slice only",
+  "linebreak_level": 3,
+  "prefix_fractions": [
+    0.34,
+    0.67,
+    0.95
+  ],
+  "prefix_window_positions": [
+    "head",
+    "middle",
+    "tail"
+  ],
+  "prefix_window_rows": 150000,
+  "renko_atr_period": 14,
+  "source_files": [
+    "timebars_audjpy_20230103_000000_20260611_010739.parquet",
+    "timebars_audusd_20230103_000000_20260611_005936.parquet",
+    "timebars_de30_20230103_000000_20260611_011511.parquet",
+    "timebars_eurjpy_20230103_000000_20260611_010703.parquet",
+    "timebars_gbpjpy_20230103_000000_20260611_010717.parquet",
+    "timebars_gbpusd_20230103_000000_20260611_003747.parquet",
+    "timebars_gbpusd_20230103_000000_20260611_005212.parquet",
+    "timebars_jp225_20230103_000000_20260611_011546.parquet",
+    "timebars_nzdusd_20230103_000000_20260611_010629.parquet",
+    "timebars_us2000_20230103_000000_20260611_011542.parquet",
+    "timebars_us500_20230103_000000_20260611_011436.parquet",
+    "timebars_usdcad_20230103_000000_20260611_005900.parquet",
+    "timebars_usdchf_20230103_000000_20260611_005853.parquet",
+    "timebars_usdjpy_20230103_000000_20260611_005907.parquet"
+  ],
+  "source_timeframes": [
+    1,
+    15,
+    60
+  ],
+  "suite_lineage": "VAL-001 rev. 3 checks, unchanged"
+}
