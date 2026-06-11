@@ -4,7 +4,7 @@ This file records reusable components that may become future registered
 candidate branches. Nothing in this file is eligible for measurement until it is
 promoted into `multiplicity-registry.md` with a candidate or component ID.
 
-## Exit Components
+## Trigger Components (can be for exits or entries)
 
 ### Heiken Ashi Exhaustion Patterns
 
@@ -36,6 +36,9 @@ Ashi features, but P&L and return evaluation must use real time-bar prices.
 - Short-exit reference: highest high over the last X traditional candles.
 - `X` is not registered. Any value or sweep must be predeclared before use.
 
+
+
+
 ## Position Management Components
 
 ### Pyramiding
@@ -43,6 +46,10 @@ Ashi features, but P&L and return evaluation must use real time-bar prices.
 - Adds entries in the same direction as an existing position.
 - Required parameter: maximum open positions.
 - Not registered for Phase 004 Batch 004-A.
+
+
+
+
 
 ## Risk Management Components
 
