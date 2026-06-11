@@ -221,6 +221,8 @@ def generate_avwap_events(
     *,
     instrument: str,
     domain: str,
+    band_multiplier: float = BAND_MULTIPLIER,
+    arm_at_adverse_band: bool = False,
 ) -> AvwapResult:
     """Generate AVWAP bounce events and regime diagnostics for one cell.
 
@@ -236,6 +238,20 @@ def generate_avwap_events(
         Instrument label stored on every output row.
     domain : str
         Domain label (e.g. ``5m``) stored on every output row.
+    band_multiplier : float, default ``BAND_MULTIPLIER``
+        MAD-band multiplier used for the event-row band/target levels and, when
+        ``arm_at_adverse_band`` is set, for the arm threshold. The default
+        reproduces the frozen Phase-004 baseline exactly.
+    arm_at_adverse_band : bool, default False
+        ``False`` (frozen baseline): arm when a completed close crosses to the
+        opposite side of the AVWAP. ``True`` is retained only to reproduce the
+        set-aside EXP-042 framing-error run: arm only when a completed close
+        crosses beyond the adverse band
+        ``AVWAP -/+ band_multiplier * MADspread`` (bull/bear). The trigger is
+        unchanged in both modes: a completed close crossing back across the
+        AVWAP in the regime direction. Active Phase 011 scopes should use the
+        frozen baseline entry and treat the band multiplier as an exit
+        parameter.
 
     Returns
     -------
@@ -346,9 +362,15 @@ def generate_avwap_events(
         avwap_i = cum_wp / cum_w
         med.push(abs(typ[i] - avwap_i))
 
+        spread_i = med.median()
+        if arm_at_adverse_band and math.isnan(spread_i):
+            # Band undefined: the adverse-band arm threshold cannot be formed.
+            continue
+
         if active_regime == 1:
+            arm_level = avwap_i - band_multiplier * spread_i if arm_at_adverse_band else avwap_i
             if not armed:
-                if close[i] < avwap_i:
+                if close[i] < arm_level:
                     armed, armed_idx = True, i
             elif close[i] > avwap_i:
                 bounce_count += 1
@@ -356,13 +378,15 @@ def generate_avwap_events(
                     _event_row(
                         instrument, domain, regime_id, active_regime, bounce_count,
                         anchor_idx, times[anchor_idx], anchor_price, times[armed_idx],
-                        i, times[i], close[i], avwap_i, med.median(),
+                        i, times[i], close[i], avwap_i, spread_i,
+                        band_multiplier=band_multiplier,
                     )
                 )
                 armed, armed_idx = False, -1
         else:  # active_regime == -1
+            arm_level = avwap_i + band_multiplier * spread_i if arm_at_adverse_band else avwap_i
             if not armed:
-                if close[i] > avwap_i:
+                if close[i] > arm_level:
                     armed, armed_idx = True, i
             elif close[i] < avwap_i:
                 bounce_count += 1
@@ -370,7 +394,8 @@ def generate_avwap_events(
                     _event_row(
                         instrument, domain, regime_id, active_regime, bounce_count,
                         anchor_idx, times[anchor_idx], anchor_price, times[armed_idx],
-                        i, times[i], close[i], avwap_i, med.median(),
+                        i, times[i], close[i], avwap_i, spread_i,
+                        band_multiplier=band_multiplier,
                     )
                 )
                 armed, armed_idx = False, -1
@@ -410,10 +435,12 @@ def _event_row(
     trigger_close: float,
     avwap: float,
     band_spread: float,
+    *,
+    band_multiplier: float = BAND_MULTIPLIER,
 ) -> dict:
     """Build one bounce-event row with bands and frozen lifetime targets."""
-    upper = avwap + BAND_MULTIPLIER * band_spread
-    lower = avwap - BAND_MULTIPLIER * band_spread
+    upper = avwap + band_multiplier * band_spread
+    lower = avwap - band_multiplier * band_spread
     if direction == 1:
         favorable, adverse = upper, lower
     else:

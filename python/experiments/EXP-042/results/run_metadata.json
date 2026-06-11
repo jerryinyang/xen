@@ -1,0 +1,183 @@
+{
+  "experiment": "EXP-042",
+  "verdict": "BAND_SELECTED_DEGENERATE_FLOOR_PENDING_ADJUDICATION",
+  "selected_band": 1.0,
+  "median_ranks": {
+    "1.0": 2.0,
+    "1.5": 5.0,
+    "2.0": 5.0,
+    "2.5": 5.0,
+    "3.0": 5.0
+  },
+  "floor_imputed_fraction_by_band": {
+    "1.0": 0.4117647058823529,
+    "1.5": 0.6470588235294118,
+    "2.0": 0.8823529411764706,
+    "2.5": 0.9803921568627451,
+    "3.0": 1.0
+  },
+  "degenerate_floor_disclosure": true,
+  "entry_rule": "arm_at_adverse_band (operator-ratified 2026-06-11); trigger = AVWAP recross",
+  "bands": [
+    1.0,
+    1.5,
+    2.0,
+    2.5,
+    3.0
+  ],
+  "horizons": [
+    4,
+    8,
+    16
+  ],
+  "binding_horizon": 8,
+  "event_floor": 30,
+  "min_coverage": 0.9,
+  "domains": {
+    "1h": 60,
+    "2h": 120,
+    "4h": 240
+  },
+  "analysis_fraction": 0.7,
+  "train_fraction": 0.7,
+  "boundaries": {
+    "BTCUSD": {
+      "source_file": "timebars_btcusd_20230102_000000_20260514_203813.parquet",
+      "total_rows_1m": 1555658,
+      "analysis_rows_1m": 1088960,
+      "train_rows_1m": 762272,
+      "test_rows_1m_count_only": 326688,
+      "train_end_ts": "2024-10-31 14:05:00"
+    },
+    "EURUSD": {
+      "source_file": "timebars_eurusd_20230102_000000_20260514_203330.parquet",
+      "total_rows_1m": 1246061,
+      "analysis_rows_1m": 872242,
+      "train_rows_1m": 610569,
+      "test_rows_1m_count_only": 261673,
+      "train_end_ts": "2024-08-25 22:19:00"
+    },
+    "USTEC": {
+      "source_file": "timebars_ustec_20230102_230000_20260514_204410.parquet",
+      "total_rows_1m": 1186488,
+      "analysis_rows_1m": 830541,
+      "train_rows_1m": 581378,
+      "test_rows_1m_count_only": 249163,
+      "train_end_ts": "2024-08-26 01:06:00"
+    },
+    "XAUUSD": {
+      "source_file": "timebars_xauusd_20230102_230200_20260514_204148.parquet",
+      "total_rows_1m": 1186674,
+      "analysis_rows_1m": 830671,
+      "train_rows_1m": 581469,
+      "test_rows_1m_count_only": 249202,
+      "train_end_ts": "2024-08-26 09:56:00"
+    },
+    "GBPUSD": {
+      "source_file": "timebars_gbpusd_20230103_000000_20260611_005212.parquet",
+      "total_rows_1m": 1273657,
+      "analysis_rows_1m": 891559,
+      "train_rows_1m": 624091,
+      "test_rows_1m_count_only": 267468,
+      "train_end_ts": "2024-09-08 22:09:00"
+    },
+    "USDJPY": {
+      "source_file": "timebars_usdjpy_20230103_000000_20260611_005907.parquet",
+      "total_rows_1m": 1274170,
+      "analysis_rows_1m": 891919,
+      "train_rows_1m": 624343,
+      "test_rows_1m_count_only": 267576,
+      "train_end_ts": "2024-09-06 12:28:00"
+    },
+    "USDCHF": {
+      "source_file": "timebars_usdchf_20230103_000000_20260611_005853.parquet",
+      "total_rows_1m": 1270134,
+      "analysis_rows_1m": 889093,
+      "train_rows_1m": 622365,
+      "test_rows_1m_count_only": 266728,
+      "train_end_ts": "2024-09-09 00:05:00"
+    },
+    "USDCAD": {
+      "source_file": "timebars_usdcad_20230103_000000_20260611_005900.parquet",
+      "total_rows_1m": 1269870,
+      "analysis_rows_1m": 888909,
+      "train_rows_1m": 622236,
+      "test_rows_1m_count_only": 266673,
+      "train_end_ts": "2024-09-06 16:23:00"
+    },
+    "AUDUSD": {
+      "source_file": "timebars_audusd_20230103_000000_20260611_005936.parquet",
+      "total_rows_1m": 1270486,
+      "analysis_rows_1m": 889340,
+      "train_rows_1m": 622538,
+      "test_rows_1m_count_only": 266802,
+      "train_end_ts": "2024-09-06 14:40:00"
+    },
+    "NZDUSD": {
+      "source_file": "timebars_nzdusd_20230103_000000_20260611_010629.parquet",
+      "total_rows_1m": 1271158,
+      "analysis_rows_1m": 889810,
+      "train_rows_1m": 622867,
+      "test_rows_1m_count_only": 266943,
+      "train_end_ts": "2024-09-06 05:42:00"
+    },
+    "EURJPY": {
+      "source_file": "timebars_eurjpy_20230103_000000_20260611_010703.parquet",
+      "total_rows_1m": 1279097,
+      "analysis_rows_1m": 895367,
+      "train_rows_1m": 626756,
+      "test_rows_1m_count_only": 268611,
+      "train_end_ts": "2024-09-06 15:12:00"
+    },
+    "GBPJPY": {
+      "source_file": "timebars_gbpjpy_20230103_000000_20260611_010717.parquet",
+      "total_rows_1m": 1278719,
+      "analysis_rows_1m": 895103,
+      "train_rows_1m": 626572,
+      "test_rows_1m_count_only": 268531,
+      "train_end_ts": "2024-09-06 15:28:00"
+    },
+    "AUDJPY": {
+      "source_file": "timebars_audjpy_20230103_000000_20260611_010739.parquet",
+      "total_rows_1m": 1277971,
+      "analysis_rows_1m": 894579,
+      "train_rows_1m": 626205,
+      "test_rows_1m_count_only": 268374,
+      "train_end_ts": "2024-09-06 14:39:00"
+    },
+    "US500": {
+      "source_file": "timebars_us500_20230103_000000_20260611_011436.parquet",
+      "total_rows_1m": 1187767,
+      "analysis_rows_1m": 831436,
+      "train_rows_1m": 582005,
+      "test_rows_1m_count_only": 249431,
+      "train_end_ts": "2024-09-17 17:26:00"
+    },
+    "US2000": {
+      "source_file": "timebars_us2000_20230103_000000_20260611_011542.parquet",
+      "total_rows_1m": 1208112,
+      "analysis_rows_1m": 845678,
+      "train_rows_1m": 591974,
+      "test_rows_1m_count_only": 253704,
+      "train_end_ts": "2024-09-10 09:33:00"
+    },
+    "DE30": {
+      "source_file": "timebars_de30_20230103_000000_20260611_011511.parquet",
+      "total_rows_1m": 1025743,
+      "analysis_rows_1m": 718020,
+      "train_rows_1m": 502613,
+      "test_rows_1m_count_only": 215407,
+      "train_end_ts": "2024-06-28 13:28:00"
+    },
+    "JP225": {
+      "source_file": "timebars_jp225_20230103_000000_20260611_011546.parquet",
+      "total_rows_1m": 1157882,
+      "analysis_rows_1m": 810517,
+      "train_rows_1m": 567361,
+      "test_rows_1m_count_only": 243156,
+      "train_end_ts": "2024-09-23 04:40:00"
+    }
+  },
+  "band_scan_sha256": "4ea9aff8cd81e326a62fd60e42b66a57c930d622aaf40ac870870a40342296fb",
+  "de30_disclosure": "DE30 coverage truncated (history ends 2026-01-16); boundaries derive from its own realized timeline (D0 P8)."
+}
