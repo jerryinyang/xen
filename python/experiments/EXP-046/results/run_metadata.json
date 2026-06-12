@@ -1,0 +1,45 @@
+{
+  "experiment": "EXP-046",
+  "verdict": "SCREEN_DELIVERED",
+  "g1_mechanical_readout": "ENTRY_GROSS_FLAT",
+  "g1_note": "G1 is adjudicated in the Phase 012 checkpoint G1-gate-review.md; this readout is the mechanical count.",
+  "reconciliation_pass": true,
+  "determinism_all_pass": true,
+  "variants_meeting_composition": [],
+  "elapsed_seconds": 5.8,
+  "method": {
+    "variants": [
+      "baseline",
+      "alpha_0.0",
+      "alpha_0.375",
+      "alpha_1.0",
+      "ma_10_25",
+      "ma_40_100",
+      "ma_60_150"
+    ],
+    "horizons": [
+      4,
+      8,
+      16
+    ],
+    "binding_horizon": 8,
+    "margin_rule": "gross(H=8) >= floor + 1*SE AND gross(4) > 0 AND gross(16) > 0 (D0 P5)",
+    "floor_rule": "RT + financing * (8*hours/24) (D0 P4)",
+    "event_floor": 30,
+    "composition_threshold": ">= 5 cells over >= 3 instruments (D0 P6)",
+    "evaluability": "trigger + H_MAX(16) within TRAIN (one population per cell x variant across horizons)",
+    "n_bootstrap": 1000,
+    "cost_model": "D0/Phase-011 P2 CONSERVATIVE (comparison floor only; no net columns anywhere)",
+    "floor_disclosure": "days(8,d) is a frozen calendar-day approximation (P4); it understates wall-clock financing for holds spanning weekends/closures (largest for 4h index cells) \u2014 any clearing index cell carries this caveat at G1.",
+    "se_disclosure": "regime-cluster SE preserves within-regime dependence only; overlap correlation between short adjacent regimes (< H=8 bars) is not captured \u2014 n_regimes_evaluable per cell is reported in events_summary.csv for this reading."
+  },
+  "dependency": {
+    "exp044_covered_cells": 37,
+    "exp045_anchor": "FH net at theta in {4,8,16}, full population, forced-clip convention"
+  },
+  "disclosures": {
+    "DE30": "DE30 truncated history: broker history ends 2026-01-16 (~5 months short); 70/30/holdout boundaries derive from its own realized timeline (D0 P8)."
+  },
+  "holdout_fence": "F01 TRAIN rows only (first 70% of first 70%, file order); TEST and global holdout never loaded",
+  "test_reads": 0
+}
