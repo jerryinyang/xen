@@ -134,6 +134,72 @@ def test_arm_at_adverse_band_bull() -> None:
     assert wide.events.height == 0          # dip does NOT reach the 3.0x band
 
 
+# --------------------------------------------------------------------------- #
+# Phase 012 P8 — /ALPHA and /MA-DOMAIN entry parameterization
+# --------------------------------------------------------------------------- #
+def test_explicit_baseline_params_reproduce_defaults_bit_for_bit() -> None:
+    frame = seeded_fixture()
+    default = generate_avwap_events(frame, instrument="T", domain="1h")
+    explicit = generate_avwap_events(
+        frame, instrument="T", domain="1h",
+        volume_exponent=0.75, fast_ma=20, slow_ma=50,
+    )
+    assert explicit.events.equals(default.events)
+    assert explicit.regimes.equals(default.regimes)
+    assert default.events.height == BASELINE_EVENT_COUNT
+
+
+def test_alpha_variants_are_deterministic_and_move_the_anchor_path() -> None:
+    frame = seeded_fixture()
+    base_digest = events_digest(
+        generate_avwap_events(frame, instrument="T", domain="1h").events
+    )
+    for alpha in (0.0, 0.375, 1.0):
+        a = generate_avwap_events(
+            frame, instrument="T", domain="1h", volume_exponent=alpha
+        )
+        b = generate_avwap_events(
+            frame, instrument="T", domain="1h", volume_exponent=alpha
+        )
+        assert a.events.equals(b.events)
+        # The exponent changes the AVWAP path, hence the arm/trigger sequence,
+        # on the seeded fixture (verified when the fixture was pinned).
+        assert events_digest(a.events) != base_digest
+
+
+def test_ma_variants_are_deterministic_and_move_the_regime_partition() -> None:
+    frame = seeded_fixture()
+    base = generate_avwap_events(frame, instrument="T", domain="1h")
+    for fast, slow in ((10, 25), (40, 100), (60, 150)):
+        a = generate_avwap_events(
+            frame, instrument="T", domain="1h", fast_ma=fast, slow_ma=slow
+        )
+        b = generate_avwap_events(
+            frame, instrument="T", domain="1h", fast_ma=fast, slow_ma=slow
+        )
+        assert a.events.equals(b.events)
+        assert a.regimes.height != base.regimes.height  # detector scale moved
+
+
+def test_ma_params_validated() -> None:
+    frame = seeded_fixture()
+    for fast, slow in ((50, 50), (50, 20), (0, 50)):
+        try:
+            generate_avwap_events(
+                frame, instrument="T", domain="1h", fast_ma=fast, slow_ma=slow
+            )
+            raise AssertionError("expected ValueError for invalid MA pair")
+        except ValueError:
+            pass
+    try:
+        generate_avwap_events(
+            frame, instrument="T", domain="1h", volume_exponent=-0.1
+        )
+        raise AssertionError("expected ValueError for negative exponent")
+    except ValueError:
+        pass
+
+
 def test_arm_at_adverse_band_bear() -> None:
     frame = trend_frame(direction=-1, dip_at=120, dip_depth=MODERATE_DIP)
     narrow = generate_avwap_events(

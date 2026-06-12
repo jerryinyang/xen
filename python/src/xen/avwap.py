@@ -183,10 +183,15 @@ def _causal_sma(values: np.ndarray, window: int) -> np.ndarray:
     return out
 
 
-def _regime_sign(close: np.ndarray) -> np.ndarray:
-    """Causal MA(20,50) regime sign per bar: +1 bull, -1 bear, 0 warmup/tie."""
-    fast = _causal_sma(close, FAST_MA)
-    slow = _causal_sma(close, SLOW_MA)
+def _regime_sign(
+    close: np.ndarray, fast_ma: int = FAST_MA, slow_ma: int = SLOW_MA
+) -> np.ndarray:
+    """Causal MA-crossover regime sign per bar: +1 bull, -1 bear, 0 warmup/tie.
+
+    Defaults reproduce the frozen MA(20,50) baseline.
+    """
+    fast = _causal_sma(close, fast_ma)
+    slow = _causal_sma(close, slow_ma)
     sign = np.zeros(close.size, dtype=np.int64)
     valid = ~np.isnan(fast) & ~np.isnan(slow)
     sign[valid & (fast > slow)] = 1
@@ -223,6 +228,9 @@ def generate_avwap_events(
     domain: str,
     band_multiplier: float = BAND_MULTIPLIER,
     arm_at_adverse_band: bool = False,
+    volume_exponent: float = VOLUME_EXPONENT,
+    fast_ma: int = FAST_MA,
+    slow_ma: int = SLOW_MA,
 ) -> AvwapResult:
     """Generate AVWAP bounce events and regime diagnostics for one cell.
 
@@ -252,6 +260,14 @@ def generate_avwap_events(
         AVWAP in the regime direction. Active Phase 011 scopes should use the
         frozen baseline entry and treat the band multiplier as an exit
         parameter.
+    volume_exponent : float, default ``VOLUME_EXPONENT``
+        Exponent applied to ``TickVolume`` for the AVWAP weights (Phase 012
+        `/ALPHA` parameterization). ``0.0`` gives an unweighted (TWAP-like)
+        anchor path. The default reproduces the frozen baseline exactly.
+    fast_ma, slow_ma : int, defaults ``FAST_MA`` / ``SLOW_MA``
+        Trailing SMA windows of the regime detector (Phase 012 `/MA-DOMAIN`
+        parameterization). Must satisfy ``0 < fast_ma < slow_ma``. The
+        defaults reproduce the frozen MA(20,50) baseline exactly.
 
     Returns
     -------
@@ -259,10 +275,14 @@ def generate_avwap_events(
         Events table, regime table, bar count, and holdout-fence timestamp.
     """
     _validate_domain_frame(frame)
+    if not (0 < fast_ma < slow_ma):
+        raise ValueError(f"require 0 < fast_ma < slow_ma, got ({fast_ma}, {slow_ma})")
+    if volume_exponent < 0.0:
+        raise ValueError(f"volume_exponent must be >= 0, got {volume_exponent}")
     n = frame.height
     analysis_end = "" if n == 0 else str(frame.get_column("CloseTime").max())
 
-    if n < SLOW_MA:
+    if n < slow_ma:
         # Not enough bars to establish any regime; emit empty, well-typed tables.
         return AvwapResult(
             instrument=instrument,
@@ -277,9 +297,9 @@ def generate_avwap_events(
     low = frame.get_column("Low").to_numpy().astype(float)
     close = frame.get_column("Close").to_numpy().astype(float)
     typ = (high + low + close) / 3.0
-    weight = np.power(frame.get_column("TickVolume").to_numpy().astype(float), VOLUME_EXPONENT)
+    weight = np.power(frame.get_column("TickVolume").to_numpy().astype(float), volume_exponent)
     times = frame.get_column("CloseTime").to_list()
-    sign = _regime_sign(close)
+    sign = _regime_sign(close, fast_ma, slow_ma)
 
     events: list[dict] = []
     regimes: list[dict] = []
