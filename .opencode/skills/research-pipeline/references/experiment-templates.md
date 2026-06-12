@@ -23,7 +23,7 @@ Save to: `python/experiments/<EXP-ID>/scope.md`
 
 - **Data Views**: <Time bars, derived feature tables, or chart types if explicitly included>
 - **Parameters**: <timeframe(s), windows, thresholds, chart-type parameters, or other scoped constants>
-- **Instruments**: <EURUSD, XAUUSD, BTCUSD, USTEC — which and why>
+- **Instruments**: <list of symbols, e.g. EURUSD, XAUUSD, BTCUSD, USTEC (the 4-instrument core) or the full 17-instrument universe — which and why>
 - **Time range**: Full dataset with nested chronological split. First 70% = analysis set (split 70/30 for train/test); final 30% = global holdout (never used).
 - **Global holdout**: The final 30% of the full dataset must not be loaded, inspected, or used in any capacity.
 - **Look-ahead bias prevention**: Features and events use only data available at or before the event timestamp. Chart-type generators, if in scope, process data sequentially and use `SourceCloseTime` for temporal alignment.

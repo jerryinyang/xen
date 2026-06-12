@@ -2,7 +2,11 @@
 
 **Checkpoint type:** Research phase design.
 **Date drafted:** 2026-06-11.
-**Status:** ACTIVE — D0 closed, **G0 PASS 2026-06-11** (operator-ratified
+**Status:** **CLOSED 2026-06-11 — FOUNDATION_NON-TUNABLE** (G2 FAIL:
+EXP-045 membership 0/37 vs P5 floor; Tracks C/D never opened; 0 of ≤6 TEST
+reads spent — see [G2-gate-review.md](G2-gate-review.md) and
+[retrospective.md](retrospective.md)). Phase history: D0 closed, **G0 PASS
+2026-06-11** (operator-ratified
 `D0-predeclarations.md`; all §8.5 items FROZEN, EXP-018 threshold fixed
 first, before any TRAIN read). **Track A0 REMOVED 2026-06-11
 (framing error):** the band multiplier is an exit parameter, not an entry

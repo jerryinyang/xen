@@ -212,14 +212,29 @@ docs/experiments-docs/checkpoints/YYYY-MM-DD-###-descriptive-name/
 
 ## Available Instruments
 
+The full universe (17 instruments) was admitted by VAL-003.
+
 | Symbol | Name | Type | Notes |
 |--------|------|------|-------|
 | EURUSD | Euro/US Dollar | Forex | Major pair, high liquidity |
-| XAUUSD | Gold/US Dollar | Commodity | Volatile, good for trend analysis |
+| GBPUSD | British Pound/US Dollar | Forex | Major pair |
+| USDJPY | US Dollar/Japanese Yen | Forex | Major pair |
+| USDCHF | US Dollar/Swiss Franc | Forex | Major pair |
+| USDCAD | US Dollar/Canadian Dollar | Forex | Major pair |
+| AUDUSD | Australian Dollar/US Dollar | Forex | Major pair |
+| NZDUSD | New Zealand Dollar/US Dollar | Forex | Major pair |
+| EURJPY | Euro/Japanese Yen | Forex | Cross pair |
+| GBPJPY | British Pound/Japanese Yen | Forex | Cross pair |
+| AUDJPY | Australian Dollar/Japanese Yen | Forex | Cross pair |
+| XAUUSD | Gold/US Dollar | Commodity | Volatile, useful for trend analysis |
 | BTCUSD | Bitcoin/US Dollar | Crypto | 24/7, high volatility |
 | USTEC | NASDAQ-100 | Index | Tech-heavy, liquid |
+| US500 | S&P 500 | Index | Broad US equities |
+| US2000 | Russell 2000 | Index | Small-cap US equities |
+| DE30 | DAX 40 | Index | German equities; broker history truncated to 2026-01-16 |
+| JP225 | Nikkei 225 | Index | Japanese equities |
 
-Other cTrader symbols may be added as the research progresses. Observations may lead to focusing on subsets.
+The original 4-instrument core (EURUSD, XAUUSD, BTCUSD, USTEC) is the default subset. Experiments using the expanded universe must justify the inclusion of new instruments in scope.
 
 ---
 
