@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import heapq
 import math
+from collections import deque
 from dataclasses import dataclass
 
 import numpy as np
@@ -39,6 +40,15 @@ FAST_MA = 20
 SLOW_MA = 50
 VOLUME_EXPONENT = 0.75
 BAND_MULTIPLIER = 1.0
+
+# Phase 013 /ANCHOR (ATR-prominence significant pivot) defaults — P1, RATIFIED
+# 2026-06-12. The generator default ``anchor_mode="running_extreme"`` keeps the
+# frozen Phases 004-012 baseline; these constants apply only when callers opt
+# into ``anchor_mode="atr_prominence"``.
+ANCHOR_MODE_BASELINE = "running_extreme"
+ANCHOR_MODE_ATR_PROMINENCE = "atr_prominence"
+ANCHOR_ATR_PERIOD = 14
+ANCHOR_PROMINENCE_K = 1.0
 
 REQUIRED_COLUMNS: tuple[str, ...] = (
     "CloseTime",
@@ -71,6 +81,7 @@ EVENT_SCHEMA: dict[str, pl.DataType] = {
     "favorable_target_at_trigger": pl.Float64,
     "adverse_target_at_trigger": pl.Float64,
     "anchor_age_bars": pl.Int64,
+    "anchor_fallback": pl.Boolean,
 }
 
 REGIME_SCHEMA: dict[str, pl.DataType] = {
@@ -88,6 +99,7 @@ REGIME_SCHEMA: dict[str, pl.DataType] = {
     "anchor_price": pl.Float64,
     "anchor_age_at_confirm": pl.Int64,
     "num_bounces": pl.Int64,
+    "anchor_fallback": pl.Boolean,
 }
 
 
@@ -199,6 +211,55 @@ def _regime_sign(
     return sign
 
 
+def _select_prominent_pivot(
+    seg_lows: list[float],
+    seg_highs: list[float],
+    seg_start_idx: int,
+    direction: int,
+    atr: float,
+    k: float,
+) -> tuple[int, float] | None:
+    """Select the P1 ATR-prominence significant pivot inside one segment.
+
+    The segment covers bars ``seg_start_idx .. seg_start_idx + len(seg_lows) - 1``
+    (all completed, ending at the regime-confirmation bar). A candidate pivot at
+    offset ``j`` qualifies iff a counter-move of at least ``k * atr`` away from it
+    has *already completed* on bars strictly after ``j`` (through the
+    confirmation bar). Selection: most price-extreme qualifying pivot
+    (lowest Low for an incoming bull regime / highest High for bear); exact
+    price ties resolve to the most recent. Returns ``(absolute_idx, price)`` or
+    ``None`` when no pivot qualifies (callers fall back to the running extreme).
+    """
+    m = len(seg_lows)
+    if m < 2:
+        return None
+    lo = np.asarray(seg_lows, dtype=float)
+    hi = np.asarray(seg_highs, dtype=float)
+    if direction == 1:
+        # Counter-move after a candidate low is the max High strictly after it.
+        suffix = np.maximum.accumulate(hi[::-1])[::-1]
+        after = np.empty(m, dtype=float)
+        after[:-1] = suffix[1:]
+        after[-1] = -math.inf
+        qualifying = np.where(after >= lo + k * atr)[0]
+        if qualifying.size == 0:
+            return None
+        best = lo[qualifying].min()
+        j = int(qualifying[lo[qualifying] == best].max())
+        return seg_start_idx + j, float(lo[j])
+    # direction == -1: counter-move after a candidate high is the min Low after.
+    suffix = np.minimum.accumulate(lo[::-1])[::-1]
+    after = np.empty(m, dtype=float)
+    after[:-1] = suffix[1:]
+    after[-1] = math.inf
+    qualifying = np.where(after <= hi - k * atr)[0]
+    if qualifying.size == 0:
+        return None
+    best = hi[qualifying].max()
+    j = int(qualifying[hi[qualifying] == best].max())
+    return seg_start_idx + j, float(hi[j])
+
+
 def _validate_domain_frame(frame: pl.DataFrame) -> None:
     """Validate the domain frame before generation; raise on contract breaches."""
     missing = [c for c in REQUIRED_COLUMNS if c not in frame.columns]
@@ -231,6 +292,9 @@ def generate_avwap_events(
     volume_exponent: float = VOLUME_EXPONENT,
     fast_ma: int = FAST_MA,
     slow_ma: int = SLOW_MA,
+    anchor_mode: str = ANCHOR_MODE_BASELINE,
+    anchor_atr_period: int = ANCHOR_ATR_PERIOD,
+    anchor_prominence_k: float = ANCHOR_PROMINENCE_K,
 ) -> AvwapResult:
     """Generate AVWAP bounce events and regime diagnostics for one cell.
 
@@ -268,6 +332,22 @@ def generate_avwap_events(
         Trailing SMA windows of the regime detector (Phase 012 `/MA-DOMAIN`
         parameterization). Must satisfy ``0 < fast_ma < slow_ma``. The
         defaults reproduce the frozen MA(20,50) baseline exactly.
+    anchor_mode : str, default ``"running_extreme"``
+        Phase 013 `/ANCHOR` parameterization. ``"running_extreme"`` (default)
+        reproduces the frozen baseline anchor bit-for-bit.
+        ``"atr_prominence"`` selects the P1 significant pivot: the most
+        price-extreme segment pivot whose counter-move of at least
+        ``anchor_prominence_k * ATR(anchor_atr_period)`` has already completed
+        by the regime-confirmation bar (exact ties -> most recent). When no
+        pivot qualifies (or the ATR window is not yet full), the anchor falls
+        back to the running extreme and the regime/events carry
+        ``anchor_fallback = True``. ATR is the trailing simple mean of the
+        true range over the same domain bars, completed bars only (the project
+        Renko convention) — fully causal.
+    anchor_atr_period : int, default ``ANCHOR_ATR_PERIOD``
+        ATR lookback for the prominence threshold (P1: fixed 14, never swept).
+    anchor_prominence_k : float, default ``ANCHOR_PROMINENCE_K``
+        Prominence multiple ``k`` (P1: 1.0).
 
     Returns
     -------
@@ -279,6 +359,13 @@ def generate_avwap_events(
         raise ValueError(f"require 0 < fast_ma < slow_ma, got ({fast_ma}, {slow_ma})")
     if volume_exponent < 0.0:
         raise ValueError(f"volume_exponent must be >= 0, got {volume_exponent}")
+    if anchor_mode not in (ANCHOR_MODE_BASELINE, ANCHOR_MODE_ATR_PROMINENCE):
+        raise ValueError(f"unknown anchor_mode: {anchor_mode!r}")
+    if anchor_atr_period < 1:
+        raise ValueError(f"anchor_atr_period must be >= 1, got {anchor_atr_period}")
+    if anchor_prominence_k < 0.0:
+        raise ValueError(f"anchor_prominence_k must be >= 0, got {anchor_prominence_k}")
+    use_prominence = anchor_mode == ANCHOR_MODE_ATR_PROMINENCE
     n = frame.height
     analysis_end = "" if n == 0 else str(frame.get_column("CloseTime").max())
 
@@ -309,10 +396,20 @@ def generate_avwap_events(
     seg_min_low_idx = -1
     seg_max_high = -math.inf
     seg_max_high_idx = -1
+    # /ANCHOR segment window: per-bar Lows/Highs since the prior confirmation
+    # bar (the same window the running extreme is tracked over). Maintained
+    # only when the prominence mode is active; bounded by segment length.
+    seg_lows: list[float] = []
+    seg_highs: list[float] = []
+    seg_start_idx = 0
+    # Causal trailing ATR state (Renko convention: simple mean of true range).
+    tr_window: deque[float] = deque(maxlen=anchor_atr_period)
+    prev_close = math.nan
 
     anchor_active = False
     anchor_idx = -1
     anchor_price = math.nan
+    anchor_fallback = False
     regime_id = 0
     confirm_idx = -1
     bounce_count = 0
@@ -330,6 +427,16 @@ def generate_avwap_events(
         if high[i] > seg_max_high:
             seg_max_high = high[i]
             seg_max_high_idx = i
+        if use_prominence:
+            seg_lows.append(low[i])
+            seg_highs.append(high[i])
+            tr = (
+                high[i] - low[i]
+                if math.isnan(prev_close)
+                else max(high[i] - low[i], abs(high[i] - prev_close), abs(low[i] - prev_close))
+            )
+            tr_window.append(tr)
+        prev_close = close[i]
 
         s = int(sign[i])
         if s != 0 and s != active_regime:
@@ -340,10 +447,22 @@ def generate_avwap_events(
                         instrument, domain, regime_id, active_regime, confirm_idx,
                         times[confirm_idx], end_idx=i - 1, anchor_idx=anchor_idx,
                         anchor_time=times[anchor_idx], anchor_price=anchor_price,
-                        num_bounces=bounce_count,
+                        num_bounces=bounce_count, anchor_fallback=anchor_fallback,
                     )
                 )
-            if s == 1:
+            anchor_fallback = False
+            selected: tuple[int, float] | None = None
+            if use_prominence:
+                if len(tr_window) == anchor_atr_period:
+                    atr = sum(tr_window) / anchor_atr_period
+                    selected = _select_prominent_pivot(
+                        seg_lows, seg_highs, seg_start_idx, s, atr, anchor_prominence_k
+                    )
+                if selected is None:
+                    anchor_fallback = True
+            if selected is not None:
+                anchor_idx, anchor_price = selected
+            elif s == 1:
                 anchor_idx, anchor_price = seg_min_low_idx, seg_min_low
             else:
                 anchor_idx, anchor_price = seg_max_high_idx, seg_max_high
@@ -367,6 +486,10 @@ def generate_avwap_events(
             # Start the next segment's pivot window at the confirmation bar.
             seg_min_low, seg_min_low_idx = low[i], i
             seg_max_high, seg_max_high_idx = high[i], i
+            if use_prominence:
+                seg_lows = [low[i]]
+                seg_highs = [high[i]]
+                seg_start_idx = i
             # Signals derived from the new regime occur only AFTER this bar.
             continue
 
@@ -400,6 +523,7 @@ def generate_avwap_events(
                         anchor_idx, times[anchor_idx], anchor_price, times[armed_idx],
                         i, times[i], close[i], avwap_i, spread_i,
                         band_multiplier=band_multiplier,
+                        anchor_fallback=anchor_fallback,
                     )
                 )
                 armed, armed_idx = False, -1
@@ -416,6 +540,7 @@ def generate_avwap_events(
                         anchor_idx, times[anchor_idx], anchor_price, times[armed_idx],
                         i, times[i], close[i], avwap_i, spread_i,
                         band_multiplier=band_multiplier,
+                        anchor_fallback=anchor_fallback,
                     )
                 )
                 armed, armed_idx = False, -1
@@ -426,7 +551,7 @@ def generate_avwap_events(
                 instrument, domain, regime_id, active_regime, confirm_idx,
                 times[confirm_idx], end_idx=n - 1, anchor_idx=anchor_idx,
                 anchor_time=times[anchor_idx], anchor_price=anchor_price,
-                num_bounces=bounce_count,
+                num_bounces=bounce_count, anchor_fallback=anchor_fallback,
             )
         )
 
@@ -457,6 +582,7 @@ def _event_row(
     band_spread: float,
     *,
     band_multiplier: float = BAND_MULTIPLIER,
+    anchor_fallback: bool = False,
 ) -> dict:
     """Build one bounce-event row with bands and frozen lifetime targets."""
     upper = avwap + band_multiplier * band_spread
@@ -486,6 +612,7 @@ def _event_row(
         "favorable_target_at_trigger": float(favorable),
         "adverse_target_at_trigger": float(adverse),
         "anchor_age_bars": trigger_idx - anchor_idx,
+        "anchor_fallback": bool(anchor_fallback),
     }
 
 
@@ -501,6 +628,7 @@ def _regime_row(
     anchor_time,
     anchor_price: float,
     num_bounces: int,
+    anchor_fallback: bool = False,
 ) -> dict:
     """Build one per-regime diagnostic row."""
     return {
@@ -518,6 +646,7 @@ def _regime_row(
         "anchor_price": float(anchor_price),
         "anchor_age_at_confirm": confirm_idx - anchor_idx,
         "num_bounces": num_bounces,
+        "anchor_fallback": bool(anchor_fallback),
     }
 
 
