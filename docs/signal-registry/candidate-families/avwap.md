@@ -1,6 +1,6 @@
 # Candidate Family: CF-AVWAP-001 - Anchored VWAP on Regime Pivots
 
-**Status:** REGISTERED for Phase 004 Batch 004-A.
+**Status:** **CLOSED for new in-family phases — 2026-06-12 (Phase 013 retrospective).** Every registered lever is measured and exhausted under frozen CONSERVATIVE costs: exits CLOSED-MEASURED (Phases 010–011), entry parameters `/ALPHA` `/MA-DOMAIN` CLOSED-MEASURED (Phase 012), `/ANCHOR` CLOSED-MEASURED as ratified at k=1.0 (Phase 013); `/LB` `/MB` `/ATR` DEFERRED with no candidate status. Standing findings: entry direction sound (gross positive 31/37, Phase 011); available lifetime move ≈5–9× the cost floor (EXP-047) — the unsolved problem is capture geometry, not move availability. TEST-pass results EXP-037/038 (EURUSD-4h) remain on the books, permanently non-upgradable (EXP-032 holdout shot spent). Re-opening any branch requires a new D0 justified against the Phase 013 retrospective. Originally REGISTERED for Phase 004 Batch 004-A.
 **Primary registry:** `docs/signal-registry/multiplicity-registry.md`
 **First EXP:** EXP-020
 

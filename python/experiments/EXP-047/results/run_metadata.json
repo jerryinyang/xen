@@ -1,0 +1,30 @@
+{
+  "experiment": "EXP-047",
+  "registry": "CF-AVWAP-001/DIAG-007",
+  "generated_utc": "2026-06-12T03:30:48.768890+00:00",
+  "p8_regression_gate": "15 passed in 0.37s",
+  "anchor_rule": {
+    "mode": "atr_prominence",
+    "atr_period": 14,
+    "k": 1.0,
+    "tie_break": "most_extreme_then_most_recent",
+    "fallback": "running_extreme"
+  },
+  "cost_model": "Phase 011 P2 CONSERVATIVE (frozen, reference line only)",
+  "n_cells": 51,
+  "n_ready": 51,
+  "reconciliation_failures": 0,
+  "integrity_clean": true,
+  "unreconciled_cells": [],
+  "g1b_input": {
+    "n_shifted_viable": 0,
+    "n_instruments": 0,
+    "instruments": "",
+    "composition_met": false,
+    "sensitivity_met_4cells_2instruments": false,
+    "sensitivity_met_3cells_2instruments": false
+  },
+  "verdict": "DIAGNOSTIC_DELIVERED",
+  "test_reads": 0,
+  "holdout_reads": 0
+}

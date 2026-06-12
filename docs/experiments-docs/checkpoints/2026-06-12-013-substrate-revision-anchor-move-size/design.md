@@ -2,12 +2,14 @@
 
 **Checkpoint type:** Research phase design.
 **Date drafted:** 2026-06-12.
-**Status:** **OPEN — G0 PASS 2026-06-12** (operator-ratified
-`D0-predeclarations.md`; ATR prominence `k=1.0`, floor multiple `M=2`; all
-P1–P8 frozen; registry amended, Phase 013 batch). No TRAIN/TEST/holdout row
-has been read under any `/ANCHOR` definition; EXP-047 TRAIN contact
-authorized behind the P8 regression-suite gate. Next: Stage-1 scoping of
-EXP-047.
+**Status:** **CLOSED 2026-06-12 — ANCHOR_MOVE_FLAT** (G1a 51/51 READY; G1b
+adjudicated 0/51 SHIFTED_VIABLE in [G1-gate-review.md](G1-gate-review.md);
+retrospective written; `CF-AVWAP-001` closed for new in-family phases;
+programme routes to a new candidate family, Phase 014). Phase history:
+G0 PASS 2026-06-12 (operator-ratified `D0-predeclarations.md`; ATR
+prominence `k=1.0`, floor multiple `M=2`; all P1–P8 frozen; registry
+amended, Phase 013 batch); EXP-047 COMPLETE 2026-06-12 (REFUTED, audit
+PASS, 0 slots, 0 TEST reads, holdouts sealed).
 **Candidate family:** `CF-AVWAP-001` (continued from Phases 004–012),
 exercising the registered non-baseline branch `CF-AVWAP-001/ANCHOR`.
 **Follows:** `2026-06-12-012-entry-side-gross-screen` (CLOSED —
