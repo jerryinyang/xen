@@ -1,0 +1,125 @@
+{
+  "data_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data",
+  "determinism_rows": 50000,
+  "dropped_fraction_gate": 0.25,
+  "experiment_id": "VAL-004",
+  "holdout_rule": "first 70 percent analysis slice only",
+  "instrument_universe": {
+    "duplicates": [],
+    "expected": [
+      "AUDJPY",
+      "AUDUSD",
+      "BTCUSD",
+      "DE30",
+      "EURJPY",
+      "EURUSD",
+      "GBPJPY",
+      "GBPUSD",
+      "JP225",
+      "NZDUSD",
+      "US2000",
+      "US500",
+      "USDCAD",
+      "USDCHF",
+      "USDJPY",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "missing": [],
+    "present": [
+      "AUDJPY",
+      "AUDUSD",
+      "BTCUSD",
+      "DE30",
+      "EURJPY",
+      "EURUSD",
+      "GBPJPY",
+      "GBPUSD",
+      "JP225",
+      "NZDUSD",
+      "US2000",
+      "US500",
+      "USDCAD",
+      "USDCHF",
+      "USDJPY",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "unexpected_inferred": [
+      "ANALYSIS70"
+    ]
+  },
+  "linebreak_level": 3,
+  "min_coverage_modes": [
+    null,
+    0.9
+  ],
+  "prefix_fractions": [
+    0.34,
+    0.67,
+    0.95
+  ],
+  "prefix_window_positions": [
+    "head",
+    "middle",
+    "tail"
+  ],
+  "prefix_window_rows": 150000,
+  "processed_files": [
+    "timebars_audjpy_20230103_000000_20260611_010739.parquet",
+    "timebars_audusd_20230103_000000_20260611_005936.parquet",
+    "timebars_btcusd_20230102_000000_20260514_203813.parquet",
+    "timebars_de30_20230103_000000_20260611_011511.parquet",
+    "timebars_eurjpy_20230103_000000_20260611_010703.parquet",
+    "timebars_eurusd_20230102_000000_20260514_203330.parquet",
+    "timebars_gbpjpy_20230103_000000_20260611_010717.parquet",
+    "timebars_gbpusd_20230103_000000_20260611_005212.parquet",
+    "timebars_jp225_20230103_000000_20260611_011546.parquet",
+    "timebars_nzdusd_20230103_000000_20260611_010629.parquet",
+    "timebars_us2000_20230103_000000_20260611_011542.parquet",
+    "timebars_us500_20230103_000000_20260611_011436.parquet",
+    "timebars_usdcad_20230103_000000_20260611_005900.parquet",
+    "timebars_usdchf_20230103_000000_20260611_005853.parquet",
+    "timebars_usdjpy_20230103_000000_20260611_005907.parquet",
+    "timebars_ustec_20230102_230000_20260514_204410.parquet",
+    "timebars_xauusd_20230102_230200_20260514_204148.parquet"
+  ],
+  "renko_atr_period": 14,
+  "source_files": [
+    "timebars_analysis70_btcusd_20230102_000000_20260514_203813.parquet",
+    "timebars_analysis70_eurusd_20230102_000000_20260514_203330.parquet",
+    "timebars_analysis70_ustec_20230102_230000_20260514_204410.parquet",
+    "timebars_analysis70_xauusd_20230102_230200_20260514_204148.parquet",
+    "timebars_audjpy_20230103_000000_20260611_010739.parquet",
+    "timebars_audusd_20230103_000000_20260611_005936.parquet",
+    "timebars_btcusd_20230102_000000_20260514_203813.parquet",
+    "timebars_de30_20230103_000000_20260611_011511.parquet",
+    "timebars_eurjpy_20230103_000000_20260611_010703.parquet",
+    "timebars_eurusd_20230102_000000_20260514_203330.parquet",
+    "timebars_gbpjpy_20230103_000000_20260611_010717.parquet",
+    "timebars_gbpusd_20230103_000000_20260611_005212.parquet",
+    "timebars_jp225_20230103_000000_20260611_011546.parquet",
+    "timebars_nzdusd_20230103_000000_20260611_010629.parquet",
+    "timebars_us2000_20230103_000000_20260611_011542.parquet",
+    "timebars_us500_20230103_000000_20260611_011436.parquet",
+    "timebars_usdcad_20230103_000000_20260611_005900.parquet",
+    "timebars_usdchf_20230103_000000_20260611_005853.parquet",
+    "timebars_usdjpy_20230103_000000_20260611_005907.parquet",
+    "timebars_ustec_20230102_230000_20260514_204410.parquet",
+    "timebars_xauusd_20230102_230200_20260514_204148.parquet"
+  ],
+  "source_timeframes": [
+    15,
+    30
+  ],
+  "sourcebars_valid_range": {
+    "15": [
+      14,
+      15
+    ],
+    "30": [
+      27,
+      30
+    ]
+  }
+}

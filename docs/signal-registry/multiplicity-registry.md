@@ -202,7 +202,7 @@ Negative, blocked, and inconclusive outcomes for any Phase 005 item stay in the 
 | `CF-AVWAP-001/DIAG-006` (`/EXIT-X` screen) | EXP-039 | TRAIN-only: does any registered exit E1–E5 deliver per-event net expectancy (frozen costs + financing) that is positive on every surviving instrument, beats the better reference (4h: max(R-FH(12), R-BTC); 1h: R-BTC), and is split-half stable, on 4h or 1h? | 0 (diagnostic) | **COMPLETE 2026-06-10 — MEASUREMENT_COMPLETE, FLAT** | 0/10 cells qualify under §8.1. 4h: R-FH(12) +37.3 bps is the binding bar; best candidate E2 +31.9 bps (gap −5.4 bps ≈ 0.5 SE, power-limited not mechanism-resolved); E3(8) split-half sign flip caught by criterion (iii). 1h: all candidates and R-BTC net-negative — structurally non-viable on this substrate (third independent confirmation after EXP-030/033). Determinism PASS; reconciliation to EXP-022/033 at machine precision. Audit PASS. File-drawer: negative screen retained. |
 | `CF-AVWAP-001/HYP-001` (measurement) | EXP-040 | Does `P(bounce \| approach to AVWAP)` exceed `P(bounce \| approach to matched non-AVWAP control levels)` on 1h/4h (analysis set, gross, real prices)? | 0 (mechanism science) | **COMPLETE 2026-06-10 — INCONCLUSIVE** | Binding pooled contrasts: 1h Δ=+1.55 pp CI[−4.52,+8.43] Holm p=0.585 (INCONCLUSIVE_SPANS_ZERO); 4h n=50/22 < 100/arm floor (BELOW_FLOOR_NO_VERDICT). Moving-copy arm (design §11/8, descriptive): 1h Δ_m=+3.41 pp [−1.23,+8.35] — kinematic confound does not explain the premium; 4h Δ_m≈0 — negative static Δ was kinematic artifact. HYP-001 remains OPEN; permanent mechanism record per §8.3; no re-parameterization within this scope. Audit PASS. |
 | `CF-AVWAP-001/EXIT-X` | EXP-041 (provisional) | Do the ≤2 TRAIN-frozen qualifying exits retain positive net expectancy on a one-shot TEST read (Holm phase family + R1.2 calibrated margins)? | **1 (reserved)** | **RESERVED-INACTIVE (2026-06-11)** — G1 never opened (EXP-039 FLAT); slot unused; no TEST row read this phase; ID never reusable | Freeze-before-TEST (`frozen_selection.json`, hash-pinned); R1.2 matched-structure null calibration per cell; R1.3 boundary; R1.6 recovery semantics; binding adjudication in the checkpoint's `G2-gate-review.md`. Every TEST cell carries the prior-read disclosure (Phase 008 read this stratum under FH/BTC exits) and the EURUSD TEST-cap note. G2 pass ⇒ frozen carry-forward package only — **no holdout read**. |
-| — (infrastructure) | INFR-002 | Collect 1-minute time bars for GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURJPY, GBPJPY, AUDJPY, US500, US2000, DE30, JP225 (USTEC already local). | — | **COMPLETE 2026-06-11 — ADMITTED (VAL-003 PASS)** | All 13 instruments collected (`run-infr002-collection.sh`, Mode=TimeBars; realized coverage 2023-01-03 → 2026-06-11 per file). **VAL-003 PASS:** 0 FAIL / 0 INCONCLUSIVE across all per-instrument checks (98 each); 24/24 negative controls detected; VAL-001 rev. 3 suite unchanged. **Disclosures:** (1) DE30 coverage truncated — broker m1 history ends 2026-01-16 13:11 (~5 months short of the other 12); its 70/30/holdout boundaries derive from its own realized timeline; operator may re-collect under an alternative broker symbol before first analytical use. (2) A pre-fix duplicate GBPUSD file (content-identical, verified row-for-row) was removed 2026-06-11; the surviving file was validated. **Holdout sealed per file at first touch:** final 30% of each file's chronologically ordered rows is global holdout; no experiment has read any new-universe row. |
+| — (infrastructure) | INFR-002 | Collect 1-minute time bars for GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURJPY, GBPJPY, AUDJPY, US500, US2000, DE30, JP225 (USTEC already local). | — | **COMPLETE 2026-06-11 — ADMITTED (VAL-003 PASS)** | All 13 instruments collected (`run-infr002-collection.sh`, Mode=TimeBars; realized coverage 2023-01-03 → 2026-06-11 per file). **VAL-003 PASS:** 0 FAIL / 0 INCONCLUSIVE across all per-instrument checks (98 each); 24/24 negative controls detected; VAL-001 rev. 3 suite unchanged. **Disclosures:** (1) DE30 coverage truncated — broker m1 history ends 2026-01-16 13:11 (~5 months short of the other 12); its 70/30/holdout boundaries derive from its own realized timeline; operator may re-collect under an alternative broker symbol before first analytical use. (2) A pre-fix duplicate GBPUSD file (content-identical, verified row-for-row) was removed 2026-06-11; the surviving file was validated. **Holdout sealed per file at first touch:** final 30% of each file's chronologically ordered rows is global holdout and remains sealed (no new-universe row read for analysis at admission; Phase 011 subsequently read new-universe first-70% rows for readiness/calibration/training). |
 
 ### Carried, not worked (Phase 010)
 
@@ -275,6 +275,75 @@ Negative, blocked, and inconclusive outcomes for any Phase 005 item stay in the 
 **Phase 013 close recorded (2026-06-12):** ANCHOR_MOVE_FLAT (G1a 51/51 READY; G1b 0/51 SHIFTED_VIABLE, mechanical). `/ANCHOR` CLOSED-MEASURED as ratified; its 1-slot reservation is **released, never consumed** (the viability phase that would have consumed it is foreclosed by the FLAT verdict). `CF-AVWAP-001` closed for new in-family phases. Routing executed per the pre-commitment: new candidate family (Phase 014, own design/D0). Gate record: `docs/experiments-docs/checkpoints/2026-06-12-013-substrate-revision-anchor-move-size/G1-gate-review.md`; retrospective in the same checkpoint.
 
 **Out of scope (recorded):** any net or cost-adjusted move-size column (gross only); exit training/selection/portfolio machinery; inference calibration (EXP-027 analog) or cTrader parity (EXP-029 analog) — deferred to a future net phase; the other Stage-C detectors `/LB` `/MB` `/ATR` (regime-timing levers, not move-geometry; entry-timing already gross-flat per Phase 012); new-family design (a routing destination, not work here); anchor re-parameterisation, threshold change, or cell re-selection after a distribution is seen; 5m; any TEST or holdout contact; MTF; execution-cost work.
+
+## Phase 014 Batch (New Candidate Family: HA Harami Substrate & Capture Geometry)
+
+**Opened:** 2026-06-14 (D0 desk work). **G0 PASS 2026-06-14** — operator-ratified
+`D0-predeclarations.md` (P1–P13; P4 revised to the adaptive duration-derived time
+cap before ratification). No row read under any harami event definition before
+ratification; pipeline entry point VAL-004 → EXP-048.
+**Governing phase:** `docs/experiments-docs/checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/design.md`
+**Family spec:** `docs/signal-registry/candidate-families/harami.md` (status `REGISTERED` — Phase 014 G0 PASS 2026-06-14).
+**Phase 013 close recorded:** ANCHOR_MOVE_FLAT → `CF-AVWAP-001` closed for new
+in-family phases; pre-committed routing to a new candidate family executed here.
+**Design brief (Phase 013 retrospective, binding):** available move was ≈5–9× the
+cost floor in every AVWAP cell, but no deterministic exit captured it — the unsolved
+problem is **capture geometry, not move availability**. The mechanism chosen here is
+a **structurally bounded favourable target** (fraction of the confirmed prior move);
+whether that bound solves favourable-before-adverse is measured early (HYP-002), not
+assumed.
+**Operator decisions recorded (2026-06-14, pre-design):** (1) readiness **and**
+characterization run on all 102 cells (17 instruments × {5m,15m,30m,1h,2h,4h}) — no
+blanket assumptions, per-cell from day one; (2) 014-A tests both barrier
+computability **and** a gross favourable-before-adverse capture-rate read (not
+deferred to 014-B); (3) ZigZag first-branch = Wilder ATR, period 14, `ATR_MULT` 1.0;
+(4) family ID `CF-HA-HARAMI-001`; registry doc and phase design split.
+**Slot accounting:** all Phase 014-A/B experiments are **characterization/diagnostic
+— 0 candidate slots, 0 TEST reads** by construction. A candidate branch for
+screening is registered only at the close of 014-B (own entry, with the
+selected-on-TRAIN disclosure). The variant branches below are registered (countable)
+but consume a slot only when a future scope activates one as a screening candidate.
+**Infrastructure precondition [VAL]:** 15m and 30m are new domains; a VAL-001-style
+temporal-integrity validation (VAL-004) across all 17 instruments must PASS before
+those cells enter EXP-048. Holdout sealed per file at first touch; no new-universe row
+has been read under the HA-harami event definition (Phase 011 read new-universe
+first-70% rows for prior, non-harami readiness/calibration/training); the global
+holdout seal carries forward.
+**TRAIN/TEST discipline:** gross throughout; no cost model; 0 TEST reads; holdouts
+sealed; no HA-price outcome metric (detection on HA candles, all outcomes on real
+prices).
+
+| ID | HYP | Question | Slot / TEST reads | Status | Gate / Note |
+| --- | --- | --- | --- | --- | --- |
+| D0 (this entry) | Tier 0 | Registry amendment + predeclarations (`D0-predeclarations.md` P1–P13). | 0 / 0 | **CLOSED 2026-06-14 — G0 PASS (operator-ratified)** | All P1–P13 frozen. P1 Wilder/14/1.0, P2 favourable 50%, P4 per-cell adaptive duration-derived time cap (`max(6, round(1.5 × median trailing-20 confirmed-move duration))`), P12 capture-viability `r≥0.55`/CI_low>0.50/≥30 resolved. VAL-004 precedes any 15m/30m read; no data contact occurred before ratification. |
+| VAL-004 | — | Do 15m and 30m aggregated OHLC pass VAL-001-style temporal integrity across all 17 instruments? | 0 / 0 | **PLANNED** | Hard gate for 15m/30m cells in EXP-048. |
+| `CF-HA-HARAMI-001/HYP-001` — **EXP-048** | HYP-001 | ZigZag substrate + HA harami detector readiness across 102 cells: determinism, look-ahead safety, invariants, per-cell coverage, `/BARCFG` coverage measured. | 0 / 0 | **PLANNED** | EXP-020-analog. Gated on VAL-004 for 15m/30m. |
+| `CF-HA-HARAMI-001/HYP-002` — **EXP-049** | HYP-002 | 3-barrier capture readiness + **gross favourable-before-adverse capture rate** per cell under default barriers (causal, exit-agnostic). | 0 / 0 | **PLANNED** | First-class capture-geometry read; reuses EXP-047 `move_size.py`. |
+| `CF-HA-HARAMI-001/HYP-003` — **EXP-050** | HYP-003 | Where in a ZigZag move do harami signals occur vs predeclared baselines (random timestamps, alt trend defs)? | 0 / 0 | **PLANNED** | Mechanical near-exhaustion threshold (P9), declared baselines (P13). |
+| `CF-HA-HARAMI-001/HYP-004` — **EXP-051** | HYP-004 | Do `/STRONG-STAT` and `/STRONG-HA` identify materially different move populations, cross-cell consistent? | 0 / 0 | **PLANNED** | Mechanical materiality threshold (P10). |
+| `CF-HA-HARAMI-001/HYP-005` — **EXP-052** | HYP-005 | Direct signal vs signal+confirmation (`/CONFIRM`): descriptive frequency/timing/outcome. | 0 / 0 | **PLANNED** | Descriptive; no selection. |
+
+### Registered variant surface (countable; slot consumed only on screening activation)
+
+| Branch | Lever | Status |
+| --- | --- | --- |
+| `CF-HA-HARAMI-001/BARCFG` | bar-direction configuration isolation | REGISTERED (characterization) |
+| `CF-HA-HARAMI-001/CONFIRM` | signal+confirmation (stop-order entry) | REGISTERED (characterization) |
+| `CF-HA-HARAMI-001/STRONG-STAT` | statistical strong-move filter | REGISTERED |
+| `CF-HA-HARAMI-001/STRONG-HA` | HA-impulse strong-move filter | REGISTERED |
+| `CF-HA-HARAMI-001/VPTARGET` | volume-profile favourable target (TickVolume proxy) | REGISTERED |
+| `CF-HA-HARAMI-001/MAGTARGET` | statistical-magnitude favourable target (`LOOKBACK>1`) | REGISTERED |
+| `CF-HA-HARAMI-001/ADV-EXTREME` | previous-move-extreme adverse target | REGISTERED |
+| `CF-HA-HARAMI-001/ADV-NONE` | no adverse target | REGISTERED |
+| `CF-HA-HARAMI-001/THIRD-EVENT` | event-based third barrier | REGISTERED |
+| `CF-HA-HARAMI-001/THIRD-TIME` | adaptive time-cap sensitivity (`k`/window/floor) | REGISTERED |
+| `CF-HA-HARAMI-001/ATRMULT` | `ATR_MULT` sensitivity (predeclared grid) | REGISTERED |
+| `CF-HA-HARAMI-001/LOOKBACK` | reference-set size sensitivity (predeclared grid) | REGISTERED |
+
+**Out of scope (recorded):** any net/cost-adjusted metric (gross only this phase);
+any HA-price outcome metric; any combined event definition before each primitive is
+measured separately; parameter tuning or post-result variant selection; any TEST or
+holdout contact; cTrader screening before 014-B registers a candidate branch.
 
 ## Amendment Rules
 
