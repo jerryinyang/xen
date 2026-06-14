@@ -106,7 +106,7 @@ def aggregate_ohlc(
     agg_exprs = [
         pl.first("Symbol").alias("Symbol"),
         pl.first("OpenTime").alias("OpenTime"),
-        pl.last("CloseTime").alias("CloseTime"),
+        pl.from_epoch((pl.first("_Bucket") + 1) * period_seconds, time_unit="s").alias("CloseTime"),
         pl.first("Open").alias("Open"),
         pl.max("High").alias("High"),
         pl.min("Low").alias("Low"),
