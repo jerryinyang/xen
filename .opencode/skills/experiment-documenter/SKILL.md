@@ -24,7 +24,9 @@ Turn validated experiment artifacts into durable project documentation.
    - `plots/`
 4. Read current indexes:
    - `python/experiments/INDEX.md`
-   - `docs/experiments-docs/INDEX.md`
+   - `docs/experiments-docs/INDEX.md` (master navigation: live status + `Family Indexes` table)
+   - the relevant family detail index under `docs/experiments-docs/families/<family>/INDEX.md`
+   - the signal registry under `docs/signal-registry/` (candidate-family file, `multiplicity-registry.md`, `test-read-ledger.md`) when the result is registry-relevant
 5. Read the bundled report templates in this skill's `references` directory.
    If needed, locate the file ending with `/experiment-documenter/references/report-templates.md`.
 
@@ -53,7 +55,7 @@ Update `python/experiments/INDEX.md` with a concise row:
 | <ID> | <title> | <status> | <one-line finding> | <date> |
 ```
 
-Update `docs/experiments-docs/INDEX.md` with the detailed five-field schema:
+Add the detailed per-experiment card to the **relevant family detail index** — `docs/experiments-docs/families/<family>/INDEX.md`, not the master — using the five-field schema:
 
 - Hypothesis Tests
 - Scope
@@ -61,7 +63,13 @@ Update `docs/experiments-docs/INDEX.md` with the detailed five-field schema:
 - Hypothesis-Specific Conclusion
 - Hypothesis-Agnostic Observations
 
-Only include hypothesis-agnostic observations when the evidence is direct and unambiguous.
+Only include hypothesis-agnostic observations when the evidence is direct and unambiguous. Append the new card under the family's experiment list and add its entry to that family's in-file ToC.
+
+Choose the family by candidate family / programme era (see the master `Family Indexes` table): e.g. `cf-ha-harami-001` for Phase 014 work, `infrastructure-validation` for VAL-/INFR-series. If the experiment opens a new candidate family, create `docs/experiments-docs/families/<new-family>/INDEX.md` (header + overview + ToC, mirroring the existing family indexes) and add a row to the master `Family Indexes` table.
+
+In the master `docs/experiments-docs/INDEX.md`, update **only** the live-status blocks — `Current Checkpoint Status`, `Current Infrastructure Tasks`, `Checkpoint Retrospectives`, and the `Family Indexes` table (EXP range / status). Do not add per-experiment cards to the master.
+
+Record a signal-registry disposition for every experiment. If the result is registry-relevant, update `docs/signal-registry/` in the same change: advance the candidate-family status in `candidate-families/<family>.md` (e.g. `SCREENED`, `RETIRED`), record the item's outcome in `multiplicity-registry.md` (refuted/blocked/inconclusive items are retained — never deleted or renamed), and enter any counted TEST read or disclosure in `test-read-ledger.md`. If it is not (e.g. a VAL/INFR integrity run with no candidate screen), state `registry: not applicable — <reason>` in `report.md`. These follow the phase checkpoint's G0/D0 conventions — do not invent a parallel scheme.
 
 ## Writing Rules
 
@@ -80,5 +88,6 @@ Only include hypothesis-agnostic observations when the evidence is direct and un
 | `docs/references/dataset-reference.md` | Always |
 | bundled report templates | Before writing `report.md` |
 | `python/experiments/INDEX.md` | Before and after index updates |
-| `docs/experiments-docs/INDEX.md` | Before and after detailed index updates |
+| `docs/experiments-docs/INDEX.md` (master) | Before and after live-status / `Family Indexes` updates |
+| `docs/experiments-docs/families/<family>/INDEX.md` | Before and after detailed per-experiment card updates |
 | latest checkpoint in `docs/experiments-docs/checkpoints/` | When findings affect phase direction |

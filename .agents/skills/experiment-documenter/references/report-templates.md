@@ -51,6 +51,10 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 
 <1–2 paragraph explanation of what we learned and why it matters.>
 
+## Registry Disposition
+
+<State the signal-registry disposition for this experiment. Either: **updates applied** — list the candidate-family status change in `docs/signal-registry/candidate-families/<family>.md`, the `multiplicity-registry.md` entry for the item, and any `test-read-ledger.md` counted read or disclosure; or **`Not applicable — <reason>`** (e.g. VAL/INFR integrity run with no candidate screen).>
+
 ## Limitations
 
 - <Limitation 1: e.g., tested on one instrument only>
@@ -106,11 +110,11 @@ File: `python/experiments/INDEX.md`
 
 ---
 
-## Comprehensive Experiment Index Template
+## Family Detail Index Template
 
-File: `docs/experiments-docs/INDEX.md`
+File: `docs/experiments-docs/families/<family>/INDEX.md`
 
-This is the authoritative detailed catalog of all experiments. Append each experiment as a new section when the experiment completes.
+The family detail indexes are the authoritative detailed catalog of all experiments, split by candidate family / programme era. Append each experiment as a new section in its family's index when the experiment completes (and add it to that family's in-file ToC). The master `docs/experiments-docs/INDEX.md` carries only live status and the `Family Indexes` navigation table — never per-experiment cards.
 
 ```markdown
 ## <EXP-ID> — <Title>
