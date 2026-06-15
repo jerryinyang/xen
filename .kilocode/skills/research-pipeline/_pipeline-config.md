@@ -14,7 +14,8 @@ All paths are relative to the project root (`{project-root}`).
 | Analysis Package (`xen`) | `python/src/xen/` |
 | Data Files | `data/` |
 | Experiment Index (brief) | `python/experiments/INDEX.md` |
-| Comprehensive Index | `docs/experiments-docs/INDEX.md` |
+| Master Index (nav + live status) | `docs/experiments-docs/INDEX.md` |
+| Family Detail Indexes | `docs/experiments-docs/families/<family>/INDEX.md` |
 | Checkpoint Directory | `docs/experiments-docs/checkpoints/` |
 | Reference Documents | `docs/references/` |
 | Code Reviews | `docs/code-reviews/` |
@@ -190,13 +191,13 @@ Xen research is organized into **phases**, each with a checkpoint in `docs/exper
 2. **Execution Phase**: Run experiments according to `design.md`
    - Each experiment follows the 8-stage pipeline
    - Update `python/experiments/INDEX.md` as experiments complete
-   - Update `docs/experiments-docs/INDEX.md` with comprehensive findings
+   - Update the relevant `docs/experiments-docs/families/<family>/INDEX.md` with the detailed experiment card; update `docs/experiments-docs/INDEX.md` (master) live status only
 
 3. **Retrospective Phase**: Create `retrospective.md` after phase completes
    - Summarize outcomes vs. objectives
    - Document lessons learned
    - Propose next phase's research direction
-   - Update comprehensive index with key findings
+   - Update the master index live status and the relevant family detail index with key findings
 
 ### Checkpoint Naming Convention
 
@@ -212,14 +213,29 @@ docs/experiments-docs/checkpoints/YYYY-MM-DD-###-descriptive-name/
 
 ## Available Instruments
 
+The full universe (17 instruments) was admitted by VAL-003.
+
 | Symbol | Name | Type | Notes |
 |--------|------|------|-------|
 | EURUSD | Euro/US Dollar | Forex | Major pair, high liquidity |
-| XAUUSD | Gold/US Dollar | Commodity | Volatile, good for trend analysis |
+| GBPUSD | British Pound/US Dollar | Forex | Major pair |
+| USDJPY | US Dollar/Japanese Yen | Forex | Major pair |
+| USDCHF | US Dollar/Swiss Franc | Forex | Major pair |
+| USDCAD | US Dollar/Canadian Dollar | Forex | Major pair |
+| AUDUSD | Australian Dollar/US Dollar | Forex | Major pair |
+| NZDUSD | New Zealand Dollar/US Dollar | Forex | Major pair |
+| EURJPY | Euro/Japanese Yen | Forex | Cross pair |
+| GBPJPY | British Pound/Japanese Yen | Forex | Cross pair |
+| AUDJPY | Australian Dollar/Japanese Yen | Forex | Cross pair |
+| XAUUSD | Gold/US Dollar | Commodity | Volatile, useful for trend analysis |
 | BTCUSD | Bitcoin/US Dollar | Crypto | 24/7, high volatility |
 | USTEC | NASDAQ-100 | Index | Tech-heavy, liquid |
+| US500 | S&P 500 | Index | Broad US equities |
+| US2000 | Russell 2000 | Index | Small-cap US equities |
+| DE30 | DAX 40 | Index | German equities; broker history truncated to 2026-01-16 |
+| JP225 | Nikkei 225 | Index | Japanese equities |
 
-Other cTrader symbols may be added as the research progresses. Observations may lead to focusing on subsets.
+The original 4-instrument core (EURUSD, XAUUSD, BTCUSD, USTEC) is the default subset. Experiments using the expanded universe must justify the inclusion of new instruments in scope.
 
 ---
 

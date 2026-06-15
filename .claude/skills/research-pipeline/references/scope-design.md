@@ -14,10 +14,10 @@ A testable hypothesis follows this pattern:
 
 Examples:
 
-- "Predefined intraday session windows have higher 20-minute realized range than adjacent same-day control windows on at least 3 of 4 available instruments, with bootstrap confidence intervals excluding zero."
+- "Predefined intraday session windows have higher 20-minute realized range than adjacent same-day control windows on at least a majority of available instruments, with bootstrap confidence intervals excluding zero."
 - "Bars closing beyond the prior-day high have lower 60-minute forward return than a matched control set, measured on real time-bar prices."
 - "Adding one deterministic confirmation filter to an event definition improves median adverse excursion by at least 0.25 ATR without reducing sample size below the predeclared minimum."
-- "Line Break level 3 produces fewer ghost bars than 1-minute time bars on at least 3 of 4 instruments." Use examples like this only when chart types are explicitly in scope.
+- "Line Break level 3 produces fewer ghost bars than 1-minute time bars on at least a majority of instruments." Use examples like this only when chart types are explicitly in scope.
 
 Some experiments are exploratory. The question must still be specific:
 

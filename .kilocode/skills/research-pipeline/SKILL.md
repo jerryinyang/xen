@@ -15,7 +15,7 @@ Coordinate the experiment workflow. Do not replace specialist skills; route work
 2. Read `docs/references/dataset-reference.md`.
 3. Read `docs/references/architecture.md`.
 4. Read `python/experiments/INDEX.md` to identify existing experiments and the next EXP-ID.
-5. Read `docs/experiments-docs/INDEX.md` for current research direction.
+5. Read `docs/experiments-docs/INDEX.md` (the master navigation: live status + `Family Indexes` table) for current research direction. Open the relevant `docs/experiments-docs/families/<family>/INDEX.md` only when you need detailed prior-experiment cards.
 6. Read the newest active checkpoint under `docs/experiments-docs/checkpoints/`:
    - use `design.md` for active phase objectives;
    - use `retrospective.md` only for completed phase lessons and redirect decisions.
@@ -65,6 +65,8 @@ Announce the resume point before continuing.
 ## Stage 1: Scope
 
 Create `python/experiments/<ID>/scope.md`.
+
+Signal-registry precondition (programme file-drawer control): before writing the scope, confirm the candidate family is `REGISTERED` in `docs/signal-registry/candidate-families/<family>.md`, and that any new countable item the scope introduces (variant, detector choice, parameter branch, or follow-up candidate) is listed in `docs/signal-registry/multiplicity-registry.md`. If the scope intends to read a TEST stratum, state that stratum's current counted-read tally from `docs/signal-registry/test-read-ledger.md` (hard cap: 2 lifetime counted reads per stratum). These entries are normally established at the phase checkpoint's G0 gate — verify they exist and reference them; do not invent a parallel process.
 
 1. Clarify the idea with no more than three questions per round.
 2. Split broad ideas into one falsifiable question per experiment.
@@ -129,6 +131,11 @@ duplicate-source event denominators must also receive `REVISE`.
 Scope criteria that are mathematically unattainable, compare percentage
 improvement against a zero baseline, or leave scoped event denominators
 undefined must also receive `REVISE`.
+A scope whose candidate family, variant, detector choice, or parameter branch
+is not yet registered in `docs/signal-registry/multiplicity-registry.md` (and
+its `candidate-families/<family>.md` file), or that plans a TEST-stratum read
+without stating that stratum's current counted-read tally from
+`docs/signal-registry/test-read-ledger.md`, must also receive `REVISE`.
 
 Write `python/experiments/<ID>/governance/pre-execution-review.md` with one verdict:
 
@@ -189,12 +196,15 @@ Expected artifacts:
 
 - `python/experiments/<ID>/report.md`
 - updated `python/experiments/INDEX.md`
-- updated `docs/experiments-docs/INDEX.md`
+- updated `docs/experiments-docs/families/<family>/INDEX.md` (the detailed per-experiment card)
+- updated `docs/experiments-docs/INDEX.md` (master live status + `Family Indexes` table only — no per-experiment card)
+- a recorded signal-registry disposition for every experiment (in `report.md`): if the result is registry-relevant, update `docs/signal-registry/` in the same change — candidate-family status (e.g. `SCREENED`, `RETIRED`), the multiplicity-registry outcome for the item (refuted/blocked/inconclusive items stay in the ledger — never deleted or renamed), and any counted TEST read or disclosure entered in `test-read-ledger.md`; if it is not, an explicit `registry: not applicable — <reason>` note
 
 ## Stage 8: Post-Experiment Governance
 
 Review `audit.md`, `results.md`, `report.md`, and index updates against the bundled governance constraints.
 If needed, locate the file ending with `/research-pipeline/references/governance-constraints.md`.
+On every experiment, confirm a signal-registry disposition was recorded. If the result was registry-relevant, also confirm the candidate-family status was advanced, the multiplicity-registry records the item's outcome (refuted/blocked/inconclusive items retained), and any counted TEST read or disclosure was entered in `test-read-ledger.md`. A missing disposition — or missing updates on a registry-relevant result — warrants `REVISE`.
 
 Write `python/experiments/<ID>/governance/post-experiment-review.md` with `APPROVE`, `REVISE`, or `REJECT`. For `REVISE`, route concrete issues to the responsible specialist and allow at most two revision cycles.
 
@@ -235,6 +245,7 @@ Report: python/experiments/<ID>/report.md
   causality, or streamed-data validity.
 - Respect the scope's filtering and time range boundaries.
 - Do not expand scope after approval. Create a new experiment for follow-up questions.
+- Do not screen, run, or interpret a candidate whose family, variant, detector, or parameter branch is not registered in `docs/signal-registry/` first; do not spend a TEST read without recording it in `test-read-ledger.md` in the same change that records the result. Refuted, blocked, and inconclusive items stay in the registry — never deleted or silently reused.
 - Flag phase misalignment with checkpoint objectives before proceeding.
 - For Heiken Ashi strategy, signal-quality, or return-evaluation experiments:
   never compute returns from HA prices. Always use
@@ -258,5 +269,7 @@ Report: python/experiments/<ID>/report.md
 | bundled scope-design reference | Stage 1 when scope is ambiguous |
 | bundled governance constraints | Stage 4 and Stage 8 |
 | `python/experiments/INDEX.md` | Start, resume, completion |
-| `docs/experiments-docs/INDEX.md` | Start and completion |
+| `docs/experiments-docs/INDEX.md` (master nav + live status) | Start and completion |
+| `docs/experiments-docs/families/<family>/INDEX.md` | When reviewing or updating detailed prior-experiment cards |
+| `docs/signal-registry/` (candidate-families, multiplicity-registry, test-read-ledger) | Stage 1 scope precondition; Stage 4/8 governance; Stage 7 updates |
 | latest checkpoint in `docs/experiments-docs/checkpoints/` | Start and phase alignment |

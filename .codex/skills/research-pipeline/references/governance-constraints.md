@@ -182,7 +182,8 @@ research question or temporal semantics.
 | Key visualisations included | Are the most important plots embedded with captions? |
 | Honest about limitations | Are negative results, inconclusive findings, and caveats included? |
 | Artifacts linked | Are all experiment artifacts referenced by relative path? |
-| Index updated | Is `python/experiments/INDEX.md` entry correct? Is `docs/experiments-docs/INDEX.md` updated? |
+| Index updated | Is `python/experiments/INDEX.md` entry correct? Is the detailed card added to the relevant `docs/experiments-docs/families/<family>/INDEX.md`, and is `docs/experiments-docs/INDEX.md` (master) live status / `Family Indexes` table updated? |
+| Registry & ledger disposition | Is a signal-registry disposition recorded for this experiment? If registry-relevant: candidate-family status advanced in `docs/signal-registry/candidate-families/<family>.md`, item outcome recorded in `multiplicity-registry.md` (refuted/blocked/inconclusive retained), and any counted TEST read or disclosure entered in `test-read-ledger.md`? If not registry-relevant: is the reason noted? |
 
 ---
 

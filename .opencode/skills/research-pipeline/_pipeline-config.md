@@ -14,7 +14,8 @@ All paths are relative to the project root (`{project-root}`).
 | Analysis Package (`xen`) | `python/src/xen/` |
 | Data Files | `data/` |
 | Experiment Index (brief) | `python/experiments/INDEX.md` |
-| Comprehensive Index | `docs/experiments-docs/INDEX.md` |
+| Master Index (nav + live status) | `docs/experiments-docs/INDEX.md` |
+| Family Detail Indexes | `docs/experiments-docs/families/<family>/INDEX.md` |
 | Checkpoint Directory | `docs/experiments-docs/checkpoints/` |
 | Reference Documents | `docs/references/` |
 | Code Reviews | `docs/code-reviews/` |
@@ -190,13 +191,13 @@ Xen research is organized into **phases**, each with a checkpoint in `docs/exper
 2. **Execution Phase**: Run experiments according to `design.md`
    - Each experiment follows the 8-stage pipeline
    - Update `python/experiments/INDEX.md` as experiments complete
-   - Update `docs/experiments-docs/INDEX.md` with comprehensive findings
+   - Update the relevant `docs/experiments-docs/families/<family>/INDEX.md` with the detailed experiment card; update `docs/experiments-docs/INDEX.md` (master) live status only
 
 3. **Retrospective Phase**: Create `retrospective.md` after phase completes
    - Summarize outcomes vs. objectives
    - Document lessons learned
    - Propose next phase's research direction
-   - Update comprehensive index with key findings
+   - Update the master index live status and the relevant family detail index with key findings
 
 ### Checkpoint Naming Convention
 
