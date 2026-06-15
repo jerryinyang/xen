@@ -7,8 +7,8 @@ met: (a) fixed first-branch primitives frozen as predeclared D0 defaults
 `docs/signal-registry/multiplicity-registry.md` (Phase 014 batch); (c) Phase 014
 `design.md` finalized. Eligible for scoping; first EXP is EXP-048 (gated on VAL-004).
 **Primary registry:** `docs/signal-registry/multiplicity-registry.md`
-**Governing phase (planned):** `docs/experiments-docs/checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/design.md`
-**First EXP (planned):** EXP-048 (substrate/detector readiness).
+**Governing phase:** `docs/experiments-docs/checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/design.md`
+**014-A experiments completed:** EXP-048 (READINESS_DELIVERED), EXP-049 (CAPTURE_READINESS_DELIVERED), EXP-050 (CONTEXT_CHARACTERISATION_DELIVERED). EXP-051/052 pending.
 
 This is a candidate family, not a proven strategy. Phase-plan content (014-A/B
 experiment split, gate definitions, programme principles) lives in the Phase 014
@@ -200,13 +200,13 @@ Registry HYP numbering is local to this family. EXP-IDs are assigned in the Phas
 014 `design.md`; the chain begins at **EXP-048**. Gate definitions and outcome
 criteria live in the `design.md`.
 
-| HYP | Question | EXP (planned) | Gate |
-| --- | --- | --- | --- |
-| HYP-001 | Can the ZigZag substrate **and** the HA harami detector each be computed deterministically, look-ahead-safe, and with adequate per-cell coverage across all 102 cells? `/BARCFG` coverage measured, not assumed. | EXP-048 | Required before any characterization. |
-| HYP-002 | Can the 3-barrier capture geometry be computed deterministically and **causally** (thresholds only from confirmed prior moves), **and** what is the gross favourable-before-adverse capture rate per cell under predeclared default barriers? | EXP-049 | First-class capture-geometry read; required before barrier-model comparison. |
-| HYP-003 | Where in a ZigZag move do harami signals occur (near exhaustion vs early/mid), and is "near exhaustion" more frequent than predeclared baselines (random timestamps, alternative trend definitions)? | EXP-050 | Characterization; informs combined-event registration. |
-| HYP-004 | Do the strong-move filters (`/STRONG-STAT`, `/STRONG-HA`) identify materially different move populations, per the predeclared mechanical threshold, consistently across cells? | EXP-051 | Characterization. |
-| HYP-005 | Direct signal vs signal+confirmation (`/CONFIRM`): descriptive frequency, timing, and subsequent outcome distribution of each. | EXP-052 | Characterization. |
+| HYP | Question | EXP | Gate | Status |
+| --- | --- | --- | --- | --- |
+| HYP-001 | Can the ZigZag substrate **and** the HA harami detector each be computed deterministically, look-ahead-safe, and with adequate per-cell coverage across all 102 cells? `/BARCFG` coverage measured, not assumed. | EXP-048 | Required before any characterization. | **READINESS_DELIVERED** — 86/102 READY, 3 COVERAGE_EXCLUDED. |
+| HYP-002 | Can the 3-barrier capture geometry be computed deterministically and **causally** (thresholds only from confirmed prior moves), **and** what is the gross favourable-before-adverse capture rate per cell under predeclared default barriers? | EXP-049 | First-class capture-geometry read; required before barrier-model comparison. | **CAPTURE_READINESS_DELIVERED** — 99/99 barrier-constructible, G1 0/99 VIABLE (r~0.50 null). |
+| HYP-003 | Where in a ZigZag move do harami signals occur (near exhaustion vs early/mid), and is "near exhaustion" more frequent than predeclared baselines (random timestamps, alternative trend definitions)? | EXP-050 | Characterization; informs combined-event registration. | **CONTEXT_CHARACTERISATION_DELIVERED** — 0/99 CLUSTERED, Δ uniformly −0.12 to −0.18. |
+| HYP-004 | Do the strong-move filters (`/STRONG-STAT`, `/STRONG-HA`) identify materially different move populations, per the predeclared mechanical threshold, consistently across cells? | EXP-051 | Characterization. | Pending. |
+| HYP-005 | Direct signal vs signal+confirmation (`/CONFIRM`): descriptive frequency, timing, and subsequent outcome distribution of each. | EXP-052 | Characterization. | Pending. |
 
 Phase 014-B (barrier-model comparison and combined-event characterization) adds
 HYPs against later EXP-IDs once 014-A readiness/characterization is read; those are

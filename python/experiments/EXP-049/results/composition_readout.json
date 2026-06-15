@@ -1,0 +1,27 @@
+{
+  "g1_primary": {
+    "n_viable": 0,
+    "n_instruments": 0,
+    "instruments": "",
+    "viable_cells": [],
+    "composition_met": false
+  },
+  "g2_secondary": {
+    "n_viable": 0,
+    "n_instruments": 0,
+    "instruments": "",
+    "viable_cells": [],
+    "composition_met": false,
+    "disclosure": "G2 events are a systematically censored subset of the G1-defined pool: ~52-60% of G1-defined events are excluded as degenerate (fav_distance<=0; entry already at/through the move midpoint) before resolution, so per-cell g2_defined is materially smaller than g1_defined and inherently lower-powered. composition_met=false here may reflect this structural censoring rather than a genuinely flat metric. Per-cell exclusion is disclosed in capture_rate_secondary.csv (g2_degenerate_frac, g2_degenerate_excluded)."
+  },
+  "sensitivity_non_binding": {
+    "g1_relaxed_4cells_2instruments": false,
+    "g1_relaxed_3cells_2instruments": false,
+    "g1_r_threshold_0_52": {
+      "n_cells": 0,
+      "n_instruments": 0,
+      "composition_met": false
+    }
+  },
+  "rule": "VIABLE iff r>=0.55 AND boot CI_low(1s)>0.50 AND resolved>=30; composition_met iff >=5 VIABLE cells over >=3 instruments (P11/P12)."
+}

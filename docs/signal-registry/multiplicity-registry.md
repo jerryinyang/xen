@@ -281,7 +281,8 @@ Negative, blocked, and inconclusive outcomes for any Phase 005 item stay in the 
 **Opened:** 2026-06-14 (D0 desk work). **G0 PASS 2026-06-14** — operator-ratified
 `D0-predeclarations.md` (P1–P13; P4 revised to the adaptive duration-derived time
 cap before ratification). No row read under any harami event definition before
-ratification; pipeline entry point VAL-004 → EXP-048.
+ratification; pipeline ran VAL-004 → EXP-048 → EXP-049 → EXP-050 with results
+recorded by 2026-06-15.
 **Governing phase:** `docs/experiments-docs/checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/design.md`
 **Family spec:** `docs/signal-registry/candidate-families/harami.md` (status `REGISTERED` — Phase 014 G0 PASS 2026-06-14).
 **Phase 013 close recorded:** ANCHOR_MOVE_FLAT → `CF-AVWAP-001` closed for new
@@ -316,10 +317,10 @@ prices).
 | ID | HYP | Question | Slot / TEST reads | Status | Gate / Note |
 | --- | --- | --- | --- | --- | --- |
 | D0 (this entry) | Tier 0 | Registry amendment + predeclarations (`D0-predeclarations.md` P1–P13). | 0 / 0 | **CLOSED 2026-06-14 — G0 PASS (operator-ratified)** | All P1–P13 frozen. P1 Wilder/14/1.0, P2 favourable 50%, P4 per-cell adaptive duration-derived time cap (`max(6, round(1.5 × median trailing-20 confirmed-move duration))`), P12 capture-viability `r≥0.55`/CI_low>0.50/≥30 resolved. VAL-004 precedes any 15m/30m read; no data contact occurred before ratification. |
-| VAL-004 | — | Do 15m and 30m aggregated OHLC pass VAL-001-style temporal integrity across all 17 instruments? | 0 / 0 | **PLANNED** | Hard gate for 15m/30m cells in EXP-048. |
-| `CF-HA-HARAMI-001/HYP-001` — **EXP-048** | HYP-001 | ZigZag substrate + HA harami detector readiness across 102 cells: determinism, look-ahead safety, invariants, per-cell coverage, `/BARCFG` coverage measured. | 0 / 0 | **PLANNED** | EXP-020-analog. Gated on VAL-004 for 15m/30m. |
-| `CF-HA-HARAMI-001/HYP-002` — **EXP-049** | HYP-002 | 3-barrier capture readiness + **gross favourable-before-adverse capture rate** per cell under default barriers (causal, exit-agnostic). | 0 / 0 | **PLANNED** | First-class capture-geometry read; reuses EXP-047 `move_size.py`. |
-| `CF-HA-HARAMI-001/HYP-003` — **EXP-050** | HYP-003 | Where in a ZigZag move do harami signals occur vs predeclared baselines (random timestamps, alt trend defs)? | 0 / 0 | **PLANNED** | Mechanical near-exhaustion threshold (P9), declared baselines (P13). |
+| VAL-004 | — | Do 15m and 30m aggregated OHLC pass VAL-001-style temporal integrity across all 17 instruments? | 0 / 0 | **COMPLETE 2026-06-14 — SUPPORTED (PASS)** | Full Suite PASS: 2,279 checks, 0 FAIL, 0 INCONCLUSIVE, 28/28 negative controls detected. 68/68 cells ADMITTED. |
+| `CF-HA-HARAMI-001/HYP-001` — **EXP-048** | HYP-001 | ZigZag substrate + HA harami detector readiness across 102 cells: determinism, look-ahead safety, invariants, per-cell coverage, `/BARCFG` coverage measured. | 0 / 0 | **COMPLETE 2026-06-14 — READINESS_DELIVERED** | 86/102 READY, 13 READY_FLAGGED, 3 COVERAGE_EXCLUDED. 0 invariant violations, 0 determinism failures. 99 member cells cleared for EXP-049. Audit PASS. |
+| `CF-HA-HARAMI-001/HYP-002` — **EXP-049** | HYP-002 | 3-barrier capture readiness + **gross favourable-before-adverse capture rate** per cell under default barriers (causal, exit-agnostic). | 0 / 0 | **COMPLETE 2026-06-15 — CAPTURE_READINESS_DELIVERED** | Barrier construction PASS 99/99. G1 r ~0.50 null → 0/99 VIABLE. G2 0/99 (structural degeneracy). Audit PASS. |
+| `CF-HA-HARAMI-001/HYP-003` — **EXP-050** | HYP-003 | Where in a ZigZag move do harami signals occur vs predeclared baselines (random timestamps, alt trend defs)? | 0 / 0 | **COMPLETE 2026-06-15 — CONTEXT_CHARACTERISATION_DELIVERED** | 0/99 CLUSTERED (all NOT_CLUSTERED). Δ −0.12 to −0.18 uniformly. Front-loading is ZigZag-specific. Audit PASS. |
 | `CF-HA-HARAMI-001/HYP-004` — **EXP-051** | HYP-004 | Do `/STRONG-STAT` and `/STRONG-HA` identify materially different move populations, cross-cell consistent? | 0 / 0 | **PLANNED** | Mechanical materiality threshold (P10). |
 | `CF-HA-HARAMI-001/HYP-005` — **EXP-052** | HYP-005 | Direct signal vs signal+confirmation (`/CONFIRM`): descriptive frequency/timing/outcome. | 0 / 0 | **PLANNED** | Descriptive; no selection. |
 

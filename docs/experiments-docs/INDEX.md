@@ -11,7 +11,7 @@
 
 | Checkpoint | Status | Focus | Documents |
 | --- | --- | --- | --- |
-| 2026-06-14-014-ha-harami-substrate-and-capture | **ACTIVE — G0 PASS 2026-06-14; VAL-004 COMPLETE 2026-06-14** (D0 ratified, P1–P13 frozen in [D0-predeclarations.md](checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/D0-predeclarations.md); VAL-004 PASS — full Suite PASS, all 68 cells ADMITTED). New candidate family **`CF-HA-HARAMI-001`** (Heiken Ashi harami at trend exhaustion), via the Phase 013 pre-committed routing on ANCHOR_MOVE_FLAT. Design brief (Phase 013 retrospective, binding): the unsolved problem is **capture geometry, not move availability** — the mechanism is a structurally bounded favourable target, measured early (HYP-002/EXP-049), not assumed. 102-cell grid (17 instruments × {5m,15m,30m,1h,2h,4h}); all work **gross, 0 candidate slots, 0 TEST reads, holdouts sealed**. Pipeline entry point: **VAL-004 PASSED** → **EXP-048** (substrate/detector readiness, next). 014-A primitives (EXP-048–052) validated separately before any 014-B combined event/barrier-model work. | **HA-harami family from first principles.** Validate each primitive (ATR-ZigZag substrate on real bars, HA harami detector on HA candles, 3-barrier capture geometry) separately, then assemble only survivors. Capture geometry is first-class — a gross favourable-before-adverse capture read lands in 014-A (EXP-049), not deferred. Detection on HA candles; every outcome metric on real prices. | [design.md](checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/design.md) · [D0-predeclarations.md](checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/D0-predeclarations.md) · [family spec](../signal-registry/candidate-families/harami.md) · [VAL-004](../../python/experiments/VAL-004/) |
+| 2026-06-14-014-ha-harami-substrate-and-capture | **ACTIVE — G0 PASS 2026-06-14; VAL-004 COMPLETE 2026-06-14; EXP-048 READINESS_DELIVERED 2026-06-14; EXP-049 CAPTURE_READINESS_DELIVERED 2026-06-15; EXP-050 CONTEXT_CHARACTERISATION_DELIVERED 2026-06-15; EXP-051 STRONG_FILTER_CHARACTERISATION_DELIVERED 2026-06-15** (D0 ratified, P1–P13 frozen in [D0-predeclarations.md](checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/D0-predeclarations.md); VAL-004 PASS — full Suite PASS, all 68 cells ADMITTED). New candidate family **`CF-HA-HARAMI-001`** (Heiken Ashi harami at trend exhaustion), via the Phase 013 pre-committed routing on ANCHOR_MOVE_FLAT. Design brief (Phase 013 retrospective, binding): the unsolved problem is **capture geometry, not move availability** — the mechanism is a structurally bounded favourable target, measured early (HYP-002/EXP-049), not assumed. 102-cell grid (17 instruments × {5m,15m,30m,1h,2h,4h}); all work **gross, 0 candidate slots, 0 TEST reads, holdouts sealed**. Pipeline entry point: **VAL-004 PASSED** → **EXP-048** → **EXP-049** → **EXP-050** → **EXP-051 STRONG_FILTER_CHARACTERISATION_DELIVERED 2026-06-15; EXP-052 pending**. 014-A primitives (EXP-048–052) validated separately before any 014-B combined event/barrier-model work. **EXP-048:** 86/102 READY, 13 READY_FLAGGED, 3 COVERAGE_EXCLUDED — no substrate defect, 0 invariant violations, 0 determinism failures; 99 member cells cleared for EXP-049. **EXP-049:** 99/99 cells barrier-constructible, G1 r ~0.50 null → 0/99 VIABLE, G2 systematically degenerate; capture geometry under benchmark defaults does not favour. **EXP-050:** raw HA harami position-in-move uniformly front-loaded (Δ −0.12 to −0.18, 0/99 CLUSTERED); front-loading is ZigZag-specific; baseline for conditional/selected harami screening. **EXP-051:** both /STRONG-STAT (p75) and /STRONG-HA (primary) identify materially different move populations (99/99 MATERIAL, both P11 pass, ρ≥1.5 & f∈[0.10,0.50] in every cell); disclosed forms agree (0 flips); invariants 0, determinism PASS. | **HA-harami family from first principles.** Validate each primitive (ATR-ZigZag substrate on real bars, HA harami detector on HA candles, 3-barrier capture geometry) separately, then assemble only survivors. Capture geometry is first-class — a gross favourable-before-adverse capture read lands in 014-A (EXP-049), not deferred. Detection on HA candles; every outcome metric on real prices. | [design.md](checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/design.md) · [D0-predeclarations.md](checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/D0-predeclarations.md) · [family spec](../signal-registry/candidate-families/harami.md) · [VAL-004](../../python/experiments/VAL-004/) |
 | 2026-06-12-013-substrate-revision-anchor-move-size | **CLOSED 2026-06-12 — ANCHOR_MOVE_FLAT** (G1a 51/51 READY; G1b adjudicated **0/51 SHIFTED_VIABLE** in [G1-gate-review.md](checkpoints/2026-06-12-013-substrate-revision-anchor-move-size/G1-gate-review.md); retrospective written 2026-06-12; **`CF-AVWAP-001` closed for new in-family phases** — exits (010–011), entry parameters (012), and the ratified `/ANCHOR` (013) all CLOSED-MEASURED; `/LB` `/MB` `/ATR` DEFERRED with no candidate status; pre-committed routing executed: programme routes to a **new candidate family** — Phase 014, own design/D0, fresh EXP-020/027/029-analog scaffolding, design brief targets **capture geometry**, not move availability). Phase history: **G0 PASS 2026-06-12** (D0 P1–P8 operator-ratified: ATR prominence `k=1.0`, floor multiple `M=2`; registry amended, Phase 013 batch; no row read under any `/ANCHOR` definition before ratification). **EXP-047 COMPLETE 2026-06-12 — DIAGNOSTIC_DELIVERED, hypothesis REFUTED, audit PASS 0C/2W (interpretive):** mechanical G1b input **ANCHOR_MOVE_FLAT** — 0/51 SHIFTED_VIABLE (relaxed sensitivity thresholds ≥4/≥2 and ≥3/≥2 also unmet). Central finding (audit-verified): the ratified k=1.0 ATR-prominence anchor **collapses to the baseline running extreme by qualification** — anchor coincidence 94.6–98.5% vs fallback only 0–2% (the predeclared fallback disclosure missed the dominant collapse path); 13/51 cells produced literally identical event populations; Δ median MFE −2.7…+0.9 bps, all inside noise. Unanticipated descriptive read: P5 leg 2 passes 51/51 — median lifetime peak MFE ≈5–9× the frozen cost floor on **both** anchors (1h ≈24, 2h ≈36, 4h ≈64 bps vs floors ≈5–7 bps) — **move availability was never the binding constraint; capture geometry is**. Integrity clean: P8 regression gate 15/15 before first TRAIN read, 51/51 READY, reconciliation 125/125 vs EXP-043 counts + EXP-046 gross(H=8) at diff exactly 0.0, determinism everywhere. **0 slots, 0 TEST reads, holdouts sealed, ledger unchanged.** Verdict conditional on the ratified k=1.0; pre-committed routing on FLAT: new candidate family (own design/D0). | **Substrate pivot opener: TRAIN-only, gross, exit-agnostic move-size diagnostic** deciding between an in-family `/ANCHOR` revision and a full new-family pivot, per the Phase 012 §1.4.2 operator pre-commitment. Compares the available per-event favorable move (lifetime MFE) under the running-extreme vs ATR-prominence anchors against the frozen per-cell cost floor across the full 17×{1h,2h,4h} grid (readiness-defined membership). | [design.md](checkpoints/2026-06-12-013-substrate-revision-anchor-move-size/design.md) · [D0-predeclarations.md](checkpoints/2026-06-12-013-substrate-revision-anchor-move-size/D0-predeclarations.md) · [G1-gate-review.md](checkpoints/2026-06-12-013-substrate-revision-anchor-move-size/G1-gate-review.md) · [retrospective.md](checkpoints/2026-06-12-013-substrate-revision-anchor-move-size/retrospective.md) · [EXP-047](../../python/experiments/EXP-047/) |
 | 2026-06-12-012-entry-side-gross-screen | **CLOSED 2026-06-12 — ENTRY_GROSS_FLAT** (G1 adjudicated in [G1-gate-review.md](checkpoints/2026-06-12-012-entry-side-gross-screen/G1-gate-review.md): no non-baseline `/ALPHA` or `/MA-DOMAIN` OAT variant meets the P6 composition threshold — best 3 clearing cells (alpha_1.0 3/3 instruments; ma_40_100 3/2) vs ≥5 cells over ≥3 instruments; **0 slots, 0 TEST reads, ledger unchanged, holdouts sealed**; routing per the design §1.4.2 operator pre-commitment: programme pivots to substrate revision — Phase 013 design starts from the Stage-C branches (`/LB` `/MB` `/ATR` `/ANCHOR`) or a new candidate family; retrospective written 2026-06-12). Phase history: **G0 PASS 2026-06-12** (D0 P1–P8 operator-ratified as drafted; registry amended; variant count corrected 8→7 pre-data-contact). **EXP-046 COMPLETE 2026-06-12 — SCREEN_DELIVERED, hypothesis REFUTED, audit PASS 0C/0W/3 Info, post-experiment governance APPROVE (single pipeline pass, no revision cycles):** 7 variants × 37 cells; 14 CLEAR / 235 NO_CLEAR / 10 BELOW_FLOOR; variant H=8 cross-cell medians −2.35 to +0.28 bps vs floors ~5–20 bps (the gross shortfall is a substrate property, not a parameterization property); 12/14 CLEAR rows in the predeclared 4h/index false-positive channel (US2000-4h clears under 5 variants — hypothesis-generating only); all 10 BELOW_FLOOR rows are slow-MA 4h cells (breadth-for-quality trade-off); integrity clean — reconciliation 259/259 at 1e-9 bps vs the EXP-043 counts and EXP-045 FH anchor, determinism 259/259 (full-frame replay), P8 regression gate green (24/24 incl. baseline-fixture invariance at default α/MA). Entry-parameter lever measured and exhausted on this substrate; `/ALPHA` and `/MA-DOMAIN` CLOSED-MEASURED. | [design.md](checkpoints/2026-06-12-012-entry-side-gross-screen/design.md) · [D0-predeclarations.md](checkpoints/2026-06-12-012-entry-side-gross-screen/D0-predeclarations.md) · [G1-gate-review.md](checkpoints/2026-06-12-012-entry-side-gross-screen/G1-gate-review.md) · [retrospective.md](checkpoints/2026-06-12-012-entry-side-gross-screen/retrospective.md) · [EXP-046](../../python/experiments/EXP-046/) |
 | 2026-06-11-011-per-instrument-foundation | **CLOSED 2026-06-11 — FOUNDATION_NON-TUNABLE** (G2 adjudicated FAIL in [G2-gate-review.md](checkpoints/2026-06-11-011-per-instrument-foundation/G2-gate-review.md): EXP-045 membership 0/37 vs P5 ≥5 cells over ≥3 instruments; Tracks C/D never opened; **0 of ≤6 TEST reads spent, ledger unchanged**; EXP-018 P1 threshold unspent; retrospective written 2026-06-11 — routing per design §9: `/ENTRY` exploration or substrate change, next phase design pending). Phase history: **G0 PASS 2026-06-11; Track A0 removed after EXP-042 FRAMING_ERROR** (D0 predeclarations frozen; EXP-042 set aside with 0 slots and 0 TEST reads; entry reverts to the frozen AVWAP-line arm/trigger; band multiplier is only a Track B exit parameter). **Track A readiness (EXP-043) COMPLETE 2026-06-11 — READINESS_DELIVERED, audit PASS:** 50/51 cells READY (0 invariant violations, 0 determinism failures, no substrate alert); JP225-2h NOT_READY on the frozen >25% 2h dropped-fraction gate (excluded from Track B); realized event-rate table supersedes design §7.4 power figures (1h 151–273, 2h 86–143, 4h 32–86 TRAIN events; all ≥30 floor). **G1 adjudicated 2026-06-11 (PARTIAL → CLOSED same day)** ([G1-gate-review.md](checkpoints/2026-06-11-011-per-instrument-foundation/G1-gate-review.md), adjudication 1 of 2): readiness leg (i) SATISFIED on 50 cells; calibration leg (ii) **measured — EXP-044 COMPLETE 2026-06-11, CALIBRATION_DELIVERED, audit PASS**: 37/50 cells COVERED, 13 NOT_COVERED (11 marginal FPR excess, USDCAD-2h material, BTCUSD-4h no finite MDE); median per-cell MDE 16/32/64 bps on 1h/2h/4h; substrate triggers not fired; **G1 CLOSED 2026-06-11** (adjudication 2 of 2 in G1-gate-review.md): Track B authorization GRANTED on the 37-cell COVERED grid; 13 NOT_COVERED cells excluded with record (11 marginal FPR, USDCAD-2h material, BTCUSD-4h no finite MDE); per-cell MDE table is the binding Track B/D power context; EXP-029-analog parity remains the pre-TEST-read requirement for 2h/new-universe strata. **Track B (EXP-045) COMPLETE 2026-06-11 — TRAINING_DELIVERED, EMPTY MEMBERSHIP, audit PASS:** 0/37 member cells (35 NON_TUNABLE, 2 FLOOR_FAIL with negative plateaus); net medians −5 to −7 bps at every grid point of both exit families under frozen CONSERVATIVE costs; G2 composition (P5) NOT met — **G2 adjudicated FAIL 2026-06-11 → phase CLOSED FOUNDATION_NON-TUNABLE; Tracks C/D never opened; 0 of ≤6 TEST reads spent.** The failure is economic, not methodological: gross proxy positive in 31/37 cells; frozen CONSERVATIVE costs consume the few-bps gross edge. The per-instrument exit-side lever is measured and exhausted on this substrate. EXP-029-analog parity dispositioned as a pre-TEST-read requirement for 2h/new-universe strata, not a G1 condition. | **Per-instrument foundation and strategic reset.** Tests whether the AVWAP baseline entry with per-instrument-trained exits across 17 instruments × {1h, 2h, 4h} can pass the portfolio-fitness primary endpoint and any top-k per-cell secondary confirmations. 5m retired; holdouts sealed; EURUSD-4h at TEST-read cap; total phase TEST budget ≤6 one-shot reads. | [design.md](checkpoints/2026-06-11-011-per-instrument-foundation/design.md) · [D0](checkpoints/2026-06-11-011-per-instrument-foundation/D0-predeclarations.md) · [G1](checkpoints/2026-06-11-011-per-instrument-foundation/G1-gate-review.md) · [G2](checkpoints/2026-06-11-011-per-instrument-foundation/G2-gate-review.md) · [retrospective.md](checkpoints/2026-06-11-011-per-instrument-foundation/retrospective.md) |
@@ -2215,6 +2215,185 @@ At the ratified k=1.0, the ATR-prominence rule selects the baseline running extr
 - The available peak move was never the scarce quantity: median lifetime MFE is ≈5–9× the frozen cost floor in all 51 cells on both anchors. Combined with the Phase 010/011 exit-side negatives, the binding constraint on this substrate is capture geometry (peak → realizable exit, net of cost), not move availability — a direct input to the new-family design brief.
 - Collapse-toward-baseline disclosures for parameterised event definitions must measure outcome coincidence (anchor coincidence rate), not just the explicit fallback path; the predeclared `fallback_rate` column read ~0 while the rule was ~98% inert.
 - Bounce-event lifetime MFE is comparable to matched in-regime control bars (descriptive) — consistent with the established relative-not-absolute character of the bounce edge.
+
+---
+
+## EXP-048 — Phase 014-A Substrate & Detector Readiness (ATR-ZigZag + HA Harami, 102 Cells)
+
+**Status**: READINESS_DELIVERED
+**Date**: 2026-06-14
+**Instruments**: all 17 (BTCUSD, EURUSD, USTEC, XAUUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURJPY, GBPJPY, AUDJPY, US500, US2000, DE30, JP225)
+**Data Views / Feature Categories**: 1-minute time bars aggregated to 5m (strict), 15m/30m/1h/2h/4h (`min_coverage=0.90`) OHLC domains; Heiken Ashi candles from domain bars via `xen.heiken_ashi_generator`; ATR-ZigZag sequential streaming substrate on real bars (Wilder ATR-14, `ATR_MULT=1.0`); HA harami shift-1 vectorized detector on HA candles; no chart-type views
+
+### Hypothesis Tests
+
+1. **Hypothesis** (exploratory readiness, no market-edge claim): For every one of the 102 cells (17 instruments × {5m, 15m, 30m, 1h, 2h, 4h}), the ATR-ZigZag trend substrate (real bars) **and** the HA harami detector (HA candles) can each be computed deterministically, look-ahead-safe, and invariant-clean on the TRAIN analysis stratum; and their measured per-cell move/event rates and `/BARCFG` coverage quantify per-cell context for the downstream capture read (EXP-049).
+
+### Scope
+
+- **Instruments**: all 17 VAL-003/VAL-004-admitted instruments (4 core + 13 new-universe). DE30 with truncated history disclosure.
+- **Data Views / Feature Categories**: 6 OHLC domains (5m strict; 15m/30m/1h/2h/4h at 0.90 coverage). HA candles per cell.
+- **Primitives** (two independent, frozen defaults): ATR-ZigZag (Wilder ATR-14, `ATR_MULT=1.0`, real bars, sequential streaming) — proof that the substrate is causal and deterministic; HA harami detector (body-inside-prior-body, reduced-form `HAClose₀ ∈ (PrevBodyMin, PrevBodyMax)`, shift-1 vectorized) — proof the detector is invariant-clean.
+- **Per-cell checks**: construction integrity (OHLC consistency, monotonic `CloseTime`, dropped-fraction gate); ZigZag invariant battery (alternation, causality, timestamps, threshold breach, monotonic confirmation, no NaN); HA harami invariant battery (reduced-form agreement, adjacency, monotonicity, no NaN); determinism replay (full second pass, frame-identical comparison).
+- **Parameters**: `ATR_MULT=1.0`, `atr_period=14`. No sweep, no tuning, no combined event.
+- **Time range**: TRAIN only (first 49% via F01 prefix; nested analysis-set TEST + final-30% holdout sealed).
+- **Exclusions**: no combined harami-at-trend-exhaustion event (014-B / EXP-050+); no 3-barrier capture, returns, MFE/MAE, expectancy, or edge of any kind; no strong-move filters; no sweep or selection; no TEST/holdout contact; no outcome metrics.
+
+### Results / Observations
+
+- **Status distribution**: 86 READY, 13 READY_FLAGGED, 3 COVERAGE_EXCLUDED (US500-4h, JP225-2h, JP225-4h), 0 CONSTRUCTED_EMPTY, 0 NOT_READY (any type).
+- **COVERAGE_EXCLUDED**: US500-4h (dropped 0.286), JP225-2h (0.257), JP225-4h (0.297) — market-hour gap × longest aggregation windows.
+- **READY_FLAGGED**: 13 cells across US500, US2000, DE30, JP225, XAUUSD, USTEC — dropped ∈ [0.10, 0.25], all well below the 0.25 exclusion gate.
+- **All invariant violations**: 0 on every cell (12 invariant keys, both primitives).
+- **All determinism failures**: 0 (102/102 cells PASS frame-identical replay).
+- **Move rates** (ATR-ZigZag confirmed moves per 1k domain bars): range [170.2, 207.0] across all non-excluded cells. All 99 cells ≥30 moves (minimum 336).
+- **Harami event rates** (per 1k HA candles): range [229.6, 261.4]. All 99 cells ≥30 events (minimum 401).
+- **`/BARCFG` coverage** (pooled fractions across domains): UP_UP ~33–35%, DN_DN ~31–34%, UP_DN ~16–18%, DN_UP ~15–17%. Near-symmetric same-direction dominance, consistent with the family's construction-derived reduction.
+- **DE30 disclosure**: truncated history (broker ends 2026-01-16); all counts/rates from its own timeline. Rates per 1k comparable; absolute counts systematically lower.
+- **SUBSTRATE_REFUTED criteria**: unmet (no non-determinism, no systematic invariant failure on ≥3 instruments).
+- **Audit PASS**: 0 Critical, 1 Warning (latent `/BARCFG` null bug — zero-harami guard not exercised in this run), 2 Info.
+
+### Hypothesis-Specific Conclusion
+
+**READINESS_DELIVERED**
+
+Both primitives are mechanically valid across all 99 non-excluded cells: zero invariant violations (both batteries), zero determinism failures (102/102), and the per-cell readiness map, move/event-rate table, and `/BARCFG` coverage table are produced as scoped. The 13 READY_FLAGGED and 3 COVERAGE_EXCLUDED cells are coverage outcomes (dropped-fraction disclosures), not primitive defects. The 99 non-excluded cells clear the substrate/detector gate for EXP-049 capture read. No market-edge claim is tested or implied.
+
+### Hypothesis-Agnostic Observations
+
+- **COVERAGE_EXCLUDED follow EXP-043 pattern**: US500-4h, JP225-2h/4h — market-hour gap × longest aggregation windows. Consistent with the EXP-043 convention; these are permanent cell-level exclusions under the frozen coverage gate.
+- **Move rates are instrument-stable**: ATR-ZigZag at `ATR_MULT=1.0` on Wilder ATR-14 produces a narrow 170–207/1k range across 17 instruments × 6 domains — a fixed-parameter pivot-threshold property, not market-structure variation.
+- **Harami incidence is near-constant**: ~230–261/1k across all cells — a construction-derived consequence of the reduced-form constraint on `HAClose₀`, not a market signal. Incidence is independent of instrument, domain, or volatility regime.
+- **`/BARCFG` near-symmetric**: UP_UP ~33–35% vs DN_DN ~31–34% dominance, expected from the family's reduced-form proof. UP_UP > DN_DN asymmetry consistent with mild bullish TRAIN-period drift.
+- **DE30 short history**: Truncated broker history means DE30 bar counts are ~20–30% lower than full-history instruments, though rates per 1k remain comparable. All DE30 cells are READY or READY_FLAGGED (no exclusions from span alone); DE30 pass-through to EXP-049 with disclosure.
+
+---
+
+## EXP-049 — Phase 014-A 3-Barrier Capture Readiness & Gross Capture Rate (ATR-ZigZag Reversals, 99 Cells)
+
+**Status**: CAPTURE_READINESS_DELIVERED
+**Date**: 2026-06-15
+**Instruments**: all 17; 99 member cells = EXP-048 READY ∪ READY_FLAGGED (3 COVERAGE_EXCLUDED cells excluded per scope)
+**Data Views / Feature Categories**: 5m/15m/30m/1h/2h/4h real domain OHLC; ATR-ZigZag trend-change confirmation anchor (Wilder ATR-14, `ATR_MULT=1.0`); P1–P5 Phase 014 benchmark 3-barrier system on real bars; no HA candles, no harami detector
+
+### Hypothesis Tests
+
+1. **Hypothesis (HYP-002)**: For every EXP-048-READY cell, the 3-barrier capture system (P2 favourable, P3 1:1 adverse, P4 adaptive time cap, P5 LOOKBACK=1) can be constructed deterministically and causally on real prices; and the per-cell gross favourable-before-adverse capture rate `r = P(fav before adv | resolved)` is measured under the predeclared default barriers (two geometries: G1 distance-based primary, G2 retracement-level secondary), with P12 viability (`r ≥ 0.55`, `CI_low > 0.50`, `resolved ≥ 30`) and P11 composition (≥5 cells over ≥3 instruments) applied as a mechanical readout.
+
+### Scope
+
+- **Instruments**: all 17 VAL-003-admitted instruments; DE30 with truncated-history disclosure.
+- **Data Views / Feature Categories**: 6 real-domain OHLC views (5m strict; 15m/30m/1h/2h/4h at `min_coverage=0.90`); ZigZag trend-change substrate (frozen `xen.zigzag`, unchanged); barrier module `xen.capture_barriers` (new).
+- **Features**: per-event favourable/adverse/time-cap/data-censored outcome on real High/Low; per-cell capture rate `r` with regime-clustered moving-block bootstrap CI (MBB, `b=round(m^(1/3))`, `N_BOOT=10_000`); invariant battery (causality, fence, determinism, NaN, G1 well-formedness).
+- **Parameter ranges**: P1 ATR-14/1.0; P2 X=50%; P3 1:1; P4 `N=max(6,round(1.5·median(trailing-20 durations)))`; P5 LOOKBACK=1; G1 (distance-based, primary), G2 (retracement-level, secondary).
+- **Exclusions**: no HA harami detector or combined harami entry (014-B); no `/CONFIRM` model; no alternative barrier variants (`/VPTARGET`, `/MAGTARGET`, etc.); no strong-move filters; no costs; no TEST/holdout contact; no candidate slot consumption; no returns or edge claims.
+
+### Results / Observations
+
+- **CAPTURE_READINESS_DELIVERED**: 99/99 member cells pass all invariant batteries (0 causality, 0 fence, 0 NaN, 0 G1 fav_dist violations); 0 non-deterministic cells (frame-identical second-pass replay); 0 systematic invariant failures.
+- **G1 capture rate (primary/distance-based)**: `r` ranges [0.4545, 0.5343] across all 99 cells, tightly clustered around the 0.50 symmetric-barrier null. **0/99 cells VIABLE** — all `BELOW_R` (r < 0.55). `composition_met = false` (0 cells, 0 instruments). Sensitivity at relaxed bars also `false`.
+- **G2 capture rate (secondary/retracement-level)**: `r` ranges [0.3257, 0.4389]. **0/99 VIABLE**. 52–60% of events degenerate (entry at/through midpoint), correctly excluded and disclosed.
+- **Power**: all member cells `resolved ≥ 30` (min 128). **0 NOT_VIABLE_BY_POWER** cells.
+- **Time-cap censoring (unresolved fraction)**: 22–33% across cells. Data-truncation < 0.5%. Adaptive P4 cap binds at 6-bar floor in 96/99 cells.
+- **Determinism**: PASS (full-frame replay, identical CI bounds, 0 degenerate bootstrap resamples in any cell).
+- **Audit PASS**: 0 Critical, 0 Warning, 4 Info notes.
+- **Verdict stage**: the experiment does not self-adjudicate G1; `composition_met = false` is consistent with design §10 CHARACTERISED_NOT_VIABLE on the capture leg. Desk adjudication combining EXP-048 (leg a), EXP-049 (leg b), and future 014-B (leg c) is pending.
+
+### Hypothesis-Specific Conclusion
+
+**CAPTURE_READINESS_DELIVERED**
+
+Barrier construction is valid on 99/99 cells. The G1 capture-rate readout is uniform negative: 0 VIABLE cells under P12. The capture geometry under benchmark defaults (50% favourable fraction, 1:1 R:R, adaptive time-cap) does not produce a favourable-before-adverse bias above the 0.55 viability bar in any cell of the 17×6 grid. The G2 secondary geometry is systematically weaker due to ~52–60% degeneracy and also 0/99 VIABLE.
+
+### Hypothesis-Agnostic Observations
+
+- **r ≈ 0.50 is a genuine null, not a power failure**: with symmetric equidistant barriers on either side of a ZigZag-confirmation entry, price has approximately equal probability of hitting either target first on this substrate. The null is consistent with a near-random-walk path.
+- **G2 degeneracy is structural**: the entry-mostly-inside-midpoint pattern means ZigZag confirmations occur after ~50% giveback of the prior move, so the midpoint is often inside the entry-exit range. This is not a model defect but a property of the `ATR_MULT=1.0` pivot threshold.
+- **Adaptive cap binds at floor**: median N_event = 6.0 (floor) in 96/99 cells. The P4 adaptive mechanism delivers no per-cell variation beyond the floor for this substrate — the `/THIRD-TIME` sensitivity branch would be informative only at barrier ratios or k-values above the floor.
+- **Barrier system is reusable**: `xen.capture_barriers` passed construction validation and determinism on 99 cells × 2 geometries. Any 014-B variant can reuse it without re-validation.
+
+---
+
+## EXP-050 — Phase 014-A Harami-in-Context Characterisation
+
+**Status**: CONTEXT_CHARACTERISATION_DELIVERED
+**Date**: 2026-06-15
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURJPY, GBPJPY, AUDJPY, US500, US2000, DE30, JP225 (99 EXP-048-READY cells)
+**Data Views / Feature Categories**: 5m (strict), 15m/30m/1h/2h/4h (`min_coverage=0.90`); HA candles for harami detection; real domain prices for all metrics
+
+### Hypothesis Tests
+
+1. **Hypothesis / exploratory question**: For each EXP-048-READY cell, where in a ZigZag move do raw HA harami signals occur, and does the per-cell final-third rate FT exceed the direction-matched random-timing baseline FT_rand by ≥ 10pp (P9 materiality)?
+
+### Scope
+
+- **Instruments**: all 17 VAL-003-admitted instruments; DE30 with truncated-history disclosure.
+- **Data Views / Feature Categories**: HA candles (via `xen.ha_candles`); real-domain OHLC for positioning; ZigZag moves via `xen.zigzag` (ATR 14/1.0, unchanged).
+- **Features**: harami detection (`xen.ha_harami`); pivot-tiling interval join for move-assignment; price-excursion position `pos = (P − S_i) / (E_i − S_i)`; FT = P(pos ≥ 0.67); direction-stratified random baseline FT_rand; regime-clustered MBB CI on Δ = FT − FT_rand; P9/P11 mechanical readout; MA(20,50) alternative-segmentation secondary.
+- **Parameter ranges**: P3 position-in-move with D0-ratified 0.67 threshold; P4 ZigZag ATR 14/1.0; P5 direction-matched random baseline (in-move cardinality, 2,000 bootstrap draws); P6 OFF (no /BARCFG filter); P7 `cluster_by_move` bootstrap; P8 two-pass deterministic replay; P9 materiality 10pp; P11 composition ≥5 cells ≥3 instruments FT ≥ 0.50; P13.2 MA(20,50) secondary segmentation.
+- **Exclusions**: no ZigZag confirmation filter; no /BARCFG or strong-move filter; no combined harami+barrier event (014-B); no costs; no TEST/holdout contact; no candidate consumption; no returns or edge claims; no direction differentiation in FT (pooled across up/down).
+
+### Results / Observations
+
+- **Verdict**: CONTEXT_CHARACTERISATION_DELIVERED. **0/99 cells CLUSTERED** (all NOT_CLUSTERED). Composition readout: 0 cells, 0 instruments, `composition_met = false` at every support tier and every sensitivity threshold.
+- **FT**: range [0.210, 0.312] across 99 cells. FT_rand: range [0.334, 0.432]. Δ = FT − FT_rand: every cell negative; median approximately −0.12 to −0.18 across domains.
+- **MA(20,50) secondary (P13.2)**: Δ_ma_vs_rand ≈ 0 (range [−0.041, +0.010]). Front-loading attenuates under MA regime segmentation — it is a ZigZag-specific phenomenon.
+- **All invariants pass**: 0 detector self-check, 0 assignment well-formedness, 0 TRAIN fence violations; all 99 cells deterministic; all reportable (min n_assigned = 393).
+- **P11 composition**: not met at any sensitivity threshold (strawman 0.50 fails on both FT and FT_rand for every cell).
+- **Secondary disclosure**: FT, FT_rand, Δ, FT_ma, FT_rand_ma, Δ_ma recorded per cell in `secondary_disclosure.csv`.
+
+### Hypothesis-Specific Conclusion
+
+**CONTEXT_CHARACTERISATION_DELIVERED.** The raw unfiltered HA harami signal does not cluster near exhaustion on the ATR-ZigZag substrate. Harami timing is systematically front-loaded relative to random in-move timing. This is a clean baseline measurement: the null landscape any filter or confirmation rule must beat is known (Δ ≈ −0.12 to −0.18).
+
+### Hypothesis-Agnostic Observations
+
+- **Front-loading is ZigZag-specific**: under MA(20,50) segmentation, delta clusters near zero. ZigZag defines move starts at pivot extremes; haramis (small consolidations) appear soon after. MA regimes define moves by crossover timing — haramis have no systematic position bias there.
+- **Selection force requirement**: a filter must shift the position distribution rightward by ~12–18pp just to reach Δ = 0, and ~22–28pp to meet the P9 materiality threshold.
+- **FT never reaches 0.50**: even the unconditioned raw-timing baseline FT_rand is typically 0.33–0.43 (direction-matched uniform draw is the third of the move ≈ 1 − 0.67). The deterministic position-in-move metric therefore cannot resolve a cell in the upper half of the unit interval for this ZigZag geometry.
+- **Implication for 014-B**: any combined harami+barrier event definition cannot rely on harami position-in-move as a timing filter — capture barriers (EXP-049/014-B) must manage outcome structurally. EXP-051 (strong-move filters) and EXP-052 (confirmation) should test whether selection can shift the distribution rightward.
+
+---
+
+## EXP-051 — Phase 014-A Strong-Move Filter Characterisation
+
+**Status**: STRONG_FILTER_CHARACTERISATION_DELIVERED
+**Date**: 2026-06-15
+**Instruments**: BTCUSD, EURUSD, USTEC, XAUUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURJPY, GBPJPY, AUDJPY, US500, US2000, DE30, JP225 (99 EXP-048-READY cells)
+**Data Views / Feature Categories**: 5m (strict), 15m/30m/1h/2h/4h (`min_coverage=0.90`); HA candles for /STRONG-HA impulse-run detection; real domain prices for all magnitude metrics
+
+### Hypothesis Tests
+
+1. **Hypothesis / exploratory question**: For each EXP-048-READY cell, do /STRONG-STAT (p75) and /STRONG-HA (primary same-direction) each carve a materially different move sub-population by P10 (ρ ≥ 1.5 and f ∈ [0.10, 0.50]), and does each meet P11 (≥5 cells over ≥3 instruments)?
+
+### Scope
+
+- **Instruments**: all 17 VAL-003-admitted instruments; DE30 with truncated-history disclosure.
+- **Data Views / Feature Categories**: domain OHLC via `xen.bar_aggregator`; HA candles via `xen.heiken_ashi_generator` (detection only); ZigZag moves via `xen.zigzag` (ATR 14/1.0, unchanged); new `xen.strong_move` module for both filter forms.
+- **Features**: /STRONG-STAT trailing-window p75 filter (window ≤20, warmup 5; binding form) + median+1×MAD alternative (disclosed); /STRONG-HA qualifying 3-bar impulse-run detection + run→move mapping (primary same-direction binding; any-direction sensitivity disclosed); per-cell ρ/f/P10 point criterion; P11 composition readout; moving-block bootstrap CI on ρ (disclosed); harami-overlap secondary (disclosed); two-pass determinism replay.
+- **Parameter ranges**: P7 trailing window 20, warmup floor 5, p75 (binding) + median+1×MAD (disclosed); P8 run length X=3, HA trailing body-median window 20, warmup floor 5 HA bars; P10 ρ ≥ 1.5 ∧ f ∈ [0.10, 0.50]; P11 composition ≥5 cells ≥3 instruments; P6 OFF (no /BARCFG filter).
+- **Exclusions**: no 3-barrier capture geometry (EXP-049), no position-in-move (EXP-050), no /CONFIRM entry model (EXP-052), no combined harami+barrier event, no /BARCFG isolation, no costs, no returns/P&L, no TEST/holdout contact, no candidate consumption.
+
+### Results / Observations
+
+- **Verdict**: STRONG_FILTER_CHARACTERISATION_DELIVERED. **Both binding forms clear P11** with 99/99 MATERIAL cells across all 17 instruments.
+- **/STRONG-STAT (p75)**: ρ range [1.72, 2.19], median 1.92, IQR [1.86, 1.97]; f range [0.25, 0.32], median 0.27. 99/99 MATERIAL, 17/17 instruments.
+- **/STRONG-HA (primary)**: ρ range [1.62, 2.08], median 1.80, IQR [1.76, 1.86]; f range [0.15, 0.24], median 0.20. 99/99 MATERIAL, 17/17 instruments.
+- **Alternative-form agreement**: 0 flips between p75↔MAD; 0 flips between primary↔sensitivity. Disclosed forms agree exactly on materiality status.
+- **All invariants pass**: 0 filter well-formedness, 0 magnitude validity, 0 HA self-consistency, 0 causality/TRAIN fence violations; determinism PASS; all 99 cells reportable (n_defined 331–31,431).
+- **Harami overlap (disclosed)**: overlap_A 65–87% (/STRONG-STAT) and 74–91% (/STRONG-HA); overlap_B 24–46% across both filters.
+- **P11 composition**: material_per_domain = 17/17/17/17/16/15 (5m/15m/30m/1h/2h/4h); 3 COVERAGE_EXCLUDED cells (US500-4h, JP225-2h/4h) not in member-cell set.
+
+### Hypothesis-Specific Conclusion
+
+**STRONG_FILTER_CHARACTERISATION_DELIVERED.** Both /STRONG-STAT (p75) and /STRONG-HA (primary) filters identify materially different move populations from the ATR-ZigZag confirmed-move substrate, meeting the P10 bar in every cell and clearing P11 with 99 material cells across all 17 instruments. The disclosed alternative forms agree (0 flips). The experiment verdict is delivery; G1 adjudication is checkpoint desk work.
+
+### Hypothesis-Agnostic Observations
+
+- **p75 mechanical selectivity**: The trailing-window p75 retains ~25% (modulo ties), mechanically inside [0.10, 0.50]. ρ ≥ 1.5 reflects the heavy right tail of move magnitudes — the median of the top quartile is ~1.9× the full median. Uniform 99/99 materiality may partly be a property of the substrate's magnitude distribution, not a special filter property.
+- **HA impulse runs as large-move proxy**: The /STRONG-HA detector selects moves containing 3 consecutive strong HA impulse bars. Lower ρ (~1.80 vs ~1.92) suggests HA impulse bars can occur mid-move without the move being in the top magnitude quartile.
+- **Both filters viable for 014-B**: The narrow cross-cell IQR (ρ ~0.06–0.10, f ~0.01–0.02 within each form) suggests uniform behaviour across instruments/domains, allowing simpler global parameterisation in 014-B.
+- **Overlap_B baseline**: Most haramis (54–76%) occur outside strong moves. A combined-event definition must handle this asymmetry — either by filtering harami detection to strong-move windows or using the strong-move condition as a post-hoc selector on captured haramis.
 
 ---
 

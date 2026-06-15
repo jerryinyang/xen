@@ -1,0 +1,49 @@
+{
+  "binding_random_baseline": {
+    "n_cells": 0,
+    "n_instruments": 0,
+    "instruments": "",
+    "cells": [],
+    "composition_met": false
+  },
+  "support_tier_ci_low_gt_0.10": {
+    "n_cells": 0,
+    "n_instruments": 0,
+    "instruments": "",
+    "cells": [],
+    "composition_met": false
+  },
+  "support_tier_reliably_positive": {
+    "n_cells": 0,
+    "n_instruments": 0,
+    "instruments": "",
+    "cells": [],
+    "composition_met": false
+  },
+  "ma_robustness_composition": {
+    "n_cells": 0,
+    "n_instruments": 0,
+    "instruments": "",
+    "cells": [],
+    "composition_met": false
+  },
+  "sensitivity_non_binding": {
+    "delta_ge_0.05": {
+      "n_cells": 0,
+      "n_instruments": 0,
+      "instruments": "",
+      "cells": [],
+      "composition_met": false
+    },
+    "delta_ge_0.15": {
+      "n_cells": 0,
+      "n_instruments": 0,
+      "instruments": "",
+      "cells": [],
+      "composition_met": false
+    },
+    "relaxed_4cells_2instruments": false,
+    "relaxed_3cells_2instruments": false
+  },
+  "rule": "CLUSTERED iff delta = FT - FT_rand >= 0.10 AND n_assigned >= 30 (binding random baseline); composition_met iff >=5 CLUSTERED cells over >=3 instruments (P9/P11). CI tiers and MA-robustness disclosed."
+}

@@ -1,0 +1,216 @@
+{
+  "experiment_id": "EXP-049",
+  "generated_utc": "2026-06-15T05:09:14.919101+00:00",
+  "phase": "014-A",
+  "hypothesis": "HYP-002",
+  "family": "CF-HA-HARAMI-001",
+  "stratum": "TRAIN-only (first 49%); nested TEST + final-30% holdout sealed",
+  "barrier_anchor": "ZigZag trend-change confirmation (substrate capture ceiling)",
+  "params": {
+    "atr_period": 14,
+    "atr_mult": 1.0,
+    "atr_estimator": "Wilder",
+    "favourable_fraction": 0.5,
+    "adverse": "1:1 R:R (P3)",
+    "third_barrier": "N=max(6,round(1.5*median(trailing-20 confirmed-move durations)))",
+    "lookback": 1,
+    "tie_break": "same-bar double-touch -> ADVERSE",
+    "n_boot": 10000,
+    "base_seed": 20260614,
+    "geometries": {
+      "G1_primary": "distance-based (0.5*M)",
+      "G2_secondary": "retracement-level (move midpoint)"
+    }
+  },
+  "membership": {
+    "source": "EXP-048 readiness_map.csv (READY + READY_FLAGGED)",
+    "n_member_cells": 99,
+    "n_excluded_cells": 3
+  },
+  "preconditions": {
+    "gate": "EXP-049 execution gate is blocked until EXP-048 reaches READINESS_DELIVERED + audit PASS (scope \u00a717-23; pre-execution review info-note 1).",
+    "exp048_readiness_verdict": "READINESS_DELIVERED",
+    "exp048_audit_verdict": "PASS",
+    "exp048_post_experiment_review": "APPROVE",
+    "satisfied": true,
+    "evidence": "EXP-048/audit.md, EXP-048/governance/post-experiment-review.md"
+  },
+  "denominators": {
+    "primary_r": "FAV / (FAV + ADV) over resolved; resolved<30 -> NOT_VIABLE_BY_POWER",
+    "fav_all": "FAV / defined (built barriers)",
+    "censoring": "TIMECAP/defined and DATA_CENSORED/defined"
+  },
+  "verdict": {
+    "verdict": "CAPTURE_READINESS_DELIVERED",
+    "non_deterministic_cells": [],
+    "systematic_invariant_failures": {}
+  },
+  "composition_readout": {
+    "g1_primary": {
+      "n_viable": 0,
+      "n_instruments": 0,
+      "instruments": "",
+      "viable_cells": [],
+      "composition_met": false
+    },
+    "g2_secondary": {
+      "n_viable": 0,
+      "n_instruments": 0,
+      "instruments": "",
+      "viable_cells": [],
+      "composition_met": false,
+      "disclosure": "G2 events are a systematically censored subset of the G1-defined pool: ~52-60% of G1-defined events are excluded as degenerate (fav_distance<=0; entry already at/through the move midpoint) before resolution, so per-cell g2_defined is materially smaller than g1_defined and inherently lower-powered. composition_met=false here may reflect this structural censoring rather than a genuinely flat metric. Per-cell exclusion is disclosed in capture_rate_secondary.csv (g2_degenerate_frac, g2_degenerate_excluded)."
+    },
+    "sensitivity_non_binding": {
+      "g1_relaxed_4cells_2instruments": false,
+      "g1_relaxed_3cells_2instruments": false,
+      "g1_r_threshold_0_52": {
+        "n_cells": 0,
+        "n_instruments": 0,
+        "composition_met": false
+      }
+    },
+    "rule": "VIABLE iff r>=0.55 AND boot CI_low(1s)>0.50 AND resolved>=30; composition_met iff >=5 VIABLE cells over >=3 instruments (P11/P12)."
+  },
+  "de30_disclosure": "DE30 truncated history: broker m1 history ends 2026-01-16; counts/rates derive from its own realized timeline and are not span-comparable (VAL-003).",
+  "instrument_meta": {
+    "BTCUSD": {
+      "source_file": "timebars_btcusd_20230102_000000_20260514_203813.parquet",
+      "total_rows_1m": 1555658,
+      "analysis_rows_1m": 1088960,
+      "train_rows_1m": 762272,
+      "train_end_ts": "2024-10-31 14:05:00",
+      "train_end_epoch_s": 1730383500
+    },
+    "EURUSD": {
+      "source_file": "timebars_eurusd_20230102_000000_20260514_203330.parquet",
+      "total_rows_1m": 1246061,
+      "analysis_rows_1m": 872242,
+      "train_rows_1m": 610569,
+      "train_end_ts": "2024-08-25 22:19:00",
+      "train_end_epoch_s": 1724624340
+    },
+    "USTEC": {
+      "source_file": "timebars_ustec_20230102_230000_20260514_204410.parquet",
+      "total_rows_1m": 1186488,
+      "analysis_rows_1m": 830541,
+      "train_rows_1m": 581378,
+      "train_end_ts": "2024-08-26 01:06:00",
+      "train_end_epoch_s": 1724634360
+    },
+    "XAUUSD": {
+      "source_file": "timebars_xauusd_20230102_230200_20260514_204148.parquet",
+      "total_rows_1m": 1186674,
+      "analysis_rows_1m": 830671,
+      "train_rows_1m": 581469,
+      "train_end_ts": "2024-08-26 09:56:00",
+      "train_end_epoch_s": 1724666160
+    },
+    "GBPUSD": {
+      "source_file": "timebars_gbpusd_20230103_000000_20260611_005212.parquet",
+      "total_rows_1m": 1273657,
+      "analysis_rows_1m": 891559,
+      "train_rows_1m": 624091,
+      "train_end_ts": "2024-09-08 22:09:00",
+      "train_end_epoch_s": 1725833340
+    },
+    "USDJPY": {
+      "source_file": "timebars_usdjpy_20230103_000000_20260611_005907.parquet",
+      "total_rows_1m": 1274170,
+      "analysis_rows_1m": 891919,
+      "train_rows_1m": 624343,
+      "train_end_ts": "2024-09-06 12:28:00",
+      "train_end_epoch_s": 1725625680
+    },
+    "USDCHF": {
+      "source_file": "timebars_usdchf_20230103_000000_20260611_005853.parquet",
+      "total_rows_1m": 1270134,
+      "analysis_rows_1m": 889093,
+      "train_rows_1m": 622365,
+      "train_end_ts": "2024-09-09 00:05:00",
+      "train_end_epoch_s": 1725840300
+    },
+    "USDCAD": {
+      "source_file": "timebars_usdcad_20230103_000000_20260611_005900.parquet",
+      "total_rows_1m": 1269870,
+      "analysis_rows_1m": 888909,
+      "train_rows_1m": 622236,
+      "train_end_ts": "2024-09-06 16:23:00",
+      "train_end_epoch_s": 1725639780
+    },
+    "AUDUSD": {
+      "source_file": "timebars_audusd_20230103_000000_20260611_005936.parquet",
+      "total_rows_1m": 1270486,
+      "analysis_rows_1m": 889340,
+      "train_rows_1m": 622538,
+      "train_end_ts": "2024-09-06 14:40:00",
+      "train_end_epoch_s": 1725633600
+    },
+    "NZDUSD": {
+      "source_file": "timebars_nzdusd_20230103_000000_20260611_010629.parquet",
+      "total_rows_1m": 1271158,
+      "analysis_rows_1m": 889810,
+      "train_rows_1m": 622867,
+      "train_end_ts": "2024-09-06 05:42:00",
+      "train_end_epoch_s": 1725601320
+    },
+    "EURJPY": {
+      "source_file": "timebars_eurjpy_20230103_000000_20260611_010703.parquet",
+      "total_rows_1m": 1279097,
+      "analysis_rows_1m": 895367,
+      "train_rows_1m": 626756,
+      "train_end_ts": "2024-09-06 15:12:00",
+      "train_end_epoch_s": 1725635520
+    },
+    "GBPJPY": {
+      "source_file": "timebars_gbpjpy_20230103_000000_20260611_010717.parquet",
+      "total_rows_1m": 1278719,
+      "analysis_rows_1m": 895103,
+      "train_rows_1m": 626572,
+      "train_end_ts": "2024-09-06 15:28:00",
+      "train_end_epoch_s": 1725636480
+    },
+    "AUDJPY": {
+      "source_file": "timebars_audjpy_20230103_000000_20260611_010739.parquet",
+      "total_rows_1m": 1277971,
+      "analysis_rows_1m": 894579,
+      "train_rows_1m": 626205,
+      "train_end_ts": "2024-09-06 14:39:00",
+      "train_end_epoch_s": 1725633540
+    },
+    "US500": {
+      "source_file": "timebars_us500_20230103_000000_20260611_011436.parquet",
+      "total_rows_1m": 1187767,
+      "analysis_rows_1m": 831436,
+      "train_rows_1m": 582005,
+      "train_end_ts": "2024-09-17 17:26:00",
+      "train_end_epoch_s": 1726593960
+    },
+    "US2000": {
+      "source_file": "timebars_us2000_20230103_000000_20260611_011542.parquet",
+      "total_rows_1m": 1208112,
+      "analysis_rows_1m": 845678,
+      "train_rows_1m": 591974,
+      "train_end_ts": "2024-09-10 09:33:00",
+      "train_end_epoch_s": 1725960780
+    },
+    "DE30": {
+      "source_file": "timebars_de30_20230103_000000_20260611_011511.parquet",
+      "total_rows_1m": 1025743,
+      "analysis_rows_1m": 718020,
+      "train_rows_1m": 502613,
+      "train_end_ts": "2024-06-28 13:28:00",
+      "train_end_epoch_s": 1719581280
+    },
+    "JP225": {
+      "source_file": "timebars_jp225_20230103_000000_20260611_011546.parquet",
+      "total_rows_1m": 1157882,
+      "analysis_rows_1m": 810517,
+      "train_rows_1m": 567361,
+      "train_end_ts": "2024-09-23 04:40:00",
+      "train_end_epoch_s": 1727066400
+    }
+  },
+  "holdout_fence": "Only Parquet metadata + first train_rows file-order rows read per instrument; full file never sorted/collected; every domain bar fenced to CloseTime <= train_end_ts; forward resolution windows clipped to the TRAIN edge; TEST and final-30% holdout never read.",
+  "note": "Routing (PROCEED_TO_SCREEN vs CHARACTERISED_NOT_VIABLE) is the \u00a710 G1 desk adjudication on this readout, not self-declared here."
+}
