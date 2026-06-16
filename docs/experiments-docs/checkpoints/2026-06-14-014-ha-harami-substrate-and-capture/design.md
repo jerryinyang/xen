@@ -2,9 +2,14 @@
 
 **Checkpoint type:** Research phase design (FINALIZED — D0 ratified at G0).
 **Date finalized:** 2026-06-14.
-**Status:** ACTIVE — **G0 PASS 2026-06-14** (D0 ratified, `D0-predeclarations.md`); no
-Phase 014 result exists; no row read under any harami event definition. Next pipeline
-step: VAL-004 (15m/30m temporal integrity), then EXP-048.
+**Status:** ACTIVE — **014-A COMPLETE, G1 adjudicated 2026-06-15.** G0 PASS 2026-06-14
+(D0 ratified, `D0-predeclarations.md`); VAL-004 PASS; EXP-048–052 complete (audits PASS).
+**014-A G1** (`G1-gate-review.md`): primitives READY; benchmark capture
+`CHARACTERISED_NOT_VIABLE` **on the unconditioned object only** — the conditioned family
+hypothesis is untested; family **OPEN**; operator directed proceed to **014-B** (no closure).
+**014-B opened 2026-06-15; G0-B PASS 2026-06-15** (`014-B-design.md`, `014-B-D0-addendum.md`;
+median expectancy endpoint, `ATR_MULT_TRAIL = 0.5`). Next: scope EXP-053. **MANDATORY before
+scoping any 014-B experiment:** `014-A-conditioning-gap-and-validation-lessons.md`.
 **Candidate family:** `CF-HA-HARAMI-001` — Heiken Ashi Harami at trend exhaustion
 (`docs/signal-registry/candidate-families/harami.md`).
 
@@ -98,6 +103,15 @@ characterization map informing 014-B and any branch registration.
 
 ## 7. Phase 014-B — Reversal Target Framework & 3-Barrier System
 
+> **014-B is now designed in full.** This section is the original theme overview; the
+> binding 014-B plan, endpoint, slate (EXP-053–060 / HYP-006–013), new branches
+> (`/EXIT-PARTIAL`, `/EXIT-TRAIL-STRUCT`), fill-model correction, and the no-intermediate-gates
+> single-G2 structure live in [`014-B-design.md`](014-B-design.md) and
+> [`014-B-D0-addendum.md`](014-B-D0-addendum.md). The 014-A G1 found the benchmark capture null
+> applies to the **unconditioned** object only; 014-B tests the **conditioned, harami-anchored**
+> signal across the full surface under a gross **expectancy** endpoint (P14). Mandatory scoping
+> precondition: [`014-A-conditioning-gap-and-validation-lessons.md`](014-A-conditioning-gap-and-validation-lessons.md).
+
 Builds on validated 014-A primitives. Extends EXP-049 capture readiness to all
 barrier-model variants. Still gross, still exploratory, no screening.
 
@@ -170,8 +184,19 @@ gross; all are per-cell first, then composed by P11 (≥5 cells over ≥3 instru
 
 ## 11. Immediate Next Steps
 
-1. Operator ratifies the §8 D0 items (G0).
-2. Enter `CF-HA-HARAMI-001` + variants + HYPs in `multiplicity-registry.md` (Phase
-   014 batch).
-3. Run the §5 VAL gate (VAL-004) for 15m/30m before EXP-048.
-4. Proceed through the research pipeline for EXP-048 (substrate/detector readiness).
+**014-A steps 1–4 are COMPLETE** (G0 PASS, registry batch, VAL-004 PASS, EXP-048–052 + G1).
+Original 014-A sequence retained for the record:
+
+1. ~~Operator ratifies the §8 D0 items (G0).~~ DONE — G0 PASS 2026-06-14.
+2. ~~Enter `CF-HA-HARAMI-001` + variants + HYPs in `multiplicity-registry.md`.~~ DONE.
+3. ~~Run the §5 VAL gate (VAL-004) for 15m/30m before EXP-048.~~ DONE — VAL-004 PASS.
+4. ~~Proceed through the research pipeline for EXP-048.~~ DONE — EXP-048–052 complete; 014-A
+   G1 adjudicated (`G1-gate-review.md`).
+
+**Current next steps (014-B):**
+
+5. Operator ratifies the `014-B-D0-addendum.md` items P14–P21 (**G0-B**).
+6. Scope EXP-053 (conditioned-signal efficacy) — research-pipeline Stage 1, **after** the
+   mandatory read of `014-A-conditioning-gap-and-validation-lessons.md` (recorded in `scope.md`).
+7. Proceed EXP-053 → EXP-054 → EXP-055 (leads), then EXP-056–060 (full surface), then the
+   single **G2** adjudication — no intermediate gates, no early closure.
