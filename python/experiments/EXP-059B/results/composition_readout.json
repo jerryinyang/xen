@@ -1,0 +1,363 @@
+{
+  "verdict": "EVIDENCE_AGAINST",
+  "n_pass": 0,
+  "passing_arms": [],
+  "fragile_passes": [],
+  "per_arm": {
+    "BENCH": {
+      "powered": {
+        "n_cells": 99,
+        "n_instruments": 17,
+        "composition_met": true
+      },
+      "viable": {
+        "n_cells": 9,
+        "n_instruments": 7,
+        "composition_met": true,
+        "cells": [
+          "BTCUSD-5m",
+          "BTCUSD-30m",
+          "EURUSD-1h",
+          "GBPUSD-4h",
+          "USDCHF-4h",
+          "USDCAD-15m",
+          "AUDUSD-5m",
+          "AUDUSD-4h",
+          "EURJPY-15m"
+        ]
+      },
+      "win": {
+        "n_cells": 0,
+        "n_instruments": 0,
+        "cells": [],
+        "passes": false,
+        "fragile": false
+      }
+    },
+    "TRAIL-PURE-UNCAPPED": {
+      "powered": {
+        "n_cells": 99,
+        "n_instruments": 17,
+        "composition_met": true
+      },
+      "viable": {
+        "n_cells": 0,
+        "n_instruments": 0,
+        "composition_met": false,
+        "cells": []
+      },
+      "win": {
+        "n_cells": 0,
+        "n_instruments": 0,
+        "cells": [],
+        "passes": false,
+        "fragile": false
+      }
+    },
+    "COMBINED-UNCAPPED-V2A": {
+      "powered": {
+        "n_cells": 99,
+        "n_instruments": 17,
+        "composition_met": true
+      },
+      "viable": {
+        "n_cells": 1,
+        "n_instruments": 1,
+        "composition_met": false,
+        "cells": [
+          "BTCUSD-5m"
+        ]
+      },
+      "win": {
+        "n_cells": 0,
+        "n_instruments": 0,
+        "cells": [],
+        "passes": false,
+        "fragile": false
+      }
+    },
+    "TRAIL-PURE-NOINIT-CAPPED": {
+      "powered": {
+        "n_cells": 99,
+        "n_instruments": 17,
+        "composition_met": true
+      },
+      "viable": {
+        "n_cells": 0,
+        "n_instruments": 0,
+        "composition_met": false,
+        "cells": []
+      },
+      "win": {
+        "n_cells": 0,
+        "n_instruments": 0,
+        "cells": [],
+        "passes": false,
+        "fragile": false
+      }
+    },
+    "COMBINED-V2A-NOINIT-CAPPED": {
+      "powered": {
+        "n_cells": 99,
+        "n_instruments": 17,
+        "composition_met": true
+      },
+      "viable": {
+        "n_cells": 2,
+        "n_instruments": 2,
+        "composition_met": false,
+        "cells": [
+          "BTCUSD-5m",
+          "USDCAD-15m"
+        ]
+      },
+      "win": {
+        "n_cells": 0,
+        "n_instruments": 0,
+        "cells": [],
+        "passes": false,
+        "fragile": false
+      }
+    }
+  },
+  "defect": {
+    "is_defect": false,
+    "non_deterministic": [],
+    "reconciliation": [
+      {
+        "checked": true,
+        "m": 78,
+        "positive_returns": 45,
+        "win_rate": 0.5769230769230769,
+        "consistent": true,
+        "instrument": "BTCUSD",
+        "cell": "BTCUSD-4h"
+      },
+      {
+        "checked": true,
+        "m": 69,
+        "positive_returns": 35,
+        "win_rate": 0.5072463768115942,
+        "consistent": true,
+        "instrument": "EURUSD",
+        "cell": "EURUSD-4h"
+      },
+      {
+        "checked": true,
+        "m": 113,
+        "positive_returns": 50,
+        "win_rate": 0.4424778761061947,
+        "consistent": true,
+        "instrument": "USTEC",
+        "cell": "USTEC-4h"
+      },
+      {
+        "checked": true,
+        "m": 45,
+        "positive_returns": 24,
+        "win_rate": 0.5333333333333333,
+        "consistent": true,
+        "instrument": "XAUUSD",
+        "cell": "XAUUSD-4h"
+      },
+      {
+        "checked": true,
+        "m": 67,
+        "positive_returns": 42,
+        "win_rate": 0.6268656716417911,
+        "consistent": true,
+        "instrument": "GBPUSD",
+        "cell": "GBPUSD-4h"
+      },
+      {
+        "checked": true,
+        "m": 98,
+        "positive_returns": 47,
+        "win_rate": 0.47959183673469385,
+        "consistent": true,
+        "instrument": "USDJPY",
+        "cell": "USDJPY-4h"
+      },
+      {
+        "checked": true,
+        "m": 69,
+        "positive_returns": 45,
+        "win_rate": 0.6521739130434783,
+        "consistent": true,
+        "instrument": "USDCHF",
+        "cell": "USDCHF-4h"
+      },
+      {
+        "checked": true,
+        "m": 75,
+        "positive_returns": 29,
+        "win_rate": 0.38666666666666666,
+        "consistent": true,
+        "instrument": "USDCAD",
+        "cell": "USDCAD-4h"
+      },
+      {
+        "checked": true,
+        "m": 73,
+        "positive_returns": 45,
+        "win_rate": 0.6164383561643836,
+        "consistent": true,
+        "instrument": "AUDUSD",
+        "cell": "AUDUSD-4h"
+      },
+      {
+        "checked": true,
+        "m": 73,
+        "positive_returns": 36,
+        "win_rate": 0.4931506849315068,
+        "consistent": true,
+        "instrument": "NZDUSD",
+        "cell": "NZDUSD-4h"
+      },
+      {
+        "checked": true,
+        "m": 97,
+        "positive_returns": 49,
+        "win_rate": 0.5051546391752577,
+        "consistent": true,
+        "instrument": "EURJPY",
+        "cell": "EURJPY-4h"
+      },
+      {
+        "checked": true,
+        "m": 81,
+        "positive_returns": 46,
+        "win_rate": 0.5679012345679012,
+        "consistent": true,
+        "instrument": "GBPJPY",
+        "cell": "GBPJPY-4h"
+      },
+      {
+        "checked": true,
+        "m": 85,
+        "positive_returns": 50,
+        "win_rate": 0.5882352941176471,
+        "consistent": true,
+        "instrument": "AUDJPY",
+        "cell": "AUDJPY-4h"
+      },
+      {
+        "checked": true,
+        "m": 179,
+        "positive_returns": 92,
+        "win_rate": 0.5139664804469274,
+        "consistent": true,
+        "instrument": "US500",
+        "cell": "US500-2h"
+      },
+      {
+        "checked": true,
+        "m": 72,
+        "positive_returns": 43,
+        "win_rate": 0.5972222222222222,
+        "consistent": true,
+        "instrument": "US2000",
+        "cell": "US2000-4h"
+      },
+      {
+        "checked": true,
+        "m": 56,
+        "positive_returns": 33,
+        "win_rate": 0.5892857142857143,
+        "consistent": true,
+        "instrument": "DE30",
+        "cell": "DE30-4h"
+      },
+      {
+        "checked": true,
+        "m": 225,
+        "positive_returns": 96,
+        "win_rate": 0.4266666666666667,
+        "consistent": true,
+        "instrument": "JP225",
+        "cell": "JP225-1h"
+      }
+    ],
+    "exp053_mismatch": [],
+    "causality_violations": [],
+    "determinism_checked": [
+      "BTCUSD-4h#5",
+      "EURUSD-4h#11",
+      "USTEC-4h#17",
+      "XAUUSD-4h#23",
+      "GBPUSD-4h#29",
+      "USDJPY-4h#35",
+      "USDCHF-4h#41",
+      "USDCAD-4h#47",
+      "AUDUSD-4h#53",
+      "NZDUSD-4h#59",
+      "EURJPY-4h#65",
+      "GBPJPY-4h#71",
+      "AUDJPY-4h#77",
+      "US500-2h#82",
+      "US2000-4h#89",
+      "DE30-4h#95",
+      "JP225-1h#99"
+    ],
+    "invariant_violations": [],
+    "exp053_available": true,
+    "exp053_checked_cells": 99
+  },
+  "censoring": {
+    "BENCH": {
+      "kind": "bench",
+      "total_censored": 11,
+      "median_cell_censored": 0.0,
+      "median_cell_qual": 473.0
+    },
+    "TRAIL-PURE-UNCAPPED": {
+      "kind": "uncapped",
+      "total_censored": 22,
+      "median_cell_censored": 0.0,
+      "median_cell_qual": 473.0
+    },
+    "COMBINED-UNCAPPED-V2A": {
+      "kind": "uncapped",
+      "total_censored": 15,
+      "median_cell_censored": 0.0,
+      "median_cell_qual": 473.0
+    },
+    "TRAIL-PURE-NOINIT-CAPPED": {
+      "kind": "capped_trail",
+      "total_censored": 9,
+      "median_cell_censored": 0.0,
+      "median_cell_qual": 473.0
+    },
+    "COMBINED-V2A-NOINIT-CAPPED": {
+      "kind": "capped_trail",
+      "total_censored": 8,
+      "median_cell_censored": 0.0,
+      "median_cell_qual": 473.0
+    }
+  },
+  "cap_isolation": {
+    "TRAIL-PURE-UNCAPPED": {
+      "sibling": "TRAIL-PURE-NOINIT-CAPPED",
+      "median_divergent_share": 0.48286604361370716,
+      "max_divergent_share": 0.6209439528023599,
+      "n_cells_divergent_ge_power": 96,
+      "n_cells_div_positive": 0,
+      "cells_div_positive": []
+    },
+    "COMBINED-UNCAPPED-V2A": {
+      "sibling": "COMBINED-V2A-NOINIT-CAPPED",
+      "median_divergent_share": 0.3584905660377358,
+      "max_divergent_share": 0.5530973451327433,
+      "n_cells_divergent_ge_power": 89,
+      "n_cells_div_positive": 2,
+      "cells_div_positive": [
+        "BTCUSD-30m",
+        "US2000-2h"
+      ]
+    }
+  },
+  "rule": "per arm: VIABLE iff median CI_low(1s)>0 AND m>=30; BEATS_BENCH iff paired CI_low(delta)>0 AND m>=30 AND bench_m>=30 AND |common|>=30; WIN=viable&beats AND uncapped; P11 iff >=5 cells over >=3 instruments. EVIDENCE_FOR iff a binding (uncapped) arm's WIN clears P11; no registration (single 014-B G2).",
+  "cap_isolation_note": "the disclosed cap-isolation paired contrast (uncapped - capped no-init sibling) attributes any expectancy difference to removing the cap; it never enters the verdict. Within-cap events exit byte-identically under both arms (structural zeros), so the binding read is the DIVERGENT-subset contrast (capiso_div_*, events held past bench_n) with capiso_div_share; a near-zero full-common contrast on a small divergent share is NOT evidence of no cap effect (F02).",
+  "censoring_note": "uncapped DATA_CENSORED (unbounded window reaches the TRAIN edge) is disclosed SEPARATELY from capped censoring; it drives the power readout and gates interpretation of the vs-BENCH contrast.",
+  "multiplicity": "uncorrected per-arm one-sided 95% CIs; family-wise correction across the full 014-B surface is deferred to the single G2 desk adjudication."
+}
