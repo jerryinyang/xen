@@ -1,0 +1,407 @@
+{
+  "experiment_id": "EXP-053",
+  "generated_utc": "2026-06-15T21:53:05.574850+00:00",
+  "phase": "014-B",
+  "hypothesis": "HYP-006",
+  "family": "CF-HA-HARAMI-001",
+  "stratum": "TRAIN-only (first 49%); nested TEST + final-30% holdout sealed",
+  "entry_anchor": "harami confirmation-bar real close (live, pre-ZigZag-confirm)",
+  "magnitude_reference": "current-price M_sofar = |C - StartPrice_inprogress| (binding)",
+  "geometry": "single benchmark (G1==G2 collapse): fav=C+rd*0.5*M_sofar; 1:1 adverse",
+  "fill_model": "P15 path-ordered intrabar (bullish O->L->H->C; bearish O->H->L->C)",
+  "params": {
+    "atr_period": 14,
+    "atr_mult": 1.0,
+    "favourable_fraction": 0.5,
+    "adverse": "1:1",
+    "stat_window": 20,
+    "stat_min_window": 5,
+    "stat_q": 0.75,
+    "ha_run_len": 3,
+    "timecap": "max(6, round(1.5*median(trailing-20 durations)))",
+    "ma_segmentation": [
+      20,
+      50
+    ],
+    "power_floor": 30,
+    "n_boot": 10000,
+    "boot_batch": 2000,
+    "base_seed": 20260615,
+    "p11": [
+      5,
+      3
+    ]
+  },
+  "binding_endpoint": "median per-event gross ATR-normalised return (P14)",
+  "baselines": [
+    "matched-count random (in-progress rd, non-signal pool)",
+    "MA(20,50)-crossover segmentation through the identical pipeline"
+  ],
+  "determinism_ok": true,
+  "reconciliation": [
+    {
+      "checked": true,
+      "cell": "5m#0",
+      "fav": 745,
+      "adv": 728,
+      "timecap": 1644,
+      "m": 3117,
+      "positive_returns": 1613,
+      "negative_returns": 1504,
+      "first_r_e": -1.3283333563535902,
+      "consistent": true,
+      "instrument": "BTCUSD"
+    },
+    {
+      "checked": true,
+      "cell": "5m#6",
+      "fav": 791,
+      "adv": 810,
+      "timecap": 1601,
+      "m": 3202,
+      "positive_returns": 1602,
+      "negative_returns": 1583,
+      "first_r_e": 1.9992951541644945,
+      "consistent": true,
+      "instrument": "EURUSD"
+    },
+    {
+      "checked": true,
+      "cell": "5m#12",
+      "fav": 998,
+      "adv": 994,
+      "timecap": 1762,
+      "m": 3754,
+      "positive_returns": 1828,
+      "negative_returns": 1918,
+      "first_r_e": -2.353336881312627,
+      "consistent": true,
+      "instrument": "USTEC"
+    },
+    {
+      "checked": true,
+      "cell": "5m#18",
+      "fav": 635,
+      "adv": 708,
+      "timecap": 1386,
+      "m": 2729,
+      "positive_returns": 1373,
+      "negative_returns": 1351,
+      "first_r_e": -1.8736140994619075,
+      "consistent": true,
+      "instrument": "XAUUSD"
+    },
+    {
+      "checked": true,
+      "cell": "5m#24",
+      "fav": 843,
+      "adv": 780,
+      "timecap": 1628,
+      "m": 3251,
+      "positive_returns": 1615,
+      "negative_returns": 1620,
+      "first_r_e": -2.237005456455556,
+      "consistent": true,
+      "instrument": "GBPUSD"
+    },
+    {
+      "checked": true,
+      "cell": "5m#30",
+      "fav": 662,
+      "adv": 714,
+      "timecap": 1667,
+      "m": 3043,
+      "positive_returns": 1515,
+      "negative_returns": 1509,
+      "first_r_e": -1.9112017663220568,
+      "consistent": true,
+      "instrument": "USDJPY"
+    },
+    {
+      "checked": true,
+      "cell": "5m#36",
+      "fav": 789,
+      "adv": 740,
+      "timecap": 1560,
+      "m": 3089,
+      "positive_returns": 1573,
+      "negative_returns": 1492,
+      "first_r_e": 0.6698279562860046,
+      "consistent": true,
+      "instrument": "USDCHF"
+    },
+    {
+      "checked": true,
+      "cell": "5m#42",
+      "fav": 799,
+      "adv": 750,
+      "timecap": 1687,
+      "m": 3236,
+      "positive_returns": 1638,
+      "negative_returns": 1583,
+      "first_r_e": -2.694812623989208,
+      "consistent": true,
+      "instrument": "USDCAD"
+    },
+    {
+      "checked": true,
+      "cell": "5m#48",
+      "fav": 673,
+      "adv": 663,
+      "timecap": 1871,
+      "m": 3207,
+      "positive_returns": 1656,
+      "negative_returns": 1528,
+      "first_r_e": -2.7451855189672436,
+      "consistent": true,
+      "instrument": "AUDUSD"
+    },
+    {
+      "checked": true,
+      "cell": "5m#54",
+      "fav": 699,
+      "adv": 686,
+      "timecap": 1842,
+      "m": 3227,
+      "positive_returns": 1640,
+      "negative_returns": 1561,
+      "first_r_e": 1.0163540584056316,
+      "consistent": true,
+      "instrument": "NZDUSD"
+    },
+    {
+      "checked": true,
+      "cell": "5m#60",
+      "fav": 614,
+      "adv": 680,
+      "timecap": 1714,
+      "m": 3008,
+      "positive_returns": 1494,
+      "negative_returns": 1504,
+      "first_r_e": 0.3892952900541439,
+      "consistent": true,
+      "instrument": "EURJPY"
+    },
+    {
+      "checked": true,
+      "cell": "5m#66",
+      "fav": 683,
+      "adv": 683,
+      "timecap": 1634,
+      "m": 3000,
+      "positive_returns": 1481,
+      "negative_returns": 1508,
+      "first_r_e": 1.153882549122281,
+      "consistent": true,
+      "instrument": "GBPJPY"
+    },
+    {
+      "checked": true,
+      "cell": "5m#72",
+      "fav": 617,
+      "adv": 627,
+      "timecap": 1781,
+      "m": 3025,
+      "positive_returns": 1496,
+      "negative_returns": 1513,
+      "first_r_e": 1.3732227046846306,
+      "consistent": true,
+      "instrument": "AUDJPY"
+    },
+    {
+      "checked": true,
+      "cell": "5m#78",
+      "fav": 842,
+      "adv": 849,
+      "timecap": 1620,
+      "m": 3311,
+      "positive_returns": 1553,
+      "negative_returns": 1716,
+      "first_r_e": -1.003221148473085,
+      "consistent": true,
+      "instrument": "US500"
+    },
+    {
+      "checked": true,
+      "cell": "5m#84",
+      "fav": 968,
+      "adv": 955,
+      "timecap": 1577,
+      "m": 3500,
+      "positive_returns": 1730,
+      "negative_returns": 1746,
+      "first_r_e": -2.402831239382277,
+      "consistent": true,
+      "instrument": "US2000"
+    },
+    {
+      "checked": true,
+      "cell": "5m#90",
+      "fav": 584,
+      "adv": 582,
+      "timecap": 1355,
+      "m": 2521,
+      "positive_returns": 1266,
+      "negative_returns": 1230,
+      "first_r_e": -0.949571023747824,
+      "consistent": true,
+      "instrument": "DE30"
+    },
+    {
+      "checked": true,
+      "cell": "5m#96",
+      "fav": 526,
+      "adv": 497,
+      "timecap": 1679,
+      "m": 2702,
+      "positive_returns": 1309,
+      "negative_returns": 1336,
+      "first_r_e": -1.4971484875323104,
+      "consistent": true,
+      "instrument": "JP225"
+    }
+  ],
+  "is_defect": false,
+  "de30_disclosure": "DE30 truncated history: broker m1 history ends 2026-01-16; counts derive from its own realized timeline and are not span-comparable (VAL-003).",
+  "fill_approximation": "P15 path is a documented approximation of unobserved intrabar motion; 1-minute base bars are not replayed inside the domain bar (EXP-054 bounds its effect).",
+  "holdout_fence": "Only Parquet metadata + first train_rows file-order rows read per instrument; full file never sorted/collected; every domain bar fenced to CloseTime <= train_end_ts; forward scans clipped to the data edge; TEST and final-30% holdout never read.",
+  "registry": "CF-HA-HARAMI-001/HYP-006; 0 candidate slots, 0 TEST reads; characterization readout feeds the single 014-B G2.",
+  "instrument_meta": {
+    "BTCUSD": {
+      "source_file": "timebars_btcusd_20230102_000000_20260514_203813.parquet",
+      "total_rows_1m": 1555658,
+      "analysis_rows_1m": 1088960,
+      "train_rows_1m": 762272,
+      "train_end_ts": "2024-10-31 14:05:00",
+      "train_end_epoch_s": 1730383500
+    },
+    "EURUSD": {
+      "source_file": "timebars_eurusd_20230102_000000_20260514_203330.parquet",
+      "total_rows_1m": 1246061,
+      "analysis_rows_1m": 872242,
+      "train_rows_1m": 610569,
+      "train_end_ts": "2024-08-25 22:19:00",
+      "train_end_epoch_s": 1724624340
+    },
+    "USTEC": {
+      "source_file": "timebars_ustec_20230102_230000_20260514_204410.parquet",
+      "total_rows_1m": 1186488,
+      "analysis_rows_1m": 830541,
+      "train_rows_1m": 581378,
+      "train_end_ts": "2024-08-26 01:06:00",
+      "train_end_epoch_s": 1724634360
+    },
+    "XAUUSD": {
+      "source_file": "timebars_xauusd_20230102_230200_20260514_204148.parquet",
+      "total_rows_1m": 1186674,
+      "analysis_rows_1m": 830671,
+      "train_rows_1m": 581469,
+      "train_end_ts": "2024-08-26 09:56:00",
+      "train_end_epoch_s": 1724666160
+    },
+    "GBPUSD": {
+      "source_file": "timebars_gbpusd_20230103_000000_20260611_005212.parquet",
+      "total_rows_1m": 1273657,
+      "analysis_rows_1m": 891559,
+      "train_rows_1m": 624091,
+      "train_end_ts": "2024-09-08 22:09:00",
+      "train_end_epoch_s": 1725833340
+    },
+    "USDJPY": {
+      "source_file": "timebars_usdjpy_20230103_000000_20260611_005907.parquet",
+      "total_rows_1m": 1274170,
+      "analysis_rows_1m": 891919,
+      "train_rows_1m": 624343,
+      "train_end_ts": "2024-09-06 12:28:00",
+      "train_end_epoch_s": 1725625680
+    },
+    "USDCHF": {
+      "source_file": "timebars_usdchf_20230103_000000_20260611_005853.parquet",
+      "total_rows_1m": 1270134,
+      "analysis_rows_1m": 889093,
+      "train_rows_1m": 622365,
+      "train_end_ts": "2024-09-09 00:05:00",
+      "train_end_epoch_s": 1725840300
+    },
+    "USDCAD": {
+      "source_file": "timebars_usdcad_20230103_000000_20260611_005900.parquet",
+      "total_rows_1m": 1269870,
+      "analysis_rows_1m": 888909,
+      "train_rows_1m": 622236,
+      "train_end_ts": "2024-09-06 16:23:00",
+      "train_end_epoch_s": 1725639780
+    },
+    "AUDUSD": {
+      "source_file": "timebars_audusd_20230103_000000_20260611_005936.parquet",
+      "total_rows_1m": 1270486,
+      "analysis_rows_1m": 889340,
+      "train_rows_1m": 622538,
+      "train_end_ts": "2024-09-06 14:40:00",
+      "train_end_epoch_s": 1725633600
+    },
+    "NZDUSD": {
+      "source_file": "timebars_nzdusd_20230103_000000_20260611_010629.parquet",
+      "total_rows_1m": 1271158,
+      "analysis_rows_1m": 889810,
+      "train_rows_1m": 622867,
+      "train_end_ts": "2024-09-06 05:42:00",
+      "train_end_epoch_s": 1725601320
+    },
+    "EURJPY": {
+      "source_file": "timebars_eurjpy_20230103_000000_20260611_010703.parquet",
+      "total_rows_1m": 1279097,
+      "analysis_rows_1m": 895367,
+      "train_rows_1m": 626756,
+      "train_end_ts": "2024-09-06 15:12:00",
+      "train_end_epoch_s": 1725635520
+    },
+    "GBPJPY": {
+      "source_file": "timebars_gbpjpy_20230103_000000_20260611_010717.parquet",
+      "total_rows_1m": 1278719,
+      "analysis_rows_1m": 895103,
+      "train_rows_1m": 626572,
+      "train_end_ts": "2024-09-06 15:28:00",
+      "train_end_epoch_s": 1725636480
+    },
+    "AUDJPY": {
+      "source_file": "timebars_audjpy_20230103_000000_20260611_010739.parquet",
+      "total_rows_1m": 1277971,
+      "analysis_rows_1m": 894579,
+      "train_rows_1m": 626205,
+      "train_end_ts": "2024-09-06 14:39:00",
+      "train_end_epoch_s": 1725633540
+    },
+    "US500": {
+      "source_file": "timebars_us500_20230103_000000_20260611_011436.parquet",
+      "total_rows_1m": 1187767,
+      "analysis_rows_1m": 831436,
+      "train_rows_1m": 582005,
+      "train_end_ts": "2024-09-17 17:26:00",
+      "train_end_epoch_s": 1726593960
+    },
+    "US2000": {
+      "source_file": "timebars_us2000_20230103_000000_20260611_011542.parquet",
+      "total_rows_1m": 1208112,
+      "analysis_rows_1m": 845678,
+      "train_rows_1m": 591974,
+      "train_end_ts": "2024-09-10 09:33:00",
+      "train_end_epoch_s": 1725960780
+    },
+    "DE30": {
+      "source_file": "timebars_de30_20230103_000000_20260611_011511.parquet",
+      "total_rows_1m": 1025743,
+      "analysis_rows_1m": 718020,
+      "train_rows_1m": 502613,
+      "train_end_ts": "2024-06-28 13:28:00",
+      "train_end_epoch_s": 1719581280
+    },
+    "JP225": {
+      "source_file": "timebars_jp225_20230103_000000_20260611_011546.parquet",
+      "total_rows_1m": 1157882,
+      "analysis_rows_1m": 810517,
+      "train_rows_1m": 567361,
+      "train_end_ts": "2024-09-23 04:40:00",
+      "train_end_epoch_s": 1727066400
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "material_classification": "IMMATERIAL",
+  "g1_p15_composition": {
+    "n_viable": 0,
+    "n_instruments": 0,
+    "instruments": "",
+    "viable_cells": [],
+    "composition_met": false
+  },
+  "g1_worstcase_composition": {
+    "n_viable": 0,
+    "n_instruments": 0,
+    "instruments": "",
+    "viable_cells": [],
+    "composition_met": false
+  },
+  "exp049_baseline": {
+    "n_viable": 0,
+    "n_member_cells": 99,
+    "source": "EXP-049/results/per_cell_capture.parquet"
+  },
+  "tie_break_sensitive_cells": [],
+  "n_tie_break_sensitive": 0,
+  "g1_delta_r_median": 0.010054533060668058,
+  "g1_delta_r_iqr": 0.005122365719348793,
+  "g1_dt_frac_median": 0.021239248727400385,
+  "g1_dt_frac_iqr": 0.011225783883641365,
+  "g2_p15_composition": {
+    "n_viable": 1,
+    "n_instruments": 1,
+    "instruments": "USDCAD",
+    "viable_cells": [
+      "USDCAD-2h"
+    ],
+    "composition_met": false
+  },
+  "rule": "TIE_BREAK_SENSITIVE iff (NOT_VIABLE_wc -> VIABLE_p15) OR delta_r>=0.05. MATERIAL iff P15 G1 meets P11 (>=5 VIABLE cells over >=3 instruments) where EXP-049 had 0/99. Routing (re-baseline vs adopt-P15) is the \u00a78 G2-area desk adjudication, not self-declared here.",
+  "approximation_note": "P15 path-ordered fills are a documented approximation of unobserved intrabar motion (1-minute base bars are not replayed inside the domain bar). The same-bar double-touch fraction (dt_frac) bounds the maximum possible delta_r."
+}

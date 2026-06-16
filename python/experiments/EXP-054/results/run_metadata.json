@@ -1,0 +1,249 @@
+{
+  "experiment_id": "EXP-054",
+  "generated_utc": "2026-06-16T00:09:16.631751+00:00",
+  "phase": "014-B",
+  "hypothesis": "HYP-007",
+  "family": "CF-HA-HARAMI-001",
+  "lead_role": "Lead 2 of the 014-B slate (intrabar fill-rule method validation)",
+  "stratum": "TRAIN-only (first 49%); nested TEST + final-30% holdout sealed",
+  "barrier_anchor": "ZigZag trend-change confirmation (EXP-049 benchmark; NOT the harami)",
+  "harami_detector_used": false,
+  "params": {
+    "atr_period": 14,
+    "atr_mult": 1.0,
+    "atr_estimator": "Wilder",
+    "favourable_fraction": 0.5,
+    "adverse": "1:1 R:R (P3)",
+    "third_barrier": "N=max(6,round(1.5*median(trailing-20 confirmed-move durations)))",
+    "lookback": 1,
+    "n_boot": 10000,
+    "base_seed": 20260614,
+    "fill_rules": {
+      "worst_case": "same-bar double-touch -> ADVERSE (EXP-049 baseline)",
+      "p15": "path-ordered: bullish O->L->H->C; bearish O->H->L->C"
+    },
+    "rng_streams": {
+      "worst_case_leg": "[BASE_SEED, cell_index, geom_id]",
+      "p15_leg": "[BASE_SEED, cell_index, geom_id, 15]",
+      "expectancy_wc": "[BASE_SEED, cell_index, 1, 99, 0]",
+      "expectancy_p15": "[BASE_SEED, cell_index, 1, 99, 15]"
+    },
+    "geometries": {
+      "G1_primary": "distance-based (0.5*M)",
+      "G2_secondary": "retracement-level (move midpoint)"
+    },
+    "binding_comparison_metric": "first-hit r = FAV/(FAV+ADV) over resolved (G1)",
+    "disclosed_secondary": "P14 median per-event gross ATR-normalised expectancy (G1)"
+  },
+  "membership": {
+    "source": "EXP-048 readiness_map.csv (READY + READY_FLAGGED); EXP-049 99-cell grid",
+    "n_member_cells": 99,
+    "n_excluded_cells": 3
+  },
+  "reconciliation": {
+    "anchor": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/EXP-049/results/per_cell_capture.parquet",
+    "rule": "worst-case leg must reproduce EXP-049 g1/g2 FAV/ADV/resolved (exact) and r/CI bounds (within 1e-12); else SUBSTRATE_METHOD_DEFECT.",
+    "all_cells_ok": true
+  },
+  "denominators": {
+    "primary_r": "FAV / (FAV + ADV) over resolved; resolved<30 -> NOT_VIABLE_BY_POWER",
+    "dt_frac": "same-bar double-touch / resolved; resolved==0 -> None",
+    "reassigned_frac": "(FAV_p15 - FAV_wc) / resolved; resolved==0 -> None",
+    "expectancy": "median over qualifying (FAV/ADV/TIMECAP, finite exit, ATR>0); <30 qualifying -> NOT_VIABLE_BY_POWER",
+    "g2_degenerate_frac": "g2_degenerate_excluded / (g2_defined + g2_degenerate_excluded)"
+  },
+  "verdict": {
+    "verdict": "FILL_MODEL_CHARACTERISED",
+    "non_deterministic_cells": [],
+    "reconciliation_failures": [],
+    "monotonicity_failures": [],
+    "systematic_invariant_failures": {}
+  },
+  "composition_readout": {
+    "material_classification": "IMMATERIAL",
+    "g1_p15_composition": {
+      "n_viable": 0,
+      "n_instruments": 0,
+      "instruments": "",
+      "viable_cells": [],
+      "composition_met": false
+    },
+    "g1_worstcase_composition": {
+      "n_viable": 0,
+      "n_instruments": 0,
+      "instruments": "",
+      "viable_cells": [],
+      "composition_met": false
+    },
+    "exp049_baseline": {
+      "n_viable": 0,
+      "n_member_cells": 99,
+      "source": "EXP-049/results/per_cell_capture.parquet"
+    },
+    "tie_break_sensitive_cells": [],
+    "n_tie_break_sensitive": 0,
+    "g1_delta_r_median": 0.010054533060668058,
+    "g1_delta_r_iqr": 0.005122365719348793,
+    "g1_dt_frac_median": 0.021239248727400385,
+    "g1_dt_frac_iqr": 0.011225783883641365,
+    "g2_p15_composition": {
+      "n_viable": 1,
+      "n_instruments": 1,
+      "instruments": "USDCAD",
+      "viable_cells": [
+        "USDCAD-2h"
+      ],
+      "composition_met": false
+    },
+    "rule": "TIE_BREAK_SENSITIVE iff (NOT_VIABLE_wc -> VIABLE_p15) OR delta_r>=0.05. MATERIAL iff P15 G1 meets P11 (>=5 VIABLE cells over >=3 instruments) where EXP-049 had 0/99. Routing (re-baseline vs adopt-P15) is the \u00a78 G2-area desk adjudication, not self-declared here.",
+    "approximation_note": "P15 path-ordered fills are a documented approximation of unobserved intrabar motion (1-minute base bars are not replayed inside the domain bar). The same-bar double-touch fraction (dt_frac) bounds the maximum possible delta_r."
+  },
+  "de30_disclosure": "DE30 truncated history: broker m1 history ends 2026-01-16; counts/rates derive from its own realized timeline and are not span-comparable (VAL-003).",
+  "session_model_caveat": "P15 path order (bullish O->L->H->C; bearish O->H->L->C) presumes session-based microstructure (auction open -> continuous trading -> close). For 24/7 instruments ['BTCUSD'] bar Open/Close are arbitrary 1-minute boundaries, not session prints, so the path-order premise has lower fidelity; treat such cells as method-characterisation, not a realistic intrabar estimate of actual fills.",
+  "continuous_market_instruments": [
+    "BTCUSD"
+  ],
+  "instrument_meta": {
+    "BTCUSD": {
+      "source_file": "timebars_btcusd_20230102_000000_20260514_203813.parquet",
+      "total_rows_1m": 1555658,
+      "analysis_rows_1m": 1088960,
+      "train_rows_1m": 762272,
+      "train_end_ts": "2024-10-31 14:05:00",
+      "train_end_epoch_s": 1730383500
+    },
+    "EURUSD": {
+      "source_file": "timebars_eurusd_20230102_000000_20260514_203330.parquet",
+      "total_rows_1m": 1246061,
+      "analysis_rows_1m": 872242,
+      "train_rows_1m": 610569,
+      "train_end_ts": "2024-08-25 22:19:00",
+      "train_end_epoch_s": 1724624340
+    },
+    "USTEC": {
+      "source_file": "timebars_ustec_20230102_230000_20260514_204410.parquet",
+      "total_rows_1m": 1186488,
+      "analysis_rows_1m": 830541,
+      "train_rows_1m": 581378,
+      "train_end_ts": "2024-08-26 01:06:00",
+      "train_end_epoch_s": 1724634360
+    },
+    "XAUUSD": {
+      "source_file": "timebars_xauusd_20230102_230200_20260514_204148.parquet",
+      "total_rows_1m": 1186674,
+      "analysis_rows_1m": 830671,
+      "train_rows_1m": 581469,
+      "train_end_ts": "2024-08-26 09:56:00",
+      "train_end_epoch_s": 1724666160
+    },
+    "GBPUSD": {
+      "source_file": "timebars_gbpusd_20230103_000000_20260611_005212.parquet",
+      "total_rows_1m": 1273657,
+      "analysis_rows_1m": 891559,
+      "train_rows_1m": 624091,
+      "train_end_ts": "2024-09-08 22:09:00",
+      "train_end_epoch_s": 1725833340
+    },
+    "USDJPY": {
+      "source_file": "timebars_usdjpy_20230103_000000_20260611_005907.parquet",
+      "total_rows_1m": 1274170,
+      "analysis_rows_1m": 891919,
+      "train_rows_1m": 624343,
+      "train_end_ts": "2024-09-06 12:28:00",
+      "train_end_epoch_s": 1725625680
+    },
+    "USDCHF": {
+      "source_file": "timebars_usdchf_20230103_000000_20260611_005853.parquet",
+      "total_rows_1m": 1270134,
+      "analysis_rows_1m": 889093,
+      "train_rows_1m": 622365,
+      "train_end_ts": "2024-09-09 00:05:00",
+      "train_end_epoch_s": 1725840300
+    },
+    "USDCAD": {
+      "source_file": "timebars_usdcad_20230103_000000_20260611_005900.parquet",
+      "total_rows_1m": 1269870,
+      "analysis_rows_1m": 888909,
+      "train_rows_1m": 622236,
+      "train_end_ts": "2024-09-06 16:23:00",
+      "train_end_epoch_s": 1725639780
+    },
+    "AUDUSD": {
+      "source_file": "timebars_audusd_20230103_000000_20260611_005936.parquet",
+      "total_rows_1m": 1270486,
+      "analysis_rows_1m": 889340,
+      "train_rows_1m": 622538,
+      "train_end_ts": "2024-09-06 14:40:00",
+      "train_end_epoch_s": 1725633600
+    },
+    "NZDUSD": {
+      "source_file": "timebars_nzdusd_20230103_000000_20260611_010629.parquet",
+      "total_rows_1m": 1271158,
+      "analysis_rows_1m": 889810,
+      "train_rows_1m": 622867,
+      "train_end_ts": "2024-09-06 05:42:00",
+      "train_end_epoch_s": 1725601320
+    },
+    "EURJPY": {
+      "source_file": "timebars_eurjpy_20230103_000000_20260611_010703.parquet",
+      "total_rows_1m": 1279097,
+      "analysis_rows_1m": 895367,
+      "train_rows_1m": 626756,
+      "train_end_ts": "2024-09-06 15:12:00",
+      "train_end_epoch_s": 1725635520
+    },
+    "GBPJPY": {
+      "source_file": "timebars_gbpjpy_20230103_000000_20260611_010717.parquet",
+      "total_rows_1m": 1278719,
+      "analysis_rows_1m": 895103,
+      "train_rows_1m": 626572,
+      "train_end_ts": "2024-09-06 15:28:00",
+      "train_end_epoch_s": 1725636480
+    },
+    "AUDJPY": {
+      "source_file": "timebars_audjpy_20230103_000000_20260611_010739.parquet",
+      "total_rows_1m": 1277971,
+      "analysis_rows_1m": 894579,
+      "train_rows_1m": 626205,
+      "train_end_ts": "2024-09-06 14:39:00",
+      "train_end_epoch_s": 1725633540
+    },
+    "US500": {
+      "source_file": "timebars_us500_20230103_000000_20260611_011436.parquet",
+      "total_rows_1m": 1187767,
+      "analysis_rows_1m": 831436,
+      "train_rows_1m": 582005,
+      "train_end_ts": "2024-09-17 17:26:00",
+      "train_end_epoch_s": 1726593960
+    },
+    "US2000": {
+      "source_file": "timebars_us2000_20230103_000000_20260611_011542.parquet",
+      "total_rows_1m": 1208112,
+      "analysis_rows_1m": 845678,
+      "train_rows_1m": 591974,
+      "train_end_ts": "2024-09-10 09:33:00",
+      "train_end_epoch_s": 1725960780
+    },
+    "DE30": {
+      "source_file": "timebars_de30_20230103_000000_20260611_011511.parquet",
+      "total_rows_1m": 1025743,
+      "analysis_rows_1m": 718020,
+      "train_rows_1m": 502613,
+      "train_end_ts": "2024-06-28 13:28:00",
+      "train_end_epoch_s": 1719581280,
+      "de30_disclosure_stale": false,
+      "de30_disclosure_train_edge": "2024-06-28 13:28:00"
+    },
+    "JP225": {
+      "source_file": "timebars_jp225_20230103_000000_20260611_011546.parquet",
+      "total_rows_1m": 1157882,
+      "analysis_rows_1m": 810517,
+      "train_rows_1m": 567361,
+      "train_end_ts": "2024-09-23 04:40:00",
+      "train_end_epoch_s": 1727066400
+    }
+  },
+  "holdout_fence": "Only Parquet metadata + first train_rows file-order rows read per instrument; full file never sorted/collected; every domain bar fenced to CloseTime <= train_end_ts; forward resolution windows clipped to the TRAIN edge; TEST and final-30% holdout never read.",
+  "approximation_note": "P15 path-ordered fills are a documented approximation of unobserved intrabar motion (1-minute base bars are not replayed inside the domain bar). The same-bar double-touch fraction (dt_frac) bounds the maximum possible delta_r.",
+  "note": "Routing (benchmark re-baseline on P15 vs adopt-P15-as-standard) is the \u00a78 G2-area desk adjudication on this readout, not self-declared here."
+}
