@@ -1,0 +1,387 @@
+{
+  "experiment_id": "EXP-052",
+  "generated_utc": "2026-06-15T14:23:51.135967+00:00",
+  "phase": "014-A",
+  "hypothesis": "HYP-005",
+  "family": "CF-HA-HARAMI-001",
+  "variant": "CF-HA-HARAMI-001/CONFIRM",
+  "stratum": "TRAIN-only (first 49%); nested TEST + final-30% holdout sealed",
+  "arms": {
+    "DIRECT": "enter at harami signal bar; entry price = RealClose[signal]",
+    "CONFIRM": "stop at signal bar real extreme (RealHigh if rd=+1 else RealLow); fills on first later bar trading through it within (s, min(next_confirm-1, s+N_event)]; entry price = stop level"
+  },
+  "reversal_direction": "rd = Direction(most recent move ConfirmTime <= HA0Time); +1 buy-stop bull reversal, -1 sell-stop bear reversal",
+  "outcome_primary": "direction-signed MFE/MAE over [entry+1, entry+N_event] on real High/Low, normalized by Wilder ATR(14) at entry; median((MFE-MAE)/ATR) per arm",
+  "outcome_secondary": "EXP-049 symmetric fav-before-adv r from each arm entry (fav_dist=0.50*|preceding confirmed move|, 1:1 adverse); reuse capture_barriers; NULL_R=0.50",
+  "comparison": "paired median((MFE-MAE)/ATR) CONFIRM-DIRECT on events filled & non-censored in both arms; MBB CI; NON-BINDING readout",
+  "params": {
+    "atr_period": 14,
+    "atr_mult": 1.0,
+    "atr_estimator": "Wilder",
+    "favourable_fraction": 0.5,
+    "p4_cap": "max(6, round(1.5*median(trailing<=20 confirmed-move durations))); <5 warmup",
+    "power_floor": 30,
+    "n_boot": 10000,
+    "base_seed": 20260615,
+    "boot_max_elems": 2000000,
+    "p11": [
+      5,
+      3
+    ],
+    "ci_form": "moving-block bootstrap, block=max(1,round(n**(1/3))), B=10000, fixed per-(cell,statistic) seed; two-sided 95% (per-arm/paired), one-sided 95% lower also recorded for paired; NON-BINDING"
+  },
+  "denominators": {
+    "n_signals": "qualifying haramis (defined rd, defined N_event, DIRECT non-censored)",
+    "fill_rate": "n_fills / n_signals (n_fills=0 -> 0, never 0/0)",
+    "outcome": "per arm over non-censored events; <30 -> NOT_REPORTABLE_BY_POWER",
+    "secondary_r": "fav/(fav+adv) over resolved>=30; symmetric null 0.50",
+    "paired": "median diff over events filled & non-censored in both arms; <30 -> not reportable"
+  },
+  "membership": {
+    "source": "EXP-048 readiness_map.csv (READY + READY_FLAGGED)",
+    "n_member_cells": 99,
+    "n_excluded_cells": 3
+  },
+  "verdict": {
+    "verdict": "CONFIRM_CHARACTERISATION_DELIVERED",
+    "non_deterministic_cells": [],
+    "systematic_invariant_failures": {}
+  },
+  "composition_readout": {
+    "n_reportable": 99,
+    "n_pos": 0,
+    "n_pos_instruments": 0,
+    "pos_instruments": [],
+    "pos_cells": [],
+    "p11_pos_readout": false,
+    "n_neg": 99,
+    "n_neg_instruments": 17,
+    "neg_instruments": [
+      "AUDJPY",
+      "AUDUSD",
+      "BTCUSD",
+      "DE30",
+      "EURJPY",
+      "EURUSD",
+      "GBPJPY",
+      "GBPUSD",
+      "JP225",
+      "NZDUSD",
+      "US2000",
+      "US500",
+      "USDCAD",
+      "USDCHF",
+      "USDJPY",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "neg_cells": [
+      "BTCUSD-5m",
+      "BTCUSD-15m",
+      "BTCUSD-30m",
+      "BTCUSD-1h",
+      "BTCUSD-2h",
+      "BTCUSD-4h",
+      "EURUSD-5m",
+      "EURUSD-15m",
+      "EURUSD-30m",
+      "EURUSD-1h",
+      "EURUSD-2h",
+      "EURUSD-4h",
+      "USTEC-5m",
+      "USTEC-15m",
+      "USTEC-30m",
+      "USTEC-1h",
+      "USTEC-2h",
+      "USTEC-4h",
+      "XAUUSD-5m",
+      "XAUUSD-15m",
+      "XAUUSD-30m",
+      "XAUUSD-1h",
+      "XAUUSD-2h",
+      "XAUUSD-4h",
+      "GBPUSD-5m",
+      "GBPUSD-15m",
+      "GBPUSD-30m",
+      "GBPUSD-1h",
+      "GBPUSD-2h",
+      "GBPUSD-4h",
+      "USDJPY-5m",
+      "USDJPY-15m",
+      "USDJPY-30m",
+      "USDJPY-1h",
+      "USDJPY-2h",
+      "USDJPY-4h",
+      "USDCHF-5m",
+      "USDCHF-15m",
+      "USDCHF-30m",
+      "USDCHF-1h",
+      "USDCHF-2h",
+      "USDCHF-4h",
+      "USDCAD-5m",
+      "USDCAD-15m",
+      "USDCAD-30m",
+      "USDCAD-1h",
+      "USDCAD-2h",
+      "USDCAD-4h",
+      "AUDUSD-5m",
+      "AUDUSD-15m",
+      "AUDUSD-30m",
+      "AUDUSD-1h",
+      "AUDUSD-2h",
+      "AUDUSD-4h",
+      "NZDUSD-5m",
+      "NZDUSD-15m",
+      "NZDUSD-30m",
+      "NZDUSD-1h",
+      "NZDUSD-2h",
+      "NZDUSD-4h",
+      "EURJPY-5m",
+      "EURJPY-15m",
+      "EURJPY-30m",
+      "EURJPY-1h",
+      "EURJPY-2h",
+      "EURJPY-4h",
+      "GBPJPY-5m",
+      "GBPJPY-15m",
+      "GBPJPY-30m",
+      "GBPJPY-1h",
+      "GBPJPY-2h",
+      "GBPJPY-4h",
+      "AUDJPY-5m",
+      "AUDJPY-15m",
+      "AUDJPY-30m",
+      "AUDJPY-1h",
+      "AUDJPY-2h",
+      "AUDJPY-4h",
+      "US500-5m",
+      "US500-15m",
+      "US500-30m",
+      "US500-1h",
+      "US500-2h",
+      "US2000-5m",
+      "US2000-15m",
+      "US2000-30m",
+      "US2000-1h",
+      "US2000-2h",
+      "US2000-4h",
+      "DE30-5m",
+      "DE30-15m",
+      "DE30-30m",
+      "DE30-1h",
+      "DE30-2h",
+      "DE30-4h",
+      "JP225-5m",
+      "JP225-15m",
+      "JP225-30m",
+      "JP225-1h"
+    ],
+    "p11_neg_readout": true,
+    "per_domain_shift": {
+      "5m": {
+        "positive": 0,
+        "negative": 17,
+        "flat": 0
+      },
+      "15m": {
+        "positive": 0,
+        "negative": 17,
+        "flat": 0
+      },
+      "30m": {
+        "positive": 0,
+        "negative": 17,
+        "flat": 0
+      },
+      "1h": {
+        "positive": 0,
+        "negative": 17,
+        "flat": 0
+      },
+      "2h": {
+        "positive": 0,
+        "negative": 16,
+        "flat": 0
+      },
+      "4h": {
+        "positive": 0,
+        "negative": 15,
+        "flat": 0
+      }
+    },
+    "fill_rate_summary": {
+      "n": 99,
+      "median": 0.3277975484381178,
+      "q25": 0.30838465519008784,
+      "q75": 0.35410090337289224,
+      "min": 0.27176524579542694,
+      "max": 0.4210069444444444
+    },
+    "lead_direct_summary": {
+      "n": 99,
+      "median": 3.0,
+      "q25": 3.0,
+      "q75": 4.0,
+      "min": 3.0,
+      "max": 4.0
+    },
+    "lead_confirm_summary": {
+      "n": 99,
+      "median": 3.0,
+      "q25": 3.0,
+      "q75": 3.0,
+      "min": 2.0,
+      "max": 4.0
+    },
+    "paired_delta_summary": {
+      "n": 99,
+      "median": -0.6237074069285331,
+      "q25": -0.6798430984474078,
+      "q75": -0.5357065213725378,
+      "min": -0.9512063932596502,
+      "max": -0.3455595268560978
+    },
+    "rule": "NON-BINDING readout: a cell shows a positive (negative) confirmation shift iff its paired median((MFE-MAE)/ATR) CONFIRM-DIRECT difference has two-sided 95% CI_low>0 (CI_high<0). Composition readout iff >=5 such cells over >=3 instruments (P11). Selects/routes nothing; HYP-005 has no viability gate."
+  },
+  "de30_disclosure": "DE30 truncated history: broker m1 history ends 2026-01-16; counts/rates derive from its own realized timeline and are not span-comparable (VAL-003).",
+  "instrument_meta": {
+    "BTCUSD": {
+      "source_file": "timebars_btcusd_20230102_000000_20260514_203813.parquet",
+      "total_rows_1m": 1555658,
+      "analysis_rows_1m": 1088960,
+      "train_rows_1m": 762272,
+      "train_end_ts": "2024-10-31 14:05:00",
+      "train_end_epoch_s": 1730383500
+    },
+    "EURUSD": {
+      "source_file": "timebars_eurusd_20230102_000000_20260514_203330.parquet",
+      "total_rows_1m": 1246061,
+      "analysis_rows_1m": 872242,
+      "train_rows_1m": 610569,
+      "train_end_ts": "2024-08-25 22:19:00",
+      "train_end_epoch_s": 1724624340
+    },
+    "USTEC": {
+      "source_file": "timebars_ustec_20230102_230000_20260514_204410.parquet",
+      "total_rows_1m": 1186488,
+      "analysis_rows_1m": 830541,
+      "train_rows_1m": 581378,
+      "train_end_ts": "2024-08-26 01:06:00",
+      "train_end_epoch_s": 1724634360
+    },
+    "XAUUSD": {
+      "source_file": "timebars_xauusd_20230102_230200_20260514_204148.parquet",
+      "total_rows_1m": 1186674,
+      "analysis_rows_1m": 830671,
+      "train_rows_1m": 581469,
+      "train_end_ts": "2024-08-26 09:56:00",
+      "train_end_epoch_s": 1724666160
+    },
+    "GBPUSD": {
+      "source_file": "timebars_gbpusd_20230103_000000_20260611_005212.parquet",
+      "total_rows_1m": 1273657,
+      "analysis_rows_1m": 891559,
+      "train_rows_1m": 624091,
+      "train_end_ts": "2024-09-08 22:09:00",
+      "train_end_epoch_s": 1725833340
+    },
+    "USDJPY": {
+      "source_file": "timebars_usdjpy_20230103_000000_20260611_005907.parquet",
+      "total_rows_1m": 1274170,
+      "analysis_rows_1m": 891919,
+      "train_rows_1m": 624343,
+      "train_end_ts": "2024-09-06 12:28:00",
+      "train_end_epoch_s": 1725625680
+    },
+    "USDCHF": {
+      "source_file": "timebars_usdchf_20230103_000000_20260611_005853.parquet",
+      "total_rows_1m": 1270134,
+      "analysis_rows_1m": 889093,
+      "train_rows_1m": 622365,
+      "train_end_ts": "2024-09-09 00:05:00",
+      "train_end_epoch_s": 1725840300
+    },
+    "USDCAD": {
+      "source_file": "timebars_usdcad_20230103_000000_20260611_005900.parquet",
+      "total_rows_1m": 1269870,
+      "analysis_rows_1m": 888909,
+      "train_rows_1m": 622236,
+      "train_end_ts": "2024-09-06 16:23:00",
+      "train_end_epoch_s": 1725639780
+    },
+    "AUDUSD": {
+      "source_file": "timebars_audusd_20230103_000000_20260611_005936.parquet",
+      "total_rows_1m": 1270486,
+      "analysis_rows_1m": 889340,
+      "train_rows_1m": 622538,
+      "train_end_ts": "2024-09-06 14:40:00",
+      "train_end_epoch_s": 1725633600
+    },
+    "NZDUSD": {
+      "source_file": "timebars_nzdusd_20230103_000000_20260611_010629.parquet",
+      "total_rows_1m": 1271158,
+      "analysis_rows_1m": 889810,
+      "train_rows_1m": 622867,
+      "train_end_ts": "2024-09-06 05:42:00",
+      "train_end_epoch_s": 1725601320
+    },
+    "EURJPY": {
+      "source_file": "timebars_eurjpy_20230103_000000_20260611_010703.parquet",
+      "total_rows_1m": 1279097,
+      "analysis_rows_1m": 895367,
+      "train_rows_1m": 626756,
+      "train_end_ts": "2024-09-06 15:12:00",
+      "train_end_epoch_s": 1725635520
+    },
+    "GBPJPY": {
+      "source_file": "timebars_gbpjpy_20230103_000000_20260611_010717.parquet",
+      "total_rows_1m": 1278719,
+      "analysis_rows_1m": 895103,
+      "train_rows_1m": 626572,
+      "train_end_ts": "2024-09-06 15:28:00",
+      "train_end_epoch_s": 1725636480
+    },
+    "AUDJPY": {
+      "source_file": "timebars_audjpy_20230103_000000_20260611_010739.parquet",
+      "total_rows_1m": 1277971,
+      "analysis_rows_1m": 894579,
+      "train_rows_1m": 626205,
+      "train_end_ts": "2024-09-06 14:39:00",
+      "train_end_epoch_s": 1725633540
+    },
+    "US500": {
+      "source_file": "timebars_us500_20230103_000000_20260611_011436.parquet",
+      "total_rows_1m": 1187767,
+      "analysis_rows_1m": 831436,
+      "train_rows_1m": 582005,
+      "train_end_ts": "2024-09-17 17:26:00",
+      "train_end_epoch_s": 1726593960
+    },
+    "US2000": {
+      "source_file": "timebars_us2000_20230103_000000_20260611_011542.parquet",
+      "total_rows_1m": 1208112,
+      "analysis_rows_1m": 845678,
+      "train_rows_1m": 591974,
+      "train_end_ts": "2024-09-10 09:33:00",
+      "train_end_epoch_s": 1725960780
+    },
+    "DE30": {
+      "source_file": "timebars_de30_20230103_000000_20260611_011511.parquet",
+      "total_rows_1m": 1025743,
+      "analysis_rows_1m": 718020,
+      "train_rows_1m": 502613,
+      "train_end_ts": "2024-06-28 13:28:00",
+      "train_end_epoch_s": 1719581280
+    },
+    "JP225": {
+      "source_file": "timebars_jp225_20230103_000000_20260611_011546.parquet",
+      "total_rows_1m": 1157882,
+      "analysis_rows_1m": 810517,
+      "train_rows_1m": 567361,
+      "train_end_ts": "2024-09-23 04:40:00",
+      "train_end_epoch_s": 1727066400
+    }
+  },
+  "holdout_fence": "Only Parquet metadata + first train_rows file-order rows read per instrument; full file never sorted/collected; every domain bar, move ConfirmTime, HA0Time, fill trigger, and forward-window-end fenced to CloseTime <= train_end_ts; TEST and final-30% holdout never read.",
+  "note": "HYP-005 is descriptive: the verdict is delivery, not 'confirmation helps'. The P11 shift readout is mechanical and NON-BINDING; any 014-B routing is checkpoint desk work, not self-declared here."
+}
