@@ -8,7 +8,9 @@ met: (a) fixed first-branch primitives frozen as predeclared D0 defaults
 `design.md` finalized. Eligible for scoping; first EXP is EXP-048 (gated on VAL-004).
 **Primary registry:** `docs/signal-registry/multiplicity-registry.md`
 **Governing phase:** `docs/experiments-docs/checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/design.md`
-**014-A experiments completed:** EXP-048 (READINESS_DELIVERED), EXP-049 (CAPTURE_READINESS_DELIVERED), EXP-050 (CONTEXT_CHARACTERISATION_DELIVERED). EXP-051/052 pending.
+**014-A experiments completed:** EXP-048 (READINESS_DELIVERED), EXP-049 (CAPTURE_READINESS_DELIVERED), EXP-050 (CONTEXT_CHARACTERISATION_DELIVERED), EXP-051 (STRONG_FILTER_CHARACTERISATION_DELIVERED) and EXP-052 (CONFIRM_CHARACTERISATION_DELIVERED).
+**014-A G1 adjudicated 2026-06-15** (`checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/G1-gate-review.md`): primitives READY; benchmark capture `CHARACTERISED_NOT_VIABLE` **on the unconditioned object only** — the **conditioned** family hypothesis (strong-move-qualified harami, anchored at the harami) was never run through an outcome read in 014-A, so it is **untested**. Family **OPEN**; operator directed proceed to **Phase 014-B** (no closure). The benchmark null, the missed conditioning, the reasoning trail, and the binding process lessons are recorded in `checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/014-A-conditioning-gap-and-validation-lessons.md` — **mandatory reading before scoping any 014-B experiment.**
+**014-B opened 2026-06-15; G0-B PASS 2026-06-15** (`.../014-B-design.md`, `.../014-B-D0-addendum.md`): full conditioned barrier + position-management surface, **median** per-event expectancy endpoint (mean disclosed), intrabar fill correction, long-horizon availability; no intermediate gates, single G2 after the full slate. Next: scope EXP-053 (conditioned efficacy) after the mandatory lessons read.
 
 This is a candidate family, not a proven strategy. Phase-plan content (014-A/B
 experiment split, gate definitions, programme principles) lives in the Phase 014
@@ -205,12 +207,28 @@ criteria live in the `design.md`.
 | HYP-001 | Can the ZigZag substrate **and** the HA harami detector each be computed deterministically, look-ahead-safe, and with adequate per-cell coverage across all 102 cells? `/BARCFG` coverage measured, not assumed. | EXP-048 | Required before any characterization. | **READINESS_DELIVERED** — 86/102 READY, 3 COVERAGE_EXCLUDED. |
 | HYP-002 | Can the 3-barrier capture geometry be computed deterministically and **causally** (thresholds only from confirmed prior moves), **and** what is the gross favourable-before-adverse capture rate per cell under predeclared default barriers? | EXP-049 | First-class capture-geometry read; required before barrier-model comparison. | **CAPTURE_READINESS_DELIVERED** — 99/99 barrier-constructible, G1 0/99 VIABLE (r~0.50 null). |
 | HYP-003 | Where in a ZigZag move do harami signals occur (near exhaustion vs early/mid), and is "near exhaustion" more frequent than predeclared baselines (random timestamps, alternative trend definitions)? | EXP-050 | Characterization; informs combined-event registration. | **CONTEXT_CHARACTERISATION_DELIVERED** — 0/99 CLUSTERED, Δ uniformly −0.12 to −0.18. |
-| HYP-004 | Do the strong-move filters (`/STRONG-STAT`, `/STRONG-HA`) identify materially different move populations, per the predeclared mechanical threshold, consistently across cells? | EXP-051 | Characterization. | Pending. |
-| HYP-005 | Direct signal vs signal+confirmation (`/CONFIRM`): descriptive frequency, timing, and subsequent outcome distribution of each. | EXP-052 | Characterization. | Pending. |
+| HYP-004 | Do the strong-move filters (`/STRONG-STAT`, `/STRONG-HA`) identify materially different move populations, per the predeclared mechanical threshold, consistently across cells? | EXP-051 | Characterization. | **STRONG_FILTER_CHARACTERISATION_DELIVERED** — 99/99 MATERIAL, both filters P11-clear, 17/17 instruments. |
+| HYP-005 | Direct signal vs signal+confirmation (`/CONFIRM`): descriptive frequency, timing, and subsequent outcome distribution of each. | EXP-052 | Characterization. | **CONFIRM_CHARACTERISATION_DELIVERED** — 99/99 negative shift, paired Δ median −0.62 ATR, confirm arm universally worse. |
+| HYP-006 | `/STRONG`-conditioned HA harami, anchored at the harami, benchmark 3-barrier geometry: does the live conditioned signal produce positive gross per-event median expectancy (P14) that clears P11 and exceeds matched controls? | EXP-053 | Lead conditioning read; feeds 014-B G2. | **CHARACTERISED — EVIDENCE_FOR** — 7 viable cells over 6 instruments, 6 over 5 beat both baselines, 0 defects. |
+| HYP-007 | Path-ordered intrabar fills (P15) vs the worst-case tie-break: does the benchmark capture readout change materially vs EXP-049? | EXP-054 | Fill-model method validation; quantifies P15 effect; adopted as 014-B fill standard. | **FILL_MODEL_CHARACTERISED (IMMATERIAL)** — median Δr 0.010, 0/99 VIABLE, 0 TIE_BREAK_SENSITIVE. |
 
-Phase 014-B (barrier-model comparison and combined-event characterization) adds
-HYPs against later EXP-IDs once 014-A readiness/characterization is read; those are
-registered in the `design.md` before any result-producing code.
+Phase 014-B (conditioned-signal efficacy, capture-geometry comparison, and combined-event
+characterization) registers **HYP-006–HYP-013** against **EXP-053–EXP-060** — the conditioned
+efficacy read (HYP-006, harami-anchored, `/STRONG`-filtered), the intrabar fill-model
+correction (HYP-007), the long-horizon availability diagnostic (HYP-008), the favourable
+(HYP-009), adverse (HYP-010), and third-barrier (HYP-011) geometry comparisons, the
+position-management exits `/EXIT-PARTIAL` and `/EXIT-TRAIL-STRUCT` (HYP-012), and the combined
+event system (HYP-013). All gross, 0 slots, 0 TEST reads, expectancy endpoint (P14), no
+intermediate gates. Full specification: the Phase 014-B design + D0 addendum and the Phase
+014-B batch in `multiplicity-registry.md`. G0-B operator ratification precedes any
+result-producing code.
+
+**HYP-012 completed (EXP-059, 2026-06-16):** `/EXIT-PARTIAL` EVIDENCE_FOR — 4 PARTIAL arms
+clear P11 (V2A strongest: 53 wins over benchmark, all 17 instruments). `/EXIT-TRAIL-STRUCT`
+uniformly detrimental within the benchmark adaptive cap (0 viable cells across all trailing and
+combined arms). 0 defects, 0 Critical, audit PASS. Registry-relevant result — multiplicity-registry
+updated; passes to EXP-060 (combined event system). The uncapped trailing variant
+(`/EXIT-TRAIL-UNCAPPED`) is separately registered for EXP-059B.
 
 ## Real-Price and Holdout Discipline
 
@@ -254,6 +272,29 @@ and inconclusive outcomes remain in the file-drawer ledger.
 - `CF-HA-HARAMI-001/THIRD-TIME` — adaptive time-cap sensitivity (the `k`/window/floor of the duration-derived fixed-holding barrier; predeclared grid, no post-result selection).
 - `CF-HA-HARAMI-001/ATRMULT` — `ATR_MULT` sensitivity (predeclared grid, no post-result selection).
 - `CF-HA-HARAMI-001/LOOKBACK` — reference-set size sensitivity (predeclared grid).
+- `CF-HA-HARAMI-001/EXIT-PARTIAL` *(Phase 014-B, 2026-06-15)* — favourable-side scaled/partial
+  exits: full entry weight split into ≤3 parts; Variant #1 {first-profitable-close, calculated
+  target, reversal-event}, Variant #2 percentage-to-final-target splits. Take-profit only;
+  adverse-target model unchanged. Spec: `014-B-D0-addendum.md` P17.
+- `CF-HA-HARAMI-001/EXIT-TRAIL-STRUCT` *(Phase 014-B, 2026-06-15)* — adverse-side structure
+  trailing stop on a smaller-`ATR_MULT` ZigZag (default `ATR_MULT_TRAIL = 0.5`): new pivot high
+  → trail to recent low (long), new pivot low → trail to recent high (short); exit on fill.
+  Spec: `014-B-D0-addendum.md` P18.
+- `CF-HA-HARAMI-001/EXIT-TRAIL-UNCAPPED` *(Phase 014-B, 2026-06-16; characterized by EXP-059B 2026-06-16)* — the structure trailing
+  stop run as a **standalone adverse-exit model**, not a barrier swap: **no benchmark time-cap
+  backstop and no initial 1:1 stop**. The position carries no adverse exit until the first
+  secondary-ZigZag (`ATR_MULT_TRAIL`) pivot confirms after entry, then ratchets monotonically
+  (P18 rule unchanged); the forward window is unbounded to the TRAIN data edge and the only
+  censoring is `DATA_CENSORED` past `train_end_ts`. Distinct from `/EXIT-TRAIL-STRUCT` (which
+  retained the 3-barrier cap) and from `/THIRD-TIME` (cap sensitivity *within* the 3-barrier
+  model). Registered after EXP-059 was found to have measured every trailing/combined arm under
+  the benchmark adaptive cap. Spec: `014-B-EXP-059B-uncapped-trailing-addendum.md`.
+  **EXP-059B result — EVIDENCE_AGAINST:** 0/2 binding arms clear P11 (TRAIL-PURE-UNCAPPED 0 viable, 0 WIN — uniformly negative; COMBINED-UNCAPPED-V2A 1 viable cell, 0 WIN). Cap-isolation confirms cap was not the constraint (0/96 divergent-positive pure TRAIL, 2/89 COMBINED). Closes the branch as a characterized negative; route to G2.
+
+**Fill-model standard (Phase 014-B, P15):** outcome reads involving more than one barrier on a
+bar resolve fills by intrabar path order (bullish `O→L→H→C`, bearish `O→H→L→C`), superseding the
+EXP-049 worst-case tie-break. A documented approximation (1-minute base bars are not replayed
+inside the domain bar); disclosed per result; effect quantified by EXP-054.
 
 ## Implementation Path
 
