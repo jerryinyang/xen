@@ -387,18 +387,126 @@ throughout; a candidate branch is registered only at G2 PROCEED_TO_SCREEN.
 | `CF-HA-HARAMI-001/HYP-011` — **EXP-058** | HYP-011 | **Third-barrier geometry:** `/THIRD-EVENT`, `/THIRD-TIME` vs benchmark adaptive cap, expectancy + censoring. | 0 / 0 | **CHARACTERISED — EVIDENCE_AGAINST (2026-06-16)** | No variant clears P11 (max 3 WIN cells). Raising floor depletes viability 8→6→4→2→1. THIRD-EVENT weakest (1 viable, 0 WIN). 99/99 powered. Audit PASS. |
 | `CF-HA-HARAMI-001/HYP-012` — **EXP-059** | HYP-012 | **Position-management exits:** `/EXIT-PARTIAL`, `/EXIT-TRAIL-STRUCT`, individually and combined, expectancy. | 0 / 0 | **CHARACTERISED — EVIDENCE_FOR (2026-06-16)** | `/EXIT-PARTIAL` EVIDENCE_FOR: 4 PARTIAL arms clear P11 (V2A strongest 53 wins/17 instr). `/EXIT-TRAIL-STRUCT` uniformly detrimental within benchmark cap (0 viable cells across all 7 trailing/combined arms). 0 defects, 0 Critical. 0 slots, 0 TEST reads. Passes to EXP-060. |
 | `CF-HA-HARAMI-001/HYP-012b` — **EXP-059B** | HYP-012 (follow-up) | **Uncapped structure trailing (EXP-059 gap-fill):** the `/EXIT-TRAIL-UNCAPPED` model — trailing adverse with **no time-cap backstop and no initial stop** — measured as `TRAIL-PURE-UNCAPPED` and `COMBINED-UNCAPPED-V2A` vs `BENCH`; capped no-init siblings re-run for cap-isolation (disclosed). Expectancy (P14). | 0 / 0 | **CHARACTERISED — EVIDENCE_AGAINST (2026-06-16)** | 0/2 binding arms clear P11. TRAIL-PURE-UNCAPPED 0 viable, 0 WIN (uniformly negative). COMBINED-UNCAPPED-V2A 1 viable (BTCUSD-5m), 0 WIN. Cap-isolation: 0/96 divergent-positive (TRAIL-PURE), 2/89 (COMBINED) — cap was not the constraint. BENCH viable in only 9/99 (audit Warning #1 — interpretation caveat for G2). 0 defects, 0 Critical, 1 Warning, 5 Info. Audit PASS. Registry-relevant; closes `/EXIT-TRAIL-UNCAPPED` as characterized negative. 0 slots, 0 TEST reads. |
-| `CF-HA-HARAMI-001/HYP-013` — **EXP-060** | HYP-013 | **Combined event system:** best per-layer geometry + conditioned signal; per-cell hit/miss/expectancy vs P13 baselines. | 0 / 0 | PLANNED | Candidate-event characterisation; feeds G2. |
+| `CF-HA-HARAMI-001/HYP-013` — **EXP-060** | HYP-013 | **Combined event system:** best per-layer geometry + conditioned signal; per-cell hit/miss/expectancy vs P13 baselines. | 0 / 0 | **CHARACTERISED — CHARACTERISED_NOT_VIABLE_ELIGIBLE (2026-06-17)** | 0 champion_wins (99/99 cells powered, 69/99 viable individually, 3 beat matched-random, 0 beat MA(20,50)). Both geometric levers (V2A, ADV-NONE) independently improve expectancy additively; interaction near zero. **Interpretation caveat (added 2026-06-17):** the "MA-baseline dominance is a substrate property" reading is *provisional* — post-hoc investigation of the generated results found (i) the champion's gross **mean** is ≈0 or negative on 5/6 domains despite positive median (capped V2A upside + uncapped ADV-NONE downside ⇒ left-skew mirage), and (ii) MA's median advantage was never tested against a matched-random control on the MA substrate, nor was MA's mean/exit-composition emitted. **EXP-060B (HYP-013b) resolves both before G2 adjudicates.** Full 014-B surface measured; G2 desk adjudicates after EXP-060B. Audit PASS. |
+| `CF-HA-HARAMI-001/HYP-013b` — **EXP-060B** | HYP-013 (follow-up) | **MA(20,50) substrate dominance: genuine lead or skew artifact? (EXP-060 gap-fill).** Re-instruments EXP-060's already-computed MA(20,50) arm to emit **mean + exit-reason composition** (EXP-060 emitted MA median only), and adds the one new control — a **matched-random entry on the MA substrate (RM3)** through the identical V2A×ADV-NONE×cap pipeline. Binding discriminator: does the MA-substrate harami (M3) clear P11 median viability **and beat its own-substrate matched-random (M3−RM3 CI_low>0)** with mean clearing P11 (genuine lead), or is MA's median dominance the same median≫mean / entry-redundant artifact as the ZigZag champion (artifact)? Skew attribution via ADV-NONE-vs-1:1 arms on both substrates; median binding (P14), mean disclosed. | 0 / 0 | **CHARACTERISED — SUBSTRATE_LEAD_FOUND (2026-06-17)** | Audit PASS (0C/2W/3I), reconciliation exact 99/99, all integrity gates pass. On the MA substrate the conditioned harami expresses a **real median edge** it does **not** on ZigZag: M3 median ≈1.16 vs RM3 ≈0.38 (non-degenerate control = geometry baseline); **M3 beats RM3 in 85/99 cells** (reverses EXP-060's ZigZag 3/99); M3 median-viable 89/99. **But median-only:** M3 gross **mean** median ≈ −0.065 (mean-viable only 14/99); skew is ADV-NONE-driven (MA median−mean gap **1.20 ATR** for ADV-NONE vs 0.49 for 1:1). **Lead = 14 cells/9 instruments (P11 met) but 8/14 are low-n 4h.** Net: a real-but-narrow median edge that is **not yet tradeable** (mean ≈0). Qualifies EXP-060's "substrate property" reading — the MA advantage is partly a real signal effect, not solely geometry/drift. **0 new countable item; 0 candidate slots, 0 TEST reads** (composes registered `/EXIT-PARTIAL` V2A, `/ADV-NONE`, benchmark cap, two P13 baselines; the MA matched-random is a null). Family stays REGISTERED/OPEN — no candidate registered here. Full spec/results: `python/experiments/EXP-060B/{scope,results,report}.md`; checkpoint addendum `014-B-EXP-060B-ma-substrate-dominance-addendum.md`. |
 
-**G2 (after full slate):** PROCEED_TO_SCREEN (≥1 EXP-060 combined definition clears P11
+**G2 (after full slate, now incl. EXP-060B):** PROCEED_TO_SCREEN (≥1 EXP-060 combined definition clears P11
 expectancy viability vs P13 baselines → register a candidate branch, first slot, EXP-027-analog
 calibration next) / CHARACTERISED_NOT_VIABLE (full conditioned surface measured, none clears →
 closure well-supported) / SUBSTRATE-METHOD_DEFECT / INCONCLUSIVE. EXP-IDs are the registered
 plan; final IDs assigned at Stage-1 per `python/experiments/INDEX.md`.
+**EXP-060B RESULT — SUBSTRATE_LEAD_FOUND (2026-06-17):** EXP-060B adjudicated EXP-060's
+"MA dominance is a substrate property" reading and returned **SUBSTRATE_LEAD_FOUND** (audit PASS).
+The conditioned harami expresses a **real median edge on the MA substrate** (M3 beats its own-substrate
+matched-random in 85/99 cells; reverses ZigZag's 3/99) — so the MA advantage is **partly a real signal
+effect, not solely a geometry/drift artifact.** **Therefore the single 014-B G2 must NOT close
+CF-HA-HARAMI-001 on a clean CHARACTERISED_NOT_VIABLE** — a scoped MA-substrate follow-up is warranted.
+**However**, the lead is **median-only and narrow**: M3's gross **mean** is ≈0/negative (mean-viable
+14/99; ADV-NONE skew gap 1.20 ATR), and the P11 lead leans on 8/14 low-n 4h cells. The binding obstacle
+to viability is now the **skew/mean**, not the signal's existence — so the follow-up must target a
+bounded-downside geometry that recovers a positive mean, **not** re-run the current V2A×ADV-NONE geometry
+(which inherits the mean≈0 problem). Candidate registration would occur at that follow-up's gate, never in
+EXP-060B (0 slots, 0 TEST reads). Family stays **REGISTERED/OPEN**.
+
+**G2 ADJUDICATED 2026-06-17 — NO_PROCEED_TO_SCREEN, FAMILY NOT CLOSED**
+(`docs/experiments-docs/checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/G2-gate-review.md`;
+operator routing ratified "Open MA-substrate follow-up"). The terminal G2 on the full slate:
+**PROCEED_TO_SCREEN NOT met** (champion A3 0/99 beats MA(20,50); EXP-060B's MA edge is
+median-only/mean≈0 and is a characterisation read that cannot register a candidate);
+**SUBSTRATE/METHOD_DEFECT NOT met** (EXP-054 IMMATERIAL, integrity all-pass);
+**INCONCLUSIVE NOT met** (99/99 powered); **CHARACTERISED_NOT_VIABLE criterion met on the
+ZigZag substrate only** — a clean close is **forbidden** by EXP-060B SUBSTRATE_LEAD_FOUND.
+Net: **014-B CHARACTERISED_NOT_VIABLE on ZigZag as configured; family carried OPEN** on the
+real MA-substrate median edge whose binding obstacle is now the **skew/mean**. **0 candidate
+slots, 0 TEST reads spent in all of 014-B; holdouts sealed; ledger unchanged.** Phase 014
+closes at G2; retrospective written. **Routing:** a scoped MA-substrate follow-up (new phase,
+own D0/G0) targeting bounded-downside adverse geometry (1:1, `/ADV-EXTREME-rr1`) with the
+**mean** as a co-primary endpoint — not a re-run of V2A×ADV-NONE — and confronting the
+8/14-low-n-4h lead concentration; no TEST/holdout contact; candidate registration only at the
+follow-up's own PROCEED gate.
 
 **Out of scope (recorded):** any net/cost-adjusted metric (gross only); any HA-price outcome
 metric; position-in-move as a *live* filter (descriptive-only); parameter tuning or
 post-result variant selection; any intermediate early-closure gate; any TEST or holdout
 contact; cTrader screening before G2 registers a candidate branch.
+
+## Phase 015 Batch (MA(20,50)-Substrate Conditioned Harami — Full-Surface Characterisation)
+
+**Status:** **ACTIVE — G0 PASS 2026-06-17 (operator).** Continuation of `CF-HA-HARAMI-001`
+(REGISTERED, OPEN) opened by the Phase 014 G2 routing ("Open MA-substrate follow-up"). Governing
+design + D0: `docs/experiments-docs/checkpoints/2026-06-17-015-ma-substrate-conditioned-harami-full-surface/`
+(`design.md`, `D0-predeclarations.md` P1–P12). **All Phase 015 work is gross, 0 candidate slots,
+0 TEST reads, holdouts sealed; no new-universe row read under the HA-harami event definition.** No
+Phase 015 data contact occurred before G0.
+
+**Why:** Phase 014 mapped the full capture/exit surface on the ZigZag substrate, where the
+conditioned harami is redundant vs random (3/99); EXP-060B then found the signal is *real* on the
+MA(20,50) substrate (beats own-substrate matched-random 85/99) but at one geometry only (V2A ×
+`/ADV-NONE`), median-only with mean ≈ 0. Phase 015 re-derives the 014-B surface on the MA substrate
+to learn whether the MA edge is a robust substrate property or a single-geometry artifact, and —
+mean as a *diagnostic* not a disqualifier — why the mean is negative and whether bounded-downside
+geometry recovers it.
+
+**New countable items (registered before any result-producing code):**
+
+| Item | Definition | Status |
+| --- | --- | --- |
+| `CF-HA-HARAMI-001/MA-SUBSTRATE` | MA(20,50) crossover segmentation on real close as the conditioned harami's move/direction/favourable-target/adaptive-cap substrate (replacing ATR-ZigZag for outcome geometry). MA(20,50) **fixed/ratified, not swept** (MA-parameter sensitivity out of scope). Semantics bound to the EXP-060/060B `ma_seg_arm`/`ma_segment_moves` construction (P1; P12 reconciliation). | **REGISTERED (Phase 015; 2026-06-17)** |
+| `CF-HA-HARAMI-001/MA-SUBSTRATE` — mode `hybrid` | Entry events = the EXP-053/060 ZigZag-`/STRONG-STAT`-conditioned haramis (byte-identical population, the EXP-060B object + reconciliation anchor); MA supplies only the outcome geometry. **Primary**; full surface. | **REGISTERED (Phase 015; 2026-06-17)** |
+| `CF-HA-HARAMI-001/MA-SUBSTRATE` — mode `native` | `/STRONG-STAT` magnitude filter **recomputed on confirmed MA segments** (qualify if MA-segment magnitude-so-far ≥ p75 of trailing-20 confirmed MA-segment magnitudes; causal). New entry population; no EXP-060B back-anchor. **Co-investigated, bounded** to decision-relevant geometries. | **REGISTERED (Phase 015; 2026-06-17)** |
+
+The bounded-downside adverse arms (benchmark 1:1, `/ADV-EXTREME` with rr1) and the reused
+favourable/third/exit OAT variants (`/VPTARGET`, `/MAGTARGET`, `/THIRD-TIME`, `/THIRD-EVENT`,
+`/EXIT-PARTIAL`, `/EXIT-TRAIL-STRUCT`) are already registered (Phase 014/014-B batches); Phase 015
+records their MA-substrate reuse. `/ADV-NONE` is retained as a disclosed unbounded reference (the
+skew source under study), not a viability candidate.
+
+**Binding posture (P1–P12):** median per-event gross ATR-normalised expectancy is the binding
+viability endpoint (CI_low>0, ≥30 events, P11 with a non-4h breadth rule of ≥3 qualifying cells
+outside 4h); the **mean** is a **diagnostic co-primary** (raw + 10% trimmed + worst-5% tail-share,
+each CI'd) — a median-viable/mean-negative result does **not** close the family; closure needs a
+positive demonstration of structural mean-irrecoverability (trimmed mean also negative ∧ persists
+under bounded-downside ∧ not removable-tail-driven). **Matched-random null per object, every read,
+reported individually (`RM-hybrid`, `RM-native`); the two objects are never pooled** (Amendment 001).
+Fixed per-cell bootstrap seed. Detection on HA candles; all outcome metrics on real prices.
+
+**AMENDED 2026-06-17 — `D0-amendment-001-dual-parallel-substrate.md`.** Both conditioning modes
+(`hybrid`, `native`) are now **parallel first-class substrates carrying the full surface, reported
+individually**. Root cause: EXP-060B/061 `M`-arms condition on MA-segment `/STRONG-STAT` and so **are
+the native object** (the 85/99 edge was native); the genuine hybrid object was never computed.
+Reconciliation flips (P12): native → EXP-060B `M0/M3` 1e-9; hybrid → EXP-053 population + determinism
++ causality + invariants. EXP-061/062/063 are **re-run dual-object, superseding in place**. EXP-067 =
+hybrid combined champion; EXP-068 = **native** combined champion (HYP-021 reassigned, merges old
+N1+N2); **HYP-022/EXP-069 DROPPED** (retained, never deleted). No new countable item (`native` already
+countable at G0).
+
+| Experiment (planned) | Object | Mirrors | Question | Slots / TEST | Status |
+| --- | --- | --- | --- | --- | --- |
+| `CF-HA-HARAMI-001/HYP-014` — EXP-061 | hybrid **+** native (L1), individually | EXP-049 + EXP-053 | MA-substrate 3-barrier capture readiness + benchmark-geometry median expectancy, each object vs its own matched null. | 0 / 0 | **CHARACTERISED (dual-object, re-run 2026-06-17): native EVIDENCE_FOR (8 cells/6 instr, all non-4h; reconciles EXP-060B 99/99 @1e-9 — confirms the prior mislabelled result) / hybrid EVIDENCE_AGAINST (genuine ZZ-conditioned 3202-class × MA geom generalises in 1 cell only). Phase verdict EVIDENCE_FOR (stronger=native).** Objects never pooled; item retained, feeds terminal G-015; no closure/registration here. |
+| `CF-HA-HARAMI-001/HYP-015` — EXP-062 | hybrid **+** native (L2), individually | EXP-055 | Lifetime availability (MFE/MAE) on MA segments, each object — room to bound the downside while keeping favourable capture? | 0 / 0 | **CHARACTERISED (dual-object, re-run 2026-06-17): AVAILABILITY_GOOD — 91/99 MOVE_AVAILABLE (17 instr/77 non-4h, P11+P6 composes); 4/99 SIGNAL_ATTRIBUTABLE — the abundant room is a generic MA-segment-length property, not harami-specific. MAE tail bounded-recoverable (tail-share ~0.23) sizing L3. Both objects measured individually; never pooled. Supersedes prior single-object result in place.** |
+| `CF-HA-HARAMI-001/HYP-016` — EXP-063 | hybrid **+** native (L3), individually | EXP-057 + mean diag | Bounded-downside adverse geometry (1:1, `/ADV-EXTREME-rr1`) vs `/ADV-NONE` + tail-share/trimmed-mean/recovery, each object. | 0 / 0 | **CHARACTERISED (dual-object, re-run 2026-06-17): EVIDENCE_FOR (nuanced) — V-BENCH generalises (8 cells/6 instr/8 non-4h) AND mean_viable composes (10 cells/6 instr/7 non-4h) per P4 closure rule; but recovery_positive=0 for all cells (formal bounded-vs-NONE contrast never crosses zero). Self-mean-viable but not recovery-positive; V-RR1 62% attribution gap. Both objects measured individually; never pooled. Supersedes prior single-object result in place.** |
+| `CF-HA-HARAMI-001/HYP-017` — EXP-064 | hybrid **+** native (S1), individually | EXP-056 | Favourable-target geometry on MA (50% vs `/VPTARGET`, `/MAGTARGET`), each object. | 0 / 0 | **PLANNED (paused → resume dual-object)** |
+| `CF-HA-HARAMI-001/HYP-018` — EXP-065 | hybrid **+** native (S2), individually | EXP-058 | Third-barrier geometry on MA (adaptive cap vs `/THIRD-TIME`, `/THIRD-EVENT`), each object. | 0 / 0 | **PLANNED (dual-object)** |
+| `CF-HA-HARAMI-001/HYP-019` — EXP-066 | hybrid **+** native (S3), individually | EXP-059 | Position-management exits on MA (`/EXIT-PARTIAL`, `/EXIT-TRAIL-STRUCT`, individually + combined), each object. | 0 / 0 | **PLANNED (dual-object)** |
+| `CF-HA-HARAMI-001/HYP-020` — EXP-067 | **hybrid** combined champion | EXP-060 | Combined hybrid MA champion vs `RM-hybrid` + disclosed native & ZigZag champions — integrative readout feeding G-015. | 0 / 0 | **PLANNED** |
+| `CF-HA-HARAMI-001/HYP-021` — EXP-068 | **native** combined champion *(merges old N1+N2)* | EXP-060 | Combined native MA champion vs `RM-native` + disclosed hybrid champion — native integrative readout feeding G-015. | 0 / 0 | **PLANNED** |
+| `CF-HA-HARAMI-001/HYP-022` — ~~EXP-069~~ | ~~native (N2)~~ | — | **DROPPED (Amendment 001)** — native efficacy/availability/adverse/geometry now covered by the dual-object L1–S3 reads; the native combined champion is EXP-068. Item retained in the ledger, never deleted or reused. | 0 / 0 | **DROPPED** |
+
+**G-015 (single terminal gate, after the full slate; spans both objects, judged individually):**
+PROCEED_TO_SCREEN (≥1 combined definition on hybrid EXP-067 **or** native EXP-068 is median-viable AND
+raw-mean-positive, beats its same-object matched null, clears P11 with non-4h breadth → register that
+definition + conditioning object as a candidate branch, first slot, EXP-027-analog calibration next) /
+CHARACTERISED_NOT_VIABLE
+(structural mean-irrecoverability on **both** objects → family closure well-supported) /
+MEAN_RECOVERABLE—FOLLOW-UP (tail-driven/partial recovery, family stays OPEN, targeted follow-up) /
+SUBSTRATE-METHOD_DEFECT / INCONCLUSIVE. EXP-IDs are the registered plan; final IDs assigned at
+Stage-1 per `python/experiments/INDEX.md`.
+
+**Out of scope (recorded):** any net/cost-adjusted metric (gross only); MA-parameter sensitivity
+(MA(20,50) fixed); fully-MA-native conditioning's *full* geometry surface (a promotion follow-up,
+not this phase); any HA-price outcome metric; position-in-move as a live filter; parameter tuning
+or post-result variant selection beyond the predeclared OAT grids; any intermediate early-closure
+gate; any TEST or holdout contact; candidate registration before G-015 PROCEED.
 
 ## Amendment Rules
 
