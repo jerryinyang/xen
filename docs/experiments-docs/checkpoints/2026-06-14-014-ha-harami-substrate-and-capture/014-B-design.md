@@ -141,3 +141,21 @@ BENCH (binding paired contrast), with capped no-init siblings re-run for a discl
 cap-isolation contrast and `DATA_CENSORED` disclosed separately from capped censoring. Full
 specification: [`014-B-EXP-059B-uncapped-trailing-addendum.md`](014-B-EXP-059B-uncapped-trailing-addendum.md).
 0 slots, 0 TEST reads, TRAIN-only, gross; joins the single 014-B G2 (no intermediate gate).
+
+## 11. Addendum (2026-06-17) — EXP-060B: MA(20,50) substrate dominance, genuine lead or skew artifact? (EXP-060 gap-fill)
+
+EXP-060 returned `CHARACTERISED_NOT_VIABLE_ELIGIBLE` (champion 0/99 wins) and recorded the result as *"MA-baseline
+dominance is a substrate property."* Post-hoc investigation of the generated results (2026-06-17) found that
+reading rests on two confounds the experiment's emitted outputs cannot resolve: (i) the champion's gross **mean**
+is ≈0 or negative on 5/6 domains despite a positive median — a capped-upside (V2A) / uncapped-downside (`/ADV-NONE`)
+left-skew mirage — and EXP-060 emitted MA's *median* only, never MA's mean or exit-composition; (ii) MA(20,50)'s
+median advantage was **never tested against a matched-random control on the MA substrate**, so "the harami adds
+value on MA" is unsupported (on ZigZag the entry was already proven redundant vs random). EXP-060B fills both on
+the same conditioned population and 99-cell grid: it emits MA mean + exit-reason composition, adds the
+matched-random-on-MA control (`RM3`), and bootstraps the mean alongside the median. Binding discriminator: does the
+MA-substrate harami (`M3`) clear P11 median viability **and** beat `RM3` (CI_low>0) with mean clearing P11
+(SUBSTRATE_LEAD_FOUND), or is MA's dominance the same median≫mean / entry-redundant artifact (ARTIFACT_CONFIRMED)?
+Median binding (P14), mean disclosed; **no new countable item** (composes registered `/EXIT-PARTIAL` V2A,
+`/ADV-NONE`, the benchmark cap, and the two P13 baselines; the MA-substrate matched-random is a null). 0 slots,
+0 TEST reads, TRAIN-only, gross; runs **before** and feeds the single 014-B G2 (no intermediate gate). Full
+specification: [`014-B-EXP-060B-ma-substrate-dominance-addendum.md`](014-B-EXP-060B-ma-substrate-dominance-addendum.md).
