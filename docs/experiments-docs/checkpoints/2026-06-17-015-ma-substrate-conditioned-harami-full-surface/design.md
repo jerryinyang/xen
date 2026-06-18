@@ -1,10 +1,15 @@
 # Phase 015 — MA(20,50)-Substrate Conditioned Harami: Full-Surface Characterisation
 
-**Status:** **ACTIVE — G0 PASS 2026-06-17 (operator).** D0 predeclarations ratified
-(`D0-predeclarations.md`, P1–P12; Q1–Q6 + hybrid/native scope ruled). Pipeline entry point:
-register the Phase 015 batch, then scope EXP-061 (Stage 1). All work gross, 0 candidate slots,
-0 TEST reads, holdouts sealed; no data contact before each experiment's own pipeline pass.
-**Date:** 2026-06-17.
+**Status:** **CLOSED 2026-06-18 at G-015 — PROCEED_TO_SCREEN (native object); first candidate slot
+consumed** (`G-015-gate-review.md`; routing operator-ratified 2026-06-18). Was ACTIVE (G0 PASS
+2026-06-17). D0 predeclarations ratified (`D0-predeclarations.md`, P1–P12; amended by
+`D0-amendment-001-dual-parallel-substrate.md` and `D0-amendment-002-drop-exp067.md`). The full
+dual-object slate (EXP-061–066 + native combined champion EXP-068; EXP-067 dropped) ran; the
+terminal G-015 adjudicated **PROCEED on the MA-native object** (hybrid CHARACTERISED_NOT_VIABLE on
+the disclosed surface, judged individually). Retrospective written (`retrospective.md`). All
+*experiments* gross, 0 candidate slots, 0 TEST reads; the G-015 PROCEED registered the first
+candidate slot at gate close; holdouts sealed.
+**Date:** 2026-06-17 (design); closed 2026-06-18.
 **Family:** `CF-HA-HARAMI-001` (REGISTERED, OPEN). Continuation phase — *not* a new family.
 **Opened by:** Phase 014 G2 routing (`../2026-06-14-014-ha-harami-substrate-and-capture/G2-gate-review.md`,
 operator "Open MA-substrate follow-up"); Phase 014 `retrospective.md` §5; operator scope direction
