@@ -1,6 +1,12 @@
 # Candidate Family: CF-HA-HARAMI-001 — Heiken Ashi Harami at Trend Exhaustion
 
-**Status:** `REGISTERED` — 2026-06-14 (Phase 014 G0 PASS). All promotion conditions
+**Status:** `REGISTERED` / **OPEN — FIRST CANDIDATE ACTIVE** (2026-06-18, Phase 015 G-015 PROCEED).
+The MA(20,50)-native conditioned harami is the family's first registered candidate branch
+(`CF-HA-HARAMI-001/CAND-001`, first candidate slot consumed); it advances to candidate screening
+(event-level method calibration → one-shot TEST confirmation of the non-4h FX core). See the
+**Phase 015 G-015** disposition below.
+
+**Status (origin):** `REGISTERED` — 2026-06-14 (Phase 014 G0 PASS). All promotion conditions
 met: (a) fixed first-branch primitives frozen as predeclared D0 defaults
 (`docs/experiments-docs/checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/D0-predeclarations.md`);
 (b) family and variant surface entered in
@@ -247,6 +253,11 @@ updated; passes to EXP-060 (combined event system). The uncapped trailing varian
 - **Hybrid object `H0` (ZigZag `/STRONG-STAT` × MA geometry, 3202-class — the *genuinely-new* object, computed here for the first time) — EVIDENCE_AGAINST.** Generalises in only 1 cell (NZDUSD-5m, marginal); powered grid composes (99 cells) ⇒ genuine negative, not power-limited. Conditioning-mask reconciles exactly to EXP-053 via `Z0`.
 
 **Headline:** the EXP-060B MA-substrate edge is a *matched-substrate* conditioning property — it generalises only when the `/STRONG-STAT` filter is computed on the same MA segment that defines the outcome geometry, not on the ZigZag move. **Phase verdict EVIDENCE_FOR (stronger object = native).** Family stays **REGISTERED, OPEN**; the surface runs regardless (P9). Disclosed `Z0` beats `RZ0` in 7 cells (indices/higher TFs). 0 candidate slots, 0 TEST reads; characterisation readout feeds the single terminal G-015 (no closure/registration here). Audit PASS (0C/0W/2I).
+
+**Phase 015 G-015 ADJUDICATED 2026-06-18 — PROCEED_TO_SCREEN (native object); first candidate slot consumed** (`checkpoints/2026-06-17-015-ma-substrate-conditioned-harami-full-surface/G-015-gate-review.md`; desk review, routing operator-ratified 2026-06-18 "PROCEED; register both native arms"). The terminal gate spans both conditioning objects, judged individually; the strongest object governs (design §7).
+- **Native object (EXP-068) — PROCEED_TO_SCREEN.** Both predeclared champion arms satisfy the full G-015 conjunction (per cell: median CI_low>0 ∧ raw-mean CI_low>0 ∧ beats-`RM-native` CI_low>0), composed at P11+P6: `N-PARTIAL-V2A` 9 cells/5 instr/7 non-4h (P4=PARTIAL_RECOVERY, the bounded-downside lead definition); `N-V2A×ADV-NONE` 14 cells/9 instr/6 non-4h (P4=TAIL_DRIVEN, disclosed broad-but-tail-driven companion). Signal present even at single-leg BENCH (6 non-4h FX cells); robust geometry-independent core ~5 non-4h FX cells (GBPUSD/NZDUSD/GBPJPY ± EURUSD). The negative mean is **not structural** (closure-on-mean rule P4 unmet → family not closed).
+- **Hybrid object (EXP-061–066; EXP-067 DROPPED, Amendment 002) — CHARACTERISED_NOT_VIABLE on the disclosed surface** (EVIDENCE_AGAINST L1/S1/S3, INCONCLUSIVE S2; no per-layer winner to combine — an inferential disposition, never pooled with native). Does not govern the phase.
+- **Consequence:** `CF-HA-HARAMI-001/CAND-001` (MA-SUBSTRATE / **native**, both champion arms) **registered as the family's first candidate branch; first candidate slot consumed.** Family is now **REGISTERED / OPEN — first candidate active.** Integrity all-pass (99/99 reconciliation @1e-9; determinism/causality/invariants). **0 TEST reads spent at G-015** — `test-read-ledger.md` unchanged, holdouts sealed; the first counted TEST read occurs at the screening scope. **Routing:** event-level method calibration (EXP-027-analog, TRAIN-only) → one-shot TEST confirmation of the non-4h FX core under the bounded-downside `N-PARTIAL-V2A` lead definition (`N-V2A×ADV-NONE` disclosed). EURUSD is TEST-capped instrument-wide (holdout-contaminated, EXP-032) and ineligible for stratum-specific TEST; the 5m/15m/30m FX-core strata must be materialized in `test-read-ledger.md` before any binding read.
 
 ## Real-Price and Holdout Discipline
 

@@ -432,12 +432,16 @@ contact; cTrader screening before G2 registers a candidate branch.
 
 ## Phase 015 Batch (MA(20,50)-Substrate Conditioned Harami — Full-Surface Characterisation)
 
-**Status:** **ACTIVE — G0 PASS 2026-06-17 (operator).** Continuation of `CF-HA-HARAMI-001`
+**Status:** **CLOSED 2026-06-18 at G-015 — PROCEED_TO_SCREEN (native object); first candidate slot
+consumed.** Was ACTIVE (G0 PASS 2026-06-17, operator). Continuation of `CF-HA-HARAMI-001`
 (REGISTERED, OPEN) opened by the Phase 014 G2 routing ("Open MA-substrate follow-up"). Governing
 design + D0: `docs/experiments-docs/checkpoints/2026-06-17-015-ma-substrate-conditioned-harami-full-surface/`
-(`design.md`, `D0-predeclarations.md` P1–P12). **All Phase 015 work is gross, 0 candidate slots,
-0 TEST reads, holdouts sealed; no new-universe row read under the HA-harami event definition.** No
-Phase 015 data contact occurred before G0.
+(`design.md`, `D0-predeclarations.md` P1–P12; `D0-amendment-001-dual-parallel-substrate.md`;
+`D0-amendment-002-drop-exp067.md`; `G-015-gate-review.md`). **All Phase 015 *experiments* were gross,
+0 candidate slots, 0 TEST reads; the G-015 PROCEED registered the first candidate slot (the MA-native
+branch) at gate close — see the G-015 block below.** TEST reads remain 0; holdouts sealed; no
+new-universe row read under the HA-harami event definition. No Phase 015 data contact occurred before
+G0.
 
 **Why:** Phase 014 mapped the full capture/exit surface on the ZigZag substrate, where the
 conditioned harami is redundant vs random (3/99); EXP-060B then found the signal is *real* on the
@@ -492,21 +496,86 @@ countable at G0).
 | `CF-HA-HARAMI-001/HYP-021` — EXP-068 | **native** combined champion *(merges old N1+N2)* | EXP-060 | Combined native MA champion vs `RM-native` + disclosed hybrid champion — native integrative readout feeding G-015. | 0 / 0 | **CHARACTERISED (2026-06-18) — PROCEED_TO_SCREEN-candidate (G-015 input; gate NOT adjudicated here, P9).** Both predeclared champion arms clear the full G-015 conjunction (median-viable ∧ raw-mean-positive ∧ beats-`RM-native`) at P11+P6: `N-PARTIAL-V2A` 9 cells/5 instr/7 non-4h (P4=PARTIAL_RECOVERY); `N-V2A×ADV-NONE` 14 cells/9 instr/6 non-4h (P4=TAIL_DRIVEN, 63/99; adv_count=0). First Phase 015 native read where the mean co-primary composes (EXP-066 S3 did not require it). Signal present even at single-leg BENCH (6 non-4h FX cells); robust non-4h core ~5 FX cells (GBPUSD/NZDUSD/GBPJPY). Caveats: narrow mean breadth (mean-positive 11–14/99 vs median-viable 45–89); ADV-NONE composition 4h-concentrated and tail-driven → bounded-downside `N-PARTIAL-V2A` is the cleaner candidate definition. Reconciliation 99/99 to EXP-061 M0/H0 + EXP-066 native PARTIAL-V2A at 1e-9; determinism/causality/invariants clean. Hybrid disclosed EVIDENCE_AGAINST (EXP-067 DROPPED, Amendment 002 — hybrid adjudicated at G-015 on the disclosed surface reads), never pooled. 0 slots, 0 TEST reads. Audit PASS (0C/0W/3I). Family stays OPEN — candidate registration only at G-015. |
 | `CF-HA-HARAMI-001/HYP-022` — ~~EXP-069~~ | ~~native (N2)~~ | — | **DROPPED (Amendment 001)** — native efficacy/availability/adverse/geometry now covered by the dual-object L1–S3 reads; the native combined champion is EXP-068. Item retained in the ledger, never deleted or reused. | 0 / 0 | **DROPPED** |
 
-**G-015 (single terminal gate, after the full slate; spans both objects, judged individually):**
-PROCEED_TO_SCREEN (≥1 combined definition on hybrid EXP-067 **or** native EXP-068 is median-viable AND
-raw-mean-positive, beats its same-object matched null, clears P11 with non-4h breadth → register that
-definition + conditioning object as a candidate branch, first slot, EXP-027-analog calibration next) /
-CHARACTERISED_NOT_VIABLE
-(structural mean-irrecoverability on **both** objects → family closure well-supported) /
-MEAN_RECOVERABLE—FOLLOW-UP (tail-driven/partial recovery, family stays OPEN, targeted follow-up) /
-SUBSTRATE-METHOD_DEFECT / INCONCLUSIVE. EXP-IDs are the registered plan; final IDs assigned at
-Stage-1 per `python/experiments/INDEX.md`.
+**G-015 ADJUDICATED 2026-06-18 — PROCEED_TO_SCREEN (native object); CHARACTERISED_NOT_VIABLE (hybrid
+object); phase outcome PROCEED_TO_SCREEN** (`docs/experiments-docs/checkpoints/2026-06-17-015-ma-substrate-conditioned-harami-full-surface/G-015-gate-review.md`;
+desk review, routing operator-ratified 2026-06-18 "PROCEED; register both native arms"). The **native**
+object (EXP-068) satisfies the full predeclared conjunction with **both** champion arms — `N-PARTIAL-V2A`
+(9 cells/5 instr/7 non-4h, P4=PARTIAL_RECOVERY) and `N-V2A×ADV-NONE` (14 cells/9 instr/6 non-4h,
+P4=TAIL_DRIVEN) — each median-viable ∧ raw-mean-positive (CI_low>0) ∧ beats-`RM-native`, composed at
+P11+P6; signal present even at single-leg BENCH (6 non-4h FX cells); mean **not structural** (closure-on-mean
+rule unmet → family not closed). The **hybrid** object is CHARACTERISED_NOT_VIABLE on the disclosed surface
+(EVIDENCE_AGAINST L1/S1/S3, INCONCLUSIVE S2; EXP-067 dropped, inferential disposition); judged individually,
+never pooled; does not govern the phase (strongest object governs, design §7). Integrity all-pass (99/99
+reconciliation @1e-9; determinism/causality/invariants). **First candidate slot consumed at this gate**
+(see candidate-slot row below). **TEST reads spent: 0** (`test-read-ledger.md` unchanged; the first counted
+TEST read occurs at the screening scope, not here); holdouts sealed.
+
+**Candidate registration (G-015 PROCEED, 2026-06-18):**
+
+| Candidate ID | Definition | Slot | Status |
+| --- | --- | --- | --- |
+| `CF-HA-HARAMI-001/CAND-001` (MA-SUBSTRATE / native) | MA(20,50)-native `/STRONG-STAT` conditioned HA harami, MA-segment 3-barrier geometry; **two registered champion arms** — lead `N-PARTIAL-V2A` (PARTIAL-V2A + 1:1 stop, bounded-downside) and disclosed `N-V2A×ADV-NONE` (EXP-060B champion geom + partial scaling, MA cap sole stop-out). Conditioning-object = **native**. | **1 (first slot consumed)** | **REGISTERED CANDIDATE — 2026-06-18 (G-015 PROCEED)**. Screening target: the ~5-cell non-4h FX core (GBPUSD/NZDUSD/GBPJPY ± EURUSD). Next: EXP-027-analog event-level method calibration (TRAIN-only) → one-shot TEST confirmation of the FX core under `N-PARTIAL-V2A`. EURUSD TEST-capped instrument-wide (ineligible for stratum-specific TEST). |
+
+The unbounded-downside arm is disclosed (TAIL_DRIVEN, 4h-concentrated); the bounded-downside
+`N-PARTIAL-V2A` is the lead definition. The hybrid mode and the dropped EXP-067/069 items are retained
+in this ledger, never deleted or reused.
+
+**G-015 outcome menu (for the record):** PROCEED_TO_SCREEN (met, native) / CHARACTERISED_NOT_VIABLE
+(structural mean-irrecoverability on **both** objects — unmet; native mean not structural) /
+MEAN_RECOVERABLE—FOLLOW-UP (unmet; the raw-mean co-primary composes at CI_low>0) /
+SUBSTRATE-METHOD_DEFECT / INCONCLUSIVE (unmet; native fully powered 99/99).
 
 **Out of scope (recorded):** any net/cost-adjusted metric (gross only); MA-parameter sensitivity
 (MA(20,50) fixed); fully-MA-native conditioning's *full* geometry surface (a promotion follow-up,
 not this phase); any HA-price outcome metric; position-in-move as a live filter; parameter tuning
 or post-result variant selection beyond the predeclared OAT grids; any intermediate early-closure
 gate; any TEST or holdout contact; candidate registration before G-015 PROCEED.
+
+## Phase 016 Batch (CF-HA-HARAMI-001 Candidate Screening)
+
+**Opened:** 2026-06-18 (Phase 016 design; **G0 PASS 2026-06-18**, D0 ratified).
+**Governing design:** `docs/experiments-docs/checkpoints/2026-06-18-016-harami-candidate-screening/design.md`
+**Candidate:** `CF-HA-HARAMI-001/CAND-001` (MA-native, first slot consumed at G-015 2026-06-18).
+**Lead arm:** `N-PARTIAL-V2A` (bounded-downside, P4=PARTIAL_RECOVERY). Disclosed arm: `N-V2A×ADV-NONE`.
+**Why:** Phase 015 returned PROCEED_TO_SCREEN on the MA-native object (both champion arms
+satisfy the full G-015 conjunction at P11+P6). Phase 016 is the **first TEST contact** in the
+family's history. Its job: (1) calibrate the evaluation method on the MA-native harami population
+(TRAIN-only), (2) confirm the non-4h FX core in the one-shot TEST stratum, (3) conditional
+cost-aware follow-up if the TEST confirms.
+**No new variant branches or families registered in Phase 016** — all branch registrations
+occurred in Phase 014/015. Phase 016 exercises already-registered branches; the hypotheses here
+are about out-of-sample evidence, not new parameter or detector variants.
+
+### Hypothesis ledger
+
+| Hypothesis | EXP-ID | Object / scope | Analogous prior | Slot | Status |
+| --- | --- | --- | --- | --- | --- |
+| HYP-023: method calibration — does the per-event gross `N-PARTIAL-V2A` evaluation method have controlled FPR (≤0.05/cell), finite MDE, and determinism on the MA-native harami event population in the predeclared TEST family cells? | EXP-070 | MA-native harami events, TRAIN-only, predeclared TEST family cells | EXP-027 (AVWAP), EXP-044 (Phase 011) | 0 / 0 TEST reads | **PENDING — G0 required** |
+| HYP-024: one-shot TEST confirmation — on the TEST stratum of the predeclared non-4h FX core (excluding EURUSD), does `N-PARTIAL-V2A` show per-event gross expectancy CI_low>0, beat RM-native, and compose at the predeclared composition threshold (≥3 cells/≥2 instruments, Holm α=0.05 + calibrated margin)? | EXP-071 | MA-native harami events, **first counted TEST read** per predeclared stratum | EXP-037/038 (AVWAP Phase 008) | 0 / **counted TEST reads (D0 predeclared budget ≤7 strata)** | **PENDING — EXP-070 PASS required before any TEST contact** |
+| HYP-025 (conditional): under the frozen per-instrument cost model, does the EXP-071 confirmed cell set retain CI_low>0 net per-event expectancy, and does a targeted tail-filter/capped-downside treatment recover net positivity in the `N-V2A×ADV-NONE` TAIL_DRIVEN cells? | EXP-072 | MA-native harami events, frozen cost model, TEST strata from EXP-071 | EXP-030 (AVWAP Phase 007) | 0 / further TEST reads by D0 | **CONDITIONAL — opened only if EXP-071 TEST_CONFIRMED and explicit operator direction; own D0 required** |
+| HYP-026 (conditional): across the EXP-071 confirmed cell set, which portfolio weighting scheme (equal-weight, inverse-ATR-volatility, instrument-cluster, domain-stratified) delivers the best gross portfolio-level expectancy on TRAIN and does it hold in the TEST stratum? Does the combined portfolio pass the programme's portfolio fitness gate (EXP-018 analog) on the harami event population? | EXP-073 | MA-native harami events, multiple weighting schemes (TRAIN selection), TEST portfolio-aggregate disclosure | EXP-018 (portfolio fitness), Phase 008 Package A/B selection | 0 / TEST portfolio disclosure (no new per-stratum counted reads) | **CONDITIONAL — opened only if EXP-071 TEST_CONFIRMED; may run in parallel with EXP-072; own D0 required** |
+
+### TEST-stratum accounting (Phase 016)
+
+- **At Phase 016 open (2026-06-18):** 0 counted TEST reads in any harami stratum.
+- **After EXP-070 PASS:** the binding TEST family is frozen (predeclared from EXP-068
+  `N-PARTIAL-V2A` non-4h cells, excluding EURUSD); the freeze file is hashed before any
+  TEST row is loaded.
+- **After EXP-071:** each binding stratum-specific inference incurs 1 counted read in
+  `test-read-ledger.md`. Budget: ≤9 strata (the full `N-PARTIAL-V2A` G-015 passing count
+  ex-EURUSD, including up to 2 4h cells). Recorded in the same change that records EXP-071's
+  result. EXP-073 portfolio aggregate is a disclosure against all member strata — no
+  additional per-stratum counted reads.
+- **EURUSD excluded instrument-wide:** ineligible for any harami stratum-specific TEST
+  confirmation; EURUSD strata in EXP-068 `N-PARTIAL-V2A` are not in the declared TEST
+  family. 4h cells from other instruments are included (no domain exclusion).
+
+### Disposition (to be updated at G-016)
+
+G-016 gate adjudication pending. Phase 016 outcome options: TEST_CONFIRMED (candidate
+advances to cost-bearing tradability/cTrader parity) / TEST_INCONCLUSIVE (evidence recorded;
+family stays OPEN) / TEST_NOT_CONFIRMED (CAND-001 retired on this scope; family stays OPEN)
+/ METHOD_DEFECT (fix EXP-070 before TEST contact).
 
 ## Amendment Rules
 

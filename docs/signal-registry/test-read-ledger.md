@@ -32,10 +32,12 @@ stratum's current counted-read tally.
 
 ## Ledger
 
-Domains: 1h, 2h, 4h (5m retired from primary strategy use, Phase 010/011;
-historical 5m exposures noted below the table). "Pre-split disclosure" =
-full-analysis-slice exposure in pre-split experiments (EXP-022/028/029/030/034
-et al. on the old universe; EXP-040 1h/4h mechanism read).
+Domains: {5m, 15m, 30m, 1h, 2h, 4h}. AVWAP family: 1h/2h/4h only (5m retired from
+primary strategy use, Phase 010/011). HA harami family: all 6 domains admitted by VAL-004
+(Phase 014); 5m/15m/30m strata formalized here 2026-06-18 at Phase 016 D0 — see "New
+Domains" table below. "Pre-split disclosure" = full-analysis-slice exposure in pre-split
+experiments (EXP-022/028/029/030/034 et al. on the old universe; EXP-040 1h/4h mechanism
+read).
 
 | TEST stratum | Counted reads | Cap state | Disclosures |
 |---|---|---|---|
@@ -65,12 +67,51 @@ et al. on the old universe; EXP-040 1h/4h mechanism read).
 | DE30-{1h,2h,4h} | 0 | open | none (truncated-coverage disclosure applies to any future entry) |
 | JP225-{1h,2h,4h} | 0 | open | none |
 
+## New Domains — Materialized 2026-06-18 (Phase 016 D0)
+
+5m, 15m, and 30m domains admitted by VAL-004 (Phase 014) but never previously entered as
+individual TEST strata. Materialized here at Phase 016 D0 before any harami family binding
+TEST read in these domains. Old-universe 5m pre-split disclosures (EURUSD/USTEC/XAUUSD/BTCUSD)
+from EXP-021/022/028/029/030/031 entered as disclosures, not counted reads. **EURUSD is
+TEST-capped instrument-wide** (holdout-contaminated, EXP-032) and ineligible for any harami
+stratum-specific TEST confirmation even where the stratum shows 0 counted reads.
+
+| TEST stratum | Counted reads | Cap state | Disclosures |
+|---|---|---|---|
+| EURUSD-5m | 0 | open (ineligible for harami TEST — instrument-wide TEST-capped) | pre-split (EXP-021/022/028/029/030/031) |
+| EURUSD-15m | 0 | open (ineligible for harami TEST — instrument-wide TEST-capped) | none (first materialization) |
+| EURUSD-30m | 0 | open (ineligible for harami TEST — instrument-wide TEST-capped) | none (first materialization) |
+| USTEC-5m | 0 | open | pre-split (EXP-021/022/028/029/030/031) |
+| USTEC-15m | 0 | open | none (first materialization) |
+| USTEC-30m | 0 | open | none (first materialization) |
+| XAUUSD-5m | 0 | open | pre-split (EXP-021/022/028/029/030/031) |
+| XAUUSD-15m | 0 | open | none (first materialization) |
+| XAUUSD-30m | 0 | open | none (first materialization) |
+| BTCUSD-5m | 0 | open | pre-split (EXP-021/022/028/029/030/031) |
+| BTCUSD-15m | 0 | open | none (first materialization) |
+| BTCUSD-30m | 0 | open | none (first materialization) |
+| GBPUSD-{5m,15m,30m} | 0 | open | none (first materialization) |
+| USDJPY-{5m,15m,30m} | 0 | open | none (first materialization) |
+| USDCHF-{5m,15m,30m} | 0 | open | none (first materialization) |
+| USDCAD-{5m,15m,30m} | 0 | open | none (first materialization) |
+| AUDUSD-{5m,15m,30m} | 0 | open | none (first materialization) |
+| NZDUSD-{5m,15m,30m} | 0 | open | none (first materialization) |
+| EURJPY-{5m,15m,30m} | 0 | open | none (first materialization) |
+| GBPJPY-{5m,15m,30m} | 0 | open | none (first materialization) |
+| AUDJPY-{5m,15m,30m} | 0 | open | none (first materialization) |
+| US500-{5m,15m,30m} | 0 | open | none (first materialization) |
+| US2000-{5m,15m,30m} | 0 | open | none (first materialization) |
+| DE30-{5m,15m,30m} | 0 | open | none (first materialization; DE30 truncated-coverage disclosure carries forward) |
+| JP225-{5m,15m,30m} | 0 | open | none (first materialization) |
+
 Notes:
 
 - **EXP-039** was TRAIN-only (provisional EXP-041 slot never used) — no entry.
-- **5m strata (old universe):** exposed in pre-split full-slice experiments;
-  5m is retired from primary strategy considerations (reserved for future MTF
-  execution-layer use). Any future 5m binding read re-opens 5m rows here first.
+- **5m/15m/30m strata:** materialized 2026-06-18 (Phase 016 D0) in the "New Domains" table
+  above. Old-universe 5m pre-split disclosures (EXP-021/022/028/029/030/031 on
+  EURUSD/USTEC/XAUUSD/BTCUSD) entered as disclosures only, not counted reads. 5m retired
+  from primary AVWAP-family strategy use (Phase 010/011) but active in the harami family
+  (VAL-004 admitted); these rows are open effective 2026-06-18.
 - **Holdout:** the global holdout (final 30% per instrument) is outside this
   ledger entirely — the single sanctioned holdout shot was SPENT (EXP-032,
   EURUSD-4h, HOLDOUT_INCONCLUSIVE); no holdout read exists for any package.
