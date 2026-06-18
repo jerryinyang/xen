@@ -160,8 +160,8 @@ with no outcome anchor (population reconciliation to EXP-053 + determinism + cau
 
 | Order | EXP (planned) | Mirrors | Question |
 | --- | --- | --- | --- |
-| S4 | EXP-067 | EXP-060 | **Hybrid combined champion.** Best per-layer MA geometry on the **hybrid** object vs `RM-hybrid`; native + ZigZag champion disclosed. |
-| — | EXP-068 | EXP-060 | **Native combined champion** *(merges the old N1+N2)*. Best per-layer MA geometry on the **native** object vs `RM-native`; hybrid champion disclosed. |
+| ~~S4~~ | ~~EXP-067~~ | EXP-060 | ~~**Hybrid combined champion.** Best per-layer MA geometry on the **hybrid** object vs `RM-hybrid`; native + ZigZag champion disclosed.~~ **DROPPED (Amendment 002, 2026-06-18)** — hybrid EVIDENCE_AGAINST across the entire individual surface (no per-layer winner to combine); gates nothing (native EXP-068 is the G-015 path); hybrid adjudicated at G-015 on the disclosed surface reads. Retained in the ledger, never deleted/reused. |
+| S4 | EXP-068 | EXP-060 | **Native combined champion** *(merges the old N1+N2)*. Best per-layer MA geometry on the **native** object vs `RM-native`; hybrid champion disclosed. **COMPLETE 2026-06-18 — PROCEED_TO_SCREEN-candidate.** |
 | ~~N2~~ | ~~EXP-069~~ | — | **DROPPED** — native efficacy/availability/adverse/geometry are covered by the dual-object L1–S3 reads; retained in the registry/ledger, never deleted. |
 
 *(EXP-050 position-in-move and EXP-054 fill-model are **not** re-run: 050 is a descriptive,

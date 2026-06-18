@@ -132,7 +132,7 @@ OAT grids are reused **unchanged** on the MA substrate (registered variants `/VP
 against predeclared MA benchmark defaults; **no new variants** beyond the registered set; **no
 post-result variant selection.** A failed geometry is a valid result, not licence to try another.
 
-## P9 — Slate, ordering, and the single terminal gate **[RATIFIED 2026-06-17 — single G-015; AMENDED 2026-06-17 — Amendment 001: dual-object surface, native track collapsed]**
+## P9 — Slate, ordering, and the single terminal gate **[RATIFIED 2026-06-17 — single G-015; AMENDED 2026-06-17 — Amendment 001: dual-object surface, native track collapsed; AMENDED 2026-06-18 — Amendment 002: EXP-067 dropped, Phase 015 slate complete]**
 
 > **AMENDED by Amendment 001.** Every L1–S3 read now emits **both** objects (hybrid + native)
 > **individually**. The separate bounded native track (old N1 EXP-068, N2 EXP-069) collapses: native
@@ -144,13 +144,22 @@ post-result variant selection.** A failed geometry is a valid result, not licenc
   null); L2 = EXP-062 (055-analog: lifetime availability); L3 = EXP-063 (057-analog adverse geometry
   + the P4 mean diagnostic). Surface S1 = EXP-064 (056), S2 = EXP-065 (058), S3 = EXP-066 (059) —
   favourable / third-barrier / exit OAT grids on **both** objects.
-- **Combined champions (split by object):** **EXP-067** = **hybrid** combined champion (best per-layer
-  hybrid geometry vs `RM-hybrid`; native + ZigZag disclosed). **EXP-068** = **native** combined
-  champion (best per-layer native geometry vs `RM-native`; hybrid disclosed) — **merges the old N1+N2**.
-  **EXP-069 is DROPPED** (retained in the registry/ledger, never deleted).
+- **Combined champions (split by object):** **EXP-068** = **native** combined champion (best per-layer
+  native geometry vs `RM-native`; hybrid disclosed) — **merges the old N1+N2**; **COMPLETE 2026-06-18,
+  PROCEED_TO_SCREEN-candidate.** **EXP-067** (hybrid combined champion) is **DROPPED by
+  `D0-amendment-002-drop-exp067.md` (2026-06-18, operator direction)** — the hybrid object is
+  EVIDENCE_AGAINST across the entire individual surface (no per-layer winner to combine), it gates
+  nothing (G-015 PROCEED requires ≥1 combined definition on **either** object; native EXP-068 already
+  qualifies), and it is adjudicated at G-015 on the disclosed surface reads. Retained in the
+  registry/ledger, never deleted/reused. **EXP-069 is DROPPED** (Amendment 001; retained, never
+  deleted).
 - EXP-050 and EXP-054 are **not** re-run (descriptive / method-invariant).
-- **Ordering:** lead (L1–L3) → surface (S1–S3) → combined champions (EXP-067 hybrid, EXP-068
-  native). All reads run **regardless** of the lead — **no early-closure path**.
+- **Ordering:** lead (L1–L3) → surface (S1–S3) → combined champion (EXP-068 native; EXP-067 hybrid
+  dropped per Amendment 002). All reads run **regardless** of the lead — **no early-closure path**.
+  *(Amendment 002 note: dropping EXP-067 is **not** an early closure — it drops a confirmatory read on
+  an object already EVIDENCE_AGAINST across the full individual surface; every read on the **native**
+  object that carries the live signal was run, and the family is not closed — it advances to G-015 with
+  a native PROCEED-candidate.)*
 - **Re-run discipline (Amendment 001):** EXP-061/062/063 are re-run under the dual-object design and
   **supersede their prior results in place** (same IDs; prior finding recorded `SUPERSEDED` with a
   defect pointer).

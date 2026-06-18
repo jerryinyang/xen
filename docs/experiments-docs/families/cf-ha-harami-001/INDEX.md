@@ -32,6 +32,10 @@
 - **EXP-061** — MA(20,50)-Substrate Benchmark-Geometry Conditioned Efficacy (Dual Object: Hybrid + Native, Phase 015 L1)
 - **EXP-062** — MA-Substrate Lifetime Availability (Conditioned HA Harami; AVWAP-Analog MFE/MAE, Hybrid, Phase 015 L2)
 - **EXP-063** — MA(20,50)-Substrate Adverse Geometry & the Mean Investigation (Conditioned HA Harami; V-BENCH 1:1, V-RR1 `/ADV-EXTREME-rr1`, V-NONE `/ADV-NONE`, V-RAW `/ADV-EXTREME-raw`; Phase 015 L3)
+- **EXP-064** — MA(20,50)-Substrate Favourable-Target Geometry (Conditioned HA Harami; `/VPTARGET`, `/MAGTARGET` vs Benchmark 50%; Dual Conditioning Object: Hybrid and Native, Phase 015 S1)
+- **EXP-065** — MA(20,50)-Substrate Third-Barrier Geometry (Conditioned HA Harami; `/THIRD-TIME`, `/THIRD-EVENT` vs Benchmark Adaptive Cap; Dual Conditioning Object: Hybrid and Native, Phase 015 S2)
+- **EXP-066** — MA(20,50)-Substrate Position-Management Exits (Conditioned HA Harami; `/EXIT-PARTIAL`, `/EXIT-TRAIL-STRUCT`, individually and combined; Dual Conditioning Object: Hybrid and Native, Phase 015 S3)
+- **EXP-068** — MA(20,50)-Substrate Native Combined Champion (Conditioned HA Harami; N-BENCH, N-PARTIAL-V2A, N-V2A×ADV-NONE vs RM-native; Hybrid Disclosed; Phase 015 S4/native)
 
 ---
 
@@ -164,6 +168,206 @@
 - **Mean viability ≠ recovery**: The bounded variants have positive raw means in ~10 cells, but V-NONE also has positive raw means in ~12 cells (different cells). The contrast between them is too noisy to resolve — the mean is *self-viable* but not *recoverable above NONE*. This is a power/width limitation, not a mechanism failure.
 - **V-RAW is structurally non-viable on MA**: The tight buffered-extreme stop eliminated all sufficient event counts — a design failure of the tight-stop model on this substrate (vs EXP-057 where it was viable on ZigZag).
 - **EVIDENCE_FOR with caveat**: The verdict is real but nuanced — G-015 must weigh whether self-mean-viable (not recovery-positive) evidence is sufficient for PROCEED or requires the MEAN_RECOVERABLE demonstration.
+
+---
+
+## EXP-064 — MA(20,50)-Substrate Favourable-Target Geometry (Conditioned HA Harami; `/VPTARGET`, `/MAGTARGET` vs Benchmark 50%; Dual Conditioning Object: Hybrid and Native, Phase 015 S1)
+
+**Status:** EVIDENCE_AGAINST (both objects)
+**Date:** 2026-06-18
+**Instruments:** all 17 VAL-003-admitted instruments; 99 member cells (3 COVERAGE_EXCLUDED: US500-4h, JP225-2h/4h)
+**Data Views / Feature Categories:** 5m/15m/30m/1h/2h/4h real domain OHLC; HA candles for harami detection only; MA(20,50) crossover substrate (real close); `/STRONG-STAT` live magnitude-percentile filter (p75, trailing 20); 8 favourable-target variants: BENCH (50%-of-`M_sofar`), VP-POC/VP-NEAR/VP-FAR (`/VPTARGET`), MAG-0.5×5/1.0×5/0.5×20/1.0×20 (`/MAGTARGET`); P15 path-ordered intrabar fills; P14 median ATR-normalised gross return (binding endpoint)
+
+### Hypothesis Tests
+
+1. **Hypothesis (HYP-017, Phase 015 S1, dual-object)**: For at least one of the 7 alternative favourable-target variants (`/VPTARGET`: VP-POC, VP-NEAR, VP-FAR; `/MAGTARGET`: MAG-0.5×5, MAG-1.0×5, MAG-0.5×20, MAG-1.0×20), does the conjunction of (a) median viability (CI_low_1s > 0, m ≥ 30), (b) signal attribution over the matched-random-on-MA null (variant − RM contrast CI_low_1s > 0), and (c) benchmark improvement (variant − benchmark paired-contrast CI_low_1s > 0) compose at P11 (≥5 cells / ≥3 instruments / ≥3 non-4h) for at least one conditioning object (native or hybrid)?
+
+### Scope
+
+- **Instruments**: all 17 VAL-003-admitted instruments; DE30 with truncated-history disclosure.
+- **Data Views / Feature Categories**: 6 real-domain OHLC views; HA candles for harami detection only; MA(20,50) crossover substrate on real close (fixed, not swept); `/STRONG-STAT` live magnitude-percentile filter (window=20, min=5, q=0.75) — computed on ZigZag magnitudes (hybrid) / MA-segment magnitudes (native); P15 path-ordered fills.
+- **Features**: 8 binding variants (BENCH + 7 alternatives) × 2 objects (native, hybrid), each with its own matched-random-on-MA null. Native BENCH reconciles to EXP-061 M0; hybrid BENCH to EXP-061 H0 (P12, RECON_TOL=1e-9). Per-object per-variant: median bootstrap CI (binding), P4 mean diagnostic (raw mean + 10% trimmed mean + worst-5% tail-share, non-binding), variant−RM independent contrast CI, variant−benchmark paired-contrast CI. P11 composition with P6 non-4h rule.
+- **Parameter ranges**: P1 MA(20,50) on real close (fixed); P2 favourable 50% (BENCH) / VP-POC/NEAR/FAR / trailing-magnitude multiples 0.5×/1.0× × window W=5/20; P3 adverse 1:1; P4 adaptive cap; P7 `/STRONG-STAT` window=20, min=5, q=0.75; P15 path-ordered fills; power floor 30; MBB bootstrap 10,000 draws; per-cell fixed seed.
+- **Exclusions**: no adverse/third/exit/combined/MA-sweep/ZigZag-favourable variants; 0 candidate slots, 0 TEST reads; TRAIN-only (first 49%, F01 file-order prefix); holdouts sealed.
+- **Constraints**: real-price discipline (HA for detection only, all metrics on real OHLC); causality discipline (VP reference = prior **completed** MA segment; MAG reference = trailing confirmed segments strictly before entry; both objects reported individually, never pooled).
+
+### Results / Observations
+
+- **Phase verdict**: EVIDENCE_AGAINST. Stronger object: **native** (consistent with EXP-061 M0 being the expressing population).
+- **Native — 0/7 alternative variants compose at P11+P6.** VP variants beat benchmark geometrically (VP-POC 11 cells, VP-FAR 11 cells beats_bench) but fail RM attribution (VP-POC 2 cells, VP-FAR 4 cells). MAG-0.5×20 beats RM at P11 (8 cells / 7 instruments / 7 non-4h) but beats benchmark in only 3 cells.
+
+| Variant (native) | Viable | Beats RM | Beats bench | Wins |
+|------------------|:------:|:--------:|:-----------:|:----:|
+| VP-POC           | 14     | 2        | 11          | 0    |
+| VP-NEAR          | 11     | 6        | 10          | 0    |
+| VP-FAR           | 14     | 4        | 11          | 0    |
+| MAG-0.5×5        | 13     | 5        | 7           | 0    |
+| MAG-1.0×5        | 7      | 5        | 5           | 0    |
+| MAG-0.5×20       | 9      | **8**    | 3           | 0    |
+| MAG-1.0×20       | 5      | 6        | 5           | 0    |
+
+- **Hybrid — 0/7 alternative variants compose at P11+P6.** Maximum 3 wins (VP-FAR), well below the P11 quorum of 5. Power-limited (max 9 viable cells vs 14 for native).
+- **BENCH arms reproduce EXP-061 anchors**: 99/99 cells to RECON_TOL=1e-9 for both objects.
+- **P4 mean diagnostic**: native BENCH: median=+0.012, mean=+0.006, trimmed=−0.018. Native VP-FAR: median=+0.019, mean=−0.078, trimmed=−0.029. Hybrid VP-FAR: median=−0.009, mean=−0.094, trimmed=−0.060. Positive medians for VP-FAR driven by a minority of cells; trimmed means negative.
+- **99/99 cells powered; 0 defects**: is_defect=false, determinism_ok=true, causality_ok=true, 0 reconciliation mismatches.
+- **Audit PASS**: 0 Critical, 0 Warning, 3 Info (rm_m < draw_count for VP/MAG by design — conservative bias; matched-count invariant checks draw target not qualifying count; vp_levels_per_event uses causal per-event loop).
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED** (both objects: EVIDENCE_AGAINST). The binding obstruction differs by variant class: VP variants beat the benchmark geometrically in many cells but the improvement is substrate-driven — the RM null benefits equally from the same VP cluster levels, so signal attribution fails. MAG-0.5×20 achieves signal attribution at P11 for native (genuinely harami-specific) but sets shorter targets that underperform the benchmark geometrically. No variant achieves the conjunction at P11 scale for either object. Result is consistent with EXP-056 (0/8 on the ZigZag substrate), extending the finding to the MA substrate with both conditioning objects. The Phase 015 S1 characterisation is complete; feeds the terminal G-015 after EXP-065 and EXP-066. 0 slots, 0 TEST reads.
+
+### Hypothesis-Agnostic Observations
+
+- **VP improvement is a substrate property, not a signal property**: the MA-substrate momentum naturally carries any in-regime entry to structural VP levels, so the RM null benefits as much as the signal from the VP geometry change. The VP targets do not improve the harami's relative edge over random in-regime entries.
+- **MAG-0.5×20 is genuinely signal-specific for native**: the secondary positive of beats_RM at P11 (8 cells/7 instruments) suggests that a shorter target scaled to trailing segment history selects events where the harami's reversal completion advantage over random is measurable — but that advantage does not survive comparison to the more generous benchmark target.
+- **Benchmark 50%-of-M_sofar appears near-optimal**: the adaptive benchmark that tracks the current in-progress `M_sofar` is difficult to outperform with either static VP levels or historical magnitude references, suggesting the benchmark's real-time adaptivity is a key structural advantage on this substrate.
+
+---
+
+## EXP-065 — MA(20,50)-Substrate Third-Barrier Geometry (Conditioned HA Harami; /THIRD-TIME, /THIRD-EVENT vs Benchmark Adaptive Cap; Dual Conditioning Object: Hybrid and Native, Phase 015 S2)
+
+**Status:** EVIDENCE_AGAINST (native) / INCONCLUSIVE (hybrid) — phase verdict EVIDENCE_AGAINST (native stronger)
+**Date:** 2026-06-18
+**Instruments:** all 17 VAL-003-admitted instruments; 99 member cells (3 COVERAGE_EXCLUDED: US500-4h, JP225-2h/4h)
+**Data Views / Feature Categories:** 5m/15m/30m/1h/2h/4h real domain OHLC; HA candles for harami detection only; MA(20,50) crossover substrate (real close); `/STRONG-STAT` live magnitude-percentile filter (p75, trailing 20) — on MA segments (native) / ZigZag moves (hybrid); 5 third-barrier variants: BENCH (floor-6 MA adaptive cap), T12/T24/T48 (`/THIRD-TIME`), EVENT (`/THIRD-EVENT` next-MA-segment rd-confirm, 8× backstop); P15 path-ordered intrabar fills; P14 median ATR-normalised gross return (binding endpoint)
+
+### Hypothesis Tests
+
+1. **Hypothesis (HYP-018, Phase 015 S2)**: For at least one of the 4 alternative third-barrier variants (`/THIRD-TIME` floors 12/24/48, `/THIRD-EVENT` next-MA-segment-rd-confirm with 8× backstop), does the conjunction of (a) median viability (CI_low_1s > 0, m ≥ 30), (b) signal attribution over the same-object matched-random-on-MA null (variant − RM contrast CI_low_1s > 0), and (c) benchmark improvement (variant − benchmark paired-contrast CI_low_1s > 0) compose at P11 (≥5 cells / ≥3 instruments / ≥3 non-4h) for at least one conditioning object (native or hybrid)? The third-barrier lever is OAT — favourable and adverse held at MA benchmark (50% and 1:1).
+
+### Scope
+
+- **Instruments**: all 17 VAL-003-admitted instruments; DE30 with truncated-history disclosure.
+- **Data Views / Feature Categories**: 6 real-domain OHLC views; HA candles for harami detection only; MA(20,50) crossover substrate on real close (fixed, not swept); `/STRONG-STAT` live magnitude-percentile filter (p75, trailing 20) — recomputed on MA segments for native, on ZigZag moves for hybrid; 5 third-barrier variants (BENCH, T12, T24, T48, EVENT); P15 path-ordered fills.
+- **Features**: 5 binding variants × 2 objects (native, hybrid), each with its own matched-random-on-MA null (RM-* native, RH-* hybrid). Native BENCH reconciles to EXP-061 M0; hybrid BENCH to EXP-061 H0 (P12, RECON_TOL=1e-9). Per-object per-variant: median bootstrap CI (binding), P4 mean diagnostic, variant−RM independent contrast CI, variant−benchmark paired-contrast CI, censoring fraction + TIMECAP composition + `/THIRD-EVENT` event-vs-backstop split. P11 composition with P6 non-4h rule.
+- **Parameter ranges**: P1 MA(20,50) on real close (fixed); P2 favourable 50%; P3 adverse 1:1; P4 adaptive cap (floor=6, k=1.5, window=20) with THIRD-TIME floors 12/24/48; THIRD-EVENT next-rd-MA-segment-confirm with 8×bench_N backstop; P7 `/STRONG-STAT` window=20, min=5, q=0.75; P15 path-ordered fills; power floor 30; MBB bootstrap 10,000 draws; per-cell fixed seed (BASE_SEED + cell_index + purpose) — distinct purposes per object/variant/statistic.
+- **Exclusions**: no favourable/adverse/exit/combined/MA-sweep/ZigZag variants; 0 candidate slots, 0 TEST reads; TRAIN-only (first 49%, F01 file-order prefix); holdouts sealed.
+- **Constraints**: real-price discipline (HA for detection only, all metrics on real OHLC); causality discipline (MA segments bounded by pre-entry crossovers; `/THIRD-EVENT` exit is a forward event — next MA segment rd-confirm strictly after entry, acted on at the confirmation bar); both objects reported individually, never pooled.
+
+### Results / Observations
+
+- **Phase verdict**: EVIDENCE_AGAINST (native stronger). Native object EVIDENCE_AGAINST; hybrid object INCONCLUSIVE_POWER_LIMITED.
+- **Native — 0/4 alternative variants compose at P11.** All 4 alternative variants are median-viable and beat RM at P11 (8–9 median-viable cells, 6 instruments, all non-4h), but **none** beats the benchmark paired contrast at P11.
+
+| Variant | Median-viable | Beats-RM | Beats-bench | Wins | P11? |
+|---------|:------------:|:--------:|:-----------:|:----:|:----:|
+| T12     | 8 (6 instr)  | 8 (6)     | 0           | 0    | NO   |
+| T24     | 8 (6)        | 9 (6)     | 0           | 0    | NO   |
+| T48     | 9 (6)        | 9 (6)     | 3 (2)       | 1 (1)| NO   |
+| EVENT   | 6 (6)        | 6 (6)     | 3 (3)       | 2 (2)| NO   |
+
+- **Hybrid — 0/4 alternative variants compose at P11.** Power-limited: max 4 powered cells across all variants (< P11 quorum). `beats_rm` composes at P11 for T24 (5 cells, fragile) and EVENT (6 cells) but without median_viable or beats_bench, this is not a signal claim.
+
+| Variant | Powered cells | Median-viable (P11?) | Beats-RM (P11?) | Beats-bench (P11?) |
+|---------|:------------:|:--------------------:|:---------------:|:------------------:|
+| BENCH   | 3 (2 instr)  | 3 — NO               | 2 — NO          | 0 — NO             |
+| T12     | 3 (2)        | 3 — NO               | 3 — NO          | 0 — NO             |
+| T24     | 3 (2)        | 3 — NO               | 5 (5) — YES (fragile) | 0 — NO        |
+| T48     | 4 (3)        | 4 — NO               | 3 — NO          | 2 — NO             |
+| EVENT   | 1 (1)        | 1 — NO               | 6 (5) — YES     | 0 — NO             |
+
+- **Censoring cost is bounded**: TIMECAP fraction stays ~0.12–0.34 across all variants for both objects. `/THIRD-EVENT` `event_bound_frac` = 1.0 for every cell — every TIMECAP exit bounded on a genuine MA rd-confirm, never the 8× backstop.
+- **P4 mean diagnostic**: mean_viable cells outnumber median_viable (e.g., native BENCH: 10 mean-viable vs 8 median-viable). Positive skew at per-cell level. Tail-share stable ~0.24–0.32.
+- **P12 reconciliation**: 99/99 cells match EXP-061 M0 (native BENCH) and EXP-061 H0 (hybrid BENCH) to RECON_TOL=1e-9.
+- **Determinism**: 17/17 instruments byte-identical replay.
+- **Causality**: 99/99 member cells pass `_causality_ok`.
+- **Invariants**: all 7 per-object invariant gates pass for all cells.
+- **Defect**: false — 0 non-deterministic, 0 causality violations, 0 invariant violations, 0 reconciliation mismatches.
+- **Audit PASS**: 0 Critical, 0 Warning, 2 Info (DE30 truncated history; reconciliation FP precision — both immaterial).
+
+### Hypothesis-Specific Conclusion
+
+**REFUTED (native) — The hypothesis is rejected for the native conditioning object on MA(20,50). No alternative third-barrier geometry improves median expectancy over the benchmark floor-6 adaptive cap at P11.** The hybrid object is INCONCLUSIVE due to power constraints — the question cannot be answered on the TRAIN slice with the 3202-class population. The phase-level reading is EVIDENCE_AGAINST (native stronger), consistent with the full surface protocol: the third barrier is not a leverage parameter on MA(20,50), matching the EXP-058 result on ZigZag. Family stays OPEN (P9); feeds terminal G-015. 0 slots, 0 TEST reads.
+
+### Hypothesis-Agnostic Observations
+
+- **The benchmark cap is already optimal**: The floor-6 MA adaptive cap may already capture the full available MA-segment move. MA segments on the TRAIN slice have a natural duration distribution that the benchmark cap (k=1.5, floor=6) already spans; longer windows add TIMECAP exits at later bars where prices have reverted toward the entry level, adding no expectancy gain.
+- **Signal attribution is the binding constraint**: The beats_rm signal-attribution gate is harder for longer-horizon variants because the matched-random control also benefits from a longer drift window. Longer windows may dilute the harami-specific contribution against the MA substrate's directional drift.
+- **Substrate convergence**: The MA(20,50) third-barrier result replicates the ZigZag (EXP-058) result exactly — no variant composes at P11. The third barrier may be a generally powerless lever for 3-barrier capture frameworks on any substrate.
+
+---
+
+## EXP-066 — MA(20,50)-Substrate Position-Management Exits (Conditioned HA Harami; `/EXIT-PARTIAL`, `/EXIT-TRAIL-STRUCT`, individually and combined; Dual Conditioning Object: Hybrid and Native, Phase 015 S3)
+
+**Status:** EVIDENCE_FOR (native) / EVIDENCE_AGAINST (hybrid) — phase verdict EVIDENCE_FOR (stronger object = native)
+**Date:** 2026-06-18 (dual-object re-run under D0-amendment-001)
+**Instruments:** all 17; 99 EXP-061 member cells (3 COVERAGE_EXCLUDED: US500-4h, JP225-2h/4h)
+**Data Views / Feature Categories:** 5m/15m/30m/1h/2h/4h real domain OHLC; HA candles for harami detection only; MA(20,50) crossover substrate (real close); `/STRONG-STAT` live magnitude-percentile filter (p75, trailing 20) — computed on MA segments for native, on ZigZag moves for hybrid; 12 position-management exit arms (BENCH, PARTIAL-V1/V2A/V2B/V2C, TRAIL-PURE/TP-INIT/TP-NOINIT, COMBINED-V1/V2A/V2B/V2C); P15 path-ordered intrabar fills; P14 median ATR-normalised position-weighted gross return endpoint
+
+### Hypothesis Tests
+
+1. **Hypothesis (HYP-019, Phase 015 S3, dual-object)**: For each conditioning object individually (never pooled), on the MA(20,50) substrate, for at least one of 11 alternative position-management exit arms — favourable-side scaled exits (`/EXIT-PARTIAL` V1/V2A/V2B/V2C), adverse-side structure trailing (`/EXIT-TRAIL-STRUCT` PURE/TP-INIT/TP-NOINIT), or their combination (COMBINED-V1/V2A/V2B/V2C) — does the conjunction of (a) median viability (CI_low_1s > 0, m ≥ 30), (b) signal attribution over the same-object matched-random-on-MA null (arm − RM contrast CI_low_1s > 0), and (c) benchmark improvement (arm − benchmark paired-contrast CI_low_1s > 0) compose at P11 (≥5 cells / ≥3 instruments / ≥3 non-4h) for at least one object? The two objects are judged individually; the phase-level reading is the stronger object's outcome.
+
+### Scope
+
+- **Instruments**: all 17 VAL-003-admitted instruments; DE30 with truncated-history disclosure.
+- **Data Views / Feature Categories**: 6 real-domain OHLC views; HA candles for harami detection; MA(20,50) crossover substrate on real close (fixed); `/STRONG-STAT` live magnitude-percentile filter (p75, trailing 20) — on ZigZag magnitudes (hybrid) / MA-segment magnitudes (native); benchmark 3-barrier geometry (50%, 1:1, adaptive cap) for BENCH arm; partial-exit leg levels via V1/V2A/V2B/V2C; trailing stop via secondary ZigZag (atr_mult=0.5) monotone ratchet; reversal-event leg via next-MA-segment-rd-confirm + opposing-harami locator; P15 path-ordered fills.
+- **Features**: 12 binding arm types × 2 objects = 24 binding arm instances, each with its own matched-random-on-MA null (RM-* native, RH-* hybrid). Binding endpoint = median position-weighted ATR-normalised gross return (P14). Per-object per-arm: median bootstrap CI (binding), P4 mean diagnostic (raw + 10% trimmed + worst-5% tail-share), arm−RM independent contrast CI, arm−benchmark paired-contrast CI, exit-reason composition. P11 composition with P6 non-4h rule. P12 reconciliation: M-BENCH ↔ EXP-061 M0, H-BENCH ↔ EXP-061 H0 to RECON_TOL=1e-9.
+- **Parameter ranges**: P1 MA(20,50); P2 favourable 50%; P3 adverse 1:1 (or trail init); P4 adaptive cap floor=6; P7 `/STRONG-STAT` window=20, q=0.75; 3 equal legs w=1/3; V2A fractions {1/3,2/3,1}; V2B {0.5,1.0,1.5}; V2C {1/3,2/3,reversal-event}; trailing atr_mult_trail=0.5; power floor 30; MBB 10,000 draws; fixed per-cell seed.
+- **Exclusions**: no ADV-NONE/VPTARGET/MAGTARGET/THIRD arms; no MA-parameter sweep; no costs; no TEST/holdout; no pooling of objects; 0 candidate slots, 0 TEST reads.
+- **Constraints**: TRAIN-only (first 49%, F01 prefix); real-price discipline; causality gate (MA segments bounded by pre-entry crossovers); all forward scans clipped to train_end_ts.
+
+### Results / Observations
+
+- **Phase verdict**: EVIDENCE_FOR (stronger object = native). Native PARTIAL-V2A is the only winning arm across both 12-arm grids.
+- **Native PARTIAL-V2A (EVIDENCE_FOR)**: 21 arm_wins cells (median-viable ∧ beats-RM ∧ beats-bench) over 13 instruments, all 21 non-4h — P11+P6 composed, not fragile. Median-viable in 45/99 cells, beats-RM in 41/99, beats-bench in 56/99.
+- **Other native PARTIAL variants (V1/V2B/V2C)**: all median-viable and beat both RM and benchmark individually at P11, but **none** composes the three-way conjunction (arm_wins=0 for each).
+- **Native TRAIL-*/COMBINED**: 0 viable cells across all 7 arms. Trailing detrimental on MA, replicating EXP-059.
+- **Hybrid (EVIDENCE_AGAINST)**: no arm composes the three-way conjunction. Hybrid PARTIAL-V2A median-viable in 28 cells and beats-bench in 30, but beats-RM in only 4 — reproduces EXP-061's hybrid failure on the exit axis.
+- **P4 mean diagnostic**: native PARTIAL-V2A raw-mean-positive in 11 cells over 6 instruments (7 non-4h), P11-composing for mean — the strongest possible P4 reading. The EXP-060B median-only/mean≈0 concern is partially closed by even-thirds scaling on the MA substrate.
+- **Exit-reason composition**: V2A weight exits predominantly via even-thirds favourable targets; shared 1:1 stop binds only ~0.8% weight; time cap <5%. BENCH replicates EXP-061 r≈0.5.
+- **P12 reconciliation (corrected roles)**: native M-BENCH ↔ EXP-061 M0 99/99 at 1e-9; hybrid H-BENCH ↔ EXP-061 H0 99/99 at 1e-9. Populations genuinely distinct (e.g., BTCUSD-5m native m=10667 vs hybrid m=3044). 0/2376 invariant violations.
+- **Determinism**: 17/17 instruments byte-identical replay; causality 0; invariants 0; is_defect false.
+- **Audit PASS**: 0 Critical, 0 Warning, 2 Info (secondary-ZigZag warmup gate never exercised; population column for TRAIL/COMBINED arms reports pre-warmup base — both benign in this run).
+
+### Hypothesis-Specific Conclusion
+
+**EVIDENCE_FOR (native) / EVIDENCE_AGAINST (hybrid) → phase EVIDENCE_FOR.** Native PARTIAL-V2A (even-thirds favourable scaling) clears the binding conjunction at P11+P6 (21 cells/13 instruments/21 non-4h). The divergence is the deliverable: exit-machinery benefit is a matched-substrate conditioning property. The EXP-060B champion favourable side reproduces on MA, and it is also raw-mean-positive — the strongest possible G-015 surface input. Hybrid failure reproduces EXP-061's central finding. Family stays OPEN; feeds terminal G-015 after EXP-067 and EXP-068. No closure or candidate registration here. 0 slots, 0 TEST reads.
+
+---
+
+## EXP-068 — MA(20,50)-Substrate Native Combined Champion (Conditioned HA Harami; N-BENCH, N-PARTIAL-V2A, N-V2A×ADV-NONE vs RM-native; Hybrid Disclosed; Phase 015 S4/native)
+
+**Status:** PROCEED_TO_SCREEN-candidate (G-015 input; the single terminal gate is **not** adjudicated here)
+**Date:** 2026-06-18
+**Instruments:** all 17; 99 member cells (3 COVERAGE_EXCLUDED: US500-4h, JP225-2h/4h)
+**Data Views / Feature Categories:** 5m/15m/30m/1h/2h/4h real domain OHLC; HA candles for harami detection only; MA(20,50) crossover substrate (real close); native `/STRONG-STAT` (p75, trailing-20 on MA segments); 3 native binding arms (BENCH single-leg; PARTIAL-V2A 3-leg {1/3,2/3,1}×fav_dist + 1:1 stop; V2A-ADVNONE same legs, **no adverse stop**, MA cap is the sole stop-out) + 1 hybrid-BENCH P12 check; P15 path-ordered intrabar fills; P14 **median** binding + **P4 raw-mean co-primary** endpoints
+
+### Hypothesis Tests
+
+1. **Hypothesis (HYP-021, Phase 015 S4/native)**: On the native conditioning object, at least one of the two predeclared champion arms — `N-PARTIAL-V2A` (S3 native winner) or `N-V2A×ADV-NONE` (EXP-060B champion geometry with partial scaling, never previously computed) — satisfies the full **G-015 conjunction** per cell, simultaneously: (a) median `CI_low(1s)>0` AND ≥30 events; (b) raw-mean `CI_low(1s)>0` (P4 co-primary, binding); (c) `arm−RM-native` median contrast `CI_low(1s)>0` (P5); all composed at P11 with the P6 non-4h rule (≥5 cells / ≥3 instruments / ≥3 non-4h). Falsifiable: if no champion arm satisfies all three simultaneously, the native combined champion does not meet the G-015 PROCEED criterion.
+
+### Scope
+
+- **Instruments**: all 17 VAL-003-admitted; DE30 with truncated-history disclosure.
+- **Data Views / Feature Categories**: 6 real-domain OHLC views; HA candles for harami detection; MA(20,50) on real close (fixed); native `/STRONG-STAT` (p75, trailing-20 on MA segments); benchmark 3-barrier geometry (50% fav / 1:1 adv / MA adaptive cap); ADV-NONE = no adverse stop; hybrid `/STRONG-STAT` mask (ZigZag, `atr_mult=1.0`) for the P12 H-BENCH check only.
+- **Features**: 3 native binding arms × (signal + matched-random-on-MA null); binding endpoint = median position-weighted ATR-normalised gross return (P14). Per arm: median bootstrap CI (binding); raw mean + 10% trimmed mean + worst-5% tail-share CI (P4 co-primary); arm−RM independent contrast (P5); arm−BENCH paired contrast (disclosed); G-015 conjunction flag. P11+P6 composition. P12: N-BENCH↔EXP-061 M0, H-BENCH↔EXP-061 H0, N-PARTIAL-V2A↔EXP-066 native PARTIAL-V2A to RECON_TOL=1e-9.
+- **Parameter ranges**: P1 MA(20,50); fav 50%; adv 1:1 (BENCH, PARTIAL-V2A) / none (V2A-ADVNONE); MA adaptive cap (k=1.5, window=20, floor=6, median, min_moves=5); `/STRONG-STAT` window=20, q=0.75; 3 equal legs w=1/3; V2A fractions {1/3,2/3,1}; MBB 10,000 draws; fixed per-cell seed (BASE_SEED=20260616).
+- **Exclusions**: no other geometric OAT (S1/S2/S3 levers held at benchmark per EXP-064/065/066); no `/STRONG-HA` arm; no V2C×ADV-NONE or other partial-variant×ADV-NONE (only V2A predeclared for ADV-NONE); hybrid not a binding object (P12 check only); no costs; no TEST/holdout; no pooling; 0 slots, 0 TEST reads.
+- **Constraints**: TRAIN-only (first 49%, F01 prefix); real-price discipline; causality gate (MA segments bounded by pre-entry crossovers); forward scans clipped to train_end_ts; ADV-NONE structural invariant (zero adverse stop-outs).
+
+### Results / Observations
+
+- **Mechanical native readout**: `PROCEED_TO_SCREEN_CANDIDATE` (both champion arms compose the full G-015 conjunction).
+- **N-PARTIAL-V2A**: median-viable 45, mean-positive 11, beats-RM 41, S3-EVIDENCE_FOR 21; **G-015 conjunction 9 cells / 5 instruments / 7 non-4h** (composes, not fragile). P4 closure = PARTIAL_RECOVERY (51 mean-negative-pt cells; 1 structural; 0 tail-driven).
+- **N-V2A×ADV-NONE**: median-viable 89, mean-positive 14, beats-RM 85, S3-EVIDENCE_FOR 57; **G-015 conjunction 14 cells / 9 instruments / 6 non-4h** (composes); **adv_count = 0** (invariant held). P4 closure = TAIL_DRIVEN (63/99 cells tail-share > 0.40; 58 mean-negative-pt; 0 structural).
+- **BENCH (reference)**: median-viable 8, mean-positive 10, beats-RM 8; G-015 conjunction 6 cells, all non-4h (signal present at single-leg benchmark).
+- **Robust non-4h core (both champion arms)**: GBPJPY-30m, GBPUSD-1h, GBPUSD-5m, NZDUSD-1h, NZDUSD-2h (5 cells / 3 instruments); 4 of these also pass at BENCH. No DE30-truncated cell in any G-015 set. Headline cell magnitudes: median 1.06–1.68 ATR, mean 0.18–0.86 ATR (mean CI_low 0.037–0.327), arm−RM CI_low 0.59–1.10 ATR.
+- **Integrity**: P12 reconciliation 99/99 on all three anchors (m + median) at 1e-9; determinism 17/17 byte-identical; causality 0 violations; invariants 0 violations; is_defect false.
+- **Audit PASS**: 0 Critical, 0 Warning, 3 Info (4h-concentration of ADV-NONE; narrow/tail-driven mean — both interpretive, routed to results.md; intentional E402).
+- **Post-hoc winsorized mean diagnostic (2026-06-18)**: 10% winsorized mean point estimate positive in BENCH 46 / N-PARTIAL-V2A 57 / N-V2A×ADV-NONE 73 cells vs raw-mean-CI+ 10/11/14 — a ~4–5× gap confirming the P4 tail-suppression hypothesis. The raw-mean co-primary fails because fat negative tails pull the mean below zero in cells where both the median and winsorized mean are clearly positive. See results.md addendum for full detail.
+
+> Note: No interpretation — preserve what the data shows.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED (surface deliverable) — PROCEED_TO_SCREEN-candidate input to G-015.** Both champion arms satisfy the full G-015 conjunction (median-viable ∧ raw-mean-positive ∧ beats-RM-native) at P11+P6 — the first Phase 015 native read to clear the mean co-primary in composition. The G-015 gate is **not** adjudicated here (single terminal gate after the full slate incl. EXP-067 + cross-object comparison). Family stays REGISTERED/OPEN; 0 slots, 0 TEST reads.
+
+### Hypothesis-Agnostic Observations
+
+- The mean-positive, RM-beating edge is present at the **single-leg benchmark** (6 non-4h FX cells), so it is not an artifact of the partial-exit / ADV-NONE machinery — those broaden it. The defensible signal is a small non-4h FX core (GBPUSD/NZDUSD/GBPJPY/EURUSD).
+- Removing the adverse stop (ADV-NONE) broadens median viability (89 vs 45) and mean-positive cells (14 vs 11) but trades it for fat negative tails (TAIL_DRIVEN, 63/99) and a 4h-concentrated composition (8/14 4h) — the EXP-060B skew mechanism, confirmed. The bounded-downside PARTIAL-V2A is the cleaner candidate definition.
+- The negative mean is **not structural** for either champion arm (0 structural-classified cells under ADV-NONE; 1 under PARTIAL-V2A) — consistent with the Phase 015 thesis that the MA mean ≈ 0 is a removable-tail / geometry phenomenon.
 
 ---
 
