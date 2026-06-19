@@ -1,0 +1,24 @@
+{
+  "experiment_id": "EXP-075",
+  "object": "nat",
+  "arm": "PARTIAL-V2A",
+  "lead_form": "F1",
+  "feature": "msofar_atr",
+  "locked_percentile": 0.95,
+  "locked_U": 20.613970831913484,
+  "F2_disclosed": {
+    "feature": "ss_excess",
+    "locked_percentile": 0.95,
+    "locked_U": 5.864967211520779
+  },
+  "band": [
+    "15m",
+    "30m",
+    "1h"
+  ],
+  "disclosed_domain": "5m",
+  "rule": "upper cap: keep entries with msofar_atr <= locked_U (native /STRONG-STAT p75 lower gate retained); pooled-TRAIN quantile; M-PERCELL diagnostic-only",
+  "deployable": false,
+  "note": "TRAIN-locked; NON-CONFIRMATORY until a separate one-shot sealed-holdout read",
+  "sha256": "8a6f4e7bdebb87fb0dee4d55fc12e95fa7789b6b526d61d0add72de6f7a31c53"
+}

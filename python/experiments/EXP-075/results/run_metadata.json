@@ -1,0 +1,42 @@
+{
+  "experiment_id": "EXP-075",
+  "hypothesis": "HYP-028",
+  "family": "CF-HA-HARAMI-001",
+  "stratum": "TRAIN only [0, train_cutoff); TEST not read; holdout sealed",
+  "design": "TRAIN-design-and-lock; endpoint = strategy legs; per-band-core-domain binding",
+  "n_cells": 99,
+  "n_powered": 67,
+  "n_boot": 10000,
+  "base_seed": 20260616,
+  "percentile_grid": [
+    0.85,
+    0.9,
+    0.95
+  ],
+  "retention_floor": 0.7,
+  "uplift_bar": 0.15,
+  "hurt_bar": -0.1,
+  "overfit_bar": 0.2,
+  "u_global": {
+    "F1": {
+      "0.85": 14.282259495578437,
+      "0.9": 16.591389739021782,
+      "0.95": 20.613970831913484
+    },
+    "F2": {
+      "0.85": 3.773122387095488,
+      "0.9": 4.522124175548557,
+      "0.95": 5.864967211520779
+    }
+  },
+  "locked_percentile": {
+    "F1": 0.95,
+    "F2": 0.95
+  },
+  "locked_U": {
+    "F1": 20.613970831913484,
+    "F2": 5.864967211520779
+  },
+  "verdict": "FILTER_INEFFECTIVE",
+  "fence": "load_train_1m slices [0, train_cutoff) only; cap removes entries (causal)"
+}
