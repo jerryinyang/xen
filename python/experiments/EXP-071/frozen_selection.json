@@ -1,0 +1,131 @@
+{
+  "experiment_id": "EXP-071",
+  "frozen_utc": "2026-06-18T21:46:26.917126+00:00",
+  "protocol": "D0 P8 freeze-before-TEST \u2014 written before any TEST row is loaded",
+  "checkpoint": "2026-06-18-016-harami-candidate-screening",
+  "binding_object": "nat",
+  "binding_arm": "PARTIAL-V2A",
+  "test_family": [
+    {
+      "cell": "GBPUSD-5m",
+      "instrument": "GBPUSD",
+      "domain": "5m",
+      "is_4h": false,
+      "fpr_conj_nullA": 0.035,
+      "fpr_conj_nullB_advisory": 0.027,
+      "calibrated_margin_atr": 0.0532706919561557,
+      "temporal_flag": "GROWING",
+      "amended_verdict": "PASS (Null-A \u2264 0.05; D0-amendment-004)",
+      "stale_both_nulls_verdict": "PASS"
+    },
+    {
+      "cell": "GBPUSD-1h",
+      "instrument": "GBPUSD",
+      "domain": "1h",
+      "is_4h": false,
+      "fpr_conj_nullA": 0.014,
+      "fpr_conj_nullB_advisory": 0.363,
+      "calibrated_margin_atr": 0.1262909581612494,
+      "temporal_flag": "DECAYING",
+      "amended_verdict": "PASS (Null-A \u2264 0.05; D0-amendment-004)",
+      "stale_both_nulls_verdict": "FPR_EXCLUDED"
+    },
+    {
+      "cell": "NZDUSD-1h",
+      "instrument": "NZDUSD",
+      "domain": "1h",
+      "is_4h": false,
+      "fpr_conj_nullA": 0.031,
+      "fpr_conj_nullB_advisory": 0.34,
+      "calibrated_margin_atr": 0.1495674443832204,
+      "temporal_flag": "DECAYING",
+      "amended_verdict": "PASS (Null-A \u2264 0.05; D0-amendment-004)",
+      "stale_both_nulls_verdict": "FPR_EXCLUDED"
+    },
+    {
+      "cell": "NZDUSD-2h",
+      "instrument": "NZDUSD",
+      "domain": "2h",
+      "is_4h": false,
+      "fpr_conj_nullA": 0.031,
+      "fpr_conj_nullB_advisory": 0.759,
+      "calibrated_margin_atr": 0.16784709240796028,
+      "temporal_flag": "STABLE",
+      "amended_verdict": "PASS (Null-A \u2264 0.05; D0-amendment-004)",
+      "stale_both_nulls_verdict": "FPR_EXCLUDED"
+    },
+    {
+      "cell": "GBPJPY-30m",
+      "instrument": "GBPJPY",
+      "domain": "30m",
+      "is_4h": false,
+      "fpr_conj_nullA": 0.014,
+      "fpr_conj_nullB_advisory": 0.161,
+      "calibrated_margin_atr": 0.07220111955631103,
+      "temporal_flag": "DECAYING",
+      "amended_verdict": "PASS (Null-A \u2264 0.05; D0-amendment-004)",
+      "stale_both_nulls_verdict": "FPR_EXCLUDED"
+    },
+    {
+      "cell": "US2000-4h",
+      "instrument": "US2000",
+      "domain": "4h",
+      "is_4h": true,
+      "fpr_conj_nullA": 0.018,
+      "fpr_conj_nullB_advisory": 0.773,
+      "calibrated_margin_atr": 0.16140241003427946,
+      "temporal_flag": "STABLE",
+      "amended_verdict": "PASS (Null-A \u2264 0.05; D0-amendment-004)",
+      "stale_both_nulls_verdict": "FPR_EXCLUDED"
+    }
+  ],
+  "fpr_exclusions": [],
+  "binding_fpr_null": "Null-A only (D0-amendment-004; Null-B advisory)",
+  "verdict_column_note": "EXP-070 calibration_map.csv 'verdict' column reflects the superseded both-nulls rule (D0-amendment-003) and was NOT regenerated; the binding FPR gate keys on fpr_conj_nullA \u2264 0.05 per D0-amendment-004.",
+  "composition_threshold": "\u2265 3 cells clear the full conjunction (median CI_low>0 Holm-adj \u2227 raw-mean CI_low>0 \u2227 beats-RM CI_low>0 Holm-adj \u2227 median > calibrated margin), spanning \u2265 2 instruments, of which \u2265 2 clearing cells are non-4h.",
+  "inference_method": {
+    "base_seed": 20260616,
+    "n_boot": 10000,
+    "block_length_rule": "b = round(m**(1/3))",
+    "rng_convention": "EXP-068 arm_pb purpose-block convention (default_rng([BASE_SEED, cell_index, purpose])); reused unchanged from the EXP-070-calibrated machinery",
+    "winsorize_trim_frac": 0.1,
+    "power_floor": 30,
+    "alpha": 0.05
+  },
+  "composite_seed": {
+    "predeclared_label": "[20260616, 999, 'composite']",
+    "median_rng_seed": [
+      20260616,
+      999,
+      0
+    ],
+    "mean_rng_seed": [
+      20260616,
+      999,
+      1
+    ]
+  },
+  "provenance": {
+    "g015_source": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/EXP-068/results/g015_verdict.json",
+    "g015_partial_v2a_cells": [
+      "EURUSD-15m",
+      "EURUSD-1h",
+      "EURUSD-4h",
+      "GBPUSD-5m",
+      "GBPUSD-1h",
+      "NZDUSD-1h",
+      "NZDUSD-2h",
+      "GBPJPY-30m",
+      "US2000-4h"
+    ],
+    "calibration_map_sha256": "7f8399db99635ef516da0c26b32fd3f4690f1224be73a051928eb8318dea537a",
+    "temporal_stability_sha256": "1e242c2c509a77a70d4ce11b649ce198d1018d1db6c6af32d953ddf3414c318d",
+    "binding_fpr_null": "Null-A only (D0-amendment-004)"
+  },
+  "excluded_eurusd_cells": [
+    "EURUSD-15m",
+    "EURUSD-1h",
+    "EURUSD-4h"
+  ],
+  "frozen_selection_sha256": "ca16bcdb6c103d57ab947ba55936adbe5fcc65f2d293cfe0d09178a454be6362"
+}

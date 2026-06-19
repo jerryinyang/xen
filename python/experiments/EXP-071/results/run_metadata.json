@@ -1,0 +1,140 @@
+{
+  "experiment_id": "EXP-071",
+  "hypothesis": "HYP-024",
+  "family": "CF-HA-HARAMI-001",
+  "candidate": "CAND-001",
+  "generated_utc": "2026-06-18T21:51:52.436509+00:00",
+  "checkpoint": "2026-06-18-016-harami-candidate-screening",
+  "stratum": "TEST (next 21% per file); TRAIN state carry-in; final-30% holdout sealed",
+  "posture": "gross only (no costs \u2014 EXP-072 scope; D0 P12)",
+  "verdict": "TEST_NOT_CONFIRMED",
+  "composition_threshold": "\u2265 3 cells clear the full conjunction (median CI_low>0 Holm-adj \u2227 raw-mean CI_low>0 \u2227 beats-RM CI_low>0 Holm-adj \u2227 median > calibrated margin), spanning \u2265 2 instruments, of which \u2265 2 clearing cells are non-4h.",
+  "binding_fpr_null": "Null-A only (D0-amendment-004)",
+  "verdict_column_note": "EXP-070 calibration_map.csv 'verdict' column reflects the superseded both-nulls rule (D0-amendment-003) and was NOT regenerated; the binding FPR gate keys on fpr_conj_nullA \u2264 0.05 per D0-amendment-004.",
+  "freeze_file": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/EXP-071/frozen_selection.json",
+  "freeze_file_sha256": "ca16bcdb6c103d57ab947ba55936adbe5fcc65f2d293cfe0d09178a454be6362",
+  "p12_reconciliation": [
+    {
+      "cell": "GBPUSD-5m",
+      "checked": true,
+      "max_abs_diff": 0.0,
+      "bench_m": 8586,
+      "partial_m": 8586
+    },
+    {
+      "cell": "GBPUSD-1h",
+      "checked": true,
+      "max_abs_diff": 0.0,
+      "bench_m": 690,
+      "partial_m": 690
+    },
+    {
+      "cell": "NZDUSD-1h",
+      "checked": true,
+      "max_abs_diff": 0.0,
+      "bench_m": 659,
+      "partial_m": 659
+    },
+    {
+      "cell": "NZDUSD-2h",
+      "checked": true,
+      "max_abs_diff": 0.0,
+      "bench_m": 303,
+      "partial_m": 303
+    },
+    {
+      "cell": "GBPJPY-30m",
+      "checked": true,
+      "max_abs_diff": 0.0,
+      "bench_m": 1529,
+      "partial_m": 1529
+    },
+    {
+      "cell": "US2000-4h",
+      "checked": true,
+      "max_abs_diff": 0.0,
+      "bench_m": 152,
+      "partial_m": 152
+    }
+  ],
+  "p12_max_abs_diff": 0.0,
+  "p12_tolerance": 1e-09,
+  "dependency_provenance": {
+    "g015_source": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/EXP-068/results/g015_verdict.json",
+    "g015_partial_v2a_cells": [
+      "EURUSD-15m",
+      "EURUSD-1h",
+      "EURUSD-4h",
+      "GBPUSD-5m",
+      "GBPUSD-1h",
+      "NZDUSD-1h",
+      "NZDUSD-2h",
+      "GBPJPY-30m",
+      "US2000-4h"
+    ],
+    "calibration_map_sha256": "7f8399db99635ef516da0c26b32fd3f4690f1224be73a051928eb8318dea537a",
+    "temporal_stability_sha256": "1e242c2c509a77a70d4ce11b649ce198d1018d1db6c6af32d953ddf3414c318d",
+    "binding_fpr_null": "Null-A only (D0-amendment-004)"
+  },
+  "determinism": {
+    "determinism_pass": true,
+    "mismatches": [],
+    "spot_check_cells": [
+      "GBPUSD-1h",
+      "US2000-4h"
+    ],
+    "n_cells_replayed": 6
+  },
+  "per_cell_results_sha256": "96643a8737b375eeaff69f70cd4f0c989d31df16c54ba7a1d22e463fc556e831",
+  "portfolio_results_sha256": "211b08bfb57b7f735c0a3c33be3ff00b8d65e03c09fa508809786c65d2bb5c19",
+  "inference_params": {
+    "base_seed": 20260616,
+    "n_boot": 10000,
+    "block_length_rule": "b = round(m**(1/3))",
+    "power_floor": 30,
+    "trim_frac": 0.1,
+    "alpha": 0.05,
+    "composite_seed": "[20260616, 999, 'composite']"
+  },
+  "reuse_note": "signal_arm / matched_random_arm / contrast / _summarize_arm / bootstrap_median_distribution / median_ci / _winsorized_mean reused unchanged in semantics from EXP-068 (the EXP-070-calibrated machinery); matched-random TEST pool restricted to the TEST window via the warmup mask only.",
+  "holdout_fence": "load_test_1m slices [0, analysis_cutoff) only; the final-30% holdout is never materialized; forward scans clip at the analysis-set edge -> DATA_CENSORED.",
+  "registry": "CF-HA-HARAMI-001/HYP-024 (EXP-071); first counted TEST reads under CAND-001; per-stratum counted reads in test_read_manifest.csv; portfolio composite is a disclosure against all 6 member strata (D0 P10), not a counted read.",
+  "instrument_meta": {
+    "GBPUSD": {
+      "source_file": "timebars_gbpusd_20230103_000000_20260611_005212.parquet",
+      "total_rows_1m": 1273657,
+      "analysis_cutoff_1m": 891559,
+      "train_cutoff_1m": 624091,
+      "test_rows_1m": 267468,
+      "train_end_epoch_s": 1725833340,
+      "analysis_end_epoch_s": 1748520660
+    },
+    "NZDUSD": {
+      "source_file": "timebars_nzdusd_20230103_000000_20260611_010629.parquet",
+      "total_rows_1m": 1271158,
+      "analysis_cutoff_1m": 889810,
+      "train_cutoff_1m": 622867,
+      "test_rows_1m": 266943,
+      "train_end_epoch_s": 1725601320,
+      "analysis_end_epoch_s": 1748495640
+    },
+    "GBPJPY": {
+      "source_file": "timebars_gbpjpy_20230103_000000_20260611_010717.parquet",
+      "total_rows_1m": 1278719,
+      "analysis_cutoff_1m": 895103,
+      "train_cutoff_1m": 626572,
+      "test_rows_1m": 268531,
+      "train_end_epoch_s": 1725636480,
+      "analysis_end_epoch_s": 1748528340
+    },
+    "US2000": {
+      "source_file": "timebars_us2000_20230103_000000_20260611_011542.parquet",
+      "total_rows_1m": 1208112,
+      "analysis_cutoff_1m": 845678,
+      "train_cutoff_1m": 591974,
+      "test_rows_1m": 253704,
+      "train_end_epoch_s": 1725960780,
+      "analysis_end_epoch_s": 1748849400
+    }
+  }
+}
