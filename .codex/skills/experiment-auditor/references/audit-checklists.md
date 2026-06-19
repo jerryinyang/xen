@@ -68,6 +68,25 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 
 <Are outputs within expected domain ranges? Do patterns make sense?>
 
+## Verdict Forensics (mandatory — run autonomously on every verdict)
+
+### Per-stratum re-derivation & masking check
+
+| Stratum (domain/instrument/cell) | Per-stratum verdict | Agrees with pooled headline? | Notes |
+|----------------------------------|---------------------|------------------------------|-------|
+| <stratum> | <verdict> | YES/NO | <if NO, what the pooled number is masking> |
+
+- Pooled/aggregated headline: <value>. **Is it masking heterogeneity?** YES/NO — <evidence>. (A pooled number is a disclosure, not a verdict, until cross-stratum homogeneity is shown.)
+
+### Mechanism
+
+<Why did the verdict come out this way? Name the binding leg, the driving cells, the tail/feature. Not "the number missed the bar" — *what produced* the number.>
+
+### Gate-shape check
+
+- Binding gate: <gate>. Effect shape: <location / tail / bimodal / asymmetric>.
+- Is the gate the wrong instrument for this effect's shape? YES/NO — <if YES, distinguish "no effect" from "effect of a shape this gate cannot see"; record for the interpreter; do NOT retro-edit the gate>.
+
 ## Scope Compliance
 
 - Analysis plan followed: YES / NO
@@ -98,9 +117,10 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 <Number>. **<Issue title>**
    - Description: <note for awareness>
 
-## Re-Audit Requirements
+## Materiality & Re-Audit Requirements
 
-<If CONDITIONAL PASS, what must be fixed and how to verify the fix.>
+- **Materiality of each finding**: for every Critical, state the verdict-bearing number it could move (blocking → fix + rerun before Stage 6). For every Warning/Info, state the explicit reasoning that it **cannot** move any verdict-bearing number (the only justification for document-and-proceed).
+- **Re-audit**: <If a blocking finding exists, what must be fixed, re-run, and how to verify the fix. If no rerun is required, the materiality reasoning above is the justification.>
 ```
 
 ---
@@ -133,6 +153,9 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | Division by zero | Any ratio computation | Check for denominator > 0 guard |
 | Wrong sample size in CI | Bootstrap or statistical test calls | Verify the `n=` passed matches actual data size |
 | Duplicate-event denominator bias | Event streams with repeated timestamps | Verify duplicate rows are excluded, merged, or explicitly counted by design |
+| Pooled verdict masks per-stratum structure | Any aggregated/equal-weight headline (pooled NO_SEPARATOR, cross-cell mean, portfolio composite) | Re-derive per domain/instrument/cell; confirm the pooled number is not hiding a stratum that flips the verdict or one outlier vetoing the rest |
+| Gate blind to the effect's shape | Any binding gate applied to a tail/bimodal/asymmetric effect | Check the gate measures the shape present (e.g. a location/consistency gate cannot see a tail-only separator); distinguish "no effect" from "wrong instrument" |
+| Verdict-material finding down-classified | Any Warning/Info on a result-bearing path | Confirm the finding genuinely cannot move sample membership, a denominator, a metric, causality, or the verdict; if it can, it is Critical and forces a rerun |
 
 ### Value Range Reference
 

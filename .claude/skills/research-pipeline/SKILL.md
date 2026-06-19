@@ -182,6 +182,20 @@ Invoke `experiment-auditor` with scope, plan, code, modified modules, and `resul
 
 Expected artifact: `python/experiments/<ID>/audit.md`.
 
+Require the audit to include **verdict forensics**, run autonomously (not contingent on anyone
+having questioned the result): a per-stratum re-derivation that affirmatively confirms any
+pooled/aggregated headline is not masking heterogeneity, an explicit mechanism statement for the
+verdict, and a gate-shape check (whether the binding gate can see the effect's shape). An audit
+that only certifies implementation quality and accepts the pooled verdict at face value is
+**incomplete** — return it to the auditor.
+
+**Materiality gate (blocking).** Any audit finding that could change sample membership, a
+denominator, a metric value, temporal/causal validity, the verdict, or the binding stratum is
+verdict-material: route it to `experiment-developer` for a fix and **re-run the experiment**
+(returning to the manual execution gate) before proceeding to Stage 6. Do not advance a verdict
+computed on code with an unresolved verdict-material finding. "Document-and-proceed" is allowed
+only for findings the audit explicitly shows cannot move any verdict-bearing number.
+
 ## Stage 6: Interpretation
 
 Invoke `experiment-quant-analyst` with scope, plan, code, results, and audit.
@@ -205,6 +219,8 @@ Expected artifacts:
 Review `audit.md`, `results.md`, `report.md`, and index updates against the bundled governance constraints.
 If needed, locate the file ending with `/research-pipeline/references/governance-constraints.md`.
 On every experiment, confirm a signal-registry disposition was recorded. If the result was registry-relevant, also confirm the candidate-family status was advanced, the multiplicity-registry records the item's outcome (refuted/blocked/inconclusive items retained), and any counted TEST read or disclosure was entered in `test-read-ledger.md`. A missing disposition — or missing updates on a registry-relevant result — warrants `REVISE`.
+
+Confirm the audit carried **verdict forensics**: a per-stratum re-derivation with an explicit masking check on any pooled/aggregated headline, a mechanism statement, and a gate-shape check. An audit lacking the per-stratum masking check — or one that accepted a pooled verdict without it — warrants `REVISE`. Likewise, a verdict-material audit finding that was documented but not fixed-and-rerun (down-classified to Warning/Info without showing it cannot move a verdict-bearing number) warrants `REVISE`.
 
 Write `python/experiments/<ID>/governance/post-experiment-review.md` with `APPROVE`, `REVISE`, or `REJECT`. For `REVISE`, route concrete issues to the responsible specialist and allow at most two revision cycles.
 

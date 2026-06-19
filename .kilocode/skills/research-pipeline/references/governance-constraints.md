@@ -112,6 +112,7 @@ research question or temporal semantics.
 | Complexity budget | Does it match the scope? Is it realistic? |
 | Holdout exclusion | Does the scope explicitly exclude the global holdout? |
 | Real-price outcome rule | Does the scope explicitly state what prices are used for returns, excursions, P&L, stops, and targets? |
+| Gate-threshold calibration | Is every binding gate/composition threshold either calibrated to the realized cell layout, data-derived/mechanically selected, or shipped with a pre-registered sensitivity band shown to leave routing invariant — not an unjustified magic constant? Borrowed/analogy constants must be disclosed as such and stress-tested. |
 
 ### Analysis Plan (analysis-plan.md)
 
@@ -122,6 +123,9 @@ research question or temporal semantics.
 | Cross-view alignment | Does the plan specify how data views or event sets are aligned by timestamp, not bar count? |
 | Visualisation plan | Are plots purposeful (answering specific sub-questions), not decorative? |
 | Interpretation guide | Are outcomes pre-defined (if X then Y because Z) to prevent post-hoc rationalisation? |
+| Per-stratum endpoints | Are binding endpoints adjudicated per stratum, with any pooled/aggregated figure declared disclosure-only unless cross-stratum homogeneity is itself tested? |
+| Shape-aware reads | If the hypothesis admits a non-location effect shape (tails, bimodality, asymmetry), is a shape-aware read predeclared alongside the standard location guard, so a shape effect is caught in-experiment rather than forcing a follow-up? |
+| Robust + raw endpoints | When the signal sits over asymmetric/bimodal geometry, are both a robust/median endpoint and the binding raw economic endpoint emitted, so the robust-vs-raw gap is available as a diagnostic? |
 | Budget compliance | Do total tests, plots, modules stay within the complexity budget? |
 
 ### Code (code/run_experiment.py)
@@ -162,6 +166,10 @@ research question or temporal semantics.
 | Scope compliance | Does the audit verify that code matches the analysis plan? |
 | Real-price outcome audit | Does audit verify that strategy and signal outcomes use scoped real prices? |
 | Timestamp alignment audit | Does audit verify cross-view alignment by timestamp? |
+| Verdict forensics present | Does the audit explain *why* the verdict came out — a mechanism statement, not just a numeric confirmation? Was it run autonomously, not only after an operator questioned the result? |
+| Per-stratum masking check | Does the audit re-derive the verdict per domain/instrument/cell and affirmatively confirm any pooled/aggregated/equal-weight headline is not masking heterogeneity? |
+| Gate-shape check | Does the audit check whether the binding gate can see the effect's shape (location vs tail/bimodal/asymmetric), and distinguish "no effect" from "wrong instrument for the shape"? |
+| Materiality & blocking | Is every Critical finding tied to the verdict-bearing number it moves (forcing fix + rerun), and every Warning/Info justified as unable to move any verdict-bearing number? |
 
 ### Results Interpretation (results.md)
 
@@ -201,6 +209,8 @@ One or more issues found. Specify:
 - `ISSUES`: specific issues with line references and remediation suggestions
 
 Allow up to 2 revision cycles.
+
+Issues that warrant REVISE include: an audit lacking verdict forensics or the per-stratum masking check; an audit that accepted a pooled/aggregated verdict without re-deriving it per stratum; a verdict-material finding documented but not fixed-and-rerun; and a binding gate threshold that is an unjustified magic constant (not calibrated, data-derived, or sensitivity-banded).
 
 ### REJECT
 

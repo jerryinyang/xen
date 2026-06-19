@@ -66,6 +66,11 @@ Validate whether the implementation and results can be trusted. Report findings 
    - chosen methods still fit the data produced.
 7. Check result plausibility against project value ranges and schemas from the references.
 8. Check derived-view determinism: same input + same parameters = same output, unless the approved scope explicitly requires seeded randomness.
+9. Run **verdict forensics** — autonomously, on every experiment, whether or not anyone has questioned the result. Do not certify a SUPPORTED/REJECTED/INCONCLUSIVE verdict you have only confirmed numerically; explain *why* it came out that way:
+   - **Per-stratum re-derivation.** Re-compute the verdict per binding stratum (domain, instrument, cell) and **affirmatively confirm that any pooled, aggregated, or equal-weight headline is not masking heterogeneity** — a pooled number is a disclosure, not a verdict, until cross-stratum homogeneity is shown. Flag any case where the pooled headline and the per-stratum picture disagree (e.g. a pooled NO_SEPARATOR over a stratum that separates near-universally; one high-cost instrument vetoing a domain).
+   - **Mechanism statement.** State the concrete driver of the verdict (which leg, which cells, which tail/feature), not merely that the number cleared or missed the bar.
+   - **Gate-shape check.** Check whether the binding gate is the wrong instrument for the effect's *shape*: a guard built for location effects can be structurally blind to tail/bimodal/asymmetric effects and veto a real finding. If so, say so explicitly and distinguish "no effect" from "effect of a shape this gate cannot see." Do **not** retro-edit the gate; record the mismatch for the interpreter and any follow-up scope.
+10. Run a **materiality assessment** on every finding and exercise blocking authority. Any finding that could change sample membership, a denominator, a metric value, temporal/causal validity, the verdict, or which stratum is binding is **verdict-material** → classify it **Critical** and require a code fix and a re-execution before interpretation (Stage 6). Decide this yourself; do not wait for an operator to raise it. "Document-and-proceed" (Warning/Info) is permitted **only** when you can affirmatively show the finding cannot move any verdict-bearing number — state that materiality reasoning explicitly for each non-blocking finding.
 
 ## Report
 
@@ -73,15 +78,19 @@ Create `python/experiments/<ID>/audit.md` using the bundled audit checklists.
 
 Classify findings:
 
-- Critical: blocks interpretation until fixed.
-- Warning: may affect results or should be addressed.
+- Critical: verdict-material (could move sample membership, a denominator, a metric value, temporal/causal validity, the verdict, or the binding stratum) — **blocks interpretation and forces a fix + re-execution** before Stage 6.
+- Warning: may affect results or should be addressed, but shown not to move any verdict-bearing number.
 - Info: useful context that does not affect trust.
 
 Include exact file paths, functions, result files, and reproduction notes for each finding.
 
+Always include a **Verdict Forensics** section (per-stratum re-derivation, masking check, mechanism, gate-shape check) and, for every non-blocking finding, the materiality reasoning that justifies not forcing a rerun.
+
 ## Constraints
 
 - Do not reinterpret results as final conclusions; leave that to `experiment-quant-analyst`.
+- Run verdict forensics and the per-stratum masking check on **every** verdict, autonomously — never make a deep diagnosis contingent on an operator first noticing the issue.
+- Exercise blocking authority yourself: a verdict-material finding is Critical and forces a fix + rerun; do not down-classify it to a documented Warning to let the pipeline proceed.
 - Do not expand the experiment scope.
 - Do not inspect the final 30 percent global holdout.
 - Prefer concrete evidence over broad style feedback, but treat code-standard
