@@ -1,0 +1,957 @@
+{
+  "5m": {
+    "verdict": "NO_SEPARATOR",
+    "n_cells": 17,
+    "n_powered": 17,
+    "sep_rate": 0.35294117647058826,
+    "n_cells_sep": 6,
+    "uniform_levers": [],
+    "domain_separable_rate": 0.5,
+    "share_min": 0.5,
+    "per_feature": [
+      {
+        "feature": "msofar_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": 0.7052309183979011,
+        "med_ci_low_1s": 0.6953656698852804,
+        "med_ci_hi_1s": 0.7202363211643039,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "ss_excess_ratio",
+        "n_cells": 17,
+        "n_candidate_cells": 1,
+        "share": 0.058823529411764705,
+        "median_effect": 0.4119412730818801,
+        "med_ci_low_1s": 0.35939268003983793,
+        "med_ci_hi_1s": 0.49766790010686357,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "JP225-5m"
+        ]
+      },
+      {
+        "feature": "ss_excess_diff",
+        "n_cells": 17,
+        "n_candidate_cells": 1,
+        "share": 0.058823529411764705,
+        "median_effect": 0.47117746106953784,
+        "med_ci_low_1s": 0.4084361871687776,
+        "med_ci_hi_1s": 0.5206264050797931,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "USTEC-5m"
+        ]
+      },
+      {
+        "feature": "disp_mad_med",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": 0.0150060473061433,
+        "med_ci_low_1s": -0.010780038222604538,
+        "med_ci_hi_1s": 0.06622823327219218,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "favdist_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": 0.7052309183979011,
+        "med_ci_low_1s": 0.6953656698852804,
+        "med_ci_hi_1s": 0.7202363211643039,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "move_age_bars",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": 0.5208903422263746,
+        "med_ci_low_1s": 0.48947603378079596,
+        "med_ci_hi_1s": 0.5241572440933655,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "move_count_k",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.01029717522225404,
+        "med_ci_low_1s": -0.026876975295774708,
+        "med_ci_hi_1s": 0.02793596217900496,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "atr_pctile",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.3886416781915597,
+        "med_ci_low_1s": -0.40375392763182505,
+        "med_ci_hi_1s": -0.359889831538846,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "harami_compression",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": 0.00035968830424626397,
+        "med_ci_low_1s": -0.0043352480852481,
+        "med_ci_hi_1s": 0.0035891836357084816,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "harami_body_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.024374670208095917,
+        "med_ci_low_1s": -0.031026732833755233,
+        "med_ci_hi_1s": -0.007798765933399898,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "entry_range_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.03415246351258694,
+        "med_ci_low_1s": -0.053159153236156276,
+        "med_ci_hi_1s": -0.01852471514016585,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "ma_sep_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": 0.039006241624386595,
+        "med_ci_low_1s": -0.01419213731758906,
+        "med_ci_hi_1s": 0.06448266079461784,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "ma_slope_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.008084058690764895,
+        "med_ci_low_1s": -0.06494342439099954,
+        "med_ci_hi_1s": 0.007462892753534289,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "polarity_agree_ha0",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.001709455890414811,
+        "med_ci_low_1s": -0.0020810702157412903,
+        "med_ci_hi_1s": 0.0005548492367643161,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "polarity_agree_ha1",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.002164501841142005,
+        "med_ci_low_1s": -0.0055395084797947875,
+        "med_ci_hi_1s": 0.0013662721264086695,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "rd_long",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.02178990098933457,
+        "med_ci_low_1s": -0.033946193066692214,
+        "med_ci_hi_1s": 0.006362227554506104,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      }
+    ]
+  },
+  "15m": {
+    "verdict": "SEPARABLE_NO_UNIFORM_LEVER",
+    "n_cells": 17,
+    "n_powered": 17,
+    "sep_rate": 0.8823529411764706,
+    "n_cells_sep": 15,
+    "uniform_levers": [],
+    "domain_separable_rate": 0.5,
+    "share_min": 0.5,
+    "per_feature": [
+      {
+        "feature": "msofar_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 4,
+        "share": 0.23529411764705882,
+        "median_effect": 0.7810050942863791,
+        "med_ci_low_1s": 0.733006086432739,
+        "med_ci_hi_1s": 0.7976618563411779,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "DE30-15m",
+          "JP225-15m",
+          "US2000-15m",
+          "US500-15m"
+        ]
+      },
+      {
+        "feature": "ss_excess_ratio",
+        "n_cells": 17,
+        "n_candidate_cells": 8,
+        "share": 0.47058823529411764,
+        "median_effect": 0.570106355242693,
+        "med_ci_low_1s": 0.5358467125120747,
+        "med_ci_hi_1s": 0.5929843879998042,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "DE30-15m",
+          "EURJPY-15m",
+          "JP225-15m",
+          "US2000-15m",
+          "US500-15m",
+          "USDCAD-15m",
+          "USDCHF-15m",
+          "USDJPY-15m"
+        ]
+      },
+      {
+        "feature": "ss_excess_diff",
+        "n_cells": 17,
+        "n_candidate_cells": 7,
+        "share": 0.4117647058823529,
+        "median_effect": 0.6021140689196358,
+        "med_ci_low_1s": 0.5442690459849004,
+        "med_ci_hi_1s": 0.6209045285060542,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "DE30-15m",
+          "EURJPY-15m",
+          "JP225-15m",
+          "US2000-15m",
+          "US500-15m",
+          "USDCHF-15m",
+          "USDJPY-15m"
+        ]
+      },
+      {
+        "feature": "disp_mad_med",
+        "n_cells": 17,
+        "n_candidate_cells": 1,
+        "share": 0.058823529411764705,
+        "median_effect": 0.04531137627104398,
+        "med_ci_low_1s": 0.016798457376044462,
+        "med_ci_hi_1s": 0.08030362392424317,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "GBPJPY-15m"
+        ]
+      },
+      {
+        "feature": "favdist_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 4,
+        "share": 0.23529411764705882,
+        "median_effect": 0.7810050942863791,
+        "med_ci_low_1s": 0.733006086432739,
+        "med_ci_hi_1s": 0.7976618563411779,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "DE30-15m",
+          "JP225-15m",
+          "US2000-15m",
+          "US500-15m"
+        ]
+      },
+      {
+        "feature": "move_age_bars",
+        "n_cells": 17,
+        "n_candidate_cells": 4,
+        "share": 0.23529411764705882,
+        "median_effect": 0.5401726393739423,
+        "med_ci_low_1s": 0.5062007713214944,
+        "med_ci_hi_1s": 0.5717903961032451,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "DE30-15m",
+          "US2000-15m",
+          "USDCHF-15m",
+          "USDJPY-15m"
+        ]
+      },
+      {
+        "feature": "move_count_k",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": 0.04391990689624303,
+        "med_ci_low_1s": 0.013616797699155248,
+        "med_ci_hi_1s": 0.13146148007325853,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "atr_pctile",
+        "n_cells": 17,
+        "n_candidate_cells": 2,
+        "share": 0.11764705882352941,
+        "median_effect": -0.3866092367642592,
+        "med_ci_low_1s": -0.4466260164998791,
+        "med_ci_hi_1s": -0.34472049689441,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "DE30-15m",
+          "US500-15m"
+        ]
+      },
+      {
+        "feature": "harami_compression",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.02018229166666663,
+        "med_ci_low_1s": -0.04153967868669706,
+        "med_ci_hi_1s": -0.005907572602790623,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "harami_body_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.04410261845103369,
+        "med_ci_low_1s": -0.05072032174174568,
+        "med_ci_hi_1s": -0.033393868638388,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "entry_range_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": 0.009213777703588333,
+        "med_ci_low_1s": -0.0030109516278237214,
+        "med_ci_hi_1s": 0.024419585203182104,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "ma_sep_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 1,
+        "share": 0.058823529411764705,
+        "median_effect": 0.028008023402502857,
+        "med_ci_low_1s": -0.0069629869370948505,
+        "med_ci_hi_1s": 0.0564265221307938,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "USDCHF-15m"
+        ]
+      },
+      {
+        "feature": "ma_slope_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 1,
+        "share": 0.058823529411764705,
+        "median_effect": -0.06846139325630596,
+        "med_ci_low_1s": -0.11468025999946063,
+        "med_ci_hi_1s": -0.0058503877130756665,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "DE30-15m"
+        ]
+      },
+      {
+        "feature": "polarity_agree_ha0",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.0021228702681274046,
+        "med_ci_low_1s": -0.0070091448787080015,
+        "med_ci_hi_1s": 0.002731084946267057,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "polarity_agree_ha1",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": 0.00405270381559271,
+        "med_ci_low_1s": 0.00032350144395930564,
+        "med_ci_hi_1s": 0.007926984833813332,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "rd_long",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": 0.0034012680559944333,
+        "med_ci_low_1s": -0.03339355644984451,
+        "med_ci_hi_1s": 0.011381538136309271,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      }
+    ]
+  },
+  "30m": {
+    "verdict": "SEPARABLE_NO_UNIFORM_LEVER",
+    "n_cells": 17,
+    "n_powered": 17,
+    "sep_rate": 0.7058823529411765,
+    "n_cells_sep": 12,
+    "uniform_levers": [],
+    "domain_separable_rate": 0.5,
+    "share_min": 0.5,
+    "per_feature": [
+      {
+        "feature": "msofar_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 1,
+        "share": 0.058823529411764705,
+        "median_effect": 0.7869761709120788,
+        "med_ci_low_1s": 0.762966722710402,
+        "med_ci_hi_1s": 0.790185907970419,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "JP225-30m"
+        ]
+      },
+      {
+        "feature": "ss_excess_ratio",
+        "n_cells": 17,
+        "n_candidate_cells": 3,
+        "share": 0.17647058823529413,
+        "median_effect": 0.5909915973241964,
+        "med_ci_low_1s": 0.529966105176664,
+        "med_ci_hi_1s": 0.6154699295195163,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "AUDJPY-30m",
+          "BTCUSD-30m",
+          "JP225-30m"
+        ]
+      },
+      {
+        "feature": "ss_excess_diff",
+        "n_cells": 17,
+        "n_candidate_cells": 2,
+        "share": 0.11764705882352941,
+        "median_effect": 0.5863547658175843,
+        "med_ci_low_1s": 0.5603527583034609,
+        "med_ci_hi_1s": 0.5959555328018724,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "AUDJPY-30m",
+          "JP225-30m"
+        ]
+      },
+      {
+        "feature": "disp_mad_med",
+        "n_cells": 17,
+        "n_candidate_cells": 1,
+        "share": 0.058823529411764705,
+        "median_effect": 0.18515587909479359,
+        "med_ci_low_1s": 0.07573523957869743,
+        "med_ci_hi_1s": 0.24988103924118898,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "EURJPY-30m"
+        ]
+      },
+      {
+        "feature": "favdist_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 1,
+        "share": 0.058823529411764705,
+        "median_effect": 0.7869761709120788,
+        "med_ci_low_1s": 0.762966722710402,
+        "med_ci_hi_1s": 0.790185907970419,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "JP225-30m"
+        ]
+      },
+      {
+        "feature": "move_age_bars",
+        "n_cells": 17,
+        "n_candidate_cells": 4,
+        "share": 0.23529411764705882,
+        "median_effect": 0.6007005438155446,
+        "med_ci_low_1s": 0.5608045322382422,
+        "med_ci_hi_1s": 0.6054946085325832,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "AUDJPY-30m",
+          "DE30-30m",
+          "US500-30m",
+          "USDCHF-30m"
+        ]
+      },
+      {
+        "feature": "move_count_k",
+        "n_cells": 17,
+        "n_candidate_cells": 4,
+        "share": 0.23529411764705882,
+        "median_effect": 0.1589982786384585,
+        "med_ci_low_1s": 0.08204536510321625,
+        "med_ci_hi_1s": 0.1948630262243518,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "AUDUSD-30m",
+          "DE30-30m",
+          "GBPUSD-30m",
+          "NZDUSD-30m"
+        ]
+      },
+      {
+        "feature": "atr_pctile",
+        "n_cells": 17,
+        "n_candidate_cells": 1,
+        "share": 0.058823529411764705,
+        "median_effect": -0.3099710393212596,
+        "med_ci_low_1s": -0.3379211175020542,
+        "med_ci_hi_1s": -0.13159724763926506,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "US500-30m"
+        ]
+      },
+      {
+        "feature": "harami_compression",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": 0.013559886723305103,
+        "med_ci_low_1s": 0.011573561217492312,
+        "med_ci_hi_1s": 0.024735114861697216,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "harami_body_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.032550171316691134,
+        "med_ci_low_1s": -0.05292214461791289,
+        "med_ci_hi_1s": -0.025831963845521777,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "entry_range_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.006059067982108313,
+        "med_ci_low_1s": -0.03358769452622723,
+        "med_ci_hi_1s": 0.0036396360363963876,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "ma_sep_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 7,
+        "share": 0.4117647058823529,
+        "median_effect": 0.188460947879322,
+        "med_ci_low_1s": 0.10228614360845767,
+        "med_ci_hi_1s": 0.26990036976170906,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "BTCUSD-30m",
+          "DE30-30m",
+          "GBPUSD-30m",
+          "JP225-30m",
+          "US500-30m",
+          "USDCAD-30m",
+          "USTEC-30m"
+        ]
+      },
+      {
+        "feature": "ma_slope_atr",
+        "n_cells": 17,
+        "n_candidate_cells": 1,
+        "share": 0.058823529411764705,
+        "median_effect": -0.06825184880854562,
+        "med_ci_low_1s": -0.15912138277383647,
+        "med_ci_hi_1s": -0.03034752814488495,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "USTEC-30m"
+        ]
+      },
+      {
+        "feature": "polarity_agree_ha0",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.004137385227487846,
+        "med_ci_low_1s": -0.009215887537131037,
+        "med_ci_hi_1s": -0.0030849572657346853,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "polarity_agree_ha1",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.004726084978085419,
+        "med_ci_low_1s": -0.023685287490488458,
+        "med_ci_hi_1s": -0.002963787074627353,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "rd_long",
+        "n_cells": 17,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.06631623449605832,
+        "med_ci_low_1s": -0.07793475783938375,
+        "med_ci_hi_1s": -0.021139120833322082,
+        "n_cells_eff": 17,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      }
+    ]
+  },
+  "1h": {
+    "verdict": "SEPARABLE_NO_UNIFORM_LEVER",
+    "n_cells": 17,
+    "n_powered": 16,
+    "sep_rate": 0.9375,
+    "n_cells_sep": 15,
+    "uniform_levers": [],
+    "domain_separable_rate": 0.5,
+    "share_min": 0.5,
+    "per_feature": [
+      {
+        "feature": "msofar_atr",
+        "n_cells": 16,
+        "n_candidate_cells": 2,
+        "share": 0.125,
+        "median_effect": 0.732957758446867,
+        "med_ci_low_1s": 0.7180596224736162,
+        "med_ci_hi_1s": 0.7718218763945155,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "AUDJPY-1h",
+          "US500-1h"
+        ]
+      },
+      {
+        "feature": "ss_excess_ratio",
+        "n_cells": 16,
+        "n_candidate_cells": 1,
+        "share": 0.0625,
+        "median_effect": 0.5979920825378402,
+        "med_ci_low_1s": 0.5621998402216719,
+        "med_ci_hi_1s": 0.6531820010352564,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "BTCUSD-1h"
+        ]
+      },
+      {
+        "feature": "ss_excess_diff",
+        "n_cells": 16,
+        "n_candidate_cells": 1,
+        "share": 0.0625,
+        "median_effect": 0.6031781671970513,
+        "med_ci_low_1s": 0.589438954577603,
+        "med_ci_hi_1s": 0.6222732075237417,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "BTCUSD-1h"
+        ]
+      },
+      {
+        "feature": "disp_mad_med",
+        "n_cells": 16,
+        "n_candidate_cells": 2,
+        "share": 0.125,
+        "median_effect": 0.003920376536450609,
+        "med_ci_low_1s": -0.06037161929610152,
+        "med_ci_hi_1s": 0.04856572954221594,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "GBPUSD-1h",
+          "USDJPY-1h"
+        ]
+      },
+      {
+        "feature": "favdist_atr",
+        "n_cells": 16,
+        "n_candidate_cells": 2,
+        "share": 0.125,
+        "median_effect": 0.732957758446867,
+        "med_ci_low_1s": 0.7180596224736162,
+        "med_ci_hi_1s": 0.7718218763945155,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "AUDJPY-1h",
+          "US500-1h"
+        ]
+      },
+      {
+        "feature": "move_age_bars",
+        "n_cells": 16,
+        "n_candidate_cells": 4,
+        "share": 0.25,
+        "median_effect": 0.4188631177838169,
+        "med_ci_low_1s": 0.38485865188539603,
+        "med_ci_hi_1s": 0.5097863122555819,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "AUDJPY-1h",
+          "EURJPY-1h",
+          "GBPJPY-1h",
+          "US500-1h"
+        ]
+      },
+      {
+        "feature": "move_count_k",
+        "n_cells": 16,
+        "n_candidate_cells": 5,
+        "share": 0.3125,
+        "median_effect": 0.18384638732919867,
+        "med_ci_low_1s": 0.15544458879360668,
+        "med_ci_hi_1s": 0.24459626100502185,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "AUDJPY-1h",
+          "AUDUSD-1h",
+          "GBPJPY-1h",
+          "GBPUSD-1h",
+          "USTEC-1h"
+        ]
+      },
+      {
+        "feature": "atr_pctile",
+        "n_cells": 16,
+        "n_candidate_cells": 6,
+        "share": 0.375,
+        "median_effect": -0.2964059652287795,
+        "med_ci_low_1s": -0.326187199057233,
+        "med_ci_hi_1s": -0.19974794417069097,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "AUDJPY-1h",
+          "GBPJPY-1h",
+          "JP225-1h",
+          "US500-1h",
+          "USDCHF-1h",
+          "XAUUSD-1h"
+        ]
+      },
+      {
+        "feature": "harami_compression",
+        "n_cells": 16,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.02086423295507417,
+        "med_ci_low_1s": -0.04408885021458786,
+        "med_ci_hi_1s": 0.011130398024769061,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "harami_body_atr",
+        "n_cells": 16,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.06078416456559865,
+        "med_ci_low_1s": -0.07940753131486639,
+        "med_ci_hi_1s": -0.032983105100358456,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "entry_range_atr",
+        "n_cells": 16,
+        "n_candidate_cells": 1,
+        "share": 0.0625,
+        "median_effect": -0.04229039816619329,
+        "med_ci_low_1s": -0.051227510354946604,
+        "med_ci_hi_1s": -0.018724797544120042,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "XAUUSD-1h"
+        ]
+      },
+      {
+        "feature": "ma_sep_atr",
+        "n_cells": 16,
+        "n_candidate_cells": 3,
+        "share": 0.1875,
+        "median_effect": 0.19268340628544378,
+        "med_ci_low_1s": -0.01471782492047563,
+        "med_ci_hi_1s": 0.25887571186235303,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "BTCUSD-1h",
+          "JP225-1h",
+          "USTEC-1h"
+        ]
+      },
+      {
+        "feature": "ma_slope_atr",
+        "n_cells": 16,
+        "n_candidate_cells": 1,
+        "share": 0.0625,
+        "median_effect": -0.03655973825821246,
+        "med_ci_low_1s": -0.0832405706675286,
+        "med_ci_hi_1s": 0.04967407958863912,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "USTEC-1h"
+        ]
+      },
+      {
+        "feature": "polarity_agree_ha0",
+        "n_cells": 16,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.018160722389466442,
+        "med_ci_low_1s": -0.029108462043335854,
+        "med_ci_hi_1s": 0.003927093905654423,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "polarity_agree_ha1",
+        "n_cells": 16,
+        "n_candidate_cells": 0,
+        "share": 0.0,
+        "median_effect": -0.025827240659667468,
+        "med_ci_low_1s": -0.031724484541603364,
+        "med_ci_hi_1s": -0.01851305803440259,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": []
+      },
+      {
+        "feature": "rd_long",
+        "n_cells": 16,
+        "n_candidate_cells": 1,
+        "share": 0.0625,
+        "median_effect": -0.0760975373234814,
+        "med_ci_low_1s": -0.09402868396799403,
+        "med_ci_hi_1s": -0.023100858356137663,
+        "n_cells_eff": 16,
+        "is_uniform_lever": false,
+        "candidate_cells": [
+          "USTEC-1h"
+        ]
+      }
+    ]
+  },
+  "2h": {
+    "verdict": "INCONCLUSIVE_POWER",
+    "n_cells": 16,
+    "n_powered": 0,
+    "min_powered": 5,
+    "sep_rate": NaN,
+    "uniform_levers": [],
+    "per_feature": []
+  },
+  "4h": {
+    "verdict": "INCONCLUSIVE_POWER",
+    "n_cells": 15,
+    "n_powered": 0,
+    "min_powered": 5,
+    "sep_rate": NaN,
+    "uniform_levers": [],
+    "per_feature": []
+  }
+}

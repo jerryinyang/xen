@@ -1,0 +1,44 @@
+{
+  "experiment_id": "EXP-074",
+  "hypothesis": "HYP-027",
+  "family": "CF-HA-HARAMI-001",
+  "stratum": "TRAIN only [0, train_cutoff); TEST not re-read; holdout sealed",
+  "binding_object": "per-domain (5m/15m/30m/1h/2h/4h), dual-metric",
+  "continuity_cell": "GBPUSD-5m",
+  "material_bar": 0.15,
+  "substrate_share_min": 0.5,
+  "domain_separable_rate": 0.5,
+  "min_powered_per_domain": 5,
+  "n_boot": 10000,
+  "base_seed": 20260616,
+  "atr_pctile_window": 500,
+  "n_cells": 99,
+  "domain_verdicts": {
+    "5m": "NO_SEPARATOR",
+    "15m": "SEPARABLE_NO_UNIFORM_LEVER",
+    "30m": "SEPARABLE_NO_UNIFORM_LEVER",
+    "1h": "SEPARABLE_NO_UNIFORM_LEVER",
+    "2h": "INCONCLUSIVE_POWER",
+    "4h": "INCONCLUSIVE_POWER"
+  },
+  "domain_sep_rate": {
+    "5m": 0.35294117647058826,
+    "15m": 0.8823529411764706,
+    "30m": 0.7058823529411765,
+    "1h": 0.9375,
+    "2h": NaN,
+    "4h": NaN
+  },
+  "domain_uniform_levers": {
+    "5m": [],
+    "15m": [],
+    "30m": [],
+    "1h": [],
+    "2h": [],
+    "4h": []
+  },
+  "pooled_substrate_verdict_disclosed": "NO_SEPARATOR",
+  "pooled_n_powered_cells": 67,
+  "continuity_verdict": "NO_SEPARATOR",
+  "fence": "load_train_1m slices [0, train_cutoff) only; forward scans clip at TRAIN edge"
+}
