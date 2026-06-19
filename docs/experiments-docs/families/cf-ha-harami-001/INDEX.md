@@ -6,7 +6,7 @@
 > Family spec: [`../../../signal-registry/candidate-families/harami.md`](../../../signal-registry/candidate-families/harami.md).
 > Compact one-row registry of all experiments: [`python/experiments/INDEX.md`](../../../../python/experiments/INDEX.md).
 
-**Status:** OPEN — **FIRST CANDIDATE ACTIVE. Phase 016 ACTIVE — G0 PASS 2026-06-18** (candidate screening; opened 2026-06-18 by G-015 PROCEED_TO_SCREEN; governing design: [`../../checkpoints/2026-06-18-016-harami-candidate-screening/design.md`](../../checkpoints/2026-06-18-016-harami-candidate-screening/design.md)). Phase 016 slate: EXP-070 method calibration (TRAIN-only, EXP-027-analog) → EXP-071 one-shot TEST confirmation of the non-4h FX core (GBPUSD/NZDUSD/GBPJPY, excluding EURUSD) under `N-PARTIAL-V2A` → EXP-072 conditional cost-aware follow-up → G-016 terminal gate. 5m/15m/30m strata materialized in `test-read-ledger.md` 2026-06-18 (D0 requirement). **0 TEST reads spent** across all phases; holdouts sealed. **Phase 015 CLOSED at G-015 2026-06-18 — PROCEED_TO_SCREEN (native object); first candidate slot consumed.** The MA(20,50)-native conditioned harami (EXP-068) satisfies the full G-015 conjunction with both champion arms (`N-PARTIAL-V2A` bounded-downside lead, P4=PARTIAL_RECOVERY / `N-V2A×ADV-NONE` disclosed, P4=TAIL_DRIVEN); the negative mean is **not structural** (family not closed); the hybrid object is CHARACTERISED_NOT_VIABLE on the disclosed surface (judged individually, never pooled — strongest object governs, design §7). See [`G-015-gate-review.md`](../../checkpoints/2026-06-17-015-ma-substrate-conditioned-harami-full-surface/G-015-gate-review.md) and the Phase 015 [`retrospective.md`](../../checkpoints/2026-06-17-015-ma-substrate-conditioned-harami-full-surface/retrospective.md).
+**Status:** **CLOSED — Phase 016 CLOSED at G-016 2026-06-19 (CLOSE_FAMILY, operator-directed); CAND-001 retired** (see [`G-016-gate-review.md`](../../checkpoints/2026-06-18-016-harami-candidate-screening/G-016-gate-review.md) and the Phase 016 [`retrospective.md`](../../checkpoints/2026-06-18-016-harami-candidate-screening/retrospective.md)). The family carries a real MA-substrate median edge but no TEST-confirmable tradable edge — the binding raw-mean leg and the median edge share one unfilterable driver (entry exhaustion bimodality); the registered surface is exhausted (Phases 014–016). Reopenable only by a genuinely new lever off the exhausted surface (own scope/D0/G0). Holdout never touched; 6 EXP-071 counted TEST reads stand (each binding stratum 1/2); file-drawer retained. (candidate screening; opened 2026-06-18 by G-015 PROCEED_TO_SCREEN; governing design: [`../../checkpoints/2026-06-18-016-harami-candidate-screening/design.md`](../../checkpoints/2026-06-18-016-harami-candidate-screening/design.md)). Phase 016 slate: EXP-070 method calibration (TRAIN-only, EXP-027-analog; CALIBRATION_DELIVERED 2026-06-18) → **EXP-071 one-shot TEST confirmation (TEST_NOT_CONFIRMED 2026-06-19 — 0/6 cells clear; 4/6 median CI_low ≤ 0; 6 counted TEST reads spent)** → EXP-072/073 **not opened** (conditional on TEST_CONFIRMED) → **EXP-074/HYP-027** (TRAIN-only loss-tail diagnostic, 99-cell substrate; CHARACTERISATION_DELIVERED 2026-06-19 — H1 exhaustion magnitude separates the q05 tail near-universally but is gate-masked; CAND-001 path not closed; D0-amendment-005/006) → **EXP-075/HYP-028** (TRAIN-design exhaustion-cap; **FILTER_INEFFECTIVE 2026-06-19** — the cap is not a lever, M-GLOBAL +0 improved cells across the whole grid, M-PERCELL ceiling 30m +0.118<0.15; closes the exhaustion-cap route; D0-amendment-007) → **G-016 adjudicated 2026-06-19: CLOSE_FAMILY (operator-directed); family CLOSED, CAND-001 retired.** 5m/15m/30m strata materialized in `test-read-ledger.md` 2026-06-18 (D0 requirement); EXP-071 booked 6 counted reads (each binding stratum now 1/2). Holdouts sealed. **Phase 015 CLOSED at G-015 2026-06-18 — PROCEED_TO_SCREEN (native object); first candidate slot consumed.** The MA(20,50)-native conditioned harami (EXP-068) satisfies the full G-015 conjunction with both champion arms (`N-PARTIAL-V2A` bounded-downside lead, P4=PARTIAL_RECOVERY / `N-V2A×ADV-NONE` disclosed, P4=TAIL_DRIVEN); the negative mean is **not structural** (family not closed); the hybrid object is CHARACTERISED_NOT_VIABLE on the disclosed surface (judged individually, never pooled — strongest object governs, design §7). See [`G-015-gate-review.md`](../../checkpoints/2026-06-17-015-ma-substrate-conditioned-harami-full-surface/G-015-gate-review.md) and the Phase 015 [`retrospective.md`](../../checkpoints/2026-06-17-015-ma-substrate-conditioned-harami-full-surface/retrospective.md).
 
 **Status (Phase 014 origin):** OPEN — **Phase 014 CLOSED at G2 2026-06-17 (NO_PROCEED_TO_SCREEN; family carried OPEN); MA-substrate follow-up next.** Heiken Ashi harami at trend exhaustion, via the Phase 013 pre-committed routing on ANCHOR_MOVE_FLAT. 014-A validated primitives + the unconditioned object (G1 2026-06-15); 014-B measured the conditioned signal across the full barrier + position-management surface under a single terminal G2. **G2 outcome:** no combined definition clears P11 vs the P13 two-baseline conjunction on the registered ZigZag substrate (champion A3 0/99 vs MA(20,50)) → `CHARACTERISED_NOT_VIABLE on ZigZag as configured`; but EXP-060B's SUBSTRATE_LEAD_FOUND (harami beats own-substrate random 85/99 on the MA substrate) forbids a clean close → **family OPEN** on a real, median-only (mean≈0) MA-substrate edge. 0 candidate slots, 0 TEST reads spent in all of 014-B; holdouts sealed. Detection on HA candles; every outcome metric on real prices. Routing: a scoped MA-substrate follow-up (new phase, own D0/G0) — bounded-downside adverse geometry (1:1, `/ADV-EXTREME-rr1`), **mean** as a co-primary endpoint, confronting the 8/14-low-n-4h lead concentration. See [`G2-gate-review.md`](../../checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/G2-gate-review.md) and the Phase 014 [`retrospective.md`](../../checkpoints/2026-06-14-014-ha-harami-substrate-and-capture/retrospective.md).
 
@@ -38,6 +38,10 @@
 - **EXP-065** — MA(20,50)-Substrate Third-Barrier Geometry (Conditioned HA Harami; `/THIRD-TIME`, `/THIRD-EVENT` vs Benchmark Adaptive Cap; Dual Conditioning Object: Hybrid and Native, Phase 015 S2)
 - **EXP-066** — MA(20,50)-Substrate Position-Management Exits (Conditioned HA Harami; `/EXIT-PARTIAL`, `/EXIT-TRAIL-STRUCT`, individually and combined; Dual Conditioning Object: Hybrid and Native, Phase 015 S3)
 - **EXP-068** — MA(20,50)-Substrate Native Combined Champion (Conditioned HA Harami; N-BENCH, N-PARTIAL-V2A, N-V2A×ADV-NONE vs RM-native; Hybrid Disclosed; Phase 015 S4/native)
+- **EXP-070** — Event-Level Method Calibration (EXP-027-Analog, TRAIN-only; Phase 016 / HYP-023)
+- **EXP-071** — One-Shot TEST Confirmation of the Full G-015 Passing Cell Set (CAND-001 `N-PARTIAL-V2A`; Phase 016 / HYP-024)
+- **EXP-074** — TRAIN-Only Substrate-Wide Loser-Tail Characterization of the 99-Cell MA-Native `N-PARTIAL-V2A` Harami (Phase 016 / HYP-027)
+- **EXP-075** — TRAIN Design of an Exhaustion-Cap Entry Filter on the MA-Native `N-PARTIAL-V2A` Harami (Phase 016 / HYP-028)
 
 ---
 
@@ -1054,3 +1058,196 @@ Barrier construction is valid on 99/99 cells. The G1 capture-rate readout is uni
 - **The matched-random control is substrate-decisive.** The identical signal+geometry is entry-redundant on ZigZag (3/99) yet beats its matched-random broadly on MA (85/99). The trend-segmentation substrate, not the harami detector or the exit geometry, determines whether the signal expresses an edge — a first-class lesson for any future capture work in this family.
 - **Median and mean disagree by construction under no-stop geometry.** A capped-upside + uncapped-downside scheme can make the median look strong while the mean sits at zero; viability read on the median alone overstates tradeable expectancy. Reporting the mean alongside the median is necessary, not optional, for any ADV-NONE arm.
 - **COMBINED arms vs standalone PARTIAL**: The trailing adverse stop antagonises partial-leg favourable exits within the benchmark cap. The 1:1 fixed stop is the superior adverse-side treatment at this horizon.
+---
+
+## EXP-070 — Event-Level Method Calibration (EXP-027-Analog, TRAIN-only; Phase 016)
+
+**Status:** `CALIBRATION_DELIVERED` · Audit PASS · 2026-06-18 · HYP-023 · 0 slots / 0 TEST reads
+
+### Experiment context
+
+EXP-070 is the Phase 016 method-calibration step (EXP-027-analog, EXP-044-analog on the
+per-cell unit). It validates, for each of the six predeclared P5 TEST-family cells, that
+the frozen EXP-068 `N-PARTIAL-V2A` event-level inference machinery has controlled
+per-cell false-positive rate, finite CI recovery, and deterministic replay — using TRAIN
+rows only, before any TEST contact. This is a methodology/calibration experiment: it does
+not evaluate whether the candidate signal works; it validates that the inference method is
+calibrated at each cell's realized event count. Its output fixes the EXP-071 binding
+family and the per-cell calibrated margin (P9 condition 4) for the EXP-071 freeze file.
+
+### Scope
+
+- **Cells:** GBPUSD-5m, GBPUSD-1h, NZDUSD-1h, NZDUSD-2h, GBPJPY-30m, US2000-4h (ex-EURUSD).
+- **Signal:** MA(20,50)-native `/STRONG-STAT`-conditioned HA harami; `N-PARTIAL-V2A` arm.
+- **Data:** TRAIN only (first 49% per file). 0 TEST reads. 0 holdout contact.
+- **Binding null (post D0-amendment-004):** Null-A (matched-random placement) only.
+- **Advisory null:** Null-B (block-circular path rotation), reported for context.
+- **Binding FPR object (post D0-amendment-003):** full conjunction
+  `ci_low_1s>0 ∧ mean_ci_low_1s>0 ∧ beats_rm_low_1s>0`.
+- **Draws:** 1000 per (cell, null); N_BOOT = 10,000.
+
+### Results
+
+**All six cells: PASS. Experiment verdict: CALIBRATION_DELIVERED.**
+
+| Cell | Null-A conj FPR | MDE | Calibrated margin | Temporal flag |
+| --- | --- | --- | --- | --- |
+| GBPUSD-5m | 0.035 | 0.025 ATR | 0.0533 ATR | GROWING |
+| GBPUSD-1h | 0.014 | 0.025 ATR | 0.1263 ATR | DECAYING (severe) |
+| NZDUSD-1h | 0.031 | 0.025 ATR | 0.1496 ATR | DECAYING (mild) |
+| NZDUSD-2h | 0.031 | 0.025 ATR | 0.1678 ATR | STABLE |
+| GBPJPY-30m | 0.014 | 0.025 ATR | 0.0722 ATR | DECAYING (severe) |
+| US2000-4h | 0.018 | 0.025 ATR | 0.1614 ATR | STABLE |
+
+P12 reconciliation: exact (all abs-diffs = 0.0 — byte-identical reuse of EXP-068/061/066).
+Determinism: PASS (2-cell cross-process byte-identical replay). All 1000/1000 draws complete.
+
+**Null-B advisory context:** Null-B conjunction FPRs = 0.027 (5m, controlled) / 0.161–0.773
+(longer TFs, inflated). Inflation is a structural geometry artifact: STRONG-STAT conditioning
+creates a barrier-geometry advantage (larger m_sofar/fav_dist/adv) that block rotation cannot
+remove because the geometry is a property of the entry point, not the forward path. The bias is
+timeframe-graded and not a code error. Per D0-amendment-004, Null-B is advisory only.
+
+### Amendment history
+
+- **D0-amendment-003 (2026-06-18):** Binding FPR object corrected from median-leg to full
+  conjunction; Null-B `beats-RM` arm symmetrized. Re-run executed.
+- **D0-amendment-004 (2026-06-18):** Null-B demoted to advisory; Null-A sole binding null.
+  No re-run. All six cells pass under amended rule; verdict changes from METHOD_DEFECT to
+  CALIBRATION_DELIVERED.
+
+### Signal-registry disposition
+
+Registry: not applicable — calibration/methodology experiment. 0 candidate slots, 0 TEST reads.
+HYP-023 row annotated with D0-amendment-003 and D0-amendment-004. EXP-071 TEST read recorded
+when EXP-071 executes.
+
+### EXP-071 authorization
+
+EXP-070 clears the Phase 016 D0 P7/P8 pre-TEST gate. Binding TEST family = all six P5 cells.
+Calibrated margins and per-cell MDE context finalized in the EXP-071 freeze file.
+Temporal flags (GROWING×1, DECAYING×3, STABLE×2) disclosed for EXP-071 interpretation.
+EXP-071 is authorized to proceed.
+
+---
+
+## EXP-071 — One-Shot TEST Confirmation of the Full G-015 Passing Cell Set (Phase 016 / HYP-024)
+
+**Verdict:** `TEST_NOT_CONFIRMED` (Evidence AGAINST, this scope) · **2026-06-19** · gross only ·
+audit PASS (0C/1W/3I) · pre-gov APPROVE / post-gov APPROVE.
+
+**The harami family's first counted TEST contact.** The frozen, EXP-070-calibrated EXP-068
+`N-PARTIAL-V2A` / `N-V2A×ADV-NONE` / `N-BENCH` / `RM-native` machinery (reused unchanged in
+semantics) applied to the TEST stratum (next 21% per file, after the first-49% TRAIN slice) of the
+predeclared 6-cell binding family: **GBPUSD-5m, GBPUSD-1h, NZDUSD-1h, NZDUSD-2h, GBPJPY-30m,
+US2000-4h** (ex-EURUSD, TEST-capped instrument-wide). Freeze-before-TEST (`frozen_selection.json`,
+SHA `ca16bcd…`) written and hash-pinned before any TEST row loaded; holdout never materialized.
+
+**Result — 0/6 cells clear the composition conjunction** (median CI_low>0 Holm ∧ raw-mean
+CI_low>0 ∧ beats-RM CI_low>0 Holm ∧ median>EXP-070 margin); **4/6 cells median CI_low ≤ 0** →
+majority directional negative → D0 P9 mechanical verdict TEST_NOT_CONFIRMED (not INCONCLUSIVE).
+No cell passes all four legs:
+
+| Cell | n | median (CI_low) | raw-mean (CI_low) | median Holm | beats-RM Holm | flag |
+| --- | --- | --- | --- | --- | --- | --- |
+| GBPUSD-5m | 3843 | 0.761 (0.428) | 0.090 (−0.086) | ✓ | ✓ | GROWING · ▲yellow-flag |
+| GBPUSD-1h | 376 | 0.130 (−0.851) | −0.187 (−0.669) | ✗ | ✗ | DECAYING |
+| NZDUSD-1h | 287 | 0.597 (−0.056) | −0.100 (−0.656) | ✗ | ✗ | DECAYING |
+| NZDUSD-2h | 129 | 0.503 (−1.309) | −0.192 (−0.849) | ✗ | ✗ | STABLE |
+| GBPJPY-30m | 554 | 1.056 (≈0⁺) | 0.359 (0.063) | ✗ | ✗ | DECAYING |
+| US2000-4h | 75 | 0.932 (−1.132) | 0.010 (−0.788) | ✗ | ✗ | STABLE |
+
+The only two cells with any positive signal each fail a different leg: GBPUSD-5m (lone
+Holm-significant median + beats-RM, GROWING, high-n) fails raw-mean — the textbook
+PARTIAL_RECOVERY tail-drag (median+, beats-RM+, winsorm+ 0.163, raw-mean−), yellow-flagged;
+GBPJPY-30m (lone raw-mean-positive cell) fails both family-corrected Holm legs.
+
+**Portfolio composite** median CI strictly positive [0.496, 0.952] **but event-pooled and
+GBPUSD-5m-dominated (3843/5264 = 73%)** — a non-binding D0 P10 disclosure, NOT family breadth
+(audit WARNING-1). Part of the negative is power-limited (NZDUSD-1h CI_low −0.056; US2000-4h
+n=75), which does not change the predeclared verdict.
+
+**Integrity:** all 6 powered (≥30 events); P12 reconciliation exact (max_abs_diff 0.0 @1e-9);
+determinism PASS (full second pass byte-identical); real-price discipline clean.
+
+**Disposition:** CAND-001 **retired on this scope; family stays OPEN** (median tilt + GBPUSD-5m
+survivor argue against closure). **6 counted TEST reads** booked in `test-read-ledger.md` (each
+stratum now 1/2 lifetime); composite entered as a disclosure against all 6 strata. EXP-072/073
+not opened (conditional on confirm). **Routed to EXP-074 / HYP-027** — TRAIN-only diagnostic of
+the GBPUSD-5m large-loss tail (exhaustion-magnitude bound; harami-polarity↔reversal-direction
+agreement); no candidate slot, no TEST contact; Phase 016 `D0-amendment-005` required before
+execution. **G-016 desk adjudication pending.**
+
+Artifacts: [`python/experiments/EXP-071/`](../../../../python/experiments/EXP-071/) —
+`report.md`, `results.md`, `audit.md`, `governance/`, `results/`, `plots/` (5),
+`frozen_selection.json`.
+
+## EXP-074 — TRAIN-Only Substrate-Wide Loser-Tail Characterization of the 99-Cell MA-Native N-PARTIAL-V2A Harami (Phase 016 / HYP-027)
+
+**Status**: COMPLETED — CHARACTERISATION_DELIVERED (diagnostic; audit CONDITIONAL PASS, post-gov APPROVE)
+**Date**: 2026-06-19
+**Instruments**: all 17 (full 99-cell MA(20,50)-native substrate matrix)
+**Data Views / Feature Categories**: MA(20,50)-segment domain bars (5m/15m/30m/1h/2h/4h); HA candles for harami detection only; real-price `N-PARTIAL-V2A` returns; 14 causal entry-time features × 3 tail framings (T-A extreme q05 + sign; T-B mean-below-median; T-C continuous).
+
+### Hypothesis Tests
+
+1. **Primary (exploratory)**: On TRAIN, across the full 99-cell MA-native substrate, which causal entry-time features separate the large-loss tail of `N-PARTIAL-V2A` returns from the rest, and do any replicate across a material share of the substrate?
+   - **H1 (lead)** — the loss tail concentrates at *extreme* `m_sofar/atr_entry` (exhaustion-magnitude bound; substrate gates a lower bound but no upper cap).
+   - **H2 (lead)** — the loss tail concentrates where harami HA polarity (`HA0/HA1Direction`) disagrees with the MA-segment reversal direction `rd`.
+
+### Scope
+
+- **Instruments**: full 99-cell matrix (17 × 6 − 3 structurally excluded), TRAIN slice only; GBPUSD-5m a named continuity cell, not the binding object.
+- **Features**: 14 causal entry-time features (msofar_atr, ss_excess_ratio/diff, disp_mad_med, favdist_atr, move_age_bars, move_count_k, atr_pctile, harami_compression, harami_body_atr, entry_range_atr, ma_sep_atr, ma_slope_atr, polarity_agree_ha0/ha1, rd_long, session, day_of_week).
+- **Parameters**: all frozen from EXP-068/071; none tuned. Binding object = **per domain**, dual-metric.
+- **Exclusions**: no TEST read (0 counted), no holdout load, no parameter tuned, no filter committed, no new shared `xen/` module.
+- **Constraints**: real-price outcomes; all features ≤ entry-bar CloseTime; forward resolution clips at the TRAIN edge.
+
+### Results / Observations
+
+- **99/99 cells resolved**, 237,698 events, no empty cells; 67 powered (5m=17, 15m=17, 30m=17, 1h=16; 2h/4h=0).
+- **H1 `msofar_atr` on the extreme-tail framing (TA_q05)**: rank-biserial 0.68–0.80 (AUC ≈ 0.84–0.90), clears the 0.15 material bar in **100% of powered cells in every powered domain**; within-domain median effect 0.705 / 0.781 / 0.787 / 0.733 (5m/15m/30m/1h), min 0.60; bootstrap 1σ lower bounds 0.60–0.75. On TA_neg ≈ 0, TB_median ≈ 0 to −0.17, TC ≈ −0.07 to −0.22 (effect vanishes or sign-flips).
+- **Binding per-domain verdict**: 5m NO_SEPARATOR (sep_rate 0.35); 15m SEPARABLE_NO_UNIFORM_LEVER (0.88); 30m SEPARABLE_NO_UNIFORM_LEVER (0.71); 1h SEPARABLE_NO_UNIFORM_LEVER (0.94); 2h/4h INCONCLUSIVE_POWER (0 powered). **0 uniform levers in any domain.** Pooled (disclosed-only, non-binding): NO_SEPARATOR, 67/99 powered.
+- **H2** `polarity_agree_ha0/ha1` on TA_q05 over 67 powered cells: median effect ≈ −0.003/−0.004, 0% of cells clear 0.15, range [−0.07, +0.08].
+- **`favdist_atr` ≡ 0.5·`msofar_atr` exactly** (ratio 0.5, zero variance, all events; V2A geometry) → rank-identical to H1 in every cell; effective feature surface 13, not 14.
+- Integrity: deterministic (integer-only seeds); stat functions verified vs closed-form; real-price discipline clean; TRAIN/TEST/holdout fence intact. Audit 0C/2W/3I.
+
+> Note: No interpretation — preserves what the data shows.
+
+### Hypothesis-Specific Conclusion
+
+**H1 SUPPORTED on the extreme-tail (q05) framing; binding "uniform lever" verdict = No (location-monotone sense). H2 REFUTED.** `msofar_atr` is a strong, broad, replicated separator of the q05 loss tail (the tail that broke EXP-071's raw mean) but is disqualified as a "candidate separator" solely by the pre-registered all-framing sign-consistency gate, which is structurally blind to tail-shape effects. The binding verdict correctly answers its registered question ("is there a distribution-wide, location-monotone uniform lever?" = No) and **stands as written** — the gate is **not** retro-edited (goalpost-moving on a pre-registered criterion); resolution is framing + routing to EXP-075. CAND-001 path **not closed**.
+
+### Hypothesis-Agnostic Observations
+
+- **Gate-design lesson**: an all-framing consistency gate is the correct anti-p-hacking guard for *location* effects but is blind to *tail-shape* effects. Exhaustion makes outcomes bimodal (median-positive or q05-catastrophic), so the feature that explains why the mean dies is precisely the feature the gate rejects. Tail-targeted screens must pre-register the tail framing.
+- **Stratified vs pooled**: the pooled NO_SEPARATOR is a masking artifact (5m noise + underpowered 2h/4h + location-monotone gate); the stratified read (15m–1h separable core; 100% q05 H1 breadth even at 5m) is the correct lens.
+- **Binding obstacle is the tail, not the median** — and the tail has an identifiable, broad driver (entry exhaustion magnitude); the lever is a **cap** (upper bound on `m_sofar/atr`), not the existing lower-bound `/STRONG-STAT` gate.
+
+**Routing**: motivates **EXP-075 / HYP-028** — a TRAIN-only exhaustion-**cap** design, q05-tail-framing pre-registered for the H1 lead, band 15m–1h core (5m credible on the tail framing), drop `favdist_atr`, do not pursue H2; filter locked on TRAIN, holdout confirmation deferred to a separate future experiment. Requires `D0-amendment-007` before any code runs. 0 candidate slots, 0 TEST reads; holdout sealed.
+
+Artifacts: [`python/experiments/EXP-074/`](../../../../python/experiments/EXP-074/) — `report.md`, `results.md`, `audit.md`, `governance/`, `results/`, `plots/` (6).
+
+---
+
+## EXP-075 — TRAIN Design of an Exhaustion-Cap Entry Filter on the MA-Native N-PARTIAL-V2A Harami (Phase 016 / HYP-028)
+
+**Status**: COMPLETED 2026-06-19 — **FILTER_INEFFECTIVE** (audit CONDITIONAL PASS 0C/1W/2I; post-gov APPROVE). TRAIN-design-and-lock; 0 candidate slots, 0 counted TEST reads, holdout untouched.
+
+**Question**: does an entry-time **upper cap on exhaustion magnitude** (F1 `msofar_atr`; F2 `m_sofar/p75_thr` normalizer-robustness) materially improve the MA-native `N-PARTIAL-V2A` harami **per band-core domain (15m/30m/1h)** — lifting the raw-mean leg that failed EXP-071 while preserving median, beats-RM-native, and event count — and is any gain a deployable uniform rule (M-GLOBAL) or per-cell overfit (M-PERCELL)? Proceed authorized on EXP-074's framing-resolved q05-tail evidence (not a formal SEPARATOR_FOUND), tail framing pre-registered a priori (`D0-amendment-007`, operator-ratified).
+
+**Method**: frozen EXP-068/074 resolution (baseline `r_e` reconciled to EXP-074 at 1e-9); cap = causal entry-only boolean subset; pre-declared U-grid {p85,p90,p95}; joint four-leg `improved` criterion (raw-mean ∧ median ∧ beats-RM CI_low>0 ∧ retention≥0.70 ∧ ≥30); per-band-core-domain binding (5m + band-pooled disclosed-only); M-GLOBAL the only deployable arm, M-PERCELL diagnostic overfit ceiling.
+
+**Result — the exhaustion cap is NOT a lever.** M-GLOBAL adds **0 improved cells in every band-core domain** at the locked U *and across the entire grid* (`u_sensitivity` = 0 improved domains at p85/p90/p95, both forms). M-PERCELL (overfit ceiling) tops out at 30m **+0.118 < 0.15** uplift (15m −0.059, 1h 0.000) → **FILTER_INEFFECTIVE**. F2 disclosed: same verdict. Locked U F1=20.61 ATR (p95, tie→least-restrictive), F2=5.86.
+
+**Mechanism (EXP-074 bimodality, now shown economically)**: high `msofar_atr` entries are bimodal — an upper cap strips the big winners together with the catastrophic q05 losers (e.g. USTEC-1h mean +0.167 → −0.089 at retention 0.90), a net wash/negative on the joint criterion. The q05-tail separator EXP-074 identified is real but **not actionable as an entry cap**: the same feature marks the worst losers and the best winners. The joint four-leg criterion (vs a separation gate) was the correct instrument and caught exactly this.
+
+### Hypothesis-Agnostic Observations
+
+- **Disposition robust to the 0.15 bar**: 30m's M-PERCELL +0.118 would flip the *tier* to FILTER_OVERFIT at a 0.10 bar, but FILTER_INEFFECTIVE and FILTER_OVERFIT route **identically** — do not spend the holdout, route toward closing CAND-001. The 0.15 is a pre-registered, analogy-borrowed bar (EXP-074 material bar ↔ AUC 0.575), not calibrated; disclosed.
+- **Undefined-feature share ≡ 0.0** on the qual set (computed from EXP-074 parquets) → retention is a clean read of the cap, not feature-undefinedness.
+- **Binding obstacle is intrinsic entry bimodality, not a removable tail** — tail-trimming entry filters are off the menu for this family.
+
+**Routing**: closes the **exhaustion-cap route**. Combined with EXP-071 (TEST_NOT_CONFIRMED) and EXP-074 (tail driver identified but gate-masked), the three jointly argue the exhaustion-cap path is exhausted. The locked filter is frozen (`deployable=false`, sha256-pinned) but **non-confirmatory and carried nowhere — no holdout read warranted**. The CF-HA-HARAMI-001/CAND-001 family-closure decision (close vs route to a distinct non-exhaustion lever) is **G-016**'s.
+
+Artifacts: [`python/experiments/EXP-075/`](../../../../python/experiments/EXP-075/) — `report.md`, `results.md`, `audit.md`, `governance/`, `results/` (incl. `locked_filter.json`), `plots/` (6).

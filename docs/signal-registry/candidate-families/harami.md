@@ -1,10 +1,88 @@
 # Candidate Family: CF-HA-HARAMI-001 — Heiken Ashi Harami at Trend Exhaustion
 
-**Status:** `REGISTERED` / **OPEN — FIRST CANDIDATE ACTIVE** (2026-06-18, Phase 015 G-015 PROCEED).
-The MA(20,50)-native conditioned harami is the family's first registered candidate branch
-(`CF-HA-HARAMI-001/CAND-001`, first candidate slot consumed); it advances to candidate screening
-(event-level method calibration → one-shot TEST confirmation of the non-4h FX core). See the
-**Phase 015 G-015** disposition below.
+**Status:** `CLOSED` (2026-06-19, Phase 016 **G-016 → CLOSE_FAMILY**, operator-directed —
+`checkpoints/2026-06-18-016-harami-candidate-screening/G-016-gate-review.md`). CAND-001 retired. The
+MA(20,50)-native conditioned harami (`CF-HA-HARAMI-001/CAND-001`, first candidate slot consumed at
+G-015) was carried to its first counted TEST contact (EXP-071, did **not** confirm: 0/6 cells, 4/6
+median CI_low ≤ 0), held OPEN for a TRAIN-only exhaustion-cap follow-up, then **closed** when that
+follow-up was exhausted: EXP-074 located the loss-tail driver (entry exhaustion magnitude, q05 tail)
+and EXP-075 showed the exhaustion **cap is not a lever** (it strips winners with losers — intrinsic
+entry bimodality). The family carries a **real median edge** on the MA substrate but **no
+TEST-confirmable tradable edge**, because the binding raw-mean leg and the median edge share one
+unfilterable driver. The registered surface (entry conditioning, favourable/adverse/third-barrier
+geometry, position-management exits, exhaustion cap) is exhausted across Phases 014–016. **Reopenable
+only by a genuinely new lever not on the exhausted surface** (own scope/D0/G0); a new entry filter on
+the same surface or a re-run of a refuted variant does not qualify. All file-drawer items retained;
+holdout never touched (sealed); 6 EXP-071 counted TEST reads stand (each binding stratum 1/2).
+
+**Phase 016 prior status (superseded by closure):** `REGISTERED` / **OPEN** — CAND-001
+`SCREENED — TEST_NOT_CONFIRMED (this scope)` (2026-06-19, EXP-071). 0/6 cells clear the composition
+conjunction, 4/6 median CI_low ≤ 0 (majority directional negative). Six counted TEST reads consumed
+(each binding stratum 1/2 lifetime). Routed to
+**EXP-074 / HYP-027** (TRAIN-only loss-tail diagnostic; no slot, no TEST contact) — **COMPLETED
+2026-06-19, CHARACTERISATION_DELIVERED; CAND-001 path NOT closed** — then **EXP-075 / HYP-028**
+(TRAIN-design exhaustion-cap; no slot, no TEST contact) — **COMPLETED 2026-06-19, FILTER_INEFFECTIVE:
+the exhaustion cap is not a lever, closing that route.** G-016 adjudication pending. See the
+**Phase 016 EXP-075**, **EXP-074**, and **EXP-071** dispositions below and the **Phase 015 G-015**
+disposition.
+
+**Phase 016 EXP-075 (HYP-028, 2026-06-19) — FILTER_INEFFECTIVE (audit CONDITIONAL PASS 0C/1W/2I, post-gov APPROVE):**
+TRAIN-design-and-lock of an entry-time **upper cap on exhaustion magnitude** (F1 `msofar_atr`; F2
+`m_sofar/p75_thr` normalizer-robustness) × selection (M-GLOBAL deployable / M-PERCELL overfit ceiling),
+pre-declared grid {p85,p90,p95}, judged on the strategy's own legs (joint four-leg `improved`:
+raw-mean ∧ median ∧ beats-RM-native CI_low>0 ∧ retention ≥ 0.70). **The cap is not a lever.** M-GLOBAL
+adds **0 improved cells in every band-core domain** at the locked U *and across the entire grid*
+(`u_sensitivity` = 0 improved domains at p85/p90/p95, both forms); M-PERCELL (overfit ceiling) tops out
+at 30m **+0.118 < 0.15** uplift (15m −0.059, 1h 0.000) → FILTER_INEFFECTIVE. **Mechanism (EXP-074
+bimodality, shown economically):** high `msofar_atr` entries are bimodal — an upper cap strips the big
+winners together with the catastrophic q05 losers (e.g. USTEC-1h mean +0.167 → −0.089 at retention
+0.90), a net wash/negative; the q05-tail separator is real but **not actionable as an entry cap**.
+Disposition robust to the pre-registered 0.15 bar (flips to FILTER_OVERFIT at 0.10 but routes
+identically — do not spend the holdout). `undef_share ≡ 0` on the qual set (retention is a clean cap
+read). Baseline `r_e` reconciled to EXP-074 at 1e-9; 67 powered (= EXP-074). Locked filter frozen
+(`deployable=false`, sha256-pinned) but **non-confirmatory and carried nowhere**. **Closes the
+exhaustion-cap route; CF-HA-HARAMI-001 stays REGISTERED / OPEN; the family-closure decision (close vs
+route to a distinct non-exhaustion lever) is G-016's.** Authorized by `D0-amendment-007`. **0 candidate
+slots, 0 counted TEST reads; holdout untouched.**
+
+**Phase 016 EXP-074 (HYP-027, 2026-06-19) — CHARACTERISATION_DELIVERED (audit CONDITIONAL PASS, 0C/2W/3I):**
+TRAIN-only diagnostic of the EXP-071 loss tail, widened from the GBPUSD-5m yellow-flag cell to the
+**full 99-cell MA-native substrate** (`D0-amendment-006`). 99/99 cells resolved (237,698 events);
+67 powered (5m/15m/30m/1h = 17/17/17/16; 2h/4h = 0). **Headline — the binding per-domain verdict
+masks the real finding.** H1 exhaustion magnitude (`msofar_atr`) separates the **extreme q05 loss
+tail** with rank-biserial **0.68–0.80 (AUC ≈ 0.84–0.90)**, clearing the 0.15 material bar in **100%
+of powered cells in every powered domain** (median 0.70–0.79). But on TA_neg/TB_median/TC the effect
+collapses to ~0 or sign-flips, so the pre-registered **all-framing sign-consistency gate** (the
+anti-p-hacking guard, structurally **blind to tail-shape effects**) disqualifies it → 0 candidate
+cells, "no uniform lever" in every domain; disclosed pooled = NO_SEPARATOR. **Mechanism:** high
+exhaustion makes outcomes **bimodal** (work/median-positive or catastrophic/q05) — the exact
+bimodality that broke EXP-071's raw mean while median/winsorized passed. *The feature that explains
+why the mean dies is precisely the feature the consistency gate rejects.* Binding per-domain verdict:
+5m NO_SEPARATOR (sep_rate 0.35); 15m/30m/1h SEPARABLE_NO_UNIFORM_LEVER (0.88/0.71/0.94); 2h/4h
+INCONCLUSIVE_POWER. **H2 (polarity agreement) REFUTED** (median ≈ 0, 0% of cells clear the bar).
+`favdist_atr` ≡ 0.5·`msofar_atr` exactly (V2A geometry; effective feature surface 13, not 14).
+**Governance:** the binding verdict **stands as written** (it correctly answered "is there a
+distribution-wide, location-monotone uniform lever?" = No); the gate is **not** retro-edited
+(goalpost-moving on a pre-registered criterion) — resolution is **framing + routing**. **CAND-001
+path NOT closed; family stays OPEN.** Routes to **EXP-075 / HYP-028** — a TRAIN-only exhaustion-**cap**
+design (upper bound on `m_sofar/atr`; the substrate currently gates only the lower bound
+`m_sofar ≥ p75`), with the **q05 tail framing pre-registered** for the H1 lead, band 15m–1h core (5m
+credible on the tail framing), `favdist_atr` dropped, H2 not pursued; filter locked on TRAIN,
+holdout confirmation deferred to a separate future experiment (`D0-amendment-007` required before any
+code runs). **0 candidate slots, 0 TEST reads; holdout untouched.**
+
+**Phase 016 EXP-071 (HYP-024, 2026-06-19) — TEST_NOT_CONFIRMED (audit PASS, post-gov APPROVE):**
+First counted TEST read in the family. The frozen EXP-068 `N-PARTIAL-V2A` machinery (EXP-070-
+calibrated) applied to the TEST stratum of GBPUSD-5m, GBPUSD-1h, NZDUSD-1h, NZDUSD-2h, GBPJPY-30m,
+US2000-4h (ex-EURUSD). **0/6 cells** clear the full conjunction (median CI_low>0 Holm ∧ raw-mean
+CI_low>0 ∧ beats-RM CI_low>0 Holm ∧ median>EXP-070 margin); no cell passes all four legs. GBPUSD-5m
+is the lone Holm-significant median+beats-RM cell (GROWING, n=3843) but fails raw-mean
+(tail-dragged → yellow-flag, the PARTIAL_RECOVERY signature). GBPJPY-30m is the lone raw-mean-
+positive cell but fails both family-corrected Holm legs. 4/6 cells median CI_low ≤ 0 → D0 P9
+mechanical verdict TEST_NOT_CONFIRMED. The portfolio composite median CI is positive [0.496,0.952]
+but **event-pooled and GBPUSD-5m-dominated (73%)** — a non-binding disclosure, not breadth. All 6
+powered; P12 exact 0.0; determinism PASS; integrity all-pass. 6 counted TEST reads, 0 candidate
+slots added (CAND-001 already registered at G-015). EXP-072/073 not opened (conditional on confirm).
 
 **Status (origin):** `REGISTERED` — 2026-06-14 (Phase 014 G0 PASS). All promotion conditions
 met: (a) fixed first-branch primitives frozen as predeclared D0 defaults

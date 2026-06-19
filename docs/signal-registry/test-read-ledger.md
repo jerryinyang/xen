@@ -53,17 +53,22 @@ read).
 | BTCUSD-1h | 0 | open | pre-split; EXP-040 |
 | BTCUSD-2h | 0 | open | none |
 | BTCUSD-4h | 0 | open | pre-split; EXP-040 |
-| GBPUSD-{1h,2h,4h} | 0 | open | none |
+| GBPUSD-1h | **1 — EXP-071 (HYP-024, N-PARTIAL-V2A)** | open (1 remaining) | EXP-071 portfolio composite (disclosure) |
+| GBPUSD-{2h,4h} | 0 | open | none |
 | USDJPY-{1h,2h,4h} | 0 | open | none |
 | USDCHF-{1h,2h,4h} | 0 | open | none |
 | USDCAD-{1h,2h,4h} | 0 | open | none |
 | AUDUSD-{1h,2h,4h} | 0 | open | none |
-| NZDUSD-{1h,2h,4h} | 0 | open | none |
+| NZDUSD-1h | **1 — EXP-071 (HYP-024, N-PARTIAL-V2A)** | open (1 remaining) | EXP-071 portfolio composite (disclosure) |
+| NZDUSD-2h | **1 — EXP-071 (HYP-024, N-PARTIAL-V2A)** | open (1 remaining) | EXP-071 portfolio composite (disclosure) |
+| NZDUSD-4h | 0 | open | none |
 | EURJPY-{1h,2h,4h} | 0 | open | none |
 | GBPJPY-{1h,2h,4h} | 0 | open | none |
 | AUDJPY-{1h,2h,4h} | 0 | open | none |
 | US500-{1h,2h,4h} | 0 | open | none |
-| US2000-{1h,2h,4h} | 0 | open | none |
+| US2000-1h | 0 | open | none |
+| US2000-2h | 0 | open | none |
+| US2000-4h | **1 — EXP-071 (HYP-024, N-PARTIAL-V2A)** | open (1 remaining) | EXP-071 portfolio composite (disclosure) |
 | DE30-{1h,2h,4h} | 0 | open | none (truncated-coverage disclosure applies to any future entry) |
 | JP225-{1h,2h,4h} | 0 | open | none |
 
@@ -90,14 +95,16 @@ stratum-specific TEST confirmation even where the stratum shows 0 counted reads.
 | BTCUSD-5m | 0 | open | pre-split (EXP-021/022/028/029/030/031) |
 | BTCUSD-15m | 0 | open | none (first materialization) |
 | BTCUSD-30m | 0 | open | none (first materialization) |
-| GBPUSD-{5m,15m,30m} | 0 | open | none (first materialization) |
+| GBPUSD-5m | **1 — EXP-071 (HYP-024, N-PARTIAL-V2A)** | open (1 remaining) | EXP-071 portfolio composite (disclosure) |
+| GBPUSD-{15m,30m} | 0 | open | none (first materialization) |
 | USDJPY-{5m,15m,30m} | 0 | open | none (first materialization) |
 | USDCHF-{5m,15m,30m} | 0 | open | none (first materialization) |
 | USDCAD-{5m,15m,30m} | 0 | open | none (first materialization) |
 | AUDUSD-{5m,15m,30m} | 0 | open | none (first materialization) |
 | NZDUSD-{5m,15m,30m} | 0 | open | none (first materialization) |
 | EURJPY-{5m,15m,30m} | 0 | open | none (first materialization) |
-| GBPJPY-{5m,15m,30m} | 0 | open | none (first materialization) |
+| GBPJPY-30m | **1 — EXP-071 (HYP-024, N-PARTIAL-V2A)** | open (1 remaining) | EXP-071 portfolio composite (disclosure) |
+| GBPJPY-{5m,15m} | 0 | open | none (first materialization) |
 | AUDJPY-{5m,15m,30m} | 0 | open | none (first materialization) |
 | US500-{5m,15m,30m} | 0 | open | none (first materialization) |
 | US2000-{5m,15m,30m} | 0 | open | none (first materialization) |
@@ -112,6 +119,23 @@ Notes:
   EURUSD/USTEC/XAUUSD/BTCUSD) entered as disclosures only, not counted reads. 5m retired
   from primary AVWAP-family strategy use (Phase 010/011) but active in the harami family
   (VAL-004 admitted); these rows are open effective 2026-06-18.
+- **EXP-071 (2026-06-19, HYP-024) — first counted TEST reads in the harami family.** Six
+  counted reads, one per binding stratum (GBPUSD-5m, GBPUSD-1h, NZDUSD-1h, NZDUSD-2h,
+  GBPJPY-30m, US2000-4h); each stratum now at **1/2** lifetime counted reads, all still open.
+  Verdict TEST_NOT_CONFIRMED. The EXP-071 equal-weight **portfolio composite** is entered as a
+  **disclosure** against all 6 strata (per the portfolio-aggregate rule), not a counted read.
+  EURUSD strata were excluded (TEST-capped instrument-wide); they recorded no read.
+- **EXP-074 (2026-06-19, HYP-027) — TRAIN-only diagnostic, NO counted reads.** The
+  99-cell MA-native loss-tail characterization read the **TRAIN stratum only**
+  (`[0, train_cutoff)`); the next-21% TEST stratum and the final-30% holdout were never
+  sliced or materialized (forward resolution clips at the TRAIN edge). **0 counted TEST
+  reads spent; this ledger is unchanged by EXP-074.** No stratum tally moves.
+- **EXP-075 (2026-06-19, HYP-028) — TRAIN-only design, NO counted reads.** The exhaustion-cap
+  TRAIN-design-and-lock read the **TRAIN stratum only** (`[0, train_cutoff)`); the cap is an
+  entry-time boolean subset that only removes entries (never reaches forward), and the next-21% TEST
+  stratum + final-30% holdout were never sliced or materialized. Verdict FILTER_INEFFECTIVE; the
+  locked filter is frozen but NON-CONFIRMATORY and carried nowhere — no holdout read warranted.
+  **0 counted TEST reads spent; this ledger is unchanged by EXP-075.** No stratum tally moves.
 - **Holdout:** the global holdout (final 30% per instrument) is outside this
   ledger entirely — the single sanctioned holdout shot was SPENT (EXP-032,
   EURUSD-4h, HOLDOUT_INCONCLUSIVE); no holdout read exists for any package.
