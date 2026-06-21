@@ -142,6 +142,7 @@ research question or temporal semantics.
 | Edge cases | Are empty DataFrames, single-element arrays, division by zero handled? |
 | Separation of concerns | Are analysis functions (pure computation) separated from plotting and orchestration? |
 | No magic numbers | Are all thresholds derived from data or documented? |
+| Verdict representation (per-stratum) | Does the code emit the **binding** verdict **per stratum** (per domain/instrument/cell/n), **not** as a single collapsed cross-cell/cross-stratum PASS/FAIL? Any collapsed conjunction (`.all()` over cells) or pooled statistic presented as the verdict is a **disclosure only** and must be explicitly labelled non-binding unless cross-stratum homogeneity is itself demonstrated. (Precedent: EXP-076 audit C1 — a collapsed `overall_pass_literal` violated the per-stratum doctrine `cf-capgeo-001.md:137,204`.) |
 | Code quality | PEP 8, docstrings, descriptive names, ~30 line function limit? |
 | Data loading | Is Polars/Parquet used correctly? Are columns properly selected before `collect()`? |
 | Organization | Are imports, path setup, constants, I/O helpers, computation helpers, plotting helpers, orchestration, and `main()` clearly separated? |
@@ -210,7 +211,7 @@ One or more issues found. Specify:
 
 Allow up to 2 revision cycles.
 
-Issues that warrant REVISE include: an audit lacking verdict forensics or the per-stratum masking check; an audit that accepted a pooled/aggregated verdict without re-deriving it per stratum; a verdict-material finding documented but not fixed-and-rerun; and a binding gate threshold that is an unjustified magic constant (not calibrated, data-derived, or sensitivity-banded).
+Issues that warrant REVISE include: an audit lacking verdict forensics or the per-stratum masking check; an audit that accepted a pooled/aggregated verdict without re-deriving it per stratum; **code that emits the binding verdict as a single collapsed cross-cell/cross-stratum PASS/FAIL (a pooled conjunction or pooled statistic) rather than per stratum, absent a demonstrated cross-stratum homogeneity claim** (collapsed convenience flags are allowed only when explicitly labelled non-binding — EXP-076 audit C1 precedent); a verdict-material finding documented but not fixed-and-rerun; and a binding gate threshold that is an unjustified magic constant (not calibrated, data-derived, or sensitivity-banded).
 
 ### REJECT
 

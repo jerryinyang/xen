@@ -581,6 +581,88 @@ adjudication still pending — to ratify the readout, the event-pooled/GBPUSD-5m
 caveat, and the EXP-074/HYP-027 TRAIN-only diagnostic routing. EXP-072/073 not opened (each was
 conditional on TEST_CONFIRMED).
 
+## Phase 017 Batch (CF-CAPGEO-001 Qualifier & Protocol Validation — "validate the yardstick")
+
+**Opened:** 2026-06-20 (Phase 017 design; **G0 PENDING** — D0 ratification required before any
+result-producing code).
+**Governing design:** `docs/experiments-docs/checkpoints/2026-06-20-017-capgeo-qualifier-validation/design.md`
+**Purpose:** Before the new Expectancy-Robust qualifier (`ASS`) or the expanding-window walk-forward
+protocol (`WF-EXPANDING`) may adjudicate any CF-CAPGEO-001 candidate, validate them framework-style
+— mirroring the 001–003b "harden the yardstick before measuring any signal" era. This is
+**methodology validation, not candidate screening**: **0 candidate slots, 0 counted TEST reads**
+(synthetic substrates + current-data dogfood, TRAIN-only). Components registered in
+`components/global-techniques.md` (`ASS`, `WF-EXPANDING`).
+**Why now:** the deepest retrospective lesson is that expectancy is a smoothed mean, fragile to the
+bimodal/tail structure that killed both prior families (§4.2); a new qualifier must be trusted before
+it can bind a verdict (§5.1). Scoring posture is therefore **expectancy + median + tail diagnostic**,
+and the qualifier is binding **only** on G-017 PASS.
+
+### Component-validation ledger (no candidate slots)
+
+| ID | EXP-ID | Question | Slot | TEST | Status |
+| --- | --- | --- | --- | --- | --- |
+| `ASS/VAL-001` | EXP-076 | **Synthetic-substrate recovery:** does `ASS` recover known expectancy/median/tail to predeclared (fixture-calibrated) tolerance across unimodal, skewed, bimodal, and sparse/uneven synthetic signal types, and does shrinkage pull sparse types toward the pooled prior while leaving rich types alone? | 0 | 0 (synthetic) | **RECOVERY_VALIDATED_G017a (2026-06-20)** — recovery PASS all 198 (type,n) cells (expectancy+median, worst ratio 0.72<0.85); coverage in-band ∀ n≥30, only n=15 expectancy sub-band (disclosed sparse-stress diagnostic = intrinsic small-sample bootstrap floor of the mean, not a defect); shrinkage monotone + sparse-pull OK, sole literal breach the predeclared n=2000 rich-pull marginal (120/2120=0.0566). Two governance dispositions → G-017 (coverage n≥30 binding; downstream n<30 expectancy guard + EXP-077 small-n FPR stratum). Audit CONDITIONAL PASS (1C-resolved: verdict made per-stratum, no recompute). Item retained. |
+| `ASS/VAL-002` | EXP-077 | **Dogfood + calibration under `WF-EXPANDING`:** FPR control (≤0.05) on known-null synthetic populations, finite per-domain MDE, and reliability of `P(return>X)` — all measured **under the expanding-window walk-forward protocol**, with the per-fold counted-read accounting against the 2-read cap validated. Current-data dogfood is TRAIN-only. | 0 | 0 (TRAIN-only) | **VALIDATED_WITH_GUARDS (per-stratum, 2026-06-20)** — error-control + protocol legs validated under `WF-EXPANDING`. **MDE finite ∀ n≥30; counted-read accounting 8/8 (cap honored); dogfood 12/12 cells (fence held, 0 reads); determinism+anchor PASS.** `verdict.json` leg flags FPR=FAIL/reliability=FAIL are faithful to the frozen D0 gates but NOT whole-qualifier failures (audit re-derived all numbers, PASS 0C/1W/3I): **FPR-U0** binding crossings (n=120/1000/2000, 0.051–0.052) are MC noise around a margin calibrated TO 0.05 (binomial P(≥edges\|p=0.05)=0.36–0.43; all binding cells Wilson-hi≤0.075); **FPR-B_zero** mild inflation n=30/60 (0.059) decays to ~0 by n≥120 — the EXP-076 small/mid-n bimodal under-coverage → **Guard (i): defer expectancy edge-calls to median at effective-n≤60** on bimodal/asymmetric mean-null strata. **Reliability** holds X=0/0.05/1.0; X=2.0 fails the slope sub-gate ONLY (0.652) while max-gap=0.017 & corr=0.934 → **Guard (ii): D2.4 slope sub-gate inapplicable at compressed predicted-P range (bind on max-gap)**; D2.4 gate NOT retro-edited. No PROTOCOL_DEFECT. Two guards are disclosures to terminal G-017 (decided after EXP-078), not acted on in Phase 017. Item retained. |
+| `ASS/VAL-003` | EXP-078 | **Shape discrimination:** does the tail/bimodality diagnostic actually flag bimodal vs unimodal populations (directly closing the EXP-074 "guard blind to tail-shape" gap), and how sensitive is `ASS` to its one tunable knob `k` (shrinkage constant)? | 0 | 0 (synthetic) | **SHAPE_DISCRIMINATION_FAIL + k_FRAGILE → DISCOVERY_ONLY input (per-stratum, 2026-06-21)** — binding double-FAIL. **Shape FAIL both legs:** U false-flag fails the n=30 binding floor (0.135–0.152; passes ≤0.046 n≥60); B detection is a **2-way shape split** (pooled FAIL masks it) — strongly-separated bimodals detect (`B_strong` \|g\|=0.60 dip-bimodal PASS; `B_neg` \|g\|=0.50 0.76@n30→1.0) but the **subtle median-positive minority-catastrophe shape `B_zero` (\|g\|=0.25) / `B_pos` (\|g\|=0.067) — the CF-HA-HARAMI-001 failure shape — is structurally undetectable and decays to 0 with n** (both legs blind: true \|g\|<τ_gap=0.30 AND not dip-bimodal, dip_p≈0.99). **`k`-sensitivity ROUTING_FLIP:** K1 shrinkage INVARIANT; K2 shrunk-expectancy null edge-call FPR k-fragile — flips CONTROLLED→INFLATED at the 2× multiplier k=240 (shrinkage pulls the null toward the positive SP prior pool_mean=+0.518 vs a margin frozen at k=120). Determinism byte-identical (**NOT PROTOCOL_DEFECT**); integrity anchors diff 0.0 to EXP-076/077; mad_zero=0; diptest 0.11.0. Audit **PASS-trust (0C/2W/4I)** — double-FAIL independently reproduced (mixture means to 1e-4, U0 false-flag exactly, sub-0.30 true gaps, K2 shrink-toward-prior mechanism) → **implementation-faithful, no fix-and-rerun**; W1 K2 deployed-k labels self-calibration noise (read across-k fragility), W2 CI-coverage k-leg not swept (2/3 dispositions) — both non-material. **`ASS` shape leg only PARTIALLY closes the EXP-074 gap.** Item retained (methodology-validation negative; file-drawer record). |
+
+`EXP-079` reserved (inactive) for a dedicated `WF-EXPANDING` isolation read should EXP-077's dogfood
+show the protocol needs to be validated apart from the qualifier. Threshold/tolerance constants are
+**calibrated via a fixture/bite check** (retrospective §5.3), not hand-set.
+
+### Gate
+
+**G-017** (terminal, after EXP-076/077/078): **`ASS_VALIDATED`** (recovery within tolerance ∧ FPR
+controlled + finite MDE + reliable `P(return>X)` under `WF-EXPANDING` ∧ shape diagnostic
+discriminates) → `ASS` is **binding-eligible** for CF-CAPGEO-001 (Phase 018). Else **`DISCOVERY_ONLY`**
+→ `ASS` non-binding; the frozen referee suite remains the binding gate. Nothing in Phase 018 spends a
+counted read on `ASS`-based adjudication until G-017 PASS.
+
+**G-017 ADJUDICATED 2026-06-21 — `DISCOVERY_ONLY`** (`G-017-gate-review.md`; predeclared D5 mechanical
+routing). Phase 017 slate complete: EXP-076 RECOVERY_VALIDATED_G017a ✓; EXP-077 VALIDATED_WITH_GUARDS
+(two bounded per-stratum guards) ✓; **EXP-078 SHAPE_DISCRIMINATION_FAIL + k_FRAGILE ✗.** Six of eight
+`ASS_VALIDATED` legs hold; the two EXP-078 legs FAIL (shape diagnostic structurally blind to the subtle
+median-positive minority-catastrophe shape; shrunk edge-call FPR `k`-fragile), so the conjunction cannot
+hold → **`ASS` non-binding (discovery use only); the frozen referee suite remains the binding gate for
+Phase 018.** No `PROTOCOL_DEFECT` (determinism held byte-identically; accounting cap honored 8/8).
+**Carried forward:** the EXP-077 guards (defer-to-median at effective-n≤60 on bimodal mean-null strata;
+bind reliability on max-gap at compressed predicted-P) and the EXP-078 limitations (subtle-bimodal blind
+spot; clean-unimodal false-flag needs n≥60; `k`-fragile edge-call FPR), plus the gate's external-validity
+bound (binding legs are i.i.d.-synthetic; moving-block CI coverage on dependent real data is unvalidated)
+and re-validation conditions C1–C4 (gate §10). 0 candidate slots, 0 counted TEST reads; ledger unchanged.
+
+## Phase 018 Batch (CF-CAPGEO-001: Data-Derived Exit / Capture Geometry) — GATED
+
+**Registered:** 2026-06-20 (family `REGISTERED`, SCREENING-GATED).
+**Opens only when:** INFR-003 complete (5-year data + holdout re-seal + VAL-005 PASS). **G-017 resolved
+2026-06-21 — `DISCOVERY_ONLY`:** the binding qualifier is therefore the **frozen referee suite**, with
+`ASS` admitted as a non-binding discovery overlay (not `ASS_VALIDATED`). Phase 018 opens once INFR-003
++ VAL-005 land, with its own D0/G0 carrying the Phase-017 guards, the §7.1 bracket re-confirmation, and
+the separability gate.
+**Governing design:** Phase 018 design (created when the batch opens; not yet written).
+**Candidate family:** `CF-CAPGEO-001` — data-derived exit / capture geometry on four frozen entry
+substrates. Family spec: `candidate-families/cf-capgeo-001.md`.
+
+### Predeclared surface (countable items — entered now per the file-drawer rule)
+
+| Field | Predeclared value |
+| --- | --- |
+| Candidate-family count | 1 (`CF-CAPGEO-001`) |
+| Entry substrates (frozen, never tuned) | `SUB-AVWAP`, `SUB-HARAMI-PARTIAL-V2A`, `SUB-HARAMI-V2A-ADVNONE`, `SUB-RANDOM` (matched-control) |
+| Domains | 15m, 1h, 4h |
+| Instruments | all 17 VAL-003-admitted (5-year, post-INFR-003) |
+| Open axis | exit / capture geometry + sizing only |
+| Registered exit/sizing branches | `/EXIT-DERIVED`, `/EXIT-RR`, `/EXIT-TRAIL`, `/EXIT-VP`, `/EXIT-PARTIAL`, `/SIZE-VOLADJ` (`/MTF`, `/VOLREGIME` deferred) |
+| Binding qualifier | **frozen referee suite** (G-017 resolved `DISCOVERY_ONLY` 2026-06-21); `ASS` is a non-binding discovery overlay |
+| Co-primary endpoint | expectancy + median + tail diagnostic (real prices) |
+| Binding pre-TEST gate | **separability check** (binding net-expectancy leg and favourable signal not driven by one unfilterable mechanism — retrospective §4.1) |
+| Protocol | `WF-EXPANDING` (counted-read accounting honors the 2-read cap; holdout never a fold) |
+| Candidate slots | reserved; consumed only per derived/benchmark exit variant at the Phase 018 screening gate |
+| TEST reads | 0 spent at registration; counted reads only at the Phase 018 screening gate, on the new 5-year strata, after the separability gate |
+
+No candidate slot is consumed by registration. Each derived or benchmark exit variant carried to a
+binding read is a countable item registered at the Phase 018 D0 with its own EXP-ID. Refuted,
+blocked, and inconclusive variants remain in the file-drawer ledger — never deleted or reused.
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:

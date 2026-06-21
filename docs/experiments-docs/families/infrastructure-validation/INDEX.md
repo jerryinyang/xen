@@ -11,6 +11,7 @@
 
 - **VAL-001** — Data Architecture Temporal Integrity Validation
 - **VAL-004** — 15m/30m Domain Temporal-Integrity Validation (Phase 014 Gate)
+- **VAL-005** — *(PENDING)* 5-Year 1-Minute Dataset Validation (INFR-003 gate): temporal integrity (VAL-001 suite) + admission/negative controls (VAL-003) + coverage + holdout seal + determinism, on the re-collected 5-year dataset. Scoped 2026-06-20; gates Phase 018 (CF-CAPGEO-001). Design: [`../../checkpoints/2026-06-20-INFR-003-five-year-data-upgrade/design.md`](../../checkpoints/2026-06-20-INFR-003-five-year-data-upgrade/design.md).
 
 ---
 

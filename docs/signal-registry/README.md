@@ -66,8 +66,13 @@ Each file in `candidate-families/` must define:
 
 ## Current Registered Batch
 
-Phase 004 Batch A registers one candidate family:
+Registered candidate families (full per-phase batches in `multiplicity-registry.md`):
 
-- `CF-AVWAP-001` - Anchored VWAP on regime pivots.
+- `CF-AVWAP-001` — Anchored VWAP on regime pivots. **CLOSED** (Phase 013, ANCHOR_MOVE_FLAT).
+- `CF-HA-HARAMI-001` — HA harami at trend exhaustion. **CLOSED** (Phase 016, CLOSE_FAMILY).
+- `CF-CAPGEO-001` — Data-derived exit / capture geometry on frozen entries. **REGISTERED —
+  SCREENING-GATED** (2026-06-20); screening admissible only after **G-017 `ASS_VALIDATED`**
+  (Phase 017 qualifier/protocol validation) **and** **INFR-003** (5-year data + holdout re-seal).
+  See `candidate-families/cf-capgeo-001.md` and the Phase 017/018 batches.
 
-The active batch is documented in `multiplicity-registry.md`.
+The active batch and gating preconditions are documented in `multiplicity-registry.md`.

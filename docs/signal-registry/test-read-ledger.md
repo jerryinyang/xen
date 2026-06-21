@@ -136,6 +136,13 @@ Notes:
   stratum + final-30% holdout were never sliced or materialized. Verdict FILTER_INEFFECTIVE; the
   locked filter is frozen but NON-CONFIRMATORY and carried nowhere — no holdout read warranted.
   **0 counted TEST reads spent; this ledger is unchanged by EXP-075.** No stratum tally moves.
+- **EXP-077 (2026-06-20, `ASS/VAL-002`, Phase 017) — methodology validation, NO counted reads.** The
+  binding FPR/MDE/reliability/accounting legs ran on **synthetic** populations (no market data); the
+  real-bar dogfood read the **first-49% TRAIN region only** (`train_cutoff = int(int(total·0.7)·0.7)`,
+  read fraction 0.4900, asserted in code), so the next-21% TEST stratum and the final-30% holdout were
+  never sliced or materialized. The `WF-EXPANDING` per-fold counted-read accounting **rule** was
+  validated as a function (cap honored, 8/8 scenarios) but **not exercised against any live stratum**.
+  **0 counted TEST reads spent; this ledger is unchanged by EXP-077.** No stratum tally moves.
 - **Holdout:** the global holdout (final 30% per instrument) is outside this
   ledger entirely — the single sanctioned holdout shot was SPENT (EXP-032,
   EURUSD-4h, HOLDOUT_INCONCLUSIVE); no holdout read exists for any package.
