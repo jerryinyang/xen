@@ -1,0 +1,238 @@
+{
+  "scale": "FROZEN (G-017 legs)",
+  "doctrine": "PER-STRATUM adjudication (cf-capgeo-001.md:137,204; D0 \u00a7D1/\u00a7D4; LESSON-001). Each leg below carries its own per-stratum verdict; FPR per (type,N,read), MDE per N, reliability per X, accounting per scenario, dogfood per cell. No collapsed cross-leg verdict is binding.",
+  "strata": {
+    "fpr": {
+      "verdict": "FAIL",
+      "binding": true,
+      "n_binding_cells": 16,
+      "binding_fail_cells": [
+        {
+          "stratum": "U0",
+          "n": 120,
+          "read": "wf",
+          "fpr": 0.0515,
+          "wilson_hi": 0.062074871360945055
+        },
+        {
+          "stratum": "U0",
+          "n": 1000,
+          "read": "wf",
+          "fpr": 0.051,
+          "wilson_hi": 0.06153153854124964
+        },
+        {
+          "stratum": "U0",
+          "n": 2000,
+          "read": "wf",
+          "fpr": 0.052,
+          "wilson_hi": 0.06261795415444468
+        },
+        {
+          "stratum": "B_zero",
+          "n": 30,
+          "read": "wf",
+          "fpr": 0.059,
+          "wilson_hi": 0.070196614851898
+        },
+        {
+          "stratum": "B_zero",
+          "n": 60,
+          "read": "wf",
+          "fpr": 0.059,
+          "wilson_hi": 0.070196614851898
+        }
+      ],
+      "small_n_stratum": [
+        {
+          "stratum": "U0",
+          "n": 15,
+          "read": "wf",
+          "fpr": 0.046,
+          "wilson_hi": 0.05608365557206656,
+          "pass": true
+        },
+        {
+          "stratum": "U0",
+          "n": 15,
+          "read": "single_window",
+          "fpr": 0.0535,
+          "wilson_hi": 0.06424573568564287,
+          "pass": false
+        },
+        {
+          "stratum": "U0",
+          "n": 30,
+          "read": "wf",
+          "fpr": 0.044,
+          "wilson_hi": 0.05389652670408614,
+          "pass": true
+        },
+        {
+          "stratum": "U0",
+          "n": 30,
+          "read": "single_window",
+          "fpr": 0.045,
+          "wilson_hi": 0.05499069598122689,
+          "pass": true
+        },
+        {
+          "stratum": "B_zero",
+          "n": 15,
+          "read": "wf",
+          "fpr": 0.0555,
+          "wilson_hi": 0.06641280644618483,
+          "pass": false
+        },
+        {
+          "stratum": "B_zero",
+          "n": 15,
+          "read": "single_window",
+          "fpr": 0.0585,
+          "wilson_hi": 0.06965671118313761,
+          "pass": false
+        },
+        {
+          "stratum": "B_zero",
+          "n": 30,
+          "read": "wf",
+          "fpr": 0.059,
+          "wilson_hi": 0.070196614851898,
+          "pass": false
+        },
+        {
+          "stratum": "B_zero",
+          "n": 30,
+          "read": "single_window",
+          "fpr": 0.071,
+          "wilson_hi": 0.08309729178558818,
+          "pass": false
+        }
+      ],
+      "note": "ci_low_1s > m (m calibrated on TAG_CAL nulls; FPR on independent TAG_VAL)"
+    },
+    "mde": {
+      "verdict": "PASS",
+      "binding": true,
+      "degenerate_binding_cells": [],
+      "mde_by_n": [
+        {
+          "n": 30,
+          "mde": 0.6441908713692946,
+          "finite": true,
+          "binding": true
+        },
+        {
+          "n": 60,
+          "mde": 0.4593406593406594,
+          "finite": true,
+          "binding": true
+        },
+        {
+          "n": 120,
+          "mde": 0.3244648318042814,
+          "finite": true,
+          "binding": true
+        },
+        {
+          "n": 250,
+          "mde": 0.2303370786516854,
+          "finite": true,
+          "binding": true
+        },
+        {
+          "n": 500,
+          "mde": 0.17083333333333334,
+          "finite": true,
+          "binding": true
+        },
+        {
+          "n": 1000,
+          "mde": 0.13265306122448983,
+          "finite": true,
+          "binding": true
+        },
+        {
+          "n": 2000,
+          "mde": 0.08480176211453747,
+          "finite": true,
+          "binding": true
+        },
+        {
+          "n": 8000,
+          "mde": 0.05,
+          "finite": true,
+          "binding": true
+        }
+      ],
+      "note": "MDE(N)=smallest mu with TPR(CI_low>0)>=0.80; gate=finiteness for N>=30"
+    },
+    "reliability": {
+      "verdict": "FAIL",
+      "binding": true,
+      "by_X": [
+        {
+          "X": 0.0,
+          "max_gap": 0.02855853309980838,
+          "slope": 0.9231018886302977,
+          "n_deciles": 10,
+          "pass": true
+        },
+        {
+          "X": 0.05,
+          "max_gap": 0.02505398606865128,
+          "slope": 0.9262843244024387,
+          "n_deciles": 10,
+          "pass": true
+        },
+        {
+          "X": 1.0,
+          "max_gap": 0.016944367983026398,
+          "slope": 0.9495007530527867,
+          "n_deciles": 10,
+          "pass": true
+        },
+        {
+          "X": 2.0,
+          "max_gap": 0.016798204885131666,
+          "slope": 0.6522458078023622,
+          "n_deciles": 6,
+          "pass": false
+        }
+      ],
+      "note": "per X: max|pred-realized|<=0.10 AND slope in [0.85,1.15]"
+    },
+    "accounting": {
+      "verdict": "PASS",
+      "binding": true,
+      "n_scenarios": 8,
+      "failing_scenarios": [],
+      "note": "D4.1: one frozen WF run=+1 counted read; cap honored; folds=disclosures"
+    },
+    "dogfood": {
+      "verdict": "PASS",
+      "binding": true,
+      "n_cells": 12,
+      "counted_reads_total": 0,
+      "cutoff_assert_all_ok": true,
+      "incomplete_or_fence_cells": [],
+      "nonfinite_cells": [],
+      "note": "TRAIN-only (first 49%); TEST + holdout never sliced; 0 counted reads"
+    }
+  },
+  "integrity": {
+    "anchor_pass": true,
+    "determinism": {
+      "reliability_match": true,
+      "reliability_decile_match": true,
+      "accounting_match": true,
+      "fpr_probe_match": true,
+      "mde_probe_match": true
+    }
+  },
+  "feeds_g017": "EXP-077 reports which ASS_VALIDATED legs hold; G-017 adjudicated after EXP-078. PROTOCOL_DEFECT if accounting fails or determinism breaks.",
+  "collapsed_convenience_flag": {
+    "value": false,
+    "caveat": "NON-BINDING. Collapsed cross-leg AND retained for convenience only; NOT the verdict. The per-stratum leg verdicts above are binding (LESSON-001)."
+  }
+}

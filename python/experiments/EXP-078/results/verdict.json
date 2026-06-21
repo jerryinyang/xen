@@ -1,0 +1,445 @@
+{
+  "scale": "FROZEN (G-017 binding)",
+  "doctrine": "PER-STRATUM adjudication (LESSON-001; D0 \u00a78; cf-capgeo-001.md:137). Shape (U false-flag / B detection per n) and k-sensitivity routing each carry a verdict. No collapsed cross-cell boolean is binding; no homogeneity.",
+  "strata": {
+    "shape_discrimination": {
+      "u_false_flag": {
+        "verdict": "FAIL",
+        "rule": "flag_rate <= 0.05 AND wilson_hi <= 0.075 on every U, n>=30",
+        "n_binding_cells": 32,
+        "worst_flag_rate": 0.152,
+        "failing_cells": [
+          {
+            "type": "U0",
+            "n": 30,
+            "flag_rate": 0.146,
+            "wilson_hi": 0.1621539592357047
+          },
+          {
+            "type": "U1",
+            "n": 30,
+            "flag_rate": 0.1355,
+            "wilson_hi": 0.1512004539727906
+          },
+          {
+            "type": "U2",
+            "n": 30,
+            "flag_rate": 0.152,
+            "wilson_hi": 0.1684006886976307
+          },
+          {
+            "type": "U3",
+            "n": 30,
+            "flag_rate": 0.147,
+            "wilson_hi": 0.16319568745234855
+          }
+        ]
+      },
+      "b_detection": {
+        "verdict": "FAIL",
+        "rule": "flag_rate >= 0.8 on every B, n>=30",
+        "n_binding_cells": 32,
+        "worst_detection": 0.0,
+        "failing_cells": [
+          {
+            "type": "B_neg",
+            "n": 30,
+            "flag_rate": 0.7595,
+            "wilson_lo": 0.7402831550529574
+          },
+          {
+            "type": "B_zero",
+            "n": 30,
+            "flag_rate": 0.4145,
+            "wilson_lo": 0.39309368290050967
+          },
+          {
+            "type": "B_zero",
+            "n": 60,
+            "flag_rate": 0.3825,
+            "wilson_lo": 0.3614450903394054
+          },
+          {
+            "type": "B_zero",
+            "n": 120,
+            "flag_rate": 0.3315,
+            "wilson_lo": 0.31120902532523526
+          },
+          {
+            "type": "B_zero",
+            "n": 250,
+            "flag_rate": 0.259,
+            "wilson_lo": 0.24027526169484267
+          },
+          {
+            "type": "B_zero",
+            "n": 500,
+            "flag_rate": 0.192,
+            "wilson_lo": 0.17533496798776405
+          },
+          {
+            "type": "B_zero",
+            "n": 1000,
+            "flag_rate": 0.1195,
+            "wilson_lo": 0.1060082089322041
+          },
+          {
+            "type": "B_zero",
+            "n": 2000,
+            "flag_rate": 0.056,
+            "wilson_lo": 0.04674833393876454
+          },
+          {
+            "type": "B_zero",
+            "n": 8000,
+            "flag_rate": 0.0,
+            "wilson_lo": 1.0842021724855044e-19
+          },
+          {
+            "type": "B_pos",
+            "n": 30,
+            "flag_rate": 0.1885,
+            "wilson_lo": 0.17196231241451954
+          },
+          {
+            "type": "B_pos",
+            "n": 60,
+            "flag_rate": 0.084,
+            "wilson_lo": 0.0726261614635203
+          },
+          {
+            "type": "B_pos",
+            "n": 120,
+            "flag_rate": 0.026,
+            "wilson_lo": 0.019882087677964753
+          },
+          {
+            "type": "B_pos",
+            "n": 250,
+            "flag_rate": 0.002,
+            "wilson_lo": 0.0007780273070510575
+          },
+          {
+            "type": "B_pos",
+            "n": 500,
+            "flag_rate": 0.0,
+            "wilson_lo": 1.0842021724855044e-19
+          },
+          {
+            "type": "B_pos",
+            "n": 1000,
+            "flag_rate": 0.0,
+            "wilson_lo": 1.0842021724855044e-19
+          },
+          {
+            "type": "B_pos",
+            "n": 2000,
+            "flag_rate": 0.0,
+            "wilson_lo": 1.0842021724855044e-19
+          },
+          {
+            "type": "B_pos",
+            "n": 8000,
+            "flag_rate": 0.0,
+            "wilson_lo": 1.0842021724855044e-19
+          }
+        ]
+      },
+      "binding": true,
+      "n_lt_30_disclosed": [
+        {
+          "type": "U0",
+          "n": 15,
+          "flag_rate": 0.3355
+        },
+        {
+          "type": "U1",
+          "n": 15,
+          "flag_rate": 0.315
+        },
+        {
+          "type": "U2",
+          "n": 15,
+          "flag_rate": 0.3235
+        },
+        {
+          "type": "U3",
+          "n": 15,
+          "flag_rate": 0.334
+        },
+        {
+          "type": "Splus",
+          "n": 15,
+          "flag_rate": 0.444
+        },
+        {
+          "type": "Sminus",
+          "n": 15,
+          "flag_rate": 0.469
+        },
+        {
+          "type": "Sminus0",
+          "n": 15,
+          "flag_rate": 0.4525
+        },
+        {
+          "type": "B_neg",
+          "n": 15,
+          "flag_rate": 0.67
+        },
+        {
+          "type": "B_zero",
+          "n": 15,
+          "flag_rate": 0.4955
+        },
+        {
+          "type": "B_pos",
+          "n": 15,
+          "flag_rate": 0.363
+        },
+        {
+          "type": "B_strong",
+          "n": 15,
+          "flag_rate": 0.7785
+        }
+      ]
+    },
+    "k_sensitivity": {
+      "binding": true,
+      "k_grid": [
+        30.0,
+        60.0,
+        120.0,
+        240.0,
+        500.0
+      ],
+      "k_default": 120.0,
+      "K1_shrinkage": {
+        "verdict": "INVARIANT",
+        "labels_by_k": {
+          "30.0": "SHRINK_OK",
+          "60.0": "SHRINK_OK",
+          "120.0": "SHRINK_OK",
+          "240.0": "SHRINK_OK",
+          "500.0": "SHRINK_OK"
+        },
+        "deployed_k_label": "SHRINK_OK",
+        "flip_ks": [],
+        "abs_delta_driver": 0.44339622641509435,
+        "rich_pull_disclosed": {
+          "note": "rich-stability pull (n>=2000) grows with k BY CONSTRUCTION \u2014 disclosed, not a binding fail; EXP-076 predeclared the n=2000 marginal (0.0566 at k=120)",
+          "max_rich_pull_by_k": {
+            "30.0": 0.014778325123152691,
+            "60.0": 0.029126213592232997,
+            "120.0": 0.05660377358490565,
+            "240.0": 0.1071428571428571,
+            "500.0": 0.19999999999999996
+          },
+          "rich_marginals_by_k": {
+            "30.0": [],
+            "60.0": [],
+            "120.0": [
+              {
+                "n": 2000,
+                "pull": 0.05660377358490565
+              }
+            ],
+            "240.0": [
+              {
+                "n": 2000,
+                "pull": 0.1071428571428571
+              }
+            ],
+            "500.0": [
+              {
+                "n": 2000,
+                "pull": 0.19999999999999996
+              },
+              {
+                "n": 8000,
+                "pull": 0.05882352941176472
+              }
+            ]
+          }
+        }
+      },
+      "K2_null_fpr": {
+        "U0/n=30": {
+          "verdict": "FLIP_UNBOUNDED",
+          "labels_by_k": {
+            "30.0": "CONTROLLED",
+            "60.0": "CONTROLLED",
+            "120.0": "INFLATED",
+            "240.0": "INFLATED",
+            "500.0": "INFLATED"
+          },
+          "deployed_k_label": "INFLATED",
+          "flip_ks": [
+            30.0,
+            60.0
+          ],
+          "abs_delta_driver": 0.999
+        },
+        "U0/n=120": {
+          "verdict": "FLIP_UNBOUNDED",
+          "labels_by_k": {
+            "30.0": "CONTROLLED",
+            "60.0": "CONTROLLED",
+            "120.0": "CONTROLLED",
+            "240.0": "INFLATED",
+            "500.0": "INFLATED"
+          },
+          "deployed_k_label": "CONTROLLED",
+          "flip_ks": [
+            240.0,
+            500.0
+          ],
+          "abs_delta_driver": 1.0
+        },
+        "U0/n=500": {
+          "verdict": "FLIP_UNBOUNDED",
+          "labels_by_k": {
+            "30.0": "CONTROLLED",
+            "60.0": "CONTROLLED",
+            "120.0": "CONTROLLED",
+            "240.0": "INFLATED",
+            "500.0": "INFLATED"
+          },
+          "deployed_k_label": "CONTROLLED",
+          "flip_ks": [
+            240.0,
+            500.0
+          ],
+          "abs_delta_driver": 1.0
+        },
+        "U0/n=2000": {
+          "verdict": "FLIP_UNBOUNDED",
+          "labels_by_k": {
+            "30.0": "CONTROLLED",
+            "60.0": "CONTROLLED",
+            "120.0": "CONTROLLED",
+            "240.0": "INFLATED",
+            "500.0": "INFLATED"
+          },
+          "deployed_k_label": "CONTROLLED",
+          "flip_ks": [
+            240.0,
+            500.0
+          ],
+          "abs_delta_driver": 0.9905
+        },
+        "B_zero/n=30": {
+          "verdict": "FLIP_UNBOUNDED",
+          "labels_by_k": {
+            "30.0": "CONTROLLED",
+            "60.0": "CONTROLLED",
+            "120.0": "CONTROLLED",
+            "240.0": "INFLATED",
+            "500.0": "INFLATED"
+          },
+          "deployed_k_label": "CONTROLLED",
+          "flip_ks": [
+            240.0,
+            500.0
+          ],
+          "abs_delta_driver": 1.0
+        },
+        "B_zero/n=120": {
+          "verdict": "FLIP_UNBOUNDED",
+          "labels_by_k": {
+            "30.0": "CONTROLLED",
+            "60.0": "CONTROLLED",
+            "120.0": "CONTROLLED",
+            "240.0": "INFLATED",
+            "500.0": "INFLATED"
+          },
+          "deployed_k_label": "CONTROLLED",
+          "flip_ks": [
+            240.0,
+            500.0
+          ],
+          "abs_delta_driver": 1.0
+        },
+        "B_zero/n=500": {
+          "verdict": "FLIP_UNBOUNDED",
+          "labels_by_k": {
+            "30.0": "CONTROLLED",
+            "60.0": "CONTROLLED",
+            "120.0": "CONTROLLED",
+            "240.0": "INFLATED",
+            "500.0": "INFLATED"
+          },
+          "deployed_k_label": "CONTROLLED",
+          "flip_ks": [
+            240.0,
+            500.0
+          ],
+          "abs_delta_driver": 1.0
+        },
+        "B_zero/n=2000": {
+          "verdict": "FLIP_UNBOUNDED",
+          "labels_by_k": {
+            "30.0": "CONTROLLED",
+            "60.0": "CONTROLLED",
+            "120.0": "CONTROLLED",
+            "240.0": "INFLATED",
+            "500.0": "INFLATED"
+          },
+          "deployed_k_label": "CONTROLLED",
+          "flip_ks": [
+            240.0,
+            500.0
+          ],
+          "abs_delta_driver": 0.9990000000000001
+        }
+      },
+      "verdict": "ROUTING_FLIP",
+      "note": "routing-invariant or bounded+disclosed across the pre-registered grid => no Phase-018 verdict flips on k within the band"
+    },
+    "skew_characterization": {
+      "binding": false,
+      "note": "DISCLOSED, non-binding. S-family flag rates (Splus/Sminus/Sminus0) in results/shape_skew.csv: the gap leg is DESIGNED to flag left-skew asymmetry; a high S gap-rate supports the design, not a false flag."
+    }
+  },
+  "operating_k": {
+    "deployed_k_default": 120.0,
+    "median_sp_n": 120.0,
+    "median_n_grid": 250.0,
+    "k_grid": [
+      30.0,
+      60.0,
+      120.0,
+      240.0,
+      500.0
+    ],
+    "note": "deployed k = median(SP n)=120 (= EXP-076 k_shrink), NOT median(N_GRID)=250; D3 multipliers applied to the deployed operating point. Disclosure."
+  },
+  "integrity": {
+    "anchor": {
+      "anchor_cell": "U2/n=250/rep=0",
+      "exp076": {
+        "recomputed": 0.07605389804248094,
+        "recorded": 0.07605389804248094,
+        "abs_diff": 0.0,
+        "self_anchor_diff": 0.0,
+        "pass": true
+      },
+      "exp077": {
+        "recomputed": 0.1278884399289532,
+        "recorded": 0.1278884399289532,
+        "abs_diff": 0.0,
+        "pass": true
+      },
+      "pass": true
+    },
+    "determinism": {
+      "shape_match": true,
+      "k1_match": true,
+      "k2_probe_match": true
+    }
+  },
+  "collapsed_convenience_flag": {
+    "value": false,
+    "caveat": "NON-BINDING. Collapsed cross-stratum AND for convenience only; the per-stratum verdicts above are binding (LESSON-001)."
+  }
+}

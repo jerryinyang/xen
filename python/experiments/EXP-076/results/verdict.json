@@ -1,0 +1,159 @@
+{
+  "scale": "FROZEN (G-017a binding)",
+  "doctrine": "PER-STRATUM adjudication (cf-capgeo-001.md:137,204; D0 \u00a7D1 'none collapsed' / \u00a7D4 'one verdict per stratum'). Each stratum below carries its own verdict; coverage is resolved per-n. No collapsed cross-cell verdict is binding and no cross-cell homogeneity is claimed.",
+  "strata": {
+    "recovery": {
+      "verdict": "PASS",
+      "binding": true,
+      "n_cells": 198,
+      "n_fail": 0,
+      "worst_ratio_vs_band_0p85": {
+        "expectancy": 0.7216792837546908,
+        "median": 0.7024684865507373
+      },
+      "failing_cells": [],
+      "note": "median |estimate - truth| <= 0.85*SE_true on every (type, n), expectancy and median"
+    },
+    "coverage": {
+      "by_n": {
+        "15": {
+          "expectancy_pass": false,
+          "median_pass": true,
+          "expectancy_min_cov": 0.833,
+          "median_min_cov": 0.876,
+          "expectancy_fail_types": [
+            "U0",
+            "B_neg",
+            "B_zero",
+            "B_pos"
+          ]
+        },
+        "30": {
+          "expectancy_pass": true,
+          "median_pass": true,
+          "expectancy_min_cov": 0.8715,
+          "median_min_cov": 0.881,
+          "expectancy_fail_types": []
+        },
+        "60": {
+          "expectancy_pass": true,
+          "median_pass": true,
+          "expectancy_min_cov": 0.876,
+          "median_min_cov": 0.882,
+          "expectancy_fail_types": []
+        },
+        "120": {
+          "expectancy_pass": true,
+          "median_pass": true,
+          "expectancy_min_cov": 0.885,
+          "median_min_cov": 0.8855,
+          "expectancy_fail_types": []
+        },
+        "250": {
+          "expectancy_pass": true,
+          "median_pass": true,
+          "expectancy_min_cov": 0.8895,
+          "median_min_cov": 0.8935,
+          "expectancy_fail_types": []
+        },
+        "500": {
+          "expectancy_pass": true,
+          "median_pass": true,
+          "expectancy_min_cov": 0.891,
+          "median_min_cov": 0.8875,
+          "expectancy_fail_types": []
+        },
+        "1000": {
+          "expectancy_pass": true,
+          "median_pass": true,
+          "expectancy_min_cov": 0.8915,
+          "median_min_cov": 0.886,
+          "expectancy_fail_types": []
+        },
+        "2000": {
+          "expectancy_pass": true,
+          "median_pass": true,
+          "expectancy_min_cov": 0.892,
+          "median_min_cov": 0.894,
+          "expectancy_fail_types": []
+        },
+        "8000": {
+          "expectancy_pass": true,
+          "median_pass": true,
+          "expectancy_min_cov": 0.8875,
+          "median_min_cov": 0.8985,
+          "expectancy_fail_types": []
+        }
+      },
+      "verdict_n_ge_30": "PASS",
+      "binding_boundary": "n>=30 binding; n<30 = sparse-stress diagnostic \u2014 PENDING D0-amendment ratification (not prejudged here)",
+      "sparse_stress_diagnostic": {
+        "description": "sub-band cells are the small-sample percentile-bootstrap floor of the MEAN (expectancy); median coverage is in-band. Disclosed diagnostic, not a binding fail \u2014 see audit.md mechanism.",
+        "failing_cells": [
+          {
+            "type": "U0",
+            "n": 15,
+            "estimand": "expectancy",
+            "coverage": 0.8595
+          },
+          {
+            "type": "B_neg",
+            "n": 15,
+            "estimand": "expectancy",
+            "coverage": 0.833
+          },
+          {
+            "type": "B_zero",
+            "n": 15,
+            "estimand": "expectancy",
+            "coverage": 0.857
+          },
+          {
+            "type": "B_pos",
+            "n": 15,
+            "estimand": "expectancy",
+            "coverage": 0.8565
+          }
+        ]
+      },
+      "binding": true
+    },
+    "shrinkage": {
+      "monotone": true,
+      "sparse_pull_pass": true,
+      "rich": {
+        "verdict": "PASS except predeclared n=2000 marginal",
+        "literal_pass": false,
+        "marginals": [
+          {
+            "member": 7,
+            "type": "B_strong",
+            "n": 2000,
+            "weight": 0.9433962264150944,
+            "pull_theory": 0.05660377358490565,
+            "pull_emp": 0.056603773584905634,
+            "sparse_ok": true,
+            "rich_ok": false,
+            "marginal_flag": true
+          }
+        ],
+        "note": "predeclared analytic k/(n+k) marginal (~0.0566 at n=2000, k=120); surfaced for governance, not silently passed"
+      },
+      "binding": true
+    }
+  },
+  "integrity": {
+    "anchor_pass": true,
+    "kde_gap_flagged": false,
+    "determinism": {
+      "recovery_match": true,
+      "shrinkage_match": true,
+      "groundtruth_match": true
+    }
+  },
+  "k_shrink": 120.0,
+  "collapsed_convenience_flag": {
+    "value": false,
+    "caveat": "NON-BINDING. Collapsed cross-cell/cross-check AND retained for convenience only; NOT the verdict. The per-stratum verdicts above are binding. No cross-cell homogeneity is claimed (cf-capgeo-001.md:137)."
+  }
+}

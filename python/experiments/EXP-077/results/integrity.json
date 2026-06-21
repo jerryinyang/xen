@@ -1,0 +1,31 @@
+{
+  "anchor": {
+    "anchor_cell": "U2/n=250/rep=0",
+    "direct_expectancy": 0.1278884399289532,
+    "numpy_mean": 0.1278884399289532,
+    "anchor_abs_diff": 0.0,
+    "anchor_pass": true
+  },
+  "determinism": {
+    "reliability_match": true,
+    "reliability_decile_match": true,
+    "accounting_match": true,
+    "fpr_probe_match": true,
+    "mde_probe_match": true
+  },
+  "config": {
+    "master_seed": 20260620,
+    "r_rep": 2000,
+    "rel_rep": 2000,
+    "n_boot": 10000,
+    "smoke": false,
+    "no_fpr_mde": false
+  },
+  "table_sha256": {
+    "fpr": "9d1066f381db18acdf158fe2986128c0a1afc94ad126464c906df5250b411a34",
+    "mde": "cae0a0513e0e6e0a2617dc5e58a734b9334224a6dccd0fda4b825f6a53abfd3a",
+    "reliability_verdict": "fee3024b8152c5dd25564699e0a11983fceb58045632655b6ad0fcfa4731358d",
+    "accounting": "40ce56d15de654bb0a3d919ba168f31cee943d2c0804e9730876a1ca1267d264",
+    "dogfood": "98df2b942885aebe356e7c3fbff6c5c6887f258f5e7eb894c80fff187d75adc8"
+  }
+}

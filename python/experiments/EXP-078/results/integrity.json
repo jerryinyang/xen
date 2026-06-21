@@ -1,0 +1,75 @@
+{
+  "anchor": {
+    "anchor_cell": "U2/n=250/rep=0",
+    "exp076": {
+      "recomputed": 0.07605389804248094,
+      "recorded": 0.07605389804248094,
+      "abs_diff": 0.0,
+      "self_anchor_diff": 0.0,
+      "pass": true
+    },
+    "exp077": {
+      "recomputed": 0.1278884399289532,
+      "recorded": 0.1278884399289532,
+      "abs_diff": 0.0,
+      "pass": true
+    },
+    "pass": true
+  },
+  "determinism": {
+    "shape_match": true,
+    "k1_match": true,
+    "k2_probe_match": true
+  },
+  "config": {
+    "master_seed": 20260620,
+    "r_rep": 2000,
+    "n_boot": 10000,
+    "tau_gap": 0.3,
+    "dip_alpha": 0.05,
+    "smoke": false,
+    "k_default": 120.0,
+    "k_grid": [
+      30.0,
+      60.0,
+      120.0,
+      240.0,
+      500.0
+    ],
+    "k_grid_disclosure": [
+      {
+        "role": "0.5x",
+        "k": 60.0,
+        "collides_with": null
+      },
+      {
+        "role": "1x",
+        "k": 120.0,
+        "collides_with": null
+      },
+      {
+        "role": "2x",
+        "k": 240.0,
+        "collides_with": null
+      },
+      {
+        "role": "anchor30",
+        "k": 30.0,
+        "collides_with": null
+      },
+      {
+        "role": "anchor500",
+        "k": 500.0,
+        "collides_with": null
+      }
+    ],
+    "mad_zero_total": 0,
+    "diptest_version": "0.11.0"
+  },
+  "table_sha256": {
+    "shape_rates": "580deb3bad48ce3a706a130c5e63e61b5dd411d65ea6c633001a9d34c5620404",
+    "shape_skew": "9f7913b0a76ecc519f2b807624b787f2479c216782962830a69f3c90d1309a16",
+    "k_sensitivity": "4ed2555e859ebd92dd37a6215db1732c764a3247f2f011dc13e1776b64ac46c7",
+    "k_shrinkage": "9b5c509da46f2c7c4e61777ebaea6f5d87bf1b6c352678b8ebd91e89afb5ea77"
+  }
+}
