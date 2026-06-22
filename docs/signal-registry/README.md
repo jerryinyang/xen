@@ -70,9 +70,14 @@ Registered candidate families (full per-phase batches in `multiplicity-registry.
 
 - `CF-AVWAP-001` — Anchored VWAP on regime pivots. **CLOSED** (Phase 013, ANCHOR_MOVE_FLAT).
 - `CF-HA-HARAMI-001` — HA harami at trend exhaustion. **CLOSED** (Phase 016, CLOSE_FAMILY).
-- `CF-CAPGEO-001` — Data-derived exit / capture geometry on frozen entries. **REGISTERED —
-  SCREENING-GATED** (2026-06-20); screening admissible only after **G-017 `ASS_VALIDATED`**
-  (Phase 017 qualifier/protocol validation) **and** **INFR-003** (5-year data + holdout re-seal).
-  See `candidate-families/cf-capgeo-001.md` and the Phase 017/018 batches.
+- `CF-CAPGEO-001` — Data-derived exit / capture geometry on frozen entries. **RETIRED** (Phase 018,
+  G-018 `NOT_CONFIRM`; no net-tradable OOS capture geometry — the exit lever is exonerated, the
+  bottleneck is upstream signal-conditional availability). See `candidate-families/cf-capgeo-001.md`.
+- **Phase 019 — Family-Selection Availability Screen** (family-agnostic; NOT a CF). Screens untested
+  entry-side *information axes* — `CF-VOLEXP-001` (single-series magnitude), `CF-XSECT-001`
+  (cross-sectional), `CF-FLOW-001` (order-flow) — by TRAIN-only availability vs a multiplicity-adjusted
+  permuted-axis null, to **select** the next family to open. **DRAFT — G0 PENDING** (2026-06-22); 0 slots,
+  0 counted TEST reads. Candidate families under consideration:
+  `candidate-families/family-selection-phase-019.md`; phase: the Phase 019 checkpoint + batch.
 
 The active batch and gating preconditions are documented in `multiplicity-registry.md`.

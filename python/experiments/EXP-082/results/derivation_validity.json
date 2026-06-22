@@ -1,0 +1,57 @@
+{
+  "verdict": "DERIVATION_DELIVERED",
+  "n_triples": 552,
+  "n_valid": 552,
+  "n_underpowered_disclosed": 0,
+  "n_degenerate_disclosed": 0,
+  "determinism_replay_byte_identical": true,
+  "harami_identity_ok": true,
+  "s_adv_source_accounting": {
+    "D1-MEDIAN-CAPTURE": {
+      "n": 184,
+      "m_anti": 1,
+      "mae_q90": 183,
+      "n_valid": 184
+    },
+    "D2-TAIL-ROBUST": {
+      "n": 184,
+      "m_anti": 1,
+      "mae_q90": 183,
+      "n_valid": 184
+    },
+    "D3-CAPTURE-EFFICIENT": {
+      "n": 184,
+      "m_anti": 1,
+      "mae_q90": 183,
+      "n_valid": 184
+    }
+  },
+  "d1_eq_d2_accounting": {
+    "n_cells": 184,
+    "n_d1_eq_d2": 184,
+    "n_d1_ne_d2": 0,
+    "mechanism": "D2 'tightened to the dip' = min(m_anti, MAE_q90); diverges iff m_anti > MAE_q90. On this TRAIN snapshot m_anti resolves rarely and below MAE_q90, so D1==D2 numerically (disclosed; distinct functions for EXP-083 per-fold re-fit)."
+  },
+  "provenance": {
+    "exp081_verdict": "CHARACTERISATION_DELIVERED",
+    "exp081_n_substrate_cells": 184,
+    "exp081_module_hashes": {
+      "capgeo_geometry": "74042e8eb732fae7767cdc9415ff5418e08526edad14e27606f2a5613d8c78b0",
+      "capgeo_substrates": "a580e693fc986d9fffe725099e4607422c7a41e8004db88e316c481cecf43570",
+      "domain_bars": "ffef654519a7551e93ed41e583422fbe79796699c9418e41680979a52dda945b",
+      "ass": "d6e1f1d51bc1287cb3d93a3a2eca4a7b4d276a1fd7350e7b7f974eb025e19087",
+      "expectancy": "42c6c26821975357c7e8c3963198a136d106e2197073dda690b64a08bb43b82e"
+    },
+    "exp081_summary_sha256": "22e97ab347b1650382d0796d1ea4efb9ef7fe2642dc557f8e8fa911cd8418855",
+    "checks": {
+      "verdict": true,
+      "n_substrate_cells": true,
+      "n_underpowered_cells": true,
+      "holdout_untouched": true,
+      "counted_test_reads": true,
+      "summary_height": true,
+      "n_usable_floor": true,
+      "substrate_set": true
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "experiment": "EXP-083",
+  "overlay": "ASS discovery (NON-BINDING; G-017 DISCOVERY_ONLY)",
+  "binding": false,
+  "n_rows": 2068,
+  "n_skipped_below_floor": 2,
+  "event_floor": 30,
+  "reconciliation_ok": true,
+  "recon_tol": 1e-09,
+  "pool_definition": "cross-cell within {substrate, candidate} (full pool incl. the unit)",
+  "k_shrink_source": "median-n across the (substrate,candidate) pool (EXP-076 deployed convention)",
+  "seeds": {
+    "SEED_RANDOM": 20260621,
+    "SEED_BOOT": 20260622
+  },
+  "ass_thresholds": {
+    "TAU_GAP": 0.3,
+    "DIP_ALPHA": 0.05
+  },
+  "guards": {
+    "guard_i_defer_at_effective_n_leq": 60,
+    "guard_ii_pgt2r_compressed_below": 0.05
+  },
+  "n_ass_screen_sign_disagreements": 136,
+  "holdout_untouched": true,
+  "test_stratum_touched": false,
+  "counted_test_reads": 0,
+  "caveats": [
+    "ASS shrinkage POOLS across cells -> per-stratum-discipline tension (LESSON-001); these shrunk estimates are DISCOVERY_ONLY, never a binding per-stratum verdict.",
+    "EXP-078 found the shrunk edge-call FPR k-FRAGILE (flips at the 2x multiplier); k here is the deployed median-n, reported for transparency, not a binding operating point."
+  ],
+  "note": "Disclosure-only. Does NOT alter the frozen valid_candidate_set.json (sha256 fa4035f3\u2026), screen_results.*, or run_metadata.json; no screen decision reads ASS."
+}

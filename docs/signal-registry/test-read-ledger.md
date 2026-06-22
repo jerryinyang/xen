@@ -93,6 +93,59 @@ final-30% holdout were never sliced or materialized (forward path resolution cli
 the TRAIN-only convention (EXP-074/075/080 precedent) this is a **disclosure, not a counted read**: all 48
 strata remain **0 counted reads / open** (tallies above unchanged). Holdout never read.
 
+**EXP-082 derivation disclosure (2026-06-22, CF-CAPGEO-001 Phase 018 HYP-003).** EXP-082 read **no market
+data at all** — it consumed only EXP-081's already-computed per-cell TRAIN summary
+(`EXP-081/results/substrate_cell_summary.parquet`, itself the TRAIN-only disclosure above) and applied the
+frozen D0 §D3 mechanical rule to emit 552 triple-barrier exit *definitions* (no exit applied, no return /
+P&L / strategy estimand, no stratum-specific selection or inference). No `data/timebars/` read, no TEST
+stratum sliced, holdout never touched (`holdout_untouched=true`, `counted_test_reads=0` in
+`run_metadata.json`). Per the derivation-off-TRAIN-only-inputs convention (EXP-074/075/081 precedent) this
+is a **disclosure, not a counted read**: all 48 strata remain **0 counted reads / open** (tallies above
+unchanged). Holdout never read.
+
+**EXP-083 TRAIN-screen disclosure (2026-06-22, CF-CAPGEO-001 Phase 018 HYP-004a).** EXP-083 applied the 3
+derived + full benchmark exit grid to the frozen-substrate held positions on the **TRAIN sub-split only**
+(`[0, int(analysis_rows·0.7))` = first 49% of each file), ran the G-018a gross screen + the binding
+separability gate (S1 ∧ S2), and emitted a hash-pinned valid-candidate set (sha256 `fa4035f3…`) as the
+EXP-084 hand-off. It read **no TEST stratum and no holdout** (`test_stratum_touched=false`,
+`holdout_untouched=true`, `counted_test_reads=0` in `run_metadata.json`; forward-path resolution clips at
+the TRAIN edge). Verdict `SCREEN_DELIVERED` (TRAIN-only eligibility — NOT an edge claim); the **counted-read
+`WF-EXPANDING` confirmation is the deferred reserved-conditional EXP-084**, which spends read #1 only on
+operator ratification. Per the TRAIN-only convention (EXP-074/075/080/081/082 precedent) this is a
+**disclosure, not a counted read**: all 48 strata remain **0 counted reads / open** (tallies above
+unchanged). Note: the two entry-identical harami substrates were screened as one stratum (`SUB-HARAMI-V2A`,
+audit C1 fix) — no effect on TEST-read accounting (TRAIN-only). Holdout never read.
+
+**EXP-085 cost-read-gate disclosure (2026-06-22, CF-CAPGEO-001 Phase 018 HYP-004 cost read-gate).** EXP-085
+applied a predeclared conservative round-trip + holding-time financing model (operator-ratified Stage 4) to
+the realized exit paths of the 26 EXP-083 hash-pinned survivors on the **TRAIN sub-split only**
+(`[0, int(analysis_rows·0.7))`), re-evaluating **net** per-event expectancy + median per stratum. It read
+**no TEST stratum and no holdout** (`test_stratum_touched=false`, `holdout_untouched=true`,
+`counted_test_reads=0` in `run_metadata.json`; the survivor exit paths were re-resolved from the same
+TRAIN region and reconciled to EXP-083 to 1e-9). Verdict `NET_SURVIVES` (21/26 NET_POS), but **per-stratum
+masked** — all 21 NET_POS are S2-DEFERRED low-n 4h `SUB-AVWAP` cells; the only S2-PASS well-powered stratum
+(AUDUSD-1h, n=988) is NET_INCONCLUSIVE. It is a **read-gate input to G-018 and authorizes nothing** (an
+EXP-084 counted read opens only on operator ratification at EXP-084's D0). Per the TRAIN-only convention
+(EXP-074/075/080/081/082/083 precedent) this is a **disclosure, not a counted read**: all 48 strata remain
+**0 counted reads / open** (tallies above unchanged).
+
+**EXP-084 portfolio-aggregate disclosure (2026-06-22, CF-CAPGEO-001 Phase 018 HYP-004b confirmation read).**
+EXP-084 was the single sanctioned out-of-sample confirmation read for HYP-004, reframed by D0-amendment-003
+(operator-ratified) to a **portfolio** unit: `SUB-AVWAP` 4h events pooled across **NZDUSD-4h + USDCAD-4h +
+USTEC-4h**, exited by the pinned parameter-free `AVWAP-FH`, NET of the EXP-085 cost model, adjudicated by one
+frozen `WF-EXPANDING` run (which reached the analysis-TEST stratum of the pooled series, [50%,100%] of the
+analysis set) + the D4 G-018 conjunction. The read makes a **portfolio claim only** (no per-stratum or per-arm
+binding inference), so per the **portfolio-aggregate rule** (Phase 011 Track-C EXP-018 precedent; this file's
+rule above) it is entered as a **disclosure** against each of the three member strata, **not a counted read**:
+**NZDUSD-4h, USDCAD-4h, USTEC-4h tallies stay 0/2 and all 48 strata remain 0 counted reads / open.** The three
+strata become **disclosed** (basket-claim-only; a future *clean* per-instrument counted read on them is
+permanently mildly weakened, EXP-032 precedent). Verdict **`NOT_CONFIRM`** (basket separates on TRAIN — S2
+finally adjudicated at pooled n=152 and passes — but all three economic OOS legs fail; the apparent edge was
+selection-region overlap and reverses in the genuinely held-back folds). **HYP-004 closes at G-018.** The
+**final-30% global holdout was never built, sliced, or folded** (`holdout_untouched=true`,
+`counted_test_reads=0` in `run_metadata.json`; the WF caller passes only the in-analysis series). Holdout
+**not** released.
+
 **The global holdout (final 30% per new file) is outside this ledger entirely** and was
 sealed at first touch in VAL-005 (0 holdout rows read). No new-dataset holdout shot exists;
 the single historical sanctioned shot (EXP-032, old dataset) is spent and non-transferable.

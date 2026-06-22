@@ -1,0 +1,107 @@
+{
+  "experiment": "EXP-083",
+  "hypothesis": "HYP-004a (D0-amendment-001 split)",
+  "generated_at": "2026-06-22T10:15:11.052366+00:00",
+  "verdict": "SCREEN_DELIVERED",
+  "n_rows": 2070,
+  "n_valid_candidates": 26,
+  "valid_set_sha256": "fa4035f371a2ada656f05d697b709be48559e6a5ad322526f45dbbfccd8f3126",
+  "holm_rule": "Holm-Bonferroni at one-sided alpha=0.05 across the full frozen {valid-candidate x stratum} grid; applied at EXP-084 on the WF verdict p-values.",
+  "n_member_cells": 46,
+  "n_screened_cells": 46,
+  "candidate_branches": {
+    "D1-MEDIAN-CAPTURE": "EXIT-DERIVED",
+    "D2-TAIL-ROBUST": "EXIT-DERIVED",
+    "D3-CAPTURE-EFFICIENT": "EXIT-DERIVED",
+    "RR-1": "EXIT-RR",
+    "RR-1.5": "EXIT-RR",
+    "RR-2": "EXIT-RR",
+    "RR-3": "EXIT-RR",
+    "VP-POC": "EXIT-VP",
+    "TRAIL-ATR1": "EXIT-TRAIL",
+    "TRAIL-ATR2": "EXIT-TRAIL",
+    "TRAIL-ATR3": "EXIT-TRAIL",
+    "TRAIL-STRUCT": "EXIT-TRAIL",
+    "PARTIAL-V2A": "EXIT-PARTIAL",
+    "V2A-ADVNONE": "EXIT-PARTIAL",
+    "AVWAP-FH": "EXIT-PARTIAL"
+  },
+  "read_region": "TRAIN sub-split [0, int(analysis_rows*0.7)); analysis-TEST + holdout never sliced",
+  "train_cutoffs": {
+    "EURUSD": 916692,
+    "GBPUSD": 917067,
+    "USDJPY": 917287,
+    "USDCHF": 912839,
+    "USDCAD": 914718,
+    "AUDUSD": 915306,
+    "NZDUSD": 915499,
+    "EURJPY": 920693,
+    "GBPJPY": 919928,
+    "AUDJPY": 919651,
+    "XAUUSD": 874351,
+    "BTCUSD": 1078665,
+    "USTEC": 874463,
+    "US500": 857311,
+    "US2000": 871443,
+    "JP225": 829187
+  },
+  "cost_treatment": "GROSS (operator 2026-06-22); cost layer deferred to conditional follow-up",
+  "ass_binding": false,
+  "seeds": {
+    "SEED_RANDOM": 20260621,
+    "SEED_BOOT": 20260622
+  },
+  "bootstrap_budgets": {
+    "N_BOOT": 10000,
+    "NULL_REPS": 200,
+    "N_BOOT_NULL": 1000,
+    "note": "N_BOOT default 10_000 (scope freeze); EXP083_N_BOOT may lower it for a manual screen run \u2014 value recorded here."
+  },
+  "frozen_constants": {
+    "K_TAIL": 3.0,
+    "TAU_TAIL": 0.06,
+    "DELTA": 0.4,
+    "N_S2_FLOOR": 120,
+    "EVENT_FLOOR": 30,
+    "DIP_ALPHA": 0.05,
+    "ATR_PERIOD": 14,
+    "RR_RATIOS": [
+      1.0,
+      1.5,
+      2.0,
+      3.0
+    ],
+    "TRAIL_ATR_K": [
+      1.0,
+      2.0,
+      3.0
+    ],
+    "VP_BIN_FRAC": 0.25
+  },
+  "module_hashes": {
+    "capgeo_exits": "34d03f45bc036a5ec746e9ecc48f481036e1b516156160280ea571f1fce55b2f",
+    "capgeo_screen": "313be198c236f3fdbf9f9917d70c3628f2d851644e0585d1af5f371fd1b10168",
+    "capgeo_substrates": "a580e693fc986d9fffe725099e4607422c7a41e8004db88e316c481cecf43570",
+    "capgeo_geometry": "74042e8eb732fae7767cdc9415ff5418e08526edad14e27606f2a5613d8c78b0",
+    "domain_bars": "ffef654519a7551e93ed41e583422fbe79796699c9418e41680979a52dda945b"
+  },
+  "provenance": {
+    "derive_barriers_sha256": "34d03f45bc036a5ec746e9ecc48f481036e1b516156160280ea571f1fce55b2f",
+    "exp081_verdict": "CHARACTERISATION_DELIVERED",
+    "exp082_verdict": "DERIVATION_DELIVERED",
+    "capgeo_exits_module": "xen.capgeo_exits"
+  },
+  "determinism_ok": true,
+  "holdout_untouched": true,
+  "test_stratum_touched": false,
+  "counted_test_reads": 0,
+  "candidate_slots": 0,
+  "deviations": [
+    "GROSS screen + suite floors deferred (operator 2026-06-22).",
+    "/SIZE-VOLADJ is non-distinct in the ATR-normalized metric frame (returns already vol-normalized) -> reported as a disclosure, not a separate gate candidate.",
+    "/EXIT-VP uses a cell-level TickVolume profile (POC target) rather than a per-event reference-move profile (screen-stage simplification, disclosed); skipped where domain bars carry no TickVolume.",
+    "/EXIT-TRAIL structure arm uses a rolling swing-window trail as a ZigZag-pivot proxy (disclosed, screen-stage).",
+    "C1 audit fix (2026-06-22): the entry-identical harami pair (PARTIAL-V2A / V2A-ADVNONE) is deduped to ONE canonical screened stratum 'SUB-HARAMI-V2A' (3 screened substrates, not 4); the multiplicity-registry harami count is consolidated accordingly. Removes the prior control-draw inconsistency that flipped a survivor between the two identical substrates.",
+    "W1 audit fix (2026-06-22): m_cell is now calibrated PER CANDIDATE from each arm's own no-stop control reference (scaled to its favourable-target distance), replacing the prior per-cell reuse of the mfe_med-target margin (anti-conservative for large-target RR arms); binding N_BOOT=10_000 honored on the edge-call CIs."
+  ]
+}

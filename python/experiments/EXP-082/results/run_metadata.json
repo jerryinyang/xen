@@ -1,0 +1,30 @@
+{
+  "experiment": "EXP-082",
+  "generated_at": "2026-06-22T04:07:45.871653+00:00",
+  "verdict": "DERIVATION_DELIVERED",
+  "n_member_cells": 184,
+  "n_triples": 552,
+  "derive_barriers_module_sha256": "34d03f45bc036a5ec746e9ecc48f481036e1b516156160280ea571f1fce55b2f",
+  "determinism_fingerprint": "a2e6e65dd5c7a9ae3d9f10f90ede86c3a9d885b71607cd0d4866971592d3cdc4",
+  "frozen_constants": {
+    "rule": "D0 \u00a7D3 verbatim (D1/D2/D3 triple-barrier; barriers are EXP-081 quantiles)",
+    "EVENT_FLOOR": 30,
+    "h_cap_integerization": "max(1, round-half-even(ttp_quantile))",
+    "d2_tightened_to_dip": "min(m_anti, MAE_q90) if isfinite(m_anti) else MAE_q90",
+    "units": "T_fav/S_adv in ATR (EXP-081 norm); H_cap in domain bars"
+  },
+  "exp081_input": {
+    "summary_parquet": "python/experiments/EXP-081/results/substrate_cell_summary.parquet",
+    "summary_sha256": "22e97ab347b1650382d0796d1ea4efb9ef7fe2642dc557f8e8fa911cd8418855",
+    "exp081_module_hashes": {
+      "capgeo_geometry": "74042e8eb732fae7767cdc9415ff5418e08526edad14e27606f2a5613d8c78b0",
+      "capgeo_substrates": "a580e693fc986d9fffe725099e4607422c7a41e8004db88e316c481cecf43570",
+      "domain_bars": "ffef654519a7551e93ed41e583422fbe79796699c9418e41680979a52dda945b",
+      "ass": "d6e1f1d51bc1287cb3d93a3a2eca4a7b4d276a1fd7350e7b7f974eb025e19087",
+      "expectancy": "42c6c26821975357c7e8c3963198a136d106e2197073dda690b64a08bb43b82e"
+    }
+  },
+  "holdout_untouched": true,
+  "counted_test_reads": 0,
+  "candidate_slots": 0
+}

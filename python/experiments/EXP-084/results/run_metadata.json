@@ -1,0 +1,99 @@
+{
+  "experiment": "EXP-084",
+  "hypothesis": "HYP-004b portfolio confirmation (D0-amendment-003)",
+  "generated_at": "2026-06-22T13:38:10.402379+00:00",
+  "verdict": "NOT_CONFIRM",
+  "unit": "portfolio",
+  "basket": [
+    "NZDUSD",
+    "USDCAD",
+    "USTEC"
+  ],
+  "domain": "4h",
+  "pinned_arm": "AVWAP-FH",
+  "binding_conjunction": "CONFIRM iff exp_lo>m AND med_lo>0 AND beats_random_lo>0 AND S1 AND S2",
+  "frozen_suite": "xen.wf WF-EXPANDING aggregate (kind=block) + FPR-calibrated margin m (EXP-070/077 instantiation); framework-era bps gate stack NOT used (unit-incompatible)",
+  "wf_schedule": {
+    "initial_frac": 0.5,
+    "step_frac": 0.1,
+    "n_folds": 5,
+    "min_fold": 30,
+    "kind": "block"
+  },
+  "separability": {
+    "K_tail": 3.0,
+    "tau_tail": 0.06,
+    "delta": 0.4,
+    "s2_floor": 120,
+    "n_train_sep": 152,
+    "s2_floor_ok": true,
+    "s1_excess_lo": 1.1091950972502624,
+    "m_margin": -0.03955202862215647
+  },
+  "cost_model": {
+    "constants_RT_F_bps": {
+      "NZDUSD": [
+        4.5,
+        0.8
+      ],
+      "USDCAD": [
+        4.0,
+        0.7
+      ],
+      "USTEC": [
+        5.0,
+        1.2
+      ]
+    },
+    "holding_days_definition": "bar-count proxy = (exit_idx - entry_idx) * domain_minutes / 1440 (trading-bar span only); partial two-leg uses the leg-2 (final) exit bar. Operator-ratified Stage 4 over the wall-clock alternative.",
+    "note": "EXP-085 operator-ratified; applied per-instrument before pooling"
+  },
+  "wf_overlap_disclosure": "WF tests [50%,100%] of the analysis series; selection region was [0,70%]; per-fold fresh flag (entry >= 70% boundary) disclosed; protocol unchanged (Option A, operator-ratified); CONFIRM read on fresh folds.",
+  "seeds": {
+    "SEED_BOOT_084": 20260622
+  },
+  "n_boot": 10000,
+  "null_reps": 200,
+  "n_boot_null": 1000,
+  "exp083_valid_set_sha256": "fa4035f371a2ada656f05d697b709be48559e6a5ad322526f45dbbfccd8f3126",
+  "exp083_valid_set_assert_ok": true,
+  "hash_pin": "4245d901f4210ea9dae89a949dfa1d5d85027545308c8691ee89f36a61b95c52",
+  "reconciliation_ok": true,
+  "determinism_ok": true,
+  "module_hashes": {
+    "capgeo_screen": "313be198c236f3fdbf9f9917d70c3628f2d851644e0585d1af5f371fd1b10168",
+    "capgeo_substrates": "a580e693fc986d9fffe725099e4607422c7a41e8004db88e316c481cecf43570",
+    "capgeo_geometry": "74042e8eb732fae7767cdc9415ff5418e08526edad14e27606f2a5613d8c78b0",
+    "domain_bars": "ffef654519a7551e93ed41e583422fbe79796699c9418e41680979a52dda945b",
+    "capgeo_exits": "34d03f45bc036a5ec746e9ecc48f481036e1b516156160280ea571f1fce55b2f",
+    "capgeo_cost": "1795019240b0918233e0705dc9be148bd90793812e7fa3735aa23f36864e8781",
+    "wf": "c7e90ed7e83760b65d0a0badd3bda049b530f53e26a3c4f31fcaf9499547d03a"
+  },
+  "holdout_untouched": true,
+  "test_stratum_in_analysis_only": true,
+  "counted_test_reads": 0,
+  "candidate_slots": 0,
+  "ledger_disclosure": [
+    "NZDUSD-4h",
+    "USDCAD-4h",
+    "USTEC-4h"
+  ],
+  "ledger_note": "portfolio-aggregate rule (Phase-011 Track-C precedent): portfolio read = DISCLOSURE against each member stratum; 0 counted reads; all 48 strata stay 0/2. The 3 basket strata become 'disclosed' (basket-claim-only; future clean per-instrument read weakened, EXP-032 precedent).",
+  "counted_reads_context": {
+    "if_per_stratum_counted_each": {
+      "stratum": "PORTFOLIO(NZDUSD,USDCAD,USTEC)-4h",
+      "accepted": true,
+      "counted_increment": 1,
+      "per_fold_reverted": false,
+      "weakened_evidence": false,
+      "prior_counted": 0,
+      "new_counted": 1,
+      "reason": "COUNTED: conforming frozen WF run = +1 (folds are disclosures)"
+    },
+    "binding_rule": "portfolio-aggregate disclosure -> 0 counted (see ledger_disclosure)"
+  },
+  "notes": [
+    "USTEC-4h/AVWAP-FH was NOT an individual EXP-085 survivor (USTEC's survivor was RR-1); AVWAP-FH is the a-priori PINNED basket arm applied uniformly (no per-instrument arm selection) \u2014 disclosed. Reconciled to the EXP-083 screen anchor (n=46, gross 1.806).",
+    "INCONCLUSIVE_SPANS_ZERO is a pre-registered acceptable (non-failure) outcome."
+  ]
+}

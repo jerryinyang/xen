@@ -1,0 +1,57 @@
+{
+  "experiment": "EXP-085",
+  "hypothesis": "HYP-004 cost read-gate (D0-amendment-002)",
+  "generated_at": "2026-06-22T12:20:14.719843+00:00",
+  "verdict": "NET_SURVIVES",
+  "n_survivors": 26,
+  "n_net_pos": 21,
+  "n_inconclusive": 5,
+  "n_net_neg": 0,
+  "cost_model": {
+    "round_trip_bps_per_instrument": {
+      "AUDUSD": 4.0,
+      "NZDUSD": 4.5,
+      "USDCAD": 4.0,
+      "USTEC": 5.0
+    },
+    "financing_bps_per_day_per_instrument": {
+      "AUDUSD": 0.8,
+      "NZDUSD": 0.8,
+      "USDCAD": 0.7,
+      "USTEC": 1.2
+    },
+    "conservative_binding": "RT = 2 x BASE (EXP-030); financing adverse-side (EXP-034)",
+    "holding_days_definition": "bar-count proxy = (exit_idx - entry_idx) * domain_minutes / 1440 (trading-bar span only); partial two-leg uses the leg-2 (final) exit bar. Operator-ratified Stage 4 over the wall-clock alternative.",
+    "ratification": "constants + holding-days definition OPERATOR-RATIFIED at Stage 4 (2026-06-22): RT/F as proposed; holding-days = bar-count proxy. Frozen before the TRAIN run; never tuned against outcomes",
+    "atr_unit_conversion": "cost_ATR = (RT/1e4 + F/1e4 * holding_days) * P_entry / ATR_entry; net_ATR = gross_ATR - cost_ATR (identical resolved events)"
+  },
+  "binding_rule": "per-stratum: NET_POS iff net_exp CI_low_1s > 0 AND net_med CI_low_1s > 0; NET_SURVIVES iff >=1 NET_POS; no pooling as a binding statistic (LESSON-001)",
+  "read_region": "TRAIN sub-split [0, int(analysis_rows*0.7)); analysis-TEST + holdout never sliced",
+  "seeds": {
+    "SEED_BOOT_085": 20260622
+  },
+  "n_boot": 10000,
+  "exp083_valid_set_sha256": "fa4035f371a2ada656f05d697b709be48559e6a5ad322526f45dbbfccd8f3126",
+  "exp083_valid_set_assert_ok": true,
+  "reconciliation_ok": true,
+  "determinism_ok": true,
+  "exit_mirror": "xen.capgeo_cost line-faithful mirror of the 3 frozen resolver families (static/fixed-horizon/partial); reconciled to frozen Resolution.ret within 1e-9 and cls/mask exactly on every resolved event",
+  "module_hashes": {
+    "capgeo_screen": "313be198c236f3fdbf9f9917d70c3628f2d851644e0585d1af5f371fd1b10168",
+    "capgeo_substrates": "a580e693fc986d9fffe725099e4607422c7a41e8004db88e316c481cecf43570",
+    "capgeo_geometry": "74042e8eb732fae7767cdc9415ff5418e08526edad14e27606f2a5613d8c78b0",
+    "domain_bars": "ffef654519a7551e93ed41e583422fbe79796699c9418e41680979a52dda945b",
+    "capgeo_exits": "34d03f45bc036a5ec746e9ecc48f481036e1b516156160280ea571f1fce55b2f",
+    "capgeo_cost": "1795019240b0918233e0705dc9be148bd90793812e7fa3735aa23f36864e8781"
+  },
+  "holdout_untouched": true,
+  "test_stratum_touched": false,
+  "counted_test_reads": 0,
+  "candidate_slots": 0,
+  "notes": [
+    "Read-gate input to G-018; does not itself close/open the family.",
+    "Matched-random net excess is a non-binding companion (same cost on both arms).",
+    "22 of 26 survivors are S2-DEFERRED low-n 4h cells (n=44-78): NET_INCONCLUSIVE_SPANS_ZERO is the expected, honest outcome; the binding power sits in AUDUSD-1h (n=988).",
+    "VP-POC (USDCAD-4h) carries EXP-083's selection-on-geometry disclosure (POC-subsample)."
+  ]
+}

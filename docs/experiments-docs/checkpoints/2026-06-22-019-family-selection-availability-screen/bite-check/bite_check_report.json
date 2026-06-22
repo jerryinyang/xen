@@ -1,0 +1,118 @@
+{
+  "seed": 20260622,
+  "C": 46,
+  "sigma": 2.0,
+  "z": 1.645,
+  "n_perm": 1000,
+  "r_rep": 5000,
+  "k_plant": 8,
+  "lift": 0.2,
+  "fwer_band": [
+    0.025,
+    0.05,
+    0.1
+  ],
+  "cell_n": {
+    "min": 46,
+    "median": 903,
+    "max": 5150
+  },
+  "plant_cells_n": [
+    3764,
+    3931,
+    4327,
+    4384,
+    4459,
+    5100,
+    5122,
+    5150
+  ],
+  "per_cell_fp_nominal": 0.04998,
+  "A_empirical_permutation": {
+    "perm_null_mean": 2.267,
+    "perm_null_mean_expected_binom": 2.299,
+    "s_star_empirical_q95": 5,
+    "s_star_binom_q95": 5,
+    "noise_realized_S": 3,
+    "noise_perm_p": 0.3896,
+    "planted_realized_S": 11,
+    "planted_perm_p": 0.001,
+    "noise_admitted": false,
+    "planted_admitted": true
+  },
+  "B_operating_characteristics": {
+    "fwer_0.025": {
+      "s_star": 6,
+      "binom_tail": 0.0075,
+      "noise_admission_rate": 0.006,
+      "noise_admission_wilson_hi": 0.0086,
+      "planted_power": 1.0,
+      "ok": true
+    },
+    "fwer_0.05": {
+      "s_star": 5,
+      "binom_tail": 0.0263,
+      "noise_admission_rate": 0.0248,
+      "noise_admission_wilson_hi": 0.0295,
+      "planted_power": 1.0,
+      "ok": true
+    },
+    "fwer_0.1": {
+      "s_star": 4,
+      "binom_tail": 0.0785,
+      "noise_admission_rate": 0.0774,
+      "noise_admission_wilson_hi": 0.0851,
+      "planted_power": 1.0,
+      "ok": true
+    }
+  },
+  "C_self_calibration_inflated_percell": {
+    "z_inflated": 1.55,
+    "per_cell_fp_inflated": 0.06057,
+    "s_star": 6,
+    "noise_admission_rate": 0.0214,
+    "noise_admission_wilson_hi": 0.0258,
+    "planted_power": 1.0,
+    "ok": true
+  },
+  "D_exp081_signband_sanity": {
+    "noise_signcount_90pct_interval": [
+      17,
+      29
+    ],
+    "exp081_observed_band": [
+      17,
+      28
+    ],
+    "exp081_in_noise_band": true,
+    "note": "EXP-081's 17/46-28/46 sits inside the Binomial(46,0.5) coin-flip noise band => 'availability ~ random' was the noise distribution; the binding CI_low>0/permutation gate separates a real lift from it."
+  },
+  "E_holm_unit_check": {
+    "input": [
+      0.2,
+      0.04,
+      0.005
+    ],
+    "adjusted": [
+      0.2,
+      0.08,
+      0.015
+    ],
+    "expected": [
+      0.2,
+      0.08,
+      0.015
+    ],
+    "ok": true
+  },
+  "checks": {
+    "not_vacuous_noise_admission_le_fwer": true,
+    "self_calibrating_under_inflated_percell": true,
+    "not_impossible_planted_power_ge_floor": true,
+    "permutation_null_matches_binomial": true,
+    "noise_axis_rejected_empirically": true,
+    "exp081_signband_sanity": true,
+    "holm_correct": true
+  },
+  "OVERALL": "GREEN"
+}
