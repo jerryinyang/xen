@@ -1,0 +1,75 @@
+{
+  "axis": "M",
+  "provisional_disposition": "ADMITTED (NON-BINDING \u2014 pending G-019 cross-axis Holm)",
+  "binding_note": "NON-BINDING: the binding admit/exonerate is G-019 (cross-axis Holm over {M,X,(F)} axis permutation p-values). EXP-086 emits the realized statistics.",
+  "S_M": 3,
+  "S_star": 2,
+  "axis_perm_p": 0.03259348130373925,
+  "ranking_z": 2.622012658961778,
+  "driving_sub_screen": "COND-NR7/tail",
+  "fwer_sensitivity_band": {
+    "0.025": {
+      "s_star": 3,
+      "admitted": false
+    },
+    "0.05": {
+      "s_star": 2,
+      "admitted": true
+    },
+    "0.1": {
+      "s_star": 2,
+      "admitted": true
+    }
+  },
+  "mc_stability_1000_vs_5000": {
+    "n_perm_stability": 1000,
+    "s_star_stability": 2,
+    "perm_p_stability": 0.03796203796203796
+  },
+  "d2a_null_band": [
+    17,
+    28
+  ],
+  "sub_screens": [
+    {
+      "primitive": "COND-HARAMI",
+      "read": "typical-range",
+      "stat": "median",
+      "S": 0,
+      "S_star_single": 0,
+      "perm_p_single": 1.0,
+      "n_powered_cells": 46,
+      "in_d2a_null_band": false
+    },
+    {
+      "primitive": "COND-HARAMI",
+      "read": "tail",
+      "stat": "tailmass",
+      "S": 0,
+      "S_star_single": 1,
+      "perm_p_single": 1.0,
+      "n_powered_cells": 46,
+      "in_d2a_null_band": false
+    },
+    {
+      "primitive": "COND-NR7",
+      "read": "typical-range",
+      "stat": "median",
+      "S": 0,
+      "S_star_single": 2,
+      "perm_p_single": 1.0,
+      "n_powered_cells": 46,
+      "in_d2a_null_band": false
+    },
+    {
+      "primitive": "COND-NR7",
+      "read": "tail",
+      "stat": "tailmass",
+      "S": 3,
+      "S_star_single": 2,
+      "perm_p_single": 0.0065986802639472104,
+      "n_powered_cells": 46,
+      "in_d2a_null_band": false
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "experiment": "EXP-086",
+  "phase": "019",
+  "axis": "M",
+  "hypothesis": "CF-VOLEXP-001/HYP-001",
+  "generated_at": "2026-06-22T18:55:34.740978+00:00",
+  "verdict": "SCREEN_DELIVERED",
+  "provisional_disposition_NON_BINDING": "ADMITTED (NON-BINDING \u2014 pending G-019 cross-axis Holm)",
+  "n_member_cells": 46,
+  "n_cell_primitive": 92,
+  "determinism_ok": true,
+  "determinism_metrics": true,
+  "determinism_gate_stream": true,
+  "recon_all_ok": true,
+  "read_region": "TRAIN sub-split [0, int(int(total_rows*0.7)*0.7)); analysis-TEST + holdout never sliced",
+  "seeds": {
+    "SEED_MASTER": 20260622,
+    "SEED_CONTROL": 20260622,
+    "SEED_POOL": 20260623,
+    "SEED_GATE": 20260624
+  },
+  "frozen_constants": {
+    "ATR_PERIOD": 14,
+    "EVENT_FLOOR": 30,
+    "N_PERM": 5000,
+    "N_PERM_STABILITY": 1000,
+    "FWER": 0.05,
+    "Z_ONE_SIDED": 1.645,
+    "NR_LOOKBACK": 7,
+    "K_TAIL": 3.0,
+    "pool_raw": [
+      8,
+      3000,
+      30000
+    ],
+    "primitives": "COND-HARAMI (raw detect_ha_harami) + COND-NR7 (real-OHLC NR7); D0-amendment-001",
+    "cap_basis": "cell MA(20,50)-segment tempo (adaptive_time_caps_by_epoch), EXP-081"
+  },
+  "module_hashes": {
+    "availability_gate": "8a8b432e8dea27fcae7bc63175c70659a32a5e965e7993b9cf9a7df61782e46f",
+    "compression_primitives": "f870f20d54f2d3c72790c28fc3e021ac86c87148b0458fb76263ea5e90211b1e",
+    "capgeo_geometry": "74042e8eb732fae7767cdc9415ff5418e08526edad14e27606f2a5613d8c78b0",
+    "capgeo_cost": "1795019240b0918233e0705dc9be148bd90793812e7fa3735aa23f36864e8781"
+  },
+  "cost_model_note": "Magnitude-budget uses the frozen EXP-085 4-instrument CONSERVATIVE table (AUDUSD/NZDUSD/USDCAD/USTEC); other instruments report COST_UNAVAILABLE (a 16-instrument cost table is a future-family concern, never tuned here).",
+  "holdout_untouched": true,
+  "counted_test_reads": 0,
+  "candidate_slots": 0
+}

@@ -174,14 +174,26 @@ Over each set's non-warmup/ATR-defined/non-clipped events:
   {typical-range, tail})`, `S = #cells-beat-random` over the ≤46 powered cells.
 - **Permuted-axis null construction (faithful to D0 §D2b: "shuffle which timestamps are signal, preserving
   per-cell event counts and the regime/direction match"):**
-  1. **Precompute a random-timing pool per (cell, primitive)** — draw a pool of `P = min(50_000, 40·n_cond)`
-     random-timing, same-regime-direction-eligible entries once and compute their per-event read metrics via
-     Step 3 (one-time cost; no per-permutation path scan).
+  1. **Precompute a random-timing pool per (cell, primitive)** — draw a pool of
+     `P_raw = min(n_bars, max(3000, 8·n_entries), 30000)` random-timing, same-regime-direction-eligible
+     entries once (raw draw count, where `n_entries` = the cell's raw conditioned entries) and compute their
+     per-event read metrics via Step 3 (one-time cost; no per-permutation path scan). The usable pool is what
+     survives the Step-2/Step-3 warmup/ATR/clip filters. The floor (3000 raw) guarantees a representative
+     random-timing law for every powered cell; the cap (30000 raw, and `n_bars` for small 4h cells) bounds
+     memory; the `8·n_entries` scale keeps the pool comfortably larger than any `n_cond`-sized draw. (Frozen
+     constants `POOL_RAW_MIN=3000`, `POOL_RAW_MULT=8`, `POOL_RAW_CAP=30000`.)
   2. **Each permutation `p` (of `N_PERM`):** per cell, draw a **fresh pseudo-signal** = an `n_cond`-sized
-     subsample from that cell's random pool (preserves the per-cell event count and the regime/direction
-     match; the pseudo-signal is pure-noise conditioning run through the identical pipeline). Compute
-     `Δ̂_p = θ_pseudo − θ_rand` and `beats_p = (Δ̂_p − 1.645·s_cell) > 0` using the **same fixed `s_cell`**
-     (Step 5). `S_perm[p, sub] = Σ_cells beats_p`.
+     **with-replacement** subsample from that cell's random pool (preserves the per-cell event count and the
+     regime/direction match; the pseudo-signal is pure-noise conditioning run through the identical pipeline).
+     Compute `Δ̂_p = θ_pseudo − θ_rand` and `beats_p = (Δ̂_p − 1.645·s_cell) > 0` using the **same fixed
+     `s_cell`** (Step 5). `S_perm[p, sub] = Σ_cells beats_p`. **With-replacement is a deliberate vectorization
+     choice** (it makes the permutation stream fully vectorized and deterministic); the ~10% within-draw
+     repeats it induces are statistically immaterial for a *null* calibration over a pool of thousands, and
+     the self-calibrating gate (bite §C) absorbs any residual per-cell test variation. This is the production
+     realization of the D0 §D2b "shuffle which timestamps are signal" null — drawing `n_cond` random
+     same-regime-eligible timestamps as the pseudo-signal is the faithful, scan-free instantiation of relabel
+     ling `n_cond` timestamps as "signal," and is closer to D0 §D2b than the bite-check's idealized sign-flip
+     abstraction (which only certified the gate is not vacuous / not impossible at `C=46`).
   3. **Within-axis multiplicity (the "screen 2 primitives × 2 reads, keep the best" risk):** the axis-level
      statistic is the **max across the 4 sub-screens**, `S_M = max_sub S`, with a **joint (max-statistic)
      permutation null** `S_perm_max[p] = max_sub S_perm[p, sub]` (same permutation index across sub-screens).
@@ -313,8 +325,11 @@ The experiment verdict is about completeness + integrity; the **admit/exonerate 
   flagged; warmup/ATR-undefined/clipped-empty counted and excluded (never folded into a statistic); permuted-p
   uses the `(1+·)/(1+N_PERM)` add-one form; no metric as a percentage over a zero baseline.
 - **Bounded iteration / progress / performance:** `tqdm` over the (cell × primitive) outer loop; the random
-  pool computed **once** per (cell, primitive) (pool cap `min(50_000, 40·n_cond)`); permutations subsample the
-  precomputed pool (no per-permutation path scan); per-cell memory bounded (do not retain all domain frames);
+  pool computed **once** per (cell, primitive) (raw draw `min(n_bars, max(3000, 8·n_entries), 30000)`;
+  `POOL_RAW_MIN=3000`/`POOL_RAW_MULT=8`/`POOL_RAW_CAP=30000`); permutations draw an `n_cond`-sized
+  **with-replacement** pseudo-signal subsample of the precomputed pool (no per-permutation path scan; the
+  with-replacement device is justified in Step 6.2 and the `availability_gate._perm_beats` docstring); per-cell
+  memory bounded (do not retain all domain frames);
   `N_PERM=5000`, `B_SE=2000`, all seeds recorded in `run_metadata.json`.
 - **Vectorization discipline:** vectorize intra-window max/argmax and the subsample-and-aggregate permutation
   inner loop with NumPy; keep the outer event loop and any causal step explicit — no transformation that
