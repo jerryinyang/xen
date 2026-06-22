@@ -1,0 +1,59 @@
+{
+  "experiment": "EXP-081",
+  "generated_at": "2026-06-22T03:26:32.183502+00:00",
+  "verdict": "CHARACTERISATION_DELIVERED",
+  "n_substrate_cells": 184,
+  "n_member_instrument_domain_cells": 46,
+  "n_underpowered_cells": 0,
+  "nondeterministic_cells": [],
+  "harami_entry_identity_geometry": true,
+  "read_region": "TRAIN sub-split [0, int(analysis_rows*0.7)); analysis-TEST + holdout never sliced",
+  "train_cutoffs": {
+    "EURUSD": 916692,
+    "GBPUSD": 917067,
+    "USDJPY": 917287,
+    "USDCHF": 912839,
+    "USDCAD": 914718,
+    "AUDUSD": 915306,
+    "NZDUSD": 915499,
+    "EURJPY": 920693,
+    "GBPJPY": 919928,
+    "AUDJPY": 919651,
+    "XAUUSD": 874351,
+    "BTCUSD": 1078665,
+    "USTEC": 874463,
+    "US500": 857311,
+    "US2000": 871443,
+    "JP225": 829187
+  },
+  "seeds": {
+    "SEED_RANDOM": 20260621,
+    "SEED_ASS": 20260621
+  },
+  "frozen_constants": {
+    "ATR_PERIOD": 14,
+    "K_TAIL": 3.0,
+    "DIP_ALPHA": 0.05,
+    "EVENT_FLOOR": 30,
+    "GUARD_I_N": 60,
+    "N_BOOT": 10000,
+    "timecap": "xen.expectancy frozen TIMECAP_* (K=1.5, WINDOW=20, FLOOR=6, MIN_MOVES=5)",
+    "cap_basis": "cell MA(20,50)-segment move-duration tempo (adaptive_time_caps_by_epoch) applied to all 4 substrates by entry epoch",
+    "quantile_method": "numpy linear"
+  },
+  "module_hashes": {
+    "capgeo_geometry": "74042e8eb732fae7767cdc9415ff5418e08526edad14e27606f2a5613d8c78b0",
+    "capgeo_substrates": "a580e693fc986d9fffe725099e4607422c7a41e8004db88e316c481cecf43570",
+    "domain_bars": "ffef654519a7551e93ed41e583422fbe79796699c9418e41680979a52dda945b",
+    "ass": "d6e1f1d51bc1287cb3d93a3a2eca4a7b4d276a1fd7350e7b7f974eb025e19087",
+    "expectancy": "42c6c26821975357c7e8c3963198a136d106e2197073dda690b64a08bb43b82e"
+  },
+  "exp080_reconciliation": {
+    "train_le_full_all": true,
+    "n_compared": 184,
+    "n_train_le_full": 184
+  },
+  "holdout_untouched": true,
+  "counted_test_reads": 0,
+  "candidate_slots": 0
+}

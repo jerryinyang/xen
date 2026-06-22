@@ -1,0 +1,90 @@
+{
+  "experiment": "EXP-080",
+  "generated_at": "2026-06-21T23:31:01.586123+00:00",
+  "verdict": "READINESS_DELIVERED",
+  "status_counts": [
+    {
+      "readiness_status": "NOT_READY",
+      "count": 8
+    },
+    {
+      "readiness_status": "READY",
+      "count": 184
+    }
+  ],
+  "nondeterministic_cells": 0,
+  "invariant_failure_cells": 0,
+  "halt_invariant_ge3_instruments": false,
+  "null_fpr_uncontrolled_operating": false,
+  "null_fpr_small_n_inflation_disclosed": true,
+  "null_fpr_operating_floor_n": 120,
+  "harami_entry_identity_all_cells": true,
+  "harami_entry_identity_basis": "shared detector by construction (both harami substrates carry the one MA-native /STRONG-STAT-conditioned HA-harami entry; they differ only by exit, not applied in EXP-080) -> entry-level counted-read accounting coincides",
+  "n_substrate_cells": 192,
+  "instruments": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "USDCHF",
+    "USDCAD",
+    "AUDUSD",
+    "NZDUSD",
+    "EURJPY",
+    "GBPJPY",
+    "AUDJPY",
+    "XAUUSD",
+    "BTCUSD",
+    "USTEC",
+    "US500",
+    "US2000",
+    "JP225"
+  ],
+  "missing_instruments": {},
+  "domains": [
+    "15m",
+    "1h",
+    "4h"
+  ],
+  "regression_check": {
+    "period_minutes": 15,
+    "rows_ours": 85839,
+    "rows_val005": 85839,
+    "frame_identical": true
+  },
+  "seeds": {
+    "SEED_RANDOM": 20260621,
+    "SEED_NULL": 20260621
+  },
+  "frozen_constants": {
+    "bracket": [
+      15,
+      8000
+    ],
+    "drop_bands": [
+      0.1,
+      0.25
+    ],
+    "ma_slow": 50,
+    "avwap_slow_ma": 50
+  },
+  "source_files": {
+    "EURUSD": "timebars_eurusd_20210602_000000_20260621_183431.parquet",
+    "GBPUSD": "timebars_gbpusd_20210602_000000_20260621_191545.parquet",
+    "USDJPY": "timebars_usdjpy_20210602_000000_20260621_191926.parquet",
+    "USDCHF": "timebars_usdchf_20210602_000000_20260621_192256.parquet",
+    "USDCAD": "timebars_usdcad_20210602_000000_20260621_192617.parquet",
+    "AUDUSD": "timebars_audusd_20210602_000000_20260621_190311.parquet",
+    "NZDUSD": "timebars_nzdusd_20210602_000000_20260621_190312.parquet",
+    "EURJPY": "timebars_eurjpy_20210602_000000_20260621_190314.parquet",
+    "GBPJPY": "timebars_gbpjpy_20210602_000000_20260621_190323.parquet",
+    "AUDJPY": "timebars_audjpy_20210602_000000_20260621_190724.parquet",
+    "XAUUSD": "timebars_xauusd_20210602_000000_20260621_190824.parquet",
+    "BTCUSD": "timebars_btcusd_20210602_000000_20260621_190803.parquet",
+    "USTEC": "timebars_ustec_20210602_000000_20260621_190833.parquet",
+    "US500": "timebars_us500_20210602_000000_20260621_191131.parquet",
+    "US2000": "timebars_us2000_20210602_000000_20260621_191208.parquet",
+    "JP225": "timebars_jp225_20210602_000000_20260621_191231.parquet"
+  },
+  "polars_version": "1.41.2",
+  "numpy_version": "2.4.6"
+}

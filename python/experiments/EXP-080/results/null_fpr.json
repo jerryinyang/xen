@@ -1,0 +1,86 @@
+{
+  "params": {
+    "n_values": [
+      15,
+      30,
+      60,
+      120,
+      250,
+      500,
+      2000
+    ],
+    "n_null": 5000,
+    "n_boot": 10000,
+    "alpha": 0.1,
+    "fpr_target": 0.05,
+    "wilson_hi_gate": 0.075,
+    "operating_floor_n": 120,
+    "halt_binds_on": "operating regime (n >= operating_floor_n) only; small-n inflation disclosed per Phase-017 D6 Guard (i) + D9 floor",
+    "carrier": "EURUSD-15m centered domain-bar log-returns (non-tradable machinery probe)"
+  },
+  "rows": [
+    {
+      "n": 15,
+      "fpr": 0.0828,
+      "wilson_hi": 0.09076275804254644,
+      "n_null": 5000,
+      "controlled": false,
+      "regime": "small_n_disclosed",
+      "note": ""
+    },
+    {
+      "n": 30,
+      "fpr": 0.0776,
+      "wilson_hi": 0.08534439268208673,
+      "n_null": 5000,
+      "controlled": false,
+      "regime": "small_n_disclosed",
+      "note": ""
+    },
+    {
+      "n": 60,
+      "fpr": 0.0738,
+      "wilson_hi": 0.08137869968412752,
+      "n_null": 5000,
+      "controlled": false,
+      "regime": "small_n_disclosed",
+      "note": ""
+    },
+    {
+      "n": 120,
+      "fpr": 0.0574,
+      "wilson_hi": 0.06419376401469082,
+      "n_null": 5000,
+      "controlled": true,
+      "regime": "operating",
+      "note": ""
+    },
+    {
+      "n": 250,
+      "fpr": 0.061,
+      "wilson_hi": 0.06797694363152859,
+      "n_null": 5000,
+      "controlled": true,
+      "regime": "operating",
+      "note": ""
+    },
+    {
+      "n": 500,
+      "fpr": 0.0588,
+      "wilson_hi": 0.0656658110269646,
+      "n_null": 5000,
+      "controlled": true,
+      "regime": "operating",
+      "note": ""
+    },
+    {
+      "n": 2000,
+      "fpr": 0.0492,
+      "wilson_hi": 0.0555489008120506,
+      "n_null": 5000,
+      "controlled": true,
+      "regime": "operating",
+      "note": ""
+    }
+  ]
+}
