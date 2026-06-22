@@ -11,7 +11,7 @@
 
 - **VAL-001** — Data Architecture Temporal Integrity Validation
 - **VAL-004** — 15m/30m Domain Temporal-Integrity Validation (Phase 014 Gate)
-- **VAL-005** — *(PENDING)* 5-Year 1-Minute Dataset Validation (INFR-003 gate): temporal integrity (VAL-001 suite) + admission/negative controls (VAL-003) + coverage + holdout seal + determinism, on the re-collected 5-year dataset. Scoped 2026-06-20; gates Phase 018 (CF-CAPGEO-001). Design: [`../../checkpoints/2026-06-20-INFR-003-five-year-data-upgrade/design.md`](../../checkpoints/2026-06-20-INFR-003-five-year-data-upgrade/design.md).
+- **VAL-005** — **PASS (ADMITTED, 2026-06-21)** 5-Year 1-Minute Dataset Validation (INFR-003 gate): temporal integrity (VAL-001 suite) + admission/negative controls (VAL-003) + coverage + holdout seal + determinism, on the re-collected 5-year dataset (16 instruments; DE30 dropped). All 5 gates PASS; unblocks Phase 018 (CF-CAPGEO-001). Detail card below. Design: [`../../checkpoints/2026-06-20-INFR-003-five-year-data-upgrade/design.md`](../../checkpoints/2026-06-20-INFR-003-five-year-data-upgrade/design.md); report: [`../../../../python/experiments/VAL-005/report.md`](../../../../python/experiments/VAL-005/report.md).
 
 ---
 
@@ -100,3 +100,38 @@ The 15m/30m domains in both strict and tolerant modes preserve temporal alignmen
 
 - Tolerant-mode dropped fractions are consistently lower than strict fractions (tolerant retains legitimate partial windows), confirming the coverage trade-off is measured, not assumed.
 - Index instruments (DE30, JP225, US500) have higher dropped fractions reflecting session gaps, but all clear the 0.25 admission gate — consistent with the Phase 011 2h dropped-fraction convention (JP225-2h was excluded at >0.25; no 15m/30m cell reaches that threshold).
+
+---
+
+## VAL-005 — 5-Year 1-Minute Dataset Validation (INFR-003 Gate)
+
+**Status**: SUPPORTED (PASS — ADMITTED)
+**Date**: 2026-06-21
+**Instruments**: 16 — EURUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURJPY, GBPJPY, AUDJPY, XAUUSD, BTCUSD, USTEC, US500, US2000, JP225. **DE30 dropped** at INFR-003 operator ratification (broker m1 history ended 2026-01-16 — stale; design §3.1). The VAL-003-admitted universe was 17; CF-CAPGEO-001 runs on 16.
+**Data Views / Feature Categories**: 1-minute base bars; 15m/1h/4h domain bars via `bar_aggregator` (clock-aligned, deployed `min_coverage=0.90` path).
+
+### Scope
+
+- **Instruments**: the 16 INFR-003-collected (VAL-003 universe minus DE30).
+- **Span**: ~5-year target from 2021-06-01 (D-span ratified); all 16 reach 2021-06-02 — **0 truncations**.
+- **Data Views**: 1-minute base + deployed 15m/1h/4h domain bars (the CF-CAPGEO-001 construction).
+- **Slice**: first-70% analysis rows only; final-30% sealed at first touch.
+- **Suite reuse**: VAL-001 rev.3 / VAL-003 pure check functions **and** the full negative-control battery imported **unchanged**; VAL-005 adds only 5-year file discovery, the deployed-coverage oracle, coverage/span accounting, the holdout-seal manifest, and the resample determinism two-pass.
+- **Exclusions**: final-30% holdout (sealed, never inspected); no edge/candidate inference; no parameter tuning.
+
+### Results / Observations
+
+- **All 5 gates PASS** → **ADMITTED**. G1 temporal integrity 369/369 (0 FAIL/0 INCONCLUSIVE); G2 23/23 negative controls + golden fixture; G3 16/16 present + 0 truncations; G4 holdout seal **0 rows read**; G5 48/48 byte-identical two-pass.
+- **20,793,010** analysis (first-70%) rows validated; **8,911,301** final-30% holdout rows sealed and never inspected.
+- Analysis slice spans ~1289–1380 days (~3.5–3.8y) — roughly **2×** the old-dataset analysis window (~2.3y); the 4h power upgrade INFR-003 targeted.
+- Median inter-bar gap 60s for every instrument (clean 1-minute cadence); BTCUSD wider span / fewer session breaks (24/7).
+- **G1 finding (resolved):** the deployed `min_coverage=0.90` path emitted 1 trailing partial-window bar per instrument/TF (4 cells flagged) whose nominal right-labelled `CloseTime` sits <1 window past the analysis-slice max (causal OHLC; nominal label only — VAL-003 never saw this as it validated strict mode only). Operator decision 2026-06-21: **fence-drop** — `build_domain_bars` drops any window labelled past the slice; re-run clean. CF-CAPGEO-001 inherits the fence.
+
+### Hypothesis-Specific Conclusion
+
+**SUPPORTED (PASS — ADMITTED).** The 5-year, 16-instrument dataset preserves temporal integrity, detects all negative controls, meets coverage/completeness, seals the new final-30% holdout per file at first touch (0 rows read), and reproduces its deployed domain views deterministically. It is canonical for CF-CAPGEO-001. With G-017 `DISCOVERY_ONLY` resolved, **both Phase 018 preconditions are met**.
+
+### Hypothesis-Agnostic Observations
+
+- The trailing-window holdout fence is now a **canonical domain-construction rule** for holdout-fenced analysis slices: drop any resample window whose label crosses the slice boundary (recorded in `dataset-reference.md` and the Phase 018 design). Any future change to `aggregate_ohlc()` or the coverage convention should trigger a VAL rerun.
+- DE30 may be re-collected via an alternate broker symbol in a later INFR item if a fresh m1 source is found; until then CF-CAPGEO-001 is a 16-instrument universe.

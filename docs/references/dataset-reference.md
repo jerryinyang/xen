@@ -6,6 +6,37 @@
 
 Xen does not store or process raw tick data. The 1-minute time bar is the smallest stored unit and the source for all chart-type generators.
 
+## Canonical Datasets by Era
+
+Xen has two coexisting base-data eras; the **latest-glob convention selects the newest file
+per symbol**, so new work is canonical-by-recency. Older files are retained for closed-family
+reproducibility and must not be mixed with the new dataset within one analysis.
+
+| Era | Files | Span | Universe | Governs | Admitted by |
+|---|---|---|---|---|---|
+| **INFR-003 5-year (canonical for CF-CAPGEO-001)** | `timebars_<sym>_20210602_*_2026062*_*.parquet` | ~5y, 2021-06-02 → 2026-06-21 collection date | **16** (VAL-003 universe **minus DE30**) | Phase 018 onward | **VAL-005 (2026-06-21, PASS)** |
+| Old (pre-INFR-003) | `timebars_<sym>_20230102/03_*` and `analysis70_*` | ~3.3y, 2023-01 → 2026-05/06 | 17 | closed families CF-AVWAP-001, CF-HA-HARAMI-001 | VAL-001 / VAL-003 / VAL-004 |
+
+**DE30 dropped from the 5-year dataset** (operator ratification 2026-06-21, INFR-003 §3.1):
+its broker m1 history ended 2026-01-16 (stale) and cannot supply current-edge rows. DE30's
+VAL-003 admission and old-dataset files are unaffected; it may be re-collected via an
+alternate broker symbol in a later INFR item.
+
+**5-year holdout re-seal:** the new final-30% global holdout was sealed per file at first
+touch on each file's own 2021-06 → collection-date timeline (VAL-005 G4, 0 holdout rows
+read); `test-read-ledger.md` was re-materialized on the new 16×{15m,1h,4h} strata (all 0
+counted reads). The old-dataset ledger and the single spent holdout shot (EXP-032) do not
+transfer.
+
+**Deployed domain-construction fence (CF-CAPGEO-001).** Domain bars (15m/1h/4h) are built
+from the 1-minute analysis slice via `aggregate_ohlc(..., min_coverage=0.90)` **plus an
+analysis-boundary fence**: drop any resample window whose right-labelled `CloseTime` exceeds
+the last available source bar. The coverage-tolerant mode otherwise retains a trailing
+partial window whose nominal grid-boundary label crosses into holdout-minute timestamps
+(causal OHLC, nominal label only); the fence keeps domain bars holdout-clean (VAL-005 G1
+finding, operator decision 2026-06-21). Strict-mode resamples (`min_coverage=None`) drop all
+partial windows and need no fence.
+
 ## Data Locations
 
 **Base data:**

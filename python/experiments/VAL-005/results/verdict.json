@@ -1,0 +1,89 @@
+{
+  "experiment_id": "VAL-005",
+  "gates": [
+    {
+      "gate": "G1",
+      "status": "PASS",
+      "summary": "369 checks, 0 FAIL, 0 INCONCLUSIVE",
+      "title": "Temporal integrity"
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "summary": "23 controls, 0 missed; golden_fixture_fail=0",
+      "title": "Negative controls"
+    },
+    {
+      "gate": "G3",
+      "status": "PASS",
+      "summary": "16/16 present; truncations disclosed: none",
+      "title": "Coverage / completeness"
+    },
+    {
+      "gate": "G4",
+      "status": "PASS",
+      "summary": "16 files sealed; holdout_rows_read=0",
+      "title": "Holdout seal"
+    },
+    {
+      "gate": "G5",
+      "status": "PASS",
+      "summary": "48 two-pass checks, 0 non-identical",
+      "title": "Determinism"
+    }
+  ],
+  "metadata": {
+    "domains_min": [
+      15,
+      60,
+      240
+    ],
+    "dropped_symbols": [
+      "DE30"
+    ],
+    "experiment_id": "VAL-005",
+    "holdout_rule": "first 70 percent analysis slice only",
+    "infr003_min_collected": "2026-06-20",
+    "min_coverage": 0.9,
+    "source_files": {
+      "AUDJPY": "timebars_audjpy_20210602_000000_20260621_190724.parquet",
+      "AUDUSD": "timebars_audusd_20210602_000000_20260621_190311.parquet",
+      "BTCUSD": "timebars_btcusd_20210602_000000_20260621_190803.parquet",
+      "EURJPY": "timebars_eurjpy_20210602_000000_20260621_190314.parquet",
+      "EURUSD": "timebars_eurusd_20210602_000000_20260621_183431.parquet",
+      "GBPJPY": "timebars_gbpjpy_20210602_000000_20260621_190323.parquet",
+      "GBPUSD": "timebars_gbpusd_20210602_000000_20260621_191545.parquet",
+      "JP225": "timebars_jp225_20210602_000000_20260621_191231.parquet",
+      "NZDUSD": "timebars_nzdusd_20210602_000000_20260621_190312.parquet",
+      "US2000": "timebars_us2000_20210602_000000_20260621_191208.parquet",
+      "US500": "timebars_us500_20210602_000000_20260621_191131.parquet",
+      "USDCAD": "timebars_usdcad_20210602_000000_20260621_192617.parquet",
+      "USDCHF": "timebars_usdchf_20210602_000000_20260621_192256.parquet",
+      "USDJPY": "timebars_usdjpy_20210602_000000_20260621_191926.parquet",
+      "USTEC": "timebars_ustec_20210602_000000_20260621_190833.parquet",
+      "XAUUSD": "timebars_xauusd_20210602_000000_20260621_190824.parquet"
+    },
+    "suite_lineage": "VAL-001 rev.3 / VAL-003 checks + negative-control battery, imported unchanged",
+    "target_span_start": "2021-06-01",
+    "target_symbols": [
+      "EURUSD",
+      "GBPUSD",
+      "USDJPY",
+      "USDCHF",
+      "USDCAD",
+      "AUDUSD",
+      "NZDUSD",
+      "EURJPY",
+      "GBPJPY",
+      "AUDJPY",
+      "XAUUSD",
+      "BTCUSD",
+      "USTEC",
+      "US500",
+      "US2000",
+      "JP225"
+    ]
+  },
+  "missing_instruments": {},
+  "verdict": "PASS"
+}

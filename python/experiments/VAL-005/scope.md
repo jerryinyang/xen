@@ -10,9 +10,14 @@ VAL-003 (admission / negative controls) on the re-collected dataset.
 
 ---
 
+> **Universe note (operator ratification, 2026-06-21):** DE30 is **dropped** from the INFR-003
+> collection (broker m1 history ended 2026-01-16 — stale; see INFR-003 design §3.1). VAL-005
+> validates the **16** collected instruments (VAL-003 universe minus DE30). References to "all 17"
+> below read as **16** for this build.
+
 ## 1. Question
 
-> Does the re-collected ~5-year 1-minute dataset (all 17 instruments) preserve temporal integrity,
+> Does the re-collected ~5-year 1-minute dataset (16 instruments) preserve temporal integrity,
 > detect all injected negative controls, meet coverage/completeness expectations, correctly seal the
 > new final-30% holdout per file at first touch, and reproduce its derived views deterministically —
 > i.e., is it admissible as the canonical dataset for CF-CAPGEO-001?
@@ -21,7 +26,8 @@ This is a data-admission validation, not an edge claim. No candidate, no slot, n
 
 ## 2. Scope
 
-- **Instruments:** all 17 VAL-003-admitted (5-year m1 files produced by INFR-003).
+- **Instruments:** the 16 INFR-003-collected (VAL-003 universe minus the dropped DE30; 5-year m1
+  files produced by INFR-003).
 - **Views:** 1-minute base bars; 15m/1h/4h resamples via `bar_aggregator` (clock-aligned,
   `min_coverage=0.90`). (Chart-type views out of VAL-005 scope unless CF-CAPGEO-001 later requires.)
 - **Slice:** validation reads **first-70% analysis rows only**; the new final-30% holdout is sealed

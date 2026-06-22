@@ -56,6 +56,26 @@ a re-materialized `test-read-ledger.md`; (d) an updated `docs/references/dataset
 | **D-seal** | Holdout seal | **Final-30% per file sealed at first touch** on the new dataset (in-robot self-guard + Python harness re-assertion, the VAL-003 mechanism). The new holdout is never read. The single historical sanctioned holdout shot (EXP-032, EURUSD-4h, old dataset) is unaffected and not transferable. |
 | **D-domains** | Domain construction | 15m/1h/4h built from the new 1-minute base via the established `bar_aggregator` (clock-aligned, `min_coverage=0.90`); 5m/30m/etc. constructible but out of CF-CAPGEO-001 scope. |
 
+### 3.1 Operator ratification (2026-06-21)
+
+Locked before collection (per §8 step 1):
+
+- **D-span — RATIFIED as proposed.** ~5-year target, start **2021-06-01**, ending at the
+  collection date; each instrument begins wherever its broker m1 history actually starts if later,
+  with a per-instrument truncation disclosure (INFR-002 pattern). The new final-30% holdout boundary
+  falls on each file's own 2021-06→collection-date timeline.
+- **D-instr — DEVIATION from proposal.** **DE30 is DROPPED from this collection.** Rationale: INFR-002
+  found DE30's broker m1 history ended 2026-01-16 (already ~5 months stale at the INFR-003 collection
+  date) — it cannot supply current-edge m1 rows for CF-CAPGEO-001 and would only enter as a truncated,
+  stale-tailed series. Rather than admit it INCONCLUSIVE again, the operator excludes it.
+  **CF-CAPGEO-001 runs on 16 instruments** (the VAL-003 universe minus DE30): EURUSD, GBPUSD, USDJPY,
+  USDCHF, USDCAD, AUDUSD, NZDUSD, EURJPY, GBPJPY, AUDJPY, XAUUSD, BTCUSD, USTEC, US500, US2000, JP225.
+  DE30's VAL-003 admission and its old-dataset files are unaffected (retained for closed-family
+  reproducibility); DE30 may be re-collected via an alternate broker symbol in a later INFR item if a
+  fresh m1 source is found. VAL-005 validates the **16** collected instruments; the "all 17" language
+  in §4–§7 and the VAL-005 scope reads as **16** for this build.
+- **D-tool / D-store / D-seal / D-domains — RATIFIED as proposed.**
+
 ## 4. Holdout & TEST-ledger governance (binding)
 
 Re-collection is a **holdout-governance event**. The following are mandatory:
