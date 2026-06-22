@@ -1,9 +1,19 @@
 # Phase 018 — CF-CAPGEO-001: Data-Derived Exit / Capture Geometry (DRAFT SKELETON)
 
-**Status:** **DRAFT — GATED, NOT OPENED.** Pre-drafted 2026-06-20; **revised 2026-06-21 for the G-017
-`DISCOVERY_ONLY` outcome.** **Does not open** until **INFR-003 COMPLETE ∧ VAL-005 PASS** (the G-017
-gate is already resolved — see below). The directory date will be re-stamped to the actual open date if
-it differs; all numeric/slate items below are skeleton placeholders pending the Phase 018 D0.
+**Status:** **DRAFT — BOTH PRECONDITIONS NOW MET (2026-06-21); ready to open at D0.** Pre-drafted
+2026-06-20; revised 2026-06-21 for the G-017 `DISCOVERY_ONLY` outcome. The two opening preconditions are
+both satisfied: **G-017 resolved `DISCOVERY_ONLY` (2026-06-21)** and **INFR-003 COMPLETE ∧ VAL-005 PASS
+(2026-06-21)**. The directory date will be re-stamped to the actual open date if it differs; all
+numeric/slate items below are skeleton placeholders pending the Phase 018 D0.
+
+> **Universe correction (2026-06-21):** the Phase 018 universe is **16 instruments**, not 17 — **DE30
+> was dropped** at the INFR-003 operator ratification (broker m1 history ended 2026-01-16 — stale; INFR-003
+> design §3.1). Every "all 17" below reads as the 16-instrument VAL-005-admitted set (VAL-003 universe minus
+> DE30). EXP-080's substrate-readiness cell grid is 16 × {15m,1h,4h}. **Data:** the VAL-005-admitted
+> 5-year dataset (2021-06-02 → 2026-06-21; new final-30% holdout sealed, 0 rows read; `test-read-ledger.md`
+> re-materialized on the new 16×{15m,1h,4h} strata, all 0 counted reads). **Domain construction** uses the
+> holdout-fenced `build_domain_bars` rule (VAL-005 G1 finding): drop any 0.90-coverage resample window
+> whose label crosses the analysis-slice boundary.
 **Family:** `CF-CAPGEO-001` (REGISTERED, SCREENING-GATED — `candidate-families/cf-capgeo-001.md`).
 **Opened by (when it opens):** INFR-003 completion + VAL-005 PASS (G-017 resolved 2026-06-21).
 **Discipline (binding):** all returns/expectancy on **real prices**; HA/Renko brick prices never used
@@ -44,7 +54,8 @@ overlay**, and behind a **pre-TEST separability gate** that would have pre-empte
 | `SUB-HARAMI-V2A-ADVNONE` | CF-HA-HARAMI-001 `N-V2A×ADV-NONE` entry population | real prior entry |
 | `SUB-RANDOM` | fixed-seed random entry, matched per domain | attribution null |
 
-- **Domains:** 15m, 1h, 4h. **Instruments:** all 17. **Data:** the 5-year post-INFR-003 dataset.
+- **Domains:** 15m, 1h, 4h. **Instruments:** 16 (VAL-003 universe minus DE30 — see the universe
+  correction note above). **Data:** the 5-year post-INFR-003, VAL-005-admitted dataset.
 - **Substrates never pooled** without a demonstrated-homogeneity claim (retrospective §2.5);
   per-stratum adjudication is the default, pooled is disclosure-only (LESSON-001).
 

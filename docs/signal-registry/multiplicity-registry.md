@@ -635,10 +635,16 @@ and re-validation conditions C1–C4 (gate §10). 0 candidate slots, 0 counted T
 **Registered:** 2026-06-20 (family `REGISTERED`, SCREENING-GATED).
 **Opens only when:** INFR-003 complete (5-year data + holdout re-seal + VAL-005 PASS). **G-017 resolved
 2026-06-21 — `DISCOVERY_ONLY`:** the binding qualifier is therefore the **frozen referee suite**, with
-`ASS` admitted as a non-binding discovery overlay (not `ASS_VALIDATED`). Phase 018 opens once INFR-003
-+ VAL-005 land, with its own D0/G0 carrying the Phase-017 guards, the §7.1 bracket re-confirmation, and
-the separability gate.
-**Governing design:** Phase 018 design (created when the batch opens; not yet written).
+`ASS` admitted as a non-binding discovery overlay (not `ASS_VALIDATED`). **BOTH PRECONDITIONS MET
+2026-06-21** (INFR-003 COMPLETE ∧ VAL-005 PASS; G-017 `DISCOVERY_ONLY`). **Phase 018 D0 RATIFIED —
+G0 PASS 2026-06-21** (`D0-predeclarations.md`) — carries the Phase-017 guards (§D6), the §D7 `[15,8000]`
+bracket re-confirmation, the frozen EXP-082 derivation rule (§D3), and the separability gate + G-018
+conjunction (§D4). **G0 closed:** D9 bite-check GREEN (separability constants FROZEN `K_tail=3.0,
+τ_tail=0.06, δ=0.40, m=m_cell`, floor n≥120; `B_pos` blind spot dispositioned benign — `bite-check/`);
+D2 (no per-variant rationing) + D8 (EURUSD eligible, clean slate) operator-ratified. **Phase 018 OPEN;
+pipeline opens at EXP-080** (HYP-001 readiness, 0 slots / 0 TEST reads).
+**Governing design:** Phase 018 [`design.md`] + [`D0-predeclarations.md`]
+(`checkpoints/2026-06-20-018-capgeo-exit-geometry/`).
 **Candidate family:** `CF-CAPGEO-001` — data-derived exit / capture geometry on four frozen entry
 substrates. Family spec: `candidate-families/cf-capgeo-001.md`.
 
@@ -649,9 +655,10 @@ substrates. Family spec: `candidate-families/cf-capgeo-001.md`.
 | Candidate-family count | 1 (`CF-CAPGEO-001`) |
 | Entry substrates (frozen, never tuned) | `SUB-AVWAP`, `SUB-HARAMI-PARTIAL-V2A`, `SUB-HARAMI-V2A-ADVNONE`, `SUB-RANDOM` (matched-control) |
 | Domains | 15m, 1h, 4h |
-| Instruments | all 17 VAL-003-admitted (5-year, post-INFR-003) |
+| Instruments | **16** — VAL-003 universe **minus DE30** (dropped at INFR-003 §3.1; broker m1 stale). *(Amended at Phase 018 D0, 2026-06-21; "all 17" → 16; removes one instrument, consumes no new slot.)* 5-year, post-INFR-003, VAL-005-admitted. |
 | Open axis | exit / capture geometry + sizing only |
 | Registered exit/sizing branches | `/EXIT-DERIVED`, `/EXIT-RR`, `/EXIT-TRAIL`, `/EXIT-VP`, `/EXIT-PARTIAL`, `/SIZE-VOLADJ` (`/MTF`, `/VOLREGIME` deferred) |
+| Derived candidates (Phase 018 D0, under `/EXIT-DERIVED`) | `D1-MEDIAN-CAPTURE`, `D2-TAIL-ROBUST`, `D3-CAPTURE-EFFICIENT` — triple-barrier exits whose barriers are mechanically set from EXP-081 cell statistics (D0-predeclarations §D3; freeze-the-rule). Carried to EXP-083; refuted/blocked/inconclusive variants retained in the ledger. |
 | Binding qualifier | **frozen referee suite** (G-017 resolved `DISCOVERY_ONLY` 2026-06-21); `ASS` is a non-binding discovery overlay |
 | Co-primary endpoint | expectancy + median + tail diagnostic (real prices) |
 | Binding pre-TEST gate | **separability check** (binding net-expectancy leg and favourable signal not driven by one unfilterable mechanism — retrospective §4.1) |
@@ -662,6 +669,13 @@ substrates. Family spec: `candidate-families/cf-capgeo-001.md`.
 No candidate slot is consumed by registration. Each derived or benchmark exit variant carried to a
 binding read is a countable item registered at the Phase 018 D0 with its own EXP-ID. Refuted,
 blocked, and inconclusive variants remain in the file-drawer ledger — never deleted or reused.
+
+### Phase 018 experiment outcomes
+
+| EXP | HYP | Role | Slots / TEST | Status |
+| --- | --- | --- | --- | --- |
+| **EXP-080** | HYP-001 | Substrate/exit **readiness** (4 frozen substrates × 16 instruments × {15m,1h,4h} = 192 substrate-cells, 5-year data): determinism, look-ahead invariants, coverage map, D7 `[15,8000]` bracket re-confirmation, moving-block null-FPR machinery sanity, harami entry-identity. | 0 / 0 | **COMPLETE 2026-06-22 — READINESS_DELIVERED; re-audit PASS.** 184/192 substrate-cells READY. **2 cells `COVERAGE_EXCLUDED` (retained, never deleted): US500-4h (dropped 0.251), JP225-4h (0.281)** — genuine 4h cash-equity-index coverage sparsity (invariants+determinism pass; US500-4h borderline; EXP-043 index-coarse-domain precedent) → excluded from EXP-081 with record. **Member set for EXP-081 = 46 instrument×domain cells.** D7 **192/192 IN_BRACKET** (`ASS` discovery in its validated regime ∀ cell; frozen referee suite binding regardless — D0 §D7). Null-FPR machinery **CONTROLLED in the binding operating regime n≥120** (wilson_hi 0.064–0.068) at the validated m_cell scale (N_NULL=5000, N_BOOT=10000); small-n (n<120) inflation disclosed/non-binding (D0 §D6 Guard (i)/§D9). 0 nondeterministic, 0 invariant failures; **harami entry-identity holds ∀ cells** (both harami substrates share one MA-native conditioned HA-harami entry → entry-level counted-read accounting coincides; they remain distinct downstream by exit). Regression vs VAL-005 frame-identical (85839 rows). **0 candidate slots, 0 counted TEST reads** (full-analysis-slice readiness exposure = disclosure, entered in `test-read-ledger.md`); holdout sealed. Initial run was SUBSTRATE_REFUTED on two verdict-material audit defects (dropped-fraction metric mis-denominatored vs a 24/7 clock; null-FPR probe under-scaled) — both fixed, Stage-5 governance ruled re-scale to the validated machinery, re-run + re-audit PASS. |
+| **EXP-081** | HYP-002 | **Characterize** (TRAIN-only, gross): per-substrate realized return-structure features over the per-event adaptive cap (real prices) — the **frozen D3 inputs** for the `/EXIT-DERIVED` candidates `D1-MEDIAN-CAPTURE` / `D2-TAIL-ROBUST` / `D3-CAPTURE-EFFICIENT`. 4 substrates × 46 member cells = 184 substrate-cells. | 0 / 0 | **COMPLETE 2026-06-22 — CHARACTERISATION_DELIVERED; audit PASS (0C/1W/3I).** No new countable item; no item refuted — this experiment **locks the D3 inputs** the registered derived candidates consume at EXP-082/083. 184/184 cells delivered; 0 underpowered (n_usable 46–5535, median 1083), 0 nondeterministic, harami PARTIAL-V2A ≡ V2A-ADVNONE geometry exact, EXP-080 entry reconciliation 184/184 (TRAIN ≤ full), holdout untouched. **D3 EXP-082-ready:** T_fav=MFE_med/MFE_q40 (~3.2–3.4 ATR), S_adv=m_anti else MAE_q90 (m_anti NaN 183/184 → MAE_q90 fallback ~9–9.7 ATR, exactly as D9 anticipated), H_cap=TTP_q75/TTP_med (~37–52 bars); no cell below the 30-event floor. **Mechanism (per-cell paired vs within-cell SUB-RANDOM): gross capture availability ≈ random** (harami median MFE below random 17/46, AVWAP coin-flip 28/46, outcome-median edge ~chance 23–25/46) — move availability is NOT the differentiator (AVWAP-situation/EXP-047 echo on 5-year data); the only structure is the **outcome shape** — harami **median +0.135 / mean ≈ 0.000, 33/46 cells median>mean** (catastrophic left-tail drag, tailmass 0.0526 > random 0.0437) = **CF-HA-HARAMI-001 median-positive/mean-killed signature reproduced on disjoint 5-year data**; AVWAP roughly symmetric (mean +0.157 ≈ median +0.150); random baseline median +0.085. m_anti resolves 1/184 (US500-1h AVWAP) — catastrophe a heavy continuous tail, not a separated mode (dip genuinely exercised, dip_p median 0.976). `ASS` discovery NON-BINDING (G-017). **Consequence:** EXP-082 derived-exit value must come from the adverse/tail leg (S_adv truncating the catastrophe); EXP-083 separability gate is the crux. **0 candidate slots, 0 counted TEST reads** (TRAIN-only disclosure, entered in `test-read-ledger.md`); holdout sealed. |
 
 ## Amendment Rules
 

@@ -1,8 +1,14 @@
 # Candidate Family: CF-CAPGEO-001 — Data-Derived Exit / Capture Geometry on Frozen Entries
 
-**Status:** `REGISTERED` (2026-06-20) — **SCREENING-GATED.** The family is registered (fixed
-first-branch definitions frozen; multiplicity batch entered; governing checkpoint commenced) but
-**no candidate screening is admissible until both preconditions clear**:
+**Status:** `REGISTERED` (2026-06-20) — **SCREENING-UNBLOCKED 2026-06-21; Phase 018 OPEN (G0 PASS) —
+HYP-001 readiness COMPLETE 2026-06-22 (EXP-080 READINESS_DELIVERED): 46-cell member set. HYP-002
+characterization COMPLETE 2026-06-22 (EXP-081 CHARACTERISATION_DELIVERED, audit PASS): 184/184 cells,
+D3 inputs locked & EXP-082-ready; gross capture availability ≈ random (move availability not the
+differentiator), the only structure is the outcome shape — harami median-positive/mean-killed
+(CF-HA-HARAMI-001 signature reproduced on 5-year data). 0 candidate slots / 0 counted TEST reads;
+holdout sealed. Derivation (EXP-082, HYP-003) is next; family stays REGISTERED/SCREENING.** The family is registered (fixed first-branch definitions frozen;
+multiplicity batch entered; governing checkpoint commenced). **Both screening preconditions have now
+cleared:**
 
 1. **G-017 — RESOLVED `DISCOVERY_ONLY` (2026-06-21).** Phase 017 validated the `ASS` qualifier and
    `WF-EXPANDING` protocol framework-style; 6 of 8 `ASS_VALIDATED` legs hold but **EXP-078's two binding
@@ -13,10 +19,15 @@ first-branch definitions frozen; multiplicity batch entered; governing checkpoin
    `PROTOCOL_DEFECT` (determinism held; accounting cap honored 8/8). Phase 018 therefore opens with the
    frozen suite binding and `ASS` as a discovery overlay only — **not** "once `ASS_VALIDATED`."
    (`checkpoints/2026-06-20-017-capgeo-qualifier-validation/G-017-gate-review.md`.)
-2. **INFR-003 complete** — the 5-year 1-minute data upgrade is collected, VAL-validated, and the
-   final-30% holdout **re-sealed per file at first touch** on the new dataset (master index
-   Infrastructure Tasks). Phase 018 screening runs on the new 5-year dataset; Phase 017 runs on
-   synthetic substrates and the **current** first-70% analysis slice only.
+2. **INFR-003 COMPLETE — ADMITTED via VAL-005 PASS (2026-06-21).** The 5-year 1-minute data upgrade
+   was collected on **16 instruments** (DE30 dropped — broker m1 stale; design §3.1), VAL-005-validated
+   (all 5 gates PASS), and the new final-30% holdout **re-sealed per file at first touch** (0 holdout
+   rows read). `test-read-ledger.md` was **re-materialized** on the new 16×{15m,1h,4h} strata (all 0
+   counted reads); the EURUSD old-dataset cap is carried as a disclosed caution, re-evaluated at the
+   Phase 018 D0. Phase 018 screening runs on the new 5-year dataset using the holdout-fenced
+   `build_domain_bars` domain construction (VAL-005 G1 finding). Phase 017 ran on synthetic substrates
+   and the **current** first-70% analysis slice only. (VAL-005 report:
+   `python/experiments/VAL-005/report.md`; master index Infrastructure Tasks.)
 
 **Governing checkpoint (qualifier/protocol gate):**
 `docs/experiments-docs/checkpoints/2026-06-20-017-capgeo-qualifier-validation/design.md`
@@ -106,11 +117,14 @@ two of the conventional-benchmark exits in Phase 018, not the family's frozen ex
 ### Data views
 
 - Base source: 1-minute time bars from `data/timebars/` (post-INFR-003: the 5-year collection).
-- **Domains: 15m, 1h, 4h** (focused; reduces the parameter space per `re.md`). 15m/4h domain
-  construction follows the established `min_coverage=0.90` convention; temporal-integrity
-  validated per VAL-001 style before any analytical use.
-- Instruments: all 17 VAL-003-admitted instruments. DE30 carries the truncated-coverage
-  disclosure (re-evaluated after INFR-003, which may extend or re-seat its history).
+- **Domains: 15m, 1h, 4h** (focused; reduces the parameter space per `re.md`). Domain
+  construction follows the established `min_coverage=0.90` convention **plus the holdout-fence**
+  (`build_domain_bars`: drop any window whose label crosses the analysis-slice boundary — VAL-005
+  G1 finding); temporal-integrity validated by VAL-005 (PASS) before any analytical use.
+- Instruments: **16** — the VAL-003-admitted universe **minus DE30** (dropped at INFR-003 §3.1;
+  broker m1 history ended 2026-01-16 — stale, cannot supply current-edge rows). DE30 may be
+  re-collected via an alternate broker symbol in a later INFR item; until then CF-CAPGEO-001 is a
+  16-instrument universe (VAL-005-admitted).
 
 ### Exit / capture geometry (the OPEN axis)
 
@@ -173,8 +187,8 @@ overlay) is sketched below; gate definitions and outcome criteria live in the Ph
 | HYP | Question | Phase | Gate | Status |
 | --- | --- | --- | --- | --- |
 | (gate) | Does `ASS` recover known expectancy/median/tail across unimodal/skewed/bimodal/sparse synthetic types, control FPR/MDE under the walk-forward protocol, and discriminate bimodal vs unimodal shape? | 017 | **G-017 `ASS_VALIDATED` → binding-eligible; else DISCOVERY_ONLY** | **G-017 ADJUDICATED 2026-06-21 — `DISCOVERY_ONLY`** (`ASS` non-binding; frozen referee suite stays the binding gate for Phase 018; no PROTOCOL_DEFECT). — **EXP-076 G-017a RECOVERY_VALIDATED (2026-06-20):** `ASS` recovers ground truth (recovery PASS all 198 cells; coverage in-band ∀ n≥30; shrinkage as designed). Caveat: expectancy-CI under-covers at **n<30** (intrinsic small-sample percentile-bootstrap floor of the mean — disclosed sparse-stress diagnostic, not a defect; median CI in-band at all n). Two dispositions to G-017: (a) coverage binding n≥30 (n=15 expectancy diagnostic), (b) downstream guard — **no expectancy edge-calls at effective n<30** (weakened-evidence) + EXP-077 adds a small-n FPR stratum; n=2000 rich-pull marginal read monotone-decreasing. **EXP-077 VALIDATED_WITH_GUARDS (2026-06-20):** error-control + protocol legs validated under `WF-EXPANDING` — MDE finite ∀ n≥30; `P(>X)` reliability holds X=0/0.05/1.0; counted-read accounting honors the 2-read cap (8/8); real-bar dogfood 12/12 cells, first-49% fence held, 0 counted reads; determinism+anchor exact. Two bounded per-stratum guards: **(i)** the small-n FPR check closes — expectancy-FPR inflates mildly on the **bimodal mean-null at effective n≤60** (B_zero 0.059 at n=30/60, decays to ~0 by n≥120) → defer to median there (location-null `U0` controlled: point crossings are MC noise around a 0.05-calibrated margin, all Wilson-hi≤0.075); **(ii)** the D2.4 calibration **slope** sub-gate is inapplicable when predicted `P(>X)` is compressed (X=2.0 max-gap 0.017/corr 0.934 but slope 0.652) → bind on max-gap. No PROTOCOL_DEFECT; gates not retro-edited; audit PASS (0C/1W/3I). **EXP-078 SHAPE_DISCRIMINATION_FAIL + k_FRAGILE → DISCOVERY_ONLY (2026-06-21):** the shape diagnostic does **not** discriminate the full target shape — it catches gross bimodality / strong left-skew (`B_strong`, `B_neg`) but is **structurally blind** to the subtle median-positive minority-catastrophe shape (`B_zero` true \|g\|=0.25 / `B_pos` \|g\|=0.067 — the CF-HA-HARAMI-001 failure shape; detection decays to 0 with n because true \|g\|<τ_gap=0.30 AND not dip-bimodal, dip_p≈0.99). **Documented qualifier limitations carried to G-017/Phase 018:** (1) **`ASS`'s shape leg only PARTIALLY closes the EXP-074 tail-shape-blind gap** — a subtle-bimodal blind spot remains; (2) clean-unimodal false-flag is controlled only at **n≥60** (the n=30 floor false-flags 0.135–0.152); (3) the shrunk-expectancy edge-call **FPR is `k`-fragile** (K2 flips CONTROLLED→INFLATED at the 2× multiplier k=240; K1 shrinkage behaviour invariant). Determinism held (no PROTOCOL_DEFECT); audit PASS-trust (0C/2W/4I), double-FAIL implementation-faithful. **Pre-registered routing: the shape FAIL means `ASS_VALIDATED` cannot hold → terminal G-017 `DISCOVERY_ONLY`** (`ASS` non-binding; the frozen referee suite stays the binding gate for Phase 018; adjudicated at the checkpoint gate review). Family status **unchanged** (`REGISTERED — SCREENING-GATED`): this is a qualifier-validation outcome, not a candidate screen. |
-| HYP-001 | Substrate/exit readiness: are all four entry substrates deterministic, look-ahead-safe, with adequate per-cell coverage on the 5-year data × {15m,1h,4h}? `SUB-RANDOM` seed fixed. | 018 | Readiness; required before any characterization. | **GATED** (opens on INFR-003 + G-017) |
-| HYP-002 | Characterize (TRAIN-only, gross): per-substrate realized return-structure features — capture-time geometry, time-to-peak, exhaustion, bimodality — that "expose the features defining what exit fits." | 018 | Characterization; 0 slots, feeds derivation. | **GATED** |
+| HYP-001 | Substrate/exit readiness: are all four entry substrates deterministic, look-ahead-safe, with adequate per-cell coverage on the 5-year data × {15m,1h,4h}? `SUB-RANDOM` seed fixed. | 018 | Readiness; required before any characterization. | **EXP-080 COMPLETE 2026-06-22 — READINESS_DELIVERED (re-audit PASS).** 184/192 substrate-cells READY (16 instruments). 2 cells `COVERAGE_EXCLUDED` (retained): US500-4h (0.251), JP225-4h (0.281) — genuine 4h cash-equity-index coverage sparsity (invariants+determinism pass; EXP-043 precedent) → excluded from EXP-081 with record. **Member set for EXP-081 = 46 instrument×domain cells.** D7 192/192 IN_BRACKET [15,8000]; null-FPR machinery controlled in the binding operating regime n≥120 (validated m_cell scale); 0 nondeterministic, 0 invariant failures; harami entry-identity holds ∀ cells; regression vs VAL-005 frame-identical. 0 slots / 0 counted TEST reads (readiness = disclosure); holdout sealed. |
+| HYP-002 | Characterize (TRAIN-only, gross): per-substrate realized return-structure features — capture-time geometry, time-to-peak, exhaustion, bimodality — that "expose the features defining what exit fits." | 018 | Characterization; 0 slots, feeds derivation. | **EXP-081 COMPLETE 2026-06-22 — CHARACTERISATION_DELIVERED (audit PASS 0C/1W/3I).** 184/184 member substrate-cells; **D3 inputs locked & EXP-082-ready** (T_fav=MFE_med/MFE_q40, S_adv=m_anti else MAE_q90 — m_anti NaN 183/184 → MAE_q90 fallback by D9, H_cap=TTP_q75/TTP_med); no cell below the 30-event floor. **Gross capture availability ≈ random** (per-cell paired vs within-cell SUB-RANDOM: harami median MFE below random 17/46, AVWAP coin-flip 28/46, outcome-median edge ~chance 23–25/46) — move availability is not the differentiator (AVWAP-situation/EXP-047 echo). Only structure = outcome shape: harami **median +0.135 / mean ≈ 0.000, 33/46 cells median>mean** (catastrophic left-tail drag, tailmass 0.0526 > random 0.0437) — CF-HA-HARAMI-001 signature reproduced on disjoint 5-year data; AVWAP roughly symmetric; random baseline. ASS discovery NON-BINDING. Family stays REGISTERED/SCREENING (characterization only — 0 slots, 0 counted TEST reads, holdout sealed). → HYP-003 (EXP-082). |
 | HYP-003 | Derive exits from HYP-002 behavior via predeclared mechanical derivation rules (freeze the rule). | 018 | Derivation; 0 slots. | **GATED** |
 | HYP-004 | Test derived exits **+ conventionally benchmark the known exits**, judged under `ASS` (binding iff validated) + frozen suite, expectancy+median+tail co-primary, per substrate, with the pre-TEST separability gate. | 018 | Candidate screening (slots spent here, per variant). | **GATED** |
 

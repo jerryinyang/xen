@@ -1,0 +1,344 @@
+{
+  "seed": 20260621,
+  "overall": "GREEN",
+  "frozen": {
+    "K_tail": 3.0,
+    "tau_tail": 0.06,
+    "delta": 0.4,
+    "m": "m_cell = Q95(null CI_low); per-cell, recomputed in EXP-083",
+    "operating_floor_n": 120,
+    "calibration_n": 250,
+    "s2_false_flag_max": 0.05,
+    "s2_detection_min": 0.8
+  },
+  "checks": [
+    {
+      "name": "D9 S2 tau_tail/delta",
+      "candidate": "K_tail=3.0, tau_tail=0.06, delta=0.4 (ff<=0.05, binding det>=0.8)",
+      "measured": "@n=250: separable false-flag=0.006 (Wilson-hi=0.009); binding detection [B_neg=1.000, B_zero=0.913]; disclosed [B_strong=1.000, B_pos=0.056]",
+      "verdict": "OK",
+      "recommendation": "FREEZE K_tail=3.0, tau_tail=0.06, delta=0.4 (feasible window confirmed at n>=250)"
+    },
+    {
+      "name": "D9 S2 operating floor",
+      "candidate": "reliable floor n>=120; n<120 deferred",
+      "measured": "@n=120: ff=0.040 (Wilson-hi=0.048), det [B_neg=0.997, B_zero=0.805]  ||  @n=60 (sub-floor): ff=0.147 (Wilson-hi=0.160), det [B_neg=0.987, B_zero=0.769] -> INFEASIBLE, deferred",
+      "verdict": "OK",
+      "recommendation": "operating floor n>=120 (binds on Wilson-hi<=0.075); S2 DEFERRED for cells with n<120 (e.g. some 4h cells) -> disclosed, adjudication carried by the frozen referee suite + median/tail disclosure"
+    },
+    {
+      "name": "D9 S1 margin m",
+      "candidate": "FPR<=0.05 via calibrated m_cell (Wilson-hi<=0.075)",
+      "measured": "raw FPR@0=0.051; m_cell=0.0004 -> calibrated FPR=0.050 (Wilson-hi=0.058)",
+      "verdict": "OK",
+      "recommendation": "bind X_fav CI_low > m_cell=0.0004 (m_cell standard); recompute per realized structure in EXP-083 at N_BOOT=10_000"
+    },
+    {
+      "name": "D9 D3 quantile estimability",
+      "candidate": "quantiles estimable at n>=30; derivation rule always well-defined",
+      "measured": "@n=30: quantile non-estimable=0.000; adverse-leg undefined=0.000; m_anti dip-resolution finite-rate [n=30:0.02, n=250:0.45, n=500:0.95] (NaN->MAE_q90 fallback elsewhere)",
+      "verdict": "OK",
+      "recommendation": "keep n>=30 floor; cells below floor disclosed, derived candidate not formed for that cell. Disclosed: m_anti engages only in large-n cells; adverse leg uses the MAE_q90 fallback elsewhere \u2014 S2 (minority-mass) is the binding shape-guard, not m_anti."
+    }
+  ],
+  "roc_grid": [
+    {
+      "n": 60,
+      "tau_tail": 0.05,
+      "delta": 0.3,
+      "false_flag": 0.19033333333333333,
+      "det_B_neg": 0.981,
+      "det_B_zero": 0.76
+    },
+    {
+      "n": 60,
+      "tau_tail": 0.05,
+      "delta": 0.4,
+      "false_flag": 0.158,
+      "det_B_neg": 0.98,
+      "det_B_zero": 0.759
+    },
+    {
+      "n": 60,
+      "tau_tail": 0.06,
+      "delta": 0.3,
+      "false_flag": 0.19033333333333333,
+      "det_B_neg": 0.981,
+      "det_B_zero": 0.76
+    },
+    {
+      "n": 60,
+      "tau_tail": 0.06,
+      "delta": 0.4,
+      "false_flag": 0.158,
+      "det_B_neg": 0.98,
+      "det_B_zero": 0.759
+    },
+    {
+      "n": 60,
+      "tau_tail": 0.07,
+      "delta": 0.3,
+      "false_flag": 0.14766666666666667,
+      "det_B_neg": 0.955,
+      "det_B_zero": 0.581
+    },
+    {
+      "n": 60,
+      "tau_tail": 0.07,
+      "delta": 0.4,
+      "false_flag": 0.11166666666666666,
+      "det_B_neg": 0.9516666666666667,
+      "det_B_zero": 0.575
+    },
+    {
+      "n": 120,
+      "tau_tail": 0.05,
+      "delta": 0.3,
+      "false_flag": 0.08766666666666667,
+      "det_B_neg": 0.9996666666666667,
+      "det_B_zero": 0.8903333333333333
+    },
+    {
+      "n": 120,
+      "tau_tail": 0.05,
+      "delta": 0.4,
+      "false_flag": 0.06966666666666667,
+      "det_B_neg": 0.9996666666666667,
+      "det_B_zero": 0.8903333333333333
+    },
+    {
+      "n": 120,
+      "tau_tail": 0.06,
+      "delta": 0.3,
+      "false_flag": 0.06366666666666666,
+      "det_B_neg": 0.9993333333333333,
+      "det_B_zero": 0.8053333333333333
+    },
+    {
+      "n": 120,
+      "tau_tail": 0.06,
+      "delta": 0.4,
+      "false_flag": 0.042,
+      "det_B_neg": 0.9993333333333333,
+      "det_B_zero": 0.8053333333333333
+    },
+    {
+      "n": 120,
+      "tau_tail": 0.07,
+      "delta": 0.3,
+      "false_flag": 0.051666666666666666,
+      "det_B_neg": 0.9963333333333333,
+      "det_B_zero": 0.6816666666666666
+    },
+    {
+      "n": 120,
+      "tau_tail": 0.07,
+      "delta": 0.4,
+      "false_flag": 0.028666666666666667,
+      "det_B_neg": 0.996,
+      "det_B_zero": 0.6796666666666666
+    },
+    {
+      "n": 250,
+      "tau_tail": 0.05,
+      "delta": 0.3,
+      "false_flag": 0.024333333333333332,
+      "det_B_neg": 1.0,
+      "det_B_zero": 0.986
+    },
+    {
+      "n": 250,
+      "tau_tail": 0.05,
+      "delta": 0.4,
+      "false_flag": 0.019,
+      "det_B_neg": 1.0,
+      "det_B_zero": 0.986
+    },
+    {
+      "n": 250,
+      "tau_tail": 0.06,
+      "delta": 0.3,
+      "false_flag": 0.009333333333333334,
+      "det_B_neg": 1.0,
+      "det_B_zero": 0.909
+    },
+    {
+      "n": 250,
+      "tau_tail": 0.06,
+      "delta": 0.4,
+      "false_flag": 0.0026666666666666666,
+      "det_B_neg": 1.0,
+      "det_B_zero": 0.909
+    },
+    {
+      "n": 250,
+      "tau_tail": 0.07,
+      "delta": 0.3,
+      "false_flag": 0.008333333333333333,
+      "det_B_neg": 1.0,
+      "det_B_zero": 0.7973333333333333
+    },
+    {
+      "n": 250,
+      "tau_tail": 0.07,
+      "delta": 0.4,
+      "false_flag": 0.0016666666666666668,
+      "det_B_neg": 1.0,
+      "det_B_zero": 0.7973333333333333
+    }
+  ],
+  "bpos_harm_visibility_map": {
+    "rows": [
+      {
+        "w_min": 0.02,
+        "depth": -0.5,
+        "true_mean": 0.137,
+        "median": 0.1385,
+        "s2_detection": 0.0033
+      },
+      {
+        "w_min": 0.02,
+        "depth": -1.0,
+        "true_mean": 0.127,
+        "median": 0.14,
+        "s2_detection": 0.008
+      },
+      {
+        "w_min": 0.02,
+        "depth": -1.5,
+        "true_mean": 0.117,
+        "median": 0.1363,
+        "s2_detection": 0.0247
+      },
+      {
+        "w_min": 0.02,
+        "depth": -2.0,
+        "true_mean": 0.107,
+        "median": 0.1363,
+        "s2_detection": 0.0273
+      },
+      {
+        "w_min": 0.02,
+        "depth": -3.0,
+        "true_mean": 0.087,
+        "median": 0.1367,
+        "s2_detection": 0.0327
+      },
+      {
+        "w_min": 0.05,
+        "depth": -0.5,
+        "true_mean": 0.1175,
+        "median": 0.1263,
+        "s2_detection": 0.01
+      },
+      {
+        "w_min": 0.05,
+        "depth": -1.0,
+        "true_mean": 0.0925,
+        "median": 0.118,
+        "s2_detection": 0.0667
+      },
+      {
+        "w_min": 0.05,
+        "depth": -1.5,
+        "true_mean": 0.0675,
+        "median": 0.1172,
+        "s2_detection": 0.274
+      },
+      {
+        "w_min": 0.05,
+        "depth": -2.0,
+        "true_mean": 0.0425,
+        "median": 0.1155,
+        "s2_detection": 0.44
+      },
+      {
+        "w_min": 0.05,
+        "depth": -3.0,
+        "true_mean": -0.0075,
+        "median": 0.1153,
+        "s2_detection": 0.548
+      },
+      {
+        "w_min": 0.1,
+        "depth": -0.5,
+        "true_mean": 0.085,
+        "median": 0.1009,
+        "s2_detection": 0.018
+      },
+      {
+        "w_min": 0.1,
+        "depth": -1.0,
+        "true_mean": 0.035,
+        "median": 0.087,
+        "s2_detection": 0.3107
+      },
+      {
+        "w_min": 0.1,
+        "depth": -1.5,
+        "true_mean": -0.015,
+        "median": 0.0832,
+        "s2_detection": 0.9007
+      },
+      {
+        "w_min": 0.1,
+        "depth": -2.0,
+        "true_mean": -0.065,
+        "median": 0.081,
+        "s2_detection": 0.9907
+      },
+      {
+        "w_min": 0.1,
+        "depth": -3.0,
+        "true_mean": -0.165,
+        "median": 0.0815,
+        "s2_detection": 0.996
+      },
+      {
+        "w_min": 0.15,
+        "depth": -0.5,
+        "true_mean": 0.0525,
+        "median": 0.0756,
+        "s2_detection": 0.0413
+      },
+      {
+        "w_min": 0.15,
+        "depth": -1.0,
+        "true_mean": -0.0225,
+        "median": 0.0466,
+        "s2_detection": 0.5393
+      },
+      {
+        "w_min": 0.15,
+        "depth": -1.5,
+        "true_mean": -0.0975,
+        "median": 0.0382,
+        "s2_detection": 0.9953
+      },
+      {
+        "w_min": 0.15,
+        "depth": -2.0,
+        "true_mean": -0.1725,
+        "median": 0.0364,
+        "s2_detection": 1.0
+      },
+      {
+        "w_min": 0.15,
+        "depth": -3.0,
+        "true_mean": -0.3225,
+        "median": 0.0413,
+        "s2_detection": 1.0
+      }
+    ],
+    "harmful_blind_cells": [
+      {
+        "w_min": 0.05,
+        "depth": -3.0,
+        "true_mean": -0.0075,
+        "median": 0.1153,
+        "s2_detection": 0.548
+      }
+    ],
+    "interpretation": "blind region (det<0.80) is bounded to true_mean>0 (benign) or true_mean~=0 (break-even, rejected by the frozen suite's expectancy/materiality leg); every materially-negative-mean shape is DETECTED. Blind spot and harm region are anti-correlated -> B_pos blind spot is economically benign; backstops = frozen referee suite (expectancy, binding) + S1 attribution + EXP-081 descriptive tail read."
+  }
+}

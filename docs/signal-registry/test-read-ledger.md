@@ -1,6 +1,10 @@
 # TEST-Read Ledger
 
-**Materialized:** 2026-06-11 (Phase 011 D0; backfill verified against experiment
+**Active ledger:** **INFR-003 5-year dataset** (re-materialized 2026-06-21 on VAL-005
+PASS). The new 16-instrument × {15m, 1h, 4h} strata below **govern Phase 018
+(CF-CAPGEO-001)**. The pre-INFR-003 (old-dataset) ledger is **retained as historical
+record** in the "Archived" section further down and does **not** govern new-dataset reads.
+**Originally materialized:** 2026-06-11 (Phase 011 D0; backfill verified against experiment
 records per Phase 011 design §7.1).
 **Governing rules:** `docs/experiments-docs/checkpoints/2026-06-11-011-per-instrument-foundation/design.md` §7.1.
 
@@ -30,7 +34,76 @@ exposure must be entered here in the same change that records the experiment
 result. Every scope that intends to read a TEST stratum must state that
 stratum's current counted-read tally.
 
-## Ledger
+## Active Ledger — INFR-003 5-Year Dataset (governs Phase 018 / CF-CAPGEO-001)
+
+**Re-materialized 2026-06-21 on VAL-005 PASS** (INFR-003 design §4.3). The 5-year
+re-collection shifted every chronological 70/30 boundary, so a new-dataset stratum is a
+**new stratum population**: every instrument×domain stratum starts at **0 counted reads**.
+Domains tracked = CF-CAPGEO-001's **{15m, 1h, 4h}** (15m/30m/5m/2h constructible but out
+of CF-CAPGEO-001 scope; materialize on first use). Universe = **16 instruments** (DE30
+dropped at INFR-003 ratification — broker m1 stale). TEST stratum = last 30% of the
+first-70% analysis slice on each new file's own 2021-06 → 2026-06-21 timeline (1-minute-row
+timestamp boundary, R1.3).
+
+**EURUSD — RESOLVED at Phase 018 D0 (2026-06-21): FULLY ELIGIBLE, clean slate.**
+EURUSD was TEST-capped instrument-wide on the **old** dataset (holdout-contaminated via
+EXP-032, EURUSD-4h). That contamination is on disjoint old-dataset rows and **does not
+transfer** to the new dataset (INFR-003 §4.3). Per the Phase 018 D0 operator decision (D8),
+EURUSD new-dataset strata are **fully eligible** for stratum-specific counted TEST reads, on
+the same footing as every other instrument — **no carried disclosure** (EXP-032 is old enough,
+and the methodology has evolved enough, to carry no weight on the new dataset).
+
+| TEST stratum (new dataset) | Counted reads | Cap state | Disclosures |
+|---|---|---|---|
+| EURUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
+| GBPUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
+| USDJPY-{15m,1h,4h} | 0 | open | none (new dataset) |
+| USDCHF-{15m,1h,4h} | 0 | open | none (new dataset) |
+| USDCAD-{15m,1h,4h} | 0 | open | none (new dataset) |
+| AUDUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
+| NZDUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
+| EURJPY-{15m,1h,4h} | 0 | open | none (new dataset) |
+| GBPJPY-{15m,1h,4h} | 0 | open | none (new dataset) |
+| AUDJPY-{15m,1h,4h} | 0 | open | none (new dataset) |
+| XAUUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
+| BTCUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
+| USTEC-{15m,1h,4h} | 0 | open | none (new dataset) |
+| US500-{15m,1h,4h} | 0 | open | none (new dataset) |
+| US2000-{15m,1h,4h} | 0 | open | none (new dataset) |
+| JP225-{15m,1h,4h} | 0 | open | none (new dataset) |
+
+**DE30:** not in the new dataset (dropped at INFR-003 §3.1); no new-dataset strata. Its
+old-dataset rows below are archived history.
+
+**EXP-080 readiness disclosure (2026-06-22, CF-CAPGEO-001 Phase 018 HYP-001).** EXP-080 read the
+**full first-70% analysis slice** of all 16×{15m,1h,4h} new-dataset strata for substrate readiness,
+determinism, look-ahead invariants, and coverage (the D7 `[15,8000]` bracket + the null-FPR machinery
+sanity) — **no strategy estimand, no stratum-specific selection or inference**. Per the readiness
+convention (EXP-043/048 precedent) this is a **disclosure, not a counted read**: all 48 strata remain
+**0 counted reads / open** (tallies above unchanged). Coverage outcome: **US500-4h and JP225-4h are
+`COVERAGE_EXCLUDED`** (4h coverage sparsity) and are excluded from the EXP-081 member set with record;
+the other 46 instrument×domain cells are READY. Holdout never read.
+
+**EXP-081 characterization disclosure (2026-06-22, CF-CAPGEO-001 Phase 018 HYP-002).** EXP-081 read the
+**TRAIN sub-split only** (`[0, int(analysis_rows*0.7))` = first 70% of each instrument's analysis slice =
+first 49% of the full file) of the 46-cell member set for per-substrate realized return-structure
+characterization (the frozen D3 inputs). It computed **only TRAIN-only descriptive geometry — no exit, no
+strategy estimand, no stratum-specific selection or inference**; the next-21% analysis-TEST stratum and the
+final-30% holdout were never sliced or materialized (forward path resolution clips at the TRAIN edge). Per
+the TRAIN-only convention (EXP-074/075/080 precedent) this is a **disclosure, not a counted read**: all 48
+strata remain **0 counted reads / open** (tallies above unchanged). Holdout never read.
+
+**The global holdout (final 30% per new file) is outside this ledger entirely** and was
+sealed at first touch in VAL-005 (0 holdout rows read). No new-dataset holdout shot exists;
+the single historical sanctioned shot (EXP-032, old dataset) is spent and non-transferable.
+
+---
+
+## Archived Ledger — OLD (pre-INFR-003) Dataset — HISTORICAL RECORD ONLY
+
+> Retained for closed-family reproducibility (CF-AVWAP-001, CF-HA-HARAMI-001). **Does not
+> govern Phase 018 or any new-dataset read.** The tables below reflect the old ~3.3y
+> dataset strata as of 2026-06-19.
 
 Domains: {5m, 15m, 30m, 1h, 2h, 4h}. AVWAP family: 1h/2h/4h only (5m retired from
 primary strategy use, Phase 010/011). HA harami family: all 6 domains admitted by VAL-004

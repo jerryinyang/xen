@@ -24,16 +24,107 @@ Both prior families produced a real edge and both died downstream on the same ab
 - *(EXP-079 reserved-inactive for a dedicated `WF-EXPANDING` isolation read if needed.)*
 - **G-017** — terminal gate, **ADJUDICATED 2026-06-21 — `DISCOVERY_ONLY`** ([`G-017-gate-review.md`](../../checkpoints/2026-06-20-017-capgeo-qualifier-validation/G-017-gate-review.md); predeclared D5 routing). 6/8 `ASS_VALIDATED` legs hold; EXP-078's two binding legs FAIL ⇒ the conjunction cannot hold ⇒ **`ASS` non-binding (discovery use only); the frozen referee suite stays the binding gate for Phase 018.** No `PROTOCOL_DEFECT` (determinism held byte-identically; accounting cap honored 8/8). Phase 017 CLOSED; see [`retrospective.md`](../../checkpoints/2026-06-20-017-capgeo-qualifier-validation/retrospective.md).
 
-### Phase 018 — CF-CAPGEO-001 Family Screening (GATED on INFR-003 + VAL-005; G-017 resolved `DISCOVERY_ONLY` → frozen referee suite binding, `ASS` discovery overlay)
+### Phase 018 — CF-CAPGEO-001 Family Screening (OPEN; G0 PASS 2026-06-21; G-017 resolved `DISCOVERY_ONLY` → frozen referee suite binding, `ASS` discovery overlay)
 
-- **HYP-001** readiness (4 substrates × {15m,1h,4h} × 17 instruments, 5-year data) — *GATED*
-- **HYP-002** characterize realized return structure (TRAIN-only, gross) — *GATED*
+- **EXP-080 — HYP-001** readiness (4 substrates × {15m,1h,4h} × **16** instruments, 5-year data) — **READINESS_DELIVERED (2026-06-22)** — 184/192 substrate-cells READY; US500-4h + JP225-4h `COVERAGE_EXCLUDED` (genuine 4h index sparsity, with record); member set for EXP-081 = 46 instrument×domain cells; D7 192/192 IN_BRACKET; null-FPR machinery controlled (operating regime n≥120); harami entry-identity holds ∀ cells. [Detailed card ↓](#exp-080-card)
+- **EXP-081 — HYP-002** characterize realized return structure (4 substrates × 46 member cells, 5-year data, TRAIN-only gross) — **CHARACTERISATION_DELIVERED (2026-06-22)** — 184/184 cells delivered; D3 inputs locked & EXP-082-ready; **gross capture availability ≈ random** (move availability not the differentiator — AVWAP-situation/EXP-047 echo); the only structure is the **outcome shape** (harami median +0.135 / mean ≈ 0.000, 33/46 median>mean — CF-HA-HARAMI-001 signature reproduced on 5-year data); m_anti resolves 1/184 (heavy tail, not a separated mode). 0 slots, 0 counted TEST reads. [Detailed card ↓](#exp-081-card)
+- **HYP-003** derive exits via the frozen D3 mechanical rule — *next (EXP-082)*
 - **HYP-003** derive exits via predeclared mechanical rules (freeze the rule) — *GATED*
 - **HYP-004** test derived exits + benchmark known exits; separability gate; candidate screening — *GATED*
 
 ---
 
 ## Detailed cards
+
+<a id="exp-081-card"></a>
+### EXP-081 — Per-Substrate Realized Return-Structure Characterization (HYP-002) — CHARACTERISATION_DELIVERED
+
+**Status:** COMPLETED. **Date:** 2026-06-22. **Phase 018, second experiment** (HYP-002 characterize; 0 candidate slots, 0 counted TEST reads — TRAIN-only disclosure). Artifacts: [`EXP-081/`](../../../../python/experiments/EXP-081/) (report · results.md · audit.md · governance/pre-execution-review.md). New code: `xen.capgeo_geometry` (adaptive-cap path geometry MFE/MAE/TTP/outcome on real OHLC, MFE/MAE floored ≥0 per EXP-055; shape diagnostics — Hartigan-dip+KDE `m_anti`, `tailmass`/`q05`). Reuses `xen.capgeo_substrates`, `xen.domain_bars`, `xen.expectancy` (adaptive cap), `xen.ass` (KDE/dip/score/bootstrap), `xen.zigzag` unchanged.
+
+**Instruments / Data Views:** 16 (VAL-003 universe minus DE30), VAL-005-admitted 5-year dataset, first-70%-of-analysis **TRAIN sub-split** only (`[0, int(analysis_rows*0.7))`); analysis-TEST + holdout never sliced. Holdout-fenced 15m/1h/4h domain bars; HA candles for harami entry detection only. All MFE/MAE/TTP/outcome/ATR on **real prices**.
+
+#### Hypothesis Tests
+
+1. **Per-substrate-cell D3 inputs (descriptive quantiles):** `MFE_med`/`MFE_q40` (favourable capture), `TTP_med`/`TTP_q75` (capture time), `MAE_q90` (adverse) over each event's adaptive cap.
+2. **Bimodality / catastrophe boundary (Hartigan dip — one of two stat tests):** `m_anti` = MAE antimode where dip_p<0.05 (KDE antimode between top-2 modes), else NaN.
+3. **Minority-mass / left-tail read (descriptive):** `tailmass` = fraction of realized outcomes below `median − 3·MAD`; `q05`.
+4. **`ASS` discovery disclosure (the second stat test — NON-BINDING, G-017 DISCOVERY_ONLY):** per-cell expectancy + median + tail, moving-block bootstrap CIs; D6 Guard (i) wired (fired 0×, all cells n≫60).
+
+No edge/pass verdict — the verdict is completeness (CHARACTERISATION_DELIVERED). Per stratum; per-substrate medians are disclosures only (LESSON-001).
+
+#### Scope
+
+- **Member set:** 4 substrates × **46** EXP-080-READY instrument×domain cells = **184 substrate-cells** (US500-4h, JP225-4h `COVERAGE_EXCLUDED`). Frozen entries reused from EXP-080 (`SUB-AVWAP`, `SUB-HARAMI-PARTIAL-V2A` ≡ `SUB-HARAMI-V2A-ADVNONE`, `SUB-RANDOM`).
+- **Lookforward:** per-event **adaptive time cap** (validated `adaptive_time_caps_by_epoch`, cell MA-segment tempo) applied uniformly to all 4 substrates; warmup disclosed+excluded.
+- **Frozen constants:** ATR(14); `K_tail=3.0`; ≥30-event floor; `TIMECAP_*` (EXP-068); quantile linear; seeds recorded.
+- **Exclusions:** no exit/barrier/target/stop/P&L (EXP-082/083); no separability gate or screening; no cross-substrate pooling as a binding statistic; TRAIN-only; holdout never read.
+
+#### Results / Observations
+
+- **CHARACTERISATION_DELIVERED: 184/184 cells.** 0 underpowered (`n_usable` 46–5535, median 1083), 0 nondeterministic (two-pass fingerprint exact), harami PARTIAL-V2A ≡ V2A-ADVNONE on all D3 cols, EXP-080 entry reconciliation 184/184 (TRAIN ≤ full), holdout untouched.
+- **D3 inputs EXP-082-ready:** `T_fav`=`MFE_med`/`MFE_q40` (~3.2–3.4 ATR); `S_adv`=`m_anti` else `MAE_q90` (~9–9.7 ATR); `H_cap`=`TTP_q75`/`TTP_med` (~37–52 bars, median ~44). No cell below the 30-event floor → a derived candidate can be formed for every member cell.
+- **Gross capture availability ≈ random** (per-cell paired vs within-cell `SUB-RANDOM`, 46 cells): harami median `MFE_med` *below* random (17/46 above), AVWAP coin-flip (28/46); outcome-median edge ~chance (23–25/46). **Move availability is not the differentiator** (AVWAP-situation/EXP-047 echo, now on 5-year data).
+- **The only structure is the OUTCOME SHAPE:** harami **median-of-cell-medians +0.135 but median-of-cell-means ≈ 0.000**; **33/46 cells median>mean** (catastrophic left-tail drag); `tailmass` harami 0.0526 > random 0.0437 (31/46 cells); `q05` ≈ −9 ATR. **CF-HA-HARAMI-001 median-positive/mean-killed signature reproduced on disjoint 5-year data.** AVWAP roughly symmetric (mean +0.157 ≈ median +0.150); random baseline median +0.085.
+- **`m_anti` resolves 1/184** (US500-1h AVWAP, dip_p 0.032, m_anti 1.79); dip_p median 0.976 (MAE predominantly unimodal). Catastrophe is a heavy **continuous** tail, not a separated mode → `MAE_q90` fallback dominates 183/184, exactly as D9 designed. Dip genuinely exercised (184 finite, 136 unique p-values).
+
+#### Hypothesis-Specific Conclusion
+
+- **CHARACTERISATION_DELIVERED.** The frozen entries' realized return structures are fully characterized and the D3 inputs are locked for EXP-082. The exit-relevant structure is concentrated in the **outcome tail/shape**, not gross favourable availability (≈ random). **No edge claim.** Consequence (next-scope): EXP-082's derived-exit value must come from the **adverse/tail leg** (`S_adv` truncating the catastrophe); **EXP-083's separability gate is the crux** — does cutting the tail also remove the median edge?
+
+#### Hypothesis-Agnostic Observations
+
+- Two inherited lessons co-locate on fresh 5-year data in one experiment: capture availability is not the lever (CF-AVWAP-001/EXP-047), and the conditioned harami's mean is killed by a catastrophic minority while its median is positive (CF-HA-HARAMI-001). The harami substrate carries the failure shape **at the entry level**, before any exit — so it is a property of the entry population, not an exit artifact.
+- The catastrophe is a **heavy continuous left tail**, not a separated second mode (dip-invisible) — a separated-mode detector (`m_anti`, and by extension `ASS`'s dip leg) is structurally the wrong instrument; minority-**mass** (`tailmass`) is the read that sees it. Carry this into EXP-083's separability S2 design.
+
+#### Audit / governance
+
+- **Audit PASS (0C/1W/3I).** Verdict forensics independently re-derived D3 inputs from raw bars to full precision, confirmed the per-cell paired real-vs-random mechanism (not pooled masking), proved the dip is genuinely exercised, and confirmed the gate-shape coherence (`tailmass` on outcome vs `m_anti` on MAE — different distributions by design). W1 (entries ≈ random / median-positive-mean-killed shape) is **mechanistic, moves no D3 number** — raised for Stage 6 / EXP-082-083, no rerun. I1 `m_anti` 1/184 (by design), I2 AVWAP direction re-derived on domain bars (frozen module unedited), I3 SUB-RANDOM = random-timing/same-regime-direction null. See [`audit.md`](../../../../python/experiments/EXP-081/audit.md).
+- **Pre-execution governance** APPROVE (no revision cycle).
+
+<a id="exp-080-card"></a>
+### EXP-080 — Phase 018 Substrate/Exit Readiness (HYP-001) — READINESS_DELIVERED
+
+**Status:** COMPLETED. **Date:** 2026-06-22. **Phase 018, first experiment** (HYP-001 readiness; 0 candidate slots, 0 counted TEST reads — readiness/coverage exposure = disclosure). Artifacts: [`EXP-080/`](../../../../python/experiments/EXP-080/) (report · results.md · audit.md (+ Re-Audit) · governance/pre-execution-review.md). New code: `xen.domain_bars.build_domain_bars` (promoted verbatim from VAL-005, regression-checked frame-identical) + `xen.capgeo_substrates` (uniform `entries()` over AVWAP final + EXP-068 conditioned-harami port + fixed-seed matched-random).
+
+**Instruments / Data Views:** 16 (VAL-003 universe minus DE30), VAL-005-admitted 5-year dataset (2021-06-02 → 2026-06-21), first-70% analysis slice; holdout-fenced 15m/1h/4h domain bars; HA candles for harami detection. No edge/return/capture/P&L computed.
+
+#### Hypothesis Tests
+
+1. **Readiness (per substrate-cell, deterministic):** construction integrity (OHLC, sortedness, holdout-fence, coverage-based dropped fraction vs frozen <0.10/0.10–0.25/>0.25 bands) ∧ entry-detector invariant battery (causality, on-close, structural) ∧ exact two-pass determinism.
+2. **D7 bracket (descriptive):** realized entry count vs the Phase-017-validated `[15,8000]` `ASS`-discovery span.
+3. **Null-FPR machinery sanity (the one statistical test):** moving-block bootstrap one-sided `CI_low>0` FPR on a non-tradable, mean-centered, block-permuted carrier; CONTROLLED (wilson_hi ≤ 0.075) binding only in the operating regime n≥120 (D0 §D9), small-n disclosed.
+4. **Harami entry-population identity (disclosure).**
+
+All reported per stratum (no pooled verdict); the `SUBSTRATE_REFUTED` halt is a disjunction of predeclared systematic triggers (non-determinism any cell; same invariant ≥3 instruments; operating-regime null-FPR uncontrolled).
+
+#### Scope
+
+- **Substrates (4, frozen, never tuned):** `SUB-AVWAP` (CF-AVWAP-001 final), `SUB-HARAMI-PARTIAL-V2A` & `SUB-HARAMI-V2A-ADVNONE` (CF-HA-HARAMI-001 finals, EXP-068 entry ported), `SUB-RANDOM` (matched control). 192 substrate-cells = 4 × 16 × {15m,1h,4h}.
+- **Frozen constants:** D7 bracket [15,8000]; drop bands 0.10/0.25; seeds recorded; null-FPR gate wilson_hi≤0.075 at floor n≥120; null-FPR machinery scale N_NULL=5000/N_BOOT=10000 (validated m_cell scale).
+- **Exclusions:** no exit/return/capture/MFE/MAE/expectancy/tail metric; no exit derivation/application; no separability gate or screening; no pooling; first-70% only; holdout never read.
+
+#### Results / Observations
+
+- **Readiness: 184/192 READY.** 8 NOT_READY = **US500-4h** (dropped 0.251) + **JP225-4h** (0.281), ×4 substrates, `COVERAGE_EXCLUDED` on the >0.25 band; both pass all invariants + determinism → genuine 4h cash-equity-index coverage sparsity (EXP-043 precedent), excluded from EXP-081 with record. US500-4h borderline. **Member set for EXP-081 = 46 instrument×domain cells.**
+- **Coverage-based dropped fraction** (validated `(candidate−retained)/candidate`): @15m BTCUSD 0.013, USTEC 0.002, forex/gold ~0.02, US500 0.091, JP225 0.161 — tracks coverage, not session structure. Only 2/48 cells > 0.25.
+- **Determinism / causality:** 0 nondeterministic cells; 0 invariant-battery failures across 192 cells; SUB-RANDOM byte-identical from its seed; domain-bar regression vs VAL-005 frame-identical (85,839 rows).
+- **D7 bracket: 192/192 IN_BRACKET** — AVWAP 78–2,641 (sparser); harami(both)/random 284–7,657. `ASS` discovery in its validated regime for every cell (frozen suite binding regardless).
+- **Null-FPR:** operating regime n≥120 all CONTROLLED (wilson_hi n120 0.0642, n250 0.0680, n500 0.0657, n2000 0.0555) at the validated scale; small-n n<120 inflation disclosed (0.081–0.091), non-binding (D0 §D6 Guard (i)/§D9).
+- **Harami entry identity:** identical entries in all cells (shared MA-native conditioned HA-harami detector by construction; differ only by later exit) → entry-level counted-read accounting coincides.
+
+#### Hypothesis-Specific Conclusion
+
+- **READINESS_DELIVERED.** The four frozen entries reproduce deterministically, look-ahead-safe, and invariant-clean on the new 5-year data with adequate coverage; the moving-block inference machinery is controlled at the operating scale. Two 4h index cells excluded on coverage with record. Phase 018 proceeds to EXP-081 characterization on the 46-cell member set. **No edge claim.**
+
+#### Hypothesis-Agnostic Observations
+
+- The coverage-based dropped fraction cleanly stratifies by each instrument's traded fraction (24/7 crypto < forex < cash-equity index), so the >0.25 band binds only at the coarse 4h domain for session instruments — relevant to any future coarse-domain index work.
+- The null-FPR operating-floor decision is **scale-sensitive**: the n=120 boundary resolved to controlled only at the validated N_BOOT=10000 scale (a bounded probe gave a spurious halt). Carry the validated scale into EXP-083.
+
+#### Audit / governance
+
+- **Re-audit PASS** (0C/0W). The **initial run returned `SUBSTRATE_REFUTED`** on two verdict-material defects: (Critical-1) the dropped-fraction metric was mis-denominatored against a continuous 24/7 clock (excluding all session instruments, leaving only BTCUSD READY) → fixed to the validated coverage-based definition; (Critical-2) the null-FPR probe ran below the validated machinery scale, making the n=120 gate noise-dominated (spurious halt) → Stage-5 governance ruled re-scale to the validated m_cell scale (gate/floor unchanged). Both fixed, re-run, re-audited PASS. See [`audit.md`](../../../../python/experiments/EXP-080/audit.md).
+- **Pre-execution governance** APPROVE after one REVISE cycle (reconciled the predeclared null-FPR halt criterion to the ratified D0 §D9 operating floor).
 
 <a id="exp-078-card"></a>
 ### EXP-078 — Shape Discrimination + `k`-Sensitivity (`ASS`/VAL-003) — DISCOVERY_ONLY (binding double-FAIL, per-stratum)
