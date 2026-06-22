@@ -1,0 +1,54 @@
+{
+  "experiment": "EXP-087",
+  "phase": "019",
+  "axis": "X",
+  "hypothesis": "CF-XSECT-001/HYP-001",
+  "generated_at": "2026-06-22T23:09:49.047767+00:00",
+  "verdict": "SCREEN_DELIVERED",
+  "provisional_disposition_NON_BINDING": "NOT_ADMITTED (NON-BINDING \u2014 S_M <= S* but outside null band on >=1 read)",
+  "n_member_cells": 46,
+  "n_cell_primitive": 92,
+  "determinism_ok": true,
+  "determinism_metrics": true,
+  "determinism_gate_stream": true,
+  "recon_all_ok": true,
+  "causal_fill_ok": true,
+  "read_region": "TRAIN sub-split [0, int(int(total_rows*0.7)*0.7)); analysis-TEST + holdout never sliced; union grid spans TRAIN domain bars only",
+  "seeds": {
+    "SEED_MASTER": 20260622,
+    "SEED_CONTROL": 20260622,
+    "SEED_CONTROL_DIR": 20260625,
+    "SEED_POOL": 20260623,
+    "SEED_POOL_DIR": 20260626,
+    "SEED_GATE": 20260624
+  },
+  "frozen_constants": {
+    "ATR_PERIOD": 14,
+    "EVENT_FLOOR": 30,
+    "N_PERM": 5000,
+    "N_PERM_STABILITY": 1000,
+    "FWER": 0.05,
+    "Z_ONE_SIDED": 1.645,
+    "LOOKBACK": 20,
+    "DECILE_Q": 0.1,
+    "MIN_XS_INSTR": 8,
+    "pool_raw": [
+      8,
+      3000,
+      30000
+    ],
+    "primitives": "COND-XSRANK (cross-sectional 20-bar-return rank) + COND-XSDIV (20-bar return minus equal-weight basket mean); both top/bottom decile LONG/SHORT; D0-amendment-002",
+    "cap_basis": "cell MA(20,50)-segment tempo (adaptive_time_caps_by_epoch), EXP-081",
+    "read": "directional-favourable MFE_med \u0394-over-random (single read, D3.X)",
+    "universe": "16 VAL-005 instruments (no DE30); forward-filled union grid per domain"
+  },
+  "module_hashes": {
+    "cross_sectional": "0b0f19876c474f6e84e6dfce4222fd64fffed02f69435a7a029ef77a07bb45ca",
+    "availability_gate": "8a8b432e8dea27fcae7bc63175c70659a32a5e965e7993b9cf9a7df61782e46f",
+    "capgeo_geometry": "74042e8eb732fae7767cdc9415ff5418e08526edad14e27606f2a5613d8c78b0",
+    "capgeo_substrates": "a580e693fc986d9fffe725099e4607422c7a41e8004db88e316c481cecf43570"
+  },
+  "holdout_untouched": true,
+  "counted_test_reads": 0,
+  "candidate_slots": 0
+}

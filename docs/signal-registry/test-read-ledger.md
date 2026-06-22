@@ -146,6 +146,38 @@ selection-region overlap and reverses in the genuinely held-back folds). **HYP-0
 `counted_test_reads=0` in `run_metadata.json`; the WF caller passes only the in-analysis series). Holdout
 **not** released.
 
+**EXP-086 Screen-M availability disclosure (2026-06-22, Phase 019 Family-Selection, axis M,
+CF-VOLEXP-001/HYP-001).** EXP-086 read the **TRAIN sub-split only**
+(`[0, int(int(total_rows·0.7)·0.7))` = first 70% of the analysis set = first 49% of each file) of the 46-cell
+EXP-080-READY member set for a family-agnostic single-series **magnitude availability** screen (two compression
+primitives — raw HA-harami inside-bar + real-OHLC NR7 — vs the matched `SUB-RANDOM` control and the D2b
+permuted-axis admission gate). It computed **only TRAIN-only Δ-over-random availability statistics — no exit, no
+strategy estimand, no stratum-specific selection or inference**; the per-cell beats-random tests aggregate to an
+**axis-level** statistic and the binding admit/exonerate is the terminal G-019 gate, not any per-stratum claim.
+The next-21% analysis-TEST stratum and the final-30% holdout were never sliced or materialized (forward path
+resolution clips at the TRAIN edge; `holdout_untouched=true`, `counted_test_reads=0`, `candidate_slots=0` in
+`run_metadata.json`). Per the TRAIN-only / availability-disclosure convention (EXP-074/075/080/081/082/083/085
+precedent) this is a **disclosure, not a counted read**: all 48 strata remain **0 counted reads / open** (tallies
+above unchanged). Verdict `SCREEN_DELIVERED` + provisional `ADMITTED` (NON-BINDING). Holdout never read.
+
+**EXP-087 Screen-X availability disclosure (2026-06-22, Phase 019 Family-Selection, axis X,
+CF-XSECT-001/HYP-001).** EXP-087 read the **TRAIN sub-split only**
+(`[0, int(int(total_rows·0.7)·0.7))` = first 70% of the analysis set = first 49% of each file) of the 46-cell
+EXP-080-READY member set for a family-agnostic **cross-sectional relative-strength directional-favourable
+availability** screen (two conditioning primitives — trailing-20-bar-return rank `COND-XSRANK` + divergence-
+from-equal-weight-basket `COND-XSDIV` — over a causal forward-filled union grid across the 16 instruments, vs
+the matched `SUB-RANDOM` control and the D2b permuted-axis admission gate). It computed **only TRAIN-only
+Δ-over-random availability statistics — no exit, no strategy estimand, no stratum-specific selection or
+inference**; the per-cell beats-random tests aggregate to an **axis-level** statistic and the binding
+admit/exonerate is the terminal G-019 gate, not any per-stratum claim. The cross-section's union grid is built
+from TRAIN-only domain-bar `CloseTime`s; the forward-fill consults no TEST/holdout bar; the next-21%
+analysis-TEST stratum and the final-30% holdout were never sliced or materialized (forward path resolution
+clips at the TRAIN edge; `holdout_untouched=true`, `causal_fill_ok=true`, `counted_test_reads=0`,
+`candidate_slots=0` in `run_metadata.json`). Per the TRAIN-only / availability-disclosure convention
+(EXP-074/075/080/081/082/083/085/086 precedent) this is a **disclosure, not a counted read**: all 48 strata
+remain **0 counted reads / open** (tallies above unchanged). Verdict `SCREEN_DELIVERED` + provisional
+`NOT_ADMITTED` (NON-BINDING, below D2a band). Holdout never read.
+
 **The global holdout (final 30% per new file) is outside this ledger entirely** and was
 sealed at first touch in VAL-005 (0 holdout rows read). No new-dataset holdout shot exists;
 the single historical sanctioned shot (EXP-032, old dataset) is spent and non-transferable.

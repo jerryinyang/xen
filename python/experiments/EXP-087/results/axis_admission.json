@@ -1,0 +1,56 @@
+{
+  "axis": "X",
+  "provisional_disposition": "NOT_ADMITTED (NON-BINDING \u2014 S_M <= S* but outside null band on >=1 read)",
+  "binding_note": "NON-BINDING: the binding admit/exonerate is G-019 (cross-axis Holm over {M,X,(F)} axis permutation p-values). EXP-087 emits the realized statistics.",
+  "S_X": 1,
+  "S_star": 1,
+  "axis_perm_p": 0.32273545290941813,
+  "ranking_z": 1.2594018439722423,
+  "driving_sub_screen": "COND-XSRANK/favourable",
+  "fwer_sensitivity_band": {
+    "0.025": {
+      "s_star": 1,
+      "admitted": false
+    },
+    "0.05": {
+      "s_star": 1,
+      "admitted": false
+    },
+    "0.1": {
+      "s_star": 1,
+      "admitted": false
+    }
+  },
+  "mc_stability_1000_vs_5000": {
+    "n_perm_stability": 1000,
+    "s_star_stability": 1,
+    "perm_p_stability": 0.3126873126873127
+  },
+  "d2a_null_band": [
+    17,
+    28
+  ],
+  "routing_note": "A Screen-X admission routes to a directional cross-sectional family (CF-XSECT-001), not the long-vol harvest model (Screen M only).",
+  "sub_screens": [
+    {
+      "primitive": "COND-XSRANK",
+      "read": "favourable",
+      "stat": "median",
+      "S": 1,
+      "S_star_single": 1,
+      "perm_p_single": 0.11317736452709458,
+      "n_powered_cells": 46,
+      "in_d2a_null_band": false
+    },
+    {
+      "primitive": "COND-XSDIV",
+      "read": "favourable",
+      "stat": "median",
+      "S": 1,
+      "S_star_single": 1,
+      "perm_p_single": 0.23635272945410918,
+      "n_powered_cells": 46,
+      "in_d2a_null_band": false
+    }
+  ]
+}
