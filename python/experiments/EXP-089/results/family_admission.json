@@ -1,0 +1,90 @@
+{
+  "family": "CF-MR-001",
+  "provisional_disposition": "ADMITTED (NON-BINDING \u2014 pending G-020; no cross-axis Holm, single family)",
+  "binding_note": "NON-BINDING: the binding admit/exonerate is G-020 (D5 mechanical rule). EXP-089 (amended) emits the realized statistics. ADMITTED iff S_fam>S* AND axis_perm_p<=0.05 (FWER 0.05).",
+  "S_fam": 28,
+  "S_star": 7,
+  "axis_perm_p": 0.0001999600079984003,
+  "ranking_z": 20.224714493813746,
+  "driving_sub_screen": "CORE/mfe_med",
+  "argmax_lever_by_z": "CORE",
+  "fwer_sensitivity_band": {
+    "0.025": {
+      "s_star": 7,
+      "admitted": true
+    },
+    "0.05": {
+      "s_star": 7,
+      "admitted": true
+    },
+    "0.1": {
+      "s_star": 6,
+      "admitted": true
+    }
+  },
+  "mc_stability_1000_vs_5000": {
+    "n_perm_stability": 1000,
+    "s_star_stability": 6,
+    "perm_p_stability": 0.000999000999000999
+  },
+  "d2a_coinflip_band": [
+    17,
+    29
+  ],
+  "sub_screens": [
+    {
+      "sub_screen": "CORE",
+      "S": 28,
+      "S_star_single": 5,
+      "perm_p_single": 0.0001999600079984003,
+      "z_rank": 17.340141757183257,
+      "n_powered_cells": 46,
+      "in_d2a_coinflip_band": true
+    },
+    {
+      "sub_screen": "CORE-VOL-LOW",
+      "S": 22,
+      "S_star_single": 5,
+      "perm_p_single": 0.0001999600079984003,
+      "z_rank": 14.6414381053216,
+      "n_powered_cells": 46,
+      "in_d2a_coinflip_band": true
+    },
+    {
+      "sub_screen": "CORE-VOL-MED",
+      "S": 25,
+      "S_star_single": 6,
+      "perm_p_single": 0.0001999600079984003,
+      "z_rank": 14.005330210972081,
+      "n_powered_cells": 46,
+      "in_d2a_coinflip_band": true
+    },
+    {
+      "sub_screen": "CORE-VOL-HIGH",
+      "S": 20,
+      "S_star_single": 3,
+      "perm_p_single": 0.0001999600079984003,
+      "z_rank": 17.73741547339339,
+      "n_powered_cells": 46,
+      "in_d2a_coinflip_band": true
+    },
+    {
+      "sub_screen": "CORE+TREND",
+      "S": 0,
+      "S_star_single": 5,
+      "perm_p_single": 1.0,
+      "z_rank": -1.770017078493103,
+      "n_powered_cells": 46,
+      "in_d2a_coinflip_band": false
+    },
+    {
+      "sub_screen": "CORE+FILTER",
+      "S": 1,
+      "S_star_single": 5,
+      "perm_p_single": 0.9592081583683263,
+      "z_rank": -1.220706802779744,
+      "n_powered_cells": 29,
+      "in_d2a_coinflip_band": false
+    }
+  ]
+}

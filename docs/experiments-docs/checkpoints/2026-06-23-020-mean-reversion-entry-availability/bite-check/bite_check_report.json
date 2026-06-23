@@ -1,0 +1,118 @@
+{
+  "phase": "020",
+  "family": "CF-MR-001",
+  "seed": 20260623,
+  "C": 46,
+  "n_sub": 6,
+  "sub_names": [
+    "CORE",
+    "CORE-VOL-LOW",
+    "CORE-VOL-MED",
+    "CORE-VOL-HIGH",
+    "CORE+TREND",
+    "CORE+FILTER"
+  ],
+  "planted_sub": "CORE+FILTER",
+  "sigma": 2.0,
+  "z": 1.645,
+  "n_perm": 5000,
+  "r_rep": 5000,
+  "k_plant": 8,
+  "lift": 0.2,
+  "fwer_band": [
+    0.025,
+    0.05,
+    0.1
+  ],
+  "per_cell_fp_nominal": 0.04998,
+  "A_real_module_integration": {
+    "n_perm": 1000,
+    "noise": {
+      "s_m": 4,
+      "s_star": 7,
+      "perm_p": 0.9451,
+      "driving_sub": "CORE-VOL-LOW/mfe_med",
+      "disposition": "EXONERATED (NON-BINDING \u2014 every sub-screen S in the D2a null band)",
+      "admitted": false
+    },
+    "planted": {
+      "s_m": 16,
+      "s_star": 9,
+      "perm_p": 0.001,
+      "driving_sub": "CORE+FILTER/mfe_med",
+      "disposition": "ADMITTED (NON-BINDING \u2014 pending G-019 cross-axis Holm)",
+      "admitted": true,
+      "argmax_is_planted": true
+    },
+    "ok": true
+  },
+  "cell_n": {
+    "min": 49,
+    "median": 542,
+    "max": 4533
+  },
+  "plant_cells_n": [
+    1916,
+    2031,
+    2268,
+    2338,
+    2859,
+    3602,
+    3610,
+    4533
+  ],
+  "B_operating_characteristics": {
+    "fwer_0.025": {
+      "s_star_joint_max6": 7,
+      "s_star_single_subscreen": 6,
+      "noise_admission_rate": 0.0106,
+      "noise_admission_wilson_hi": 0.0138,
+      "planted_power": 0.9986,
+      "planted_argmax_rate": 0.9978,
+      "inflated_rate_if_single_threshold": 0.0414,
+      "ok": true
+    },
+    "fwer_0.05": {
+      "s_star_joint_max6": 6,
+      "s_star_single_subscreen": 5,
+      "noise_admission_rate": 0.0436,
+      "noise_admission_wilson_hi": 0.0496,
+      "planted_power": 1.0,
+      "planted_argmax_rate": 0.9972,
+      "inflated_rate_if_single_threshold": 0.1464,
+      "ok": true
+    },
+    "fwer_0.1": {
+      "s_star_joint_max6": 6,
+      "s_star_single_subscreen": 4,
+      "noise_admission_rate": 0.0452,
+      "noise_admission_wilson_hi": 0.0513,
+      "planted_power": 1.0,
+      "planted_argmax_rate": 0.998,
+      "inflated_rate_if_single_threshold": 0.3968,
+      "ok": true
+    }
+  },
+  "C_joint_max_necessity": {
+    "s_star_single_subscreen_q95": 5,
+    "s_star_joint_max6_q95": 6,
+    "family_noise_rate_under_single_threshold": 0.1492,
+    "family_noise_rate_under_joint_threshold": 0.0428,
+    "note": "6-way max inflates family error under the single-sub-screen S*; the joint max-of-6 S* raises the bar and restores FWER control.",
+    "ok": true
+  },
+  "D_mc_stability": {
+    "s_star_q95_1000": 6,
+    "s_star_q95_5000": 6,
+    "planted_perm_p_1000": 0.001,
+    "planted_perm_p_5000": 0.0004,
+    "ok": true
+  },
+  "checks": {
+    "A_real_module_routes_correctly": true,
+    "B_not_vacuous_and_not_impossible_across_band": true,
+    "C_joint_max_necessary_and_sufficient": true,
+    "D_mc_stable_1000_vs_5000": true
+  },
+  "OVERALL": "GREEN"
+}

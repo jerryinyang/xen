@@ -178,6 +178,24 @@ clips at the TRAIN edge; `holdout_untouched=true`, `causal_fill_ok=true`, `count
 remain **0 counted reads / open** (tallies above unchanged). Verdict `SCREEN_DELIVERED` + provisional
 `NOT_ADMITTED` (NON-BINDING, below D2a band). Holdout never read.
 
+**EXP-089 mean-reversion availability disclosure (2026-06-23, Phase 020, CF-MR-001/HYP-001; amended
+`D0-amendment-001`).** EXP-089 read the **TRAIN sub-split only** (`[0, int(int(total_rows·0.7)·0.7))` = first
+70% of the analysis set = first 49% of each file) of the 46-cell EXP-080-READY member set for the CF-MR-001
+RSI-2 mean-reversion **favourable-excursion availability** screen (6 single-test sub-screens — `CORE`,
+`CORE-VOL-{LOW,MED,HIGH}`, `CORE+TREND`, `CORE+FILTER` — over a causal MR-tempo cap, leg-1 Δ-over-random vs a
+matched `SUB-RANDOM` control, regime-matched for the `/VOLREGIME` sub-screens, and the D2b joint-max
+permuted-axis admission gate). It computed **only TRAIN-only Δ-over-random availability statistics — no exit, no
+strategy estimand, no stratum-specific selection or inference**; the per-cell beats-random tests aggregate to a
+family-level statistic and the binding admit/exonerate is the terminal G-020 gate, not any per-stratum claim.
+The MR-tempo cap and forward path use only bars at/after entry within the cap, clipped at the TRAIN edge; the
+next-21% analysis-TEST stratum and the final-30% holdout were never sliced or materialized
+(`holdout_untouched=true`, `regime_match_recon_ok=true`, `counted_test_reads=0`, `candidate_slots=0` in
+`run_metadata.json`). Per the TRAIN-only / availability-disclosure convention
+(EXP-074/075/080/081/082/083/085/086/087 precedent) this is a **disclosure, not a counted read**: all 48 strata
+remain **0 counted reads / open** (tallies above unchanged). Verdict `SCREEN_DELIVERED`; **G-020 ADMITTED
+(BINDING) 2026-06-23** (driver = bare RSI-2 fade, vol-regime inert). **G-020 admission consumed a candidate slot,
+NOT a counted TEST read** — all 48 strata stay 0/2 open; holdout never read.
+
 **The global holdout (final 30% per new file) is outside this ledger entirely** and was
 sealed at first touch in VAL-005 (0 holdout rows read). No new-dataset holdout shot exists;
 the single historical sanctioned shot (EXP-032, old dataset) is spent and non-transferable.

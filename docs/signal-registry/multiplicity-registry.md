@@ -752,6 +752,132 @@ never deleted or reused. A promoted family registers its own CF-XXX spec + EXP-I
 | **EXP-088** | F — `CF-FLOW-001/HYP-001` | **Screen F** (TRAIN-only, reserved-conditional): order-flow / liquidity-imbalance availability vs matched random; admit/exonerate vs the D2b gate. | 0 / 0 | **NOT OPENED at G-019** — reserved-conditional; operator did not request a third comparison. The one price-adjacent cell left unmeasured; available as a future cheap screen, not required for the terminal verdict. Retained. |
 | **G-019** | — | Terminal gate: emit the ranked admit/exonerate/inconclusive inventory; route per the D5 mechanical rule. | 0 / 0 | **ADJUDICATED 2026-06-23 — ALL SCREENED AXES NOT ADMITTED → TERMINAL BRANCH** (`G-019-gate-review.md`). Cross-axis Holm over the realized axis-level perm p-values: **M** Holm-adj p=2·0.0326=**0.0652>0.05** (single-axis `S_M=3>S*=2` does NOT survive cross-axis multiplicity → CF-VOLEXP-001 single-series-magnitude cell **CLOSED**: typical-range dead + NR7-tail thread tiny/long-vol/fails-FWER); **X** `S_X=1≤S*=1`, p=0.323 → CF-XSECT-001 cross-sectional cell **CLOSED, dead-by-absence** (below coin-flip band). ADMITTED set **empty** ⇒ no family promoted, 0 slots / 0 reads. **Price-derived information — single-series magnitude AND cross-sectional relational — exhausted on this dataset; frontier = non-price data acquisition (operator decision).** Both families retained (file-drawer), never reopened by re-parameterization. Bite-check GREEN precondition met; both EXP audits PASS; determinism byte-identical; ledger unchanged (all 48 strata 0/2). |
 
+## Phase 020 Batch (CF-MR-001 Mean-Reversion Entry Availability Screen) — G-020 ADMITTED (BINDING); first candidate slot consumed
+
+> **EXP-089 COMPLETE 2026-06-23 (amended `D0-amendment-001`) — `SCREEN_DELIVERED`; G-020 ADMITTED (BINDING)
+> 2026-06-23.** Joint-max gate `S_fam=28 > S*=7`, axis perm-p≈0.0002, FWER-robust, MC-stable → **ADMITTED**
+> (D5 rule; no cross-axis Holm — single family). Per sub-screen S: **CORE 28** (the lever), CORE-VOL-LOW 22 /
+> -MED 25 / -HIGH 20 (**pass but INERT** — flat Δ̂_rand 0.05–0.08 ATR, add nothing over CORE), CORE+TREND 0 /
+> CORE+FILTER 1 (**dead** — variants contradict the fade). Driver = bare RSI-2 fade (z=17.3); intraday
+> (15m 16/16, 1h 11/16, 4h 1/14); ~3-bar horizon. **G-020 consequence: CF-MR-001 consumes its first candidate
+> slot** (the lever = bare RSI-2 fade, opened intraday-first at a future G0/D0 — capture-geometry / exit / cost,
+> the availability→tradability step). **Amendment (`D0-amendment-001`): the leg-2 beats-CORE conjunction +
+> regime-membership-shuffle null are RETIRED** (audit C-1 ATR-normalization confound; C-2 trend-length horizon)
+> — the regime-conjunction is **no longer a countable item**; all 6 sub-screens are single-test leg-1 over a
+> causal MR-tempo cap with regime-matched controls. The first run was a deviation (voided/deleted). **All items
+> retained; 0 counted TEST reads, holdout sealed, all 48 strata stay 0/2 open.** Admission consumed a
+> **candidate slot, not a TEST read**. Adjudication: `G-020-gate-review.md`.
+
+**Registered:** 2026-06-23. **First candidate family opened after the Phase 019 terminal branch, by explicit
+operator override of the G-019 price→non-price routing** (`candidate-families/cf-mr-001.md` §0; Phase 020
+design §1). The phase's sole experiment (EXP-089) is a **TRAIN-only availability screen** of a **new entry-side
+family** — RSI-2 **mean reversion** (a fade mechanism; every prior family was continuation/pullback) with a
+**global, strategy-agnostic ATR volatility-regime partition** treated as part of the signal definition (cell =
+`asset+domain+regime`). **0 candidate slots, 0 counted TEST reads, holdout never touched** (TRAIN sub-split
+only; availability disclosure, not a stratum-specific inference — EXP-080/081/086/087 precedent;
+`test-read-ledger.md` unchanged, all 48 strata stay 0/2 open).
+**Honest prior (binding on interpretation):** the programme-level null is availability ≈ random (three closed
+families + Phase 019) — the hypothesis the screen tries to reject, not a prediction of failure. Both legs
+carry the override on their own merits: leg 1 a new entry mechanism (fade), leg 2 a new *kind* of filter —
+strategy-agnostic, intrinsic to the market, made a cell-differentiating part of the signal definition rather
+than a bolt-on plugin. The screen is a fully-committed falsification attempt at 0 reads / 0 slots; the
+analysis imports no prior family's outcome as a biasing expectation.
+**Status:** **OPEN — G0 RATIFIED (2026-06-23, operator-authorized).** D0 FROZEN (`D0-predeclarations.md`); the
+**D2b admission-gate bite-check is GREEN on the single-test legs** at the family's **6-sub-screen** structure
+and C=46 (`bite-check/bite_check.py` → `bite_check_report.json`, sha256
+`f01a000b1b230cd172cb4a6cde914014f1efb7ba6b5fc92d25376ee0b6ffab65`, byte-identical second pass). **Leg-2
+design correction (2026-06-23, operator-directed, applied in place):** the three `/VOLREGIME` sub-screens now
+test a **binding beats-random ∧ beats-CORE conjunction** (`Δ̂_core > 0`, the additive edge over the pooled
+core) under a **regime-membership-shuffle-within-CORE** null — a new per-cell statistic + null requiring the
+**bite-check to be extended and re-confirmed GREEN (new sha) before EXP-089 runs**. EXP-089 authorized on that
+extended GREEN.
+**Governing design:** [`../experiments-docs/checkpoints/2026-06-23-020-mean-reversion-entry-availability/design.md`](../experiments-docs/checkpoints/2026-06-23-020-mean-reversion-entry-availability/design.md)
++ [`D0-predeclarations.md`] + gate [`G-020-gate-criteria.md`].
+**Family spec (FROZEN, G0-RATIFIED):**
+[`candidate-families/cf-mr-001.md`](candidate-families/cf-mr-001.md).
+
+### Predeclared surface (countable items — entered now per the file-drawer rule)
+
+| Field | Predeclared value |
+| --- | --- |
+| Candidate family (countable) | **`CF-MR-001`** — RSI-2 mean-reversion entry + global `/VOLREGIME` partition. Consumes a candidate slot only on ADMIT at a future G0/D0; the availability screen consumes 0. |
+| Entry (frozen) | `RSI(2)` Wilder on domain Close; long `RSI₂<10`, short `RSI₂>90` (period 2, extremes 10/90) |
+| Global filter `/VOLREGIME` (frozen) | `ATR(14)` causal trailing rolling-50 percentile, cuts 33/66 → Low/Med/High; per-(instrument,domain); **partition on the bare core only**, tested by the **binding leg-2 beats-CORE conjunction** (the regime must *add* favourable availability over the pooled core) |
+| Variant toggles (frozen; pooled in batch 1) | TREND `EMA(20)`; RSI-FILTER `RSI(5)≷50` |
+| Batch-1 sub-screens (countable; joint-max controlled) | `CORE`, `CORE-VOL-LOW`, `CORE-VOL-MED`, `CORE-VOL-HIGH`, `CORE+TREND`, `CORE+FILTER` |
+| Dataset / domains / instruments | VAL-005 5-year, {15m,1h,4h}, 16 instruments; TRAIN sub-split `[0, int(analysis_rows·0.7))` only; member cells = EXP-080-READY 46 (US500-4h, JP225-4h `COVERAGE_EXCLUDED`) |
+| Matched-random control | EXP-080/081 `SUB-RANDOM`, matched on **count + direction** — the same all-bars control for every sub-screen (no regime-matching: ATR-normalisation removes the regime scale; the regime's additive value is isolated by `Δ̂_core`) |
+| Binding admission gate | `xen.availability_gate` 6-sub-screen **joint-max** permuted-axis null at the realized cell count; per-sub-screen `S` = `#beats-random` (CORE/variants, leg 1) / `#(beats-random ∧ beats-CORE)` (`/VOLREGIME`, leg 2 binding); null = signal-shuffle / regime-membership-shuffle-within-CORE; `ADMITTED iff S_fam > S* (Q95) ∧ axis perm_p ≤ 0.05` (FWER 0.05); no cross-axis Holm (single family); **bite-checked GREEN, extended for leg-2, before the run** (D2b) |
+| Endpoint | favourable `MFE_med`, ATR-normalised, directional — leg 1 `Δ̂_rand` vs `SUB-RANDOM` (all sub-screens); leg 2 `Δ̂_core` vs pooled CORE (`/VOLREGIME` binding, variants descriptive) (D3) |
+| Verdict | **ADMITTED** (argmax sub-screen names the lever) / **EXONERATED** (single-series-directional dead under mean-reversion too → G-019 non-price frontier) / **INCONCLUSIVE** (D5) |
+| Candidate slots | **1 (CONSUMED at G-020 ADMIT, 2026-06-23)** — the screen itself consumed 0; the binding G-020 admission promoted CF-MR-001 to its first candidate slot (lever = bare RSI-2 fade) |
+| TEST reads | **0** — TRAIN-only availability disclosure; ledger unchanged |
+| **Deferred branches (registered, uncounted)** | **CONTRARIAN** toggle (flip direction on the RSI-filter axis); **25/75** regime scheme; **regime × variant** cross-cuts; RSI/EMA/ATR/window **parameter tuning**; instrument/domain/variant **expansion**. Each requires a dated `D0-amendment-*` stating whether it consumes a new slot. |
+
+No candidate slot is consumed by registration. `CF-MR-001` and each batch-1 sub-screen is a countable item;
+its outcome (admit / exonerate / inconclusive) is **retained** here and in `candidate-families/cf-mr-001.md`,
+never deleted or reused. A refuted family is closed and not silently reopened by re-parameterization.
+
+### Phase 020 experiment outcomes
+
+| EXP | HYP | Role | Slots / TEST | Status |
+| --- | --- | --- | --- | --- |
+| **EXP-089** | `CF-MR-001/HYP-001` | **Availability screen** (TRAIN-only, AMENDED `D0-amendment-001`): RSI-2 mean-reversion favourable-excursion availability — 6 sub-screens (`CORE`, `CORE-VOL-{LOW,MED,HIGH}`, `CORE+TREND`, `CORE+FILTER`) over 46 member cells × {15m,1h,4h}; **all single-test leg-1 beats-`SUB-RANDOM`** (regime-matched for `/VOLREGIME`; **leg-2 conjunction RETIRED**) over a **causal MR-tempo cap**; admit/exonerate vs the D2b joint-max permuted-axis gate. | 0 / 0 | **COMPLETE 2026-06-23 — `SCREEN_DELIVERED`, provisional ADMITTED (NON-BINDING at screen time → made BINDING ADMITTED at G-020 2026-06-23); audit PASS (0C/0W/3I).** `S_fam=28 > S*=7`, perm-p≈0.0002, FWER-robust, MC-stable. **CORE 28 (lever)**; VOL-LOW/MED/HIGH 22/25/20 **inert** (add nothing over CORE); TREND/FILTER 0/1 **dead**. Bare RSI-2 fade, intraday (15m 16/16, 1h 11/16, 4h 1/14), ~3-bar horizon. First run was a deviation (audit C-1/C-2), voided/deleted, amended in place — confounds confirmed removed. Determinism/recon/holdout-fence clean; bite GREEN `f01a000b…`. **0 slots, 0 counted TEST reads, ledger unchanged.** Items retained. |
+| **G-020** | — | Terminal gate: admit (lever named) / exonerate (→ non-price frontier) / inconclusive, per D5. | 1 slot / 0 TEST | **ADMITTED — adjudicated 2026-06-23** (`G-020-gate-review.md`). `S_fam=28 > S*=7`, axis perm-p≈0.0002 ≤ 0.05 (FWER 0.05, no cross-axis Holm). Lever = **bare RSI-2 fade (CORE)**, intraday; vol-regime inert, variants dead. **CF-MR-001 consumes its first candidate slot**; next scope opens the bare fade (capture-geometry / exit / cost) at a future G0/D0. Admission = a candidate slot, **not** a counted TEST read — ledger unchanged (48 strata 0/2), holdout sealed. |
+
+## Phase 021 Batch (CF-MR-001 batch 2 — RSI-2 Fade Capture-Geometry & Tradability) — OPEN, G0 RATIFIED
+
+> **G0 RATIFIED 2026-06-23 (operator-authorized).** Batch 2 of CF-MR-001 — the **availability→tradability**
+> step for the **bare RSI-2 fade (CORE)** admitted at G-020. **D0 FROZEN** (`D0-predeclarations.md`); no new
+> selection statistic ⇒ **no bite-check required** (the binding gate is the existing frozen referee suite; if
+> EXP-091/092 introduce a novel selection statistic it must be bite-checked GREEN first). The **first candidate
+> slot was already consumed at G-020**; Phase 021 consumes **no additional slot**. TRAIN-only through EXP-092
+> (0 counted reads); the one-shot **EXP-093 TEST** spends ≤1 counted read per carried (instrument,domain) cell
+> on the **analysis-TEST stratum** (cap 2/stratum; all 48 strata currently 0/2 → carried strata go 0→1),
+> recorded in `test-read-ledger.md` in the same change. **The final-30% global holdout is never loaded** (a
+> holdout release is a separate later gate). Items retained per the file-drawer rule.
+
+**Registered:** 2026-06-23. **Scope:** exit / capture geometry / cost for the bare RSI-2 fade, **intraday
+{15m, 1h} only** (4h dead-by-absence at EXP-089, not carried). The entry is **inherited frozen** (`RSI(2)`
+2/10/90; no re-tuning); the only open axis is the **exit + cost layer**.
+**Governing design:** [`../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/design.md`](../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/design.md)
++ [`D0-predeclarations.md`] + gate [`G-021-gate-criteria.md`].
+**Family spec:** [`candidate-families/cf-mr-001.md`](candidate-families/cf-mr-001.md).
+
+### Predeclared surface (countable items — entered now per the file-drawer rule)
+
+| Field | Predeclared value |
+| --- | --- |
+| Candidate slots | **0 additional** — the first CF-MR-001 slot was consumed at G-020; Phase 021 spends no new slot |
+| Entry (inherited frozen) | `RSI(2)` Wilder, long `RSI₂<10` / short `RSI₂>90` (2/10/90); no re-tuning |
+| Domains / member cells | {15m, 1h} only; 16 instruments × 2 = **32 cells** (4h excluded, dead-by-absence) |
+| **Exit families (countable — the capture-geometry slate)** | **Native pair (primary):** **EXIT-RCT** (RSI₂→50 reversion-completion price `P*=Close+(AL−AG)`, proactive limit, 1m intrabar fill) · **EXIT-ERT** (return-to-`EMA(10)` equilibrium target, 1m intrabar fill). **Conventional contrast:** RSI-revert-on-close · fixed-bar · ATR triple-barrier (`1.0×ATR` tgt / `2.0×ATR` stop) · favourable partial/trail (EXP-059 V2A). **Single frozen parameter point each — no grid.** |
+| Adverse side (frozen, all arms) | stop `2.0×ATR(14)` + the EXP-089 causal MR-tempo cap (mult 1.0, FLOOR 3, MAX 40); exit-on-close at cap |
+| Intrabar fill (new module) | `xen.intrabar_fill` — timestamp-aligned domain→1m, causal order-of-touch (conservative adverse-first tie-break), real touched fill prices; TRAIN-clip by timestamp |
+| Cost model (binding) | EXP-085 CONSERVATIVE round-trip (2×BASE) + per-instrument financing (`xen.capgeo_cost`/`xen.financing`), unchanged |
+| Binding gate | the **frozen referee suite** (strict + ratified-loose + revised incremental); `ASS` **non-binding** (G-017) |
+| Endpoint | net per-event expectancy (mean + median), ATR units, real prices, after cost; binding figure = net `ci_low_1s` |
+| EXP-091 rule | net-clear iff net `ci_low_1s`>0; exit passes iff ≥5 cells / ≥3 instruments; **empty screen ⇒ G-021 NOT_TRADABLE at 0 reads** |
+| EXP-092 rule | per-cell `SEQUENCE_PASS` at α=0.05 one-sided → hash-pinned candidate set (sha256) + phase Holm rule |
+| EXP-093 rule (TEST) | carried cell CONFIRMS iff Holm-adj p≤0.05 ∧ `ci_low_1s` > margin (margin = EXP-090 MDE) |
+| Verdict | **TRADABLE** (≥1 carried cell confirms on TEST) / **NOT_TRADABLE** (empty screen, or all carried cells fail) / **INCONCLUSIVE** (TEST power-limited) (G-021) |
+| TEST reads | **0 through EXP-092**; EXP-093 ≤1/carried-stratum (cap 2/stratum; carried strata 0→1); analysis-TEST only, holdout sealed |
+| **Deferred branches (registered, uncounted)** | the inert **vol-regime partition**, the dead **TREND/FILTER** variants, the **CONTRARIAN** arm, the **25/75** scheme, **regime×variant** cross-cuts, parameter **tuning**, instrument/domain (incl. **4h**) **expansion**. Each requires a dated `D0-amendment-*` stating whether it consumes a new slot. |
+
+Each exit family is a countable item; its outcome (clears / dies / inconclusive) is **retained** here and in
+`candidate-families/cf-mr-001.md`, never deleted or reused. A refuted exit is not silently reopened by
+re-parameterization.
+
+### Phase 021 experiment outcomes
+
+| EXP | HYP | Role | Slots / TEST | Status |
+| --- | --- | --- | --- | --- |
+| **EXP-090** | `CF-MR-001/HYP-002` | Exit-substrate readiness & per-cell inference calibration (TRAIN) — member set, event coverage, finite per-cell MDE under the frozen referee | 0 / 0 | **PLANNED** (D8 bracket). |
+| **EXP-091** | `CF-MR-001/HYP-002` | TRAIN-only exit/capture-geometry screen (gross + EXP-085 cost) over the §3 slate; native pair vs conventional contrast | 0 / 0 | **PLANNED** (empty ⇒ G-021 NOT_TRADABLE at 0 reads). |
+| **EXP-092** | `CF-MR-001/HYP-002` | Per-instrument cost-bearing tradability sequence → hash-pinned candidate set + Holm rule | 0 / 0 | **PLANNED**. |
+| **EXP-093** | `CF-MR-001/HYP-002` | One-shot TEST confirmation under phase Holm + margin | ≤2 TEST (carried strata 0→1) | **PLANNED** (the binding tradability read). |
+| **G-021** | — | Terminal gate: tradable / not-tradable / inconclusive, per D6. | 0 slot / — | **PENDING** (criteria frozen in `G-021-gate-criteria.md`). |
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:

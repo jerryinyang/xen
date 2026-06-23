@@ -15,6 +15,17 @@ slots, 0 counted TEST reads**.
 **Holdout:** never touched at any point in Phase 019. `test-read-ledger.md` **unchanged** (all 48 strata stay
 0/2 open). Operator-directed phase closure ("G-019 review — close both families").
 
+> **Amendment (2026-06-23, operator-directed — scoping, not re-adjudication).** The "price-derived information
+> is exhausted" framing above is **scoped** to what Phase 019 (and the four prior closed families) actually
+> screened: single-series **magnitude**, cross-sectional **relational**, and single-series directional
+> **continuation** entries. A **mean-reversion (fade) entry mechanism was never screened**, so the terminal
+> sentence is read as *the screened continuation / magnitude / relational surface is exhausted on this
+> dataset* — **not** as a verdict over every price-derived lever. The routing to **non-price data acquisition
+> was overridden by operator decision (2026-06-23)** to open **CF-MR-001** (Phase 020), which screens the
+> unscreened mean-reversion mechanism plus a strategy-agnostic volatility-regime partition. The mechanical
+> adjudication (empty ADMITTED set; CF-VOLEXP-001 and CF-XSECT-001 CLOSED and retained) is **unchanged**; only
+> the over-broad framing is narrowed.
+
 ---
 
 ## 1. Decision

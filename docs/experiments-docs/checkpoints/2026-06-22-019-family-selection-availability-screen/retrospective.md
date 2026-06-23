@@ -6,6 +6,13 @@
 **Cost:** 0 candidate slots, 0 counted TEST reads, holdout never touched, `test-read-ledger.md` unchanged
 (all 48 strata stay 0/2 open). 2 screens run (EXP-086 M, EXP-087 X); Screen F (EXP-088) reserved, not opened.
 
+> **Amendment (2026-06-23, operator-directed — scoping).** The terminal "price-derived information exhausted →
+> non-price frontier" verdict is **scoped** to the screened surface (single-series magnitude, cross-sectional
+> relational, and single-series directional **continuation** entries). A **mean-reversion (fade) mechanism was
+> never screened**; the non-price routing was **overridden by operator decision (2026-06-23)** to open
+> **CF-MR-001** (Phase 020). The mechanical Phase-019 adjudication is unchanged. See
+> [`G-019-gate-review.md`](G-019-gate-review.md) amendment.
+
 ---
 
 ## 1. Objectives vs outcomes

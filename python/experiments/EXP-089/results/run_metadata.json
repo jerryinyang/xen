@@ -1,0 +1,71 @@
+{
+  "experiment": "EXP-089",
+  "phase": "020",
+  "family": "CF-MR-001",
+  "hypothesis": "CF-MR-001/HYP-001",
+  "amendment": "D0-amendment-001",
+  "generated_at": "2026-06-23T12:43:21.818318+00:00",
+  "verdict": "SCREEN_DELIVERED",
+  "provisional_disposition_NON_BINDING": "ADMITTED (NON-BINDING \u2014 pending G-019 cross-axis Holm)",
+  "n_member_cells": 46,
+  "n_cells_built": 46,
+  "determinism_ok": true,
+  "determinism_cells": true,
+  "determinism_gate_stream": true,
+  "recon_all_ok": true,
+  "regime_match_recon_ok": true,
+  "read_region": "TRAIN sub-split [0, int(int(total_rows*0.7)*0.7)); analysis-TEST + holdout never sliced",
+  "seeds": {
+    "SEED_MASTER": 20260623,
+    "CTRL_TAG": 11,
+    "POOL_TAG": 12,
+    "POOLDIR_TAG": 13,
+    "GATE_TAG": 21
+  },
+  "frozen_constants": {
+    "ATR_PERIOD": 14,
+    "RSI": "2 (10/90), filter 5 (50-cross), EMA 20",
+    "regime": "ATR(14) causal rolling-50 percentile, cuts 33/66 LOW/MED/HIGH",
+    "mr_tempo_cap": {
+      "K_MULT": 1.0,
+      "EPISODE_WINDOW": 20,
+      "MIN_EPISODES": 5,
+      "CAP_FLOOR": 3,
+      "CAP_MAX": 40,
+      "episode_close_rsi": 50.0
+    },
+    "EVENT_FLOOR": 15,
+    "N_PERM": 5000,
+    "N_PERM_STABILITY": 1000,
+    "FWER": 0.05,
+    "Z_ONE_SIDED": 1.645,
+    "pool_raw": [
+      8,
+      3000,
+      30000
+    ],
+    "sub_screen_order": [
+      "CORE",
+      "CORE-VOL-LOW",
+      "CORE-VOL-MED",
+      "CORE-VOL-HIGH",
+      "CORE+TREND",
+      "CORE+FILTER"
+    ],
+    "cross_axis_holm": "NONE (single family)",
+    "cap_basis": "causal RSI-2 reversion-episode tempo (D0-amendment-001; replaces MA-segment trend cap)",
+    "control": "regime-matched (same-regime bars) for /VOLREGIME; all-bars for CORE/variants; leg-2 retired",
+    "endpoint": "entry-signed favourable MFE_med (ATR units); leg-1 vs matched control (single-test all 6 sub-screens)"
+  },
+  "bite_report_sha256": "f01a000b1b230cd172cb4a6cde914014f1efb7ba6b5fc92d25376ee0b6ffab65",
+  "bite_expected_single_test_sha256": "f01a000b1b230cd172cb4a6cde914014f1efb7ba6b5fc92d25376ee0b6ffab65",
+  "module_hashes": {
+    "availability_gate": "8a8b432e8dea27fcae7bc63175c70659a32a5e965e7993b9cf9a7df61782e46f",
+    "mean_reversion": "db4f39bb9afc8a6c9e58c79e79948a0d2a6a200a4d5abbc336682eefe4b99052",
+    "vol_regime": "ed2c6a11c50706201982a8be716ae41202cd0e61577c8d20048901c2df7436c7",
+    "capgeo_geometry": "74042e8eb732fae7767cdc9415ff5418e08526edad14e27606f2a5613d8c78b0"
+  },
+  "holdout_untouched": true,
+  "counted_test_reads": 0,
+  "candidate_slots": 0
+}
