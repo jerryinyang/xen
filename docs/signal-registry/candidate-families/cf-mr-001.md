@@ -204,6 +204,40 @@ gate after the Phase 019 terminal branch. On ADMIT, G-020 would open the **bare 
 the vol-regime lever is a low-priority follow-up given its inertness here. Artifacts:
 [`../../../python/experiments/EXP-089/report.md`](../../../python/experiments/EXP-089/report.md).
 
+## Outcome — EXP-090 (`CF-MR-001/HYP-002`, Phase 021 batch 2), 2026-06-24
+
+**`READINESS_CALIBRATION_DELIVERED` · 20 MEMBER / 12 COVERAGE_EXCLUDED · 0 slots · 0 counted TEST reads · holdout
+sealed · audit PASS · AMENDED `D0-amendment-002`.** The availability→tradability step's first experiment: the
+bare-fade entry substrate, the new 1-minute intrabar exit-fill engine (`xen.intrabar_fill`), and the binding
+mean net-expectancy referee are constructible, deterministic, causal, timestamp-aligned, holdout-fenced, and
+**powered** on **20 of 32** cells (10 × 15m + 10 × 1h), which carry to EXP-091 with calibrated margins (RCT
+0.0125 / ERT 0.025 ATR = the EXP-093 margins).
+
+- **The 12 excluded cells all fail for the same power reason** — *no finite MDE on either native arm* (cannot
+  bound a confirmation at their realized count). NOT an FPR, engine, or coverage failure: every cell is
+  `IN_FLOOR`, fill-validity/timestamp/determinism are TRUE on every cell × arm, and the per-cell FPR is
+  symmetric and controlled (native-arm median 0.048–0.051; every member's carried arm ≤ 0.050 under **both**
+  nulls).
+- **No edge is claimed or computed.** The real fade outcomes were never resolved
+  (`real_fade_outcomes_resolved: false`) — EXP-091 is the first to read them. The calibration certifies the
+  *estimator*, cost-free by translation-equivariance (a valid net margin).
+- **Audit trail (3 runs; `D0-amendment-002`):** Run 1 HALTed on a 1-minute fill-engine bug (per-bar window
+  over-assignment across dropped/session-gap windows + limit/stop gap-throughs → fills outside `[Low,High]`);
+  Run 2 found the analysis-plan's Null B (block-rotated **path**) pathological — it matched entries to wrong-era
+  prices, inflating ATR-normalised return variance 30–145× (mean exactly 0), wrongly excluding 14 cells on the
+  binding mean. Both fixed and fully re-run: window anchored to each bar's own `(close − period, close]`,
+  gap-throughs fill at the touching 1m **open**; Null B reverted to block-permuted **resolved returns** (the
+  EXP-001/027/044 form `scope.md` originally specified). The disclosed median leg (D5, non-binding) was dropped
+  for performance (binding mean bit-identical to `xen.ass`; runtime 8 h → 67 min).
+- **Member-set note vs the intermediate broken-Null-B run (12 members):** 9 robust (member in both), 11
+  newly-admitted (the rotation-artifact casualties), 3 boundary-noise dropouts (Null B FPR 0.051–0.057). The
+  hard ≤ 0.05 gate (±0.014 Wilson noise at 1000 draws) flips marginal cells; the 9 robust cells are the safest
+  EXP-091 evidence.
+
+No countable exit item is screened or refuted here (that is EXP-091). Artifacts:
+[`../../../python/experiments/EXP-090/report.md`](../../../python/experiments/EXP-090/report.md) · amendment
+[`../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/D0-amendment-002.md`](../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/D0-amendment-002.md).
+
 ---
 
 *All outcomes — admit, exonerate, inconclusive — are **retained** in this file and the Phase 020

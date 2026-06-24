@@ -128,6 +128,81 @@ def _rsi_value(avg_gain: float, avg_loss: float) -> float:
     return 100.0 - 100.0 / (1.0 + avg_gain / avg_loss)
 
 
+def wilder_avg_gain_loss(close: np.ndarray, period: int) -> tuple[np.ndarray, np.ndarray]:
+    """Causal Wilder average gain/loss arrays underlying :func:`wilder_rsi` (EXP-090 D2.1).
+
+    Exposes the smoothed average gain ``AG`` and average loss ``AL`` series that
+    :func:`wilder_rsi` consumes internally, so the EXIT-RCT reversion-completion target can be
+    derived in closed form (``P* = Close + (AL - AG)`` long, for period ``n = 2``). Byte-identical
+    seeding/recursion to :func:`wilder_rsi` (simple mean of the first ``period`` deltas, then
+    ``avg = (avg*(p-1) + x)/p``); the first ``period`` entries are ``NaN`` (warmup). Strictly
+    causal — bar ``i`` uses only closes ``<= i``.
+
+    Parameters
+    ----------
+    close : np.ndarray
+        Real domain-bar close prices (float64), length ``n``.
+    period : int
+        Wilder smoothing period (``>= 1``).
+
+    Returns
+    -------
+    (avg_gain, avg_loss) : (np.ndarray, np.ndarray)
+        Wilder average gain / average loss aligned to ``close``; first ``period`` entries ``NaN``.
+    """
+    x = np.asarray(close, dtype=np.float64)
+    n = x.shape[0]
+    ag = np.full(n, np.nan, dtype=np.float64)
+    al = np.full(n, np.nan, dtype=np.float64)
+    if n <= period:
+        return ag, al
+    delta = np.diff(x)
+    gain = np.where(delta > 0.0, delta, 0.0)
+    loss = np.where(delta < 0.0, -delta, 0.0)
+    avg_gain = float(np.mean(gain[:period]))
+    avg_loss = float(np.mean(loss[:period]))
+    ag[period] = avg_gain
+    al[period] = avg_loss
+    for i in range(period + 1, n):
+        avg_gain = (avg_gain * (period - 1) + gain[i - 1]) / period
+        avg_loss = (avg_loss * (period - 1) + loss[i - 1]) / period
+        ag[i] = avg_gain
+        al[i] = avg_loss
+    return ag, al
+
+
+def reversion_completion_target(
+    close: np.ndarray, period: int = RSI_FAST_PERIOD,
+) -> np.ndarray:
+    """EXIT-RCT trailing reversion-completion target price per bar (EXP-090 D2.1).
+
+    The next-bar close that returns ``RSI(period)`` to the neutral midline 50 satisfies the
+    closed form ``P*_t = Close_t + (period - 1)·(AL_t - AG_t)``. The offset ``(AL - AG)`` is
+    **signed**: when oversold (``AL > AG``) it is positive so ``P* > Close`` (a long's favourable
+    target above); when overbought (``AL < AG``) it is negative so ``P* < Close`` (a short's
+    favourable target below) — one formula for both directions, matching the D2.1 long
+    ``Close + (AL - AG)`` and short ``Close - (AG - AL)`` specs. The target is a causal transform
+    of the Wilder state through bar ``t`` (no look-ahead); ``NaN`` during the RSI warmup. The
+    consumer (the intrabar fill engine) uses the entry direction to decide the touch side
+    (long fills when ``high >= P*``; short when ``low <= P*``).
+
+    Parameters
+    ----------
+    close : np.ndarray
+        Real domain-bar close prices (float64), length ``n``.
+    period : int, default ``RSI_FAST_PERIOD`` (2)
+        Wilder RSI period (the entry oscillator; frozen at 2).
+
+    Returns
+    -------
+    np.ndarray
+        Per-bar trailing target price (float64); ``NaN`` during warmup. The RSI implied by
+        reaching ``P*_t`` equals 50 by construction (EXP-090 readiness invariant).
+    """
+    ag, al = wilder_avg_gain_loss(close, period)
+    return np.asarray(close, dtype=np.float64) + float(period - 1) * (al - ag)
+
+
 def wilder_ema(close: np.ndarray, period: int) -> np.ndarray:
     """Exponential moving average of ``close`` (causal; NaN during warmup).
 

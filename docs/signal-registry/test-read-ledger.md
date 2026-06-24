@@ -196,6 +196,24 @@ remain **0 counted reads / open** (tallies above unchanged). Verdict `SCREEN_DEL
 (BINDING) 2026-06-23** (driver = bare RSI-2 fade, vol-regime inert). **G-020 admission consumed a candidate slot,
 NOT a counted TEST read** — all 48 strata stay 0/2 open; holdout never read.
 
+**EXP-090 exit-substrate readiness & calibration disclosure (2026-06-24, Phase 021, CF-MR-001/HYP-002; amended
+`D0-amendment-002`).** EXP-090 read the **TRAIN sub-split only** (`[0, int(int(total_rows·0.7)·0.7))` = first 49%
+of each file) of the 32-cell member set (16 × {15m,1h}) to establish exit-substrate readiness (bare-fade entries
++ the new 1-minute intrabar fill engine `xen.intrabar_fill` resolving five frozen exit arms — deterministic,
+timestamp-aligned, causal, fenced, real fill prices) and the per-cell inference calibration of the binding mean
+net-expectancy moving-block bootstrap lower bound (FPR / event-level MDE). It computed **only readiness records,
+raw per-cell event counts, and a synthetic null/planted-edge estimator calibration — no exit screened, no net or
+gross strategy expectancy, no stratum-specific selection or inference**; the **real CORE fade outcomes were never
+resolved or read** (`real_fade_outcomes_resolved=false` — the calibration used matched-random-entry exit-resolved
+returns only, the EXP-044 anti-overfitting fence). The 1-minute fill walk uses only bars at/after entry within
+the cap, clipped at the TRAIN edge; the next-21% analysis-TEST stratum and the final-30% holdout were never
+sliced or materialized (`holdout_untouched=true`, `counted_test_reads=0`, `candidate_slots=0` in
+`run_metadata.json`). Per the TRAIN-only / readiness-disclosure convention
+(EXP-074/075/080/081/082/083/085/086/087/089 precedent) this is a **disclosure, not a counted read**: all 48
+strata remain **0 counted reads / open** (tallies above unchanged). Verdict `READINESS_CALIBRATION_DELIVERED`
+(20 MEMBER / 12 COVERAGE_EXCLUDED); the carried per-cell MDEs are the EXP-093 margins. No counted read is spent
+until the one-shot EXP-093 TEST.
+
 **The global holdout (final 30% per new file) is outside this ledger entirely** and was
 sealed at first touch in VAL-005 (0 holdout rows read). No new-dataset holdout shot exists;
 the single historical sanctioned shot (EXP-032, old dataset) is spent and non-transferable.

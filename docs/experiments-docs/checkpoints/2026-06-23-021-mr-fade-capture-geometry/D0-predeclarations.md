@@ -76,7 +76,10 @@ favourable-exit mechanism varies ⇒ a win is attributable to the target, not th
 - **RSI-revert-on-close** — exit at the domain **close** when RSI₂ crosses 50 (the reactive, non-intrabar
   analog of RCT; quantifies what proactive-resting + intrabar fill buys).
 - **Fixed-bar** — close at the MR-tempo-cap horizon (`xen.exit_rules.fixed_horizon_exit_idx`).
-- **ATR triple-barrier** — favourable `1.0×ATR` target / `2.0×ATR` stop, intrabar-filled (the same engine).
+- **ATR triple-barrier** — favourable `1.0×ATR` target / `2.0×ATR` stop, intrabar-filled (the same engine);
+  the **third (time) barrier is the same EXP-089 MR-tempo cap (param #3)** used by every other arm, so the
+  adverse side (stop + hold horizon) is identical across all arms (D2.3) and only the favourable leg varies
+  (clarified in `D0-amendment-001`, 2026-06-23).
 - **Favourable partial / trail** — EXP-059 V2A-style two-leg (`xen.capgeo_cost.partial_two_leg_exit`), as the
   primitive allows.
 - Each arm is a **single frozen parameter point — no grid** (multiplicity discipline).
@@ -137,6 +140,12 @@ mean-fragile per EXP-089 — both legs disclosed, never pooled across cells).
   stratum**; all 48 strata are currently 0/2, so each carried stratum goes 0→1 (one read preserved for any
   future confirmation). The read is on the **analysis-TEST stratum** (last 30% of the analysis set) — **not**
   the final-30% global holdout, which stays sealed (a global-holdout release is a separate, later gate).
+- **One stratum = one counted read, even if multiple surviving exits select the same cell** (clarified in
+  `D0-amendment-001`, 2026-06-23). The counted read attaches to the **(instrument, domain) stratum**, not to
+  the (exit × cell) pair: if two surviving exits both carry the same (instrument, domain) cell to EXP-093, that
+  stratum spends **1** counted read (0→1), not 2 — the binding read is the stratum's events entering the gate,
+  which happens once regardless of how many exits are evaluated on it. This keeps a single EXP-093 from pushing
+  any stratum toward its 2/2 cap.
 - The candidate slot is **already consumed** (G-020); Phase 021 consumes **no additional slot**.
 
 ## D8 — Member-cell readiness bracket (EXP-090)

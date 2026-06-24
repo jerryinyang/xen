@@ -1,0 +1,97 @@
+{
+  "experiment_id": "EXP-090",
+  "phase": "021",
+  "family": "CF-MR-001",
+  "hyp": "HYP-002",
+  "generated_utc": "2026-06-24T08:56:02.376842+00:00",
+  "experiment_verdict": "READINESS_CALIBRATION_DELIVERED",
+  "master_seed": 20260623,
+  "instruments": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "USDCHF",
+    "USDCAD",
+    "AUDUSD",
+    "NZDUSD",
+    "EURJPY",
+    "GBPJPY",
+    "AUDJPY",
+    "XAUUSD",
+    "BTCUSD",
+    "USTEC",
+    "US500",
+    "US2000",
+    "JP225"
+  ],
+  "domains": [
+    "15m",
+    "1h"
+  ],
+  "arms_engine": [
+    "RCT",
+    "ERT",
+    "ATR-BARRIER",
+    "RSI-REVERT",
+    "FIXED-BAR"
+  ],
+  "arm_partial_trail": "deferred to EXP-091 (two-leg resolver)",
+  "native_arms": [
+    "RCT",
+    "ERT"
+  ],
+  "n_draws": 1000,
+  "n_boot": 10000,
+  "edge_grid_atr": [
+    0.0,
+    0.0125,
+    0.025,
+    0.05,
+    0.1,
+    0.2,
+    0.4,
+    0.8
+  ],
+  "alpha0": 0.05,
+  "tpr_target": 0.8,
+  "n_cal_max": 4000,
+  "n_pool_max": 6000,
+  "coverage_floor": 15,
+  "adv_atr_mult": 2.0,
+  "ert_ema_period": 10,
+  "atr_period": 14,
+  "dependency_gate": {
+    "exp080_status": "",
+    "not_ready_15m_1h": 0,
+    "missing_member_cells": []
+  },
+  "determinism": {
+    "determinism_pass": true,
+    "cells_checked": [
+      "EURUSD-15m",
+      "AUDJPY-1h"
+    ],
+    "non_deterministic": []
+  },
+  "verdict_counts": {
+    "COVERAGE_EXCLUDED": 12,
+    "MEMBER": 20
+  },
+  "holdout_untouched": true,
+  "counted_test_reads": 0,
+  "candidate_slots": 0,
+  "real_fade_outcomes_resolved": false,
+  "calibration_compute_structure": "pooled matched-random resolution + moving-block resample to true-0 (deviation flagged; see module docstring + completion note)",
+  "null_b_construction": "block-permuted REAL resolved returns (EXP-044 form, per scope.md; D0-amendment-002). Reverts the analysis-plan block-rotated-PATH Null B, which matched entries to wrong-era prices and inflated ATR-unit return variance 30-145x \u2014 pathological for the binding mean FPR.",
+  "median_leg": "DROPPED \u2014 disclosed median lower bound (D5 non-binding, never gates) omitted for performance; binding mean lower bound bit-identical to xen.ass (median consumed no randomness). See _mblock_mean_lower_bound.",
+  "fill_engine_fix": "intrabar_fill: (1) per-bar 1m window anchored to (close-period, close] not previous-kept-close, fixing dropped/gap-window over-assignment; (2) limit/stop gap-throughs fill at the touching 1m bar OPEN (real price in [Low,High]). Both fixes restore the D2.5 real-touched-price invariant; prior run HALTed on fill-price validity.",
+  "output_hashes": {
+    "member_map.csv": "aa4d450b0cf8ac6087d814fb278d9f6c1c03b5cc4dfbb9555203f1a76bca7f15",
+    "entry_coverage.csv": "567b15a33da75ac322ae68f3b4063ba678de843acd92ab81b55dd8f648c3255d",
+    "exit_substrate_readiness.csv": "d397ba3e3b1e3a8eb5fe694c32467cec178f67552eb6476301511e75ef5edd93",
+    "fpr_mde_per_cell.csv": "40c6ddb22da318eb602dfd021cdc141014e84fb0769dde08ffa70462fb8f1521",
+    "calibration_draws.parquet": "ad87c6e2d0a933677354b2d803cf57947488c566ab4bf624edabe5f421329f3f",
+    "null_fpr_sanity.json": "9ffd04da1b083fa2161c59a35d0d15717f744f7fe7a735dade5ea512229b07ca"
+  },
+  "n_workers": 10
+}

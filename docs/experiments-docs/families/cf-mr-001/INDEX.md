@@ -11,8 +11,9 @@ partition is inert; variants counter-productive); effect is **intraday (15m/1h)*
 **Batch 2 — Phase 021 OPEN** (G0 RATIFIED 2026-06-23, D0 FROZEN): the
 **availability→tradability** step for the bare fade — exit / capture geometry / cost, intraday-first. See
 [`../../checkpoints/2026-06-23-021-mr-fade-capture-geometry/design.md`](../../checkpoints/2026-06-23-021-mr-fade-capture-geometry/design.md).
-Planned EXP-090 (readiness/calibration) → EXP-091 (exit screen) → EXP-092 (cost-bearing sequence) → EXP-093
-(one-shot TEST). **Primary exit hypothesis = a native intrabar reversion-target pair** — **EXIT-RCT**
+**EXP-090 (readiness/calibration) COMPLETE 2026-06-24 — `READINESS_CALIBRATION_DELIVERED`, 20 MEMBER / 12
+COVERAGE_EXCLUDED (AMENDED `D0-amendment-002`; audit PASS)** → EXP-091 (exit screen) → EXP-092 (cost-bearing
+sequence) → EXP-093 (one-shot TEST). **Primary exit hypothesis = a native intrabar reversion-target pair** — **EXIT-RCT**
 (operator-proposed; closed-form RSI₂→50 reversion-completion price `P*=Close+(AL−AG)`, proactive limit, 1m
 intrabar fill) and **EXIT-ERT** (Claude-designed; price-returns-to-equilibrium-mean target) — measured against
 conventional reactive contrast arms (RSI-revert-on-close, fixed-bar, ATR-barrier, partial/trail), adverse side
@@ -57,6 +58,7 @@ a cheap falsification attempt (0 reads / 0 slots) reusing the Phase-019 admissio
 | EXP | HYP | Title | Status | Key finding |
 | --- | --- | --- | --- | --- |
 | EXP-089 | `CF-MR-001/HYP-001` | RSI-MR Availability Screen (bare core + vol-regime partition + 2 variants; 6 sub-screens; TRAIN-only; AMENDED) | **SCREEN_DELIVERED → G-020 ADMITTED (BINDING) 2026-06-23** | `S_fam=28 > S*=7`, perm-p≈0.0002, FWER-robust, MC-stable; driver = **CORE** (bare fade, z=17.3); vol-regime **inert** (LOW/MED/HIGH ≈22/25/20, flat Δ̂); variants kill it (0,1); intraday (15m 16/16, 1h 11/16, 4h 1/14); ~3-bar horizon. First run voided (deviation, audit C-1/C-2); amended (`D0-amendment-001`) — confounds confirmed removed. |
+| EXP-090 | `CF-MR-001/HYP-002` | Exit-Substrate Readiness & Per-Cell Inference Calibration (32 cells = 16×{15m,1h}; TRAIN-only; AMENDED `D0-amendment-002`) | **READINESS_CALIBRATION_DELIVERED 2026-06-24** | **20 MEMBER / 12 COVERAGE_EXCLUDED** (10×15m + 10×1h members → EXP-091, margins RCT 0.0125 / ERT 0.025 ATR). All 12 excluded for the *same power reason* — no finite MDE on either native arm (not FPR/engine/coverage). 1m fill engine + FPR control clean (every member arm ≤0.050 both nulls). Two HALT-class confounds found+fixed+rerun (`D0-amendment-002`: 1m fill window/gap-fill; Null B path→returns). Median leg dropped (D5 non-binding). Audit PASS. |
 
 ### EXP-089 — detailed card (`CF-MR-001/HYP-001`)
 
@@ -79,6 +81,41 @@ a cheap falsification attempt (0 reads / 0 slots) reusing the Phase-019 admissio
   availability (TREND/FILTER → S 0/1) — direct, unambiguous. (2) The short-horizon reversion availability is a
   higher-frequency phenomenon, monotone-decaying 15m→1h→4h and absent by 4h. (3) The result is conservative
   w.r.t. ATR-normalization (extremes carry elevated entry ATR, deflating the signal metric).
+
+### EXP-090 — detailed card (`CF-MR-001/HYP-002`)
+
+- **Hypothesis tests:** readiness/calibration (no edge claim) — for each of 32 cells (16 × {15m,1h}) on TRAIN:
+  (1) bare-fade entry deterministic, look-ahead-safe, ≥15 events; (2) every frozen exit arm resolves to one
+  terminal through the 1-minute engine (deterministic, timestamp-aligned, causal, holdout-fenced, real fill
+  prices); (3) controlled per-cell FPR (≤0.05 under two structurally-different nulls) and a **finite event-level
+  MDE** under the binding mean net-expectancy lower bound (`Z=1.645`). One binding estimator, none gates a
+  market edge.
+- **Scope:** TRAIN-only, gross, real-OHLC; 32 cells; five unified-engine arms (RCT, ERT, ATR-barrier,
+  RSI-revert, fixed-bar; two-leg partial/trail deferred to EXP-091); calibration on matched-random exit-resolved
+  returns (real fade outcomes never read — anti-overfitting fence). New module `xen.intrabar_fill`. 0 slots, 0
+  counted TEST reads, holdout sealed. Amended in place (`D0-amendment-002`).
+- **Results / observations:** `READINESS_CALIBRATION_DELIVERED`; **20 MEMBER / 12 COVERAGE_EXCLUDED**,
+  determinism PASS (EURUSD-15m, AUDJPY-1h byte-identical; SHA-pinned). Members 10×15m + 10×1h, carried margins
+  RCT 0.0125 / ERT 0.025 ATR (RCT carries 15 cells, ERT 5). All 32 cells `IN_FLOOR` (15m 12,827–16,225; 1h
+  3,293–4,156 events; dropped ≤0.217). Fill-validity / timestamp / determinism TRUE ∀ cell×arm; resolution
+  0.991–1.000; tie-break ≤0.18%. FPR symmetric+controlled (native median 15m 0.050/0.049, 1h 0.051/0.048
+  A/B; every member arm ≤0.050 under both nulls); `null_fpr_sanity.controlled_alpha0:false` is the over-strict
+  pooled boolean tripping on noise-level points (A max 0.071, B 0.082). The 12 excluded all fail *no finite MDE
+  on either native arm*. Median leg dropped (D5 non-binding; mean bit-identical to `xen.ass`). **Audit (3
+  runs):** Run 1 HALT (1m fill-window over-assignment + limit gap-throughs), Run 2 Null-B path-rotation
+  pathology (ATR-return variance ×30–145), both fixed (`D0-amendment-002`) + rerun. Audit PASS.
+- **Hypothesis-specific conclusion:** **DELIVERED.** The bare-fade entry + 1-minute intrabar exit-fill engine +
+  the binding referee are constructible, deterministic, causal, fenced, and **powered on 20 of 32 cells**, which
+  carry to EXP-091 with their margins. The 12 excluded cannot bound a confirmation at their count (with record).
+  No edge claimed — the real fade outcomes were never resolved (EXP-091 does that first).
+- **Hypothesis-agnostic observations:** (1) the 1-minute fill model must anchor each domain bar to its **own**
+  resample window and fill limit/stop gap-throughs at the touching 1m **open** — anchoring to the previous kept
+  close corrupts fills across dropped/session-gap windows (a reusable readiness invariant). (2) A calibration
+  second null must **block-permute the resolved returns**, not rotate the price path, when returns are
+  ATR-normalised and the binding statistic is the **mean** (path rotation matches entries to wrong-era prices →
+  variance ×30–145; harmless under a median statistic, fatal under a mean). (3) With a hard ≤0.05 FPR gate and
+  ~±0.014 sampling noise, membership near the boundary flips between runs — the 9 cells that were members under
+  both the broken and fixed Null B are the robust core.
 
 ## Gate
 
