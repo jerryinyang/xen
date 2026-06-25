@@ -1,0 +1,133 @@
+{
+  "experiment_id": "TEMP-091",
+  "phase": "TEMP",
+  "family": "HUNCH",
+  "hyp": "4h-only",
+  "generated_utc": "2026-06-24T11:56:59.541886+00:00",
+  "experiment_verdict": "SCREEN_DELIVERED",
+  "note": "TEMPORARY \u2014 copied from EXP-091, modified to 4h only. Will be deleted.",
+  "master_seed": 20260623,
+  "n_member_cells": 13,
+  "member_cells": [
+    "AUDJPY-4h",
+    "AUDUSD-4h",
+    "EURJPY-4h",
+    "EURUSD-4h",
+    "GBPJPY-4h",
+    "GBPUSD-4h",
+    "JP225-4h",
+    "NZDUSD-4h",
+    "US2000-4h",
+    "USDCHF-4h",
+    "USDJPY-4h",
+    "USTEC-4h",
+    "XAUUSD-4h"
+  ],
+  "arms": [
+    "RCT",
+    "ERT",
+    "ATR-BARRIER",
+    "RSI-REVERT",
+    "FIXED-BAR",
+    "PARTIAL-TRAIL"
+  ],
+  "native_arms": [
+    "RCT",
+    "ERT"
+  ],
+  "n_boot": 10000,
+  "boot_alpha": 0.1,
+  "z_one_sided": 1.645,
+  "quorum_cells": 5,
+  "quorum_instruments": 3,
+  "cost_model": "EXP-085 CONSERVATIVE RT (D0-amendment-003 Phase-021 table); F=0",
+  "cost_rt_bps": {
+    "EURUSD": 3.0,
+    "GBPUSD": 4.0,
+    "USDJPY": 4.0,
+    "USDCHF": 4.0,
+    "AUDUSD": 4.0,
+    "NZDUSD": 4.5,
+    "EURJPY": 6.0,
+    "GBPJPY": 6.0,
+    "AUDJPY": 6.0,
+    "XAUUSD": 6.0,
+    "USTEC": 5.0,
+    "US2000": 6.0,
+    "JP225": 6.0
+  },
+  "fin_bps_day": 0.0,
+  "cost_table_hash": "fa7c887cf60bb9d82c2ee553bad0f40715c10720c2c7d7a52c7dc8eea2353d39",
+  "cost_table_note": "Phase-021-LOCAL (D0-amendment-003, FROZEN 2026-06-24); shared xen.capgeo_cost.COST_CONSTANTS NOT mutated (Phase-018 integrity). Global OHLC-spread RT rule attempted + empirically refuted (see amendment).",
+  "partial_arm_note": "PARTIAL-TRAIL uses xen.capgeo_cost.partial_two_leg_exit (domain-bar two-leg resolver), NOT the 1m intrabar engine \u2014 disclosed coarser fill model for this non-primary contrast arm (D2.4 'as the primitive allows').",
+  "quorum_per_arm": {
+    "RCT": {
+      "n_clearing_cells": 12,
+      "n_clearing_instruments": 12,
+      "passes": true
+    },
+    "ERT": {
+      "n_clearing_cells": 0,
+      "n_clearing_instruments": 0,
+      "passes": false
+    },
+    "ATR-BARRIER": {
+      "n_clearing_cells": 0,
+      "n_clearing_instruments": 0,
+      "passes": false
+    },
+    "RSI-REVERT": {
+      "n_clearing_cells": 0,
+      "n_clearing_instruments": 0,
+      "passes": false
+    },
+    "FIXED-BAR": {
+      "n_clearing_cells": 0,
+      "n_clearing_instruments": 0,
+      "passes": false
+    },
+    "PARTIAL-TRAIL": {
+      "n_clearing_cells": 0,
+      "n_clearing_instruments": 0,
+      "passes": false
+    }
+  },
+  "any_arm_passes": true,
+  "native_vs_contrast_summary": {
+    "n_paired": 12,
+    "median_delta": 0.2631748355091549,
+    "n_RCT_gt_RSIREVERT": 12,
+    "wilcoxon_stat": 0.0,
+    "wilcoxon_p": 0.00048828125,
+    "test": "wilcoxon_signed_rank",
+    "native_clear_cells": {
+      "RCT": 12,
+      "ERT": 0
+    },
+    "contrast_clear_cells": {
+      "ATR-BARRIER": 0,
+      "RSI-REVERT": 0,
+      "FIXED-BAR": 0,
+      "PARTIAL-TRAIL": 0
+    }
+  },
+  "determinism": {
+    "determinism_pass": true,
+    "cells_checked": [
+      "EURUSD-4h",
+      "GBPUSD-4h"
+    ],
+    "non_deterministic": []
+  },
+  "real_fade_outcomes_resolved": true,
+  "holdout_untouched": true,
+  "counted_test_reads": 0,
+  "candidate_slots": 0,
+  "output_hashes": {
+    "screen_per_cell_arm.csv": "382d863a04836d7f7bfe6544ba7ae0ee688caab1fb3a27e238f638da84e5bb61",
+    "quorum_per_arm.csv": "68cbbfd7cff48c0ced3458fcdd967996c07dfb0ff2e73ec075fe30af5f4557e4",
+    "native_vs_contrast.csv": "862f1c30675e8c5b3574b5411f49d1c4b3fe27853525fba39b3e95849886b8d9",
+    "cost_decomposition.csv": "e8db43a489ae08dfc3dda834024120c2fa19571039ffeccefd65150035c16140",
+    "cost_sensitivity_faster.csv": "0df92cb93481482aa0622b83a17b4935419422b6a3e0efc4384e40c294d7f67d"
+  }
+}
