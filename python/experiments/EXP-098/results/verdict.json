@@ -1,0 +1,60 @@
+{
+  "experiment_id": "EXP-098",
+  "role": "non-binding cross-broker & aggregation-method robustness replication of the G-022a-frozen RSI-2 fade deployment portfolio (PPS data)",
+  "primary": "B",
+  "band": {
+    "A": 1.75,
+    "B": 2.0
+  },
+  "rule": "CONFIRM(P) iff PPS Sharpe_LB(P) > band_P AND Calmar_LB(P) > 0; band_A=1.75, band_B=2.00",
+  "cross_broker_robust": true,
+  "aggregation_robust": true,
+  "exp097_verdict_unchanged": true,
+  "counted_test_reads": 0,
+  "candidate_slots": 0,
+  "infr003_holdout_loaded": false,
+  "per_arm": {
+    "PPS-CANON": {
+      "label": "ROBUST",
+      "confirm_B": true,
+      "confirm_A": true,
+      "B": {
+        "ann_sharpe": 7.080918377957189,
+        "ann_sharpe_lo": 5.96765424914729,
+        "calmar_lo": 12.533514245274429,
+        "n_weeks": 251,
+        "max_drawdown": 0.059515093010559905
+      },
+      "A": {
+        "ann_sharpe": 7.277246191823272,
+        "ann_sharpe_lo": 6.14684817760809,
+        "calmar_lo": 12.16564467554576
+      },
+      "masking_label_flips": false,
+      "h_eval": "2021-09-01T08:00:00",
+      "burn_in_steps": 2160,
+      "n_eval_steps": 42057
+    },
+    "PPS-ALTAGG": {
+      "label": "ROBUST",
+      "confirm_B": true,
+      "confirm_A": true,
+      "B": {
+        "ann_sharpe": 7.222342247505384,
+        "ann_sharpe_lo": 6.103627386842862,
+        "calmar_lo": 13.318265323045388,
+        "n_weeks": 251,
+        "max_drawdown": 0.05721682012242635
+      },
+      "A": {
+        "ann_sharpe": 7.406533920017982,
+        "ann_sharpe_lo": 6.302112755966522,
+        "calmar_lo": 13.445045357391127
+      },
+      "masking_label_flips": false,
+      "h_eval": "2021-09-01T08:00:00",
+      "burn_in_steps": 2160,
+      "n_eval_steps": 42112
+    }
+  }
+}

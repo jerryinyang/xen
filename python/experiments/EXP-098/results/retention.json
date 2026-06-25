@@ -1,0 +1,149 @@
+{
+  "note": "descriptive context vs EXP-097 committed holdout outputs; INFR-003 parquet is NOT re-read; band stays fixed at m*",
+  "arms": {
+    "PPS-CANON": {
+      "portfolio": {
+        "A": {
+          "pps_sharpe_lo": 6.14684817760809,
+          "infr003_sharpe_lo": 4.250065964517897,
+          "retention_ratio": 1.446294770228432
+        },
+        "B": {
+          "pps_sharpe_lo": 5.96765424914729,
+          "infr003_sharpe_lo": 4.762389243346642,
+          "retention_ratio": 1.2530799025897514
+        }
+      },
+      "per_cell": [
+        {
+          "cell": "EURUSD-4h",
+          "pps_net_mean": 0.1109052488364023,
+          "infr003_net_mean": 0.13170858787148332,
+          "pps_net_ci_low": 0.09408357456826813,
+          "infr003_net_ci_low": 0.10384876551968092
+        },
+        {
+          "cell": "XAUUSD-4h",
+          "pps_net_mean": 0.10026517426210857,
+          "infr003_net_mean": 0.11480553242615188,
+          "pps_net_ci_low": 0.08263325537797865,
+          "infr003_net_ci_low": 0.08189451575260133
+        },
+        {
+          "cell": "USDCHF-4h",
+          "pps_net_mean": 0.0874416694857816,
+          "infr003_net_mean": 0.09497184150715675,
+          "pps_net_ci_low": 0.07040187091795092,
+          "infr003_net_ci_low": 0.06585816042308244
+        },
+        {
+          "cell": "AUDJPY-4h",
+          "pps_net_mean": 0.07401814604672745,
+          "infr003_net_mean": 0.063791334375191,
+          "pps_net_ci_low": 0.059234455446625575,
+          "infr003_net_ci_low": 0.03956391253528776
+        },
+        {
+          "cell": "EURJPY-4h",
+          "pps_net_mean": 0.026487670078982287,
+          "infr003_net_mean": -0.006007451826009892,
+          "pps_net_ci_low": 0.010531375554030822,
+          "infr003_net_ci_low": -0.031123620849871487
+        },
+        {
+          "cell": "GBPJPY-4h",
+          "pps_net_mean": 0.047912612249375014,
+          "infr003_net_mean": 0.04582585429060262,
+          "pps_net_ci_low": 0.03178644955704078,
+          "infr003_net_ci_low": 0.016862708308633238
+        },
+        {
+          "cell": "USTEC-1h",
+          "pps_net_mean": 0.05108837569309946,
+          "infr003_net_mean": 0.03339360916657413,
+          "pps_net_ci_low": 0.040970910678475296,
+          "infr003_net_ci_low": 0.013516567909630075
+        },
+        {
+          "cell": "US2000-1h",
+          "pps_net_mean": 0.05962562446860469,
+          "infr003_net_mean": 0.05493569251563551,
+          "pps_net_ci_low": 0.049553042438838193,
+          "infr003_net_ci_low": 0.037107258650421665
+        }
+      ]
+    },
+    "PPS-ALTAGG": {
+      "portfolio": {
+        "A": {
+          "pps_sharpe_lo": 6.302112755966522,
+          "infr003_sharpe_lo": 4.250065964517897,
+          "retention_ratio": 1.4828270451753796
+        },
+        "B": {
+          "pps_sharpe_lo": 6.103627386842862,
+          "infr003_sharpe_lo": 4.762389243346642,
+          "retention_ratio": 1.281631356649399
+        }
+      },
+      "per_cell": [
+        {
+          "cell": "EURUSD-4h",
+          "pps_net_mean": 0.11093346487335083,
+          "infr003_net_mean": 0.13170858787148332,
+          "pps_net_ci_low": 0.0940964363287277,
+          "infr003_net_ci_low": 0.10384876551968092
+        },
+        {
+          "cell": "XAUUSD-4h",
+          "pps_net_mean": 0.10026517426210857,
+          "infr003_net_mean": 0.11480553242615188,
+          "pps_net_ci_low": 0.08263325537797865,
+          "infr003_net_ci_low": 0.08189451575260133
+        },
+        {
+          "cell": "USDCHF-4h",
+          "pps_net_mean": 0.0874416694857816,
+          "infr003_net_mean": 0.09497184150715675,
+          "pps_net_ci_low": 0.07040187091795092,
+          "infr003_net_ci_low": 0.06585816042308244
+        },
+        {
+          "cell": "AUDJPY-4h",
+          "pps_net_mean": 0.07401814604672745,
+          "infr003_net_mean": 0.063791334375191,
+          "pps_net_ci_low": 0.059234455446625575,
+          "infr003_net_ci_low": 0.03956391253528776
+        },
+        {
+          "cell": "EURJPY-4h",
+          "pps_net_mean": 0.026488735644030467,
+          "infr003_net_mean": -0.006007451826009892,
+          "pps_net_ci_low": 0.010532494397331409,
+          "infr003_net_ci_low": -0.031123620849871487
+        },
+        {
+          "cell": "GBPJPY-4h",
+          "pps_net_mean": 0.047912612249375014,
+          "infr003_net_mean": 0.04582585429060262,
+          "pps_net_ci_low": 0.03178644955704078,
+          "infr003_net_ci_low": 0.016862708308633238
+        },
+        {
+          "cell": "USTEC-1h",
+          "pps_net_mean": 0.05180468648453776,
+          "infr003_net_mean": 0.03339360916657413,
+          "pps_net_ci_low": 0.041886349249732564,
+          "infr003_net_ci_low": 0.013516567909630075
+        },
+        {
+          "cell": "US2000-1h",
+          "pps_net_mean": 0.060631634038647124,
+          "infr003_net_mean": 0.05493569251563551,
+          "pps_net_ci_low": 0.05050323402137237,
+          "infr003_net_ci_low": 0.037107258650421665
+        }
+      ]
+    }
+  }
+}

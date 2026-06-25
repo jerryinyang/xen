@@ -1,0 +1,335 @@
+{
+  "experiment_id": "EXP-097",
+  "phase": "022",
+  "family": "CF-MR-001",
+  "hyp": "HYP-003",
+  "role": "the single sanctioned global-holdout release (OOS-final deployment confirmation; a la EXP-032)",
+  "g022_state": "DEPLOYABLE_CONFIRMED",
+  "primary_portfolio": "B",
+  "confirm_B": true,
+  "confirm_A": true,
+  "confirmation_rule": "CONFIRM(P) iff holdout Sharpe_LB(P) > band_P AND Calmar_LB(P) > 0; band_A=1.75, band_B=2.00 (= inherited A4 m*); terminal keys off primary B, no OR",
+  "frozen_construction": "G-022a: carry-8 set; binding-v2 noise-aware ERC + intra-1h MTM; LW-90d cov, weekly rebalance, 10% vol anchor, 1.5x cap, trailing-50 breaker; v2 fill (next-1m-open + 0.05xATR adverse slippage); EXIT-RCT/adverse/cost frozen",
+  "generated_utc": "2026-06-25T07:31:12.082724+00:00",
+  "master_seed": 20260624,
+  "deployable_cells": [
+    "EURUSD-4h",
+    "XAUUSD-4h",
+    "USDCHF-4h",
+    "AUDJPY-4h",
+    "EURJPY-4h",
+    "GBPJPY-4h",
+    "USTEC-1h",
+    "US2000-1h"
+  ],
+  "surviving_exit": "RCT",
+  "holdout_metrics": {
+    "A": {
+      "ann_sharpe": 6.054718751851498,
+      "ann_sharpe_lo": 4.250065964517897,
+      "calmar": 13.4520420678681,
+      "calmar_lo": 8.29613925726825,
+      "max_drawdown": 0.04709882162374268,
+      "cvar5_weekly": 0.01088041320345663,
+      "ulcer": 0.010603160716016514,
+      "ann_return": 0.43351689355238143,
+      "ann_vol": 0.11480655111651512,
+      "n_weeks": 80
+    },
+    "B": {
+      "ann_sharpe": 6.639453375032464,
+      "ann_sharpe_lo": 4.762389243346642,
+      "calmar": 17.453346381751516,
+      "calmar_lo": 10.73129873545203,
+      "max_drawdown": 0.045993494580922445,
+      "cvar5_weekly": 0.012763051918959538,
+      "ulcer": 0.009315167841102997,
+      "ann_return": 0.44865085530331206,
+      "ann_vol": 0.11419596920135981,
+      "n_weeks": 80
+    },
+    "naive_iv": {
+      "ann_sharpe": 6.030164859169739,
+      "ann_sharpe_lo": 4.260532992448194,
+      "calmar": 13.262564188669861,
+      "calmar_lo": 8.350868059729063,
+      "max_drawdown": 0.04504488736232759,
+      "cvar5_weekly": 0.01022946304315953,
+      "ulcer": 0.009680511696170499,
+      "ann_return": 0.4057635329444949,
+      "ann_vol": 0.10970103337191342,
+      "n_weeks": 80
+    }
+  },
+  "per_cell_holdout": [
+    {
+      "cell": "EURUSD-4h",
+      "n_holdout_events": 616,
+      "net_mean": 0.13170858787148332,
+      "net_median": 0.08475544510329686,
+      "net_ci_low_1s": 0.10384876551968092,
+      "net_negative": false
+    },
+    {
+      "cell": "XAUUSD-4h",
+      "n_holdout_events": 583,
+      "net_mean": 0.11480553242615188,
+      "net_median": 0.08827117127899024,
+      "net_ci_low_1s": 0.08189451575260133,
+      "net_negative": false
+    },
+    {
+      "cell": "USDCHF-4h",
+      "n_holdout_events": 598,
+      "net_mean": 0.09497184150715675,
+      "net_median": 0.045100249078587284,
+      "net_ci_low_1s": 0.06585816042308244,
+      "net_negative": false
+    },
+    {
+      "cell": "AUDJPY-4h",
+      "n_holdout_events": 614,
+      "net_mean": 0.063791334375191,
+      "net_median": 0.005305320070679187,
+      "net_ci_low_1s": 0.03956391253528776,
+      "net_negative": false
+    },
+    {
+      "cell": "EURJPY-4h",
+      "n_holdout_events": 627,
+      "net_mean": -0.006007451826009892,
+      "net_median": -0.07495260960189398,
+      "net_ci_low_1s": -0.031123620849871487,
+      "net_negative": true
+    },
+    {
+      "cell": "GBPJPY-4h",
+      "n_holdout_events": 581,
+      "net_mean": 0.04582585429060262,
+      "net_median": -0.005333231776906366,
+      "net_ci_low_1s": 0.016862708308633238,
+      "net_negative": false
+    },
+    {
+      "cell": "USTEC-1h",
+      "n_holdout_events": 2536,
+      "net_mean": 0.03339360916657413,
+      "net_median": -0.04461857231573117,
+      "net_ci_low_1s": 0.013516567909630075,
+      "net_negative": false
+    },
+    {
+      "cell": "US2000-1h",
+      "n_holdout_events": 2423,
+      "net_mean": 0.05493569251563551,
+      "net_median": -0.047783623001750625,
+      "net_ci_low_1s": 0.037107258650421665,
+      "net_negative": false
+    }
+  ],
+  "shrinkage": {
+    "note": "descriptive context vs EXP-096 binding-v2 analysis-set; band stays fixed at m*",
+    "portfolio_sharpe_lo": {
+      "A": {
+        "analysis_v2": 5.146751974351359,
+        "holdout": 4.250065964517897,
+        "delta": -0.8966860098334619
+      },
+      "B": {
+        "analysis_v2": 4.897179416042319,
+        "holdout": 4.762389243346642,
+        "delta": -0.13479017269567706
+      }
+    },
+    "per_cell": [
+      {
+        "cell": "EURUSD-4h",
+        "analysis_v2_net_mean": 0.09847452992237948,
+        "holdout_net_mean": 0.13170858787148332,
+        "delta_net_mean": 0.033234057949103835,
+        "analysis_v2_net_ci_low": 0.07920063336415242,
+        "holdout_net_ci_low": 0.10384876551968092
+      },
+      {
+        "cell": "XAUUSD-4h",
+        "analysis_v2_net_mean": 0.08331604554884528,
+        "holdout_net_mean": 0.11480553242615188,
+        "delta_net_mean": 0.0314894868773066,
+        "analysis_v2_net_ci_low": 0.0609820835872844,
+        "holdout_net_ci_low": 0.08189451575260133
+      },
+      {
+        "cell": "USDCHF-4h",
+        "analysis_v2_net_mean": 0.07974874789525788,
+        "holdout_net_mean": 0.09497184150715675,
+        "delta_net_mean": 0.015223093611898872,
+        "analysis_v2_net_ci_low": 0.06112855102340924,
+        "holdout_net_ci_low": 0.06585816042308244
+      },
+      {
+        "cell": "AUDJPY-4h",
+        "analysis_v2_net_mean": 0.07308734339845604,
+        "holdout_net_mean": 0.063791334375191,
+        "delta_net_mean": -0.00929600902326505,
+        "analysis_v2_net_ci_low": 0.05501907366850098,
+        "holdout_net_ci_low": 0.03956391253528776
+      },
+      {
+        "cell": "EURJPY-4h",
+        "analysis_v2_net_mean": 0.028225178179616745,
+        "holdout_net_mean": -0.006007451826009892,
+        "delta_net_mean": -0.03423263000562664,
+        "analysis_v2_net_ci_low": 0.007921475013240977,
+        "holdout_net_ci_low": -0.031123620849871487
+      },
+      {
+        "cell": "GBPJPY-4h",
+        "analysis_v2_net_mean": 0.04617067907470361,
+        "holdout_net_mean": 0.04582585429060262,
+        "delta_net_mean": -0.000344824784100993,
+        "analysis_v2_net_ci_low": 0.027751128849329502,
+        "holdout_net_ci_low": 0.016862708308633238
+      },
+      {
+        "cell": "USTEC-1h",
+        "analysis_v2_net_mean": 0.05451285620012355,
+        "holdout_net_mean": 0.03339360916657413,
+        "delta_net_mean": -0.02111924703354942,
+        "analysis_v2_net_ci_low": 0.04347348561763625,
+        "holdout_net_ci_low": 0.013516567909630075
+      },
+      {
+        "cell": "US2000-1h",
+        "analysis_v2_net_mean": 0.05981603104345653,
+        "holdout_net_mean": 0.05493569251563551,
+        "delta_net_mean": -0.004880338527821021,
+        "analysis_v2_net_ci_low": 0.04881990903546282,
+        "holdout_net_ci_low": 0.037107258650421665
+      }
+    ]
+  },
+  "grid_start_epoch": 1622707200,
+  "n_grid_steps": 44217,
+  "H_global_epoch": 1734056580,
+  "n_holdout_weeks": 80,
+  "n_holdout_rows_per_file": {
+    "EURUSD-4h": 561241,
+    "XAUUSD-4h": 535317,
+    "USDCHF-4h": 558882,
+    "AUDJPY-4h": 563053,
+    "EURJPY-4h": 563690,
+    "GBPJPY-4h": 563222,
+    "USTEC-1h": 535386,
+    "US2000-1h": 533537
+  },
+  "mtm_conservation_pass": true,
+  "causal_weight_assertion": {
+    "causal_weight_pass": true,
+    "rebalance_row_tested": 37632,
+    "tested_in_holdout": true
+  },
+  "causal_entry_fill_assertion": {
+    "causal_entry_fill_pass": true,
+    "holdout_event_tested": 1467,
+    "signal_in_holdout": true
+  },
+  "determinism": {
+    "determinism_pass": true,
+    "A_identical": true,
+    "B_identical": true
+  },
+  "binding_statistic_determinism": true,
+  "n_boot": 10000,
+  "boot_alpha": 0.1,
+  "real_prices_only": true,
+  "global_holdout_shot_spent": true,
+  "holdout_first_touch": "EXP-097",
+  "holdout_untouched": false,
+  "counted_test_reads": 0,
+  "candidate_slots": 0,
+  "read_accounting": "the single sanctioned global-holdout release (one holdout-governance event, a la EXP-032); outside the analysis-TEST 48-stratum ledger (11 carried strata stay 1/2); both A and B from ONE materialization = ONE read (operator decision 2026-06-25); non-repeatable, non-upgradable",
+  "source_meta": {
+    "EURUSD-4h": {
+      "source_file": "timebars_eurusd_20210602_000000_20260621_183431.parquet",
+      "total_rows": 1870801,
+      "analysis_cutoff": 1309560,
+      "n_holdout_rows": 561241,
+      "analysis_end": "2024-12-12 15:10:00",
+      "file_end": "2026-06-19 20:56:00",
+      "H_cell_epoch": 1734016260
+    },
+    "XAUUSD-4h": {
+      "source_file": "timebars_xauusd_20210602_000000_20260621_190824.parquet",
+      "total_rows": 1784390,
+      "analysis_cutoff": 1249073,
+      "n_holdout_rows": 535317,
+      "analysis_end": "2024-12-12 04:09:00",
+      "file_end": "2026-06-19 16:58:00",
+      "H_cell_epoch": 1733976600
+    },
+    "USDCHF-4h": {
+      "source_file": "timebars_usdchf_20210602_000000_20260621_192256.parquet",
+      "total_rows": 1862939,
+      "analysis_cutoff": 1304057,
+      "n_holdout_rows": 558882,
+      "analysis_end": "2024-12-13 02:22:00",
+      "file_end": "2026-06-19 20:56:00",
+      "H_cell_epoch": 1734056580
+    },
+    "AUDJPY-4h": {
+      "source_file": "timebars_audjpy_20210602_000000_20260621_190724.parquet",
+      "total_rows": 1876841,
+      "analysis_cutoff": 1313788,
+      "n_holdout_rows": 563053,
+      "analysis_end": "2024-12-12 04:42:00",
+      "file_end": "2026-06-19 20:56:00",
+      "H_cell_epoch": 1733978580
+    },
+    "EURJPY-4h": {
+      "source_file": "timebars_eurjpy_20210602_000000_20260621_190314.parquet",
+      "total_rows": 1878966,
+      "analysis_cutoff": 1315276,
+      "n_holdout_rows": 563690,
+      "analysis_end": "2024-12-12 03:44:00",
+      "file_end": "2026-06-19 20:56:00",
+      "H_cell_epoch": 1733975100
+    },
+    "GBPJPY-4h": {
+      "source_file": "timebars_gbpjpy_20210602_000000_20260621_190323.parquet",
+      "total_rows": 1877405,
+      "analysis_cutoff": 1314183,
+      "n_holdout_rows": 563222,
+      "analysis_end": "2024-12-12 09:25:00",
+      "file_end": "2026-06-19 20:56:00",
+      "H_cell_epoch": 1733995560
+    },
+    "USTEC-1h": {
+      "source_file": "timebars_ustec_20210602_000000_20260621_190833.parquet",
+      "total_rows": 1784619,
+      "analysis_cutoff": 1249233,
+      "n_holdout_rows": 535386,
+      "analysis_end": "2024-12-11 17:33:00",
+      "file_end": "2026-06-19 16:58:00",
+      "H_cell_epoch": 1733938440
+    },
+    "US2000-1h": {
+      "source_file": "timebars_us2000_20210602_000000_20260621_191208.parquet",
+      "total_rows": 1778456,
+      "analysis_cutoff": 1244919,
+      "n_holdout_rows": 533537,
+      "analysis_end": "2024-12-12 14:32:00",
+      "file_end": "2026-06-19 16:59:00",
+      "H_cell_epoch": 1734013980
+    }
+  },
+  "output_hashes": {
+    "portfolio_returns_A.csv": "154136154fee97ee10004906da9c967842d4357a28874c55ccbd81e9070c4a3e",
+    "portfolio_returns_B.csv": "3a5873ea8777cc3a6869ba65b7dbe10c7f19d4f0d6154a0ad36ac0ad8f014aef",
+    "per_cell_holdout.csv": "c89750eff4666a075105f91008b4a0371b0c8488dc6a4436009f3ee347d092bd",
+    "mtm_conservation.csv": "58a9426decd0eab9d72bb83f067683afd066a9e17af73d4151fbe25bda352dff",
+    "holdout_metrics.csv": "42e4fb56381a033620514efda9c86c9f40eb2136548c6560023e72da1874b21e",
+    "holdout_boundary.json": "2a665681ef5e9a30f5ee88b6c9c08f81d96198dd4116d7e95e429346bbf7699a",
+    "verdict.json": "acde77bd7234b6d9283bfa79d0af722d609c428bbedc4007bcbbb32e906d37a2",
+    "shrinkage.json": "a183a404ac1ac0d6369a222b578c3b98bbc9ae76aa7502315d7bfba347665cba"
+  }
+}

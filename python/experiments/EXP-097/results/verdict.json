@@ -1,0 +1,20 @@
+{
+  "g022_state": "DEPLOYABLE_CONFIRMED",
+  "primary": "B",
+  "confirm_B": true,
+  "confirm_A": true,
+  "no_OR_rescue": "A confirm does NOT promote the family verdict; terminal keys off B",
+  "rule": "CONFIRM(P) iff Sharpe_LB(P) > band_P AND Calmar_LB(P) > 0; band_A=1.75, band_B=2.00",
+  "B": {
+    "ann_sharpe": 6.639453375032464,
+    "ann_sharpe_lo": 4.762389243346642,
+    "calmar_lo": 10.73129873545203,
+    "band": 2.0
+  },
+  "A": {
+    "ann_sharpe": 6.054718751851498,
+    "ann_sharpe_lo": 4.250065964517897,
+    "calmar_lo": 8.29613925726825,
+    "band": 1.75
+  }
+}

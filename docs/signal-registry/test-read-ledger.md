@@ -314,11 +314,40 @@ cleared by the realized edge; G-022a must freeze the band ≥ m*). Disclosure st
 correction (still 0 counted reads; 11 carried strata stay 1/2). The first counted holdout shot remains the gated
 **EXP-097** global-holdout release.
 
+**EXP-096 noise-infusion disclosure (2026-06-25, Phase 022, CF-MR-001/HYP-003) — COMPLETE, tally unchanged.**
+EXP-096 re-derived the deployment portfolio under a realistic 1-minute **entry-fill** model (v1/v2-binding/v3) — a
+**pure entry-leg perturbation** of the EXP-095 construction: only the entry execution price changes, while the
+EXIT-RCT exit path, adverse stop, cost, and the resolved-event **keep mask are reused verbatim from EXP-093**
+(provenance reconciled abs-diff 0.0 on all 8 cells; `n_entry_unavailable_on_keep=0`). It re-resolves the entry leg
+of the **same 8 cells on the same EXP-093 analysis-TEST series under a perturbed execution model — same cells, same
+selection, no new stratum-specific inference** — and makes a **portfolio-aggregate claim** only. Per the
+**portfolio-aggregate rule + the cost-re-resolution precedent (EXP-084/085)** this is a **disclosure, not a counted
+read**: **all 48 strata unchanged — the 11 carried strata stay 1/2, the other 37 stay 0/2.** The final-30% global
+holdout (incl. 1-minute bars) was never loaded (`holdout_untouched=true`, `counted_test_reads=0`,
+`candidate_slots=0` in `run_metadata.json`; max-touched `CloseTime` < the analysis edge). Verdict (analysis-set, no
+holdout verdict): the fill-realism leg **SURVIVES** at the binding v2 (portfolio benefit ADDS_VALUE, broad-based,
+v2 A/B Sharpe LB ≥ inherited m*); circuit-breaker NEUTRAL at v2 / tail-protective at v3; EURJPY-4h flagged
+NOISE_DEGRADED but retained (G-022a membership input). The first counted holdout shot remains the gated **EXP-097**
+global-holdout release.
+
+**EXP-097 GLOBAL-HOLDOUT-GOVERNANCE EVENT — the new-dataset holdout shot is SPENT (2026-06-25, Phase 022,
+CF-MR-001/HYP-003).** EXP-097 loaded the **final-30% global holdout for the first time** (per file,
+`[int(total·0.7), total)` on each file's 2021-06 → collection-date timeline) and applied the G-022a-frozen rule to
+the deployment portfolio. This is the **single sanctioned global-holdout release** (à la EXP-032), recorded here as
+a **holdout-governance event — outside the analysis-TEST 48-stratum ledger**. Per the operator decision 2026-06-25,
+**reading both Portfolio A and Portfolio B from one holdout materialization is ONE read** (both are weightings of
+the same streams from a single materialization; the A-vs-B choice was fixed pre-holdout; the terminal verdict keys
+off B only — no OR-multiplicity). **The analysis-TEST ledger is untouched: the 11 carried strata stay 1/2, the
+other 37 stay 0/2; `counted_test_reads=0`, `candidate_slots=0` in `run_metadata.json`.** The analysis set was
+loaded only as past-only causal warmup (EXP-093 pattern). Verdict **`DEPLOYABLE_CONFIRMED`** (primary B holdout
+Sharpe LB 4.762 > band 2.00 AND Calmar LB 10.731 > 0; A co-confirms, no OR rescue). **Non-repeatable,
+non-upgradable** — any confound found hereafter is a permanent caveat, not a re-read. Audit PASS (0C/0W/4I).
+
 **The global holdout (final 30% per new file) is outside this ledger entirely** and was
 sealed at first touch in VAL-005 (0 holdout rows read). The single historical sanctioned shot (EXP-032, old
-dataset) is spent and non-transferable; **no new-dataset holdout shot has yet been spent** — the first will be
-the gated **Phase 022 EXP-097** global-holdout release of the deployment portfolio (one-shot, non-upgradable,
-non-repeatable; à la EXP-032), and only after the G-022a freeze.
+dataset) is spent and non-transferable; **the new-dataset holdout shot has now been spent at the gated Phase 022
+EXP-097 global-holdout release** (2026-06-25, after the G-022a freeze; one-shot, non-upgradable, non-repeatable, à
+la EXP-032) — see the EXP-097 holdout-governance event note above.
 
 ---
 
@@ -439,6 +468,19 @@ Notes:
   never sliced or materialized. The `WF-EXPANDING` per-fold counted-read accounting **rule** was
   validated as a function (cap honored, 8/8 scenarios) but **not exercised against any live stratum**.
   **0 counted TEST reads spent; this ledger is unchanged by EXP-077.** No stratum tally moves.
-- **Holdout:** the global holdout (final 30% per instrument) is outside this
-  ledger entirely — the single sanctioned holdout shot was SPENT (EXP-032,
-  EURUSD-4h, HOLDOUT_INCONCLUSIVE); no holdout read exists for any package.
+- **EXP-098 (2026-06-25, `CF-MR-001/HYP-003`, Phase 022 — robustness disclosure, NO counted reads, NO
+  holdout shot).** Cross-broker & aggregation-method robustness replication of the G-022a-frozen RSI-2 fade
+  deployment portfolio on an **independent broker dataset** (`data/timebars/pps/`, the 8 carry-8 instruments).
+  PPS is **outside this ledger entirely** (the 48 strata are defined on the INFR-003 dataset) and **outside the
+  INFR-003 global holdout** — which was **NOT loaded** (`infr003_holdout_loaded=false`, asserted in code). Recorded
+  here as a **robustness governance disclosure**: `counted_test_reads=0`, `candidate_slots=0`; **no stratum tally
+  moves** (the 11 carried CF-MR-001 strata stay 1/2, the other 37 stay 0/2). Outcome `CROSS_BROKER_ROBUST` ∧
+  `AGGREGATION_ROBUST` (both arms); EXP-097 `DEPLOYABLE_CONFIRMED` unchanged. **PPS is now "touched" as a
+  robustness dataset** — any *future binding* use of PPS (e.g. a sanctioned second-feed holdout) requires its own
+  governance and read accounting.
+- **Holdout (CF-MR-001 / current 5-year dataset):** the single sanctioned final-30% global-holdout shot was
+  **SPENT at EXP-097 (2026-06-25, RSI-2 fade ERC portfolio → `DEPLOYABLE_CONFIRMED`)** as a holdout-governance
+  event (non-repeatable, non-upgradable). EXP-098 did **not** load it.
+- **Holdout (legacy / old dataset):** the global holdout (final 30% per instrument) is outside this
+  ledger entirely — the prior single sanctioned holdout shot was SPENT (EXP-032,
+  EURUSD-4h, HOLDOUT_INCONCLUSIVE) on the old dataset; no other holdout read exists for any package.

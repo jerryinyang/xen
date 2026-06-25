@@ -1,0 +1,309 @@
+{
+  "experiment_id": "EXP-096",
+  "phase": "022",
+  "family": "CF-MR-001",
+  "hyp": "HYP-003",
+  "role": "noise infusion \u2014 realistic 1-minute entry fill (analysis-set; no holdout verdict)",
+  "amendment_inherited": "D0-amendment-001 (A1 intra-1h MTM; A2 like-for-like median-cell baseline; A3 co-binding Calmar/CVaR/Ulcer; A4 MDE m* INHERITED, not recomputed)",
+  "generated_utc": "2026-06-25T00:05:47.583269+00:00",
+  "master_seed": 20260624,
+  "deployable_cells": [
+    "EURUSD-4h",
+    "XAUUSD-4h",
+    "USDCHF-4h",
+    "AUDJPY-4h",
+    "EURJPY-4h",
+    "GBPJPY-4h",
+    "USTEC-1h",
+    "US2000-1h"
+  ],
+  "surviving_exit": "RCT",
+  "noise_model": {
+    "binding_variant": "v2",
+    "slippage_atr": 0.05,
+    "k_worst": 3,
+    "v1": "next-1m-open",
+    "v2": "next-1m-open + 0.05*ATR adverse slippage (BINDING)",
+    "v3": "worst (most adverse) of next k=3 1m bars",
+    "entry_leg_only": true,
+    "cost_notional": "pinned to signal-bar close (identical to EXP-093; not double-counted)"
+  },
+  "construction": "EXP-095 frozen build reused verbatim (ERC/Ledoit-Wolf/weekly/10% vol/1.5x cap/trailing-50 breaker/intra-1h MTM); only the entry execution price changes",
+  "cost_model": "EXP-085/093 CONSERVATIVE RT (D0-amendment-003); F=0",
+  "cost_rt_bps": {
+    "EURUSD": 3.0,
+    "USDCHF": 4.0,
+    "XAUUSD": 6.0,
+    "EURJPY": 6.0,
+    "GBPJPY": 6.0,
+    "AUDJPY": 6.0,
+    "USTEC": 5.0,
+    "US2000": 6.0
+  },
+  "binding_v2_metrics": {
+    "A": {
+      "ann_sharpe": 6.496346879622778,
+      "ann_sharpe_lo": 5.146751974351359,
+      "calmar": 10.04861899413077,
+      "calmar_lo": 7.021166428479169,
+      "max_drawdown": 0.06248092112975076,
+      "cvar5_weekly": 0.013968683300474512,
+      "ulcer": 0.011987075585936558,
+      "ann_return": 0.5247507643734832,
+      "ann_vol": 0.11172209599658246,
+      "n_weeks": 185,
+      "turnover": 0.000766666093561853,
+      "n_indeterminate": 3
+    },
+    "B": {
+      "ann_sharpe": 6.286852158350792,
+      "ann_sharpe_lo": 4.897179416042319,
+      "calmar": 11.249774072883069,
+      "calmar_lo": 6.826633573481814,
+      "max_drawdown": 0.061185890619674645,
+      "cvar5_weekly": 0.015163901207594218,
+      "ulcer": 0.013174552917121765,
+      "ann_return": 0.5042100535953112,
+      "ann_vol": 0.11163389142255317,
+      "n_weeks": 185,
+      "turnover": 0.0026965683480212853,
+      "n_indeterminate": 3
+    },
+    "naive_iv": {
+      "ann_sharpe": 6.441097293751031,
+      "ann_sharpe_lo": 5.089023898839868,
+      "calmar": 9.843950896147106,
+      "calmar_lo": 6.76747275831909,
+      "max_drawdown": 0.058055563522541084,
+      "cvar5_weekly": 0.013100124267775492,
+      "ulcer": 0.01139306412365023,
+      "ann_return": 0.4889647712329048,
+      "ann_vol": 0.10782295359994913,
+      "n_weeks": 185
+    },
+    "best_cell_name": "US2000-1h",
+    "best_cell_sharpe": 4.682528470472056,
+    "pooled_expectancy_lo": 0.055773714780437765
+  },
+  "benefit_v2": {
+    "baseline": "cross-cell median single-cell lower bound (deployment-realistic)",
+    "median_cell_sharpe_lo": 2.5542579107568697,
+    "median_cell_calmar_lo": 2.7447140952934674,
+    "A_sharpe": {
+      "margin": 2.592494063594489,
+      "sampling_band": 1.3495949052714193,
+      "label": "ADDS_VALUE"
+    },
+    "B_sharpe": {
+      "margin": 2.3429215052854495,
+      "sampling_band": 1.3896727423084725,
+      "label": "ADDS_VALUE"
+    },
+    "A_calmar": {
+      "margin": 4.276452333185701,
+      "sampling_band": 3.0274525656516014,
+      "label": "ADDS_VALUE"
+    },
+    "B_calmar": {
+      "margin": 4.081919478188347,
+      "sampling_band": 4.423140499401255,
+      "label": "ADDS_VALUE"
+    },
+    "disclosed_best_cell_sharpe_pt": 4.682528470472056,
+    "disclosed_best_cell_sharpe_lo": 3.4606397162836267,
+    "disclosed_best_cell_name": "US2000-1h",
+    "disclosed_A_vs_best_cell_lo": {
+      "margin": 1.6861122580677321,
+      "sampling_band": 1.3495949052714193,
+      "label": "ADDS_VALUE"
+    },
+    "disclosed_naive_sharpe_lo": 5.089023898839868
+  },
+  "noise_ladder": {
+    "ideal": {
+      "A_sharpe_lo": 10.280731775221053,
+      "B_sharpe_lo": 10.14437140412452,
+      "A_calmar_lo": 61.35206067872459,
+      "B_calmar_lo": 57.55626284189843
+    },
+    "v1": {
+      "A_sharpe_lo": 10.305305839344774,
+      "B_sharpe_lo": 10.11370257943608,
+      "A_calmar_lo": 57.18070904460246,
+      "B_calmar_lo": 56.721318504272496
+    },
+    "v2": {
+      "A_sharpe_lo": 5.146751974351359,
+      "B_sharpe_lo": 4.897179416042319,
+      "A_calmar_lo": 7.021166428479169,
+      "B_calmar_lo": 6.826633573481814
+    },
+    "v3": {
+      "A_sharpe_lo": -1.6506939258226871,
+      "B_sharpe_lo": 1.825789296536281,
+      "A_calmar_lo": -0.2704822237023202,
+      "B_calmar_lo": 1.4602550955504945
+    }
+  },
+  "gate_recheck_inherited_mstar": {
+    "m_star_source": "EXP-095 A4 MDE-curve (inherited; NOT recomputed under noise)",
+    "A": {
+      "m_star": 1.75,
+      "v2_sharpe_lo": 5.146751974351359,
+      "edge_vs_mstar": 3.396751974351359,
+      "clears_inherited_mde": true
+    },
+    "B": {
+      "m_star": 2.0,
+      "v2_sharpe_lo": 4.897179416042319,
+      "edge_vs_mstar": 2.897179416042319,
+      "clears_inherited_mde": true
+    },
+    "statistic_clearable_under_noise": true,
+    "routing": ">=1 portfolio clears m* -> band >= m* still detectable under noise"
+  },
+  "adaptability_v2": {
+    "d_sharpe_lo_A_minus_B": 0.24957255830903957,
+    "d_maxdd_A_minus_B": 0.0012950305100761159,
+    "d_ulcer_A_minus_B": -0.001187477331185207,
+    "A_sharpe_lo": 5.146751974351359,
+    "B_sharpe_lo": 4.897179416042319,
+    "A_maxdd": 0.06248092112975076,
+    "B_maxdd": 0.061185890619674645,
+    "A_ulcer": 0.011987075585936558,
+    "B_ulcer": 0.013174552917121765,
+    "fragile_cell_dealloc_fraction": {
+      "USTEC-1h": 0.2612758252772479,
+      "US2000-1h": 0.2172718160949271
+    }
+  },
+  "cov_window_bracket_v2_disclosed": {
+    "cov_60d": 6.553869842234804,
+    "cov_90d": 6.496346879622778,
+    "cov_120d": 6.4598640560486915
+  },
+  "per_cell_margins": {
+    "EURUSD-1h": 0.0125,
+    "GBPUSD-1h": 0.0125,
+    "NZDUSD-1h": 0.0125,
+    "US2000-1h": 0.0125,
+    "USTEC-1h": 0.0125,
+    "AUDJPY-4h": 0.025,
+    "EURJPY-4h": 0.025,
+    "EURUSD-4h": 0.025,
+    "GBPJPY-4h": 0.025,
+    "USDCHF-4h": 0.025,
+    "XAUUSD-4h": 0.025
+  },
+  "noise_degraded_cells_flagged": [
+    "EURJPY-4h"
+  ],
+  "membership_rule": "portfolio-only (operator 2026-06-25): all 8 retained; per-cell flags are disclosure; G-022a adjudicates the holdout-frozen set",
+  "fpr_sanity_v2_disclosed": {
+    "note": "FPR sanity skipped (disclosure-only; m* inherited from EXP-095)"
+  },
+  "mtm_conservation_pass": true,
+  "causal_entry_fill_assertion": {
+    "causal_entry_fill_pass": true,
+    "event_tested": 0,
+    "first_post_signal_idx": 719
+  },
+  "causal_weight_assertion": {
+    "causal_weight_pass": true,
+    "rebalance_row_tested": 15456
+  },
+  "determinism": {
+    "determinism_pass": true,
+    "A_identical": true,
+    "B_identical": true
+  },
+  "grid_start_epoch": 1622707200,
+  "n_grid_steps": 30929,
+  "holdout_equiv_steps": 13255,
+  "n_boot": 10000,
+  "cal_n_boot": 2000,
+  "n_null": 1000,
+  "boot_alpha": 0.1,
+  "real_prices_only": true,
+  "holdout_untouched": true,
+  "counted_test_reads": 0,
+  "candidate_slots": 0,
+  "read_accounting": "portfolio-aggregate / cost-re-resolution disclosure (EXP-085 precedent): re-resolves only the entry-fill leg of the EXP-093 analysis-TEST series \u2014 same cells, same selection, no new stratum-specific inference; 11 carried strata stay 1/2; 37 stay 0/2; final-30% global holdout never loaded",
+  "source_meta": {
+    "EURUSD-4h": {
+      "source_file": "timebars_eurusd_20210602_000000_20260621_183431.parquet",
+      "total_rows": 1870801,
+      "analysis_rows": 1309560,
+      "train_rows": 916692,
+      "test_rows": 392868,
+      "analysis_end": "2024-12-12 15:10:00"
+    },
+    "XAUUSD-4h": {
+      "source_file": "timebars_xauusd_20210602_000000_20260621_190824.parquet",
+      "total_rows": 1784390,
+      "analysis_rows": 1249073,
+      "train_rows": 874351,
+      "test_rows": 374722,
+      "analysis_end": "2024-12-12 04:09:00"
+    },
+    "USDCHF-4h": {
+      "source_file": "timebars_usdchf_20210602_000000_20260621_192256.parquet",
+      "total_rows": 1862939,
+      "analysis_rows": 1304057,
+      "train_rows": 912839,
+      "test_rows": 391218,
+      "analysis_end": "2024-12-13 02:22:00"
+    },
+    "AUDJPY-4h": {
+      "source_file": "timebars_audjpy_20210602_000000_20260621_190724.parquet",
+      "total_rows": 1876841,
+      "analysis_rows": 1313788,
+      "train_rows": 919651,
+      "test_rows": 394137,
+      "analysis_end": "2024-12-12 04:42:00"
+    },
+    "EURJPY-4h": {
+      "source_file": "timebars_eurjpy_20210602_000000_20260621_190314.parquet",
+      "total_rows": 1878966,
+      "analysis_rows": 1315276,
+      "train_rows": 920693,
+      "test_rows": 394583,
+      "analysis_end": "2024-12-12 03:44:00"
+    },
+    "GBPJPY-4h": {
+      "source_file": "timebars_gbpjpy_20210602_000000_20260621_190323.parquet",
+      "total_rows": 1877405,
+      "analysis_rows": 1314183,
+      "train_rows": 919928,
+      "test_rows": 394255,
+      "analysis_end": "2024-12-12 09:25:00"
+    },
+    "USTEC-1h": {
+      "source_file": "timebars_ustec_20210602_000000_20260621_190833.parquet",
+      "total_rows": 1784619,
+      "analysis_rows": 1249233,
+      "train_rows": 874463,
+      "test_rows": 374770,
+      "analysis_end": "2024-12-11 17:33:00"
+    },
+    "US2000-1h": {
+      "source_file": "timebars_us2000_20210602_000000_20260621_191208.parquet",
+      "total_rows": 1778456,
+      "analysis_rows": 1244919,
+      "train_rows": 871443,
+      "test_rows": 373476,
+      "analysis_end": "2024-12-12 14:32:00"
+    }
+  },
+  "output_hashes": {
+    "provenance_reconciliation.csv": "33a10cdf7fdaef6221311c56bd37de2442c604e28c94904265ff19f5337dbc72",
+    "mtm_conservation.csv": "759f648719fae5c8e1bc643bd88db7be5a490fbe140802032412148959099a89",
+    "noise_ladder.csv": "b06ceff647cb543ce099eec589d2c81ad87275c476635e57bea1bef90f72c29d",
+    "per_cell_degradation.csv": "d1302b618143456d833103f7babfc4d4c62d556b20c6fc63767b6912b0d2c613",
+    "portfolio_returns_A.csv": "977de196f4f3793acb503af84c89c913b1b04e9f862eb08c2990896a77804847",
+    "portfolio_returns_B.csv": "57512c501b19e76e7626397ec97030796088ce2671d9ebc7c0ad71764450ec6c",
+    "portfolio_metrics.csv": "60fe21a4a6eac07b0436874d7dc0864f110edb131e75ce73d546716d016c4d1b",
+    "benefit_v2.json": "da4eee2d8e5c6ddd69dabe3e7147957ff0acee2f6f71a689a87d0d44a7fc81c3",
+    "gate_recheck.json": "646a9f73fa0bcaa6054485dfafa414ea9552e1934f05f24b814d2fba0607fe87"
+  }
+}

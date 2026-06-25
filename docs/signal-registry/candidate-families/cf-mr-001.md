@@ -1,7 +1,11 @@
 # CF-MR-001 — Mean-Reversion Entry (RSI-2), with Global Volatility-Regime Partition
 
-**Status:** `ADMITTED (BINDING) — G-020 adjudicated 2026-06-23; first candidate slot consumed; lever = bare
-RSI-2 fade (CORE), intraday` (EXP-089 `SCREEN_DELIVERED`, 2026-06-23; G-020 ADMITTED). First candidate family
+**Status:** `DEPLOYABLE — G-022 DEPLOYABLE_CONFIRMED 2026-06-25 (EXP-097 global-holdout release; single sanctioned
+holdout shot SPENT, non-repeatable). ADMITTED (BINDING) G-020 2026-06-23 / TRADABLE G-021 2026-06-24; first
+candidate slot consumed; lever = bare RSI-2 fade (CORE), intraday + 4h.` The bare RSI-2 fade, deployed as the
+G-022a-frozen carry-8 causal ERC portfolio (binding-v2 entry fill, intra-1h MTM, circuit breaker, primary
+Portfolio B) under conservative cost, is the **programme's first deployment-grade price strategy** — primary
+holdout Sharpe LB 4.762 > band 2.00, Calmar LB 10.731 > 0. (EXP-089 `SCREEN_DELIVERED`, 2026-06-23; G-020 ADMITTED.) First candidate family
 opened **after** the Phase 019 terminal branch, by **explicit operator override** of the G-019 price→non-price
 routing (see §0). The family's first read was a **TRAIN-only availability screen** (EXP-089, `CF-MR-001/HYP-001`):
 **0 counted TEST reads, holdout never touched.** **G-020 ADMITTED** (`S_fam=28 > S*=7`, axis perm-p≈0.0002,
@@ -175,6 +179,30 @@ Holm (single family).
     in-sample favorable-selected, not deployment-realistic; binding read = EXP-097. **Status unchanged: ADMITTED
     (BINDING)/TRADABLE; 0 new slots, 0 counted reads** (11 carried strata stay 1/2). Next: EXP-096 noise infusion
     → G-022a freeze (band ≥ m*; decide A vs B) → EXP-097.
+  - **EXP-096 COMPLETE 2026-06-25 (noise infusion / realistic 1-minute entry fill; analysis-set, NO holdout
+    verdict; re-audit PASS 0C/0W/5I; 0 reads/0 slots, holdout untouched).** The fill-realism leg of HYP-003: a
+    **pure entry-leg perturbation** of the EXP-095 construction (only the entry execution price changes; exit
+    target/stop/cost frozen; exit path + keep mask reused verbatim from EXP-093; new
+    `xen.intrabar_fill.resolve_entry_fills`), re-derived under the binding v2 fill (next-1m-open + 0.05×ATR
+    adverse slippage) with intra-1h MTM; m* **inherited** from EXP-095 (not recomputed). **The diversification
+    benefit SURVIVES the binding v2 fill:** A v2 Sharpe 6.50 (MBB LB **5.147**) / B 6.29 (LB 4.90) / naive-IV 6.44
+    (LB 5.09); benefit (like-for-like LB vs cross-cell-median single-cell LB **2.554**) A **+2.59 > sampling band
+    1.35 = ADDS_VALUE**, co-binding Calmar LB +4.28; **broad-based** (all 8 per-cell v2 Sharpe LBs positive
+    0.13–3.65; portfolio LB > best cell — no broken cell masked); ERC ≈ naive-IV. **Mechanism:** v1 latency-neutral
+    + a flat 0.05×ATR tick subtracting an EXACT −0.05 ATR/event uniformly → halves BOTH the portfolio LB AND the
+    baseline → relative margin preserved (keep mask byte-identical to EXP-093; not variance hiding). **Ladder (A
+    Sharpe LB):** ideal 10.28 → v1 10.31 → v2 5.15 → v3 **−1.65** (A BREAKS, MaxDD 40.9%); **v3 B +1.83 (MaxDD
+    6.0%)** — v3 a deliberately harsh STRESS CEILING (disclosure-only). **A-vs-B (G-022a input):** circuit-breaker
+    NEUTRAL at the binding v2 (A≈B; reproduces EXP-095) but large TAIL-INSURANCE at v3 (de-allocates fragile 1h
+    cells USTEC 26.1%/US2000 21.7%; prevents 40.9%→6.0% MaxDD) — real edge-decay-threshold effect → argues for
+    Portfolio **B**. **Gate re-check (inherited m*):** v2 A LB 5.15 ≥ 1.75 (+3.40), B LB 4.90 ≥ 2.00 (+2.90) →
+    `statistic_clearable_under_noise=true` → G-022a band ≥ m*. **EURJPY-4h flagged NOISE_DEGRADED** (v2 net
+    ci_low 0.0079 < 0.025 margin) but net-positive, **RETAINED** (operator portfolio-only membership; G-022a
+    decides the holdout-frozen set). Integrity: provenance abs_diff 0.0 vs EXP-093 all 8; MTM conservation
+    ≤1.4e-14; determinism/causal-fill/causal-weight PASS; ideal variant reproduces EXP-095 A Sharpe point 11.691
+    exactly. Scale caveat: Sharpe ~6-12 in-sample favorable-selected; binding read = EXP-097. **Status unchanged:
+    ADMITTED (BINDING)/TRADABLE; 0 new slots, 0 counted reads** (11 carried strata stay 1/2). Next: G-022a freeze
+    (band ≥ m*; A-vs-B leans B; decide EURJPY-4h carry) → EXP-097 global-holdout release.
 
 ## Kill / pass
 
@@ -420,6 +448,66 @@ smallest-defensible sizing), adjudicated by the frozen D6/4c rule (`CONFIRM iff 
   positive 4h core; a 1h median-fragility diagnostic; the deferred levers (vol-regime, contrarian, 25/75, 15m,
   faster-cost sensitivity) each under their own dated `D0-amendment-*` + slot decision. Artifacts:
   [`../../../python/experiments/EXP-093/report.md`](../../../python/experiments/EXP-093/report.md).
+
+## Outcome — EXP-097 (`CF-MR-001/HYP-003`, Phase 022 batch 3 — the global-holdout release), 2026-06-25
+
+**`DEPLOYABLE_CONFIRMED` · HYP-003 deployment leg SUPPORTED OOS-final · the single sanctioned global-holdout shot
+SPENT (non-repeatable, non-upgradable, à la EXP-032) · 0 counted TEST reads · 0 candidate slots · audit PASS
+(0C/0W/4I) · pre/post-exec governance APPROVE.** The programme's first new-dataset global-holdout read. Deployed as
+the G-022a-frozen carry-8 binding-v2 causal ERC portfolio with intra-1h MTM, the primary **Portfolio B** confirms
+on the fully-fresh final-30% global holdout:
+
+- **Binding (n=80 holdout weeks):** B holdout ann Sharpe **6.639 (MBB LB 4.762) > band 2.00** (+2.76, 2.4×) AND
+  co-binding **Calmar LB 10.731 > 0** → CONFIRM. A co-adjudicated on the same single materialization (one read):
+  Sharpe 6.055, LB 4.250 > 1.75, CONFIRM — but **no OR rescue** (terminal keys off B only). naive-IV LB 4.261
+  (non-binding contrast).
+- **Masking check (broad-based):** 7 of 8 cells carry a positive holdout net ci_low; the only net-negative cell,
+  **EURJPY-4h** (net mean −0.006, ci_low −0.031), is exactly the cell pre-flagged `NOISE_DEGRADED` at G-022a and the
+  smallest contributor — dropping it would *improve* the book. No broken cell hidden; no one-cell-driven verdict.
+- **Mechanism:** the ~6.6 Sharpe is structural (diversified ERC of 8 low-correlation cells, vol-anchored 10%;
+  in-family with the analysis-set LB ≈4.9 the band was calibrated against — not a bug). The portfolio did **not**
+  decay (B LB 4.897→4.762, Δ−0.135) because per-cell decay was heterogeneous — the three strongest 4h cells
+  (EURUSD/XAUUSD/USDCHF) *improved* OOS-final while JPY/index cells decayed — and the **circuit breaker drove B≫A**
+  (A LB 5.147→4.250, Δ−0.897) by de-allocating the fragile 1h cells during weak stretches (the tail-insurance role
+  EXP-096's v3 probe predicted, and the reason B was primary).
+- **Reads / holdout:** the final-30% global holdout was loaded for the first and only time here; recorded as a
+  **holdout-governance event** in [`../test-read-ledger.md`](../test-read-ledger.md) +
+  [`../multiplicity-registry.md`](../multiplicity-registry.md) in the same change; outside the analysis-TEST
+  48-stratum ledger (the 11 carried strata stay 1/2, the other 37 stay 0/2); `counted_test_reads=0`,
+  `candidate_slots=0`. Non-repeatable, non-upgradable.
+- **Next (separate scopes, post-G-022; each its own dated `D0-amendment-*` + slot decision):** an EURJPY-4h
+  drop/book-trim re-cost (deployment engineering, not a holdout re-read); the deferred levers (vol-regime,
+  contrarian, 25/75 sizing, 15m domain, regime×variant cross-cuts, faster-cost, instrument/domain expansion).
+  Artifacts: [`../../../python/experiments/EXP-097/report.md`](../../../python/experiments/EXP-097/report.md).
+
+## Outcome — EXP-098 (`CF-MR-001/HYP-003`, Phase 022 batch 3 — robustness companion), 2026-06-25
+
+**`CROSS_BROKER_ROBUST` ∧ `AGGREGATION_ROBUST` · non-binding robustness disclosure · 0 candidate slots · 0 counted
+TEST reads · INFR-003 holdout NOT loaded · audit PASS (0C/0W/3I) · opened by
+[`D0-amendment-002`](../../experiments-docs/checkpoints/2026-06-24-022-portfolio-noise-holdout/D0-amendment-002.md).**
+The G-022a-frozen deployment portfolio rerun **verbatim** on an **independent broker's** 1-minute data
+(`data/timebars/pps/`, the 8 carry-8 instruments + same span) under two bar-aggregation timestamping methods —
+**Arm 1 `PPS-CANON`** (deployed bucket-boundary label) and **Arm 2 `PPS-ALTAGG`** (`AGG-LASTCLOSE` last-source-close
+label) — over the full PPS timeline (after the covariance burn-in; operator decision, model fully frozen).
+
+- **Both arms ROBUST:** primary Portfolio B PPS Sharpe LB **5.97 (CANON) / 6.10 (ALTAGG) > band 2.00**, co-binding
+  Calmar LB **12.5 / 13.3 > 0** (n=251 evaluable weeks; A co-confirms LB 6.15 / 6.30) → `CROSS_BROKER_ROBUST`
+  (Arm 1) ∧ `AGGREGATION_ROBUST` (both). The two overfitting hypotheses EXP-097 could not separate —
+  **broker-feed overfit** and **aggregation-method overfit** — are both rejected.
+- **Broad-based, no masking:** all **8/8 cells net-positive on both arms** (PPS net ci_low +0.0105…+0.0941);
+  **EURJPY-4h** (net-negative −0.006 on the INFR-003 holdout, pre-flagged NOISE_DEGRADED) **recovers to +0.026** on
+  PPS; drop-one masking (removes largest contributor US2000-1h) still confirms B (LB 5.48 / 5.57), no flip.
+- **Aggregation near-inert:** the arms are near-identical (domain-bar counts equal except USTEC-1h/US2000-1h ±1
+  trailing bar; 4h per-cell nets identical to ~1e-5) — the last-source-close relabel can only move the
+  trailing/incomplete window, which rarely changes the resolved event population.
+- **Mechanism:** the cost-geometry edge (ATR-normalized cost small on the slower domain) is **price-structural,
+  not feed-specific**, so it reproduces on PPS (per-cell nets within ~10–25% of INFR-003); the ~7 Sharpe is
+  structural diversification of 8 low-correlation cells vol-anchored to 10% (in-family with EXP-097's ~4.9 LBs).
+- **Integrity:** MTM conservation ≤2.8e-14; determinism + causal-weight/causal-fill PASS in the evaluable region;
+  real-price only; `infr003_holdout_loaded=false`. **EXP-097 `DEPLOYABLE_CONFIRMED` UNCHANGED** — EXP-098 is a
+  strengthening robustness companion, **non-upgradable** of the deployment verdict. **PPS now "touched" as a
+  robustness dataset** (future binding use needs its own governance). Artifacts:
+  [`../../../python/experiments/EXP-098/report.md`](../../../python/experiments/EXP-098/report.md).
 
 ---
 

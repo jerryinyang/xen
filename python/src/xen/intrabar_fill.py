@@ -268,6 +268,11 @@ def net_return_atr(
     undefined or the ATR is non-positive (never ``0/0``). This is the gross return-shape input to
     the EXP-090 estimator calibration; **cost and strategy expectancy are out of scope here**
     (EXP-091+).
+
+    The ``entry_close`` argument is the entry reference price; passing a perturbed entry-execution
+    price here (e.g. an :class:`EntryFill` variant) yields the net-of-entry-noise gross return used
+    by the CF-MR-001 Phase-022 entry-fill noise model (EXP-096): only the entry leg changes, the
+    exit ``fill_price`` and ``atr_entry`` are frozen.
     """
     fp = np.asarray(fill_price, dtype=np.float64)
     ec = np.asarray(entry_close, dtype=np.float64)
@@ -277,3 +282,120 @@ def net_return_atr(
         r = d * (fp - ec) / a
     bad = ~np.isfinite(fp) | ~np.isfinite(a) | (a <= 0.0)
     return np.where(bad, np.nan, r)
+
+
+# --------------------------------------------------------------------------- #
+# Pure computation — causal entry-side fill (CF-MR-001 Phase-022 noise model, EXP-096)
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class EntryFill:
+    """Per-event entry execution price under the three D0 §D5 fill variants (length ``m``).
+
+    The strategy emits its entry order at a domain-bar **close** (the signal bar). A realistic fill
+    is taken from the 1-minute bars **after** that close — never the signal-bar close itself (which a
+    live system cannot get). Only the entry execution price changes; the exit target/stop and ATR are
+    frozen (the noise is a pure entry-leg perturbation on the EXP-090/093 resolved exits).
+
+    Attributes
+    ----------
+    fill_v1 : np.ndarray[float64]
+        **v1 (mild floor):** the open of the first 1-minute bar after the signal-bar close.
+    fill_v2 : np.ndarray[float64]
+        **v2 (BINDING):** ``fill_v1 + direction · slippage_atr · atr_entry`` (adverse — a long pays
+        more, a short sells lower).
+    fill_v3 : np.ndarray[float64]
+        **v3 (stress ceiling):** the most adverse touched price across the first ``k_worst`` 1-minute
+        bars after the signal close (``max(high)`` for a long, ``min(low)`` for a short).
+    available : np.ndarray[bool]
+        ``True`` when ≥1 in-fence 1-minute bar exists after the signal close (so a fill is defined).
+        ``False`` ⇒ all three fills are ``NaN`` (the post-signal window was empty within the fence).
+    n_unavailable : int
+        Count of events with no in-fence post-signal 1-minute bar (expected 0 for resolved events).
+    """
+
+    fill_v1: np.ndarray
+    fill_v2: np.ndarray
+    fill_v3: np.ndarray
+    available: np.ndarray
+    n_unavailable: int
+
+
+def resolve_entry_fills(
+    minute_open: np.ndarray,
+    minute_high: np.ndarray,
+    minute_low: np.ndarray,
+    minute_close_epoch: np.ndarray,
+    signal_close_epoch: np.ndarray,
+    direction: np.ndarray,
+    atr_entry: np.ndarray,
+    train_edge_epoch: int,
+    k_worst: int = 3,
+    slippage_atr: float = 0.05,
+) -> EntryFill:
+    """Causal 1-minute entry-fill prices (v1/v2/v3) for the CF-MR-001 entry-fill noise model.
+
+    For each event the fill window opens at the **first 1-minute bar whose ``CloseTime`` is strictly
+    after the signal-bar close** (located by ``searchsorted`` on the sorted 1-minute close epochs —
+    never by bar index), clipped at the holdout fence ``train_edge_epoch``. The v3 stress ceiling
+    scans a **bounded** ``k_worst`` window forward from that first bar. Strictly causal (only bars
+    at/after the signal close, none past the fence); real touched prices only.
+
+    Parameters
+    ----------
+    minute_open, minute_high, minute_low : np.ndarray
+        Real 1-minute open/high/low (float64), aligned to ``minute_close_epoch``.
+    minute_close_epoch : np.ndarray
+        1-minute close epochs (seconds, int64), strictly increasing.
+    signal_close_epoch : np.ndarray
+        Per-event signal domain-bar close epoch (seconds, int64), length ``m`` (the entry order time).
+    direction : np.ndarray
+        Per-event direction (+1 long / -1 short), length ``m``.
+    atr_entry : np.ndarray
+        Per-event ATR(14) at the signal bar (price units), length ``m`` — the slippage scale.
+    train_edge_epoch : int
+        Last in-fence 1-minute close epoch; no 1-minute bar past it is consulted (holdout fence).
+    k_worst : int
+        Number of post-signal 1-minute bars scanned for the v3 most-adverse touched price.
+    slippage_atr : float
+        v2 adverse slippage in ATR units (D0 §D5 / param #8 = 0.05).
+
+    Returns
+    -------
+    EntryFill
+        Per-event v1/v2/v3 entry execution prices, availability mask, and the unavailable count.
+    """
+    mce = np.asarray(minute_close_epoch, dtype=np.int64)
+    mo = np.asarray(minute_open, dtype=np.float64)
+    mh = np.asarray(minute_high, dtype=np.float64)
+    ml = np.asarray(minute_low, dtype=np.float64)
+    sig = np.asarray(signal_close_epoch, dtype=np.int64)
+    d = np.asarray(direction, dtype=np.float64)
+    atr = np.asarray(atr_entry, dtype=np.float64)
+    edge = int(train_edge_epoch)
+    n_min = mce.shape[0]
+
+    first = np.searchsorted(mce, sig, side="right")                  # first 1m bar with close > signal
+    safe_first = np.clip(first, 0, max(n_min - 1, 0))
+    available = (first < n_min) & (n_min > 0)
+    if n_min > 0:
+        available &= mce[safe_first] <= edge                        # defensive holdout fence
+
+    v1 = np.where(available, mo[safe_first], np.nan)
+    v2 = v1 + d * float(slippage_atr) * atr                          # NaN propagates where v1 is NaN
+
+    # v3 — bounded (<= k_worst) forward scan for the most adverse touched price (causal).
+    worst_high = np.full(sig.shape[0], -np.inf, dtype=np.float64)
+    worst_low = np.full(sig.shape[0], np.inf, dtype=np.float64)
+    for off in range(int(k_worst)):
+        idx = safe_first + off
+        valid = available & (idx < n_min)
+        if n_min > 0:
+            idx_c = np.clip(idx, 0, n_min - 1)
+            valid &= mce[idx_c] <= edge
+            worst_high = np.where(valid, np.maximum(worst_high, mh[idx_c]), worst_high)
+            worst_low = np.where(valid, np.minimum(worst_low, ml[idx_c]), worst_low)
+    v3 = np.where(d > 0.0, worst_high, worst_low)
+    v3 = np.where(available & np.isfinite(v3), v3, np.nan)
+
+    return EntryFill(fill_v1=v1, fill_v2=v2, fill_v3=v3, available=available,
+                     n_unavailable=int(np.count_nonzero(~available)))

@@ -1,0 +1,60 @@
+{
+  "PPS-CANON": {
+    "mtm_conservation_pass": true,
+    "causal_weight": {
+      "causal_weight_pass": true,
+      "rebalance_row_tested": 23184,
+      "tested_in_evaluable": true
+    },
+    "causal_fill": {
+      "causal_entry_fill_pass": true,
+      "evaluable_event_tested": 98,
+      "signal_in_evaluable": true
+    },
+    "determinism": {
+      "determinism_pass": true,
+      "A_identical": true,
+      "B_identical": true
+    },
+    "binding_statistic_determinism": true,
+    "masking": {
+      "dropped_cell": "US2000-1h",
+      "dropped_contribution": 448.9213266241258,
+      "confirm_B_full": true,
+      "confirm_B_drop_one": true,
+      "label_flips": false,
+      "drop_one_sharpe_lo": 5.480570511020685,
+      "drop_one_calmar_lo": 10.299820346140548
+    }
+  },
+  "PPS-ALTAGG": {
+    "mtm_conservation_pass": true,
+    "causal_weight": {
+      "causal_weight_pass": true,
+      "rebalance_row_tested": 23184,
+      "tested_in_evaluable": true
+    },
+    "causal_fill": {
+      "causal_entry_fill_pass": true,
+      "evaluable_event_tested": 98,
+      "signal_in_evaluable": true
+    },
+    "determinism": {
+      "determinism_pass": true,
+      "A_identical": true,
+      "B_identical": true
+    },
+    "binding_statistic_determinism": true,
+    "masking": {
+      "dropped_cell": "US2000-1h",
+      "dropped_contribution": 456.7799762724299,
+      "confirm_B_full": true,
+      "confirm_B_drop_one": true,
+      "label_flips": false,
+      "drop_one_sharpe_lo": 5.570542433442039,
+      "drop_one_calmar_lo": 10.433928856744071
+    }
+  },
+  "infr003_holdout_loaded": false,
+  "real_prices_only": true
+}

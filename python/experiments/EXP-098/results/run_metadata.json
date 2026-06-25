@@ -1,0 +1,518 @@
+{
+  "experiment_id": "EXP-098",
+  "phase": "022",
+  "family": "CF-MR-001",
+  "hyp": "HYP-003",
+  "role": "non-binding cross-broker & aggregation-method robustness replication (PPS data; D0-amendment-002)",
+  "opened_by": "D0-amendment-002",
+  "exp097_verdict_unchanged": true,
+  "data_source": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/timebars/pps",
+  "instruments": [
+    "AUDJPY",
+    "EURJPY",
+    "EURUSD",
+    "GBPJPY",
+    "US2000",
+    "USDCHF",
+    "USTEC",
+    "XAUUSD"
+  ],
+  "arms": [
+    "PPS-CANON",
+    "PPS-ALTAGG"
+  ],
+  "arm2_aggregation": "last-source-close CloseTime label (AGG-LASTCLOSE) + analysis-boundary fence",
+  "frozen_construction": "G-022a: carry-8 set; binding-v2 noise-aware ERC + intra-1h MTM; LW-90d cov, weekly rebalance, 10% vol anchor, 1.5x cap, trailing-50 breaker; v2 fill (next-1m-open + 0.05xATR adverse slippage); EXIT-RCT/adverse/cost/band frozen",
+  "eval_slice": "full PPS timeline after the LOOKBACK_STEPS covariance burn-in (NOT a holdout)",
+  "burn_in_steps": 2160,
+  "generated_utc": "2026-06-25T08:19:45.375473+00:00",
+  "master_seed": 20260624,
+  "n_boot": 10000,
+  "boot_alpha": 0.1,
+  "band": {
+    "A": 1.75,
+    "B": 2.0
+  },
+  "deployable_cells": [
+    "EURUSD-4h",
+    "XAUUSD-4h",
+    "USDCHF-4h",
+    "AUDJPY-4h",
+    "EURJPY-4h",
+    "GBPJPY-4h",
+    "USTEC-1h",
+    "US2000-1h"
+  ],
+  "surviving_exit": "RCT",
+  "overall": {
+    "experiment_id": "EXP-098",
+    "role": "non-binding cross-broker & aggregation-method robustness replication of the G-022a-frozen RSI-2 fade deployment portfolio (PPS data)",
+    "primary": "B",
+    "band": {
+      "A": 1.75,
+      "B": 2.0
+    },
+    "rule": "CONFIRM(P) iff PPS Sharpe_LB(P) > band_P AND Calmar_LB(P) > 0; band_A=1.75, band_B=2.00",
+    "cross_broker_robust": true,
+    "aggregation_robust": true,
+    "exp097_verdict_unchanged": true,
+    "counted_test_reads": 0,
+    "candidate_slots": 0,
+    "infr003_holdout_loaded": false,
+    "per_arm": {
+      "PPS-CANON": {
+        "label": "ROBUST",
+        "confirm_B": true,
+        "confirm_A": true,
+        "B": {
+          "ann_sharpe": 7.080918377957189,
+          "ann_sharpe_lo": 5.96765424914729,
+          "calmar_lo": 12.533514245274429,
+          "n_weeks": 251,
+          "max_drawdown": 0.059515093010559905
+        },
+        "A": {
+          "ann_sharpe": 7.277246191823272,
+          "ann_sharpe_lo": 6.14684817760809,
+          "calmar_lo": 12.16564467554576
+        },
+        "masking_label_flips": false,
+        "h_eval": "2021-09-01T08:00:00",
+        "burn_in_steps": 2160,
+        "n_eval_steps": 42057
+      },
+      "PPS-ALTAGG": {
+        "label": "ROBUST",
+        "confirm_B": true,
+        "confirm_A": true,
+        "B": {
+          "ann_sharpe": 7.222342247505384,
+          "ann_sharpe_lo": 6.103627386842862,
+          "calmar_lo": 13.318265323045388,
+          "n_weeks": 251,
+          "max_drawdown": 0.05721682012242635
+        },
+        "A": {
+          "ann_sharpe": 7.406533920017982,
+          "ann_sharpe_lo": 6.302112755966522,
+          "calmar_lo": 13.445045357391127
+        },
+        "masking_label_flips": false,
+        "h_eval": "2021-09-01T08:00:00",
+        "burn_in_steps": 2160,
+        "n_eval_steps": 42112
+      }
+    }
+  },
+  "retention": {
+    "note": "descriptive context vs EXP-097 committed holdout outputs; INFR-003 parquet is NOT re-read; band stays fixed at m*",
+    "arms": {
+      "PPS-CANON": {
+        "portfolio": {
+          "A": {
+            "pps_sharpe_lo": 6.14684817760809,
+            "infr003_sharpe_lo": 4.250065964517897,
+            "retention_ratio": 1.446294770228432
+          },
+          "B": {
+            "pps_sharpe_lo": 5.96765424914729,
+            "infr003_sharpe_lo": 4.762389243346642,
+            "retention_ratio": 1.2530799025897514
+          }
+        },
+        "per_cell": [
+          {
+            "cell": "EURUSD-4h",
+            "pps_net_mean": 0.1109052488364023,
+            "infr003_net_mean": 0.13170858787148332,
+            "pps_net_ci_low": 0.09408357456826813,
+            "infr003_net_ci_low": 0.10384876551968092
+          },
+          {
+            "cell": "XAUUSD-4h",
+            "pps_net_mean": 0.10026517426210857,
+            "infr003_net_mean": 0.11480553242615188,
+            "pps_net_ci_low": 0.08263325537797865,
+            "infr003_net_ci_low": 0.08189451575260133
+          },
+          {
+            "cell": "USDCHF-4h",
+            "pps_net_mean": 0.0874416694857816,
+            "infr003_net_mean": 0.09497184150715675,
+            "pps_net_ci_low": 0.07040187091795092,
+            "infr003_net_ci_low": 0.06585816042308244
+          },
+          {
+            "cell": "AUDJPY-4h",
+            "pps_net_mean": 0.07401814604672745,
+            "infr003_net_mean": 0.063791334375191,
+            "pps_net_ci_low": 0.059234455446625575,
+            "infr003_net_ci_low": 0.03956391253528776
+          },
+          {
+            "cell": "EURJPY-4h",
+            "pps_net_mean": 0.026487670078982287,
+            "infr003_net_mean": -0.006007451826009892,
+            "pps_net_ci_low": 0.010531375554030822,
+            "infr003_net_ci_low": -0.031123620849871487
+          },
+          {
+            "cell": "GBPJPY-4h",
+            "pps_net_mean": 0.047912612249375014,
+            "infr003_net_mean": 0.04582585429060262,
+            "pps_net_ci_low": 0.03178644955704078,
+            "infr003_net_ci_low": 0.016862708308633238
+          },
+          {
+            "cell": "USTEC-1h",
+            "pps_net_mean": 0.05108837569309946,
+            "infr003_net_mean": 0.03339360916657413,
+            "pps_net_ci_low": 0.040970910678475296,
+            "infr003_net_ci_low": 0.013516567909630075
+          },
+          {
+            "cell": "US2000-1h",
+            "pps_net_mean": 0.05962562446860469,
+            "infr003_net_mean": 0.05493569251563551,
+            "pps_net_ci_low": 0.049553042438838193,
+            "infr003_net_ci_low": 0.037107258650421665
+          }
+        ]
+      },
+      "PPS-ALTAGG": {
+        "portfolio": {
+          "A": {
+            "pps_sharpe_lo": 6.302112755966522,
+            "infr003_sharpe_lo": 4.250065964517897,
+            "retention_ratio": 1.4828270451753796
+          },
+          "B": {
+            "pps_sharpe_lo": 6.103627386842862,
+            "infr003_sharpe_lo": 4.762389243346642,
+            "retention_ratio": 1.281631356649399
+          }
+        },
+        "per_cell": [
+          {
+            "cell": "EURUSD-4h",
+            "pps_net_mean": 0.11093346487335083,
+            "infr003_net_mean": 0.13170858787148332,
+            "pps_net_ci_low": 0.0940964363287277,
+            "infr003_net_ci_low": 0.10384876551968092
+          },
+          {
+            "cell": "XAUUSD-4h",
+            "pps_net_mean": 0.10026517426210857,
+            "infr003_net_mean": 0.11480553242615188,
+            "pps_net_ci_low": 0.08263325537797865,
+            "infr003_net_ci_low": 0.08189451575260133
+          },
+          {
+            "cell": "USDCHF-4h",
+            "pps_net_mean": 0.0874416694857816,
+            "infr003_net_mean": 0.09497184150715675,
+            "pps_net_ci_low": 0.07040187091795092,
+            "infr003_net_ci_low": 0.06585816042308244
+          },
+          {
+            "cell": "AUDJPY-4h",
+            "pps_net_mean": 0.07401814604672745,
+            "infr003_net_mean": 0.063791334375191,
+            "pps_net_ci_low": 0.059234455446625575,
+            "infr003_net_ci_low": 0.03956391253528776
+          },
+          {
+            "cell": "EURJPY-4h",
+            "pps_net_mean": 0.026488735644030467,
+            "infr003_net_mean": -0.006007451826009892,
+            "pps_net_ci_low": 0.010532494397331409,
+            "infr003_net_ci_low": -0.031123620849871487
+          },
+          {
+            "cell": "GBPJPY-4h",
+            "pps_net_mean": 0.047912612249375014,
+            "infr003_net_mean": 0.04582585429060262,
+            "pps_net_ci_low": 0.03178644955704078,
+            "infr003_net_ci_low": 0.016862708308633238
+          },
+          {
+            "cell": "USTEC-1h",
+            "pps_net_mean": 0.05180468648453776,
+            "infr003_net_mean": 0.03339360916657413,
+            "pps_net_ci_low": 0.041886349249732564,
+            "infr003_net_ci_low": 0.013516567909630075
+          },
+          {
+            "cell": "US2000-1h",
+            "pps_net_mean": 0.060631634038647124,
+            "infr003_net_mean": 0.05493569251563551,
+            "pps_net_ci_low": 0.05050323402137237,
+            "infr003_net_ci_low": 0.037107258650421665
+          }
+        ]
+      }
+    }
+  },
+  "per_arm_metrics": {
+    "PPS-CANON": {
+      "A": {
+        "ann_sharpe": 7.277246191823272,
+        "ann_sharpe_lo": 6.14684817760809,
+        "calmar": 14.45927052550542,
+        "calmar_lo": 12.16564467554576,
+        "max_drawdown": 0.04978296419364581,
+        "cvar5_weekly": 0.010319298471277473,
+        "ulcer": 0.008697068994462426,
+        "ann_return": 0.5214387258782068,
+        "ann_vol": 0.10917077618038053,
+        "n_weeks": 251
+      },
+      "B": {
+        "ann_sharpe": 7.080918377957189,
+        "ann_sharpe_lo": 5.96765424914729,
+        "calmar": 15.638163881563202,
+        "calmar_lo": 12.533514245274429,
+        "max_drawdown": 0.059515093010559905,
+        "cvar5_weekly": 0.01064487689659475,
+        "ulcer": 0.009495604449616979,
+        "ann_return": 0.5043614069343568,
+        "ann_vol": 0.10816610111099437,
+        "n_weeks": 251
+      },
+      "naive_iv": {
+        "ann_sharpe": 7.263786571335292,
+        "ann_sharpe_lo": 6.127233485658209,
+        "calmar": 13.902755389069597,
+        "calmar_lo": 11.87068840829717,
+        "max_drawdown": 0.04772530753056459,
+        "cvar5_weekly": 0.009590517304604966,
+        "ulcer": 0.008067342260715647,
+        "ann_return": 0.4864962106552269,
+        "ann_vol": 0.1054486497629127,
+        "n_weeks": 251
+      }
+    },
+    "PPS-ALTAGG": {
+      "A": {
+        "ann_sharpe": 7.406533920017982,
+        "ann_sharpe_lo": 6.302112755966522,
+        "calmar": 16.558210066057246,
+        "calmar_lo": 13.445045357391127,
+        "max_drawdown": 0.04779938385828819,
+        "cvar5_weekly": 0.010161197240649282,
+        "ulcer": 0.008273714067748742,
+        "ann_return": 0.5270266463178267,
+        "ann_vol": 0.10844670487058768,
+        "n_weeks": 251
+      },
+      "B": {
+        "ann_sharpe": 7.222342247505384,
+        "ann_sharpe_lo": 6.103627386842862,
+        "calmar": 17.19220299946842,
+        "calmar_lo": 13.318265323045388,
+        "max_drawdown": 0.05721682012242635,
+        "cvar5_weekly": 0.010216126310461896,
+        "ulcer": 0.00919715359673734,
+        "ann_return": 0.514806709807487,
+        "ann_vol": 0.10761677447164827,
+        "n_weeks": 251
+      },
+      "naive_iv": {
+        "ann_sharpe": 7.388426661677024,
+        "ann_sharpe_lo": 6.28310181636115,
+        "calmar": 15.7797017969568,
+        "calmar_lo": 13.063933301426603,
+        "max_drawdown": 0.043950202140974115,
+        "cvar5_weekly": 0.009495259130398082,
+        "ulcer": 0.007648660863600632,
+        "ann_return": 0.49149683587001103,
+        "ann_vol": 0.10497712077964826,
+        "n_weeks": 251
+      }
+    }
+  },
+  "per_arm_source_meta": {
+    "PPS-CANON": {
+      "EURUSD-4h": {
+        "source_file": "timebars_eurusd_20210602_000000_20260625_003407.parquet",
+        "total_rows": 1870971,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-CANON",
+        "dropped_fraction": 0.07299359921221071,
+        "n_domain_bars": 7531,
+        "status": "OK"
+      },
+      "XAUUSD-4h": {
+        "source_file": "timebars_xauusd_20210602_000000_20260625_003407.parquet",
+        "total_rows": 1784508,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-CANON",
+        "dropped_fraction": 0.19883620155998516,
+        "n_domain_bars": 6471,
+        "status": "OK"
+      },
+      "USDCHF-4h": {
+        "source_file": "timebars_usdchf_20210602_000000_20260625_003407.parquet",
+        "total_rows": 1863099,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-CANON",
+        "dropped_fraction": 0.08431806991629742,
+        "n_domain_bars": 7439,
+        "status": "OK"
+      },
+      "AUDJPY-4h": {
+        "source_file": "timebars_audjpy_20210602_000000_20260625_003407.parquet",
+        "total_rows": 1877019,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-CANON",
+        "dropped_fraction": 0.06683899556868533,
+        "n_domain_bars": 7581,
+        "status": "OK"
+      },
+      "EURJPY-4h": {
+        "source_file": "timebars_eurjpy_20210602_000000_20260625_003504.parquet",
+        "total_rows": 1879139,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-CANON",
+        "dropped_fraction": 0.0670851797144264,
+        "n_domain_bars": 7579,
+        "status": "OK"
+      },
+      "GBPJPY-4h": {
+        "source_file": "timebars_gbpjpy_20210602_000000_20260625_003504.parquet",
+        "total_rows": 1877583,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-CANON",
+        "dropped_fraction": 0.06696208764155587,
+        "n_domain_bars": 7580,
+        "status": "OK"
+      },
+      "USTEC-1h": {
+        "source_file": "timebars_ustec_20210602_000000_20260625_003503.parquet",
+        "total_rows": 1784739,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-CANON",
+        "dropped_fraction": 0.0028852283020767144,
+        "n_domain_bars": 29721,
+        "status": "OK"
+      },
+      "US2000-1h": {
+        "source_file": "timebars_us2000_20210602_000000_20260625_003508.parquet",
+        "total_rows": 1778576,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-CANON",
+        "dropped_fraction": 0.008288034360110053,
+        "n_domain_bars": 29555,
+        "status": "OK"
+      }
+    },
+    "PPS-ALTAGG": {
+      "EURUSD-4h": {
+        "source_file": "timebars_eurusd_20210602_000000_20260625_003407.parquet",
+        "total_rows": 1870971,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-ALTAGG",
+        "dropped_fraction": 0.07299359921221071,
+        "n_domain_bars": 7531,
+        "status": "OK"
+      },
+      "XAUUSD-4h": {
+        "source_file": "timebars_xauusd_20210602_000000_20260625_003407.parquet",
+        "total_rows": 1784508,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-ALTAGG",
+        "dropped_fraction": 0.19883620155998516,
+        "n_domain_bars": 6471,
+        "status": "OK"
+      },
+      "USDCHF-4h": {
+        "source_file": "timebars_usdchf_20210602_000000_20260625_003407.parquet",
+        "total_rows": 1863099,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-ALTAGG",
+        "dropped_fraction": 0.08431806991629742,
+        "n_domain_bars": 7439,
+        "status": "OK"
+      },
+      "AUDJPY-4h": {
+        "source_file": "timebars_audjpy_20210602_000000_20260625_003407.parquet",
+        "total_rows": 1877019,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-ALTAGG",
+        "dropped_fraction": 0.06683899556868533,
+        "n_domain_bars": 7581,
+        "status": "OK"
+      },
+      "EURJPY-4h": {
+        "source_file": "timebars_eurjpy_20210602_000000_20260625_003504.parquet",
+        "total_rows": 1879139,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-ALTAGG",
+        "dropped_fraction": 0.0670851797144264,
+        "n_domain_bars": 7579,
+        "status": "OK"
+      },
+      "GBPJPY-4h": {
+        "source_file": "timebars_gbpjpy_20210602_000000_20260625_003504.parquet",
+        "total_rows": 1877583,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-ALTAGG",
+        "dropped_fraction": 0.06696208764155587,
+        "n_domain_bars": 7580,
+        "status": "OK"
+      },
+      "USTEC-1h": {
+        "source_file": "timebars_ustec_20210602_000000_20260625_003503.parquet",
+        "total_rows": 1784739,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-ALTAGG",
+        "dropped_fraction": 0.002851679135773444,
+        "n_domain_bars": 29722,
+        "status": "OK"
+      },
+      "US2000-1h": {
+        "source_file": "timebars_us2000_20210602_000000_20260625_003508.parquet",
+        "total_rows": 1778576,
+        "file_start": "2021-06-02 00:01:00",
+        "file_end": "2026-06-21 23:59:00",
+        "arm": "PPS-ALTAGG",
+        "dropped_fraction": 0.008254479565129813,
+        "n_domain_bars": 29556,
+        "status": "OK"
+      }
+    }
+  },
+  "real_prices_only": true,
+  "infr003_holdout_loaded": false,
+  "counted_test_reads": 0,
+  "candidate_slots": 0,
+  "read_accounting": "PPS robustness read on an independent broker dataset; outside the INFR-003 analysis-TEST 48-stratum ledger AND the INFR-003 global holdout (never loaded); recorded as a robustness governance disclosure; cannot upgrade/revoke EXP-097",
+  "output_hashes": {
+    "eval_metrics.csv": "7d259521f574de7589806ae3fcc15623044291102616c6e2d85b204e8fd4c690",
+    "mtm_conservation_pps_altagg.csv": "baa6d443708a5e74471d09b658d7b25d3a9307dab7e419617593f88d846c37fd",
+    "mtm_conservation_pps_canon.csv": "58a9426decd0eab9d72bb83f067683afd066a9e17af73d4151fbe25bda352dff",
+    "per_cell_pps.csv": "91498ebea17fa36b64314e89d4274399a2277d3a5104bcdb72b777379a56d974",
+    "portfolio_returns_A_pps_altagg.csv": "4926c41524e1b2237e22600a40c10e9e02647ef0a81d19a24cd884e86cd0070b",
+    "portfolio_returns_A_pps_canon.csv": "97000dc5d48018aeaa50dcad57f0853813e2cf3f0a56fbdcdc47103af72f71c1",
+    "portfolio_returns_B_pps_altagg.csv": "5583219293bd277f755fee162d701370585536c0198d175ff191796192b244cd",
+    "portfolio_returns_B_pps_canon.csv": "7f13495e906452d4edb557774abb9dfe084f5c9f3bb22428b56e61f03dea8585",
+    "integrity.json": "fe42b284a3e8dda375bc66062524ea6b99d9b0990fb584fcf1b3fd16f5297487",
+    "retention.json": "d62253abd074be976473b34802ed812157b30b3fd4b5422251e5457274bbe766",
+    "verdict.json": "ac8be86d8598c8f7da544b8580f89c050b2d9a3a3fc5ff2e131b75e87b5d17c9"
+  }
+}

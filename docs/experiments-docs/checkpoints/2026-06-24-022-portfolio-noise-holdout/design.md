@@ -1,11 +1,19 @@
 # Phase 022 — Portfolio Construction, Noise Infusion & Global-Holdout Release (CF-MR-001, batch 3)
 
-**Status:** **OPEN — G0 RATIFIED 2026-06-24 (operator-authorized).** Batch 3 of CF-MR-001 — the
+**Status:** **CLOSED — G-022 DEPLOYABLE_CONFIRMED 2026-06-25** ([`G-022-gate-review.md`](G-022-gate-review.md);
+retrospective [`retrospective.md`](retrospective.md)). G0 RATIFIED 2026-06-24; G-022a FREEZE ADJUDICATED
+2026-06-25; EXP-097 spent the single sanctioned global-holdout shot (`DEPLOYABLE_CONFIRMED`); EXP-098 PPS
+robustness companion ROBUST (non-binding). Batch 3 of CF-MR-001 — the
 **deployment-economics & out-of-sample-final** step for the bare RSI-2 fade (CORE) with EXIT-RCT, confirmed
-net-tradable on the analysis-TEST stratum at G-021. **D0 FROZEN** (`D0-predeclarations.md`); the terminal
-global-holdout rubric (`G-022-gate-criteria.md`) and the pre-holdout freeze gate (`G-022a-gate-criteria.md`) are
-frozen at **G-022a**, after EXP-095/096 and before EXP-097 reads the holdout. No result-producing code runs
-against anything but the frozen D0.
+net-tradable on the analysis-TEST stratum at G-021. **D0 FROZEN** (`D0-predeclarations.md`). EXP-095 (portfolio
+construction) + EXP-096 (noise infusion) **COMPLETE** (analysis-set, 0 reads/0 slots, holdout untouched); the
+fill-realism leg **SURVIVES** at the binding v2 fill. **G-022a adjudicated FREEZE** ([`G-022a-gate-review.md`](G-022a-gate-review.md))
+— all four D0 §D9 preconditions met; the deployable set (carry-8), construction (binding-v2 ERC + MTM), A-vs-B
+structure (both on one read; **primary = B**, operator decision 2026-06-25), confirmation statistic + band (Sharpe
+LB > m\*: band_A 1.75 / band_B 2.00, co-binding Calmar LB > 0), and read accounting are **frozen** in
+[`G-022a-gate-criteria.md`](G-022a-gate-criteria.md); the terminal rubric is frozen in
+[`G-022-gate-criteria.md`](G-022-gate-criteria.md). **Next: EXP-097** — the single sanctioned global-holdout
+release, gated behind the freeze. No result-producing code runs against anything but the frozen D0 + G-022a.
 
 **Family:** [`CF-MR-001`](../../../signal-registry/candidate-families/cf-mr-001.md) — RSI-2 mean-reversion (fade)
 entry. **Lever (admitted G-020, tradable G-021):** the **bare RSI-2 fade (CORE) + EXIT-RCT**, intraday.
