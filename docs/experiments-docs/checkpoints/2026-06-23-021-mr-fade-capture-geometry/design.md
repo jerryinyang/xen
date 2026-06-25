@@ -1,10 +1,12 @@
 # Phase 021 — RSI-2 Fade Capture-Geometry & Tradability (CF-MR-001, batch 2)
 
-**Status:** **OPEN — G0 RATIFIED (2026-06-23, operator-authorized); D0 FROZEN.** This is the phase design
-artifact (Phase Lifecycle: Design Phase). The binding **D0-predeclarations** (frozen exit definitions, cost
-model, referee suite, thresholds, TEST plan) and the **G-021 gate criteria** are now frozen; EXP-090 may be
-scoped. Nothing here reads data, spends a slot beyond the one already consumed at G-020, or touches the
-holdout.
+**Status:** **CLOSED — G-021 ADJUDICATED TRADABLE (2026-06-24).** Phase 021 ran EXP-090→094 (TRAIN) → EXP-093
+(one-shot TEST): the bare RSI-2 fade with EXIT-RCT **confirms net-tradable OOS on 8/11 carried cells** (six 4h
+mean-AND-median-positive + USTEC-1h/US2000-1h mean-carried) — the programme's first net-positive price entry. See
+[`G-021-gate-review.md`](G-021-gate-review.md) and [`retrospective.md`](retrospective.md). 11 counted TEST reads
+spent (each carried stratum 0→1); final-30% global holdout never loaded; 0 additional candidate slots. *(History:
+OPEN — G0 RATIFIED 2026-06-23, D0 FROZEN; the binding D0-predeclarations + G-021 gate criteria were frozen before
+EXP-090 ran.)*
 
 **Family:** [`CF-MR-001`](../../../signal-registry/candidate-families/cf-mr-001.md) — RSI-2 mean-reversion
 (fade) entry. **Lever (admitted at G-020):** the **bare RSI-2 fade (CORE)**, intraday.

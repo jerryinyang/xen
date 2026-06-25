@@ -36,7 +36,20 @@ domain `Close`; **long `RSI₂<10`**, **short `RSI₂>90`** (period 2, extremes 
 short→down.
 
 **Dataset:** VAL-005-admitted 5-year 1-minute bars, 16 instruments, holdout-fenced `build_domain_bars`.
-**Domains: {15m, 1h} only** (4h excluded — dead-by-absence at EXP-089, 1/14; not carried). The **1-minute base
+**Domains: {15m, 1h} only** (4h excluded — dead-by-absence at EXP-089, 1/14; not carried).
+
+> **AMENDED — `D0-amendment-004` (2026-06-24, FROZEN/operator-ratified).** The **4h domain is OPENED** as a
+> domain expansion of the admitted CORE-fade + EXIT-RCT lever (**0 new candidate slots**), triggered by an
+> operator hunch (the archived `TEMP-091`: EXIT-RCT net-clears 12/12 instruments on 4h, mean-and-median
+> positive). 4h is **opened, not admitted**: no 4h cell is eligible for EXP-092/093 until a new TRAIN-only
+> governed experiment (**EXP-094**) clears a binding **falsification re-screen** — 4h readiness (EXP-090
+> analog) + the frozen net exit screen (EXP-091 analog) + a **matched favourable-target-distance oscillation
+> null** (binding null corrected by **`D0-amendment-005`**: a favourable limit placed at a distance resampled
+> from the real RCT target multiples, fired at random times — the original SUB-RANDOM-entry RCT null was biased
+> toward admission, retained as a non-binding companion) that reconciles the EXP-089 4h dead-by-absence
+> (real-fade EXIT-RCT must beat the matched-distance null on net per-event expectancy in a ≥5-cell/≥3-instrument
+> quorum, else the 4h net-clear is exit-geometry/oscillation harvesting and 4h stays closed). TRAIN-only, 0
+> counted reads. See `D0-amendment-004.md` + `D0-amendment-005.md`. The **1-minute base
 series** is the intrabar fill source (D2.5). **TRAIN sub-split `[0, int(analysis_rows·0.7))` only** for
 EXP-090–092; EXP-093 reads the analysis-TEST stratum (D7). The final-30% global holdout is never sliced. All
 P&L/excursion metrics in **ATR(14) units** on real OHLC. Master seed `20260623`.
@@ -103,6 +116,17 @@ favourable-exit mechanism varies ⇒ a win is attributable to the target, not th
 in ATR units. A faster-turnover round-trip sensitivity is a disclosed companion at EXP-091, **not** a
 re-estimation of the binding model.
 
+> **AMENDED — `D0-amendment-003` (2026-06-24, FROZEN/operator-ratified).** The inherited EXP-085
+> `COST_CONSTANTS` prices only 4 instruments; the EXP-090 member set spans 13. A global data-derived RT rule
+> (OHLC effective-spread estimators) was **attempted and empirically refuted** (vol-dominated, ~10× inflated /
+> degenerate — recorded in the amendment). Resolution: a **Phase-021-local** cost table covering the 13 member
+> instruments — **RT_i = 4·c_i** (CONSERVATIVE; documented anchors EURUSD 3.0 / XAUUSD 6.0 / AUDUSD 4.0 /
+> NZDUSD 4.5 / USTEC 5.0, conservative liquidity tiers for the 8 non-anchored: FX majors 4.0, JPY crosses 6.0,
+> US2000/JP225 6.0) and **financing `F_i = 0` for all** (not derivable from price; immaterial at the ~3-bar
+> hold — disclosed mild anti-conservative simplification). The shared `xen.capgeo_cost.COST_CONSTANTS` is **not
+> edited** (Phase-018 integrity preserved); EXP-091 imports only the `event_costs`/`holding_days` mechanics and
+> passes its own `RT_i`, `fin_bps_day=0`. See `D0-amendment-003.md`.
+
 ## D4 — Binding tradability gate (frozen referee suite; not re-derived)
 
 The **frozen qualification suite** — strict gate stack + EXP-012 ratified-loose referee + EXP-018 revised
@@ -162,9 +186,11 @@ power figures and are disclosed per cell.
 - **Real prices only** (`RealOpen/High/Low/Close`, 1m real OHLC for fills); no HA/Renko synthetic-price returns.
 - **No tuning:** RSI 2/10/90, ERT EMA-10, adverse 2.0×ATR, the MR-tempo cap, the EXP-085 cost table, and the
   D6 thresholds are **frozen**. The vol-regime partition, the TREND/FILTER variants, the contrarian arm, the
-  25/75 scheme, regime×variant cross-cuts, and instrument/domain (incl. 4h) expansion are
+  25/75 scheme, regime×variant cross-cuts, and instrument/domain expansion are
   **registered-but-deferred** (multiplicity ledger); opening any requires a dated `D0-amendment-*` stating
-  whether it consumes a new slot.
+  whether it consumes a new slot. **The 4h domain has been OPENED** (`D0-amendment-004`, 2026-06-24, **0 new
+  slots**) — gated behind the EXP-094 falsification re-screen (§D1 amendment note); all other levers (15m
+  capture, vol-regime, contrarian, 25/75, cross-cuts, parameter tuning) **remain deferred**.
 
 ## Slot & TEST accounting (summary)
 
