@@ -1,0 +1,121 @@
+{
+  "experiment_id": "EXP-094",
+  "phase": "021",
+  "family": "CF-MR-001",
+  "hyp": "HYP-002",
+  "amendments": [
+    "D0-amendment-004",
+    "D0-amendment-005"
+  ],
+  "generated_utc": "2026-06-24T14:46:09.253052+00:00",
+  "experiment_verdict": "ADMIT_4H",
+  "master_seed": 20260623,
+  "domain": "4h",
+  "n_universe": 13,
+  "n_members": 6,
+  "members": [
+    "AUDJPY",
+    "EURJPY",
+    "EURUSD",
+    "GBPJPY",
+    "USDCHF",
+    "XAUUSD"
+  ],
+  "arms": [
+    "RCT",
+    "ERT",
+    "ATR-BARRIER",
+    "RSI-REVERT",
+    "FIXED-BAR"
+  ],
+  "n_boot": 10000,
+  "boot_alpha": 0.1,
+  "z_one_sided": 1.645,
+  "quorum_cells": 5,
+  "quorum_instruments": 3,
+  "binding_null": "matched_favourable_target_distance_oscillation (entry-bar target; D0-amendment-005)",
+  "sensitivity_null": "matched_realized_capture_distance (audit \u00a75; non-binding)",
+  "companion_null": "sub_random_entry_rct_wrongside_guarded (non-binding)",
+  "cost_model": "EXP-085 CONSERVATIVE RT (D0-amendment-003); F=0",
+  "cost_rt_bps": {
+    "EURUSD": 3.0,
+    "GBPUSD": 4.0,
+    "USDJPY": 4.0,
+    "USDCHF": 4.0,
+    "AUDUSD": 4.0,
+    "NZDUSD": 4.5,
+    "EURJPY": 6.0,
+    "GBPJPY": 6.0,
+    "AUDJPY": 6.0,
+    "XAUUSD": 6.0,
+    "USTEC": 5.0,
+    "US2000": 6.0,
+    "JP225": 6.0
+  },
+  "fin_bps_day": 0.0,
+  "cost_table_hash": "fa7c887cf60bb9d82c2ee553bad0f40715c10720c2c7d7a52c7dc8eea2353d39",
+  "screen_quorum_rct": {
+    "n_clearing_cells": 6,
+    "n_clearing_instruments": 6,
+    "passes": true
+  },
+  "falsification_quorum": {
+    "n_clearing_cells": 6,
+    "n_clearing_instruments": 6,
+    "passes": true
+  },
+  "falsification_quorum_realized_sensitivity": {
+    "n_clearing_cells": 6,
+    "n_clearing_instruments": 6,
+    "passes": true
+  },
+  "control_beats_random": 5,
+  "bite_check": {
+    "verdict": "GREEN",
+    "fpr_cell_mean": 0.051666666666666666,
+    "fpr_quorum_rate": 0.0,
+    "fpr_cell_max": 0.1,
+    "fpr_quorum_max": 0.1,
+    "power_by_g": {
+      "0.05": 0.41,
+      "0.1": 0.8566666666666668,
+      "0.15": 0.9927777777777776,
+      "0.2": 1.0
+    },
+    "power_ref_atr": 0.1,
+    "power_at_ref": 0.8566666666666668,
+    "tpr_target": 0.8,
+    "two_sample_mde": 0.1,
+    "observed_delta_median": 0.2756961809476294,
+    "fpr_ok": true,
+    "power_ok": true,
+    "n_replicates": 300,
+    "n_boot": 2000,
+    "n_cells": 6
+  },
+  "determinism": {
+    "determinism_pass": true,
+    "cells_checked": [
+      "EURUSD-4h",
+      "GBPUSD-4h"
+    ],
+    "non_deterministic": []
+  },
+  "readiness_cache": {
+    "use_cache": true,
+    "n_cache_hits": 0,
+    "n_universe": 13
+  },
+  "holdout_untouched": true,
+  "counted_test_reads": 0,
+  "candidate_slots": 0,
+  "output_hashes": {
+    "readiness_4h.csv": "6a4a07465a6d2c99ced675a1691007442093ff36dfa2a0a38c0d4da6e7406097",
+    "screen_per_cell_arm_4h.csv": "0630206819e07734c384fab63a1155040c4e671a90ddf744915861eafff40257",
+    "quorum_per_arm_4h.csv": "af44446b6134dd85bb3905d926c48b239788c655a1a8d374790a882725410c6e",
+    "falsification_paired_delta_4h.csv": "f21c8f85ff5ada818b2c1c12e063c31acf20d04d7c70e6f3b3b29c13f9111ef7",
+    "falsification_quorum.csv": "8db9fa90a7512074f393d55ec8a4d2d1ebdc7d6b205c08ce441c74e5652cd9e6",
+    "positive_control_1h.csv": "d84fdace0fdec6629fbb4dc3320ab319b90e159e2cecedaa7dbca3f0cc2f9051",
+    "cost_decomposition_4h.csv": "9f22c4fc6aa22b4a0572676e8915d13cf918b9dd63eb6b1c8b29a0e16b06ac7c"
+  }
+}

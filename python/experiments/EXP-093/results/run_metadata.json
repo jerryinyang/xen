@@ -1,0 +1,84 @@
+{
+  "experiment_id": "EXP-093",
+  "phase": "021",
+  "family": "CF-MR-001",
+  "hyp": "HYP-002",
+  "generated_utc": "2026-06-24T16:41:33.800633+00:00",
+  "experiment_verdict": "TEST_CONFIRMED",
+  "master_seed": 20260623,
+  "surviving_exit": "RCT",
+  "carried_set_decision": "D0-amendment-006 (all 11 EXP-092 SEQUENCE_PASS cells; Holm-11)",
+  "n_carried_cells": 11,
+  "carried_cells": [
+    "EURUSD-1h",
+    "GBPUSD-1h",
+    "NZDUSD-1h",
+    "US2000-1h",
+    "USTEC-1h",
+    "AUDJPY-4h",
+    "EURJPY-4h",
+    "EURUSD-4h",
+    "GBPJPY-4h",
+    "USDCHF-4h",
+    "XAUUSD-4h"
+  ],
+  "n_confirm": 8,
+  "verdict_counts": {
+    "CONFIRM": 8,
+    "INCONCLUSIVE": 3
+  },
+  "holm": {
+    "method": "holm-bonferroni",
+    "alpha": 0.05,
+    "sided": "one",
+    "family_size": 11,
+    "margin": "per-cell EXP-090/094 MDE (1h 0.0125 / 4h 0.025 ATR)"
+  },
+  "n_boot": 10000,
+  "boot_alpha": 0.1,
+  "z_one_sided": 1.645,
+  "test_rule": "CONFIRM iff Holm-adj p <= 0.05 AND net ci_low_1s > margin; else FAIL / INCONCLUSIVE_SPANS_ZERO (D6/4c)",
+  "cost_model": "EXP-085 CONSERVATIVE RT (D0-amendment-003 Phase-021 table); F=0",
+  "cost_rt_bps": {
+    "EURUSD": 3.0,
+    "GBPUSD": 4.0,
+    "USDJPY": 4.0,
+    "USDCHF": 4.0,
+    "AUDUSD": 4.0,
+    "NZDUSD": 4.5,
+    "EURJPY": 6.0,
+    "GBPJPY": 6.0,
+    "AUDJPY": 6.0,
+    "XAUUSD": 6.0,
+    "USTEC": 5.0,
+    "US2000": 6.0,
+    "JP225": 6.0
+  },
+  "fin_bps_day": 0.0,
+  "cost_table_hash": "fa7c887cf60bb9d82c2ee553bad0f40715c10720c2c7d7a52c7dc8eea2353d39",
+  "determinism": {
+    "determinism_pass": true,
+    "cells_checked": [
+      "USTEC-1h",
+      "EURUSD-4h"
+    ],
+    "non_deterministic": []
+  },
+  "real_fade_outcomes_resolved": true,
+  "stratum": "analysis-TEST (last 30% of the first-70% analysis set; holdout never loaded)",
+  "holdout_untouched": true,
+  "counted_test_reads": 11,
+  "candidate_slots": 0,
+  "ledger_note": "each carried (instrument, domain) stratum spends 1 counted TEST read (0->1); cap 2/stratum; recorded in test-read-ledger.md in the same change as the result",
+  "upstream": {
+    "exp090_member_map": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/EXP-090/results/member_map.csv",
+    "exp091_screen": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/EXP-091/results/screen_per_cell_arm.csv",
+    "exp094_readiness": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/EXP-094/results/readiness_4h.csv",
+    "exp092_candidate": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/EXP-092/results/candidate_set.csv"
+  },
+  "output_hashes": {
+    "test_adjudication.csv": "c257f3dc1334665a9372a5c3ef5f88a2c9715379fae2f259532e238b4605903f",
+    "test_per_cell.csv": "c46e81aa227656f9e3a3ee38a8a203d54437ee292078b5d1c4c9515ad6f766a0",
+    "train_vs_test.csv": "06450783614c3a9861118cd7bd6a398913281cc9df55fda914d025809e282c0e"
+  }
+}

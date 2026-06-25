@@ -1,0 +1,140 @@
+{
+  "experiment_id": "EXP-091",
+  "phase": "021",
+  "family": "CF-MR-001",
+  "hyp": "HYP-002",
+  "generated_utc": "2026-06-24T11:31:18.762645+00:00",
+  "experiment_verdict": "SCREEN_DELIVERED",
+  "master_seed": 20260623,
+  "n_member_cells": 20,
+  "member_cells": [
+    "EURUSD-1h",
+    "GBPUSD-15m",
+    "GBPUSD-1h",
+    "USDJPY-15m",
+    "USDJPY-1h",
+    "USDCHF-15m",
+    "USDCHF-1h",
+    "AUDUSD-15m",
+    "NZDUSD-1h",
+    "EURJPY-1h",
+    "GBPJPY-15m",
+    "GBPJPY-1h",
+    "AUDJPY-15m",
+    "AUDJPY-1h",
+    "XAUUSD-15m",
+    "USTEC-15m",
+    "USTEC-1h",
+    "US2000-15m",
+    "US2000-1h",
+    "JP225-15m"
+  ],
+  "arms": [
+    "RCT",
+    "ERT",
+    "ATR-BARRIER",
+    "RSI-REVERT",
+    "FIXED-BAR",
+    "PARTIAL-TRAIL"
+  ],
+  "native_arms": [
+    "RCT",
+    "ERT"
+  ],
+  "n_boot": 10000,
+  "boot_alpha": 0.1,
+  "z_one_sided": 1.645,
+  "quorum_cells": 5,
+  "quorum_instruments": 3,
+  "cost_model": "EXP-085 CONSERVATIVE RT (D0-amendment-003 Phase-021 table); F=0",
+  "cost_rt_bps": {
+    "EURUSD": 3.0,
+    "GBPUSD": 4.0,
+    "USDJPY": 4.0,
+    "USDCHF": 4.0,
+    "AUDUSD": 4.0,
+    "NZDUSD": 4.5,
+    "EURJPY": 6.0,
+    "GBPJPY": 6.0,
+    "AUDJPY": 6.0,
+    "XAUUSD": 6.0,
+    "USTEC": 5.0,
+    "US2000": 6.0,
+    "JP225": 6.0
+  },
+  "fin_bps_day": 0.0,
+  "cost_table_hash": "fa7c887cf60bb9d82c2ee553bad0f40715c10720c2c7d7a52c7dc8eea2353d39",
+  "cost_table_note": "Phase-021-LOCAL (D0-amendment-003, FROZEN 2026-06-24); shared xen.capgeo_cost.COST_CONSTANTS NOT mutated (Phase-018 integrity). Global OHLC-spread RT rule attempted + empirically refuted (see amendment).",
+  "partial_arm_note": "PARTIAL-TRAIL uses xen.capgeo_cost.partial_two_leg_exit (domain-bar two-leg resolver), NOT the 1m intrabar engine \u2014 disclosed coarser fill model for this non-primary contrast arm (D2.4 'as the primitive allows').",
+  "quorum_per_arm": {
+    "RCT": {
+      "n_clearing_cells": 5,
+      "n_clearing_instruments": 5,
+      "passes": true
+    },
+    "ERT": {
+      "n_clearing_cells": 0,
+      "n_clearing_instruments": 0,
+      "passes": false
+    },
+    "ATR-BARRIER": {
+      "n_clearing_cells": 0,
+      "n_clearing_instruments": 0,
+      "passes": false
+    },
+    "RSI-REVERT": {
+      "n_clearing_cells": 0,
+      "n_clearing_instruments": 0,
+      "passes": false
+    },
+    "FIXED-BAR": {
+      "n_clearing_cells": 0,
+      "n_clearing_instruments": 0,
+      "passes": false
+    },
+    "PARTIAL-TRAIL": {
+      "n_clearing_cells": 0,
+      "n_clearing_instruments": 0,
+      "passes": false
+    }
+  },
+  "any_arm_passes": true,
+  "native_vs_contrast_summary": {
+    "n_paired": 20,
+    "median_delta": 0.26064429018550905,
+    "n_RCT_gt_RSIREVERT": 20,
+    "wilcoxon_stat": 0.0,
+    "wilcoxon_p": 1.9073486328125e-06,
+    "test": "wilcoxon_signed_rank",
+    "native_clear_cells": {
+      "RCT": 5,
+      "ERT": 0
+    },
+    "contrast_clear_cells": {
+      "ATR-BARRIER": 0,
+      "RSI-REVERT": 0,
+      "FIXED-BAR": 0,
+      "PARTIAL-TRAIL": 0
+    }
+  },
+  "determinism": {
+    "determinism_pass": true,
+    "cells_checked": [
+      "USTEC-15m",
+      "EURUSD-1h"
+    ],
+    "non_deterministic": []
+  },
+  "real_fade_outcomes_resolved": true,
+  "holdout_untouched": true,
+  "counted_test_reads": 0,
+  "candidate_slots": 0,
+  "exp090_member_map": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/EXP-090/results/member_map.csv",
+  "output_hashes": {
+    "screen_per_cell_arm.csv": "7e1844b9ca9f4965ccd51920dfc37228833319baf204af1b4ce7d44e9e41672e",
+    "quorum_per_arm.csv": "c66c9216693a161f24521a3cf8bc231d01cc48eb6712daa48d0e2dbc1c121de0",
+    "native_vs_contrast.csv": "43c1fb092c5b4547fc476b96aeadc1663f636951e8c03c608dc039036911813e",
+    "cost_decomposition.csv": "240ea7461dfbd6756eb079e05f2db792325564f8525ecb76d3319ab2136898ca",
+    "cost_sensitivity_faster.csv": "78131795e3812bd82af03b4b25b1d1f859eac73b83e93ef632e228ef8afebf42"
+  }
+}
