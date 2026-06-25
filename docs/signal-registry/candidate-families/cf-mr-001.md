@@ -20,14 +20,26 @@ non-random price entry to clear the family-selection availability gate. See
 · D0 [`D0-predeclarations.md`](../../experiments-docs/checkpoints/2026-06-23-020-mean-reversion-entry-availability/D0-predeclarations.md)
 · gate [`G-020-gate-criteria.md`](../../experiments-docs/checkpoints/2026-06-23-020-mean-reversion-entry-availability/G-020-gate-criteria.md)
 · review [`G-020-gate-review.md`](../../experiments-docs/checkpoints/2026-06-23-020-mean-reversion-entry-availability/G-020-gate-review.md).
-**Active phase (batch 2 — availability→tradability):** [`Phase 021 design`](../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/design.md)
+**Prior phase (batch 2 — availability→tradability): CLOSED — G-021 TRADABLE 2026-06-24.** [`Phase 021 design`](../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/design.md)
 · [D0-predeclarations](../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/D0-predeclarations.md)
-*(FROZEN, G0-RATIFIED 2026-06-23)* · [G-021 gate criteria](../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/G-021-gate-criteria.md)
-— exit / capture geometry / cost for the bare RSI-2 fade, intraday-first (15m/1h); native intrabar reversion
-targets **EXIT-RCT** (RSI₂→50 completion price) + **EXIT-ERT** (return-to-EMA10) vs conventional contrast;
-planned EXP-090→093 (TRAIN-only until a one-shot TEST under the 2/stratum cap). The deferred
-levers (regime, contrarian, 25/75, cross-cuts, tuning, expansion) are NOT in Phase 021 — each needs its own
-dated `D0-amendment-*` + slot decision.
+· [G-021 gate review](../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/G-021-gate-review.md).
+EXP-090→094 (TRAIN) → EXP-093 (one-shot TEST): bare RSI-2 fade + **EXIT-RCT** confirms net-tradable OOS on the
+analysis-TEST stratum — **8/11 carried cells CONFIRM** (six 4h mean-AND-median-positive robust core + USTEC-1h/
+US2000-1h mean-carried); the programme's first net-positive price entry. 11 counted TEST reads spent (each
+carried stratum 0→1, now 1/2); final-30% global holdout never loaded. EXIT-ERT + the conventional arms died at
+the screen (file drawer).
+
+**Active phase (batch 3 — deployment economics & global-holdout-final):** [`Phase 022 design`](../../experiments-docs/checkpoints/2026-06-24-022-portfolio-noise-holdout/design.md)
+· [D0-predeclarations](../../experiments-docs/checkpoints/2026-06-24-022-portfolio-noise-holdout/D0-predeclarations.md)
+*(FROZEN, G0-RATIFIED 2026-06-24)* — **HYP-003**: deploy the 8 confirmed cells as a time-aligned, causal,
+parameter-free **ERC portfolio** with cross-instrument correlation + an online performance **circuit-breaker**
+(EXP-095), stress it under a realistic **1-minute entry-fill noise** model (EXP-096), then **release the
+final-30% global holdout** as the single sanctioned one-shot deployment confirmation (EXP-097, gated behind the
+G-022a freeze). 0 new slots; EXP-095/096 are 0 counted TEST reads (portfolio-aggregate disclosure reusing the
+EXP-093 series); **EXP-097 spends the global-holdout shot** (outside the analysis-TEST ledger). The deferred
+levers (regime, contrarian, 25/75, 15m, cross-cuts, tuning, expansion) are NOT in Phase 022 — each needs its own
+dated `D0-amendment-*` + slot decision. **The 4h domain was OPENED 2026-06-24 (`D0-amendment-004`, 0 new
+slots), gated behind the EXP-094 falsification re-screen** (see the EXP-094 outcome section below).
 **Real-price / holdout discipline (binding):** all excursion/range metrics on real prices
 (`RealOpen/High/Low/Close`); the final-30% global holdout is never read in screening or any future
 readiness/characterization; counted TEST reads are spent only at a future binding confirmation under the
@@ -136,8 +148,33 @@ Holm (single family).
 - `CF-MR-001/HYP-001` — *Availability screen* (Phase 020, **EXP-089**): does the bare RSI-MR core, any of its
   three vol-regime partitions, or either pooled variant beat the multiplicity-adjusted admission gate
   (`S_fam > S*` ∧ axis perm_p ≤ 0.05)? Admit/exonerate, **0 slots, 0 reads**.
-- `CF-MR-001/HYP-002+` — readiness / characterization / capture-geometry / net screen — **only if admitted**,
-  at a future G0/D0.
+- `CF-MR-001/HYP-002` — *Capture-geometry / tradability* (Phase 021, EXP-090→094 TRAIN + **EXP-093** one-shot
+  TEST): does the bare fade's gross availability survive a real exit + conservative cost as a positive net
+  expectancy clearing the frozen referee, and hold on a counted TEST read? **SUPPORTED — G-021 TRADABLE**
+  (8/11 carried cells confirm OOS).
+- `CF-MR-001/HYP-003` — *Deployment economics & global-holdout-final* (Phase 022, EXP-095/096 analysis-set +
+  **EXP-097** global-holdout): deployed as a time-aligned, causal, parameter-free ERC portfolio (with an online
+  circuit-breaker) under a realistic 1-minute entry fill, does the confirmed fade retain a positive
+  risk-adjusted edge that confirms on the final-30% global holdout? 0 new slots; the binding read is the
+  single sanctioned global-holdout shot (EXP-097), gated behind the G-022a freeze.
+  - **EXP-095 COMPLETE 2026-06-25 (D0-amendment-001 amend-in-place rerun; analysis-set, noise-free — no holdout
+    verdict; re-audit PASS).** The rerun restored the D0 §D2.1 **intra-1h mark-to-market** (the prior flat-at-exit
+    booking inflated Sharpe/MaxDD differentially across 1h/4h — a verdict-material defect), re-specified the benefit
+    criterion (like-for-like LB + cross-cell-median baseline), made Calmar/CVaR/Ulcer co-binding, and replaced the
+    fixed-Sharpe=1.0 bite with an MDE-curve. Causal parameter-free ERC portfolio: A Sharpe **11.69 (MBB lo 10.24)**
+    / B **11.57 (lo 10.19)** / naive-IV **11.55 (lo 10.07)** / best cell US2000-1h **8.73 (lo 7.53)**.
+    **(1) Portfolio benefit SUPPORTED** (corrects the prior flat-at-exit "NOT MET"): A/B Sharpe LB clears every
+    baseline (median-cell LB 4.99 +5.25; best-cell point 8.73; best-cell LB 7.53 +2.71; naive-IV LB 10.07) +
+    co-binding Calmar LB (+53); mechanism = genuine moment-to-moment diversification of 8 low-correlation cells
+    (mean |corr| 0.10) → portfolio MaxDD 0.034 below every constituent. **(2) ERC ≈ naive-IV** (prior refutation
+    overturned). **(3) Circuit-breaker NEUTRAL** — A ≈ B within noise (MaxDD 3.44% vs 3.75%; B marginally better on
+    Ulcer), no material de-risking (prior "de-risks −22.4%" was a flat-at-exit artifact; a wash, not a
+    degradation; B still de-allocates fragile cells). **(4) Gate statistic
+    READY** — FPR controlled (A 0.000/B 0.002), MDE m*=1.75/2.00 finite, realized LB 10.24 ≫ m* ⇒
+    `statistic_ready_for_g022a=true`; G-022a must freeze the band ≥ m*. **Scale caveat:** Sharpe ~11-12 is
+    in-sample favorable-selected, not deployment-realistic; binding read = EXP-097. **Status unchanged: ADMITTED
+    (BINDING)/TRADABLE; 0 new slots, 0 counted reads** (11 carried strata stay 1/2). Next: EXP-096 noise infusion
+    → G-022a freeze (band ≥ m*; decide A vs B) → EXP-097.
 
 ## Kill / pass
 
@@ -237,6 +274,152 @@ mean net-expectancy referee are constructible, deterministic, causal, timestamp-
 No countable exit item is screened or refuted here (that is EXP-091). Artifacts:
 [`../../../python/experiments/EXP-090/report.md`](../../../python/experiments/EXP-090/report.md) · amendment
 [`../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/D0-amendment-002.md`](../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/D0-amendment-002.md).
+
+## Outcome — EXP-091 (`CF-MR-001/HYP-002`, Phase 021 batch 2), 2026-06-24
+
+**`SCREEN_DELIVERED` — non-empty (one exit passes) · 0 slots · 0 counted TEST reads · holdout sealed · audit PASS
+(0C/3W/3I).** The first Phase-021 experiment to resolve the **real** bare-fade exit outcomes (EXP-090 never read
+them). Over the frozen D2 exit slate on the 20 EXP-090 member cells, net of the operator-ratified Phase-021
+conservative cost (`D0-amendment-003`, F=0):
+
+- **EXIT-RCT (native reversion-completion target) is the only arm to pass the frozen D6 quorum** — net-clears
+  (`net ci_low_1s>0`) in **5 cells / 5 instruments, all 1h** (EURUSD/GBPUSD/NZDUSD/US2000/USTEC-1h). **EXIT-ERT,
+  ATR triple-barrier, RSI-revert-on-close, fixed-bar, and favourable partial/trail each net-clear 0 cells → die
+  at the screen** (retained in the file drawer, not reopened by re-parameterization).
+- **Mechanism — pure ATR-normalized cost geometry, not signal strength.** Both natives gross-clear 20/20
+  (availability real and broad; RCT hits its target ~99% of events, gross ~0.27–0.30 ATR on every cell). But the
+  fixed-bps round-trip ÷ entry ATR(14) costs ~0.6 ATR on 15m vs ~0.24–0.30 on 1h, so net is deeply negative on
+  every 15m cell (cost ≈ 2× gross) and positive only on the cheapest 1h cells. RCT clears 0/10 on 15m, 5/10 on
+  1h — the honest prior *availability ≠ capturable edge* realized exactly for a short ~3-bar, ~0.28-ATR geometry.
+- **Native intrabar machinery beats reactive exit-on-close (RCT vs RSI-revert-on-close)** in 20/20 cells (per-cell
+  net Δ median +0.261 ATR, Wilcoxon p≈1.9e-6, descriptive) — but RCT-specific; the far native ERT (return to
+  EMA10) holds longer into adverse moves and fails entirely.
+- **Three caveats binding on EXP-092 (audit verdict forensics):** the pass is (1) **domain-conditional** (1h-only,
+  0/10 on 15m); (2) **boundary-fragile** (GBPUSD-1h `net_ci_low` +0.0043 — drop it → 4 cells → fails the quorum);
+  (3) **mean/tail-carried on 3 of 5** (net_median<0 on EURUSD/GBPUSD/NZDUSD-1h; only **USTEC-1h & US2000-1h** are
+  mean-and-median-positive = the defensible robust core). Faster-cost companion (RT/2): RCT clears 14 cells →
+  cost-dominated, not signal-absent.
+
+**Routing: the screen is NON-EMPTY, so Phase 021 ADVANCES to EXP-092** (per-instrument cost-bearing sequence,
+TRAIN-only, 0 reads / 0 slots → hash-pinned candidate set + Holm rule), 1h-scoped and centered on the robust
+core, rather than closing at G-021 NOT_TRADABLE. The cost table is Phase-021-local (`D0-amendment-003`, hash
+`fa7c887…`); the shared `xen.capgeo_cost.COST_CONSTANTS` was not mutated (Phase-018 integrity). Artifacts:
+[`../../../python/experiments/EXP-091/report.md`](../../../python/experiments/EXP-091/report.md).
+
+## Outcome — `D0-amendment-004` (4h domain opened, gated behind EXP-094), 2026-06-24
+
+**4h OPENED as a domain expansion of the admitted CORE-fade + EXIT-RCT lever · 0 new candidate slots · 4h NOT
+yet admitted.** Triggered by an operator hunch — the **archived, unaudited** side-test `TEMP-091` (EXP-091
+frozen slate on 4h only, 13 cost-table instruments, TRAIN-only): **EXIT-RCT net-clears 12/12 instruments on 4h,
+every clearing cell mean *and* median positive** (more robust than the 1h EXP-091 pass), while the reactive
+RSI-revert-on-close analog of the same entry is net-negative on all 12.
+
+- **The contradiction that gates admission:** EXP-089 found 4h **dead-by-absence (1/14)** — the fade *entry*
+  has no favourable-excursion edge above a direction-matched random clock on 4h. On 4h only the proactive
+  small resting-limit (RCT) is positive; the reactive same-signal analog and all other arms are negative —
+  consistent with RCT harvesting **generic short-horizon oscillation** that nets positive only because
+  ATR-normalized cost is tiny on 4h, **not** the RSI-2 fade. TEMP-091's RCT-vs-RSI-revert A/B is an
+  *exit-mechanism* contrast and does not discriminate signal from oscillation.
+- **Resolution (binding):** 4h is **opened, not admitted**. A new TRAIN-only governed experiment **EXP-094**
+  must clear a falsification re-screen — (a) 4h member readiness + finite RCT MDE (EXP-090 analog); (b) the
+  frozen net exit screen on 4h (EXP-091 analog, `D0-amendment-003` cost); (c) a **matched-random /
+  shuffled-entry RCT null** (EXP-089 `SUB-RANDOM` construction, exit geometry held identical) in which the
+  **real-fade entry must beat random entry** on net per-event expectancy (paired Δ, one-sided lower bound > 0)
+  in a **≥5-cell / ≥3-instrument quorum**. Admit ⇒ 4h RCT cells become eligible for EXP-092/093 (no new slot);
+  (c) fails ⇒ 4h stays **closed, retained** (dead-by-absence reaffirmed, mechanistically explained). A 1h
+  positive control assures the test has power. The §4(c) paired-Δ statistic is bite-checked GREEN at EXP-094
+  D0 before running.
+- **No constant re-tuned;** all other deferred levers remain deferred. TEMP-091 archived to
+  `python/experiments/_archive/temp-exp-091/`, recorded in the file drawer regardless of outcome. Amendment:
+  [`../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/D0-amendment-004.md`](../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/D0-amendment-004.md).
+
+## Outcome — EXP-094 (`CF-MR-001/HYP-002`, 4h falsification re-screen), 2026-06-24
+
+**`ADMIT_4H` · 4h ADMITTED as a domain expansion · 0 new candidate slots · 0 counted TEST reads · holdout sealed
+· audit PASS (re-audit).** EXP-094 cleared the `D0-amendment-004` falsification gate — with the binding null
+**corrected by `D0-amendment-005`** to a **matched favourable-target-distance oscillation null** (the original
+SUB-RANDOM-entry RCT null was found at Stage 3 to be structurally biased toward admission and was demoted to a
+non-binding companion).
+
+- **Readiness corrected the hunch:** **6 MEMBER / 7 COVERAGE_EXCLUDED** on 4h. TEMP-091's naive "RCT net-clears
+  12/12" over-claimed — six of those cells (AUDUSD/GBPUSD/NZDUSD/US2000/USDJPY/USTEC-4h) have **no finite RCT
+  MDE** (cannot bound a confirmation; JP225-4h build-fails). The powered set is FX-cross/major + gold;
+  **the indices TEMP-091 highlighted (USTEC/US2000-4h) are unpowered.** Excluded cells retained in the file drawer.
+- **On the 6 powered cells (AUDJPY/EURJPY/EURUSD/GBPJPY/USDCHF/XAUUSD-4h):** real EXIT-RCT beats the **binding
+  matched-distance oscillation null 6/6** (`delta_lo` 0.19–0.27) **and** the **realized-capture sensitivity null
+  6/6** → the 4h edge is the **fade entry signal, not generic oscillation harvesting**, robust to the
+  matched-distance choice. **Mechanism:** entering at a real RSI extreme lifts the reversion-completion hit rate
+  **~65% (random timing) → ~99% (real)** for an identical target/stop/fill/cost — the null nets negative
+  (−0.09…−0.18), real nets positive (+0.07…+0.16). EXP-089's 4h dead-by-absence is, on these cells, a
+  metric-specific false negative of the ~3-bar MFE_med statistic. Net screen 6/6; 1h positive control 5/5;
+  **bite-check GREEN** (per-cell power leg corrected after a first-run RED miscalibration). All 6 members
+  **mean-AND-median net-positive** (a defensible robust core, unlike the median-fragile 1h EXP-091 pass).
+- **Next:** EXP-092 carries the 6 powered 4h cells (smallest-defensible) into the per-instrument cost-bearing
+  sequence alongside the 1h survivors; 0 new slots; the counted TEST read is EXP-093 (4h strata 0/2). Amendments:
+  [`D0-amendment-004.md`](../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/D0-amendment-004.md)
+  · [`D0-amendment-005.md`](../../experiments-docs/checkpoints/2026-06-23-021-mr-fade-capture-geometry/D0-amendment-005.md).
+  Artifacts: [`../../../python/experiments/EXP-094/report.md`](../../../python/experiments/EXP-094/report.md).
+
+## Outcome — EXP-092 (`CF-MR-001/HYP-002`, Phase 021 batch 2), 2026-06-24
+
+**`SEQUENCE_DELIVERED` · candidate set hash-pinned · 0 slots · 0 counted TEST reads · holdout sealed · audit PASS
+(0C/0W/4I).** The per-instrument cost-bearing tradability sequence (design §4, D0 §D6/4b; analog EXP-034/083).
+EXIT-RCT — the **only** exit to survive the EXP-091 (1h) / EXP-094 (4h) screen (EXIT-ERT + 4 conventional arms
+died, retained in the file drawer) — was sequenced on its 11 carried cells: 1h {EURUSD, GBPUSD, NZDUSD, US2000,
+USTEC} + 4h {AUDJPY, EURJPY, EURUSD, GBPJPY, USDCHF, XAUUSD}.
+
+- **All 11 carried cells `SEQUENCE_PASS`** (net `ci_low_1s` +0.0044…+0.135 ATR > 0 at α=0.05, power-confirmed by
+  the EXP-090/094 MDE) → **hash-pinned candidate set (sha256 `f6427e8342400d46…`) + sized phase Holm rule** for
+  the one-shot EXP-093 TEST. Non-empty ⇒ Phase 021 advances to EXP-093 (not G-021 NOT_TRADABLE). This is a
+  TRAIN eligibility set, **not** an out-of-sample edge claim.
+- **Faithful re-derivation:** each cell's `net_ci_low` reproduces its EXP-091/094 value within ≤6.2e-4
+  (independent bootstrap seeds, all same-sign) on byte-identical resolved-event populations — confirms the
+  verbatim substrate reuse, not a coincidental pass.
+- **Disclosed two-tier quality split (the EXP-093 selection signal):** the 11/11 count masks — but the per-cell
+  margin + mean/median flags expose — a **robust core (8)**: all six 4h members + USTEC-1h + US2000-1h
+  (margin-clearing AND mean-AND-median positive); a **mean-carried 1h tier (2)**: EURUSD-1h, NZDUSD-1h
+  (median<0); and **GBPUSD-1h** (net_ci_low 0.0044 < its 0.0125 margin, median −0.052 → pinned for completeness
+  but should NOT be carried to TEST). 4h dominates the ranking because ATR-normalized cost is smaller on the
+  slower domain (the EXP-091/094 mechanism). The binding gate is the mean (location); the median is co-reported
+  (D5 shape read) — gate-shape OK.
+- **Next:** EXP-093 carries the **smallest-defensible robust core** (mean-AND-median-positive, margin-clearing:
+  USTEC-1h, US2000-1h, and the six 4h members), ≤1–2 cells per surviving exit/domain at EXP-093's D0, sized to
+  the phase Holm rule; **GBPUSD-1h excluded**. Each carried `(instrument, domain)` stratum spends 1 counted TEST
+  read (0→1; EURUSD-1h and EURUSD-4h are distinct strata). Artifacts:
+  [`../../../python/experiments/EXP-092/report.md`](../../../python/experiments/EXP-092/report.md).
+
+## Outcome — EXP-093 (`CF-MR-001/HYP-002`, Phase 021 batch 2 — the one-shot TEST), 2026-06-24
+
+**`TEST_CONFIRMED` · HYP-002 tradability SUPPORTED · routes G-021 TRADABLE · 11 counted TEST reads (first of the
+family) · 0 candidate slots · final-30% global holdout never loaded · audit PASS (0C/1W non-material/3I).** The
+phase's single binding tradability read: real EXIT-RCT exits resolved on the **analysis-TEST stratum** of all 11
+carried cells (`D0-amendment-006`: full SEQUENCE_PASS set, Holm-11, operator-ratified — superseding the §8.3
+smallest-defensible sizing), adjudicated by the frozen D6/4c rule (`CONFIRM iff Holm-adj p ≤ 0.05 ∧ net ci_low_1s
+> margin`).
+
+- **8 of 11 cells CONFIRM** at `Holm-adj p = 0.0011`, across **7 instruments and both domains** — the
+  **programme's first net-positive out-of-sample price entry**, reversing (for this lever) the G-019
+  price→non-price routing. **Robust core = the six 4h cells, mean-AND-median positive** (`net ci_low_1s`
+  0.039–0.094 vs the 0.025 margin: EURUSD/XAUUSD/USDCHF/AUDJPY/EURJPY/GBPJPY-4h); plus **two mean-carried 1h**
+  confirms (US2000-1h +0.073, USTEC-1h +0.046; USTEC TEST median −0.026 — the binding mean gate passes, median
+  fragile).
+- **Non-confirm (3, retained):** **GBPUSD-1h** (net_mean −0.080, ci_low −0.103, n=1653) and **EURUSD-1h**
+  (−0.010, −0.032, n=1619) are **well-powered net-negative — EVIDENCE_AGAINST** (genuine OOS reversal);
+  **NZDUSD-1h** (+0.003, −0.015) is near-zero — **INCONCLUSIVE**. GBPUSD-1h was pre-flagged
+  (`D0-amendment-006 §2`) as a near-certain non-confirm (below margin on TRAIN); its read was spent as ratified.
+- **Mechanism:** the RCT reversion-completion target is reached ~99% of events; 4h cells clear the net gate by
+  the widest margin via **cost geometry** (fixed-bps cost is a smaller ATR fraction on the larger-ATR domain —
+  the EXP-091/092 mechanism reproduced OOS, **not** a stronger 4h signal). Every cell shrank TRAIN→TEST (Δ
+  net_ci_low −0.005…−0.107, the expected selection-overlap shrinkage); the robust core's larger TRAIN bounds
+  absorbed it, the thin-margin 1h tier reversed. Numbers reproduced from raw data; determinism PASS.
+- **Reads / holdout:** **11 counted TEST reads, one per carried (instrument, domain) stratum, each 0→1** (cap
+  2/stratum; one read preserved); recorded in [`../test-read-ledger.md`](../test-read-ledger.md) in the same
+  change. EURUSD-1h and EURUSD-4h are distinct strata. The other 37 strata stay 0/2; the **final-30% global
+  holdout is untouched** (a global-holdout release is a separate, later gate).
+- **Next (separate gates / scopes):** a sanctioned global-holdout release decision for the mean-AND-median-
+  positive 4h core; a 1h median-fragility diagnostic; the deferred levers (vol-regime, contrarian, 25/75, 15m,
+  faster-cost sensitivity) each under their own dated `D0-amendment-*` + slot decision. Artifacts:
+  [`../../../python/experiments/EXP-093/report.md`](../../../python/experiments/EXP-093/report.md).
 
 ---
 

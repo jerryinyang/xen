@@ -55,21 +55,41 @@ and the methodology has evolved enough, to carry no weight on the new dataset).
 
 | TEST stratum (new dataset) | Counted reads | Cap state | Disclosures |
 |---|---|---|---|
-| EURUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
-| GBPUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
+| EURUSD-15m | 0 | open | none (new dataset) |
+| EURUSD-1h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST CONFIRM-class read (EVIDENCE_AGAINST: net-negative OOS) |
+| EURUSD-4h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST CONFIRM (robust core, mean-AND-median +) |
+| GBPUSD-15m | 0 | open | none (new dataset) |
+| GBPUSD-1h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST read (EVIDENCE_AGAINST: net-negative OOS; pre-disqualified `D0-amendment-006 §2`) |
+| GBPUSD-4h | 0 | open | none (new dataset) |
 | USDJPY-{15m,1h,4h} | 0 | open | none (new dataset) |
-| USDCHF-{15m,1h,4h} | 0 | open | none (new dataset) |
+| USDCHF-15m | 0 | open | none (new dataset) |
+| USDCHF-1h | 0 | open | none (new dataset) |
+| USDCHF-4h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST CONFIRM (robust core, mean-AND-median +) |
 | USDCAD-{15m,1h,4h} | 0 | open | none (new dataset) |
 | AUDUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
-| NZDUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
-| EURJPY-{15m,1h,4h} | 0 | open | none (new dataset) |
-| GBPJPY-{15m,1h,4h} | 0 | open | none (new dataset) |
-| AUDJPY-{15m,1h,4h} | 0 | open | none (new dataset) |
-| XAUUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
+| NZDUSD-15m | 0 | open | none (new dataset) |
+| NZDUSD-1h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST read (INCONCLUSIVE: near-zero OOS) |
+| NZDUSD-4h | 0 | open | none (new dataset) |
+| EURJPY-15m | 0 | open | none (new dataset) |
+| EURJPY-1h | 0 | open | none (new dataset) |
+| EURJPY-4h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST CONFIRM (robust core, mean-AND-median +) |
+| GBPJPY-15m | 0 | open | none (new dataset) |
+| GBPJPY-1h | 0 | open | none (new dataset) |
+| GBPJPY-4h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST CONFIRM (robust core, mean-AND-median +) |
+| AUDJPY-15m | 0 | open | none (new dataset) |
+| AUDJPY-1h | 0 | open | none (new dataset) |
+| AUDJPY-4h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST CONFIRM (robust core, mean-AND-median +) |
+| XAUUSD-15m | 0 | open | none (new dataset) |
+| XAUUSD-1h | 0 | open | none (new dataset) |
+| XAUUSD-4h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST CONFIRM (robust core, mean-AND-median +) |
 | BTCUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
-| USTEC-{15m,1h,4h} | 0 | open | none (new dataset) |
+| USTEC-15m | 0 | open | none (new dataset) |
+| USTEC-1h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST CONFIRM (mean-carried; TEST median −0.026) |
+| USTEC-4h | 0 | open | none (new dataset) |
 | US500-{15m,1h,4h} | 0 | open | none (new dataset) |
-| US2000-{15m,1h,4h} | 0 | open | none (new dataset) |
+| US2000-15m | 0 | open | none (new dataset) |
+| US2000-1h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST CONFIRM (mean-carried; TEST median ≈ 0) |
+| US2000-4h | 0 | open | none (new dataset) |
 | JP225-{15m,1h,4h} | 0 | open | none (new dataset) |
 
 **DE30:** not in the new dataset (dropped at INFR-003 §3.1); no new-dataset strata. Its
@@ -214,9 +234,91 @@ strata remain **0 counted reads / open** (tallies above unchanged). Verdict `REA
 (20 MEMBER / 12 COVERAGE_EXCLUDED); the carried per-cell MDEs are the EXP-093 margins. No counted read is spent
 until the one-shot EXP-093 TEST.
 
+**EXP-091 exit/capture-geometry screen disclosure (2026-06-24, Phase 021, CF-MR-001/HYP-002; `D0-amendment-003`
+cost).** EXP-091 read the **TRAIN sub-split only** of the 20 EXP-090 member cells (16×{15m,1h}) to screen the
+frozen exit slate net of the Phase-021 conservative cost (`SCREEN_DELIVERED`, non-empty: EXIT-RCT passes 5/5, 1h).
+No analysis-TEST or holdout slice; per the TRAIN-only convention this is a **disclosure, not a counted read** — all
+48 strata remain **0 counted reads / open**; `holdout_untouched=true`, `counted_test_reads=0`, `candidate_slots=0`.
+
+**EXP-094 4h readiness + falsification re-screen disclosure (2026-06-24, Phase 021, CF-MR-001/HYP-002;
+`D0-amendment-004` opens 4h + `D0-amendment-005` corrects the binding null).** EXP-094 read the **TRAIN sub-split
+only** of the 13 cost-table instruments × **4h** to (a) establish 4h member readiness + per-cell EXIT-RCT MDE
+(EXP-090 analog → 6 MEMBER / 7 COVERAGE_EXCLUDED), (b) run the frozen net exit screen on the members, and (c)
+falsify the 4h edge against a **matched favourable-target-distance oscillation null** (real vs random-time limit;
+binding) + a realized-capture sensitivity + SUB-RANDOM companion + a 1h positive control. Verdict **`ADMIT_4H`**
+(real beats both binding and sensitivity nulls 6/6; bite-check GREEN). It computed readiness records, screen/net
+expectancy, and the falsification paired-Δ on the **TRAIN region only**; the next-21% analysis-TEST stratum and the
+final-30% holdout were never sliced (`holdout_untouched=true`, `counted_test_reads=0`, `candidate_slots=0`). Per
+the TRAIN-only convention this is a **disclosure, not a counted read**: all 48 strata — **including the six powered
+4h strata now admitted (AUDJPY/EURJPY/EURUSD/GBPJPY/USDCHF/XAUUSD-4h)** — remain **0 counted reads / open (0/2)**.
+The 4h admission opens these strata for the EXP-092 sequence; the first counted 4h read (if any) is spent only at
+the one-shot EXP-093 TEST.
+
+**EXP-092 per-instrument cost-bearing sequence disclosure (2026-06-24, Phase 021, CF-MR-001/HYP-002).** EXP-092
+read the **TRAIN sub-split only** of EXIT-RCT's 11 carried cells (5×1h EXP-091 survivors + 6×4h EXP-094 members)
+to re-derive the binding net per-event-expectancy lower bound, certify each cell's `SEQUENCE_PASS`, and emit the
+**hash-pinned candidate set (sha256 `f6427e83…`) + sized phase Holm rule** for EXP-093 (`SEQUENCE_DELIVERED`,
+11/11 PASS). It computed only TRAIN net expectancy + the sequence/hash-pin/margin-preread — **no analysis-TEST or
+holdout slice, no stratum-specific TEST inference** (the binding TEST read is the deferred EXP-093). Per the
+TRAIN-only convention (EXP-090/091/094 precedent) this is a **disclosure, not a counted read**:
+`holdout_untouched=true`, `counted_test_reads=0`, `candidate_slots=0`; **all 48 strata — including the 11 carried
+(EURUSD/GBPUSD/NZDUSD/US2000/USTEC-1h + AUDJPY/EURJPY/EURUSD/GBPJPY/USDCHF/XAUUSD-4h) — remain 0 counted reads /
+open (0/2).** The first counted read is spent only at the one-shot EXP-093 TEST (≤1/carried-stratum; EURUSD-1h
+and EURUSD-4h are distinct strata).
+
+**EXP-093 one-shot TEST confirmation — FIRST COUNTED TEST READS on the new dataset (2026-06-24, Phase 021,
+CF-MR-001/HYP-002; carried set per `D0-amendment-006`).** EXP-093 resolved the real bare-fade EXIT-RCT exits on
+the **analysis-TEST stratum** (`[int(int(total·0.7)·0.7), int(total·0.7))` = last 30% of the first-70% analysis
+set; 1-minute-row timestamp boundary R1.3) of the **11 carried strata** and ran the binding per-cell inference
+(moving-block net `ci_low_1s` + one-sided bootstrap p → phase Holm-11 → D6/4c adjudication). This is a
+**stratum-specific binding inference** on each of the 11 strata ⇒ **11 counted TEST reads, one per stratum, each
+0→1** (cap 2/stratum; one read preserved per stratum). Strata: **EURUSD-1h, GBPUSD-1h, NZDUSD-1h, US2000-1h,
+USTEC-1h, AUDJPY-4h, EURJPY-4h, EURUSD-4h, GBPJPY-4h, USDCHF-4h, XAUUSD-4h** (tallies above updated to 1/2;
+EURUSD-1h and EURUSD-4h are distinct strata). The TRAIN region was loaded only as causal indicator warmup (no
+TRAIN entry entered the binding estimand); the 1-minute fill walk clipped at the analysis edge by timestamp.
+**The final-30% global holdout was never loaded, sliced, or materialized** (`holdout_untouched=true`,
+`counted_test_reads=11`, `candidate_slots=0` in `run_metadata.json`; ~561k holdout rows per file confirmed not
+read). Verdict **`TEST_CONFIRMED`** — 8/11 CONFIRM (six 4h mean-AND-median-positive robust core + USTEC-1h/
+US2000-1h mean-carried), GBPUSD-1h/EURUSD-1h EVIDENCE_AGAINST, NZDUSD-1h INCONCLUSIVE → routes G-021 TRADABLE.
+The other 37 strata stay 0/2. Audit PASS. This is the first time any CF-MR-001 stratum has spent a counted read.
+
+**Phase 022 read plan (CF-MR-001 batch 3 — portfolio / noise / global-holdout; G0 RATIFIED 2026-06-24).**
+EXP-095 (portfolio construction) and EXP-096 (noise infusion) build a deployment portfolio from the **8
+G-021-confirmed cells** (all within the EXP-093 carried 11) by **re-combining the EXP-093 already-resolved
+analysis-TEST per-cell series** (EXP-096 additionally re-resolves only the *entry-fill leg* under a perturbed
+1-minute fill model — same cells, same selection, no new stratum-specific inference). Per the
+**portfolio-aggregate rule** + the cost-re-resolution precedent (EXP-085), both are **disclosures, not counted
+reads**: **all 48 strata are unchanged — the 11 carried strata stay 1/2, the other 37 stay 0/2**;
+`counted_test_reads=0`, `candidate_slots=0`, `holdout_untouched=true` in both `run_metadata.json`. **EXP-097 is
+the single sanctioned final-30% global-holdout release** (the deployment OOS-final), gated behind the G-022a
+pre-holdout freeze — it is **outside this ledger entirely** (see the global-holdout note below) and recorded as
+a holdout-governance event in the same change that records its result.
+
+**EXP-095 portfolio-construction disclosure (2026-06-24, Phase 022, CF-MR-001/HYP-003) — COMPLETE, tally
+unchanged.** EXP-095 built the causal ERC portfolio (A static / B circuit-breaker) of the 8 G-021-confirmed cells
+by **re-combining the EXP-093 already-resolved analysis-TEST per-cell series** (regenerated byte-equivalently
+through the frozen EXP-090/092 substrate; provenance reconciled to EXP-093 at abs-diff 0.0 on all 8 cells) plus
+the TRAIN region, on the **analysis set only**. It makes a **portfolio-aggregate claim** (no new per-stratum
+selection or stratum-specific inference — the binding per-stratum reads were spent at EXP-093) and the
+final-30% global holdout was never loaded (`holdout_untouched=true`, `counted_test_reads=0`, `candidate_slots=0`
+in `run_metadata.json`). Per the portfolio-aggregate rule + the cost-re-resolution precedent (EXP-084/085), this
+is a **disclosure, not a counted read**: **all 48 strata unchanged — the 11 carried strata stay 1/2, the other 37
+stay 0/2.** Verdict (analysis-set, no holdout verdict; **corrected at the D0-amendment-001 amend-in-place rerun
+2026-06-25**, re-audit PASS): the rerun restored the D0 §D2.1 intra-1h mark-to-market (the prior flat-at-exit
+booking was a verdict-material defect) → **portfolio benefit SUPPORTED** (A Sharpe LB 10.24 clears every baseline;
+genuine diversification of 8 low-correlation cells); **ERC ≈ naive-IV** (prior refutation overturned);
+**circuit-breaker NEUTRAL** (A ≈ B within noise; no material de-risking — prior "de-risks −22.4%" was a
+flat-at-exit artifact); the NEW portfolio-level
+confirmation statistic is **READY** (`statistic_ready_for_g022a=true` — FPR controlled, MDE m*=1.75/2.00 finite and
+cleared by the realized edge; G-022a must freeze the band ≥ m*). Disclosure status and tally are unchanged by the
+correction (still 0 counted reads; 11 carried strata stay 1/2). The first counted holdout shot remains the gated
+**EXP-097** global-holdout release.
+
 **The global holdout (final 30% per new file) is outside this ledger entirely** and was
-sealed at first touch in VAL-005 (0 holdout rows read). No new-dataset holdout shot exists;
-the single historical sanctioned shot (EXP-032, old dataset) is spent and non-transferable.
+sealed at first touch in VAL-005 (0 holdout rows read). The single historical sanctioned shot (EXP-032, old
+dataset) is spent and non-transferable; **no new-dataset holdout shot has yet been spent** — the first will be
+the gated **Phase 022 EXP-097** global-holdout release of the deployment portfolio (one-shot, non-upgradable,
+non-repeatable; à la EXP-032), and only after the G-022a freeze.
 
 ---
 
