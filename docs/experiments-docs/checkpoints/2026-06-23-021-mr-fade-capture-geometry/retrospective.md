@@ -1,5 +1,14 @@
 # Phase 021 Retrospective — RSI-2 Fade Capture-Geometry & Tradability (CF-MR-001 batch 2)
 
+> ## ⚠ RETRACTED — REFUTED (2026-06-26): EXIT-RCT exit look-ahead
+> **The Phase 021 TRADABLE outcome below is RETRACTED.** EXP-093's `TEST_CONFIRMED` rests on a one-bar
+> look-ahead in the EXIT-RCT favourable limit (`arm_levels` rests `rct_target[di]` — bar `di`'s own close —
+> during bar `di`; live-actable is `rct[di-1]`; `EXP-090/code/run_experiment.py:305-310`,
+> `mean_reversion.py:174`). Causalized, the bare RSI-2 fade + EXIT-RCT is net-negative even gross; exposed by
+> the cTrader port + forward test (`XRSI-V1/DIAGNOSIS-real-entry-slippage-omission.md`). The 11 EXP-093 counted
+> TEST reads stay SPENT (spent-on-defect). **CF-MR-001 CLOSED — REFUTED**; EXP-089/G-020 availability stands.
+> Full scope: `docs/experiments-docs/families/cf-mr-001/INDEX.md` §CLOSURE. *Text below retained verbatim.*
+
 **Phase:** 021 · **Family:** CF-MR-001 (bare RSI-2 fade, CORE) · **HYP:** `CF-MR-001/HYP-002` (tradability)
 **Opened:** 2026-06-23 (G0 RATIFIED, D0 FROZEN) · **Closed:** 2026-06-24 at **G-021 — TRADABLE**
 ([`G-021-gate-review.md`](G-021-gate-review.md)).

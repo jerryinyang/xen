@@ -1,11 +1,54 @@
 # CF-MR-001 — Mean-Reversion Entry (RSI-2), with Global Volatility-Regime Partition
 
-**Status:** `DEPLOYABLE — G-022 DEPLOYABLE_CONFIRMED 2026-06-25 (EXP-097 global-holdout release; single sanctioned
-holdout shot SPENT, non-repeatable). ADMITTED (BINDING) G-020 2026-06-23 / TRADABLE G-021 2026-06-24; first
-candidate slot consumed; lever = bare RSI-2 fade (CORE), intraday + 4h.` The bare RSI-2 fade, deployed as the
-G-022a-frozen carry-8 causal ERC portfolio (binding-v2 entry fill, intra-1h MTM, circuit breaker, primary
-Portfolio B) under conservative cost, is the **programme's first deployment-grade price strategy** — primary
-holdout Sharpe LB 4.762 > band 2.00, Calmar LB 10.731 > 0. (EXP-089 `SCREEN_DELIVERED`, 2026-06-23; G-020 ADMITTED.) First candidate family
+**Status:** `CLOSED — REFUTED (2026-06-26): the net-tradable / deployment arc (EXP-091→098) rests on an
+uncaught one-bar EXIT-RCT exit look-ahead; live-causal the bare fade is net-negative even gross. G-021 TRADABLE
+and G-022 DEPLOYABLE_CONFIRMED are RETRACTED. Availability-only (EXP-089 / G-020 ADMITTED) stands. Family CLOSED,
+not reopenable by re-parameterization; outcomes retained.` See **§CLOSURE (2026-06-26)** below.
+
+> ### CLOSURE — REFUTED (2026-06-26): EXIT-RCT exit look-ahead invalidates the tradability/deployment arc
+>
+> **Source of truth:** `XRSI-V1/DIAGNOSIS-real-entry-slippage-omission.md` (final) +
+> `XRSI-V1/ISSUE-booked-vs-real-feed-divergence.md` (initial), confirmed by an independent Xen-code trace.
+>
+> **Mechanism (the why).** The EXIT-RCT favourable limit is built with a one-bar look-ahead. `arm_levels`
+> (`python/experiments/EXP-090/code/run_experiment.py:305-310`) sets the intrabar resting limit for the domain
+> bar at offset `off` (`di = entry_idx+off`) to `ctx.rct_target[di]` — the reversion-completion target
+> `P*_di = Close_di + (period-1)·(AL_di − AG_di)` computed from **bar `di`'s own close**
+> (`reversion_completion_target`, `python/src/xen/mean_reversion.py:174`; the readiness invariant
+> `EXP-090:~603` itself treats `rct_target[i]` as the *hypothetical next-bar close*, i.e. the target for bar
+> `i+1`). A limit that can rest *during* bar `di` is only live-actable from `rct_target[di-1]`. `resolve_exit_paths`
+> reads `fav_level[j, off-1]` (`intrabar_fill.py:212`), but the `off-1` is just the array slot for offset `off`
+> — it does **not** shift the rct value back a bar, so the engine rests `rct[di]` during `di`. This off-by-one is
+> the cBot's "booked-lookahead `rct[di]` gross +0.20 vs booked-causal `rct[di-1]` −0.05" gap, worth **~+0.25
+> ATR/trade**. **Causalized (`rct[di-1]`) the bare RSI-2 fade + EXIT-RCT is net-negative even gross** — the
+> captured "tradable edge" was the look-ahead. Exposed by porting to cTrader (XRSI-V1) and forward-testing:
+> native execution can only rest `rct[di-1]`.
+>
+> **Secondary (compounding) defect, cBot-port-only.** The XRSI-V1 REAL execution stream also dropped the binding
+> **v2 entry slippage** (0.05·ATR) that the research model charges (`Diagnostics.LogActualFill` referenced gross
+> to the raw broker fill `v1`), making the live run look profitable (+$62.8k) when faithfully it is negative.
+> This reinforces the refutation but is *not* the research-level cause — the EXIT-RCT exit look-ahead is.
+>
+> **Scope of invalidation.** EXP-091/092/094 (screen/sequence), **EXP-093 `TEST_CONFIRMED`** (11 counted TEST
+> reads), EXP-095/096 (portfolio + v2 fill — "survives slippage" rests on the inflated look-ahead gross),
+> **EXP-097 `DEPLOYABLE_CONFIRMED`** (the global-holdout shot), and EXP-098 robustness — **all net-tradable /
+> deployment claims are REFUTED.** **NOT invalidated: EXP-089 availability / G-020 ADMITTED** — it used gross
+> `MFE_med` favourable excursion with no RCT limit. The fade's favourable *availability* is real; what is refuted
+> is that it was net-*capturable* live. HYP-002 and HYP-003 close REFUTED; HYP-001 (availability) stands.
+>
+> **Governance.** Family **CLOSED — REFUTED**. The **11 EXP-093 counted TEST reads and the EXP-097 global-holdout
+> shot were spent on a look-ahead-biased construction** — reads/shots are non-refundable (a discovered defect does
+> not restore them); they stay SPENT, now recorded as **spent-on-defect** in `test-read-ledger.md` +
+> `multiplicity-registry.md`. **G-021 TRADABLE and G-022 DEPLOYABLE_CONFIRMED are RETRACTED** (checkpoint gate
+> reviews superseded). Per registry rules all prior outcomes below are **retained, not deleted**; the family is
+> **not reopenable by re-parameterization**. Live-backtest observations worth a fresh look (native-fill behaviour,
+> slow-domain cost geometry) may seed a **new family** under its own D0 — only **after** a pipeline fix that
+> causalizes the EXIT-RCT limit (`rct[di-1]`) — and are explicitly **out of scope** of this closure.
+>
+> *Everything below this banner is the prior (now superseded) DEPLOYABLE record, retained verbatim for
+> file-drawer integrity.*
+
+(EXP-089 `SCREEN_DELIVERED`, 2026-06-23; G-020 ADMITTED.) First candidate family
 opened **after** the Phase 019 terminal branch, by **explicit operator override** of the G-019 price→non-price
 routing (see §0). The family's first read was a **TRAIN-only availability screen** (EXP-089, `CF-MR-001/HYP-001`):
 **0 counted TEST reads, holdout never touched.** **G-020 ADMITTED** (`S_fam=28 > S*=7`, axis perm-p≈0.0002,
@@ -154,8 +197,9 @@ Holm (single family).
   (`S_fam > S*` ∧ axis perm_p ≤ 0.05)? Admit/exonerate, **0 slots, 0 reads**.
 - `CF-MR-001/HYP-002` — *Capture-geometry / tradability* (Phase 021, EXP-090→094 TRAIN + **EXP-093** one-shot
   TEST): does the bare fade's gross availability survive a real exit + conservative cost as a positive net
-  expectancy clearing the frozen referee, and hold on a counted TEST read? **SUPPORTED — G-021 TRADABLE**
-  (8/11 carried cells confirm OOS).
+  expectancy clearing the frozen referee, and hold on a counted TEST read? **REFUTED (2026-06-26) — G-021
+  RETRACTED** (the EXP-093 "8/11 confirm OOS" was inflated by the EXIT-RCT `rct[di]` exit look-ahead; live-causal
+  net-negative — see §CLOSURE).
 - `CF-MR-001/HYP-003` — *Deployment economics & global-holdout-final* (Phase 022, EXP-095/096 analysis-set +
   **EXP-097** global-holdout): deployed as a time-aligned, causal, parameter-free ERC portfolio (with an online
   circuit-breaker) under a realistic 1-minute entry fill, does the confirmed fade retain a positive

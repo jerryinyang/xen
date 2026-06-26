@@ -1,5 +1,17 @@
 # G-021 Gate Review — RSI-2 Fade Capture-Geometry & Tradability (Terminal)
 
+> ## ⚠ RETRACTED — REFUTED (2026-06-26): EXIT-RCT exit look-ahead
+> **The G-021 TRADABLE adjudication below is RETRACTED.** EXP-093's `TEST_CONFIRMED` (8/11 cells OOS) was
+> inflated by a one-bar look-ahead in the EXIT-RCT favourable limit: `arm_levels`
+> (`python/experiments/EXP-090/code/run_experiment.py:305-310`) rests `rct_target[di]` — computed from bar
+> `di`'s **own** close (`python/src/xen/mean_reversion.py:174`) — as the intrabar limit *during* bar `di`; the
+> live-actable limit is `rct_target[di-1]`. Causalized (`rct[di-1]`), the bare RSI-2 fade + EXIT-RCT is
+> net-negative even gross. Exposed by porting to cTrader (XRSI-V1) and forward-testing
+> (`XRSI-V1/DIAGNOSIS-real-entry-slippage-omission.md`). The 11 EXP-093 counted TEST reads stay SPENT
+> (spent-on-defect, non-refundable; strata stay 1/2). **CF-MR-001 CLOSED — REFUTED.** EXP-089/G-020
+> availability (gross MFE_med, no RCT limit) is unaffected. Full scope + governance:
+> `docs/experiments-docs/families/cf-mr-001/INDEX.md` §CLOSURE. *Text below retained verbatim.*
+
 **Date:** 2026-06-24
 **Gate:** G-021 (Phase 021 terminal gate — **tradable / not-tradable / inconclusive** verdict on the **bare
 RSI-2 fade (CORE)** admitted at G-020, by a net-of-cost capture-geometry screen + a one-shot counted TEST read).

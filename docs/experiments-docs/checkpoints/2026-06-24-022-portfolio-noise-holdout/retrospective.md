@@ -1,5 +1,16 @@
 # Phase 022 Retrospective — Portfolio Construction, Noise Infusion & Global-Holdout Release (CF-MR-001 batch 3)
 
+> ## ⚠ RETRACTED — REFUTED (2026-06-26): EXIT-RCT exit look-ahead
+> **The Phase 022 `DEPLOYABLE_CONFIRMED` outcome below is RETRACTED.** The deployment portfolio and the EXP-097
+> global-holdout confirmation inherit the EXP-093 EXIT-RCT one-bar exit look-ahead (`arm_levels` rests
+> `rct_target[di]` — bar `di`'s own close — during bar `di`; live-actable is `rct[di-1]`;
+> `EXP-090/code/run_experiment.py:305-310`, `mean_reversion.py:174`). Causalized, the bare RSI-2 fade is
+> net-negative even gross; exposed by the cTrader port + forward test
+> (`XRSI-V1/DIAGNOSIS-real-entry-slippage-omission.md`). **The single global-holdout shot (EXP-097) stays SPENT —
+> spent-on-defect, non-refundable; G-022a freeze + G-022 RETRACTED.** **CF-MR-001 CLOSED — REFUTED**;
+> EXP-089/G-020 availability stands. Full scope: `docs/experiments-docs/families/cf-mr-001/INDEX.md` §CLOSURE.
+> *Text below retained verbatim.*
+
 **Phase:** 022 · **Family:** CF-MR-001 (bare RSI-2 fade, CORE + EXIT-RCT) · **HYP:** `CF-MR-001/HYP-003`
 (deployment economics & global-holdout-final confirmation)
 **Opened:** 2026-06-24 (G0 RATIFIED, D0 FROZEN) · **Pre-holdout freeze:** 2026-06-25 (G-022a FREEZE) ·

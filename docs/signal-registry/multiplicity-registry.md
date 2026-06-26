@@ -825,7 +825,19 @@ never deleted or reused. A refuted family is closed and not silently reopened by
 | **EXP-089** | `CF-MR-001/HYP-001` | **Availability screen** (TRAIN-only, AMENDED `D0-amendment-001`): RSI-2 mean-reversion favourable-excursion availability — 6 sub-screens (`CORE`, `CORE-VOL-{LOW,MED,HIGH}`, `CORE+TREND`, `CORE+FILTER`) over 46 member cells × {15m,1h,4h}; **all single-test leg-1 beats-`SUB-RANDOM`** (regime-matched for `/VOLREGIME`; **leg-2 conjunction RETIRED**) over a **causal MR-tempo cap**; admit/exonerate vs the D2b joint-max permuted-axis gate. | 0 / 0 | **COMPLETE 2026-06-23 — `SCREEN_DELIVERED`, provisional ADMITTED (NON-BINDING at screen time → made BINDING ADMITTED at G-020 2026-06-23); audit PASS (0C/0W/3I).** `S_fam=28 > S*=7`, perm-p≈0.0002, FWER-robust, MC-stable. **CORE 28 (lever)**; VOL-LOW/MED/HIGH 22/25/20 **inert** (add nothing over CORE); TREND/FILTER 0/1 **dead**. Bare RSI-2 fade, intraday (15m 16/16, 1h 11/16, 4h 1/14), ~3-bar horizon. First run was a deviation (audit C-1/C-2), voided/deleted, amended in place — confounds confirmed removed. Determinism/recon/holdout-fence clean; bite GREEN `f01a000b…`. **0 slots, 0 counted TEST reads, ledger unchanged.** Items retained. |
 | **G-020** | — | Terminal gate: admit (lever named) / exonerate (→ non-price frontier) / inconclusive, per D5. | 1 slot / 0 TEST | **ADMITTED — adjudicated 2026-06-23** (`G-020-gate-review.md`). `S_fam=28 > S*=7`, axis perm-p≈0.0002 ≤ 0.05 (FWER 0.05, no cross-axis Holm). Lever = **bare RSI-2 fade (CORE)**, intraday; vol-regime inert, variants dead. **CF-MR-001 consumes its first candidate slot**; next scope opens the bare fade (capture-geometry / exit / cost) at a future G0/D0. Admission = a candidate slot, **not** a counted TEST read — ledger unchanged (48 strata 0/2), holdout sealed. |
 
-## Phase 021 Batch (CF-MR-001 batch 2 — RSI-2 Fade Capture-Geometry & Tradability) — OPEN, G0 RATIFIED
+## Phase 021 Batch (CF-MR-001 batch 2 — RSI-2 Fade Capture-Geometry & Tradability) — CLOSED, REFUTED 2026-06-26
+
+> ### ⚠ SUPERSEDED — REFUTED (2026-06-26): EXIT-RCT exit look-ahead. G-021 TRADABLE RETRACTED.
+> The entire EXIT-RCT tradability result (EXP-091/092/094 screen+sequence, **EXP-093 `TEST_CONFIRMED`**) is
+> invalidated by a one-bar look-ahead in the EXIT-RCT favourable limit: `arm_levels`
+> (`EXP-090/code/run_experiment.py:305-310`) rests `rct_target[di]` — computed from bar `di`'s **own** close
+> (`mean_reversion.py:174`) — as the intrabar limit *during* bar `di`; the live-actable limit is `rct_target[di-1]`.
+> The off-by-one inflates captured edge by ~+0.25 ATR/trade; causalized (`rct[di-1]`) the bare fade is net-negative
+> even gross. Exposed by the cTrader port + forward test (`XRSI-V1/DIAGNOSIS-real-entry-slippage-omission.md`). **The
+> 11 EXP-093 counted TEST reads stay SPENT, now recorded spent-on-defect** (a discovered defect does not refund a
+> read; see `test-read-ledger.md`). **G-021 TRADABLE is RETRACTED.** EXP-089/G-020 availability is NOT affected
+> (gross MFE_med, no RCT limit). All rows below are **retained** per the file-drawer rule; family **not reopenable
+> by re-parameterization**. Full mechanism + scope: `candidate-families/cf-mr-001.md` §CLOSURE.
 
 > **G0 RATIFIED 2026-06-23 (operator-authorized).** Batch 2 of CF-MR-001 — the **availability→tradability**
 > step for the **bare RSI-2 fade (CORE)** admitted at G-020. **D0 FROZEN** (`D0-predeclarations.md`); no new
@@ -892,7 +904,20 @@ re-parameterization.
 | **EXP-093** | `CF-MR-001/HYP-002` | One-shot TEST confirmation under phase Holm + margin (carried set = all 11 SEQUENCE_PASS cells, Holm-11, operator-ratified `D0-amendment-006` — superseding the §8.3 smallest-defensible sizing) | **11 counted TEST reads** (one per carried stratum, each 0→1; 0 slots) | **COMPLETE 2026-06-24 — `TEST_CONFIRMED` → routes G-021 TRADABLE; audit PASS (0C/1W non-material/3I).** The binding tradability read on the **analysis-TEST stratum** of all 11 carried cells (frozen D6/4c: `CONFIRM iff Holm-adj p≤0.05 ∧ net ci_low_1s > margin`). **8/11 CONFIRM** at `Holm-adj p=0.0011`, across **7 instruments and both domains** — the **programme's first net-positive out-of-sample price entry.** Per-cell outcomes (all retained): **CONFIRM (8)** = the six 4h members (EURUSD/XAUUSD/USDCHF/AUDJPY/EURJPY/GBPJPY-4h, net_ci_low 0.039–0.094 vs 0.025 margin, **mean-AND-median positive**) + USTEC-1h (+0.046) & US2000-1h (+0.073) (**mean-carried**; USTEC TEST median −0.026); **EVIDENCE_AGAINST (2)** = GBPUSD-1h (net_mean −0.080, ci_low −0.103, n=1653; pre-disqualified `D0-amendment-006 §2`) & EURUSD-1h (−0.010, −0.032, n=1619), well-powered net-negative OOS reversal; **INCONCLUSIVE (1)** = NZDUSD-1h (+0.003, −0.015), near-zero. Mechanism: RCT target hit ~99%; 4h nets clear by cost geometry (smaller ATR-cost fraction), not stronger signal; uniform TRAIN→TEST shrinkage (Δ ci_low −0.005…−0.107) — robust core absorbed it, thin 1h tier reversed. No new countable item. Determinism PASS; numbers reproduced from raw data. **11 counted TEST reads recorded in `test-read-ledger.md` same change (each carried stratum 0→1; cap 2/stratum; other 37 strata 0/2); final-30% global holdout never loaded; 0 candidate slots.** G-021 routes TRADABLE (mechanical rule, ≥1 CONFIRM); formal adjudication `G-021-gate-review.md` pending at the checkpoint. |
 | **G-021** | — | Terminal gate: tradable / not-tradable / inconclusive, per D6. | 0 slot / — | **ADJUDICATED TRADABLE 2026-06-24** (`G-021-gate-review.md`; mechanical D6/4c rule, 8/11 CONFIRM). Phase 021 CLOSED. Routes to **Phase 022** (portfolio + noise + global-holdout release) — separate checkpoint/D0; deferred levers each their own slot/D0. |
 
-## Phase 022 Batch (CF-MR-001 batch 3 — Portfolio Construction, Noise Infusion & Global-Holdout Release) — OPEN, G0 RATIFIED
+## Phase 022 Batch (CF-MR-001 batch 3 — Portfolio Construction, Noise Infusion & Global-Holdout Release) — CLOSED, REFUTED 2026-06-26
+
+> ### ⚠ SUPERSEDED — REFUTED (2026-06-26): EXIT-RCT exit look-ahead. G-022 DEPLOYABLE_CONFIRMED RETRACTED.
+> The deployment portfolio (EXP-095/096) and the global-holdout confirmation (**EXP-097 `DEPLOYABLE_CONFIRMED`**)
+> inherit the EXP-093 EXIT-RCT exit look-ahead (`rct[di]` rested during bar `di`; see the Phase 021 banner above
+> and `candidate-families/cf-mr-001.md` §CLOSURE). EXP-096's "survives v2 slippage" rests on the inflated
+> look-ahead gross; live-causal the bare fade is net-negative even gross, so the high portfolio Sharpe is not a
+> deployable edge. A secondary cBot-port defect (the XRSI-V1 REAL stream also omitted the v2 0.05·ATR entry
+> slippage the research charges) compounds it. **The single sanctioned final-30% global-holdout shot (EXP-097)
+> stays SPENT, now recorded spent-on-defect** (non-refundable; `test-read-ledger.md`). **G-022a freeze and G-022
+> DEPLOYABLE_CONFIRMED are RETRACTED.** EXP-098 cross-broker/aggregation robustness replicated a look-ahead-biased
+> portfolio and carries no deployment weight. All rows below are **retained**; family **CLOSED — not reopenable by
+> re-parameterization**. Live-backtest observations may seed a **new family** only after the EXIT-RCT limit is
+> causalized, under its own D0.
 
 > **G0 RATIFIED 2026-06-24 (operator-authorized).** Batch 3 of CF-MR-001 — the **deployment-economics &
 > OOS-final** step for the G-021-confirmed bare RSI-2 fade + EXIT-RCT. **D0 FROZEN**

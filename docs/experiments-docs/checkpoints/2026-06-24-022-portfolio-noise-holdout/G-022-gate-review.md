@@ -1,5 +1,18 @@
 # G-022 Gate Review — Global-Holdout Deployment Release (Terminal)
 
+> ## ⚠ RETRACTED — REFUTED (2026-06-26): EXIT-RCT exit look-ahead
+> **The G-022 `DEPLOYABLE_CONFIRMED` adjudication below is RETRACTED.** The deployment portfolio (EXP-095/096)
+> and the EXP-097 global-holdout confirmation inherit the EXP-093 EXIT-RCT one-bar exit look-ahead: `arm_levels`
+> (`EXP-090/code/run_experiment.py:305-310`) rests `rct_target[di]` — bar `di`'s **own** close
+> (`mean_reversion.py:174`) — as the intrabar limit during bar `di`; live-actable is `rct_target[di-1]`.
+> Causalized, the bare RSI-2 fade is net-negative even gross, so the high portfolio Sharpe is not a deployable
+> edge. Exposed by the cTrader port + forward test (`XRSI-V1/DIAGNOSIS-real-entry-slippage-omission.md`; a
+> secondary cBot-port defect = the REAL stream also omitted the v2 0.05·ATR entry slippage the research charges).
+> **The single sanctioned global-holdout shot (EXP-097) stays SPENT — spent-on-defect, non-refundable.** EXP-098
+> robustness replicated a look-ahead-biased portfolio. **CF-MR-001 CLOSED — REFUTED**; EXP-089/G-020 availability
+> stands. Full scope + governance: `docs/experiments-docs/families/cf-mr-001/INDEX.md` §CLOSURE. *Text below
+> retained verbatim.*
+
 **Date:** 2026-06-25
 **Gate:** G-022 (Phase 022 terminal gate — **DEPLOYABLE_CONFIRMED / DECAYED / INCONCLUSIVE** on the **bare RSI-2
 fade (CORE) + EXIT-RCT** deployed as the G-022a-frozen, noise-aware causal ERC portfolio, against the single

@@ -1,8 +1,46 @@
 # CF-MR-001 — Mean-Reversion Entry (RSI-2) — Detail Index
 
-**Status:** `DEPLOYABLE — G-022 DEPLOYABLE_CONFIRMED 2026-06-25 (EXP-097 global-holdout release; holdout shot
-SPENT, non-repeatable). ADMITTED (BINDING) G-020 2026-06-23 / TRADABLE G-021 2026-06-24; first candidate slot
-consumed.` The bare RSI-2 fade, deployed as the G-022a-frozen carry-8 causal ERC portfolio (binding-v2 fill,
+**Status:** `CLOSED — REFUTED (2026-06-26): EXIT-RCT exit look-ahead invalidates the net-tradable / deployment
+arc (EXP-091→098). G-021 TRADABLE + G-022 DEPLOYABLE_CONFIRMED RETRACTED. Availability-only (EXP-089 / G-020
+ADMITTED) stands. Family not reopenable by re-parameterization; outcomes retained.` See **§CLOSURE** below.
+
+> ## §CLOSURE — REFUTED (2026-06-26): EXIT-RCT exit look-ahead
+>
+> **Source of truth:** `XRSI-V1/DIAGNOSIS-real-entry-slippage-omission.md` (final) +
+> `XRSI-V1/ISSUE-booked-vs-real-feed-divergence.md` (initial), confirmed by an independent Xen-code trace.
+>
+> **Mechanism (the why).** EXIT-RCT's favourable intrabar limit is built with a one-bar look-ahead.
+> `arm_levels` (`python/experiments/EXP-090/code/run_experiment.py:305-310`) sets the resting limit for the
+> domain bar at offset `off` (`di = entry_idx+off`) to `ctx.rct_target[di]` — the reversion-completion target
+> `P*_di = Close_di + (period-1)·(AL_di − AG_di)` computed from **bar `di`'s own close**
+> (`python/src/xen/mean_reversion.py:174`; the readiness invariant treats `rct_target[i]` as the *hypothetical
+> next-bar close*, i.e. the target for bar `i+1`). A limit that can rest *during* bar `di` is only live-actable
+> from `rct_target[di-1]`. `resolve_exit_paths` reads `fav_level[j, off-1]` (`intrabar_fill.py:212`), but `off-1`
+> is merely the array slot for offset `off` — it does **not** shift the rct value back a bar, so the engine rests
+> `rct[di]` during `di`. The off-by-one is worth **~+0.25 ATR/trade** (booked-lookahead `rct[di]` gross +0.20 vs
+> causal `rct[di-1]` −0.05); **causalized (`rct[di-1]`), the bare RSI-2 fade + EXIT-RCT is net-negative even
+> gross.** It surfaced only on porting to cTrader (XRSI-V1) + forward-testing, because native execution can rest
+> a limit no earlier than `rct[di-1]`. A secondary, compounding cBot-port-only defect (the REAL stream also
+> omitted the binding v2 0.05·ATR entry slippage the research charges) reinforced the negative result but is not
+> the research-level cause.
+>
+> **Scope.** EXP-091/092/094 (screen/sequence), **EXP-093 `TEST_CONFIRMED`** (11 counted TEST reads),
+> EXP-095/096 (portfolio + v2 fill), **EXP-097 `DEPLOYABLE_CONFIRMED`** (the global-holdout shot), and EXP-098
+> robustness — all **net-tradable / deployment claims REFUTED**. **EXP-089 availability / G-020 ADMITTED stands**
+> (gross `MFE_med`, no RCT limit): the fade's favourable *availability* is real; it is not net-*capturable* live.
+> HYP-002/HYP-003 close REFUTED; HYP-001 (availability) stands.
+>
+> **Governance.** Family **CLOSED — REFUTED**, not reopenable by re-parameterization. The 11 EXP-093 counted TEST
+> reads (strata stay 1/2) and the EXP-097 global-holdout shot stay **SPENT — spent-on-defect** (a discovered
+> defect does not refund a read/shot); recorded in `test-read-ledger.md` + `multiplicity-registry.md` (Phase
+> 021/022 banners) + `candidate-families/cf-mr-001.md` §CLOSURE. **G-021 TRADABLE and G-022 DEPLOYABLE_CONFIRMED
+> RETRACTED** (checkpoint gate reviews + retrospectives superseded). All cards below are **retained, not deleted**.
+> Live-backtest observations (native-fill behaviour, slow-domain cost geometry) may seed a **new family** under
+> its own D0 — only after a pipeline fix that causalizes the EXIT-RCT limit — out of scope here.
+>
+> *Everything below this banner is the prior (now superseded) DEPLOYABLE record, retained verbatim.*
+
+**[SUPERSEDED — see §CLOSURE]** The bare RSI-2 fade, deployed as the G-022a-frozen carry-8 causal ERC portfolio (binding-v2 fill,
 intra-1h MTM, circuit breaker, primary Portfolio B), confirms on the final-30% global holdout (B Sharpe LB 4.762 >
 band 2.00, Calmar LB 10.731 > 0) — the **programme's first deployment-grade price strategy**. (EXP-089
 `SCREEN_DELIVERED`, 2026-06-23, amended `D0-amendment-001`; G-020 ADMITTED.) First candidate family opened

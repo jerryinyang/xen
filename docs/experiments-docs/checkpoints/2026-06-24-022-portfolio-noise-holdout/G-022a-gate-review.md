@@ -1,5 +1,15 @@
 # G-022a Gate Review — Pre-Holdout Freeze ADJUDICATED (CF-MR-001 deployment portfolio)
 
+> ## ⚠ RETRACTED — REFUTED (2026-06-26): EXIT-RCT exit look-ahead
+> **The G-022a pre-holdout freeze below is RETRACTED** (with G-022). It froze a deployment portfolio whose edge
+> is the EXP-093 EXIT-RCT one-bar exit look-ahead (`arm_levels` rests `rct_target[di]` — bar `di`'s own close —
+> during bar `di`; live-actable is `rct[di-1]`; `EXP-090/code/run_experiment.py:305-310`, `mean_reversion.py:174`).
+> Causalized, the bare RSI-2 fade is net-negative even gross; the analysis-set Sharpe the band was calibrated
+> against is look-ahead-inflated. Exposed by the cTrader port + forward test
+> (`XRSI-V1/DIAGNOSIS-real-entry-slippage-omission.md`). **CF-MR-001 CLOSED — REFUTED**; the EXP-097 holdout shot
+> it gated stays SPENT (spent-on-defect). Full scope: `docs/experiments-docs/families/cf-mr-001/INDEX.md`
+> §CLOSURE. *Text below retained verbatim.*
+
 **Date:** 2026-06-25 · **Gate:** G-022a (Phase 022 pre-holdout freeze).
 **Adjudicated outcome:** **FREEZE — proceed to EXP-097.** All four D0 §D9 preconditions hold on the analysis-set
 evidence; the deployable set, construction, confirmation statistic + band, A-vs-B structure, and read accounting

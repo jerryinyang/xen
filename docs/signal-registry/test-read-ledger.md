@@ -343,6 +343,19 @@ loaded only as past-only causal warmup (EXP-093 pattern). Verdict **`DEPLOYABLE_
 Sharpe LB 4.762 > band 2.00 AND Calmar LB 10.731 > 0; A co-confirms, no OR rescue). **Non-repeatable,
 non-upgradable** — any confound found hereafter is a permanent caveat, not a re-read. Audit PASS (0C/0W/4I).
 
+**CF-MR-001 CLOSED — REFUTED (2026-06-26): the EXP-093 reads and the EXP-097 holdout shot were SPENT-ON-DEFECT
+(non-refundable).** An uncaught one-bar look-ahead in the EXIT-RCT favourable limit (`arm_levels` rests
+`rct_target[di]` — computed from bar `di`'s own close — as the intrabar limit during bar `di`; the live-actable
+limit is `rct_target[di-1]`; `EXP-090/code/run_experiment.py:305-310`, `mean_reversion.py:174`) inflated the
+captured edge by ~+0.25 ATR/trade. Causalized, the bare RSI-2 fade + EXIT-RCT is net-negative even gross; exposed
+by the cTrader port + forward test (`XRSI-V1/DIAGNOSIS-real-entry-slippage-omission.md`). **Both the 11 EXP-093
+counted TEST reads (each carried stratum stays 1/2) and the EXP-097 global-holdout shot remain SPENT** — a defect
+discovered after the fact does **not** refund a read or a holdout shot. They are now flagged **spent-on-defect**:
+the strata tallies and the spent global-holdout shot are unchanged (the budget consequences stand), but no
+CF-MR-001 net-tradable/deployment claim rests on them. **G-021 TRADABLE and G-022 DEPLOYABLE_CONFIRMED are
+RETRACTED.** EXP-089/G-020 availability (gross MFE_med, no RCT limit) is unaffected. Full mechanism + scope:
+`candidate-families/cf-mr-001.md` §CLOSURE + the Phase 021/022 banners in `multiplicity-registry.md`.
+
 **The global holdout (final 30% per new file) is outside this ledger entirely** and was
 sealed at first touch in VAL-005 (0 holdout rows read). The single historical sanctioned shot (EXP-032, old
 dataset) is spent and non-transferable; **the new-dataset holdout shot has now been spent at the gated Phase 022
