@@ -29,7 +29,7 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 
 ## Method Summary
 
-<2–3 sentence description of the analytical approach. Reference analysis-plan.md for details.>
+<2–3 sentence description of the analytical approach. Reference design.md for details.>
 
 ## Key Findings
 
@@ -74,14 +74,15 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 
 | Artifact | Path |
 |----------|------|
-| Scope | [scope.md](scope.md) |
-| Analysis Plan | [analysis-plan.md](analysis-plan.md) |
+| Design (scope + analysis plan) | [design.md](design.md) |
 | Code | [code/](code/) |
 | Audit | [audit.md](audit.md) |
-| Results | [results.md](results.md) |
-| Governance Reviews | [governance/](governance/) |
+| Report (this file: interpretation + results) | [report.md](report.md) |
 | Plots | [plots/](plots/) |
+| Results outputs | [results/](results/) |
 ```
+
+(Governance is inline — `GATE` blocks inside `design.md` (pre-exec) and `report.md` (post-exec); there is no `governance/` directory.)
 
 ---
 

@@ -176,3 +176,49 @@ effect sizes, flag within-noise, note when metrics disagree. (b) An availability
 horizon + control parity must match the family's own mechanism, or the read is non-comparable.
 **Enforced at.** analysis-plan interpretation criteria; auditor gate-shape check. (Memories:
 `symmetry_of_skepticism_framing`, `availability_horizon_matches_mechanism`.)
+
+---
+
+## L-12 — Referee gate rigidity: fixed-threshold conjunctions over-reject and mis-scale ⭐ (Chapter-02 renew)
+
+**What.** A standing weakness, not a single bug — surfaced repeatedly across the chapter and
+patched ad hoc each time. The frozen referee is a **conjunction of fixed-threshold legs**
+(5-check stack L1–L5; portfolio-fitness unit), and that shape produced three recurring failure
+modes that wrongly killed, or could not even test, real candidates.
+
+**Mechanism (why), with the three modes.**
+1. **Conjunctive fragility.** Requiring all of L1–L5 simultaneously drives **FPR ≈ 0 but at a
+   2–8× larger economic MDE** (EXP-003 keystone trade-off). A real-but-modest, tail-only, or
+   sparse edge that any *single* leg is structurally blind to is vetoed by the AND — the gate is
+   theoretically ideal (no false positives) yet practically a near-impossible bar that also
+   rejects true positives (selection that favours only large, location-shaped, dense edges).
+2. **Structurally-impossible legs.** A leg can have **no finite MDE** in a regime, so no true
+   effect could ever satisfy it there — it is an automatic fail, not a test. EXP-015's
+   incremental unit was REFUTED for exactly this (standalone-L2 had no finite MDE in high-overlap
+   synchronous-null cells) and the revised unit had to **drop** that leg; many CF-MR-001 cells
+   were `COVERAGE_EXCLUDED` for the same "no finite MDE on the carried arm" reason. Power was
+   conflated with evidence-against.
+3. **Fixed thresholds mis-scaled to the candidate.** A threshold calibrated to a reference
+   vehicle mis-rejects a candidate of different sparsity / shape / instrument: the fixed per-bar
+   MDE floor wrongly REFUTED a ~6%-active signal via ~16× denominator dilution (L-04); per-instrument
+   MDEs run *below* the pooled floor (EXP-008); and inside CF-MR-001 a **fixed Sharpe=1.0 bite**
+   and a **SUB-RANDOM-entry null** both had to be swapped mid-family for an **MDE-curve co-designed
+   with the band** (EXP-095) and a **matched-distance** null (`D0-amendment-005`). The repeated
+   manual fix was always the same shape: replace a fixed plant with a candidate-matched, power-aware
+   construction (see L-08).
+
+**Fix / new rule (Chapter-02 renew — needs validation, not yet applied).** Investigate replacing
+rigid fixed-threshold conjunctive gates with **power-aware, candidate-matched adaptive gating**
+that preserves the FPR control the frozen suite earned: apply a leg only where it has finite MDE
+(report *unpowered*, never *fail*); scale thresholds to the candidate's vehicle/shape/instrument
+(generalize the MDE-curve-co-designed-with-the-band pattern); and replace the hard AND with a
+calibrated composite that no single structurally-blind leg can veto. **Governance constraint:** the
+referee is FROZEN — any redesign is itself a predeclared experiment, FPR-recalibrated on the
+dogfood-negative + synthetic-positive (EXP-019 style) and frozen **before** it adjudicates any live
+candidate; it must **not** be tuned on the candidate it will judge.
+
+**Enforced at.** Chapter-02 Phase-001 checkpoint
+(`docs/experiments-docs/checkpoints/2026-06-27-001-referee-adaptivity-rsi2-benchmark/`); the
+causal RSI-2 rerun (**CF-MR-002**) is the held-out benchmark vehicle + end-to-end architecture
+test, not a tuning set. Builds on [[L-03]] (pooled-as-verdict), [[L-04]] (vehicle match),
+[[L-08]] (bite = MDE-curve, not a fixed plant), [[L-11]] (gate-shape blindness).

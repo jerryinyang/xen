@@ -87,6 +87,40 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 - Binding gate: <gate>. Effect shape: <location / tail / bimodal / asymmetric>.
 - Is the gate the wrong instrument for this effect's shape? YES/NO — <if YES, distinguish "no effect" from "effect of a shape this gate cannot see"; record for the interpreter; do NOT retro-edit the gate>.
 
+## Causal Provenance & Leak (mandatory — independent of numeric reproduction)
+
+> Re-deriving the numbers reproduces a leak baked into a shared module; it can never expose one
+> (L-01). This section is required on every audit.
+
+### Provenance trace (verdict-bearing columns)
+
+| Column (signal/entry/outcome/cost/fill) | Inputs & their timestamps | Uses only data ≤ t (≤ t-1 for next-bar)? | Lines |
+|---|---|---|---|
+| <column> | <inputs> | YES/NO | <file:line> |
+
+- Any `rct[di]`-style use of bar `di`'s own close as the intrabar limit during bar `di`? YES/NO
+  (live-actable is `[di-1]`). If YES → **REJECT-class**.
+- Every decision taken at the action bar's **open** on confirmed bars only (`≤ t-1`), with no read
+  of the forming bar's own OHLC? YES/NO. If NO → **REJECT-class**.
+- Returns measured **open-to-open** (not open-to-close)? YES/NO. An open-to-close return used for an
+  edge / P&L / deployability claim is **REJECT-class** (`OnClose` is not executable live); allowed
+  only as an explicitly labelled non-tradable diagnostic.
+
+### Leak tripwire
+
+- Future-destroying control shipped (future-shuffle / time-reversal / label-permutation): YES/NO.
+- Edge **collapsed** under it? YES/NO — <evidence>. (A surviving edge ⇒ leak ⇒ **REJECT-class**.)
+
+### Shared-module provenance contracts
+
+- Modules emitting outcome/target/excursion columns match their documented causal contract? YES/NO.
+
+### Price-primary check
+
+- Edge-generating experiment ran in the cTrader engine (`data/strategy_runs/<ID>/` under the
+  `AnalysisEndUtc` fence), not a vectorized Python backtest? YES/NO. (Vectorized price-strategy
+  backtest ⇒ **REJECT-class**.) Booked-vs-real: binding-leg slippage/cost charged? YES/NO.
+
 ## Scope Compliance
 
 - Analysis plan followed: YES / NO
@@ -156,6 +190,12 @@ Save to: `python/experiments/<EXP-ID>/audit.md`
 | Pooled verdict masks per-stratum structure | Any aggregated/equal-weight headline (pooled NO_SEPARATOR, cross-cell mean, portfolio composite) | Re-derive per domain/instrument/cell; confirm the pooled number is not hiding a stratum that flips the verdict or one outlier vetoing the rest |
 | Gate blind to the effect's shape | Any binding gate applied to a tail/bimodal/asymmetric effect | Check the gate measures the shape present (e.g. a location/consistency gate cannot see a tail-only separator); distinguish "no effect" from "wrong instrument" |
 | Verdict-material finding down-classified | Any Warning/Info on a result-bearing path | Confirm the finding genuinely cannot move sample membership, a denominator, a metric, causality, or the verdict; if it can, it is Critical and forces a rerun |
+| Acausal favourable-index (the L-01 pattern) | Any outcome/target/limit column built from a bar's own close used during that bar | Trace input timestamps; `rct[di]` used during bar `di` is look-ahead — the live-actable choice is `[di-1]`. REJECT-class. |
+| Acting on the forming bar | Any signal/filter/regime/indicator/exit that reads the bar it acts in | Decisions evaluate at the action bar's **open** on confirmed bars only (`≤ t-1`); reading the action bar's own OHLC is look-ahead. REJECT-class. |
+| Open-to-close return for a P&L/edge claim | Any return computed open→close (or close→close acted intrabar) | `OnClose` is not executable live; use **open-to-open**. Open-to-close is a labelled non-tradable diagnostic only. REJECT-class for a tradability claim. |
+| Edge survives a future-destroying control | The shipped leak tripwire (future-shuffle / time-reversal / label-permutation) | A real edge must collapse when the future is destroyed; if it survives, there is a leak. REJECT-class. |
+| Vectorized backtest of a price strategy | Any Python that regenerates signals/edges from price instead of ingesting cTrader emissions | Price-primary edges must run in-engine (`data/strategy_runs/<ID>/`). A vectorized price-strategy backtest is REJECT-class. |
+| Booked-vs-real feed divergence | Any cTrader port / dual feed | Binding-leg slippage/cost must be charged; a look-ahead favourable-index view must be labelled non-tradable (L-02). |
 
 ### Value Range Reference
 

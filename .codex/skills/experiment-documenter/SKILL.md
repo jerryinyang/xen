@@ -14,14 +14,12 @@ Turn validated experiment artifacts into durable project documentation.
    locate the file whose path ends with `/research-pipeline/_pipeline-config.md`.
 2. Read `docs/references/dataset-reference.md`.
 3. Read the full experiment package:
-   - `scope.md`
-   - `analysis-plan.md`
+   - `design.md` (merged scope + analysis plan, with the inline pre-exec `GATE`)
    - `code/`
-   - `results/`
+   - `results/` (and `data/strategy_runs/<ID>/` for price-primary)
    - `audit.md`
-   - `results.md`
-   - `governance/`
    - `plots/`
+   - the interpretation section (written into `report.md` by `experiment-quant-analyst`)
 4. Read current indexes:
    - `python/experiments/INDEX.md`
    - `docs/experiments-docs/INDEX.md` (master navigation: live status + `Family Indexes` table)
@@ -32,20 +30,26 @@ Turn validated experiment artifacts into durable project documentation.
 
 ## Report Workflow
 
-Create `python/experiments/<ID>/report.md`.
+Assemble the **consolidated** `python/experiments/<ID>/report.md` — it merges the interpretation
+(written by `experiment-quant-analyst`), the results, and the final report into one artifact.
+Keep it within the size cap (≈400 lines); dense, not verbose.
 
 Include:
 
 - research question or hypothesis;
 - scope boundaries and exclusions;
 - method summary;
-- key quantitative results with sample sizes and effect sizes;
-- audit caveats;
+- **interpretation + key quantitative results** with sample sizes, effect sizes, per-stratum
+  (non-pooled) verdicts, and uncertainty;
+- audit caveats (incl. the causal-provenance & leak result);
 - conclusion using the approved result category;
-- links to code, results, plots, audit, and governance artifacts;
-- follow-up recommendations as separate future experiments.
+- links to `design.md`, code, results, plots, and `audit.md`;
+- follow-up recommendations as separate future experiments;
+- the **inline post-exec `GATE` block** (recorded by the orchestrator) and the signal-registry
+  disposition.
 
-Use key plots only. Do not embed every generated plot unless each one materially supports the conclusion.
+Use key plots only. Do not embed every generated plot unless each one materially supports the
+conclusion. There is no separate `results.md` or `governance/` directory.
 
 ## Index Updates
 

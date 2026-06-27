@@ -1,6 +1,6 @@
 ---
 name: experiment-quant-analyst
-description: Design experiment analysis plans and interpret completed experiment results for Xen research. Use when selecting statistical methods, writing an analysis-plan.md, defining interpretation criteria, interpreting result tables or plots, explaining statistical trade-offs, or responding to methodology prompts such as analysis plan, statistical method, what test, interpret results, or what do these results mean.
+description: Design experiment analysis plans and interpret completed experiment results for Xen research. Use when selecting statistical methods, writing the analysis plan in design.md, defining interpretation criteria, interpreting result tables or plots, explaining statistical trade-offs, or responding to methodology prompts such as analysis plan, statistical method, what test, interpret results, or what do these results mean.
 ---
 
 # Experiment Quant Analyst
@@ -99,4 +99,4 @@ documenter assembles the rest of that one consolidated artifact). Do not create 
 | shared pipeline config in sibling `research-pipeline` skill | Always |
 | `docs/references/dataset-reference.md` | Always |
 | bundled methods catalog | Plan mode |
-| bundled interpretation guides | Writing `analysis-plan.md` or `results.md` |
+| bundled interpretation guides | Writing the `design.md` analysis plan or the `report.md` interpretation |

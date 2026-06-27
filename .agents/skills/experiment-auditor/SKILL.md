@@ -14,13 +14,14 @@ Validate whether the implementation and results can be trusted. Report findings 
    locate the file whose path ends with `/research-pipeline/_pipeline-config.md`.
 2. Read `docs/references/dataset-reference.md`.
 3. Read the experiment artifacts:
-   - `python/experiments/<ID>/scope.md`
-   - `python/experiments/<ID>/analysis-plan.md`
-   - `python/experiments/<ID>/code/`
+   - `python/experiments/<ID>/design.md` (merged scope + analysis plan)
+   - `python/experiments/<ID>/code/` (price-primary: the C# model + `tools/ctrader-cli/experiments/<ID>.conf`)
    - relevant modified files in `python/src/xen/`
-   - `python/experiments/<ID>/results/`
+   - `python/experiments/<ID>/results/` (and `data/strategy_runs/<ID>/` for price-primary)
 4. Read the bundled audit checklists in this skill's `references` directory.
    If needed, locate the file ending with `/experiment-auditor/references/audit-checklists.md`.
+5. Read `docs/knowledge-base/lessons-and-amendments.md` (especially L-01 — the look-ahead leak a
+   prior audit missed by re-deriving from the contaminated module).
 
 ## Audit Workflow
 
@@ -72,9 +73,30 @@ Validate whether the implementation and results can be trusted. Report findings 
    - **Gate-shape check.** Check whether the binding gate is the wrong instrument for the effect's *shape*: a guard built for location effects can be structurally blind to tail/bimodal/asymmetric effects and veto a real finding. If so, say so explicitly and distinguish "no effect" from "effect of a shape this gate cannot see." Do **not** retro-edit the gate; record the mismatch for the interpreter and any follow-up scope.
 10. Run a **materiality assessment** on every finding and exercise blocking authority. Any finding that could change sample membership, a denominator, a metric value, temporal/causal validity, the verdict, or which stratum is binding is **verdict-material** → classify it **Critical** and require a code fix and a re-execution before interpretation (Stage 6). Decide this yourself; do not wait for an operator to raise it. "Document-and-proceed" (Warning/Info) is permitted **only** when you can affirmatively show the finding cannot move any verdict-bearing number — state that materiality reasoning explicitly for each non-blocking finding.
 
+11. Run the **causal-provenance & leak pass** — mandatory on every experiment, autonomously.
+    **This is independent of numeric reproduction: re-deriving the numbers reproduces a leak
+    baked into a shared module, so it can never expose one (L-01 — the look-ahead that shipped a
+    false `DEPLOYABLE_CONFIRMED`).** You must:
+    - **Provenance trace.** For every verdict-bearing column (signal, entry, outcome/target,
+      cost, fill), trace the timestamps of all inputs and confirm each value used at
+      decision-time `t` derives only from data `≤ t` (`≤ t-1` for next-bar action). Name the
+      exact lines. Flag any `rct[di]`-style use of bar `di`'s own close as the intrabar limit
+      during bar `di` (the live-actable choice is `[di-1]`).
+    - **Leak tripwire check.** Confirm the experiment shipped ≥1 future-destroying control
+      (future-shuffle / time-reversal / outcome-label permutation) and that the edge
+      **collapsed** under it. A surviving edge ⇒ leak ⇒ **REJECT-class** finding.
+    - **Shared-module provenance contracts.** For any `python/src/xen` module emitting
+      outcome/target/excursion columns, verify the code matches its documented causal contract.
+    - **Price-primary check.** Confirm an edge-generating experiment ran in the cTrader engine
+      (emitted `data/strategy_runs/<ID>/` under the fence), not as a vectorized Python backtest.
+      A vectorized price-strategy backtest is a REJECT-class finding.
+    - **Booked-vs-real feed.** If a feed/port is involved, confirm binding-leg slippage/cost is
+      charged and that any look-ahead favourable-index view is labelled non-tradable (L-02).
+
 ## Report
 
-Create `python/experiments/<ID>/audit.md` using the bundled audit checklists.
+Create `python/experiments/<ID>/audit.md` using the bundled audit checklists. This artifact is
+**uncapped** — give the forensic and causal-provenance work the room it needs.
 
 Classify findings:
 
@@ -84,7 +106,7 @@ Classify findings:
 
 Include exact file paths, functions, result files, and reproduction notes for each finding.
 
-Always include a **Verdict Forensics** section (per-stratum re-derivation, masking check, mechanism, gate-shape check) and, for every non-blocking finding, the materiality reasoning that justifies not forcing a rerun.
+Always include a **Verdict Forensics** section (per-stratum re-derivation, masking check, mechanism, gate-shape check) **and a Causal-Provenance & Leak section** (provenance trace of verdict-bearing columns, leak-tripwire result, shared-module contract check, price-primary check). For every non-blocking finding, give the materiality reasoning that justifies not forcing a rerun. An audit that certifies the numbers without the causal-provenance section is **incomplete** — it cannot have seen an acausal leak.
 
 ## Constraints
 

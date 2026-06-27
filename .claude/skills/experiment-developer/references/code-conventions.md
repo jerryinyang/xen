@@ -13,7 +13,7 @@ safe.
 ```python
 """
 Experiment EXP-XXX: <Title>
-Implements the analysis plan from analysis-plan.md.
+Implements the analysis plan from design.md.
 """
 from pathlib import Path
 
@@ -81,6 +81,16 @@ invisible because the audit re-derived from the same module. Code rules:
 - **Provenance contract on outcome modules.** Any `xen` function emitting an outcome / target /
   excursion / fill column documents, in its docstring, which timestamps each output reads. Never
   use a bar's own close as that bar's intrabar limit. The next-bar-action convention is `[di-1]`.
+- **Evaluate-on-bar-open, lagged reference only.** Every decision (signal, filter, regime label,
+  indicator read, exit arm) is taken at a bar's **open** and may read only **previous confirmed
+  (closed) bars** — data through `t-1`. The forming bar's own OHLC is unknown at decision time;
+  reading it is look-ahead. The C# `OnBar` model gives this by construction (it never sees a future
+  bar); Python analysis must apply the `[t-1]` lag explicitly and align on the **open** of the
+  action bar.
+- **Open-to-open returns only.** Measure strategy / signal / P&L returns **open-to-open**. An
+  `OnClose` fill cannot happen live (the close is unknown until the bar completes), so an
+  open-to-close return is non-tradable — allowed only as an explicitly labelled diagnostic, never
+  for an edge / P&L / deployability claim.
 - **Ship the leak tripwire.** Implement the design's future-destroying control (future-shuffle /
   time-reversal / outcome-label permutation) so the audit can confirm the edge collapses. Make it
   a runnable mode/flag of `run_experiment.py`, not a manual afterthought.
@@ -231,7 +241,7 @@ def plot_<name>(
 ```python
 """
 Experiment EXP-XXX: <Title>
-Implements the analysis plan from analysis-plan.md.
+Implements the analysis plan from design.md.
 """
 from pathlib import Path
 
@@ -404,5 +414,7 @@ def safe_computation(data: np.ndarray) -> float:
 | `iter_rows()` or Python row loops on large frames | Slow and memory-inefficient | Use Polars expressions, joins, windows, or NumPy when causally equivalent |
 | Unsafe vectorization of sequential logic | Introduces look-ahead or streamed-data violations | Keep a bounded explicit loop or implement a true sequential generator |
 | Using synthetic chart prices for P&L | Incorrect P&L | Use real prices aligned by `CloseTime`, event timestamp, or `SourceCloseTime` |
+| Acting on the forming bar | Look-ahead bias | Decide at bar **open** on confirmed bars only (`[t-1]`); never read the action bar's own OHLC |
+| Open-to-close returns for P&L | `OnClose` not executable live | Use **open-to-open** returns; open-to-close is a labelled non-tradable diagnostic only |
 | Aligning data views by bar count | Look-ahead bias | Always align by timestamp (`CloseTime`, event timestamp, or `SourceCloseTime`) |
 | Assuming same event count across data views | Logical error | Different event definitions can produce different counts for the same period |

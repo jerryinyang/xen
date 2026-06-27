@@ -42,14 +42,28 @@ and inside `report.md` post-exec) — there is no `governance/` directory and no
 `pre/post-*-review.md`. The orchestrator **executes** the experiment (no manual handoff),
 pausing only at the operator-gated critical decisions.
 
-### Artifact size discipline
+### Artifact verbosity discipline (format, not length)
 
-| Artifact | Cap | Rationale |
-|----------|-----|-----------|
-| `design.md` | ≤ ~500 lines | merged scope+plan; dense, not verbose |
-| `report.md` | ≤ ~400 lines | interpretation+results+report; key plots only |
-| `audit.md` | **uncapped** | forensic/adversarial/causal-provenance needs room |
+The guard is **density**, not a line count: wordy prose, hedging, and restated
+points waste input tokens and bury the signal. Prefer tables, bullets, fragments, and
+named facts over paragraphs. The line figures below are budgets that flag *bloat to
+compress*, not hard truncation — a dense artifact may exceed them; a padded one must be
+compressed, never thinned of substance.
+
+| Artifact | Budget | Density rule |
+|----------|--------|--------------|
+| `design.md` | ~500 lines | merged scope+plan; tables/bullets, no prose padding |
+| `report.md` | ~400 lines | interpretation+results+report; key plots only |
+| `audit.md` | **uncapped** | forensic/adversarial/causal-provenance needs room — but still terse |
 | registry updates | concise rows only | regulate format; never drop the ledger mechanism |
+
+**Compression tool (mandatory on prose-heavy artifacts).** When `design.md` / `report.md`
+(or a KB doc) reads wordy, run the `caveman` plugin: `/caveman-compress <abs-path>`. It
+strips articles/filler/hedging and compresses prose to terse format while preserving
+**code, tables, file paths, numbers, and headings exactly** (it writes a `<file>.original.md`
+backup — delete it before commit; do not commit backups). Never run it on `code/` or other
+non-prose files. Compression is a formatting pass — it must not drop a fact, a number, or a
+verdict.
 
 ### Checkpoint Structure (Phase-Based Documentation)
 
@@ -185,6 +199,8 @@ These binding constraints apply to all Xen research.
 | **Complexity budget enforced** | Every experiment has defined limits on statistical tests, visualisations, and new code modules. |
 | **No premature optimisation** | Characterisation phases must not tune strategy parameters, windows, filters, stops, or targets against analysis-set performance. Optimisation requires an explicit phase and scope. |
 | **Causal-by-construction execution** | Price-primary (edge-generating) experiments run in the cTrader engine where look-ahead is impossible; Python is analysis-only on emitted runs. A vectorized Python backtest of a price strategy is rejected. (Structural fix for the L-01 look-ahead leak.) |
+| **Evaluate-on-bar-open + lagged reference only** | Every decision is evaluated at a bar's **open**, conditioned only on **previous, confirmed (closed) bars** (data through bar `t-1`); the forming bar's own OHLC is unknown at decision time. No signal, filter, regime label, indicator, or exit may read the bar it acts in. The C# `OnBar` model enforces this by construction; analysis code must use the `[t-1]` lag. (Generalizes the L-01 `rct[di]→[di-1]` fix into a standing rule.) |
+| **Open-to-open returns only** | Strategy / signal / P&L returns are measured **open-to-open**, never open-to-close — an `OnClose` execution is impossible in real time (the close is unknown until the bar completes). Close-referenced returns are a non-tradable diagnostic and must be labelled as such. |
 | **Leak resistance is audited independently of the numbers** | Numeric reproduction reproduces a leak. Every price-primary experiment ships a future-destroying control that must collapse the edge; the audit traces verdict-bearing columns' input timestamps. A surviving edge under that control is a leak → REJECT. |
 | **Knowledge-base-first** | Read `docs/knowledge-base/` before designing. Never re-run a `pitfalls-ledger.md` dead end; never re-learn a `lessons-and-amendments.md` mechanism. |
 
@@ -212,7 +228,7 @@ Xen research is organized into **phases**, each with a checkpoint in `docs/exper
    - Reference previous phase's `retrospective.md` if applicable
 
 2. **Execution Phase**: Run experiments according to `design.md`
-   - Each experiment follows the 8-stage pipeline
+   - Each experiment follows the lean pipeline (4 artifacts, inline governance, autonomous execution)
    - Update `python/experiments/INDEX.md` as experiments complete
    - Update the relevant `docs/experiments-docs/families/<family>/INDEX.md` with the detailed experiment card; update `docs/experiments-docs/INDEX.md` (master) live status only
 
@@ -275,7 +291,7 @@ All governance reviews produce one of three verdicts:
 ### REVISE Routing
 
 When governance issues REVISE, the verdict identifies:
-- `FAILING_ARTIFACT`: which file needs fixing (scope.md, analysis-plan.md, code, audit.md, results.md, report.md)
+- `FAILING_ARTIFACT`: which file needs fixing (`design.md`, `code/`, `audit.md`, `report.md`)
 - `REQUIRED_SKILL`: which skill should fix it (experiment-quant-analyst, experiment-developer, experiment-auditor, experiment-documenter)
 
 ---

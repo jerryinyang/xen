@@ -44,6 +44,9 @@ parity. Returns/P&L use the emitted real OHLC — never synthetic chart prices.
 ## Causal guarantee (why this is leak-resistant)
 
 - **Streaming:** `StrategyHostRunner` feeds bars sequentially; `OnBar` cannot see the future.
+- **Bar-open + lagged reference:** decide at the bar **open** on confirmed (closed) bars only —
+  `OnBar(bar, domain)` may use `bar` and accumulated past state, never the forming bar's
+  not-yet-known OHLC. Returns/P&L are **open-to-open**; an `OnClose` fill is impossible live.
 - **Fence:** `HoldoutFence.AssertCanEmit` throws on any emission at/after `AnalysisEndUtc`;
   `ShouldStopBeforeProcessing` halts the run at the fence. The final 30% global holdout is
   never processed.

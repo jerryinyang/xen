@@ -1,6 +1,6 @@
 ---
 name: experiment-developer
-description: Implement approved Xen experiment analysis plans in Python. Use when creating or modifying experiment scripts, reusable analysis utilities, result generation code, plots, or fixes requested by audit for files under python/experiments/<ID>/code or python/src. Trigger on implement, write code, create script, code the analysis, build module, implement the plan, or fix audited experiment code.
+description: Implement approved Xen experiment designs — price-primary signal models in C# (cTrader StrategyHost) and analysis-only code in Python. Use when creating or modifying experiment scripts, C# ISignalModel strategies, reusable analysis utilities, result generation code, plots, leak tripwires, or fixes requested by audit for files under python/experiments/<ID>/code, python/src, StrategyHost, or tools/ctrader-cli. Trigger on implement, write code, create script, code the analysis, build module, implement the design, add the strategy model, or fix audited experiment code.
 ---
 
 # Experiment Developer
@@ -13,18 +13,38 @@ Translate an approved scope and analysis plan into Python code. Implement only t
    the same skills root. If the file tool cannot resolve sibling skill paths,
    locate the file whose path ends with `/research-pipeline/_pipeline-config.md`.
 2. Read `docs/references/dataset-reference.md`.
-3. Read `python/experiments/<ID>/scope.md`.
-4. Read `python/experiments/<ID>/analysis-plan.md`.
-5. Read the bundled code conventions in this skill's `references` directory.
+3. Read `python/experiments/<ID>/design.md` (merged scope + analysis plan), including its
+   **price-primary vs analysis-only** classification and the **leak tripwire(s)** it requires.
+4. Read the bundled code conventions in this skill's `references` directory.
    If needed, locate the file ending with `/experiment-developer/references/code-conventions.md`.
+5. For price-primary work, read `tools/ctrader-cli/README.md` (the harness recipe).
 6. Inspect existing `python/src/xen/` modules before creating new abstractions.
+
+## Price-primary vs analysis-only (decide first)
+
+- **Price-primary** (generates signals/entries/positions/edges from price): implement a C#
+  `ISignalModel` in `StrategyHost/` (copy `DonchianBreakoutModel.cs`), register it in the
+  `Xen.cs` `XenStrategy` enum + `CreateStrategyModel()`, and add
+  `tools/ctrader-cli/experiments/<ID>.conf`. **Do not write a Python backtest of the strategy** —
+  Python only ingests/validates the emitted `data/strategy_runs/<ID>/` via `xen.signals.ingestion`.
+  A model's `OnBar()` uses only the current and past bars. This is the L-01 structural fix.
+- **Analysis-only**: Python on emitted strategy-run / timebar extracts; never regenerate a signal.
+
+## Leak tripwires & provenance (mandatory)
+
+- Implement the design's **leak tripwire(s)** — a future-destroying control (future-shuffle /
+  time-reversal / outcome-label permutation) the audit will use to confirm the edge collapses.
+- Any new/edited `python/src/xen` module that emits an outcome/target/excursion column must carry
+  a **causal provenance contract** in its docstring: which timestamps each output reads. Never
+  use a bar's own close as that bar's intrabar limit (the `rct[di]` leak — use `[di-1]`).
 
 ## Implementation Workflow
 
-1. Map every analysis-plan requirement to code.
+1. Map every design (scope + plan) requirement to code.
 2. Decide file placement:
-   - use `python/experiments/<ID>/code/run_experiment.py` for experiment orchestration;
-   - use `python/src/xen/` (the installed `xen` package) only for reusable functions likely to serve multiple experiments;
+   - price-primary signal logic → C# `StrategyHost/` model (not Python);
+   - analysis orchestration → `python/experiments/<ID>/code/run_experiment.py`;
+   - reusable analysis functions → `python/src/xen/` (the installed `xen` package);
    - avoid notebooks unless the user or plan explicitly requires them.
 3. Load data with the standard project pattern from `code-conventions.md`.
 4. Exclude the final 30 percent global holdout before analysis.

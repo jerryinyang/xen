@@ -38,6 +38,12 @@ and the traps to avoid, on any new experiment.
 - **Shape-aware reads.** If an effect can be tail/bimodal/asymmetric, predeclare a shape-aware
   read alongside the location guard, and check whether the binding gate can even *see* the
   effect's shape. A location/consistency gate is structurally blind to a tail-only separator.
+- **Execution-causality convention (bar-open + open-to-open).** Decide at the action bar's
+  **open**, conditioned only on previous **confirmed (closed)** bars (`≤ t-1`) — never the forming
+  bar's own OHLC. Measure returns **open-to-open**, never open-to-close (`OnClose` is not
+  executable live). This generalizes the L-01 `rct[di]→[di-1]` fix into a standing rule the
+  cTrader engine enforces by construction. See [lessons-and-amendments.md](lessons-and-amendments.md)
+  L-01/L-02.
 
 ## Futile / low-yield methodology (don't repeat)
 

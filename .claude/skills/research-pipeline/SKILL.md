@@ -119,8 +119,10 @@ is a REJECT-class finding.
 
 Invoke `experiment-documenter` to produce the consolidated **interpretation + results + final
 report** in `report.md` (interpretation is routed to the quant-analyst and written into this one
-file — no separate `results.md`), plus the index and registry updates. Keep it within the size
-cap; use key plots only.
+file — no separate `results.md`), plus the index and registry updates. Keep it dense (tables/
+bullets, key plots only); if `report.md` or `design.md` reads wordy, run `/caveman-compress
+<abs-path>` (format-only pass; preserves code/tables/numbers; delete the `.original.md` backup
+before commit). See the verbosity-discipline section in `_pipeline-config.md`.
 
 **Inline post-exec gate.** The orchestrator reviews `audit.md`, `report.md`, and index/registry
 updates against `references/governance-constraints.md` and records a one-block verdict **inside
@@ -149,6 +151,9 @@ finding, the registry disposition, and the path to `report.md`.
   strategy is REJECT. Outcomes/returns use emitted **real** prices, never synthetic chart prices.
 - Use `CloseTime` / `SourceCloseTime` for temporal alignment, never bar indices. No data after an
   event's timestamp may inform that event.
+- Evaluate every decision at the action bar's **open** on confirmed bars only (`≤ t-1`); never read
+  the forming bar's own OHLC. Returns are **open-to-open** — `OnClose` is not executable live, so an
+  open-to-close return is a labelled non-tradable diagnostic only.
 - Per-stratum binding verdicts; a pooled/aggregated figure is disclosure-only until cross-stratum
   homogeneity is shown.
 - Register a candidate before screening it; never spend a TEST read without recording it (cap 2

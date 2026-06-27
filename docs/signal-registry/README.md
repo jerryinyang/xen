@@ -68,6 +68,13 @@ Each file in `candidate-families/` must define:
 
 Registered candidate families (full per-phase batches in `multiplicity-registry.md`):
 
+- `CF-MR-002` — Causal RSI-2 mean-reversion fade (cTrader-primary; `rct[di-1]` exit). **REGISTERED —
+  G0 PENDING** (Chapter-02 Phase 001, 2026-06-27); 0 slots, 0 counted TEST reads. Successor to the
+  CLOSED/REFUTED CF-MR-001 under a new D0 after the causal fix (KB L-01). Benchmark vehicle for the
+  referee-adaptivity renew (KB L-12). See `candidate-families/cf-mr-002.md`.
+- `CF-MR-001` — RSI-2 fade + EXIT-RCT exit. **CLOSED — REFUTED** (2026-06-26; one-bar EXIT-RCT
+  look-ahead; G-021/G-022 retracted). Not reopenable by re-parameterization. See
+  `candidate-families/cf-mr-001.md`.
 - `CF-AVWAP-001` — Anchored VWAP on regime pivots. **CLOSED** (Phase 013, ANCHOR_MOVE_FLAT).
 - `CF-HA-HARAMI-001` — HA harami at trend exhaustion. **CLOSED** (Phase 016, CLOSE_FAMILY).
 - `CF-CAPGEO-001` — Data-derived exit / capture geometry on frozen entries. **RETIRED** (Phase 018,
