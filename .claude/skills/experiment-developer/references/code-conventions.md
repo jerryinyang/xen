@@ -69,6 +69,24 @@ lb_bars = generate_linebreak(analysis_set, level=3)
 
 ---
 
+## Causal Provenance & Leak Resistance (mandatory)
+
+The Chapter-01 false positive (L-01) was a one-bar look-ahead in a shared outcome module
+(`rct_target[di]` used as the intrabar limit *during* bar `di`; live-actable is `[di-1]`),
+invisible because the audit re-derived from the same module. Code rules:
+
+- **Price-primary signal logic is C#, not Python.** Edge generation runs in the cTrader engine
+  (`StrategyHost/` model + `tools/ctrader-cli`). Python ingests `data/strategy_runs/<ID>/` via
+  `xen.signals.ingestion` and never re-generates a signal. No vectorized price-strategy backtest.
+- **Provenance contract on outcome modules.** Any `xen` function emitting an outcome / target /
+  excursion / fill column documents, in its docstring, which timestamps each output reads. Never
+  use a bar's own close as that bar's intrabar limit. The next-bar-action convention is `[di-1]`.
+- **Ship the leak tripwire.** Implement the design's future-destroying control (future-shuffle /
+  time-reversal / outcome-label permutation) so the audit can confirm the edge collapses. Make it
+  a runnable mode/flag of `run_experiment.py`, not a manual afterthought.
+- **Booked-vs-real (ports).** Charge binding-leg slippage/cost; keep any look-ahead favourable
+  view explicitly labelled non-tradable (L-02).
+
 ## Existing Analysis Modules
 
 Check these modules before creating new reusable functions:

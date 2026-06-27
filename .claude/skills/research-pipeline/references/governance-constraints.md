@@ -1,6 +1,13 @@
 # Governance Constraints
 
-The constraint framework enforced at both governance gates (pre-execution and post-experiment reviews). These constraints are non-negotiable and apply to all artifacts in the Xen research pipeline.
+The constraint framework enforced at both **inline** governance gates (the pre-execution `GATE`
+block in `design.md` and the post-experiment `GATE` block in `report.md`). These constraints are
+non-negotiable and apply to all artifacts in the Xen research pipeline.
+
+**Artifact mapping (lean pipeline).** The per-artifact checks below were written for the
+Chapter-01 artifacts; map them onto the merged artifacts: *Scope Document* + *Analysis Plan*
+checks → **`design.md`**; *Results Interpretation* + *Final Report* checks → **`report.md`**;
+*Audit Report* checks → **`audit.md`** (now also requires the causal-provenance & leak section).
 
 See `_pipeline-config.md` for programme principles, OOS rules, and project path conventions.
 
@@ -211,13 +218,21 @@ One or more issues found. Specify:
 
 Allow up to 2 revision cycles.
 
-Issues that warrant REVISE include: an audit lacking verdict forensics or the per-stratum masking check; an audit that accepted a pooled/aggregated verdict without re-deriving it per stratum; **code that emits the binding verdict as a single collapsed cross-cell/cross-stratum PASS/FAIL (a pooled conjunction or pooled statistic) rather than per stratum, absent a demonstrated cross-stratum homogeneity claim** (collapsed convenience flags are allowed only when explicitly labelled non-binding — EXP-076 audit C1 precedent); a verdict-material finding documented but not fixed-and-rerun; and a binding gate threshold that is an unjustified magic constant (not calibrated, data-derived, or sensitivity-banded).
+Issues that warrant REVISE include: an audit lacking verdict forensics, the per-stratum masking check, **or the causal-provenance & leak section**; a price-primary experiment with **no shipped leak tripwire**; an audit that accepted a pooled/aggregated verdict without re-deriving it per stratum; **code that emits the binding verdict as a single collapsed cross-cell/cross-stratum PASS/FAIL (a pooled conjunction or pooled statistic) rather than per stratum, absent a demonstrated cross-stratum homogeneity claim** (collapsed convenience flags are allowed only when explicitly labelled non-binding — EXP-076 audit C1 precedent); a verdict-material finding documented but not fixed-and-rerun; and a binding gate threshold that is an unjustified magic constant (not calibrated, data-derived, or sensitivity-banded).
 
 ### REJECT
 
 Fundamental, unfixable issues. Examples:
 - Holdout contamination (data from the 30% reserve was used)
-- Look-ahead bias (using data from after the event timestamp when analyzing an event)
+- Look-ahead bias (using data from after the event timestamp when analyzing an event), including
+  the `rct[di]` acausal favourable-index pattern (a bar's own close used as its intrabar limit;
+  the live-actable choice is `[di-1]` — the L-01 leak that shipped a false `DEPLOYABLE_CONFIRMED`)
+- An edge that **survives a future-destroying control** (future-shuffle / time-reversal /
+  label-permutation) — proof of a leak
+- A **vectorized Python backtest of a price strategy** (price-primary edges must run in the
+  cTrader engine; Python is analysis-only on emitted runs)
+- A deployability/tradability claim with **no causal-provenance trace** in the audit, or an audit
+  missing the causal-provenance & leak section
 - Synthetic price violation (computing strategy P&L from Heiken Ashi prices or
   Renko brick prices instead of real prices; `HAClose` diagnostic returns are
   allowed only for explicitly scoped HA distortion experiments that label them

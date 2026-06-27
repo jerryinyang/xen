@@ -13,32 +13,43 @@ All paths are relative to the project root (`{project-root}`).
 | Experiment Directory | `python/experiments/<EXP-ID>/` |
 | Analysis Package (`xen`) | `python/src/xen/` |
 | Data Files | `data/` |
+| Strategy-run emissions (cTrader) | `data/strategy_runs/<EXP-ID>/` |
+| cTrader-CLI harness | `tools/ctrader-cli/` (`run-experiment.sh`, `experiments/<ID>.conf`, `README.md`) |
+| **Knowledge Base (read first)** | `docs/knowledge-base/` (INDEX, lessons-and-amendments, pitfalls-ledger, …) |
+| Signal Registry (live ledgers) | `docs/signal-registry/` (multiplicity, test-read, candidate-families) |
 | Experiment Index (brief) | `python/experiments/INDEX.md` |
 | Master Index (nav + live status) | `docs/experiments-docs/INDEX.md` |
 | Family Detail Indexes | `docs/experiments-docs/families/<family>/INDEX.md` |
 | Checkpoint Directory | `docs/experiments-docs/checkpoints/` |
 | Reference Documents | `docs/references/` |
-| Code Reviews | `docs/code-reviews/` |
 | Architecture Doc | `docs/references/architecture.md` |
 | Dataset Reference | `docs/references/dataset-reference.md` |
 
-### Per-Experiment Structure
+### Per-Experiment Structure (lean — 4 artifacts, inline governance)
 
 ```
 python/experiments/<EXP-ID>/
-├── scope.md                    # Experiment scope (Stage 1)
-├── analysis-plan.md            # Analysis methodology (Stage 2)
-├── code/
-│   └── run_experiment.py       # Implementation (Stage 3)
-├── plots/                      # Generated visualisations
-├── results/                    # Raw output data
-├── governance/
-│   ├── pre-execution-review.md # Pre-exec governance verdict
-│   └── post-experiment-review.md # Post-exec governance verdict
-├── audit.md                    # Code/results audit (Stage 5)
-├── results.md                  # Results interpretation (Stage 6)
-└── report.md                   # Final experiment report (Stage 7)
+├── design.md     # scope + analysis plan merged (Stage 1); inline pre-exec GATE recorded here
+├── code/         # implementation (Stage 2); price-primary → C# model + ctrader-cli/<ID>.conf
+├── plots/        # generated visualisations
+├── results/      # emitted/computed outputs (price-primary also data/strategy_runs/<ID>/)
+├── audit.md      # validation + verdict forensics + causal-provenance (Stage 4) — UNCAPPED
+└── report.md     # interpretation + results + final report (Stage 5); inline post-exec GATE here
 ```
+
+Governance is **inline** (one `GATE: APPROVE/REVISE/REJECT` block inside `design.md` pre-exec
+and inside `report.md` post-exec) — there is no `governance/` directory and no separate
+`pre/post-*-review.md`. The orchestrator **executes** the experiment (no manual handoff),
+pausing only at the operator-gated critical decisions.
+
+### Artifact size discipline
+
+| Artifact | Cap | Rationale |
+|----------|-----|-----------|
+| `design.md` | ≤ ~500 lines | merged scope+plan; dense, not verbose |
+| `report.md` | ≤ ~400 lines | interpretation+results+report; key plots only |
+| `audit.md` | **uncapped** | forensic/adversarial/causal-provenance needs room |
+| registry updates | concise rows only | regulate format; never drop the ledger mechanism |
 
 ### Checkpoint Structure (Phase-Based Documentation)
 
@@ -173,6 +184,18 @@ These binding constraints apply to all Xen research.
 | **Single hypothesis per experiment** | Each experiment answers exactly one question. Scope creep is a governance violation. |
 | **Complexity budget enforced** | Every experiment has defined limits on statistical tests, visualisations, and new code modules. |
 | **No premature optimisation** | Characterisation phases must not tune strategy parameters, windows, filters, stops, or targets against analysis-set performance. Optimisation requires an explicit phase and scope. |
+| **Causal-by-construction execution** | Price-primary (edge-generating) experiments run in the cTrader engine where look-ahead is impossible; Python is analysis-only on emitted runs. A vectorized Python backtest of a price strategy is rejected. (Structural fix for the L-01 look-ahead leak.) |
+| **Leak resistance is audited independently of the numbers** | Numeric reproduction reproduces a leak. Every price-primary experiment ships a future-destroying control that must collapse the edge; the audit traces verdict-bearing columns' input timestamps. A surviving edge under that control is a leak → REJECT. |
+| **Knowledge-base-first** | Read `docs/knowledge-base/` before designing. Never re-run a `pitfalls-ledger.md` dead end; never re-learn a `lessons-and-amendments.md` mechanism. |
+
+### Price-Primary vs Analysis-Only (binding)
+
+- **Price-primary** — generates signals/entries/positions/edges from price ⇒ runs in cTrader
+  (StrategyHost) via `tools/ctrader-cli/run-experiment.sh`, emits `data/strategy_runs/<ID>/`
+  under the `AnalysisEndUtc` fence, analysed in Python only on emissions. See
+  `tools/ctrader-cli/README.md`.
+- **Analysis-only** — Python on emitted strategy-run / timebar extracts; never regenerates a
+  signal or edge. No vectorized price-strategy backtest.
 
 ---
 

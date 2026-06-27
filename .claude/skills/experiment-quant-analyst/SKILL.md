@@ -12,18 +12,27 @@ Design methodology and interpret results. Do not implement production code; hand
 1. Read the shared pipeline config from the sibling `research-pipeline` skill in
    the same skills root. If the file tool cannot resolve sibling skill paths,
    locate the file whose path ends with `/research-pipeline/_pipeline-config.md`.
-2. Read `docs/references/dataset-reference.md`.
+2. Read `docs/references/dataset-reference.md` and `docs/knowledge-base/INDEX.md`
+   (methodology-canon + pitfalls-ledger — do not propose a dead direction or re-learn a lesson).
 3. Identify mode:
-   - plan mode: scope is present and `analysis-plan.md` is needed;
-   - interpretation mode: plan, code outputs, and audit are present and `results.md` is needed.
+   - **design mode**: produce the merged `design.md` (scope + analysis plan);
+   - **interpretation mode**: plan, code outputs, and audit are present — write the interpretation
+     **into `report.md`** (assembled by `experiment-documenter`); there is no separate `results.md`.
 
-## Plan Mode
+## Design Mode
 
-Create `python/experiments/<ID>/analysis-plan.md`.
+Create `python/experiments/<ID>/design.md` — the merged **scope + analysis plan** (one artifact,
+size-capped; dense, not verbose).
 
-1. Read `python/experiments/<ID>/scope.md`.
-2. Extract the hypothesis or question, data scope, feature set, filters, holdout exclusion, and complexity budget.
-3. Read the bundled methods catalog in this skill's `references` directory.
+1. **Scope half:** one falsifiable question; data views / instruments / features / parameters /
+   time range / exclusions (including the mandatory final-30% holdout exclusion); measurable
+   success / failure / inconclusive criteria; complexity budget; metric denominators +
+   zero-baseline behavior; and the **price-primary vs analysis-only** classification (price-primary
+   ⇒ runs in the cTrader engine; design the C# model + cells + `AnalysisEndUtc` fence accordingly).
+2. **Leak tripwire(s):** predeclare ≥1 future-destroying control (future-shuffle / time-reversal /
+   outcome-label permutation) that *must* collapse the edge — the audit will check it.
+3. Extract the hypothesis/question, data scope, feature set, filters, holdout exclusion, budget.
+4. Read the bundled methods catalog in this skill's `references` directory.
    If needed, locate the file ending with `/experiment-quant-analyst/references/methods-catalog.md`.
 4. Select the simplest sufficient methods in this order:
    - descriptive statistics and visual checks;
@@ -51,9 +60,10 @@ Create `python/experiments/<ID>/analysis-plan.md`.
 
 ## Interpretation Mode
 
-Create `python/experiments/<ID>/results.md`.
+Write the **interpretation section directly into `python/experiments/<ID>/report.md`** (the
+documenter assembles the rest of that one consolidated artifact). Do not create `results.md`.
 
-1. Read `scope.md`, `analysis-plan.md`, `audit.md`, code outputs, tables, and plots.
+1. Read `design.md`, `audit.md`, code outputs, tables, and plots.
 2. Anchor interpretation to the pre-defined interpretation guide.
 3. State observed values, effect sizes, uncertainty, and sample sizes.
 4. Treat negative and inconclusive results as valid findings.

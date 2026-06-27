@@ -12,7 +12,6 @@ are not part of the core data layer.
 from __future__ import annotations
 
 from xen.bar_aggregator import aggregate_ohlc, coverage_summary
-from xen.ha_harami import detect_ha_harami
 from xen.heiken_ashi_generator import HeikenAshiGenerator, generate_heiken_ashi
 from xen.linebreak_generator import LineBreakGenerator, generate_linebreak
 from xen.renko_generator import RenkoGenerator, generate_renko
@@ -25,7 +24,6 @@ from xen.zigzag import generate_zigzag, wilder_atr
 __all__ = [
     "aggregate_ohlc",
     "coverage_summary",
-    "detect_ha_harami",
     "HeikenAshiGenerator",
     "generate_heiken_ashi",
     "LineBreakGenerator",
