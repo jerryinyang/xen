@@ -1,7 +1,8 @@
 # CF-MR-002 — Causal RSI-2 Mean-Reversion Fade (cTrader-primary)
 
-**Status:** `REGISTERED` (2026-06-27) — G0 PENDING at Chapter-02 Phase 001. 0 candidate slots
-consumed, 0 counted TEST reads, global holdout sealed.
+**Status:** `REGISTERED` (2026-06-27) — G0 RATIFIED at Chapter-02 Phase 001 (D0 in the checkpoint
+`design.md` §D0). 0 candidate slots consumed, 0 counted TEST reads, global holdout sealed. Adjudicated
+at D-benchmark, after the adaptive gate is frozen (E5); never used to tune the gate (L-12).
 
 **Provenance.** Successor to **CF-MR-001** (CLOSED — REFUTED 2026-06-26; the net-tradable/deployment
 arc rested on a one-bar EXIT-RCT look-ahead, `rct[di]` rested during bar `di`; causalized the bare
