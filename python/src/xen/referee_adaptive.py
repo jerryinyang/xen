@@ -19,8 +19,21 @@ statistic) is built at E3 and appended here once E0 is frozen.
 """
 from __future__ import annotations
 
+from typing import Any, Callable
+
 import numpy as np
 import polars as pl
+
+from xen.referee_calibration import (
+    DOMAIN_SPECS,
+    _episode_counts,
+    _gate_bootstrap_pair,
+    estimate_block_length,
+    materiality_bps_for,
+    naive_momentum_positions,
+    resolve_split_index,
+    strategy_return_bps,
+)
 
 # --------------------------------------------------------------------------- #
 # E0.2 — 17-instrument round-trip cost map (Q6). FROZEN 2026-06-28.
@@ -111,3 +124,120 @@ def next_open_to_open_returns_from_bars(bars: pl.DataFrame) -> tuple[np.ndarray,
     ).drop_nulls("NextOpenLogReturn")
     returns = np.asarray(aligned.get_column("NextOpenLogReturn"), dtype=float)
     return returns, aligned
+
+
+# --------------------------------------------------------------------------- #
+# E1 cost-convention seam — parametrized gate-stack core (EXP-001).
+#
+# `referee_calibration.gate_stack_core` hardcodes the per-held-bar cost
+# convention (`strategy_return_bps`) for the signal leg and exposes no seam to
+# swap it. This wrapper MIRRORS that core but takes a `strategy_fn` so the
+# amortized (per-entry) convention can be run through the same gate logic.
+# It is added here (not in the frozen suite) so `referee_calibration.py` stays
+# byte-frozen — the renew adds, it does not mutate. Every gate sub-primitive
+# (split discipline, block bootstrap, episode counts, L1/L4 legs) is imported
+# and reused unchanged.
+#
+# SEAM SCOPE (binding): `strategy_fn` is applied to the **signal leg only**.
+# The L3 vs-naive control always uses the frozen per-held-bar `strategy_return_bps`,
+# so it is a fixed reference across conventions. Consequences:
+#   * strategy_fn=strategy_return_bps reproduces gate_stack_core EXACTLY (same
+#     cost_bps) — the audit equivalence check.
+#   * On a strictly-alternating signal (every active bar is an entry) the two
+#     conventions produce an identical signal series AND share the unchanged
+#     naive leg, so the whole gate output coincides (EXP-001 tripwire 2).
+# --------------------------------------------------------------------------- #
+def gate_stack_core_costfn(
+    returns: np.ndarray,
+    positions: np.ndarray,
+    *,
+    domain: str,
+    cost_bps: float,
+    n_bootstrap: int,
+    seed: int,
+    strategy_fn: Callable[..., np.ndarray] = strategy_return_bps,
+    split_index: int | None = None,
+) -> dict[str, Any]:
+    """Alpha-independent gate-stack state with an injectable signal cost convention.
+
+    Faithful mirror of :func:`xen.referee_calibration.gate_stack_core` with two
+    differences: ``cost_bps`` is supplied explicitly (the E0 17-instrument map is
+    the caller's responsibility — see :func:`adaptive_cost_bps_for`) and the
+    signal leg is computed with ``strategy_fn`` instead of the hardcoded
+    per-held-bar function. The vs-naive control leg is deliberately left on the
+    frozen per-held-bar convention (a fixed reference; see seam-scope note above).
+    Pass ``strategy_fn=strategy_return_bps`` to reproduce the frozen core exactly.
+
+    Parameters
+    ----------
+    returns : np.ndarray
+        Real next-step (open-to-open ``<= t-1``) returns, fractional.
+    positions : np.ndarray
+        Signal positions in ``{-1, 0, +1}``.
+    domain : str
+        ``"1h"`` or ``"4h"`` (selects the frozen ``DomainSpec`` + materiality).
+    cost_bps : float
+        Round-trip cost (bps) for both legs' cost charging.
+    n_bootstrap : int
+        Block-bootstrap resamples (passed through to the frozen bootstrap pair).
+    seed : int
+        Bootstrap seed (frozen ``seed + 1`` / ``seed + 2`` sub-seeding reused).
+    strategy_fn : Callable, default ``strategy_return_bps``
+        Signal-leg net-return function ``(returns, positions, *, cost_bps)``.
+    split_index : int or None
+        Train/test cut; ``None`` uses the frozen default split.
+
+    Returns
+    -------
+    dict[str, Any]
+        Same schema as :func:`gate_stack_core`, consumable by
+        :func:`xen.referee_calibration.gate_stack_row`.
+    """
+    spec = DOMAIN_SPECS[domain]
+    materiality_bps = materiality_bps_for(domain)
+    strategy = strategy_fn(returns, positions, cost_bps=cost_bps)
+    naive = strategy_return_bps(
+        returns, naive_momentum_positions(returns), cost_bps=cost_bps
+    )
+    cut = resolve_split_index(len(strategy), split_index)
+    train_values, test_values = strategy[:cut], strategy[cut:]
+    pos_arr = np.asarray(positions, dtype=float)
+    train_pos, test_pos = pos_arr[:cut], pos_arr[cut:]
+    block_length = estimate_block_length(train_values)
+    effective_n = len(test_values) / max(block_length, 1)
+
+    diff_vs_naive = test_values - naive[cut : cut + len(test_values)]
+    neutral_dist, naive_dist = _gate_bootstrap_pair(
+        test_values,
+        diff_vs_naive,
+        n_bootstrap=n_bootstrap,
+        block_length=block_length,
+        seed=seed,
+    )
+    neutral_means, neutral_mean, n_neutral = neutral_dist
+    naive_means, naive_mean, n_naive = naive_dist
+
+    train_up, train_down, test_up, test_down = _episode_counts(train_pos, test_pos)
+    return {
+        "neutral_means": neutral_means,
+        "neutral_mean": neutral_mean,
+        "n_neutral": n_neutral,
+        "naive_means": naive_means,
+        "naive_mean": naive_mean,
+        "n_naive": n_naive,
+        "block_length": block_length,
+        "effective_n": effective_n,
+        "split_index": cut,
+        "cost_bps": cost_bps,
+        "materiality_bps": materiality_bps,
+        "l1": bool(
+            effective_n >= spec.min_effective_n
+            and min(train_up, train_down, test_up, test_down) >= spec.min_state_count
+        ),
+        "l2": True,
+        "l4": bool(np.mean(train_values) > 0.0 and np.mean(test_values) > 0.0),
+        "train_up": train_up,
+        "train_down": train_down,
+        "test_up": test_up,
+        "test_down": test_down,
+    }

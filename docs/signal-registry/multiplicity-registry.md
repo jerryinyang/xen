@@ -965,6 +965,45 @@ holdout outcome) are **retained**, never deleted or reused.
 | **G-022** | — | Terminal gate: DEPLOYABLE_CONFIRMED / DECAYED / INCONCLUSIVE, per the G-022a band. | 0 / — | **DEPLOYABLE_CONFIRMED 2026-06-25** (EXP-097; primary Portfolio B holdout Sharpe LB 4.762 > band 2.00, Calmar LB 10.731 > 0). |
 | **EXP-098** (`D0-amendment-002`) | `CF-MR-001/HYP-003` (robustness companion) | **Non-binding cross-broker & aggregation-method robustness replication.** Rerun the G-022a-frozen deployment portfolio **verbatim** on an **independent broker's** 1-minute data (`data/timebars/pps/`, same 8 instruments + span), under two bar-aggregation timestamping methods — **Arm 1 `PPS-CANON`** (bucket-boundary label, deployed) and **Arm 2 `PPS-ALTAGG`** (`AGG-LASTCLOSE`, last-source-close label). Full PPS timeline; criterion = the inherited EXP-097 band (primary B: Sharpe LB > 2.00 AND Calmar LB > 0), per arm. Tests broker-overfit (Arm 1) and aggregation-overfit (Arm 1 vs 2). | **0 / 0** (PPS robustness read — outside the analysis-TEST ledger and the INFR-003 global holdout; recorded as a robustness governance disclosure; **cannot upgrade/revoke EXP-097**) | **COMPLETE 2026-06-25 — `CROSS_BROKER_ROBUST` ∧ `AGGREGATION_ROBUST` (non-binding; audit PASS 0C/0W/3I).** Both arms ROBUST: primary Portfolio B PPS Sharpe LB 5.97 (CANON) / 6.10 (ALTAGG) > band 2.00, Calmar LB 12.5 / 13.3 > 0 (n=251 evaluable weeks; A co-confirms). Broad-based (8/8 cells net-positive both arms; EURJPY-4h recovers from the INFR-003 holdout net-negative to +0.026); drop-one masking holds (no flip). Aggregation near-inert (arms differ only by ±1 trailing 1h bar; 4h nets identical to ~1e-5). Integrity PASS (conservation ≤2.8e-14, determinism + causal-weight/fill); INFR-003 holdout never loaded; `counted_test_reads=0`, `candidate_slots=0` (11 carried strata stay 1/2, 37 stay 0/2). Recorded as a robustness governance disclosure (`test-read-ledger.md`). `AGG-LASTCLOSE` retained (file-drawer); PPS registered + now "touched" as a robustness data source (future binding use needs its own governance). **EXP-097 `DEPLOYABLE_CONFIRMED` UNCHANGED — strengthening companion, not an upgrade.** |
 
+## Chapter 02 · Phase 001 Batch (Referee-Gate Adaptivity Renew + Causal RSI-2 Benchmark, CF-MR-002) — REGISTERED, G0 PENDING
+
+**Opened:** 2026-06-27 (first Chapter-02 phase; cTrader-primary era).
+**Governing phase:** `docs/experiments-docs/checkpoints/2026-06-27-001-referee-adaptivity-rsi2-benchmark/design.md`.
+**Provenance.** Opens after the Chapter 01→02 rollover (tag `chapter-01-close`). CF-MR-001 is
+**CLOSED — REFUTED** (EXIT-RCT `rct[di]` exit look-ahead; G-021/G-022 retracted) and not reopenable
+by re-parameterization; its closure note authorises a **new family under a new D0 only after the
+`rct[di-1]` causal fix** — that family is **CF-MR-002** (`candidate-families/cf-mr-002.md`).
+**Purpose (dual).** (1) **Referee renew** — fix the gating-system rigidity uncovered across Chapter 01
+(KB **L-12**: conjunctive fragility / structurally-impossible legs / fixed thresholds mis-scaled to the
+candidate); investigate a power-aware, candidate-matched adaptive gate that **keeps the earned FPR
+control**, FPR-recalibrated on the dogfood-negative + synthetic-positive (EXP-019 protocol) and
+**frozen before** it judges any candidate. (2) **Architecture benchmark** — push the causal RSI-2 fade
+(CF-MR-002) end-to-end through the new lean cTrader-primary pipeline to measure correctness + speed/
+token efficiency vs the Chapter-01 8-stage baseline.
+**Binding governance.** The frozen Chapter-01 suite stays binding and is reported in parallel until a
+redesign is re-ratified on fresh draws. The adaptive gate must **not** be tuned on CF-MR-002 (the L-12
+selection-bias trap). The final-30% global holdout is **not** in scope for Phase 001.
+**Slot accounting.** Registration consumes **0 candidate slots** (first slot consumed only at a future
+ADMIT, per CF-MR-001 precedent) and **0 counted TEST reads**; holdout sealed.
+
+| ID | Hypothesis | Role | Slot | Status |
+| --- | --- | --- | --- | --- |
+| `CF-MR-002/HYP-001` | Causal tradability screen | Does the causal (`rct[di-1]`) RSI-2 fade, run in-engine under bar-open / open-to-open execution, net-clear the referee on TRAIN with the leak tripwire collapsing the future-destroying control? Also the architecture-benchmark vehicle. | 0 (screen) | **REGISTERED — G0 PENDING (2026-06-27).** 0 reads, holdout sealed. Honest prior: causalized the bare fade is not net-tradable (L-01). |
+| Referee-adaptivity redesign | methodological | Power-aware / candidate-matched gate (L-12); FPR-recalibrated on dogfood-negative + synthetic-positive; frozen before any live read. | 0 (methodology) | **REGISTERED — G0 PENDING.** Frozen suite retained in parallel until re-ratified. E-series substrate work below. |
+
+**Referee-renew E-series disposition (methodological substrate; 0 slots, 0 reads each).** These
+characterize the renew levers; they screen **no** candidate and touch **no** candidate slot or TEST
+read. `referee_calibration.py` stays byte-frozen — seams are additive in `referee_adaptive.py`.
+
+| EXP | Arm | Outcome (audit) | Slot/Reads |
+| --- | --- | --- | --- |
+| **EXP-001** | **E1 — cost convention (per-held-bar vs amortized)** | **COMPLETE 2026-06-28 — ACCOUNTING_MATERIAL (audit PASS).** Per-stratum (16 inst × {1h,4h}): ΔMDE = MDE_perheld − MDE_amortized ≥ 0 on all 32 strata (per-held-net-edge grid units; pool median 1.5, max 11.5 bps BTCUSD/4h — disclosure-only L-03), scaling with cost & L. Per-held over-charges turnover ~L×; **L-12 Mode-1 is partly accounting, not solely gate shape** → E3 adopts amortized accounting, targets only the tail-only/sparse residue. Seam `gate_stack_core_costfn` bit-identical to frozen core at `strategy_return_bps`; analysis-only; holdout sealed. One mis-specified guard fixed+rerun (ΔMDE bit-identical, orthogonality proven). | 0 / 0 |
+
+**Deferred branches (registered, uncounted).** The CF-MR-001 levers do **not** carry over implicitly —
+vol-regime partition, CONTRARIAN arm, 25/75 scheme, 15m capture, regime×variant cross-cuts, parameter
+tuning, instrument/domain expansion: each needs its own dated D0-amendment + slot decision under
+CF-MR-002. Holdout release and deployment economics are out of Phase-001 scope. All outcomes retained.
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:

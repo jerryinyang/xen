@@ -10,6 +10,13 @@ Live status + family navigation for the current chapter. Chapter 01 is archived 
 renew (fix gate rigidity, KB L-12); (2) end-to-end benchmark of the rollover via the causal RSI-2
 fade (CF-MR-002). 0 slots / 0 reads; global holdout sealed.
 
+**Referee-renew E-series (D-referee):** **E1 — EXP-001 COMPLETE (2026-06-28, audit PASS).**
+ACCOUNTING_MATERIAL: the frozen per-held-bar cost convention over-charges turnover ~L× on
+persistent signals; amortizing (once per episode) recovers ΔMDE 1.0–11.5 bps/stratum (median 1.5),
+scaling with cost & L. L-12 Mode-1 is partly accounting, not solely gate shape → scopes E3. Seam is
+additive (`referee_adaptive.gate_stack_core_costfn`); frozen suite byte-unchanged. Next: E2
+(non-constant plant), E3 (composite redesign adopting amortized accounting).
+
 ## Current Infrastructure Tasks
 _(none)_
 
