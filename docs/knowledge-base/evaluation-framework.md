@@ -5,6 +5,10 @@ Report its components on any candidate; never retune thresholds, losses, costs, 
 or pass logic after seeing a candidate's outcome. Full per-experiment cards:
 `archive/chapter-01-*/docs/experiments-docs/families/framework-referee/INDEX.md`.
 
+**Authoritative implementation (code wins on any disagreement):**
+`python/src/xen/referee_calibration.py` (5-check gate stack + shared primitives),
+`python/src/xen/incremental_referee.py` (portfolio-fitness / incremental unit).
+
 ## The frozen three-component suite
 
 | Component | Source | Detection floor (MDE) by domain |
@@ -17,8 +21,19 @@ A candidate may be reported against all three; the binding gate depends on the s
 
 ## The 5-check gate stack (legs)
 
-L1 readiness · L2 standalone significance · L3 CI-vs-naive (`ci_lower_bps > 0`) · L4
-direction/consistency · L5 materiality (`ci_lower_bps > τ·materiality`). Key calibration facts:
+Legs **as implemented** (`gate_stack_core` / `gate_stack_row`); `passed = L1 ∧ L2 ∧ L3 ∧ L4 ∧ L5`:
+- **L1 readiness** — `effective_n ≥ min_effective_n` **and** min(train_up, train_down, test_up,
+  test_down) episodes `≥ min_state_count`.
+- **L2 integrity** — hard-coded `True` (placeholder leg; carries no test in the frozen code).
+- **L3 outcome** — neutral CI lower `> 0` **and** vs-naive-control CI lower `> 0` (folds
+  standalone-significance and CI-vs-naive into one leg; beats both a zero baseline and a naive
+  prior-return-sign control). α-dependent.
+- **L4 stability** — mean(train net) `> 0` **and** mean(test net) `> 0` (direction holds in both
+  segments).
+- **L5 materiality** — neutral CI lower `> materiality_bps` (the economic floor, binding,
+  α-invariant). τ scales the strict→loose threshold.
+
+Key calibration facts:
 - Gate-stack **FPR ≈ 0** at every domain/α (drives FPR from ≈α to 0), bought with a **2–8×
   larger economic MDE** vs the minimal baseline (EXP-003 keystone trade-off).
 - **L5 materiality is the binding, α-invariant leg** — it sets the gate MDE; the α grid moves

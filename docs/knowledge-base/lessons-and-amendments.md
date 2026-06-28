@@ -15,14 +15,16 @@ DEPLOYABLE_CONFIRMED (G-022, the spent EXP-097 global-holdout shot), then was **
 
 **Mechanism.** The EXIT-RCT favourable limit rested `rct_target[di]` — the target computed
 from bar `di`'s **own close** — as the intrabar limit *during* bar `di`. The live-actable
-limit is `rct_target[di-1]` (`EXP-090/code/run_experiment.py:305-310`,
-`mean_reversion.py:174`). This one-bar look-ahead inflated the captured edge by **~+0.25
+limit is `rct_target[di-1]` (`archive/chapter-01-price-geometry-referee/experiments/EXP-090/code/run_experiment.py:305-310`,
+`archive/chapter-01-price-geometry-referee/src-archived/xen/mean_reversion.py` →
+`reversion_completion_target`). This one-bar look-ahead inflated the captured edge by **~+0.25
 ATR/trade**. Causalized, the bare RSI-2 fade is net-negative even gross. It slipped past a
 sophisticated auditor because (a) the leak lived in a **shared vectorized outcome module**
 feeding the "favourable target," and (b) the audit's verdict-forensics **re-derived the
 numbers from the same contaminated module**, so the biased numbers reproduced perfectly.
 **Numeric reproduction is structurally blind to acausal provenance.** It was finally exposed
-only by the cTrader port + forward test (`XRSI-V1/DIAGNOSIS-real-entry-slippage-omission.md`).
+only by the cTrader port + forward test (diagnosis lives in the **XRSI-V1 cTrader port project**,
+external to this repo — see the `XRSI.code-workspace` sibling project, not committed here).
 
 **Fix / new rule.** Four layers, independent of numeric reproduction:
 1. **cTrader-primary execution** for any price-primary (edge-generating) experiment —
