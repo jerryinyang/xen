@@ -19,6 +19,9 @@ statistic) is built at E3 and appended here once E0 is frozen.
 """
 from __future__ import annotations
 
+import json
+import math
+from statistics import NormalDist
 from typing import Any, Callable
 
 import numpy as np
@@ -28,7 +31,10 @@ from xen.referee_calibration import (
     DOMAIN_SPECS,
     _episode_counts,
     _gate_bootstrap_pair,
+    _stationary_block_indices,
+    ci_from_means,
     estimate_block_length,
+    finite_values,
     materiality_bps_for,
     naive_momentum_positions,
     resolve_split_index,
@@ -66,6 +72,38 @@ ROUND_TRIP_COST_BPS_17: dict[str, dict[str, float]] = {
     # crypto
     "BTCUSD": {"1h": 10.0, "4h": 10.0},
 }
+
+
+def entry_mask(positions: np.ndarray) -> np.ndarray:
+    """Bars that open a new directional commitment (one round-trip per holding episode).
+
+    An entry is a non-zero position differing from the previous bar's position (the first bar is an
+    entry if non-zero); a direct sign flip is one entry; an exit to flat is not charged at the zero
+    bar. Promoted from EXP-001 ``code/cost_conventions.py`` (reused by EXP-002+).
+    """
+    pos = np.asarray(positions, dtype=float)
+    if len(pos) == 0:
+        return np.zeros(0, dtype=bool)
+    prev = np.concatenate(([0.0], pos[:-1]))
+    return (pos != 0.0) & (pos != prev)
+
+
+def strategy_return_bps_turnover(
+    returns: np.ndarray, positions: np.ndarray, *, cost_bps: float
+) -> np.ndarray:
+    """Per-bar net strategy return in bps, charging ``cost_bps`` once per entry (amortized arm).
+
+    Identical to :func:`xen.referee_calibration.strategy_return_bps` except the round-trip cost is
+    deducted on entry bars only (one round-trip per holding episode) rather than every active bar.
+    Total episode cost = ``cost_bps`` (vs ``L * cost_bps`` per-held), with equality iff every active
+    bar is an entry (L == 1). The B-style amortized convention; the binding arm consumed by
+    :func:`gate_stack_core_costfn` in EXP-002. Promoted from EXP-001 ``code/cost_conventions.py``.
+    """
+    n = min(len(returns), len(positions))
+    ret = np.asarray(returns[:n], dtype=float)
+    pos = np.asarray(positions[:n], dtype=float)
+    gross = pos * ret * 10_000.0
+    return gross - (cost_bps * entry_mask(pos).astype(float))
 
 
 def adaptive_cost_bps_for(instrument: str, domain: str) -> float:
@@ -240,4 +278,250 @@ def gate_stack_core_costfn(
         "train_down": train_down,
         "test_up": test_up,
         "test_down": test_down,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# E3a — economic-leg ADAPTIVE gate (EXP-003). Built per the checkpoint reservation
+# ("the adaptive gate itself ... built at E3"). Binding D0 (checkpoint:101-106):
+# L1+coverage stay RIGID (validity floor, FPR~0); only the economic legs L3/L5 adapt.
+# Changes vs the frozen stack: amortized accounting (E1); L2 no-op REMOVED (F4);
+# L3/L5 power-aware (abstain where undefined, never veto); L5 gains a candidate-blind
+# sub-population path (fixed q*-quantile of per-episode net-mean) to recover an edge
+# confined to a latent sub-state (the E2 STATE loss, L-03). Frozen sub-primitives are
+# reused unchanged; `referee_calibration.py` is untouched.
+#
+# Candidate-blindness (Q5): q*, MIN_EPISODES_SUBPOP, materiality are fixed module
+# constants; the sub-pop statistic is computed on the test net series exactly as any
+# referee leg is — no state mask, no selection, no performance-derived threshold.
+# --------------------------------------------------------------------------- #
+SUBPOP_QUANTILE: float = 0.75       # fixed q* — recovers an edge carried by >=25% of episodes (Q5)
+MIN_EPISODES_SUBPOP: int = 5        # below this the sub-pop test is undefined -> ABSTAIN
+# A1 (2026-06-29): studentized floor for the sub-pop L5 path. = Phi^-1(q*), the q*-quantile of the
+# standard normal == the studentized q* (q*-quantile / std) of ANY symmetric-about-zero null. A
+# pure-dispersion (no-edge) episode-mean distribution lands at ~this value regardless of scale, so a
+# high-volatility null no longer clears the sub-pop test on raw-bps size alone. Derived from q*
+# only (no data / FPR / outcome / state mask) -> candidate-blind, Q5. Tracks q* if q* changes.
+Q_STUD_MIN: float = NormalDist().inv_cdf(SUBPOP_QUANTILE)   # = 0.6744897501960817 for q*=0.75
+
+
+def episode_net_means(strategy_bps: np.ndarray, positions: np.ndarray) -> np.ndarray:
+    """Per-episode mean net bps; an episode = a contiguous run of the same nonzero position.
+
+    Flat bars (position 0) belong to no episode and break a run. Consumes a precomputed net
+    series + its positions and reads no future bar (provenance: alpha to the input series only).
+
+    Parameters
+    ----------
+    strategy_bps : np.ndarray
+        Per-bar net strategy return in bps (already cost-charged).
+    positions : np.ndarray
+        Per-bar positions in ``{-1, 0, +1}``.
+
+    Returns
+    -------
+    np.ndarray
+        One mean per episode (empty if there are no active bars).
+    """
+    n = min(len(strategy_bps), len(positions))
+    s = np.asarray(strategy_bps[:n], dtype=float)
+    p = np.asarray(positions[:n], dtype=float)
+    if n == 0:
+        return np.empty(0, dtype=float)
+    active = p != 0.0
+    changed = np.concatenate(([True], p[1:] != p[:-1]))
+    new_ep = active & changed
+    ep_id = np.cumsum(new_ep) - 1
+    valid = active & (ep_id >= 0)
+    if not valid.any():
+        return np.empty(0, dtype=float)
+    ids = ep_id[valid].astype(np.int64)
+    sums = np.bincount(ids, weights=s[valid])
+    counts = np.bincount(ids)
+    return sums[counts > 0] / counts[counts > 0]
+
+
+def _block_bootstrap_quantile_dist(
+    values: np.ndarray, *, q: float, n_resamples: int, block_length: int, seed: int
+) -> np.ndarray:
+    """Stationary block-bootstrap distribution of the ``q``-quantile (reuses the frozen resampler)."""
+    finite = finite_values(values)
+    n = len(finite)
+    if n == 0 or n_resamples <= 0:
+        return np.empty(0, dtype=float)
+    bl = max(1, min(int(block_length), n))
+    rng = np.random.default_rng(seed)
+    cols = np.arange(n, dtype=np.int32)
+    idx = _stationary_block_indices(rng, rows=n_resamples, n=n, block_length=bl, p=1.0 / bl, cols=cols)
+    return np.quantile(finite[idx], q, axis=1)
+
+
+def _block_bootstrap_studentized_quantile_dist(
+    values: np.ndarray, *, q: float, n_resamples: int, block_length: int, seed: int
+) -> np.ndarray:
+    """Block-bootstrap distribution of the **studentized** ``q``-quantile (``q``-quantile / std).
+
+    Scale-free per resample: each resample's ``q``-quantile is divided by that resample's std. A
+    resample with zero dispersion contributes ``0.0`` (it cannot clear the positive studentized
+    floor). Same Politis-Romano resampling / seeding as :func:`_block_bootstrap_quantile_dist`
+    (A1, 2026-06-29).
+    """
+    finite = finite_values(values)
+    n = len(finite)
+    if n == 0 or n_resamples <= 0:
+        return np.empty(0, dtype=float)
+    bl = max(1, min(int(block_length), n))
+    rng = np.random.default_rng(seed)
+    cols = np.arange(n, dtype=np.int32)
+    idx = _stationary_block_indices(rng, rows=n_resamples, n=n, block_length=bl, p=1.0 / bl, cols=cols)
+    sample = finite[idx]
+    quant = np.quantile(sample, q, axis=1)
+    std = np.std(sample, axis=1)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        return np.where(std > 0.0, quant / std, 0.0)
+
+
+def subpop_quantile_materiality(
+    episode_means: np.ndarray, *, q: float, materiality_bps: float, n_bootstrap: int,
+    block_length: int, seed: int, alpha: float = 0.05,
+) -> dict[str, Any]:
+    """Dilution-robust L5 path: studentized ∧ raw-bps q-quantile of per-episode net-means (A1).
+
+    PASS iff **both** floors clear (conjunction): the **studentized** ``q``-quantile
+    (``q``-quantile / std) bootstrap CI-lower exceeds :data:`Q_STUD_MIN` (= ``Phi^-1(q)``, the
+    null-shape level — kills high-dispersion noise-firing) **and** the **raw-bps** ``q``-quantile
+    bootstrap CI-lower exceeds ``materiality_bps`` (the frozen economic floor). ABSTAIN when fewer
+    than ``MIN_EPISODES_SUBPOP`` episodes or the episode-means have zero dispersion. ``q``,
+    ``Q_STUD_MIN``, and the materiality floor are fixed predeclared constants (Q5) — the statistic
+    reads the test net series + positions only, no state mask, no future bar.
+    """
+    n_ep = len(episode_means)
+    finite = finite_values(episode_means)
+    if n_ep < MIN_EPISODES_SUBPOP or len(finite) == 0 or float(np.std(finite)) == 0.0:
+        return {"abstain": True, "passed": False, "stat": math.nan, "ci_lower": math.nan,
+                "stud_stat": math.nan, "stud_ci_lower": math.nan, "n_episodes": n_ep}
+    raw_dist = _block_bootstrap_quantile_dist(
+        episode_means, q=q, n_resamples=n_bootstrap, block_length=block_length, seed=seed)
+    stud_dist = _block_bootstrap_studentized_quantile_dist(
+        episode_means, q=q, n_resamples=n_bootstrap, block_length=block_length, seed=seed + 1)
+    raw_stat = float(np.quantile(finite, q))
+    stud_stat = raw_stat / float(np.std(finite))
+    raw_ci_lower = float(np.quantile(raw_dist, alpha / 2.0)) if len(raw_dist) else math.nan
+    stud_ci_lower = float(np.quantile(stud_dist, alpha / 2.0)) if len(stud_dist) else math.nan
+    passed = bool(stud_ci_lower > Q_STUD_MIN and raw_ci_lower > materiality_bps)
+    return {"abstain": False, "passed": passed, "stat": raw_stat, "ci_lower": raw_ci_lower,
+            "stud_stat": stud_stat, "stud_ci_lower": stud_ci_lower, "n_episodes": n_ep}
+
+
+def gate_stack_adaptive(
+    returns: np.ndarray, positions: np.ndarray, *, domain: str, cost_bps: float,
+    n_bootstrap: int, seed: int, q: float = SUBPOP_QUANTILE, split_index: int | None = None,
+) -> dict[str, Any]:
+    """Alpha-independent state for the E3a economic-leg adaptive gate (L1 rigid; L3/L5 adapted).
+
+    Amortized signal-leg accounting; L2 removed; the per-episode net-means + the raw and
+    **studentized** q-quantile block-bootstrap distributions are computed here so
+    :func:`adaptive_row` can apply alpha (A1 conjunction: studentized CI-lower > ``Q_STUD_MIN`` AND
+    raw-bps CI-lower > ``materiality_bps``). L1 + coverage and the neutral/naive bootstrap pair are
+    computed exactly as :func:`gate_stack_core_costfn` (the rigid validity floor and frozen L3).
+    """
+    spec = DOMAIN_SPECS[domain]
+    materiality_bps = materiality_bps_for(domain)
+    strategy = strategy_return_bps_turnover(returns, positions, cost_bps=cost_bps)
+    naive = strategy_return_bps(returns, naive_momentum_positions(returns), cost_bps=cost_bps)
+    cut = resolve_split_index(len(strategy), split_index)
+    train_values, test_values = strategy[:cut], strategy[cut:]
+    pos_arr = np.asarray(positions, dtype=float)
+    train_pos, test_pos = pos_arr[:cut], pos_arr[cut:]
+    block_length = estimate_block_length(train_values)
+    effective_n = len(test_values) / max(block_length, 1)
+
+    diff_vs_naive = test_values - naive[cut : cut + len(test_values)]
+    neutral_dist, naive_dist = _gate_bootstrap_pair(
+        test_values, diff_vs_naive, n_bootstrap=n_bootstrap, block_length=block_length, seed=seed)
+    neutral_means, neutral_mean, n_neutral = neutral_dist
+    naive_means, naive_mean, n_naive = naive_dist
+
+    # Sub-pop L5 (A1): two block-bootstrap dists over per-episode net-means — the raw-bps q*-quantile
+    # (economic floor) and the studentized q*-quantile = q*-quantile/std (null-shape floor). PASS in
+    # `adaptive_row` requires BOTH CI-lowers to clear their floors (studentized > Q_STUD_MIN AND
+    # raw > materiality_bps). ABSTAIN when too few episodes OR zero episode-mean dispersion.
+    ep_means = episode_net_means(test_values, test_pos)
+    ep_finite = finite_values(ep_means)
+    ep_block = estimate_block_length(ep_means) if len(ep_means) else 1
+    subpop_dist = _block_bootstrap_quantile_dist(
+        ep_means, q=q, n_resamples=n_bootstrap, block_length=ep_block, seed=seed + 3)
+    subpop_stud_dist = _block_bootstrap_studentized_quantile_dist(
+        ep_means, q=q, n_resamples=n_bootstrap, block_length=ep_block, seed=seed + 4)
+    ep_std = float(np.std(ep_finite)) if len(ep_finite) else 0.0
+    raw_stat = float(np.quantile(ep_finite, q)) if len(ep_finite) else math.nan
+
+    train_up, train_down, test_up, test_down = _episode_counts(train_pos, test_pos)
+    return {
+        "neutral_means": neutral_means, "neutral_mean": neutral_mean, "n_neutral": n_neutral,
+        "naive_means": naive_means, "naive_mean": naive_mean, "n_naive": n_naive,
+        "block_length": block_length, "effective_n": effective_n, "split_index": cut,
+        "cost_bps": cost_bps, "materiality_bps": materiality_bps,
+        "l1": bool(effective_n >= spec.min_effective_n
+                   and min(train_up, train_down, test_up, test_down) >= spec.min_state_count),
+        "subpop_q": q, "subpop_stat": raw_stat,
+        "subpop_stud_stat": (raw_stat / ep_std if ep_std > 0.0 else math.nan),
+        "subpop_dist": subpop_dist, "subpop_stud_dist": subpop_stud_dist, "n_episodes": len(ep_means),
+        "subpop_abstain": (len(ep_means) < MIN_EPISODES_SUBPOP) or (ep_std == 0.0),
+        "train_up": train_up, "train_down": train_down, "test_up": test_up, "test_down": test_down,
+    }
+
+
+def adaptive_row(core: dict[str, Any], *, alpha: float) -> dict[str, Any]:
+    """Assemble the E3a adaptive verdict for one alpha (L1 rigid; power-aware L3/L5; L2 removed)."""
+    ci_neutral = ci_from_means(core["neutral_mean"], core["neutral_means"], core["n_neutral"], alpha=alpha)
+    ci_naive = ci_from_means(core["naive_mean"], core["naive_means"], core["n_naive"], alpha=alpha)
+    l1 = bool(core["l1"])                       # rigid validity floor (incl. coverage)
+
+    # L3 economic — power-aware {PASS, FAIL, ABSTAIN}.
+    if core["n_neutral"] == 0 or core["n_naive"] == 0:
+        l3 = "ABSTAIN"
+    else:
+        l3 = "PASS" if (ci_neutral.lower > 0.0 and ci_naive.lower > 0.0) else "FAIL"
+
+    # L5 economic — pooled-material OR sub-population-material; power-aware.
+    # Sub-pop (A1): PASS iff BOTH the studentized CI-lower > Q_STUD_MIN (null-shape floor) AND the
+    # raw-bps CI-lower > materiality_bps (economic floor) — a high-dispersion null clears the bps
+    # floor on size but fails the studentized floor (~Phi^-1(q*)), so it no longer passes.
+    pooled_pass = bool(core["n_neutral"] > 0 and ci_neutral.lower > core["materiality_bps"])
+    subpop_abstain = bool(core["subpop_abstain"]) or len(core["subpop_dist"]) == 0 \
+        or len(core["subpop_stud_dist"]) == 0
+    if subpop_abstain:
+        subpop_raw_ci_lower = math.nan
+        subpop_stud_ci_lower = math.nan
+    else:
+        subpop_raw_ci_lower = float(np.quantile(core["subpop_dist"], alpha / 2.0))
+        subpop_stud_ci_lower = float(np.quantile(core["subpop_stud_dist"], alpha / 2.0))
+    subpop_pass = bool((not subpop_abstain)
+                       and subpop_stud_ci_lower > Q_STUD_MIN
+                       and subpop_raw_ci_lower > core["materiality_bps"])
+    if core["n_neutral"] == 0 and subpop_abstain:
+        l5 = "ABSTAIN"
+    else:
+        l5 = "PASS" if (pooled_pass or subpop_pass) else "FAIL"
+
+    economic = [l3, l5]
+    passed = bool(l1 and ("FAIL" not in economic) and ("PASS" in economic))
+    leg_results = {
+        "L1_readiness": l1, "L3_outcome": l3, "L5_materiality": l5,
+        "L5_pooled_pass": pooled_pass, "L5_subpop_pass": subpop_pass,
+        "L5_subpop_abstain": subpop_abstain,
+        "L5_subpop_raw_ci_lower_bps": subpop_raw_ci_lower,
+        "L5_subpop_stud_ci_lower": subpop_stud_ci_lower,
+        "L5_subpop_stud_stat": core["subpop_stud_stat"],
+        "subpop_stat_bps": core["subpop_stat"], "n_episodes": core["n_episodes"],
+        "ci_vs_naive_lower_bps": ci_naive.lower, "materiality_bps": core["materiality_bps"],
+        "Q_STUD_MIN": Q_STUD_MIN,
+    }
+    return {
+        "referee": "gate_stack_adaptive", "alpha": alpha,
+        "verdict": "PASS" if passed else "REJECT", "passed": passed,
+        "effect_bps": ci_neutral.mean, "ci_lower_bps": ci_neutral.lower, "ci_upper_bps": ci_neutral.upper,
+        "effective_n": core["effective_n"], "block_length": core["block_length"],
+        "split_index": core["split_index"], "leg_results": json.dumps(leg_results, sort_keys=True),
     }
