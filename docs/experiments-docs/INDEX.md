@@ -5,10 +5,11 @@ Live status + family navigation for the current chapter. Chapter 01 is archived 
 `docs/knowledge-base/` (read first).
 
 ## Current Checkpoint Status
-**Phase 001 — Referee-Gate Adaptivity + Causal RSI-2 Benchmark** — DRAFT, G0 PENDING (2026-06-27).
-`checkpoints/2026-06-27-001-referee-adaptivity-rsi2-benchmark/design.md`. Dual purpose: (1) referee
-renew (fix gate rigidity, KB L-12); (2) end-to-end benchmark of the rollover via the causal RSI-2
-fade (CF-MR-002). 0 slots / 0 reads; global holdout sealed.
+**Phase 001 — Referee-Gate Adaptivity + Causal RSI-2 Benchmark** — D-referee COMPLETE; renewed
+referee FROZEN (2026-06-29). `checkpoints/2026-06-27-001-referee-adaptivity-rsi2-benchmark/design.md`.
+Dual purpose: (1) **referee renew (DONE — gate frozen at E5, §10.3a, q\*=0.75)**; (2) end-to-end
+benchmark of the rollover via the causal RSI-2 fade (CF-MR-002) — **next: D-benchmark, operator-gated
+(credentialed/cost-bearing cTrader)**. 0 slots / 0 reads; global holdout sealed.
 
 **Referee-renew E-series (D-referee):**
 - **E1 — EXP-001 COMPLETE (2026-06-28, audit PASS).** ACCOUNTING_MATERIAL: the frozen per-held-bar
@@ -35,13 +36,29 @@ fade (CF-MR-002). 0 slots / 0 reads; global holdout sealed.
   → cured the FPR leak **at the gate** (passes 0/162 on the prior-worst strata) with STATE recovery
   retained. This **pulls E3b's return-series/Sharpe-LB unit forward**. Frozen suite byte-unchanged.
 
-**Next: E4 (robustness) → E5 (freeze) — the defect that blocked freezing is cured.**
-- **E4 (next):** robustness sweep — `q*` sensitivity (DET-dominance + FPR=0 stable across
-  `q*∈{0.6,0.7,0.8}`), bootstrap-count / seed stability, residual skew-FPR (A1.2). Due-diligence that
-  licenses the freeze; don't freeze on an untested knob.
-- **E5:** DET-adjudicate + **FREEZE** the adaptive gate, **with a mandatory folded Q4 composite-form
-  check** (§10.3a vs single-statistic variant-c — predeclared, non-skippable, folded from E3b): freeze
-  §10.3a only if it matches-or-beats variant-c, record variant-c as the rejected alternative.
+**D-referee ladder COMPLETE (E0→E5); renewed referee FROZEN. Next: D-benchmark (operator-gated).**
+- **E4 — EXP-004 COMPLETE (2026-06-29, audit PASS, 0 Critical) — FREEZE LICENSED (RANGE-BOUNDED).**
+  Baseline q\*=0.75 = **32/32 DET_DOMINANT** (adaptive dogfood FPR 0.0); safe q\* range **{0.7,0.75}**
+  (extremes 0.6/0.8 each flip 1 stratum). Residual skew-FPR (A1.2) **refuted** — a strong right-skew
+  null (skew≈3.6) gives **0/32** adaptive passes (studentized floor holds; no `Q_STUD_MIN` bump). All
+  6 FPR_BROKEN across the sweep are single 1/162 label artifacts (`wilson_lower(1,162)>0` vs a zero
+  frozen baseline) — gate true FPR ≤0.62% ≪ control, future-destroy max 0.050, leak-clean → recorded
+  **E5 freeze-adjudication precondition** (min-pass-count≥2 / control-relative FPR rule), NOT a gate
+  defect. Regression anchor 0/32 reproduces EXP-003; `referee_*` byte-frozen; bootstrap/seed stable;
+  D-regime recent-third 30/32; 4h sub-pop CI non-degenerate (L-06). 0 reads, holdout sealed.
+- **E5 — EXP-005 COMPLETE (2026-06-29, audit PASS, 0 Critical) — RENEWED REFEREE FROZEN.** Q4
+  composite-form adjudicated by DET-dominance: **§10.3a (validity→economics, `adaptive_row`)
+  matches-or-beats the single-statistic variant-c 32/32**; §10.3a leak-clean 32/32 (dogfood FPR 0/32,
+  future-destroy ≤0.050). **variant-c REFUTED** — the single statistic (incremental-over-naive
+  CI-lower>0) has **no absolute floor**, so it admits anything less-bad than a money-losing momentum
+  baseline (dogfood FPR up to 1.0; **survives future-destroy** on BTCUSD/USDJPY/XAUUSD 4h);
+  mechanism-general. §10.3a's neutral-CI + materiality + studentized-subpop legs are exactly what
+  supply the FPR control the single statistic lacks. Renewed referee **FROZEN at §10.3a, q\*=0.75**
+  (`freeze_manifest.json`, `sha256=b4fd6cb1…ae847`); variant-c recorded as the rejected alternative.
+  **E4-derived less-brittle freeze-adjudication FPR rule** (`MIN_FPR_PASSES=2` / `2α`) adopted
+  candidate-blind (adjudication only; gate byte-unchanged). Regression anchor **0/32** reproduces
+  EXP-003/E4; variant-c added **additively** (70+/0−); `referee_calibration.py` byte-frozen. 0 reads /
+  0 slots; holdout sealed; not tuned on CF-MR-002. Freeze is **before** any live read (L-12 honored).
 - **E3b — FOLDED (2026-06-29):** return-series unit → E3a (A1); Q4 composite-form → E5. Dissolved as a
   standalone rung; retained in the registry as the record.
 

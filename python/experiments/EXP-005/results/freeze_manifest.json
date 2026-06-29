@@ -1,0 +1,117 @@
+{
+  "status": "FROZEN",
+  "blocked_reasons": [],
+  "frozen_referee": "10.3a (gate_stack_adaptive/adaptive_row)",
+  "rejected_alternative": "variant_c (adaptive_row_variant_c)",
+  "variant_c_leak_clean": false,
+  "variant_c_refuted_no_fpr_control": true,
+  "s103a_leak_clean": true,
+  "operating_point": {
+    "q_star": 0.75,
+    "Q_STUD_MIN": 0.6744897501960817,
+    "N_BOOTSTRAP": 500,
+    "alpha": 0.05,
+    "MIN_EPISODES_SUBPOP": 5,
+    "subpop_quantile_module_default": 0.75,
+    "return_basis": "open_to_open_le_t_minus_1"
+  },
+  "materiality_bps": {
+    "1h": 1.5,
+    "4h": 3.0
+  },
+  "cost_map": {
+    "EURUSD": {
+      "1h": 1.0,
+      "4h": 1.0
+    },
+    "USDJPY": {
+      "1h": 1.0,
+      "4h": 1.0
+    },
+    "GBPUSD": {
+      "1h": 1.2,
+      "4h": 1.2
+    },
+    "USDCHF": {
+      "1h": 1.5,
+      "4h": 1.5
+    },
+    "USDCAD": {
+      "1h": 1.5,
+      "4h": 1.5
+    },
+    "AUDUSD": {
+      "1h": 1.5,
+      "4h": 1.5
+    },
+    "NZDUSD": {
+      "1h": 2.0,
+      "4h": 2.0
+    },
+    "EURJPY": {
+      "1h": 2.0,
+      "4h": 2.0
+    },
+    "AUDJPY": {
+      "1h": 2.5,
+      "4h": 2.5
+    },
+    "GBPJPY": {
+      "1h": 2.5,
+      "4h": 2.5
+    },
+    "XAUUSD": {
+      "1h": 3.0,
+      "4h": 3.0
+    },
+    "US500": {
+      "1h": 3.0,
+      "4h": 3.0
+    },
+    "USTEC": {
+      "1h": 4.0,
+      "4h": 4.0
+    },
+    "DE30": {
+      "1h": 4.0,
+      "4h": 4.0
+    },
+    "JP225": {
+      "1h": 4.0,
+      "4h": 4.0
+    },
+    "US2000": {
+      "1h": 5.0,
+      "4h": 5.0
+    },
+    "BTCUSD": {
+      "1h": 10.0,
+      "4h": 10.0
+    }
+  },
+  "adjudication_fpr_rule": {
+    "MIN_FPR_PASSES": 2,
+    "FPR_CONTROL_BOUND": 0.1,
+    "note": "adjudication-harness only; gate adaptive_row byte-unchanged"
+  },
+  "provenance": {
+    "referee_adaptive_sha256": "b4fd6cb110b6c610438e4039ebcd69e79cb90d251244b31398ed83067bbae847",
+    "git_commit": "6e170d4",
+    "referee_calibration": "byte-frozen (Chapter-01 suite untouched)"
+  },
+  "adjudication": {
+    "n_strata": 32,
+    "n_103a_matches_or_beats": 32,
+    "n_variant_c_dominates": 0,
+    "n_mixed": 0,
+    "n_strata_both_det_eligible": 0,
+    "state_mde_gap_vc_minus_103a_both_eligible_median_bps": NaN,
+    "state_mde_gap_vc_minus_103a_both_eligible_max_bps": NaN,
+    "state_mde_gap_note": "valid only where BOTH forms DET-eligible; NaN if n_both==0 (a leaking form's MDE is not a valid comparison)",
+    "regression_anchor": "PASS"
+  },
+  "regression_anchor": {
+    "status": "PASS",
+    "n_mismatch": 0
+  }
+}

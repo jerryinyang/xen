@@ -525,3 +525,81 @@ def adaptive_row(core: dict[str, Any], *, alpha: float) -> dict[str, Any]:
         "effective_n": core["effective_n"], "block_length": core["block_length"],
         "split_index": core["split_index"], "leg_results": json.dumps(leg_results, sort_keys=True),
     }
+
+
+# --------------------------------------------------------------------------- #
+# E5 — Q4 composite-form VARIANT-C (EXP-005). Single sufficient statistic +
+# power guards (referee-framework-assessment §10.3(c)): the incremental net edge
+# (vs-naive CI-lower) IS the verdict; the other legs become reported diagnostics,
+# not gates. This is the REJECTED-ALTERNATIVE form the E5 freeze adjudicates the
+# primary §10.3a (`adaptive_row`) against by DET-dominance.
+#
+# ADDITIVE ONLY: it consumes the SAME `gate_stack_adaptive` core dict unchanged
+# (identical split / block bootstrap / neutral+naive CI pair / sub-pop dists) and
+# only assembles a different verdict. It does NOT edit `adaptive_row`,
+# `gate_stack_adaptive`, or any module constant (the E5 regression anchor + an
+# additions-only diff prove this). L1+coverage stay the rigid admissibility gate,
+# bit-identical to §10.3a. No new free knob, threshold, or constant.
+# --------------------------------------------------------------------------- #
+def adaptive_row_variant_c(core: dict[str, Any], *, alpha: float) -> dict[str, Any]:
+    """Assemble the E5 variant-c verdict for one alpha (single-statistic composite form).
+
+    ⚠ REJECTED ALTERNATIVE — NOT THE FROZEN REFEREE. E5 (EXP-005) adjudicated this single-statistic
+    form against the primary §10.3a (:func:`adaptive_row`) and **REFUTED it**: the incremental-over-
+    naive statistic has no absolute edge floor, so it admits anything less-bad than the net-negative
+    naive-momentum baseline — dogfood FPR up to 1.0, survives future-destroy (no FPR control). It is
+    retained **only** as the form-check record for reproducibility. The FROZEN renewed referee is
+    §10.3a (:func:`adaptive_row`); see ``EXP-005/results/freeze_manifest.json``. **Never call this as
+    a referee / gate.**
+
+    PASS iff ``L1 ∧ coverage ∧ (incremental-net vs-naive CI-lower > 0)`` — the single binding
+    economic statistic is the incremental net edge over the naive-momentum control. Power-aware
+    ABSTAIN when the naive leg is undefined (``n_naive == 0``); an abstaining economic statistic
+    cannot PASS (there is no other binding leg to carry it — that is the point of the form). L5
+    materiality (pooled + studentized sub-pop) and the L3 neutral CI are computed and emitted as
+    **non-binding diagnostics** so the DET map can show what variant-c forgoes; they never gate.
+    L1 + the neutral/naive bootstrap pair are read from the same ``core`` as :func:`adaptive_row`.
+    """
+    ci_neutral = ci_from_means(core["neutral_mean"], core["neutral_means"], core["n_neutral"], alpha=alpha)
+    ci_naive = ci_from_means(core["naive_mean"], core["naive_means"], core["n_naive"], alpha=alpha)
+    l1 = bool(core["l1"])                       # rigid validity floor (incl. coverage) — admissibility
+
+    # Single binding economic statistic: incremental net edge vs the naive control.
+    if core["n_naive"] == 0:
+        economic = "ABSTAIN"
+    else:
+        economic = "PASS" if ci_naive.lower > 0.0 else "FAIL"
+    passed = bool(l1 and economic == "PASS")
+
+    # Diagnostics ONLY (non-binding) — what the multi-leg §10.3a form would have weighed.
+    pooled_diag = bool(core["n_neutral"] > 0 and ci_neutral.lower > core["materiality_bps"])
+    subpop_abstain = bool(core["subpop_abstain"]) or len(core["subpop_dist"]) == 0 \
+        or len(core["subpop_stud_dist"]) == 0
+    if subpop_abstain:
+        subpop_raw_ci_lower = math.nan
+        subpop_stud_ci_lower = math.nan
+        subpop_pass_diag = False
+    else:
+        subpop_raw_ci_lower = float(np.quantile(core["subpop_dist"], alpha / 2.0))
+        subpop_stud_ci_lower = float(np.quantile(core["subpop_stud_dist"], alpha / 2.0))
+        subpop_pass_diag = bool(subpop_stud_ci_lower > Q_STUD_MIN
+                                and subpop_raw_ci_lower > core["materiality_bps"])
+    leg_results = {
+        "L1_readiness": l1, "economic_statistic": economic,
+        "binding_statistic": "incremental_net_vs_naive_ci_lower>0",
+        "ci_vs_naive_lower_bps": ci_naive.lower,
+        "DIAG_L3_neutral_ci_lower_bps": ci_neutral.lower,
+        "DIAG_L5_pooled_pass": pooled_diag,
+        "DIAG_L5_subpop_pass": subpop_pass_diag,
+        "DIAG_L5_subpop_abstain": subpop_abstain,
+        "DIAG_L5_subpop_raw_ci_lower_bps": subpop_raw_ci_lower,
+        "DIAG_L5_subpop_stud_ci_lower": subpop_stud_ci_lower,
+        "materiality_bps": core["materiality_bps"], "n_episodes": core["n_episodes"],
+    }
+    return {
+        "referee": "gate_stack_adaptive/variant_c", "alpha": alpha,
+        "verdict": "PASS" if passed else "REJECT", "passed": passed,
+        "effect_bps": ci_neutral.mean, "ci_lower_bps": ci_neutral.lower, "ci_upper_bps": ci_neutral.upper,
+        "effective_n": core["effective_n"], "block_length": core["block_length"],
+        "split_index": core["split_index"], "leg_results": json.dumps(leg_results, sort_keys=True),
+    }
