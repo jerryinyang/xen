@@ -21,7 +21,13 @@ public sealed record SignalPositionRecord(
     // without re-deriving the AVWAP signal. Default sentinels for non-regime models
     // (MA/Donchian) keep their emission unchanged.
     int RegimeId = -1,
-    int RegimeDirection = 0);
+    int RegimeDirection = 0,
+    // EXP-006 (CF-MR-002): the causal reversion-completion limit fill price P*_{t-1}
+    // on a bar where the resting limit was touched and the position exited intrabar;
+    // NaN on every other bar (and for all non-RSI-fade models). Lets the Python
+    // adjudication truncate the exit bar's open-to-open return at the realized
+    // favourable fill (engine-realized; no Python rct recompute — L-01/P-09).
+    double ExitFillPrice = double.NaN);
 
 public sealed record SignalEventRecord(
     DateTime SourceCloseTime,

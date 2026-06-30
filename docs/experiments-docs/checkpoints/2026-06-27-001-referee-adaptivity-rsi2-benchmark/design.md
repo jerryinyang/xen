@@ -144,3 +144,31 @@ D-benchmark  CF-MR-002 causal in-engine; report on BOTH frozen old suite AND new
 Referee FROZEN until E5 freeze; new gate **never** tuned on CF-MR-002; global holdout sealed (not in Phase-001
 scope); per-stratum binding verdicts (pooled = disclosure-only); no scope expansion after this G0; cost map +
 return basis frozen candidate-blind at E0.
+
+---
+
+## AMENDMENT — E6 inserted: P*-capable referee variant (operator-ratified, 2026-06-29)
+
+**Why.** D-benchmark (EXP-006) implementation surfaced a structural gap: CF-MR-002's faithful exit is an
+intrabar **engine-realized `P*` favourable-limit fill** (operator-ratified, EXP-006 amendment A1), but
+**both frozen gates** (Chapter-01 suite and §10.3a `gate_stack_adaptive`) consume **`position·market-
+return` only** — no `strategy_fn` seam on the binding adaptive path; feeding a realized series requires
+editing the hash-frozen module (forbidden). This is the same architecture limit that forced CF-MR-001's
+bespoke intrabar fill engine (L-01 leak site): the cTrader-primary + frozen-referee stack adjudicates
+**per-bar position-state** strategies only.
+
+**Decision.** Insert a new D-referee rung **before** D-benchmark; **D-benchmark is BLOCKED** until it
+freezes:
+```
+E6  P*-capable referee variant (EXP-007). Analysis-only. Add a realized-return adjudication path that
+    consumes an engine-realized per-bar net series (generalize the E1 strategy_fn seam to the §10.3a
+    adaptive form, additively — referee_adaptive stays byte-frozen; new path in a new module). FPR-
+    recalibrate on the EXP-019 dogfood-negative + the E2 synthetic-positive battery; per-stratum;
+    Wilson-bounded FPR. FREEZE + hash-pin BEFORE it adjudicates CF-MR-002 (L-12). 0 reads/slots.
+D-benchmark  CF-MR-002 causal in-engine; adjudicate under the frozen old suite, §10.3a (position-state
+    proxy), AND the newly-frozen E6 P*-capable gate (realized fill). Parallel disclosure.
+```
+**Guards (unchanged + extended).** §10.3a stays byte-frozen (E6 is additive, never mutates it); E6 is
+**never** tuned on CF-MR-002 and frozen before any live read; the realized `P*` fill is the **engine's**
+causal realized fill, audited (never a Python `rct` recompute — P-09). EXP-006 ID/design retained;
+its run resumes post-E6-freeze.

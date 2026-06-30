@@ -8,8 +8,27 @@ Live status + family navigation for the current chapter. Chapter 01 is archived 
 **Phase 001 — Referee-Gate Adaptivity + Causal RSI-2 Benchmark** — D-referee COMPLETE; renewed
 referee FROZEN (2026-06-29). `checkpoints/2026-06-27-001-referee-adaptivity-rsi2-benchmark/design.md`.
 Dual purpose: (1) **referee renew (DONE — gate frozen at E5, §10.3a, q\*=0.75)**; (2) end-to-end
-benchmark of the rollover via the causal RSI-2 fade (CF-MR-002) — **next: D-benchmark, operator-gated
-(credentialed/cost-bearing cTrader)**. 0 slots / 0 reads; global holdout sealed.
+benchmark of the rollover via the causal RSI-2 fade (CF-MR-002). 0 slots / 0 reads; global holdout sealed.
+
+**D-benchmark BLOCKED (2026-06-29).** EXP-006 implementation (causal RSI-2 fade, engine-realized `P*`
+exit — C# model + emission + `EXP-006.conf`, `dotnet build` PASS) surfaced that CF-MR-002's faithful
+intrabar `P*`-fill exit **cannot be adjudicated by the frozen gates** (both consume `position·market-
+return`; §10.3a has no `strategy_fn` seam; editing the hash-frozen module is forbidden). Operator
+inserted a new rung: **E6 — P*-capable referee variant (EXP-007)**, analysis-only, FPR-recalibrated +
+frozen before adjudicating CF-MR-002. See checkpoint AMENDMENT (2026-06-29) + EXP-006 amendments A1/A2.
+
+**E6 — EXP-007 FROZEN (2026-06-29, audit PASS, 0 Critical) — ADOPT ratified at operator freeze sign-off;
+`referee_pstar.gate_stack_pstar` hash-pinned (`results/freeze_manifest.json`, `referee_pstar.py
+sha256=1fd06b28…4f23`; prior suites byte-unchanged, `referee_adaptive b4fd6cb1…ae847` == E5,
+`referee_calibration 04f933f6…7994`). D-benchmark (EXP-006) resumes.**
+Additive `referee_pstar.gate_stack_pstar` = §10.3a with the signal leg sourced from an injected
+engine-realized series (one change; `referee_adaptive`/`referee_calibration` byte-unchanged, hash == E5).
+Arm R reduction identity **32/32 bit-identical**; Arm N realized-fill FPR controlled (N1 symmetric 0/32,
+N3 dogfood 0/32, N2 future-destroy max 1/80 single-draw artifacts ≤ 2α); Arm P finite power 32/32. Honest
+caveat: returns-space bracket caps (not captures) — true intrabar `P*` capture is exercised by the real
+engine in EXP-006. **Next (operator-gated):** FREEZE + hash-pin `gate_stack_pstar` → then **D-benchmark
+(EXP-006) resumes**, adjudicating CF-MR-002 under frozen old suite + §10.3a proxy + the E6 P*-gate
+(parallel disclosure). 0 reads/slots; holdout sealed; CF-MR-002 not tuned (L-12).
 
 **Referee-renew E-series (D-referee):**
 - **E1 — EXP-001 COMPLETE (2026-06-28, audit PASS).** ACCOUNTING_MATERIAL: the frozen per-held-bar

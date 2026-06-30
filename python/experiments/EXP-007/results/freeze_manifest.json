@@ -1,0 +1,88 @@
+{
+  "experiment": "EXP-007",
+  "rung": "E6 — P*-capable referee variant (referee renew, D-referee)",
+  "status": "FROZEN",
+  "frozen_on": "2026-06-29",
+  "operator_signoff": "freeze ratified (research-pipeline operator instruction, 2026-06-29)",
+  "blocked_reasons": [],
+
+  "frozen_path": {
+    "module": "python/src/xen/referee_pstar.py",
+    "function": "gate_stack_pstar",
+    "relationship": "§10.3a (referee_adaptive.gate_stack_adaptive) with the signal leg sourced from an injected engine-realized per-bar net series (realized_bps) instead of strategy_return_bps_turnover(returns, positions). Exactly one computational change; every sub-primitive (L1+coverage validity floor, L3 vs-naive on the frozen market-return reference, L5 pooled + studentized sub-pop, block bootstrap, split discipline) imported from the frozen modules and reused unchanged; same result-dict schema → referee_adaptive.adaptive_row consumes it unedited. No new threshold, knob, or constant.",
+    "calibration_substrate_helper": "make_realized_fill (synthetic resting-bracket realized series; CALIBRATION ONLY — never adjudicates a real price strategy; the engine ExitFillPrice emission does, EXP-006)"
+  },
+
+  "provenance": {
+    "referee_pstar_sha256": "1fd06b28df463535da7e750a1c7baa0bc02fb445442b206d1765413d0ada4f23",
+    "git_commit": "05e38d7",
+    "note": "referee_pstar.py is the only file added/changed by E6; the prior frozen suites are byte-unchanged (hashes below == E5 freeze_manifest)."
+  },
+
+  "prior_suites_unchanged": {
+    "referee_adaptive.py": {
+      "sha256": "b4fd6cb110b6c610438e4039ebcd69e79cb90d251244b31398ed83067bbae847",
+      "matches": "EXP-005 E5 freeze (§10.3a renewed referee), byte-identical"
+    },
+    "referee_calibration.py": {
+      "sha256": "04f933f6cddad3e35480c1dc512705b368ef6331b868b529ab64a720bad47994",
+      "matches": "Chapter-01 frozen suite, byte-identical (untouched)"
+    },
+    "byte_freeze_check": "results/byte_freeze_check.json (frozen_modules_before == frozen_modules_after, unchanged=true)"
+  },
+
+  "operating_point": {
+    "note": "inherited unchanged from the E5 freeze (referee_pstar mirrors §10.3a; it introduces no new operating-point constant).",
+    "q_star": 0.75,
+    "Q_STUD_MIN": 0.6744897501960817,
+    "N_BOOTSTRAP": 500,
+    "alpha": 0.05,
+    "MIN_EPISODES_SUBPOP": 5,
+    "subpop_quantile_module_default": 0.75,
+    "return_basis": "open_to_open_le_t_minus_1",
+    "adjudication_fpr_rule": {
+      "MIN_FPR_PASSES": 2,
+      "FPR_CONTROL_BOUND": 0.1,
+      "note": "E4-derived less-brittle freeze-adjudication rule; adjudication-harness only, gate byte-unchanged"
+    }
+  },
+
+  "validation": {
+    "arm_r_reduction_identity": {
+      "result": "core dict bit-identical 32/32; verdict identical 32/32 (gate_stack_pstar(realized:=strategy_return_bps_turnover) == gate_stack_adaptive)",
+      "pass": true
+    },
+    "arm_n_fpr": {
+      "n1_symmetric_no_edge": "0/32 passes (≤ §10.3a dogfood FPR 0)",
+      "n2_future_destroy": "max 0.0125 (5×4h strata at 1/80 = E4 wilson_lower(1,80)>0 single-draw artifacts ≤ 2α=0.10); 27/32 = 0",
+      "n3_dogfood_negative": "0/32 passes (Donchian/MA lagged via realized path; ≤ §10.3a dogfood FPR 0)",
+      "pass": true
+    },
+    "arm_p_power": {
+      "result": "32/32 finite MDE (planted realized drift through wide bracket); MDE 0.5–4.0 bps",
+      "pass": true
+    },
+    "honest_caveat": "In returns-space the calibration bracket CAPS the per-bar net return; it cannot capture an intrabar excursion the close misses (needs intrabar High/Low). Arm P validates finite power on a realized series (the binding criterion), NOT capture-beyond-position-state. True intrabar P* capture is exercised by the real cTrader engine in EXP-006, not in this calibration."
+  },
+
+  "adoption_rule": "ADOPT iff Arm-R byte-identical ∧ Arm-N FPR ≤ §10.3a dogfood FPR ∧ Arm-P finite power, per stratum. All three met on all 32 strata → ADOPT (predeclared DET-dominance adoption rule, design.md).",
+
+  "audit": {
+    "verdict": "PASS",
+    "critical": 0,
+    "warnings": 1,
+    "info": 3,
+    "n2_control_fix": "an earlier N2 control permuted the realized P&L OUTPUT (preserving its mean) → FPR 1.000; corrected to permute the market returns at the INPUT (L-07) and re-ran clean — verdict-material, fixed+rerun"
+  },
+
+  "governance": {
+    "reads_spent": 0,
+    "candidate_slots": 0,
+    "holdout": "sealed (first-70% only; final-30% global holdout never loaded)",
+    "cf_mr_002_tuned": false,
+    "l12_guard": "frozen BEFORE adjudicating any live candidate; CF-MR-002 not tuned on this gate",
+    "registry_disposition": "referee-method experiment — not applicable (no candidate family adjudicated, no slot consumed)"
+  },
+
+  "next": "D-benchmark (EXP-006) resumes — adjudicate CF-MR-002 under the frozen Chapter-01 suite (position-state proxy, close-to-close) + §10.3a (position-state proxy, open-to-open) + this E6 gate_stack_pstar (engine-realized P* fill), parallel disclosure."
+}

@@ -52,7 +52,7 @@ compressed, never thinned of substance.
 
 | Artifact | Budget | Density rule |
 |----------|--------|--------------|
-| `design.md` | ~500 lines | merged scope+plan; tables/bullets, no prose padding |
+| `design.md` | ~300 lines | merged scope+plan; tables/bullets, no prose padding |
 | `report.md` | ~400 lines | interpretation+results+report; key plots only |
 | `audit.md` | **uncapped** | forensic/adversarial/causal-provenance needs room — but still terse |
 | registry updates | concise rows only | regulate format; never drop the ledger mechanism |

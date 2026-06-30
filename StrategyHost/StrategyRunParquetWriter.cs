@@ -170,7 +170,9 @@ public sealed class StrategyRunParquetWriter : IDisposable
             new DataField<bool>("IsFlat"),
             // EXP-029: per-bar regime state (sentinel -1/0 for non-regime models).
             new DataField<int>("RegimeId"),
-            new DataField<int>("RegimeDirection")
+            new DataField<int>("RegimeDirection"),
+            // EXP-006: causal reversion-completion limit fill price on exit bars (NaN otherwise).
+            new DataField<double>("ExitFillPrice")
         };
         using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
         using var writer = ParquetWriter.CreateAsync(new ParquetSchema(fields), stream).GetAwaiter().GetResult();
@@ -191,6 +193,7 @@ public sealed class StrategyRunParquetWriter : IDisposable
         groupWriter.WriteColumnAsync(new DataColumn(fields[10], rows.Select(row => row.IsFlat).ToArray())).GetAwaiter().GetResult();
         groupWriter.WriteColumnAsync(new DataColumn(fields[11], rows.Select(row => row.RegimeId).ToArray())).GetAwaiter().GetResult();
         groupWriter.WriteColumnAsync(new DataColumn(fields[12], rows.Select(row => row.RegimeDirection).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[13], rows.Select(row => row.ExitFillPrice).ToArray())).GetAwaiter().GetResult();
     }
 
     private static void WriteEvents(string path, IReadOnlyList<SignalEventRecord> rows)

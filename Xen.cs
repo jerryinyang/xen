@@ -21,7 +21,8 @@ public enum XenStrategy
 {
     MaCrossover,
     AvwapBaseline,
-    Donchian20
+    Donchian20,
+    Rsi2Fade
 }
 
 [Robot(AccessRights = AccessRights.FullAccess, AddIndicators = false, DefaultTimeFrame="Minute")]
@@ -355,6 +356,7 @@ public class Xen : Robot
             XenStrategy.MaCrossover => new MovingAverageCrossoverModel(FastMa, SlowMa),
             XenStrategy.AvwapBaseline => new AvwapBounceModel(FastMa, SlowMa),
             XenStrategy.Donchian20 => new DonchianBreakoutModel(),
+            XenStrategy.Rsi2Fade => new RsiFadeModel(),
             _ => throw new InvalidOperationException($"Unsupported strategy: {Strategy}")
         };
     }
@@ -382,6 +384,12 @@ public class Xen : Robot
                 break;
             case XenStrategy.Donchian20:
                 parameters["lookback"] = 20;
+                break;
+            case XenStrategy.Rsi2Fade:
+                parameters["rsi_period"] = 2;
+                parameters["low_extreme"] = 10.0;
+                parameters["high_extreme"] = 90.0;
+                parameters["exit"] = "rct_causal_di_minus_1";
                 break;
         }
         return parameters;

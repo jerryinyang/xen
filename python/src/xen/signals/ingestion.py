@@ -23,6 +23,10 @@ from typing import Any
 import numpy as np
 import polars as pl
 
+from xen.referee_adaptive import (
+    entry_mask,
+    next_open_to_open_returns_from_bars,
+)
 from xen.referee_calibration import (
     domain_split_index,
     evaluate_referees,
@@ -92,6 +96,69 @@ def returns_and_positions(positions: pl.DataFrame) -> tuple[np.ndarray, np.ndarr
     returns, aligned = next_log_returns_from_bars(bars)
     position_array = ordered.get_column("Position").to_numpy().astype(float)
     return returns, position_array[: len(returns)], aligned
+
+
+def returns_and_positions_realized(
+    positions: pl.DataFrame, *, cost_bps: float
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, pl.DataFrame]:
+    """Open-to-open (``<= t-1``) market returns + aligned positions + the engine-REALIZED
+    per-bar NET bps series, for the E6 P*-capable gate (EXP-006 amendment A1, Option C).
+
+    The realized series mirrors the §10.3a signal leg
+    (:func:`xen.referee_adaptive.strategy_return_bps_turnover`) EXACTLY, except on a bar where the
+    cTrader engine filled the resting reversion-completion limit. There the bar's open-to-open log
+    return is replaced by ``log(P* / RealOpen)`` — the engine-realized favourable fill, carried in the
+    emitted ``ExitFillPrice`` column (``NaN`` on every non-exit bar). Round-trip ``cost_bps`` is charged
+    once per entry (amortized), matching the gate. The fill is the **engine's** emitted price; no Python
+    ``rct`` recompute / favourable-index pass exists (L-01 / P-09 clean).
+
+    Causal-provenance contract: ``realized_bps[t]`` reads only ``positions[t]`` (the held direction),
+    ``RealOpen[t]`` / ``RealOpen[t+1]`` (the executable open-to-open move), and ``ExitFillPrice[t]`` (the
+    engine fill of a limit *placed before bar t opened*). No value reads a future bar.
+
+    Parameters
+    ----------
+    positions : pl.DataFrame
+        Emitted positions frame; must carry ``SourceCloseTime, Position, RealOpen, RealHigh, RealLow,
+        RealClose, ExitFillPrice``.
+    cost_bps : float
+        Round-trip cost in bps charged once per entry (the amortized B-convention).
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray, np.ndarray, pl.DataFrame]
+        ``(returns, positions_aligned, realized_bps, aligned)`` — open-to-open log market returns, the
+        aligned position array, the realized NET bps series (same length as ``returns``), and the
+        aligned bar rows (last bar dropped — no next open).
+    """
+    _validate_positions(positions)
+    missing = {"RealOpen", "ExitFillPrice"}.difference(positions.columns)
+    if missing:
+        raise ValueError(f"realized adjudication needs columns {sorted(missing)} (P*-fill emission)")
+    ordered = positions.sort("SourceCloseTime")
+    bars = ordered.select(
+        pl.col("SourceCloseTime").alias("OpenTime"),
+        pl.col("SourceCloseTime").alias("CloseTime"),
+        pl.col("RealOpen").alias("Open"),
+        pl.col("RealHigh").alias("High"),
+        pl.col("RealLow").alias("Low"),
+        pl.col("RealClose").alias("Close"),
+        pl.lit(0, dtype=pl.Int64).alias("TickVolume"),
+    )
+    returns, aligned = next_open_to_open_returns_from_bars(bars)
+    m = len(returns)
+    pos = ordered.get_column("Position").to_numpy().astype(float)[:m]
+    open_t = ordered.get_column("RealOpen").to_numpy().astype(float)[:m]
+    exit_fill = ordered.get_column("ExitFillPrice").to_numpy().astype(float)[:m]
+
+    held_bps = pos * returns * 10_000.0
+    is_exit = (~np.isnan(exit_fill)) & (pos != 0.0)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        exit_bps = pos * np.log(exit_fill / open_t) * 10_000.0
+    gross = np.where(is_exit, exit_bps, held_bps)
+    gross = np.where(pos != 0.0, gross, 0.0)
+    realized_bps = gross - cost_bps * entry_mask(pos).astype(float)
+    return returns, pos, realized_bps, aligned
 
 
 def screen_emitted_positions(
