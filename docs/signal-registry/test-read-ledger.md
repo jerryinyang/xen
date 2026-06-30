@@ -356,6 +356,18 @@ CF-MR-001 net-tradable/deployment claim rests on them. **G-021 TRADABLE and G-02
 RETRACTED.** EXP-089/G-020 availability (gross MFE_med, no RCT limit) is unaffected. Full mechanism + scope:
 `candidate-families/cf-mr-001.md` §CLOSURE + the Phase 021/022 banners in `multiplicity-registry.md`.
 
+**EXP-006 CF-MR-002 D-benchmark causal-screen disclosure (2026-06-30, Phase 001, CF-MR-002/HYP-001) —
+NO counted reads.** EXP-006 ran the causal RSI-2 fade in the cTrader StrategyHost over 17×{1h,4h} and
+adjudicated the emissions under three frozen referees on the **first-70% analysis slice only** (the
+referee's internal train/test split operates within the analysis set; the final-30% global holdout was
+**never loaded** — `AnalysisEndUtc` fence verified 0/34 runs over the cutoff). This is an **honest-prior
+causal tradability screen** (admit/exonerate, no binding stratum-specific confirmation estimand), so per
+the screen/disclosure convention (EXP-089/094 precedent) it is a **disclosure, not a counted read**:
+`counted_test_reads=0`, `candidate_slots=0`, holdout sealed. Verdict **NOT-TRADABLE 34/34 — CF-MR-002
+EXONERATED**; the gates were frozen (E5/E6) before this read (L-12 honored). No stratum tally moves
+(CF-MR-002 strata are the same INFR-003 instrument×domain populations; none enter a binding inference
+here). A future counted read would open only on a TRAIN admit (none occurred).
+
 **The global holdout (final 30% per new file) is outside this ledger entirely** and was
 sealed at first touch in VAL-005 (0 holdout rows read). The single historical sanctioned shot (EXP-032, old
 dataset) is spent and non-transferable; **the new-dataset holdout shot has now been spent at the gated Phase 022

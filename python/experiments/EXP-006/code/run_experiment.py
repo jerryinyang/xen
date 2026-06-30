@@ -102,11 +102,20 @@ def run_identity(run) -> tuple[str, str]:
 # Pure helpers
 # --------------------------------------------------------------------------- #
 def frozen_gate_row(positions: pl.DataFrame, *, instrument: str, domain: str, seed: int) -> dict:
-    """Gate-A frozen Chapter-01 suite verdict (close-to-close, position-state proxy)."""
-    rows = screen_emitted_positions(positions, instrument=instrument, domain=domain, seed=seed,
-                                    alpha_values=(ALPHA,), n_bootstrap=N_BOOTSTRAP)
-    gate = next(r for r in rows if r["referee"] == "gate_stack")
-    return gate
+    """Gate-A frozen Chapter-01 suite verdict (close-to-close, position-state proxy).
+
+    The frozen suite's cost map (`referee_calibration.ROUND_TRIP_COST_BPS`) covers only its native
+    4-core (EURUSD/XAUUSD/BTCUSD/USTEC); it is byte-frozen and cannot be extended. For the other 13
+    instruments gate A is structurally UNAVAILABLE (cost-map gap) — recorded as `N/A_FROZEN_COSTMAP`,
+    a disclosure, not a fail. Gates B/C (renewed §10.3a, E0 17-instrument map) cover all 17.
+    """
+    try:
+        rows = screen_emitted_positions(positions, instrument=instrument, domain=domain, seed=seed,
+                                        alpha_values=(ALPHA,), n_bootstrap=N_BOOTSTRAP)
+        return next(r for r in rows if r["referee"] == "gate_stack")
+    except KeyError:
+        return {"referee": "gate_stack", "verdict": "N/A_FROZEN_COSTMAP", "passed": False,
+                "ci_lower_bps": float("nan")}
 
 
 def adaptive_proxy_row(returns: np.ndarray, positions: np.ndarray, *, domain: str, cost_bps: float,

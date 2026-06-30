@@ -1,8 +1,22 @@
 # CF-MR-002 — Causal RSI-2 Mean-Reversion Fade (cTrader-primary)
 
-**Status:** `REGISTERED` (2026-06-27) — G0 RATIFIED at Chapter-02 Phase 001 (D0 in the checkpoint
-`design.md` §D0). 0 candidate slots consumed, 0 counted TEST reads, global holdout sealed. Adjudicated
-at D-benchmark, after the adaptive gate is frozen (E5); never used to tune the gate (L-12).
+**Status:** `SCREENED — EXONERATED (NOT-TRADABLE)` (D-benchmark **EXP-006**, 2026-06-30; audit PASS, 0
+Critical). Prior: `REGISTERED` (2026-06-27) — G0 RATIFIED at Chapter-02 Phase 001 (D0 §D0). 0 candidate
+slots consumed, 0 counted TEST reads, global holdout sealed; never used to tune the gate (L-12 honored —
+gates frozen at E5/E6 before the read).
+
+**D-benchmark outcome (EXP-006/HYP-001, 2026-06-30).** Causal RSI-2 fade (RSI(2) 10/90, causal
+`rct[di-1]`/`P*_{t-1}` exit, engine-realized intrabar fill) run in the cTrader StrategyHost over
+17×{1h,4h} = 34 strata, adjudicated under 3 referees (frozen Chapter-01 / §10.3a position-state proxy /
+E6 P\*-capable `referee_pstar.gate_stack_pstar`). **NOT-TRADABLE 34/34** — all gates REJECT every cell;
+net P&L negative on all 34 (−0.03…−9.66 bps/active bar); the faithful P\*-realized gate's ci_lower<0
+everywhere. Binding leg = **L3 absolute neutral floor** (the fade beats a naive momentum baseline but is
+net-negative in absolute terms). **Leak-clean:** T1 future-destroy collapsed 0.000/34, T2 causal-
+provenance clean 34/34 — the L-01 falsification confirmed on the faithful engine-fill mechanism (not a
+proxy). **CF-MR-002 is exonerated as a tradable edge** on the causal TRAIN screen. Family remains in the
+registry (never deleted); deferred levers (vol-regime, 25/75, 15m) each need a fresh D0 + slot and face
+the same absolute-floor wall absent new information. See `python/experiments/EXP-006/report.md`,
+`audit.md`, and `families/cf-mr-002/INDEX.md`.
 
 **Provenance.** Successor to **CF-MR-001** (CLOSED — REFUTED 2026-06-26; the net-tradable/deployment
 arc rested on a one-bar EXIT-RCT look-ahead, `rct[di]` rested during bar `di`; causalized the bare

@@ -10,12 +10,19 @@ referee FROZEN (2026-06-29). `checkpoints/2026-06-27-001-referee-adaptivity-rsi2
 Dual purpose: (1) **referee renew (DONE — gate frozen at E5, §10.3a, q\*=0.75)**; (2) end-to-end
 benchmark of the rollover via the causal RSI-2 fade (CF-MR-002). 0 slots / 0 reads; global holdout sealed.
 
-**D-benchmark BLOCKED (2026-06-29).** EXP-006 implementation (causal RSI-2 fade, engine-realized `P*`
-exit — C# model + emission + `EXP-006.conf`, `dotnet build` PASS) surfaced that CF-MR-002's faithful
-intrabar `P*`-fill exit **cannot be adjudicated by the frozen gates** (both consume `position·market-
-return`; §10.3a has no `strategy_fn` seam; editing the hash-frozen module is forbidden). Operator
-inserted a new rung: **E6 — P*-capable referee variant (EXP-007)**, analysis-only, FPR-recalibrated +
-frozen before adjudicating CF-MR-002. See checkpoint AMENDMENT (2026-06-29) + EXP-006 amendments A1/A2.
+**D-benchmark COMPLETE (2026-06-30) — EXP-006 NOT-TRADABLE 34/34, CF-MR-002 EXONERATED (audit PASS, 0
+Critical).** The causal RSI-2 fade (engine-realized `P*` intrabar fill) adjudicated under 3 referees
+(frozen Chapter-01 / §10.3a position-state proxy / **E6 P\*-capable gate** `referee_pstar.gate_stack_pstar`)
+on 17×{1h,4h}: **all gates REJECT every cell**; net P&L negative on all 34 (−0.03…−9.66 bps/active bar);
+the faithful P\*-realized gate's ci_lower<0 everywhere. Binding leg = **L3 absolute neutral floor** (the
+fade beats a naive momentum baseline — vs-naive +0.87 @ EURUSD/1h — but is **net-negative in absolute
+terms**: exactly the floor §10.3a has and variant-c lacked, E5/L-12). **T1 future-destroy 0.000/34, T2
+provenance 34/34 → leak-clean**: the L-01 falsification lands on the *faithful* mechanism (real engine
+intrabar fill, not a capped proxy). **O3:** Chapter-02's first price-primary run exposed + fixed 3 latent
+`run-experiment.sh` infra bugs (stamp-suffix completion detection; flush race; report-json completion
+gate) + 1 op note (parallel-rerun symlink race) + the frozen suite's 4-core cost-map limit (gate A 8/34,
+renewed §10.3a generalizes). 0 reads/slots; holdout sealed; not tuned (L-12). The blocking that inserted
+EXP-007 (E6) is resolved. (Prior block note retained in EXP-006 amendments A1/A2.)
 
 **E6 — EXP-007 FROZEN (2026-06-29, audit PASS, 0 Critical) — ADOPT ratified at operator freeze sign-off;
 `referee_pstar.gate_stack_pstar` hash-pinned (`results/freeze_manifest.json`, `referee_pstar.py
@@ -87,7 +94,7 @@ _(none)_
 ## Family Indexes
 | Family | EXP range | Status |
 |--------|-----------|--------|
-| CF-MR-002 — causal RSI-2 fade (cTrader-primary) | _(EXP-IDs at promotion)_ | REGISTERED — G0 PENDING (Phase 001) |
+| CF-MR-002 — causal RSI-2 fade (cTrader-primary) | EXP-006 | **SCREENED — EXONERATED (NOT-TRADABLE 34/34, D-benchmark 2026-06-30)**; `families/cf-mr-002/INDEX.md` |
 
 ## Checkpoint Retrospectives
 _(none yet)_

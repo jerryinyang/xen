@@ -91,8 +91,15 @@ prepare_cache_layout() {
   done < <(cache_providers)
 }
 
-run_dir_for()  { echo "$OUT_DIR/${STRATEGY}_$(echo "$1" | tr 'A-Z' 'a-z')_${2}"; }
-run_complete() { local d; d=$(run_dir_for "$1" "$2"); [[ -s "$d/run_metadata.json" && -s "$d/positions.parquet" && -s "$d/trade_blotter.parquet" && -s "$3" ]]; }
+# The StrategyRunParquetWriter appends a UTC timestamp suffix to the run dir
+# (`{strategy}_{symbol}_{domain}_{stamp}`), so resolve the NEWEST matching dir rather
+# than an exact unsuffixed path (else run_complete never matches -> 4h max_wait hang).
+run_dir_for()  { { ls -dt "$OUT_DIR/${STRATEGY}_$(echo "$1" | tr 'A-Z' 'a-z')_${2}_"*/ 2>/dev/null || true; } | head -1; }
+# Gate on the StrategyHost emissions only (the binding artifacts). The cTrader `--report-json`
+# ($3) is a diagnostic the Python suite never consumes, and cTrader's console can crash on shutdown
+# AFTER the parquet is flushed (state-machine exception) — gating on the report then hangs the worker
+# for the full max_wait. positions/trade_blotter/run_metadata are written together at Dispose.
+run_complete() { local d; d=$(run_dir_for "$1" "$2"); [[ -n "$d" && -s "${d}run_metadata.json" && -s "${d}positions.parquet" && -s "${d}trade_blotter.parquet" ]]; }
 
 run_backtest() {
   local symbol="$1" domain="$2"
@@ -123,6 +130,9 @@ run_backtest() {
     sleep 5
   done
   wait "$log_pid" 2>/dev/null || true
+  # Close the flush race: a container that exits on its own may write positions/trade_blotter/report
+  # a moment after the while-loop sees it gone — give the artifacts a few seconds to land.
+  for _ in 1 2 3 4 5 6; do run_complete "$symbol" "$domain" "$report" && break; sleep 2; done
   run_complete "$symbol" "$domain" "$report" || { echo "$run_id produced incomplete artifacts." >&2; return 1; }
   echo "Completed $run_id -> $(run_dir_for "$symbol" "$domain")"
 }
