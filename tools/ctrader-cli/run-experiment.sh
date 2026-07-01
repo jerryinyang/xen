@@ -37,6 +37,10 @@ fi
 
 # --- per-experiment config (declares the assoc arrays below) -----------------------------
 declare -A ANALYSIS_END BACKTEST_END
+# MODEL_ARGS_BY_SYMBOL[symbol] = extra per-symbol cBot args (space-separated), e.g. a multi-symbol
+# experiment's per-cell basket declaration (EXP-010 CONC-1: --BasketMates=A;B;C). Word-split on
+# expansion; values must not contain spaces within a single arg.
+declare -A MODEL_ARGS_BY_SYMBOL
 SYMBOLS=(); DOMAINS=(); MODEL_ARGS=()
 STRATEGY=""; STRATEGY_VALUE=""
 # shellcheck disable=SC1090
@@ -121,7 +125,7 @@ run_backtest() {
       --StrategyOutputDirectory=/workspace/data/strategy_runs/$EXP_ID \
       --DomainMinutes="$(domain_minutes "$domain")" \
       --StrictCoverage="$(strict_coverage "$domain")" --MinCoverage="$(min_coverage "$domain")" \
-      "${MODEL_ARGS[@]}")
+      "${MODEL_ARGS[@]}" ${MODEL_ARGS_BY_SYMBOL[$symbol]:-})
   docker logs -f "$cid" | sed -u "s/^/[$run_id] /" & local log_pid=$!
   start=$(date +%s)
   while docker ps -q --filter "id=$cid" | grep -q .; do

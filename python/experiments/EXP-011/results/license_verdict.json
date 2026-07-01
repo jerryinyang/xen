@@ -1,0 +1,23 @@
+{
+  "verdict": "FREEZE_LICENSED",
+  "anchor_status": "PASS",
+  "anchor_pstar_identity": 32,
+  "prior_fpr_controlled": true,
+  "prior_dense_powered": true,
+  "prior_recovery_strata": 16,
+  "prior_strata": 16,
+  "band_flip_strata": [],
+  "pstar_identity_15m": 112,
+  "n_15m_rows": 112,
+  "future_destroy_max": 0.1,
+  "tripwire_failures": [],
+  "min_fpr_passes_rule": 2,
+  "constants": {
+    "materiality_bps": 0.75,
+    "min_effective_n": 90,
+    "min_state_count": 25,
+    "episode_length": 17,
+    "min_coverage": 0.9,
+    "cost_rule": "inherit_per_instrument_1h"
+  }
+}

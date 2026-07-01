@@ -1,0 +1,40 @@
+{
+  "experiment": "EXP-012",
+  "corrected_outcome": "NOT_TRADABLE_POWERED",
+  "raw_outcome_superseded": "REJECT_LEAK",
+  "reason": "REJECT_LEAK was a false trip: F-2 Python permutation-destroy is mathematically mean-invariant, so an additive-positive plant can never collapse under it (Stage-2 control mis-spec). The VALID future-destroy is the live phase-shifted-basket shuffle run (EXP-012-t2b-shuffle): shuffle_survivors=[]/tripwire_pass=True -> clean. Planted-positive power check PASS 24/24 confirms the vehicle can detect a real edge at this N, so the null is genuine (not underpowered).",
+  "domain": "15m",
+  "min_state_count": 25,
+  "arms": {
+    "T2a": {
+      "cells": 14,
+      "powered": 14,
+      "holm_admit_fit": 0,
+      "unfit": 0
+    },
+    "T2b": {
+      "cells": 10,
+      "powered": 10,
+      "holm_admit_fit": 0,
+      "unfit": 0
+    }
+  },
+  "n_powered": 24,
+  "n_holm_admit_fit": 0,
+  "live_tripwire_pass": true,
+  "shuffle_survivors": [],
+  "f2_planted_detect_ok": true,
+  "f2_permutation_destroy": "INVALID_MEAN_INVARIANT_DIAGNOSTIC_NOT_A_GATE",
+  "f1_fidelity": "PASS all 24 (z_corr=1.00, Jaccard 0.97-0.99)",
+  "best_cells_bps": {
+    "T2a:GBPUSD": 0.04,
+    "T2a:US2000": 0.02
+  },
+  "worst_cells_bps": {
+    "T2a:BTCUSD": -0.77,
+    "T2b:USTEC": -0.54,
+    "T2a:USTEC": -0.41
+  },
+  "n_admit": 0,
+  "n_holm_admit": 0
+}

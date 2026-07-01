@@ -1,0 +1,156 @@
+{
+  "experiment": "EXP-010",
+  "arm": "T1_S5_exec1h",
+  "cells": [
+    {
+      "instrument": "AUDUSD",
+      "n_bars": 17440,
+      "n_entries": 77,
+      "n_episodes": 10,
+      "realized_mean_bps": -0.2594877766287555,
+      "ci_low": -0.19043911201400782,
+      "l1": false,
+      "l3": "FAIL",
+      "admit": false,
+      "holm_admit": false,
+      "powered": false
+    },
+    {
+      "instrument": "GBPUSD",
+      "n_bars": 17512,
+      "n_entries": 116,
+      "n_episodes": 23,
+      "realized_mean_bps": 0.10216907322004573,
+      "ci_low": -0.03548841492926943,
+      "l1": false,
+      "l3": "FAIL",
+      "admit": false,
+      "holm_admit": false,
+      "powered": false
+    },
+    {
+      "instrument": "NZDUSD",
+      "n_bars": 17433,
+      "n_entries": 89,
+      "n_episodes": 22,
+      "realized_mean_bps": -0.25827926911121385,
+      "ci_low": -0.11334478849141166,
+      "l1": false,
+      "l3": "FAIL",
+      "admit": false,
+      "holm_admit": false,
+      "powered": false
+    },
+    {
+      "instrument": "US2000",
+      "n_bars": 16778,
+      "n_entries": 119,
+      "n_episodes": 18,
+      "realized_mean_bps": -0.6998047917534482,
+      "ci_low": -0.5580806365051321,
+      "l1": false,
+      "l3": "FAIL",
+      "admit": false,
+      "holm_admit": false,
+      "powered": false
+    },
+    {
+      "instrument": "US500",
+      "n_bars": 15734,
+      "n_entries": 157,
+      "n_episodes": 32,
+      "realized_mean_bps": -0.6082233170532553,
+      "ci_low": -0.15941736108417656,
+      "l1": false,
+      "l3": "FAIL",
+      "admit": false,
+      "holm_admit": false,
+      "powered": false
+    }
+  ],
+  "n_powered": 0,
+  "n_holm_admit": 0,
+  "tripwire_pass": true,
+  "shuffle_cells": [
+    {
+      "instrument": "AUDUSD",
+      "n_bars": 17440,
+      "n_entries": 66,
+      "n_episodes": 9,
+      "realized_mean_bps": 1.0197558217704104,
+      "ci_low": -0.00345967973189991,
+      "l1": false,
+      "l3": "FAIL",
+      "admit": false,
+      "holm_admit": false,
+      "powered": false
+    },
+    {
+      "instrument": "GBPUSD",
+      "n_bars": 17512,
+      "n_entries": 78,
+      "n_episodes": 15,
+      "realized_mean_bps": 0.021231459259278888,
+      "ci_low": -0.031006703777676642,
+      "l1": false,
+      "l3": "FAIL",
+      "admit": false,
+      "holm_admit": false,
+      "powered": false
+    },
+    {
+      "instrument": "NZDUSD",
+      "n_bars": 17433,
+      "n_entries": 84,
+      "n_episodes": 22,
+      "realized_mean_bps": 0.5072672623691684,
+      "ci_low": -0.1413423474516988,
+      "l1": false,
+      "l3": "FAIL",
+      "admit": false,
+      "holm_admit": false,
+      "powered": false
+    },
+    {
+      "instrument": "US2000",
+      "n_bars": 16778,
+      "n_entries": 74,
+      "n_episodes": 12,
+      "realized_mean_bps": 0.4618285375477454,
+      "ci_low": -0.5257838273958065,
+      "l1": false,
+      "l3": "FAIL",
+      "admit": false,
+      "holm_admit": false,
+      "powered": false
+    },
+    {
+      "instrument": "US500",
+      "n_bars": 15734,
+      "n_entries": 59,
+      "n_episodes": 11,
+      "realized_mean_bps": 0.3725537619392387,
+      "ci_low": -0.14594924531139059,
+      "l1": false,
+      "l3": "FAIL",
+      "admit": false,
+      "holm_admit": false,
+      "powered": false
+    }
+  ],
+  "outcome": "UNPOWERED",
+  "holm": {
+    "AUDUSD": false,
+    "GBPUSD": false,
+    "NZDUSD": false,
+    "US2000": false,
+    "US500": false
+  },
+  "pvals": {
+    "AUDUSD": 0.954,
+    "GBPUSD": 0.1026,
+    "NZDUSD": 0.3308,
+    "US2000": 0.983,
+    "US500": 0.2857
+  }
+}

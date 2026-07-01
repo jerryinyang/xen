@@ -1,0 +1,46 @@
+{
+  "status": "FROZEN",
+  "experiment": "EXP-011",
+  "renew_leg": "E7-15m-domain-extension",
+  "added_domain": "15m",
+  "operating_point": {
+    "q_star": 0.75,
+    "Q_STUD_MIN": 0.6744897501960817,
+    "N_BOOTSTRAP": 500,
+    "alpha": 0.05,
+    "return_basis": "open_to_open_le_t_minus_1"
+  },
+  "domain_spec_15m": {
+    "period_minutes": 15,
+    "min_coverage": 0.9,
+    "min_effective_n": 90,
+    "min_state_count": 25
+  },
+  "materiality_bps_15m": 0.75,
+  "episode_length_15m": 17,
+  "cost_rule_15m": "inherit_per_instrument_1h_round_trip (domain-invariant, per-trade)",
+  "derivation": {
+    "materiality": "0.19365*sqrt(15)=0.75 (reproduces frozen 1h/4h)",
+    "min_effective_n": "log-period interp(5m 120, 1h 60)~=93.5 -> 90",
+    "min_state_count": "log-period interp(5m 30, 1h 20)~=25.6 -> 25",
+    "episode_length": "log-period interp(5m 24, 1h 8)~=16.9 -> 17"
+  },
+  "license_verdict": "FREEZE_LICENSED",
+  "frozen_modules_before": {
+    "referee_adaptive.py": "b4fd6cb110b6c610438e4039ebcd69e79cb90d251244b31398ed83067bbae847",
+    "referee_calibration.py": "04f933f6cddad3e35480c1dc512705b368ef6331b868b529ab64a720bad47994",
+    "referee_pstar.py": "1fd06b28df463535da7e750a1c7baa0bc02fb445442b206d1765413d0ada4f23",
+    "incremental_referee.py": "b0ad99b20147f7400261bbdb5a56ee224e817c21d2879676326515e13134c075"
+  },
+  "frozen_modules_after": {
+    "referee_adaptive.py": "96c940b5b7a598c6f8b188ff0c17070eb92a157522ed29d2d0b20c2535a1cb82",
+    "referee_calibration.py": "d10e6a27397e1995124611adda89cf2baf3bc01238d7b3866b65afd90e61fafe",
+    "referee_pstar.py": "1fd06b28df463535da7e750a1c7baa0bc02fb445442b206d1765413d0ada4f23",
+    "incremental_referee.py": "1b33e70a68e7a3b4f2d5c599a07903eb101c2f375d4bfe16f7147fb0f5b2e9aa"
+  },
+  "modules_edited": [
+    "referee_calibration.py",
+    "referee_adaptive.py",
+    "incremental_referee.py"
+  ]
+}
