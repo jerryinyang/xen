@@ -1066,6 +1066,63 @@ tradability, counted TEST reads, and holdout release are all out of Phase-002 sc
 dated D0 + slot decision. The EXP-009 ADMIT advances CF-MR-003 to the concretization gate; no slot/read
 consumed. All outcomes retained.
 
+## Chapter 02 · Phase 003 Batch (CF-MR-003 Tradability Concretization, CONC-1) — EXP-010 (T1) + EXP-012 (T2) NOT-TRADABLE → TRADABILITY CLOSED
+
+**Opened + closed:** 2026-07-01 (Track 1 = EXP-010, Track 2 = EXP-012). **Family:** CF-MR-003. **Governing checkpoint:**
+`docs/experiments-docs/checkpoints/2026-07-01-003-cf-mr-003-tradability-concretization/`. **Governing experiments:**
+EXP-010 (T1 exec-1h) + EXP-012 (T2 exec-15m; referee prereq E7/EXP-011). **Slot accounting: 1 candidate slot CONSUMED**
+(first tradability exploration on CF-MR-003; **T2 opened 0 new slots** — same concretization); **0 counted TEST reads**;
+holdout sealed; frozen referee untouched (L-12).
+
+**EXP-012 — CF-MR-003 CONC-1 Track 2 (2026-07-01) — NOT-TRADABLE (POWERED); price-primary in-engine; audit PASS, 0
+Critical.** The same **form-2 limit-at-anchor** fade on the **24 EXP-009 exec-15m admits**, adjudicated under the
+**frozen 15m referee** (EXP-011, §10.3a q\*=0.75 + E6 P\*-gate, `min_state_count=25`), **one Holm family, two explicit
+sub-families**: **T2a = 14 S3_DETREND single-symbol** (rolling-OLS log-price trendline-residual anchor, W=200; new
+single-symbol path, S3 OLS bit-parity vs `cross_domain_mr.rolling_ols_fit`, Δ 1.8e-15) + **T2b = 10 S5_SPREAD basket**
+(exec-grid-β, in-engine `MarketData.GetBars`). **Result: 24/24 POWERED** (reversion episodes 70–390 ≥ 15m floor 25 —
+the ~4× 15m bars clear the higher floor that stranded T1), **0/24 admit, 0/24 Holm-admit**; every CI_lower ≤ 0 (net
+−0.77…+0.04 bps/active — best GBPUSD +0.04 / US2000 +0.02, both CI_low<0; worst BTCUSD −0.77, USTEC(T2b) −0.54). T2a
+0/14, T2b 0/10 — sub-families agree, **no pooled masking**. **Mechanism:** shorter-horizon reversion captures a smaller
+favourable move against the **same** per-instrument round-trip cost → the powered definitive close the LOW prior
+predicted (not UNPOWERED like T1). **EXP-010 gate-debt DISCHARGED:** F-1 vehicle fidelity **PASS all 24** (z_corr 1.00,
+Jaccard 0.97–0.99 — the S3 single-symbol path carries no basket carry-forward; clears the tightened 0.90/0.70 tol vs
+T1's 0.67/0.30); F-2 leak-resistance now **tested and non-vacuous via the live control**: planted-positive (+8 bps)
+detected **24/24** (power real) + **valid future-destroy** (live phase-shifted-basket shuffle, `EXP-012-t2b-shuffle`)
+**CLEAN** (`shuffle_survivors=[]`, `tripwire_pass=True`). **Control caveat (audit, non-verdict-moving):** the raw-script
+`REJECT_LEAK` headline was a **false trip** — the *Python* F-2 "future-destroy" permutes the realized-bps array, but a
+mean statistic is **permutation-invariant**, so an additive-positive plant can never collapse under it (23/24
+`destroyed_pass=True`); superseded by `results/verdict_corrected.json`, no re-run (verdict NOT-TRADABLE either way).
+Follow-up (methodology): a Python-side leak control for a mean referee must break the position↔return alignment causally
+(permute positions + re-assemble), never permute P&L. Causal-provenance PASS (≤t-1 decision inputs; fills in-range;
+fence sealed — 0 rows at/after `AnalysisEndUtc` on all 34 runs). **CF-MR-003 → CONC-1 NOT-TRADABLE at 1h (T1) AND 15m
+(T2) ⇒ TRADABILITY CLOSED:** availability (EXP-009 SCREENED-ADMIT) does **not** survive to net at either execution
+horizon; with sister CF-MR-002 EXONERATED, no CONC-2 axis sweep is warranted (moot; no P-02 rescue). Family **retained**,
+all outcomes kept. A counted TEST read / holdout release stays gated on a TRAIN net-positive (none occurred).
+
+**EXP-010 — CF-MR-003 CONC-1 Track 1 (2026-07-01) — NOT-TRADABLE (UNPOWERED; price-primary in-engine; audit PASS,
+0 Critical).** Concretized the EXP-009-admitted S5_SPREAD to net: **form-2 limit-at-anchor** (`/TARGET`=mean,
+`/DIRECTION`=fade, `/REENTRY`=none), **exec-grid-β** anchor computed **in-engine** (multi-symbol
+`MarketData.GetBars`, XRSI pattern; `StrategyHost/CrossDomainMrLimitModel.cs`), adjudicated under the frozen 1h
+referee (§10.3a q\*=0.75 + E6 P\*-gate). **Member set = 5 DISTINCT S5 exec-1h cells** under **phase Holm(5)**:
+AUDUSD, GBPUSD, NZDUSD (FX_MAJORS basket), US2000, US500 (INDICES basket). **Member-set correction (substrate
+override of design prose):** EXP-009's "S5_SPREAD 20 admits" double-counts the exec-1h **1D/4h-anchor label**,
+which is byte-identical for exec-grid-β S5 (`per_cell.parquet` max|Δn_events|=0) → the family has **15 distinct**
+S5 strategies (5 exec-1h + 10 exec-15m), not 20; T1 = 5, not the design's earlier 10. **Result: 0/5 powered,
+0/5 admit** — the VR∧HL∧|z|≥2 conjunction fires only 10–32 reversion episodes/cell → below the 1h referee floor
+`min_state_count=20` (per cell: 3/11/7/7/15); net −0.70…+0.10 bps/active bar, all CIs cover 0 (only GBPUSD
+fractionally +). **Availability does NOT survive to net** — UNPOWERED ("could not test at power"), not a positive
+refutation; consistent with the honest LOW prior + CF-MR-002 exoneration. **Leak tripwire** (phase-shifted basket,
+`EXP-010-shuffle`) `surviving-under-shuffle=[]` → PASS **but vacuous** (null live edge; the control read *more*
+positive, unpowered noise) → leak-resistance UNTESTED (audit F-2). **Gate-debt (audit F-1, binding before any
+future powered-positive booking):** the in-engine vehicle is a **loose replica** of the screen — anchor *level*
+corr 0.99 (β correct) but residual `dev` corr 0.73 / `z`-selector corr 0.67, |z|≥2 Jaccard 0.30 (real cTrader 1h
+bars + basket carry-forward-≤t vs the screen's m1-aggregation + exact-`CloseTime` join). Causal-provenance PASS
+(decide-before-fold `≤ t-1`; fills executable in-range after a smoke-caught gap-through-fill fix; fence sealed —
+0 rows at/after `AnalysisEndUtc` on all 10 runs). **CF-MR-003 → SCREENED-ADMIT / CONC-1 NOT-TRADABLE.** Track 1
+consumes 1 slot / 0 reads; **T2a (14 S3 exec-15m) + T2b (10 S5 exec-15m) DEFERRED behind E7/EXP-011** (frozen
+referee 15m-domain extension). A counted TEST read / holdout release remains gated on a TRAIN net-positive (none
+occurred). All outcomes retained.
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:

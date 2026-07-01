@@ -1,6 +1,29 @@
 # CF-MR-003 — Cross-Domain Mean-Reversion (deviation-from-higher-domain-anchor)
 
-**Status:** `SCREENED-ADMIT` (per-stratum, native vehicle — EXP-009, 2026-07-01; audit PASS, 0 Critical).
+**Status:** `RETIRED — SCREENED-ADMIT → CONC-1 NOT-TRADABLE (family CONCLUDED, Phase-003 retrospective
+2026-07-01)` (T1 exec-1h UNPOWERED EXP-010 + T2 exec-15m POWERED EXP-012, net, TRAIN; audit PASS, 0
+Critical). Availability real, net-nil at both horizons → retired; retained in registry, re-open only with a
+cheaper capture mechanism or lower-cost universe (not a re-parameterization; no P-02 rescue). Full arc:
+`docs/experiments-docs/checkpoints/2026-07-01-003-cf-mr-003-tradability-concretization/retrospective.md`. **1 candidate slot consumed**
+(tradability exploration; T2 opened **0 new slots**); 0 counted TEST reads; holdout sealed; referee untouched (L-12).
+**T2 (EXP-012) result:** the same form-2 limit-at-anchor fade on the **24 EXP-009 exec-15m admits** (T2a 14
+S3_DETREND single-symbol + T2b 10 S5_SPREAD basket, one Holm family) under the **frozen 15m referee** is **24/24
+powered** (reversion episodes 70–390 ≥ 15m `min_state_count=25` — the extra 15m bars clear the higher floor), **0/24
+admit**, every CI_lower ≤ 0 (net −0.77…+0.04 bps/active). This is the **powered** definitive close the LOW prior
+predicted (mechanism: shorter-horizon reversion earns less against the **same** round-trip cost). **EXP-010 gate-debt
+DISCHARGED:** F-1 vehicle fidelity now PASS all 24 (z_corr 1.00, Jaccard 0.97–0.99 — the S3 single-symbol path has no
+basket carry-forward); F-2 leak-resistance now tested — planted-positive detected 24/24 (power real) + valid live
+phase-shifted-basket future-destroy CLEAN (0 survivors). *(Raw-script `REJECT_LEAK` was a false trip from a
+mean-invariant Python permutation-destroy → superseded by `verdict_corrected.json`; no re-run, verdict identical.)*
+**⇒ Availability (EXP-009 SCREENED-ADMIT) does NOT survive to net at either the 1h or 15m execution horizon.**
+Family **retained** (never deleted), terminal-branch prior reinforced; with sister CF-MR-002 EXONERATED, CF-MR-003
+tradability is closed. CONC-2+ axis sweep is **moot** (no tradable CONC-1 base; no P-02 dead-entry rescue).
+**Member-set note (substrate override):** EXP-009's "S5_SPREAD 20 admits" double-counts the exec-1h 1D/4h-anchor
+label → **15 distinct** S5 strategies (5 exec-1h + 10 exec-15m); T2a adds the 14 S3_DETREND exec-15m cells.
+*(T1 detail retained: 5 distinct S5 exec-1h admits, exec-grid-β in-engine, 0/5 powered — episode sparsity 10–32 <
+1h floor 20; net −0.70…+0.10, CIs cover 0; read UNPOWERED, not a positive refutation.)*
+
+**Prior status:** `SCREENED-ADMIT` (per-stratum, native vehicle — EXP-009, 2026-07-01; audit PASS, 0 Critical).
 The native re-screen (target-based: anchor-hit / fraction-recovered / time-to-anchor; event-specific
 half-life horizon; **screen-fail dislocation-matched null**) records **36 leak-clean per-stratum
 reversion-to-anchor passes** — **S5_SPREAD 20** (FX majors: EURUSD/USDJPY/NZDUSD/USDCHF/GBPUSD), **S3_DETREND
@@ -134,14 +157,21 @@ fade-toward-anchor (extreme-primary). **DEFERRED** — the trend/regime secondar
 
 ## Concretization roadmap (post-ADMIT; each step = own dated D0 + slot; price-primary where an edge/P&L is generated)
 
-1. **CONC-1 (next, price-primary, operator-gated):** form-2 **limit-at-anchor, `/TARGET`=mean**, `/DIRECTION`=fade,
-   `/REENTRY`=none, live-limit entries on `≤ t-1` anchor levels — run **in cTrader** on the admitted axes
-   (**S5_SPREAD** first, then **S3_DETREND**), binding-leg cost charged, adjudicated under the frozen referee.
-   First **tradability** test (availability→net). A counted TEST read / holdout release is gated on this.
-2. **CONC-2+:** on a tradable CONC-1, sweep the deferred axes as registered branches — `/TARGET`
-   (mean vs opposite-extreme), `/REENTRY` (none/allow/extend), `/EXIT` plane, `/EXTREME`, `/DIRECTION`
-   trend/regime secondary — each its own gated experiment; no downstream-stack tuning to rescue a dead
-   entry (P-02).
+1. **CONC-1 T1 DONE (EXP-010, 2026-07-01) — NOT-TRADABLE (UNPOWERED):** form-2 **limit-at-anchor, `/TARGET`=mean**,
+   `/DIRECTION`=fade, `/REENTRY`=none, live-limit entries on `≤ t-1` anchor — run **in cTrader** on the **5 distinct
+   S5_SPREAD exec-1h** admits (exec-grid-β anchor in-engine), binding-leg cost, frozen 1h referee. **0/5 powered,
+   0/5 admit** (episode sparsity < min_state 20); availability does not survive to net. 1 slot consumed; 0 counted
+   reads; holdout sealed.
+1b. **CONC-1 T2 DONE (EXP-012, 2026-07-01) — NOT-TRADABLE (POWERED); TRADABILITY CLOSED:** the same form-2
+   limit-at-anchor fade on the **24 exec-15m admits** (T2a 14 S3_DETREND single-symbol + T2b 10 S5_SPREAD basket),
+   frozen **15m** referee (EXP-011), one Holm family. **24/24 powered** (episodes 70–390 ≥ 15m floor 25 — extra
+   bars clear the higher floor), **0/24 admit**, every CI_low ≤ 0 (net −0.77…+0.04 bps/active) — the **powered**
+   close the LOW prior predicted. **EXP-010 gate-debt discharged:** F-1 vehicle fidelity PASS all 24 (1.00 /
+   0.97–0.99); F-2 tested — plant 24/24 + valid live phase-shift future-destroy clean. (Raw `REJECT_LEAK` = false
+   trip from mean-invariant permutation-destroy; superseded, no re-run.) **⇒ availability does not survive to net
+   at 1h or 15m.** 0 new slots, 0 counted reads, holdout sealed, referee untouched (L-12).
+2. **CONC-2+:** ~~on a tradable CONC-1, sweep the deferred axes~~ — **MOOT (2026-07-01):** no tradable CONC-1
+   base at either horizon → the axis sweep is not opened (no P-02 dead-entry rescue). Retained for the record.
 3. **Robustness debt (carry):** constant-n TRAIN-thirds test (resolve the recent-third power gap); S1/S2
    less-trend-contaminated-z re-screen.
 

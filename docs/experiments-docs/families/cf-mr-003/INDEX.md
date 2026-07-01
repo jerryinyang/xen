@@ -5,13 +5,17 @@ distinguishing information source: **cross-domain deviation + MR-screen-as-selec
 availability-first at zero cost. Registry: `docs/signal-registry/candidate-families/cf-mr-003.md`.
 Governing checkpoint: `docs/experiments-docs/checkpoints/2026-07-01-002-cross-domain-mean-reversion/`.
 
-**Status:** REGISTERED — **EXP-008 closed as a METHODOLOGY FINDING (2026-07-01); NOT exonerated / NOT
-admitted.** The screen used a vehicle inherited from the price-geometry family (fixed-horizon MFE +
-random-timing null), **indicated** non-native to MR: a reactive vehicle diagnostic separates native target
-metrics (anchor-hit +2.9 pp, fraction-recovered +2.7 pp) under a dislocation-matched null while MFE is
-blind → the EXONERATE is **held, not booked**. Preliminary **positive native evidence**; native re-screen =
-**EXP-009** (target-based estimand + dislocation-binned null). L-13. 0 slots / 0 counted TEST reads;
-holdout sealed.
+**Status:** **RETIRED — SCREENED-ADMIT (availability) → CONC-1 NOT-TRADABLE (net), family CONCLUDED
+(2026-07-01, Phase-003 retrospective).** Arc: EXP-008 methodology finding (vehicle mismatch, L-13; verdict
+held) → **EXP-009 SCREENED-ADMIT** (native target-based re-screen: price does return to the higher-domain
+anchor beyond a dislocation-matched control, per-stratum, leak-clean) → **CONC-1 NOT-TRADABLE at both
+execution horizons**: T1 exec-1h (EXP-010, UNPOWERED) + T2 exec-15m (EXP-012, **POWERED** — 24/24 powered,
+0/24 admit, every CI_low ≤ 0). **Availability is real but does not survive to net** — the capturable
+reversion move is smaller than the round-trip cost at every horizon tested (the same cost/capture veto that
+closed CF-MR-002 and AVWAP). CONC-2+ axis sweep is **moot** (no tradable base; no P-02 dead-entry rescue).
+Referee untouched throughout (L-12); 1 candidate slot consumed, 0 counted TEST reads, holdout sealed.
+Retained in the registry; re-opening requires a genuinely cheaper capture mechanism or lower-cost universe,
+not a re-parameterization. Full arc: [Phase-003 retrospective](../../checkpoints/2026-07-01-003-cf-mr-003-tradability-concretization/retrospective.md).
 
 ## Exploration axes & concretization roadmap
 
@@ -26,14 +30,129 @@ C `/EXTREME` (robust-z/z/quantile — sweep deferred). D `/DIRECTION` (extreme-p
 secondary open). E execution machinery **DEFERRED to price-primary**: live-limit entries, `/REENTRY`
 none/allow/extend, `/TARGET` mean(screened)/opposite-extreme(deferred), `/EXIT` form-1/form-2/plane.
 
-**Roadmap.** (1) **CONC-1** (next, price-primary, operator-gated) — form-2 limit-at-anchor, target=mean,
-live-limit entries, in-engine on S5_SPREAD→S3_DETREND, binding-leg cost, frozen-referee: first tradability
-test; counted read/holdout gated on it. (2) **CONC-2+** — sweep deferred axes on a tradable base (no
-dead-entry rescue, P-02). (3) **Robustness debt** — constant-n thirds test; S1/S2 less-trend-contaminated-z.
+**Roadmap.** (1) **CONC-1 T1 DONE (EXP-010, 2026-07-01) — NOT-TRADABLE (UNPOWERED)**: 5 distinct S5 exec-1h
+cells, exec-grid-β in-engine, form-2 limit; 0/5 powered/admit under the frozen 1h referee (episode sparsity <
+min_state 20); availability does not survive to net. 1 slot consumed. **CONC-1b/T2b (S5 exec-15m) + T2a (S3
+exec-15m) DONE (EXP-012, 2026-07-01) — NOT-TRADABLE (POWERED)**: 24 exec-15m admits (T2a 14 S3 + T2b 10 S5) under
+the frozen 15m referee, 24/24 powered (episodes 70–390 ≥ floor 25), **0/24 admit**, every CI_low ≤ 0 — the powered
+definitive close the LOW prior predicted; **F-1 vehicle fidelity PASS all 24 (1.00 / 0.97–0.99) — EXP-010 gate-debt
+discharged**; F-2 plant 24/24 + valid live phase-shift future-destroy clean. **⇒ CF-MR-003 TRADABILITY CLOSED**
+(availability does not survive to net at 1h or 15m). 0 new slots. (2) **CONC-2+** — sweep deferred axes on a tradable
+base (no dead-entry rescue, P-02) — **moot** (no tradable CONC-1 base). (3) **Methodology follow-up** — a Python-side
+leak control for a mean referee must break position↔return alignment causally (permute positions + re-assemble), never
+permute P&L (which is mean-invariant); or standardize on the in-engine phase-shift shuffle as the sole future-destroy.
 
 ## Experiments
 - [EXP-008 — cross-domain MR availability screen (HYP-001; methodology finding)](#exp-008)
 - [EXP-009 — native re-screen: does price return to the anchor? (HYP-001; SCREENED-ADMIT)](#exp-009)
+- [EXP-010 — CONC-1 T1: form-2 limit-at-anchor tradability screen (price-primary; NOT-TRADABLE)](#exp-010)
+- [EXP-012 — CONC-1 T2: form-2 limit-at-anchor exec-15m (price-primary; NOT-TRADABLE, POWERED — tradability CLOSED)](#exp-012)
+
+---
+
+## EXP-012 {#exp-012}
+
+**Status**: COMPLETED — **NOT-TRADABLE (POWERED)** · **Date**: 2026-07-01 · audit PASS, 0 Critical ·
+price-primary, cTrader in-engine (L-01) · frozen 15m referee (EXP-011, L-12).
+
+### Hypothesis Tests
+1. **CF-MR-003 CONC-1 Track 2 (net, TRAIN)** — does the concretized **form-2 limit-at-anchor fade** on the
+   EXP-009-admitted **exec-15m** cells earn a net-positive per-15m-bar edge (binding-leg cost charged) that
+   clears the **frozen 15m referee** (`gate_stack_pstar`, domain="15m"), per stratum? Two arms, one Holm
+   family: T2a = 14 S3_DETREND single-symbol (rolling-OLS trendline residual anchor), T2b = 10 S5_SPREAD
+   multi-symbol basket.
+
+### Scope
+- **24 cells** = EXP-009 exec-15m admits (`any_pass`). T2a: AUDJPY AUDUSD BTCUSD EURJPY EURUSD GBPJPY GBPUSD
+  NZDUSD US2000 USDCAD USDCHF USDJPY USTEC XAUUSD. T2b: AUDUSD EURUSD GBPUSD NZDUSD US2000 US500 USDCAD USDCHF
+  USDJPY USTEC. Per-symbol TRAIN fence (first-49% cutoff); holdout sealed.
+- Anchor/selector/limit logic in the C# engine (`CrossDomainMrLimitModel.cs`, `--CdmSeries`); S3 OLS anchor
+  bit-parity vs `cross_domain_mr.rolling_ols_fit` (Δ 1.8e-15). Python ingest-only (no vectorized backtest).
+- Cost = frozen per-instrument 15m round-trip (= 1h value). Intra-position MTM (L-09), one RT/entry (L-02).
+
+### Results / Observations
+- **24/24 POWERED** (reversion episodes 70–390 ≥ 15m floor min_state 25) — converts EXP-010's UNPOWERED gap
+  into a **definitive powered close**. **0/24 admit, 0/24 Holm-admit.**
+- Every CI_lower ≤ 0; net −0.77…+0.04 bps/active (best GBPUSD +0.04 / US2000 +0.02, both CI_low<0; worst
+  BTCUSD −0.77, USTEC(T2b) −0.54). T2a 0/14, T2b 0/10 — sub-families agree, no pooled masking.
+- **F-1 vehicle fidelity PASS all 24** (z_corr 1.00, Jaccard 0.97–0.99) — clears tightened tol
+  (0.90/0.70), **discharges EXP-010 T1's loose-vehicle debt** (0.67/0.30).
+- **Power real:** F-2 planted-positive (+8 bps/active) detected 24/24. **Valid future-destroy** (live
+  phase-shifted-basket shuffle) CLEAN — 0 survivors, `tripwire_pass=True`.
+- **Caveat (see audit.md):** raw-script `REJECT_LEAK` is a **false trip** from a mean-invariant Python
+  permutation-destroy (a mean statistic cannot collapse under a mean-preserving permutation) → superseded by
+  `verdict_corrected.json`; no verdict-bearing number moves; no re-run (verdict NOT-TRADABLE either way).
+
+### Hypothesis-Specific Conclusion
+**NOT-TRADABLE (POWERED).** The form-2 limit-at-anchor MR fade earns no net-positive edge on any exec-15m
+admit; the vehicle is faithful (F-1) and adequately powered (plant 24/24), and the valid leak control is
+clean. Mechanism: shorter-horizon reversion captures a smaller favourable move against the **same**
+round-trip cost. With EXP-010 (exec-1h) + CF-MR-002 exoneration, **CF-MR-003 tradability is CLOSED** —
+availability (EXP-009 SCREENED-ADMIT) does **not** survive to net at 1h or 15m. Not a P-02 rescue; LOW prior
+held. 0 counted reads (TRAIN disclosure), 0 new slots, holdout sealed, referee untouched (L-12).
+
+### Hypothesis-Agnostic Observations
+- Extra 15m bars do clear the higher 15m power floor (episodes 70–390 vs EXP-010's 10–32) — the
+  more-episodes-vs-higher-floor tradeoff resolved in favour of powered testability, as the E7 prior expected.
+- A permutation of realized P&L is mean-invariant → it is a **vacuous future-destroy for a mean referee**;
+  a valid Python-side leak control must break the position↔return alignment causally (methodology follow-up).
+
+**Links**: [design.md](../../../../python/experiments/EXP-012/design.md) ·
+[report.md](../../../../python/experiments/EXP-012/report.md) ·
+[audit.md](../../../../python/experiments/EXP-012/audit.md)
+
+---
+
+## EXP-010 {#exp-010}
+
+**Status**: COMPLETED — **NOT-TRADABLE (UNPOWERED)** · **Date**: 2026-07-01 · audit PASS, 0 Critical ·
+PRICE-PRIMARY in-engine, TRAIN-only, **1 candidate slot**, 0 counted TEST reads, holdout sealed, referee
+untouched (L-12).
+
+### Hypothesis Tests
+1. **CF-MR-003 CONC-1 (net, TRAIN)** — does the concretized **form-2 limit-at-anchor fade** on the EXP-009-admitted
+   S5_SPREAD exec-1h strata produce a **net-positive** per-bar realized edge (binding-leg cost) clearing the frozen
+   referee (§10.3a q\*=0.75 + E6 P\*-gate, domain=1h), per stratum?
+
+### Scope
+- **5 distinct S5 exec-1h cells** — AUDUSD/GBPUSD/NZDUSD (FX_MAJORS basket), US2000/US500 (INDICES). The EXP-009
+  "S5 20 admits" collapse to **15 distinct** (exec-1h 1D/4h-anchor labels are byte-identical for exec-grid-β S5:
+  max|Δn_events|=0; the design's earlier 10-cell T1 was corrected to 5 — substrate override of prose).
+- In-engine (L-01): S5 anchor = **exec-grid rolling-β** (W_Z=200, class-mate mean log-Close, class−self) via
+  multi-symbol `MarketData.GetBars` (XRSI pattern); `StrategyHost/CrossDomainMrLimitModel.cs`. Python adjudicates
+  only. First-49% fence; frozen referee domain=1h; Holm(5). Leak tripwire = phase-shifted basket.
+
+### Results / Observations
+- **0/5 powered, 0/5 admit.** Per cell (entries · episodes · net bps/active · ci_low · min_state):
+  AUDUSD 77·10·−0.26·−0.19·3 · GBPUSD 116·23·+0.10·−0.04·11 · NZDUSD 89·22·−0.26·−0.11·7 ·
+  US2000 119·18·−0.70·−0.56·7 · US500 157·32·−0.61·−0.16·15.
+- L1 fails on the 1h floor `min_state_count≥20` (all cells 3–17); `min_effective_n=60` met (eff_n≈5000) — power
+  fails on **episode count**, not series length. Net ~null-to-negative; only GBPUSD fractionally + (CI covers 0).
+- Leak tripwire `surviving-under-shuffle=[]` → PASS **but vacuous** (null live edge; phase-shifted control more
+  positive, unpowered noise) → leak-resistance UNTESTED.
+- Causal-provenance PASS (decide-before-fold `≤ t-1`; fills executable in-range after the smoke-caught gap-through
+  fix; fence sealed). Anchor parity vs `cross_domain_mr`: level corr **0.99** (β correct), dev corr 0.73 / z corr
+  0.67 (loose vehicle fidelity — F-1).
+
+> No interpretation in this block — see report.md.
+
+### Hypothesis-Specific Conclusion
+**NOT-TRADABLE (UNPOWERED).** The S5_SPREAD availability edge (EXP-009 anchor-hit / fraction-recovered) does **not**
+survive to a net-tradable per-bar edge — the VR∧HL∧|z|≥2 conjunction yields too few reversion episodes to power the
+1h referee. Read as "could not test at power," not a positive refutation. Consistent with the honest LOW prior +
+CF-MR-002 exoneration. Family **retained**.
+
+### Hypothesis-Agnostic Observations
+- Concretizing a screened availability vehicle in-engine on **real execution bars** (cTrader 1h) diverges from the
+  m1-aggregated screen vehicle (z-selector corr 0.67, |z|≥2 Jaccard 0.30) — the anchor level is faithful (0.99) but
+  the residual/extreme is hypersensitive. A tradability concretization is not automatically a tight replica of its
+  availability screen (carry as gate-debt F-1).
+- A leak tripwire is only informative against a **non-null live edge**; on a null result it is vacuously satisfied
+  (F-2) — leak-resistance must be re-established on any future powered positive.
+
+**Links**: [design.md](../../../../python/experiments/EXP-010/design.md) ·
+[report.md](../../../../python/experiments/EXP-010/report.md) ·
+[audit.md](../../../../python/experiments/EXP-010/audit.md)
 
 ---
 

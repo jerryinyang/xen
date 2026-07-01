@@ -5,7 +5,9 @@ Live status + family navigation for the current chapter. Chapter 01 is archived 
 `docs/knowledge-base/` (read first).
 
 ## Current Checkpoint Status
-**Phase 002 — Cross-Domain Mean-Reversion Availability (CF-MR-003)** — **ACTIVE** (G0 ratified 2026-07-01). `checkpoints/2026-07-01-002-cross-domain-mean-reversion/design.md`.
+**No active phase — Phase 003 CONCLUDED 2026-07-01; awaiting next-phase G0.**
+
+**Phase 003 — CF-MR-003 Tradability Concretization (CONC-1) — CONCLUDED 2026-07-01: CF-MR-003 RETIRED (SCREENED-ADMIT → NOT-TRADABLE at 1h + 15m).** [Retrospective](checkpoints/2026-07-01-003-cf-mr-003-tradability-concretization/retrospective.md) · [design.md](checkpoints/2026-07-01-003-cf-mr-003-tradability-concretization/design.md). The form-2 limit-at-anchor MR fade was concretized to net on the EXP-009 availability admits under the frozen referee (L-12), price-primary in-engine, per-stratum: **T1 exec-1h (EXP-010) NOT-TRADABLE (UNPOWERED)** — 0/5 powered/admit, episode sparsity < 1h floor 20; **T2 exec-15m (EXP-012) NOT-TRADABLE (POWERED)** — 24/24 powered (episodes 70–390 ≥ 15m floor 25), 0/24 admit, every CI_low ≤ 0 (net −0.77…+0.04 bps/active); F-1 vehicle fidelity PASS all 24 (1.00 / 0.97–0.99, discharges EXP-010 debt); F-2 tested (plant 24/24 + valid live phase-shift future-destroy clean; raw `REJECT_LEAK` was a mean-invariant-permutation false trip, superseded). Prereq **E7/EXP-011** froze the referee's 15m domain candidate-blind + hash-pinned before any 15m read. **Availability (EXP-009 SCREENED-ADMIT) does NOT survive to net at either horizon** — the capturable move < round-trip cost (same cost/capture veto as CF-MR-002 + AVWAP); CONC-2+ moot (no P-02 rescue). 1 slot consumed, 0 counted reads, holdout sealed, referee untouched, all 3 audits PASS 0 Critical. Prior: **Phase 002 (availability) — EXP-009 SCREENED-ADMIT.**
 **EXP-009 COMPLETE (2026-07-01) — SCREENED-ADMIT (per-stratum, native vehicle; audit PASS, 0 Critical).**
 The native re-screen (target-based reversion-to-anchor: anchor-hit / fraction-recovered / time-to-anchor,
 event-specific half-life horizon, **screen-fail dislocation-matched null**) records **36 leak-clean
@@ -87,6 +89,20 @@ engine in EXP-006. **Next (operator-gated):** FREEZE + hash-pin `gate_stack_psta
   → cured the FPR leak **at the gate** (passes 0/162 on the prior-worst strata) with STATE recovery
   retained. This **pulls E3b's return-series/Sharpe-LB unit forward**. Frozen suite byte-unchanged.
 
+**E7 — EXP-011 COMPLETE + FROZEN (2026-07-01, audit PASS, 0 Critical) — 15m-DOMAIN ADDED.** The frozen
+renewed referee (§10.3a q\*=0.75 + E6 P\*-gate) gained a **15m trading domain** so CF-MR-003's exec-15m
+cells can be adjudicated (Phase-003 Track 2 prereq). The extension is **four additive dict rows**
+(DomainSpec/materiality/cost/episode + ADAPTIVE_DOMAINS), gate logic byte-unchanged. **Regression anchor
+0/32 mismatch + E6 P\*-reduction-identity 32/32** → 1h/4h reproduce E3/E6 bit-for-bit. **15m battery
+(16 inst): 16/16 DET_DOMINANT, dogfood+skew FPR 0.000, DENSE-powered 16/16, §10.3a STATE recovery ΔMDE
+med 5.5 (all+) + SPARSE 15/16** — the E3a shape-recovery signature survives the domain change (clean
+peer of 1h/4h). Sensitivity band {M∈.5/.75/1, N∈75/90/105, S∈20/25/30} **112/112, 0 flips**. Constants
+**mechanically derived candidate-blind** (materiality 0.75 = √-period reproducing 1h/4h; floors 90/25 +
+episode 17 = log-period interp; cost inherits per-instrument 1h). **Frozen + hash-pinned BEFORE any
+CF-MR-003 read (L-12):** `referee_adaptive 96c940b5…`, `referee_calibration d10e6a27…`,
+`incremental_referee 1b33e70a…`; `referee_pstar 1fd06b28…` unchanged == E6. analysis-only, 0 reads/0
+slots, holdout sealed; not a rescue (referee prereq only). → unblocked EXP-010 T2a/T2b, since run + concluded (EXP-012 NOT-TRADABLE POWERED; CF-MR-003 retired).
+
 **D-referee ladder COMPLETE (E0→E5); renewed referee FROZEN. Next: D-benchmark (operator-gated).**
 - **E4 — EXP-004 COMPLETE (2026-06-29, audit PASS, 0 Critical) — FREEZE LICENSED (RANGE-BOUNDED).**
   Baseline q\*=0.75 = **32/32 DET_DOMINANT** (adaptive dogfood FPR 0.0); safe q\* range **{0.7,0.75}**
@@ -119,8 +135,10 @@ _(none)_
 ## Family Indexes
 | Family | EXP range | Status |
 |--------|-----------|--------|
-| CF-MR-003 — cross-domain MR (deviation-from-higher-domain-anchor) | EXP-008, EXP-009 | **SCREENED-ADMIT (per-stratum, native vehicle — EXP-009, 2026-07-01): 36 leak-clean reversion-to-anchor passes (S5_SPREAD/S3_DETREND/S4_OU). EXP-008 vehicle mismatch (L-13). Availability-only → form-2 limit-at-anchor concretization (price-primary)**; `families/cf-mr-003/INDEX.md` |
+| CF-MR-003 — cross-domain MR (deviation-from-higher-domain-anchor) | EXP-008, EXP-009, EXP-010, EXP-012 (+E7/EXP-011 referee prereq) | **SCREENED-ADMIT (EXP-009) → CONC-1 T1 NOT-TRADABLE (UNPOWERED) (EXP-010) → CONC-1 T2 NOT-TRADABLE (POWERED) (EXP-012, 2026-07-01): 24/24 powered, 0/24 admit at exec-15m; F-1 vehicle fidelity PASS (fixes EXP-010 debt). TRADABILITY CLOSED — availability does not survive to net at 1h or 15m; 0 new slots, 0 reads, holdout sealed. EXP-008 vehicle mismatch (L-13)**; `families/cf-mr-003/INDEX.md` |
+| Referee-renew (D-referee) — 15m-domain extension | EXP-011 (E7) | **COMPLETE + FROZEN (2026-07-01): 15m domain added to §10.3a+P\* referee, FREEZE_LICENSED, hash-pinned, 1h/4h byte-unchanged. Analysis-only, 0 reads/slots.** Tracked in the referee-renew E-series live-status block above; not a candidate family. |
 | CF-MR-002 — causal RSI-2 fade (cTrader-primary) | EXP-006 | **SCREENED — EXONERATED (NOT-TRADABLE 34/34, D-benchmark 2026-06-30)**; `families/cf-mr-002/INDEX.md` |
 
 ## Checkpoint Retrospectives
 - [Phase 001 — Referee-Gate Adaptivity + Causal RSI-2 Benchmark](checkpoints/2026-06-27-001-referee-adaptivity-rsi2-benchmark/retrospective.md) — COMPLETED 2026-06-30
+- [Phase 003 — CF-MR-003 Tradability Concretization (CONC-1)](checkpoints/2026-07-01-003-cf-mr-003-tradability-concretization/retrospective.md) — COMPLETED 2026-07-01 · **CF-MR-003 RETIRED (SCREENED-ADMIT → NOT-TRADABLE at 1h + 15m)**

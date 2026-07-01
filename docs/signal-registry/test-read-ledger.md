@@ -374,6 +374,18 @@ dataset) is spent and non-transferable; **the new-dataset holdout shot has now b
 EXP-097 global-holdout release** (2026-06-25, after the G-022a freeze; one-shot, non-upgradable, non-repeatable, à
 la EXP-032) — see the EXP-097 holdout-governance event note above.
 
+- **EXP-010 (2026-07-01, `CF-MR-003` CONC-1 T1, Chapter 02 Phase 003 — price-primary tradability screen
+  disclosure, NO counted reads, 1 CANDIDATE SLOT).** Form-2 limit-at-anchor concretization of the 5 distinct
+  S5_SPREAD exec-1h admits (AUDUSD/GBPUSD/NZDUSD/US2000/US500), run **in-engine in cTrader** on the **first-49%
+  TRAIN sub-split only** (`AnalysisEndUtc` per file = `int(int(N·0.7)·0.7)`; host emitted 0 rows at/after the
+  fence on all 5 live + 5 shuffle runs; analysis-TEST band + final-30% holdout never emitted/loaded). Adjudicated
+  under the frozen 1h referee — an **honest-prior tradability screen** (admit/not, no binding stratum-specific TEST
+  estimand), so per the screen/disclosure convention (EXP-006/089/094 precedent) it is a **disclosure, not a
+  counted read**: `counted_test_reads=0`, `holdout_untouched=true`; **no stratum tally moves** (AUDUSD/GBPUSD/
+  NZDUSD/US2000/US500 × 1h stay 0/2 open). **It consumed 1 candidate slot** (tradability exploration opened —
+  tracked in `candidate-families/cf-mr-003.md`, not this per-stratum read ledger). Outcome **NOT-TRADABLE
+  (UNPOWERED)** — 0/5 powered/admit; availability does not survive to net. A counted TEST read / holdout release
+  was **gated on a TRAIN net-positive and did not open** (none occurred). Global holdout **sealed**.
 - **EXP-009 (2026-07-01, `CF-MR-003/HYP-001`, Chapter 02 Phase 002 — native re-screen disclosure, NO
   counted reads, NO holdout shot).** Target-based reversion-to-anchor availability screen (16 inst × 5
   series × 3 pairs), **TRAIN-only** (first 49% per file; TEST + holdout never sliced,
