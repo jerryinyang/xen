@@ -5,8 +5,33 @@ Live status + family navigation for the current chapter. Chapter 01 is archived 
 `docs/knowledge-base/` (read first).
 
 ## Current Checkpoint Status
-**Phase 001 — Referee-Gate Adaptivity + Causal RSI-2 Benchmark** — D-referee COMPLETE; renewed
-referee FROZEN (2026-06-29). `checkpoints/2026-06-27-001-referee-adaptivity-rsi2-benchmark/design.md`.
+**Phase 002 — Cross-Domain Mean-Reversion Availability (CF-MR-003)** — **ACTIVE** (G0 ratified 2026-07-01). `checkpoints/2026-07-01-002-cross-domain-mean-reversion/design.md`.
+**EXP-009 COMPLETE (2026-07-01) — SCREENED-ADMIT (per-stratum, native vehicle; audit PASS, 0 Critical).**
+The native re-screen (target-based reversion-to-anchor: anchor-hit / fraction-recovered / time-to-anchor,
+event-specific half-life horizon, **screen-fail dislocation-matched null**) records **36 leak-clean
+per-stratum passes** — S5_SPREAD 20 (FX majors), S3_DETREND 14, S4_OU 2; label-permutation collapses on
+all. Positive hits across all 5 series (S1/S2 precision-limited, +5–8pp, UNPOWERED_HINT). Robust on
+S5_SPREAD (18–20 across horizon/floor/z-edges), moderate on S3_DETREND (8–16); recent-third unconfirmed
+(power). Null-choice validated the vehicle fix (screen-fail +5pp / random-extreme +2.5pp / random-timing
+−29pp). **CF-MR-003 → SCREENED-ADMIT; EXP-008's EXONERATE was a vehicle artifact (L-13).** Availability,
+not tradability — concretization = the family's **form-2 limit-at-anchor (target=mean)**, price-primary,
+new D0. 0 slots / 0 counted reads, holdout sealed, referee untouched (L-12). Operator-steered:
+dislocation-matched null + event-specific horizon + per-stratum reading + precision fixes each load-bearing.
+**EXP-008 CLOSED (2026-07-01) — METHODOLOGY FINDING; family verdict HELD, not booked (L-13).** EXP-008 ran
+three times and its value is methodological: (1) 3-leg screen → INCONCLUSIVE (inherited `Hurst-DFA<0.45`
+leg structurally unsatisfiable on deviation *levels* — forensic A1); (2) 2-leg VR∧HL → EXONERATE; (3) a
+**vehicle diagnostic (A2)** showed that EXONERATE is a **vehicle artifact** — the evaluation stack
+(fixed-horizon signed-MFE-toward-anchor + Δ-over-regime-matched-**random-timing**) was **inherited from the
+price-geometry family and is non-native to mean-reversion**. Under a **dislocation-matched** null the native
+target metrics separate (**anchor-hit +2.9 pp**, fraction-recovered +2.7 pp, CIs exclude 0) while the MFE
+metric is **blind**; the random-timing null reads spuriously negative on near-anchor bars. **EXONERATE HELD,
+not booked.** CF-MR-003 stays **REGISTERED** with **preliminary positive native evidence** (small, ~+2.9 pp,
+not cost-tested). Native re-screen = **EXP-009** (new D0, operator-gated): target-based estimands (anchor-hit
+/ time-to-anchor vs fitted half-life / fraction-recovered / deferred limit-at-anchor P&L) against a
+dislocation-**binned** null. Lesson **L-13**; **0 slots / 0 counted reads, holdout sealed**, referee
+untouched (L-12).
+
+**Phase 001 — Referee-Gate Adaptivity + Causal RSI-2 Benchmark** — **COMPLETED** (2026-06-30). D-referee ladder renewed; referee FROZEN (2026-06-29). `checkpoints/2026-06-27-001-referee-adaptivity-rsi2-benchmark/design.md` · [`retrospective.md`](checkpoints/2026-06-27-001-referee-adaptivity-rsi2-benchmark/retrospective.md).
 Dual purpose: (1) **referee renew (DONE — gate frozen at E5, §10.3a, q\*=0.75)**; (2) end-to-end
 benchmark of the rollover via the causal RSI-2 fade (CF-MR-002). 0 slots / 0 reads; global holdout sealed.
 
@@ -94,7 +119,8 @@ _(none)_
 ## Family Indexes
 | Family | EXP range | Status |
 |--------|-----------|--------|
+| CF-MR-003 — cross-domain MR (deviation-from-higher-domain-anchor) | EXP-008, EXP-009 | **SCREENED-ADMIT (per-stratum, native vehicle — EXP-009, 2026-07-01): 36 leak-clean reversion-to-anchor passes (S5_SPREAD/S3_DETREND/S4_OU). EXP-008 vehicle mismatch (L-13). Availability-only → form-2 limit-at-anchor concretization (price-primary)**; `families/cf-mr-003/INDEX.md` |
 | CF-MR-002 — causal RSI-2 fade (cTrader-primary) | EXP-006 | **SCREENED — EXONERATED (NOT-TRADABLE 34/34, D-benchmark 2026-06-30)**; `families/cf-mr-002/INDEX.md` |
 
 ## Checkpoint Retrospectives
-_(none yet)_
+- [Phase 001 — Referee-Gate Adaptivity + Causal RSI-2 Benchmark](checkpoints/2026-06-27-001-referee-adaptivity-rsi2-benchmark/retrospective.md) — COMPLETED 2026-06-30

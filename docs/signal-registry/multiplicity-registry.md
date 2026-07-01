@@ -1019,6 +1019,53 @@ vol-regime partition, CONTRARIAN arm, 25/75 scheme, 15m capture, regime×variant
 tuning, instrument/domain expansion: each needs its own dated D0-amendment + slot decision under
 CF-MR-002. Holdout release and deployment economics are out of Phase-001 scope. All outcomes retained.
 
+## Chapter 02 · Phase 002 Batch (Cross-Domain Mean-Reversion Availability, CF-MR-003) — EXP-008 METHODOLOGY FINDING (verdict held); native re-screen = EXP-009
+
+**Update (2026-07-01, Amendment A2).** EXP-008 is closed as a **methodology finding**, not a family
+verdict. Its 3-leg screen (INCONCLUSIVE) and 2-leg VR∧HL screen (EXONERATE) both used an evaluation vehicle
+inherited from the price-geometry family (fixed-horizon MFE + Δ-over-regime-matched-**random-timing**) that
+is **non-native to MR**. A vehicle diagnostic (analysis-only, 0 reads; reactive, not pre-registered)
+**indicates** the EXONERATE is vehicle-dependent: under a **dislocation-matched** null the native target metrics separate (anchor-hit
++2.9 pp, fraction-recovered +2.7 pp, CIs exclude 0) while MFE is blind. **EXONERATE HELD, not booked.**
+CF-MR-003 stays `REGISTERED` with **preliminary positive native evidence**; the native re-screen is
+**EXP-009** (new D0, target-based estimand + dislocation-binned null). Lesson **L-13**. Still **0 slots /
+0 counted TEST reads; holdout sealed**. The HYP-001 row below records the original 3-leg run for the
+file-drawer; its verdict is superseded by this methodology finding (not a family closure).
+
+**Opened:** 2026-07-01 (G0 ratified). **Governing checkpoint:**
+`docs/experiments-docs/checkpoints/2026-07-01-002-cross-domain-mean-reversion/design.md`.
+**Family:** CF-MR-003 (`candidate-families/cf-mr-003.md`) — operator-ratified probe against the
+terminal-branch prior, admitted only for a distinguishing information source (cross-domain deviation +
+MR-screen-as-selector), gated availability-first at zero cost.
+
+**Multiplicity design:** 16 inst × 5 anchor series × 3 domain pairs ≤ 240 cells, controlled by
+**cross-axis Holm over the 15 series×domain axes** (max-statistic permuted-axis admission, G-019 pattern,
+`xen.availability_gate`). Per-stratum binding (L-03); pooled = disclosure-only.
+
+| Candidate ID | Hypothesis | EXP-ID | Slot | Status |
+| --- | --- | --- | --- | --- |
+| `CF-MR-003/HYP-001` | Availability screen — does MR-screen-conditioned entry produce a reversion excursion toward the higher-domain anchor beyond a matched-random, matched-count, matched-regime control on TRAIN, for any of 5 anchor series × 3 domain pairs? | EXP-008 | 0 (availability screen) | **COMPLETE 2026-07-01 — SCREENED-INCONCLUSIVE (underpowered; audit PASS, 0 Critical).** 0/15 axes eligible, 0 powered instrument-cells (both endpoints), max 18 events/cell (N_min=100); only 33/240 cells cleared the ≥2-event floor. **Root cause (drop-one disclosure):** the design's 3-leg MR selector (VR∧half-life∧**Hurst-DFA<0.45**) is vetoed by the Hurst leg — every leg-combo *with* Hurst → ≤792 total events & **0/240** powered; *without* it (VR+HL) → 315,644 events & **216/240** powered. `Hurst<0.45` (increment anti-persistence) mis-applied to the mean-reverting deviation **level** series (locally persistent, Hurst>0.5), contradicting the VR/half-life legs — the **L-12 §3 near-impossible-conjunctive-leg** pattern reappearing inside the *screen* (DFA validated correct: WN α≈0.52, walk α≈1.48). Per design §7 (`>½ axes ineligible-UNPOWERED`) → **INCONCLUSIVE**, not EXONERATE (axes never powered → availability never *tested*). **CF-MR-003 retained, neither admitted nor exonerated;** terminal-branch prior untested on this vehicle. Leak-clean (2 tripwires shipped — conditioning-label permutation + forward-excursion time-reversal; no admitting cell to fire on). Analysis-only, TRAIN-only, every decision input ≤t-1. **0 slots / 0 counted TEST reads; holdout sealed; not tuned on the referee (L-12).** All 15 series×domain axes UNPOWERED. Fix = a corrected re-screen (2-leg VR+HL, or Hurst-on-increments) under a **new dated-D0** experiment — not amend-in-place (no contamination; honestly underpowered). |
+
+**EXP-009 — CF-MR-003/HYP-001 native re-screen (2026-07-01) — SCREENED-ADMIT (per-stratum, audit PASS, 0
+Critical).** After EXP-008's methodology finding (vehicle non-native to MR, L-13), EXP-009 re-screened with
+a **native** vehicle: target-based estimands (anchor-hit / fraction-recovered / time-to-anchor,
+event-specific half-life horizon) against a **screen-fail dislocation-matched** null (operator-ratified
+pass-vs-fail), per-stratum (L-03; axis-majority rule relaxed on operator direction). **36 leak-clean
+per-instrument passes** (label-permutation collapses): **S5_SPREAD 20** (FX majors), **S3_DETREND 14**,
+**S4_OU 2**; pervasive positive hits on S1/S2 (precision-limited, UNPOWERED_HINT). Robust on S5_SPREAD
+(18–20 across horizon/floor/z-edges), moderate on S3_DETREND (8–16); recent-third unconfirmed (power).
+**CF-MR-003 → SCREENED-ADMIT.** Amendments A1 (drop Hurst leg, EXP-008), A2 (vehicle mismatch, EXP-008),
+B1 (time-reversal → diagnostic), B2 (endpoint floors + precision-aware disposition + per-stratum). Still
+**availability, not tradability**; **0 slots / 0 counted TEST reads; holdout sealed; referee untouched
+(L-12)**. Concretization = the family's **form-2 limit-at-anchor (target=mean)** in a separate
+**price-primary** experiment (new D0, operator-gated) — the tradability test; a counted TEST read / holdout
+release remains gated on that.
+
+**Deferred (registered, uncounted).** Strategy machinery (`/DIRECTION /REENTRY /TARGET /EXIT`), cost/net
+tradability, counted TEST reads, and holdout release are all out of Phase-002 scope — each needs its own
+dated D0 + slot decision. The EXP-009 ADMIT advances CF-MR-003 to the concretization gate; no slot/read
+consumed. All outcomes retained.
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:

@@ -48,8 +48,19 @@ PERM_BATCH: int = 500              # permutation batch (memory bound)
 EVENT_FLOOR_DEFAULT: int = 30      # usable-event floor; below -> underpowered (excluded from S)
 
 STAT_MEDIAN = "median"             # typical-range read statistic
-STAT_TAILMASS = "tailmass"         # tail read statistic
+STAT_TAILMASS = "tailmass"         # lower-catastrophe tail read statistic (median − K_TAIL·MAD)
 K_TAIL: float = 3.0                # catastrophe boundary median − K_TAIL·MAD (matches capgeo_geometry)
+
+# Additive upper-favourable-tail read for availability screens whose outcome is a *favourable*
+# excursion (higher is better), e.g. CF-MR-003/EXP-008 reversion excursion toward the anchor. This
+# is the design §5 endpoint (S) ``#{θ >= TAU_UPPER}/n``. Additive only — existing STAT_MEDIAN /
+# STAT_TAILMASS callers are byte-unchanged; no frozen gate constant (Z/FWER/N_PERM/…) is touched.
+STAT_TAILMASS_UPPER = "tailmass_upper"
+TAU_UPPER: float = 1.0             # upper-tail threshold in the metric's units (ATR for EXP-008)
+
+# Additive mean read for a binary/rate endpoint (e.g. CF-MR-003/EXP-009 anchor-hit rate = mean of a
+# 0/1 hit indicator). Additive only — existing stat_kinds byte-unchanged; no frozen gate constant touched.
+STAT_MEAN = "mean"
 
 
 # --------------------------------------------------------------------------- #
@@ -123,6 +134,10 @@ def _stat_1d(values: np.ndarray, stat_kind: str) -> float:
         return float("nan")
     if stat_kind == STAT_MEDIAN:
         return float(np.median(x))
+    if stat_kind == STAT_MEAN:
+        return float(np.mean(x))
+    if stat_kind == STAT_TAILMASS_UPPER:
+        return float(np.count_nonzero(x >= TAU_UPPER)) / x.shape[0]
     med = float(np.median(x))
     mad = float(np.median(np.abs(x - med)))           # scale=1.0 (matches capgeo_geometry.tail_stats)
     boundary = med - K_TAIL * mad
@@ -133,6 +148,10 @@ def _stat_2d(mat: np.ndarray, stat_kind: str) -> np.ndarray:
     """Vectorized read statistic per row of a ``(rows, n)`` resample matrix."""
     if stat_kind == STAT_MEDIAN:
         return np.median(mat, axis=1)
+    if stat_kind == STAT_MEAN:
+        return mat.mean(axis=1)
+    if stat_kind == STAT_TAILMASS_UPPER:
+        return (mat >= TAU_UPPER).mean(axis=1)
     med = np.median(mat, axis=1)
     mad = np.median(np.abs(mat - med[:, None]), axis=1)
     boundary = med - K_TAIL * mad

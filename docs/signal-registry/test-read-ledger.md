@@ -374,6 +374,23 @@ dataset) is spent and non-transferable; **the new-dataset holdout shot has now b
 EXP-097 global-holdout release** (2026-06-25, after the G-022a freeze; one-shot, non-upgradable, non-repeatable, à
 la EXP-032) — see the EXP-097 holdout-governance event note above.
 
+- **EXP-009 (2026-07-01, `CF-MR-003/HYP-001`, Chapter 02 Phase 002 — native re-screen disclosure, NO
+  counted reads, NO holdout shot).** Target-based reversion-to-anchor availability screen (16 inst × 5
+  series × 3 pairs), **TRAIN-only** (first 49% per file; TEST + holdout never sliced,
+  `infr003_holdout_loaded=false`). Pre-split TRAIN availability read, no stratum-specific inference →
+  **disclosure**: `counted_test_reads=0`, `candidate_slots=0`; **no stratum tally moves**. Outcome
+  **SCREENED-ADMIT (per-stratum)**; 36 leak-clean per-instrument passes (S5_SPREAD/S3_DETREND/S4_OU). The
+  tradability concretization (form-2 limit-at-anchor, price-primary) — which *would* consume a counted TEST
+  read — remains **DEFERRED / NOT REGISTERED** (own D0 + gate). Global holdout **sealed**.
+- **EXP-008 (2026-07-01, `CF-MR-003/HYP-001`, Chapter 02 Phase 002 — availability-screen disclosure, NO
+  counted reads, NO holdout shot).** Cross-domain MR availability screen over 16 inst × 5 anchor series × 3
+  domain pairs, **TRAIN-only** (first 70% of the first-70% analysis set = first 49% of each file; asserted
+  in code — the next-21% TEST stratum and final-30% global holdout were never sliced or materialized). A
+  **pre-split TRAIN availability read with no stratum-specific inference** → recorded as a **disclosure**:
+  `counted_test_reads=0`, `candidate_slots=0`; **no stratum tally moves**. Outcome SCREENED-INCONCLUSIVE
+  (underpowered — MR-screen Hurst-leg veto; see the Chapter-02 Phase-002 batch in
+  `multiplicity-registry.md`). Global holdout **sealed** (`infr003_holdout_loaded=false`).
+
 ---
 
 ## Archived Ledger — OLD (pre-INFR-003) Dataset — HISTORICAL RECORD ONLY

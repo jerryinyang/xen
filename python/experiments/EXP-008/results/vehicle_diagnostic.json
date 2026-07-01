@@ -1,0 +1,67 @@
+{
+  "aggregate": {
+    "mfe_d_C1": {
+      "median_delta": -0.0373,
+      "ci90": [
+        -0.0915,
+        0.025
+      ],
+      "frac_cells_pos": 0.467,
+      "n_cells": 120
+    },
+    "mfe_d_C2": {
+      "median_delta": 0.0055,
+      "ci90": [
+        -0.0305,
+        0.0237
+      ],
+      "frac_cells_pos": 0.525,
+      "n_cells": 120
+    },
+    "frac_d_C1": {
+      "median_delta": -0.1753,
+      "ci90": [
+        -0.2189,
+        -0.1489
+      ],
+      "frac_cells_pos": 0.142,
+      "n_cells": 120
+    },
+    "frac_d_C2": {
+      "median_delta": 0.0267,
+      "ci90": [
+        0.0131,
+        0.0312
+      ],
+      "frac_cells_pos": 0.692,
+      "n_cells": 120
+    },
+    "hit_d_C1": {
+      "median_delta": -0.1961,
+      "ci90": [
+        -0.212,
+        -0.1694
+      ],
+      "frac_cells_pos": 0.142,
+      "n_cells": 120
+    },
+    "hit_d_C2": {
+      "median_delta": 0.0286,
+      "ci90": [
+        0.0202,
+        0.0374
+      ],
+      "frac_cells_pos": 0.817,
+      "n_cells": 120
+    }
+  },
+  "verdict": {
+    "masking_demonstrated": true,
+    "note": "MASKING if a native metric (frac/hit) separates under the dislocation-matched control C2 while MFE-Delta does not. If none separate, no masking -> EXONERATE stands on the metric. If MFE also separates, the current vehicle was not blind."
+  },
+  "n_cells": 120,
+  "controls": {
+    "C1": "regime-matched random timing (current)",
+    "C2": "dislocation-matched (|z|>=2, regime-matched, no screen)"
+  }
+}

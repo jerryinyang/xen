@@ -1,0 +1,84 @@
+{
+  "note": "EXP-008 Amendment A1 forensic \u2014 why Hurst-DFA<0.45 vetoed the MR screen.",
+  "probe_B_ou_object": [
+    {
+      "half_life_bars": 2,
+      "phi": 0.7071,
+      "H_level": 1.005,
+      "H_incr": 0.352
+    },
+    {
+      "half_life_bars": 5,
+      "phi": 0.8706,
+      "H_level": 1.195,
+      "H_incr": 0.461
+    },
+    {
+      "half_life_bars": 10,
+      "phi": 0.933,
+      "H_level": 1.33,
+      "H_incr": 0.512
+    },
+    {
+      "half_life_bars": 24,
+      "phi": 0.9715,
+      "H_level": 1.415,
+      "H_incr": 0.527
+    },
+    {
+      "half_life_bars": 48,
+      "phi": 0.9857,
+      "H_level": 1.432,
+      "H_incr": 0.538
+    }
+  ],
+  "probe_C_window": [
+    {
+      "window": 100,
+      "H_level": 1.37,
+      "H_incr": 0.54
+    },
+    {
+      "window": 200,
+      "H_level": 1.305,
+      "H_incr": 0.499
+    },
+    {
+      "window": 400,
+      "H_level": 1.26,
+      "H_incr": 0.469
+    },
+    {
+      "window": 800,
+      "H_level": 1.2,
+      "H_incr": 0.423
+    }
+  ],
+  "probe_A_real_S4_OU": [
+    {
+      "symbol": "EURUSD",
+      "n": 400,
+      "H_level_med": 1.281,
+      "H_incr_med": 0.463,
+      "frac_H_incr_lt_0.45": 0.083,
+      "fitted_HL_med_bars": 7.0
+    },
+    {
+      "symbol": "XAUUSD",
+      "n": 400,
+      "H_level_med": 1.084,
+      "H_incr_med": 0.39,
+      "frac_H_incr_lt_0.45": 0.077,
+      "fitted_HL_med_bars": 5.2
+    },
+    {
+      "symbol": "BTCUSD",
+      "n": 400,
+      "H_level_med": 1.237,
+      "H_incr_med": 0.47,
+      "frac_H_incr_lt_0.45": 0.048,
+      "fitted_HL_med_bars": 4.3
+    }
+  ],
+  "conclusion": "WRONG-OBJECT (proximate): DFA integrates its input; on deviation LEVELS it scores the integrated process -> H~1.0-1.4 for any OU level, so H<0.45 is structurally impossible (the 0/240). ESTIMATOR-UNFIT (deeper): even on increments, H<0.45 fires only for extreme reversion (HL~2) and needs windows>=400; at the empirical HL~4-7 and W_s=200, H_incr~0.5. DFA-Hurst measures long-range/increment persistence (neutral for moderate OU), not reversion-to-a-level. VR + half-life measure reversion directly -> drop Hurst."
+}

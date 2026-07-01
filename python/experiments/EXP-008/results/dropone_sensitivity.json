@@ -1,0 +1,24 @@
+{
+  "analysis": "S8 drop-one-leg event-availability disclosure (design S8)",
+  "note": "Event = extreme(|z|>=2) AND leg-combo-pass; ceiling on conditioned events per cell before regime/finite-theta filtering. Same 16x5x3=240 cells as the main screen.",
+  "total_events_by_combo": {
+    "VR": 433790,
+    "HL": 609626,
+    "HU": 792,
+    "VR+HL": 315644,
+    "VR+HU": 528,
+    "HL+HU": 339,
+    "ALL3": 280
+  },
+  "cells_ge100_by_combo": {
+    "VR": 222,
+    "HL": 234,
+    "HU": 0,
+    "VR+HL": 216,
+    "VR+HU": 0,
+    "HL+HU": 0,
+    "ALL3": 0
+  },
+  "finding": "Hurst-DFA<0.45 leg is the binding veto: every combo containing it yields <=792 total events and 0/240 powered cells; every combo excluding it powers 216-234/240 cells. Hurst-on-deviation-LEVELS contradicts the VR/HL mean-reversion legs (a locally-persistent reverting level has Hurst>0.5). This is the L-12 \u00a73 near-impossible-conjunctive-leg pattern inside the screen.",
+  "governance": "Design \u00a77 INCONCLUSIVE branch is predeclared: no goalpost move; a corrected screen is a NEW experiment. CF-MR-003 stays REGISTERED (neither admitted nor exonerated)."
+}

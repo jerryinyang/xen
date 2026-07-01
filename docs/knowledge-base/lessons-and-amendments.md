@@ -224,3 +224,53 @@ candidate; it must **not** be tuned on the candidate it will judge.
 causal RSI-2 rerun (**CF-MR-002**) is the held-out benchmark vehicle + end-to-end architecture
 test, not a tuning set. Builds on [[L-03]] (pooled-as-verdict), [[L-04]] (vehicle match),
 [[L-08]] (bite = MDE-curve, not a fixed plant), [[L-11]] (gate-shape blindness).
+
+---
+
+## L-13 — A reused evaluation vehicle can silently mis-fit a new family (EXP-008 / CF-MR-003) ⭐
+
+**What.** CF-MR-003's cross-domain MR availability screen (EXP-008) was built by **reusing the
+price-geometry availability stack** — `availability_gate` Δ-over-**regime-matched-random-timing** +
+**fixed-horizon (24-bar) signed-MFE-toward-anchor**. It first returned INCONCLUSIVE (an inherited
+`Hurst-DFA<0.45` leg, structurally unsatisfiable on deviation *levels* — the wrong-object + estimator-
+unfit forensic, EXP-008 Amendment A1), then, with Hurst dropped, EXONERATE. A **reactive** vehicle diagnostic
+(not pre-registered) **indicated** EXONERATE was **vehicle-dependent**: under a **dislocation-matched** null
+(random bars at the same `|z|≥2`, no screen) the native target metrics separated — **anchor-hit +2.9 pp**
+(CI [+2.0,+3.7]),
+**fraction-of-dislocation-recovered +2.7 pp** (CI [+1.3,+3.1]), 82% of cells positive — while the
+**MFE metric stayed within 0** (CI [−3.1,+2.4]). Against the *original* regime-matched-random control the
+native metrics read **−17 to −20 pp** (near-anchor random bars trivially "revert"). So both prior
+verdicts were artifacts of an ill-fit vehicle, not readings of the family.
+
+**Mechanism (why), three coupled faults — none native to mean-reversion.**
+1. **Metric confounds signal with volatility.** Fixed-horizon **MFE** toward a target grows like `√H·σ`
+   at *any* bar; a volatility-matched control earns the same MFE from noise → the reversion component is
+   invisible. (The MR-native reads are **target-based**: reach-anchor / time-to-anchor scaled by the
+   fitted half-life / fraction-of-dislocation recovered / limit-at-anchor P&L — not a max-excursion.)
+2. **The null is not dislocation-matched.** An extreme-entry (`|z|≥2`) strategy compared to
+   regime-matched *random-timing* (mostly near-anchor) bars asks the wrong question — near-anchor bars
+   are trivially "already reverted." The native null holds **dislocation** fixed and varies only the
+   screen: "among equally-dislocated bars, does the screen pick better reversion?"
+3. **Arbitrary inherited thresholds.** The 24-bar horizon and the `Hurst<0.45` leg were carried over
+   without a mechanism check; the horizon should track the fitted half-life, and Hurst-DFA measures
+   long-range/increment persistence, not reversion-to-a-level.
+
+**Fix / new rule.** When starting a **new family**, re-derive the evaluation vehicle from the family's
+own mechanism before reusing a prior one: (a) match the **metric** to the mechanism (target-based for a
+target-reverting strategy, not a max-excursion); (b) match the **null** to the entry condition
+(dislocation-matched for an extreme-entry strategy, not random-timing); (c) tie horizons to a fitted
+mechanism scale (half-life), not a round number; (d) mechanism-check every inherited threshold/leg for an
+attainable-pass region before it can gate. A "clean" reused pipeline that runs without error is **not**
+evidence the vehicle fits — verify separation-vs-null on a native metric first. **Do not book a
+family verdict from a vehicle whose fit to the family is unverified.**
+
+**Enforced at.** EXP-008 recorded as a **methodology finding** (verdict *held*, not booked). The native
+re-screen **EXP-009** (target-based estimands + screen-fail dislocation-matched null + event-specific
+half-life horizon) then **SCREENED-ADMIT** CF-MR-003 with **36 leak-clean per-stratum reversion-to-anchor
+passes** (S5_SPREAD/S3_DETREND/S4_OU) where the EXP-008 vehicle read EXONERATE — a **strong confirmation
+that the vehicle, not the family, was the problem**. Practical corollaries proven in the loop: the null
+must be **dislocation-matched** (random-timing flipped the sign −29pp); the horizon must be **event-specific
+(half-life)**; the disposition must separate **precision-limited (UNPOWERED_HINT) from no-signal**; and
+per-stratum reporting (L-03) beats an axis-majority rule. Builds on [[L-04]] (match the vehicle to the
+signal), [[L-11]] (control/horizon parity to the mechanism), [[L-12]] (near-impossible leg — here the
+inherited Hurst leg). Memory: `evaluation_vehicle_must_be_native`.

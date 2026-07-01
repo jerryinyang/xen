@@ -1,0 +1,80 @@
+{
+  "floors": {
+    "hit": 0.03,
+    "frac": 0.05
+  },
+  "per_series": {
+    "S3_DETREND": {
+      "baseline": {
+        "n_stratum_pass": 13,
+        "n_cells": 48
+      },
+      "m=2": {
+        "n_stratum_pass": 16,
+        "n_cells": 48
+      },
+      "m=4": {
+        "n_stratum_pass": 13,
+        "n_cells": 48
+      },
+      "H_CAP=96": {
+        "n_stratum_pass": 8,
+        "n_cells": 48
+      },
+      "z-edges 2/3": {
+        "n_stratum_pass": 14,
+        "n_cells": 48
+      },
+      "recent-third": {
+        "n_stratum_pass": 0,
+        "n_cells": 46
+      },
+      "cell-median-HL": {
+        "n_stratum_pass": 9,
+        "n_cells": 48
+      }
+    },
+    "S5_SPREAD": {
+      "baseline": {
+        "n_stratum_pass": 20,
+        "n_cells": 42
+      },
+      "m=2": {
+        "n_stratum_pass": 19,
+        "n_cells": 42
+      },
+      "m=4": {
+        "n_stratum_pass": 18,
+        "n_cells": 42
+      },
+      "H_CAP=96": {
+        "n_stratum_pass": 18,
+        "n_cells": 42
+      },
+      "z-edges 2/3": {
+        "n_stratum_pass": 20,
+        "n_cells": 42
+      },
+      "recent-third": {
+        "n_stratum_pass": 0,
+        "n_cells": 0
+      },
+      "cell-median-HL": {
+        "n_stratum_pass": 19,
+        "n_cells": 42
+      }
+    }
+  },
+  "floor_sweep": {
+    "S3_DETREND": {
+      "hit0.02/frac0.03": 0,
+      "hit0.03/frac0.05": 14,
+      "hit0.05/frac0.08": 24
+    },
+    "S5_SPREAD": {
+      "hit0.02/frac0.03": 6,
+      "hit0.03/frac0.05": 19,
+      "hit0.05/frac0.08": 13
+    }
+  }
+}
