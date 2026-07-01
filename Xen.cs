@@ -22,7 +22,8 @@ public enum XenStrategy
     MaCrossover,
     AvwapBaseline,
     Donchian20,
-    Rsi2Fade
+    Rsi2Fade,
+    CrossDomainMrLimit
 }
 
 [Robot(AccessRights = AccessRights.FullAccess, AddIndicators = false, DefaultTimeFrame="Minute")]
@@ -64,6 +65,26 @@ public class Xen : Robot
 
     [Parameter("Slow MA", DefaultValue = 50)]
     public int SlowMa { get; set; } = 50;
+
+    // EXP-010 (CONC-1): S5_SPREAD basket mates for CrossDomainMrLimit — the traded symbol's
+    // asset-class class-mates (class minus self), semicolon- or comma-separated broker symbols,
+    // e.g. "EURUSD;USDJPY;USDCHF;USDCAD;GBPUSD;NZDUSD". Read via MarketData.GetBars at the exec
+    // TimeFrame (Hour) and averaged (log-Close, causal <= t) in-engine to form the basket.
+    [Parameter("Basket Mates (CANON;...)", DefaultValue = "")]
+    public string BasketMates { get; set; } = "";
+
+    // EXP-010 T1 LEAK TRIPWIRE (§7). >0 phase-shifts the basket feed back by this many hours,
+    // decorrelating the basket from the traded price: the cross-domain co-movement (the edge
+    // source) is destroyed while each series' marginal + autocorrelation are preserved. The net
+    // per-cell edge MUST collapse to within referee FPR (a surviving edge => leak => REJECT).
+    // 0 = the live run (no shift).
+    [Parameter("Basket Phase Shift Hours", DefaultValue = 0)]
+    public int BasketPhaseShiftHours { get; set; }
+
+    // EXP-012 (CONC-1 Track 2): CrossDomainMrLimit anchor series. "S5_SPREAD" = multi-symbol basket
+    // (needs Basket Mates); "S3_DETREND" = single-symbol rolling-OLS trendline residual (no basket).
+    [Parameter("CDM Series", DefaultValue = "S5_SPREAD")]
+    public string CdmSeries { get; set; } = "S5_SPREAD";
 
     private TimeBarParquetWriter? _writer;
     private BarAggregator? _strategyAggregator;
@@ -357,8 +378,45 @@ public class Xen : Robot
             XenStrategy.AvwapBaseline => new AvwapBounceModel(FastMa, SlowMa),
             XenStrategy.Donchian20 => new DonchianBreakoutModel(),
             XenStrategy.Rsi2Fade => new RsiFadeModel(),
+            XenStrategy.CrossDomainMrLimit => CreateCrossDomainMrLimitModel(),
             _ => throw new InvalidOperationException($"Unsupported strategy: {Strategy}")
         };
+    }
+
+    private ISignalModel CreateCrossDomainMrLimitModel()
+    {
+        // T1 (EXP-010) = exec-1h; T2 (EXP-012) = exec-15m. The model is grid-relative (WZ/WS/horizon are
+        // bar counts), so both are valid; reject other domains as a safety rail.
+        if (DomainMinutes != 60 && DomainMinutes != 15)
+            throw new InvalidOperationException(
+                $"CrossDomainMrLimit is exec-1h (T1) or exec-15m (T2) only; DomainMinutes must be 60 or 15, got {DomainMinutes}.");
+        if (CdmSeries == CrossDomainMrLimitModel.SeriesS3)
+        {
+            // T2a: single-symbol rolling-OLS trendline residual — no basket feed.
+            Print("Xen CONC-1 S3_DETREND (single-symbol) for {0}, domain={1}m.", SymbolName, DomainMinutes);
+            return new CrossDomainMrLimitModel(null, CrossDomainMrLimitModel.SeriesS3);
+        }
+        var mates = ParseMates(BasketMates);
+        if (mates.Count == 0)
+            throw new InvalidOperationException("CrossDomainMrLimit S5_SPREAD requires Basket Mates (S5 class-mates).");
+        var feed = new MarketDataBasketFeed(this, mates, BasketPhaseShiftHours);
+        Print("Xen CONC-1 S5_SPREAD basket feed for {0}: {1}/{2} mates resolved ({3}); phase_shift_hours={4}.",
+            SymbolName, feed.ResolvedCount, mates.Count, string.Join(",", mates), BasketPhaseShiftHours);
+        return new CrossDomainMrLimitModel(feed, CrossDomainMrLimitModel.SeriesS5);
+    }
+
+    private static List<string> ParseMates(string raw)
+    {
+        var mates = new List<string>();
+        if (string.IsNullOrWhiteSpace(raw))
+            return mates;
+        foreach (var token in raw.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            var m = token.Trim();
+            if (m.Length > 0)
+                mates.Add(m);
+        }
+        return mates;
     }
 
     private IReadOnlyDictionary<string, object?> BuildStrategyParameters(double? minCoverage)
@@ -391,6 +449,23 @@ public class Xen : Robot
                 parameters["high_extreme"] = 90.0;
                 parameters["exit"] = "rct_causal_di_minus_1";
                 break;
+            case XenStrategy.CrossDomainMrLimit:
+                parameters["series"] = CdmSeries == CrossDomainMrLimitModel.SeriesS3
+                    ? "S3_DETREND_rolling_ols_time"
+                    : "S5_SPREAD_exec_grid_beta";
+                parameters["w_z"] = 200;
+                parameters["w_s"] = 200;
+                parameters["vr_q"] = 4;
+                parameters["vr_delta"] = 0.10;
+                parameters["hl_max"] = 48.0;
+                parameters["z_star"] = 2.0;
+                parameters["direction"] = "fade";
+                parameters["reentry"] = "none";
+                parameters["target"] = "form2_limit_at_anchor_mean";
+                parameters["exit_fallback"] = "horizon_min48_3xHL_market_close";
+                parameters["basket_mates"] = BasketMates;
+                parameters["basket_phase_shift_hours"] = BasketPhaseShiftHours;   // 0 live; >0 leak tripwire
+                break;
         }
         return parameters;
     }
@@ -418,6 +493,71 @@ public class Xen : Robot
     private static string SanitizeLabel(string value)
     {
         return value.ToLowerInvariant().Replace(" ", "_").Replace("(", "").Replace(")", "");
+    }
+
+    // EXP-010 (CONC-1): S5_SPREAD basket feed over cAlgo secondary-symbol 1h bars
+    // (MarketData.GetBars — the XRSI-V1 multi-symbol pattern). Causal by construction:
+    // LogPriceAt(at) uses only mate bars whose CloseTime (OpenTime + 1h) <= `at`, so the
+    // forming/future mate bar is never read. A monotone per-mate cursor makes the repeated
+    // increasing-time lookups O(1) amortized. Unresolved mates are skipped (drop-to-available
+    // mean, matching build_baskets np.nanmean); no resolvable mate at `at` -> NaN (flat).
+    private sealed class MarketDataBasketFeed : IBasketFeed
+    {
+        private readonly List<Bars> _bars = new();
+        private readonly List<int> _cursor = new();
+        private readonly int _phaseShiftHours;   // >0 = leak-tripwire decorrelation (EXP-010 §7)
+
+        public MarketDataBasketFeed(Xen bot, IReadOnlyList<string> mates, int phaseShiftHours = 0)
+        {
+            _phaseShiftHours = Math.Max(0, phaseShiftHours);
+            foreach (var mate in mates)
+            {
+                Bars? bars = null;
+                try
+                {
+                    if (bot.Symbols.GetSymbol(mate) != null)
+                        bars = bot.MarketData.GetBars(TimeFrame.Hour, mate);
+                }
+                catch (Exception ex)
+                {
+                    bot.Print("CONC-1 basket: mate '{0}' unresolved ({1}) — skipped.", mate, ex.Message);
+                    bars = null;
+                }
+                if (bars != null)
+                {
+                    _bars.Add(bars);
+                    _cursor.Add(0);
+                }
+            }
+        }
+
+        public int ResolvedCount => _bars.Count;
+
+        public double LogPriceAt(DateTime at)
+        {
+            if (_phaseShiftHours > 0)
+                at = at.AddHours(-_phaseShiftHours);   // decorrelate basket from the traded price (tripwire)
+            double sum = 0.0;
+            int used = 0;
+            for (var m = 0; m < _bars.Count; m++)
+            {
+                var bars = _bars[m];
+                var c = _cursor[m];
+                while (c + 1 < bars.Count && bars.OpenTimes[c + 1].AddHours(1) <= at)
+                    c++;
+                _cursor[m] = c;
+                if (c < bars.Count && bars.OpenTimes[c].AddHours(1) <= at)
+                {
+                    var px = bars.ClosePrices[c];
+                    if (px > 0.0)
+                    {
+                        sum += Math.Log(px);
+                        used++;
+                    }
+                }
+            }
+            return used > 0 ? sum / used : double.NaN;
+        }
     }
 
     private sealed class TimeBarParquetWriter : IDisposable

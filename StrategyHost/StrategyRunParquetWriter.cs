@@ -172,7 +172,15 @@ public sealed class StrategyRunParquetWriter : IDisposable
             new DataField<int>("RegimeId"),
             new DataField<int>("RegimeDirection"),
             // EXP-006: causal reversion-completion limit fill price on exit bars (NaN otherwise).
-            new DataField<double>("ExitFillPrice")
+            new DataField<double>("ExitFillPrice"),
+            // EXP-010 (CONC-1): limit-entry fill price + causal decision provenance (NaN otherwise).
+            new DataField<double>("EntryFillPrice"),
+            new DataField<double>("Anchor"),
+            new DataField<double>("Dev"),
+            new DataField<double>("Z"),
+            new DataField<double>("Vr"),
+            new DataField<double>("Hl"),
+            new DataField<double>("Beta")
         };
         using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
         using var writer = ParquetWriter.CreateAsync(new ParquetSchema(fields), stream).GetAwaiter().GetResult();
@@ -194,6 +202,13 @@ public sealed class StrategyRunParquetWriter : IDisposable
         groupWriter.WriteColumnAsync(new DataColumn(fields[11], rows.Select(row => row.RegimeId).ToArray())).GetAwaiter().GetResult();
         groupWriter.WriteColumnAsync(new DataColumn(fields[12], rows.Select(row => row.RegimeDirection).ToArray())).GetAwaiter().GetResult();
         groupWriter.WriteColumnAsync(new DataColumn(fields[13], rows.Select(row => row.ExitFillPrice).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[14], rows.Select(row => row.EntryFillPrice).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[15], rows.Select(row => row.Anchor).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[16], rows.Select(row => row.Dev).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[17], rows.Select(row => row.Z).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[18], rows.Select(row => row.Vr).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[19], rows.Select(row => row.Hl).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[20], rows.Select(row => row.Beta).ToArray())).GetAwaiter().GetResult();
     }
 
     private static void WriteEvents(string path, IReadOnlyList<SignalEventRecord> rows)

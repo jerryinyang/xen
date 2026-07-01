@@ -27,7 +27,22 @@ public sealed record SignalPositionRecord(
     // NaN on every other bar (and for all non-RSI-fade models). Lets the Python
     // adjudication truncate the exit bar's open-to-open return at the realized
     // favourable fill (engine-realized; no Python rct recompute — L-01/P-09).
-    double ExitFillPrice = double.NaN);
+    double ExitFillPrice = double.NaN,
+    // EXP-010 (CF-MR-003 CONC-1): engine-realized limit-entry fill price on a bar
+    // where the resting entry limit (rested from t-1) filled intrabar; NaN otherwise
+    // and for all non-CONC-1 models. Paired with ExitFillPrice, this lets the Python
+    // adjudication assemble the exact-fill realized return with no re-derived edge.
+    double EntryFillPrice = double.NaN,
+    // EXP-010 causal decision provenance (all rested from t-1; the T2 causal-provenance
+    // trace audits these). Anchor = exec-grid-β fitted a[t-1] (the form-2 exit-limit
+    // target); Dev = log(price)-a; Z = std-z(dev); Vr/Hl = the VR∧HL selector legs;
+    // Beta = the rolling-β on the exec-grid basket. NaN in warmup / non-CONC-1 models.
+    double Anchor = double.NaN,
+    double Dev = double.NaN,
+    double Z = double.NaN,
+    double Vr = double.NaN,
+    double Hl = double.NaN,
+    double Beta = double.NaN);
 
 public sealed record SignalEventRecord(
     DateTime SourceCloseTime,
