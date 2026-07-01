@@ -46,31 +46,31 @@ from xen.referee_calibration import (
 # Per-bar round-trip bps, domain-invariant, 1h/4h only. Operator-ratified; the
 # 4 Chapter-01 anchors (EURUSD/XAUUSD/USTEC/BTCUSD) are unchanged fixed points.
 # --------------------------------------------------------------------------- #
-ADAPTIVE_DOMAINS: tuple[str, ...] = ("1h", "4h")
+ADAPTIVE_DOMAINS: tuple[str, ...] = ("15m", "1h", "4h")
 
 ROUND_TRIP_COST_BPS_17: dict[str, dict[str, float]] = {
     # FX majors
-    "EURUSD": {"1h": 1.0, "4h": 1.0},
-    "USDJPY": {"1h": 1.0, "4h": 1.0},
-    "GBPUSD": {"1h": 1.2, "4h": 1.2},
-    "USDCHF": {"1h": 1.5, "4h": 1.5},
-    "USDCAD": {"1h": 1.5, "4h": 1.5},
-    "AUDUSD": {"1h": 1.5, "4h": 1.5},
-    "NZDUSD": {"1h": 2.0, "4h": 2.0},
+    "EURUSD": {"15m": 1.0, "1h": 1.0, "4h": 1.0},
+    "USDJPY": {"15m": 1.0, "1h": 1.0, "4h": 1.0},
+    "GBPUSD": {"15m": 1.2, "1h": 1.2, "4h": 1.2},
+    "USDCHF": {"15m": 1.5, "1h": 1.5, "4h": 1.5},
+    "USDCAD": {"15m": 1.5, "1h": 1.5, "4h": 1.5},
+    "AUDUSD": {"15m": 1.5, "1h": 1.5, "4h": 1.5},
+    "NZDUSD": {"15m": 2.0, "1h": 2.0, "4h": 2.0},
     # FX crosses
-    "EURJPY": {"1h": 2.0, "4h": 2.0},
-    "AUDJPY": {"1h": 2.5, "4h": 2.5},
-    "GBPJPY": {"1h": 2.5, "4h": 2.5},
+    "EURJPY": {"15m": 2.0, "1h": 2.0, "4h": 2.0},
+    "AUDJPY": {"15m": 2.5, "1h": 2.5, "4h": 2.5},
+    "GBPJPY": {"15m": 2.5, "1h": 2.5, "4h": 2.5},
     # metal
-    "XAUUSD": {"1h": 3.0, "4h": 3.0},
+    "XAUUSD": {"15m": 3.0, "1h": 3.0, "4h": 3.0},
     # indices
-    "US500": {"1h": 3.0, "4h": 3.0},
-    "USTEC": {"1h": 4.0, "4h": 4.0},
-    "DE30": {"1h": 4.0, "4h": 4.0},
-    "JP225": {"1h": 4.0, "4h": 4.0},
-    "US2000": {"1h": 5.0, "4h": 5.0},
+    "US500": {"15m": 3.0, "1h": 3.0, "4h": 3.0},
+    "USTEC": {"15m": 4.0, "1h": 4.0, "4h": 4.0},
+    "DE30": {"15m": 4.0, "1h": 4.0, "4h": 4.0},
+    "JP225": {"15m": 4.0, "1h": 4.0, "4h": 4.0},
+    "US2000": {"15m": 5.0, "1h": 5.0, "4h": 5.0},
     # crypto
-    "BTCUSD": {"1h": 10.0, "4h": 10.0},
+    "BTCUSD": {"15m": 10.0, "1h": 10.0, "4h": 10.0},
 }
 
 

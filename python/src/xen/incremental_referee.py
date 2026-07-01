@@ -87,7 +87,7 @@ from xen.referee_calibration import (
 )
 
 # Per-domain blockwise latent-state episode length (D-incr-substrate). Frozen.
-EPISODE_LENGTHS: dict[str, int] = {"5m": 24, "1h": 8, "4h": 4}
+EPISODE_LENGTHS: dict[str, int] = {"5m": 24, "15m": 17, "1h": 8, "4h": 4}
 # Per-domain directional position bound for the combined book (D-incr-form).
 POSITION_BOUND: float = 1.0
 # Seeded R/C masks (D-incr-substrate). Each episode is assigned wholly to one mask,

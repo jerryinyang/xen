@@ -47,6 +47,7 @@ class DomainSpec:
 DOMAIN_SPECS: dict[str, DomainSpec] = {
     "5m": DomainSpec("5m", 5, None, min_effective_n=120, min_state_count=30),
     "1h": DomainSpec("1h", 60, 0.90, min_effective_n=60, min_state_count=20),
+    "15m": DomainSpec("15m", 15, 0.90, min_effective_n=90, min_state_count=25),
     "4h": DomainSpec("4h", 240, 0.90, min_effective_n=25, min_state_count=8),
 }
 COVERAGE_GRID: tuple[float | None, ...] = (None, 0.90, 0.80)
@@ -60,7 +61,7 @@ ROUND_TRIP_COST_BPS: dict[str, dict[str, float]] = {
     "BTCUSD": {"5m": 10.0, "1h": 10.0, "4h": 10.0},
     "USTEC": {"5m": 4.0, "1h": 4.0, "4h": 4.0},
 }
-MATERIALITY_BPS: dict[str, float] = {"5m": 0.5, "1h": 1.5, "4h": 3.0}
+MATERIALITY_BPS: dict[str, float] = {"5m": 0.5, "15m": 0.75, "1h": 1.5, "4h": 3.0}
 ALPHA_GRID: tuple[float, ...] = (0.10, 0.05, 0.01)
 EDGE_GRID_BPS: tuple[float, ...] = (0.0, 0.5, 1.0, 2.0, 4.0, 8.0, 12.0, 16.0, 24.0, 32.0)
 
