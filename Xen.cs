@@ -14,7 +14,11 @@ public enum XenMode
 {
     StrategyHost,
     TimeBars,
-    StrategyHostParity
+    StrategyHostParity,
+    // EXP-013 (CF-MR-004): native cTrader pending-order execution. The robot places REAL
+    // limit orders and cTrader's backtester (m1) owns fill resolution — no self-adjudicated
+    // fills on aggregated bars (the Route-A faithful build; see CrossInstrumentSpreadPlanner).
+    NativeOrders
 }
 
 public enum XenStrategy
@@ -23,11 +27,12 @@ public enum XenStrategy
     AvwapBaseline,
     Donchian20,
     Rsi2Fade,
-    CrossDomainMrLimit
+    CrossDomainMrLimit,
+    CrossInstrumentSpreadMr
 }
 
 [Robot(AccessRights = AccessRights.FullAccess, AddIndicators = false, DefaultTimeFrame="Minute")]
-public class Xen : Robot
+public partial class Xen : Robot
 {
     private const string OutputDirectory = "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/timebars";
     private const string StrategyRunOutputDirectory = "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/strategy_runs";
@@ -86,6 +91,63 @@ public class Xen : Robot
     [Parameter("CDM Series", DefaultValue = "S5_SPREAD")]
     public string CdmSeries { get; set; } = "S5_SPREAD";
 
+    // EXP-013 (CF-MR-004): Cross-instrument spread MR series. S5_SPREAD = rolling-β basket;
+    // S6_PAIR = fixed-ratio pair (β=1, single peer); S7_BASKET = fixed-weight basket (equal);
+    // S8_RVINDEX = relative-value index (pair + rolling median). 4h anchor domain only, no lower-domain.
+    [Parameter("CIS Series", DefaultValue = "S5_SPREAD")]
+    public string CisSeries { get; set; } = "S5_SPREAD";
+
+    // EXP-014 (CF-MR-004 HYP-002) — reentry axis. "none" = single open leg, cancel all on fill
+    // (binding PRIMARY); "allow" = refill the base band (z*=2.0), concurrent legs; "extend" = arm
+    // the z*∈{2.0,2.5,3.0} ladder, one fill per deeper level, concurrent legs. Multi-leg netting
+    // engine handles all three (proposal /REENTRY).
+    [Parameter("CIS Reentry", DefaultValue = "none")]
+    public string CisReentry { get; set; } = "none";
+
+    // EXP-014 A/B recalc→fill arm. false = R (refresh: re-arm the bracket each 4h bar);
+    // true = S (static: place the bracket once when flat, leave until filled/horizon). Lifecycle-
+    // changing → a separate labeled run per arm (design §6).
+    [Parameter("CIS Static Arm", DefaultValue = false)]
+    public bool CisStaticArm { get; set; }
+
+    // DEPRECATED (HYP-003 / amendment-003): the fix/trail split is removed — single-leg exit is ALWAYS the
+    // moving-mean form-2 (refresh to exp(anchorLog) each bar) + form-1, no horizon. This param is retained
+    // for back-compat only and no longer affects the single-leg exit. (Was: false=fixed entry-referential
+    // limit, true=trailing moving anchor.)
+    [Parameter("CIS Trail", DefaultValue = false)]
+    public bool CisTrail { get; set; }
+
+    // HYP-003 (amendment-003): both-leg variant. When true, an S8 spread signal opens a grouped spread
+    // position — short the traded instrument AND long each equal-weight basket mate — held as one unit and
+    // exited jointly on form-1 (spread reverts through the mean). Captures peer-side reversion the single
+    // traded-instrument limit cannot (audit M1). reentry is forced to none for both-leg.
+    [Parameter("CIS Both Leg", DefaultValue = false)]
+    public bool CisBothLeg { get; set; }
+
+    // HYP-003 (amendment-003): entry deviation-magnitude axis. Base band = CisZStar·σ; the reentry
+    // ladder is derived as {z*, z*+0.5, z*+1.0}. Axis values: 2.0 (default) and 1.5 (more aggressive,
+    // less-extreme entry). Threaded to the planner + the robot's ladder.
+    [Parameter("CIS ZStar", DefaultValue = 2.0)]
+    public double CisZStar { get; set; } = 2.0;
+
+    // HYP-003 (amendment-003 A10) — both-leg entry sub-axis (only when CisBothLeg=true).
+    // "market" = market-fill all N+1 legs the instant the ≤t-1-close S8 spread breaches ±z*·σ
+    //   (clean group, no desync). "limit" = ATOMIC: A rests band-limits at exp(anchorLog±z*·σ),
+    //   mates rest limits at their ≤t-1 close on A-fill; if the full N+1 group is not filled by the
+    //   next domain bar, market-unwind any filled legs (flat) — only a full-group fill survives.
+    [Parameter("CIS Both Leg Entry", DefaultValue = "market")]
+    public string CisBothLegEntry { get; set; } = "market";
+
+    // HYP-004 (amendment-004) — single-leg EXIT-SET axis. "moving" = E0 faithful moving-mean
+    // (form-1 event reversion + refreshing form-2 at the moving anchor; the EXP-014b baseline).
+    // "frozen_tp" = E1: TP limit frozen at the entry-time anchor a_entry per leg (set at the fill,
+    // never modified); no SL, no time-stop, form-1 disabled. "frozen_tp_sl" = E2: E1 + SL stop
+    // frozen at the symmetric outward barrier o±D (o = entry fill, D = |o − a_entry|).
+    // "bracket" = E3: E2 + hard time-stop ⌈3·HL_entry⌉ domain bars (cap 48) → market close.
+    // E3 reproduces the symmetry two-barrier availability race exactly. Single-leg only.
+    [Parameter("CIS Exit Set", DefaultValue = "moving")]
+    public string CisExitSet { get; set; } = "moving";
+
     private TimeBarParquetWriter? _writer;
     private BarAggregator? _strategyAggregator;
     private ISignalModel? _strategyModel;
@@ -109,6 +171,20 @@ public class Xen : Robot
         {
             RunStrategyHostParityExport();
             Stop();
+            return;
+        }
+
+        if (Mode == XenMode.NativeOrders)
+        {
+            try
+            {
+                StartNativeOrders();
+            }
+            catch (Exception ex)
+            {
+                Print("Xen native-orders failed to start: {0}", ex.Message);
+                Stop();
+            }
             return;
         }
 
@@ -143,6 +219,12 @@ public class Xen : Robot
     {
         if (IsStrategyHostParityMode())
             return;
+        if (Mode == XenMode.NativeOrders)
+        {
+            if (_nativeReady)
+                RunNativeOrdersOnBar();
+            return;
+        }
         if (IsStrategyHostMode())
         {
             if (_strategyHostReady)
@@ -156,7 +238,12 @@ public class Xen : Robot
     {
         try
         {
-            if (IsStrategyHostMode())
+            if (Mode == XenMode.NativeOrders)
+            {
+                FlushOpenLegsAsCensored();   // EXP-014b: emit still-open legs as censored open_at_end rows
+                _strategyWriter?.Dispose();
+            }
+            else if (IsStrategyHostMode())
             {
                 if (!_stoppingAtFence && !_strategyFixedRunCompleted)
                     FlushStrategyDomainBars();
@@ -379,6 +466,10 @@ public class Xen : Robot
             XenStrategy.Donchian20 => new DonchianBreakoutModel(),
             XenStrategy.Rsi2Fade => new RsiFadeModel(),
             XenStrategy.CrossDomainMrLimit => CreateCrossDomainMrLimitModel(),
+            // CF-MR-004 runs via native cTrader pending orders (Mode=NativeOrders), not as a
+            // self-adjudicating StrategyHost model — see StartNativeOrders / the planner.
+            XenStrategy.CrossInstrumentSpreadMr => throw new InvalidOperationException(
+                "CrossInstrumentSpreadMr runs in Mode=NativeOrders (native pending orders), not StrategyHost."),
             _ => throw new InvalidOperationException($"Unsupported strategy: {Strategy}")
         };
     }
@@ -466,6 +557,46 @@ public class Xen : Robot
                 parameters["basket_mates"] = BasketMates;
                 parameters["basket_phase_shift_hours"] = BasketPhaseShiftHours;   // 0 live; >0 leak tripwire
                 break;
+            case XenStrategy.CrossInstrumentSpreadMr:
+                parameters["series"] = CisSeries;
+                parameters["execution"] = "native_ctrader_pending_orders_m1";
+                parameters["entry"] = "resting_bracket_no_z_gate";  // limits at anchor±Z*σ; band IS the trigger
+                parameters["w_z"] = CrossInstrumentSpreadPlanner.WZ;
+                parameters["z_star"] = CisZStar;
+                parameters["w_a"] = CrossInstrumentSpreadPlanner.Wa;
+                parameters["median_w"] = CrossInstrumentSpreadPlanner.MedianW;  // EXP-014 F-fix: 90 (S8 basket−median-90)
+                parameters["direction"] = "fade_both_directions";
+                parameters["domain"] = _nativeDomain;             // HYP-003: 1h or 4h decision domain
+                // HYP-004 (amendment-004) — exit-set axis: moving (E0) | frozen_tp | frozen_tp_sl | bracket.
+                parameters["exit_set_axis"] = _exitSet;
+                parameters["exit_set"] = _frozenExit
+                    ? "frozen_tp_at_entry_anchor" + (_frozenSl ? "+sl_outward_oD" : "")
+                      + (_frozenTimeStop ? "+time_stop_3xHL_cap48" : "")
+                    : "form1_event_reversion+form2_moving_mean_limit";  // E0: no horizon
+                parameters["form2_exit"] = CisBothLeg
+                    ? "both_leg_joint_form1_at_spread_mean_no_separate_form2"
+                    : (_frozenExit
+                        ? "tp_frozen_at_entry_time_anchor_never_modified"
+                        : "moving_anchor_mean_modify_tp_each_bar_favorable_asserted");
+                parameters["form1"] = _frozenExit
+                    ? "disabled_frozen_exit_modes"
+                    : "spread_reverted_through_mean_close_next_bar_open";
+                parameters["both_leg"] = CisBothLeg
+                    ? "short_instrument_plus_long_equal_weight_basket_grouped_spread_position"
+                    : "single_leg_traded_instrument_only";
+                parameters["open_at_end"] = "censored_disclosed_excluded_from_realized_referee";
+                parameters["reentry"] = CisBothLeg ? "none" : CisReentry;   // both-leg forces none
+                parameters["both_leg_entry"] = CisBothLeg ? _bothLegEntry : "n/a_single_leg";  // A10 market|limit
+                parameters["ladder_z_stars"] = string.Join(";", _ladderZStars);
+                parameters["recalc_fill_arm"] = "R_refresh_per_bar";        // HYP-003: R only (S dropped)
+                parameters["target"] = "form2_limit_at_moving_anchor_mean";
+                parameters["breach_policy"] = "skip_le_t1_close+disclose_live_bidask";
+                parameters["min_mate_rule"] = "valid_basket_bar_requires_full_predeclared_membership";
+                parameters["trend_measure"] = "ema20_minus_ema50_over_sigma_close_wz";
+                parameters["vol_regime"] = "spread_sigma_tercile_over_trailing_500_domain_bars";
+                parameters["basket_mates"] = BasketMates;
+                parameters["basket_phase_shift_bars"] = BasketPhaseShiftHours;  // 0 live; >0 leak tripwire (4h bars)
+                break;
         }
         return parameters;
     }
@@ -493,6 +624,797 @@ public class Xen : Robot
     private static string SanitizeLabel(string value)
     {
         return value.ToLowerInvariant().Replace(" ", "_").Replace("(", "").Replace(")", "");
+    }
+
+    // =======================================================================
+    // EXP-013 (CF-MR-004) — NATIVE-ORDER EXECUTION (Route A).
+    // The robot decides on the 4h anchor grid (≤ t-1) and places REAL cTrader
+    // pending limit orders; cTrader's m1 backtester owns fill resolution. No
+    // self-adjudicated fills on aggregated bars. Emission = per-4h-bar position
+    // record with ENGINE fill prices (EntryFillPrice/ExitFillPrice), so the Python
+    // suite adjudicates on the engine's realized fills. Holdout fence = the backtest
+    // --end date; every emitted SourceCloseTime is asserted < AnalysisEndUtc.
+    // =======================================================================
+    private const string NativeStrategyName = "cross_instrument_spread_mr";
+    // EXP-014 faithful full-exit constants. Ladder z*-levels for /REENTRY=extend (base first);
+    // trend EMA fast/slow + σ_close window; vol-regime tercile history window (design §6/§7).
+    // HYP-003: reentry ladder derived from the base z* axis at start = {z*, z*+0.5, z*+1.0}
+    // (z*=2.0 → {2.0,2.5,3.0}; z*=1.5 → {1.5,2.0,2.5}). Set in StartNativeOrders from CisZStar.
+    private double[] _ladderZStars = { 2.0, 2.5, 3.0 };
+    private const int TrendFast = 20;
+    private const int TrendSlow = 50;
+    private const int TrendSigmaWindow = CrossInstrumentSpreadPlanner.WZ;  // σ_close window = WZ (200)
+    private const int VolHistWindow = 500;    // trailing spread-σ history for the vol-regime tercile
+    private CrossInstrumentSpreadPlanner _planner = null!;
+    private CrossInstrumentBasketFeed _cisFeed = null!;
+    private Bars _h4 = null!;
+    private bool _nativeReady;
+    private bool _nativeStopping;
+    private int _h4Index = -1;                 // index of last processed completed domain bar
+    private DateTime? _lastProcessedH4Open;
+    private string _nativeDomain = "4h";        // set in StartNativeOrders = DomainLabel(DomainMinutes)
+    private int _nativeDomainMinutes = 240;     // HYP-003: 60 (1h) or 240 (4h)
+    private string _orderLabel = "";
+    private double _orderVolume;
+    private long _nativeTradeSeq;
+    private SpreadBracket _lastBracket;
+    private List<SignalEventRecord> _periodEvents = new();
+    private List<StrategyTradeRecord> _periodTrades = new();
+
+    // --- EXP-014 reentry / arm mode (resolved once at start) -------------------------------
+    private string _reentryMode = "none";      // none | allow | extend
+    private bool _staticArm;                   // true = S (place-once); false = R (refresh/bar)
+    private bool _bracketPlacedStatic;         // S arm: whether the resting bracket is currently placed
+    private bool _trail;                       // EXP-014b: true = trailing form-2 (moving anchor); false = fixed exit
+
+    // --- HYP-004 exit-set axis (resolved once at start) --------------------------------------
+    // moving (E0) | frozen_tp (E1) | frozen_tp_sl (E2) | bracket (E3). Frozen modes bypass the
+    // moving form-2 refresh AND form-1 entirely; each leg carries its own bracket frozen at fill.
+    private string _exitSet = "moving";
+    private bool _frozenExit;                  // any of E1/E2/E3
+    private bool _frozenSl;                    // E2/E3: SL at the outward barrier o±D
+    private bool _frozenTimeStop;              // E3: ⌈3·HL_entry⌉ time-stop (cap 48)
+    private const int FrozenHorizonCap = 48;   // matches the availability race H_CAP
+
+    // --- EXP-014 multi-leg netting engine --------------------------------------------------
+    // One NativeLeg per open position (concurrent under allow/extend; ≤1 under none). Matched to
+    // the cTrader Position by Id. Exit reason is staged in _pendingCloseReason before a market
+    // ClosePosition and consumed by the (possibly async) close event.
+    private sealed class NativeLeg
+    {
+        public long PositionId;
+        public int Dir;                        // +1 long / −1 short
+        public int LadderLevel;                // 0 = z*=2.0, 1 = 2.5, 2 = 3.0
+        public double EntryFill;
+        public int EntryH4Index;
+        public DateTime EntryTime;
+        public double EntryZ, EntrySpread, EntryAnchorPrice, EntrySigma;
+        public double EntryTrendZ; public int EntryTrendDir; public int EntryVolRegime;
+        // EXP-014b: entry-referential fixed exit = EntryFill·exp(dir·band), band = Z*·σ locked at the arm
+        // bar. Set once at open; used as the fixed form-2 TP (NaN under trailing). MAE/MFE track the
+        // dir-signed adverse/favorable excursion over the hold for the forensic per-trade lens.
+        public double FixedExit = double.NaN;
+        public double MaeBps;                  // most adverse (min dir-signed return, bps)
+        public double MfeBps;                  // most favorable (max dir-signed return, bps)
+        // HYP-004 frozen bracket (E1-E3): FixedExit doubles as the frozen TP (= a_entry). SlPrice =
+        // outward barrier o±D (NaN under E1/moving). HorizonBars = ⌈3·HL_entry⌉ cap 48 (0 = none).
+        public double SlPrice = double.NaN;
+        public int HorizonBars;
+    }
+    private readonly List<NativeLeg> _legs = new();
+    private readonly Dictionary<long, string> _pendingCloseReason = new();
+    // Closed-trade rows staged during a period (market + limit exits) and flushed to cis_trades in
+    // EmitNativePosition with SourceCloseTime = the emitted bar's 4h closeTime (fence-consistent).
+    private sealed class ClosedTrade
+    {
+        public NativeLeg Leg = null!;
+        public double ExitFill;
+        public string Reason = "";
+        public DateTime ExitTime;
+        public double ExitAnchorPrice;
+        public double ExitSpread;
+        public int BarsHeld;
+    }
+    private readonly List<ClosedTrade> _periodClosed = new();
+    // Emission direction convention (CF-MR-003): the entry bar carries the entered dir; hold/exit
+    // bars carry the dir held into the period. Concurrent legs are always same-side, so net sign
+    // == that side. For the binding PRIMARY (reentry=none) this reduces to the single-leg case.
+    private int _periodStartSign;              // net sign of legs held into the period being emitted
+    private int _periodEntryDir;               // dir of any entry that filled during this period (0 if none)
+    private double _pendingEntryFill = double.NaN;   // representative last entry fill this period (emit)
+    private double _pendingExitFill = double.NaN;    // representative last exit fill this period (emit)
+
+    // --- EXP-014 conditioner state (trend on traded 4h; vol regime on spread-σ history) ----
+    private readonly List<double> _h4Close = new();     // trailing traded closes for σ_close(WZ)
+    private double _ema20 = double.NaN;
+    private double _ema50 = double.NaN;
+    private readonly List<double> _sigmaHist = new();   // trailing spread-σ for the vol tercile
+    private double _trendZ = double.NaN;
+    private int _trendDir;
+    private int _volRegime = -1;
+
+    private void StartNativeOrders()
+    {
+        if (DomainMinutes != 240 && DomainMinutes != 60)
+            throw new InvalidOperationException(
+                $"NativeOrders CF-MR-004 (HYP-003) is 1h or 4h anchor; DomainMinutes must be 60 or 240, got {DomainMinutes}.");
+        _nativeDomainMinutes = DomainMinutes;
+        _nativeDomain = DomainLabel(DomainMinutes);
+        var nativeTimeFrame = DomainMinutes == 60 ? TimeFrame.Hour : TimeFrame.Hour4;
+        if (!TryParseAnalysisEndUtc(AnalysisEndUtc, out var analysisEndUtc))
+            throw new InvalidOperationException("Analysis End UTC must be explicit, e.g. 2026-01-01T00:00:00Z.");
+
+        _planner = new CrossInstrumentSpreadPlanner(CisSeries, CisZStar);   // throws on unknown series
+        _reentryMode = (CisReentry ?? "none").Trim().ToLowerInvariant();
+        if (_reentryMode != "none" && _reentryMode != "allow" && _reentryMode != "extend")
+            throw new InvalidOperationException(
+                $"CIS Reentry must be none|allow|extend, got '{CisReentry}'.");
+        _staticArm = CisStaticArm;
+        _trail = CisTrail;
+        _exitSet = (CisExitSet ?? "moving").Trim().ToLowerInvariant();
+        if (_exitSet != "moving" && _exitSet != "frozen_tp" && _exitSet != "frozen_tp_sl" && _exitSet != "bracket")
+            throw new InvalidOperationException(
+                $"CIS Exit Set must be moving|frozen_tp|frozen_tp_sl|bracket, got '{CisExitSet}'.");
+        _frozenExit = _exitSet != "moving";
+        _frozenSl = _exitSet == "frozen_tp_sl" || _exitSet == "bracket";
+        _frozenTimeStop = _exitSet == "bracket";
+        if (_frozenExit && CisBothLeg)
+            throw new InvalidOperationException("CIS Exit Set frozen modes are single-leg only (HYP-004).");
+        var z0 = CisZStar > 0.0 ? CisZStar : CrossInstrumentSpreadPlanner.ZStar;
+        _ladderZStars = new[] { z0, z0 + 0.5, z0 + 1.0 };   // HYP-003 base-z* + reentry ladder
+        _bothLeg = CisBothLeg;                              // HYP-003 A10 — grouped-spread variant (Increment B)
+        var mates = ParseMates(BasketMates);
+        if (mates.Count == 0)
+            throw new InvalidOperationException(
+                "NativeOrders CF-MR-004 requires Basket Mates (basket for S5/S7/S8, single peer for S6).");
+        _cisFeed = new CrossInstrumentBasketFeed(this, mates, BasketPhaseShiftHours, nativeTimeFrame);
+        _h4 = MarketData.GetBars(nativeTimeFrame, SymbolName);
+        _strategyFence = new HoldoutFence(analysisEndUtc);
+        _strategyWriter = new StrategyRunParquetWriter(
+            StrategyOutputDirectory, NativeStrategyName, SymbolName, _nativeDomain,
+            _strategyFence, BuildStrategyParameters(null));
+        _orderLabel = $"cis_{SanitizeLabel(SymbolName)}_{CisSeries}";
+        _orderVolume = Symbol.NormalizeVolumeInUnits(Symbol.VolumeInUnitsMin);
+
+        if (_bothLeg)
+            InitBothLeg(mates, nativeTimeFrame);
+
+        Positions.Opened += OnNativePositionOpened;
+        Positions.Closed += OnNativePositionClosed;
+        _nativeReady = true;
+
+        Print(
+            "Xen CF-MR-004 NativeOrders {0} for {1}: {2}/{3} mates; reentry={4}; arm={5}; exit_set={6}; phase_shift_bars={7}; AnalysisEndUtc={8:o}; out={9}",
+            CisSeries, SymbolName, _cisFeed.ResolvedCount, mates.Count, _reentryMode,
+            _staticArm ? "S_static" : "R_refresh", _exitSet, BasketPhaseShiftHours,
+            _strategyFence.AnalysisEndUtc, _strategyWriter.RunDirectory);
+    }
+
+    private void RunNativeOrdersOnBar()
+    {
+        if (_nativeStopping)
+            return;
+        var latest = _h4.Count - 2;   // last fully-completed 4h bar
+        if (latest <= _h4Index)
+            return;
+        for (var i = _h4Index + 1; i <= latest; i++)
+            if (!ProcessCompletedH4Bar(i, armOrders: i == latest))
+                return;   // hit fence
+    }
+
+    // Process one completed domain bar i: Observe (≤ i), update conditioners, apply the exit set to
+    // open legs (form-1 event reversion at the moving mean; NO horizon), refresh the moving-mean form-2
+    // TP each bar, emit the per-bar record, and (on the latest bar) re-arm. HYP-003: single-leg exit is
+    // the moving-mean artifact (form-2 refreshes to exp(anchorLog) + form-1); the fixed exit is dropped.
+    private bool ProcessCompletedH4Bar(int i, bool armOrders)
+    {
+        var openTime = _h4.OpenTimes[i];
+        var closeTime = openTime.AddMinutes(_nativeDomainMinutes);
+        if (_strategyFence!.ShouldStopBeforeProcessing(closeTime))
+        {
+            _nativeStopping = true;
+            Stop();
+            return false;
+        }
+
+        var close = _h4.ClosePrices[i];
+        var logClose = close > 0.0 ? Math.Log(close) : double.NaN;
+        var feedLog = _cisFeed.BasketLogAt(openTime);
+        var mateCount = _cisFeed.LastMateCount;
+        var mateGap = mateCount < _cisFeed.ExpectedMates;   // min-mate rule: basket bar invalid on any gap
+        _planner.Observe(logClose, feedLog);
+        _lastBracket = _planner.CurrentBracket();
+        UpdateConditioners(close);
+
+        // HYP-003 A10 — both-leg grouped-spread path (Increment B). Fully self-contained; the
+        // single-leg netting engine below is untouched. Shares Observe/conditioners/bracket above.
+        if (_bothLeg)
+        {
+            ProcessBothLegBar(i, armOrders, logClose, close, mateCount, mateGap, closeTime);
+            _h4Index = i;
+            _lastProcessedH4Open = openTime;
+            return true;
+        }
+
+        // Track per-leg adverse/favorable excursion at every completed bar's close (forensic lens).
+        if (_legs.Count > 0)
+            UpdateLegExcursions(close);
+
+        // Proposal-faithful exits at THIS bar's boundary (open of i+1; open-to-open). form-1 = spread
+        // reverted through mean → market close. NO horizon (unspecified in the proposal). A non-reverting
+        // position rides until form-1/form-2 fires or the fence stops it (then censored, open_at_end).
+        var form1Any = false;
+        if (!_frozenExit && armOrders && _legs.Count > 0
+            && double.IsFinite(_lastBracket.AnchorLog) && double.IsFinite(logClose))
+            form1Any = ApplyEventExits(i, logClose);
+
+        // HYP-004 E3 time-stop: close legs held ≥ their frozen ⌈3·HL_entry⌉ horizon at market
+        // (exit at next open). E1/E2 have no time exit; E0 uses form-1/form-2 above.
+        if (_frozenTimeStop && armOrders && _legs.Count > 0)
+            ApplyFrozenTimeStop(i);
+
+        // Form-2 exit (E0 moving-mean only). Each bar, modify every surviving leg's TP to the
+        // moving anchor mean exp(anchorLog_t); favorable-asserted per (re)placement. E1-E3 legs are
+        // never touched — their bracket is frozen at the fill (HYP-004).
+        var refreshedTp = double.NaN;
+        if (!_frozenExit && armOrders && _legs.Count > 0 && !_lastBracket.Warmup)
+            refreshedTp = RefreshForm2Targets(close);
+
+        EmitNativePosition(i, closeTime, mateCount, mateGap, refreshedTp, form1Any);
+        _pendingEntryFill = double.NaN;
+        _pendingExitFill = double.NaN;
+
+        if (armOrders)
+            RearmBracket(logClose, mateGap);
+
+        _h4Index = i;
+        _lastProcessedH4Open = openTime;
+        return true;
+    }
+
+    private void EmitNativePosition(int i, DateTime closeTime, int mateCount, bool mateGap,
+                                    double refreshedTp, bool form1Any)
+    {
+        var b = _lastBracket;
+        var heldPosition = _periodEntryDir != 0 ? _periodEntryDir : _periodStartSign;
+        var closeI = _h4.ClosePrices[i];
+
+        // Base-level (z*=2.0) armed band prices + breach flags for emission (deeper ladder levels
+        // are recorded per fill in cis_trades). Breach = binding ≤t-1-close test + live disclosure.
+        double armSell = double.NaN, armBuy = double.NaN;
+        bool breachSell = false, breachBuy = false, liveBreachSell = false, liveBreachBuy = false;
+        if (!b.Warmup && double.IsFinite(b.AnchorLog) && b.Sigma > 0.0)
+        {
+            var band = _ladderZStars[0] * b.Sigma;
+            armSell = Math.Exp(b.AnchorLog + band);
+            armBuy = Math.Exp(b.AnchorLog - band);
+            breachSell = armSell <= closeI;          // ≤ t-1 confirmed close (binding breach test)
+            breachBuy = armBuy >= closeI;
+            liveBreachSell = armSell <= Symbol.Bid;  // live bid/ask (disclosure)
+            liveBreachBuy = armBuy >= Symbol.Ask;
+        }
+
+        // Aggregate intra-position MTM over surviving legs (L-09), marked at RealClose.
+        double mtm = double.NaN;
+        if (_legs.Count > 0)
+        {
+            var acc = 0.0; var n = 0;
+            foreach (var leg in _legs)
+                if (leg.EntryFill > 0.0) { acc += leg.Dir * (closeI - leg.EntryFill) / leg.EntryFill * 1e4; n++; }
+            if (n > 0) mtm = acc;
+        }
+
+        var rec = new SignalPositionRecord(
+            SourceCloseTime: closeTime, Domain: _nativeDomain, Strategy: NativeStrategyName,
+            Position: heldPosition, SignalValue: b.Z,
+            RealOpen: _h4.OpenPrices[i], RealHigh: _h4.HighPrices[i],
+            RealLow: _h4.LowPrices[i], RealClose: closeI,
+            Warmup: b.Warmup, IsFlat: heldPosition == 0,
+            ExitFillPrice: _pendingExitFill, EntryFillPrice: _pendingEntryFill,
+            Anchor: b.Warmup ? double.NaN : Math.Exp(b.AnchorLog),
+            Dev: b.Spread, Z: b.Z, Vr: b.Vr, Hl: b.Hl, Beta: b.Beta,
+            ArmSellPrice: armSell, ArmBuyPrice: armBuy, Sigma: b.Sigma, SpreadMean: b.Mean,
+            MateCount: mateCount, MateExpected: _cisFeed.ExpectedMates, MateGap: mateGap,
+            TrendZ: _trendZ, TrendDir: _trendDir, VolRegime: _volRegime,
+            BreachSkipSell: breachSell, BreachSkipBuy: breachBuy,
+            LiveBreachSkipSell: liveBreachSell, LiveBreachSkipBuy: liveBreachBuy,
+            OpenLegs: _legs.Count, MtmBps: mtm, RefreshedTp: refreshedTp, Form1Any: form1Any);
+        _strategyWriter!.Append(new SignalUpdate(rec, _periodEvents, _periodTrades));
+        _periodEvents = new List<SignalEventRecord>();
+        _periodTrades = new List<StrategyTradeRecord>();
+
+        // Flush closed-trade rows realized within the period ending at closeTime (fence-consistent).
+        foreach (var ct in _periodClosed)
+        {
+            var bps = ct.Leg.EntryFill > 0.0
+                ? ct.Leg.Dir * (ct.ExitFill - ct.Leg.EntryFill) / ct.Leg.EntryFill * 1e4
+                : double.NaN;
+            _strategyWriter!.AppendCisTrade(new CisTradeRecord(
+                SourceCloseTime: closeTime, Domain: _nativeDomain, Strategy: NativeStrategyName, Series: CisSeries,
+                EntryTime: ct.Leg.EntryTime, ExitTime: ct.ExitTime, Direction: ct.Leg.Dir, LadderLevel: ct.Leg.LadderLevel,
+                EntryFillPrice: ct.Leg.EntryFill, ExitFillPrice: ct.ExitFill, ExitReason: ct.Reason,
+                BarsHeld: ct.BarsHeld, RealizedBps: bps,
+                EntryZ: ct.Leg.EntryZ, EntrySpread: ct.Leg.EntrySpread, EntryAnchorPrice: ct.Leg.EntryAnchorPrice,
+                EntrySigma: ct.Leg.EntrySigma, ExitAnchorPrice: ct.ExitAnchorPrice, ExitSpread: ct.ExitSpread,
+                EntryTrendZ: ct.Leg.EntryTrendZ, EntryTrendDir: ct.Leg.EntryTrendDir, EntryVolRegime: ct.Leg.EntryVolRegime,
+                FixedExitPrice: ct.Leg.FixedExit, MaeBps: ct.Leg.MaeBps, MfeBps: ct.Leg.MfeBps, Censored: 0,
+                SlPrice: ct.Leg.SlPrice, HorizonBars: ct.Leg.HorizonBars));
+        }
+        _periodClosed.Clear();
+
+        // Advance period-direction trackers for the next period.
+        _periodStartSign = NetSign();
+        _periodEntryDir = 0;
+    }
+
+    // Arm the resting bracket(s) for the next period. R (refresh): cancel + re-arm each bar. S
+    // (static): place once when flat and leave until filled/horizon. /REENTRY=none arms only the
+    // base band (z*=2.0) and holds off while a leg is open; extend arms the full z*-ladder; allow
+    // re-arms the base band each bar (concurrent legs). Skip a side breached vs the ≤t-1 close
+    // (binding, don't chase) or through the live market; skip entirely on a min-mate gap.
+    private void RearmBracket(double logClose, bool mateGap)
+    {
+        var b = _lastBracket;
+        if (!_staticArm)
+        {
+            if (_reentryMode == "none" && _legs.Count > 0)
+                return;                       // no new entries while a leg is open (none)
+            CancelOurPendingOrders();
+            _bracketPlacedStatic = false;
+        }
+        else
+        {
+            if (_legs.Count > 0 || _bracketPlacedStatic)
+                return;                       // static: leave the resting bracket until filled/horizon
+            CancelOurPendingOrders();
+        }
+        if (b.Warmup || mateGap || !(b.Sigma > 0.0) || !double.IsFinite(b.AnchorLog) || !double.IsFinite(logClose))
+            return;
+
+        var closeI = Math.Exp(logClose);      // ≤ t-1 confirmed close price (binding breach reference)
+        var levels = _reentryMode == "extend" ? _ladderZStars.Length : 1;
+        var placedAny = false;
+        for (var lv = 0; lv < levels; lv++)
+        {
+            var band = _ladderZStars[lv] * b.Sigma;
+            var sell = RoundPrice(Math.Exp(b.AnchorLog + band));
+            var buy = RoundPrice(Math.Exp(b.AnchorLog - band));
+            if (sell > closeI && sell > Symbol.Bid)   // not through ≤t-1 close nor the live market
+            {
+                PlaceLimitOrder(TradeType.Sell, SymbolName, _orderVolume, sell, _orderLabel, null, null, null, lv.ToString());
+                placedAny = true;
+            }
+            if (buy < closeI && buy < Symbol.Ask)
+            {
+                PlaceLimitOrder(TradeType.Buy, SymbolName, _orderVolume, buy, _orderLabel, null, null, null, lv.ToString());
+                placedAny = true;
+            }
+        }
+        if (_staticArm && placedAny)
+            _bracketPlacedStatic = true;
+    }
+
+    // Close one leg's position at market with a staged exit reason (consumed by the close event,
+    // async-safe). Used for form-1 (event reversion) and horizon exits.
+    private void CloseLegMarket(long positionId, string reason)
+    {
+        _pendingCloseReason[positionId] = reason;
+        foreach (var p in Positions)
+            if (p.Label == _orderLabel && p.Id == positionId) { ClosePosition(p); break; }
+    }
+
+    private void CancelOurPendingOrders()
+    {
+        var toCancel = new List<PendingOrder>();
+        foreach (var o in PendingOrders)
+            if (o.Label == _orderLabel)
+                toCancel.Add(o);
+        foreach (var o in toCancel)
+            CancelPendingOrder(o);
+    }
+
+    private void OnNativePositionOpened(PositionOpenedEventArgs args)
+    {
+        var pos = args.Position;
+        if (_bothLeg && pos.Label == _bothLegLabel)
+        {
+            OnBothLegOpened(pos);
+            return;
+        }
+        if (pos.Label != _orderLabel)
+            return;
+        var dir = pos.TradeType == TradeType.Sell ? -1 : 1;
+        var level = int.TryParse(pos.Comment, out var lv) ? lv : 0;
+        var b = _lastBracket;
+        // Entry-referential FIXED exit (proposal semantics): unwind the locked dislocation from the
+        // ACTUAL fill. band = Z*·σ at the arm bar (level's ladder z*); exit = EntryFill·exp(dir·band)
+        // (short dir=−1 → exp(−band) lower; long dir=+1 → exp(+band) higher). Locked once, never moved.
+        var lvl = level >= 0 && level < _ladderZStars.Length ? level : 0;
+        var band = _ladderZStars[lvl] * b.Sigma;
+        var fixedExit = b.Sigma > 0.0 ? pos.EntryPrice * Math.Exp(dir * band) : double.NaN;
+        var leg = new NativeLeg
+        {
+            PositionId = pos.Id, Dir = dir, LadderLevel = level, EntryFill = pos.EntryPrice,
+            EntryH4Index = _h4Index, EntryTime = Server.Time,
+            EntryZ = b.Z, EntrySpread = b.Spread,
+            EntryAnchorPrice = b.Warmup ? double.NaN : Math.Exp(b.AnchorLog),
+            EntrySigma = b.Sigma, EntryTrendZ = _trendZ, EntryTrendDir = _trendDir, EntryVolRegime = _volRegime,
+            FixedExit = fixedExit   // forensic disclosure only (HYP-003 exit = moving-mean, not this level)
+        };
+        _legs.Add(leg);
+        _periodEntryDir = dir;                 // mark this period's active direction (entry bar)
+        _pendingEntryFill = pos.EntryPrice;
+
+        if (!_frozenExit)
+        {
+            // E0: set the initial form-2 TP to the moving anchor mean exp(anchorLog) (refreshed each bar,
+            // HYP-003). Assert favorable before placement (long: TP>fill; short: TP<fill). fixedExit is a
+            // forensic disclosure column only (the entry-referential level the dropped fixed exit would use).
+            var target = b.ExitPrice;
+            if (double.IsFinite(target))
+            {
+                var rt = RoundPrice(target);
+                var favorable = dir > 0 ? rt > pos.EntryPrice : rt < pos.EntryPrice;
+                if (favorable)
+                    pos.ModifyTakeProfitPrice(rt);
+            }
+        }
+        else
+        {
+            // HYP-004 E1-E3: freeze the leg's bracket AT THE FILL TICK from the ≤t-1 arm bracket —
+            // TP at a_entry (the entry-time anchor), optional SL at the symmetric outward barrier
+            // o±D, optional ⌈3·HL_entry⌉ horizon. Attached natively to the position so same-bar m1
+            // exits work (live orders rest from the first tick — no next-bar activation lag). Never
+            // modified afterwards; the moving refresh and form-1 paths skip these legs entirely.
+            var aEntry = b.Warmup || !double.IsFinite(b.AnchorLog) ? double.NaN : Math.Exp(b.AnchorLog);
+            if (double.IsFinite(aEntry) && aEntry > 0.0)
+            {
+                var tp = RoundPrice(aEntry);
+                var favorable = dir > 0 ? tp > pos.EntryPrice : tp < pos.EntryPrice;
+                if (favorable)
+                    pos.ModifyTakeProfitPrice(tp);
+                leg.FixedExit = tp;                       // frozen TP (E1-E3 semantics of FixedExitPrice)
+                var d = Math.Abs(pos.EntryPrice - aEntry);
+                if (_frozenSl && d > 0.0)
+                {
+                    var sl = RoundPrice(dir > 0 ? pos.EntryPrice - d : pos.EntryPrice + d);
+                    pos.ModifyStopLossPrice(sl);
+                    leg.SlPrice = sl;
+                }
+                if (_frozenTimeStop)
+                    leg.HorizonBars = double.IsFinite(b.Hl) && b.Hl > 0.0
+                        ? Math.Min(FrozenHorizonCap, (int)Math.Ceiling(3.0 * b.Hl))
+                        : FrozenHorizonCap;
+            }
+        }
+
+        // Reentry order management: none → cancel all pendings; allow/extend → cancel only the
+        // opposite side (keep same-side deeper levels / re-armable base for concurrent legs).
+        if (_reentryMode == "none")
+            CancelOurPendingOrders();
+        else
+            CancelOppositeSide(dir);
+
+        _periodTrades.Add(new StrategyTradeRecord(
+            Server.Time, _nativeDomain, NativeStrategyName, dir > 0 ? "buy" : "sell",
+            0, dir, pos.EntryPrice, Math.Abs(dir), ++_nativeTradeSeq));
+        _periodEvents.Add(new SignalEventRecord(
+            Server.Time, _nativeDomain, NativeStrategyName, "enter_fade_limit", dir, 0, b.Z));
+    }
+
+    private void OnNativePositionClosed(PositionClosedEventArgs args)
+    {
+        var pos = args.Position;
+        if (_bothLeg && pos.Label == _bothLegLabel)
+        {
+            OnBothLegClosed(pos);
+            return;
+        }
+        if (pos.Label != _orderLabel)
+            return;
+        var leg = _legs.FirstOrDefault(l => l.PositionId == pos.Id);
+        var fill = ClosingPriceOf(pos.Id);
+        _pendingExitFill = fill;
+        // Reason default: E0 = form-2 favorable limit (cTrader TP fill). Frozen modes (E1-E3): an
+        // unstaged close is the native TP or SL filling — attribute by fill proximity to the two
+        // frozen prices (tp_anchor vs sl_outward; E1 has no SL → always tp_anchor). A staged reason
+        // (time_stop / open_at_end) overrides.
+        string unstaged;
+        if (!_frozenExit)
+            unstaged = "form2_favorable_limit";
+        else
+        {
+            var l = leg;
+            unstaged = l != null && double.IsFinite(l.SlPrice) && double.IsFinite(fill)
+                       && Math.Abs(fill - l.SlPrice) < Math.Abs(fill - l.FixedExit)
+                ? "sl_outward" : "tp_anchor";
+        }
+        var reason = _pendingCloseReason.TryGetValue(pos.Id, out var r) ? r : unstaged;
+        _pendingCloseReason.Remove(pos.Id);
+        var prev = leg?.Dir ?? (pos.TradeType == TradeType.Sell ? -1 : 1);
+        if (leg != null)
+        {
+            _periodClosed.Add(new ClosedTrade
+            {
+                Leg = leg, ExitFill = fill, Reason = reason, ExitTime = Server.Time,
+                ExitAnchorPrice = _lastBracket.Warmup ? double.NaN : Math.Exp(_lastBracket.AnchorLog),
+                ExitSpread = _lastBracket.Spread, BarsHeld = Math.Max(0, _h4Index - leg.EntryH4Index)
+            });
+            _legs.Remove(leg);
+        }
+        if (_legs.Count == 0)
+            _bracketPlacedStatic = false;      // static: allow a fresh bracket after the episode ends
+        _periodTrades.Add(new StrategyTradeRecord(
+            Server.Time, _nativeDomain, NativeStrategyName, prev > 0 ? "sell" : "buy",
+            prev, 0, fill, Math.Abs(prev), ++_nativeTradeSeq));
+        _periodEvents.Add(new SignalEventRecord(
+            Server.Time, _nativeDomain, NativeStrategyName, reason, 0, prev, _lastBracket.Z));
+    }
+
+    private double ClosingPriceOf(long positionId)
+    {
+        for (var k = History.Count - 1; k >= 0; k--)
+            if (History[k].PositionId == positionId)
+                return History[k].ClosingPrice;
+        return double.NaN;
+    }
+
+    // Cancel only the opposite-side resting limits after a directional fill (allow/extend keep the
+    // same-side ladder / re-armable base band for concurrent legs).
+    private void CancelOppositeSide(int dir)
+    {
+        var oppType = dir > 0 ? TradeType.Sell : TradeType.Buy;
+        var toCancel = new List<PendingOrder>();
+        foreach (var o in PendingOrders)
+            if (o.Label == _orderLabel && o.TradeType == oppType)
+                toCancel.Add(o);
+        foreach (var o in toCancel)
+            CancelPendingOrder(o);
+    }
+
+    // Apply form-1 (event reversion) exits to open legs at this bar's boundary. sc = logClose −
+    // anchorLog (S5: OLS residual; S6/7/8: spread − mean). Short reverts when sc ≤ 0, long when
+    // sc ≥ 0 → close at market (open of i+1). NO horizon (EXP-014b: proposal enforces no other
+    // exits). Returns whether any form-1 fired. All decision inputs are ≤ t-1 (bar i completed).
+    private bool ApplyEventExits(int i, double logClose)
+    {
+        var sc = logClose - _lastBracket.AnchorLog;
+        var toClose = new List<long>();
+        foreach (var leg in _legs)
+        {
+            var reverted = (leg.Dir < 0 && sc <= 0.0) || (leg.Dir > 0 && sc >= 0.0);
+            if (reverted)
+                toClose.Add(leg.PositionId);
+        }
+        foreach (var id in toClose)
+            CloseLegMarket(id, "form1_reversion");
+        return toClose.Count > 0;
+    }
+
+    // HYP-004 E3: market-close every leg held ≥ its frozen horizon (⌈3·HL_entry⌉, cap 48). The fill
+    // bar counts as bar 1 (EntryH4Index = the ≤t-1 arm bar), matching the availability race window
+    // [entry .. entry+H−1]; the close decision at completed bar i executes at the open of i+1.
+    private void ApplyFrozenTimeStop(int i)
+    {
+        var toClose = new List<long>();
+        foreach (var leg in _legs)
+            if (leg.HorizonBars > 0 && i - leg.EntryH4Index >= leg.HorizonBars)
+                toClose.Add(leg.PositionId);
+        foreach (var id in toClose)
+            CloseLegMarket(id, "time_stop");
+    }
+
+    // Refresh the moving form-2 TP (anchor mean) for every open leg; assert favorable placement
+    // before each modify (long: TP > mark; short: TP < mark) — skip adverse (finding F guard).
+    private double RefreshForm2Targets(double mark)
+    {
+        var target = _lastBracket.ExitPrice;   // exp(moving anchorLog)
+        if (!double.IsFinite(target))
+            return double.NaN;
+        var rt = RoundPrice(target);
+        var representative = double.NaN;
+        foreach (var p in Positions)
+        {
+            if (p.Label != _orderLabel)
+                continue;
+            var dir = p.TradeType == TradeType.Sell ? -1 : 1;
+            var favorable = dir > 0 ? rt > mark : rt < mark;
+            if (!favorable)
+                continue;                       // leave the prior TP; never place an adverse target
+            p.ModifyTakeProfitPrice(rt);
+            representative = rt;
+        }
+        return representative;
+    }
+
+    private int NetSign()
+    {
+        var s = 0;
+        foreach (var leg in _legs)
+            s += leg.Dir;
+        return Math.Sign(s);
+    }
+
+    // Update per-leg adverse/favorable excursion from the current 4h close (dir-signed return, bps).
+    // MAE = running min (most adverse), MFE = running max (most favorable); both start at 0 (entry).
+    private void UpdateLegExcursions(double close)
+    {
+        if (!(close > 0.0))
+            return;
+        foreach (var leg in _legs)
+        {
+            if (!(leg.EntryFill > 0.0))
+                continue;
+            var bps = leg.Dir * (close - leg.EntryFill) / leg.EntryFill * 1e4;
+            if (bps < leg.MaeBps) leg.MaeBps = bps;
+            if (bps > leg.MfeBps) leg.MfeBps = bps;
+        }
+    }
+
+    // At the fence/stop, emit any still-open legs as censored open_at_end rows — excluded from the
+    // realized-P&L referee (RealizedBps NaN), disclosed for the survival count. Marked at the last close.
+    private void FlushOpenLegsAsCensored()
+    {
+        if (_bothLeg)
+        {
+            FlushBothLegCensored();
+            return;
+        }
+        if (_strategyWriter == null || _h4 == null || _legs.Count == 0)
+            return;
+        var idx = _h4Index >= 0 && _h4Index < _h4.Count ? _h4Index : _h4.Count - 1;
+        if (idx < 0)
+            return;
+        var mark = _h4.ClosePrices[idx];
+        var closeTime = _h4.OpenTimes[idx].AddMinutes(_nativeDomainMinutes);
+        var anchor = _lastBracket.Warmup ? double.NaN : Math.Exp(_lastBracket.AnchorLog);
+        foreach (var leg in _legs)
+            _strategyWriter.AppendCisTrade(new CisTradeRecord(
+                SourceCloseTime: closeTime, Domain: _nativeDomain, Strategy: NativeStrategyName, Series: CisSeries,
+                EntryTime: leg.EntryTime, ExitTime: closeTime, Direction: leg.Dir, LadderLevel: leg.LadderLevel,
+                EntryFillPrice: leg.EntryFill, ExitFillPrice: mark, ExitReason: "open_at_end",
+                BarsHeld: Math.Max(0, _h4Index - leg.EntryH4Index), RealizedBps: double.NaN,
+                EntryZ: leg.EntryZ, EntrySpread: leg.EntrySpread, EntryAnchorPrice: leg.EntryAnchorPrice,
+                EntrySigma: leg.EntrySigma, ExitAnchorPrice: anchor, ExitSpread: _lastBracket.Spread,
+                EntryTrendZ: leg.EntryTrendZ, EntryTrendDir: leg.EntryTrendDir, EntryVolRegime: leg.EntryVolRegime,
+                FixedExitPrice: leg.FixedExit, MaeBps: leg.MaeBps, MfeBps: leg.MfeBps, Censored: 1,
+                SlPrice: leg.SlPrice, HorizonBars: leg.HorizonBars));
+    }
+
+    // Update the per-bar conditioner state from the traded 4h close (≤ t-1). Trend = (EMA20 −
+    // EMA50)/σ_close(WZ); vol regime = tercile of the current spread-σ in the trailing σ history.
+    private void UpdateConditioners(double close)
+    {
+        if (close > 0.0)
+        {
+            if (double.IsNaN(_ema20)) { _ema20 = close; _ema50 = close; }
+            else
+            {
+                _ema20 += (2.0 / (TrendFast + 1)) * (close - _ema20);
+                _ema50 += (2.0 / (TrendSlow + 1)) * (close - _ema50);
+            }
+            _h4Close.Add(close);
+            if (_h4Close.Count > TrendSigmaWindow)
+                _h4Close.RemoveAt(0);
+            var sigmaClose = ConditionerStd(_h4Close);
+            _trendZ = sigmaClose > 0.0 ? (_ema20 - _ema50) / sigmaClose : double.NaN;
+            _trendDir = double.IsNaN(_trendZ) ? 0 : Math.Sign(_trendZ);
+        }
+        var sig = _lastBracket.Sigma;
+        if (double.IsFinite(sig))
+        {
+            _sigmaHist.Add(sig);
+            if (_sigmaHist.Count > VolHistWindow)
+                _sigmaHist.RemoveAt(0);
+            _volRegime = VolTercile(_sigmaHist, sig);
+        }
+    }
+
+    private static int VolTercile(List<double> hist, double val)
+    {
+        if (hist.Count < 3)
+            return -1;
+        var below = 0;
+        foreach (var v in hist)
+            if (v < val) below++;
+        var frac = (double)below / hist.Count;
+        return frac < 1.0 / 3.0 ? 0 : frac < 2.0 / 3.0 ? 1 : 2;
+    }
+
+    private static double ConditionerStd(List<double> vals)
+    {
+        if (vals.Count < 2)
+            return double.NaN;
+        var m = 0.0;
+        foreach (var v in vals) m += v;
+        m /= vals.Count;
+        var ss = 0.0;
+        foreach (var v in vals) { var d = v - m; ss += d * d; }
+        return Math.Sqrt(ss / (vals.Count - 1));
+    }
+
+    private double RoundPrice(double price)
+    {
+        return Math.Round(price, Symbol.Digits);
+    }
+
+    // CF-MR-004 cross-instrument basket feed — FROM SCRATCH (L-13), 4h anchor domain, EXACT
+    // CloseTime alignment (no carry-forward — fixes the CF-MR-003 F-1 artifact). Equal-weight
+    // mean of mate ln(Close) at the bar whose OpenTime == the requested 4h OpenTime; a mate with
+    // no bar at that slot is skipped (explicit gap policy); NaN if none aligns. Phase-shift
+    // (leak tripwire) subtracts whole 4h bars from each mate's own index, keeping a valid but
+    // time-decorrelated basket. Distinct from MarketDataBasketFeed (that stays 1h/CONC-1 for the
+    // retired CF-MR-003 model; not reused here).
+    private sealed class CrossInstrumentBasketFeed
+    {
+        private readonly List<Bars> _bars = new();
+        private readonly List<int> _cursor = new();
+        private readonly int _phaseShiftBars;
+        private readonly int _expectedMates;
+
+        public CrossInstrumentBasketFeed(Xen bot, IReadOnlyList<string> mates, int phaseShiftBars,
+                                         TimeFrame timeFrame)
+        {
+            _phaseShiftBars = Math.Max(0, phaseShiftBars);
+            _expectedMates = mates.Count;   // full predeclared membership (min-mate rule, design §4)
+            foreach (var mate in mates)
+            {
+                Bars? bars = null;
+                try
+                {
+                    if (bot.Symbols.GetSymbol(mate) != null)
+                        bars = bot.MarketData.GetBars(timeFrame, mate);
+                }
+                catch (Exception ex)
+                {
+                    bot.Print("CF-MR-004 feed: mate '{0}' unresolved ({1}) — skipped.", mate, ex.Message);
+                    bars = null;
+                }
+                if (bars != null)
+                {
+                    _bars.Add(bars);
+                    _cursor.Add(0);
+                }
+            }
+        }
+
+        public int ResolvedCount => _bars.Count;
+
+        // Full predeclared class-mate membership (min-mate-count rule): the basket bar is VALID
+        // only if LastMateCount == ExpectedMates (design §4). A shortfall → basket invalid → the
+        // robot arms no new order that bar (β/anchor composition stays fixed; no silent mate-drop).
+        public int ExpectedMates => _expectedMates;
+        public int LastMateCount { get; private set; }
+
+        // Equal-weight mean of mate ln(Close) at EXACTLY OpenTime == openTime. Monotonic cursor
+        // (openTime is non-decreasing across calls). No carry-forward: an unaligned mate is skipped
+        // (recorded in LastMateCount so the min-mate rule + audit can bound the invalid-bar rate).
+        public double BasketLogAt(DateTime openTime)
+        {
+            var sum = 0.0;
+            var used = 0;
+            for (var m = 0; m < _bars.Count; m++)
+            {
+                var bars = _bars[m];
+                var c = _cursor[m];
+                while (c < bars.Count && bars.OpenTimes[c] < openTime)
+                    c++;
+                _cursor[m] = c;
+                if (c >= bars.Count || bars.OpenTimes[c] != openTime)
+                    continue;                      // exact-alignment gap → skip this mate
+                var idx = c - _phaseShiftBars;      // leak-tripwire time-decorrelation (0 = live)
+                if (idx < 0)
+                    continue;
+                var px = bars.ClosePrices[idx];
+                if (px > 0.0)
+                {
+                    sum += Math.Log(px);
+                    used++;
+                }
+            }
+            LastMateCount = used;
+            return used > 0 ? sum / used : double.NaN;
+        }
     }
 
     // EXP-010 (CONC-1): S5_SPREAD basket feed over cAlgo secondary-symbol 1h bars
