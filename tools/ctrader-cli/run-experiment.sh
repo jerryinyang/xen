@@ -46,6 +46,14 @@ STRATEGY=""; STRATEGY_VALUE=""
 # shellcheck disable=SC1090
 source "$CONF"
 
+# Xen robot Mode ordinal: 0=StrategyHost (default, self-adjudicated replay), 3=NativeOrders
+# (EXP-013/CF-MR-004 native cTrader pending orders, m1 fills). Confs may override via MODE=.
+MODE="${MODE:-0}"
+
+# Backtest starting balance. Large values prevent ruin-truncation (equity→0 abort) on high-notional
+# instruments with fixed volume; the referee judges bps (balance-independent). Confs may override.
+BALANCE="${BALANCE:-10000}"
+
 # --- credentials / image (shared .env) ---------------------------------------------------
 ENV_FILE="${CTRADER_ENV_FILE:-$SCRIPT_DIR/.env}"
 [[ -f "$ENV_FILE" ]] && { # shellcheck disable=SC1090
@@ -90,7 +98,10 @@ prepare_cache_layout() {
       local cdir ldir; cdir=$(canonical_cache_dir "$symbol" m1); ldir="$SCRIPT_DIR/data/V1/$provider/$symbol/m1"
       mkdir -p "$cdir" "$(dirname "$ldir")"
       [[ -e "$ldir" && ! -L "$ldir" ]] && { echo "Cache path is a real dir, not a symlink: $ldir" >&2; continue; }
-      ln -sfn "../../../$CACHE_ACCOUNT/$symbol/m1" "$ldir"
+      # Race-tolerant (EXP-006 O3 op-note): concurrent bounded `one` cells re-run this prep and can
+      # collide on `ln -sfn` ("File exists") for a shared symbol. The link content is identical
+      # regardless of which racer wins, so tolerating the collision is safe (idempotent).
+      ln -sfn "../../../$CACHE_ACCOUNT/$symbol/m1" "$ldir" 2>/dev/null || true
     done
   done < <(cache_providers)
 }
@@ -117,10 +128,10 @@ run_backtest() {
     --mount "type=bind,src=$PWD_FILE_HOST,dst=/secrets/ctrader-cli.pwd,readonly" \
     "$IMAGE" backtest /workspace/bin/Debug/net6.0/Xen.algo \
       --start="02/01/2021 00:00" --end="${BACKTEST_END[$symbol]}" \
-      --data-mode=m1 --data-dir=/workspace/tools/ctrader-cli/data --balance=10000 \
+      --data-mode=m1 --data-dir=/workspace/tools/ctrader-cli/data --balance="$BALANCE" \
       --report-json="/workspace/tools/ctrader-cli/reports/$EXP_ID/${STRATEGY}_${symbol}_${domain}.json" \
       --ctid="$CTID" --pwd-file=/secrets/ctrader-cli.pwd --account="$ACCOUNT" "${broker_args[@]}" \
-      --symbol="$symbol" --period=m1 --full-access --Mode=0 \
+      --symbol="$symbol" --period=m1 --full-access --Mode="$MODE" \
       --Strategy="$STRATEGY_VALUE" --AnalysisEndUtc="${ANALYSIS_END[$symbol]}" \
       --StrategyOutputDirectory=/workspace/data/strategy_runs/$EXP_ID \
       --DomainMinutes="$(domain_minutes "$domain")" \
