@@ -274,3 +274,101 @@ must be **dislocation-matched** (random-timing flipped the sign −29pp); the ho
 per-stratum reporting (L-03) beats an axis-majority rule. Builds on [[L-04]] (match the vehicle to the
 signal), [[L-11]] (control/horizon parity to the mechanism), [[L-12]] (near-impossible leg — here the
 inherited Hurst leg). Memory: `evaluation_vehicle_must_be_native`.
+
+---
+
+## L-14 — A silently-dropped core exit shipped a confounded verdict (EXP-013 / CF-MR-004) ⭐
+
+**What.** EXP-013 booked CF-MR-004 `NOT_TRADABLE` (audit `CONFIRMED, 0 material`). An operator-directed
+review **downgraded it to CONFOUNDED**: the strategy that ran was **not the strategy proposed**. The
+proposal (`.ignore/idea/original-phase002-thoughts.md`) mandates **two** native exits — **form-1**
+(event-driven exit when the anchor *series* reverts, i.e. spread → mean recomputed each bar against the
+**moving** anchor) and **form-2** (a favorable limit at the anchor mean). EXP-013 shipped only form-2
+**frozen at entry** + a time-horizon stop. No form-1; the form-2 TP never refreshed as the peer basket
+(hence the anchor) drifted.
+
+**Mechanism (why, and why it slipped through).** The spread `S = logClose − feedLog` reverts either by the
+traded price moving **or by the peer/basket moving**. A **fixed-price** TP can only capture price-side
+reversion; **peer-side reversion never triggers an exit**, so those positions ride to the horizon and book
+adverse. That manufactured the report's "~70% ride to horizon adverse." The reported "~30% favorable-hit →
+spread not mean-reverting" was the **static-TP hit rate**, not the reversion rate — the audit even named the
+right cause ("reversion shared with the peer") and then **dismissed it** as a bug artifact. It slipped
+through because (a) form-1 was dropped **silently** in the design (design §4 listed only "exit at anchor
+mean … horizon fallback"; the pre-exec gate never diffed the implemented exits against the proposal's
+**named** exits), and (b) the audit's verdict forensics re-derived P&L from the same crippled-exit
+emission, so the numbers reproduced perfectly — **numeric reproduction is blind to a missing mechanism, just
+as it is to acausal provenance** ([[L-01]]).
+
+**Fix / new rule.**
+1. **Exit-set diff at the pre-exec gate.** For any strategy with a proposal-specified exit set, the gate
+   **must enumerate the implemented exits and diff them against the proposal's named exits**; a missing or
+   substituted core exit (e.g. a time-stop standing in for an event-reversion exit) is a REVISE, not an
+   approve. A dropped core component is an **unauthorised deviation** and needs explicit operator sign-off
+   ([[L-10]]; renewal `README.md` "any deviation MUST be explicitly approved").
+2. **A moving-target exit must move.** When the exit level is a function of a live series (a moving anchor /
+   peer basket), a fixed-at-entry limit is a **different strategy** — refresh it each bar (or express it as
+   the series condition, not a frozen price).
+3. **Separate the fill metric from the mechanism metric.** "Favorable-limit hit rate" ≠ "reversion-
+   completion rate." Book the native reversion estimand ([[L-13]]: reach-anchor / fraction-recovered /
+   time-to-anchor ÷ HL) independently of any static-TP fill rate, or the availability read is confounded.
+4. **Don't book a family verdict from a vehicle-incomplete run.** A `NOT_TRADABLE` from a crippled exit set
+   does **not** reinforce the terminal-branch prior.
+
+**Enforced at.** `research-pipeline` pre-exec gate (exit-set diff vs proposal); `experiment-auditor`
+materiality (a missing/substituted proposal-named exit is verdict-material → fix + re-execute); EXP-013
+downgraded, **EXP-014 (HYP-002)** is the faithful redo (amendment
+`checkpoints/2026-07-01-004-cross-domain-mr-renewal/amendment-001-faithful-full-strategy-redo.md`). Builds
+on [[L-01]] (reproduction is blind — here to a missing mechanism, not a leak), [[L-10]] (silent frozen-
+design deviation → amend-in-place), [[L-13]] (native estimand ≠ inherited/incidental metric).
+
+**Discharged (2026-07-02, EXP-014, audit PASS 0 Critical).** The faithful redo shipped **both** proposal-named
+exits — form-1 event-reversion + **refreshing** form-2 anchor-mean limit (audit confirmed they fire: primary
+none/R 3445 trades = form-1 281 / form-2 1898 / horizon 1266) — so the strategy tested was the one proposed.
+It **still** closes **NOT-TRADABLE** (0/38 strata net- and gross-admit under the frozen 4h referee, homogeneous),
+and availability itself does not separate from a dislocation-matched control at 4h. So EXP-013's confound was
+real (form-1/refresh materially changed the exit mix) **but not verdict-flipping** — the family is a genuine
+cost/capture wash, now booked on a faithful vehicle. Residual caveat: the per-bar mean-referee is a partial
+gate-shape mismatch for a discrete high-variance round-trip bracket (19/38 cells cannot detect a planted +8 bps,
+L-12 mode-2) — a per-trade/episode-native referee would need its own predeclared freeze before re-judging.
+
+## L-15 — A binary admit on an attribution control binarizes noise at the admit bar; report the collapse fraction (EXP-014c / CF-MR-004)
+
+**What.** EXP-014c's per-cell leak tripwire (60h peer-feed phase-shift) was read as a binary
+admit/no-admit through the frozen referee. On US2000 extend/z15 the shifted edge stayed
+**CI-positive at every exit object** (net ci_low +0.19 e0, +0.485 e2, +0.482 e3) and "collapsed"
+only because the 3.0-bps **L5 materiality leg** failed at e2/e3 (shifted effect 2.26–2.58 bps) —
+while the *same cell* at e0/z15 passed the full stack under the shift. A ~50% shrink on a
+still-positive edge was one referee leg away from being read as a construction-specific
+collapse. (EXP-014c `audit.md` W3 / §5.4.)
+
+**Mechanism (why).** An attribution control (phase-shift, or any destroy) produces a
+**continuous** quantity: how much of the raw edge survives when the tested relationship is
+destroyed. Piping that through a threshold conjunction (materiality bar, studentized floor,
+Holm) collapses the continuum to one bit, so a control net sitting *near* any leg's threshold
+flips between ADMIT and NO-ADMIT on noise — and the flip direction then masquerades as a
+mechanism claim ("needs the construction" vs "own-price leak"). The referee's legs were
+designed to gate *candidate admission* conservatively, not to measure *attribution*; reusing
+the admit stack as the attribution read imports thresholds that mean nothing for the
+survives-vs-collapses question. A genuinely construction-specific edge must go **toward zero**
+under the destroy at **every** exit object; failing one materiality leg at one exit while
+staying CI-positive everywhere is a shrink, not a zeroing.
+
+**Fix / new rule.**
+1. **Always disclose the collapse fraction** (control net / raw net), per cell and per exit
+   object, alongside any binary control verdict. The binary alone is inadmissible as an
+   attribution statement.
+2. **A construction-specificity claim requires collapse toward zero at every exit object** —
+   not a threshold flip on one leg. Conversely, a leak claim (edge survives the destroy)
+   should cite the surviving fraction, not just the surviving admit.
+3. Where an attribution read is load-bearing, prefer a **paired raw-vs-control statistic**
+   (CI on the difference/ratio) over two independent admit reads.
+4. Sequencing: for mixed own-price/construction P&L, the control's semantics are only
+   interpretable once the harvest mechanism is characterised — the shift destroys trigger
+   timing, not the harvest (operator D3, 2026-07-03).
+
+**Enforced at.** `experiment-quant-analyst` design stage (any shift/destroy control predeclares
+collapse-fraction disclosure — already binding in `cf-mr-005.md` first-branch constraint 6 and
+EXP-015 M3a/tripwire design); `experiment-auditor` leak pass (a binary-only control read on an
+admitting cell is a REVISE); `research-pipeline` post-exec gate. Builds on [[L-11]] (report
+absolute effect sizes; don't overstate a binary read when the magnitudes are a wash) and the
+EXP-014c W3 finding (`python/experiments/EXP-014c/audit.md` §5.4, §7-W3).
