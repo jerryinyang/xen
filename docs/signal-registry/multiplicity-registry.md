@@ -1123,6 +1123,40 @@ consumes 1 slot / 0 reads; **T2a (14 S3 exec-15m) + T2b (10 S5 exec-15m) DEFERRE
 referee 15m-domain extension). A counted TEST read / holdout release remains gated on a TRAIN net-positive (none
 occurred). All outcomes retained.
 
+## Chapter 02 · Phase 004 Batch (CF-MR-004 Cross-Instrument Spread MR) — EXP-013 CONFOUNDED (retained) → EXP-014 (HYP-002) faithful redo NOT-TRADABLE
+
+**Opened:** 2026-07-02. **Family:** CF-MR-004. **Governing checkpoint:**
+`docs/experiments-docs/checkpoints/2026-07-01-004-cross-domain-mr-renewal/`. **Slot accounting: 0 candidate
+slots consumed, 0 counted TEST reads** (TRAIN-only disclosure throughout). Holdout sealed; frozen referee untuned (L-12).
+
+| Candidate ID | Hypothesis | EXP-ID | Slot | Status |
+|---|---|---|---|---|
+| `CF-MR-004/HYP-001` | Does the precalc limit-order cross-instrument MR fade (4 series) produce availability + net edge per stratum on TRAIN? | EXP-013 | 0 | **DOWNGRADED CONFOUNDED (amendment 2026-07-02) — retained, never deleted.** As-run 0/32 admit, but form-1 exit absent + form-2 TP frozen → not the proposed strategy; not a family reading. Superseded by EXP-014. Lesson **L-14**. |
+| `CF-MR-004/HYP-002` | Does the **faithful** full-exit strategy (form-1 event-reversion + refreshing form-2 + horizon; reentry none/allow/extend; trend/vol conditioners) produce availability + net edge per stratum on TRAIN, and if not which leg fails? | EXP-014 | 0 | **COMPLETE 2026-07-02 — NOT-TRADABLE (faithful; audit PASS, 0 Critical).** 152/152 cells (4 series × 4 arms). Both proposal-named exits fire (form-1 281 / refreshing form-2 1898 / horizon 1266, primary) → **L-14 discharged**. Frozen 4h referee per stratum: **0/38 net- AND gross-admit, homogeneous (no masking)**; availability does not separate at 4h (native reversion-completion Δ vs dislocation-matched control ci_low<0 on ~all cells). Mechanism = **capture-vs-dispersion wash** (per-trade −57…+29 bps; net ci_low<0) — same cost/capture veto as CF-MR-002/003. Power caveat: 19/38 cells bite-fail (per-cell referee underpowered on a discrete round-trip bracket, L-12 mode-2); credible null on the bite-passing subset (also all reject). Leak tripwires moot (0 admits); label-perm mean-invariant/vacuous. Independent 6-stage MR screen booked pre-verdict (VR<1 on S7/S8 baskets; S6 pairs near random walk). **Disposition: RETIRE CF-MR-004 recommended, OPERATOR-GATED.** All outcomes retained; every decision input ≤ t-1; holdout sealed. |
+| `CF-MR-004/HYP-003` | On S8 (basket−median₉₀), 1h+4h, does the outlier revert beyond a coin flip (symmetry two-barrier) and does any single-leg or both-leg config clear the frozen referee per (cell,domain,arm,z\*)? | EXP-014b | 0 | **COMPLETE 2026-07-03 — REJECT_LEAK, 0 TRADABLE / 220 strata (audited; C1 label logic + C2 both-leg weighting fixed analysis-only).** 1h availability raw-passes all survive peer-feed phase-shift (own-price auto-reversion; the basket dilutes it) → S8-at-1h retired. Collapse-verified availability only 4h JP225 (p_inward 0.696, ci 0.638; replicated z1.5) + weakly 4h EURUSD — not tradable there (moving-mean exit = small-f2-wins / large-f1-anchor-drift-losses ≈ 0 gross). extend admits = own-price MR harvest. Both-leg killed by the ~50-bar loss tail + N+1 costs. → HYP-004 lean-bracket last shot. 0 slots, 0 counted reads, holdout sealed. |
+| `CF-MR-004/HYP-004` | Does the exit-set matching the measured two-barrier object (TP@entry anchor, symmetric outward SL, ⌈3·HL⌉ time-stop; E0→E3 decomposition; reentry + z\* axes) extract the collapse-verified 4h availability on the prespecified primaries (JP225, EURUSD)? | EXP-014c | 0 | **COMPLETE 2026-07-03 — CREDIBLE_NEGATIVE_RETIRE (audit PASS, 0 Critical; raw-emission re-derivation).** Both primaries powered + bite-valid + net-fail (JP225 +0.26 ci −1.84; EURUSD +0.28 ci −0.46); 0 Holm admits in the binding family. Mechanism = **entry-seam mismatch**: limit-touch fill ≠ the measured confirmed-breach conditioning event (JP225 TP-share 0.52 vs p_inward 0.696); exits exonerated (frozen TP recovers the E0 loss engine, SL negative value, time-stop benign). Disclosure retained: 4 REJECT_LEAK extend/z15 cells (own-price; shift survives 50–85%); US2000 "collapse" = materiality-leg flip on a CI-positive shifted edge → no construction-specific claim (W3 collapse-fraction rule, KB lesson-candidate); **extend-arm field 61 cells net ci_low>0 (53 non-admitted), all extend/allow, year-stable 2021–24 → spun out to CF-MR-005**. **FAMILY RETIRED (operator D1, 2026-07-03).** 0 slots, 0 counted reads, holdout sealed, referee untuned. |
+
+**Family close-out (2026-07-03):** CF-MR-004 **RETIRED** on HYP-004's credible negative — the fourth
+MR family closed at the capture/attribution seam (CF-MR-001/002/003 precedent). All outcomes
+retained, never deleted. Re-opening requires a new entry object (confirmed-breach conditioning)
+under a new D0.
+
+## Chapter 02 · CF-MR-005 Registration (2026-07-03) — 4h Ladder Scale-In Own-Price MR Harvest
+
+**Opened:** 2026-07-03 (operator decision D2 — EXP-014c disclosure spin-out). **Family:**
+CF-MR-005 (`candidate-families/cf-mr-005.md`). **Slot accounting: 0 slots consumed at
+registration; 0 counted TEST reads.** No experiments yet — Stage-1 design pending. Binding
+first-branch constraints: mechanism characterisation first (operator D2/D3); basket-free trigger;
+cost realism binding early (CF-MR-001/002/003 cost-vs-capture precedent; P-02 bars exit-stack
+rescues); native availability definition (L-13 — the single-entry two-barrier race is the wrong
+object for a multi-add ladder); attribution controls disclose collapse fractions (EXP-014c W3);
+phase-shift-semantics study deferred behind characterisation (operator D3). Evidence base =
+EXP-014b/014c extend-arm field disclosure (TRAIN-only; motivates registration, pre-admits nothing).
+
+| Candidate ID | Hypothesis | EXP-ID | Slot | Status |
+|---|---|---|---|---|
+| `CF-MR-005/HYP-001` | Mechanism characterisation of the 4h ladder scale-in own-price MR harvest under a basket-free trigger (own-price `S = log P − Median₉₀`, z-depth bins): what reverts, at what depth/horizon (M1 recovery vs dislocation-matched control); depth gradient (M2); drift/vol/reversion attribution incl. per-level collapse fractions (M3, W3); left-tail census (M4); cost-stress disclosure (M5). Block-permuted-returns destroy binding (L-07). No tradability claim — HYP-002 gated on MECHANISM_SUPPORTED. | EXP-015 | 0 | **SCOPED 2026-07-03 — design gated (pre-exec GATE: APPROVE, `python/experiments/EXP-015/design.md`). ANALYSIS-ONLY** (Part A = EXP-014b/c emissions read-only; Part B = timebar measurement; no strategy backtest). EXP-013 TRAIN fence; 0 slots, 0 counted reads; frozen referee not the binding instrument (predeclared per-stratum characterisation criteria; UNPOWERED never FAIL). Awaiting Stage 2 (implement). |
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:

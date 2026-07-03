@@ -68,6 +68,13 @@ Each file in `candidate-families/` must define:
 
 Registered candidate families (full per-phase batches in `multiplicity-registry.md`):
 
+- `CF-MR-004` — Cross-domain mean-reversion (fixed-parameter cross-instrument spreads). **REGISTERED —
+  G0 RATIFIED** (Chapter-02 Phase 004, 2026-07-01); 0 slots, 0 counted TEST reads. Renewal of the MR
+  thesis with 3 new cross-instrument spread designs (fixed-ratio pair, fixed-weight basket,
+  relative-value index) + S5 redo (rolling-β basket, from scratch). Full-strategy-first (precalc
+  limit orders, set-and-forget, no lower-domain); informative-not-gating MR screen; cTrader
+  price-primary. Targets the untested cross-section/magnitude cell in the availability 2×2. See
+  `candidate-families/cf-mr-004.md`.
 - `CF-MR-002` — Causal RSI-2 mean-reversion fade (cTrader-primary; `rct[di-1]` exit). **REGISTERED —
   G0 PENDING** (Chapter-02 Phase 001, 2026-06-27); 0 slots, 0 counted TEST reads. Successor to the
   CLOSED/REFUTED CF-MR-001 under a new D0 after the causal fix (KB L-01). Benchmark vehicle for the
