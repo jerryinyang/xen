@@ -12,6 +12,8 @@ public sealed class StrategyRunParquetWriter : IDisposable
     private readonly List<SignalPositionRecord> _positions = new();
     private readonly List<SignalEventRecord> _events = new();
     private readonly List<StrategyTradeRecord> _trades = new();
+    // EXP-014 (CF-MR-004 HYP-002): per-closed-trade table (empty for every other model).
+    private readonly List<CisTradeRecord> _cisTrades = new();
     // EXP-029: optional per-bounce AVWAP detail table (serialized AvwapEventDetail),
     // consumed by the Python parity harness to rebuild matched controls without a
     // signal oracle. Set once at run end via SetAvwapEventDetails; empty for other models.
@@ -62,6 +64,16 @@ public sealed class StrategyRunParquetWriter : IDisposable
         _avwapEventDetails = details;
     }
 
+    /// <summary>
+    /// Register one closed-trade row (EXP-014). Fence-asserted on its exit-bar time; written to
+    /// <c>cis_trades.parquet</c> at Dispose. No-op-shaped for models that emit no such rows.
+    /// </summary>
+    public void AppendCisTrade(CisTradeRecord trade)
+    {
+        _fence.AssertCanEmit(trade.SourceCloseTime);
+        _cisTrades.Add(trade);
+    }
+
     public void Append(SignalUpdate update)
     {
         _fence.AssertCanEmit(update.Position.SourceCloseTime);
@@ -88,6 +100,7 @@ public sealed class StrategyRunParquetWriter : IDisposable
         WritePositions(Path.Combine(_runDirectory, "positions.parquet"), _positions);
         WriteEvents(Path.Combine(_runDirectory, "events.parquet"), _events);
         WriteTrades(Path.Combine(_runDirectory, "trade_blotter.parquet"), _trades);
+        WriteCisTrades(Path.Combine(_runDirectory, "cis_trades.parquet"), _cisTrades);
         if (_avwapEventDetails.Count > 0)
             WriteAvwapEvents(Path.Combine(_runDirectory, "avwap_events.parquet"), _avwapEventDetails);
         _disposed = true;
@@ -180,7 +193,26 @@ public sealed class StrategyRunParquetWriter : IDisposable
             new DataField<double>("Z"),
             new DataField<double>("Vr"),
             new DataField<double>("Hl"),
-            new DataField<double>("Beta")
+            new DataField<double>("Beta"),
+            // EXP-014 rich per-bar state (§11). Sentinels for every non-CIS model.
+            new DataField<double>("ArmSellPrice"),
+            new DataField<double>("ArmBuyPrice"),
+            new DataField<double>("Sigma"),
+            new DataField<double>("SpreadMean"),
+            new DataField<int>("MateCount"),
+            new DataField<int>("MateExpected"),
+            new DataField<bool>("MateGap"),
+            new DataField<double>("TrendZ"),
+            new DataField<int>("TrendDir"),
+            new DataField<int>("VolRegime"),
+            new DataField<bool>("BreachSkipSell"),
+            new DataField<bool>("BreachSkipBuy"),
+            new DataField<bool>("LiveBreachSkipSell"),
+            new DataField<bool>("LiveBreachSkipBuy"),
+            new DataField<int>("OpenLegs"),
+            new DataField<double>("MtmBps"),
+            new DataField<double>("RefreshedTp"),
+            new DataField<bool>("Form1Any")
         };
         using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
         using var writer = ParquetWriter.CreateAsync(new ParquetSchema(fields), stream).GetAwaiter().GetResult();
@@ -209,6 +241,99 @@ public sealed class StrategyRunParquetWriter : IDisposable
         groupWriter.WriteColumnAsync(new DataColumn(fields[18], rows.Select(row => row.Vr).ToArray())).GetAwaiter().GetResult();
         groupWriter.WriteColumnAsync(new DataColumn(fields[19], rows.Select(row => row.Hl).ToArray())).GetAwaiter().GetResult();
         groupWriter.WriteColumnAsync(new DataColumn(fields[20], rows.Select(row => row.Beta).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[21], rows.Select(row => row.ArmSellPrice).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[22], rows.Select(row => row.ArmBuyPrice).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[23], rows.Select(row => row.Sigma).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[24], rows.Select(row => row.SpreadMean).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[25], rows.Select(row => row.MateCount).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[26], rows.Select(row => row.MateExpected).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[27], rows.Select(row => row.MateGap).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[28], rows.Select(row => row.TrendZ).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[29], rows.Select(row => row.TrendDir).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[30], rows.Select(row => row.VolRegime).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[31], rows.Select(row => row.BreachSkipSell).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[32], rows.Select(row => row.BreachSkipBuy).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[33], rows.Select(row => row.LiveBreachSkipSell).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[34], rows.Select(row => row.LiveBreachSkipBuy).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[35], rows.Select(row => row.OpenLegs).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[36], rows.Select(row => row.MtmBps).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[37], rows.Select(row => row.RefreshedTp).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[38], rows.Select(row => row.Form1Any).ToArray())).GetAwaiter().GetResult();
+    }
+
+    // EXP-014 (CF-MR-004 HYP-002): per-closed-trade table for leg-level analysis (exit reason /
+    // ladder level / trend / vol). Empty (header-only) for every non-CIS model.
+    private static void WriteCisTrades(string path, IReadOnlyList<CisTradeRecord> rows)
+    {
+        var fields = new DataField[]
+        {
+            new DataField<DateTime>("SourceCloseTime"),
+            new DataField<string>("Domain"),
+            new DataField<string>("Strategy"),
+            new DataField<string>("Series"),
+            new DataField<DateTime>("EntryTime"),
+            new DataField<DateTime>("ExitTime"),
+            new DataField<int>("Direction"),
+            new DataField<int>("LadderLevel"),
+            new DataField<double>("EntryFillPrice"),
+            new DataField<double>("ExitFillPrice"),
+            new DataField<string>("ExitReason"),
+            new DataField<int>("BarsHeld"),
+            new DataField<double>("RealizedBps"),
+            new DataField<double>("EntryZ"),
+            new DataField<double>("EntrySpread"),
+            new DataField<double>("EntryAnchorPrice"),
+            new DataField<double>("EntrySigma"),
+            new DataField<double>("ExitAnchorPrice"),
+            new DataField<double>("ExitSpread"),
+            new DataField<double>("EntryTrendZ"),
+            new DataField<int>("EntryTrendDir"),
+            new DataField<int>("EntryVolRegime"),
+            new DataField<double>("FixedExitPrice"),
+            new DataField<double>("MaeBps"),
+            new DataField<double>("MfeBps"),
+            new DataField<int>("Censored"),
+            new DataField<string>("LegSymbol"),
+            new DataField<long>("SpreadPositionId"),
+            new DataField<double>("SlPrice"),
+            new DataField<int>("HorizonBars")
+        };
+        using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
+        using var writer = ParquetWriter.CreateAsync(new ParquetSchema(fields), stream).GetAwaiter().GetResult();
+        writer.CompressionMethod = CompressionMethod.Zstd;
+        if (rows.Count == 0)
+            return;
+        using var groupWriter = writer.CreateRowGroup();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[0], rows.Select(r => r.SourceCloseTime).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[1], rows.Select(r => r.Domain).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[2], rows.Select(r => r.Strategy).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[3], rows.Select(r => r.Series).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[4], rows.Select(r => r.EntryTime).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[5], rows.Select(r => r.ExitTime).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[6], rows.Select(r => r.Direction).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[7], rows.Select(r => r.LadderLevel).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[8], rows.Select(r => r.EntryFillPrice).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[9], rows.Select(r => r.ExitFillPrice).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[10], rows.Select(r => r.ExitReason).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[11], rows.Select(r => r.BarsHeld).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[12], rows.Select(r => r.RealizedBps).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[13], rows.Select(r => r.EntryZ).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[14], rows.Select(r => r.EntrySpread).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[15], rows.Select(r => r.EntryAnchorPrice).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[16], rows.Select(r => r.EntrySigma).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[17], rows.Select(r => r.ExitAnchorPrice).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[18], rows.Select(r => r.ExitSpread).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[19], rows.Select(r => r.EntryTrendZ).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[20], rows.Select(r => r.EntryTrendDir).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[21], rows.Select(r => r.EntryVolRegime).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[22], rows.Select(r => r.FixedExitPrice).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[23], rows.Select(r => r.MaeBps).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[24], rows.Select(r => r.MfeBps).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[25], rows.Select(r => r.Censored).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[26], rows.Select(r => r.LegSymbol).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[27], rows.Select(r => r.SpreadPositionId).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[28], rows.Select(r => r.SlPrice).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[29], rows.Select(r => r.HorizonBars).ToArray())).GetAwaiter().GetResult();
     }
 
     private static void WriteEvents(string path, IReadOnlyList<SignalEventRecord> rows)
