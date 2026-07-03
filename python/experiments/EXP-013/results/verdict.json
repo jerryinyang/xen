@@ -1,0 +1,1362 @@
+{
+  "experiment": "EXP-013",
+  "family": "CF-MR-004",
+  "domain": "4h",
+  "min_state_count": 8,
+  "arms": {
+    "S5": {
+      "cells": 11,
+      "powered": 7,
+      "gross_admit": 0,
+      "net_holm_admit": 0
+    },
+    "S6": {
+      "cells": 5,
+      "powered": 3,
+      "gross_admit": 0,
+      "net_holm_admit": 0
+    },
+    "S7": {
+      "cells": 11,
+      "powered": 7,
+      "gross_admit": 0,
+      "net_holm_admit": 0
+    },
+    "S8": {
+      "cells": 5,
+      "powered": 4,
+      "gross_admit": 0,
+      "net_holm_admit": 0
+    }
+  },
+  "n_powered": 21,
+  "n_gross_admit": 0,
+  "n_net_holm_admit": 0,
+  "tripwire_pass": true,
+  "shift_survivors": [],
+  "f2_planted_detect_ok": false,
+  "f2_future_destroy_collapse_ok": false,
+  "outcome": "NOT_TRADABLE",
+  "holm": {
+    "S5:EURUSD": false,
+    "S5:GBPUSD": false,
+    "S5:USDJPY": false,
+    "S5:USDCHF": false,
+    "S5:USDCAD": false,
+    "S5:AUDUSD": false,
+    "S5:NZDUSD": false,
+    "S5:USTEC": false,
+    "S5:US500": false,
+    "S5:US2000": false,
+    "S5:JP225": false,
+    "S6:EURUSD": false,
+    "S6:AUDUSD": false,
+    "S6:USDCHF": false,
+    "S6:USTEC": false,
+    "S6:US500": false,
+    "S7:EURUSD": false,
+    "S7:GBPUSD": false,
+    "S7:USDJPY": false,
+    "S7:USDCHF": false,
+    "S7:USDCAD": false,
+    "S7:AUDUSD": false,
+    "S7:NZDUSD": false,
+    "S7:USTEC": false,
+    "S7:US500": false,
+    "S7:US2000": false,
+    "S7:JP225": false,
+    "S8:EURUSD": false,
+    "S8:AUDUSD": false,
+    "S8:USDCHF": false,
+    "S8:USTEC": false,
+    "S8:US500": false
+  },
+  "pvals": {
+    "S5:EURUSD": 0.1052,
+    "S5:GBPUSD": 0.0888,
+    "S5:USDJPY": 0.4754,
+    "S5:USDCHF": 0.7141,
+    "S5:USDCAD": 0.1203,
+    "S5:AUDUSD": 0.3745,
+    "S5:NZDUSD": 0.212,
+    "S5:USTEC": 0.5643,
+    "S5:US500": 0.5137,
+    "S5:US2000": 0.5234,
+    "S5:JP225": 0.7703,
+    "S6:EURUSD": 0.4112,
+    "S6:AUDUSD": 0.1451,
+    "S6:USDCHF": 0.7369,
+    "S6:USTEC": 0.8133,
+    "S6:US500": 0.3195,
+    "S7:EURUSD": 0.7983,
+    "S7:GBPUSD": 0.2118,
+    "S7:USDJPY": 0.7089,
+    "S7:USDCHF": 0.8085,
+    "S7:USDCAD": 0.3951,
+    "S7:AUDUSD": 0.1479,
+    "S7:NZDUSD": 0.3025,
+    "S7:USTEC": 0.6428,
+    "S7:US500": 0.8278,
+    "S7:US2000": 0.0977,
+    "S7:JP225": 0.5706,
+    "S8:EURUSD": 0.356,
+    "S8:AUDUSD": 0.6669,
+    "S8:USDCHF": 0.6422,
+    "S8:USTEC": 0.6422,
+    "S8:US500": 0.4305
+  },
+  "cells": [
+    {
+      "arm": "S5",
+      "instrument": "EURUSD",
+      "n_bars": 5873,
+      "n_entries": 52,
+      "n_exits": 51,
+      "favorable_hit_rate": 0.21568627450980393,
+      "vr_med": 0.9726083031901536,
+      "hl_med": 24.501182603747548,
+      "n_episodes": 15,
+      "net_mean_bps": 0.5331785708466822,
+      "gross_mean_bps": 0.5598726160212202,
+      "ci_low_net": -0.14580040620763984,
+      "ci_low_gross": -0.13655827558062497,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": false,
+      "powered": false,
+      "cost_bps": 1.0
+    },
+    {
+      "arm": "S5",
+      "instrument": "GBPUSD",
+      "n_bars": 5932,
+      "n_entries": 67,
+      "n_exits": 66,
+      "favorable_hit_rate": 0.16666666666666666,
+      "vr_med": 0.975718936735227,
+      "hl_med": 21.234827578551435,
+      "n_episodes": 17,
+      "net_mean_bps": -0.12911740702309946,
+      "gross_mean_bps": -0.09596276784784172,
+      "ci_low_net": -0.13983852439095082,
+      "ci_low_gross": -0.1294557803056718,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": false,
+      "powered": false,
+      "cost_bps": 1.2
+    },
+    {
+      "arm": "S5",
+      "instrument": "USDJPY",
+      "n_bars": 5930,
+      "n_entries": 57,
+      "n_exits": 56,
+      "favorable_hit_rate": 0.21428571428571427,
+      "vr_med": 0.9964340329325658,
+      "hl_med": 23.822201194659065,
+      "n_episodes": 22,
+      "net_mean_bps": -0.2108297340540733,
+      "gross_mean_bps": -0.18309250777670102,
+      "ci_low_net": -0.8655521833303315,
+      "ci_low_gross": -0.8546474272194924,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 1.0
+    },
+    {
+      "arm": "S5",
+      "instrument": "USDCHF",
+      "n_bars": 5933,
+      "n_entries": 71,
+      "n_exits": 70,
+      "favorable_hit_rate": 0.2571428571428571,
+      "vr_med": 0.9894508296027107,
+      "hl_med": 21.729081344775942,
+      "n_episodes": 20,
+      "net_mean_bps": -0.00604853991609361,
+      "gross_mean_bps": 0.037138808015779845,
+      "ci_low_net": -0.8060703821768315,
+      "ci_low_gross": -0.7908907502956796,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 1.5
+    },
+    {
+      "arm": "S5",
+      "instrument": "USDCAD",
+      "n_bars": 5931,
+      "n_entries": 85,
+      "n_exits": 84,
+      "favorable_hit_rate": 0.36904761904761907,
+      "vr_med": 0.9514573634025175,
+      "hl_med": 18.284707945693068,
+      "n_episodes": 24,
+      "net_mean_bps": 0.3820784170045803,
+      "gross_mean_bps": 0.43472086126552173,
+      "ci_low_net": -0.16480632832426964,
+      "ci_low_gross": -0.14404380657141827,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 1.5
+    },
+    {
+      "arm": "S5",
+      "instrument": "AUDUSD",
+      "n_bars": 5931,
+      "n_entries": 70,
+      "n_exits": 69,
+      "favorable_hit_rate": 0.2463768115942029,
+      "vr_med": 0.9998502778019522,
+      "hl_med": 22.096821017248523,
+      "n_episodes": 21,
+      "net_mean_bps": 0.23415016257474683,
+      "gross_mean_bps": 0.2794673831185535,
+      "ci_low_net": -0.5510769249937846,
+      "ci_low_gross": -0.5295856143340075,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 1.5
+    },
+    {
+      "arm": "S5",
+      "instrument": "NZDUSD",
+      "n_bars": 5927,
+      "n_entries": 57,
+      "n_exits": 57,
+      "favorable_hit_rate": 0.19298245614035087,
+      "vr_med": 0.9859481030488678,
+      "hl_med": 24.736290427776524,
+      "n_episodes": 16,
+      "net_mean_bps": 0.7240200947964088,
+      "gross_mean_bps": 0.777516106058727,
+      "ci_low_net": -0.41583368833939244,
+      "ci_low_gross": -0.40120640298261084,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": false,
+      "powered": false,
+      "cost_bps": 2.0
+    },
+    {
+      "arm": "S5",
+      "instrument": "USTEC",
+      "n_bars": 5820,
+      "n_entries": 95,
+      "n_exits": 95,
+      "favorable_hit_rate": 0.37894736842105264,
+      "vr_med": 0.9721311854748911,
+      "hl_med": 21.47077852419452,
+      "n_episodes": 29,
+      "net_mean_bps": -0.12201980954153867,
+      "gross_mean_bps": 0.027303295879239207,
+      "ci_low_net": -1.5224408333010855,
+      "ci_low_gross": -1.447848686308074,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 4.0
+    },
+    {
+      "arm": "S5",
+      "instrument": "US500",
+      "n_bars": 5919,
+      "n_entries": 147,
+      "n_exits": 146,
+      "favorable_hit_rate": 0.5136986301369864,
+      "vr_med": 0.94613415350701,
+      "hl_med": 18.672443571583397,
+      "n_episodes": 37,
+      "net_mean_bps": -0.5595806004866282,
+      "gross_mean_bps": -0.4190452276376797,
+      "ci_low_net": -1.0849573229882068,
+      "ci_low_gross": -1.0122787346478996,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 3.0
+    },
+    {
+      "arm": "S5",
+      "instrument": "US2000",
+      "n_bars": 5887,
+      "n_entries": 94,
+      "n_exits": 94,
+      "favorable_hit_rate": 0.40425531914893614,
+      "vr_med": 0.9727412301737538,
+      "hl_med": 18.03224590506468,
+      "n_episodes": 23,
+      "net_mean_bps": -0.6849455751243644,
+      "gross_mean_bps": -0.5127213171544119,
+      "ci_low_net": -1.7007390817859047,
+      "ci_low_gross": -1.6347707419026114,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 5.0
+    },
+    {
+      "arm": "S5",
+      "instrument": "JP225",
+      "n_bars": 5934,
+      "n_entries": 75,
+      "n_exits": 75,
+      "favorable_hit_rate": 0.38666666666666666,
+      "vr_med": 0.9735649026374521,
+      "hl_med": 17.73426836403101,
+      "n_episodes": 18,
+      "net_mean_bps": 1.0211298961949014,
+      "gross_mean_bps": 1.1594276341950798,
+      "ci_low_net": -2.5071566601683717,
+      "ci_low_gross": -2.468164931060051,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": false,
+      "powered": false,
+      "cost_bps": 4.0
+    },
+    {
+      "arm": "S6",
+      "instrument": "EURUSD",
+      "n_bars": 5873,
+      "n_entries": 91,
+      "n_exits": 91,
+      "favorable_hit_rate": 0.34065934065934067,
+      "vr_med": 0.9261987086336174,
+      "hl_med": 19.734767108835605,
+      "n_episodes": 29,
+      "net_mean_bps": 0.39948765935956,
+      "gross_mean_bps": 0.4307460340720632,
+      "ci_low_net": -0.4296489994919531,
+      "ci_low_gross": -0.4112605711787014,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 1.0
+    },
+    {
+      "arm": "S6",
+      "instrument": "AUDUSD",
+      "n_bars": 5931,
+      "n_entries": 111,
+      "n_exits": 110,
+      "favorable_hit_rate": 0.4727272727272727,
+      "vr_med": 0.8984109391913871,
+      "hl_med": 31.336275480407753,
+      "n_episodes": 23,
+      "net_mean_bps": 0.8600768189246256,
+      "gross_mean_bps": 0.9086573927472452,
+      "ci_low_net": -0.35625145994728524,
+      "ci_low_gross": -0.3313338154719871,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 1.5
+    },
+    {
+      "arm": "S6",
+      "instrument": "USDCHF",
+      "n_bars": 5933,
+      "n_entries": 58,
+      "n_exits": 58,
+      "favorable_hit_rate": 0.08620689655172414,
+      "vr_med": 0.9268374196409148,
+      "hl_med": 27.065097335736596,
+      "n_episodes": 14,
+      "net_mean_bps": -0.2777178994654014,
+      "gross_mean_bps": -0.23826281206752406,
+      "ci_low_net": -0.7175604891975952,
+      "ci_low_gross": -0.7062645053931002,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": false,
+      "powered": false,
+      "cost_bps": 1.5
+    },
+    {
+      "arm": "S6",
+      "instrument": "USTEC",
+      "n_bars": 5820,
+      "n_entries": 105,
+      "n_exits": 105,
+      "favorable_hit_rate": 0.4380952380952381,
+      "vr_med": 1.0117587559965033,
+      "hl_med": 31.550867789912843,
+      "n_episodes": 35,
+      "net_mean_bps": -1.750488635028116,
+      "gross_mean_bps": -1.6219303246516237,
+      "ci_low_net": -2.4319729011648024,
+      "ci_low_gross": -2.348845282259391,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 4.0
+    },
+    {
+      "arm": "S6",
+      "instrument": "US500",
+      "n_bars": 5919,
+      "n_entries": 81,
+      "n_exits": 80,
+      "favorable_hit_rate": 0.4,
+      "vr_med": 0.9084410961804377,
+      "hl_med": 24.56260533181192,
+      "n_episodes": 18,
+      "net_mean_bps": 0.4828219821547518,
+      "gross_mean_bps": 0.5674062264268845,
+      "ci_low_net": -0.7185763152495565,
+      "ci_low_gross": -0.6849128601263058,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": false,
+      "powered": false,
+      "cost_bps": 3.0
+    },
+    {
+      "arm": "S7",
+      "instrument": "EURUSD",
+      "n_bars": 5873,
+      "n_entries": 55,
+      "n_exits": 55,
+      "favorable_hit_rate": 0.21818181818181817,
+      "vr_med": 0.9254005266560605,
+      "hl_med": 32.15393906362871,
+      "n_episodes": 14,
+      "net_mean_bps": -0.202626089860601,
+      "gross_mean_bps": -0.177174909851346,
+      "ci_low_net": -0.5824372863366342,
+      "ci_low_gross": -0.5743793612192082,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": false,
+      "powered": false,
+      "cost_bps": 1.0
+    },
+    {
+      "arm": "S7",
+      "instrument": "GBPUSD",
+      "n_bars": 5932,
+      "n_entries": 67,
+      "n_exits": 66,
+      "favorable_hit_rate": 0.24242424242424243,
+      "vr_med": 0.9311809124947674,
+      "hl_med": 25.008757679109255,
+      "n_episodes": 20,
+      "net_mean_bps": 0.06337309402815078,
+      "gross_mean_bps": 0.09590984012359285,
+      "ci_low_net": -0.3181829843176536,
+      "ci_low_gross": -0.30238599617430284,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 1.2
+    },
+    {
+      "arm": "S7",
+      "instrument": "USDJPY",
+      "n_bars": 5930,
+      "n_entries": 56,
+      "n_exits": 56,
+      "favorable_hit_rate": 0.03571428571428571,
+      "vr_med": 0.9720435272095506,
+      "hl_med": 30.974842258066573,
+      "n_episodes": 18,
+      "net_mean_bps": -0.8216299635740644,
+      "gross_mean_bps": -0.796517855950746,
+      "ci_low_net": -0.8935481087399836,
+      "ci_low_gross": -0.8830411419052742,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 1.0
+    },
+    {
+      "arm": "S7",
+      "instrument": "USDCHF",
+      "n_bars": 5933,
+      "n_entries": 47,
+      "n_exits": 47,
+      "favorable_hit_rate": 0.02127659574468085,
+      "vr_med": 0.9817610299383822,
+      "hl_med": 27.29937971257188,
+      "n_episodes": 13,
+      "net_mean_bps": -0.24730593932715111,
+      "gross_mean_bps": -0.2120911541123659,
+      "ci_low_net": -0.7632000986287893,
+      "ci_low_gross": -0.7543490986478034,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": false,
+      "powered": false,
+      "cost_bps": 1.5
+    },
+    {
+      "arm": "S7",
+      "instrument": "USDCAD",
+      "n_bars": 5931,
+      "n_entries": 55,
+      "n_exits": 55,
+      "favorable_hit_rate": 0.16363636363636364,
+      "vr_med": 0.9683942260256935,
+      "hl_med": 25.588060779519367,
+      "n_episodes": 15,
+      "net_mean_bps": 0.2422816788369811,
+      "gross_mean_bps": 0.2828421508133823,
+      "ci_low_net": -0.2696845894048581,
+      "ci_low_gross": -0.2563594755030377,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": false,
+      "powered": false,
+      "cost_bps": 1.5
+    },
+    {
+      "arm": "S7",
+      "instrument": "AUDUSD",
+      "n_bars": 5931,
+      "n_entries": 70,
+      "n_exits": 69,
+      "favorable_hit_rate": 0.30434782608695654,
+      "vr_med": 0.9714203894901781,
+      "hl_med": 26.56735949448209,
+      "n_episodes": 17,
+      "net_mean_bps": 0.952754561177988,
+      "gross_mean_bps": 0.9952991316804192,
+      "ci_low_net": -0.27295861717960873,
+      "ci_low_gross": -0.26062593036955406,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 1.5
+    },
+    {
+      "arm": "S7",
+      "instrument": "NZDUSD",
+      "n_bars": 5927,
+      "n_entries": 67,
+      "n_exits": 66,
+      "favorable_hit_rate": 0.22727272727272727,
+      "vr_med": 0.9914458293492145,
+      "hl_med": 31.944153072498437,
+      "n_episodes": 23,
+      "net_mean_bps": 0.09879454202273517,
+      "gross_mean_bps": 0.15586255822999248,
+      "ci_low_net": -0.5528190285707695,
+      "ci_low_gross": -0.527071272418681,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 2.0
+    },
+    {
+      "arm": "S7",
+      "instrument": "USTEC",
+      "n_bars": 5820,
+      "n_entries": 82,
+      "n_exits": 82,
+      "favorable_hit_rate": 0.34146341463414637,
+      "vr_med": 1.0058071002287714,
+      "hl_med": 26.510312747846484,
+      "n_episodes": 29,
+      "net_mean_bps": -2.07153753139602,
+      "gross_mean_bps": -1.949559100752658,
+      "ci_low_net": -1.7531192590904263,
+      "ci_low_gross": -1.6819660974902246,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 4.0
+    },
+    {
+      "arm": "S7",
+      "instrument": "US500",
+      "n_bars": 5919,
+      "n_entries": 135,
+      "n_exits": 134,
+      "favorable_hit_rate": 0.4552238805970149,
+      "vr_med": 0.9681034495206722,
+      "hl_med": 29.672691146434303,
+      "n_episodes": 34,
+      "net_mean_bps": -0.5529782666442817,
+      "gross_mean_bps": -0.4370937640033202,
+      "ci_low_net": -1.698165572357175,
+      "ci_low_gross": -1.6278214191427904,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 3.0
+    },
+    {
+      "arm": "S7",
+      "instrument": "US2000",
+      "n_bars": 5887,
+      "n_entries": 84,
+      "n_exits": 84,
+      "favorable_hit_rate": 0.40476190476190477,
+      "vr_med": 0.9536791558650872,
+      "hl_med": 24.583194754500916,
+      "n_episodes": 22,
+      "net_mean_bps": 0.5819511474221268,
+      "gross_mean_bps": 0.7357288260866321,
+      "ci_low_net": -0.5371115082115638,
+      "ci_low_gross": -0.461672623063996,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 5.0
+    },
+    {
+      "arm": "S7",
+      "instrument": "JP225",
+      "n_bars": 5934,
+      "n_entries": 71,
+      "n_exits": 71,
+      "favorable_hit_rate": 0.2535211267605634,
+      "vr_med": 0.9589227739365337,
+      "hl_med": 23.232803519217555,
+      "n_episodes": 17,
+      "net_mean_bps": 0.5677627935346644,
+      "gross_mean_bps": 0.6735750141009833,
+      "ci_low_net": -1.7772257988664997,
+      "ci_low_gross": -1.7391983342615887,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": false,
+      "powered": false,
+      "cost_bps": 4.0
+    },
+    {
+      "arm": "S8",
+      "instrument": "EURUSD",
+      "n_bars": 5873,
+      "n_entries": 86,
+      "n_exits": 86,
+      "favorable_hit_rate": 0.37209302325581395,
+      "vr_med": 0.9889112580193734,
+      "hl_med": 16.928358696240537,
+      "n_episodes": 25,
+      "net_mean_bps": 0.8958400162652896,
+      "gross_mean_bps": 0.9323286613328419,
+      "ci_low_net": -0.3617875010875141,
+      "ci_low_gross": -0.3449213782742386,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 1.0
+    },
+    {
+      "arm": "S8",
+      "instrument": "AUDUSD",
+      "n_bars": 5931,
+      "n_entries": 137,
+      "n_exits": 137,
+      "favorable_hit_rate": 0.5766423357664233,
+      "vr_med": 0.9504515982865182,
+      "hl_med": 20.32434114499791,
+      "n_episodes": 24,
+      "net_mean_bps": 0.5578224856365573,
+      "gross_mean_bps": 0.6209883813783101,
+      "ci_low_net": -0.9313892351266028,
+      "ci_low_gross": -0.9052005008677138,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 1.5
+    },
+    {
+      "arm": "S8",
+      "instrument": "USDCHF",
+      "n_bars": 5933,
+      "n_entries": 73,
+      "n_exits": 73,
+      "favorable_hit_rate": 0.1780821917808219,
+      "vr_med": 0.9809863335970734,
+      "hl_med": 19.844328111339376,
+      "n_episodes": 20,
+      "net_mean_bps": -0.1301761352532101,
+      "gross_mean_bps": -0.08361192053475586,
+      "ci_low_net": -0.6602849249891906,
+      "ci_low_gross": -0.6441682582179009,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 1.5
+    },
+    {
+      "arm": "S8",
+      "instrument": "USTEC",
+      "n_bars": 5820,
+      "n_entries": 140,
+      "n_exits": 139,
+      "favorable_hit_rate": 0.5323741007194245,
+      "vr_med": 1.0553154836839633,
+      "hl_med": 21.457600973598545,
+      "n_episodes": 39,
+      "net_mean_bps": -1.6063055189432252,
+      "gross_mean_bps": -1.4440289439705263,
+      "ci_low_net": -1.9906065999743412,
+      "ci_low_gross": -1.8991110831130733,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": true,
+      "powered": true,
+      "cost_bps": 4.0
+    },
+    {
+      "arm": "S8",
+      "instrument": "US500",
+      "n_bars": 5919,
+      "n_entries": 87,
+      "n_exits": 87,
+      "favorable_hit_rate": 0.40229885057471265,
+      "vr_med": 0.9814841828410861,
+      "hl_med": 17.886439470830236,
+      "n_episodes": 18,
+      "net_mean_bps": -0.1827914094078791,
+      "gross_mean_bps": -0.08873543804452097,
+      "ci_low_net": -0.8333972128397883,
+      "ci_low_gross": -0.8033728923130544,
+      "admit_net": false,
+      "admit_gross": false,
+      "holm_admit_net": false,
+      "l1": false,
+      "powered": false,
+      "cost_bps": 3.0
+    }
+  ],
+  "f2": {
+    "S5:EURUSD": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S5:GBPUSD": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S5:USDJPY": {
+      "planted_pass": true,
+      "destroyed_pass": false
+    },
+    "S5:USDCHF": {
+      "planted_pass": true,
+      "destroyed_pass": true
+    },
+    "S5:USDCAD": {
+      "planted_pass": true,
+      "destroyed_pass": false
+    },
+    "S5:AUDUSD": {
+      "planted_pass": true,
+      "destroyed_pass": false
+    },
+    "S5:NZDUSD": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S5:USTEC": {
+      "planted_pass": true,
+      "destroyed_pass": false
+    },
+    "S5:US500": {
+      "planted_pass": true,
+      "destroyed_pass": false
+    },
+    "S5:US2000": {
+      "planted_pass": true,
+      "destroyed_pass": true
+    },
+    "S5:JP225": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S6:EURUSD": {
+      "planted_pass": true,
+      "destroyed_pass": true
+    },
+    "S6:AUDUSD": {
+      "planted_pass": true,
+      "destroyed_pass": true
+    },
+    "S6:USDCHF": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S6:USTEC": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S6:US500": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S7:EURUSD": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S7:GBPUSD": {
+      "planted_pass": true,
+      "destroyed_pass": true
+    },
+    "S7:USDJPY": {
+      "planted_pass": true,
+      "destroyed_pass": true
+    },
+    "S7:USDCHF": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S7:USDCAD": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S7:AUDUSD": {
+      "planted_pass": true,
+      "destroyed_pass": true
+    },
+    "S7:NZDUSD": {
+      "planted_pass": true,
+      "destroyed_pass": true
+    },
+    "S7:USTEC": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S7:US500": {
+      "planted_pass": true,
+      "destroyed_pass": false
+    },
+    "S7:US2000": {
+      "planted_pass": true,
+      "destroyed_pass": true
+    },
+    "S7:JP225": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S8:EURUSD": {
+      "planted_pass": true,
+      "destroyed_pass": true
+    },
+    "S8:AUDUSD": {
+      "planted_pass": true,
+      "destroyed_pass": true
+    },
+    "S8:USDCHF": {
+      "planted_pass": true,
+      "destroyed_pass": true
+    },
+    "S8:USTEC": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    },
+    "S8:US500": {
+      "planted_pass": false,
+      "destroyed_pass": false
+    }
+  },
+  "provenance_breach": {
+    "S5:EURUSD": {
+      "EntryFillPrice": {
+        "n_fills": 52,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 51,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S5:GBPUSD": {
+      "EntryFillPrice": {
+        "n_fills": 67,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 66,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S5:USDJPY": {
+      "EntryFillPrice": {
+        "n_fills": 57,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 56,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S5:USDCHF": {
+      "EntryFillPrice": {
+        "n_fills": 71,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 70,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S5:USDCAD": {
+      "EntryFillPrice": {
+        "n_fills": 85,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 84,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S5:AUDUSD": {
+      "EntryFillPrice": {
+        "n_fills": 70,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 69,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S5:NZDUSD": {
+      "EntryFillPrice": {
+        "n_fills": 57,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 57,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S5:USTEC": {
+      "EntryFillPrice": {
+        "n_fills": 95,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 95,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S5:US500": {
+      "EntryFillPrice": {
+        "n_fills": 147,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 146,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S5:US2000": {
+      "EntryFillPrice": {
+        "n_fills": 94,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 94,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S5:JP225": {
+      "EntryFillPrice": {
+        "n_fills": 75,
+        "n_breach": 1,
+        "max_bps": 122.40272006044577,
+        "breach_frac": 0.013333333333333334
+      },
+      "ExitFillPrice": {
+        "n_fills": 75,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S6:EURUSD": {
+      "EntryFillPrice": {
+        "n_fills": 91,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 91,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S6:AUDUSD": {
+      "EntryFillPrice": {
+        "n_fills": 111,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 110,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S6:USDCHF": {
+      "EntryFillPrice": {
+        "n_fills": 58,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 58,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S6:USTEC": {
+      "EntryFillPrice": {
+        "n_fills": 105,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 105,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S6:US500": {
+      "EntryFillPrice": {
+        "n_fills": 81,
+        "n_breach": 1,
+        "max_bps": 156.18807842040238,
+        "breach_frac": 0.012345679012345678
+      },
+      "ExitFillPrice": {
+        "n_fills": 80,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S7:EURUSD": {
+      "EntryFillPrice": {
+        "n_fills": 55,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 55,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S7:GBPUSD": {
+      "EntryFillPrice": {
+        "n_fills": 67,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 66,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S7:USDJPY": {
+      "EntryFillPrice": {
+        "n_fills": 56,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 56,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S7:USDCHF": {
+      "EntryFillPrice": {
+        "n_fills": 47,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 47,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S7:USDCAD": {
+      "EntryFillPrice": {
+        "n_fills": 55,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 55,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S7:AUDUSD": {
+      "EntryFillPrice": {
+        "n_fills": 70,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 69,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S7:NZDUSD": {
+      "EntryFillPrice": {
+        "n_fills": 67,
+        "n_breach": 1,
+        "max_bps": 13.669301712779932,
+        "breach_frac": 0.014925373134328358
+      },
+      "ExitFillPrice": {
+        "n_fills": 66,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S7:USTEC": {
+      "EntryFillPrice": {
+        "n_fills": 82,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 82,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S7:US500": {
+      "EntryFillPrice": {
+        "n_fills": 135,
+        "n_breach": 1,
+        "max_bps": 156.18807842040238,
+        "breach_frac": 0.007407407407407408
+      },
+      "ExitFillPrice": {
+        "n_fills": 134,
+        "n_breach": 1,
+        "max_bps": 20.69239952248357,
+        "breach_frac": 0.007462686567164179
+      }
+    },
+    "S7:US2000": {
+      "EntryFillPrice": {
+        "n_fills": 84,
+        "n_breach": 1,
+        "max_bps": 105.02396622485041,
+        "breach_frac": 0.011904761904761904
+      },
+      "ExitFillPrice": {
+        "n_fills": 84,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S7:JP225": {
+      "EntryFillPrice": {
+        "n_fills": 71,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 71,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S8:EURUSD": {
+      "EntryFillPrice": {
+        "n_fills": 86,
+        "n_breach": 2,
+        "max_bps": 15.618970617960299,
+        "breach_frac": 0.023255813953488372
+      },
+      "ExitFillPrice": {
+        "n_fills": 86,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S8:AUDUSD": {
+      "EntryFillPrice": {
+        "n_fills": 137,
+        "n_breach": 1,
+        "max_bps": 8.961868694169942,
+        "breach_frac": 0.0072992700729927005
+      },
+      "ExitFillPrice": {
+        "n_fills": 137,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S8:USDCHF": {
+      "EntryFillPrice": {
+        "n_fills": 73,
+        "n_breach": 2,
+        "max_bps": 7.426267769998107,
+        "breach_frac": 0.0273972602739726
+      },
+      "ExitFillPrice": {
+        "n_fills": 73,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S8:USTEC": {
+      "EntryFillPrice": {
+        "n_fills": 140,
+        "n_breach": 1,
+        "max_bps": 92.20181462582507,
+        "breach_frac": 0.007142857142857143
+      },
+      "ExitFillPrice": {
+        "n_fills": 139,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      }
+    },
+    "S8:US500": {
+      "EntryFillPrice": {
+        "n_fills": 87,
+        "n_breach": 0,
+        "max_bps": 0.0,
+        "breach_frac": 0.0
+      },
+      "ExitFillPrice": {
+        "n_fills": 87,
+        "n_breach": 1,
+        "max_bps": 16.840909798064374,
+        "breach_frac": 0.011494252873563218
+      }
+    }
+  }
+}

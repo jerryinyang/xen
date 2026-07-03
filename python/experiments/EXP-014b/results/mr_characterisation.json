@@ -1,0 +1,2742 @@
+{
+  "experiment": "EXP-014b",
+  "family": "CF-MR-004",
+  "hypothesis": "HYP-003",
+  "read": "symmetry_two_barrier_before_verdict",
+  "null": 0.5,
+  "z_triggers": [
+    2.0,
+    1.5
+  ],
+  "min_state_avail": 30,
+  "cells": [
+    {
+      "domain": "1h",
+      "instrument": "EURUSD",
+      "z_trigger": 2.0,
+      "n_bars": 22870,
+      "n_events": 1893,
+      "n_ambiguous": 0,
+      "n_censored": 1192,
+      "autocorr1": 0.5493443234796346,
+      "vr_med": 0.26647763133790436,
+      "adf_t": -50.069107580091796,
+      "kpss_lm": 1.1344097968713867,
+      "hl_med": 1.1571723980569903,
+      "slices": {
+        "all": {
+          "p_inward": 0.5078459343794579,
+          "ci_low": 0.47075606276747506,
+          "ci_high": 0.543509272467903,
+          "n_decided": 701
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.5726495726495726,
+          "ci_low": 0.5085470085470085,
+          "ci_high": 0.6325854700854685,
+          "n_decided": 234
+        },
+        "trend_neutral": {
+          "p_inward": 0.4753747323340471,
+          "ci_low": 0.430406852248394,
+          "ci_high": 0.5203426124197003,
+          "n_decided": 467
+        },
+        "vol_low": {
+          "p_inward": 0.5266666666666666,
+          "ci_low": 0.47,
+          "ci_high": 0.5833333333333334,
+          "n_decided": 300
+        },
+        "vol_mid": {
+          "p_inward": 0.5425101214574899,
+          "ci_low": 0.4817813765182186,
+          "ci_high": 0.6032388663967612,
+          "n_decided": 247
+        },
+        "vol_high": {
+          "p_inward": 0.4155844155844156,
+          "ci_low": 0.33766233766233766,
+          "ci_high": 0.4935064935064935,
+          "n_decided": 154
+        }
+      },
+      "p_inward_reverse": 0.9968233799237611,
+      "ci_low_reverse": 0.9936467598475223,
+      "p_inward_shift": 0.6883116883116883,
+      "ci_low_shift": 0.6493506493506493
+    },
+    {
+      "domain": "1h",
+      "instrument": "EURUSD",
+      "z_trigger": 1.5,
+      "n_bars": 22870,
+      "n_events": 4415,
+      "n_ambiguous": 0,
+      "n_censored": 2151,
+      "autocorr1": 0.5493443234796346,
+      "vr_med": 0.26647763133790436,
+      "adf_t": -50.069107580091796,
+      "kpss_lm": 1.1344097968713867,
+      "hl_med": 1.1571723980569903,
+      "slices": {
+        "all": {
+          "p_inward": 0.5490282685512368,
+          "ci_low": 0.5287102473498233,
+          "ci_high": 0.5697879858657244,
+          "n_decided": 2264
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.6370860927152318,
+          "ci_low": 0.6026490066225165,
+          "ci_high": 0.6701986754966888,
+          "n_decided": 755
+        },
+        "trend_neutral": {
+          "p_inward": 0.5049701789264414,
+          "ci_low": 0.47978793903247186,
+          "ci_high": 0.5308151093439364,
+          "n_decided": 1509
+        },
+        "vol_low": {
+          "p_inward": 0.5494716618635928,
+          "ci_low": 0.5187319884726225,
+          "ci_high": 0.579250720461095,
+          "n_decided": 1041
+        },
+        "vol_mid": {
+          "p_inward": 0.5753803596127247,
+          "ci_low": 0.5394190871369294,
+          "ci_high": 0.6113416320885201,
+          "n_decided": 723
+        },
+        "vol_high": {
+          "p_inward": 0.51,
+          "ci_low": 0.466,
+          "ci_high": 0.556,
+          "n_decided": 500
+        }
+      },
+      "p_inward_reverse": 0.978865406006674,
+      "ci_low_reverse": 0.9741379310344828,
+      "p_inward_shift": 0.5661182205971969,
+      "ci_low_shift": 0.5423522242535039
+    },
+    {
+      "domain": "1h",
+      "instrument": "GBPUSD",
+      "z_trigger": 2.0,
+      "n_bars": 23109,
+      "n_events": 1901,
+      "n_ambiguous": 0,
+      "n_censored": 1013,
+      "autocorr1": 0.7529878233838547,
+      "vr_med": 0.28971830361225187,
+      "adf_t": -34.79896912992253,
+      "kpss_lm": 0.8687057020619144,
+      "hl_med": 2.443246168006267,
+      "slices": {
+        "all": {
+          "p_inward": 0.48085585585585583,
+          "ci_low": 0.44707207207207206,
+          "ci_high": 0.5135135135135135,
+          "n_decided": 888
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.39864864864864863,
+          "ci_low": 0.34121621621621623,
+          "ci_high": 0.4560810810810811,
+          "n_decided": 296
+        },
+        "trend_neutral": {
+          "p_inward": 0.5219594594594594,
+          "ci_low": 0.4814189189189189,
+          "ci_high": 0.5608108108108109,
+          "n_decided": 592
+        },
+        "vol_low": {
+          "p_inward": 0.5594989561586639,
+          "ci_low": 0.5156576200417536,
+          "ci_high": 0.6033402922755741,
+          "n_decided": 479
+        },
+        "vol_mid": {
+          "p_inward": 0.42641509433962266,
+          "ci_low": 0.3660377358490566,
+          "ci_high": 0.4830188679245283,
+          "n_decided": 265
+        },
+        "vol_high": {
+          "p_inward": 0.3194444444444444,
+          "ci_low": 0.24305555555555555,
+          "ci_high": 0.3958333333333333,
+          "n_decided": 144
+        }
+      },
+      "p_inward_reverse": 0.9909529553679132,
+      "ci_low_reverse": 0.9861278648974668,
+      "p_inward_shift": 0.6029411764705882,
+      "ci_low_shift": 0.5588235294117647
+    },
+    {
+      "domain": "1h",
+      "instrument": "GBPUSD",
+      "z_trigger": 1.5,
+      "n_bars": 23109,
+      "n_events": 4383,
+      "n_ambiguous": 0,
+      "n_censored": 2014,
+      "autocorr1": 0.7529878233838547,
+      "vr_med": 0.28971830361225187,
+      "adf_t": -34.79896912992253,
+      "kpss_lm": 0.8687057020619144,
+      "hl_med": 2.443246168006267,
+      "slices": {
+        "all": {
+          "p_inward": 0.5407344871253693,
+          "ci_low": 0.5208948923596454,
+          "ci_high": 0.5609962009286619,
+          "n_decided": 2369
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.5126582278481012,
+          "ci_low": 0.47848101265822784,
+          "ci_high": 0.5468670886075945,
+          "n_decided": 790
+        },
+        "trend_neutral": {
+          "p_inward": 0.5547815072830906,
+          "ci_low": 0.5300823305889804,
+          "ci_high": 0.5794806839772008,
+          "n_decided": 1579
+        },
+        "vol_low": {
+          "p_inward": 0.5634995296331138,
+          "ci_low": 0.5333960489181562,
+          "ci_high": 0.5936030103480715,
+          "n_decided": 1063
+        },
+        "vol_mid": {
+          "p_inward": 0.550251256281407,
+          "ci_low": 0.5138190954773869,
+          "ci_high": 0.5841708542713567,
+          "n_decided": 796
+        },
+        "vol_high": {
+          "p_inward": 0.47843137254901963,
+          "ci_low": 0.43529411764705883,
+          "ci_high": 0.5215686274509804,
+          "n_decided": 510
+        }
+      },
+      "p_inward_reverse": 0.9802392095683827,
+      "ci_low_reverse": 0.9755590223608944,
+      "p_inward_shift": 0.5431409062693979,
+      "ci_low_shift": 0.5183116076970825
+    },
+    {
+      "domain": "1h",
+      "instrument": "USDJPY",
+      "z_trigger": 2.0,
+      "n_bars": 23100,
+      "n_events": 1994,
+      "n_ambiguous": 0,
+      "n_censored": 1534,
+      "autocorr1": 0.9669049697213081,
+      "vr_med": 0.6305643391854491,
+      "adf_t": -15.154618279592873,
+      "kpss_lm": 1.3106561843100273,
+      "hl_med": 20.62646593581445,
+      "slices": {
+        "all": {
+          "p_inward": 0.41739130434782606,
+          "ci_low": 0.3717391304347826,
+          "ci_high": 0.46304347826086956,
+          "n_decided": 460
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.4935064935064935,
+          "ci_low": 0.4155844155844156,
+          "ci_high": 0.5714285714285714,
+          "n_decided": 154
+        },
+        "trend_neutral": {
+          "p_inward": 0.3790849673202614,
+          "ci_low": 0.3235294117647059,
+          "ci_high": 0.434640522875817,
+          "n_decided": 306
+        },
+        "vol_low": {
+          "p_inward": 0.504,
+          "ci_low": 0.44,
+          "ci_high": 0.564,
+          "n_decided": 250
+        },
+        "vol_mid": {
+          "p_inward": 0.39436619718309857,
+          "ci_low": 0.31690140845070425,
+          "ci_high": 0.4788732394366197,
+          "n_decided": 142
+        },
+        "vol_high": {
+          "p_inward": 0.14705882352941177,
+          "ci_low": 0.07352941176470588,
+          "ci_high": 0.23529411764705882,
+          "n_decided": 68
+        }
+      },
+      "p_inward_reverse": 0.9866412213740458,
+      "ci_low_reverse": 0.9790076335877863,
+      "p_inward_shift": 0.4513888888888889,
+      "ci_low_shift": 0.4097222222222222
+    },
+    {
+      "domain": "1h",
+      "instrument": "USDJPY",
+      "z_trigger": 1.5,
+      "n_bars": 23100,
+      "n_events": 4513,
+      "n_ambiguous": 0,
+      "n_censored": 3256,
+      "autocorr1": 0.9669049697213081,
+      "vr_med": 0.6305643391854491,
+      "adf_t": -15.154618279592873,
+      "kpss_lm": 1.3106561843100273,
+      "hl_med": 20.62646593581445,
+      "slices": {
+        "all": {
+          "p_inward": 0.45743834526650756,
+          "ci_low": 0.4303898170246619,
+          "ci_high": 0.48528241845664283,
+          "n_decided": 1257
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.4916467780429594,
+          "ci_low": 0.4439140811455847,
+          "ci_high": 0.5393794749403341,
+          "n_decided": 419
+        },
+        "trend_neutral": {
+          "p_inward": 0.4403341288782816,
+          "ci_low": 0.40692124105011934,
+          "ci_high": 0.47494033412887826,
+          "n_decided": 838
+        },
+        "vol_low": {
+          "p_inward": 0.49784791965566716,
+          "ci_low": 0.460545193687231,
+          "ci_high": 0.5351506456241033,
+          "n_decided": 697
+        },
+        "vol_mid": {
+          "p_inward": 0.5029940119760479,
+          "ci_low": 0.4491017964071856,
+          "ci_high": 0.5568862275449101,
+          "n_decided": 334
+        },
+        "vol_high": {
+          "p_inward": 0.26548672566371684,
+          "ci_low": 0.2079646017699115,
+          "ci_high": 0.3230088495575221,
+          "n_decided": 226
+        }
+      },
+      "p_inward_reverse": 0.9836132732486685,
+      "ci_low_reverse": 0.9782875870544858,
+      "p_inward_shift": 0.4915158371040724,
+      "ci_low_shift": 0.4677601809954751
+    },
+    {
+      "domain": "1h",
+      "instrument": "USDCHF",
+      "z_trigger": 2.0,
+      "n_bars": 23112,
+      "n_events": 2267,
+      "n_ambiguous": 0,
+      "n_censored": 1880,
+      "autocorr1": 0.7524865987645507,
+      "vr_med": 0.2881202441162618,
+      "adf_t": -34.801270096647606,
+      "kpss_lm": 0.9126546953477737,
+      "hl_med": 2.4374656107265222,
+      "slices": {
+        "all": {
+          "p_inward": 0.4496124031007752,
+          "ci_low": 0.4005167958656331,
+          "ci_high": 0.49870801033591733,
+          "n_decided": 387
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.5581395348837209,
+          "ci_low": 0.4728682170542636,
+          "ci_high": 0.6434108527131783,
+          "n_decided": 129
+        },
+        "trend_neutral": {
+          "p_inward": 0.3953488372093023,
+          "ci_low": 0.3372093023255814,
+          "ci_high": 0.45348837209302323,
+          "n_decided": 258
+        },
+        "vol_low": {
+          "p_inward": 0.43781094527363185,
+          "ci_low": 0.3681592039800995,
+          "ci_high": 0.5074626865671642,
+          "n_decided": 201
+        },
+        "vol_mid": {
+          "p_inward": 0.36134453781512604,
+          "ci_low": 0.2773109243697479,
+          "ci_high": 0.4455882352941146,
+          "n_decided": 119
+        },
+        "vol_high": {
+          "p_inward": 0.6417910447761194,
+          "ci_low": 0.5223880597014925,
+          "ci_high": 0.746268656716418,
+          "n_decided": 67
+        }
+      },
+      "p_inward_reverse": 0.9987789987789988,
+      "ci_low_reverse": 0.9963369963369964,
+      "p_inward_shift": 0.4503424657534247,
+      "ci_low_shift": 0.410958904109589
+    },
+    {
+      "domain": "1h",
+      "instrument": "USDCHF",
+      "z_trigger": 1.5,
+      "n_bars": 23112,
+      "n_events": 4656,
+      "n_ambiguous": 0,
+      "n_censored": 3502,
+      "autocorr1": 0.7524865987645507,
+      "vr_med": 0.2881202441162618,
+      "adf_t": -34.801270096647606,
+      "kpss_lm": 0.9126546953477737,
+      "hl_med": 2.4374656107265222,
+      "slices": {
+        "all": {
+          "p_inward": 0.4532062391681109,
+          "ci_low": 0.4246100519930676,
+          "ci_high": 0.48180242634315423,
+          "n_decided": 1154
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.4805194805194805,
+          "ci_low": 0.43116883116883115,
+          "ci_high": 0.5324675324675324,
+          "n_decided": 385
+        },
+        "trend_neutral": {
+          "p_inward": 0.43953185955786733,
+          "ci_low": 0.40312093628088425,
+          "ci_high": 0.47464239271781533,
+          "n_decided": 769
+        },
+        "vol_low": {
+          "p_inward": 0.423728813559322,
+          "ci_low": 0.3847457627118644,
+          "ci_high": 0.46440677966101696,
+          "n_decided": 590
+        },
+        "vol_mid": {
+          "p_inward": 0.4368421052631579,
+          "ci_low": 0.3868421052631579,
+          "ci_high": 0.4868421052631579,
+          "n_decided": 380
+        },
+        "vol_high": {
+          "p_inward": 0.5815217391304348,
+          "ci_low": 0.5108695652173914,
+          "ci_high": 0.6521739130434783,
+          "n_decided": 184
+        }
+      },
+      "p_inward_reverse": 0.9974811083123426,
+      "ci_low_reverse": 0.9949622166246851,
+      "p_inward_shift": 0.4591295116772824,
+      "ci_low_shift": 0.43683651804670914
+    },
+    {
+      "domain": "1h",
+      "instrument": "USDCAD",
+      "z_trigger": 2.0,
+      "n_bars": 23104,
+      "n_events": 1998,
+      "n_ambiguous": 0,
+      "n_censored": 1761,
+      "autocorr1": 0.7370226767121915,
+      "vr_med": 0.2895658849849788,
+      "adf_t": -36.052384142484414,
+      "kpss_lm": 0.2641986579675983,
+      "hl_med": 2.2718906730736323,
+      "slices": {
+        "all": {
+          "p_inward": 0.7215189873417721,
+          "ci_low": 0.6624472573839663,
+          "ci_high": 0.7805907172995781,
+          "n_decided": 237
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.7721518987341772,
+          "ci_low": 0.6708860759493671,
+          "ci_high": 0.8607594936708861,
+          "n_decided": 79
+        },
+        "trend_neutral": {
+          "p_inward": 0.6962025316455697,
+          "ci_low": 0.6265822784810127,
+          "ci_high": 0.7658227848101266,
+          "n_decided": 158
+        },
+        "vol_low": {
+          "p_inward": 0.7279411764705882,
+          "ci_low": 0.6544117647058824,
+          "ci_high": 0.8014705882352942,
+          "n_decided": 136
+        },
+        "vol_mid": {
+          "p_inward": 0.6329113924050633,
+          "ci_low": 0.5189873417721519,
+          "ci_high": 0.7341772151898734,
+          "n_decided": 79
+        },
+        "vol_high": {
+          "p_inward": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0,
+          "n_decided": 22
+        }
+      },
+      "p_inward_reverse": 1.0,
+      "ci_low_reverse": 1.0,
+      "p_inward_shift": 0.5795981452859351,
+      "ci_low_shift": 0.5409582689335394
+    },
+    {
+      "domain": "1h",
+      "instrument": "USDCAD",
+      "z_trigger": 1.5,
+      "n_bars": 23104,
+      "n_events": 4472,
+      "n_ambiguous": 0,
+      "n_censored": 3711,
+      "autocorr1": 0.7370226767121915,
+      "vr_med": 0.2895658849849788,
+      "adf_t": -36.052384142484414,
+      "kpss_lm": 0.2641986579675983,
+      "hl_med": 2.2718906730736323,
+      "slices": {
+        "all": {
+          "p_inward": 0.6412614980289093,
+          "ci_low": 0.607095926412615,
+          "ci_high": 0.6741130091984231,
+          "n_decided": 761
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.7480314960629921,
+          "ci_low": 0.6968503937007874,
+          "ci_high": 0.7992125984251969,
+          "n_decided": 254
+        },
+        "trend_neutral": {
+          "p_inward": 0.5877712031558185,
+          "ci_low": 0.5443786982248521,
+          "ci_high": 0.631163708086785,
+          "n_decided": 507
+        },
+        "vol_low": {
+          "p_inward": 0.6005221932114883,
+          "ci_low": 0.5535248041775457,
+          "ci_high": 0.6501305483028721,
+          "n_decided": 383
+        },
+        "vol_mid": {
+          "p_inward": 0.6145833333333334,
+          "ci_low": 0.5590277777777778,
+          "ci_high": 0.6701388888888888,
+          "n_decided": 288
+        },
+        "vol_high": {
+          "p_inward": 0.9,
+          "ci_low": 0.8333333333333334,
+          "ci_high": 0.9555555555555556,
+          "n_decided": 90
+        }
+      },
+      "p_inward_reverse": 0.9954579863739591,
+      "ci_low_reverse": 0.991672975018925,
+      "p_inward_shift": 0.6190217391304348,
+      "ci_low_shift": 0.5972826086956522
+    },
+    {
+      "domain": "1h",
+      "instrument": "AUDUSD",
+      "z_trigger": 2.0,
+      "n_bars": 23102,
+      "n_events": 2013,
+      "n_ambiguous": 0,
+      "n_censored": 1292,
+      "autocorr1": 0.6530163239604283,
+      "vr_med": 0.2774153540892073,
+      "adf_t": -42.631946924624664,
+      "kpss_lm": 0.20998809583348102,
+      "hl_med": 1.626522013753446,
+      "slices": {
+        "all": {
+          "p_inward": 0.6352288488210819,
+          "ci_low": 0.6005201109570042,
+          "ci_high": 0.6699029126213593,
+          "n_decided": 721
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.5518672199170125,
+          "ci_low": 0.4896265560165975,
+          "ci_high": 0.6141078838174274,
+          "n_decided": 241
+        },
+        "trend_neutral": {
+          "p_inward": 0.6770833333333334,
+          "ci_low": 0.6354166666666666,
+          "ci_high": 0.71875,
+          "n_decided": 480
+        },
+        "vol_low": {
+          "p_inward": 0.6683291770573566,
+          "ci_low": 0.6209476309226932,
+          "ci_high": 0.713216957605985,
+          "n_decided": 401
+        },
+        "vol_mid": {
+          "p_inward": 0.6188118811881188,
+          "ci_low": 0.5495049504950495,
+          "ci_high": 0.6881188118811881,
+          "n_decided": 202
+        },
+        "vol_high": {
+          "p_inward": 0.5508474576271186,
+          "ci_low": 0.4576271186440678,
+          "ci_high": 0.6440677966101694,
+          "n_decided": 118
+        }
+      },
+      "p_inward_reverse": 0.9963617463617463,
+      "ci_low_reverse": 0.9932432432432432,
+      "p_inward_shift": 0.6517412935323383,
+      "ci_low_shift": 0.6135986733001658
+    },
+    {
+      "domain": "1h",
+      "instrument": "AUDUSD",
+      "z_trigger": 1.5,
+      "n_bars": 23102,
+      "n_events": 4436,
+      "n_ambiguous": 1,
+      "n_censored": 2262,
+      "autocorr1": 0.6530163239604283,
+      "vr_med": 0.2774153540892073,
+      "adf_t": -42.631946924624664,
+      "kpss_lm": 0.20998809583348102,
+      "hl_med": 1.626522013753446,
+      "slices": {
+        "all": {
+          "p_inward": 0.5858260469397146,
+          "ci_low": 0.5655775425678785,
+          "ci_high": 0.606994937873907,
+          "n_decided": 2173
+        },
+        "counter_trend": {
+          "p_inward": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "n_decided": 1
+        },
+        "with_trend": {
+          "p_inward": 0.5897790055248618,
+          "ci_low": 0.5538674033149171,
+          "ci_high": 0.6256906077348067,
+          "n_decided": 724
+        },
+        "trend_neutral": {
+          "p_inward": 0.5842541436464088,
+          "ci_low": 0.5587016574585635,
+          "ci_high": 0.6098066298342542,
+          "n_decided": 1448
+        },
+        "vol_low": {
+          "p_inward": 0.6118980169971672,
+          "ci_low": 0.5826251180358829,
+          "ci_high": 0.6411709159584513,
+          "n_decided": 1059
+        },
+        "vol_mid": {
+          "p_inward": 0.5507246376811594,
+          "ci_low": 0.5144927536231884,
+          "ci_high": 0.5884057971014492,
+          "n_decided": 690
+        },
+        "vol_high": {
+          "p_inward": 0.5778301886792453,
+          "ci_low": 0.5306603773584906,
+          "ci_high": 0.625,
+          "n_decided": 424
+        }
+      },
+      "p_inward_reverse": 0.9852799227799228,
+      "ci_low_reverse": 0.981418918918919,
+      "p_inward_shift": 0.5688789737869493,
+      "ci_low_shift": 0.5460122699386503
+    },
+    {
+      "domain": "1h",
+      "instrument": "NZDUSD",
+      "z_trigger": 2.0,
+      "n_bars": 23088,
+      "n_events": 2073,
+      "n_ambiguous": 0,
+      "n_censored": 1281,
+      "autocorr1": 0.9819737152895903,
+      "vr_med": 1.0244177228765559,
+      "adf_t": -14.52472994048787,
+      "kpss_lm": 0.3409213659023049,
+      "hl_med": 38.1544671554388,
+      "slices": {
+        "all": {
+          "p_inward": 0.5883838383838383,
+          "ci_low": 0.5542929292929293,
+          "ci_high": 0.6212121212121212,
+          "n_decided": 792
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.5227272727272727,
+          "ci_low": 0.4621212121212121,
+          "ci_high": 0.5833333333333334,
+          "n_decided": 264
+        },
+        "trend_neutral": {
+          "p_inward": 0.6212121212121212,
+          "ci_low": 0.5795454545454546,
+          "ci_high": 0.6628787878787878,
+          "n_decided": 528
+        },
+        "vol_low": {
+          "p_inward": 0.5339805825242718,
+          "ci_low": 0.4854368932038835,
+          "ci_high": 0.5825242718446602,
+          "n_decided": 412
+        },
+        "vol_mid": {
+          "p_inward": 0.5963636363636363,
+          "ci_low": 0.5381818181818182,
+          "ci_high": 0.6545454545454545,
+          "n_decided": 275
+        },
+        "vol_high": {
+          "p_inward": 0.780952380952381,
+          "ci_low": 0.7047619047619048,
+          "ci_high": 0.8571428571428571,
+          "n_decided": 105
+        }
+      },
+      "p_inward_reverse": 0.9989304812834224,
+      "ci_low_reverse": 0.9973262032085561,
+      "p_inward_shift": 0.5572649572649573,
+      "ci_low_shift": 0.5162393162393163
+    },
+    {
+      "domain": "1h",
+      "instrument": "NZDUSD",
+      "z_trigger": 1.5,
+      "n_bars": 23088,
+      "n_events": 4492,
+      "n_ambiguous": 1,
+      "n_censored": 2258,
+      "autocorr1": 0.9819737152895903,
+      "vr_med": 1.0244177228765559,
+      "adf_t": -14.52472994048787,
+      "kpss_lm": 0.3409213659023049,
+      "hl_med": 38.1544671554388,
+      "slices": {
+        "all": {
+          "p_inward": 0.5772503358710255,
+          "ci_low": 0.5562024182713838,
+          "ci_high": 0.5969547693685625,
+          "n_decided": 2233
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.5610738255033557,
+          "ci_low": 0.5248322147651007,
+          "ci_high": 0.5973154362416108,
+          "n_decided": 745
+        },
+        "trend_neutral": {
+          "p_inward": 0.5853494623655914,
+          "ci_low": 0.5597950268817204,
+          "ci_high": 0.6102150537634409,
+          "n_decided": 1488
+        },
+        "vol_low": {
+          "p_inward": 0.5377176015473888,
+          "ci_low": 0.5077127659574467,
+          "ci_high": 0.5676982591876208,
+          "n_decided": 1034
+        },
+        "vol_mid": {
+          "p_inward": 0.6160714285714286,
+          "ci_low": 0.5816326530612245,
+          "ci_high": 0.6492346938775511,
+          "n_decided": 784
+        },
+        "vol_high": {
+          "p_inward": 0.6024096385542169,
+          "ci_low": 0.5566265060240964,
+          "ci_high": 0.6506024096385542,
+          "n_decided": 415
+        }
+      },
+      "p_inward_reverse": 0.9887144259077527,
+      "ci_low_reverse": 0.985279685966634,
+      "p_inward_shift": 0.5452054794520548,
+      "ci_low_shift": 0.5227397260273973
+    },
+    {
+      "domain": "1h",
+      "instrument": "USTEC",
+      "z_trigger": 2.0,
+      "n_bars": 21708,
+      "n_events": 1689,
+      "n_ambiguous": 2,
+      "n_censored": 409,
+      "autocorr1": 0.9557407884342453,
+      "vr_med": 1.0020251585702689,
+      "adf_t": -22.329053915146734,
+      "kpss_lm": 0.13926777957950667,
+      "hl_med": 15.314254045314403,
+      "slices": {
+        "all": {
+          "p_inward": 0.46635367762128327,
+          "ci_low": 0.43896713615023475,
+          "ci_high": 0.4937402190923318,
+          "n_decided": 1278
+        },
+        "counter_trend": {
+          "p_inward": 0.7142857142857143,
+          "ci_low": 0.42857142857142855,
+          "ci_high": 1.0,
+          "n_decided": 7
+        },
+        "with_trend": {
+          "p_inward": 0.44630071599045346,
+          "ci_low": 0.39856801909307876,
+          "ci_high": 0.4964200477326969,
+          "n_decided": 419
+        },
+        "trend_neutral": {
+          "p_inward": 0.47417840375586856,
+          "ci_low": 0.4413145539906103,
+          "ci_high": 0.5082159624413145,
+          "n_decided": 852
+        },
+        "vol_low": {
+          "p_inward": 0.5178849144634525,
+          "ci_low": 0.47900466562986005,
+          "ci_high": 0.5567651632970451,
+          "n_decided": 643
+        },
+        "vol_mid": {
+          "p_inward": 0.3916913946587537,
+          "ci_low": 0.34124629080118696,
+          "ci_high": 0.44510385756676557,
+          "n_decided": 337
+        },
+        "vol_high": {
+          "p_inward": 0.4395973154362416,
+          "ci_low": 0.3858221476510068,
+          "ci_high": 0.4966442953020134,
+          "n_decided": 298
+        }
+      },
+      "p_inward_reverse": 0.8870383779869659,
+      "ci_low_reverse": 0.8703837798696596,
+      "p_inward_shift": 0.5768025078369906,
+      "ci_low_shift": 0.5235109717868338
+    },
+    {
+      "domain": "1h",
+      "instrument": "USTEC",
+      "z_trigger": 1.5,
+      "n_bars": 21708,
+      "n_events": 4160,
+      "n_ambiguous": 5,
+      "n_censored": 902,
+      "autocorr1": 0.9557407884342453,
+      "vr_med": 1.0020251585702689,
+      "adf_t": -22.329053915146734,
+      "kpss_lm": 0.13926777957950667,
+      "hl_med": 15.314254045314403,
+      "slices": {
+        "all": {
+          "p_inward": 0.5155241315708576,
+          "ci_low": 0.49800184445127577,
+          "ci_high": 0.5324316015985244,
+          "n_decided": 3253
+        },
+        "counter_trend": {
+          "p_inward": 0.5079365079365079,
+          "ci_low": 0.38095238095238093,
+          "ci_high": 0.6349206349206349,
+          "n_decided": 63
+        },
+        "with_trend": {
+          "p_inward": 0.4461839530332681,
+          "ci_low": 0.4158512720156556,
+          "ci_high": 0.4765166340508806,
+          "n_decided": 1022
+        },
+        "trend_neutral": {
+          "p_inward": 0.5484317343173432,
+          "ci_low": 0.5272140221402214,
+          "ci_high": 0.5691881918819188,
+          "n_decided": 2168
+        },
+        "vol_low": {
+          "p_inward": 0.5496296296296296,
+          "ci_low": 0.522962962962963,
+          "ci_high": 0.5762962962962963,
+          "n_decided": 1350
+        },
+        "vol_mid": {
+          "p_inward": 0.44871794871794873,
+          "ci_low": 0.4166666666666667,
+          "ci_high": 0.4807692307692308,
+          "n_decided": 936
+        },
+        "vol_high": {
+          "p_inward": 0.532574974146846,
+          "ci_low": 0.500517063081696,
+          "ci_high": 0.5646328852119958,
+          "n_decided": 967
+        }
+      },
+      "p_inward_reverse": 0.8278071886319309,
+      "ci_low_reverse": 0.8155475062691557,
+      "p_inward_shift": 0.521190261496844,
+      "ci_low_shift": 0.4914337240757439
+    },
+    {
+      "domain": "1h",
+      "instrument": "US500",
+      "z_trigger": 2.0,
+      "n_bars": 22088,
+      "n_events": 1913,
+      "n_ambiguous": 5,
+      "n_censored": 458,
+      "autocorr1": 0.9515936329465787,
+      "vr_med": 1.0034934443264794,
+      "adf_t": -23.617109869291166,
+      "kpss_lm": 0.392826544036141,
+      "hl_med": 13.970040357153051,
+      "slices": {
+        "all": {
+          "p_inward": 0.4668965517241379,
+          "ci_low": 0.4406896551724138,
+          "ci_high": 0.4917241379310345,
+          "n_decided": 1450
+        },
+        "counter_trend": {
+          "p_inward": 0.45,
+          "ci_low": 0.3933333333333333,
+          "ci_high": 0.5066666666666667,
+          "n_decided": 300
+        },
+        "with_trend": {
+          "p_inward": 0.657608695652174,
+          "ci_low": 0.5869565217391305,
+          "ci_high": 0.7228260869565217,
+          "n_decided": 184
+        },
+        "trend_neutral": {
+          "p_inward": 0.4358178053830228,
+          "ci_low": 0.40476190476190477,
+          "ci_high": 0.4668737060041408,
+          "n_decided": 966
+        },
+        "vol_low": {
+          "p_inward": 0.48653198653198654,
+          "ci_low": 0.44612794612794615,
+          "ci_high": 0.5252525252525253,
+          "n_decided": 594
+        },
+        "vol_mid": {
+          "p_inward": 0.475,
+          "ci_low": 0.42954545454545456,
+          "ci_high": 0.5227272727272727,
+          "n_decided": 440
+        },
+        "vol_high": {
+          "p_inward": 0.43028846153846156,
+          "ci_low": 0.38221153846153844,
+          "ci_high": 0.47596153846153844,
+          "n_decided": 416
+        }
+      },
+      "p_inward_reverse": 0.41133333333333333,
+      "ci_low_reverse": 0.386,
+      "p_inward_shift": 0.5465116279069767,
+      "ci_low_shift": 0.4844961240310077
+    },
+    {
+      "domain": "1h",
+      "instrument": "US500",
+      "z_trigger": 1.5,
+      "n_bars": 22088,
+      "n_events": 4525,
+      "n_ambiguous": 24,
+      "n_censored": 816,
+      "autocorr1": 0.9515936329465787,
+      "vr_med": 1.0034934443264794,
+      "adf_t": -23.617109869291166,
+      "kpss_lm": 0.392826544036141,
+      "hl_med": 13.970040357153051,
+      "slices": {
+        "all": {
+          "p_inward": 0.5185888738127544,
+          "ci_low": 0.5020352781546812,
+          "ci_high": 0.5348710990502036,
+          "n_decided": 3685
+        },
+        "counter_trend": {
+          "p_inward": 0.5154241645244216,
+          "ci_low": 0.480719794344473,
+          "ci_high": 0.5501285347043702,
+          "n_decided": 778
+        },
+        "with_trend": {
+          "p_inward": 0.6164079822616408,
+          "ci_low": 0.5720620842572062,
+          "ci_high": 0.6607538802660754,
+          "n_decided": 451
+        },
+        "trend_neutral": {
+          "p_inward": 0.501628664495114,
+          "ci_low": 0.4820846905537459,
+          "ci_high": 0.5207654723127035,
+          "n_decided": 2456
+        },
+        "vol_low": {
+          "p_inward": 0.5015082956259427,
+          "ci_low": 0.47435897435897434,
+          "ci_high": 0.528657616892911,
+          "n_decided": 1326
+        },
+        "vol_mid": {
+          "p_inward": 0.5109983079526227,
+          "ci_low": 0.48223350253807107,
+          "ci_high": 0.538917089678511,
+          "n_decided": 1182
+        },
+        "vol_high": {
+          "p_inward": 0.5454545454545454,
+          "ci_low": 0.5174171622769753,
+          "ci_high": 0.5734919286321155,
+          "n_decided": 1177
+        }
+      },
+      "p_inward_reverse": 0.39132706374085685,
+      "ci_low_reverse": 0.3764367816091954,
+      "p_inward_shift": 0.5473053892215569,
+      "ci_low_shift": 0.5137724550898204
+    },
+    {
+      "domain": "1h",
+      "instrument": "US2000",
+      "z_trigger": 2.0,
+      "n_bars": 21966,
+      "n_events": 1751,
+      "n_ambiguous": 0,
+      "n_censored": 476,
+      "autocorr1": 0.9660824474699233,
+      "vr_med": 1.005096500822227,
+      "adf_t": -19.355297722231747,
+      "kpss_lm": 0.15129005949251478,
+      "hl_med": 20.094252548808615,
+      "slices": {
+        "all": {
+          "p_inward": 0.46588235294117647,
+          "ci_low": 0.4384313725490196,
+          "ci_high": 0.49333333333333335,
+          "n_decided": 1275
+        },
+        "counter_trend": {
+          "p_inward": 0.3333333333333333,
+          "ci_low": 0.1111111111111111,
+          "ci_high": 0.6666666666666666,
+          "n_decided": 9
+        },
+        "with_trend": {
+          "p_inward": 0.41586538461538464,
+          "ci_low": 0.3701923076923077,
+          "ci_high": 0.4639423076923077,
+          "n_decided": 416
+        },
+        "trend_neutral": {
+          "p_inward": 0.49176470588235294,
+          "ci_low": 0.4588235294117647,
+          "ci_high": 0.5247058823529411,
+          "n_decided": 850
+        },
+        "vol_low": {
+          "p_inward": 0.41947565543071164,
+          "ci_low": 0.3782771535580524,
+          "ci_high": 0.46254681647940077,
+          "n_decided": 534
+        },
+        "vol_mid": {
+          "p_inward": 0.4103896103896104,
+          "ci_low": 0.36103896103896105,
+          "ci_high": 0.4597402597402597,
+          "n_decided": 385
+        },
+        "vol_high": {
+          "p_inward": 0.5955056179775281,
+          "ci_low": 0.5449438202247191,
+          "ci_high": 0.6460674157303371,
+          "n_decided": 356
+        }
+      },
+      "p_inward_reverse": 0.9154196486662329,
+      "ci_low_reverse": 0.9011060507482108,
+      "p_inward_shift": 0.49521531100478466,
+      "ci_low_shift": 0.4473684210526316
+    },
+    {
+      "domain": "1h",
+      "instrument": "US2000",
+      "z_trigger": 1.5,
+      "n_bars": 21966,
+      "n_events": 4558,
+      "n_ambiguous": 2,
+      "n_censored": 1026,
+      "autocorr1": 0.9660824474699233,
+      "vr_med": 1.005096500822227,
+      "adf_t": -19.355297722231747,
+      "kpss_lm": 0.15129005949251478,
+      "hl_med": 20.094252548808615,
+      "slices": {
+        "all": {
+          "p_inward": 0.503399433427762,
+          "ci_low": 0.48640226628895183,
+          "ci_high": 0.5198300283286119,
+          "n_decided": 3530
+        },
+        "counter_trend": {
+          "p_inward": 0.64,
+          "ci_low": 0.5333333333333333,
+          "ci_high": 0.7466666666666667,
+          "n_decided": 75
+        },
+        "with_trend": {
+          "p_inward": 0.4745916515426497,
+          "ci_low": 0.4455535390199637,
+          "ci_high": 0.5036297640653358,
+          "n_decided": 1102
+        },
+        "trend_neutral": {
+          "p_inward": 0.5125371865703358,
+          "ci_low": 0.49213769655758605,
+          "ci_high": 0.5325116872078198,
+          "n_decided": 2353
+        },
+        "vol_low": {
+          "p_inward": 0.45220830586684246,
+          "ci_low": 0.4278180619644034,
+          "ci_high": 0.4772577455504285,
+          "n_decided": 1517
+        },
+        "vol_mid": {
+          "p_inward": 0.5050709939148073,
+          "ci_low": 0.473630831643002,
+          "ci_high": 0.5365111561866126,
+          "n_decided": 986
+        },
+        "vol_high": {
+          "p_inward": 0.5774099318403116,
+          "ci_low": 0.5472249269717624,
+          "ci_high": 0.6075949367088608,
+          "n_decided": 1027
+        }
+      },
+      "p_inward_reverse": 0.8509028794533919,
+      "ci_low_reverse": 0.8396778916544656,
+      "p_inward_shift": 0.464,
+      "ci_low_shift": 0.436
+    },
+    {
+      "domain": "1h",
+      "instrument": "JP225",
+      "z_trigger": 2.0,
+      "n_bars": 22154,
+      "n_events": 1948,
+      "n_ambiguous": 0,
+      "n_censored": 874,
+      "autocorr1": 0.981262986675955,
+      "vr_med": 0.975088097667628,
+      "adf_t": -14.096023172292306,
+      "kpss_lm": 0.3676508016581391,
+      "hl_med": 37.17543437537185,
+      "slices": {
+        "all": {
+          "p_inward": 0.45251396648044695,
+          "ci_low": 0.42178770949720673,
+          "ci_high": 0.4813780260707635,
+          "n_decided": 1074
+        },
+        "counter_trend": {
+          "p_inward": 0.75,
+          "ci_low": 0.6136363636363636,
+          "ci_high": 0.8636363636363636,
+          "n_decided": 44
+        },
+        "with_trend": {
+          "p_inward": 0.3471337579617834,
+          "ci_low": 0.2929936305732484,
+          "ci_high": 0.3980891719745223,
+          "n_decided": 314
+        },
+        "trend_neutral": {
+          "p_inward": 0.48044692737430167,
+          "ci_low": 0.44273743016759776,
+          "ci_high": 0.5181564245810056,
+          "n_decided": 716
+        },
+        "vol_low": {
+          "p_inward": 0.5369928400954654,
+          "ci_low": 0.4892601431980907,
+          "ci_high": 0.5847255369928401,
+          "n_decided": 419
+        },
+        "vol_mid": {
+          "p_inward": 0.489247311827957,
+          "ci_low": 0.4381720430107527,
+          "ci_high": 0.5403225806451613,
+          "n_decided": 372
+        },
+        "vol_high": {
+          "p_inward": 0.2791519434628975,
+          "ci_low": 0.22968197879858657,
+          "ci_high": 0.3321554770318021,
+          "n_decided": 283
+        }
+      },
+      "p_inward_reverse": 0.7636526410026858,
+      "ci_low_reverse": 0.738585496866607,
+      "p_inward_shift": 0.5381679389312977,
+      "ci_low_shift": 0.4770992366412214
+    },
+    {
+      "domain": "1h",
+      "instrument": "JP225",
+      "z_trigger": 1.5,
+      "n_bars": 22154,
+      "n_events": 4344,
+      "n_ambiguous": 1,
+      "n_censored": 1567,
+      "autocorr1": 0.981262986675955,
+      "vr_med": 0.975088097667628,
+      "adf_t": -14.096023172292306,
+      "kpss_lm": 0.3676508016581391,
+      "hl_med": 37.17543437537185,
+      "slices": {
+        "all": {
+          "p_inward": 0.484149855907781,
+          "ci_low": 0.4654178674351585,
+          "ci_high": 0.5028818443804035,
+          "n_decided": 2776
+        },
+        "counter_trend": {
+          "p_inward": 0.5423728813559322,
+          "ci_low": 0.4689265536723164,
+          "ci_high": 0.615819209039548,
+          "n_decided": 177
+        },
+        "with_trend": {
+          "p_inward": 0.4325767690253672,
+          "ci_low": 0.3978638184245661,
+          "ci_high": 0.46862483311081443,
+          "n_decided": 749
+        },
+        "trend_neutral": {
+          "p_inward": 0.49945945945945946,
+          "ci_low": 0.47675675675675677,
+          "ci_high": 0.5221621621621622,
+          "n_decided": 1850
+        },
+        "vol_low": {
+          "p_inward": 0.5407608695652174,
+          "ci_low": 0.5108695652173914,
+          "ci_high": 0.5706521739130435,
+          "n_decided": 1104
+        },
+        "vol_mid": {
+          "p_inward": 0.5257847533632287,
+          "ci_low": 0.49327354260089684,
+          "ci_high": 0.5582959641255605,
+          "n_decided": 892
+        },
+        "vol_high": {
+          "p_inward": 0.3564102564102564,
+          "ci_low": 0.3217948717948718,
+          "ci_high": 0.38974358974358975,
+          "n_decided": 780
+        }
+      },
+      "p_inward_reverse": 0.705757682797598,
+      "ci_low_reverse": 0.6891557753444013,
+      "p_inward_shift": 0.4585201793721973,
+      "ci_low_shift": 0.4260089686098655
+    },
+    {
+      "domain": "4h",
+      "instrument": "EURUSD",
+      "z_trigger": 2.0,
+      "n_bars": 5873,
+      "n_events": 598,
+      "n_ambiguous": 0,
+      "n_censored": 396,
+      "autocorr1": 0.6543689579214124,
+      "vr_med": 0.273331948264955,
+      "adf_t": -21.094232591288144,
+      "kpss_lm": 1.7578622893322302,
+      "hl_med": 1.6350803755616974,
+      "slices": {
+        "all": {
+          "p_inward": 0.5891089108910891,
+          "ci_low": 0.5198019801980198,
+          "ci_high": 0.6584158415841584,
+          "n_decided": 202
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.6029411764705882,
+          "ci_low": 0.4852941176470588,
+          "ci_high": 0.7205882352941176,
+          "n_decided": 68
+        },
+        "trend_neutral": {
+          "p_inward": 0.582089552238806,
+          "ci_low": 0.5,
+          "ci_high": 0.664179104477612,
+          "n_decided": 134
+        },
+        "vol_low": {
+          "p_inward": 0.7419354838709677,
+          "ci_low": 0.6559139784946236,
+          "ci_high": 0.8279569892473119,
+          "n_decided": 93
+        },
+        "vol_mid": {
+          "p_inward": 0.5285714285714286,
+          "ci_low": 0.4142857142857143,
+          "ci_high": 0.6428571428571429,
+          "n_decided": 70
+        },
+        "vol_high": {
+          "p_inward": 0.3333333333333333,
+          "ci_low": 0.1794871794871795,
+          "ci_high": 0.48717948717948717,
+          "n_decided": 39
+        }
+      },
+      "p_inward_reverse": 0.9978070175438597,
+      "ci_low_reverse": 0.993421052631579,
+      "p_inward_shift": 0.5779816513761468,
+      "ci_low_shift": 0.48623853211009177
+    },
+    {
+      "domain": "4h",
+      "instrument": "EURUSD",
+      "z_trigger": 1.5,
+      "n_bars": 5873,
+      "n_events": 1305,
+      "n_ambiguous": 1,
+      "n_censored": 690,
+      "autocorr1": 0.6543689579214124,
+      "vr_med": 0.273331948264955,
+      "adf_t": -21.094232591288144,
+      "kpss_lm": 1.7578622893322302,
+      "hl_med": 1.6350803755616974,
+      "slices": {
+        "all": {
+          "p_inward": 0.5244299674267101,
+          "ci_low": 0.48534201954397393,
+          "ci_high": 0.5635179153094463,
+          "n_decided": 614
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.6,
+          "ci_low": 0.5317073170731708,
+          "ci_high": 0.6682926829268293,
+          "n_decided": 205
+        },
+        "trend_neutral": {
+          "p_inward": 0.48655256723716384,
+          "ci_low": 0.43765281173594134,
+          "ci_high": 0.5354523227383863,
+          "n_decided": 409
+        },
+        "vol_low": {
+          "p_inward": 0.56797583081571,
+          "ci_low": 0.513595166163142,
+          "ci_high": 0.622356495468278,
+          "n_decided": 331
+        },
+        "vol_mid": {
+          "p_inward": 0.526595744680851,
+          "ci_low": 0.4574468085106383,
+          "ci_high": 0.5957446808510638,
+          "n_decided": 188
+        },
+        "vol_high": {
+          "p_inward": 0.3684210526315789,
+          "ci_low": 0.2736842105263158,
+          "ci_high": 0.4631578947368421,
+          "n_decided": 95
+        }
+      },
+      "p_inward_reverse": 0.9753846153846154,
+      "ci_low_reverse": 0.9651282051282051,
+      "p_inward_shift": 0.480225988700565,
+      "ci_low_shift": 0.4293785310734463
+    },
+    {
+      "domain": "4h",
+      "instrument": "GBPUSD",
+      "z_trigger": 2.0,
+      "n_bars": 5932,
+      "n_events": 544,
+      "n_ambiguous": 0,
+      "n_censored": 355,
+      "autocorr1": 0.897248601118834,
+      "vr_med": 0.3693919600751289,
+      "adf_t": -11.536374332689345,
+      "kpss_lm": 1.2164730519960516,
+      "hl_med": 6.396674115601851,
+      "slices": {
+        "all": {
+          "p_inward": 0.544973544973545,
+          "ci_low": 0.4708994708994709,
+          "ci_high": 0.6137566137566137,
+          "n_decided": 189
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.6507936507936508,
+          "ci_low": 0.5238095238095238,
+          "ci_high": 0.7619047619047619,
+          "n_decided": 63
+        },
+        "trend_neutral": {
+          "p_inward": 0.49206349206349204,
+          "ci_low": 0.40476190476190477,
+          "ci_high": 0.5793650793650794,
+          "n_decided": 126
+        },
+        "vol_low": {
+          "p_inward": 0.5921052631578947,
+          "ci_low": 0.4868421052631579,
+          "ci_high": 0.6973684210526315,
+          "n_decided": 76
+        },
+        "vol_mid": {
+          "p_inward": 0.36538461538461536,
+          "ci_low": 0.23076923076923078,
+          "ci_high": 0.5,
+          "n_decided": 52
+        },
+        "vol_high": {
+          "p_inward": 0.639344262295082,
+          "ci_low": 0.5245901639344263,
+          "ci_high": 0.7540983606557377,
+          "n_decided": 61
+        }
+      },
+      "p_inward_reverse": 0.9898580121703854,
+      "ci_low_reverse": 0.9797160243407708,
+      "p_inward_shift": 0.42,
+      "ci_low_shift": 0.34
+    },
+    {
+      "domain": "4h",
+      "instrument": "GBPUSD",
+      "z_trigger": 1.5,
+      "n_bars": 5932,
+      "n_events": 1238,
+      "n_ambiguous": 0,
+      "n_censored": 661,
+      "autocorr1": 0.897248601118834,
+      "vr_med": 0.3693919600751289,
+      "adf_t": -11.536374332689345,
+      "kpss_lm": 1.2164730519960516,
+      "hl_med": 6.396674115601851,
+      "slices": {
+        "all": {
+          "p_inward": 0.48353552859618715,
+          "ci_low": 0.4436741767764298,
+          "ci_high": 0.5233968804159446,
+          "n_decided": 577
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.43523316062176165,
+          "ci_low": 0.36787564766839376,
+          "ci_high": 0.5077720207253886,
+          "n_decided": 193
+        },
+        "trend_neutral": {
+          "p_inward": 0.5078125,
+          "ci_low": 0.4557291666666667,
+          "ci_high": 0.5572916666666666,
+          "n_decided": 384
+        },
+        "vol_low": {
+          "p_inward": 0.5367965367965368,
+          "ci_low": 0.47186147186147187,
+          "ci_high": 0.5974025974025974,
+          "n_decided": 231
+        },
+        "vol_mid": {
+          "p_inward": 0.27586206896551724,
+          "ci_low": 0.20689655172413793,
+          "ci_high": 0.35172413793103446,
+          "n_decided": 145
+        },
+        "vol_high": {
+          "p_inward": 0.572139303482587,
+          "ci_low": 0.5024875621890548,
+          "ci_high": 0.6417910447761194,
+          "n_decided": 201
+        }
+      },
+      "p_inward_reverse": 0.9817684594348223,
+      "ci_low_reverse": 0.9735642661804923,
+      "p_inward_shift": 0.3522012578616352,
+      "ci_low_shift": 0.31027253668763105
+    },
+    {
+      "domain": "4h",
+      "instrument": "USDJPY",
+      "z_trigger": 2.0,
+      "n_bars": 5930,
+      "n_events": 569,
+      "n_ambiguous": 0,
+      "n_censored": 427,
+      "autocorr1": 0.9784395938843022,
+      "vr_med": 0.8502979655813455,
+      "adf_t": -7.084409112014797,
+      "kpss_lm": 1.4414503660387272,
+      "hl_med": 32.17373558115373,
+      "slices": {
+        "all": {
+          "p_inward": 0.36619718309859156,
+          "ci_low": 0.2887323943661972,
+          "ci_high": 0.44366197183098594,
+          "n_decided": 142
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.25,
+          "ci_low": 0.125,
+          "ci_high": 0.375,
+          "n_decided": 48
+        },
+        "trend_neutral": {
+          "p_inward": 0.425531914893617,
+          "ci_low": 0.32978723404255317,
+          "ci_high": 0.5319148936170213,
+          "n_decided": 94
+        },
+        "vol_low": {
+          "p_inward": 0.5882352941176471,
+          "ci_low": 0.4117647058823529,
+          "ci_high": 0.7647058823529411,
+          "n_decided": 34
+        },
+        "vol_mid": {
+          "p_inward": 0.29310344827586204,
+          "ci_low": 0.1896551724137931,
+          "ci_high": 0.41379310344827586,
+          "n_decided": 58
+        },
+        "vol_high": {
+          "p_inward": 0.3,
+          "ci_low": 0.18,
+          "ci_high": 0.44,
+          "n_decided": 50
+        }
+      },
+      "p_inward_reverse": 1.0,
+      "ci_low_reverse": 1.0,
+      "p_inward_shift": 0.5,
+      "ci_low_shift": 0.42777777777777776
+    },
+    {
+      "domain": "4h",
+      "instrument": "USDJPY",
+      "z_trigger": 1.5,
+      "n_bars": 5930,
+      "n_events": 1217,
+      "n_ambiguous": 0,
+      "n_censored": 776,
+      "autocorr1": 0.9784395938843022,
+      "vr_med": 0.8502979655813455,
+      "adf_t": -7.084409112014797,
+      "kpss_lm": 1.4414503660387272,
+      "hl_med": 32.17373558115373,
+      "slices": {
+        "all": {
+          "p_inward": 0.39909297052154197,
+          "ci_low": 0.35374149659863946,
+          "ci_high": 0.4467120181405896,
+          "n_decided": 441
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.32653061224489793,
+          "ci_low": 0.25170068027210885,
+          "ci_high": 0.40816326530612246,
+          "n_decided": 147
+        },
+        "trend_neutral": {
+          "p_inward": 0.43537414965986393,
+          "ci_low": 0.37755102040816324,
+          "ci_high": 0.4931972789115646,
+          "n_decided": 294
+        },
+        "vol_low": {
+          "p_inward": 0.48333333333333334,
+          "ci_low": 0.39166666666666666,
+          "ci_high": 0.575,
+          "n_decided": 120
+        },
+        "vol_mid": {
+          "p_inward": 0.4339622641509434,
+          "ci_low": 0.3584905660377358,
+          "ci_high": 0.5094339622641509,
+          "n_decided": 159
+        },
+        "vol_high": {
+          "p_inward": 0.30246913580246915,
+          "ci_low": 0.2345679012345679,
+          "ci_high": 0.37037037037037035,
+          "n_decided": 162
+        }
+      },
+      "p_inward_reverse": 1.0,
+      "ci_low_reverse": 1.0,
+      "p_inward_shift": 0.4766536964980545,
+      "ci_low_shift": 0.433852140077821
+    },
+    {
+      "domain": "4h",
+      "instrument": "USDCHF",
+      "z_trigger": 2.0,
+      "n_bars": 5933,
+      "n_events": 481,
+      "n_ambiguous": 0,
+      "n_censored": 432,
+      "autocorr1": 0.8145379296741748,
+      "vr_med": 0.31203502269293054,
+      "adf_t": -14.944843003785348,
+      "kpss_lm": 1.2849430560607886,
+      "hl_med": 3.378999515749919,
+      "slices": {
+        "all": {
+          "p_inward": 0.3469387755102041,
+          "ci_low": 0.22448979591836735,
+          "ci_high": 0.4897959183673469,
+          "n_decided": 49
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.8823529411764706,
+          "ci_low": 0.7058823529411765,
+          "ci_high": 1.0,
+          "n_decided": 17
+        },
+        "trend_neutral": {
+          "p_inward": 0.0625,
+          "ci_low": 0.0,
+          "ci_high": 0.15625,
+          "n_decided": 32
+        },
+        "vol_low": {
+          "p_inward": 0.5,
+          "ci_low": 0.3,
+          "ci_high": 0.7,
+          "n_decided": 20
+        },
+        "vol_mid": {
+          "p_inward": 0.29411764705882354,
+          "ci_low": 0.11764705882352941,
+          "ci_high": 0.5294117647058824,
+          "n_decided": 17
+        },
+        "vol_high": {
+          "p_inward": 0.16666666666666666,
+          "ci_low": 0.0,
+          "ci_high": 0.4166666666666667,
+          "n_decided": 12
+        }
+      },
+      "p_inward_reverse": 0.9906976744186047,
+      "ci_low_reverse": 0.9767441860465116,
+      "p_inward_shift": 0.45535714285714285,
+      "ci_low_shift": 0.36607142857142855
+    },
+    {
+      "domain": "4h",
+      "instrument": "USDCHF",
+      "z_trigger": 1.5,
+      "n_bars": 5933,
+      "n_events": 1146,
+      "n_ambiguous": 0,
+      "n_censored": 947,
+      "autocorr1": 0.8145379296741748,
+      "vr_med": 0.31203502269293054,
+      "adf_t": -14.944843003785348,
+      "kpss_lm": 1.2849430560607886,
+      "hl_med": 3.378999515749919,
+      "slices": {
+        "all": {
+          "p_inward": 0.5025125628140703,
+          "ci_low": 0.4321608040201005,
+          "ci_high": 0.5728643216080402,
+          "n_decided": 199
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.417910447761194,
+          "ci_low": 0.29850746268656714,
+          "ci_high": 0.5373134328358209,
+          "n_decided": 67
+        },
+        "trend_neutral": {
+          "p_inward": 0.5454545454545454,
+          "ci_low": 0.4621212121212121,
+          "ci_high": 0.6287878787878788,
+          "n_decided": 132
+        },
+        "vol_low": {
+          "p_inward": 0.58,
+          "ci_low": 0.48,
+          "ci_high": 0.67,
+          "n_decided": 100
+        },
+        "vol_mid": {
+          "p_inward": 0.5932203389830508,
+          "ci_low": 0.4576271186440678,
+          "ci_high": 0.711864406779661,
+          "n_decided": 59
+        },
+        "vol_high": {
+          "p_inward": 0.175,
+          "ci_low": 0.075,
+          "ci_high": 0.3,
+          "n_decided": 40
+        }
+      },
+      "p_inward_reverse": 0.9868421052631579,
+      "ci_low_reverse": 0.9758771929824561,
+      "p_inward_shift": 0.5610859728506787,
+      "ci_low_shift": 0.5158371040723982
+    },
+    {
+      "domain": "4h",
+      "instrument": "USDCAD",
+      "z_trigger": 2.0,
+      "n_bars": 5931,
+      "n_events": 427,
+      "n_ambiguous": 0,
+      "n_censored": 406,
+      "autocorr1": 0.7983716122004572,
+      "vr_med": 0.31446580286307085,
+      "adf_t": -15.797006457730859,
+      "kpss_lm": 0.3037443964093557,
+      "hl_med": 3.07821007735522,
+      "slices": {
+        "all": {
+          "p_inward": 0.38095238095238093,
+          "ci_low": 0.19047619047619047,
+          "ci_high": 0.5714285714285714,
+          "n_decided": 21
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.14285714285714285,
+          "ci_low": 0.0,
+          "ci_high": 0.42857142857142855,
+          "n_decided": 7
+        },
+        "trend_neutral": {
+          "p_inward": 0.5,
+          "ci_low": 0.21428571428571427,
+          "ci_high": 0.7857142857142857,
+          "n_decided": 14
+        },
+        "vol_low": {
+          "p_inward": 0.4166666666666667,
+          "ci_low": 0.16666666666666666,
+          "ci_high": 0.6666666666666666,
+          "n_decided": 12
+        },
+        "vol_mid": {
+          "p_inward": 0.375,
+          "ci_low": 0.125,
+          "ci_high": 0.75,
+          "n_decided": 8
+        },
+        "vol_high": {
+          "p_inward": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "n_decided": 1
+        }
+      },
+      "p_inward_reverse": 1.0,
+      "ci_low_reverse": 1.0,
+      "p_inward_shift": 0.5,
+      "ci_low_shift": 0.4074074074074074
+    },
+    {
+      "domain": "4h",
+      "instrument": "USDCAD",
+      "z_trigger": 1.5,
+      "n_bars": 5931,
+      "n_events": 1204,
+      "n_ambiguous": 0,
+      "n_censored": 1053,
+      "autocorr1": 0.7983716122004572,
+      "vr_med": 0.31446580286307085,
+      "adf_t": -15.797006457730859,
+      "kpss_lm": 0.3037443964093557,
+      "hl_med": 3.07821007735522,
+      "slices": {
+        "all": {
+          "p_inward": 0.4370860927152318,
+          "ci_low": 0.3576158940397351,
+          "ci_high": 0.5165562913907285,
+          "n_decided": 151
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.43137254901960786,
+          "ci_low": 0.29411764705882354,
+          "ci_high": 0.5686274509803921,
+          "n_decided": 51
+        },
+        "trend_neutral": {
+          "p_inward": 0.44,
+          "ci_low": 0.34,
+          "ci_high": 0.54,
+          "n_decided": 100
+        },
+        "vol_low": {
+          "p_inward": 0.4507042253521127,
+          "ci_low": 0.3380281690140845,
+          "ci_high": 0.5633802816901409,
+          "n_decided": 71
+        },
+        "vol_mid": {
+          "p_inward": 0.3125,
+          "ci_low": 0.1875,
+          "ci_high": 0.4375,
+          "n_decided": 48
+        },
+        "vol_high": {
+          "p_inward": 0.59375,
+          "ci_low": 0.4375,
+          "ci_high": 0.75,
+          "n_decided": 32
+        }
+      },
+      "p_inward_reverse": 1.0,
+      "ci_low_reverse": 1.0,
+      "p_inward_shift": 0.5854214123006833,
+      "ci_low_shift": 0.5398633257403189
+    },
+    {
+      "domain": "4h",
+      "instrument": "AUDUSD",
+      "z_trigger": 2.0,
+      "n_bars": 5931,
+      "n_events": 515,
+      "n_ambiguous": 0,
+      "n_censored": 316,
+      "autocorr1": 0.7211767369357561,
+      "vr_med": 0.2893762550519208,
+      "adf_t": -18.799150166157066,
+      "kpss_lm": 0.3076939533002141,
+      "hl_med": 2.12060417094244,
+      "slices": {
+        "all": {
+          "p_inward": 0.5326633165829145,
+          "ci_low": 0.4623115577889447,
+          "ci_high": 0.6030150753768844,
+          "n_decided": 199
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.6865671641791045,
+          "ci_low": 0.582089552238806,
+          "ci_high": 0.7910447761194029,
+          "n_decided": 67
+        },
+        "trend_neutral": {
+          "p_inward": 0.45454545454545453,
+          "ci_low": 0.3712121212121212,
+          "ci_high": 0.5378787878787878,
+          "n_decided": 132
+        },
+        "vol_low": {
+          "p_inward": 0.6581196581196581,
+          "ci_low": 0.5726495726495726,
+          "ci_high": 0.7435897435897436,
+          "n_decided": 117
+        },
+        "vol_mid": {
+          "p_inward": 0.2641509433962264,
+          "ci_low": 0.1509433962264151,
+          "ci_high": 0.37735849056603776,
+          "n_decided": 53
+        },
+        "vol_high": {
+          "p_inward": 0.5172413793103449,
+          "ci_low": 0.3448275862068966,
+          "ci_high": 0.6896551724137931,
+          "n_decided": 29
+        }
+      },
+      "p_inward_reverse": 1.0,
+      "ci_low_reverse": 1.0,
+      "p_inward_shift": 0.6541353383458647,
+      "ci_low_shift": 0.5714285714285714
+    },
+    {
+      "domain": "4h",
+      "instrument": "AUDUSD",
+      "z_trigger": 1.5,
+      "n_bars": 5931,
+      "n_events": 1317,
+      "n_ambiguous": 0,
+      "n_censored": 611,
+      "autocorr1": 0.7211767369357561,
+      "vr_med": 0.2893762550519208,
+      "adf_t": -18.799150166157066,
+      "kpss_lm": 0.3076939533002141,
+      "hl_med": 2.12060417094244,
+      "slices": {
+        "all": {
+          "p_inward": 0.443342776203966,
+          "ci_low": 0.4065155807365439,
+          "ci_high": 0.4801699716713881,
+          "n_decided": 706
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.6822033898305084,
+          "ci_low": 0.6228813559322034,
+          "ci_high": 0.7415254237288136,
+          "n_decided": 236
+        },
+        "trend_neutral": {
+          "p_inward": 0.32340425531914896,
+          "ci_low": 0.28085106382978725,
+          "ci_high": 0.36601063829787156,
+          "n_decided": 470
+        },
+        "vol_low": {
+          "p_inward": 0.5796610169491525,
+          "ci_low": 0.5254237288135594,
+          "ci_high": 0.6338983050847458,
+          "n_decided": 295
+        },
+        "vol_mid": {
+          "p_inward": 0.30687830687830686,
+          "ci_low": 0.24338624338624337,
+          "ci_high": 0.37037037037037035,
+          "n_decided": 189
+        },
+        "vol_high": {
+          "p_inward": 0.3783783783783784,
+          "ci_low": 0.3153153153153153,
+          "ci_high": 0.44144144144144143,
+          "n_decided": 222
+        }
+      },
+      "p_inward_reverse": 0.9910634495084897,
+      "ci_low_reverse": 0.9848078641644326,
+      "p_inward_shift": 0.519455252918288,
+      "ci_low_shift": 0.4766536964980545
+    },
+    {
+      "domain": "4h",
+      "instrument": "NZDUSD",
+      "z_trigger": 2.0,
+      "n_bars": 5927,
+      "n_events": 635,
+      "n_ambiguous": 0,
+      "n_censored": 403,
+      "autocorr1": 0.982280370052998,
+      "vr_med": 1.011647856692538,
+      "adf_t": -7.258333759189039,
+      "kpss_lm": 0.4481148577120339,
+      "hl_med": 38.871560350940904,
+      "slices": {
+        "all": {
+          "p_inward": 0.5818965517241379,
+          "ci_low": 0.5172413793103449,
+          "ci_high": 0.646551724137931,
+          "n_decided": 232
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.9102564102564102,
+          "ci_low": 0.8461538461538461,
+          "ci_high": 0.9615384615384616,
+          "n_decided": 78
+        },
+        "trend_neutral": {
+          "p_inward": 0.4155844155844156,
+          "ci_low": 0.33766233766233766,
+          "ci_high": 0.4935064935064935,
+          "n_decided": 154
+        },
+        "vol_low": {
+          "p_inward": 0.7375,
+          "ci_low": 0.6375,
+          "ci_high": 0.825,
+          "n_decided": 80
+        },
+        "vol_mid": {
+          "p_inward": 0.6153846153846154,
+          "ci_low": 0.49230769230769234,
+          "ci_high": 0.7230769230769231,
+          "n_decided": 65
+        },
+        "vol_high": {
+          "p_inward": 0.41379310344827586,
+          "ci_low": 0.3103448275862069,
+          "ci_high": 0.5172413793103449,
+          "n_decided": 87
+        }
+      },
+      "p_inward_reverse": 1.0,
+      "ci_low_reverse": 1.0,
+      "p_inward_shift": 0.6097560975609756,
+      "ci_low_shift": 0.5365853658536586
+    },
+    {
+      "domain": "4h",
+      "instrument": "NZDUSD",
+      "z_trigger": 1.5,
+      "n_bars": 5927,
+      "n_events": 1557,
+      "n_ambiguous": 0,
+      "n_censored": 827,
+      "autocorr1": 0.982280370052998,
+      "vr_med": 1.011647856692538,
+      "adf_t": -7.258333759189039,
+      "kpss_lm": 0.4481148577120339,
+      "hl_med": 38.871560350940904,
+      "slices": {
+        "all": {
+          "p_inward": 0.43561643835616437,
+          "ci_low": 0.4,
+          "ci_high": 0.4726027397260274,
+          "n_decided": 730
+        },
+        "counter_trend": {
+          "p_inward": NaN,
+          "ci_low": NaN,
+          "ci_high": NaN,
+          "n_decided": 0
+        },
+        "with_trend": {
+          "p_inward": 0.5819672131147541,
+          "ci_low": 0.5204918032786885,
+          "ci_high": 0.6434426229508197,
+          "n_decided": 244
+        },
+        "trend_neutral": {
+          "p_inward": 0.36213991769547327,
+          "ci_low": 0.32098765432098764,
+          "ci_high": 0.4033436213991762,
+          "n_decided": 486
+        },
+        "vol_low": {
+          "p_inward": 0.5671140939597316,
+          "ci_low": 0.5100671140939598,
+          "ci_high": 0.6241610738255033,
+          "n_decided": 298
+        },
+        "vol_mid": {
+          "p_inward": 0.4511627906976744,
+          "ci_low": 0.3813953488372093,
+          "ci_high": 0.5162790697674419,
+          "n_decided": 215
+        },
+        "vol_high": {
+          "p_inward": 0.23963133640552994,
+          "ci_low": 0.18433179723502305,
+          "ci_high": 0.2995391705069124,
+          "n_decided": 217
+        }
+      },
+      "p_inward_reverse": 0.9977544910179641,
+      "ci_low_reverse": 0.9947604790419161,
+      "p_inward_shift": 0.47680890538033394,
+      "ci_low_shift": 0.43413729128014844
+    },
+    {
+      "domain": "4h",
+      "instrument": "USTEC",
+      "z_trigger": 2.0,
+      "n_bars": 5820,
+      "n_events": 520,
+      "n_ambiguous": 0,
+      "n_censored": 136,
+      "autocorr1": 0.8570047792593483,
+      "vr_med": 1.0035887959909315,
+      "adf_t": -21.5725461333724,
+      "kpss_lm": 0.14171645078832923,
+      "hl_med": 4.492074836355981,
+      "slices": {
+        "all": {
+          "p_inward": 0.5182291666666666,
+          "ci_low": 0.46875,
+          "ci_high": 0.5677083333333334,
+          "n_decided": 384
+        },
+        "counter_trend": {
+          "p_inward": 0.35294117647058826,
+          "ci_low": 0.11764705882352941,
+          "ci_high": 0.5882352941176471,
+          "n_decided": 17
+        },
+        "with_trend": {
+          "p_inward": 0.5045045045045045,
+          "ci_low": 0.4144144144144144,
+          "ci_high": 0.5945945945945946,
+          "n_decided": 111
+        },
+        "trend_neutral": {
+          "p_inward": 0.53515625,
+          "ci_low": 0.4765625,
+          "ci_high": 0.5938476562499986,
+          "n_decided": 256
+        },
+        "vol_low": {
+          "p_inward": 0.4564102564102564,
+          "ci_low": 0.38461538461538464,
+          "ci_high": 0.5282051282051282,
+          "n_decided": 195
+        },
+        "vol_mid": {
+          "p_inward": 0.5729166666666666,
+          "ci_low": 0.46875,
+          "ci_high": 0.6666666666666666,
+          "n_decided": 96
+        },
+        "vol_high": {
+          "p_inward": 0.5913978494623656,
+          "ci_low": 0.4946236559139785,
+          "ci_high": 0.6881720430107527,
+          "n_decided": 93
+        }
+      },
+      "p_inward_reverse": 0.8383838383838383,
+      "ci_low_reverse": 0.8005050505050505,
+      "p_inward_shift": 0.36,
+      "ci_low_shift": 0.27
+    },
+    {
+      "domain": "4h",
+      "instrument": "USTEC",
+      "z_trigger": 1.5,
+      "n_bars": 5820,
+      "n_events": 1207,
+      "n_ambiguous": 1,
+      "n_censored": 201,
+      "autocorr1": 0.8570047792593483,
+      "vr_med": 1.0035887959909315,
+      "adf_t": -21.5725461333724,
+      "kpss_lm": 0.14171645078832923,
+      "hl_med": 4.492074836355981,
+      "slices": {
+        "all": {
+          "p_inward": 0.4766169154228856,
+          "ci_low": 0.44477611940298506,
+          "ci_high": 0.5074626865671642,
+          "n_decided": 1005
+        },
+        "counter_trend": {
+          "p_inward": 0.5357142857142857,
+          "ci_low": 0.35714285714285715,
+          "ci_high": 0.7142857142857143,
+          "n_decided": 28
+        },
+        "with_trend": {
+          "p_inward": 0.4755700325732899,
+          "ci_low": 0.4201954397394137,
+          "ci_high": 0.5309446254071661,
+          "n_decided": 307
+        },
+        "trend_neutral": {
+          "p_inward": 0.4746268656716418,
+          "ci_low": 0.4373134328358209,
+          "ci_high": 0.5134328358208955,
+          "n_decided": 670
+        },
+        "vol_low": {
+          "p_inward": 0.43478260869565216,
+          "ci_low": 0.3864734299516908,
+          "ci_high": 0.4830917874396135,
+          "n_decided": 414
+        },
+        "vol_mid": {
+          "p_inward": 0.5192307692307693,
+          "ci_low": 0.46153846153846156,
+          "ci_high": 0.5737179487179487,
+          "n_decided": 312
+        },
+        "vol_high": {
+          "p_inward": 0.4910394265232975,
+          "ci_low": 0.4336917562724014,
+          "ci_high": 0.5483870967741935,
+          "n_decided": 279
+        }
+      },
+      "p_inward_reverse": 0.8389662027833003,
+      "ci_low_reverse": 0.81610337972167,
+      "p_inward_shift": 0.44336569579288027,
+      "ci_low_shift": 0.3883495145631068
+    },
+    {
+      "domain": "4h",
+      "instrument": "US500",
+      "z_trigger": 2.0,
+      "n_bars": 5919,
+      "n_events": 527,
+      "n_ambiguous": 0,
+      "n_censored": 105,
+      "autocorr1": 0.8285876906691491,
+      "vr_med": 1.0047230276518002,
+      "adf_t": -24.334996902024585,
+      "kpss_lm": 0.472421933194648,
+      "hl_med": 3.6863137675072895,
+      "slices": {
+        "all": {
+          "p_inward": 0.4099526066350711,
+          "ci_low": 0.36255924170616116,
+          "ci_high": 0.45734597156398105,
+          "n_decided": 422
+        },
+        "counter_trend": {
+          "p_inward": 0.24778761061946902,
+          "ci_low": 0.168141592920354,
+          "ci_high": 0.3274336283185841,
+          "n_decided": 113
+        },
+        "with_trend": {
+          "p_inward": 0.4642857142857143,
+          "ci_low": 0.2857142857142857,
+          "ci_high": 0.6428571428571429,
+          "n_decided": 28
+        },
+        "trend_neutral": {
+          "p_inward": 0.4697508896797153,
+          "ci_low": 0.4128113879003559,
+          "ci_high": 0.5267793594306036,
+          "n_decided": 281
+        },
+        "vol_low": {
+          "p_inward": 0.3695652173913043,
+          "ci_low": 0.2898550724637681,
+          "ci_high": 0.4492753623188406,
+          "n_decided": 138
+        },
+        "vol_mid": {
+          "p_inward": 0.5746268656716418,
+          "ci_low": 0.4925373134328358,
+          "ci_high": 0.6567164179104478,
+          "n_decided": 134
+        },
+        "vol_high": {
+          "p_inward": 0.3,
+          "ci_low": 0.23333333333333334,
+          "ci_high": 0.37333333333333335,
+          "n_decided": 150
+        }
+      },
+      "p_inward_reverse": 0.48878923766816146,
+      "ci_low_reverse": 0.44170403587443946,
+      "p_inward_shift": 0.30158730158730157,
+      "ci_low_shift": 0.19047619047619047
+    },
+    {
+      "domain": "4h",
+      "instrument": "US500",
+      "z_trigger": 1.5,
+      "n_bars": 5919,
+      "n_events": 1185,
+      "n_ambiguous": 11,
+      "n_censored": 171,
+      "autocorr1": 0.8285876906691491,
+      "vr_med": 1.0047230276518002,
+      "adf_t": -24.334996902024585,
+      "kpss_lm": 0.472421933194648,
+      "hl_med": 3.6863137675072895,
+      "slices": {
+        "all": {
+          "p_inward": 0.45363908275174475,
+          "ci_low": 0.423728813559322,
+          "ci_high": 0.48454636091724823,
+          "n_decided": 1003
+        },
+        "counter_trend": {
+          "p_inward": 0.30833333333333335,
+          "ci_low": 0.25,
+          "ci_high": 0.36666666666666664,
+          "n_decided": 240
+        },
+        "with_trend": {
+          "p_inward": 0.42105263157894735,
+          "ci_low": 0.3263157894736842,
+          "ci_high": 0.5263157894736842,
+          "n_decided": 95
+        },
+        "trend_neutral": {
+          "p_inward": 0.5104790419161677,
+          "ci_low": 0.47305389221556887,
+          "ci_high": 0.5479041916167665,
+          "n_decided": 668
+        },
+        "vol_low": {
+          "p_inward": 0.45896656534954405,
+          "ci_low": 0.40425531914893614,
+          "ci_high": 0.513677811550152,
+          "n_decided": 329
+        },
+        "vol_mid": {
+          "p_inward": 0.5730337078651685,
+          "ci_low": 0.5131086142322098,
+          "ci_high": 0.6329588014981273,
+          "n_decided": 267
+        },
+        "vol_high": {
+          "p_inward": 0.371007371007371,
+          "ci_low": 0.32432432432432434,
+          "ci_high": 0.4176904176904177,
+          "n_decided": 407
+        }
+      },
+      "p_inward_reverse": 0.46079380445304935,
+      "ci_low_reverse": 0.430784123910939,
+      "p_inward_shift": 0.33962264150943394,
+      "ci_low_shift": 0.2783018867924528
+    },
+    {
+      "domain": "4h",
+      "instrument": "US2000",
+      "z_trigger": 2.0,
+      "n_bars": 5887,
+      "n_events": 423,
+      "n_ambiguous": 0,
+      "n_censored": 103,
+      "autocorr1": 0.9361043231333144,
+      "vr_med": 1.0093088812460196,
+      "adf_t": -13.696073755911856,
+      "kpss_lm": 0.18129318033030398,
+      "hl_med": 10.498752347761458,
+      "slices": {
+        "all": {
+          "p_inward": 0.50625,
+          "ci_low": 0.45,
+          "ci_high": 0.559375,
+          "n_decided": 320
+        },
+        "counter_trend": {
+          "p_inward": 0.8571428571428571,
+          "ci_low": 0.5714285714285714,
+          "ci_high": 1.0,
+          "n_decided": 7
+        },
+        "with_trend": {
+          "p_inward": 0.61,
+          "ci_low": 0.52,
+          "ci_high": 0.7,
+          "n_decided": 100
+        },
+        "trend_neutral": {
+          "p_inward": 0.4460093896713615,
+          "ci_low": 0.38028169014084506,
+          "ci_high": 0.5117370892018779,
+          "n_decided": 213
+        },
+        "vol_low": {
+          "p_inward": 0.45098039215686275,
+          "ci_low": 0.37254901960784315,
+          "ci_high": 0.5294117647058824,
+          "n_decided": 153
+        },
+        "vol_mid": {
+          "p_inward": 0.6290322580645161,
+          "ci_low": 0.5,
+          "ci_high": 0.7419354838709677,
+          "n_decided": 62
+        },
+        "vol_high": {
+          "p_inward": 0.5142857142857142,
+          "ci_low": 0.41904761904761906,
+          "ci_high": 0.6095238095238096,
+          "n_decided": 105
+        }
+      },
+      "p_inward_reverse": 0.8986301369863013,
+      "ci_low_reverse": 0.8684931506849315,
+      "p_inward_shift": 0.2911392405063291,
+      "ci_low_shift": 0.189873417721519
+    },
+    {
+      "domain": "4h",
+      "instrument": "US2000",
+      "z_trigger": 1.5,
+      "n_bars": 5887,
+      "n_events": 1070,
+      "n_ambiguous": 0,
+      "n_censored": 212,
+      "autocorr1": 0.9361043231333144,
+      "vr_med": 1.0093088812460196,
+      "adf_t": -13.696073755911856,
+      "kpss_lm": 0.18129318033030398,
+      "hl_med": 10.498752347761458,
+      "slices": {
+        "all": {
+          "p_inward": 0.5337995337995338,
+          "ci_low": 0.5,
+          "ci_high": 0.5675990675990676,
+          "n_decided": 858
+        },
+        "counter_trend": {
+          "p_inward": 0.8,
+          "ci_low": 0.5,
+          "ci_high": 1.0,
+          "n_decided": 10
+        },
+        "with_trend": {
+          "p_inward": 0.6521739130434783,
+          "ci_low": 0.5942028985507246,
+          "ci_high": 0.7065217391304348,
+          "n_decided": 276
+        },
+        "trend_neutral": {
+          "p_inward": 0.47202797202797203,
+          "ci_low": 0.4318181818181818,
+          "ci_high": 0.513986013986014,
+          "n_decided": 572
+        },
+        "vol_low": {
+          "p_inward": 0.5055555555555555,
+          "ci_low": 0.4527777777777778,
+          "ci_high": 0.5583333333333333,
+          "n_decided": 360
+        },
+        "vol_mid": {
+          "p_inward": 0.5217391304347826,
+          "ci_low": 0.45652173913043476,
+          "ci_high": 0.5869565217391305,
+          "n_decided": 230
+        },
+        "vol_high": {
+          "p_inward": 0.582089552238806,
+          "ci_low": 0.5223880597014925,
+          "ci_high": 0.6417910447761194,
+          "n_decided": 268
+        }
+      },
+      "p_inward_reverse": 0.8686659772492245,
+      "ci_low_reverse": 0.8469493278179938,
+      "p_inward_shift": 0.44871794871794873,
+      "ci_low_shift": 0.3942307692307692
+    },
+    {
+      "domain": "4h",
+      "instrument": "JP225",
+      "z_trigger": 2.0,
+      "n_bars": 5934,
+      "n_events": 413,
+      "n_ambiguous": 0,
+      "n_censored": 153,
+      "autocorr1": 0.9281229798828702,
+      "vr_med": 0.9942567268394333,
+      "adf_t": -14.662489438601908,
+      "kpss_lm": 0.5251013269455101,
+      "hl_med": 9.295951243184328,
+      "slices": {
+        "all": {
+          "p_inward": 0.6961538461538461,
+          "ci_low": 0.6384615384615384,
+          "ci_high": 0.75,
+          "n_decided": 260
+        },
+        "counter_trend": {
+          "p_inward": 0.9166666666666666,
+          "ci_low": 0.75,
+          "ci_high": 1.0,
+          "n_decided": 12
+        },
+        "with_trend": {
+          "p_inward": 0.5466666666666666,
+          "ci_low": 0.44,
+          "ci_high": 0.6533333333333333,
+          "n_decided": 75
+        },
+        "trend_neutral": {
+          "p_inward": 0.7456647398843931,
+          "ci_low": 0.6820809248554913,
+          "ci_high": 0.8092485549132948,
+          "n_decided": 173
+        },
+        "vol_low": {
+          "p_inward": 0.7191011235955056,
+          "ci_low": 0.6179775280898876,
+          "ci_high": 0.8089887640449438,
+          "n_decided": 89
+        },
+        "vol_mid": {
+          "p_inward": 0.7183098591549296,
+          "ci_low": 0.6056338028169014,
+          "ci_high": 0.8169014084507042,
+          "n_decided": 71
+        },
+        "vol_high": {
+          "p_inward": 0.66,
+          "ci_low": 0.57,
+          "ci_high": 0.75,
+          "n_decided": 100
+        }
+      },
+      "p_inward_reverse": 0.852017937219731,
+      "ci_low_reverse": 0.8026905829596412,
+      "p_inward_shift": 0.5405405405405406,
+      "ci_low_shift": 0.45045045045045046
+    },
+    {
+      "domain": "4h",
+      "instrument": "JP225",
+      "z_trigger": 1.5,
+      "n_bars": 5934,
+      "n_events": 1049,
+      "n_ambiguous": 0,
+      "n_censored": 267,
+      "autocorr1": 0.9281229798828702,
+      "vr_med": 0.9942567268394333,
+      "adf_t": -14.662489438601908,
+      "kpss_lm": 0.5251013269455101,
+      "hl_med": 9.295951243184328,
+      "slices": {
+        "all": {
+          "p_inward": 0.5767263427109974,
+          "ci_low": 0.5421994884910486,
+          "ci_high": 0.6112531969309463,
+          "n_decided": 782
+        },
+        "counter_trend": {
+          "p_inward": 0.7948717948717948,
+          "ci_low": 0.6666666666666666,
+          "ci_high": 0.9230769230769231,
+          "n_decided": 39
+        },
+        "with_trend": {
+          "p_inward": 0.5,
+          "ci_low": 0.43243243243243246,
+          "ci_high": 0.5630630630630631,
+          "n_decided": 222
+        },
+        "trend_neutral": {
+          "p_inward": 0.5930902111324377,
+          "ci_low": 0.5489443378119002,
+          "ci_high": 0.6353166986564299,
+          "n_decided": 521
+        },
+        "vol_low": {
+          "p_inward": 0.6212121212121212,
+          "ci_low": 0.5643939393939394,
+          "ci_high": 0.678030303030303,
+          "n_decided": 264
+        },
+        "vol_mid": {
+          "p_inward": 0.635,
+          "ci_low": 0.565,
+          "ci_high": 0.7,
+          "n_decided": 200
+        },
+        "vol_high": {
+          "p_inward": 0.5031446540880503,
+          "ci_low": 0.44654088050314467,
+          "ci_high": 0.559748427672956,
+          "n_decided": 318
+        }
+      },
+      "p_inward_reverse": 0.7452966714905933,
+      "ci_low_reverse": 0.7120115774240231,
+      "p_inward_shift": 0.49640287769784175,
+      "ci_low_shift": 0.43884892086330934
+    }
+  ]
+}
