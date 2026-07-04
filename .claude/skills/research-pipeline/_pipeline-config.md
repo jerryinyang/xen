@@ -25,22 +25,24 @@ All paths are relative to the project root (`{project-root}`).
 | Architecture Doc | `docs/references/architecture.md` |
 | Dataset Reference | `docs/references/dataset-reference.md` |
 
-### Per-Experiment Structure (lean — 4 artifacts, inline governance)
+### Per-Experiment Structure (INFR-001)
 
 ```
 python/experiments/<EXP-ID>/
-├── design.md     # scope + analysis plan merged (Stage 1); inline pre-exec GATE recorded here
-├── code/         # implementation (Stage 2); price-primary → C# model + ctrader-cli/<ID>.conf
-├── plots/        # generated visualisations
-├── results/      # emitted/computed outputs (price-primary also data/strategy_runs/<ID>/)
-├── audit.md      # validation + verdict forensics + causal-provenance (Stage 4) — UNCAPPED
-└── report.md     # interpretation + results + final report (Stage 5); inline post-exec GATE here
+├── design.md          # quant-designer: mechanism-first scope + plan (mandatory declaration blocks)
+├── qa-review.md       # qa-compliance: fresh-context pre-exec review — APPEND-ONLY across reruns
+├── code/              # developer: C# model refs + conf notes (NO Python analysis code)
+├── analysis_code/     # data-analyst's own interrogation scripts (canonical xen estimands only)
+├── results/           # incl. estimand_validation.json (blocking gate artifact)
+├── plots/
+├── analysis.md        # data-analyst: evidence FOR+AGAINST + recommended verdict — UNCAPPED
+└── report.md          # documenter: record incl. the OPERATOR's final verdict
 ```
 
-Governance is **inline** (one `GATE: APPROVE/REVISE/REJECT` block inside `design.md` pre-exec
-and inside `report.md` post-exec) — there is no `governance/` directory and no separate
-`pre/post-*-review.md`. The orchestrator **executes** the experiment (no manual handoff),
-pausing only at the operator-gated critical decisions.
+Governance: QA runs pre-execution in a **fresh context** (subagent or new operator session;
+rerunnable; append-only `qa-review.md`). The **execution approval and the final experiment
+verdict are operator gates**. Hard blocks are integrity-only (tripwire, holdout, causality,
+estimand reconciliation); all quality reads are informative — the operator judges value.
 
 ### Artifact verbosity discipline (format, not length)
 
@@ -53,9 +55,10 @@ compressed, never thinned of substance.
 | Artifact | Budget | Density rule |
 |----------|--------|--------------|
 | `design.md` | ~300 lines | merged scope+plan; tables/bullets, no prose padding |
-| `report.md` | ~400 lines | interpretation+results+report; key plots only |
-| `audit.md` | **uncapped** | forensic/adversarial/causal-provenance needs room — but still terse |
-| registry updates | concise rows only | regulate format; never drop the ledger mechanism |
+| `report.md` | ~400 lines | operator verdict + evidence record; key plots only |
+| `analysis.md` | **uncapped** | interrogation/evidence work needs room — but still terse |
+| `qa-review.md` | per-run sections | append-only; table-format traces |
+| registry updates | concise rows only | evidence rows only mid-experiment; no status transitions |
 
 **Compression tool (mandatory on prose-heavy artifacts).** When `design.md` / `report.md`
 (or a KB doc) reads wordy, run the `caveman` plugin: `/caveman-compress <abs-path>`. It
@@ -203,15 +206,25 @@ These binding constraints apply to all Xen research.
 | **Open-to-open returns only** | Strategy / signal / P&L returns are measured **open-to-open**, never open-to-close — an `OnClose` execution is impossible in real time (the close is unknown until the bar completes). Close-referenced returns are a non-tradable diagnostic and must be labelled as such. |
 | **Leak resistance is audited independently of the numbers** | Numeric reproduction reproduces a leak. Every price-primary experiment ships a future-destroying control that must collapse the edge; the audit traces verdict-bearing columns' input timestamps. A surviving edge under that control is a leak → REJECT. |
 | **Knowledge-base-first** | Read `docs/knowledge-base/` before designing. Never re-run a `pitfalls-ledger.md` dead end; never re-learn a `lessons-and-amendments.md` mechanism. |
+| **Integrity gates hard, value reads informative** | Only integrity checks block (leak tripwire, holdout, causality/provenance, estimand reconciliation). Quality/materiality/significance reads are evidence for the operator — no auto-verdicts, no threshold stacks, no auto-RETIRE. |
+| **Estimand before hypothesis** | No verdict, control read, or TEST read on an emission without a passing `xen.estimand_validation` gate. Controls that validate a hypothesis on an unvalidated estimand certify artifacts (critical-017). |
+| **Experiment ≠ family** | Experiments produce evidence and experiment-level verdicts. Family open/retire/promote decisions happen only at checkpoint retrospectives, operator-signed. Checkpoints group multiple experiments. |
+| **Protocols, not directives** | Every lesson is codified as a checkable protocol, script, or structural separation — directives ("interrogate raw data") recur; protocols do not. |
 
-### Price-Primary vs Analysis-Only (binding)
+### Every Experiment Is Price-Primary (binding, INFR-001)
 
-- **Price-primary** — generates signals/entries/positions/edges from price ⇒ runs in cTrader
-  (StrategyHost) via `tools/ctrader-cli/run-experiment.sh`, emits `data/strategy_runs/<ID>/`
-  under the `AnalysisEndUtc` fence, analysed in Python only on emissions. See
-  `tools/ctrader-cli/README.md`.
-- **Analysis-only** — Python on emitted strategy-run / timebar extracts; never regenerates a
-  signal or edge. No vectorized price-strategy backtest.
+- All strategy logic runs in cTrader (StrategyHost) via `tools/ctrader-cli/run-experiment.sh`,
+  emitting `data/strategy_runs/<ID>/` under the `AnalysisEndUtc` fence. No Python backtest of
+  a price strategy, ever. No developer-side Python analysis replication — analysis of emitted
+  data is the `data-analyst`'s job, with its own code on canonical `xen` estimands.
+- **VAL carve-out** — re-analysis of already-emitted, still-valid data enters at the estimand
+  gate → `data-analyst` directly (no design/QA/execute stages). If the prior emission is
+  invalidated by an identified defect, a rerun through the full pipeline is required first.
+- **Estimand gate** — no analysis, verdict, control read, or counted TEST read on any emission
+  without a passing `results/estimand_validation.json`
+  (`python -m xen.estimand_validation ...`, blocking: reconciliation/schema/fence/manifest).
+- Accounting primitives live only in `xen.adjudication`; defining them in experiment dirs
+  fails `check_no_local_accounting` (L-18 / critical-017).
 
 ---
 
@@ -290,9 +303,9 @@ All governance reviews produce one of three verdicts:
 
 ### REVISE Routing
 
-When governance issues REVISE, the verdict identifies:
-- `FAILING_ARTIFACT`: which file needs fixing (`design.md`, `code/`, `audit.md`, `report.md`)
-- `REQUIRED_SKILL`: which skill should fix it (experiment-quant-analyst, experiment-developer, experiment-auditor, experiment-documenter)
+When QA issues REVISE, the verdict identifies:
+- `FAILING_ARTIFACT`: which file needs fixing (`design.md`, `code/`, `analysis.md`, `report.md`)
+- `REQUIRED_SKILL`: which skill should fix it (quant-designer, experiment-developer, data-analyst, experiment-documenter)
 
 ---
 
@@ -312,11 +325,12 @@ Use these trigger phrases to identify which skill to invoke:
 
 | Skill | Trigger Phrases |
 |-------|-----------------|
-| **research-pipeline** | run experiment, execute pipeline, go end-to-end, start experiment, automate, run the pipeline, no interruptions, full run, run from scope, continue experiment |
-| **experiment-quant-analyst** | analysis plan, statistical method, methodology, interpret results, what test, how to analyse, what do these results mean |
-| **experiment-developer** | implement, write code, create script, code the analysis, build module |
-| **experiment-auditor** | audit, validate, check code, verify results, test correctness, numerical check |
-| **experiment-documenter** | document, write report, summarise, update docs, experiment report, findings, write up results |
+| **research-pipeline** | run experiment, execute pipeline, go end-to-end, start experiment, automate, run the pipeline, full run, continue experiment |
+| **quant-designer** | design the experiment, analysis plan, statistical method, methodology, what test, scope this idea |
+| **experiment-developer** | implement, write code, build the model, code the strategy, add the conf |
+| **qa-compliance** | QA, pre-exec review, fidelity check, compliance review, ready to run? (fresh context only) |
+| **data-analyst** | analyse the data, audit, validate, interrogate, verify results, what does the data say |
+| **experiment-documenter** | document, write report, summarise, update docs, write up results |
 
 ---
 
@@ -330,6 +344,9 @@ Before creating new modules, check these existing reusable functions:
 | Chart-type generator | `xen.renko_generator` | Renko brick generation |
 | Chart-type generator | `xen.heiken_ashi_generator` | Heiken Ashi candle generation |
 | OHLC resampling | `xen.bar_aggregator` | N-minute clock-aligned OHLC aggregation |
+| **Canonical P&L estimands** | `xen.adjudication` | Multi-leg-correct per-bar/per-leg/episode P&L; reconciliation invariant (L-18) — the ONLY permitted accounting path |
+| **Estimand validation gate** | `xen.estimand_validation` | Blocking pre-analysis gate: reconciliation, schema, fence, manifest + physicality report; `check_no_local_accounting` |
+| Run ingestion | `xen.signals.ingestion` | Emitted-run loading + holdout fence assertion |
 | *(More to be added as analysis modules are developed)* | `python/src/xen/` | Reusable analysis code |
 
 ---
