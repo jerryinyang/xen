@@ -171,6 +171,7 @@ slots, holdout sealed; not a rescue (referee prereq only). → unblocked EXP-010
 ## Current Infrastructure Tasks
 | Item | Status | Detail |
 |------|--------|--------|
+| INFR-005 — Indices-basket completion (5-year m1 collection of the 6 missing index symbols) | **OPEN — scoped 2026-07-05; collection pending** | Completes the 10-symbol Indices basket: 4 loaded (USTEC/US500/US2000/JP225), collect 6 (AUS200, US30, EU50, GER40, HK50, UK100) into canonical `data/timebars/` on the INFR-003 ~5-year window. GER40/DE40 fresh (live history, ≠ retired DE30). Additive only — no re-collection of the 16 INFR-003 instruments. Per-file holdout sealed at first touch; **not readable until VAL-007 PASS**. Docs (dataset-reference + `_pipeline-config`) restructured into Currencies/Indices baskets at scope. Script: `tools/ctrader-cli/run-infr005-collection.sh`. Design: `checkpoints/2026-07-05-INFR-005-index-basket-completion/design.md`. |
 | VAL-006 — Corrective re-derivation of multi-leg verdicts (critical-017 blast radius) | **COMPLETE 2026-07-05 (operator verdict: NOT SUPPORTED)** | Prior multi-leg record does not survive. 207 TRAIN cells re-derived via canonical `xen.adjudication`: 44/52 "CI-positive" = e1 frozen-TP survivorship; named candidate US2000 e3/extend/z15 ≈0 even at zero cost; AUDUSD/NZDUSD extend losers confirmed; 8 legitimate CI-positive survivors but small (2-5%/yr on peak), 2022-concentrated. Integrity: blocking_pass (271 cells, ~1e-12 reconciliation); 0 TEST reads consumed; holdout sealed. Residual WASH-to-weak-positive US2000 e0/e2 + US500 both-leg clusters flagged. Full artifact: `python/experiments/VAL-006/report.md`. |
 
 ## Family Indexes
@@ -184,6 +185,7 @@ slots, holdout sealed; not a rescue (referee prereq only). → unblocked EXP-010
 | CF-MR-002 — causal RSI-2 fade (cTrader-primary) | EXP-006 | **SCREENED — EXONERATED (NOT-TRADABLE 34/34, D-benchmark 2026-06-30)**; `families/cf-mr-002/INDEX.md` |
 
 ## Checkpoint Retrospectives
+- [INFR-005 — Indices-Basket Completion](checkpoints/2026-07-05-INFR-005-index-basket-completion/design.md) — OPEN 2026-07-05: collect 6 missing index symbols → VAL-007 gate (retrospective pending)
 - [Phase 006 — CF-MR-005 Disposition](checkpoints/2026-07-04-006-cf-mr-005-disposition/design.md) — CONCLUDED 2026-07-04: EXP-018 NOT SUPPORTED → **CF-MR-005 RETIRED** · [retrospective](checkpoints/2026-07-04-006-cf-mr-005-disposition/retrospective.md)
 - [Phase 005 — CF-MR-005 Ladder-Harvest Mechanism Characterisation](checkpoints/2026-07-03-005-cf-mr-005-ladder-harvest-characterisation/design.md) — EXP-015 COMPLETE 2026-07-03 (NO_MECHANISM_EVIDENCE; retire recommended) · superseded by Phase 006 (no separate retrospective)
 - [Phase 004 — Cross-Domain MR Renewal (CF-MR-004)](checkpoints/2026-07-01-004-cross-domain-mr-renewal/design.md) — CONCLUDED 2026-07-03 · **CF-MR-004 RETIRED (EXP-014c CREDIBLE_NEGATIVE_RETIRE) → CF-MR-005 REGISTERED (spin-out)** · [retrospective](checkpoints/2026-07-01-004-cross-domain-mr-renewal/retrospective.md)

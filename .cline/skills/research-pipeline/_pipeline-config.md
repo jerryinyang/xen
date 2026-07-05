@@ -263,31 +263,39 @@ docs/experiments-docs/checkpoints/YYYY-MM-DD-###-descriptive-name/
 
 ---
 
-## Available Instruments
+## Available Instruments (baskets)
 
-The full universe (17 instruments) was admitted by VAL-003.
+The universe is organized as two named baskets — **Currencies** and **Indices** — plus
+an **Other** bucket (metal, crypto). `Loaded` = 5-year m1 file present + admitted
+(VAL-005); `Pending` = scoped for collection, not yet loaded/admitted. Full per-symbol
+detail and broker-name alternates live in `docs/references/dataset-reference.md`.
 
-| Symbol | Name | Type | Notes |
-|--------|------|------|-------|
-| EURUSD | Euro/US Dollar | Forex | Major pair, high liquidity |
-| GBPUSD | British Pound/US Dollar | Forex | Major pair |
-| USDJPY | US Dollar/Japanese Yen | Forex | Major pair |
-| USDCHF | US Dollar/Swiss Franc | Forex | Major pair |
-| USDCAD | US Dollar/Canadian Dollar | Forex | Major pair |
-| AUDUSD | Australian Dollar/US Dollar | Forex | Major pair |
-| NZDUSD | New Zealand Dollar/US Dollar | Forex | Major pair |
-| EURJPY | Euro/Japanese Yen | Forex | Cross pair |
-| GBPJPY | British Pound/Japanese Yen | Forex | Cross pair |
-| AUDJPY | Australian Dollar/Japanese Yen | Forex | Cross pair |
-| XAUUSD | Gold/US Dollar | Commodity | Volatile, useful for trend analysis |
-| BTCUSD | Bitcoin/US Dollar | Crypto | 24/7, high volatility |
-| USTEC | NASDAQ-100 | Index | Tech-heavy, liquid |
-| US500 | S&P 500 | Index | Broad US equities |
-| US2000 | Russell 2000 | Index | Small-cap US equities |
-| DE30 | DAX 40 | Index | German equities; broker history truncated to 2026-01-16 |
-| JP225 | Nikkei 225 | Index | Japanese equities |
+**Currencies basket (10 — complete, all Loaded/VAL-005):**
+EURUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD (majors) · EURJPY, GBPJPY, AUDJPY (crosses).
 
-The original 4-instrument core (EURUSD, XAUUSD, BTCUSD, USTEC) is the default subset. Experiments using the expanded universe must justify the inclusion of new instruments in scope.
+**Indices basket (10 — target; 4 Loaded, 6 Pending INFR-005):**
+
+| Symbol | Index | Status |
+|--------|-------|--------|
+| USTEC (US100) | NASDAQ-100 | Loaded (VAL-005) |
+| US500 | S&P 500 | Loaded (VAL-005) |
+| US2000 | Russell 2000 | Loaded (VAL-005) |
+| JP225 | Nikkei 225 | Loaded (VAL-005) |
+| AUS200 | ASX 200 | **Pending (INFR-005 → VAL-007)** |
+| US30 | Dow Jones 30 | **Pending (INFR-005 → VAL-007)** |
+| EU50 (STOXX50) | Euro Stoxx 50 | **Pending (INFR-005 → VAL-007)** |
+| GER40 (DE40) | DAX 40 | **Pending (INFR-005 → VAL-007)** |
+| HK50 | Hang Seng 50 | **Pending (INFR-005 → VAL-007)** |
+| UK100 | FTSE 100 | **Pending (INFR-005 → VAL-007)** |
+
+**Other:** XAUUSD (Gold, metal) · BTCUSD (Bitcoin, crypto) — both Loaded (VAL-005).
+
+`GER40`/`DE40` is collected fresh (live history); it is **not** the retired `DE30`
+(stale m1 to 2026-01-16, dropped at INFR-003 §3.1). The 6 pending index symbols are
+**not readable** by any experiment until INFR-005 completes and VAL-007 PASSes.
+
+The original 4-instrument core (EURUSD, XAUUSD, BTCUSD, USTEC) is the default subset.
+Experiments using the expanded universe must justify the inclusion of new instruments in scope.
 
 ---
 

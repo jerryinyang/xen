@@ -22,6 +22,14 @@ its broker m1 history ended 2026-01-16 (stale) and cannot supply current-edge ro
 VAL-003 admission and old-dataset files are unaffected; it may be re-collected via an
 alternate broker symbol in a later INFR item.
 
+**Indices-basket completion (INFR-005, in progress).** The INFR-003 5-year set loaded
+4 of the 10 target index symbols (USTEC, US500, US2000, JP225). INFR-005 collects the
+remaining 6 (AUS200, US30, EU50, GER40, HK50, UK100) into the **same** canonical
+`data/timebars/` set on the same ~5-year window, each holdout-sealed per file at first
+touch. These 6 are **not admitted** — no experiment may read them — until **VAL-007**
+(a VAL-005-analog re-seal + admission gate) PASSes. See the Indices basket table under
+"Instruments (baskets)" for per-symbol status.
+
 **5-year holdout re-seal:** the new final-30% global holdout was sealed per file at first
 touch on each file's own 2021-06 → collection-date timeline (VAL-005 G4, 0 holdout rows
 read); `test-read-ledger.md` was re-materialized on the new 16×{15m,1h,4h} strata (all 0
@@ -312,26 +320,63 @@ data/
 
 Per-experiment generated data may also be cached under `python/experiments/<EXP-ID>/cache/` when needed for reproducibility.
 
-## Instruments
+## Instruments (baskets)
 
-| Symbol | Name | Type | Notes |
+The universe is documented as two named baskets — **Currencies** and **Indices** —
+plus an **Other** bucket for the two single-instrument asset classes (metal, crypto)
+that belong to neither. `Loaded` = a 5-year m1 file is present under `data/timebars/`
+and admitted (VAL-005 for the INFR-003 set). `Pending` = the symbol is scoped for
+collection but not yet loaded/admitted.
+
+### Currencies basket (10 — complete)
+
+| Symbol | Name | Sub-class | Status |
 | --- | --- | --- | --- |
-| EURUSD | Euro/US Dollar | Forex | Major pair, high liquidity |
-| GBPUSD | British Pound/US Dollar | Forex | Major pair |
-| USDJPY | US Dollar/Japanese Yen | Forex | Major pair |
-| USDCHF | US Dollar/Swiss Franc | Forex | Major pair |
-| USDCAD | US Dollar/Canadian Dollar | Forex | Major pair |
-| AUDUSD | Australian Dollar/US Dollar | Forex | Major pair |
-| NZDUSD | New Zealand Dollar/US Dollar | Forex | Major pair |
-| EURJPY | Euro/Japanese Yen | Forex | Cross pair |
-| GBPJPY | British Pound/Japanese Yen | Forex | Cross pair |
-| AUDJPY | Australian Dollar/Japanese Yen | Forex | Cross pair |
-| XAUUSD | Gold/US Dollar | Commodity | Volatile, useful for trend analysis |
-| BTCUSD | Bitcoin/US Dollar | Crypto | 24/7, high volatility |
-| USTEC | NASDAQ-100 | Index | Tech-heavy, liquid |
-| US500 | S&P 500 | Index | Broad US equities |
-| US2000 | Russell 2000 | Index | Small-cap US equities |
-| DE30 | DAX 40 | Index | German equities; broker history ends 2026-01-16 |
-| JP225 | Nikkei 225 | Index | Japanese equities |
+| EURUSD | Euro/US Dollar | Major | Loaded (VAL-005) |
+| GBPUSD | British Pound/US Dollar | Major | Loaded (VAL-005) |
+| USDJPY | US Dollar/Japanese Yen | Major | Loaded (VAL-005) |
+| USDCHF | US Dollar/Swiss Franc | Major | Loaded (VAL-005) |
+| USDCAD | US Dollar/Canadian Dollar | Major | Loaded (VAL-005) |
+| AUDUSD | Australian Dollar/US Dollar | Major | Loaded (VAL-005) |
+| NZDUSD | New Zealand Dollar/US Dollar | Major | Loaded (VAL-005) |
+| EURJPY | Euro/Japanese Yen | Cross | Loaded (VAL-005) |
+| GBPJPY | British Pound/Japanese Yen | Cross | Loaded (VAL-005) |
+| AUDJPY | Australian Dollar/Japanese Yen | Cross | Loaded (VAL-005) |
 
-This is the full instrument universe admitted by VAL-003. The original 4-instrument core (EURUSD, XAUUSD, BTCUSD, USTEC) is the default subset; experiments using the expanded universe must justify the inclusion of new instruments in scope.
+### Indices basket (10 — target; 4 loaded, 6 pending INFR-005)
+
+| Symbol | Alt name | Index | Status |
+| --- | --- | --- | --- |
+| USTEC | US100 | NASDAQ-100 | Loaded (VAL-005) |
+| US500 | — | S&P 500 | Loaded (VAL-005) |
+| US2000 | — | Russell 2000 | Loaded (VAL-005) |
+| JP225 | — | Nikkei 225 | Loaded (VAL-005) |
+| AUS200 | AU200 | ASX 200 | **Pending (INFR-005 → VAL-007)** |
+| US30 | DJ30/WS30 | Dow Jones 30 | **Pending (INFR-005 → VAL-007)** |
+| EU50 | STOXX50 | Euro Stoxx 50 | **Pending (INFR-005 → VAL-007)** |
+| GER40 | DE40 | DAX 40 | **Pending (INFR-005 → VAL-007)** |
+| HK50 | HSI50 | Hang Seng 50 | **Pending (INFR-005 → VAL-007)** |
+| UK100 | FTSE100 | FTSE 100 | **Pending (INFR-005 → VAL-007)** |
+
+Broker symbol strings for index CFDs vary; the `Symbol` column lists the operator's
+requested primaries and `Alt name` the known alternates. The collection script
+(`tools/ctrader-cli/run-infr005-collection.sh`) resolves rejections via
+`one <BROKER_SYMBOL>` or the `INFR005_SYMBOLS` override.
+
+**GER40 vs retired DE30.** The old `DE30` symbol (DAX under the broker's legacy
+string) was dropped at INFR-003 §3.1 — its broker m1 history ended 2026-01-16 (stale)
+and it is absent from the 5-year dataset. `GER40`/`DE40` is collected **fresh** as the
+live-history German-index symbol; it is not a re-collection of DE30. DE30's VAL-003
+admission and old-dataset files are retained for closed-family reproducibility only.
+
+### Other (single-instrument classes)
+
+| Symbol | Name | Class | Status |
+| --- | --- | --- | --- |
+| XAUUSD | Gold/US Dollar | Metal | Loaded (VAL-005) |
+| BTCUSD | Bitcoin/US Dollar | Crypto | Loaded (VAL-005) |
+
+The original 4-instrument core (EURUSD, XAUUSD, BTCUSD, USTEC) is the default subset;
+experiments using the expanded universe must justify the inclusion of new instruments
+in scope. The 6 pending index symbols are **not readable** by any experiment until
+INFR-005 collection completes and VAL-007 PASSes.
