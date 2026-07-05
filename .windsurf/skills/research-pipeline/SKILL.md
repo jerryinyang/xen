@@ -1,177 +1,125 @@
 ---
 name: research-pipeline
-description: Orchestrate the Xen research experiment lifecycle from idea or EXP-ID through merged design, implementation, execution, audit, and documentation, with inline governance. Use when starting a new experiment, resuming a partial experiment, designing experiment scope, running the research pipeline end to end, continuing an EXP or VAL item, or enforcing the Xen experiment process.
+description: Orchestrate the Xen research experiment lifecycle from idea or EXP-ID through mechanism-first design, fresh-context QA, engine execution, estimand validation, data analysis, and operator verdict. Use when starting a new experiment, resuming a partial experiment, designing experiment scope, running the research pipeline end to end, continuing an EXP or VAL item, or enforcing the Xen experiment process.
 ---
 
-# Research Pipeline (Lean Orchestrator)
+# Research Pipeline (INFR-001 Orchestrator)
 
-Coordinate the experiment workflow and enforce the project gates. Route work to specialists;
-do not replace them. This pipeline is the **token-efficient** successor to the Chapter-01
-8-stage flow: **four artifacts, inline governance, autonomous execution.**
+Coordinate the experiment workflow; route work to specialists; enforce the split:
+**machines gate integrity; the operator judges value.** Hard blocks exist only for integrity
+(leak tripwire, holdout, causality/provenance, estimand reconciliation). Every quality or
+materiality read is informative — presented as evidence, decided by the operator.
 
 ## Start
 
-1. Read the bundled pipeline config (`_pipeline-config.md` in this skill directory).
-2. Read the curated knowledge base **first**: `docs/knowledge-base/INDEX.md` and, at minimum,
-   `lessons-and-amendments.md` (the leak that shipped a false positive) and
-   `pitfalls-ledger.md` (dead ends — do not re-run). This is mandatory, not optional.
-3. Read `docs/references/dataset-reference.md` and `docs/references/architecture.md`.
-4. Read `python/experiments/INDEX.md` (next EXP-ID) and `docs/experiments-docs/INDEX.md`
-   (live status). Open the newest active checkpoint `design.md` for phase objectives.
-5. Check the live signal-registry preconditions (`docs/signal-registry/`).
-6. Determine entry point: new EXP, resume EXP, VAL rerun, or scope-only design.
+1. Read `_pipeline-config.md` (this skill directory).
+2. Read `docs/knowledge-base/INDEX.md`, `lessons-and-amendments.md`, `pitfalls-ledger.md` —
+   mandatory before design.
+3. Read `docs/references/dataset-reference.md`, `architecture.md`.
+4. Read `python/experiments/INDEX.md`, `docs/experiments-docs/INDEX.md`, the newest active
+   checkpoint `design.md`, and `docs/signal-registry/` preconditions.
+5. Determine entry point: new EXP, resume EXP, VAL re-analysis, or scope-only design.
 
-## Routing
+## Stages
 
-| Need | Skill | Artifact (one each) |
+```
+1 Design ............ quant-designer                    → design.md
+2 QA pre-exec ....... qa-compliance (FRESH context)     → qa-review.md (append-only)
+    [OPERATOR GATE — execution approval]
+3 Execute ........... cTrader CLI run                   → data/strategy_runs/<ID>/
+4 Estimand gate ..... xen.estimand_validation (script)  → results/estimand_validation.json
+5 Data analysis ..... data-analyst                      → analysis.md
+    [OPERATOR — final experiment verdict]
+6 Document .......... experiment-documenter             → report.md + indexes
+```
+
+| Stage | Skill | Notes |
 | --- | --- | --- |
-| Merged scope + analysis plan | `experiment-quant-analyst` | `design.md` |
-| Implementation | `experiment-developer` | `code/` |
-| Code + result validation | `experiment-auditor` | `audit.md` (uncapped) |
-| Interpretation + final report + indexes | `experiment-documenter` | `report.md` |
+| Design | `quant-designer` | mechanism-first; mandatory declaration blocks (its `design-requirements.md`) |
+| QA | `qa-compliance` | **spawn as a subagent** (fresh context by construction) or the operator runs it in a new session; rerunnable; APPROVE required before the execution gate |
+| Execute | orchestrator | **operator-gated**: credentials/cost + this is the mandatory approval point; operator may demand more QA runs first, run it manually, or approve an orchestrator run |
+| Estimand gate | script | `python -m xen.estimand_validation <family_root> --expect <instruments> --out python/experiments/<ID>/results/estimand_validation.json` — `blocking_pass` required before ANY analysis, verdict, or TEST read |
+| Analysis | `data-analyst` | own code, canonical `xen` estimands, evidence for+against, recommended verdict only |
+| Verdict | **operator** | decides on the analyst's evidence; may order follow-up probes (analyst reruns Phase 2) |
+| Document | `experiment-documenter` | records the operator's verdict + evidence; experiment-level registry rows only |
 
-The orchestrator runs governance **inline** (no separate governance artifacts) and **executes**
-the experiment itself (no manual handoff) — except at the operator-gated critical decisions below.
+## Every experiment is price-primary
 
-## Price-primary vs analysis-only (binding routing)
-
-Classify every experiment before design:
-
-- **Price-primary** — generates signals/entries/positions/edges from price. It **must** run in
-  the cTrader engine (StrategyHost mode) via `tools/ctrader-cli/run-experiment.sh`, emit
-  `data/strategy_runs/<ID>/` under the `AnalysisEndUtc` fence, and be analysed in Python only on
-  the emitted runs. A vectorized Python backtest of a price strategy is a **REJECT** (this is the
-  L-01 structural fix; see `docs/knowledge-base/lessons-and-amendments.md`).
-- **Analysis-only** — Python operating solely on emitted strategy-run / timebar parquet extracts.
-  Never regenerates signals or edges.
-
-See `tools/ctrader-cli/README.md` for the harness recipe.
+All strategy logic runs in the cTrader engine (C# `ISignalModel`, `tools/ctrader-cli/`).
+A Python backtest of a price strategy is REJECT-class. **VAL carve-out:** re-analysis of
+already-emitted, still-valid data skips stages 1-3 and enters at the estimand gate →
+`data-analyst`. If the prior emission is invalidated by an identified defect, a rerun (full
+pipeline) is required first.
 
 ## Per-experiment artifacts
 
 ```
 python/experiments/<ID>/
-├── design.md     # scope + analysis plan (quant-analyst) — inline pre-exec gate recorded here
-├── code/         # implementation (developer); price-primary → C# model + <ID>.conf
-├── results/      # emitted/computed outputs
+├── design.md          # quant-designer (mandatory declaration blocks)
+├── qa-review.md       # qa-compliance, append-only across reruns
+├── code/              # developer: C# refs + confs notes (no Python analysis)
+├── analysis_code/     # data-analyst's own scripts
+├── results/           # incl. estimand_validation.json (gate artifact)
 ├── plots/
-├── audit.md      # validation + verdict forensics + causal-provenance (auditor) — UNCAPPED
-└── report.md     # interpretation + results + final report (documenter) — inline post-exec gate
+├── analysis.md        # data-analyst: evidence for+against + recommended verdict — UNCAPPED
+└── report.md          # documenter: record incl. the OPERATOR's final verdict
 ```
 
-`design.md` and `report.md` are size-capped (see config); `audit.md` is **not** (forensic /
-adversarial / causal-provenance work needs room). No `governance/` directory.
+## Operator gates (the only stops)
+
+1. **Execution approval** (mandatory, after QA APPROVE) — operator may rerun QA first.
+2. **Final experiment verdict** (after `analysis.md`).
+3. Spending a counted TEST read — additionally requires a passing
+   `estimand_validation.json` for the emission being read (pre-read gate).
+4. Anything holdout-adjacent; any deployability claim.
+
+## Experiment vs family (binding separation)
+
+- An experiment produces **evidence and an experiment-level verdict**. It never opens,
+  closes, retires, or promotes a candidate family.
+- Family status changes happen ONLY at a **checkpoint retrospective**, operator-signed.
+- Registry updates during an experiment: append evidence/disposition rows only — never a
+  status transition.
+- **Checkpoints group multiple experiments** (a phase container). Do not open a checkpoint
+  for a single experiment.
 
 ## Resume detection
 
-Resume at the first missing/incomplete artifact: no `design.md`→Design; no `code/`→Implement;
-no `results/`→Execute; no `audit.md`→Audit; `audit.md` with an unresolved Critical→fix+re-execute;
-no `report.md`→Document. Announce the resume point.
+Resume at the first missing artifact: no `design.md`→Design; no `qa-review.md` APPROVE→QA;
+no emission→execution gate; no passing `estimand_validation.json`→estimand gate; no
+`analysis.md`→Analysis; no operator verdict→present evidence; no `report.md`→Document.
+Announce the resume point.
 
-## Stage 1 — Design (quant-analyst → `design.md`)
+## Elicitation standard (all skills, all stages)
 
-Invoke `experiment-quant-analyst` to produce the merged **scope + analysis plan**: one
-falsifiable question; data views/instruments/features/params/time-range/exclusions; the
-mandatory final-30% holdout exclusion; measurable success/failure/inconclusive criteria;
-complexity budget; metric denominators + zero-baseline behavior; the **price-primary vs
-analysis-only** classification; methods with per-stratum (non-pooled) binding endpoints,
-shape-aware reads, and predeclared interpretation criteria; and the **leak tripwire(s)** the
-experiment will ship (a future-destroying control that must collapse the edge).
-
-**Inline pre-exec gate.** The orchestrator reviews `design.md` against
-`references/governance-constraints.md` and the checkpoint `design.md`, and records a one-block
-verdict **inside `design.md`** (`GATE: APPROVE` / `REVISE <issues>` / `REJECT <reason>`). Route
-REVISE to the analyst (≤2 cycles). Registry precondition: the candidate family / variant /
-parameter branch must be registered in `docs/signal-registry/` and any TEST-stratum read must
-state the stratum's counted-read tally (cap 2). A scope missing these gets REVISE.
-
-## Stage 2 — Implement (developer → `code/`)
-
-Invoke `experiment-developer`. For **price-primary**: a C# `ISignalModel` + the
-`tools/ctrader-cli/experiments/<ID>.conf`; Python only ingests/validates. For **analysis-only**:
-Python on emitted extracts. Require the leak tripwire(s) to be implemented and a code-standards
-+ provenance self-check (`experiment-developer/references/code-conventions.md`). The orchestrator
-folds the implementation review into the pre-exec gate (no separate artifact).
-
-## Stage 3 — Execute (orchestrator, autonomous)
-
-The orchestrator runs the experiment — **no manual handoff**:
-- analysis-only / local cached replays → run directly;
-- **price-primary credentialed/cost-bearing cTrader-CLI runs are a CRITICAL DECISION** →
-  confirm with the operator before running (credentials/cost), then run.
-Never load the final-30% holdout. Outputs to `results/` (and `data/strategy_runs/<ID>/`).
-
-## Stage 4 — Audit (auditor → `audit.md`)
-
-Invoke `experiment-auditor`. The audit must carry, autonomously: **verdict forensics**
-(per-stratum re-derivation + masking check + mechanism + gate-shape check) **and the new
-causal-provenance & leak pass** (trace every verdict-bearing column's input timestamps; confirm
-the leak tripwire collapsed the edge; verify shared-module provenance contracts). Numeric
-reproduction alone is **not** an audit — it cannot see acausal provenance (L-01).
-
-**Materiality gate (blocking).** Any finding that could move sample membership, a denominator, a
-metric, temporal/causal validity, the verdict, or the binding stratum is verdict-material →
-fix (`experiment-developer`) and **re-execute** (return to Stage 3) before Stage 5. A surviving
-edge under a future-destroying control, or a missing provenance trace on a deployability claim,
-is a REJECT-class finding.
-
-## Stage 5 — Document (documenter → `report.md`)
-
-Invoke `experiment-documenter` to produce the consolidated **interpretation + results + final
-report** in `report.md` (interpretation is routed to the quant-analyst and written into this one
-file — no separate `results.md`), plus the index and registry updates. Keep it dense (tables/
-bullets, key plots only); if `report.md` or `design.md` reads wordy, run `/caveman-compress
-<abs-path>` (format-only pass; preserves code/tables/numbers; delete the `.original.md` backup
-before commit). See the verbosity-discipline section in `_pipeline-config.md`.
-
-**Inline post-exec gate.** The orchestrator reviews `audit.md`, `report.md`, and index/registry
-updates against `references/governance-constraints.md` and records a one-block verdict **inside
-`report.md`** (`GATE: APPROVE` / `REVISE` / `REJECT`). Confirm: verdict forensics + causal-
-provenance pass present; per-stratum masking check done; every verdict-material finding was
-fixed-and-rerun; a signal-registry disposition recorded (and, if registry-relevant, candidate
-status advanced, multiplicity outcome recorded, any counted TEST read entered). Missing any of
-these → REVISE.
-
-## Critical decisions (operator-gated — the only stops)
-
-The orchestrator otherwise runs autonomously, but **must** pause for the operator on:
-spending a counted TEST read; opening/retiring a candidate family; any deployability claim;
-credentialed/cost-bearing cTrader-CLI runs; and anything holdout-adjacent.
-
-## Completion
-
-Report: artifacts written (`design.md`, `code/`, `audit.md`, `report.md`), the one-line key
-finding, the registry disposition, and the path to `report.md`.
+Questions to the operator: one plain sentence per question; concrete options with one-line
+consequences; recommendation marked; no compound questions; no jargon walls. If a question
+cannot be stated plainly, the asker does not understand it yet — investigate first.
 
 ## Hard constraints
 
-- Read the knowledge base before designing; never re-run a `pitfalls-ledger.md` dead end.
-- Never load/inspect the final-30% global holdout. Both sanctioned holdout shots are spent.
-- Price-primary edges run in the cTrader engine; a vectorized Python backtest of a price
-  strategy is REJECT. Outcomes/returns use emitted **real** prices, never synthetic chart prices.
-- Use `CloseTime` / `SourceCloseTime` for temporal alignment, never bar indices. No data after an
-  event's timestamp may inform that event.
-- Evaluate every decision at the action bar's **open** on confirmed bars only (`≤ t-1`); never read
-  the forming bar's own OHLC. Returns are **open-to-open** — `OnClose` is not executable live, so an
-  open-to-close return is a labelled non-tradable diagnostic only.
-- Per-stratum binding verdicts; a pooled/aggregated figure is disclosure-only until cross-stratum
-  homogeneity is shown.
-- Register a candidate before screening it; never spend a TEST read without recording it (cap 2
-  lifetime/stratum). Refuted/blocked/inconclusive items stay in the registry — never deleted.
-- Do not expand scope after the pre-exec gate. New questions → new experiment.
-- Do not accept performance optimizations that compromise correctness, causality, denominators,
-  metric definitions, or streaming validity.
+- Knowledge base before design; never re-run a `pitfalls-ledger.md` dead end.
+- Never load/inspect the final-30% global holdout (both sanctioned shots spent).
+- Engine execution for all edge generation; real prices; `CloseTime`/`SourceCloseTime`
+  alignment (never bar indices); decisions at bar open on confirmed bars (`≤ t-1`);
+  open-to-open returns.
+- Estimands come from `xen.adjudication`; no accounting primitives in experiment dirs
+  (`check_no_local_accounting`).
+- No verdict, control read, or TEST read on an emission without a passing estimand gate.
+- Per-stratum reads; pooled figures are disclosure-only.
+- Register candidates before screening; counted TEST reads recorded (cap 2 lifetime/stratum).
+- No scope expansion after QA APPROVE — new questions are new experiments.
+- No auto-verdicts: quality thresholds do not gate; the operator decides.
 
 ## References
 
 | Resource | Read when |
 | --- | --- |
 | `_pipeline-config.md` (this skill) | Always |
-| `docs/knowledge-base/` (INDEX, lessons, pitfalls) | Always, before design |
-| `docs/references/dataset-reference.md`, `architecture.md` | Always |
-| `references/governance-constraints.md` | Pre-exec and post-exec gates |
+| `docs/knowledge-base/` | Always, before design |
+| `references/governance-constraints.md` | QA stage; TEST-read gate |
 | `references/scope-design.md`, `experiment-templates.md` | Stage 1 |
-| `tools/ctrader-cli/README.md` | Price-primary design/execution |
+| `tools/ctrader-cli/README.md` | Execution |
 | `python/experiments/INDEX.md`, `docs/experiments-docs/INDEX.md` | Start, completion |
-| `docs/signal-registry/` | Stage 1 precondition; gates; Stage 5 updates |
+| `docs/signal-registry/` | Stage 1 precondition; Stage 6 evidence rows |
 | latest checkpoint in `docs/experiments-docs/checkpoints/` | Start, phase alignment |

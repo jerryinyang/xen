@@ -148,12 +148,15 @@ Save to: `python/experiments/<EXP-ID>/analysis-plan.md`
 
 ---
 
-## Audit Report Template
+## Analysis Report Template (analysis.md)
 
-Save to: `python/experiments/<EXP-ID>/audit.md`
+**Superseded (INFR-001):** the canonical `analysis.md` template — integrity gate, question
+list, evidence FOR/AGAINST, recommended verdict — lives in
+`data-analyst/references/interrogation-protocol.md`. Use that. The legacy audit table below
+is retained only as a probe catalog.
 
 ```markdown
-# Audit Report: Experiment <EXP-ID>
+# Audit Report: Experiment <EXP-ID> (LEGACY FORMAT — do not use for new experiments)
 
 ## Summary
 
@@ -347,7 +350,7 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 | Scope | [scope.md](scope.md) |
 | Analysis Plan | [analysis-plan.md](analysis-plan.md) |
 | Code | [code/](code/) |
-| Audit | [audit.md](audit.md) |
+| Analysis | [analysis.md](analysis.md) |
 | Results | [results.md](results.md) |
 | Governance Reviews | [governance/](governance/) |
 | Plots | [plots/](plots/) |
@@ -432,8 +435,8 @@ or
 
 ```
 VERDICT: REVISE
-FAILING_ARTIFACT: <scope.md | analysis-plan.md | code/run_experiment.py | audit.md | results.md | report.md>
-REQUIRED_SKILL: <scope-design | experiment-quant-analyst | experiment-developer | experiment-auditor | experiment-documenter>
+FAILING_ARTIFACT: <design.md | code/ | analysis.md | report.md>
+REQUIRED_SKILL: <quant-designer | experiment-developer | data-analyst | experiment-documenter>
 ISSUES:
 1. <specific issue with line reference and remediation>
 2. ...

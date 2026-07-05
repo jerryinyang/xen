@@ -14,12 +14,14 @@ Turn validated experiment artifacts into durable project documentation.
    locate the file whose path ends with `/research-pipeline/_pipeline-config.md`.
 2. Read `docs/references/dataset-reference.md`.
 3. Read the full experiment package:
-   - `design.md` (merged scope + analysis plan, with the inline pre-exec `GATE`)
-   - `code/`
-   - `results/` (and `data/strategy_runs/<ID>/` for price-primary)
-   - `audit.md`
+   - `design.md` (mechanism-first scope + plan)
+   - `qa-review.md` (fresh-context pre-exec review runs)
+   - `code/` and `analysis_code/`
+   - `results/` incl. `estimand_validation.json` (and `data/strategy_runs/<ID>/`)
+   - `analysis.md` (data-analyst: evidence for+against + recommended verdict)
+   - the **operator's final verdict** (from the conversation/decision record — the report
+     records it; the documenter never substitutes its own)
    - `plots/`
-   - the interpretation section (written into `report.md` by `experiment-quant-analyst`)
 4. Read current indexes:
    - `python/experiments/INDEX.md`
    - `docs/experiments-docs/INDEX.md` (master navigation: live status + `Family Indexes` table)
@@ -30,23 +32,22 @@ Turn validated experiment artifacts into durable project documentation.
 
 ## Report Workflow
 
-Assemble the **consolidated** `python/experiments/<ID>/report.md` — it merges the interpretation
-(written by `experiment-quant-analyst`), the results, and the final report into one artifact.
-Keep it within the size cap (≈400 lines); dense, not verbose.
+Assemble the **consolidated** `python/experiments/<ID>/report.md`. Keep it within the size
+cap (≈400 lines); dense, not verbose.
 
 Include:
 
-- research question or hypothesis;
+- research question or hypothesis + mechanism statement;
 - scope boundaries and exclusions;
 - method summary;
-- **interpretation + key quantitative results** with sample sizes, effect sizes, per-stratum
-  (non-pooled) verdicts, and uncertainty;
-- audit caveats (incl. the causal-provenance & leak result);
-- conclusion using the approved result category;
-- links to `design.md`, code, results, plots, and `audit.md`;
+- **key quantitative evidence** from `analysis.md`: effect sizes with uncertainty, sample
+  sizes, per-stratum (non-pooled) results, collapse fractions, evidence for AND against;
+- integrity-gate results (estimand validation, tripwire, provenance) and analysis caveats;
+- **the operator's final verdict**, recorded verbatim, with the analyst's recommendation
+  noted separately if they differ;
+- links to `design.md`, `qa-review.md`, `analysis.md`, code, results, plots;
 - follow-up recommendations as separate future experiments;
-- the **inline post-exec `GATE` block** (recorded by the orchestrator) and the signal-registry
-  disposition.
+- the signal-registry disposition (evidence rows only — see below).
 
 Use key plots only. Do not embed every generated plot unless each one materially supports the
 conclusion. There is no separate `results.md` or `governance/` directory.
@@ -73,7 +74,14 @@ Choose the family by candidate family / programme era (see the master `Family In
 
 In the master `docs/experiments-docs/INDEX.md`, update **only** the live-status blocks — `Current Checkpoint Status`, `Current Infrastructure Tasks`, `Checkpoint Retrospectives`, and the `Family Indexes` table (EXP range / status). Do not add per-experiment cards to the master.
 
-Record a signal-registry disposition for every experiment. If the result is registry-relevant, update `docs/signal-registry/` in the same change: advance the candidate-family status in `candidate-families/<family>.md` (e.g. `SCREENED`, `RETIRED`), record the item's outcome in `multiplicity-registry.md` (refuted/blocked/inconclusive items are retained — never deleted or renamed), and enter any counted TEST read or disclosure in `test-read-ledger.md`. If it is not (e.g. a VAL/INFR integrity run with no candidate screen), state `registry: not applicable — <reason>` in `report.md`. These follow the phase checkpoint's G0/D0 conventions — do not invent a parallel scheme.
+Record a signal-registry disposition for every experiment — **evidence rows only** (INFR-001
+experiment/family separation): record the item's outcome in `multiplicity-registry.md`
+(refuted/blocked/inconclusive items retained — never deleted or renamed) and enter any counted
+TEST read or disclosure in `test-read-ledger.md`. **Never change a candidate-family status**
+(open/RETIRED/promoted) from within an experiment — family status transitions happen only at a
+checkpoint retrospective, operator-signed; append the experiment's evidence to
+`candidate-families/<family>.md` without touching its status field. If not registry-relevant
+(e.g. a VAL/INFR integrity run), state `registry: not applicable — <reason>` in `report.md`.
 
 ## Writing Rules
 
@@ -82,7 +90,7 @@ Record a signal-registry disposition for every experiment. If the result is regi
 - Separate factual observations from interpretation.
 - Link artifacts with relative paths.
 - Keep the report concise enough to support future review.
-- Do not introduce new claims that are absent from `results.md`, `audit.md`, or raw outputs.
+- Do not introduce new claims that are absent from `analysis.md` or raw outputs.
 
 ## References
 

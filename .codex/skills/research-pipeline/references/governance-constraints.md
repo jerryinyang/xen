@@ -1,13 +1,19 @@
 # Governance Constraints
 
-The constraint framework enforced at both **inline** governance gates (the pre-execution `GATE`
-block in `design.md` and the post-experiment `GATE` block in `report.md`). These constraints are
-non-negotiable and apply to all artifacts in the Xen research pipeline.
+The constraint framework enforced by **`qa-compliance`** (fresh-context pre-execution review)
+and at the estimand/TEST-read gates. These constraints are non-negotiable and apply to all
+artifacts in the Xen research pipeline.
 
-**Artifact mapping (lean pipeline).** The per-artifact checks below were written for the
-Chapter-01 artifacts; map them onto the merged artifacts: *Scope Document* + *Analysis Plan*
-checks → **`design.md`**; *Results Interpretation* + *Final Report* checks → **`report.md`**;
-*Audit Report* checks → **`audit.md`** (now also requires the causal-provenance & leak section).
+**Blocking frame (INFR-001).** Only **integrity** violations block: leak/causality, holdout
+contact, estimand reconciliation failure, silent design deviation, missing tripwire. All
+quality/materiality/significance reads are **informative** — evidence for the operator, never
+auto-verdicts. There are no binding quality thresholds, readiness floors, or gate stacks.
+
+**Artifact mapping.** *Scope Document* + *Analysis Plan* checks → **`design.md`** (plus the
+mandatory declaration blocks in `quant-designer/references/design-requirements.md`);
+*Audit Report* checks → **`analysis.md`** (data-analyst: integrity gate + evidence for/against);
+*Results Interpretation* + *Final Report* checks → **`report.md`** (records the operator's
+verdict).
 
 See `_pipeline-config.md` for programme principles, OOS rules, and project path conventions.
 
@@ -163,21 +169,20 @@ research question or temporal semantics.
 | Safe optimization | Do performance improvements preserve correctness, sample membership, temporal ordering, denominators, metric definitions, and streaming semantics? |
 | Vectorization discipline | Are Python row loops replaced where safely possible, while genuinely sequential logic remains sequential and bounded? |
 
-### Audit Report (audit.md)
+### Data Analysis (analysis.md)
 
 | Check | Questions |
 |-------|-----------|
-| Thoroughness | Are correctness, edge cases, type safety, NaN handling, holdout exclusion, look-ahead bias, and synthetic price discipline all checked? |
-| Evidence | Does every finding include specific line numbers, values, or code excerpts? |
-| Severity classification | Are issues classified as Critical, Warning, or Info appropriately? |
-| Numerical validation | Are spot checks, boundary checks, statistical sanity checks included? |
-| Scope compliance | Does the audit verify that code matches the analysis plan? |
-| Real-price outcome audit | Does audit verify that strategy and signal outcomes use scoped real prices? |
-| Timestamp alignment audit | Does audit verify cross-view alignment by timestamp? |
-| Verdict forensics present | Does the audit explain *why* the verdict came out — a mechanism statement, not just a numeric confirmation? Was it run autonomously, not only after an operator questioned the result? |
-| Per-stratum masking check | Does the audit re-derive the verdict per domain/instrument/cell and affirmatively confirm any pooled/aggregated/equal-weight headline is not masking heterogeneity? |
-| Gate-shape check | Does the audit check whether the binding gate can see the effect's shape (location vs tail/bimodal/asymmetric), and distinguish "no effect" from "wrong instrument for the shape"? |
-| Materiality & blocking | Is every Critical finding tied to the verdict-bearing number it moves (forcing fix + rerun), and every Warning/Info justified as unable to move any verdict-bearing number? |
+| Integrity gate first | Estimand validation (blocking_pass all cells), provenance trace, tripwire collapse + non-vacuity, holdout, price-primary, `check_no_local_accounting` — all present with evidence before any interpretation? |
+| Independent code path | Every verdict-bearing number computed by the analyst's own `analysis_code/` on canonical `xen` estimands — zero imports from the experiment's `code/`? |
+| Question list | Was the interrogation list written before computation, covering the mandatory minimum set, with every question answered or explicitly UNANSWERED? |
+| Evidence symmetry | Are the FOR and AGAINST sections both present, with equal rigor — effect sizes, CIs, n, per stratum? |
+| Per-stratum before pooled | Every headline re-derived per instrument/cell; pooled figures labelled disclosure-only? |
+| Collapse fractions | Every control read discloses control/raw fraction, not just survive/die? |
+| Power honesty | Negatives distinguished from unpowered (MDE stated); wash (A≈B) reported as wash? |
+| Mechanism statement | Does the analysis explain *why* the numbers came out this way — the concrete driver, not just that a bar was cleared or missed? |
+| Physicality interpreted | Occupancy/Sharpe/maxDD read against what the strategy IS, not just pasted? |
+| Recommendation scope | Verdict recommended on the experiment's hypothesis only — no family calls, explicitly non-final? |
 
 ### Results Interpretation (results.md)
 
@@ -218,7 +223,14 @@ One or more issues found. Specify:
 
 Allow up to 2 revision cycles.
 
-Issues that warrant REVISE include: an audit lacking verdict forensics, the per-stratum masking check, **or the causal-provenance & leak section**; a price-primary experiment with **no shipped leak tripwire**; an audit that accepted a pooled/aggregated verdict without re-deriving it per stratum; **code that emits the binding verdict as a single collapsed cross-cell/cross-stratum PASS/FAIL (a pooled conjunction or pooled statistic) rather than per stratum, absent a demonstrated cross-stratum homogeneity claim** (collapsed convenience flags are allowed only when explicitly labelled non-binding — EXP-076 audit C1 precedent); a verdict-material finding documented but not fixed-and-rerun; and a binding gate threshold that is an unjustified magic constant (not calibrated, data-derived, or sensitivity-banded).
+Issues that warrant REVISE include: a design missing any mandatory declaration block
+(mechanism, object-identity, control validity proofs, tripwire, bands, power, golden trace);
+a control without a non-degeneracy/bite/non-vacuity proof; an analysis lacking the integrity
+gate, the per-stratum re-derivation, or either evidence section (for/against); a pooled figure
+presented as a finding without homogeneity; an unpowered stratum reported as a negative; a
+design-fidelity trace with an unresolved DEVIATES/MISSING row; experiment-local accounting
+definitions (`check_no_local_accounting` failure); **any auto-verdict machinery** — a quality
+threshold, readiness floor, or gate conjunction wired to decide instead of inform.
 
 ### REJECT
 

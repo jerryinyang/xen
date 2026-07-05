@@ -76,7 +76,7 @@ Save to: `python/experiments/<EXP-ID>/report.md`
 |----------|------|
 | Design (scope + analysis plan) | [design.md](design.md) |
 | Code | [code/](code/) |
-| Audit | [audit.md](audit.md) |
+| Analysis | [analysis.md](analysis.md) |
 | Report (this file: interpretation + results) | [report.md](report.md) |
 | Plots | [plots/](plots/) |
 | Results outputs | [results/](results/) |
