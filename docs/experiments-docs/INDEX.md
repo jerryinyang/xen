@@ -169,7 +169,9 @@ slots, holdout sealed; not a rescue (referee prereq only). → unblocked EXP-010
   standalone rung; retained in the registry as the record.
 
 ## Current Infrastructure Tasks
-_(none)_
+| Item | Status | Detail |
+|------|--------|--------|
+| VAL-006 — Corrective re-derivation of multi-leg verdicts (critical-017 blast radius) | **COMPLETE 2026-07-05 (operator verdict: NOT SUPPORTED)** | Prior multi-leg record does not survive. 207 TRAIN cells re-derived via canonical `xen.adjudication`: 44/52 "CI-positive" = e1 frozen-TP survivorship; named candidate US2000 e3/extend/z15 ≈0 even at zero cost; AUDUSD/NZDUSD extend losers confirmed; 8 legitimate CI-positive survivors but small (2-5%/yr on peak), 2022-concentrated. Integrity: blocking_pass (271 cells, ~1e-12 reconciliation); 0 TEST reads consumed; holdout sealed. Residual WASH-to-weak-positive US2000 e0/e2 + US500 both-leg clusters flagged. Full artifact: `python/experiments/VAL-006/report.md`. |
 
 ## Family Indexes
 | Family | EXP range | Status |
