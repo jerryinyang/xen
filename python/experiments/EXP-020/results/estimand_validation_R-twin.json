@@ -1,0 +1,383 @@
+{
+  "root": "../data/strategy_runs/EXP-020-R-twin",
+  "n_cells": 16,
+  "manifest": {
+    "ok": true,
+    "expected": [
+      "EURUSD",
+      "GBPUSD",
+      "USDJPY",
+      "USDCHF",
+      "USDCAD",
+      "AUDUSD",
+      "NZDUSD",
+      "EURJPY",
+      "GBPJPY",
+      "AUDJPY",
+      "XAUUSD",
+      "BTCUSD",
+      "USTEC",
+      "US500",
+      "US2000",
+      "JP225"
+    ],
+    "emitted": [
+      "AUDJPY",
+      "AUDUSD",
+      "BTCUSD",
+      "EURJPY",
+      "EURUSD",
+      "GBPJPY",
+      "GBPUSD",
+      "JP225",
+      "NZDUSD",
+      "US2000",
+      "US500",
+      "USDCAD",
+      "USDCHF",
+      "USDJPY",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "missing": []
+  },
+  "blocking_pass": true,
+  "cells": [
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_audjpy_4h_20260705_181920",
+      "instrument": "AUDJPY",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-06 13:00:00",
+        "fence": "2024-09-06T14:39:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_audusd_4h_20260705_175516",
+      "instrument": "AUDUSD",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-06 13:00:00",
+        "fence": "2024-09-06T14:40:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_btcusd_4h_20260705_175517",
+      "instrument": "BTCUSD",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-10-31 13:00:00",
+        "fence": "2024-10-31T14:05:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_eurjpy_4h_20260705_175516",
+      "instrument": "EURJPY",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-06 13:00:00",
+        "fence": "2024-09-06T15:12:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_eurusd_4h_20260705_181819",
+      "instrument": "EURUSD",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-08-23 21:00:00",
+        "fence": "2024-08-25T22:19:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_gbpjpy_4h_20260705_181910",
+      "instrument": "GBPJPY",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-06 13:00:00",
+        "fence": "2024-09-06T15:28:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_gbpusd_4h_20260705_181829",
+      "instrument": "GBPUSD",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-06 21:00:00",
+        "fence": "2024-09-08T22:09:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_jp225_4h_20260705_182000",
+      "instrument": "JP225",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-23 01:00:00",
+        "fence": "2024-09-23T04:40:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_nzdusd_4h_20260705_181859",
+      "instrument": "NZDUSD",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-06 05:00:00",
+        "fence": "2024-09-06T05:42:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_us2000_4h_20260705_175517",
+      "instrument": "US2000",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-10 09:00:00",
+        "fence": "2024-09-10T09:33:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_us500_4h_20260705_181949",
+      "instrument": "US500",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-17 17:00:00",
+        "fence": "2024-09-17T17:26:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_usdcad_4h_20260705_181849",
+      "instrument": "USDCAD",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-06 13:00:00",
+        "fence": "2024-09-06T16:23:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_usdchf_4h_20260705_175516",
+      "instrument": "USDCHF",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-06 21:00:00",
+        "fence": "2024-09-09T00:05:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_usdjpy_4h_20260705_181839",
+      "instrument": "USDJPY",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-06 09:00:00",
+        "fence": "2024-09-06T12:28:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_ustec_4h_20260705_181939",
+      "instrument": "USTEC",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-08-26 01:00:00",
+        "fence": "2024-08-26T01:06:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-twin/rebalance_harvest_xauusd_4h_20260705_181929",
+      "instrument": "XAUUSD",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-08-26 09:00:00",
+        "fence": "2024-08-26T09:56:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    }
+  ]
+}

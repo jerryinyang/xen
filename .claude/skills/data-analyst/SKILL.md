@@ -81,6 +81,15 @@ UNANSWERED with a reason. Add follow-up questions as answers raise them.
 - Report effect sizes with uncertainty (bootstrap CIs), sample sizes, and — for any
   survives/dies control read — the **collapse fraction** (control effect / raw effect), not
   just the binary.
+- CI hygiene (INFR-004 / L-20): use `xen.evaluation.block_bootstrap_ci` — it already caps the
+  block below n (no zero-width CI on sparse strata) and aggregates a 5-seed battery. For any
+  read where `ci` sits near zero, quote the **`ci_low_seed_range`** — if that seed band
+  straddles 0 the read is MC-fragile, not significant. For any block-CI that carries a verdict,
+  disclose a **`block_sensitivity`** sweep (½×/1×/2× the chosen block); if `sign(ci_low)`
+  changes the inference is block-fragile. Where the mean may be outlier-driven, show a
+  `trimmed_mean`/median CI alongside. Report a CI that clears zero as
+  "**bootstrap 95% CI excludes zero**" — never "<5% if the true effect were 0" (a percentile CI
+  is not a hypothesis test; `CI_EXCLUDES_ZERO_PHRASE`).
 - Distinguish "no effect" from "unpowered": state the minimum detectable effect where a
   negative matters.
 - Physicality numbers (from the estimand validation report) are interpreted, not just pasted:

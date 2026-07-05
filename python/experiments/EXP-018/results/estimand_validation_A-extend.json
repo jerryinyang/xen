@@ -1,0 +1,100 @@
+{
+  "root": "data/strategy_runs/EXP-018-4h-A-extend",
+  "n_cells": 2,
+  "manifest": {
+    "ok": true,
+    "expected": [
+      "US2000",
+      "NZDUSD"
+    ],
+    "emitted": [
+      "NZDUSD",
+      "US2000"
+    ],
+    "missing": []
+  },
+  "blocking_pass": true,
+  "cells": [
+    {
+      "run_dir": "data/strategy_runs/EXP-018-4h-A-extend/cross_instrument_spread_mr_nzdusd_4h_20260704_194052",
+      "instrument": "NZDUSD",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-06 05:00:00",
+        "fence": "2024-09-06T05:42:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -18530.8779719942,
+        "per_leg_realized_total": -18530.877971994192,
+        "abs_diff_bps": 7.275957614183426e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.8118868355007987,
+        "n_bars": 5927,
+        "n_legs": 996,
+        "n_censored_legs": 0,
+        "total_net_bps": -18530.8779719942,
+        "annualised_return": -0.4861340006060187,
+        "per_bar_sharpe_annualised": -0.48117259403288765,
+        "max_drawdown_bps": -26869.793387079688,
+        "occupancy": 0.5780327315674034,
+        "buy_and_hold_annualised_return": -0.025049788508515098,
+        "buy_and_hold_annualised_vol": 0.11120368575254344,
+        "sanity_flags": [
+          "annualised return -48.6% exceeds 3x buy-and-hold vol (11.1%) on the same instrument"
+        ]
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "data/strategy_runs/EXP-018-4h-A-extend/cross_instrument_spread_mr_us2000_4h_20260704_194049",
+      "instrument": "US2000",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-10 09:00:00",
+        "fence": "2024-09-10T09:33:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 55080.39236834954,
+        "per_leg_realized_total": 55080.39236834954,
+        "abs_diff_bps": 0.0,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.823750855578371,
+        "n_bars": 5887,
+        "n_legs": 1317,
+        "n_censored_legs": 0,
+        "total_net_bps": 55080.39236834954,
+        "annualised_return": 1.4404806811090787,
+        "per_bar_sharpe_annualised": 0.6893588266134498,
+        "max_drawdown_bps": -28912.83710648639,
+        "occupancy": 0.5440801766604383,
+        "buy_and_hold_annualised_return": 0.05070168069511829,
+        "buy_and_hold_annualised_vol": 0.23783277435715497,
+        "sanity_flags": [
+          "|annualised return| 144.0% > 100%/yr",
+          "annualised return 144.0% exceeds 3x buy-and-hold vol (23.8%) on the same instrument"
+        ]
+      },
+      "blocking_pass": true
+    }
+  ]
+}

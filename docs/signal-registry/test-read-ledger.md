@@ -66,10 +66,11 @@ and the methodology has evolved enough, to carry no weight on the new dataset).
 | USDCHF-1h | 0 | open | none (new dataset) |
 | USDCHF-4h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST CONFIRM (robust core, mean-AND-median +) |
 | USDCAD-{15m,1h,4h} | 0 | open | none (new dataset) |
-| AUDUSD-{15m,1h,4h} | 0 | open | none (new dataset) |
+| AUDUSD-{15m,1h} | 0 | open | none (new dataset) |
+| AUDUSD-4h | **1 — EXP-016 (CF-MR-005 persistence read, operator-directed 2026-07-03) — SPENT_ON_DEFECT** | open (1 remaining) | Counted BEFORE result contact: one-shot TEST-band (49%→70%, 20230103-era rows) referee read of e3/extend/z15 S8 ladder net; criteria frozen in `python/experiments/EXP-016/design.md` §4. **SPENT_ON_DEFECT (2026-07-04):** the read consumed the corrupted multi-leg per-bar estimand (`critical-017.md`; L-01 shape); no CF-MR-005 TEST-retention claim rests on it. Corrected TRAIN re-derivation: `python/experiments/VAL-006/analysis.md` (this cell: extend ladders outright losers per leg). Read NOT refunded. |
 | NZDUSD-15m | 0 | open | none (new dataset) |
 | NZDUSD-1h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST read (INCONCLUSIVE: near-zero OOS) |
-| NZDUSD-4h | 0 | open | none (new dataset) |
+| NZDUSD-4h | **1 — EXP-016 (CF-MR-005 persistence read, operator-directed 2026-07-03) — SPENT_ON_DEFECT** | open (1 remaining) | Counted BEFORE result contact; same frozen one-shot as AUDUSD-4h (EXP-016 design §4). **SPENT_ON_DEFECT (2026-07-04):** corrupted multi-leg estimand (`critical-017.md`); corrected TRAIN picture in `VAL-006/analysis.md` (NZDUSD extend −25…−33 bps/leg). Read NOT refunded. |
 | EURJPY-15m | 0 | open | none (new dataset) |
 | EURJPY-1h | 0 | open | none (new dataset) |
 | EURJPY-4h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST CONFIRM (robust core, mean-AND-median +) |
@@ -89,7 +90,7 @@ and the methodology has evolved enough, to carry no weight on the new dataset).
 | US500-{15m,1h,4h} | 0 | open | none (new dataset) |
 | US2000-15m | 0 | open | none (new dataset) |
 | US2000-1h | **1 — EXP-093 (HYP-002, EXIT-RCT)** | open (1 remaining) | EXP-093 TEST CONFIRM (mean-carried; TEST median ≈ 0) |
-| US2000-4h | 0 | open | none (new dataset) |
+| US2000-4h | **1 — EXP-016 (CF-MR-005 persistence read, operator-directed 2026-07-03) — SPENT_ON_DEFECT** | open (1 remaining) | Counted BEFORE result contact; same frozen one-shot as AUDUSD-4h (EXP-016 design §4). **SPENT_ON_DEFECT (2026-07-04):** corrupted multi-leg estimand (`critical-017.md`); corrected TRAIN picture in `VAL-006/analysis.md` (e3/extend/z15 US2000: +9.5 bps/leg gross, CI [−15.9,+32.0] — indistinguishable from 0 at zero cost). Read NOT refunded. |
 | JP225-{15m,1h,4h} | 0 | open | none (new dataset) |
 
 **DE30:** not in the new dataset (dropped at INFR-003 §3.1); no new-dataset strata. Its

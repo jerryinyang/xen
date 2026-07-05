@@ -372,3 +372,140 @@ EXP-015 M3a/tripwire design); `experiment-auditor` leak pass (a binary-only cont
 admitting cell is a REVISE); `research-pipeline` post-exec gate. Builds on [[L-11]] (report
 absolute effect sizes; don't overstate a binary read when the magnitudes are a wash) and the
 EXP-014c W3 finding (`python/experiments/EXP-014c/audit.md` §5.4, §7-W3).
+
+## L-16 — A characterisation estimand must match the P&L-bearing object, or its null is object-mismatch, not absence (EXP-015/EXP-016 / CF-MR-005) ⭐
+
+**What.** EXP-015 characterised the CF-MR-005 ladder harvest with a **per-event** estimand
+(single dislocation → fraction-of-dislocation recovered vs matched control) and returned
+NO_MECHANISM_EVIDENCE (0/11 supported; per-event non-reversion independently confirmed under a
+control-free symmetric read) → retire recommended. The operator instead spent 3 counted TEST
+reads (EXP-016, one-shot, criteria frozen pre-contact): the traded object's net **reproduced
+out-of-TRAIN above its TRAIN level in all 3 cells** (US2000 +11.83 vs 10.90 bps/active,
+TEST ci_low +5.33, boot_p 0.0001, 20 episodes; NZDUSD Holm-significant too). Both results are
+true: the P&L object is a **multi-leg episode structure** (EXP-015's own Part A: ~68% of net
+accrues with ≥2 legs open; per-leg P&L fattens with add depth), and a single-entry estimand is
+structurally deaf to a structure-borne P&L.
+
+**Mechanism (why).** A scale-in ladder's return is a function of the **joint path over an
+episode** (adds at deepening levels, one shared frozen exit family, position-size path), not of
+any single event's forward return. Measuring per-event recovery marginalises exactly the
+dimension the strategy monetises — like characterising a straddle by the underlying's mean
+drift. The per-event null then reads as "no mechanism" when it only established "no *per-event*
+mechanism". This is [[L-13]] (evaluation vehicle must be native to the family) extended one
+stage upstream: **characterisation estimands** must be re-derived from the family's own P&L
+mechanism too, and a characterisation null may only trigger retirement if its estimand
+provably covers the object that earns the P&L.
+
+**How to apply.** Before booking a characterisation null as family-terminal: (1) state the
+P&L-bearing object explicitly (event, episode, portfolio-path); (2) show the estimand is a
+function of that object (an episode-native estimand for multi-leg strategies); (3) if the
+estimand is narrower, label the outcome `NO_<object>_MECHANISM`, never family-level absence.
+Enforced at: `experiment-quant-analyst` design (object statement mandatory in scope),
+pre-exec gate, `experiment-auditor` gate-shape check. Builds on [[L-13]]; companion fact
+recorded as project memory `event-mass-must-match-field-cadence` (now scoped to the per-event
+object). EXP-016: `python/experiments/EXP-016/report.md` §4.
+
+## L-17 — The frozen referee's L1 readiness floor is band-length-blind: it cannot adjudicate short (TEST-band) samples at any edge size (EXP-016) ⭐
+
+**What.** EXP-016's TEST band (~1,110 4h bars ≈ 9 months, rows 49%→70%) was adjudicated with
+the frozen 4h referee. On the strongest cell (US2000: net +11.83 bps/active, ci_low +5.33,
+boot_p 0.0001, 20 episodes) the gate still REJECTED — leg forensics show **L3 PASS, L5
+materiality PASS, sole failing leg `L1_readiness`** (effective_n 333 vs a floor calibrated on
+full ~3.2-year TRAIN samples). The +8 bps bite plant fails the same leg: the gate is provably
+blind on this band — its negative (and its positive) carry no evidential weight there.
+
+**Mechanism (why).** L1 is a fixed effective-sample floor, edge-independent ([[L-12]] §2's
+readiness-veto mode). Any band that is a fraction of the calibration sample fails it
+mechanically, so confirmation reads on TEST bands (~21% of rows by construction) are
+structurally unadjudicable by the frozen instrument. The referee was frozen against
+full-sample screening; nobody re-derived its readiness leg for the short-band confirmation
+use case — a vehicle-fit gap ([[L-13]]) inside the referee itself.
+
+**How to apply.** (1) Never book a frozen-referee verdict (either direction) on a band the
+bite plant cannot pass — run the plant first; if it fails on sample-size legs, the gate is
+inapplicable, not negative. (2) Any TEST-band or short-window confirmation needs a
+**predeclared, candidate-blind, frozen-before-use short-band instrument** (band-length-aware
+readiness rule or an episode-native statistic with its own FPR calibration — the L-12
+mode-2 fix finally becomes binding work before the *last* TEST read of any stratum is spent).
+(3) Until that exists, short-band reads report frozen-seed bootstrap p + ci_low as
+predeclared descriptives (as EXP-016 design §4 did), clearly labelled non-referee. Enforced
+at: design pre-exec gate (any TEST read must name its band-capable instrument),
+`experiment-auditor` gate-shape check. Builds on [[L-12]], [[L-13]].
+
+## L-18 — RESERVED (critical-017): accounting primitives live only in `xen.adjudication`
+
+Placeholder: the ID L-18 is already cited across the programme (`_pipeline-config.md`,
+`xen.estimand_validation.check_no_local_accounting`, VAL-006) for the critical-017 lesson —
+per-bar/per-leg accounting must come from canonical `xen.adjudication` with the reconciliation
+invariant; experiment-local reimplementations certified three wrong verdicts. Recorded here as
+a stub so the ID is never reused; the operative rule is enforced in code (blocking gate).
+
+## L-19 — A single-draw random control is a noisy yardstick: kill tests need seed batteries and percentile reads (EXP-018 → EXP-019 / CF-VOLHARV-001) ⭐
+
+**What.** EXP-018's random-timing control was ONE seeded schedule per cell. Its NZDUSD draw
+printed +31.5 bps/leg with CI_low +13.7 — strong enough to look like a process property and to
+seed a new family's founding anomaly. EXP-019 ran 25 independent ex-ante seeds per instrument:
+the same construction centres on 0 in every (instrument × hold) stratum (NZDUSD |battery mean|
+< MDE 1.4–5.3 bps), with per-seed stratum means spanning **[−11.5, +8.6]** pooled (per-stratum
+seed SD 3.6–13.3 bps/leg) — the +31.5 sits above the entire distribution. A one-seed control
+can land anywhere in that band, so any live-vs-single-twin comparison inherits it.
+
+**Mechanism (why).** A seeded random arm is one draw from a sampling distribution whose spread
+(seed variance × window luck) is the same order as the effect sizes under test. Leg-level CIs
+within the draw are clustering-optimistic and do not see across-draw variance at all, so a
+single twin can be "significantly" positive by luck (EXP-018's +31.5) or negative — biasing a
+beats-random read either way. The failure is asymmetric in practice: a lucky control can kill a
+genuine edge; an unlucky one can pass a dead strategy. EXP-018's verdict survived only because
+its primary leg was control-free (episode WASH) and its live arms were ≈0/negative — the
+single-twin reads were corroborating, not load-bearing.
+
+**How to apply.** (1) Random/timing controls are **batteries, never single twins**: ≥25
+disjoint seeds, provably data-independent (regenerable from seed + bar calendar, byte-diff at
+QA — EXP-019 D1/tripwire-1 pattern). (2) The binding read is the live arm's **percentile
+within the seed distribution** (rank read) plus the battery mean vs its MDE — never a diff
+against one draw. (3) Anchor on an analytic null when the object permits (coin-flip direction
+⇒ E[gross]=0 by construction); the seeds then calibrate, not define, the null. (4) Run both
+control flavours where drift matters: dir/exposure-MATCHED twin (carry benchmark, E≠0 by
+design) and coin-flip twin (zero benchmark) — their gap isolates the drift-carry component.
+(5) Inference at seed level; declared MDE; UNPOWERED never read as negative (B-5). (6) All
+seeds share one price window: across-seed dispersion understates common-shock variance —
+window-level block bootstrap before booking any cross-seed "coherent" positive (EXP-019's
+BTCUSD-48 WASH). (7) A single-twin comparison may still be run for cost reasons, but it is
+**corroboration-only** and must be labelled as such — no verdict leg may rest on it. Enforced
+at: quant-designer control declarations (B-1/B-5 blocks), QA pre-exec (schedule regeneration),
+data-analyst battery/percentile protocol. Builds on [[L-11]], [[L-15]]; supersedes the
+implicit single-twin practice of EXP-018; companion memory
+`single-random-control-fragility`. EXP-019: `python/experiments/EXP-019/report.md`.
+
+## L-20 — The CI referee itself has fragilities: a small-n block bootstrap can emit a zero-width CI, and a single seed is one draw (INFR-004 / `xen.evaluation`) ⭐
+
+**What.** `block_bootstrap_ci` (the shared CI on every effect read) had two defects. (1) Start
+positions were drawn on `[0, n-block)` then wrapped `% n`; for `n <= block+1` (and for
+`block >= n`) that range collapses to a single start, so all 10k resamples equal the original
+series and the reported CI is `[stat, stat]` — **zero width, false certainty** on exactly the
+sparse strata (UNPOWERED cells, thin per-leg counts) where uncertainty is largest. With
+`DEFAULT_BLOCK=5` any stratum with ≤6 events was affected. (2) A fixed `seed=0` made every
+reported bound a **single Monte-Carlo draw**; near the zero decision boundary the 2.5% quantile's
+MC noise can flip a CI-positive/negative read — L-19's single-draw disease, aimed at the
+measurement apparatus instead of the strategy.
+
+**Mechanism (why).** A moving-block bootstrap needs ≥2 distinct start positions to inject
+resampling variability; truncating starts to `[0, n-block)` removes them when the block is a
+large fraction of n, and a single block of length ≥n is just a rotation of the whole series
+(mean-invariant) → variance 0. Separately, the 2.5%/97.5% quantiles of a 10k-rep draw are
+themselves random; one seed hides that spread, so a boundary read looks certain when it is not.
+
+**How to apply.** (1) Cap effective block to `[1, n-1]` and draw starts over the full circular
+range `[0, n)` (proper circular block bootstrap) — guarantees genuine resampling for any n≥2;
+never emit a sampling-derived zero-width CI. (2) Aggregate every CI across a **seed battery**
+(`DEFAULT_N_SEEDS=5`, median of each bound) and disclose the per-seed bound spread
+(`ci_low_seed_range`/`ci_high_seed_range`) — a boundary read with a seed range straddling 0 is
+UNPOWERED-adjacent, not significant. (3) Block length has no correct value: disclose a
+**`block_sensitivity`** sweep (½×/1×/2×) and flag if `sign(ci_low)` changes — block-fragile
+inference is not evidence. (4) The mean chases outliers: report a `trimmed_mean`/median CI
+alongside as a robustness disclosure (the `stat` arg already supports it). (5) A percentile CI
+is **not** a hypothesis test — report "`bootstrap 95% CI excludes zero`", never "<5% if the true
+effect were 0" (`CI_EXCLUDES_ZERO_PHRASE`). Declined: BCa (jackknife acceleration assumes iid,
+unsound on block bootstrap; no decision-flip for the mean at these n). Builds on [[L-19]];
+enforced in `xen.evaluation`, tests in `python/tests/test_evaluation.py`. Companion memory
+`evaluation-ci-hardening`.

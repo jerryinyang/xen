@@ -73,7 +73,13 @@ public sealed record SignalPositionRecord(
     int OpenLegs = 0,                   // concurrent open legs during this bar
     double MtmBps = double.NaN,         // Σ_leg dir·(RealClose − entryFill)/entryFill·1e4 (unrealized)
     double RefreshedTp = double.NaN,    // current (refreshed) form-2 TP price for the active side
-    bool Form1Any = false);             // any open leg's spread reverted through mean this bar
+    bool Form1Any = false,              // any open leg's spread reverted through mean this bar
+    // EXP-020 (CF-VOLHARV-001 HYP-002) ARM R — per-bar virtual-portfolio state (rebalance
+    // premium is a per-bar path estimand; the analyst rebuilds both paths from these + fills).
+    // NaN for every other model.
+    double PortWeight = double.NaN,     // asset weight u·close/(u·close + cash) at bar close
+    double PortUnits = double.NaN,      // asset units u held through this bar's close
+    double PortCash = double.NaN);      // virtual cash leg (account currency)
 
 public sealed record SignalEventRecord(
     DateTime SourceCloseTime,

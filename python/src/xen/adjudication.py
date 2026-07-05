@@ -63,6 +63,8 @@ class MultiLegSeries:
     n_legs: int
     n_censored: int
     censored_mtm_bps: float
+    n_aborted: int = 0  # legs with no exit fill and non-finite RealizedBps (e.g.
+    #                     partial_abort) — excluded from all series, disclosed here
 
 
 @dataclass(frozen=True)
@@ -102,13 +104,20 @@ def per_leg_net(cis_trades: pl.DataFrame, *, cost_bps: float) -> pl.DataFrame:
 
 
 def assemble_multileg_bps(positions: pl.DataFrame, cis_trades: pl.DataFrame, *,
-                          cost_bps: float) -> MultiLegSeries:
+                          cost_bps: float, own_symbol: str | None = None) -> MultiLegSeries:
     """Exposure-correct per-bar gross/net series from the per-leg ledger.
 
     Correct for any leg multiplicity (single-leg arms are the one-leg special case).
     Every open leg contributes its own marked increment each bar; cost is charged on each
     leg's entry bar. See the module accounting contract for the mark construction and the
     telescoping reconciliation guarantee.
+
+    ``own_symbol``: for mixed-symbol ledgers (both-leg arms carry mate-symbol legs), a
+    censored leg can only be marked to open against its OWN symbol's price path. Pass the
+    cell's symbol to restrict ``censored_mtm_bps`` to own-symbol legs; foreign-symbol
+    censored legs still count in ``n_censored`` but contribute no marked MTM (marking a
+    EURUSD leg to a USDJPY open is meaningless). Completed legs are unaffected — their
+    P&L telescopes to their own fills regardless of interior marks.
     """
     _require(positions, REQUIRED_POSITION_COLS, "positions")
     _require(cis_trades, REQUIRED_LEG_COLS, "cis_trades")
@@ -128,12 +137,23 @@ def assemble_multileg_bps(positions: pl.DataFrame, cis_trades: pl.DataFrame, *,
     if cis_trades.height == 0:
         return MultiLegSeries(times, gross, net, open_legs, 0, 0, 0.0)
 
-    legs = cis_trades
+    # aborted legs (no exit fill, non-finite realized P&L, not censored — e.g. the engine's
+    # partial_abort on a both-leg entry) are excluded from every series and disclosed
+    aborted_mask = (pl.col("RealizedBps").is_finite().not_()
+                    & (pl.col("Censored").cast(pl.Boolean).not_()))
+    n_aborted = cis_trades.filter(aborted_mask).height
+    legs = cis_trades.filter(aborted_mask.not_())
+    if legs.height == 0:
+        return MultiLegSeries(times, gross, net, open_legs, 0, 0, 0.0, n_aborted)
     entry_i, exit_i = _leg_bar_spans(times, legs)
     direction = legs.get_column("Direction").to_numpy().astype(float)
     entry_px = legs.get_column("EntryFillPrice").to_numpy().astype(float)
     exit_px = legs.get_column("ExitFillPrice").to_numpy().astype(float)
     censored = legs.get_column("Censored").to_numpy().astype(bool)
+    if own_symbol is not None and "LegSymbol" in legs.columns:
+        markable = (legs.get_column("LegSymbol") == own_symbol).to_numpy()
+    else:
+        markable = np.ones(legs.height, dtype=bool)
 
     for k in range(legs.height):
         b_e, b_x = int(entry_i[k]), int(exit_i[k])
@@ -146,7 +166,8 @@ def assemble_multileg_bps(positions: pl.DataFrame, cis_trades: pl.DataFrame, *,
             last = opens[min(b_x + 1, n - 1)]
             marks[-1] = last
             n_censored += 1
-            censored_mtm += direction[k] * (last - entry_px[k]) / entry_px[k] * 1e4
+            if markable[k]:
+                censored_mtm += direction[k] * (last - entry_px[k]) / entry_px[k] * 1e4
         else:
             marks[-1] = exit_px[k]
         inc = direction[k] * np.diff(marks) / entry_px[k] * 1e4
@@ -157,7 +178,7 @@ def assemble_multileg_bps(positions: pl.DataFrame, cis_trades: pl.DataFrame, *,
             net[b_e] -= cost_bps
 
     return MultiLegSeries(times, gross, net, open_legs, legs.height, n_censored,
-                          float(censored_mtm))
+                          float(censored_mtm), n_aborted)
 
 
 def reconcile(series: MultiLegSeries, cis_trades: pl.DataFrame, *,
@@ -169,7 +190,8 @@ def reconcile(series: MultiLegSeries, cis_trades: pl.DataFrame, *,
     no control run may consume it (critical-017 / A-4).
     """
     _require(cis_trades, REQUIRED_LEG_COLS, "cis_trades")
-    leg_total = float(cis_trades.filter(pl.col("Censored").cast(pl.Boolean).not_())
+    leg_total = float(cis_trades.filter(pl.col("Censored").cast(pl.Boolean).not_()
+                                        & pl.col("RealizedBps").is_finite())
                       .get_column("RealizedBps").sum() or 0.0)
     bar_total = float(series.gross_bps.sum())
     diff = abs(bar_total - leg_total)
@@ -190,7 +212,11 @@ def build_episodes(positions: pl.DataFrame, cis_trades: pl.DataFrame, *,
     times, net, open_legs = series.times, series.net_bps, series.open_legs
     if cis_trades.height == 0:
         return pl.DataFrame()
-    legs = per_leg_net(cis_trades, cost_bps=cost_bps)
+    live = cis_trades.filter(pl.col("RealizedBps").is_finite()
+                             | pl.col("Censored").cast(pl.Boolean))
+    if live.height == 0:
+        return pl.DataFrame()
+    legs = per_leg_net(live, cost_bps=cost_bps)
     entry_i, _ = _leg_bar_spans(times, legs)
     leg_net = legs.get_column("NetBps").to_numpy()
     leg_censored = legs.get_column("Censored").to_numpy().astype(bool)

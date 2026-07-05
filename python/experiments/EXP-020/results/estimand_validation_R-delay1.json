@@ -1,0 +1,61 @@
+{
+  "root": "../data/strategy_runs/EXP-020-R-delay1",
+  "n_cells": 2,
+  "manifest": {
+    "ok": true,
+    "expected": [
+      "NZDUSD",
+      "USDCAD"
+    ],
+    "emitted": [
+      "NZDUSD",
+      "USDCAD"
+    ],
+    "missing": []
+  },
+  "blocking_pass": true,
+  "cells": [
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-delay1/rebalance_harvest_nzdusd_4h_20260705_181441",
+      "instrument": "NZDUSD",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-06 05:00:00",
+        "fence": "2024-09-06T05:42:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-020-R-delay1/rebalance_harvest_usdcad_4h_20260705_181451",
+      "instrument": "USDCAD",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-06 13:00:00",
+        "fence": "2024-09-06T16:23:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "note": "no leg ledger"
+      },
+      "blocking_pass": true
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "root": "data/strategy_runs/EXP-018-smoke",
+  "n_cells": 1,
+  "manifest": {
+    "ok": true,
+    "expected": [
+      "US2000"
+    ],
+    "emitted": [
+      "US2000"
+    ],
+    "missing": []
+  },
+  "blocking_pass": true,
+  "cells": [
+    {
+      "run_dir": "data/strategy_runs/EXP-018-smoke/cross_instrument_spread_mr_us2000_4h_20260704_192455",
+      "instrument": "US2000",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2021-12-30 22:00:00",
+        "fence": "2021-12-31T00:00:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 10614.29969434495,
+        "per_leg_realized_total": 10614.299694344943,
+        "abs_diff_bps": 7.275957614183426e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 1.1284508327629477,
+        "n_bars": 1735,
+        "n_legs": 311,
+        "n_censored_legs": 2,
+        "total_net_bps": 10614.29969434495,
+        "annualised_return": 0.9406080784535771,
+        "per_bar_sharpe_annualised": 0.3944942792463184,
+        "max_drawdown_bps": -28912.83710648639,
+        "occupancy": 0.4737752161383285,
+        "buy_and_hold_annualised_return": 0.24439364608537212,
+        "buy_and_hold_annualised_vol": 0.2277241858840664,
+        "sanity_flags": [
+          "annualised return 94.1% exceeds 3x buy-and-hold vol (22.8%) on the same instrument"
+        ]
+      },
+      "blocking_pass": true
+    }
+  ]
+}

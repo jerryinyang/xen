@@ -27,7 +27,7 @@ Preferred statistical methods organised by analysis type. Use this catalog when 
 
 | Method | Use When | Output | Notes |
 |--------|----------|--------|-------|
-| Bootstrap confidence interval | Estimating uncertainty of any statistic | CI (lower, upper) | Use ≥ 10,000 resamples |
+| Bootstrap confidence interval | Estimating uncertainty of any statistic | CI (lower, upper) + seed range | `xen.evaluation.block_bootstrap_ci`: circular block bootstrap, ≥10,000 resamples × 5-seed battery. Effective block capped < n (no zero-width CI on sparse strata, INFR-004/L-20). For verdict-bearing reads, co-declare a `block_sensitivity` sweep (½×/1×/2×) and, where the mean may be outlier-driven, a `trimmed_mean`/median CI. Report "CI excludes zero", not a p-value. |
 | Bootstrap hypothesis test | When analytical p-values are unreliable | Empirical p-value | Resample under null hypothesis |
 | Cross-validation | Assessing model stability | Mean score, std across folds | Use chronological CV for time-series |
 

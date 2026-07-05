@@ -212,7 +212,11 @@ public sealed class StrategyRunParquetWriter : IDisposable
             new DataField<int>("OpenLegs"),
             new DataField<double>("MtmBps"),
             new DataField<double>("RefreshedTp"),
-            new DataField<bool>("Form1Any")
+            new DataField<bool>("Form1Any"),
+            // EXP-020 ARM R per-bar virtual-portfolio state (NaN for other models).
+            new DataField<double>("PortWeight"),
+            new DataField<double>("PortUnits"),
+            new DataField<double>("PortCash")
         };
         using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
         using var writer = ParquetWriter.CreateAsync(new ParquetSchema(fields), stream).GetAwaiter().GetResult();
@@ -259,6 +263,9 @@ public sealed class StrategyRunParquetWriter : IDisposable
         groupWriter.WriteColumnAsync(new DataColumn(fields[36], rows.Select(row => row.MtmBps).ToArray())).GetAwaiter().GetResult();
         groupWriter.WriteColumnAsync(new DataColumn(fields[37], rows.Select(row => row.RefreshedTp).ToArray())).GetAwaiter().GetResult();
         groupWriter.WriteColumnAsync(new DataColumn(fields[38], rows.Select(row => row.Form1Any).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[39], rows.Select(row => row.PortWeight).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[40], rows.Select(row => row.PortUnits).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[41], rows.Select(row => row.PortCash).ToArray())).GetAwaiter().GetResult();
     }
 
     // EXP-014 (CF-MR-004 HYP-002): per-closed-trade table for leg-level analysis (exit reason /

@@ -1,0 +1,38 @@
+{
+  "experiment": "EXP-015",
+  "family": "CF-MR-005",
+  "hypothesis": "HYP-001",
+  "labels": {
+    "EURUSD": "NO_SEPARATION",
+    "GBPUSD": "NO_SEPARATION",
+    "USDJPY": "NO_SEPARATION",
+    "USDCHF": "NO_SEPARATION",
+    "USDCAD": "NO_SEPARATION",
+    "AUDUSD": "NO_SEPARATION",
+    "NZDUSD": "NO_SEPARATION",
+    "USTEC": "NO_SEPARATION",
+    "US500": "NO_SEPARATION",
+    "US2000": "NO_SEPARATION",
+    "JP225": "UNPOWERED"
+  },
+  "n_supported": 0,
+  "supported_cells": [],
+  "classes_covered": [],
+  "family_gate_supported": false,
+  "n_powered": 10,
+  "seeds": {
+    "bootstrap": 20260703,
+    "permutation": 20260704
+  },
+  "params": {
+    "median_w": 90,
+    "sigma_w": 200,
+    "z_entry": 1.5,
+    "z_exit": 1.0,
+    "block": 12,
+    "n_controls": 20,
+    "n_bootstrap": 10000,
+    "n_perm": 200,
+    "min_events": 30
+  }
+}

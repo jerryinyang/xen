@@ -88,6 +88,9 @@ public partial class Xen
         public double EntryTrendZ;
         public int EntryTrendDir;
         public int EntryVolRegime;
+        // EXP-018: group time-stop horizon — arm A (harvest) = ⌈3·HL_entry⌉ cap 48; random-timing
+        // arm = the scheduled matched hold. 0 = none (legacy moving/form-1-only behaviour).
+        public int HorizonBars;
         public readonly List<BothLegLeg> Legs = new();
         public readonly HashSet<long> ClosingIds = new();
     }
@@ -132,11 +135,13 @@ public partial class Xen
     {
         // Joint form-1 exit on the held group: sc = logClose − anchorLog = spread − mean. A short
         // spread reverts when sc ≤ 0, a long spread when sc ≥ 0 → close ALL legs at the next open.
+        // Decision state (_decisionBracket/_decisionLogClose) == current at delay 0; N bars old on
+        // the EXP-018 entry-delay tripwire arm. Schedule mode disables form-1 entirely (L-08).
         var form1 = false;
-        if (armOrders && _group != null && _group.State == GroupHeld
-            && double.IsFinite(_lastBracket.AnchorLog) && double.IsFinite(logClose))
+        if (!_scheduleMode && armOrders && _group != null && _group.State == GroupHeld
+            && double.IsFinite(_decisionBracket.AnchorLog) && double.IsFinite(_decisionLogClose))
         {
-            var sc = logClose - _lastBracket.AnchorLog;
+            var sc = _decisionLogClose - _decisionBracket.AnchorLog;
             var reverted = (_group.SpreadDir < 0 && sc <= 0.0) || (_group.SpreadDir > 0 && sc >= 0.0);
             if (reverted)
             {
@@ -145,28 +150,40 @@ public partial class Xen
             }
         }
 
+        // EXP-018 group time-stop: arm A (harvest) ⌈3·HL_entry⌉ cap 48; random-timing arm = the
+        // scheduled matched hold. Fires only if form-1 did not already stage the close this bar.
+        if (armOrders && _group != null && _group.State == GroupHeld && _group.HorizonBars > 0
+            && i - _group.EntryBarIndex >= _group.HorizonBars)
+            CloseBothLegGroup(i, _scheduleMode ? "matched_hold" : "time_stop");
+
         // Atomic partial unwind (limit sub-axis): an arming group not completed by its next bar.
         if (_group != null && _group.State == GroupArming && i > _group.EntryBarIndex)
             UnwindArmingGroup(i);
 
         EmitBothLegBar(i, closeTime, mateCount, mateGap, form1);
 
-        // Arm a new group only when flat (reentry none) and the ≤t-1 inputs are valid.
-        if (armOrders && _group == null && !_lastBracket.Warmup && !mateGap
-            && _lastBracket.Sigma > 0.0 && double.IsFinite(_lastBracket.AnchorLog) && double.IsFinite(logClose))
+        // Arm a new group only when flat (reentry none) and the ≤t-1 decision inputs are valid.
+        if (_scheduleMode)
+        {
+            if (armOrders && _group == null && double.IsFinite(logClose))
+                TryOpenScheduledGroup(i, logClose);
+        }
+        else if (armOrders && _group == null && !_decisionBracket.Warmup && !mateGap
+            && _decisionBracket.Sigma > 0.0 && double.IsFinite(_decisionBracket.AnchorLog)
+            && double.IsFinite(_decisionLogClose))
         {
             if (_bothLegEntry == "market")
-                TryOpenMarketGroup(i, logClose);
+                TryOpenMarketGroup(i, _decisionLogClose);
             else
-                TryArmLimitGroup(i, logClose);
+                TryArmLimitGroup(i, _decisionLogClose);
         }
     }
 
     // --- Entry: market sub-axis ------------------------------------------------------------
     private void TryOpenMarketGroup(int i, double logClose)
     {
-        var band = _blZStar * _lastBracket.Sigma;
-        var sc = logClose - _lastBracket.AnchorLog;   // spread − mean (≤ t-1)
+        var band = _blZStar * _decisionBracket.Sigma;
+        var sc = logClose - _decisionBracket.AnchorLog;   // spread − mean (≤ t-1; delay-aware)
         int spreadDir;
         if (sc >= band) spreadDir = -1;               // spread rich → short A + long mates
         else if (sc <= -band) spreadDir = 1;          // spread cheap → long A + short mates
@@ -203,10 +220,10 @@ public partial class Xen
     // --- Entry: limit sub-axis (atomic) ----------------------------------------------------
     private void TryArmLimitGroup(int i, double logClose)
     {
-        var band = _blZStar * _lastBracket.Sigma;
+        var band = _blZStar * _decisionBracket.Sigma;
         var closeI = Math.Exp(logClose);
-        var sell = RoundPrice(Math.Exp(_lastBracket.AnchorLog + band));
-        var buy = RoundPrice(Math.Exp(_lastBracket.AnchorLog - band));
+        var sell = RoundPrice(Math.Exp(_decisionBracket.AnchorLog + band));
+        var buy = RoundPrice(Math.Exp(_decisionBracket.AnchorLog - band));
 
         var group = NewGroup(i, 0, "limit", logClose);   // SpreadDir unknown until the A band fills
         var comment = group.GroupId.ToString();
@@ -484,16 +501,62 @@ public partial class Xen
     // --- Helpers ---------------------------------------------------------------------------
     private BothLegGroup NewGroup(int i, int spreadDir, string mode, double logClose)
     {
+        var b = _decisionBracket;   // decision-state provenance (== _lastBracket at delay 0)
         return new BothLegGroup
         {
             GroupId = ++_spreadGroupSeq, SpreadDir = spreadDir, ExpectedLegs = _blExpectedLegs,
             EntryBarIndex = i, EntryTime = Server.Time, ArmBarOpenTime = _h4.OpenTimes[i],
             ArmAnchorClosePrice = Math.Exp(logClose), State = GroupArming, EntryMode = mode,
-            EntryZ = _lastBracket.Z, EntrySpread = _lastBracket.Spread,
-            EntryAnchorPrice = _lastBracket.Warmup ? double.NaN : Math.Exp(_lastBracket.AnchorLog),
-            EntrySigma = _lastBracket.Sigma, EntryTrendZ = _trendZ, EntryTrendDir = _trendDir,
-            EntryVolRegime = _volRegime
+            EntryZ = b.Z, EntrySpread = b.Spread,
+            EntryAnchorPrice = b.Warmup ? double.NaN : Math.Exp(b.AnchorLog),
+            EntrySigma = b.Sigma, EntryTrendZ = _trendZ, EntryTrendDir = _trendDir,
+            EntryVolRegime = _volRegime,
+            // EXP-018 arm A: group ⌈3·HL_entry⌉ time-stop, cap 48 (schedule mode overwrites with
+            // the matched hold; legacy moving arm leaves 0 = no time exit).
+            HorizonBars = _harvestExit
+                ? (double.IsFinite(b.Hl) && b.Hl > 0.0
+                    ? Math.Min(FrozenHorizonCap, (int)Math.Ceiling(3.0 * b.Hl))
+                    : FrozenHorizonCap)
+                : 0
         };
+    }
+
+    // EXP-018 random-timing arm (both-leg): open a market group with the SCHEDULED direction and
+    // matched hold at each scheduled bar — no band condition, no form-1; exits only by matched
+    // hold or fence. Reuses the market-group sizing/skip rules (never a partial-by-sizing group).
+    private void TryOpenScheduledGroup(int i, double logClose)
+    {
+        var openTime = _h4.OpenTimes[i];
+        while (_scheduleCursor < _schedule.Count && _schedule[_scheduleCursor].OpenTimeUtc < openTime)
+            _scheduleCursor++;
+        if (_scheduleCursor >= _schedule.Count || _schedule[_scheduleCursor].OpenTimeUtc != openTime)
+            return;
+        var e = _schedule[_scheduleCursor++];
+
+        var aPrice = Math.Exp(logClose);
+        var mateVols = new double[_blMateNames.Count];
+        for (var m = 0; m < _blMateNames.Count; m++)
+        {
+            var v = ComputeMateVolume(Symbols.GetSymbol(_blMateNames[m]), aPrice);
+            if (!(v > 0.0))
+            {
+                Print("both-leg scheduled group skipped ({0}): mate '{1}' below min-volume at sizing.",
+                    SymbolName, _blMateNames[m]);
+                return;
+            }
+            mateVols[m] = v;
+        }
+
+        var group = NewGroup(i, e.Dir, "market", logClose);
+        group.HorizonBars = e.HoldBars;
+        _group = group;
+        var comment = group.GroupId.ToString();
+        ExecuteMarketOrder(e.Dir > 0 ? TradeType.Buy : TradeType.Sell, SymbolName, _orderVolume,
+            _bothLegLabel, null, null, comment);
+        var mateDir = -e.Dir;
+        for (var m = 0; m < _blMateNames.Count; m++)
+            ExecuteMarketOrder(mateDir > 0 ? TradeType.Buy : TradeType.Sell, _blMateNames[m], mateVols[m],
+                _bothLegLabel, null, null, comment);
     }
 
     private double ComputeMateVolume(Symbol msym, double aPrice)

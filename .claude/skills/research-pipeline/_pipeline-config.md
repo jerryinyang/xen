@@ -346,6 +346,8 @@ Before creating new modules, check these existing reusable functions:
 | OHLC resampling | `xen.bar_aggregator` | N-minute clock-aligned OHLC aggregation |
 | **Canonical P&L estimands** | `xen.adjudication` | Multi-leg-correct per-bar/per-leg/episode P&L; reconciliation invariant (L-18) — the ONLY permitted accounting path |
 | **Estimand validation gate** | `xen.estimand_validation` | Blocking pre-analysis gate: reconciliation, schema, fence, manifest + physicality report; `check_no_local_accounting` |
+| **Signal-quality toolbox** | `xen.evaluation` | Informative-only evidence: block-bootstrap CIs (INFR-004: circular block capped < n → no zero-width CI on sparse strata; 5-seed battery with `ci_low_seed_range`; `block_sensitivity` sweep; `trimmed_mean` robust stat; report "CI excludes zero", not a p-value — L-20), MDE/UNPOWERED labels, exposure-honest economics (avg+peak normalizations, B&H exposure-matched), cost curves, collapse fractions, splits. Composed per candidate by the Quant Designer — no fixed stack. |
+| ~~Frozen referee stack~~ | `xen.referee_*`, `xen.incremental_referee` | **RETIRED FROM SERVICE (INFR-001 WS-7, 2026-07-04)** — byte-frozen for Chapter-01/02 reproducibility only. Never used for new adjudication: its gate conjunctions/readiness floors select fragile gate-threaders (L-17, B-5/B-7). New evaluation = `xen.evaluation` + operator judgment. |
 | Run ingestion | `xen.signals.ingestion` | Emitted-run loading + holdout fence assertion |
 | *(More to be added as analysis modules are developed)* | `python/src/xen/` | Reusable analysis code |
 

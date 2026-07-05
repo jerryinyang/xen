@@ -1,0 +1,149 @@
+{
+  "experiment": "EXP-016",
+  "family": "CF-MR-005",
+  "variant": "e3/extend/z15",
+  "cells": {
+    "AUDUSD": {
+      "cost_bps": 1.5,
+      "train_repro": {
+        "n_bars": 5930,
+        "n_trades": 842,
+        "carryover_legs": 0,
+        "net_mean_bps": 3.9808754586765844,
+        "ci_low": 1.0604797480434442,
+        "effect_bps": 1.8071375583664517,
+        "passed": true,
+        "n_episodes": 23,
+        "boot_p": 0.0,
+        "bite": true,
+        "powered": true,
+        "exp014c_net": 3.98,
+        "exp014c_ci_low": 1.06
+      },
+      "test": {
+        "n_bars": 1121,
+        "n_trades": 170,
+        "carryover_legs": 2,
+        "net_mean_bps": 5.498722540523915,
+        "ci_low": -0.6350525204061717,
+        "effect_bps": 2.144086855704349,
+        "passed": false,
+        "n_episodes": 5,
+        "boot_p": 0.0657,
+        "bite": false,
+        "powered": false
+      },
+      "shift_test": {
+        "n_bars": 1121,
+        "n_trades": 118,
+        "carryover_legs": 0,
+        "net_mean_bps": 5.164036172284359,
+        "ci_low": -0.8864865884009253,
+        "effect_bps": 2.0752594070015506,
+        "passed": false,
+        "n_episodes": 5,
+        "boot_p": 0.0871,
+        "bite": false,
+        "powered": false
+      },
+      "collapse_fraction_test": 0.9391337959365981,
+      "holm_admit": false,
+      "verdict": "UNPOWERED"
+    },
+    "NZDUSD": {
+      "cost_bps": 2.0,
+      "train_repro": {
+        "n_bars": 5926,
+        "n_trades": 996,
+        "carryover_legs": 0,
+        "net_mean_bps": 3.995340072363103,
+        "ci_low": 1.525510692332569,
+        "effect_bps": 2.4072084463955083,
+        "passed": true,
+        "n_episodes": 24,
+        "boot_p": 0.0,
+        "bite": true,
+        "powered": true,
+        "exp014c_net": 4.0,
+        "exp014c_ci_low": 1.53
+      },
+      "test": {
+        "n_bars": 1121,
+        "n_trades": 130,
+        "carryover_legs": 3,
+        "net_mean_bps": 4.681864724560258,
+        "ci_low": 0.5946039826610732,
+        "effect_bps": 3.2520320999266157,
+        "passed": false,
+        "n_episodes": 7,
+        "boot_p": 0.0064,
+        "bite": false,
+        "powered": false
+      },
+      "shift_test": {
+        "n_bars": 1121,
+        "n_trades": 112,
+        "carryover_legs": 0,
+        "net_mean_bps": 4.969379043299643,
+        "ci_low": 1.3365898007769101,
+        "effect_bps": 4.029489829739915,
+        "passed": false,
+        "n_episodes": 5,
+        "boot_p": 0.001,
+        "bite": false,
+        "powered": false
+      },
+      "collapse_fraction_test": 1.0614102148725344,
+      "holm_admit": false,
+      "verdict": "UNPOWERED"
+    },
+    "US2000": {
+      "cost_bps": 5.0,
+      "train_repro": {
+        "n_bars": 5886,
+        "n_trades": 1317,
+        "carryover_legs": 0,
+        "net_mean_bps": 10.9002526907874,
+        "ci_low": 3.166340318850169,
+        "effect_bps": 4.977897425979204,
+        "passed": true,
+        "n_episodes": 40,
+        "boot_p": 0.0,
+        "bite": true,
+        "powered": true,
+        "exp014c_net": 10.9,
+        "exp014c_ci_low": 3.17
+      },
+      "test": {
+        "n_bars": 1110,
+        "n_trades": 262,
+        "carryover_legs": 0,
+        "net_mean_bps": 11.829610787285347,
+        "ci_low": 5.327273156213887,
+        "effect_bps": 12.707183718037008,
+        "passed": false,
+        "n_episodes": 20,
+        "boot_p": 0.0001,
+        "bite": false,
+        "powered": false
+      },
+      "shift_test": {
+        "n_bars": 1110,
+        "n_trades": 61,
+        "carryover_legs": 4,
+        "net_mean_bps": 6.6206074410916385,
+        "ci_low": -2.3262616039743156,
+        "effect_bps": 5.654865614358985,
+        "passed": false,
+        "n_episodes": 13,
+        "boot_p": 0.0919,
+        "bite": false,
+        "powered": false
+      },
+      "collapse_fraction_test": 0.5596640126323997,
+      "holm_admit": false,
+      "verdict": "UNPOWERED"
+    }
+  },
+  "family_routing": "OPERATOR_ROUTING_MIXED"
+}

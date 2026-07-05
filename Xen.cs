@@ -28,7 +28,14 @@ public enum XenStrategy
     Donchian20,
     Rsi2Fade,
     CrossDomainMrLimit,
-    CrossInstrumentSpreadMr
+    CrossInstrumentSpreadMr,
+    // EXP-019 (CF-VOLHARV-001): seeded random-timing fixed-hold market legs — runs in
+    // Mode=NativeOrders only (see Xen.RandomHold.cs).
+    RandomHold,
+    // EXP-020 (CF-VOLHARV-001 HYP-002): structure harvest arms — Mode=NativeOrders only
+    // (see Xen.StructureHarvest.cs). RebalanceHarvest = ARM R; GridHarvest = ARM G.
+    RebalanceHarvest,
+    GridHarvest
 }
 
 [Robot(AccessRights = AccessRights.FullAccess, AddIndicators = false, DefaultTimeFrame="Minute")]
@@ -145,8 +152,63 @@ public partial class Xen : Robot
     // frozen at the symmetric outward barrier o±D (o = entry fill, D = |o − a_entry|).
     // "bracket" = E3: E2 + hard time-stop ⌈3·HL_entry⌉ domain bars (cap 48) → market close.
     // E3 reproduces the symmetry two-barrier availability race exactly. Single-leg only.
+    // EXP-018 (CF-MR-005 HYP-003) — arm A "harvest" exit set: refreshing form-2 TP at the MOVING
+    // anchor mean + per-leg ⌈3·HL_entry⌉ time-stop (cap 48), NO stop-loss, NO form-1 event exit
+    // (design §4 arm A names exactly {moving TP, time-stop}). Arm B ("braked") = existing "bracket".
     [Parameter("CIS Exit Set", DefaultValue = "moving")]
     public string CisExitSet { get; set; } = "moving";
+
+    // EXP-018 CAUSAL-MISALIGNMENT TRIPWIRE (design §5, entry-delay +1): >0 delays the DECISION
+    // state (bracket + logClose) by N completed domain bars — arming, exits, TP refresh, and leg
+    // provenance all condition on t-1-N instead of t-1. 0 = live (identical code path, zero drift).
+    [Parameter("CIS Entry Delay Bars", DefaultValue = 0)]
+    public int CisEntryDelayBars { get; set; }
+
+    // EXP-018 RANDOM-TIMING LADDER DESTROY (design §5, operator-resolved 2026-07-04): path to a
+    // pre-generated seeded schedule CSV (open_time_utc,level,dir,hold_bars). When set, the robot
+    // places NO band limits: it market-enters at each scheduled bar's next open and market-exits
+    // after the scheduled matched hold (drawn from the live arm's realized per-level BarsHeld) —
+    // an exposure-matched carry read. No TP, no form-1, no SL (L-08: exits must not re-import the
+    // anchor, or near-anchor random entries close instantly and bias the null toward collapse).
+    [Parameter("CIS Schedule Path", DefaultValue = "")]
+    public string CisSchedulePath { get; set; } = "";
+
+    // EXP-019 (CF-VOLHARV-001) — RandomHold schedule CSV (open_time_utc,level,dir,hold_bars;
+    // level unused/0; hold ∈ {6,12,24,48}), pre-generated from (seed, engine bar calendar) only —
+    // never prices. EMPTY = calendar-emission run: no orders, per-bar records only (the calendar
+    // the schedule generator consumes; deviation D1 in Xen.RandomHold.cs).
+    [Parameter("RH Schedule Path", DefaultValue = "")]
+    public string RhSchedulePath { get; set; } = "";
+
+    // EXP-019 provenance label only (the schedule is already fully determined by its CSV): the
+    // generator seed recorded into run_metadata so each of the 25 seeded runs is identifiable.
+    [Parameter("RH Seed", DefaultValue = 0)]
+    public int RhSeed { get; set; }
+
+    // EXP-019 inventory cap: a scheduled entry landing when this many legs are open is SKIPPED
+    // (logged cap_skip), never deferred — deterministic (design §4).
+    [Parameter("RH Max Open Legs", DefaultValue = 6)]
+    public int RhMaxOpenLegs { get; set; } = 6;
+
+    // EXP-020 (CF-VOLHARV-001 HYP-002) — structure-harvest twin flag. ARM R: true = the
+    // unrebalanced same-mix B&H twin (init only, never rebalances). ARM G: true = the
+    // direction-INVERTED momentum grid (stop entries, unwind one level away from A).
+    [Parameter("SH Twin", DefaultValue = false)]
+    public bool ShTwin { get; set; }
+
+    // EXP-020 ARM R band b_w in WEIGHT terms (A1 table, candidate-blind from EXP-019;
+    // tripwire 2: values byte-diffed against derive_exp020_params.py output).
+    [Parameter("SH Band W", DefaultValue = 0.0)]
+    public double ShBandW { get; set; }
+
+    // EXP-020 ARM G grid spacing g in bps of the monthly anchor (A1 table; tripwire 2).
+    [Parameter("SH Grid Bps", DefaultValue = 0.0)]
+    public double ShGridBps { get; set; }
+
+    // EXP-020 TRIPWIRE 1 (entry-delay +1): 1 delays every decision input (rebalance weight,
+    // month-boundary reset, level arming) by one completed 4h bar. 0 = live, identical path.
+    [Parameter("SH Delay Bars", DefaultValue = 0)]
+    public int ShDelayBars { get; set; }
 
     private TimeBarParquetWriter? _writer;
     private BarAggregator? _strategyAggregator;
@@ -178,7 +240,14 @@ public partial class Xen : Robot
         {
             try
             {
-                StartNativeOrders();
+                if (Strategy == XenStrategy.RandomHold)
+                    StartRandomHold();
+                else if (Strategy == XenStrategy.RebalanceHarvest)
+                    StartRebalanceHarvest();
+                else if (Strategy == XenStrategy.GridHarvest)
+                    StartGridHarvest();
+                else
+                    StartNativeOrders();
             }
             catch (Exception ex)
             {
@@ -221,7 +290,13 @@ public partial class Xen : Robot
             return;
         if (Mode == XenMode.NativeOrders)
         {
-            if (_nativeReady)
+            if (_rhReady)
+                RunRandomHoldOnBar();
+            else if (_rebReady)
+                RunRebalanceHarvestOnBar();
+            else if (_gridReady)
+                RunGridHarvestOnBar();
+            else if (_nativeReady)
                 RunNativeOrdersOnBar();
             return;
         }
@@ -240,7 +315,14 @@ public partial class Xen : Robot
         {
             if (Mode == XenMode.NativeOrders)
             {
-                FlushOpenLegsAsCensored();   // EXP-014b: emit still-open legs as censored open_at_end rows
+                if (_rhReady)
+                    FlushRandomHoldCensored();   // EXP-019: censored open legs (should be empty — D3)
+                else if (_rebReady)
+                    FlushRebalanceSummary();     // EXP-020 ARM R: no leg ledger; summary print only
+                else if (_gridReady)
+                    FlushGridCensored();         // EXP-020 ARM G: fence-open inventory → censored rows
+                else
+                    FlushOpenLegsAsCensored();   // EXP-014b: emit still-open legs as censored open_at_end rows
                 _strategyWriter?.Dispose();
             }
             else if (IsStrategyHostMode())
@@ -470,6 +552,10 @@ public partial class Xen : Robot
             // self-adjudicating StrategyHost model — see StartNativeOrders / the planner.
             XenStrategy.CrossInstrumentSpreadMr => throw new InvalidOperationException(
                 "CrossInstrumentSpreadMr runs in Mode=NativeOrders (native pending orders), not StrategyHost."),
+            XenStrategy.RandomHold => throw new InvalidOperationException(
+                "RandomHold (EXP-019) runs in Mode=NativeOrders (native market orders), not StrategyHost."),
+            XenStrategy.RebalanceHarvest or XenStrategy.GridHarvest => throw new InvalidOperationException(
+                "RebalanceHarvest/GridHarvest (EXP-020) run in Mode=NativeOrders, not StrategyHost."),
             _ => throw new InvalidOperationException($"Unsupported strategy: {Strategy}")
         };
     }
@@ -569,18 +655,30 @@ public partial class Xen : Robot
                 parameters["domain"] = _nativeDomain;             // HYP-003: 1h or 4h decision domain
                 // HYP-004 (amendment-004) — exit-set axis: moving (E0) | frozen_tp | frozen_tp_sl | bracket.
                 parameters["exit_set_axis"] = _exitSet;
-                parameters["exit_set"] = _frozenExit
-                    ? "frozen_tp_at_entry_anchor" + (_frozenSl ? "+sl_outward_oD" : "")
-                      + (_frozenTimeStop ? "+time_stop_3xHL_cap48" : "")
-                    : "form1_event_reversion+form2_moving_mean_limit";  // E0: no horizon
+                parameters["exit_set"] = _scheduleMode
+                    ? "random_timing_matched_hold_market_exit_only"
+                    : _harvestExit
+                        ? "harvest_moving_tp+time_stop_3xHL_cap48_no_sl_no_form1"
+                        : _frozenExit
+                            ? "frozen_tp_at_entry_anchor" + (_frozenSl ? "+sl_outward_oD" : "")
+                              + (_frozenTimeStop ? "+time_stop_3xHL_cap48" : "")
+                            : "form1_event_reversion+form2_moving_mean_limit";  // E0: no horizon
                 parameters["form2_exit"] = CisBothLeg
-                    ? "both_leg_joint_form1_at_spread_mean_no_separate_form2"
+                    ? (_harvestExit
+                        ? "both_leg_joint_form1_at_spread_mean+group_time_stop_3xHL_cap48"
+                        : "both_leg_joint_form1_at_spread_mean_no_separate_form2")
                     : (_frozenExit
                         ? "tp_frozen_at_entry_time_anchor_never_modified"
                         : "moving_anchor_mean_modify_tp_each_bar_favorable_asserted");
-                parameters["form1"] = _frozenExit
-                    ? "disabled_frozen_exit_modes"
+                parameters["form1"] = _frozenExit || _harvestExit || _scheduleMode
+                    ? (CisBothLeg && _harvestExit
+                        ? "both_leg_joint_spread_reversion_is_the_harvest_exit"
+                        : "disabled_this_exit_set")
                     : "spread_reverted_through_mean_close_next_bar_open";
+                // EXP-018 control-arm provenance
+                parameters["entry_delay_bars"] = CisEntryDelayBars;
+                parameters["schedule_path"] = CisSchedulePath;
+                parameters["schedule_mode"] = _scheduleMode;
                 parameters["both_leg"] = CisBothLeg
                     ? "short_instrument_plus_long_equal_weight_basket_grouped_spread_position"
                     : "single_leg_traded_instrument_only";
@@ -596,6 +694,46 @@ public partial class Xen : Robot
                 parameters["vol_regime"] = "spread_sigma_tercile_over_trailing_500_domain_bars";
                 parameters["basket_mates"] = BasketMates;
                 parameters["basket_phase_shift_bars"] = BasketPhaseShiftHours;  // 0 live; >0 leak tripwire (4h bars)
+                break;
+            case XenStrategy.RandomHold:
+                // EXP-019 (CF-VOLHARV-001) provenance — the schedule fully determines behavior.
+                parameters["execution"] = "native_ctrader_market_orders_m1";
+                parameters["schedule_path"] = RhSchedulePath;
+                parameters["schedule_seed"] = RhSeed;
+                parameters["calendar_emission_mode"] = string.IsNullOrWhiteSpace(RhSchedulePath);
+                parameters["max_open_legs"] = RhMaxOpenLegs;
+                parameters["entry"] = "unconditional_scheduled_market_at_bar_open";
+                parameters["exit_set"] = "matched_hold_market_only_no_tp_no_sl_no_refresh";
+                parameters["hold_grid"] = "6;12;24;48_round_robin_in_schedule_order";
+                parameters["sizing"] = "fixed_min_volume_never_varied";
+                parameters["cap_policy"] = "skip_logged_cap_skip_never_deferred";
+                parameters["open_at_end"] = "censored_disclosed_excluded_from_realized";
+                break;
+            case XenStrategy.RebalanceHarvest:
+                // EXP-020 ARM R provenance (design §3 + A1 params; tripwire 2 byte-diff).
+                parameters["execution"] = "native_ctrader_market_orders_m1";
+                parameters["arm"] = ShTwin ? "R_twin_unrebalanced_bh_mix" : "R_banded_rebalance";
+                parameters["w_star"] = 0.5;
+                parameters["band_w"] = ShBandW;
+                parameters["entry_delay_bars"] = ShDelayBars;      // 0 live; 1 tripwire 1
+                parameters["trigger"] = "abs_weight_dev_ge_band_at_t-1_close_trade_next_open";
+                parameters["estimand"] = "per_bar_path_PortWeight_Units_Cash+trade_blotter_no_leg_ledger";
+                parameters["sizing"] = "virtual_portfolio_real_position_ge_20_vol_steps_per_trade";
+                break;
+            case XenStrategy.GridHarvest:
+                // EXP-020 ARM G provenance (design §3 + 2026-07-05 twin clarification; A1 params).
+                parameters["execution"] = "native_ctrader_pending_orders_m1";
+                parameters["arm"] = ShTwin ? "G_twin_inverted_momentum_grid" : "G_mr_grid";
+                parameters["anchor"] = "previous_calendar_month_close_monthly_reset_inventory_carried";
+                parameters["grid_bps"] = ShGridBps;
+                parameters["levels_per_side"] = GridLevelsPerSide;
+                parameters["max_open_legs"] = GridMaxOpenLegs;
+                parameters["entry_delay_bars"] = ShDelayBars;      // 0 live; 1 tripwire 1
+                parameters["unwind"] = ShTwin
+                    ? "tp_one_level_AWAY_from_anchor_stop_entries"
+                    : "tp_one_level_TOWARD_anchor_limit_entries";
+                parameters["cap_policy"] = "level_order_not_placed_at_cap_logged_cap_skip";
+                parameters["open_at_end"] = "censored_disclosed_excluded_from_realized";
                 break;
         }
         return parameters;
@@ -674,7 +812,22 @@ public partial class Xen : Robot
     private bool _frozenExit;                  // any of E1/E2/E3
     private bool _frozenSl;                    // E2/E3: SL at the outward barrier o±D
     private bool _frozenTimeStop;              // E3: ⌈3·HL_entry⌉ time-stop (cap 48)
+    private bool _harvestExit;                 // EXP-018 arm A: moving TP + time-stop, no SL/form-1
     private const int FrozenHorizonCap = 48;   // matches the availability race H_CAP
+
+    // --- EXP-018 decision-state delay (entry-delay tripwire) --------------------------------
+    // All DECISIONS (arming, form-1 test, TP refresh, leg provenance) read _decisionBracket /
+    // _decisionLogClose; the per-bar EMISSION keeps the current bar's bracket (provenance of the
+    // bar itself). delay=0 → decision state == current state (bit-identical live path).
+    private SpreadBracket _decisionBracket = new() { Warmup = true };
+    private double _decisionLogClose = double.NaN;
+    private readonly Queue<(SpreadBracket Bracket, double LogClose)> _delayQueue = new();
+
+    // --- EXP-018 random-timing schedule state ------------------------------------------------
+    private bool _scheduleMode;
+    private sealed record ScheduledEntry(DateTime OpenTimeUtc, int Level, int Dir, int HoldBars);
+    private List<ScheduledEntry> _schedule = new();
+    private int _scheduleCursor;
 
     // --- EXP-014 multi-leg netting engine --------------------------------------------------
     // One NativeLeg per open position (concurrent under allow/extend; ≤1 under none). Matched to
@@ -752,14 +905,26 @@ public partial class Xen : Robot
         _staticArm = CisStaticArm;
         _trail = CisTrail;
         _exitSet = (CisExitSet ?? "moving").Trim().ToLowerInvariant();
-        if (_exitSet != "moving" && _exitSet != "frozen_tp" && _exitSet != "frozen_tp_sl" && _exitSet != "bracket")
+        if (_exitSet != "moving" && _exitSet != "frozen_tp" && _exitSet != "frozen_tp_sl"
+            && _exitSet != "bracket" && _exitSet != "harvest")
             throw new InvalidOperationException(
-                $"CIS Exit Set must be moving|frozen_tp|frozen_tp_sl|bracket, got '{CisExitSet}'.");
-        _frozenExit = _exitSet != "moving";
+                $"CIS Exit Set must be moving|frozen_tp|frozen_tp_sl|bracket|harvest, got '{CisExitSet}'.");
+        _harvestExit = _exitSet == "harvest";
+        _frozenExit = _exitSet != "moving" && !_harvestExit;
         _frozenSl = _exitSet == "frozen_tp_sl" || _exitSet == "bracket";
         _frozenTimeStop = _exitSet == "bracket";
         if (_frozenExit && CisBothLeg)
             throw new InvalidOperationException("CIS Exit Set frozen modes are single-leg only (HYP-004).");
+        if (CisEntryDelayBars < 0)
+            throw new InvalidOperationException("CIS Entry Delay Bars must be >= 0.");
+        if (!string.IsNullOrWhiteSpace(CisSchedulePath))
+        {
+            _schedule = LoadSchedule(CisSchedulePath.Trim());
+            _scheduleMode = true;
+            if (CisEntryDelayBars > 0)
+                throw new InvalidOperationException(
+                    "Schedule mode and entry-delay are separate control arms — do not combine.");
+        }
         var z0 = CisZStar > 0.0 ? CisZStar : CrossInstrumentSpreadPlanner.ZStar;
         _ladderZStars = new[] { z0, z0 + 0.5, z0 + 1.0 };   // HYP-003 base-z* + reentry ladder
         _bothLeg = CisBothLeg;                              // HYP-003 A10 — grouped-spread variant (Increment B)
@@ -826,6 +991,29 @@ public partial class Xen : Robot
         _lastBracket = _planner.CurrentBracket();
         UpdateConditioners(close);
 
+        // EXP-018 decision-state delay: decisions condition on the state N bars back (tripwire arm);
+        // delay=0 → decision state == the just-observed state (live path, bit-identical to HYP-004).
+        if (CisEntryDelayBars <= 0)
+        {
+            _decisionBracket = _lastBracket;
+            _decisionLogClose = logClose;
+        }
+        else
+        {
+            _delayQueue.Enqueue((_lastBracket, logClose));
+            if (_delayQueue.Count > CisEntryDelayBars)
+            {
+                var d = _delayQueue.Dequeue();
+                _decisionBracket = d.Bracket;
+                _decisionLogClose = d.LogClose;
+            }
+            else
+            {
+                _decisionBracket = new SpreadBracket { Warmup = true };
+                _decisionLogClose = double.NaN;
+            }
+        }
+
         // HYP-003 A10 — both-leg grouped-spread path (Increment B). Fully self-contained; the
         // single-leg netting engine below is untouched. Shares Observe/conditioners/bracket above.
         if (_bothLeg)
@@ -844,20 +1032,24 @@ public partial class Xen : Robot
         // reverted through mean → market close. NO horizon (unspecified in the proposal). A non-reverting
         // position rides until form-1/form-2 fires or the fence stops it (then censored, open_at_end).
         var form1Any = false;
-        if (!_frozenExit && armOrders && _legs.Count > 0
-            && double.IsFinite(_lastBracket.AnchorLog) && double.IsFinite(logClose))
-            form1Any = ApplyEventExits(i, logClose);
+        if (!_frozenExit && !_harvestExit && !_scheduleMode && armOrders && _legs.Count > 0
+            && double.IsFinite(_decisionBracket.AnchorLog) && double.IsFinite(_decisionLogClose))
+            form1Any = ApplyEventExits(i, _decisionLogClose);
 
-        // HYP-004 E3 time-stop: close legs held ≥ their frozen ⌈3·HL_entry⌉ horizon at market
-        // (exit at next open). E1/E2 have no time exit; E0 uses form-1/form-2 above.
-        if (_frozenTimeStop && armOrders && _legs.Count > 0)
+        // HYP-004 E3 / EXP-018 arm A time-stop: close legs held ≥ their frozen ⌈3·HL_entry⌉
+        // horizon at market (exit at next open). E1/E2 have no time exit; E0 uses form-1/form-2.
+        if ((_frozenTimeStop || _harvestExit) && !_scheduleMode && armOrders && _legs.Count > 0)
             ApplyFrozenTimeStop(i);
 
-        // Form-2 exit (E0 moving-mean only). Each bar, modify every surviving leg's TP to the
-        // moving anchor mean exp(anchorLog_t); favorable-asserted per (re)placement. E1-E3 legs are
-        // never touched — their bracket is frozen at the fill (HYP-004).
+        // EXP-018 random-timing arm: matched-hold market exits only (no TP/form-1/SL — L-08).
+        if (_scheduleMode && armOrders && _legs.Count > 0)
+            ApplyMatchedHoldExits(i);
+
+        // Form-2 exit (E0 moving-mean + EXP-018 harvest). Each bar, modify every surviving leg's
+        // TP to the moving anchor mean exp(anchorLog_t); favorable-asserted per (re)placement.
+        // E1-E3 legs are never touched — their bracket is frozen at the fill (HYP-004).
         var refreshedTp = double.NaN;
-        if (!_frozenExit && armOrders && _legs.Count > 0 && !_lastBracket.Warmup)
+        if (!_frozenExit && !_scheduleMode && armOrders && _legs.Count > 0 && !_decisionBracket.Warmup)
             refreshedTp = RefreshForm2Targets(close);
 
         EmitNativePosition(i, closeTime, mateCount, mateGap, refreshedTp, form1Any);
@@ -865,7 +1057,12 @@ public partial class Xen : Robot
         _pendingExitFill = double.NaN;
 
         if (armOrders)
-            RearmBracket(logClose, mateGap);
+        {
+            if (_scheduleMode)
+                FireScheduledEntries(i);
+            else
+                RearmBracket(_decisionLogClose, mateGap);
+        }
 
         _h4Index = i;
         _lastProcessedH4Open = openTime;
@@ -954,7 +1151,7 @@ public partial class Xen : Robot
     // (binding, don't chase) or through the live market; skip entirely on a min-mate gap.
     private void RearmBracket(double logClose, bool mateGap)
     {
-        var b = _lastBracket;
+        var b = _decisionBracket;   // == _lastBracket at delay 0; N-bar-old state on the tripwire arm
         if (!_staticArm)
         {
             if (_reentryMode == "none" && _legs.Count > 0)
@@ -1024,8 +1221,18 @@ public partial class Xen : Robot
         if (pos.Label != _orderLabel)
             return;
         var dir = pos.TradeType == TradeType.Sell ? -1 : 1;
-        var level = int.TryParse(pos.Comment, out var lv) ? lv : 0;
-        var b = _lastBracket;
+        // Schedule mode encodes "level;hold_bars" in the comment; live limit orders carry the level.
+        var level = 0;
+        var scheduledHold = 0;
+        if (_scheduleMode)
+        {
+            var parts = (pos.Comment ?? "").Split(';');
+            if (parts.Length >= 1) int.TryParse(parts[0], out level);
+            if (parts.Length >= 2) int.TryParse(parts[1], out scheduledHold);
+        }
+        else
+            level = int.TryParse(pos.Comment, out var lv) ? lv : 0;
+        var b = _decisionBracket;   // decision-state provenance (== _lastBracket at delay 0)
         // Entry-referential FIXED exit (proposal semantics): unwind the locked dislocation from the
         // ACTUAL fill. band = Z*·σ at the arm bar (level's ladder z*); exit = EntryFill·exp(dir·band)
         // (short dir=−1 → exp(−band) lower; long dir=+1 → exp(+band) higher). Locked once, never moved.
@@ -1045,7 +1252,14 @@ public partial class Xen : Robot
         _periodEntryDir = dir;                 // mark this period's active direction (entry bar)
         _pendingEntryFill = pos.EntryPrice;
 
-        if (!_frozenExit)
+        if (_scheduleMode)
+        {
+            // EXP-018 random-timing arm: NO TP/SL — the leg exits only by its matched hold
+            // (market close after scheduledHold bars) or the fence (censored). L-08: re-importing
+            // the anchor exit would collapse near-anchor random entries instantly and bias the null.
+            leg.HorizonBars = scheduledHold > 0 ? scheduledHold : FrozenHorizonCap;
+        }
+        else if (!_frozenExit)
         {
             // E0: set the initial form-2 TP to the moving anchor mean exp(anchorLog) (refreshed each bar,
             // HYP-003). Assert favorable before placement (long: TP>fill; short: TP<fill). fixedExit is a
@@ -1058,6 +1272,12 @@ public partial class Xen : Robot
                 if (favorable)
                     pos.ModifyTakeProfitPrice(rt);
             }
+            // EXP-018 arm A (harvest): per-leg ⌈3·HL_entry⌉ time-stop, cap 48 (design §4) —
+            // bounds e1-style censoring. No SL, no form-1 (the moving TP above is the exit).
+            if (_harvestExit)
+                leg.HorizonBars = double.IsFinite(b.Hl) && b.Hl > 0.0
+                    ? Math.Min(FrozenHorizonCap, (int)Math.Ceiling(3.0 * b.Hl))
+                    : FrozenHorizonCap;
         }
         else
         {
@@ -1178,7 +1398,7 @@ public partial class Xen : Robot
     // exits). Returns whether any form-1 fired. All decision inputs are ≤ t-1 (bar i completed).
     private bool ApplyEventExits(int i, double logClose)
     {
-        var sc = logClose - _lastBracket.AnchorLog;
+        var sc = logClose - _decisionBracket.AnchorLog;
         var toClose = new List<long>();
         foreach (var leg in _legs)
         {
@@ -1204,11 +1424,77 @@ public partial class Xen : Robot
             CloseLegMarket(id, "time_stop");
     }
 
+    // EXP-018 random-timing arm: market-close every leg held ≥ its scheduled matched hold. The
+    // matched hold is a seeded draw from the live arm's realized per-level BarsHeld distribution
+    // (exposure-matched carry read — operator-resolved 2026-07-04).
+    private void ApplyMatchedHoldExits(int i)
+    {
+        var toClose = new List<long>();
+        foreach (var leg in _legs)
+            if (leg.HorizonBars > 0 && i - leg.EntryH4Index >= leg.HorizonBars)
+                toClose.Add(leg.PositionId);
+        foreach (var id in toClose)
+            CloseLegMarket(id, "matched_hold");
+    }
+
+    // EXP-018 random-timing arm: market-enter each scheduled entry whose OpenTime == bar i's
+    // OpenTime (fills at the next open — same convention as the both-leg market entry). The
+    // schedule is strictly time-sorted; stale rows (before the first processed bar) are skipped.
+    private void FireScheduledEntries(int i)
+    {
+        var openTime = _h4.OpenTimes[i];
+        while (_scheduleCursor < _schedule.Count && _schedule[_scheduleCursor].OpenTimeUtc < openTime)
+            _scheduleCursor++;   // stale (bar not processed at this time) — skipped, disclosed in logs
+        while (_scheduleCursor < _schedule.Count && _schedule[_scheduleCursor].OpenTimeUtc == openTime)
+        {
+            var e = _schedule[_scheduleCursor++];
+            ExecuteMarketOrder(e.Dir > 0 ? TradeType.Buy : TradeType.Sell, SymbolName, _orderVolume,
+                _orderLabel, null, null, $"{e.Level};{e.HoldBars}");
+        }
+    }
+
+    // Schedule CSV: header + rows "open_time_utc,level,dir,hold_bars" (ISO-8601 UTC; dir ∈ {-1,+1};
+    // hold_bars ≥ 1), strictly non-decreasing in time. Generated seeded from the live arm's emission
+    // by tools/ctrader-cli/experiments/gen_exp018_schedules.py — never hand-written.
+    private static List<ScheduledEntry> LoadSchedule(string path)
+    {
+        if (!System.IO.File.Exists(path))
+            throw new InvalidOperationException($"CIS Schedule Path not found: {path}");
+        var rows = new List<ScheduledEntry>();
+        var last = DateTime.MinValue;
+        foreach (var line in System.IO.File.ReadAllLines(path))
+        {
+            var t = line.Trim();
+            if (t.Length == 0 || t.StartsWith("open_time", StringComparison.OrdinalIgnoreCase) || t.StartsWith("#"))
+                continue;
+            var f = t.Split(',');
+            if (f.Length < 4)
+                throw new InvalidOperationException($"Bad schedule row (need 4 fields): '{t}'");
+            if (!DateTime.TryParse(f[0], CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var ts))
+                throw new InvalidOperationException($"Bad schedule timestamp: '{f[0]}'");
+            var level = int.Parse(f[1], CultureInfo.InvariantCulture);
+            var dir = int.Parse(f[2], CultureInfo.InvariantCulture);
+            var hold = int.Parse(f[3], CultureInfo.InvariantCulture);
+            if (dir != 1 && dir != -1)
+                throw new InvalidOperationException($"Bad schedule dir (must be ±1): '{t}'");
+            if (hold < 1)
+                throw new InvalidOperationException($"Bad schedule hold_bars (must be ≥1): '{t}'");
+            if (ts < last)
+                throw new InvalidOperationException($"Schedule not time-sorted at: '{t}'");
+            last = ts;
+            rows.Add(new ScheduledEntry(ts, level, dir, hold));
+        }
+        if (rows.Count == 0)
+            throw new InvalidOperationException($"Schedule is empty: {path}");
+        return rows;
+    }
+
     // Refresh the moving form-2 TP (anchor mean) for every open leg; assert favorable placement
     // before each modify (long: TP > mark; short: TP < mark) — skip adverse (finding F guard).
     private double RefreshForm2Targets(double mark)
     {
-        var target = _lastBracket.ExitPrice;   // exp(moving anchorLog)
+        var target = _decisionBracket.ExitPrice;   // exp(moving anchorLog); decision-state (delay-aware)
         if (!double.IsFinite(target))
             return double.NaN;
         var rt = RoundPrice(target);

@@ -1,0 +1,55 @@
+{
+  "root": "data/strategy_runs/EXP-018-4h-blmkt-A-delay1",
+  "n_cells": 1,
+  "manifest": {
+    "ok": true,
+    "expected": [
+      "US500"
+    ],
+    "emitted": [
+      "US500"
+    ],
+    "missing": []
+  },
+  "blocking_pass": true,
+  "cells": [
+    {
+      "run_dir": "data/strategy_runs/EXP-018-4h-blmkt-A-delay1/cross_instrument_spread_mr_us500_4h_20260704_194731",
+      "instrument": "US500",
+      "domain": "4h",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-09-17 17:00:00",
+        "fence": "2024-09-17T17:26:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 8114.82897782767,
+        "per_leg_realized_total": 8114.828977827708,
+        "abs_diff_bps": 3.728928277269006e-11,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.8438284280173396,
+        "n_bars": 5919,
+        "n_legs": 324,
+        "n_censored_legs": 0,
+        "total_net_bps": 8114.82897782767,
+        "annualised_return": 0.21111319430074896,
+        "per_bar_sharpe_annualised": 0.08151889668116152,
+        "max_drawdown_bps": -17807.559061241875,
+        "occupancy": 0.4279439094441629,
+        "buy_and_hold_annualised_return": 0.1204860865958659,
+        "buy_and_hold_annualised_vol": 0.17035250783435524,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    }
+  ]
+}
