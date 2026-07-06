@@ -123,6 +123,43 @@ fi
 
 timeframes=(m1)
 
+# Known broker-string alternates per canonical index symbol (design D-names +
+# header note). collect_with_fallback tries these in order until one produces a
+# finalized parquet, so a broker that rejects the primary name is handled
+# automatically instead of requiring a manual `one <BROKER_SYMBOL>` re-run.
+symbol_candidates() {
+  case "$1" in
+    AUS200) echo "AUS200 AU200 ASX200 AUS200.i" ;;
+    US30)   echo "US30 DJ30 WS30 US30.i DJI30" ;;
+    EU50)   echo "EU50 STOXX50 EUSTX50 STOXX50E EU50.i" ;;
+    GER40)  echo "GER40 DE40 DAX40 GER40.i" ;;
+    HK50)   echo "HK50 HSI50 HK50.i HSI" ;;
+    UK100)  echo "UK100 FTSE100 UK100.i FTSE" ;;
+    *)      echo "$1" ;;
+  esac
+}
+
+RESOLVED_LOG="$SCRIPT_DIR/reports/infr005-resolved.txt"
+
+# Try each known broker-string alternate for a canonical symbol until one lands
+# a valid parquet; record the resolved mapping for the VAL-007 report.
+collect_with_fallback() {
+  local canonical="$1"
+  local candidates
+  read -r -a candidates <<<"$(symbol_candidates "$canonical")"
+  local cand
+  for cand in "${candidates[@]}"; do
+    echo "[$canonical] trying broker symbol '$cand'"
+    if run_collection "$cand"; then
+      echo "RESOLVED $canonical -> $cand" | tee -a "$RESOLVED_LOG"
+      return 0
+    fi
+    echo "[$canonical] candidate '$cand' failed; trying next alternate." >&2
+  done
+  echo "$canonical: all candidates failed (${candidates[*]})" >&2
+  return 1
+}
+
 canonical_cache_dir() {
   local symbol="$1"
   local timeframe="$2"
@@ -285,7 +322,7 @@ if [[ "${1:-}" == "one" ]]; then
   if [[ -z "${INFR005_SKIP_CACHE_PREP:-}" ]]; then
     prepare_cache_layout
   fi
-  run_collection "$2"
+  collect_with_fallback "$2"
   exit $?
 fi
 
