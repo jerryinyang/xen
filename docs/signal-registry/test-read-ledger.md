@@ -539,3 +539,10 @@ Notes:
 - **Holdout (legacy / old dataset):** the global holdout (final 30% per instrument) is outside this
   ledger entirely — the prior single sanctioned holdout shot was SPENT (EXP-032,
   EURUSD-4h, HOLDOUT_INCONCLUSIVE) on the old dataset; no other holdout read exists for any package.
+- **VAL-007 (2026-07-06, INFR-005 gate — data admission, NO counted reads).** The 6 index symbols
+  completing the Indices basket (AUS200, US30, EU50→`STOXX50`, GER40→`DE40`, HK50, UK100) passed all
+  five VAL gates (PASS/ADMITTED). This **extends the ledger with 18 new strata** — the 6 symbols ×
+  {15m, 1h, 4h} — each at **0/2 counted lifetime reads**. Admission read the **first-70% analysis
+  slice only**; each file's final-30% global holdout was sealed at first touch (`holdout_rows_read=0`)
+  and is **unspent** (no sanctioned shot yet defined on these symbols). No candidate slot, no edge
+  inference; this is a data-admission event. Unblocks EXP-022 (CF-CSRR-001 HYP-002 Indices arm).

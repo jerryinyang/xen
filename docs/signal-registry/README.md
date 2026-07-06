@@ -68,6 +68,16 @@ Each file in `candidate-families/` must define:
 
 Registered candidate families (full per-phase batches in `multiplicity-registry.md`):
 
+- `CF-CSRR-001` — Cross-Sectional Consensus-Residual Reversion (basket). **REGISTERED — G0 PENDING**
+  (Chapter-02 checkpoint-009, 2026-07-06); 0 slots, 0 counted TEST reads, holdout sealed. Fades a
+  member's deviation from the basket's cross-sectional consensus (median / equal-wt / weighted-implied),
+  reversion endpoint on the open cross-sectional cell of the availability 2×2. 5 registered variants
+  (4 suggested + the V5 active-entry/passive-exit remodel) decomposed onto 7 component axes;
+  characterise each, construct one model. Baskets: Currencies (ready) + Indices (**Indices arm
+  gated on INFR-005/VAL-007**); **4h only**; USD-strength consensus on Currencies; V5 execution
+  (active entry / passive rolling-consensus exit / time-only stop) as the tradability vehicle;
+  three-twin control battery mandatory. See `candidate-families/cf-csrr-001.md` +
+  `docs/experiments-docs/families/cf-csrr-001/origin.md`.
 - `CF-MR-004` — Cross-domain mean-reversion (fixed-parameter cross-instrument spreads). **REGISTERED —
   G0 RATIFIED** (Chapter-02 Phase 004, 2026-07-01); 0 slots, 0 counted TEST reads. Renewal of the MR
   thesis with 3 new cross-instrument spread designs (fixed-ratio pair, fixed-weight basket,

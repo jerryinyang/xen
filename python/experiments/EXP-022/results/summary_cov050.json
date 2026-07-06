@@ -1,0 +1,59 @@
+{
+  "union_bars": 3912,
+  "train_frac": 0.49,
+  "members": [
+    "USTEC",
+    "US500",
+    "US2000",
+    "US30",
+    "JP225",
+    "AUS200",
+    "EU50",
+    "GER40",
+    "HK50",
+    "UK100"
+  ],
+  "regions": {
+    "US": [
+      "ustec",
+      "us500",
+      "us2000",
+      "us30"
+    ],
+    "EU": [
+      "stoxx50",
+      "de40",
+      "uk100"
+    ],
+    "ASIA": [
+      "jp225",
+      "aus200",
+      "hk50"
+    ]
+  },
+  "n_seeds": 25,
+  "n_perm": 1000,
+  "n_boot_primary": 10000,
+  "n_boot_robust": 2000,
+  "k_trailing_window": 120,
+  "span": [
+    "2021-06-02T04:00:00.000000",
+    "2023-12-20T08:00:00.000000"
+  ],
+  "median_present_per_bar": 9,
+  "constructions": [
+    "N/P",
+    "A/P",
+    "R_US/P",
+    "R_EU/P",
+    "R_ASIA/P",
+    "N/S",
+    "A/S",
+    "R_US/S",
+    "R_EU/S",
+    "R_ASIA/S"
+  ],
+  "min_coverage": 0.5,
+  "period_minutes": 240,
+  "suffix": "_cov050"
+}

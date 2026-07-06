@@ -1,0 +1,67 @@
+{
+  "experiment_id": "VAL-007",
+  "gates": [
+    {
+      "gate": "G1",
+      "status": "PASS",
+      "summary": "139 checks, 0 FAIL, 0 INCONCLUSIVE",
+      "title": "Temporal integrity"
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "summary": "23 controls, 0 missed; golden_fixture_fail=0",
+      "title": "Negative controls"
+    },
+    {
+      "gate": "G3",
+      "status": "PASS",
+      "summary": "6/6 present; truncations disclosed: none",
+      "title": "Coverage / completeness"
+    },
+    {
+      "gate": "G4",
+      "status": "PASS",
+      "summary": "6 files sealed; holdout_rows_read=0",
+      "title": "Holdout seal"
+    },
+    {
+      "gate": "G5",
+      "status": "PASS",
+      "summary": "18 two-pass checks, 0 non-identical",
+      "title": "Determinism"
+    }
+  ],
+  "metadata": {
+    "domains_min": [
+      15,
+      60,
+      240
+    ],
+    "dropped_symbols": [],
+    "experiment_id": "VAL-007",
+    "holdout_rule": "first 70 percent analysis slice only",
+    "infr003_min_collected": "2026-07-05",
+    "min_coverage": 0.9,
+    "source_files": {
+      "AUS200": "timebars_aus200_20210602_000000_20260706_093031.parquet",
+      "DE40": "timebars_de40_20210602_001500_20260706_093104.parquet",
+      "HK50": "timebars_hk50_20210602_011500_20260706_093715.parquet",
+      "STOXX50": "timebars_stoxx50_20210602_060000_20260706_093040.parquet",
+      "UK100": "timebars_uk100_20210602_000000_20260706_093736.parquet",
+      "US30": "timebars_us30_20210602_000000_20260706_093046.parquet"
+    },
+    "suite_lineage": "VAL-001 rev.3 / VAL-003 checks + negative-control battery, imported unchanged",
+    "target_span_start": "2021-06-01",
+    "target_symbols": [
+      "AUS200",
+      "US30",
+      "STOXX50",
+      "DE40",
+      "HK50",
+      "UK100"
+    ]
+  },
+  "missing_instruments": {},
+  "verdict": "PASS"
+}

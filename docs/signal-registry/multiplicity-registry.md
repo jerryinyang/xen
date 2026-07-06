@@ -1187,6 +1187,56 @@ cost-floor + VR disclosures at the checkpoint. Kill criteria predeclared in the 
 | `CF-VOLHARV-001/HYP-001` | Seed/fill falsification of the EXP-018 random-timing per-leg positive under fully ex-ante construction (16 instruments × 25 seeds × hold grid {6,12,24,48}, 4h TRAIN, fixed unit, cap 6): does any (instrument × hold) stratum show an across-seed mean gross ≥ MDE against the analytic E[gross]=0 null? Deliverables regardless: swap-inclusive carrying-cost floor per stratum (1×/2×) + VR/oscillation substrate profile (disclosures). Tripwires: schedule regeneration byte-diff (price-independence), fill-causality audit, NZDUSD +1-bar delay twin. Bands: ARTIFACT_CONFIRMED (expected) / PROCESS_ASYMMETRY (→ fill forensics, never booked as edge) / WASH / UNPOWERED. | EXP-019 | 0 (0 counted reads, TRAIN only) | **COMPLETED 2026-07-05 — SUPPORTED / ARTIFACT_CONFIRMED (operator verdict).** QA APPROVE; 441 runs; estimand gates blocking_pass (~1e-12 recon). NZDUSD battery ≈ 0 in all strata (|mean| < MDE 1.4–5.3 bps); +31.5 above the entire 25-seed distribution ([−11.5,+8.6]); 2/64 strata beyond MDE (≈ chance); direction splits drift-shaped; BTCUSD-48/EURUSD-12 WASH; BTCUSD H∈{12,24,48} UNPOWERED. Delay twin indistinguishable. COST_FLOOR booked (FTMO commissions; spread unpinned — design §12/A5 superseded swap) + VR substrate (FX-block MR, NZDUSD 0.80 @H24). `python/experiments/EXP-019/report.md`. |
 | `CF-VOLHARV-001/HYP-002` | Structure-borne oscillation harvest (rebalanced-exposure / symmetric grid) net of double-sided spread + swap at capped inventory, vs unconditioned twin + exposure-matched two-sided B&H. | EXP-020 | 0 (0 counted reads, TRAIN only) | **COMPLETED 2026-07-05 — NOT SUPPORTED (operator verdict), USDCAD flagged.** QA APPROVE; 68 cells, estimand gates blocking_pass; +2 bps plant detected pre-read; tripwire-1 delay graceful. ARM R (rebalance premium vs never-rebalanced twin): 4/4 MR cells UNPOWERED (MDE > effect; §8 over-stated the classical w(1−w)σ² premium ~100×, true ~0.04–0.07%/yr); only US2000 (mid) CI-positive. ARM G (MR grid vs momentum twin, drift-robust spread): MR-block 1/4 — USDCAD +132 bps/mo CI[+43,+257] survives commission/weekend-×4/top-3/both-halves BUT fails inverted-twin sign-flip (momentum twin +3,491) + 2022=67%>60% cleanliness; NZDUSD −56, GBPUSD wash, AUDUSD −104. Realized RT = +g every cell (mechanism real) but rare: fills 5–28% of A1-implied cadence, 3/4 MR cap-locked, NZDUSD dead after 2022-04; censored ≤8-leg inventory erases 100–155% of realized (VAL-006). RW alarm scan clean. Robust to hardened block_bootstrap_ci re-run (INFR-004/L-20; 2 immaterial half flips). **Structure failure, not substrate absence — does NOT license "no harvest exists."** Net-at-live-spread BLOCKED (spread pin; EURJPY unpinned even at ceiling). Family disposition → checkpoint-008 retrospective (operator-signed). `python/experiments/EXP-020/report.md`. |
 
+## Chapter 02 · CF-CSRR-001 Registration (2026-07-06) — Cross-Sectional Consensus-Residual Reversion (basket)
+
+**Status:** **REGISTERED — G0 PENDING** (operator-directed 2026-07-06). **Family:** CF-CSRR-001
+(`candidate-families/cf-csrr-001.md`; origin `docs/experiments-docs/families/cf-csrr-001/origin.md`).
+**Governing checkpoint:** checkpoint-009
+(`docs/experiments-docs/checkpoints/2026-07-06-009-cf-csrr-001-cross-sectional-residual-reversion/design.md`).
+**Slot accounting: 0 slots consumed at registration; 0 counted TEST reads; holdout sealed.**
+**Baskets:** Currencies (10, VAL-005, ready) + Indices (10; 4 loaded, **6 pending
+INFR-005/VAL-007 — Indices arm blocked until VAL-007 PASS**). **Domain: 4h only.**
+
+**Provenance:** MR-arc post-mortem (`verdict.md`) selected the cross-sectional/relative-value
+cell of the availability 2×2 as the open frontier. Four suggested variants (r1-dlc S2, r4-tpg §2,
+r4-tpg closing obs, r2-ksd I1) + one programme remodel (V5 active-entry/passive-exit) registered
+so each of the 7 shared component axes (A consensus estimator · B normalization · C selection ·
+D hedge · E entry execution · F exit/stop · G threshold) is characterised individually before one
+model is constructed. Full faithful variant text: origin.md.
+
+**Binding first-branch constraints (G0):** (1) causal anchor `r_i=ln(P_i/anchor_i)`, decisions on
+confirmed 4h bars ≤ t-1, open-to-open; (2) consensus is a non-parametric cross-sectional statistic
+(no beta/covariance/cointegration/rolling-z beyond axis-B σ); (3) **Currencies consensus built on a
+USD-strength alignment**, not a naive quote median (operator 2026-07-06; the aligned residual's
+mean-reversion is itself validated in EXP-021, naive-median is a disclosure-only contrast branch);
+(4) tradability vehicle = V5 execution (active confirmed-breach entry, passive rolling-consensus
+exit, time-only stop, single-worst + median-index 1:1 hedge, no hard cap); (5) mandatory three-twin
+control battery (random-timing L-18/19, random-index, momentum-signed inverted / USDCAD lesson);
+(6) TRAIN-only throughout this checkpoint; (7) exploratory + validatory scoped now (0 reads),
+confirmatory HYP-004 pre-declared but NOT spent.
+
+**Distinctness (P-01/P-02):** cross-sectional residual entry (not own-price directional →
+distinct from CF-MR-002..005); reversion endpoint (not CF-XSECT-001's directional relative-
+strength); entry-conditioned on a measured dislocation (not CF-VOLHARV-001's E[gross]=0
+unconditioned object). Re-open standard met.
+
+| Candidate ID | Hypothesis | EXP | Slot | Status |
+|---|---|---|---|---|
+| `CF-CSRR-001/HYP-001` | Currencies (USD-strength consensus) 4h TRAIN, execution-agnostic: is the consensus-residual mean-reverting (VR<1 / residual autocorr<0), and which (A×B×C×D) combination maximises signal-conditional residual-reversion Δ over a matched random-index + random-timing control (multiplicity-adjusted permuted-axis null at realized cell count)? | EXP-021 | 0 (0 counted reads, TRAIN only) | **SCREENED — NOT SUPPORTED (availability; operator verdict 2026-07-06).** Substrate MR confirmed (VR(2)<1 on 28/28 4h cells, HL~1.4; VR<1 on 1D). But **0 hedged (mechanism-faithful) cells survive the max-stat multiplicity** on any instrument; sole family-wise survivor AUDUSD *unhedged* +9.4 bps fw_p .008 = market drift (hedged twin fw_p .68). Heterogeneous (USDJPY continues, 0/16 cells+, dominates single-worst). Leak-clean, holdout sealed, 0 reads/slots. AUDUSD/USDCAD = disclosed leads (not booked). Family status unchanged (disposition → checkpoint-009 retrospective). `families/cf-csrr-001/INDEX.md`, `python/experiments/EXP-021/report.md`. |
+| `CF-CSRR-001/HYP-002` | Indices basket mirror of HYP-001 on the native single-factor equity basket. | EXP-022 | 0 (0 counted reads, TRAIN only) | **SCREENED — NOT SUPPORTED (availability; operator verdict 2026-07-06).** Substrate MR confirmed (VR(2)<1 on 40/40 primary cells, HL ~0.8–1.9 4h-bars; 90% across builds). Signal-conditional **idiosyncratic (hedged) reversion does NOT separate** at primary (N×P): 0/74 powered cells clear uncorrected ci_low>0; max-stat over 16 cells → **0/9 instruments fw_p<0.05** (best JP225 0.33). Every primary cell UNPOWERED for the ≥1 bp band (MDE 3.9–21.7; `argmax\|s\|` concentrates events, §8 ~10× optimistic). 90%-coverage 4h filter culled EU50/HK50 to 0 events → effectively a US-cash sub-basket (EU/Asia UNPOWERED, not contradicted, B-5). **Addendum A1** (operator-directed, min_coverage 0.90→0.50) powered HK50 (0→519) = **clean null → US-cash NOT-SUPPORTED generalises**; EU50 structurally UNPOWERED (4h+1D). **USTEC (R_US bloc + session-open anchor, hedged) = disclosed member-specific lead** (+4.7–4.8 bps, p_perm .002, genuinely idiosyncratic α+4.71/raw+0.30/β1.19, siblings null, tripwire-clean; underpowered hardened ci_low<0, effect≈MDE, non-primary → registered-branch candidate, NOT support; parallels EXP-021 AUDUSD/USDCAD). Leak-clean, holdout sealed, 0 reads/slots. Family status unchanged (disposition → checkpoint-009 retrospective). `families/cf-csrr-001/INDEX.md`, `python/experiments/EXP-022/report.md`. |
+| `CF-CSRR-001/HYP-002b` | US-bloc session-anchor availability primary (pre-registered follow-up to the EXP-022 USTEC disclosed lead). FROZEN single construction — R_US bloc {USTEC,US500,US2000,US30}, session-open anchor, A=median/B=raw/D=hedged, C=all>k (power), h=2·HL; multiplicity family = the 4 members (Holm); BINDING bar = the hardened block-bootstrap CI USTEC FAILED in EXP-022 (ci_low −0.58, effect≈MDE 5.28) — NOT the permutation-only read. Resolves (a) does power push ci_low>0 or dilute to MDE, and (b) real bloc mechanism vs USTEC-only artifact (siblings hinted null). Controlled thesis-shopping from a disclosed lead — pre-registered, TRAIN-only, in-sample-honest (a pass only graduates USTEC to EXP-023, NOT confirmatory). New construction branch, multiplicity rule 4. | EXP-024 | 0 (0 counted reads, TRAIN only) | **REGISTERED — checkpoint-009 (2026-07-06, operator-directed).** DESIGN complete; QA pending. |
+| `CF-CSRR-001/HYP-004` | Confirmatory single counted TEST read of the frozen, hash-pinned selected model per stratum (cap 2/stratum). | — | pre-declared; **0 reads (NOT spent)** | **DEFERRED — gate criteria in family card §Confirmatory gate; authorised only if EXP-023 clears.** |
+
+**Registered non-baseline / deferred branches (countable, no slot until activated):** naive-median
+Currencies consensus (contrast); weekly-anchor variant (timezone-sidestep, r1-dlc note); regional
+sub-basket clustering (Asia/Europe/US, r3-mlg); vol-expansion-armed trigger (V-source r3-mlg S2,
+treads CF-VOLEXP-001 — deferred); two-flanking-index half-notional hedge (r1-dlc). Each needs a
+dated `D0-amendment-*` stating whether it consumes a new slot.
+
+**Predeclared kill criteria (checkpoint-level):** family card §Kill criteria — substrate not MR /
+no combination separates from both twins / momentum-twin matches any positive (drift-carry) /
+capture < honest round-trip on every stratum / any integrity tripwire → REJECT+fix+rerun.
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:
