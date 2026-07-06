@@ -351,12 +351,12 @@ collection but not yet loaded/admitted.
 | US500 | — | S&P 500 | Loaded (VAL-005) |
 | US2000 | — | Russell 2000 | Loaded (VAL-005) |
 | JP225 | — | Nikkei 225 | Loaded (VAL-005) |
-| AUS200 | AU200 | ASX 200 | **Pending (INFR-005 → VAL-007)** |
-| US30 | DJ30/WS30 | Dow Jones 30 | **Pending (INFR-005 → VAL-007)** |
-| EU50 | STOXX50 | Euro Stoxx 50 | **Pending (INFR-005 → VAL-007)** |
-| GER40 | DE40 | DAX 40 | **Pending (INFR-005 → VAL-007)** |
-| HK50 | HSI50 | Hang Seng 50 | **Pending (INFR-005 → VAL-007)** |
-| UK100 | FTSE100 | FTSE 100 | **Pending (INFR-005 → VAL-007)** |
+| AUS200 | AU200 | ASX 200 | Loaded (VAL-007; broker `AUS200`) |
+| US30 | DJ30/WS30 | Dow Jones 30 | Loaded (VAL-007; broker `US30`) |
+| EU50 | STOXX50 | Euro Stoxx 50 | Loaded (VAL-007; broker `STOXX50`) |
+| GER40 | DE40 | DAX 40 | Loaded (VAL-007; broker `DE40`) |
+| HK50 | HSI50 | Hang Seng 50 | Loaded (VAL-007; broker `HK50`) |
+| UK100 | FTSE100 | FTSE 100 | Loaded (VAL-007; broker `UK100`) |
 
 Broker symbol strings for index CFDs vary; the `Symbol` column lists the operator's
 requested primaries and `Alt name` the known alternates. The collection script
