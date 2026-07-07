@@ -68,8 +68,9 @@ Each file in `candidate-families/` must define:
 
 Registered candidate families (full per-phase batches in `multiplicity-registry.md`):
 
-- `CF-CSRR-001` — Cross-Sectional Consensus-Residual Reversion (basket). **REGISTERED — G0 PENDING**
-  (Chapter-02 checkpoint-009, 2026-07-06); 0 slots, 0 counted TEST reads, holdout sealed. Fades a
+- `CF-CSRR-001` — Cross-Sectional Consensus-Residual Reversion (basket). **RETIRED — 2026-07-07**
+  (operator-signed, checkpoint-009 retrospective; availability — EXP-021/022/024 all NOT SUPPORTED);
+  0 slots, 0 counted TEST reads, holdout sealed. Fades a
   member's deviation from the basket's cross-sectional consensus (median / equal-wt / weighted-implied),
   reversion endpoint on the open cross-sectional cell of the availability 2×2. 5 registered variants
   (4 suggested + the V5 active-entry/passive-exit remodel) decomposed onto 7 component axes;

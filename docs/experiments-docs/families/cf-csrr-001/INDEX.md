@@ -10,8 +10,11 @@ transient idiosyncratic flow and reverts toward consensus within a bounded horiz
 endpoint (distinct from CF-XSECT-001's directional relative-strength). Availability screened first,
 execution-agnostic; tradability via the V5 active-entry/passive-exit vehicle (EXP-023).
 
-**Status:** REGISTERED (G0), checkpoint-009 open. Family status transitions occur ONLY at the
-checkpoint retrospective (operator-signed); experiment cards below carry evidence, not dispositions.
+**Status:** **RETIRED (2026-07-07, operator-signed, checkpoint-009 retrospective).** Substrate
+reverts on both baskets but no mechanism-faithful (hedged) construction clears availability
+(EXP-021/022/024 all NOT SUPPORTED); best lead (USTEC) effect-at-MDE. 0 slots, 0 counted TEST
+reads, holdout sealed; EXP-023/HYP-004 never scoped. Retrospective:
+[`../../checkpoints/2026-07-06-009-cf-csrr-001-cross-sectional-residual-reversion/retrospective.md`](../../checkpoints/2026-07-06-009-cf-csrr-001-cross-sectional-residual-reversion/retrospective.md).
 
 ## Table of Contents
 
