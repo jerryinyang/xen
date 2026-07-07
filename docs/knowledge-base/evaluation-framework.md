@@ -70,3 +70,36 @@ defect). For sparse event vehicles use the **event-level method** (EXP-027, METH
 per-event expectancy + matched-control lifetime excess, regime-cluster bootstrap, Holm). This
 is a standing distinction — match the evaluation vehicle to the signal's activity rate.
 See [lessons-and-amendments.md](lessons-and-amendments.md) L-04.
+
+## Trading-cost model (net-of-cost / tradability tier)
+
+Costs are **analyst-injected in Python only** — the cTrader engine is costless (emits real-OHLC
+mid/last fills, gross `MtmBps`, no commission/spread applied; bid/ask appear only as disclosure
+flags). The single source of truth is `xen.evaluation.FTMO_COSTS` + `round_trip_cost_bps`, so a
+table update propagates to every future analysis automatically. Availability-screen tiers
+(EXP-021/022/024) apply **no** cost; cost first gates at the tradability tier (EXP-023 / HYP-003).
+
+`round_trip_cost_bps` (corrected 2026-07-07, operator-directed):
+- **flat_USD** commissions are the published `usd_commission_per_lot` (e.g. $5), a **round-turn**
+  fixed-USD charge → applied **once** (NOT ×`commission_events`), converted to bps via the USD
+  notional of one lot. Notional is **currency-convention aware** (`usd_notional_per_lot`):
+  XXXUSD = contract_size·price; USDXXX = contract_size (price-free); cross = contract_size·
+  `base_usd_rate` (must be pinned explicitly, like `spread_pips`). The old code used the $3-pip
+  proxy ×2 = $6-equiv — a ~20% over-charge, now removed.
+- **percent** commissions are charged on notional (price-free). `commission_basis` ∈
+  {per_side, round_turn} pins the convention per symbol; per_side scales by `commission_events`
+  (×2 RT), round_turn is charged once. A wrong per-side assumption on a round-turn % overstates
+  the fee 2×. **Standing TODO: verify BTC/XAU/XAG against FTMO** (currently declared per_side).
+- **spread** is one full published spread per round trip — correct crossing cost on a mid-fill
+  engine, **not** a double-count. `stress` (1×/2×) is a sensitivity bound, never "fees paid".
+
+**Netted-turnover requirement (EXP-023, binding).** Charge cost against the **netted episode /
+turnover** object, never per raw signal. Charging a full round trip per signal overstates fees
+whenever adjacent/overlapping signals net into held inventory (the real over-statement vector
+once flat_USD is fixed). EXP-020 armR did this right (turnover_frac × per-side); the per-event
+availability estimand must NOT be costed per-event at the tradability tier.
+
+**Position sizing** stays out of the edge/availability tier (bps-of-notional is size-invariant;
+gross and cost both per-unit-notional → the ratio cancels size). It enters only at EXP-023+ /
+deployment, where account-currency P&L, drawdown, the FTMO risk-amount (cost-per-unit-**risk**
+vs per-notional), multi-leg notional weights, and Kelly are all size-dependent and do not cancel.
