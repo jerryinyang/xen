@@ -1,0 +1,34 @@
+{
+  "experiment": "EXP-024",
+  "family": "CF-CSRR-001",
+  "branch": "HYP-002b",
+  "construction": "R_US / anchor-S / median / raw / all>k / hedged",
+  "union_bars": 3174,
+  "train_frac": 0.49,
+  "min_coverage": 0.9,
+  "members": [
+    "USTEC",
+    "US500",
+    "US2000",
+    "US30"
+  ],
+  "min_members": 3,
+  "n_seeds": 25,
+  "n_perm": 1000,
+  "n_trip": 300,
+  "block_trip": 12,
+  "n_boot_full": 10000,
+  "n_boot_robust": 2000,
+  "k_trailing_window": 120,
+  "alpha": 0.05,
+  "span": [
+    "2021-06-02T04:00:00.000000",
+    "2023-11-21T20:00:00.000000"
+  ],
+  "median_present_per_bar": 4,
+  "n_valid_holm": 4,
+  "n_allk_events": 2200,
+  "n_single_worst_events": 1562,
+  "block_ge_h": true,
+  "suffix": ""
+}
