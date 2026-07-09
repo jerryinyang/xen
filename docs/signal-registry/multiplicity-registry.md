@@ -1241,6 +1241,87 @@ dated `D0-amendment-*` stating whether it consumes a new slot.
 no combination separates from both twins / momentum-twin matches any positive (drift-carry) /
 capture < honest round-trip on every stratum / any integrity tripwire → REJECT+fix+rerun.
 
+## Chapter 02 · Phase 010 Batch (CF-HTFDI-001 Higher-Timeframe DI Conditioning) — **RETIRED (2026-07-09, operator-signed, checkpoint-010/011 retrospective)**; promoted from the SPDR CTRL-01/02/03 series; CORRECTED 2026-07-08 (single thread)
+
+**Retired:** 2026-07-09 — EXP-025 HYP-A NOT SUPPORTED (magnitude, not existence; powered
+negative, 0/440 qualifiers). T2 exit tier + counted TEST reads NOT SCOPED / never spent
+(0 reads, 0 slots). Retrospective:
+`docs/experiments-docs/checkpoints/2026-07-08-010-htf-di-conditioning-spdr-series/retrospective.md`.
+**Opened:** 2026-07-08. **Family:** CF-HTFDI-001 (`candidate-families/cf-htfdi-001.md`).
+**Governing checkpoint:** `docs/experiments-docs/checkpoints/2026-07-08-010-htf-di-conditioning-spdr-series/`
+(binding **corrected** `synthesis.md`; audit + correction probe in `correction/`; origin
+`origin-mtf.md`). **Slot accounting: 0 candidate slots consumed, 0 counted TEST reads** — the
+promoting evidence is the SPDR speed-run screen (TRAIN-only, no engine, no estimand gate, no
+read). Holdout sealed. **SPDR legs are NOT experiment slots** (lane spec): the screen legs
+`SPDR-001/002/003` remain indexed in `python/experiments/INDEX.md`; they registered no family and
+spent no read.
+
+**Correction (2026-07-08, same day as registration):** independent audit found (1) SPDR-001 CIs
+under-blocked (block=5 vs dependence ≈ H on the overlapping per-bar estimand) and (2) the SPDR-003
+fade cell computed on the side-signed strategy × DI interaction, not the labelled raw-move
+conditioning. Under corrected statistics no fade-signed cell is CI-clear anywhere; **HYP-B was
+WITHDRAWN — NOT SUPPORTED**; EURUSD 1d/1h demoted from HYP-A anchor to power-up stratum. Affected
+artifacts rewritten in place.
+
+**Multiplicity disclosure (screen):** 960 cells/leg × 3 legs (4 instruments × 3 domain-pairs ×
+4 holds × 20 filter variants). Per-stratum reads only; the graduation experiment carries a
+pre-registered **per-instrument family-wise max-stat over holds** as the honest multiplicity test.
+
+| Candidate ID | Thread / role | EXP-ID | Slot | Status |
+|---|---|---|---|---|
+| `CF-HTFDI-001/HYP-A` | **Thread A (sole thread) — HTF-DI continuation**: net-of-cost directional edge on USTEC 1h/5min (secondary: EURUSD 1d/1h power-up stratum), vol-regime **amplifier** measured, vs matched random battery | **EXP-025** (design 2026-07-08, `python/experiments/EXP-025/design.md`) | 0 | **EXP-025 COMPLETE 2026-07-09 — NOT SUPPORTED (magnitude, not existence; operator verdict).** T1-terminal powered negative: 0/440 SEL-NEIGHBOR qualifiers (rule 1 universal fail), 0 counted TEST reads spent, MDE ≤5.2 bps all cells. Reconciled: the design's "30–60 bps" target was a 4.1× ATR-units artifact (1h divisor asserted vs the screen's 5min LTF ATR(14)[t−1]); the channel is REAL and replicates screen→ref-arm→battery at ≈4 bps/trade h48 (~1–3 bps after capture dilution) — below FX commission, ~1/10 of the selection bar on indices; index positives drift-shaped, no DI dose-response. External reviews confirmed → KB L-21..L-24. Family status transition reserved for the checkpoint retrospective. `python/experiments/EXP-025/report.md`. *(Prior registration evidence:)* Corrected SPDR evidence: USTEC 1h/5min dir_gap +0.09→+0.50 ATR, CI-clear at all four holds under hold-matched blocks (random base) **and** CI-clear +0.26→+0.39 at H24–48 on the blind momentum base (non-overlapping trades); corrected breadth 9+/0− of 84 DI-axis cells; survives mis-aligned-HTF + phase-shift controls. |
+| `CF-HTFDI-001/HYP-B` | ~~Thread B — HTF-DI fade (XAUUSD)~~ | — | 0 | **WITHDRAWN — NOT SUPPORTED (correction 2026-07-08).** All pillars failed re-derivation: 17/23 negative breadth → 4+/3− at block=H (under-blocking artifact); the −0.86 cell was the side-signed interaction (raw-move −0.083 [−0.68,+0.53] n.s., both half-splits n.s.); EUR-intraday & BTC-daily fade cells not CI-clear. Revival requires new pre-registered CI-clear negative dir_gap on the raw-move estimand with dependence-matched blocks. |
+
+**Scope amendment (2026-07-08, operator-directed, pre-measurement):** HYP-A graduation scope fixed
+in the family card §Phase 011 graduation scope — CTRL-02 breakout vehicle + DI confirm; full
+22-symbol universe; 1h/5min only; variants `di` + 3 ATR×DI (ADX axis dropped); hyperparameters =
+breakout lookback X + exit method (6-candidate set vs fixed-hold benchmark, capping exits measure
+erosion); neighbour-stability selection (`SEL-NEIGHBOR`, to be registered before measurement);
+`WF-EXPANDING` with optimisation inside TRAIN and TEST as counted confirmation reads under
+per-instrument max-stat + Holm; sign prior USTEC-continuation only, all else two-sided. No slot or
+read consumed by this amendment.
+
+**EXP-025 design registration (2026-07-08, pre-measurement):** `SEL-NEIGHBOR` promoted from
+`components/global-techniques.md` (plateau selection: own-cell clear + ±1-step neighbourhood
+median clear + fold-sign persistence; contradicted neighbours are disclosure-only, not a
+disqualifier — hostile-neighbour hard veto removed as outlier-fragile, amended 2026-07-08
+pre-measurement, operator-directed; TRAIN-only, mechanical).
+TRAIN plane disclosed: 22 instruments × X {2,3,4,5,8} × H {12,24,36,48} × 4 variant-strata =
+4,400 conditioning cells + ≤60 exit cells (6-exit set vs fixed-hold benchmark) — all
+selection-side, uncounted. **Counted-TEST pre-commitment: ≤5 counted reads** (1/instrument,
+eligibility = SEL-NEIGHBOR (contains the CI_low>0 gate) + candidate > battery mean by ≥2
+seed-SD (distributional read; replaced the ≥97.5-pct order statistic, amended 2026-07-08
+pre-measurement) + projected TEST n≥50 + estimand gate + operator approval; Holm α=0.05 over instruments read; USTEC one-sided, rest
+two-sided; overflow qualifies-unread → file-drawer). Controls pre-registered with seeds:
+25-seed battery 1001–1025, random-entry reference arm 2001, ADX-only null sentinel (judged
+family-wise, breach count vs binomial expectation); tripwire = +60-bar HTF phase-shift with a
+pooled quantified REJECT criterion (pooled shifted effect >50% of raw, CI excluding ≤25%;
+per-cell survivors disclosure-only — amended 2026-07-08 pre-measurement after independent
+fragility review; MDE plant at 2× MDE). 0 slots, 0 reads at design.
+
+**Controls (apparatus, NOT candidates — carried from the SPDR legs):** 25-seed matched-cadence
+random battery (availability benchmark, Control-B role, costs modeled); random-entry reference arm
+(re-measures the conditioning effect on TEST without base confound); ≥1 null sentinel (symmetric-sign
+ADX/ATR-only gating, behaved null on TRAIN). All declared as named controls with pre-registered
+seeds in the design doc (QA: no undeclared TEST-touching arm).
+
+**Recorded NOT SUPPORTED (screen, corrected):** universal "HTF improves LTF" thesis; ATR as a
+*direct* dispersion signal (~1.5× normaliser artifact; retained only as the amplifier
+interaction); ATR as a sign-setter (low-vol branch not CI-clear); 4h/1h domain; BTC 1h/5min
+continuation as an HTF-specific thread (shared with LTF autocorrelation); **XAUUSD fade thread
+(withdrawn at the correction)**.
+**Deferred design hypothesis (one-leg 002):** ADX conditions dispersion more cleanly than ATR.
+**Separate exploration log line (NOT this family, not opened):** tail-managed naive base (both
+informative bases median-positive / tail-killed).
+
+**Binding design constraints (family card §Design constraints, corrected):** vol-regime
+interaction measured as an AMPLIFIER hypothesis (high-vol amplifies; "ATR sets the sign" is not
+carried); uncapped/horizon exits (or measured TP erosion); per-instrument max-stat over holds;
+raw-bps/fixed-ATR for any dispersion claim; USTEC-continuation sign fixed a priori from TRAIN (no
+other sign priors); dependence-matched uncertainty (block ≥ H on overlapping estimands).
+**HTF-bar-boundary** (`CloseTime < Open(t)`) is the load-bearing leak guard, code-asserted +
+golden-trace.
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:

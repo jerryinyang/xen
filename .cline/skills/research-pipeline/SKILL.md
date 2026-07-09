@@ -51,6 +51,14 @@ already-emitted, still-valid data skips stages 1-3 and enters at the estimand ga
 `data-analyst`. If the prior emission is invalidated by an identified defect, a rerun (full
 pipeline) is required first.
 
+**SPDR carve-out (speed-run screens).** The `SPDR-###` lane is a TRAIN-only availability
+screen that runs vectorised in Python to gate a `WORTH_EXPLORING` disposition **before** a
+full experiment — it is NOT a tradability claim and never touches TEST/holdout, spends a
+read, or registers a family. It is permitted only inside the hard integrity boundary
+(TRAIN-only fence + causal `t-1` lag, code-asserted; matched-control + seed battery;
+per-stratum). A `WORTH_EXPLORING` graduates the idea into the standard cTrader-primary
+pipeline. Full spec + stages + artifacts: `docs/references/spdr-lane.md`.
+
 ## Per-experiment artifacts
 
 ```
@@ -123,3 +131,4 @@ cannot be stated plainly, the asker does not understand it yet — investigate f
 | `python/experiments/INDEX.md`, `docs/experiments-docs/INDEX.md` | Start, completion |
 | `docs/signal-registry/` | Stage 1 precondition; Stage 6 evidence rows |
 | latest checkpoint in `docs/experiments-docs/checkpoints/` | Start, phase alignment |
+| `docs/references/spdr-lane.md` | Any `SPDR-###` speed-run screen |

@@ -68,6 +68,22 @@ Each file in `candidate-families/` must define:
 
 Registered candidate families (full per-phase batches in `multiplicity-registry.md`):
 
+- `CF-HTFDI-001` — Higher-Timeframe DI Conditioning (MTF continuation). **REGISTERED — 2026-07-08,
+  G0 PENDING; CORRECTED same day** (promoted from the SPDR CTRL-01/02/03 series, WORTH_EXPLORING,
+  operator-signed; independent audit + correction probe in the Phase-010 checkpoint `correction/`);
+  0 slots, 0 counted TEST reads, holdout sealed. Last-closed HTF ±DI conditions the sign of the LTF
+  forward return; edge is magnitude-weighted; high-vol ATR regime amplifies (not sign-sets).
+  **Single thread (corrected):** A — continuation, **USTEC 1h/5min** (replicated on random+momentum
+  blind bases, CI-clear under hold-matched blocks, corrected breadth 9+/0−); EURUSD 1d/1h carried
+  only as a power-up stratum. **Former Thread B (XAUUSD fade) WITHDRAWN — NOT SUPPORTED** (fade
+  fingerprint was an under-blocking artifact; the −0.86 cell was a mislabelled side-signed
+  interaction, raw-move n.s.). Domains 1h/5min primary (**4h/1h NOT SUPPORTED**). Control apparatus
+  carried from the SPDR legs (25-seed random battery + random-entry reference arm + null sentinels)
+  — the random base is a **control, not a candidate**. Design constraints (corrected): vol-regime
+  amplifier measured, uncapped/horizon exits, per-instrument max-stat, raw-bps dispersion,
+  USTEC-continuation sign the only a-priori sign, dependence-matched blocks (block ≥ H). Separate
+  log line (not this family): tail-managed naive base. Prior evidence: Phase 010 checkpoint
+  `2026-07-08-010-htf-di-conditioning-spdr-series/`. See `candidate-families/cf-htfdi-001.md`.
 - `CF-CSRR-001` — Cross-Sectional Consensus-Residual Reversion (basket). **RETIRED — 2026-07-07**
   (operator-signed, checkpoint-009 retrospective; availability — EXP-021/022/024 all NOT SUPPORTED);
   0 slots, 0 counted TEST reads, holdout sealed. Fades a

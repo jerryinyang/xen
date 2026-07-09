@@ -63,6 +63,11 @@ running the implementation to produce its own expectations.
   primitives outside `xen.adjudication`.
 - No Python strategy backtest anywhere in the experiment.
 - Registry preconditions (family registered; any planned counted TEST read states the tally).
+- Screen-effect conversion pin (L-21): if the design cites SPDR/screen evidence in money
+  units, the `CONVERSION-PIN` block exists and each line is verified against data — divisor
+  object matches the screen code verbatim, the measured TRAIN-median value is recomputed (not
+  recalled), the resulting bps/trade effect and cost-floor comparison follow arithmetically;
+  §5 bands and §6 power use the pinned effect (`docs/references/spdr-lane.md`).
 - Holdout: no code path can touch the final 30%; conf fence set.
 - Any `DEVIATIONS` block: each deviation was operator-approved (evidence, not assertion).
 - Elicitation hygiene: open questions to the operator are plain-language.

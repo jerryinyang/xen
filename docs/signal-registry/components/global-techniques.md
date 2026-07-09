@@ -118,6 +118,29 @@ frozen referee suite remains binding and these are discovery-only. Specs: `.igno
   TEST-read-ledger **2-lifetime-counted-reads-per-stratum** cap; this accounting is predeclared and
   validated at G-017 before any Phase 018 TEST contact. The final-30% global holdout is never a fold.
 
+## Selection Components
+
+### Neighbour-Stability Selection (`SEL-NEIGHBOR`)
+
+- **Promoted 2026-07-08** to `multiplicity-registry.md` (Chapter 02 · Phase 010 batch,
+  CF-HTFDI-001; first bound use: EXP-025 design §7). 0 slots, 0 reads at registration.
+- Plateau selection on a predeclared ordered parameter grid: a cell qualifies only if
+  (1) its own selection-fold statistic clears, (2) the **median** of its ±1-step
+  neighbourhood (adjacent grid positions, same stratum) clears, and (3) the **pooled**
+  later-validation-fold statistic shares the selection-fold sign with no single fold
+  significantly contradicted (CI_high < 0) — raw per-fold sign agreement on small folds
+  is coin-flip fragile (amended 2026-07-08). Isolated maxima are disqualified
+  (they fail the neighbourhood median). Contradicted neighbours (CI_high < 0) are a
+  **disclosure, not a disqualifier** — the median is the robust smoother; a hard
+  single-neighbour veto is outlier-fragile in the opposite direction (amended
+  2026-07-08 pre-measurement, operator-directed).
+- Tie/edge rules: even-count medians use the lower median; boundary cells (one
+  neighbour) require sign agreement of both cells. Winner = highest **neighbourhood
+  median** (not own value); remaining ties → the simpler/smaller parameter.
+- TRAIN-only, mechanical, predeclared before measurement; never applied after TEST
+  contact. Each experiment binds its own grid, statistic, and fold structure in
+  `design.md` before QA.
+
 ## Notes
 
 These notes are intentionally non-operative. Treat them as backlog material, not

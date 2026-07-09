@@ -93,3 +93,25 @@ HARD (block): tripwire collapse, holdout, causal provenance, estimand reconcilia
 INFORMATIVE (operator judges): all effect sizes, significance reads, robustness reads,
   cost sensitivity, collapse fractions. No auto-verdict thresholds anywhere.
 ```
+
+## 9. Screen-effect conversion pin (mandatory when the design cites SPDR/screen evidence — L-21)
+
+Dimensionless screen numbers become money claims at this seam; EXP-025 inflated its target
+4× by asserting the wrong ATR divisor from memory. Any design that converts a screen-derived
+normalised effect into bps/money must declare:
+
+```
+CONVERSION-PIN:
+  divisor object: <verbatim from the screen code — indicator, period, timeframe, lag,
+                   e.g. "LTF 5min ATR(14)[t−1], spdr00X_screen.py:<line>">
+  measured value: <TRAIN-median of that exact object on the target instrument(s), in bps —
+                   computed from data, never recalled>
+  resulting effect: <screen effect × measured value = <X> bps/trade>
+  cost floor:     <spread estimate + commission + capture dilution (≈ gap/2)>; state whether
+                   the resulting effect clears it — if not, the experiment must be framed as
+                   apparatus/characterisation, not tradability.
+```
+
+Each line is verifiable against data; QA traces this block as a clause. Power statements (§6)
+and interpretation bands (§5) must use the pinned effect, never the raw screen units.
+Full convention: `docs/references/spdr-lane.md` §Unit convention + money-unit floor.
