@@ -551,6 +551,10 @@ CI_low > 0 must survive the 1× spread estimate before an instrument counts towa
 multiplicity family). 0.5×/2× spread remain disclosure. Builds on [[L-21]]; companion memory
 `cost-model-and-injection`.
 
+**Where enforced.** `quant-designer/references/design-requirements.md` §10 (binding band
+declaration) + `qa-compliance/SKILL.md` §3 (L-22 clause; commission-only band on a
+0-commission instrument = REVISE). Codified at the chapter-02→03 rollover (2026-07-09).
+
 ## L-23 — Pre-measurement amendments must declare their direction (looser/tighter) and keep a running count; re-derive the joint false-qualification rate at the final gate set (EXP-025 external review F03)
 
 **What.** All seven 2026-07-08 pre-measurement amendments to EXP-025's design moved the same
@@ -569,6 +573,10 @@ set (simulable from the battery machinery: apply the selection rules to random-d
 runs); if materially above budget, tighten one gate back. (3) A one-directional streak ≥3 is
 an explicit flag to the operator at the execution gate. Builds on [[L-12]]; companion memory
 `selection-rules-symmetric-outlier-robustness`.
+
+**Where enforced.** `quant-designer/references/design-requirements.md` §11 (AMENDMENT block
+format + final-gate re-derivation) + `qa-compliance/SKILL.md` §3 (L-23 clause). Codified at
+the chapter-02→03 rollover (2026-07-09).
 
 ## L-24 — Eligibility/null design gaps surfaced by EXP-025 external review (F02/F04/F06/F07) — future-design rules
 
@@ -604,4 +612,8 @@ tripwire never ran; no TEST read spent) but binding on future designs:
 
 **How to apply.** quant-designer checks all four at design time for any battery-gated,
 multi-cell, capped-read design; QA traces them as clauses. EXP-025 reviews:
-`python/experiments/EXP-025/report.md`.
+`archive/chapter-02-mr-volharv-htfdi/experiments/EXP-025/report.md`.
+
+**Where enforced.** `quant-designer/references/design-requirements.md` §12 (four mandatory
+rules) + `qa-compliance/SKILL.md` §3 (L-24 clause-trace). Codified at the chapter-02→03
+rollover (2026-07-09).
