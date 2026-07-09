@@ -1,5 +1,10 @@
 # Evaluation / Referee Framework (Frozen)
 
+> **Chapter-02 renewal (binding since 2026-06-29):** the operative referee is the **renewed
+> §10.3a gate at q\*=0.75** with the **E6 P\*-capable variant** and the **E7 15m domain** — see
+> the "Chapter-02 renewed referee" section below. The Chapter-01 suite described next remains
+> the historical baseline the renewal was DET-dominance-adjudicated against.
+
 Built and calibrated in Phases 001–003b (framework-referee family, EXP-001–019). **Frozen.**
 Report its components on any candidate; never retune thresholds, losses, costs, denominators,
 or pass logic after seeing a candidate's outcome. Full per-experiment cards:
@@ -70,6 +75,39 @@ defect). For sparse event vehicles use the **event-level method** (EXP-027, METH
 per-event expectancy + matched-control lifetime excess, regime-cluster bootstrap, Holm). This
 is a standing distinction — match the evaluation vehicle to the signal's activity rate.
 See [lessons-and-amendments.md](lessons-and-amendments.md) L-04.
+
+## Chapter-02 renewed referee (FROZEN 2026-06-29; 15m added 2026-07-01)
+
+Chapter-02 Phase 001 (E-series, EXP-001–005) renewed the gate; it is the binding referee for
+all price-primary reads. Never retune after outcome contact (L-12 honored — frozen before any
+live read).
+
+- **Form: §10.3a (validity→economics, `adaptive_row`), q\*=0.75.** Amortized cost convention
+  (E1: the per-held-bar convention over-charged turnover ~L× on persistent signals); power-aware
+  L3/L5; **studentized** sub-population L5 (`q*-quantile/std > Φ⁻¹(q*)≈0.674`, candidate-blind —
+  the E3a A1 fix that cured the high-σ 4h FPR leak *at the gate*); L2 removed; L1 bit-identical
+  to frozen. DET-dominates the frozen gate 32/32 (STATE ΔMDE median 7.5 bps; sparse recovered
+  28/32) at dogfood FPR 0.
+- **variant-c REFUTED (E5):** a single incremental-over-naive statistic has **no absolute
+  floor** — it admits anything less-bad than a money-losing baseline and survives
+  future-destroy. The neutral-CI + materiality + studentized-subpop legs are what supply FPR
+  control. Recorded as the rejected alternative.
+- **E6 P\*-gate (`referee_pstar.gate_stack_pstar`):** §10.3a with the signal leg sourced from an
+  injected **engine-realized** series — the referee for real intrabar-fill P&L. Reduction
+  identity 32/32 bit-identical; realized-fill FPR controlled.
+- **E7 15m domain (EXP-011):** four additive dict rows, gate logic byte-unchanged; constants
+  mechanically derived candidate-blind; 16/16 DET_DOMINANT, sensitivity 112/112 0 flips. Frozen
+  + hash-pinned **before** any 15m read.
+- **Hash pins:** `freeze_manifest.json` per freeze — `referee_adaptive 96c940b5…`,
+  `referee_calibration d10e6a27…`, `incremental_referee 1b33e70a…`, `referee_pstar 1fd06b28…`.
+- **Freeze-adjudication FPR rule (E4):** single 1/162 label artifacts are not gate defects;
+  require `MIN_FPR_PASSES=2` / control-relative `2α` before calling FPR_BROKEN.
+- **INFR-004 hardening (L-20):** `xen.evaluation.block_bootstrap_ci` gained a seed battery,
+  block-length sweep, and robust statistic after a zero-width small-n CI was caught. Gate logic
+  untouched; verdicts re-checked (EXP-020 robust, 2 immaterial flips).
+- **Known blind spot (L-17, open):** the L1 readiness floor is band-length-blind — it cannot
+  adjudicate short (TEST-band, ~1,100-bar) samples at any edge size. A short-band instrument is
+  required before any final TEST read; none exists yet.
 
 ## Trading-cost model (net-of-cost / tradability tier)
 

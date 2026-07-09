@@ -56,6 +56,14 @@ Python reads these via `xen.signals.ingestion` (read/validate-only). The C2 rene
 a generic experiment template on this contract — see the cTrader harness in `tools/ctrader-cli/`
 and `StrategyHost/`.
 
+## Indices basket (INFR-005, complete 2026-07-06)
+
+The 10-symbol Indices basket is complete in canonical `data/timebars/` on the ~5-year window
+(all reach 2021-06-02): USTEC, US500, US2000, JP225 + collected AUS200, US30, `STOXX50`
+(EU50), `DE40` (GER40), HK50, UK100. Broker-string auto-fallback lives in
+`tools/ctrader-cli/run-infr005-collection.sh`. Per-file holdout sealed at first touch;
+VAL-007 PASS (all 5 gates, `holdout_rows_read=0`).
+
 ## Universe (17 instruments; 16 on the INFR-003 5-year dataset)
 
 EURUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD, EURJPY, GBPJPY, AUDJPY, XAUUSD, BTCUSD,

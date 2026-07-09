@@ -61,6 +61,40 @@ and the traps to avoid, on any new experiment.
   [lessons-and-amendments.md](lessons-and-amendments.md); the Chapter 02 structural fix is
   cTrader-primary execution + a causal-provenance audit pass.
 
+## Chapter 02 additions (earned 2026-06-27 → 2026-07-09)
+
+- **SPDR speed-run screening lane.** Before any engine run or estimand gate, a candidate can be
+  screened TRAIN-only in Python (0 engine runs, 0 counted reads, 0 slots): blind multi-leg
+  analyst passes, ref-arm replication, control battery. Cheap WORTH_EXPLORING/KILL routing —
+  CF-HTFDI-001 was registered and retired for ~0 budget. Lane spec: `docs/references/spdr-lane.md`.
+- **Unit pin at every screen→graduation seam (L-21).** A dimensionless screen effect becomes a
+  money claim only through an explicit unit derivation (which ATR, which timeframe, which lag),
+  re-computed — not asserted — at graduation, plus a **money-unit floor** (bps/trade vs the cost
+  stack). The 4.1× EXP-025 inflation is the canonical failure.
+- **Spread is a verdict leg on 0-commission instruments (L-22).** A commission-only cost band
+  never binds where commission is 0; the SUPPORTED tier must price spread.
+- **Amendment-direction ledger (L-23).** Every pre-measurement amendment declares looser/tighter
+  and increments a running count; re-derive the joint false-qualification rate at the final gate.
+- **Seed batteries, never single-draw controls (L-19/L-20).** One random twin is one draw; kill
+  tests need ex-ante seed batteries and percentile reads. The CI machinery itself is hardened
+  (block sweep, robust stat) after INFR-004 killed a zero-width small-n bootstrap CI.
+- **Block ≥ dependence horizon on overlapping estimands.** Per-bar forward returns at hold H
+  overlap; bootstrap blocks < H under-cover (the Phase-010 correction). Verify the computed
+  estimand matches its label before reading CIs.
+- **Symmetric selection rules.** No hard single-cell vetoes; median-smooth qualification in both
+  directions (SEL-NEIGHBOR amendment) — outlier robustness must not be one-sided.
+- **Exposure-honest comparison.** Never kill a part-time strategy on raw B&H comparison;
+  normalize by average and peak exposure time.
+- **Equal-info fade tiering.** On a null base, a negative is an equal-information fade signal —
+  but tier such threads by replication strength; controls graduate as **apparatus**, not candidates.
+- **Native orders for limit strategies.** StrategyHost fills on aggregated-bar OHLC; any
+  limit/stop capture claim needs native cTrader orders with m1 fills (EXP-013 lesson,
+  Mode=NativeOrders).
+- **Event-mass match.** A re-attributed trigger must reproduce the field object's event cadence,
+  or the thesis strata are UNPOWERED by construction (EXP-015).
+- **Controlled thesis-shopping is the model.** Exploration from refuted hypotheses is allowed —
+  gate with registration + multiplicity, never dismiss by origin.
+
 ## Statistical defaults
 
 Non-parametric / empirical by default (block / stationary / moving-block bootstrap;

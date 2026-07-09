@@ -1,7 +1,8 @@
 # Families Explored — Dispositions
 
-Every candidate family Chapter 01 opened, and where it landed. Live status: the
-signal-registry; full cards: `archive/chapter-01-*/docs/experiments-docs/families/`.
+Every candidate family the programme opened, and where it landed. Live status: the
+signal-registry; full cards: `archive/chapter-01-*/` and `archive/chapter-02-*/`
+under `docs/experiments-docs/families/`.
 
 ## The availability 2×2 (the frame for what's open)
 
@@ -36,6 +37,35 @@ those also null out.
 | **CF-VOLEXP-001** | Screen M — single-series magnitude/volatility-expansion availability | **Provisionally ADMITTED (non-binding).** Typical range is *flat* vs random; only a tail-only hint. A "pass" on the tail read is a long-vol finding, not a tradable directional edge; routes to a properly scoped vol-expansion family under the §3 harvest model (two-sided cost). |
 | **CF-XSECT-001** | Screen X — cross-sectional relative-strength directional availability | **NOT_ADMITTED** (below the multiplicity-adjusted admission band on the screen). Remains the a-priori mechanism favourite but did not earn admission on the directional-favourable endpoint. |
 | **infrastructure-validation** | VAL-/INFR-series: substrate validation, universe collection, 5-year re-collection | Ongoing infra. VAL-003 admitted the 17-instrument universe; INFR-003 re-materialized the 5-year 16-instrument dataset (VAL-005 PASS); VAL-002 = behavioral-suite reproduction for cTrader ports. |
+
+## Chapter 02 family dispositions (2026-06-27 → 2026-07-09)
+
+Chapter 02 opened seven arcs; **every candidate family closed negative** — but each closed
+*for a mechanistic reason*, recorded here so no re-run happens without a genuinely new object.
+Full cards: `archive/chapter-02-mr-volharv-htfdi/docs/experiments-docs/families/`.
+
+| Family | What it was | Disposition (mechanism) |
+|---|---|---|
+| **Referee-renew (E-series + E7)** | Chapter-02 rebuild of the referee gate | **COMPLETE / FROZEN.** §10.3a (validity→economics) at q\*=0.75 DET-dominates the Chapter-01 frozen gate 32/32; variant-c (single statistic, no absolute floor) REFUTED. E6 added the P\*-capable gate (engine-realized fill series); E7 added the 15m domain (additive rows, gate logic byte-unchanged). Hash-pinned in `python/experiments/EXP-005..007,011/results/freeze_manifest.json`. INFR-004 later hardened `block_bootstrap_ci` (seed battery, block sweep) without touching gate logic. |
+| **CF-MR-002** — causal RSI-2 fade | cTrader-primary benchmark of the rollover | **EXONERATED / NOT-TRADABLE 34/34** (EXP-006). Fade beats a naive momentum baseline but is net-negative in absolute terms; binding leg = L3 absolute neutral floor. Leak-clean on the faithful engine fill. |
+| **CF-MR-003** — deviation-from-HTF-anchor MR | Anchor-reversion fade, limit-at-anchor | **RETIRED.** Availability SCREENED-ADMIT (EXP-009, native dislocation-matched null) but NOT-TRADABLE at 1h (unpowered) and 15m (powered, 0/24 admit): capturable move < round-trip cost. EXP-008's EXONERATE was a **vehicle artifact** (L-13). |
+| **CF-MR-004** — cross-instrument fixed-param spreads | S5–S8 anchor series, limit entries | **RETIRED (CREDIBLE_NEGATIVE, EXP-014c).** Both powered primaries net-fail; mechanism = **entry-seam mismatch** — the limit-touch fill is a different conditioning event than the measured confirmed-close-breach (adverse selection); exits exonerated, no rescue possible. EXP-014b: 1h arm was own-price auto-reversion leak. Extend-arm field spun out → CF-MR-005. |
+| **CF-MR-005** — 4h ladder scale-in own-price harvest | The EXP-014c extend-arm discovery | **RETIRED (EXP-018).** Episode-net primary WASH in all residue cells; **random-timing matched-cadence ladders reproduce per-leg CI_low>0 with no signal** (the anomaly's form is producible unconditioned); surviving US2000 cell = 2022 long-drift carry. Arc also produced L-16 (estimand↔object match) and L-17 (referee short-band blindness); EXP-016's 3 TEST reads SPENT_ON_DEFECT (critical-017). |
+| **CF-VOLHARV-001** — two-sided oscillation harvest | Rebalance premium + symmetric grid | **RETIRED.** HYP-001: the EXP-018 NZDUSD per-leg positive is a sampling draw of a zero-mean construction (441-run seed battery; analytic E[gross]=0). HYP-002 (EXP-020): rebalance premium real but ~100× smaller than designed (UNPOWERED); grid fills at 5–28% of implied cadence, cap-locked, censored-inventory erases 100–155% of harvest — **structure failure, not substrate absence**. FX MR substrate (VR<1) genuinely exists. A within-episode-clearing structure = NEW family. |
+| **CF-CSRR-001** — cross-sectional consensus-residual reversion | Basket-hedged fade of member deviation from USD-strength / equity consensus | **RETIRED (availability).** The consensus residual **does** mean-revert on both baskets (VR(2)<1, 28/28 FX and 40/40 index cells) but no mechanism-faithful (hedged) construction clears multiplicity — the tradable idiosyncratic component is ≈0; survivors are drift/beta. Disclosed leads (AUDUSD/USDCAD, USTEC session-open) all effect-at-MDE, retired at 0 cost. |
+| **CF-HTFDI-001** — HTF ±DI continuation conditioning | USTEC 1h/5min sign-conditioning from the SPDR screen lane | **RETIRED (magnitude, not existence — EXP-025).** The conditioning channel is REAL and replicates blind, but true effect ≈1–4 bps/trade after capture dilution — below commission on FX, ~1/10 the selection bar on indices; index positives 99% drift-side aligned, no DI dose-response. The "30–60 bps" graduation target was a **4.1× ATR-unit inflation** at the screen→graduation seam (L-21). T1-terminal powered negative: 0/440 qualifiers, MDE ≤5.2 bps on 2.43M trades. |
+
+### The updated availability frame
+
+Chapter 02 extends the Chapter-01 2×2 verdicts:
+- **Own-price directional reversion (single + cross-instrument anchors): CLOSED** — availability
+  sometimes admits, but the capturable move never survives the capture/cost seam (CF-MR-002..005,
+  four different vehicles, same veto).
+- **Cross-sectional reversion endpoint: CLOSED at availability** — the factor residual reverts but
+  the hedged (idiosyncratic) component is untradably small (CF-CSRR-001).
+- **HTF conditioning of LTF sign: REAL but sub-cost** at the tested granularity (CF-HTFDI-001).
+- **Volatility harvest: substrate exists (FX VR<1), tested structures fail mechanically**
+  (CF-VOLHARV-001) — the one cell where the negative is about structure, not substrate.
 
 ## Selection discipline going forward
 

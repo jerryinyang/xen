@@ -10,3 +10,6 @@ as work happens. Append a one-line pointer per memory file below. Distinct from 
 - [frozen-suite-floors.md](frozen-suite-floors.md) — the frozen MDE floors per domain/component; do not retune.
 - [holdout-shots-spent.md](holdout-shots-spent.md) — both sanctioned global-holdout shots are spent.
 - [availability-first.md](availability-first.md) — screen availability before committing a candidate slot.
+- [renewed-referee-frozen.md](renewed-referee-frozen.md) — the binding referee is the Chapter-02 renewed §10.3a gate + P* gate + 15m domain, hash-pinned.
+- [spdr-speed-run-lane.md](spdr-speed-run-lane.md) — TRAIN-only Python speed-run screening lane (0 runs/reads/slots) for cheap family routing.
+- [unit-pin-money-floor.md](unit-pin-money-floor.md) — L-21/L-22: pin the unit at every screen→graduation seam; floor effects in money.

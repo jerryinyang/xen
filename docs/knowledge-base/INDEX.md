@@ -1,8 +1,10 @@
 # Xen Knowledge Base — Read First
 
 The curated, cross-chapter canon for the Xen research programme. Distilled from Chapter 01
-(~98 experiments, ~25 phases). Read this **before** designing any new experiment: it records
-what is frozen, what is dead, what worked, and the lessons that cost a false positive to learn.
+(~98 experiments, ~25 phases) and Chapter 02 (EXP-001–025 + SPDR-001..003, 11 phases,
+2026-06-27 → 2026-07-09; seven family arcs, all closed negative with mechanisms recorded).
+Read this **before** designing any new experiment: it records what is frozen, what is dead,
+what worked, and the lessons that cost a false positive to learn.
 
 This KB is canonical and **append-merged** at every chapter rollover (new chapters add/update;
 they do not wipe prior canon). The **signal-registry** (`docs/signal-registry/`) is the *live*
@@ -11,10 +13,10 @@ copied — it persists across chapters and must never be reset.
 
 ## What's FROZEN (do not re-derive)
 
-- **The evaluation/referee suite** — the 5-check gate stack, the ratified loose operating
-  point, the revised portfolio-fitness unit, and the per-domain MDE maps. See
-  [evaluation-framework.md](evaluation-framework.md). Reusing it is mandatory; retuning it
-  after seeing a candidate's outcome is a governance violation.
+- **The evaluation/referee suite** — the Chapter-02 **renewed §10.3a gate (q\*=0.75) + E6
+  P\*-gate + E7 15m domain**, hash-pinned; plus the Chapter-01 5-check stack it dominated and
+  the per-domain MDE maps. See [evaluation-framework.md](evaluation-framework.md). Reusing it
+  is mandatory; retuning it after seeing a candidate's outcome is a governance violation.
 - **The data layer** — 1-minute time-bar base, deterministic derived views, the cTrader
   strategy-host contract, the holdout fence. See [data-architecture.md](data-architecture.md).
 - **The global holdout** — final 30% per file. One sanctioned read existed per dataset; both
@@ -51,3 +53,5 @@ copied — it persists across chapters and must never be reset.
 
 - `archive/chapter-01-*/` — the full Chapter 01 experiments, family indexes, checkpoints, and
   reflections. Reachable for convention reference; not loaded by default.
+- `archive/chapter-02-mr-volharv-htfdi/` — the full Chapter 02 experiments (EXP-001–025,
+  SPDR-001..003, VAL-006/007), experiments-docs, thesis-specific cBots, and run tooling.
