@@ -18,7 +18,7 @@ materiality read is informative — presented as evidence, decided by the operat
 3. Read `docs/references/dataset-reference.md`, `architecture.md`.
 4. Read `python/experiments/INDEX.md`, `docs/experiments-docs/INDEX.md`, the newest active
    checkpoint `design.md`, and `docs/signal-registry/` preconditions.
-5. Determine entry point: new EXP, resume EXP, VAL re-analysis, or scope-only design.
+5. Determine entry point: new EXP, resume EXP, VAL re-analysis, SPDR speed-run screen (see SPDR carve-out below), or scope-only design.
 
 ## Stages
 

@@ -29,7 +29,7 @@ tradability or deployability claim.
 | **No local accounting primitives** mimicking `xen.adjudication` P&L for a verdict. Screen metrics = availability/lift (`xen.evaluation` toolbox), not a booked P&L. | Local accounting certified three wrong verdicts (L-18 / critical-017). |
 | **Dependence-matched uncertainty.** Any CI on a per-bar estimand with overlapping H-bar forward windows must use a block bootstrap with **block ≥ H** (or resample a non-overlapping / greedy trade series). Library defaults (e.g. block=5) do not substitute for this choice; a mismatch invalidates every CI-clearance call on that estimand. | Phase-010 correction (2026-07-08): block=5 on overlapping H=48 windows (autocorr 0.84 at lag 5) understated uncertainty ~2–3× and manufactured a fade thread that did not exist. |
 
-PDR may output
+## Dispositions an SPDR may output
 
 Per-stratum disposition, one of:
 

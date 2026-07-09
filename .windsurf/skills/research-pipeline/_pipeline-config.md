@@ -324,7 +324,7 @@ When QA issues REVISE, the verdict identifies:
 - Once assigned, an ID is **never reused**, even if the experiment is abandoned.
 - If no index exists, start with `EXP-001`.
 - VAL-series experiments (validation reruns) use `VAL-001`, `VAL-002`, etc. — same structure, different prefix.
-- SPDR-series speed-runs (TRAIN-only availability screens) use `SPDR-001`, etc. — lean 3-artifact lane, no cTrader/estimand gate, disposition-only. Spec: `docs/references/spdr-lane.md`.
+- SPDR-series speed-runs (TRAIN-only availability screens) use `SPDR-001`, etc. — lean screen lane (design.md + screen.md + analysis.md, no QA subagent), no cTrader/estimand gate, disposition-only. Spec: `docs/references/spdr-lane.md`.
 
 ---
 
