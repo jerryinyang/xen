@@ -17,6 +17,13 @@ cost of a full experiment. A speed-run compounds several coherent questions in o
 runs vectorised in Python on the local dataset. Its only output is a disposition, never a
 tradability or deployability claim.
 
+**Hard vs flexible.** The integrity boundary below is HARD and never waivable. Everything
+else — execution vehicle, stage shape, artifact extras — is a **default the operator may
+override by directive** (recorded in the leg's `design.md`). Example: the operator may
+direct an SPDR leg to run on the cTrader engine instead of vectorised Python (e.g. when
+fill mechanics matter to the screen question); the leg remains an SPDR — TRAIN-only,
+disposition-only, no estimand-gated verdict, no family action.
+
 ## Integrity boundary (HARD — this is what keeps L-01 intact)
 
 | Rule | Why |
@@ -39,8 +46,10 @@ Per-stratum disposition, one of:
 | `NOT_WORTH` | No lift over the matched baseline. |
 | `INCONCLUSIVE` | Underpowered / vehicle-limited; not a negative (B-5, UNPOWERED ≠ evidence-against). |
 
-SPDR **never** registers a family, spends a read, opens a checkpoint, or makes a tradability
-claim. A `WORTH_EXPLORING` is a *routing signal*, not a verdict.
+SPDR **never** registers a family, spends a read, or makes a tradability claim. A single
+SPDR leg never opens a checkpoint; a multi-leg series' disposition lives in its **phase
+container** checkpoint (e.g. checkpoint-010 for the SPDR-001/002/003 series). A
+`WORTH_EXPLORING` is a *routing signal*, not a verdict.
 
 ## Stages (lean)
 
