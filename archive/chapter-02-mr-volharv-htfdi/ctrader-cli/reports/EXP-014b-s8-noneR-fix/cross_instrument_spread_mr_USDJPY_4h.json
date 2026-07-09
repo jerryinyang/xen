@@ -1,0 +1,2210 @@
+{
+  "main": {
+    "utcOffset": 0,
+    "language": "en",
+    "depositAsset": "USD",
+    "depositAssetDigits": 2,
+    "period": "m1",
+    "symbol": "USDJPY",
+    "brokerTitle": "",
+    "cBotName": "Xen",
+    "roi": 0,
+    "netProfit": -109.72,
+    "startingCapital": 100000000,
+    "endingEquity": 99999890.27999994,
+    "endingBalance": 99999890.27999994,
+    "testingPeriod": {
+      "duration": "3y 8m 4d",
+      "startDate": 1609545600000,
+      "endDate": 1725580800000,
+      "formatted": "3y 8m 4d (02/01/2021 - 06/09/2024)"
+    },
+    "accountType": "hedging",
+    "accountLeverage": 1000,
+    "data": {
+      "type": "m1BarsFromServer",
+      "isCustom": false,
+      "customName": null
+    },
+    "spread": {
+      "type": "fixed",
+      "min": null,
+      "max": null,
+      "value": 0
+    },
+    "commissions": {
+      "type": "usdPerMillionUsdVolume",
+      "value": 0,
+      "applyCommissionAutomatically": false
+    },
+    "theme": "dark",
+    "titleKind": "backtesting",
+    "authorNickName": "jerprog0",
+    "authorLink": null,
+    "cBotLink": null,
+    "embedded": false
+  },
+  "equity": {
+    "points": [
+      {
+        "balance": 100000000,
+        "minEquity": 100000000,
+        "maxEquity": 100000000,
+        "timestamp": 1609545600000
+      },
+      {
+        "balance": 100000006.21,
+        "minEquity": 99999999.27,
+        "maxEquity": 100000006.27,
+        "timestamp": 1610013600000
+      },
+      {
+        "balance": 100000009.91999999,
+        "minEquity": 100000004.38,
+        "maxEquity": 100000010.08,
+        "timestamp": 1610503200000
+      },
+      {
+        "balance": 100000007.82999998,
+        "minEquity": 99999999.73999998,
+        "maxEquity": 100000011.72999999,
+        "timestamp": 1612864800000
+      },
+      {
+        "balance": 100000014.36999999,
+        "minEquity": 100000005.27999999,
+        "maxEquity": 100000015.60999998,
+        "timestamp": 1614290460000
+      },
+      {
+        "balance": 99999999.21,
+        "minEquity": 99999996.07999998,
+        "maxEquity": 100000016.28999999,
+        "timestamp": 1616014860000
+      },
+      {
+        "balance": 99999999.22999999,
+        "minEquity": 99999989.05999999,
+        "maxEquity": 100000001.52,
+        "timestamp": 1619715600000
+      },
+      {
+        "balance": 99999997.63999999,
+        "minEquity": 99999995.17999999,
+        "maxEquity": 100000005.33999999,
+        "timestamp": 1624870800000
+      },
+      {
+        "balance": 100000002.59999998,
+        "minEquity": 99999992.40999998,
+        "maxEquity": 100000003.39999999,
+        "timestamp": 1627030800000
+      },
+      {
+        "balance": 100000010.36999997,
+        "minEquity": 100000000.48999998,
+        "maxEquity": 100000010.37999998,
+        "timestamp": 1628254800000
+      },
+      {
+        "balance": 100000013.03999998,
+        "minEquity": 100000008.67999998,
+        "maxEquity": 100000013.69999997,
+        "timestamp": 1629810000000
+      },
+      {
+        "balance": 100000012.89999998,
+        "minEquity": 100000008.71999998,
+        "maxEquity": 100000017.51999998,
+        "timestamp": 1631797200000
+      },
+      {
+        "balance": 99999984.37999998,
+        "minEquity": 99999980.98999998,
+        "maxEquity": 100000014.31999998,
+        "timestamp": 1634734800000
+      },
+      {
+        "balance": 99999989.19999997,
+        "minEquity": 99999981.18999998,
+        "maxEquity": 99999989.42999998,
+        "timestamp": 1641837600000
+      },
+      {
+        "balance": 99999986.94999997,
+        "minEquity": 99999980.77999997,
+        "maxEquity": 99999991.52999997,
+        "timestamp": 1643205600000
+      },
+      {
+        "balance": 99999992.87999998,
+        "minEquity": 99999983.86999997,
+        "maxEquity": 99999993.80999997,
+        "timestamp": 1643824800000
+      },
+      {
+        "balance": 99999958.22999997,
+        "minEquity": 99999934.92999998,
+        "maxEquity": 99999994.19999997,
+        "timestamp": 1648731600000
+      },
+      {
+        "balance": 99999957.11999997,
+        "minEquity": 99999948.19999997,
+        "maxEquity": 99999961.36999997,
+        "timestamp": 1650531600000
+      },
+      {
+        "balance": 99999957.74999997,
+        "minEquity": 99999948.70999998,
+        "maxEquity": 99999961.91999997,
+        "timestamp": 1651582800000
+      },
+      {
+        "balance": 99999967.49999997,
+        "minEquity": 99999955.95999996,
+        "maxEquity": 99999968.37999997,
+        "timestamp": 1651770000000
+      },
+      {
+        "balance": 99999968.64999998,
+        "minEquity": 99999941.88999997,
+        "maxEquity": 99999972.09999996,
+        "timestamp": 1654102800000
+      },
+      {
+        "balance": 99999991.64999998,
+        "minEquity": 99999965.83999997,
+        "maxEquity": 99999993.50999998,
+        "timestamp": 1655398800000
+      },
+      {
+        "balance": 99999977.59999998,
+        "minEquity": 99999945.07999998,
+        "maxEquity": 99999996.84999998,
+        "timestamp": 1660078860000
+      },
+      {
+        "balance": 99999981.14999998,
+        "minEquity": 99999968.90999998,
+        "maxEquity": 99999992.46999998,
+        "timestamp": 1663347600000
+      },
+      {
+        "balance": 100000004.83999997,
+        "minEquity": 99999974.87999998,
+        "maxEquity": 100000004.56999998,
+        "timestamp": 1665740160000
+      },
+      {
+        "balance": 99999975.71999997,
+        "minEquity": 99999947.24999997,
+        "maxEquity": 100000028.53999998,
+        "timestamp": 1669096800000
+      },
+      {
+        "balance": 100000003.17999996,
+        "minEquity": 99999968.41999997,
+        "maxEquity": 100000002.45999996,
+        "timestamp": 1673530560000
+      },
+      {
+        "balance": 100000028.14999996,
+        "minEquity": 100000001.58999996,
+        "maxEquity": 100000027.62999997,
+        "timestamp": 1674012600000
+      },
+      {
+        "balance": 99999986.42999996,
+        "minEquity": 99999978.49999996,
+        "maxEquity": 100000031.32999997,
+        "timestamp": 1677852000000
+      },
+      {
+        "balance": 99999980.31999996,
+        "minEquity": 99999955.03999996,
+        "maxEquity": 99999992.52999996,
+        "timestamp": 1680224400000
+      },
+      {
+        "balance": 99999971.88999996,
+        "minEquity": 99999959.68999997,
+        "maxEquity": 99999985.13999996,
+        "timestamp": 1685624400000
+      },
+      {
+        "balance": 99999965.91999996,
+        "minEquity": 99999943.63999996,
+        "maxEquity": 99999972.74999996,
+        "timestamp": 1689872400000
+      },
+      {
+        "balance": 99999976.10999995,
+        "minEquity": 99999965.05999996,
+        "maxEquity": 99999976.46999995,
+        "timestamp": 1697130000000
+      },
+      {
+        "balance": 99999986.17999995,
+        "minEquity": 99999972.65999995,
+        "maxEquity": 99999985.78999996,
+        "timestamp": 1698746460000
+      },
+      {
+        "balance": 99999994.82999995,
+        "minEquity": 99999979.66999994,
+        "maxEquity": 99999995.10999995,
+        "timestamp": 1699567200000
+      },
+      {
+        "balance": 99999984.54999995,
+        "minEquity": 99999978.57999995,
+        "maxEquity": 100000002.14999995,
+        "timestamp": 1701813660000
+      },
+      {
+        "balance": 100000009.51999995,
+        "minEquity": 99999983.19999996,
+        "maxEquity": 100000007.14999995,
+        "timestamp": 1702280460000
+      },
+      {
+        "balance": 100000011.31999995,
+        "minEquity": 100000000.61999995,
+        "maxEquity": 100000027.87999995,
+        "timestamp": 1703584800000
+      },
+      {
+        "balance": 99999972.21999995,
+        "minEquity": 99999962.92999995,
+        "maxEquity": 100000013.30999994,
+        "timestamp": 1706565660000
+      },
+      {
+        "balance": 99999973.09999995,
+        "minEquity": 99999953.24999996,
+        "maxEquity": 99999974.80999996,
+        "timestamp": 1710723600000
+      },
+      {
+        "balance": 99999993.41999994,
+        "minEquity": 99999956.74999996,
+        "maxEquity": 99999993.41999994,
+        "timestamp": 1716471900000
+      },
+      {
+        "balance": 99999970.23999994,
+        "minEquity": 99999965.69999994,
+        "maxEquity": 99999997.59999995,
+        "timestamp": 1720083600000
+      },
+      {
+        "balance": 99999890.27999994,
+        "minEquity": 99999847.80999993,
+        "maxEquity": 99999970.55999993,
+        "timestamp": 1723525200000
+      },
+      {
+        "balance": 99999890.27999994,
+        "minEquity": 99999890.27999994,
+        "maxEquity": 99999892.13999994,
+        "timestamp": 1725627600000
+      }
+    ],
+    "maxBalanceDrawdownPercent": 0.00013786996120927552,
+    "maxEquityDrawdownPercent": 0.0001835199425437332,
+    "maxBalanceDrawdownAbsolute": 137.87000001966953,
+    "maxEquityDrawdownAbsolute": 183.52000004053116
+  },
+  "tradeStatistics": {
+    "netProfit": {
+      "all": -109.72,
+      "long": 14.06,
+      "short": -123.78
+    },
+    "profitFactor": {
+      "all": 0.68,
+      "long": 1.1,
+      "short": 0.37
+    },
+    "commissions": {
+      "all": 0,
+      "long": 0,
+      "short": 0
+    },
+    "swaps": {
+      "all": -7.86,
+      "long": 18.06,
+      "short": -25.92
+    },
+    "totalTrades": {
+      "all": 42,
+      "long": 24,
+      "short": 18
+    },
+    "winningTrades": {
+      "all": 24,
+      "long": 16,
+      "short": 8
+    },
+    "maxConsecutiveWinningTrades": {
+      "all": 4,
+      "long": 5,
+      "short": 4
+    },
+    "largestWinningTrade": {
+      "all": 27.46,
+      "long": 24.97,
+      "short": 27.46
+    },
+    "losingTrades": {
+      "all": 18,
+      "long": 8,
+      "short": 10
+    },
+    "maxConsecutiveLosingTrades": {
+      "all": 4,
+      "long": 2,
+      "short": 4
+    },
+    "largestLosingTrade": {
+      "all": -79.96,
+      "long": -79.96,
+      "short": -41.72
+    },
+    "averageTrade": {
+      "all": -2.61,
+      "long": 0.59,
+      "short": -6.88
+    }
+  },
+  "parameters": [
+    {
+      "group": null,
+      "displayName": "Mode",
+      "propertyName": "Mode",
+      "value": "NativeOrders"
+    },
+    {
+      "group": null,
+      "displayName": "Strategy",
+      "propertyName": "Strategy",
+      "value": "CrossInstrumentSpreadMr"
+    },
+    {
+      "group": null,
+      "displayName": "Collect \u0026 Store Time Bars",
+      "propertyName": "CollectTimeBars",
+      "value": "false"
+    },
+    {
+      "group": null,
+      "displayName": "Analysis End UTC",
+      "propertyName": "AnalysisEndUtc",
+      "value": "2024-09-06T12:28:00Z"
+    },
+    {
+      "group": null,
+      "displayName": "Strategy Output Directory",
+      "propertyName": "StrategyOutputDirectory",
+      "value": "/workspace/data/strategy_runs/EXP-014b-s8-noneR-fix"
+    },
+    {
+      "group": null,
+      "displayName": "Source Parquet Path",
+      "propertyName": "SourceParquetPath",
+      "value": ""
+    },
+    {
+      "group": null,
+      "displayName": "Domain Minutes",
+      "propertyName": "DomainMinutes",
+      "value": 240
+    },
+    {
+      "group": null,
+      "displayName": "Strict Coverage",
+      "propertyName": "StrictCoverage",
+      "value": "false"
+    },
+    {
+      "group": null,
+      "displayName": "Min Coverage",
+      "propertyName": "MinCoverage",
+      "value": 0.9
+    },
+    {
+      "group": null,
+      "displayName": "Fast MA",
+      "propertyName": "FastMa",
+      "value": 20
+    },
+    {
+      "group": null,
+      "displayName": "Slow MA",
+      "propertyName": "SlowMa",
+      "value": 50
+    },
+    {
+      "group": null,
+      "displayName": "Basket Mates (CANON;...)",
+      "propertyName": "BasketMates",
+      "value": "EURUSD;GBPUSD;USDCHF;USDCAD;AUDUSD;NZDUSD"
+    },
+    {
+      "group": null,
+      "displayName": "Basket Phase Shift Hours",
+      "propertyName": "BasketPhaseShiftHours",
+      "value": 0
+    },
+    {
+      "group": null,
+      "displayName": "CDM Series",
+      "propertyName": "CdmSeries",
+      "value": "S5_SPREAD"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Series",
+      "propertyName": "CisSeries",
+      "value": "S8_RVINDEX"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Reentry",
+      "propertyName": "CisReentry",
+      "value": "none"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Static Arm",
+      "propertyName": "CisStaticArm",
+      "value": "false"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Trail",
+      "propertyName": "CisTrail",
+      "value": "false"
+    }
+  ],
+  "usedSymbols": [
+    {
+      "symbol": "USDJPY",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "USD",
+      "baseAssetDigits": 2,
+      "quoteAsset": "JPY",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": 0.84,
+      "swapShort": -1.72,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 3,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 2,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "EURUSD",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "EUR",
+      "baseAssetDigits": 2,
+      "quoteAsset": "USD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -0.82,
+      "swapShort": 0.15,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 5,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 4,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "GBPUSD",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "GBP",
+      "baseAssetDigits": 2,
+      "quoteAsset": "USD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -0.39,
+      "swapShort": -0.41,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 5,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 4,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "USDCHF",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "USD",
+      "baseAssetDigits": 2,
+      "quoteAsset": "CHF",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": 0.56,
+      "swapShort": -1.24,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 5,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 4,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "USDCAD",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "USD",
+      "baseAssetDigits": 2,
+      "quoteAsset": "CAD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": 0.27,
+      "swapShort": -1.03,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 5,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 4,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "AUDUSD",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "AUD",
+      "baseAssetDigits": 2,
+      "quoteAsset": "USD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -0.23,
+      "swapShort": -0.48,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 5,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 4,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "NZDUSD",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "NZD",
+      "baseAssetDigits": 2,
+      "quoteAsset": "USD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -0.44,
+      "swapShort": 0.04,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 5,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 4,
+      "swapCalculationType": "pips"
+    }
+  ],
+  "positions": {
+    "columns": [
+      "id",
+      "symbol",
+      "quantity",
+      "volume",
+      "direction",
+      "entryPrice",
+      "tp",
+      "sl",
+      "commissions",
+      "closingCommissions",
+      "created",
+      "label",
+      "comment",
+      "pips",
+      "net",
+      "gross",
+      "swaps"
+    ],
+    "items": [],
+    "marginUsed": 0,
+    "freeMargin": 99999890.27999994,
+    "marginLevel": null,
+    "unrealizedNet": 0,
+    "unrealizedGross": 0
+  },
+  "orders": {
+    "columns": [
+      "id",
+      "symbol",
+      "direction",
+      "created",
+      "quantity",
+      "volume",
+      "orderType",
+      "submittedPrice",
+      "distance",
+      "tp",
+      "sl",
+      "expiryDate",
+      "currentPrice",
+      "limitRange",
+      "comment",
+      "label"
+    ],
+    "items": [
+      {
+        "id": 7111,
+        "created": 1725613200000,
+        "quantity": 0.01,
+        "volume": 1000,
+        "orderType": "limit",
+        "submittedPrice": 146.917,
+        "distance": 394.1,
+        "tp": null,
+        "sl": null,
+        "expiryDate": null,
+        "currentPrice": 142.976,
+        "limitRange": null,
+        "comment": "0",
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "symbol": "USDJPY",
+        "direction": "sell"
+      },
+      {
+        "id": 7112,
+        "created": 1725613200000,
+        "quantity": 0.01,
+        "volume": 1000,
+        "orderType": "limit",
+        "submittedPrice": 137.828,
+        "distance": 514.8,
+        "tp": null,
+        "sl": null,
+        "expiryDate": null,
+        "currentPrice": 142.976,
+        "limitRange": null,
+        "comment": "0",
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "symbol": "USDJPY",
+        "direction": "buy"
+      }
+    ]
+  },
+  "history": {
+    "columns": [
+      "id",
+      "symbol",
+      "direction",
+      "net",
+      "gross",
+      "entryTime",
+      "closeTime",
+      "entryPrice",
+      "closePrice",
+      "swaps",
+      "commissions",
+      "volume",
+      "label",
+      "comment",
+      "quantity",
+      "pips"
+    ],
+    "items": [
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 2,
+        "net": 6.21,
+        "gross": 5.91,
+        "entryTime": 1609752900000,
+        "closeTime": 1610013600000,
+        "entryPrice": 102.719,
+        "closePrice": 103.567,
+        "commissions": 0,
+        "swaps": 0.3,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000006.21,
+        "quantity": 0.01,
+        "pips": 84.8
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 4,
+        "net": 3.71,
+        "gross": 3.95,
+        "entryTime": 1610359680000,
+        "closeTime": 1610503200000,
+        "entryPrice": 104.129,
+        "closePrice": 103.562,
+        "commissions": 0,
+        "swaps": -0.24,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000009.91999999,
+        "quantity": 0.01,
+        "pips": 56.699999999999996
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 6,
+        "net": -2.0900000000000003,
+        "gross": -0.89,
+        "entryTime": 1611840840000,
+        "closeTime": 1612864800000,
+        "entryPrice": 104.44,
+        "closePrice": 104.567,
+        "commissions": 0,
+        "swaps": -1.2000000000000002,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000007.82999998,
+        "quantity": 0.01,
+        "pips": -12.7
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 8,
+        "net": 6.54,
+        "gross": 6.18,
+        "entryTime": 1614002460000,
+        "closeTime": 1614290460000,
+        "entryPrice": 105.304,
+        "closePrice": 106.191,
+        "commissions": 0,
+        "swaps": 0.36,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000014.36999999,
+        "quantity": 0.01,
+        "pips": 88.7
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 10,
+        "net": -15.16,
+        "gross": -13,
+        "entryTime": 1614684480000,
+        "closeTime": 1616014860000,
+        "entryPrice": 106.958,
+        "closePrice": 108.822,
+        "commissions": 0,
+        "swaps": -2.16,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999999.21,
+        "quantity": 0.01,
+        "pips": -186.4
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 12,
+        "net": 0.020000000000000018,
+        "gross": -1,
+        "entryTime": 1618353120000,
+        "closeTime": 1619715600000,
+        "entryPrice": 109.035,
+        "closePrice": 108.892,
+        "commissions": 0,
+        "swaps": 1.02,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999999.22999999,
+        "quantity": 0.01,
+        "pips": -14.299999999999999
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 14,
+        "net": -1.5899999999999999,
+        "gross": -0.15,
+        "entryTime": 1623874800000,
+        "closeTime": 1624870800000,
+        "entryPrice": 110.699,
+        "closePrice": 110.721,
+        "commissions": 0,
+        "swaps": -1.44,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999997.63999999,
+        "quantity": 0.01,
+        "pips": -2.1999999999999997
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 16,
+        "net": 4.96,
+        "gross": 4.06,
+        "entryTime": 1625730360000,
+        "closeTime": 1627030800000,
+        "entryPrice": 109.904,
+        "closePrice": 110.486,
+        "commissions": 0,
+        "swaps": 0.9000000000000001,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000002.59999998,
+        "quantity": 0.01,
+        "pips": 58.199999999999996
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 18,
+        "net": 7.7700000000000005,
+        "gross": 7.53,
+        "entryTime": 1628076360000,
+        "closeTime": 1628254800000,
+        "entryPrice": 109.034,
+        "closePrice": 110.114,
+        "commissions": 0,
+        "swaps": 0.24,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000010.36999997,
+        "quantity": 0.01,
+        "pips": 108
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 20,
+        "net": 2.67,
+        "gross": 3.03,
+        "entryTime": 1629332760000,
+        "closeTime": 1629810000000,
+        "entryPrice": 109.967,
+        "closePrice": 109.532,
+        "commissions": 0,
+        "swaps": -0.36,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000013.03999998,
+        "quantity": 0.01,
+        "pips": 43.5
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 22,
+        "net": -0.14,
+        "gross": -0.92,
+        "entryTime": 1630637520000,
+        "closeTime": 1631797200000,
+        "entryPrice": 109.824,
+        "closePrice": 109.692,
+        "commissions": 0,
+        "swaps": 0.78,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000012.89999998,
+        "quantity": 0.01,
+        "pips": -13.200000000000001
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 24,
+        "net": -28.520000000000003,
+        "gross": -25.64,
+        "entryTime": 1632463860000,
+        "closeTime": 1634734800000,
+        "entryPrice": 110.526,
+        "closePrice": 114.203,
+        "commissions": 0,
+        "swaps": -2.880000000000001,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999984.37999998,
+        "quantity": 0.01,
+        "pips": -367.7
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 26,
+        "net": 4.82,
+        "gross": 5.54,
+        "entryTime": 1641286980000,
+        "closeTime": 1641837600000,
+        "entryPrice": 115.884,
+        "closePrice": 115.09,
+        "commissions": 0,
+        "swaps": -0.72,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999989.19999997,
+        "quantity": 0.01,
+        "pips": 79.4
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 28,
+        "net": -2.25,
+        "gross": -3.09,
+        "entryTime": 1642003800000,
+        "closeTime": 1643205600000,
+        "entryPrice": 114.747,
+        "closePrice": 114.304,
+        "commissions": 0,
+        "swaps": 0.8400000000000001,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999986.94999997,
+        "quantity": 0.01,
+        "pips": -44.3
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 30,
+        "net": 5.93,
+        "gross": 6.41,
+        "entryTime": 1643281800000,
+        "closeTime": 1643824800000,
+        "entryPrice": 115.247,
+        "closePrice": 114.328,
+        "commissions": 0,
+        "swaps": -0.48,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999992.87999998,
+        "quantity": 0.01,
+        "pips": 91.9
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 32,
+        "net": -34.65,
+        "gross": -32.25,
+        "entryTime": 1646997840000,
+        "closeTime": 1648731600000,
+        "entryPrice": 116.997,
+        "closePrice": 121.622,
+        "commissions": 0,
+        "swaps": -2.4000000000000004,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999958.22999997,
+        "quantity": 0.01,
+        "pips": -462.5
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 34,
+        "net": -1.1099999999999999,
+        "gross": -0.63,
+        "entryTime": 1650339420000,
+        "closeTime": 1650531600000,
+        "entryPrice": 127.973,
+        "closePrice": 128.063,
+        "commissions": 0,
+        "swaps": -0.48,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999957.11999997,
+        "quantity": 0.01,
+        "pips": -9
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 36,
+        "net": 0.63,
+        "gross": 0.99,
+        "entryTime": 1651124220000,
+        "closeTime": 1651582800000,
+        "entryPrice": 130.025,
+        "closePrice": 129.883,
+        "commissions": 0,
+        "swaps": -0.36,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999957.74999997,
+        "quantity": 0.01,
+        "pips": 14.2
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 38,
+        "net": 9.75,
+        "gross": 9.75,
+        "entryTime": 1651712880000,
+        "closeTime": 1651770000000,
+        "entryPrice": 129.016,
+        "closePrice": 130.415,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999967.49999997,
+        "quantity": 0.01,
+        "pips": 139.9
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 40,
+        "net": 1.1500000000000004,
+        "gross": -0.17,
+        "entryTime": 1652171520000,
+        "closeTime": 1654102800000,
+        "entryPrice": 130.157,
+        "closePrice": 130.132,
+        "commissions": 0,
+        "swaps": 1.3200000000000003,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999968.64999998,
+        "quantity": 0.01,
+        "pips": -2.5
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 42,
+        "net": 23,
+        "gross": 23.6,
+        "entryTime": 1655093400000,
+        "closeTime": 1655398800000,
+        "entryPrice": 135.197,
+        "closePrice": 131.813,
+        "commissions": 0,
+        "swaps": -0.6,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999991.64999998,
+        "quantity": 0.01,
+        "pips": 338.4
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 44,
+        "net": -14.05,
+        "gross": -15.07,
+        "entryTime": 1658445000000,
+        "closeTime": 1660078860000,
+        "entryPrice": 137.207,
+        "closePrice": 135.045,
+        "commissions": 0,
+        "swaps": 1.0200000000000002,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999977.59999998,
+        "quantity": 0.01,
+        "pips": -216.2
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 46,
+        "net": 3.5500000000000003,
+        "gross": 4.87,
+        "entryTime": 1662516840000,
+        "closeTime": 1663347600000,
+        "entryPrice": 143.728,
+        "closePrice": 143.03,
+        "commissions": 0,
+        "swaps": -1.3199999999999998,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999981.14999998,
+        "quantity": 0.01,
+        "pips": 69.8
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 48,
+        "net": 23.689999999999998,
+        "gross": 22.97,
+        "entryTime": 1664892360000,
+        "closeTime": 1665740160000,
+        "entryPrice": 144.47,
+        "closePrice": 147.764,
+        "commissions": 0,
+        "swaps": 0.72,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000004.83999997,
+        "quantity": 0.01,
+        "pips": 329.4
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 50,
+        "net": -29.12,
+        "gross": -30.92,
+        "entryTime": 1666368000000,
+        "closeTime": 1669096800000,
+        "entryPrice": 146.277,
+        "closePrice": 141.842,
+        "commissions": 0,
+        "swaps": 1.8000000000000005,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999975.71999997,
+        "quantity": 0.01,
+        "pips": -443.49999999999994
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 52,
+        "net": 27.46,
+        "gross": 28.3,
+        "entryTime": 1672927260000,
+        "closeTime": 1673530560000,
+        "entryPrice": 133.706,
+        "closePrice": 129.647,
+        "commissions": 0,
+        "swaps": -0.84,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000003.17999996,
+        "quantity": 0.01,
+        "pips": 405.90000000000003
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 54,
+        "net": 24.970000000000002,
+        "gross": 24.85,
+        "entryTime": 1673836140000,
+        "closeTime": 1674012600000,
+        "entryPrice": 127.488,
+        "closePrice": 131.052,
+        "commissions": 0,
+        "swaps": 0.12,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000028.14999996,
+        "quantity": 0.01,
+        "pips": 356.4
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 56,
+        "net": -41.72,
+        "gross": -38.36,
+        "entryTime": 1675434180000,
+        "closeTime": 1677852000000,
+        "entryPrice": 130.412,
+        "closePrice": 135.914,
+        "commissions": 0,
+        "swaps": -3.3600000000000008,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999986.42999996,
+        "quantity": 0.01,
+        "pips": -550.1999999999999
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 58,
+        "net": -6.109999999999999,
+        "gross": -7.37,
+        "entryTime": 1678462320000,
+        "closeTime": 1680224400000,
+        "entryPrice": 134.298,
+        "closePrice": 133.241,
+        "commissions": 0,
+        "swaps": 1.2600000000000002,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999980.31999996,
+        "quantity": 0.01,
+        "pips": -105.69999999999999
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 60,
+        "net": -8.43,
+        "gross": -6.75,
+        "entryTime": 1684413240000,
+        "closeTime": 1685624400000,
+        "entryPrice": 138.137,
+        "closePrice": 139.105,
+        "commissions": 0,
+        "swaps": -1.6800000000000002,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999971.88999996,
+        "quantity": 0.01,
+        "pips": -96.8
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 62,
+        "net": -5.970000000000001,
+        "gross": -6.69,
+        "entryTime": 1689006840000,
+        "closeTime": 1689872400000,
+        "entryPrice": 141.422,
+        "closePrice": 140.463,
+        "commissions": 0,
+        "swaps": 0.72,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999965.91999996,
+        "quantity": 0.01,
+        "pips": -95.89999999999999
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 64,
+        "net": 10.19,
+        "gross": 9.77,
+        "entryTime": 1696526580000,
+        "closeTime": 1697130000000,
+        "entryPrice": 148.338,
+        "closePrice": 149.739,
+        "commissions": 0,
+        "swaps": 0.42,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999976.10999995,
+        "quantity": 0.01,
+        "pips": 140.1
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 66,
+        "net": 10.07,
+        "gross": 10.01,
+        "entryTime": 1698649380000,
+        "closeTime": 1698746460000,
+        "entryPrice": 149.307,
+        "closePrice": 150.742,
+        "commissions": 0,
+        "swaps": 0.06,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999986.17999995,
+        "quantity": 0.01,
+        "pips": 143.5
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 68,
+        "net": 8.65,
+        "gross": 8.17,
+        "entryTime": 1698891780000,
+        "closeTime": 1699567200000,
+        "entryPrice": 150.161,
+        "closePrice": 151.333,
+        "commissions": 0,
+        "swaps": 0.48,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999994.82999995,
+        "quantity": 0.01,
+        "pips": 117.19999999999999
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 70,
+        "net": -10.28,
+        "gross": -11.24,
+        "entryTime": 1700453760000,
+        "closeTime": 1701813660000,
+        "entryPrice": 148.711,
+        "closePrice": 147.099,
+        "commissions": 0,
+        "swaps": 0.9600000000000002,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999984.54999995,
+        "quantity": 0.01,
+        "pips": -161.20000000000002
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 72,
+        "net": 24.970000000000002,
+        "gross": 24.85,
+        "entryTime": 1701971220000,
+        "closeTime": 1702280460000,
+        "entryPrice": 142.445,
+        "closePrice": 146.009,
+        "commissions": 0,
+        "swaps": 0.12,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000009.51999995,
+        "quantity": 0.01,
+        "pips": 356.4
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 74,
+        "net": 1.8,
+        "gross": 1.2,
+        "entryTime": 1702506840000,
+        "closeTime": 1703584800000,
+        "entryPrice": 142.332,
+        "closePrice": 142.504,
+        "commissions": 0,
+        "swaps": 0.6000000000000001,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000011.31999995,
+        "quantity": 0.01,
+        "pips": 17.2
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 76,
+        "net": -39.1,
+        "gross": -35.86,
+        "entryTime": 1704239880000,
+        "closeTime": 1706565660000,
+        "entryPrice": 142.156,
+        "closePrice": 147.299,
+        "commissions": 0,
+        "swaps": -3.2400000000000007,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999972.21999995,
+        "quantity": 0.01,
+        "pips": -514.3
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 78,
+        "net": 0.88,
+        "gross": 0.16,
+        "entryTime": 1709738220000,
+        "closeTime": 1710723600000,
+        "entryPrice": 149.263,
+        "closePrice": 149.286,
+        "commissions": 0,
+        "swaps": 0.72,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999973.09999995,
+        "quantity": 0.01,
+        "pips": 2.3
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 80,
+        "net": 20.32,
+        "gross": 18.88,
+        "entryTime": 1714595760000,
+        "closeTime": 1716471900000,
+        "entryPrice": 154.262,
+        "closePrice": 156.97,
+        "commissions": 0,
+        "swaps": 1.4400000000000002,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999993.41999994,
+        "quantity": 0.01,
+        "pips": 270.8
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "sell",
+        "id": 82,
+        "net": -23.18,
+        "gross": -21.02,
+        "entryTime": 1718698680000,
+        "closeTime": 1720083600000,
+        "entryPrice": 158.231,
+        "closePrice": 161.245,
+        "commissions": 0,
+        "swaps": -2.16,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999970.23999994,
+        "quantity": 0.01,
+        "pips": -301.4
+      },
+      {
+        "symbol": "USDJPY",
+        "direction": "buy",
+        "id": 84,
+        "net": -79.96,
+        "gross": -81.82,
+        "entryTime": 1720701780000,
+        "closeTime": 1723525200000,
+        "entryPrice": 159.451,
+        "closePrice": 147.716,
+        "commissions": 0,
+        "swaps": 1.8600000000000005,
+        "volume": 1000,
+        "label": "cis_usdjpy_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999890.27999994,
+        "quantity": 0.01,
+        "pips": -1173.5
+      }
+    ]
+  },
+  "entries": {
+    "entriesByHours": {
+      "zero": {
+        "totalTrades": 1
+      },
+      "one": {
+        "totalTrades": 1
+      },
+      "two": {
+        "totalTrades": 4
+      },
+      "three": {
+        "totalTrades": 1
+      },
+      "four": {
+        "totalTrades": 2
+      },
+      "five": {
+        "totalTrades": 1
+      },
+      "six": {
+        "totalTrades": 1
+      },
+      "seven": {
+        "totalTrades": 2
+      },
+      "eight": {
+        "totalTrades": 2
+      },
+      "nine": {
+        "totalTrades": 2
+      },
+      "ten": {
+        "totalTrades": 1
+      },
+      "eleven": {
+        "totalTrades": 4
+      },
+      "twelve": {
+        "totalTrades": 2
+      },
+      "thirteen": {
+        "totalTrades": 1
+      },
+      "fourteen": {
+        "totalTrades": 4
+      },
+      "fifteen": {
+        "totalTrades": 2
+      },
+      "sixteen": {
+        "totalTrades": 3
+      },
+      "seventeen": {
+        "totalTrades": 2
+      },
+      "eighteen": {
+        "totalTrades": 0
+      },
+      "nineteen": {
+        "totalTrades": 0
+      },
+      "twenty": {
+        "totalTrades": 2
+      },
+      "twentyOne": {
+        "totalTrades": 0
+      },
+      "twentyTwo": {
+        "totalTrades": 2
+      },
+      "twentyThree": {
+        "totalTrades": 2
+      }
+    },
+    "entriesByWeekdays": {
+      "sunday": {
+        "totalTrades": 0
+      },
+      "monday": {
+        "totalTrades": 8
+      },
+      "tuesday": {
+        "totalTrades": 8
+      },
+      "wednesday": {
+        "totalTrades": 7
+      },
+      "thursday": {
+        "totalTrades": 13
+      },
+      "friday": {
+        "totalTrades": 6
+      },
+      "saturday": {
+        "totalTrades": 0
+      }
+    },
+    "entriesByMonths": {
+      "january": {
+        "totalTrades": 9
+      },
+      "february": {
+        "totalTrades": 2
+      },
+      "march": {
+        "totalTrades": 4
+      },
+      "april": {
+        "totalTrades": 3
+      },
+      "may": {
+        "totalTrades": 4
+      },
+      "june": {
+        "totalTrades": 3
+      },
+      "july": {
+        "totalTrades": 4
+      },
+      "august": {
+        "totalTrades": 2
+      },
+      "september": {
+        "totalTrades": 3
+      },
+      "october": {
+        "totalTrades": 4
+      },
+      "november": {
+        "totalTrades": 2
+      },
+      "december": {
+        "totalTrades": 2
+      }
+    }
+  },
+  "profitsLosses": {
+    "profitsLossesByHours": {
+      "zero": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "one": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "two": {
+        "winningTrades": 3,
+        "losingTrades": 1
+      },
+      "three": {
+        "winningTrades": 0,
+        "losingTrades": 1
+      },
+      "four": {
+        "winningTrades": 1,
+        "losingTrades": 1
+      },
+      "five": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "six": {
+        "winningTrades": 0,
+        "losingTrades": 1
+      },
+      "seven": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      },
+      "eight": {
+        "winningTrades": 1,
+        "losingTrades": 1
+      },
+      "nine": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      },
+      "ten": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "eleven": {
+        "winningTrades": 2,
+        "losingTrades": 2
+      },
+      "twelve": {
+        "winningTrades": 0,
+        "losingTrades": 2
+      },
+      "thirteen": {
+        "winningTrades": 0,
+        "losingTrades": 1
+      },
+      "fourteen": {
+        "winningTrades": 3,
+        "losingTrades": 1
+      },
+      "fifteen": {
+        "winningTrades": 1,
+        "losingTrades": 1
+      },
+      "sixteen": {
+        "winningTrades": 0,
+        "losingTrades": 3
+      },
+      "seventeen": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      },
+      "eighteen": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "nineteen": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "twenty": {
+        "winningTrades": 1,
+        "losingTrades": 1
+      },
+      "twentyOne": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "twentyTwo": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      },
+      "twentyThree": {
+        "winningTrades": 0,
+        "losingTrades": 2
+      }
+    },
+    "profitsLossesByWeekdays": {
+      "sunday": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "monday": {
+        "winningTrades": 6,
+        "losingTrades": 2
+      },
+      "tuesday": {
+        "winningTrades": 4,
+        "losingTrades": 4
+      },
+      "wednesday": {
+        "winningTrades": 5,
+        "losingTrades": 2
+      },
+      "thursday": {
+        "winningTrades": 9,
+        "losingTrades": 4
+      },
+      "friday": {
+        "winningTrades": 0,
+        "losingTrades": 6
+      },
+      "saturday": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      }
+    },
+    "profitsLossesByMonth": {
+      "january": {
+        "winningTrades": 6,
+        "losingTrades": 3
+      },
+      "february": {
+        "winningTrades": 1,
+        "losingTrades": 1
+      },
+      "march": {
+        "winningTrades": 1,
+        "losingTrades": 3
+      },
+      "april": {
+        "winningTrades": 2,
+        "losingTrades": 1
+      },
+      "may": {
+        "winningTrades": 3,
+        "losingTrades": 1
+      },
+      "june": {
+        "winningTrades": 1,
+        "losingTrades": 2
+      },
+      "july": {
+        "winningTrades": 1,
+        "losingTrades": 3
+      },
+      "august": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      },
+      "september": {
+        "winningTrades": 1,
+        "losingTrades": 2
+      },
+      "october": {
+        "winningTrades": 3,
+        "losingTrades": 1
+      },
+      "november": {
+        "winningTrades": 1,
+        "losingTrades": 1
+      },
+      "december": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      }
+    }
+  },
+  "roi": {
+    "period1w": {
+      "totalRoi": 0,
+      "points": [
+        {
+          "timestamp": 1725627600000,
+          "roi": 0
+        }
+      ]
+    },
+    "period1m": {
+      "totalRoi": 0,
+      "points": [
+        {
+          "timestamp": 1723525200000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1723593600000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1725627600000,
+          "roi": 0
+        }
+      ]
+    },
+    "period3m": {
+      "totalRoi": -7.996002378954663E-05,
+      "points": [
+        {
+          "timestamp": 1720083600000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1720137600000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1723593600000,
+          "roi": -7.996002378954663E-05
+        },
+        {
+          "timestamp": 1725627600000,
+          "roi": -7.996002378954663E-05
+        }
+      ]
+    },
+    "period6m": {
+      "totalRoi": -8.282002228633464E-05,
+      "points": [
+        {
+          "timestamp": 1710723600000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1710806400000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1716508800000,
+          "roi": 2.032000545892892E-05
+        },
+        {
+          "timestamp": 1720137600000,
+          "roi": -2.860000783645327E-06
+        },
+        {
+          "timestamp": 1723593600000,
+          "roi": -8.282002228633464E-05
+        },
+        {
+          "timestamp": 1725627600000,
+          "roi": -8.282002228633464E-05
+        }
+      ]
+    },
+    "period1y": {
+      "totalRoi": -8.583002051790496E-05,
+      "points": [
+        {
+          "timestamp": 1697130000000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1697155200000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1698796800000,
+          "roi": 1.007000239857102E-05
+        },
+        {
+          "timestamp": 1699574400000,
+          "roi": 1.8720004471016985E-05
+        },
+        {
+          "timestamp": 1701820800000,
+          "roi": 8.440002013932299E-06
+        },
+        {
+          "timestamp": 1702339200000,
+          "roi": 3.341000797807464E-05
+        },
+        {
+          "timestamp": 1703635200000,
+          "roi": 3.521000840511451E-05
+        },
+        {
+          "timestamp": 1706572800000,
+          "roi": -3.89000092991727E-06
+        },
+        {
+          "timestamp": 1710806400000,
+          "roi": -3.0100007244535926E-06
+        },
+        {
+          "timestamp": 1716508800000,
+          "roi": 1.7310004122843016E-05
+        },
+        {
+          "timestamp": 1720137600000,
+          "roi": -5.870001422012875E-06
+        },
+        {
+          "timestamp": 1723593600000,
+          "roi": -8.583002051790496E-05
+        },
+        {
+          "timestamp": 1725627600000,
+          "roi": -8.583002051790496E-05
+        }
+      ]
+    },
+    "periodAll": {
+      "totalRoi": -0.00010972000005841256,
+      "points": [
+        {
+          "timestamp": 1609545600000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1609632000000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1610064000000,
+          "roi": 6.209999993443489E-06
+        },
+        {
+          "timestamp": 1610582400000,
+          "roi": 9.919999986886978E-06
+        },
+        {
+          "timestamp": 1612915200000,
+          "roi": 7.8299999833107E-06
+        },
+        {
+          "timestamp": 1614297600000,
+          "roi": 1.4369999989867209E-05
+        },
+        {
+          "timestamp": 1616025600000,
+          "roi": -7.900000065565109E-07
+        },
+        {
+          "timestamp": 1619740800000,
+          "roi": -7.70000010728836E-07
+        },
+        {
+          "timestamp": 1624924800000,
+          "roi": -2.360000014305115E-06
+        },
+        {
+          "timestamp": 1627084800000,
+          "roi": 2.5999999791383744E-06
+        },
+        {
+          "timestamp": 1628294400000,
+          "roi": 1.0369999974966049E-05
+        },
+        {
+          "timestamp": 1629849600000,
+          "roi": 1.303999997675419E-05
+        },
+        {
+          "timestamp": 1631836800000,
+          "roi": 1.2899999976158144E-05
+        },
+        {
+          "timestamp": 1634774400000,
+          "roi": -1.562000001966953E-05
+        },
+        {
+          "timestamp": 1641859200000,
+          "roi": -1.080000002682209E-05
+        },
+        {
+          "timestamp": 1643241600000,
+          "roi": -1.3050000026822092E-05
+        },
+        {
+          "timestamp": 1643846400000,
+          "roi": -7.1200000196695336E-06
+        },
+        {
+          "timestamp": 1648771200000,
+          "roi": -4.177000002563E-05
+        },
+        {
+          "timestamp": 1650585600000,
+          "roi": -4.288000002503395E-05
+        },
+        {
+          "timestamp": 1651622400000,
+          "roi": -4.225000002980232E-05
+        },
+        {
+          "timestamp": 1651795200000,
+          "roi": -3.250000002980232E-05
+        },
+        {
+          "timestamp": 1654128000000,
+          "roi": -3.135000002384186E-05
+        },
+        {
+          "timestamp": 1655424000000,
+          "roi": -8.350000023841858E-06
+        },
+        {
+          "timestamp": 1660089600000,
+          "roi": -2.2400000020861628E-05
+        },
+        {
+          "timestamp": 1663372800000,
+          "roi": -1.8850000023841857E-05
+        },
+        {
+          "timestamp": 1665792000000,
+          "roi": 4.839999973773956E-06
+        },
+        {
+          "timestamp": 1669161600000,
+          "roi": -2.4280000030994414E-05
+        },
+        {
+          "timestamp": 1673568000000,
+          "roi": 3.179999962449074E-06
+        },
+        {
+          "timestamp": 1674086400000,
+          "roi": 2.814999996125698E-05
+        },
+        {
+          "timestamp": 1677888000000,
+          "roi": -1.3570000037550928E-05
+        },
+        {
+          "timestamp": 1680307200000,
+          "roi": -1.968000003695488E-05
+        },
+        {
+          "timestamp": 1685664000000,
+          "roi": -2.8110000044107435E-05
+        },
+        {
+          "timestamp": 1689897600000,
+          "roi": -3.408000004291534E-05
+        },
+        {
+          "timestamp": 1697155200000,
+          "roi": -2.389000004529953E-05
+        },
+        {
+          "timestamp": 1698796800000,
+          "roi": -1.3820000052452086E-05
+        },
+        {
+          "timestamp": 1699574400000,
+          "roi": -5.170000046491623E-06
+        },
+        {
+          "timestamp": 1701820800000,
+          "roi": -1.5450000047683716E-05
+        },
+        {
+          "timestamp": 1702339200000,
+          "roi": 9.519999951124192E-06
+        },
+        {
+          "timestamp": 1703635200000,
+          "roi": 1.131999994814396E-05
+        },
+        {
+          "timestamp": 1706572800000,
+          "roi": -2.7780000045895577E-05
+        },
+        {
+          "timestamp": 1710806400000,
+          "roi": -2.6900000050663944E-05
+        },
+        {
+          "timestamp": 1716508800000,
+          "roi": -6.580000057816505E-06
+        },
+        {
+          "timestamp": 1720137600000,
+          "roi": -2.9760000064969063E-05
+        },
+        {
+          "timestamp": 1723593600000,
+          "roi": -0.00010972000005841256
+        },
+        {
+          "timestamp": 1725627600000,
+          "roi": -0.00010972000005841256
+        }
+      ]
+    }
+  }
+}

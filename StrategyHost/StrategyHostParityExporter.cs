@@ -31,7 +31,6 @@ public static class StrategyHostParityExporter
             WriteMarketBias(Path.Combine(outputDirectory, $"market_bias_{spec.Label}.csv"), domainBars);
             WriteMarketBiasWarmup(Path.Combine(outputDirectory, $"market_bias_warmup_{spec.Label}.csv"), domainBars);
             WriteMovingAverageCrossover(outputDirectory, spec, sourceBars, fence);
-            WriteAvwapBaseline(outputDirectory, spec, sourceBars, fence);
             WriteDonchian(outputDirectory, spec, sourceBars, fence);
         }
 
@@ -250,91 +249,6 @@ public static class StrategyHostParityExporter
                     Float(trade.PositionDelta),
                     trade.TradeSequence.ToString(CultureInfo.InvariantCulture)));
             }
-        }
-    }
-
-    private static void WriteAvwapBaseline(
-        string outputDirectory,
-        DomainSpec spec,
-        IReadOnlyList<TimeBar> sourceBars,
-        HoldoutFence fence)
-    {
-        var model = new AvwapBounceModel();
-        var runner = new StrategyHostRunner(
-            new BarAggregator(spec.PeriodMinutes, spec.MinCoverage),
-            model,
-            fence,
-            spec.Label);
-        var updates = runner.Run(sourceBars);
-
-        using var positions = CreateCsv(
-            Path.Combine(outputDirectory, $"avwap_baseline_positions_{spec.Label}.csv"),
-            "SourceCloseTime,Domain,Strategy,Position,SignalValue,RealOpen,RealHigh,RealLow,RealClose,Warmup,IsFlat");
-        using var trades = CreateCsv(
-            Path.Combine(outputDirectory, $"avwap_baseline_trades_{spec.Label}.csv"),
-            "SourceCloseTime,Domain,Strategy,Action,PreviousPosition,Position,Price,PositionDelta,TradeSequence");
-        foreach (var update in updates)
-        {
-            var position = update.Position;
-            positions.WriteLine(string.Join(
-                ",",
-                Time(position.SourceCloseTime),
-                Csv(position.Domain),
-                Csv(position.Strategy),
-                position.Position.ToString(CultureInfo.InvariantCulture),
-                Float(position.SignalValue),
-                Float(position.RealOpen),
-                Float(position.RealHigh),
-                Float(position.RealLow),
-                Float(position.RealClose),
-                position.Warmup ? "true" : "false",
-                position.IsFlat ? "true" : "false"));
-            foreach (var trade in update.Trades)
-            {
-                trades.WriteLine(string.Join(
-                    ",",
-                    Time(trade.SourceCloseTime),
-                    Csv(trade.Domain),
-                    Csv(trade.Strategy),
-                    Csv(trade.Action),
-                    trade.PreviousPosition.ToString(CultureInfo.InvariantCulture),
-                    trade.Position.ToString(CultureInfo.InvariantCulture),
-                    Float(trade.Price),
-                    Float(trade.PositionDelta),
-                    trade.TradeSequence.ToString(CultureInfo.InvariantCulture)));
-            }
-        }
-
-        // Full per-bounce detail for the EXP-023 transcription smoke vs xen.avwap.
-        using var eventsDetail = CreateCsv(
-            Path.Combine(outputDirectory, $"avwap_baseline_events_{spec.Label}.csv"),
-            "domain,regime_id,direction,bounce_index_in_regime,is_pyramid_bounce,anchor_idx,anchor_time,"
-            + "anchor_price,armed_time,trigger_idx,trigger_time,trigger_close,avwap_at_trigger,"
-            + "band_spread_at_trigger,upper_band_at_trigger,lower_band_at_trigger,"
-            + "favorable_target_at_trigger,adverse_target_at_trigger,anchor_age_bars");
-        foreach (var detail in model.EventDetails)
-        {
-            eventsDetail.WriteLine(string.Join(
-                ",",
-                Csv(detail.Domain),
-                detail.RegimeId.ToString(CultureInfo.InvariantCulture),
-                detail.Direction.ToString(CultureInfo.InvariantCulture),
-                detail.BounceIndexInRegime.ToString(CultureInfo.InvariantCulture),
-                detail.IsPyramidBounce ? "true" : "false",
-                detail.AnchorIdx.ToString(CultureInfo.InvariantCulture),
-                Time(detail.AnchorTime),
-                Float(detail.AnchorPrice),
-                Time(detail.ArmedTime),
-                detail.TriggerIdx.ToString(CultureInfo.InvariantCulture),
-                Time(detail.TriggerTime),
-                Float(detail.TriggerClose),
-                Float(detail.AvwapAtTrigger),
-                Float(detail.BandSpreadAtTrigger),
-                Float(detail.UpperBandAtTrigger),
-                Float(detail.LowerBandAtTrigger),
-                Float(detail.FavorableTargetAtTrigger),
-                Float(detail.AdverseTargetAtTrigger),
-                detail.AnchorAgeBars.ToString(CultureInfo.InvariantCulture)));
         }
     }
 

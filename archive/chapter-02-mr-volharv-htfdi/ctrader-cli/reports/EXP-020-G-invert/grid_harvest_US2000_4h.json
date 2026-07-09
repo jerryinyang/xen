@@ -1,0 +1,3940 @@
+{
+  "main": {
+    "utcOffset": 0,
+    "language": "en",
+    "depositAsset": "USD",
+    "depositAssetDigits": 2,
+    "period": "m1",
+    "symbol": "US2000",
+    "brokerTitle": "",
+    "cBotName": "Xen",
+    "roi": 0,
+    "netProfit": -2908.73,
+    "startingCapital": 100000000,
+    "endingEquity": 99997091.27000003,
+    "endingBalance": 99999509.50000003,
+    "testingPeriod": {
+      "duration": "3y 8m 8d",
+      "startDate": 1609545600000,
+      "endDate": 1725926400000,
+      "formatted": "3y 8m 8d (02/01/2021 - 10/09/2024)"
+    },
+    "accountType": "hedging",
+    "accountLeverage": 1000,
+    "data": {
+      "type": "m1BarsFromServer",
+      "isCustom": false,
+      "customName": null
+    },
+    "spread": {
+      "type": "fixed",
+      "min": null,
+      "max": null,
+      "value": 0
+    },
+    "commissions": {
+      "type": "usdPerMillionUsdVolume",
+      "value": 0,
+      "applyCommissionAutomatically": false
+    },
+    "theme": "dark",
+    "titleKind": "backtesting",
+    "authorNickName": "jerprog0",
+    "authorLink": null,
+    "cBotLink": null,
+    "embedded": false
+  },
+  "equity": {
+    "points": [
+      {
+        "balance": 100000000,
+        "minEquity": 100000000,
+        "maxEquity": 100000000,
+        "timestamp": 1609545600000
+      },
+      {
+        "balance": 100000023.45,
+        "minEquity": 99999998.25,
+        "maxEquity": 100000019.7,
+        "timestamp": 1609780560000
+      },
+      {
+        "balance": 100000046.56,
+        "minEquity": 99999864.42,
+        "maxEquity": 100000027.71000001,
+        "timestamp": 1609928460000
+      },
+      {
+        "balance": 100000071.21000001,
+        "minEquity": 99999839.77,
+        "maxEquity": 99999886.49000001,
+        "timestamp": 1609950060000
+      },
+      {
+        "balance": 100000096.86000001,
+        "minEquity": 99999814.12,
+        "maxEquity": 99999842.84,
+        "timestamp": 1609958520000
+      },
+      {
+        "balance": 100000119.81000002,
+        "minEquity": 99999788.59000002,
+        "maxEquity": 99999859.08000001,
+        "timestamp": 1610065860000
+      },
+      {
+        "balance": 100000144.92000002,
+        "minEquity": 99999765.47000001,
+        "maxEquity": 99999863.37000002,
+        "timestamp": 1610412420000
+      },
+      {
+        "balance": 100000162.57000002,
+        "minEquity": 99999627.56000002,
+        "maxEquity": 99999897.88000001,
+        "timestamp": 1612197960000
+      },
+      {
+        "balance": 100000189.32000002,
+        "minEquity": 99999823.66000003,
+        "maxEquity": 99999845.06000002,
+        "timestamp": 1612206900000
+      },
+      {
+        "balance": 100000213.88000003,
+        "minEquity": 99999797.66000003,
+        "maxEquity": 99999824.27000003,
+        "timestamp": 1612254060000
+      },
+      {
+        "balance": 100000238.96000002,
+        "minEquity": 99999769.70000002,
+        "maxEquity": 99999816.37000002,
+        "timestamp": 1612448940000
+      },
+      {
+        "balance": 100000265.20000002,
+        "minEquity": 99999744.05000003,
+        "maxEquity": 99999771.40000002,
+        "timestamp": 1612455720000
+      },
+      {
+        "balance": 100000290.06000002,
+        "minEquity": 99999496.38000003,
+        "maxEquity": 99999809.98000002,
+        "timestamp": 1614328440000
+      },
+      {
+        "balance": 100000318.09000002,
+        "minEquity": 99999609.69000001,
+        "maxEquity": 99999830.52000001,
+        "timestamp": 1614830640000
+      },
+      {
+        "balance": 100000347.18000002,
+        "minEquity": 99999660.00000001,
+        "maxEquity": 99999792.85000002,
+        "timestamp": 1614880500000
+      },
+      {
+        "balance": 100000374.83000003,
+        "minEquity": 99999776.68000002,
+        "maxEquity": 99999849.38000003,
+        "timestamp": 1614883920000
+      },
+      {
+        "balance": 100000403.18000002,
+        "minEquity": 99999723.42000003,
+        "maxEquity": 99999878.70000003,
+        "timestamp": 1614957840000
+      },
+      {
+        "balance": 100000432.50000001,
+        "minEquity": 99999852.53000002,
+        "maxEquity": 99999927.35000002,
+        "timestamp": 1614961140000
+      },
+      {
+        "balance": 100000455.79000002,
+        "minEquity": 99999617.38000001,
+        "maxEquity": 99999946.17000002,
+        "timestamp": 1615388160000
+      },
+      {
+        "balance": 100000482.54000002,
+        "minEquity": 99999559.66000003,
+        "maxEquity": 99999664.24000002,
+        "timestamp": 1615476900000
+      },
+      {
+        "balance": 100000510.42000002,
+        "minEquity": 99999501.10000002,
+        "maxEquity": 99999569.76000002,
+        "timestamp": 1615582560000
+      },
+      {
+        "balance": 100000540.05000001,
+        "minEquity": 99999471.47000001,
+        "maxEquity": 99999711.35000002,
+        "timestamp": 1616527440000
+      },
+      {
+        "balance": 100000568.64000002,
+        "minEquity": 99999671.9,
+        "maxEquity": 99999741.35000001,
+        "timestamp": 1616614020000
+      },
+      {
+        "balance": 100000597.15000002,
+        "minEquity": 99999739.38000001,
+        "maxEquity": 99999767.47000001,
+        "timestamp": 1616671620000
+      },
+      {
+        "balance": 100000626.18000002,
+        "minEquity": 99999500.36000001,
+        "maxEquity": 99999793.18000002,
+        "timestamp": 1617366960000
+      },
+      {
+        "balance": 100000653.31000002,
+        "minEquity": 99999477.09000002,
+        "maxEquity": 99999498.32000002,
+        "timestamp": 1617367740000
+      },
+      {
+        "balance": 100000679.75000001,
+        "minEquity": 99999414.74000002,
+        "maxEquity": 99999723.21000002,
+        "timestamp": 1620891060000
+      },
+      {
+        "balance": 100000705.01000002,
+        "minEquity": 99999494.73000002,
+        "maxEquity": 99999584.31000002,
+        "timestamp": 1623154800000
+      },
+      {
+        "balance": 100000704.54000002,
+        "minEquity": 99999547.30000003,
+        "maxEquity": 99999560.72000001,
+        "timestamp": 1623162600000
+      },
+      {
+        "balance": 100000712.20000002,
+        "minEquity": 99999246.18000002,
+        "maxEquity": 99999563.04000002,
+        "timestamp": 1630324920000
+      },
+      {
+        "balance": 100000700.82000002,
+        "minEquity": 99999035.28000002,
+        "maxEquity": 99999410.07000002,
+        "timestamp": 1635176640000
+      },
+      {
+        "balance": 100000688.93000002,
+        "minEquity": 99999098.70000002,
+        "maxEquity": 99999244.71000002,
+        "timestamp": 1635776460000
+      },
+      {
+        "balance": 100000713.07000002,
+        "minEquity": 99999204.54000002,
+        "maxEquity": 99999253.89000002,
+        "timestamp": 1635778980000
+      },
+      {
+        "balance": 100000580.47000003,
+        "minEquity": 99999251.44000003,
+        "maxEquity": 99999255.58000003,
+        "timestamp": 1635784680000
+      },
+      {
+        "balance": 100000507.70000003,
+        "minEquity": 99999097.58000003,
+        "maxEquity": 99999255.20000003,
+        "timestamp": 1635785400000
+      },
+      {
+        "balance": 100000374.00000003,
+        "minEquity": 99999154.52000003,
+        "maxEquity": 99999272.94000003,
+        "timestamp": 1635948240000
+      },
+      {
+        "balance": 100000402.75000003,
+        "minEquity": 99999052.70000003,
+        "maxEquity": 99999224.76000004,
+        "timestamp": 1635950760000
+      },
+      {
+        "balance": 100000431.62000003,
+        "minEquity": 99999131.85000002,
+        "maxEquity": 99999220.38000003,
+        "timestamp": 1636033320000
+      },
+      {
+        "balance": 100000458.52000004,
+        "minEquity": 99999070.43000004,
+        "maxEquity": 99999193.40000004,
+        "timestamp": 1636379340000
+      },
+      {
+        "balance": 100000487.42000005,
+        "minEquity": 99999043.12000003,
+        "maxEquity": 99999519.15000004,
+        "timestamp": 1637910420000
+      },
+      {
+        "balance": 100000523.42000005,
+        "minEquity": 99999493.00000004,
+        "maxEquity": 99999628.15000005,
+        "timestamp": 1637914740000
+      },
+      {
+        "balance": 100000547.54000005,
+        "minEquity": 99999417.03000005,
+        "maxEquity": 99999701.02000004,
+        "timestamp": 1638290640000
+      },
+      {
+        "balance": 100000576.03000005,
+        "minEquity": 99999501.34000005,
+        "maxEquity": 99999740.07000005,
+        "timestamp": 1638390180000
+      },
+      {
+        "balance": 100000600.06000005,
+        "minEquity": 99999565.21000005,
+        "maxEquity": 99999711.80000004,
+        "timestamp": 1638964560000
+      },
+      {
+        "balance": 100000623.05000004,
+        "minEquity": 99999560.63000004,
+        "maxEquity": 99999690.80000004,
+        "timestamp": 1639491060000
+      },
+      {
+        "balance": 100000648.83000004,
+        "minEquity": 99999573.30000004,
+        "maxEquity": 99999742.55000004,
+        "timestamp": 1641222300000
+      },
+      {
+        "balance": 100000670.10000004,
+        "minEquity": 99999541.55000004,
+        "maxEquity": 99999574.01000005,
+        "timestamp": 1642539300000
+      },
+      {
+        "balance": 100000681.84000003,
+        "minEquity": 99999358.18000004,
+        "maxEquity": 99999557.50000004,
+        "timestamp": 1643314440000
+      },
+      {
+        "balance": 100000693.72000003,
+        "minEquity": 99999305.01000004,
+        "maxEquity": 99999391.79000004,
+        "timestamp": 1643372760000
+      },
+      {
+        "balance": 100000713.43000002,
+        "minEquity": 99999287.84000003,
+        "maxEquity": 99999797.31000003,
+        "timestamp": 1644396360000
+      },
+      {
+        "balance": 100000738.48000002,
+        "minEquity": 99999638.97000003,
+        "maxEquity": 99999778.98000002,
+        "timestamp": 1644505740000
+      },
+      {
+        "balance": 100000763.04000002,
+        "minEquity": 99999359.27000003,
+        "maxEquity": 99999836.88000003,
+        "timestamp": 1645643040000
+      },
+      {
+        "balance": 100000789.16000003,
+        "minEquity": 99999285.63000003,
+        "maxEquity": 99999383.32000002,
+        "timestamp": 1645662600000
+      },
+      {
+        "balance": 100000814.26000002,
+        "minEquity": 99999215.08000003,
+        "maxEquity": 99999289.60000002,
+        "timestamp": 1645672140000
+      },
+      {
+        "balance": 100000837.70000002,
+        "minEquity": 99999115.93000002,
+        "maxEquity": 99999819.47000001,
+        "timestamp": 1646118420000
+      },
+      {
+        "balance": 100000863.14000002,
+        "minEquity": 99999206.49000002,
+        "maxEquity": 99999963.29000002,
+        "timestamp": 1648560720000
+      },
+      {
+        "balance": 100000856.49000001,
+        "minEquity": 99999955.64000002,
+        "maxEquity": 99999974.68000002,
+        "timestamp": 1648560840000
+      },
+      {
+        "balance": 100000875.50000001,
+        "minEquity": 99999934.48,
+        "maxEquity": 100000043.12,
+        "timestamp": 1648578240000
+      },
+      {
+        "balance": 100000899.70000002,
+        "minEquity": 99998449.86000001,
+        "maxEquity": 100000093.08000001,
+        "timestamp": 1651690140000
+      },
+      {
+        "balance": 100000922.96000002,
+        "minEquity": 99998888.16000001,
+        "maxEquity": 99999047.85000002,
+        "timestamp": 1651691820000
+      },
+      {
+        "balance": 100000946.66000003,
+        "minEquity": 99998359.78000002,
+        "maxEquity": 99999134.76000002,
+        "timestamp": 1651864920000
+      },
+      {
+        "balance": 100000962.39000003,
+        "minEquity": 99997616.52000003,
+        "maxEquity": 99998809.27000003,
+        "timestamp": 1654629660000
+      },
+      {
+        "balance": 100000980.73000003,
+        "minEquity": 99996858.52000003,
+        "maxEquity": 99998856.53000003,
+        "timestamp": 1657069620000
+      },
+      {
+        "balance": 100001001.07000004,
+        "minEquity": 99997228.34000003,
+        "maxEquity": 99997668.42000003,
+        "timestamp": 1657205280000
+      },
+      {
+        "balance": 100001022.54000004,
+        "minEquity": 99997048.68000004,
+        "maxEquity": 99997931.65000004,
+        "timestamp": 1658284620000
+      },
+      {
+        "balance": 100001043.80000004,
+        "minEquity": 99997794.65000004,
+        "maxEquity": 99998650.88000004,
+        "timestamp": 1659719520000
+      },
+      {
+        "balance": 100001023.65000004,
+        "minEquity": 99998594.73000005,
+        "maxEquity": 99998657.73000005,
+        "timestamp": 1659728880000
+      },
+      {
+        "balance": 100001048.32000004,
+        "minEquity": 99998594.21000004,
+        "maxEquity": 99998802.74000004,
+        "timestamp": 1659965640000
+      },
+      {
+        "balance": 100001003.57000004,
+        "minEquity": 99998519.24000004,
+        "maxEquity": 99998914.39000003,
+        "timestamp": 1660143660000
+      },
+      {
+        "balance": 100001025.22000004,
+        "minEquity": 99998858.25000004,
+        "maxEquity": 99998962.06000003,
+        "timestamp": 1660159500000
+      },
+      {
+        "balance": 100001048.50000004,
+        "minEquity": 99998945.37000005,
+        "maxEquity": 99999087.69000004,
+        "timestamp": 1660224840000
+      },
+      {
+        "balance": 100001072.31000005,
+        "minEquity": 99998219.07000004,
+        "maxEquity": 99999281.11000004,
+        "timestamp": 1662022320000
+      },
+      {
+        "balance": 100001095.96000005,
+        "minEquity": 99997965.47000004,
+        "maxEquity": 99998476.47000004,
+        "timestamp": 1662732300000
+      },
+      {
+        "balance": 100001117.19000006,
+        "minEquity": 99998442.47000006,
+        "maxEquity": 99998592.65000005,
+        "timestamp": 1662989580000
+      },
+      {
+        "balance": 100001140.84000006,
+        "minEquity": 99998541.05000006,
+        "maxEquity": 99998747.15000005,
+        "timestamp": 1663072200000
+      },
+      {
+        "balance": 100001165.55000006,
+        "minEquity": 99997912.74000007,
+        "maxEquity": 99998746.46000007,
+        "timestamp": 1663336380000
+      },
+      {
+        "balance": 100001187.54000005,
+        "minEquity": 99997010.80000006,
+        "maxEquity": 99998124.76000005,
+        "timestamp": 1664809800000
+      },
+      {
+        "balance": 100001207.90000005,
+        "minEquity": 99997308.23000005,
+        "maxEquity": 99997542.65000005,
+        "timestamp": 1664858040000
+      },
+      {
+        "balance": 100001231.90000005,
+        "minEquity": 99997537.55000006,
+        "maxEquity": 99997710.25000004,
+        "timestamp": 1664890380000
+      },
+      {
+        "balance": 100001249.80000006,
+        "minEquity": 99997698.20000005,
+        "maxEquity": 99997834.00000004,
+        "timestamp": 1664892300000
+      },
+      {
+        "balance": 100001274.10000005,
+        "minEquity": 99997018.93000005,
+        "maxEquity": 99998202.31000006,
+        "timestamp": 1668179760000
+      },
+      {
+        "balance": 100001242.61000006,
+        "minEquity": 99996947.75000006,
+        "maxEquity": 99998262.46000005,
+        "timestamp": 1675182840000
+      },
+      {
+        "balance": 100001172.82000005,
+        "minEquity": 99997902.80000006,
+        "maxEquity": 99998102.01000006,
+        "timestamp": 1675280640000
+      },
+      {
+        "balance": 100001197.27000006,
+        "minEquity": 99998006.82000005,
+        "maxEquity": 99998231.86000006,
+        "timestamp": 1675283820000
+      },
+      {
+        "balance": 100001221.56000006,
+        "minEquity": 99998154.14000006,
+        "maxEquity": 99998354.83000006,
+        "timestamp": 1675353120000
+      },
+      {
+        "balance": 100001156.67000006,
+        "minEquity": 99996358.58000006,
+        "maxEquity": 99998398.43000007,
+        "timestamp": 1689167160000
+      },
+      {
+        "balance": 100001179.51000006,
+        "minEquity": 99997209.02000006,
+        "maxEquity": 99997522.40000007,
+        "timestamp": 1689773340000
+      },
+      {
+        "balance": 100001129.75000006,
+        "minEquity": 99995005.16000007,
+        "maxEquity": 99997601.82000007,
+        "timestamp": 1702500420000
+      },
+      {
+        "balance": 100000933.24000005,
+        "minEquity": 99996623.22000006,
+        "maxEquity": 99997059.00000006,
+        "timestamp": 1703017800000
+      },
+      {
+        "balance": 100000959.83000006,
+        "minEquity": 99996422.49000005,
+        "maxEquity": 99997233.52000006,
+        "timestamp": 1707502800000
+      },
+      {
+        "balance": 100000982.52000006,
+        "minEquity": 99996801.99000005,
+        "maxEquity": 99996943.87000006,
+        "timestamp": 1707749520000
+      },
+      {
+        "balance": 100001004.21000005,
+        "minEquity": 99996508.80000006,
+        "maxEquity": 99997047.81000006,
+        "timestamp": 1708023120000
+      },
+      {
+        "balance": 100001016.76000005,
+        "minEquity": 99996641.23000005,
+        "maxEquity": 99997099.76000005,
+        "timestamp": 1709545140000
+      },
+      {
+        "balance": 100001040.25000004,
+        "minEquity": 99996914.15000005,
+        "maxEquity": 99997212.44000006,
+        "timestamp": 1709905440000
+      },
+      {
+        "balance": 100000567.56000005,
+        "minEquity": 99996670.30000004,
+        "maxEquity": 99997261.39000005,
+        "timestamp": 1711632900000
+      },
+      {
+        "balance": 100000579.42000005,
+        "minEquity": 99996711.80000004,
+        "maxEquity": 99997252.36000004,
+        "timestamp": 1711637760000
+      },
+      {
+        "balance": 100000633.41000004,
+        "minEquity": 99996235.77000004,
+        "maxEquity": 99997276.91000004,
+        "timestamp": 1714739460000
+      },
+      {
+        "balance": 100000676.32000004,
+        "minEquity": 99996721.41000004,
+        "maxEquity": 99997023.11000004,
+        "timestamp": 1715776260000
+      },
+      {
+        "balance": 100000697.11000004,
+        "minEquity": 99996399.50000004,
+        "maxEquity": 99997167.61000004,
+        "timestamp": 1720706460000
+      },
+      {
+        "balance": 100000146.46000004,
+        "minEquity": 99996879.38000004,
+        "maxEquity": 99997138.12000005,
+        "timestamp": 1720786020000
+      },
+      {
+        "balance": 100000171.37000003,
+        "minEquity": 99996567.48000003,
+        "maxEquity": 99997151.07000004,
+        "timestamp": 1720786140000
+      },
+      {
+        "balance": 100000124.39000003,
+        "minEquity": 99997078.22000003,
+        "maxEquity": 99997181.08000003,
+        "timestamp": 1720793220000
+      },
+      {
+        "balance": 100000148.01000004,
+        "minEquity": 99997102.74000002,
+        "maxEquity": 99997256.19000003,
+        "timestamp": 1721052660000
+      },
+      {
+        "balance": 99999509.50000003,
+        "minEquity": 99997211.88000004,
+        "maxEquity": 99997581.47000003,
+        "timestamp": 1722452520000
+      },
+      {
+        "balance": 99999509.50000003,
+        "minEquity": 99996913.83000003,
+        "maxEquity": 99997584.47000003,
+        "timestamp": 1725973200000
+      }
+    ],
+    "maxBalanceDrawdownPercent": 0.0017645775175416899,
+    "maxEquityDrawdownPercent": 0.0050879152641106545,
+    "maxBalanceDrawdownAbsolute": 1764.6000000238419,
+    "maxEquityDrawdownAbsolute": 5087.9199999421835
+  },
+  "tradeStatistics": {
+    "netProfit": {
+      "all": -490.50000000000523,
+      "long": -1102.9500000000053,
+      "short": 612.45
+    },
+    "profitFactor": {
+      "all": 0.81,
+      "long": 0.57,
+      "short": 0
+    },
+    "commissions": {
+      "all": 0,
+      "long": 0,
+      "short": 0
+    },
+    "swaps": {
+      "all": -3198.370000000005,
+      "long": -3161.5800000000054,
+      "short": -36.78999999999999
+    },
+    "totalTrades": {
+      "all": 103,
+      "long": 79,
+      "short": 24
+    },
+    "winningTrades": {
+      "all": 85,
+      "long": 61,
+      "short": 24
+    },
+    "maxConsecutiveWinningTrades": {
+      "all": 27,
+      "long": 17,
+      "short": 24
+    },
+    "largestWinningTrade": {
+      "all": 53.99,
+      "long": 53.99,
+      "short": 36
+    },
+    "losingTrades": {
+      "all": 18,
+      "long": 18,
+      "short": 0
+    },
+    "maxConsecutiveLosingTrades": {
+      "all": 3,
+      "long": 3,
+      "short": 0
+    },
+    "largestLosingTrade": {
+      "all": -638.510000000007,
+      "long": -638.510000000007,
+      "short": 0
+    },
+    "averageTrade": {
+      "all": -4.76,
+      "long": -13.96,
+      "short": 25.52
+    }
+  },
+  "parameters": [
+    {
+      "group": null,
+      "displayName": "Mode",
+      "propertyName": "Mode",
+      "value": "NativeOrders"
+    },
+    {
+      "group": null,
+      "displayName": "Strategy",
+      "propertyName": "Strategy",
+      "value": "GridHarvest"
+    },
+    {
+      "group": null,
+      "displayName": "Collect \u0026 Store Time Bars",
+      "propertyName": "CollectTimeBars",
+      "value": "false"
+    },
+    {
+      "group": null,
+      "displayName": "Analysis End UTC",
+      "propertyName": "AnalysisEndUtc",
+      "value": "2024-09-10T09:33:00Z"
+    },
+    {
+      "group": null,
+      "displayName": "Strategy Output Directory",
+      "propertyName": "StrategyOutputDirectory",
+      "value": "/workspace/data/strategy_runs/EXP-020-G-invert"
+    },
+    {
+      "group": null,
+      "displayName": "Source Parquet Path",
+      "propertyName": "SourceParquetPath",
+      "value": ""
+    },
+    {
+      "group": null,
+      "displayName": "Domain Minutes",
+      "propertyName": "DomainMinutes",
+      "value": 240
+    },
+    {
+      "group": null,
+      "displayName": "Strict Coverage",
+      "propertyName": "StrictCoverage",
+      "value": "false"
+    },
+    {
+      "group": null,
+      "displayName": "Min Coverage",
+      "propertyName": "MinCoverage",
+      "value": 0.9
+    },
+    {
+      "group": null,
+      "displayName": "Fast MA",
+      "propertyName": "FastMa",
+      "value": 20
+    },
+    {
+      "group": null,
+      "displayName": "Slow MA",
+      "propertyName": "SlowMa",
+      "value": 50
+    },
+    {
+      "group": null,
+      "displayName": "Basket Mates (CANON;...)",
+      "propertyName": "BasketMates",
+      "value": ""
+    },
+    {
+      "group": null,
+      "displayName": "Basket Phase Shift Hours",
+      "propertyName": "BasketPhaseShiftHours",
+      "value": 0
+    },
+    {
+      "group": null,
+      "displayName": "CDM Series",
+      "propertyName": "CdmSeries",
+      "value": "S5_SPREAD"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Series",
+      "propertyName": "CisSeries",
+      "value": "S5_SPREAD"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Reentry",
+      "propertyName": "CisReentry",
+      "value": "none"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Static Arm",
+      "propertyName": "CisStaticArm",
+      "value": "false"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Trail",
+      "propertyName": "CisTrail",
+      "value": "false"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Both Leg",
+      "propertyName": "CisBothLeg",
+      "value": "false"
+    },
+    {
+      "group": null,
+      "displayName": "CIS ZStar",
+      "propertyName": "CisZStar",
+      "value": 2
+    },
+    {
+      "group": null,
+      "displayName": "CIS Both Leg Entry",
+      "propertyName": "CisBothLegEntry",
+      "value": "market"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Exit Set",
+      "propertyName": "CisExitSet",
+      "value": "moving"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Entry Delay Bars",
+      "propertyName": "CisEntryDelayBars",
+      "value": 0
+    },
+    {
+      "group": null,
+      "displayName": "CIS Schedule Path",
+      "propertyName": "CisSchedulePath",
+      "value": ""
+    },
+    {
+      "group": null,
+      "displayName": "RH Schedule Path",
+      "propertyName": "RhSchedulePath",
+      "value": ""
+    },
+    {
+      "group": null,
+      "displayName": "RH Seed",
+      "propertyName": "RhSeed",
+      "value": 0
+    },
+    {
+      "group": null,
+      "displayName": "RH Max Open Legs",
+      "propertyName": "RhMaxOpenLegs",
+      "value": 6
+    },
+    {
+      "group": null,
+      "displayName": "SH Twin",
+      "propertyName": "ShTwin",
+      "value": "true"
+    },
+    {
+      "group": null,
+      "displayName": "SH Band W",
+      "propertyName": "ShBandW",
+      "value": 0
+    },
+    {
+      "group": null,
+      "displayName": "SH Grid Bps",
+      "propertyName": "ShGridBps",
+      "value": 127.27028950381005
+    },
+    {
+      "group": null,
+      "displayName": "SH Delay Bars",
+      "propertyName": "ShDelayBars",
+      "value": 0
+    }
+  ],
+  "usedSymbols": [
+    {
+      "symbol": "US2000",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "US2000",
+      "baseAssetDigits": 2,
+      "quoteAsset": "USD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -6.89,
+      "swapShort": -0.32,
+      "threeDaySwaps": "friday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 2,
+      "lotSize": 1,
+      "stepVolume": 1,
+      "pipPosition": 1,
+      "swapCalculationType": "pips"
+    }
+  ],
+  "positions": {
+    "columns": [
+      "id",
+      "symbol",
+      "quantity",
+      "volume",
+      "direction",
+      "entryPrice",
+      "tp",
+      "sl",
+      "commissions",
+      "closingCommissions",
+      "created",
+      "label",
+      "comment",
+      "pips",
+      "net",
+      "gross",
+      "swaps"
+    ],
+    "items": [
+      {
+        "id": 103,
+        "created": 1714739460000,
+        "quantity": 1,
+        "volume": 1,
+        "entryPrice": 2057.92,
+        "tp": null,
+        "sl": null,
+        "commissions": 0,
+        "closingCommissions": 0,
+        "swaps": -89.69999999999987,
+        "pips": 457.99999999999994,
+        "gross": 45.8,
+        "net": -43.89999999999988,
+        "label": "grd_us2000",
+        "comment": "41;2;1;2046.1",
+        "symbol": "US2000",
+        "direction": "buy"
+      },
+      {
+        "id": 51,
+        "created": 1641222300000,
+        "quantity": 1,
+        "volume": 1,
+        "entryPrice": 2280.69,
+        "tp": 2308.86,
+        "sl": null,
+        "commissions": 0,
+        "closingCommissions": 0,
+        "swaps": -676.8900000000076,
+        "pips": -1769.6999999999998,
+        "gross": -176.97,
+        "net": -853.8600000000076,
+        "label": "grd_us2000",
+        "comment": "13;1;1;2308.86",
+        "symbol": "US2000",
+        "direction": "buy"
+      },
+      {
+        "id": 42,
+        "created": 1636528080000,
+        "quantity": 1,
+        "volume": 1,
+        "entryPrice": 2424.8,
+        "tp": 2452.73,
+        "sl": null,
+        "commissions": 0,
+        "closingCommissions": 0,
+        "swaps": -714.1500000000096,
+        "pips": -3210.7999999999997,
+        "gross": -321.08,
+        "net": -1035.2300000000096,
+        "label": "grd_us2000",
+        "comment": "11;4;1;2452.73",
+        "symbol": "US2000",
+        "direction": "buy"
+      },
+      {
+        "id": 86,
+        "created": 1665668040000,
+        "quantity": 1,
+        "volume": 1,
+        "entryPrice": 1640.42,
+        "tp": 1621.65,
+        "sl": null,
+        "commissions": 0,
+        "closingCommissions": 0,
+        "swaps": -21.94000000000006,
+        "pips": -4633,
+        "gross": -463.3,
+        "net": -485.24000000000007,
+        "label": "grd_us2000",
+        "comment": "22;1;-1;1621.65",
+        "symbol": "US2000",
+        "direction": "sell"
+      }
+    ],
+    "marginUsed": 31.4736,
+    "freeMargin": 99997059.79640003,
+    "marginLevel": 317717360.8039754,
+    "unrealizedNet": -2418.2300000000173,
+    "unrealizedGross": -915.55
+  },
+  "orders": {
+    "columns": [
+      "id",
+      "symbol",
+      "direction",
+      "created",
+      "quantity",
+      "volume",
+      "orderType",
+      "submittedPrice",
+      "distance",
+      "tp",
+      "sl",
+      "expiryDate",
+      "currentPrice",
+      "limitRange",
+      "comment",
+      "label"
+    ],
+    "items": [
+      {
+        "id": 385,
+        "created": 1725228000000,
+        "quantity": 1,
+        "volume": 1,
+        "orderType": "stop",
+        "submittedPrice": 2300.28,
+        "distance": 1965.6,
+        "tp": null,
+        "sl": null,
+        "expiryDate": null,
+        "currentPrice": 2103.72,
+        "limitRange": null,
+        "comment": "45;3;1;2328.48",
+        "label": "grd_us2000",
+        "symbol": "US2000",
+        "direction": "buy"
+      },
+      {
+        "id": 386,
+        "created": 1725228000000,
+        "quantity": 1,
+        "volume": 1,
+        "orderType": "stop",
+        "submittedPrice": 2328.48,
+        "distance": 2247.6,
+        "tp": null,
+        "sl": null,
+        "expiryDate": null,
+        "currentPrice": 2103.72,
+        "limitRange": null,
+        "comment": "45;4;1;2356.68",
+        "label": "grd_us2000",
+        "symbol": "US2000",
+        "direction": "buy"
+      },
+      {
+        "id": 383,
+        "created": 1725228000000,
+        "quantity": 1,
+        "volume": 1,
+        "orderType": "stop",
+        "submittedPrice": 2243.88,
+        "distance": 1401.6,
+        "tp": null,
+        "sl": null,
+        "expiryDate": null,
+        "currentPrice": 2103.72,
+        "limitRange": null,
+        "comment": "45;1;1;2272.08",
+        "label": "grd_us2000",
+        "symbol": "US2000",
+        "direction": "buy"
+      },
+      {
+        "id": 384,
+        "created": 1725228000000,
+        "quantity": 1,
+        "volume": 1,
+        "orderType": "stop",
+        "submittedPrice": 2272.08,
+        "distance": 1683.6,
+        "tp": null,
+        "sl": null,
+        "expiryDate": null,
+        "currentPrice": 2103.72,
+        "limitRange": null,
+        "comment": "45;2;1;2300.28",
+        "label": "grd_us2000",
+        "symbol": "US2000",
+        "direction": "buy"
+      }
+    ]
+  },
+  "history": {
+    "columns": [
+      "id",
+      "symbol",
+      "direction",
+      "net",
+      "gross",
+      "entryTime",
+      "closeTime",
+      "entryPrice",
+      "closePrice",
+      "swaps",
+      "commissions",
+      "volume",
+      "label",
+      "comment",
+      "quantity",
+      "pips"
+    ],
+    "items": [
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 3,
+        "net": 23.45,
+        "gross": 23.45,
+        "entryTime": 1609775580000,
+        "closeTime": 1609780560000,
+        "entryPrice": 1946.48,
+        "closePrice": 1923.03,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "1;1;-1;1925.75",
+        "balance": 100000023.45,
+        "quantity": 1,
+        "pips": 234.49999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 7,
+        "net": 23.11,
+        "gross": 23.11,
+        "entryTime": 1609910220000,
+        "closeTime": 1609928460000,
+        "entryPrice": 2004.23,
+        "closePrice": 2027.34,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "1;1;1;2026.35",
+        "balance": 100000046.56,
+        "quantity": 1,
+        "pips": 231.1
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 9,
+        "net": 24.65,
+        "gross": 24.65,
+        "entryTime": 1609928460000,
+        "closeTime": 1609950060000,
+        "entryPrice": 2027.34,
+        "closePrice": 2051.99,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "1;2;1;2051.5",
+        "balance": 100000071.21000001,
+        "quantity": 1,
+        "pips": 246.49999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 11,
+        "net": 25.65,
+        "gross": 25.65,
+        "entryTime": 1609950060000,
+        "closeTime": 1609958520000,
+        "entryPrice": 2051.99,
+        "closePrice": 2077.64,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "1;3;1;2076.65",
+        "balance": 100000096.86000001,
+        "quantity": 1,
+        "pips": 256.49999999999994
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 12,
+        "net": 22.95,
+        "gross": 24.33,
+        "entryTime": 1609958520000,
+        "closeTime": 1610065860000,
+        "entryPrice": 2077.64,
+        "closePrice": 2101.97,
+        "commissions": 0,
+        "swaps": -1.38,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "1;4;1;2101.8",
+        "balance": 100000119.81000002,
+        "quantity": 1,
+        "pips": 243.29999999999998
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 14,
+        "net": 25.11,
+        "gross": 25.8,
+        "entryTime": 1610333400000,
+        "closeTime": 1610412420000,
+        "entryPrice": 2076.69,
+        "closePrice": 2102.49,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "1;4;1;2101.8",
+        "balance": 100000144.92000002,
+        "quantity": 1,
+        "pips": 258
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 17,
+        "net": 17.65,
+        "gross": 19.72,
+        "entryTime": 1611943320000,
+        "closeTime": 1612197960000,
+        "entryPrice": 2082.08,
+        "closePrice": 2101.8,
+        "commissions": 0,
+        "swaps": -2.07,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "1;4;1;2101.8",
+        "balance": 100000162.57000002,
+        "quantity": 1,
+        "pips": 197.2
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 19,
+        "net": 26.75,
+        "gross": 26.75,
+        "entryTime": 1612164420000,
+        "closeTime": 1612206900000,
+        "entryPrice": 2091.53,
+        "closePrice": 2118.28,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "2;1;1;2117.1",
+        "balance": 100000189.32000002,
+        "quantity": 1,
+        "pips": 267.5
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 21,
+        "net": 24.56,
+        "gross": 25.25,
+        "entryTime": 1612206900000,
+        "closeTime": 1612254060000,
+        "entryPrice": 2118.28,
+        "closePrice": 2143.53,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "2;2;1;2143.38",
+        "balance": 100000213.88000003,
+        "quantity": 1,
+        "pips": 252.5
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 23,
+        "net": 25.080000000000002,
+        "gross": 26.46,
+        "entryTime": 1612254060000,
+        "closeTime": 1612448940000,
+        "entryPrice": 2143.53,
+        "closePrice": 2169.99,
+        "commissions": 0,
+        "swaps": -1.38,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "2;3;1;2169.65",
+        "balance": 100000238.96000002,
+        "quantity": 1,
+        "pips": 264.59999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 24,
+        "net": 26.24,
+        "gross": 26.24,
+        "entryTime": 1612448940000,
+        "closeTime": 1612455720000,
+        "entryPrice": 2169.99,
+        "closePrice": 2196.23,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "2;4;1;2195.93",
+        "balance": 100000265.20000002,
+        "quantity": 1,
+        "pips": 262.4
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 26,
+        "net": 24.86,
+        "gross": 24.86,
+        "entryTime": 1614319440000,
+        "closeTime": 1614328440000,
+        "entryPrice": 2171.39,
+        "closePrice": 2196.25,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "2;4;1;2195.93",
+        "balance": 100000290.06000002,
+        "quantity": 1,
+        "pips": 248.6
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 30,
+        "net": 28.029999999999998,
+        "gross": 28.06,
+        "entryTime": 1614805140000,
+        "closeTime": 1614830640000,
+        "entryPrice": 2209.16,
+        "closePrice": 2181.1,
+        "commissions": 0,
+        "swaps": -0.03,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;1;-1;2182.06",
+        "balance": 100000318.09000002,
+        "quantity": 1,
+        "pips": 280.59999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 32,
+        "net": 29.09,
+        "gross": 29.09,
+        "entryTime": 1614830640000,
+        "closeTime": 1614880500000,
+        "entryPrice": 2181.1,
+        "closePrice": 2152.01,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;2;-1;2153.56",
+        "balance": 100000347.18000002,
+        "quantity": 1,
+        "pips": 290.9
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 34,
+        "net": 27.65,
+        "gross": 27.65,
+        "entryTime": 1614880500000,
+        "closeTime": 1614883920000,
+        "entryPrice": 2152.01,
+        "closePrice": 2124.36,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;3;-1;2125.06",
+        "balance": 100000374.83000003,
+        "quantity": 1,
+        "pips": 276.49999999999994
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 36,
+        "net": 28.35,
+        "gross": 28.35,
+        "entryTime": 1614955860000,
+        "closeTime": 1614957840000,
+        "entryPrice": 2152.97,
+        "closePrice": 2124.62,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;3;-1;2125.06",
+        "balance": 100000403.18000002,
+        "quantity": 1,
+        "pips": 283.5
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 37,
+        "net": 29.32,
+        "gross": 29.35,
+        "entryTime": 1614883920000,
+        "closeTime": 1614961140000,
+        "entryPrice": 2124.36,
+        "closePrice": 2095.01,
+        "commissions": 0,
+        "swaps": -0.03,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;4;-1;2096.57",
+        "balance": 100000432.50000001,
+        "quantity": 1,
+        "pips": 293.5
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 40,
+        "net": 23.29,
+        "gross": 29.5,
+        "entryTime": 1614617940000,
+        "closeTime": 1615388160000,
+        "entryPrice": 2267.68,
+        "closePrice": 2297.18,
+        "commissions": 0,
+        "swaps": -6.209999999999999,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;1;1;2296.04",
+        "balance": 100000455.79000002,
+        "quantity": 1,
+        "pips": 295
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 42,
+        "net": 26.75,
+        "gross": 27.44,
+        "entryTime": 1615388160000,
+        "closeTime": 1615476900000,
+        "entryPrice": 2297.18,
+        "closePrice": 2324.62,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;2;1;2324.54",
+        "balance": 100000482.54000002,
+        "quantity": 1,
+        "pips": 274.4
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 44,
+        "net": 27.88,
+        "gross": 28.57,
+        "entryTime": 1615476900000,
+        "closeTime": 1615582560000,
+        "entryPrice": 2324.62,
+        "closePrice": 2353.19,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;3;1;2353.04",
+        "balance": 100000510.42000002,
+        "quantity": 1,
+        "pips": 285.7
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 47,
+        "net": 29.63,
+        "gross": 29.63,
+        "entryTime": 1616521560000,
+        "closeTime": 1616527440000,
+        "entryPrice": 2210.22,
+        "closePrice": 2180.59,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;1;-1;2182.06",
+        "balance": 100000540.05000001,
+        "quantity": 1,
+        "pips": 296.29999999999995
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 49,
+        "net": 28.59,
+        "gross": 29.09,
+        "entryTime": 1615187940000,
+        "closeTime": 1616614020000,
+        "entryPrice": 2181.71,
+        "closePrice": 2152.62,
+        "commissions": 0,
+        "swaps": -0.5000000000000001,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;2;-1;2153.56",
+        "balance": 100000568.64000002,
+        "quantity": 1,
+        "pips": 290.9
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 51,
+        "net": 28.509999999999998,
+        "gross": 28.54,
+        "entryTime": 1616614020000,
+        "closeTime": 1616671620000,
+        "entryPrice": 2152.62,
+        "closePrice": 2124.08,
+        "commissions": 0,
+        "swaps": -0.03,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;3;-1;2125.06",
+        "balance": 100000597.15000002,
+        "quantity": 1,
+        "pips": 285.4
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 55,
+        "net": 29.029999999999998,
+        "gross": 29.72,
+        "entryTime": 1617288300000,
+        "closeTime": 1617366960000,
+        "entryPrice": 2251.77,
+        "closePrice": 2281.49,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "4;1;1;2279.68",
+        "balance": 100000626.18000002,
+        "quantity": 1,
+        "pips": 297.2
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 56,
+        "net": 27.13,
+        "gross": 27.13,
+        "entryTime": 1617366960000,
+        "closeTime": 1617367740000,
+        "entryPrice": 2281.49,
+        "closePrice": 2308.62,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "4;2;1;2307.97",
+        "balance": 100000653.31000002,
+        "quantity": 1,
+        "pips": 271.29999999999995
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 58,
+        "net": 26.44,
+        "gross": 27.98,
+        "entryTime": 1616693820000,
+        "closeTime": 1620891060000,
+        "entryPrice": 2152.85,
+        "closePrice": 2124.87,
+        "commissions": 0,
+        "swaps": -1.5400000000000007,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;3;-1;2125.06",
+        "balance": 100000679.75000001,
+        "quantity": 1,
+        "pips": 279.8
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 61,
+        "net": 25.259999999999998,
+        "gross": 29.4,
+        "entryTime": 1622593440000,
+        "closeTime": 1623154800000,
+        "entryPrice": 2297.87,
+        "closePrice": 2327.27,
+        "commissions": 0,
+        "swaps": -4.14,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "6;1;1;2326.27",
+        "balance": 100000705.01000002,
+        "quantity": 1,
+        "pips": 293.99999999999994
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 62,
+        "net": -0.47000000000000597,
+        "gross": 28.51,
+        "entryTime": 1619502720000,
+        "closeTime": 1623162600000,
+        "entryPrice": 2308.51,
+        "closePrice": 2337.02,
+        "commissions": 0,
+        "swaps": -28.980000000000008,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "4;3;1;2336.26",
+        "balance": 100000704.54000002,
+        "quantity": 1,
+        "pips": 285.1
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 65,
+        "net": 7.660000000000004,
+        "gross": 26.98,
+        "entryTime": 1627912020000,
+        "closeTime": 1630324920000,
+        "entryPrice": 2260.16,
+        "closePrice": 2287.14,
+        "commissions": 0,
+        "swaps": -19.319999999999997,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "8;1;1;2286",
+        "balance": 100000712.20000002,
+        "quantity": 1,
+        "pips": 269.8
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 67,
+        "net": -11.379999999999999,
+        "gross": 27.26,
+        "entryTime": 1630324920000,
+        "closeTime": 1635176640000,
+        "entryPrice": 2287.14,
+        "closePrice": 2314.4,
+        "commissions": 0,
+        "swaps": -38.64,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "8;2;1;2314.38",
+        "balance": 100000700.82000002,
+        "quantity": 1,
+        "pips": 272.6
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 69,
+        "net": -11.889999999999997,
+        "gross": 29.51,
+        "entryTime": 1630595460000,
+        "closeTime": 1635776460000,
+        "entryPrice": 2305.88,
+        "closePrice": 2335.39,
+        "commissions": 0,
+        "swaps": -41.4,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "9;1;1;2334.79",
+        "balance": 100000688.93000002,
+        "quantity": 1,
+        "pips": 295.1
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 70,
+        "net": 24.14,
+        "gross": 28.28,
+        "entryTime": 1635205920000,
+        "closeTime": 1635778980000,
+        "entryPrice": 2316.1,
+        "closePrice": 2344.38,
+        "commissions": 0,
+        "swaps": -4.14,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "10;4;1;2343.94",
+        "balance": 100000713.07000002,
+        "quantity": 1,
+        "pips": 282.8
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 71,
+        "net": -132.59999999999965,
+        "gross": 25.41,
+        "entryTime": 1616004660000,
+        "closeTime": 1635784680000,
+        "entryPrice": 2327.69,
+        "closePrice": 2353.1,
+        "commissions": 0,
+        "swaps": -158.00999999999965,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;3;1;2353.04",
+        "balance": 100000580.47000003,
+        "quantity": 1,
+        "pips": 254.1
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 72,
+        "net": -72.76999999999984,
+        "gross": 27.97,
+        "entryTime": 1623154800000,
+        "closeTime": 1635785400000,
+        "entryPrice": 2327.27,
+        "closePrice": 2355.24,
+        "commissions": 0,
+        "swaps": -100.73999999999984,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "6;2;1;2355.14",
+        "balance": 100000507.70000003,
+        "quantity": 1,
+        "pips": 279.7
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 74,
+        "net": -133.69999999999965,
+        "gross": 29.14,
+        "entryTime": 1615582560000,
+        "closeTime": 1635948240000,
+        "entryPrice": 2353.19,
+        "closePrice": 2382.33,
+        "commissions": 0,
+        "swaps": -162.83999999999963,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;4;1;2381.53",
+        "balance": 100000374.00000003,
+        "quantity": 1,
+        "pips": 291.4
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 76,
+        "net": 28.75,
+        "gross": 29.44,
+        "entryTime": 1635854580000,
+        "closeTime": 1635950760000,
+        "entryPrice": 2364.74,
+        "closePrice": 2394.18,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "11;2;1;2394.04",
+        "balance": 100000402.75000003,
+        "quantity": 1,
+        "pips": 294.4
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 78,
+        "net": 28.869999999999997,
+        "gross": 29.56,
+        "entryTime": 1635950760000,
+        "closeTime": 1636033320000,
+        "entryPrice": 2394.18,
+        "closePrice": 2423.74,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "11;3;1;2423.38",
+        "balance": 100000431.62000003,
+        "quantity": 1,
+        "pips": 295.59999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 79,
+        "net": 26.9,
+        "gross": 29.66,
+        "entryTime": 1636033320000,
+        "closeTime": 1636379340000,
+        "entryPrice": 2423.74,
+        "closePrice": 2453.4,
+        "commissions": 0,
+        "swaps": -2.76,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "11;4;1;2452.73",
+        "balance": 100000458.52000004,
+        "quantity": 1,
+        "pips": 296.59999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 83,
+        "net": 28.9,
+        "gross": 28.9,
+        "entryTime": 1637899800000,
+        "closeTime": 1637910420000,
+        "entryPrice": 2275.88,
+        "closePrice": 2246.98,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "11;1;-1;2247.29",
+        "balance": 100000487.42000005,
+        "quantity": 1,
+        "pips": 288.99999999999994
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 85,
+        "net": 36,
+        "gross": 36,
+        "entryTime": 1637910420000,
+        "closeTime": 1637914740000,
+        "entryPrice": 2246.98,
+        "closePrice": 2210.98,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "11;2;-1;2217.94",
+        "balance": 100000523.42000005,
+        "quantity": 1,
+        "pips": 360
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 87,
+        "net": 24.12,
+        "gross": 24.25,
+        "entryTime": 1637914740000,
+        "closeTime": 1638290640000,
+        "entryPrice": 2210.98,
+        "closePrice": 2186.73,
+        "commissions": 0,
+        "swaps": -0.13,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "11;3;-1;2188.6",
+        "balance": 100000547.54000005,
+        "quantity": 1,
+        "pips": 242.5
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 89,
+        "net": 28.49,
+        "gross": 28.52,
+        "entryTime": 1638290640000,
+        "closeTime": 1638390180000,
+        "entryPrice": 2186.73,
+        "closePrice": 2158.21,
+        "commissions": 0,
+        "swaps": -0.03,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "11;4;-1;2159.25",
+        "balance": 100000576.03000005,
+        "quantity": 1,
+        "pips": 285.2
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 91,
+        "net": 24.03,
+        "gross": 28.86,
+        "entryTime": 1638351720000,
+        "closeTime": 1638964560000,
+        "entryPrice": 2250.2,
+        "closePrice": 2279.06,
+        "commissions": 0,
+        "swaps": -4.83,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "12;1;1;2278.26",
+        "balance": 100000600.06000005,
+        "quantity": 1,
+        "pips": 288.59999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 93,
+        "net": 22.99,
+        "gross": 23.02,
+        "entryTime": 1639407240000,
+        "closeTime": 1639491060000,
+        "entryPrice": 2188.01,
+        "closePrice": 2164.99,
+        "commissions": 0,
+        "swaps": -0.03,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "12;1;-1;2165.16",
+        "balance": 100000623.05000004,
+        "quantity": 1,
+        "pips": 230.2
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 96,
+        "net": 25.78,
+        "gross": 30.61,
+        "entryTime": 1640620260000,
+        "closeTime": 1641222300000,
+        "entryPrice": 2250.08,
+        "closePrice": 2280.69,
+        "commissions": 0,
+        "swaps": -4.83,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "12;1;1;2278.26",
+        "balance": 100000648.83000004,
+        "quantity": 1,
+        "pips": 306.09999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 97,
+        "net": 21.270000000000014,
+        "gross": 30.67,
+        "entryTime": 1616671620000,
+        "closeTime": 1642539300000,
+        "entryPrice": 2124.08,
+        "closePrice": 2093.41,
+        "commissions": 0,
+        "swaps": -9.399999999999988,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "3;4;-1;2096.57",
+        "balance": 100000670.10000004,
+        "quantity": 1,
+        "pips": 306.7
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 98,
+        "net": 11.740000000000046,
+        "gross": 23.9,
+        "entryTime": 1609801200000,
+        "closeTime": 1643314440000,
+        "entryPrice": 1949.6,
+        "closePrice": 1925.7,
+        "commissions": 0,
+        "swaps": -12.159999999999952,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "1;1;-1;1925.75",
+        "balance": 100000681.84000003,
+        "quantity": 1,
+        "pips": 238.99999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 99,
+        "net": 11.88000000000005,
+        "gross": 24.1,
+        "entryTime": 1609780560000,
+        "closeTime": 1643372760000,
+        "entryPrice": 1923.03,
+        "closePrice": 1898.93,
+        "commissions": 0,
+        "swaps": -12.219999999999951,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "1;2;-1;1900.6",
+        "balance": 100000693.72000003,
+        "quantity": 1,
+        "pips": 241
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 103,
+        "net": 19.71,
+        "gross": 25.23,
+        "entryTime": 1643731080000,
+        "closeTime": 1644396360000,
+        "entryPrice": 2037.23,
+        "closePrice": 2062.46,
+        "commissions": 0,
+        "swaps": -5.52,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "14;1;1;2062.41",
+        "balance": 100000713.43000002,
+        "quantity": 1,
+        "pips": 252.29999999999998
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 105,
+        "net": 25.049999999999997,
+        "gross": 25.74,
+        "entryTime": 1644396360000,
+        "closeTime": 1644505740000,
+        "entryPrice": 2062.46,
+        "closePrice": 2088.2,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "14;2;1;2088.01",
+        "balance": 100000738.48000002,
+        "quantity": 1,
+        "pips": 257.4
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 107,
+        "net": 24.56,
+        "gross": 25.16,
+        "entryTime": 1643970060000,
+        "closeTime": 1645643040000,
+        "entryPrice": 1984.74,
+        "closePrice": 1959.58,
+        "commissions": 0,
+        "swaps": -0.6000000000000001,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "14;1;-1;1960.03",
+        "balance": 100000763.04000002,
+        "quantity": 1,
+        "pips": 251.6
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 109,
+        "net": 26.119999999999997,
+        "gross": 26.15,
+        "entryTime": 1645643040000,
+        "closeTime": 1645662600000,
+        "entryPrice": 1959.58,
+        "closePrice": 1933.43,
+        "commissions": 0,
+        "swaps": -0.03,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "14;2;-1;1934.43",
+        "balance": 100000789.16000003,
+        "quantity": 1,
+        "pips": 261.49999999999994
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 110,
+        "net": 25.1,
+        "gross": 25.1,
+        "entryTime": 1645662600000,
+        "closeTime": 1645672140000,
+        "entryPrice": 1933.43,
+        "closePrice": 1908.33,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "14;3;-1;1908.83",
+        "balance": 100000814.26000002,
+        "quantity": 1,
+        "pips": 251
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 112,
+        "net": 23.439999999999998,
+        "gross": 26.2,
+        "entryTime": 1645822020000,
+        "closeTime": 1646118420000,
+        "entryPrice": 2036.83,
+        "closePrice": 2063.03,
+        "commissions": 0,
+        "swaps": -2.76,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "14;1;1;2062.41",
+        "balance": 100000837.70000002,
+        "quantity": 1,
+        "pips": 262
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 115,
+        "net": 25.44,
+        "gross": 33.03,
+        "entryTime": 1647612540000,
+        "closeTime": 1648560720000,
+        "entryPrice": 2076,
+        "closePrice": 2109.03,
+        "commissions": 0,
+        "swaps": -7.59,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "15;1;1;2101.9",
+        "balance": 100000863.14000002,
+        "quantity": 1,
+        "pips": 330.3
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 116,
+        "net": -6.650000000000013,
+        "gross": 25.78,
+        "entryTime": 1644505740000,
+        "closeTime": 1648560840000,
+        "entryPrice": 2088.2,
+        "closePrice": 2113.98,
+        "commissions": 0,
+        "swaps": -32.430000000000014,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "14;3;1;2113.61",
+        "balance": 100000856.49000001,
+        "quantity": 1,
+        "pips": 257.8
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 118,
+        "net": 19.01,
+        "gross": 19.01,
+        "entryTime": 1648560720000,
+        "closeTime": 1648578240000,
+        "entryPrice": 2109.03,
+        "closePrice": 2128.04,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "15;2;1;2127.99",
+        "balance": 100000875.50000001,
+        "quantity": 1,
+        "pips": 190.1
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 122,
+        "net": 24.2,
+        "gross": 25.58,
+        "entryTime": 1651502100000,
+        "closeTime": 1651690140000,
+        "entryPrice": 1889.93,
+        "closePrice": 1915.51,
+        "commissions": 0,
+        "swaps": -1.38,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "17;1;1;1913.52",
+        "balance": 100000899.70000002,
+        "quantity": 1,
+        "pips": 255.79999999999998
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 124,
+        "net": 23.26,
+        "gross": 23.26,
+        "entryTime": 1651690140000,
+        "closeTime": 1651691820000,
+        "entryPrice": 1915.51,
+        "closePrice": 1938.77,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "17;2;1;1937.27",
+        "balance": 100000922.96000002,
+        "quantity": 1,
+        "pips": 232.6
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 126,
+        "net": 23.7,
+        "gross": 23.7,
+        "entryTime": 1651844280000,
+        "closeTime": 1651864920000,
+        "entryPrice": 1842.11,
+        "closePrice": 1818.41,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "17;1;-1;1818.52",
+        "balance": 100000946.66000003,
+        "quantity": 1,
+        "pips": 236.99999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 129,
+        "net": 15.73,
+        "gross": 23.32,
+        "entryTime": 1653683400000,
+        "closeTime": 1654629660000,
+        "entryPrice": 1890.33,
+        "closePrice": 1913.65,
+        "commissions": 0,
+        "swaps": -7.59,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "17;1;1;1913.52",
+        "balance": 100000962.39000003,
+        "quantity": 1,
+        "pips": 233.2
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 131,
+        "net": 18.34,
+        "gross": 21.79,
+        "entryTime": 1656683340000,
+        "closeTime": 1657069620000,
+        "entryPrice": 1722.53,
+        "closePrice": 1744.32,
+        "commissions": 0,
+        "swaps": -3.4499999999999997,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "19;1;1;1744.05",
+        "balance": 100000980.73000003,
+        "quantity": 1,
+        "pips": 217.89999999999998
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 133,
+        "net": 20.34,
+        "gross": 21.03,
+        "entryTime": 1657092180000,
+        "closeTime": 1657205280000,
+        "entryPrice": 1744.69,
+        "closePrice": 1765.72,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "19;2;1;1765.7",
+        "balance": 100001001.07000004,
+        "quantity": 1,
+        "pips": 210.3
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 135,
+        "net": 21.47,
+        "gross": 22.16,
+        "entryTime": 1658243100000,
+        "closeTime": 1658284620000,
+        "entryPrice": 1787.41,
+        "closePrice": 1809.57,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "19;4;1;1808.99",
+        "balance": 100001022.54000004,
+        "quantity": 1,
+        "pips": 221.6
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 137,
+        "net": 21.259999999999998,
+        "gross": 23.33,
+        "entryTime": 1659456960000,
+        "closeTime": 1659719520000,
+        "entryPrice": 1896.59,
+        "closePrice": 1919.92,
+        "commissions": 0,
+        "swaps": -2.07,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "20;1;1;1919.9",
+        "balance": 100001043.80000004,
+        "quantity": 1,
+        "pips": 233.29999999999998
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 138,
+        "net": -20.149999999999988,
+        "gross": 24.01,
+        "entryTime": 1654193280000,
+        "closeTime": 1659728880000,
+        "entryPrice": 1896.72,
+        "closePrice": 1920.73,
+        "commissions": 0,
+        "swaps": -44.15999999999999,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "18;1;1;1920.54",
+        "balance": 100001023.65000004,
+        "quantity": 1,
+        "pips": 240.1
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 141,
+        "net": 24.67,
+        "gross": 24.67,
+        "entryTime": 1659909600000,
+        "closeTime": 1659965640000,
+        "entryPrice": 1920.1,
+        "closePrice": 1944.77,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "20;2;1;1943.72",
+        "balance": 100001048.32000004,
+        "quantity": 1,
+        "pips": 246.70000000000002
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 142,
+        "net": -44.74999999999993,
+        "gross": 22.87,
+        "entryTime": 1651691820000,
+        "closeTime": 1660143660000,
+        "entryPrice": 1938.77,
+        "closePrice": 1961.64,
+        "commissions": 0,
+        "swaps": -67.61999999999993,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "17;3;1;1961.02",
+        "balance": 100001003.57000004,
+        "quantity": 1,
+        "pips": 228.7
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 144,
+        "net": 21.650000000000002,
+        "gross": 23.03,
+        "entryTime": 1659965640000,
+        "closeTime": 1660159500000,
+        "entryPrice": 1944.77,
+        "closePrice": 1967.8,
+        "commissions": 0,
+        "swaps": -1.38,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "20;3;1;1967.55",
+        "balance": 100001025.22000004,
+        "quantity": 1,
+        "pips": 230.3
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 145,
+        "net": 23.279999999999998,
+        "gross": 23.97,
+        "entryTime": 1660159500000,
+        "closeTime": 1660224840000,
+        "entryPrice": 1967.8,
+        "closePrice": 1991.77,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "20;4;1;1991.38",
+        "balance": 100001048.50000004,
+        "quantity": 1,
+        "pips": 239.7
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 147,
+        "net": 23.810000000000002,
+        "gross": 23.87,
+        "entryTime": 1661879700000,
+        "closeTime": 1662022320000,
+        "entryPrice": 1848.28,
+        "closePrice": 1824.41,
+        "commissions": 0,
+        "swaps": -0.06,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "20;1;-1;1824.58",
+        "balance": 100001072.31000005,
+        "quantity": 1,
+        "pips": 238.7
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 150,
+        "net": 23.65,
+        "gross": 23.65,
+        "entryTime": 1662696360000,
+        "closeTime": 1662732300000,
+        "entryPrice": 1853.71,
+        "closePrice": 1877.36,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "21;1;1;1876.94",
+        "balance": 100001095.96000005,
+        "quantity": 1,
+        "pips": 236.49999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 152,
+        "net": 21.23,
+        "gross": 23.3,
+        "entryTime": 1662732300000,
+        "closeTime": 1662989580000,
+        "entryPrice": 1877.36,
+        "closePrice": 1900.66,
+        "commissions": 0,
+        "swaps": -2.07,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "21;2;1;1900.23",
+        "balance": 100001117.19000006,
+        "quantity": 1,
+        "pips": 233
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 154,
+        "net": 23.65,
+        "gross": 24.34,
+        "entryTime": 1662989580000,
+        "closeTime": 1663072200000,
+        "entryPrice": 1900.66,
+        "closePrice": 1925,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "21;3;1;1923.53",
+        "balance": 100001140.84000006,
+        "quantity": 1,
+        "pips": 243.39999999999998
+      },
+      {
+        "symbol": "US2000",
+        "direction": "sell",
+        "id": 156,
+        "net": 24.71,
+        "gross": 24.71,
+        "entryTime": 1663314600000,
+        "closeTime": 1663336380000,
+        "entryPrice": 1807.01,
+        "closePrice": 1782.3,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "21;1;-1;1783.76",
+        "balance": 100001165.55000006,
+        "quantity": 1,
+        "pips": 247.1
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 159,
+        "net": 21.99,
+        "gross": 21.99,
+        "entryTime": 1664798580000,
+        "closeTime": 1664809800000,
+        "entryPrice": 1685.19,
+        "closePrice": 1707.18,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "22;1;1;1706.37",
+        "balance": 100001187.54000005,
+        "quantity": 1,
+        "pips": 219.89999999999998
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 161,
+        "net": 20.36,
+        "gross": 21.05,
+        "entryTime": 1664809800000,
+        "closeTime": 1664858040000,
+        "entryPrice": 1707.18,
+        "closePrice": 1728.23,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "22;2;1;1727.54",
+        "balance": 100001207.90000005,
+        "quantity": 1,
+        "pips": 210.5
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 163,
+        "net": 24,
+        "gross": 24,
+        "entryTime": 1664858040000,
+        "closeTime": 1664890380000,
+        "entryPrice": 1728.23,
+        "closePrice": 1752.23,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "22;3;1;1748.72",
+        "balance": 100001231.90000005,
+        "quantity": 1,
+        "pips": 240
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 164,
+        "net": 17.9,
+        "gross": 17.9,
+        "entryTime": 1664890380000,
+        "closeTime": 1664892300000,
+        "entryPrice": 1752.23,
+        "closePrice": 1770.13,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "22;4;1;1769.9",
+        "balance": 100001249.80000006,
+        "quantity": 1,
+        "pips": 178.99999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 167,
+        "net": 24.3,
+        "gross": 24.3,
+        "entryTime": 1668144540000,
+        "closeTime": 1668179760000,
+        "entryPrice": 1874.21,
+        "closePrice": 1898.51,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "23;1;1;1897.55",
+        "balance": 100001274.10000005,
+        "quantity": 1,
+        "pips": 243
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 169,
+        "net": -31.489999999999974,
+        "gross": 21.64,
+        "entryTime": 1668519240000,
+        "closeTime": 1675182840000,
+        "entryPrice": 1899.79,
+        "closePrice": 1921.43,
+        "commissions": 0,
+        "swaps": -53.129999999999974,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "23;2;1;1921.1",
+        "balance": 100001242.61000006,
+        "quantity": 1,
+        "pips": 216.4
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 171,
+        "net": -69.78999999999985,
+        "gross": 27.5,
+        "entryTime": 1663072200000,
+        "closeTime": 1675280640000,
+        "entryPrice": 1925,
+        "closePrice": 1952.5,
+        "commissions": 0,
+        "swaps": -97.28999999999985,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "21;4;1;1946.82",
+        "balance": 100001172.82000005,
+        "quantity": 1,
+        "pips": 275
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 172,
+        "net": 24.45,
+        "gross": 24.45,
+        "entryTime": 1675280640000,
+        "closeTime": 1675283820000,
+        "entryPrice": 1952.5,
+        "closePrice": 1976.95,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "26;1;1;1976.61",
+        "balance": 100001197.27000006,
+        "quantity": 1,
+        "pips": 244.49999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 175,
+        "net": 24.29,
+        "gross": 24.29,
+        "entryTime": 1675346880000,
+        "closeTime": 1675353120000,
+        "entryPrice": 1977.1,
+        "closePrice": 2001.39,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "26;2;1;2001.15",
+        "balance": 100001221.56000006,
+        "quantity": 1,
+        "pips": 242.89999999999998
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 177,
+        "net": -64.88999999999987,
+        "gross": 25.5,
+        "entryTime": 1677862740000,
+        "closeTime": 1689167160000,
+        "entryPrice": 1921.6,
+        "closePrice": 1947.1,
+        "commissions": 0,
+        "swaps": -90.38999999999987,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "27;1;1;1944.42",
+        "balance": 100001156.67000006,
+        "quantity": 1,
+        "pips": 255
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 179,
+        "net": 22.84,
+        "gross": 24.22,
+        "entryTime": 1689610260000,
+        "closeTime": 1689773340000,
+        "entryPrice": 1959.26,
+        "closePrice": 1983.48,
+        "commissions": 0,
+        "swaps": -1.38,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "31;3;1;1982.85",
+        "balance": 100001179.51000006,
+        "quantity": 1,
+        "pips": 242.2
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 181,
+        "net": -49.759999999999934,
+        "gross": 21.31,
+        "entryTime": 1693575120000,
+        "closeTime": 1702500420000,
+        "entryPrice": 1929.58,
+        "closePrice": 1950.89,
+        "commissions": 0,
+        "swaps": -71.06999999999994,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "33;1;1;1950.79",
+        "balance": 100001129.75000006,
+        "quantity": 1,
+        "pips": 213.09999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 182,
+        "net": -196.50999999999945,
+        "gross": 24.29,
+        "entryTime": 1675353120000,
+        "closeTime": 1703017800000,
+        "entryPrice": 2001.39,
+        "closePrice": 2025.68,
+        "commissions": 0,
+        "swaps": -220.79999999999944,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "26;3;1;2025.68",
+        "balance": 100000933.24000005,
+        "quantity": 1,
+        "pips": 242.89999999999998
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 185,
+        "net": 26.59,
+        "gross": 26.59,
+        "entryTime": 1707472620000,
+        "closeTime": 1707502800000,
+        "entryPrice": 1983.52,
+        "closePrice": 2010.11,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "38;1;1;2008.44",
+        "balance": 100000959.83000006,
+        "quantity": 1,
+        "pips": 265.9
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 187,
+        "net": 22.69,
+        "gross": 24.76,
+        "entryTime": 1707502800000,
+        "closeTime": 1707749520000,
+        "entryPrice": 2010.11,
+        "closePrice": 2034.87,
+        "commissions": 0,
+        "swaps": -2.07,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "38;2;1;2033.37",
+        "balance": 100000982.52000006,
+        "quantity": 1,
+        "pips": 247.6
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 189,
+        "net": 21.69,
+        "gross": 23.76,
+        "entryTime": 1707749520000,
+        "closeTime": 1708023120000,
+        "entryPrice": 2034.87,
+        "closePrice": 2058.63,
+        "commissions": 0,
+        "swaps": -2.07,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "38;3;1;2058.3",
+        "balance": 100001004.21000005,
+        "quantity": 1,
+        "pips": 237.6
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 190,
+        "net": 12.55,
+        "gross": 24.97,
+        "entryTime": 1708023120000,
+        "closeTime": 1709545140000,
+        "entryPrice": 2058.63,
+        "closePrice": 2083.6,
+        "commissions": 0,
+        "swaps": -12.419999999999998,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "38;4;1;2083.23",
+        "balance": 100001016.76000005,
+        "quantity": 1,
+        "pips": 249.7
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 193,
+        "net": 23.490000000000002,
+        "gross": 26.25,
+        "entryTime": 1709545380000,
+        "closeTime": 1709905440000,
+        "entryPrice": 2084.55,
+        "closePrice": 2110.8,
+        "commissions": 0,
+        "swaps": -2.76,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "39;1;1;2110.11",
+        "balance": 100001040.25000004,
+        "quantity": 1,
+        "pips": 262.5
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 194,
+        "net": -472.6899999999985,
+        "gross": 26.87,
+        "entryTime": 1649079060000,
+        "closeTime": 1711632900000,
+        "entryPrice": 2099.49,
+        "closePrice": 2126.36,
+        "commissions": 0,
+        "swaps": -499.5599999999985,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "16;1;1;2125.62",
+        "balance": 100000567.56000005,
+        "quantity": 1,
+        "pips": 268.7
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 196,
+        "net": 11.860000000000003,
+        "gross": 25.66,
+        "entryTime": 1709905440000,
+        "closeTime": 1711637760000,
+        "entryPrice": 2110.8,
+        "closePrice": 2136.46,
+        "commissions": 0,
+        "swaps": -13.799999999999997,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "39;2;1;2136.3",
+        "balance": 100000579.42000005,
+        "quantity": 1,
+        "pips": 256.59999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 199,
+        "net": 53.989999999999995,
+        "gross": 55.37,
+        "entryTime": 1714588920000,
+        "closeTime": 1714739460000,
+        "entryPrice": 2002.55,
+        "closePrice": 2057.92,
+        "commissions": 0,
+        "swaps": -1.38,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "41;1;1;2021.02",
+        "balance": 100000633.41000004,
+        "quantity": 1,
+        "pips": 553.6999999999999
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 201,
+        "net": 42.91,
+        "gross": 48.43,
+        "entryTime": 1715091660000,
+        "closeTime": 1715776260000,
+        "entryPrice": 2071.25,
+        "closePrice": 2119.68,
+        "commissions": 0,
+        "swaps": -5.52,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "41;4;1;2096.27",
+        "balance": 100000676.32000004,
+        "quantity": 1,
+        "pips": 484.29999999999995
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 203,
+        "net": 20.79,
+        "gross": 20.79,
+        "entryTime": 1720701060000,
+        "closeTime": 1720706460000,
+        "entryPrice": 2084.94,
+        "closePrice": 2105.73,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "43;1;1;2104.79",
+        "balance": 100000697.11000004,
+        "quantity": 1,
+        "pips": 207.89999999999998
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 205,
+        "net": -550.650000000002,
+        "gross": 26.19,
+        "entryTime": 1648578240000,
+        "closeTime": 1720786020000,
+        "entryPrice": 2128.04,
+        "closePrice": 2154.23,
+        "commissions": 0,
+        "swaps": -576.8400000000021,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "15;3;1;2154.08",
+        "balance": 100000146.46000004,
+        "quantity": 1,
+        "pips": 261.9
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 206,
+        "net": 24.91,
+        "gross": 25.6,
+        "entryTime": 1720727220000,
+        "closeTime": 1720786140000,
+        "entryPrice": 2131.43,
+        "closePrice": 2157.03,
+        "commissions": 0,
+        "swaps": -0.69,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "43;3;1;2157.03",
+        "balance": 100000171.37000003,
+        "quantity": 1,
+        "pips": 256
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 208,
+        "net": -46.97999999999993,
+        "gross": 26.16,
+        "entryTime": 1711637760000,
+        "closeTime": 1720793220000,
+        "entryPrice": 2136.46,
+        "closePrice": 2162.62,
+        "commissions": 0,
+        "swaps": -73.13999999999993,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "39;3;1;2162.49",
+        "balance": 100000124.39000003,
+        "quantity": 1,
+        "pips": 261.59999999999997
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 209,
+        "net": 23.62,
+        "gross": 25.69,
+        "entryTime": 1720792860000,
+        "closeTime": 1721052660000,
+        "entryPrice": 2157.72,
+        "closePrice": 2183.41,
+        "commissions": 0,
+        "swaps": -2.07,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "43;4;1;2183.15",
+        "balance": 100000148.01000004,
+        "quantity": 1,
+        "pips": 256.9
+      },
+      {
+        "symbol": "US2000",
+        "direction": "buy",
+        "id": 210,
+        "net": -638.510000000007,
+        "gross": 28.03,
+        "entryTime": 1638964560000,
+        "closeTime": 1722452520000,
+        "entryPrice": 2279.06,
+        "closePrice": 2307.09,
+        "commissions": 0,
+        "swaps": -666.540000000007,
+        "volume": 1,
+        "label": "grd_us2000",
+        "comment": "12;2;1;2306.54",
+        "balance": 99999509.50000003,
+        "quantity": 1,
+        "pips": 280.3
+      }
+    ]
+  },
+  "entries": {
+    "entriesByHours": {
+      "zero": {
+        "totalTrades": 2
+      },
+      "one": {
+        "totalTrades": 0
+      },
+      "two": {
+        "totalTrades": 1
+      },
+      "three": {
+        "totalTrades": 0
+      },
+      "four": {
+        "totalTrades": 4
+      },
+      "five": {
+        "totalTrades": 3
+      },
+      "six": {
+        "totalTrades": 1
+      },
+      "seven": {
+        "totalTrades": 6
+      },
+      "eight": {
+        "totalTrades": 3
+      },
+      "nine": {
+        "totalTrades": 3
+      },
+      "ten": {
+        "totalTrades": 2
+      },
+      "eleven": {
+        "totalTrades": 2
+      },
+      "twelve": {
+        "totalTrades": 8
+      },
+      "thirteen": {
+        "totalTrades": 13
+      },
+      "fourteen": {
+        "totalTrades": 14
+      },
+      "fifteen": {
+        "totalTrades": 10
+      },
+      "sixteen": {
+        "totalTrades": 6
+      },
+      "seventeen": {
+        "totalTrades": 5
+      },
+      "eighteen": {
+        "totalTrades": 10
+      },
+      "nineteen": {
+        "totalTrades": 7
+      },
+      "twenty": {
+        "totalTrades": 4
+      },
+      "twentyOne": {
+        "totalTrades": 0
+      },
+      "twentyTwo": {
+        "totalTrades": 1
+      },
+      "twentyThree": {
+        "totalTrades": 2
+      }
+    },
+    "entriesByWeekdays": {
+      "sunday": {
+        "totalTrades": 1
+      },
+      "monday": {
+        "totalTrades": 23
+      },
+      "tuesday": {
+        "totalTrades": 17
+      },
+      "wednesday": {
+        "totalTrades": 21
+      },
+      "thursday": {
+        "totalTrades": 20
+      },
+      "friday": {
+        "totalTrades": 25
+      },
+      "saturday": {
+        "totalTrades": 0
+      }
+    },
+    "entriesByMonths": {
+      "january": {
+        "totalTrades": 10
+      },
+      "february": {
+        "totalTrades": 19
+      },
+      "march": {
+        "totalTrades": 22
+      },
+      "april": {
+        "totalTrades": 4
+      },
+      "may": {
+        "totalTrades": 8
+      },
+      "june": {
+        "totalTrades": 3
+      },
+      "july": {
+        "totalTrades": 7
+      },
+      "august": {
+        "totalTrades": 7
+      },
+      "september": {
+        "totalTrades": 7
+      },
+      "october": {
+        "totalTrades": 6
+      },
+      "november": {
+        "totalTrades": 10
+      },
+      "december": {
+        "totalTrades": 4
+      }
+    }
+  },
+  "profitsLosses": {
+    "profitsLossesByHours": {
+      "zero": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      },
+      "one": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "two": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "three": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "four": {
+        "winningTrades": 4,
+        "losingTrades": 0
+      },
+      "five": {
+        "winningTrades": 2,
+        "losingTrades": 1
+      },
+      "six": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "seven": {
+        "winningTrades": 5,
+        "losingTrades": 1
+      },
+      "eight": {
+        "winningTrades": 3,
+        "losingTrades": 0
+      },
+      "nine": {
+        "winningTrades": 3,
+        "losingTrades": 0
+      },
+      "ten": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      },
+      "eleven": {
+        "winningTrades": 1,
+        "losingTrades": 1
+      },
+      "twelve": {
+        "winningTrades": 4,
+        "losingTrades": 4
+      },
+      "thirteen": {
+        "winningTrades": 9,
+        "losingTrades": 4
+      },
+      "fourteen": {
+        "winningTrades": 13,
+        "losingTrades": 1
+      },
+      "fifteen": {
+        "winningTrades": 6,
+        "losingTrades": 4
+      },
+      "sixteen": {
+        "winningTrades": 5,
+        "losingTrades": 1
+      },
+      "seventeen": {
+        "winningTrades": 5,
+        "losingTrades": 0
+      },
+      "eighteen": {
+        "winningTrades": 7,
+        "losingTrades": 3
+      },
+      "nineteen": {
+        "winningTrades": 6,
+        "losingTrades": 1
+      },
+      "twenty": {
+        "winningTrades": 3,
+        "losingTrades": 1
+      },
+      "twentyOne": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "twentyTwo": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "twentyThree": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      }
+    },
+    "profitsLossesByWeekdays": {
+      "sunday": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "monday": {
+        "winningTrades": 20,
+        "losingTrades": 3
+      },
+      "tuesday": {
+        "winningTrades": 12,
+        "losingTrades": 5
+      },
+      "wednesday": {
+        "winningTrades": 17,
+        "losingTrades": 4
+      },
+      "thursday": {
+        "winningTrades": 14,
+        "losingTrades": 6
+      },
+      "friday": {
+        "winningTrades": 21,
+        "losingTrades": 4
+      },
+      "saturday": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      }
+    },
+    "profitsLossesByMonth": {
+      "january": {
+        "winningTrades": 9,
+        "losingTrades": 1
+      },
+      "february": {
+        "winningTrades": 17,
+        "losingTrades": 2
+      },
+      "march": {
+        "winningTrades": 17,
+        "losingTrades": 5
+      },
+      "april": {
+        "winningTrades": 2,
+        "losingTrades": 2
+      },
+      "may": {
+        "winningTrades": 6,
+        "losingTrades": 2
+      },
+      "june": {
+        "winningTrades": 1,
+        "losingTrades": 2
+      },
+      "july": {
+        "winningTrades": 7,
+        "losingTrades": 0
+      },
+      "august": {
+        "winningTrades": 6,
+        "losingTrades": 1
+      },
+      "september": {
+        "winningTrades": 4,
+        "losingTrades": 3
+      },
+      "october": {
+        "winningTrades": 5,
+        "losingTrades": 1
+      },
+      "november": {
+        "winningTrades": 8,
+        "losingTrades": 2
+      },
+      "december": {
+        "winningTrades": 3,
+        "losingTrades": 1
+      }
+    }
+  },
+  "roi": {
+    "period1w": {
+      "totalRoi": 0,
+      "points": [
+        {
+          "timestamp": 1725973200000,
+          "roi": 0
+        }
+      ]
+    },
+    "period1m": {
+      "totalRoi": 0,
+      "points": [
+        {
+          "timestamp": 1725973200000,
+          "roi": 0
+        }
+      ]
+    },
+    "period3m": {
+      "totalRoi": -0.0011876017211239463,
+      "points": [
+        {
+          "timestamp": 1720706460000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1720742400000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1720828800000,
+          "roi": -0.0005727160075531486
+        },
+        {
+          "timestamp": 1721088000000,
+          "roi": -0.0005490961722046144
+        },
+        {
+          "timestamp": 1722470400000,
+          "roi": -0.0011876017211239463
+        },
+        {
+          "timestamp": 1725973200000,
+          "roi": -0.0011876017211239463
+        }
+      ]
+    },
+    "period6m": {
+      "totalRoi": -0.0010580539949260313,
+      "points": [
+        {
+          "timestamp": 1711632900000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1711670400000,
+          "roi": 1.1859932687169989E-05
+        },
+        {
+          "timestamp": 1714780800000,
+          "roi": 6.584962625790072E-05
+        },
+        {
+          "timestamp": 1715817600000,
+          "roi": 0.00010875938271571068
+        },
+        {
+          "timestamp": 1720742400000,
+          "roi": 0.00012954926472721282
+        },
+        {
+          "timestamp": 1720828800000,
+          "roi": -0.0004431674847753125
+        },
+        {
+          "timestamp": 1721088000000,
+          "roi": -0.00041954761882745536
+        },
+        {
+          "timestamp": 1722470400000,
+          "roi": -0.0010580539949260313
+        },
+        {
+          "timestamp": 1725973200000,
+          "roi": -0.0010580539949260313
+        }
+      ]
+    },
+    "period1y": {
+      "totalRoi": -0.0016202316954622219,
+      "points": [
+        {
+          "timestamp": 1702500420000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1702512000000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1703030400000,
+          "roi": -0.00019650777995872023
+        },
+        {
+          "timestamp": 1707523200000,
+          "roi": -0.00016991808035227526
+        },
+        {
+          "timestamp": 1707782400000,
+          "roi": -0.00014722833669203846
+        },
+        {
+          "timestamp": 1708041600000,
+          "roi": -0.00012553858173442928
+        },
+        {
+          "timestamp": 1709596800000,
+          "roi": -0.0001129887235194327
+        },
+        {
+          "timestamp": 1709942400000,
+          "roi": -8.9498988900074E-05
+        },
+        {
+          "timestamp": 1711670400000,
+          "roi": -0.0005503237827301772
+        },
+        {
+          "timestamp": 1714780800000,
+          "roi": -0.0004963343926806758
+        },
+        {
+          "timestamp": 1715817600000,
+          "roi": -0.00045342487745450035
+        },
+        {
+          "timestamp": 1720742400000,
+          "roi": -0.00043263511232031554
+        },
+        {
+          "timestamp": 1720828800000,
+          "roi": -0.0010053486421029215
+        },
+        {
+          "timestamp": 1721088000000,
+          "roi": -0.0009817289089420886
+        },
+        {
+          "timestamp": 1722470400000,
+          "roi": -0.0016202316954622219
+        },
+        {
+          "timestamp": 1725973200000,
+          "roi": -0.0016202316954622219
+        }
+      ]
+    },
+    "periodAll": {
+      "totalRoi": -0.0004904999999701977,
+      "points": [
+        {
+          "timestamp": 1609545600000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1609632000000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1609804800000,
+          "roi": 2.3450000002980232E-05
+        },
+        {
+          "timestamp": 1609977600000,
+          "roi": 9.68600000143051E-05
+        },
+        {
+          "timestamp": 1610150400000,
+          "roi": 0.00011981000001728533
+        },
+        {
+          "timestamp": 1610496000000,
+          "roi": 0.0001449200000166893
+        },
+        {
+          "timestamp": 1612224000000,
+          "roi": 0.00018932000002264975
+        },
+        {
+          "timestamp": 1612310400000,
+          "roi": 0.00021388000002503396
+        },
+        {
+          "timestamp": 1612483200000,
+          "roi": 0.0002652000000178814
+        },
+        {
+          "timestamp": 1614384000000,
+          "roi": 0.00029006000001728535
+        },
+        {
+          "timestamp": 1614902400000,
+          "roi": 0.0003748300000280142
+        },
+        {
+          "timestamp": 1614988800000,
+          "roi": 0.00043250000001490116
+        },
+        {
+          "timestamp": 1615420800000,
+          "roi": 0.00045579000002145763
+        },
+        {
+          "timestamp": 1615507200000,
+          "roi": 0.00048254000002145766
+        },
+        {
+          "timestamp": 1615593600000,
+          "roi": 0.0005104200000166893
+        },
+        {
+          "timestamp": 1616544000000,
+          "roi": 0.000540050000011921
+        },
+        {
+          "timestamp": 1616630400000,
+          "roi": 0.0005686400000154972
+        },
+        {
+          "timestamp": 1616716800000,
+          "roi": 0.0005971500000208616
+        },
+        {
+          "timestamp": 1617408000000,
+          "roi": 0.0006533100000172854
+        },
+        {
+          "timestamp": 1620950400000,
+          "roi": 0.0006797500000149012
+        },
+        {
+          "timestamp": 1623196800000,
+          "roi": 0.0007045400000214577
+        },
+        {
+          "timestamp": 1630368000000,
+          "roi": 0.0007122000000178814
+        },
+        {
+          "timestamp": 1635206400000,
+          "roi": 0.0007008200000226497
+        },
+        {
+          "timestamp": 1635811200000,
+          "roi": 0.0005077000000327825
+        },
+        {
+          "timestamp": 1635984000000,
+          "roi": 0.00040275000002980234
+        },
+        {
+          "timestamp": 1636070400000,
+          "roi": 0.00043162000003457067
+        },
+        {
+          "timestamp": 1636416000000,
+          "roi": 0.0004585200000405312
+        },
+        {
+          "timestamp": 1637971200000,
+          "roi": 0.0005234200000464916
+        },
+        {
+          "timestamp": 1638316800000,
+          "roi": 0.00054754000005126
+        },
+        {
+          "timestamp": 1638403200000,
+          "roi": 0.0005760300000458956
+        },
+        {
+          "timestamp": 1639008000000,
+          "roi": 0.0006000600000470877
+        },
+        {
+          "timestamp": 1639526400000,
+          "roi": 0.0006230500000417232
+        },
+        {
+          "timestamp": 1641254400000,
+          "roi": 0.0006488300000429154
+        },
+        {
+          "timestamp": 1642550400000,
+          "roi": 0.0006701000000387431
+        },
+        {
+          "timestamp": 1643328000000,
+          "roi": 0.0006818400000333785
+        },
+        {
+          "timestamp": 1643414400000,
+          "roi": 0.0006937200000286102
+        },
+        {
+          "timestamp": 1644451200000,
+          "roi": 0.0007134300000220537
+        },
+        {
+          "timestamp": 1644537600000,
+          "roi": 0.0007384800000190735
+        },
+        {
+          "timestamp": 1645660800000,
+          "roi": 0.0007630400000214576
+        },
+        {
+          "timestamp": 1645747200000,
+          "roi": 0.0008142600000202657
+        },
+        {
+          "timestamp": 1646179200000,
+          "roi": 0.0008377000000178813
+        },
+        {
+          "timestamp": 1648598400000,
+          "roi": 0.0008755000000149011
+        },
+        {
+          "timestamp": 1651708800000,
+          "roi": 0.0009229600000232458
+        },
+        {
+          "timestamp": 1651881600000,
+          "roi": 0.000946660000026226
+        },
+        {
+          "timestamp": 1654646400000,
+          "roi": 0.0009623900000303985
+        },
+        {
+          "timestamp": 1657152000000,
+          "roi": 0.0009807300000339747
+        },
+        {
+          "timestamp": 1657238400000,
+          "roi": 0.0010010700000375509
+        },
+        {
+          "timestamp": 1658361600000,
+          "roi": 0.0010225400000363587
+        },
+        {
+          "timestamp": 1659744000000,
+          "roi": 0.001023650000035763
+        },
+        {
+          "timestamp": 1660003200000,
+          "roi": 0.001048320000037551
+        },
+        {
+          "timestamp": 1660176000000,
+          "roi": 0.0010252200000435115
+        },
+        {
+          "timestamp": 1660262400000,
+          "roi": 0.0010485000000447036
+        },
+        {
+          "timestamp": 1662076800000,
+          "roi": 0.0010723100000470877
+        },
+        {
+          "timestamp": 1662768000000,
+          "roi": 0.001095960000053048
+        },
+        {
+          "timestamp": 1663027200000,
+          "roi": 0.0011171900000572206
+        },
+        {
+          "timestamp": 1663113600000,
+          "roi": 0.001140840000063181
+        },
+        {
+          "timestamp": 1663372800000,
+          "roi": 0.0011655500000566244
+        },
+        {
+          "timestamp": 1664841600000,
+          "roi": 0.00118754000005126
+        },
+        {
+          "timestamp": 1664928000000,
+          "roi": 0.0012498000000566245
+        },
+        {
+          "timestamp": 1668211200000,
+          "roi": 0.0012741000000536442
+        },
+        {
+          "timestamp": 1675209600000,
+          "roi": 0.0012426100000590087
+        },
+        {
+          "timestamp": 1675296000000,
+          "roi": 0.0011972700000554323
+        },
+        {
+          "timestamp": 1675382400000,
+          "roi": 0.0012215600000619888
+        },
+        {
+          "timestamp": 1689206400000,
+          "roi": 0.0011566700000613928
+        },
+        {
+          "timestamp": 1689811200000,
+          "roi": 0.001179510000064969
+        },
+        {
+          "timestamp": 1702512000000,
+          "roi": 0.0011297500000596048
+        },
+        {
+          "timestamp": 1703030400000,
+          "roi": 0.0009332400000542401
+        },
+        {
+          "timestamp": 1707523200000,
+          "roi": 0.0009598300000578165
+        },
+        {
+          "timestamp": 1707782400000,
+          "roi": 0.0009825200000554322
+        },
+        {
+          "timestamp": 1708041600000,
+          "roi": 0.0010042100000530482
+        },
+        {
+          "timestamp": 1709596800000,
+          "roi": 0.0010167600000500678
+        },
+        {
+          "timestamp": 1709942400000,
+          "roi": 0.0010402500000447033
+        },
+        {
+          "timestamp": 1711670400000,
+          "roi": 0.0005794200000464917
+        },
+        {
+          "timestamp": 1714780800000,
+          "roi": 0.0006334100000411272
+        },
+        {
+          "timestamp": 1715817600000,
+          "roi": 0.0006763200000375509
+        },
+        {
+          "timestamp": 1720742400000,
+          "roi": 0.0006971100000441074
+        },
+        {
+          "timestamp": 1720828800000,
+          "roi": 0.00012439000003039837
+        },
+        {
+          "timestamp": 1721088000000,
+          "roi": 0.00014801000003516674
+        },
+        {
+          "timestamp": 1722470400000,
+          "roi": -0.0004904999999701977
+        },
+        {
+          "timestamp": 1725973200000,
+          "roi": -0.0004904999999701977
+        }
+      ]
+    }
+  }
+}

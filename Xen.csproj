@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Remove="tools/**/*.cs" />
+    <Compile Remove="archive/**/*.cs" />
     <PackageReference Include="cTrader.Automate" Version="*" />
     <PackageReference Include="Parquet.Net" Version="4.24.0" />
   </ItemGroup>

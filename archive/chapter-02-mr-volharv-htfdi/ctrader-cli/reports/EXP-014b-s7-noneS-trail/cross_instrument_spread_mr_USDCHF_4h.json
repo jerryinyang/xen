@@ -1,0 +1,1233 @@
+{
+  "main": {
+    "utcOffset": 0,
+    "language": "en",
+    "depositAsset": "USD",
+    "depositAssetDigits": 2,
+    "period": "m1",
+    "symbol": "USDCHF",
+    "brokerTitle": "",
+    "cBotName": "Xen",
+    "roi": 0,
+    "netProfit": 3.24,
+    "startingCapital": 100000000,
+    "endingEquity": 100000003.24000001,
+    "endingBalance": 100000036.2,
+    "testingPeriod": {
+      "duration": "3y 8m 7d",
+      "startDate": 1609545600000,
+      "endDate": 1725840000000,
+      "formatted": "3y 8m 7d (02/01/2021 - 09/09/2024)"
+    },
+    "accountType": "hedging",
+    "accountLeverage": 1000,
+    "data": {
+      "type": "m1BarsFromServer",
+      "isCustom": false,
+      "customName": null
+    },
+    "spread": {
+      "type": "fixed",
+      "min": null,
+      "max": null,
+      "value": 0
+    },
+    "commissions": {
+      "type": "usdPerMillionUsdVolume",
+      "value": 0,
+      "applyCommissionAutomatically": false
+    },
+    "theme": "dark",
+    "titleKind": "backtesting",
+    "authorNickName": "jerprog0",
+    "authorLink": null,
+    "cBotLink": null,
+    "embedded": false
+  },
+  "equity": {
+    "points": [
+      {
+        "balance": 100000000,
+        "minEquity": 100000000,
+        "maxEquity": 100000000,
+        "timestamp": 1609545600000
+      },
+      {
+        "balance": 100000015.29,
+        "minEquity": 99999988.94,
+        "maxEquity": 100000016.03,
+        "timestamp": 1617930000000
+      },
+      {
+        "balance": 100000006.79,
+        "minEquity": 99999953.47000001,
+        "maxEquity": 100000017.36,
+        "timestamp": 1653400080000
+      },
+      {
+        "balance": 100000011.53,
+        "minEquity": 99999991.52000001,
+        "maxEquity": 100000011.83000001,
+        "timestamp": 1683909840000
+      },
+      {
+        "balance": 100000017.71000001,
+        "minEquity": 99999992.01,
+        "maxEquity": 100000018.61,
+        "timestamp": 1690962540000
+      },
+      {
+        "balance": 100000030.85000001,
+        "minEquity": 100000004.73,
+        "maxEquity": 100000030.39000002,
+        "timestamp": 1697029620000
+      },
+      {
+        "balance": 100000024.96000001,
+        "minEquity": 99999990.76,
+        "maxEquity": 100000046.85000001,
+        "timestamp": 1705395960000
+      },
+      {
+        "balance": 100000037.82000001,
+        "minEquity": 100000024.87,
+        "maxEquity": 100000036.96000001,
+        "timestamp": 1709828940000
+      },
+      {
+        "balance": 100000018.62,
+        "minEquity": 100000001.4,
+        "maxEquity": 100000042.37,
+        "timestamp": 1714722300000
+      },
+      {
+        "balance": 100000031.65,
+        "minEquity": 100000011.2,
+        "maxEquity": 100000032.19,
+        "timestamp": 1719550800000
+      },
+      {
+        "balance": 100000036.2,
+        "minEquity": 100000028.35000001,
+        "maxEquity": 100000036.13000001,
+        "timestamp": 1722209400000
+      },
+      {
+        "balance": 100000036.2,
+        "minEquity": 99999995.93,
+        "maxEquity": 100000038.97,
+        "timestamp": 1725843600000
+      }
+    ],
+    "maxBalanceDrawdownPercent": 1.9199992741542977E-05,
+    "maxEquityDrawdownPercent": 6.388998889439282E-05,
+    "maxBalanceDrawdownAbsolute": 19.200000002980232,
+    "maxEquityDrawdownAbsolute": 63.889999985694885
+  },
+  "tradeStatistics": {
+    "netProfit": {
+      "all": 36.2,
+      "long": 22.61,
+      "short": 13.59
+    },
+    "profitFactor": {
+      "all": 2.08,
+      "long": 4.84,
+      "short": 1.49
+    },
+    "commissions": {
+      "all": 0,
+      "long": 0,
+      "short": 0
+    },
+    "swaps": {
+      "all": -7.56,
+      "long": 8.64,
+      "short": -16.2
+    },
+    "totalTrades": {
+      "all": 10,
+      "long": 5,
+      "short": 5
+    },
+    "winningTrades": {
+      "all": 7,
+      "long": 4,
+      "short": 3
+    },
+    "maxConsecutiveWinningTrades": {
+      "all": 3,
+      "long": 2,
+      "short": 2
+    },
+    "largestWinningTrade": {
+      "all": 15.29,
+      "long": 13.03,
+      "short": 15.29
+    },
+    "losingTrades": {
+      "all": 3,
+      "long": 1,
+      "short": 2
+    },
+    "maxConsecutiveLosingTrades": {
+      "all": 1,
+      "long": 1,
+      "short": 1
+    },
+    "largestLosingTrade": {
+      "all": -19.2,
+      "long": -5.89,
+      "short": -19.2
+    },
+    "averageTrade": {
+      "all": 3.62,
+      "long": 4.52,
+      "short": 2.72
+    }
+  },
+  "parameters": [
+    {
+      "group": null,
+      "displayName": "Mode",
+      "propertyName": "Mode",
+      "value": "NativeOrders"
+    },
+    {
+      "group": null,
+      "displayName": "Strategy",
+      "propertyName": "Strategy",
+      "value": "CrossInstrumentSpreadMr"
+    },
+    {
+      "group": null,
+      "displayName": "Collect \u0026 Store Time Bars",
+      "propertyName": "CollectTimeBars",
+      "value": "false"
+    },
+    {
+      "group": null,
+      "displayName": "Analysis End UTC",
+      "propertyName": "AnalysisEndUtc",
+      "value": "2024-09-09T00:05:00Z"
+    },
+    {
+      "group": null,
+      "displayName": "Strategy Output Directory",
+      "propertyName": "StrategyOutputDirectory",
+      "value": "/workspace/data/strategy_runs/EXP-014b-s7-noneS-trail"
+    },
+    {
+      "group": null,
+      "displayName": "Source Parquet Path",
+      "propertyName": "SourceParquetPath",
+      "value": ""
+    },
+    {
+      "group": null,
+      "displayName": "Domain Minutes",
+      "propertyName": "DomainMinutes",
+      "value": 240
+    },
+    {
+      "group": null,
+      "displayName": "Strict Coverage",
+      "propertyName": "StrictCoverage",
+      "value": "false"
+    },
+    {
+      "group": null,
+      "displayName": "Min Coverage",
+      "propertyName": "MinCoverage",
+      "value": 0.9
+    },
+    {
+      "group": null,
+      "displayName": "Fast MA",
+      "propertyName": "FastMa",
+      "value": 20
+    },
+    {
+      "group": null,
+      "displayName": "Slow MA",
+      "propertyName": "SlowMa",
+      "value": 50
+    },
+    {
+      "group": null,
+      "displayName": "Basket Mates (CANON;...)",
+      "propertyName": "BasketMates",
+      "value": "EURUSD;GBPUSD;USDJPY;USDCAD;AUDUSD;NZDUSD"
+    },
+    {
+      "group": null,
+      "displayName": "Basket Phase Shift Hours",
+      "propertyName": "BasketPhaseShiftHours",
+      "value": 0
+    },
+    {
+      "group": null,
+      "displayName": "CDM Series",
+      "propertyName": "CdmSeries",
+      "value": "S5_SPREAD"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Series",
+      "propertyName": "CisSeries",
+      "value": "S7_BASKET"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Reentry",
+      "propertyName": "CisReentry",
+      "value": "none"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Static Arm",
+      "propertyName": "CisStaticArm",
+      "value": "true"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Trail",
+      "propertyName": "CisTrail",
+      "value": "true"
+    }
+  ],
+  "usedSymbols": [
+    {
+      "symbol": "USDCHF",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "USD",
+      "baseAssetDigits": 2,
+      "quoteAsset": "CHF",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": 0.56,
+      "swapShort": -1.24,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 5,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 4,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "EURUSD",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "EUR",
+      "baseAssetDigits": 2,
+      "quoteAsset": "USD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -0.82,
+      "swapShort": 0.15,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 5,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 4,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "GBPUSD",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "GBP",
+      "baseAssetDigits": 2,
+      "quoteAsset": "USD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -0.39,
+      "swapShort": -0.41,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 5,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 4,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "USDJPY",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "USD",
+      "baseAssetDigits": 2,
+      "quoteAsset": "JPY",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": 0.84,
+      "swapShort": -1.72,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 3,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 2,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "USDCAD",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "USD",
+      "baseAssetDigits": 2,
+      "quoteAsset": "CAD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": 0.27,
+      "swapShort": -1.03,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 5,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 4,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "AUDUSD",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "AUD",
+      "baseAssetDigits": 2,
+      "quoteAsset": "USD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -0.23,
+      "swapShort": -0.48,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 5,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 4,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "NZDUSD",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "NZD",
+      "baseAssetDigits": 2,
+      "quoteAsset": "USD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -0.44,
+      "swapShort": 0.04,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 5,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 4,
+      "swapCalculationType": "pips"
+    }
+  ],
+  "positions": {
+    "columns": [
+      "id",
+      "symbol",
+      "quantity",
+      "volume",
+      "direction",
+      "entryPrice",
+      "tp",
+      "sl",
+      "commissions",
+      "closingCommissions",
+      "created",
+      "label",
+      "comment",
+      "pips",
+      "net",
+      "gross",
+      "swaps"
+    ],
+    "items": [
+      {
+        "id": 11,
+        "created": 1722515760000,
+        "quantity": 0.01,
+        "volume": 1000,
+        "entryPrice": 0.8746,
+        "tp": 0.86146,
+        "sl": null,
+        "commissions": 0,
+        "closingCommissions": 0,
+        "swaps": 2.54,
+        "pips": -301.3,
+        "gross": -35.5,
+        "net": -32.96,
+        "label": "cis_usdchf_S7_BASKET",
+        "comment": "0",
+        "symbol": "USDCHF",
+        "direction": "buy"
+      }
+    ],
+    "marginUsed": 1,
+    "freeMargin": 100000002.24000001,
+    "marginLevel": 10000000324,
+    "unrealizedNet": -32.96,
+    "unrealizedGross": -35.5
+  },
+  "orders": {
+    "columns": [
+      "id",
+      "symbol",
+      "direction",
+      "created",
+      "quantity",
+      "volume",
+      "orderType",
+      "submittedPrice",
+      "distance",
+      "tp",
+      "sl",
+      "expiryDate",
+      "currentPrice",
+      "limitRange",
+      "comment",
+      "label"
+    ],
+    "items": []
+  },
+  "history": {
+    "columns": [
+      "id",
+      "symbol",
+      "direction",
+      "net",
+      "gross",
+      "entryTime",
+      "closeTime",
+      "entryPrice",
+      "closePrice",
+      "swaps",
+      "commissions",
+      "volume",
+      "label",
+      "comment",
+      "quantity",
+      "pips"
+    ],
+    "items": [
+      {
+        "symbol": "USDCHF",
+        "direction": "sell",
+        "id": 2,
+        "net": 15.29,
+        "gross": 17.52,
+        "entryTime": 1616682960000,
+        "closeTime": 1617930000000,
+        "entryPrice": 0.93868,
+        "closePrice": 0.92381,
+        "commissions": 0,
+        "swaps": -2.2299999999999995,
+        "volume": 1000,
+        "label": "cis_usdchf_S7_BASKET",
+        "comment": "0",
+        "balance": 100000015.29,
+        "quantity": 0.01,
+        "pips": 148.7
+      },
+      {
+        "symbol": "USDCHF",
+        "direction": "sell",
+        "id": 4,
+        "net": -8.5,
+        "gross": -4.04,
+        "entryTime": 1650634680000,
+        "closeTime": 1653400080000,
+        "entryPrice": 0.95668,
+        "closePrice": 0.96011,
+        "commissions": 0,
+        "swaps": -4.46,
+        "volume": 1000,
+        "label": "cis_usdchf_S7_BASKET",
+        "comment": "0",
+        "balance": 100000006.79,
+        "quantity": 0.01,
+        "pips": -34.3
+      },
+      {
+        "symbol": "USDCHF",
+        "direction": "buy",
+        "id": 6,
+        "net": 4.74,
+        "gross": 2.55,
+        "entryTime": 1681305720000,
+        "closeTime": 1683909840000,
+        "entryPrice": 0.89639,
+        "closePrice": 0.89855,
+        "commissions": 0,
+        "swaps": 2.1900000000000004,
+        "volume": 1000,
+        "label": "cis_usdchf_S7_BASKET",
+        "comment": "0",
+        "balance": 100000011.53,
+        "quantity": 0.01,
+        "pips": 21.599999999999998
+      },
+      {
+        "symbol": "USDCHF",
+        "direction": "buy",
+        "id": 8,
+        "net": 6.180000000000001,
+        "gross": 4.74,
+        "entryTime": 1689167280000,
+        "closeTime": 1690962540000,
+        "entryPrice": 0.8729,
+        "closePrice": 0.87692,
+        "commissions": 0,
+        "swaps": 1.4400000000000004,
+        "volume": 1000,
+        "label": "cis_usdchf_S7_BASKET",
+        "comment": "0",
+        "balance": 100000017.71000001,
+        "quantity": 0.01,
+        "pips": 40.2
+      },
+      {
+        "symbol": "USDCHF",
+        "direction": "sell",
+        "id": 10,
+        "net": 13.14,
+        "gross": 15.37,
+        "entryTime": 1695711420000,
+        "closeTime": 1697029620000,
+        "entryPrice": 0.91418,
+        "closePrice": 0.90114,
+        "commissions": 0,
+        "swaps": -2.2299999999999995,
+        "volume": 1000,
+        "label": "cis_usdchf_S7_BASKET",
+        "comment": "0",
+        "balance": 100000030.85000001,
+        "quantity": 0.01,
+        "pips": 130.39999999999998
+      },
+      {
+        "symbol": "USDCHF",
+        "direction": "buy",
+        "id": 12,
+        "net": -5.890000000000001,
+        "gross": -8.98,
+        "entryTime": 1701359940000,
+        "closeTime": 1705395960000,
+        "entryPrice": 0.86892,
+        "closePrice": 0.8613,
+        "commissions": 0,
+        "swaps": 3.0899999999999994,
+        "volume": 1000,
+        "label": "cis_usdchf_S7_BASKET",
+        "comment": "0",
+        "balance": 100000024.96000001,
+        "quantity": 0.01,
+        "pips": -76.2
+      },
+      {
+        "symbol": "USDCHF",
+        "direction": "sell",
+        "id": 14,
+        "net": 12.86,
+        "gross": 13.75,
+        "entryTime": 1709304960000,
+        "closeTime": 1709828940000,
+        "entryPrice": 0.88917,
+        "closePrice": 0.8775,
+        "commissions": 0,
+        "swaps": -0.8899999999999999,
+        "volume": 1000,
+        "label": "cis_usdchf_S7_BASKET",
+        "comment": "0",
+        "balance": 100000037.82000001,
+        "quantity": 0.01,
+        "pips": 116.69999999999999
+      },
+      {
+        "symbol": "USDCHF",
+        "direction": "sell",
+        "id": 16,
+        "net": -19.200000000000003,
+        "gross": -12.81,
+        "entryTime": 1711009860000,
+        "closeTime": 1714722300000,
+        "entryPrice": 0.8963,
+        "closePrice": 0.90717,
+        "commissions": 0,
+        "swaps": -6.390000000000003,
+        "volume": 1000,
+        "label": "cis_usdchf_S7_BASKET",
+        "comment": "0",
+        "balance": 100000018.62,
+        "quantity": 0.01,
+        "pips": -108.69999999999999
+      },
+      {
+        "symbol": "USDCHF",
+        "direction": "buy",
+        "id": 18,
+        "net": 13.030000000000001,
+        "gross": 11.25,
+        "entryTime": 1717509660000,
+        "closeTime": 1719550800000,
+        "entryPrice": 0.88997,
+        "closePrice": 0.89952,
+        "commissions": 0,
+        "swaps": 1.7800000000000005,
+        "volume": 1000,
+        "label": "cis_usdchf_S7_BASKET",
+        "comment": "0",
+        "balance": 100000031.65,
+        "quantity": 0.01,
+        "pips": 95.49999999999999
+      },
+      {
+        "symbol": "USDCHF",
+        "direction": "buy",
+        "id": 20,
+        "net": 4.55,
+        "gross": 4.41,
+        "entryTime": 1721891940000,
+        "closeTime": 1722209400000,
+        "entryPrice": 0.88057,
+        "closePrice": 0.88431,
+        "commissions": 0,
+        "swaps": 0.14,
+        "volume": 1000,
+        "label": "cis_usdchf_S7_BASKET",
+        "comment": "0",
+        "balance": 100000036.2,
+        "quantity": 0.01,
+        "pips": 37.4
+      }
+    ]
+  },
+  "entries": {
+    "entriesByHours": {
+      "zero": {
+        "totalTrades": 0
+      },
+      "one": {
+        "totalTrades": 0
+      },
+      "two": {
+        "totalTrades": 0
+      },
+      "three": {
+        "totalTrades": 0
+      },
+      "four": {
+        "totalTrades": 0
+      },
+      "five": {
+        "totalTrades": 0
+      },
+      "six": {
+        "totalTrades": 1
+      },
+      "seven": {
+        "totalTrades": 1
+      },
+      "eight": {
+        "totalTrades": 1
+      },
+      "nine": {
+        "totalTrades": 0
+      },
+      "ten": {
+        "totalTrades": 0
+      },
+      "eleven": {
+        "totalTrades": 0
+      },
+      "twelve": {
+        "totalTrades": 1
+      },
+      "thirteen": {
+        "totalTrades": 3
+      },
+      "fourteen": {
+        "totalTrades": 3
+      },
+      "fifteen": {
+        "totalTrades": 1
+      },
+      "sixteen": {
+        "totalTrades": 0
+      },
+      "seventeen": {
+        "totalTrades": 0
+      },
+      "eighteen": {
+        "totalTrades": 0
+      },
+      "nineteen": {
+        "totalTrades": 0
+      },
+      "twenty": {
+        "totalTrades": 0
+      },
+      "twentyOne": {
+        "totalTrades": 0
+      },
+      "twentyTwo": {
+        "totalTrades": 0
+      },
+      "twentyThree": {
+        "totalTrades": 0
+      }
+    },
+    "entriesByWeekdays": {
+      "sunday": {
+        "totalTrades": 0
+      },
+      "monday": {
+        "totalTrades": 0
+      },
+      "tuesday": {
+        "totalTrades": 2
+      },
+      "wednesday": {
+        "totalTrades": 2
+      },
+      "thursday": {
+        "totalTrades": 5
+      },
+      "friday": {
+        "totalTrades": 2
+      },
+      "saturday": {
+        "totalTrades": 0
+      }
+    },
+    "entriesByMonths": {
+      "january": {
+        "totalTrades": 0
+      },
+      "february": {
+        "totalTrades": 0
+      },
+      "march": {
+        "totalTrades": 3
+      },
+      "april": {
+        "totalTrades": 2
+      },
+      "may": {
+        "totalTrades": 0
+      },
+      "june": {
+        "totalTrades": 1
+      },
+      "july": {
+        "totalTrades": 2
+      },
+      "august": {
+        "totalTrades": 1
+      },
+      "september": {
+        "totalTrades": 1
+      },
+      "october": {
+        "totalTrades": 0
+      },
+      "november": {
+        "totalTrades": 1
+      },
+      "december": {
+        "totalTrades": 0
+      }
+    }
+  },
+  "profitsLosses": {
+    "profitsLossesByHours": {
+      "zero": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "one": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "two": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "three": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "four": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "five": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "six": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "seven": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "eight": {
+        "winningTrades": 0,
+        "losingTrades": 1
+      },
+      "nine": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "ten": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "eleven": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "twelve": {
+        "winningTrades": 0,
+        "losingTrades": 1
+      },
+      "thirteen": {
+        "winningTrades": 2,
+        "losingTrades": 1
+      },
+      "fourteen": {
+        "winningTrades": 3,
+        "losingTrades": 0
+      },
+      "fifteen": {
+        "winningTrades": 0,
+        "losingTrades": 1
+      },
+      "sixteen": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "seventeen": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "eighteen": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "nineteen": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "twenty": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "twentyOne": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "twentyTwo": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "twentyThree": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      }
+    },
+    "profitsLossesByWeekdays": {
+      "sunday": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "monday": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "tuesday": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      },
+      "wednesday": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      },
+      "thursday": {
+        "winningTrades": 2,
+        "losingTrades": 3
+      },
+      "friday": {
+        "winningTrades": 1,
+        "losingTrades": 1
+      },
+      "saturday": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      }
+    },
+    "profitsLossesByMonth": {
+      "january": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "february": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "march": {
+        "winningTrades": 2,
+        "losingTrades": 1
+      },
+      "april": {
+        "winningTrades": 1,
+        "losingTrades": 1
+      },
+      "may": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "june": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "july": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      },
+      "august": {
+        "winningTrades": 0,
+        "losingTrades": 1
+      },
+      "september": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "october": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "november": {
+        "winningTrades": 0,
+        "losingTrades": 1
+      },
+      "december": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      }
+    }
+  },
+  "roi": {
+    "period1w": {
+      "totalRoi": 0,
+      "points": [
+        {
+          "timestamp": 1725843600000,
+          "roi": 0
+        }
+      ]
+    },
+    "period1m": {
+      "totalRoi": 0,
+      "points": [
+        {
+          "timestamp": 1725843600000,
+          "roi": 0
+        }
+      ]
+    },
+    "period3m": {
+      "totalRoi": 4.549998556945224E-06,
+      "points": [
+        {
+          "timestamp": 1719550800000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1719619200000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1722211200000,
+          "roi": 4.549998556945224E-06
+        },
+        {
+          "timestamp": 1725843600000,
+          "roi": 4.549998556945224E-06
+        }
+      ]
+    },
+    "period6m": {
+      "totalRoi": 1.757999672481647E-05,
+      "points": [
+        {
+          "timestamp": 1714722300000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1714780800000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1719619200000,
+          "roi": 1.3029997575006545E-05
+        },
+        {
+          "timestamp": 1722211200000,
+          "roi": 1.757999672481647E-05
+        },
+        {
+          "timestamp": 1725843600000,
+          "roi": 1.757999672481647E-05
+        }
+      ]
+    },
+    "period1y": {
+      "totalRoi": 5.3499983435650456E-06,
+      "points": [
+        {
+          "timestamp": 1697029620000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1697068800000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1705449600000,
+          "roi": -5.8899981835316066E-06
+        },
+        {
+          "timestamp": 1709856000000,
+          "roi": 6.969997848563571E-06
+        },
+        {
+          "timestamp": 1714780800000,
+          "roi": -1.2229996231218487E-05
+        },
+        {
+          "timestamp": 1719619200000,
+          "roi": 7.999997502198448E-07
+        },
+        {
+          "timestamp": 1722211200000,
+          "roi": 5.3499983435650456E-06
+        },
+        {
+          "timestamp": 1725843600000,
+          "roi": 5.3499983435650456E-06
+        }
+      ]
+    },
+    "periodAll": {
+      "totalRoi": 3.6200000002980234E-05,
+      "points": [
+        {
+          "timestamp": 1609545600000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1609632000000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1618012800000,
+          "roi": 1.529000000655651E-05
+        },
+        {
+          "timestamp": 1653436800000,
+          "roi": 6.79000000655651E-06
+        },
+        {
+          "timestamp": 1683936000000,
+          "roi": 1.1530000001192092E-05
+        },
+        {
+          "timestamp": 1691020800000,
+          "roi": 1.771000000834465E-05
+        },
+        {
+          "timestamp": 1697068800000,
+          "roi": 3.0850000008940695E-05
+        },
+        {
+          "timestamp": 1705449600000,
+          "roi": 2.496000000834465E-05
+        },
+        {
+          "timestamp": 1709856000000,
+          "roi": 3.7820000007748604E-05
+        },
+        {
+          "timestamp": 1714780800000,
+          "roi": 1.862000000476837E-05
+        },
+        {
+          "timestamp": 1719619200000,
+          "roi": 3.1650000005960466E-05
+        },
+        {
+          "timestamp": 1722211200000,
+          "roi": 3.6200000002980234E-05
+        },
+        {
+          "timestamp": 1725843600000,
+          "roi": 3.6200000002980234E-05
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,5029 @@
+{
+  "main": {
+    "utcOffset": 0,
+    "language": "en",
+    "depositAsset": "USD",
+    "depositAssetDigits": 2,
+    "period": "m1",
+    "symbol": "JP225",
+    "brokerTitle": "",
+    "cBotName": "Xen",
+    "roi": 0,
+    "netProfit": -76.86,
+    "startingCapital": 100000000,
+    "endingEquity": 99999923.13999994,
+    "endingBalance": 99999923.13999994,
+    "testingPeriod": {
+      "duration": "3y 8m 21d",
+      "startDate": 1609545600000,
+      "endDate": 1727049600000,
+      "formatted": "3y 8m 21d (02/01/2021 - 23/09/2024)"
+    },
+    "accountType": "hedging",
+    "accountLeverage": 1000,
+    "data": {
+      "type": "m1BarsFromServer",
+      "isCustom": false,
+      "customName": null
+    },
+    "spread": {
+      "type": "fixed",
+      "min": null,
+      "max": null,
+      "value": 0
+    },
+    "commissions": {
+      "type": "usdPerMillionUsdVolume",
+      "value": 0,
+      "applyCommissionAutomatically": false
+    },
+    "theme": "dark",
+    "titleKind": "backtesting",
+    "authorNickName": "jerprog0",
+    "authorLink": null,
+    "cBotLink": null,
+    "embedded": false
+  },
+  "equity": {
+    "points": [
+      {
+        "balance": 100000000,
+        "minEquity": 100000000,
+        "maxEquity": 100000000,
+        "timestamp": 1609545600000
+      },
+      {
+        "balance": 99999993.35,
+        "minEquity": 99999976.1,
+        "maxEquity": 100000000.18,
+        "timestamp": 1611151200000
+      },
+      {
+        "balance": 99999987.94999999,
+        "minEquity": 99999983.16999999,
+        "maxEquity": 99999983.16999999,
+        "timestamp": 1611151200000
+      },
+      {
+        "balance": 99999983.66999999,
+        "minEquity": 99999983.16999999,
+        "maxEquity": 99999983.16999999,
+        "timestamp": 1611151200000
+      },
+      {
+        "balance": 99999986.10999998,
+        "minEquity": 99999983.05999999,
+        "maxEquity": 99999986.29999998,
+        "timestamp": 1611799200000
+      },
+      {
+        "balance": 99999986.43999998,
+        "minEquity": 99999985.86999999,
+        "maxEquity": 99999986.69999999,
+        "timestamp": 1612346400000
+      },
+      {
+        "balance": 99999986.71999998,
+        "minEquity": 99999986.09999998,
+        "maxEquity": 99999987.02999999,
+        "timestamp": 1612807260000
+      },
+      {
+        "balance": 99999992.74999999,
+        "minEquity": 99999981.71999998,
+        "maxEquity": 99999999.79999998,
+        "timestamp": 1613702520000
+      },
+      {
+        "balance": 99999997.51999998,
+        "minEquity": 100000000.95999998,
+        "maxEquity": 100000000.95999998,
+        "timestamp": 1613702520000
+      },
+      {
+        "balance": 100000001.13999999,
+        "minEquity": 99999996.17999998,
+        "maxEquity": 100000000.94999999,
+        "timestamp": 1614091560000
+      },
+      {
+        "balance": 100000000.54999998,
+        "minEquity": 100000000.43999998,
+        "maxEquity": 100000001.43999998,
+        "timestamp": 1620856800000
+      },
+      {
+        "balance": 99999994.89999998,
+        "minEquity": 99999984.90999998,
+        "maxEquity": 100000005.94999999,
+        "timestamp": 1623157200000
+      },
+      {
+        "balance": 99999991.19999997,
+        "minEquity": 99999988.12999998,
+        "maxEquity": 99999988.12999998,
+        "timestamp": 1623157200000
+      },
+      {
+        "balance": 99999988.99999997,
+        "minEquity": 99999988.41999997,
+        "maxEquity": 99999988.41999997,
+        "timestamp": 1623157200000
+      },
+      {
+        "balance": 99999994.32999997,
+        "minEquity": 99999982.49999997,
+        "maxEquity": 100000001.16999997,
+        "timestamp": 1624296060000
+      },
+      {
+        "balance": 99999998.75999998,
+        "minEquity": 100000001.12999997,
+        "maxEquity": 100000001.65999997,
+        "timestamp": 1624297260000
+      },
+      {
+        "balance": 100000002.29999998,
+        "minEquity": 100000001.51999998,
+        "maxEquity": 100000002.17999998,
+        "timestamp": 1624318260000
+      },
+      {
+        "balance": 100000002.46999998,
+        "minEquity": 99999981.04999998,
+        "maxEquity": 100000006.30999999,
+        "timestamp": 1626109200000
+      },
+      {
+        "balance": 100000003.67999998,
+        "minEquity": 100000005.30999999,
+        "maxEquity": 100000005.30999999,
+        "timestamp": 1626109200000
+      },
+      {
+        "balance": 100000005.80999997,
+        "minEquity": 100000005.37999998,
+        "maxEquity": 100000005.37999998,
+        "timestamp": 1626109200000
+      },
+      {
+        "balance": 100000005.54999997,
+        "minEquity": 100000005.37999997,
+        "maxEquity": 100000006.59999998,
+        "timestamp": 1626386400000
+      },
+      {
+        "balance": 100000005.87999997,
+        "minEquity": 100000005.32999997,
+        "maxEquity": 100000007.14999996,
+        "timestamp": 1626397200000
+      },
+      {
+        "balance": 100000006.11999996,
+        "minEquity": 100000005.79999997,
+        "maxEquity": 100000006.41999997,
+        "timestamp": 1626699600000
+      },
+      {
+        "balance": 100000007.41999996,
+        "minEquity": 100000004.82999995,
+        "maxEquity": 100000012.03999996,
+        "timestamp": 1626757200000
+      },
+      {
+        "balance": 100000009.54999995,
+        "minEquity": 100000009.47999996,
+        "maxEquity": 100000009.47999996,
+        "timestamp": 1626757200000
+      },
+      {
+        "balance": 100000009.88999996,
+        "minEquity": 100000009.32999995,
+        "maxEquity": 100000009.92999995,
+        "timestamp": 1626904800000
+      },
+      {
+        "balance": 100000011.93999995,
+        "minEquity": 100000008.99999996,
+        "maxEquity": 100000015.50999996,
+        "timestamp": 1627491600000
+      },
+      {
+        "balance": 100000014.80999996,
+        "minEquity": 100000014.73999995,
+        "maxEquity": 100000014.73999995,
+        "timestamp": 1627491600000
+      },
+      {
+        "balance": 100000016.32999995,
+        "minEquity": 100000013.90999995,
+        "maxEquity": 100000021.38999996,
+        "timestamp": 1628010000000
+      },
+      {
+        "balance": 100000018.66999996,
+        "minEquity": 100000018.37999995,
+        "maxEquity": 100000018.37999995,
+        "timestamp": 1628010000000
+      },
+      {
+        "balance": 100000021.40999995,
+        "minEquity": 100000016.51999995,
+        "maxEquity": 100000026.90999995,
+        "timestamp": 1629072120000
+      },
+      {
+        "balance": 100000025.35999995,
+        "minEquity": 100000029.00999995,
+        "maxEquity": 100000029.59999995,
+        "timestamp": 1629072300000
+      },
+      {
+        "balance": 100000030.46999995,
+        "minEquity": 100000029.79999995,
+        "maxEquity": 100000030.20999995,
+        "timestamp": 1629072960000
+      },
+      {
+        "balance": 100000030.77999996,
+        "minEquity": 100000029.90999995,
+        "maxEquity": 100000031.02999996,
+        "timestamp": 1629450000000
+      },
+      {
+        "balance": 100000029.78999996,
+        "minEquity": 100000029.68999995,
+        "maxEquity": 100000030.99999996,
+        "timestamp": 1629738000000
+      },
+      {
+        "balance": 100000029.75999996,
+        "minEquity": 100000029.75999996,
+        "maxEquity": 100000029.75999996,
+        "timestamp": 1629738000000
+      },
+      {
+        "balance": 100000019.56999996,
+        "minEquity": 99999978.00999996,
+        "maxEquity": 100000030.30999996,
+        "timestamp": 1632272400000
+      },
+      {
+        "balance": 100000010.27999996,
+        "minEquity": 100000000.95999996,
+        "maxEquity": 100000000.95999996,
+        "timestamp": 1632272400000
+      },
+      {
+        "balance": 100000001.82999995,
+        "minEquity": 100000000.95999996,
+        "maxEquity": 100000000.95999996,
+        "timestamp": 1632272400000
+      },
+      {
+        "balance": 100000009.30999996,
+        "minEquity": 99999984.62999995,
+        "maxEquity": 100000033.95999995,
+        "timestamp": 1635728400000
+      },
+      {
+        "balance": 100000019.73999996,
+        "minEquity": 100000031.01999995,
+        "maxEquity": 100000031.01999995,
+        "timestamp": 1635728400000
+      },
+      {
+        "balance": 100000033.01999997,
+        "minEquity": 100000031.01999997,
+        "maxEquity": 100000031.01999997,
+        "timestamp": 1635728400000
+      },
+      {
+        "balance": 100000038.07999997,
+        "minEquity": 100000029.33999996,
+        "maxEquity": 100000040.36999996,
+        "timestamp": 1638339720000
+      },
+      {
+        "balance": 100000037.94999997,
+        "minEquity": 100000034.97999997,
+        "maxEquity": 100000040.70999996,
+        "timestamp": 1638410400000
+      },
+      {
+        "balance": 100000042.69999997,
+        "minEquity": 100000025.06999998,
+        "maxEquity": 100000051.63999997,
+        "timestamp": 1639979100000
+      },
+      {
+        "balance": 100000048.57999997,
+        "minEquity": 100000050.77999997,
+        "maxEquity": 100000051.94999997,
+        "timestamp": 1639983960000
+      },
+      {
+        "balance": 100000052.20999996,
+        "minEquity": 100000051.57999997,
+        "maxEquity": 100000052.08999997,
+        "timestamp": 1639984140000
+      },
+      {
+        "balance": 100000046.67999996,
+        "minEquity": 100000039.17999996,
+        "maxEquity": 100000052.48999996,
+        "timestamp": 1640282400000
+      },
+      {
+        "balance": 100000042.44999996,
+        "minEquity": 100000039.45999996,
+        "maxEquity": 100000039.45999996,
+        "timestamp": 1640282400000
+      },
+      {
+        "balance": 100000039.57999995,
+        "minEquity": 100000039.45999996,
+        "maxEquity": 100000039.45999996,
+        "timestamp": 1640282400000
+      },
+      {
+        "balance": 100000039.10999995,
+        "minEquity": 100000038.47999996,
+        "maxEquity": 100000039.73999995,
+        "timestamp": 1641837600000
+      },
+      {
+        "balance": 100000039.92999995,
+        "minEquity": 100000039.10999995,
+        "maxEquity": 100000039.92999995,
+        "timestamp": 1642572000000
+      },
+      {
+        "balance": 100000038.66999994,
+        "minEquity": 100000035.30999994,
+        "maxEquity": 100000040.85999995,
+        "timestamp": 1643047200000
+      },
+      {
+        "balance": 100000038.45999995,
+        "minEquity": 100000039.29999994,
+        "maxEquity": 100000039.29999994,
+        "timestamp": 1643047200000
+      },
+      {
+        "balance": 100000039.29999995,
+        "minEquity": 100000039.29999995,
+        "maxEquity": 100000039.29999995,
+        "timestamp": 1643047200000
+      },
+      {
+        "balance": 100000039.02999996,
+        "minEquity": 100000038.30999996,
+        "maxEquity": 100000040.68999995,
+        "timestamp": 1643263200000
+      },
+      {
+        "balance": 100000039.78999996,
+        "minEquity": 100000039.78999996,
+        "maxEquity": 100000039.78999996,
+        "timestamp": 1643263200000
+      },
+      {
+        "balance": 100000039.35999995,
+        "minEquity": 100000039.24999996,
+        "maxEquity": 100000041.52999996,
+        "timestamp": 1643652000000
+      },
+      {
+        "balance": 100000038.88999996,
+        "minEquity": 100000038.79999995,
+        "maxEquity": 100000039.57999995,
+        "timestamp": 1643670000000
+      },
+      {
+        "balance": 100000040.73999995,
+        "minEquity": 100000038.84999995,
+        "maxEquity": 100000041.03999996,
+        "timestamp": 1643680800000
+      },
+      {
+        "balance": 100000045.70999995,
+        "minEquity": 100000040.38999996,
+        "maxEquity": 100000045.54999995,
+        "timestamp": 1644999360000
+      },
+      {
+        "balance": 100000044.63999996,
+        "minEquity": 100000044.52999994,
+        "maxEquity": 100000050.35999995,
+        "timestamp": 1645207200000
+      },
+      {
+        "balance": 100000044.75999996,
+        "minEquity": 100000044.68999995,
+        "maxEquity": 100000044.68999995,
+        "timestamp": 1645207200000
+      },
+      {
+        "balance": 100000043.86999996,
+        "minEquity": 100000041.34999996,
+        "maxEquity": 100000045.75999996,
+        "timestamp": 1645682400000
+      },
+      {
+        "balance": 100000044.22999996,
+        "minEquity": 100000045.55999996,
+        "maxEquity": 100000045.55999996,
+        "timestamp": 1645682400000
+      },
+      {
+        "balance": 100000045.54999995,
+        "minEquity": 100000045.54999995,
+        "maxEquity": 100000045.54999995,
+        "timestamp": 1645682400000
+      },
+      {
+        "balance": 100000044.53999995,
+        "minEquity": 100000043.08999996,
+        "maxEquity": 100000045.62999995,
+        "timestamp": 1645743600000
+      },
+      {
+        "balance": 100000044.60999994,
+        "minEquity": 100000044.56999995,
+        "maxEquity": 100000044.56999995,
+        "timestamp": 1645743600000
+      },
+      {
+        "balance": 100000044.55999994,
+        "minEquity": 100000044.30999994,
+        "maxEquity": 100000045.19999994,
+        "timestamp": 1645754400000
+      },
+      {
+        "balance": 100000040.98999995,
+        "minEquity": 100000020.51999994,
+        "maxEquity": 100000047.09999995,
+        "timestamp": 1647262800000
+      },
+      {
+        "balance": 100000038.70999995,
+        "minEquity": 100000036.84999995,
+        "maxEquity": 100000036.84999995,
+        "timestamp": 1647262800000
+      },
+      {
+        "balance": 100000037.57999995,
+        "minEquity": 100000037.07999995,
+        "maxEquity": 100000037.07999995,
+        "timestamp": 1647262800000
+      },
+      {
+        "balance": 100000021.57999995,
+        "minEquity": 99999980.69999996,
+        "maxEquity": 100000039.61999996,
+        "timestamp": 1648602000000
+      },
+      {
+        "balance": 100000006.97999996,
+        "minEquity": 99999993.23999995,
+        "maxEquity": 99999993.23999995,
+        "timestamp": 1648602000000
+      },
+      {
+        "balance": 99999993.80999996,
+        "minEquity": 99999993.22999996,
+        "maxEquity": 99999993.22999996,
+        "timestamp": 1648602000000
+      },
+      {
+        "balance": 99999990.00999996,
+        "minEquity": 99999985.60999995,
+        "maxEquity": 99999997.89999996,
+        "timestamp": 1649350800000
+      },
+      {
+        "balance": 99999988.11999996,
+        "minEquity": 99999987.65999997,
+        "maxEquity": 99999987.65999997,
+        "timestamp": 1649350800000
+      },
+      {
+        "balance": 99999988.08999996,
+        "minEquity": 99999988.01999997,
+        "maxEquity": 99999988.01999997,
+        "timestamp": 1649350800000
+      },
+      {
+        "balance": 99999988.92999996,
+        "minEquity": 99999987.91999996,
+        "maxEquity": 99999988.99999996,
+        "timestamp": 1650992400000
+      },
+      {
+        "balance": 99999989.32999997,
+        "minEquity": 99999988.92999996,
+        "maxEquity": 99999989.39999996,
+        "timestamp": 1651010400000
+      },
+      {
+        "balance": 99999984.83999997,
+        "minEquity": 99999968.29999997,
+        "maxEquity": 100000007.38999997,
+        "timestamp": 1652806800000
+      },
+      {
+        "balance": 99999982.00999998,
+        "minEquity": 99999979.97999997,
+        "maxEquity": 99999979.97999997,
+        "timestamp": 1652806800000
+      },
+      {
+        "balance": 99999980.80999997,
+        "minEquity": 99999979.97999997,
+        "maxEquity": 99999979.97999997,
+        "timestamp": 1652806800000
+      },
+      {
+        "balance": 99999981.51999997,
+        "minEquity": 99999980.01999997,
+        "maxEquity": 99999981.93999997,
+        "timestamp": 1654707600000
+      },
+      {
+        "balance": 99999980.36999996,
+        "minEquity": 99999980.07999997,
+        "maxEquity": 99999981.51999997,
+        "timestamp": 1654880400000
+      },
+      {
+        "balance": 99999978.53999996,
+        "minEquity": 99999977.93999995,
+        "maxEquity": 99999982.44999996,
+        "timestamp": 1655370000000
+      },
+      {
+        "balance": 99999979.51999997,
+        "minEquity": 99999979.51999997,
+        "maxEquity": 99999979.51999997,
+        "timestamp": 1655370000000
+      },
+      {
+        "balance": 99999979.04999997,
+        "minEquity": 99999979.00999996,
+        "maxEquity": 99999979.65999997,
+        "timestamp": 1656090000000
+      },
+      {
+        "balance": 99999974.00999996,
+        "minEquity": 99999961.69999997,
+        "maxEquity": 99999985.96999997,
+        "timestamp": 1657717200000
+      },
+      {
+        "balance": 99999971.01999997,
+        "minEquity": 99999968.57999995,
+        "maxEquity": 99999968.57999995,
+        "timestamp": 1657717200000
+      },
+      {
+        "balance": 99999969.70999996,
+        "minEquity": 99999968.77999997,
+        "maxEquity": 99999968.77999997,
+        "timestamp": 1657717200000
+      },
+      {
+        "balance": 99999969.27999996,
+        "minEquity": 99999968.77999996,
+        "maxEquity": 99999969.76999997,
+        "timestamp": 1658293200000
+      },
+      {
+        "balance": 99999969.27999996,
+        "minEquity": 99999969.27999996,
+        "maxEquity": 99999969.27999996,
+        "timestamp": 1660514400000
+      },
+      {
+        "balance": 99999968.97999996,
+        "minEquity": 99999968.96999995,
+        "maxEquity": 99999969.30999996,
+        "timestamp": 1661734800000
+      },
+      {
+        "balance": 99999964.83999996,
+        "minEquity": 99999962.66999996,
+        "maxEquity": 99999974.25999996,
+        "timestamp": 1662973200000
+      },
+      {
+        "balance": 99999963.12999997,
+        "minEquity": 99999962.54999995,
+        "maxEquity": 99999962.54999995,
+        "timestamp": 1662973200000
+      },
+      {
+        "balance": 99999963.25999996,
+        "minEquity": 99999962.99999997,
+        "maxEquity": 99999963.47999996,
+        "timestamp": 1663797600000
+      },
+      {
+        "balance": 99999965.67999996,
+        "minEquity": 99999962.43999997,
+        "maxEquity": 99999966.16999996,
+        "timestamp": 1664773200000
+      },
+      {
+        "balance": 99999965.05999996,
+        "minEquity": 99999964.28999996,
+        "maxEquity": 99999965.88999996,
+        "timestamp": 1664834400000
+      },
+      {
+        "balance": 99999965.41999996,
+        "minEquity": 99999965.37999995,
+        "maxEquity": 99999965.37999995,
+        "timestamp": 1664834400000
+      },
+      {
+        "balance": 99999965.20999996,
+        "minEquity": 99999965.17999996,
+        "maxEquity": 99999965.48999995,
+        "timestamp": 1664845200000
+      },
+      {
+        "balance": 99999964.80999996,
+        "minEquity": 99999964.69999996,
+        "maxEquity": 99999965.49999997,
+        "timestamp": 1665464400000
+      },
+      {
+        "balance": 99999964.95999996,
+        "minEquity": 99999964.80999996,
+        "maxEquity": 99999965.81999996,
+        "timestamp": 1665478800000
+      },
+      {
+        "balance": 99999965.16999996,
+        "minEquity": 99999964.95999996,
+        "maxEquity": 99999965.46999997,
+        "timestamp": 1665709200000
+      },
+      {
+        "balance": 99999965.38999996,
+        "minEquity": 99999964.76999995,
+        "maxEquity": 99999965.38999996,
+        "timestamp": 1665723600000
+      },
+      {
+        "balance": 99999965.03999996,
+        "minEquity": 99999964.82999995,
+        "maxEquity": 99999965.66999996,
+        "timestamp": 1666717200000
+      },
+      {
+        "balance": 99999964.58999996,
+        "minEquity": 99999959.99999996,
+        "maxEquity": 99999976.55999996,
+        "timestamp": 1683522000000
+      },
+      {
+        "balance": 99999965.35999995,
+        "minEquity": 99999966.75999996,
+        "maxEquity": 99999966.75999996,
+        "timestamp": 1683522000000
+      },
+      {
+        "balance": 99999967.17999995,
+        "minEquity": 99999966.88999996,
+        "maxEquity": 99999966.88999996,
+        "timestamp": 1683522000000
+      },
+      {
+        "balance": 99999952.42999995,
+        "minEquity": 99999926.18999995,
+        "maxEquity": 99999967.97999994,
+        "timestamp": 1685311200000
+      },
+      {
+        "balance": 99999938.60999995,
+        "minEquity": 99999925.21999995,
+        "maxEquity": 99999925.21999995,
+        "timestamp": 1685311200000
+      },
+      {
+        "balance": 99999925.79999995,
+        "minEquity": 99999925.21999995,
+        "maxEquity": 99999925.21999995,
+        "timestamp": 1685311200000
+      },
+      {
+        "balance": 99999931.11999995,
+        "minEquity": 99999922.04999995,
+        "maxEquity": 99999941.63999996,
+        "timestamp": 1685689680000
+      },
+      {
+        "balance": 99999935.36999995,
+        "minEquity": 99999941.49999994,
+        "maxEquity": 99999941.49999994,
+        "timestamp": 1685689740000
+      },
+      {
+        "balance": 99999941.90999995,
+        "minEquity": 99999941.44999994,
+        "maxEquity": 99999941.83999994,
+        "timestamp": 1685691480000
+      },
+      {
+        "balance": 99999941.63999996,
+        "minEquity": 99999941.27999996,
+        "maxEquity": 99999942.26999995,
+        "timestamp": 1686088800000
+      },
+      {
+        "balance": 99999946.00999996,
+        "minEquity": 99999933.70999995,
+        "maxEquity": 99999958.15999995,
+        "timestamp": 1686587220000
+      },
+      {
+        "balance": 99999951.59999996,
+        "minEquity": 99999957.79999997,
+        "maxEquity": 99999958.38999996,
+        "timestamp": 1686587760000
+      },
+      {
+        "balance": 99999958.79999997,
+        "minEquity": 99999958.02999997,
+        "maxEquity": 99999958.79999997,
+        "timestamp": 1686597180000
+      },
+      {
+        "balance": 99999962.91999997,
+        "minEquity": 99999957.99999997,
+        "maxEquity": 99999963.24999997,
+        "timestamp": 1687150800000
+      },
+      {
+        "balance": 99999968.20999998,
+        "minEquity": 99999957.60999997,
+        "maxEquity": 99999982.73999996,
+        "timestamp": 1688342460000
+      },
+      {
+        "balance": 99999974.94999997,
+        "minEquity": 99999982.62999998,
+        "maxEquity": 99999982.62999998,
+        "timestamp": 1688342460000
+      },
+      {
+        "balance": 99999983.58999997,
+        "minEquity": 99999982.62999998,
+        "maxEquity": 99999982.62999998,
+        "timestamp": 1688342520000
+      },
+      {
+        "balance": 99999979.92999998,
+        "minEquity": 99999959.60999997,
+        "maxEquity": 99999985.57999997,
+        "timestamp": 1689930000000
+      },
+      {
+        "balance": 99999977.77999997,
+        "minEquity": 99999976.07999998,
+        "maxEquity": 99999976.07999998,
+        "timestamp": 1689930000000
+      },
+      {
+        "balance": 99999977.21999997,
+        "minEquity": 99999976.14999998,
+        "maxEquity": 99999976.14999998,
+        "timestamp": 1689930000000
+      },
+      {
+        "balance": 99999971.03999996,
+        "minEquity": 99999968.22999997,
+        "maxEquity": 99999983.11999997,
+        "timestamp": 1708927200000
+      },
+      {
+        "balance": 99999972.50999996,
+        "minEquity": 99999965.92999996,
+        "maxEquity": 99999977.57999997,
+        "timestamp": 1713531600000
+      },
+      {
+        "balance": 99999977.35999995,
+        "minEquity": 99999977.35999995,
+        "maxEquity": 99999977.35999995,
+        "timestamp": 1713531600000
+      },
+      {
+        "balance": 99999982.33999996,
+        "minEquity": 99999977.16999996,
+        "maxEquity": 99999982.55999996,
+        "timestamp": 1714021200000
+      },
+      {
+        "balance": 99999984.41999996,
+        "minEquity": 99999982.08999996,
+        "maxEquity": 99999984.41999996,
+        "timestamp": 1715043600000
+      },
+      {
+        "balance": 99999990.79999995,
+        "minEquity": 99999980.27999996,
+        "maxEquity": 99999999.49999996,
+        "timestamp": 1715863860000
+      },
+      {
+        "balance": 99999995.95999995,
+        "minEquity": 99999993.47999996,
+        "maxEquity": 99999999.49999996,
+        "timestamp": 1716164820000
+      },
+      {
+        "balance": 99999999.83999994,
+        "minEquity": 99999998.97999994,
+        "maxEquity": 99999998.97999994,
+        "timestamp": 1716164820000
+      },
+      {
+        "balance": 99999999.90999994,
+        "minEquity": 99999998.97999994,
+        "maxEquity": 99999999.90999994,
+        "timestamp": 1717020000000
+      },
+      {
+        "balance": 100000000.55999994,
+        "minEquity": 99999996.23999994,
+        "maxEquity": 100000003.05999994,
+        "timestamp": 1717045200000
+      },
+      {
+        "balance": 100000002.64999995,
+        "minEquity": 100000002.64999995,
+        "maxEquity": 100000002.64999995,
+        "timestamp": 1717045200000
+      },
+      {
+        "balance": 100000004.14999995,
+        "minEquity": 100000000.45999995,
+        "maxEquity": 100000011.44999994,
+        "timestamp": 1717736400000
+      },
+      {
+        "balance": 100000006.91999994,
+        "minEquity": 100000006.75999995,
+        "maxEquity": 100000006.75999995,
+        "timestamp": 1717736400000
+      },
+      {
+        "balance": 99999993.79999994,
+        "minEquity": 99999944.23999994,
+        "maxEquity": 100000015.18999994,
+        "timestamp": 1720746000000
+      },
+      {
+        "balance": 99999981.91999994,
+        "minEquity": 99999970.80999994,
+        "maxEquity": 99999970.80999994,
+        "timestamp": 1720746000000
+      },
+      {
+        "balance": 99999971.46999994,
+        "minEquity": 99999970.80999994,
+        "maxEquity": 99999970.80999994,
+        "timestamp": 1720746000000
+      },
+      {
+        "balance": 99999940.56999993,
+        "minEquity": 99999778.76999994,
+        "maxEquity": 99999975.23999994,
+        "timestamp": 1723467600000
+      },
+      {
+        "balance": 99999912.56999993,
+        "minEquity": 99999885.45999993,
+        "maxEquity": 99999885.45999993,
+        "timestamp": 1723467600000
+      },
+      {
+        "balance": 99999887.24999994,
+        "minEquity": 99999885.74999994,
+        "maxEquity": 99999885.74999994,
+        "timestamp": 1723467600000
+      },
+      {
+        "balance": 99999894.43999994,
+        "minEquity": 99999869.19999994,
+        "maxEquity": 99999924.47999994,
+        "timestamp": 1725487200000
+      },
+      {
+        "balance": 99999906.37999994,
+        "minEquity": 99999922.31999993,
+        "maxEquity": 99999922.31999993,
+        "timestamp": 1725487200000
+      },
+      {
+        "balance": 99999923.13999994,
+        "minEquity": 99999922.55999994,
+        "maxEquity": 99999922.55999994,
+        "timestamp": 1725487200000
+      },
+      {
+        "balance": 99999923.13999994,
+        "minEquity": 99999922.88999994,
+        "maxEquity": 99999923.13999994,
+        "timestamp": 1727067600000
+      }
+    ],
+    "maxBalanceDrawdownPercent": 0.00016495991389767483,
+    "maxEquityDrawdownPercent": 0.00027371985635305776,
+    "maxBalanceDrawdownAbsolute": 164.9600000232458,
+    "maxEquityDrawdownAbsolute": 273.72000002861023
+  },
+  "tradeStatistics": {
+    "netProfit": {
+      "all": -76.86,
+      "long": 39.73,
+      "short": -116.59
+    },
+    "profitFactor": {
+      "all": 0.77,
+      "long": 1.33,
+      "short": 0.46
+    },
+    "commissions": {
+      "all": 0,
+      "long": 0,
+      "short": 0
+    },
+    "swaps": {
+      "all": -49.2,
+      "long": -27.45,
+      "short": -21.75
+    },
+    "totalTrades": {
+      "all": 147,
+      "long": 78,
+      "short": 69
+    },
+    "winningTrades": {
+      "all": 79,
+      "long": 50,
+      "short": 29
+    },
+    "maxConsecutiveWinningTrades": {
+      "all": 13,
+      "long": 13,
+      "short": 5
+    },
+    "largestWinningTrade": {
+      "all": 16.76,
+      "long": 13.28,
+      "short": 16.76
+    },
+    "losingTrades": {
+      "all": 68,
+      "long": 28,
+      "short": 40
+    },
+    "maxConsecutiveLosingTrades": {
+      "all": 10,
+      "long": 6,
+      "short": 7
+    },
+    "largestLosingTrade": {
+      "all": -30.9,
+      "long": -30.9,
+      "short": -16
+    },
+    "averageTrade": {
+      "all": -0.52,
+      "long": 0.51,
+      "short": -1.69
+    }
+  },
+  "parameters": [
+    {
+      "group": null,
+      "displayName": "Mode",
+      "propertyName": "Mode",
+      "value": "NativeOrders"
+    },
+    {
+      "group": null,
+      "displayName": "Strategy",
+      "propertyName": "Strategy",
+      "value": "CrossInstrumentSpreadMr"
+    },
+    {
+      "group": null,
+      "displayName": "Collect \u0026 Store Time Bars",
+      "propertyName": "CollectTimeBars",
+      "value": "false"
+    },
+    {
+      "group": null,
+      "displayName": "Analysis End UTC",
+      "propertyName": "AnalysisEndUtc",
+      "value": "2024-09-23T04:40:00Z"
+    },
+    {
+      "group": null,
+      "displayName": "Strategy Output Directory",
+      "propertyName": "StrategyOutputDirectory",
+      "value": "/workspace/data/strategy_runs/EXP-014b-s8-extendS-fix"
+    },
+    {
+      "group": null,
+      "displayName": "Source Parquet Path",
+      "propertyName": "SourceParquetPath",
+      "value": ""
+    },
+    {
+      "group": null,
+      "displayName": "Domain Minutes",
+      "propertyName": "DomainMinutes",
+      "value": 240
+    },
+    {
+      "group": null,
+      "displayName": "Strict Coverage",
+      "propertyName": "StrictCoverage",
+      "value": "false"
+    },
+    {
+      "group": null,
+      "displayName": "Min Coverage",
+      "propertyName": "MinCoverage",
+      "value": 0.9
+    },
+    {
+      "group": null,
+      "displayName": "Fast MA",
+      "propertyName": "FastMa",
+      "value": 20
+    },
+    {
+      "group": null,
+      "displayName": "Slow MA",
+      "propertyName": "SlowMa",
+      "value": 50
+    },
+    {
+      "group": null,
+      "displayName": "Basket Mates (CANON;...)",
+      "propertyName": "BasketMates",
+      "value": "USTEC;US500;US2000"
+    },
+    {
+      "group": null,
+      "displayName": "Basket Phase Shift Hours",
+      "propertyName": "BasketPhaseShiftHours",
+      "value": 0
+    },
+    {
+      "group": null,
+      "displayName": "CDM Series",
+      "propertyName": "CdmSeries",
+      "value": "S5_SPREAD"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Series",
+      "propertyName": "CisSeries",
+      "value": "S8_RVINDEX"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Reentry",
+      "propertyName": "CisReentry",
+      "value": "extend"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Static Arm",
+      "propertyName": "CisStaticArm",
+      "value": "true"
+    },
+    {
+      "group": null,
+      "displayName": "CIS Trail",
+      "propertyName": "CisTrail",
+      "value": "false"
+    }
+  ],
+  "usedSymbols": [
+    {
+      "symbol": "JP225",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "JP225",
+      "baseAssetDigits": 2,
+      "quoteAsset": "JPY",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -106.16,
+      "swapShort": -63.69,
+      "threeDaySwaps": "friday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 2,
+      "lotSize": 1,
+      "stepVolume": 1,
+      "pipPosition": 1,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "USTEC",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "USTEC",
+      "baseAssetDigits": 2,
+      "quoteAsset": "USD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -69.11,
+      "swapShort": -2.69,
+      "threeDaySwaps": "friday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 2,
+      "lotSize": 1,
+      "stepVolume": 1,
+      "pipPosition": 1,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "US500",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "US500",
+      "baseAssetDigits": 2,
+      "quoteAsset": "USD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -17.34,
+      "swapShort": -0.68,
+      "threeDaySwaps": "friday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 2,
+      "lotSize": 1,
+      "stepVolume": 0.1,
+      "pipPosition": 1,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "US2000",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "US2000",
+      "baseAssetDigits": 2,
+      "quoteAsset": "USD",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": -6.99,
+      "swapShort": -0.27,
+      "threeDaySwaps": "friday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 2,
+      "lotSize": 1,
+      "stepVolume": 1,
+      "pipPosition": 1,
+      "swapCalculationType": "pips"
+    },
+    {
+      "symbol": "USDJPY",
+      "period": "m1",
+      "swapTime": "21:00",
+      "baseAsset": "USD",
+      "baseAssetDigits": 2,
+      "quoteAsset": "JPY",
+      "quoteAssetDigits": 2,
+      "commissions": {
+        "type": "usdPerMillionUsdVolume",
+        "value": 0,
+        "applyCommissionAutomatically": false
+      },
+      "swapLong": 0.84,
+      "swapShort": -1.72,
+      "threeDaySwaps": "wednesday",
+      "weekendSwaps": false,
+      "swapPeriods": 24,
+      "gracePeriods": 0,
+      "digits": 3,
+      "lotSize": 100000,
+      "stepVolume": 1000,
+      "pipPosition": 2,
+      "swapCalculationType": "pips"
+    }
+  ],
+  "positions": {
+    "columns": [
+      "id",
+      "symbol",
+      "quantity",
+      "volume",
+      "direction",
+      "entryPrice",
+      "tp",
+      "sl",
+      "commissions",
+      "closingCommissions",
+      "created",
+      "label",
+      "comment",
+      "pips",
+      "net",
+      "gross",
+      "swaps"
+    ],
+    "items": [],
+    "marginUsed": 0,
+    "freeMargin": 99999923.13999994,
+    "marginLevel": null,
+    "unrealizedNet": 0,
+    "unrealizedGross": 0
+  },
+  "orders": {
+    "columns": [
+      "id",
+      "symbol",
+      "direction",
+      "created",
+      "quantity",
+      "volume",
+      "orderType",
+      "submittedPrice",
+      "distance",
+      "tp",
+      "sl",
+      "expiryDate",
+      "currentPrice",
+      "limitRange",
+      "comment",
+      "label"
+    ],
+    "items": [
+      {
+        "id": 826,
+        "created": 1725498000000,
+        "quantity": 1,
+        "volume": 1,
+        "orderType": "limit",
+        "submittedPrice": 39480.05,
+        "distance": 9413.4,
+        "tp": null,
+        "sl": null,
+        "expiryDate": null,
+        "currentPrice": 38538.71,
+        "limitRange": null,
+        "comment": "1",
+        "label": "cis_jp225_S8_RVINDEX",
+        "symbol": "JP225",
+        "direction": "sell"
+      },
+      {
+        "id": 829,
+        "created": 1725498000000,
+        "quantity": 1,
+        "volume": 1,
+        "orderType": "limit",
+        "submittedPrice": 33629.03,
+        "distance": 49096.8,
+        "tp": null,
+        "sl": null,
+        "expiryDate": null,
+        "currentPrice": 38538.71,
+        "limitRange": null,
+        "comment": "2",
+        "label": "cis_jp225_S8_RVINDEX",
+        "symbol": "JP225",
+        "direction": "buy"
+      },
+      {
+        "id": 824,
+        "created": 1725498000000,
+        "quantity": 1,
+        "volume": 1,
+        "orderType": "limit",
+        "submittedPrice": 38908.52,
+        "distance": 3698.1,
+        "tp": null,
+        "sl": null,
+        "expiryDate": null,
+        "currentPrice": 38538.71,
+        "limitRange": null,
+        "comment": "0",
+        "label": "cis_jp225_S8_RVINDEX",
+        "symbol": "JP225",
+        "direction": "sell"
+      },
+      {
+        "id": 825,
+        "created": 1725498000000,
+        "quantity": 1,
+        "volume": 1,
+        "orderType": "limit",
+        "submittedPrice": 34624.25,
+        "distance": 39144.6,
+        "tp": null,
+        "sl": null,
+        "expiryDate": null,
+        "currentPrice": 38538.71,
+        "limitRange": null,
+        "comment": "0",
+        "label": "cis_jp225_S8_RVINDEX",
+        "symbol": "JP225",
+        "direction": "buy"
+      },
+      {
+        "id": 828,
+        "created": 1725498000000,
+        "quantity": 1,
+        "volume": 1,
+        "orderType": "limit",
+        "submittedPrice": 40059.98,
+        "distance": 15212.7,
+        "tp": null,
+        "sl": null,
+        "expiryDate": null,
+        "currentPrice": 38538.71,
+        "limitRange": null,
+        "comment": "2",
+        "label": "cis_jp225_S8_RVINDEX",
+        "symbol": "JP225",
+        "direction": "sell"
+      },
+      {
+        "id": 827,
+        "created": 1725498000000,
+        "quantity": 1,
+        "volume": 1,
+        "orderType": "limit",
+        "submittedPrice": 34123.01,
+        "distance": 44157,
+        "tp": null,
+        "sl": null,
+        "expiryDate": null,
+        "currentPrice": 38538.71,
+        "limitRange": null,
+        "comment": "1",
+        "label": "cis_jp225_S8_RVINDEX",
+        "symbol": "JP225",
+        "direction": "buy"
+      }
+    ]
+  },
+  "history": {
+    "columns": [
+      "id",
+      "symbol",
+      "direction",
+      "net",
+      "gross",
+      "entryTime",
+      "closeTime",
+      "entryPrice",
+      "closePrice",
+      "swaps",
+      "commissions",
+      "volume",
+      "label",
+      "comment",
+      "quantity",
+      "pips"
+    ],
+    "items": [
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 4,
+        "net": -6.65,
+        "gross": -6.15,
+        "entryTime": 1610062980000,
+        "closeTime": 1611151200000,
+        "entryPrice": 27697,
+        "closePrice": 28580,
+        "commissions": 0,
+        "swaps": -0.49999999999999994,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999993.35,
+        "quantity": 1,
+        "pips": -8830
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 5,
+        "net": -5.4,
+        "gross": -4.9,
+        "entryTime": 1610067180000,
+        "closeTime": 1611151200000,
+        "entryPrice": 27877,
+        "closePrice": 28580,
+        "commissions": 0,
+        "swaps": -0.49999999999999994,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999987.94999999,
+        "quantity": 1,
+        "pips": -7030
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 6,
+        "net": -4.279999999999999,
+        "gross": -3.78,
+        "entryTime": 1610078100000,
+        "closeTime": 1611151200000,
+        "entryPrice": 28038,
+        "closePrice": 28580,
+        "commissions": 0,
+        "swaps": -0.49999999999999994,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999983.66999999,
+        "quantity": 1,
+        "pips": -5420
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 8,
+        "net": 2.44,
+        "gross": 2.44,
+        "entryTime": 1611791520000,
+        "closeTime": 1611799200000,
+        "entryPrice": 27975,
+        "closePrice": 28325,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999986.10999998,
+        "quantity": 1,
+        "pips": 3500
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 10,
+        "net": 0.33,
+        "gross": 0.33,
+        "entryTime": 1612338900000,
+        "closeTime": 1612346400000,
+        "entryPrice": 28683,
+        "closePrice": 28636,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999986.43999998,
+        "quantity": 1,
+        "pips": 470
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 12,
+        "net": 0.28,
+        "gross": 0.28,
+        "entryTime": 1612790640000,
+        "closeTime": 1612807260000,
+        "entryPrice": 29483,
+        "closePrice": 29443,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999986.71999998,
+        "quantity": 1,
+        "pips": 400
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 16,
+        "net": 6.03,
+        "gross": 6.15,
+        "entryTime": 1613448600000,
+        "closeTime": 1613702520000,
+        "entryPrice": 30639,
+        "closePrice": 29756,
+        "commissions": 0,
+        "swaps": -0.12,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999992.74999999,
+        "quantity": 1,
+        "pips": 8830
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 17,
+        "net": 4.77,
+        "gross": 4.89,
+        "entryTime": 1613435160000,
+        "closeTime": 1613702520000,
+        "entryPrice": 30473,
+        "closePrice": 29771,
+        "commissions": 0,
+        "swaps": -0.12,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999997.51999998,
+        "quantity": 1,
+        "pips": 7020
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 18,
+        "net": 3.62,
+        "gross": 3.91,
+        "entryTime": 1613434440000,
+        "closeTime": 1614091560000,
+        "entryPrice": 30298,
+        "closePrice": 29737,
+        "commissions": 0,
+        "swaps": -0.29,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000001.13999999,
+        "quantity": 1,
+        "pips": 5610
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 20,
+        "net": -0.5900000000000001,
+        "gross": -0.52,
+        "entryTime": 1620846960000,
+        "closeTime": 1620856800000,
+        "entryPrice": 27755,
+        "closePrice": 27680,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000000.54999998,
+        "quantity": 1,
+        "pips": -750
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 24,
+        "net": -5.65,
+        "gross": -4.78,
+        "entryTime": 1621301160000,
+        "closeTime": 1623157200000,
+        "entryPrice": 28383,
+        "closePrice": 29069,
+        "commissions": 0,
+        "swaps": -0.8700000000000001,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999994.89999998,
+        "quantity": 1,
+        "pips": -6860
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 25,
+        "net": -3.7,
+        "gross": -3.12,
+        "entryTime": 1621900500000,
+        "closeTime": 1623157200000,
+        "entryPrice": 28621,
+        "closePrice": 29069,
+        "commissions": 0,
+        "swaps": -0.58,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999991.19999997,
+        "quantity": 1,
+        "pips": -4480
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 26,
+        "net": -2.1999999999999997,
+        "gross": -1.7,
+        "entryTime": 1622122860000,
+        "closeTime": 1623157200000,
+        "entryPrice": 28825,
+        "closePrice": 29069,
+        "commissions": 0,
+        "swaps": -0.49999999999999994,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999988.99999997,
+        "quantity": 1,
+        "pips": -2440
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 30,
+        "net": 5.33,
+        "gross": 5.33,
+        "entryTime": 1624241220000,
+        "closeTime": 1624296060000,
+        "entryPrice": 27904,
+        "closePrice": 28669,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999994.32999997,
+        "quantity": 1,
+        "pips": 7650
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 31,
+        "net": 4.43,
+        "gross": 4.43,
+        "entryTime": 1624235580000,
+        "closeTime": 1624297260000,
+        "entryPrice": 28075,
+        "closePrice": 28710,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999998.75999998,
+        "quantity": 1,
+        "pips": 6350
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 32,
+        "net": 3.54,
+        "gross": 3.61,
+        "entryTime": 1624234260000,
+        "closeTime": 1624318260000,
+        "entryPrice": 28270,
+        "closePrice": 28788,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000002.29999998,
+        "quantity": 1,
+        "pips": 5180
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 36,
+        "net": 0.17000000000000004,
+        "gross": 0.67,
+        "entryTime": 1625469840000,
+        "closeTime": 1626109200000,
+        "entryPrice": 28534,
+        "closePrice": 28630,
+        "commissions": 0,
+        "swaps": -0.5,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000002.46999998,
+        "quantity": 1,
+        "pips": 960
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 37,
+        "net": 1.21,
+        "gross": 1.64,
+        "entryTime": 1625580960000,
+        "closeTime": 1626109200000,
+        "entryPrice": 28394,
+        "closePrice": 28630,
+        "commissions": 0,
+        "swaps": -0.43000000000000005,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000003.67999998,
+        "quantity": 1,
+        "pips": 2360
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 38,
+        "net": 2.13,
+        "gross": 2.56,
+        "entryTime": 1625589720000,
+        "closeTime": 1626109200000,
+        "entryPrice": 28263,
+        "closePrice": 28630,
+        "commissions": 0,
+        "swaps": -0.43000000000000005,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000005.80999997,
+        "quantity": 1,
+        "pips": 3670
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 40,
+        "net": -0.26,
+        "gross": -0.19,
+        "entryTime": 1626371760000,
+        "closeTime": 1626386400000,
+        "entryPrice": 28038,
+        "closePrice": 28011,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000005.54999997,
+        "quantity": 1,
+        "pips": -270
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 42,
+        "net": 0.33,
+        "gross": 0.33,
+        "entryTime": 1626393720000,
+        "closeTime": 1626397200000,
+        "entryPrice": 27884,
+        "closePrice": 27932,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000005.87999997,
+        "quantity": 1,
+        "pips": 480
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 44,
+        "net": 0.24,
+        "gross": 0.24,
+        "entryTime": 1626695160000,
+        "closeTime": 1626699600000,
+        "entryPrice": 27391,
+        "closePrice": 27426,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000006.11999996,
+        "quantity": 1,
+        "pips": 350
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 47,
+        "net": 1.3,
+        "gross": 1.37,
+        "entryTime": 1626703320000,
+        "closeTime": 1626757200000,
+        "entryPrice": 27233,
+        "closePrice": 27430,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000007.41999996,
+        "quantity": 1,
+        "pips": 1970
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 48,
+        "net": 2.1300000000000003,
+        "gross": 2.2,
+        "entryTime": 1626713160000,
+        "closeTime": 1626757200000,
+        "entryPrice": 27114,
+        "closePrice": 27430,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000009.54999995,
+        "quantity": 1,
+        "pips": 3160
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 50,
+        "net": 0.34,
+        "gross": 0.38,
+        "entryTime": 1626894060000,
+        "closeTime": 1626904800000,
+        "entryPrice": 27954,
+        "closePrice": 27900,
+        "commissions": 0,
+        "swaps": -0.04,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000009.88999996,
+        "quantity": 1,
+        "pips": 540
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 53,
+        "net": 2.0500000000000003,
+        "gross": 2.12,
+        "entryTime": 1627400460000,
+        "closeTime": 1627491600000,
+        "entryPrice": 27495,
+        "closePrice": 27799,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000011.93999995,
+        "quantity": 1,
+        "pips": 3040
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 54,
+        "net": 2.87,
+        "gross": 2.94,
+        "entryTime": 1627406340000,
+        "closeTime": 1627491600000,
+        "entryPrice": 27377,
+        "closePrice": 27799,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000014.80999996,
+        "quantity": 1,
+        "pips": 4220
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 57,
+        "net": 1.52,
+        "gross": 1.81,
+        "entryTime": 1627608960000,
+        "closeTime": 1628010000000,
+        "entryPrice": 27389,
+        "closePrice": 27649,
+        "commissions": 0,
+        "swaps": -0.29000000000000004,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000016.32999995,
+        "quantity": 1,
+        "pips": 2600
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 58,
+        "net": 2.34,
+        "gross": 2.63,
+        "entryTime": 1627621980000,
+        "closeTime": 1628010000000,
+        "entryPrice": 27272,
+        "closePrice": 27649,
+        "commissions": 0,
+        "swaps": -0.29000000000000004,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000018.66999996,
+        "quantity": 1,
+        "pips": 3770
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 62,
+        "net": 2.74,
+        "gross": 2.99,
+        "entryTime": 1628556300000,
+        "closeTime": 1629072120000,
+        "entryPrice": 28074,
+        "closePrice": 27645,
+        "commissions": 0,
+        "swaps": -0.25,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000021.40999995,
+        "quantity": 1,
+        "pips": 4290
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 63,
+        "net": 3.95,
+        "gross": 4.16,
+        "entryTime": 1628685060000,
+        "closeTime": 1629072300000,
+        "entryPrice": 28173,
+        "closePrice": 27576,
+        "commissions": 0,
+        "swaps": -0.21000000000000002,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000025.35999995,
+        "quantity": 1,
+        "pips": 5970
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 64,
+        "net": 5.11,
+        "gross": 5.28,
+        "entryTime": 1628727780000,
+        "closeTime": 1629072960000,
+        "entryPrice": 28272,
+        "closePrice": 27514,
+        "commissions": 0,
+        "swaps": -0.17,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000030.46999995,
+        "quantity": 1,
+        "pips": 7580
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 66,
+        "net": 0.31,
+        "gross": 0.31,
+        "entryTime": 1629439560000,
+        "closeTime": 1629450000000,
+        "entryPrice": 26938,
+        "closePrice": 26982,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000030.77999996,
+        "quantity": 1,
+        "pips": 440
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 69,
+        "net": -0.99,
+        "gross": -0.99,
+        "entryTime": 1629684300000,
+        "closeTime": 1629738000000,
+        "entryPrice": 27480,
+        "closePrice": 27622,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000029.78999996,
+        "quantity": 1,
+        "pips": -1420
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 70,
+        "net": -0.03,
+        "gross": -0.03,
+        "entryTime": 1629731520000,
+        "closeTime": 1629738000000,
+        "entryPrice": 27617,
+        "closePrice": 27622,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000029.75999996,
+        "quantity": 1,
+        "pips": -50
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 74,
+        "net": -10.190000000000001,
+        "gross": -9.32,
+        "entryTime": 1630454700000,
+        "closeTime": 1632272400000,
+        "entryPrice": 28255,
+        "closePrice": 29592,
+        "commissions": 0,
+        "swaps": -0.8700000000000001,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000019.56999996,
+        "quantity": 1,
+        "pips": -13370
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 75,
+        "net": -9.29,
+        "gross": -8.42,
+        "entryTime": 1630455120000,
+        "closeTime": 1632272400000,
+        "entryPrice": 28384,
+        "closePrice": 29592,
+        "commissions": 0,
+        "swaps": -0.8700000000000001,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000010.27999996,
+        "quantity": 1,
+        "pips": -12080
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 76,
+        "net": -8.45,
+        "gross": -7.58,
+        "entryTime": 1630476720000,
+        "closeTime": 1632272400000,
+        "entryPrice": 28505,
+        "closePrice": 29592,
+        "commissions": 0,
+        "swaps": -0.8700000000000001,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000001.82999995,
+        "quantity": 1,
+        "pips": -10870
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 80,
+        "net": 7.4799999999999995,
+        "gross": 9.48,
+        "entryTime": 1633328100000,
+        "closeTime": 1635728400000,
+        "entryPrice": 28230,
+        "closePrice": 29590,
+        "commissions": 0,
+        "swaps": -2.000000000000001,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000009.30999996,
+        "quantity": 1,
+        "pips": 13600
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 81,
+        "net": 10.43,
+        "gross": 12.43,
+        "entryTime": 1633358160000,
+        "closeTime": 1635728400000,
+        "entryPrice": 27807,
+        "closePrice": 29590,
+        "commissions": 0,
+        "swaps": -2.000000000000001,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000019.73999996,
+        "quantity": 1,
+        "pips": 17830
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 82,
+        "net": 13.28,
+        "gross": 15.14,
+        "entryTime": 1633488420000,
+        "closeTime": 1635728400000,
+        "entryPrice": 27417,
+        "closePrice": 29590,
+        "commissions": 0,
+        "swaps": -1.8600000000000005,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000033.01999997,
+        "quantity": 1,
+        "pips": 21730
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 85,
+        "net": 5.06,
+        "gross": 5.13,
+        "entryTime": 1638252480000,
+        "closeTime": 1638339720000,
+        "entryPrice": 27475,
+        "closePrice": 28211,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000038.07999997,
+        "quantity": 1,
+        "pips": 7360
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 86,
+        "net": -0.13,
+        "gross": 0.01,
+        "entryTime": 1638251820000,
+        "closeTime": 1638410400000,
+        "entryPrice": 27829,
+        "closePrice": 27830,
+        "commissions": 0,
+        "swaps": -0.14,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000037.94999997,
+        "quantity": 1,
+        "pips": 10
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 90,
+        "net": 4.75,
+        "gross": 5.29,
+        "entryTime": 1638864660000,
+        "closeTime": 1639979100000,
+        "entryPrice": 28647,
+        "closePrice": 27888,
+        "commissions": 0,
+        "swaps": -0.5399999999999999,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000042.69999997,
+        "quantity": 1,
+        "pips": 7590
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 91,
+        "net": 5.88,
+        "gross": 6.42,
+        "entryTime": 1638896820000,
+        "closeTime": 1639983960000,
+        "entryPrice": 28789,
+        "closePrice": 27868,
+        "commissions": 0,
+        "swaps": -0.5399999999999999,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000048.57999997,
+        "quantity": 1,
+        "pips": 9210
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 92,
+        "net": 3.63,
+        "gross": 4.17,
+        "entryTime": 1638850080000,
+        "closeTime": 1639984140000,
+        "entryPrice": 28469,
+        "closePrice": 27870,
+        "commissions": 0,
+        "swaps": -0.5399999999999999,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000052.20999996,
+        "quantity": 1,
+        "pips": 5990
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 96,
+        "net": -5.53,
+        "gross": -5.41,
+        "entryTime": 1639997220000,
+        "closeTime": 1640282400000,
+        "entryPrice": 28063,
+        "closePrice": 28839,
+        "commissions": 0,
+        "swaps": -0.12,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000046.67999996,
+        "quantity": 1,
+        "pips": -7760
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 97,
+        "net": -4.23,
+        "gross": -4.11,
+        "entryTime": 1640028060000,
+        "closeTime": 1640282400000,
+        "entryPrice": 28250,
+        "closePrice": 28839,
+        "commissions": 0,
+        "swaps": -0.12,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000042.44999996,
+        "quantity": 1,
+        "pips": -5890
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 98,
+        "net": -2.87,
+        "gross": -2.79,
+        "entryTime": 1640050380000,
+        "closeTime": 1640282400000,
+        "entryPrice": 28438,
+        "closePrice": 28839,
+        "commissions": 0,
+        "swaps": -0.08,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000039.57999995,
+        "quantity": 1,
+        "pips": -4010
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 100,
+        "net": -0.47,
+        "gross": -0.47,
+        "entryTime": 1641827580000,
+        "closeTime": 1641837600000,
+        "entryPrice": 28035,
+        "closePrice": 27967,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000039.10999995,
+        "quantity": 1,
+        "pips": -680
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 102,
+        "net": 0.82,
+        "gross": 0.82,
+        "entryTime": 1642571460000,
+        "closeTime": 1642572000000,
+        "entryPrice": 27321,
+        "closePrice": 27438,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000039.92999995,
+        "quantity": 1,
+        "pips": 1170
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 106,
+        "net": -1.26,
+        "gross": -1.26,
+        "entryTime": 1643036640000,
+        "closeTime": 1643047200000,
+        "entryPrice": 27079,
+        "closePrice": 26898,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000038.66999994,
+        "quantity": 1,
+        "pips": -1810
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 107,
+        "net": -0.21,
+        "gross": -0.21,
+        "entryTime": 1643042340000,
+        "closeTime": 1643047200000,
+        "entryPrice": 26928,
+        "closePrice": 26898,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000038.45999995,
+        "quantity": 1,
+        "pips": -300
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 108,
+        "net": 0.84,
+        "gross": 0.84,
+        "entryTime": 1643044440000,
+        "closeTime": 1643047200000,
+        "entryPrice": 26777,
+        "closePrice": 26898,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000039.29999995,
+        "quantity": 1,
+        "pips": 1210
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 111,
+        "net": -0.27,
+        "gross": -0.27,
+        "entryTime": 1643250780000,
+        "closeTime": 1643263200000,
+        "entryPrice": 26195,
+        "closePrice": 26156,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000039.02999996,
+        "quantity": 1,
+        "pips": -390
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 112,
+        "net": 0.76,
+        "gross": 0.76,
+        "entryTime": 1643260560000,
+        "closeTime": 1643263200000,
+        "entryPrice": 26047,
+        "closePrice": 26156,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000039.78999996,
+        "quantity": 1,
+        "pips": 1090
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 114,
+        "net": -0.43,
+        "gross": -0.43,
+        "entryTime": 1643598780000,
+        "closeTime": 1643652000000,
+        "entryPrice": 27073,
+        "closePrice": 27135,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000039.35999995,
+        "quantity": 1,
+        "pips": -620
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 116,
+        "net": -0.47,
+        "gross": -0.43,
+        "entryTime": 1643661300000,
+        "closeTime": 1643670000000,
+        "entryPrice": 27252,
+        "closePrice": 27314,
+        "commissions": 0,
+        "swaps": -0.04,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000038.88999996,
+        "quantity": 1,
+        "pips": -620
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 118,
+        "net": 1.85,
+        "gross": 1.85,
+        "entryTime": 1643678400000,
+        "closeTime": 1643680800000,
+        "entryPrice": 27412,
+        "closePrice": 27146,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000040.73999995,
+        "quantity": 1,
+        "pips": 2660
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 120,
+        "net": 4.97,
+        "gross": 5.04,
+        "entryTime": 1644901620000,
+        "closeTime": 1644999360000,
+        "entryPrice": 26767,
+        "closePrice": 27490,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000045.70999995,
+        "quantity": 1,
+        "pips": 7230
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 123,
+        "net": -1.07,
+        "gross": -1,
+        "entryTime": 1645128300000,
+        "closeTime": 1645207200000,
+        "entryPrice": 26950,
+        "closePrice": 26806,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000044.63999996,
+        "quantity": 1,
+        "pips": -1440
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 124,
+        "net": 0.12,
+        "gross": 0.12,
+        "entryTime": 1645145460000,
+        "closeTime": 1645207200000,
+        "entryPrice": 26789,
+        "closePrice": 26806,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000044.75999996,
+        "quantity": 1,
+        "pips": 170
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 128,
+        "net": -0.89,
+        "gross": -0.89,
+        "entryTime": 1645671720000,
+        "closeTime": 1645682400000,
+        "entryPrice": 26106,
+        "closePrice": 25978,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000043.86999996,
+        "quantity": 1,
+        "pips": -1280
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 129,
+        "net": 0.36,
+        "gross": 0.36,
+        "entryTime": 1645672200000,
+        "closeTime": 1645682400000,
+        "entryPrice": 25926,
+        "closePrice": 25978,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000044.22999996,
+        "quantity": 1,
+        "pips": 520
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 130,
+        "net": 1.32,
+        "gross": 1.32,
+        "entryTime": 1645674000000,
+        "closeTime": 1645682400000,
+        "entryPrice": 25788,
+        "closePrice": 25978,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000045.54999995,
+        "quantity": 1,
+        "pips": 1900
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 133,
+        "net": -1.01,
+        "gross": -0.97,
+        "entryTime": 1645731300000,
+        "closeTime": 1645743600000,
+        "entryPrice": 26053,
+        "closePrice": 26192,
+        "commissions": 0,
+        "swaps": -0.04,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000044.53999995,
+        "quantity": 1,
+        "pips": -1390
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 134,
+        "net": 0.07,
+        "gross": 0.11,
+        "entryTime": 1645733040000,
+        "closeTime": 1645743600000,
+        "entryPrice": 26208,
+        "closePrice": 26192,
+        "commissions": 0,
+        "swaps": -0.04,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000044.60999994,
+        "quantity": 1,
+        "pips": 160
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 136,
+        "net": -0.05,
+        "gross": -0.05,
+        "entryTime": 1645748940000,
+        "closeTime": 1645754400000,
+        "entryPrice": 26365,
+        "closePrice": 26372,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000044.55999994,
+        "quantity": 1,
+        "pips": -70
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 140,
+        "net": -3.5700000000000003,
+        "gross": -2.85,
+        "entryTime": 1646356320000,
+        "closeTime": 1647262800000,
+        "entryPrice": 25811,
+        "closePrice": 25402,
+        "commissions": 0,
+        "swaps": -0.72,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000040.98999995,
+        "quantity": 1,
+        "pips": -4090
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 141,
+        "net": -2.2800000000000002,
+        "gross": -1.78,
+        "entryTime": 1646607780000,
+        "closeTime": 1647262800000,
+        "entryPrice": 25658,
+        "closePrice": 25402,
+        "commissions": 0,
+        "swaps": -0.5,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000038.70999995,
+        "quantity": 1,
+        "pips": -2560
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 142,
+        "net": -1.13,
+        "gross": -0.63,
+        "entryTime": 1646610660000,
+        "closeTime": 1647262800000,
+        "entryPrice": 25493,
+        "closePrice": 25402,
+        "commissions": 0,
+        "swaps": -0.5,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000037.57999995,
+        "quantity": 1,
+        "pips": -910
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 146,
+        "net": -16,
+        "gross": -15.42,
+        "entryTime": 1647396900000,
+        "closeTime": 1648602000000,
+        "entryPrice": 25789,
+        "closePrice": 28001,
+        "commissions": 0,
+        "swaps": -0.58,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000021.57999995,
+        "quantity": 1,
+        "pips": -22120
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 147,
+        "net": -14.6,
+        "gross": -14.02,
+        "entryTime": 1647418680000,
+        "closeTime": 1648602000000,
+        "entryPrice": 25990,
+        "closePrice": 28001,
+        "commissions": 0,
+        "swaps": -0.58,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000006.97999996,
+        "quantity": 1,
+        "pips": -20110
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 148,
+        "net": -13.17,
+        "gross": -12.59,
+        "entryTime": 1647440220000,
+        "closeTime": 1648602000000,
+        "entryPrice": 26195,
+        "closePrice": 28001,
+        "commissions": 0,
+        "swaps": -0.58,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999993.80999996,
+        "quantity": 1,
+        "pips": -18060
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 152,
+        "net": -3.8000000000000003,
+        "gross": -3.37,
+        "entryTime": 1648772400000,
+        "closeTime": 1649350800000,
+        "entryPrice": 27402,
+        "closePrice": 26919,
+        "commissions": 0,
+        "swaps": -0.43000000000000005,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999990.00999996,
+        "quantity": 1,
+        "pips": -4830
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 153,
+        "net": -1.8900000000000001,
+        "gross": -1.82,
+        "entryTime": 1649243760000,
+        "closeTime": 1649350800000,
+        "entryPrice": 27180,
+        "closePrice": 26919,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999988.11999996,
+        "quantity": 1,
+        "pips": -2610
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 154,
+        "net": -0.03,
+        "gross": -0.03,
+        "entryTime": 1649289660000,
+        "closeTime": 1649350800000,
+        "entryPrice": 26923,
+        "closePrice": 26919,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999988.08999996,
+        "quantity": 1,
+        "pips": -40
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 156,
+        "net": 0.84,
+        "gross": 0.84,
+        "entryTime": 1650986400000,
+        "closeTime": 1650992400000,
+        "entryPrice": 26202,
+        "closePrice": 26322,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999988.92999996,
+        "quantity": 1,
+        "pips": 1200
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 158,
+        "net": 0.39999999999999997,
+        "gross": 0.47,
+        "entryTime": 1651003800000,
+        "closeTime": 1651010400000,
+        "entryPrice": 25969,
+        "closePrice": 26037,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999989.32999997,
+        "quantity": 1,
+        "pips": 680
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 162,
+        "net": -4.49,
+        "gross": -3.66,
+        "entryTime": 1651022640000,
+        "closeTime": 1652806800000,
+        "entryPrice": 26258,
+        "closePrice": 26783,
+        "commissions": 0,
+        "swaps": -0.8300000000000001,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999984.83999997,
+        "quantity": 1,
+        "pips": -5250
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 163,
+        "net": -2.83,
+        "gross": -2,
+        "entryTime": 1651047300000,
+        "closeTime": 1652806800000,
+        "entryPrice": 26496,
+        "closePrice": 26783,
+        "commissions": 0,
+        "swaps": -0.8300000000000001,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999982.00999998,
+        "quantity": 1,
+        "pips": -2870
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 164,
+        "net": -1.2,
+        "gross": -0.41,
+        "entryTime": 1651119060000,
+        "closeTime": 1652806800000,
+        "entryPrice": 26724,
+        "closePrice": 26783,
+        "commissions": 0,
+        "swaps": -0.79,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999980.80999997,
+        "quantity": 1,
+        "pips": -590
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 166,
+        "net": 0.71,
+        "gross": 0.71,
+        "entryTime": 1654696500000,
+        "closeTime": 1654707600000,
+        "entryPrice": 28273,
+        "closePrice": 28171,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999981.51999997,
+        "quantity": 1,
+        "pips": 1020
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 168,
+        "net": -1.15,
+        "gross": -1.15,
+        "entryTime": 1654869720000,
+        "closeTime": 1654880400000,
+        "entryPrice": 27511,
+        "closePrice": 27346,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999980.36999996,
+        "quantity": 1,
+        "pips": -1650
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 171,
+        "net": -1.83,
+        "gross": -1.83,
+        "entryTime": 1655364900000,
+        "closeTime": 1655370000000,
+        "entryPrice": 26094,
+        "closePrice": 25832,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999978.53999996,
+        "quantity": 1,
+        "pips": -2620
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 172,
+        "net": 0.98,
+        "gross": 0.98,
+        "entryTime": 1655365380000,
+        "closeTime": 1655370000000,
+        "entryPrice": 25692,
+        "closePrice": 25832,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999979.51999997,
+        "quantity": 1,
+        "pips": 1400
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 174,
+        "net": -0.47,
+        "gross": -0.47,
+        "entryTime": 1656079380000,
+        "closeTime": 1656090000000,
+        "entryPrice": 26743,
+        "closePrice": 26811,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999979.04999997,
+        "quantity": 1,
+        "pips": -680
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 178,
+        "net": -5.04,
+        "gross": -3.9,
+        "entryTime": 1656281460000,
+        "closeTime": 1657717200000,
+        "entryPrice": 26858,
+        "closePrice": 26299,
+        "commissions": 0,
+        "swaps": -1.1400000000000003,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999974.00999996,
+        "quantity": 1,
+        "pips": -5590
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 179,
+        "net": -2.99,
+        "gross": -2.06,
+        "entryTime": 1656547380000,
+        "closeTime": 1657717200000,
+        "entryPrice": 26594,
+        "closePrice": 26299,
+        "commissions": 0,
+        "swaps": -0.9300000000000002,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999971.01999997,
+        "quantity": 1,
+        "pips": -2950
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 180,
+        "net": -1.31,
+        "gross": -0.38,
+        "entryTime": 1656566820000,
+        "closeTime": 1657717200000,
+        "entryPrice": 26353,
+        "closePrice": 26299,
+        "commissions": 0,
+        "swaps": -0.9300000000000002,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999969.70999996,
+        "quantity": 1,
+        "pips": -540
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 182,
+        "net": -0.43,
+        "gross": -0.43,
+        "entryTime": 1658281440000,
+        "closeTime": 1658293200000,
+        "entryPrice": 27572,
+        "closePrice": 27634,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999969.27999996,
+        "quantity": 1,
+        "pips": -620
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 184,
+        "net": 0,
+        "gross": 0,
+        "entryTime": 1660514400000,
+        "closeTime": 1660514400000,
+        "entryPrice": 28743,
+        "closePrice": 28743,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999969.27999996,
+        "quantity": 1,
+        "pips": 0
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 186,
+        "net": -0.3,
+        "gross": -0.3,
+        "entryTime": 1661734140000,
+        "closeTime": 1661734800000,
+        "entryPrice": 27837,
+        "closePrice": 27794,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999968.97999996,
+        "quantity": 1,
+        "pips": -430
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 189,
+        "net": -4.14,
+        "gross": -3.56,
+        "entryTime": 1661780580000,
+        "closeTime": 1662973200000,
+        "entryPrice": 28075,
+        "closePrice": 28586,
+        "commissions": 0,
+        "swaps": -0.58,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999964.83999996,
+        "quantity": 1,
+        "pips": -5110
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 190,
+        "net": -1.71,
+        "gross": -1.58,
+        "entryTime": 1662741480000,
+        "closeTime": 1662973200000,
+        "entryPrice": 28360,
+        "closePrice": 28586,
+        "commissions": 0,
+        "swaps": -0.13,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999963.12999997,
+        "quantity": 1,
+        "pips": -2260
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 192,
+        "net": 0.13,
+        "gross": 0.2,
+        "entryTime": 1663792200000,
+        "closeTime": 1663797600000,
+        "entryPrice": 27074,
+        "closePrice": 27102,
+        "commissions": 0,
+        "swaps": -0.07,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999963.25999996,
+        "quantity": 1,
+        "pips": 280
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 194,
+        "net": 2.42,
+        "gross": 2.42,
+        "entryTime": 1664754780000,
+        "closeTime": 1664773200000,
+        "entryPrice": 25729,
+        "closePrice": 26076,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999965.67999996,
+        "quantity": 1,
+        "pips": 3470
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 197,
+        "net": -0.62,
+        "gross": -0.58,
+        "entryTime": 1664807220000,
+        "closeTime": 1664834400000,
+        "entryPrice": 26530,
+        "closePrice": 26613,
+        "commissions": 0,
+        "swaps": -0.04,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999965.05999996,
+        "quantity": 1,
+        "pips": -830
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 198,
+        "net": 0.36000000000000004,
+        "gross": 0.4,
+        "entryTime": 1664821800000,
+        "closeTime": 1664834400000,
+        "entryPrice": 26670,
+        "closePrice": 26613,
+        "commissions": 0,
+        "swaps": -0.04,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999965.41999996,
+        "quantity": 1,
+        "pips": 570
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 200,
+        "net": -0.21,
+        "gross": -0.21,
+        "entryTime": 1664844720000,
+        "closeTime": 1664845200000,
+        "entryPrice": 26809,
+        "closePrice": 26839,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999965.20999996,
+        "quantity": 1,
+        "pips": -300
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 202,
+        "net": -0.4,
+        "gross": -0.4,
+        "entryTime": 1665454440000,
+        "closeTime": 1665464400000,
+        "entryPrice": 26454,
+        "closePrice": 26396,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999964.80999996,
+        "quantity": 1,
+        "pips": -580
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 204,
+        "net": 0.15,
+        "gross": 0.15,
+        "entryTime": 1665471720000,
+        "closeTime": 1665478800000,
+        "entryPrice": 26315,
+        "closePrice": 26337,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999964.95999996,
+        "quantity": 1,
+        "pips": 220
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 206,
+        "net": 0.21,
+        "gross": 0.21,
+        "entryTime": 1665708000000,
+        "closeTime": 1665709200000,
+        "entryPrice": 26976,
+        "closePrice": 26946,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999965.16999996,
+        "quantity": 1,
+        "pips": 300
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 208,
+        "net": 0.22,
+        "gross": 0.22,
+        "entryTime": 1665714000000,
+        "closeTime": 1665723600000,
+        "entryPrice": 27115,
+        "closePrice": 27084,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999965.38999996,
+        "quantity": 1,
+        "pips": 310
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 210,
+        "net": -0.35,
+        "gross": -0.35,
+        "entryTime": 1666706160000,
+        "closeTime": 1666717200000,
+        "entryPrice": 27442,
+        "closePrice": 27492,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999965.03999996,
+        "quantity": 1,
+        "pips": -500
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 214,
+        "net": -0.44999999999999996,
+        "gross": -0.03,
+        "entryTime": 1682665980000,
+        "closeTime": 1683522000000,
+        "entryPrice": 28961,
+        "closePrice": 28965,
+        "commissions": 0,
+        "swaps": -0.42,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999964.58999996,
+        "quantity": 1,
+        "pips": -40
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 215,
+        "net": 0.77,
+        "gross": 1.06,
+        "entryTime": 1682900100000,
+        "closeTime": 1683522000000,
+        "entryPrice": 29117,
+        "closePrice": 28965,
+        "commissions": 0,
+        "swaps": -0.29000000000000004,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999965.35999995,
+        "quantity": 1,
+        "pips": 1520
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 216,
+        "net": 1.8199999999999998,
+        "gross": 2.11,
+        "entryTime": 1682958180000,
+        "closeTime": 1683522000000,
+        "entryPrice": 29268,
+        "closePrice": 28965,
+        "commissions": 0,
+        "swaps": -0.29000000000000004,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999967.17999995,
+        "quantity": 1,
+        "pips": 3030
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 220,
+        "net": -14.75,
+        "gross": -14.17,
+        "entryTime": 1684109340000,
+        "closeTime": 1685311200000,
+        "entryPrice": 29591,
+        "closePrice": 31624,
+        "commissions": 0,
+        "swaps": -0.58,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999952.42999995,
+        "quantity": 1,
+        "pips": -20330
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 221,
+        "net": -13.82,
+        "gross": -13.24,
+        "entryTime": 1684146180000,
+        "closeTime": 1685311200000,
+        "entryPrice": 29724,
+        "closePrice": 31624,
+        "commissions": 0,
+        "swaps": -0.58,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999938.60999995,
+        "quantity": 1,
+        "pips": -19000
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 222,
+        "net": -12.81,
+        "gross": -12.23,
+        "entryTime": 1684169940000,
+        "closeTime": 1685311200000,
+        "entryPrice": 29869,
+        "closePrice": 31624,
+        "commissions": 0,
+        "swaps": -0.58,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999925.79999995,
+        "quantity": 1,
+        "pips": -17550
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 226,
+        "net": 5.32,
+        "gross": 5.46,
+        "entryTime": 1685506860000,
+        "closeTime": 1685689680000,
+        "entryPrice": 30827,
+        "closePrice": 31610,
+        "commissions": 0,
+        "swaps": -0.14,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999931.11999995,
+        "quantity": 1,
+        "pips": 7830
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 227,
+        "net": 4.25,
+        "gross": 4.39,
+        "entryTime": 1685491380000,
+        "closeTime": 1685689740000,
+        "entryPrice": 30987,
+        "closePrice": 31617,
+        "commissions": 0,
+        "swaps": -0.14,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999935.36999995,
+        "quantity": 1,
+        "pips": 6300
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 228,
+        "net": 6.54,
+        "gross": 6.68,
+        "entryTime": 1685543160000,
+        "closeTime": 1685691480000,
+        "entryPrice": 30683,
+        "closePrice": 31642,
+        "commissions": 0,
+        "swaps": -0.14,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999941.90999995,
+        "quantity": 1,
+        "pips": 9590
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 230,
+        "net": -0.27,
+        "gross": -0.23,
+        "entryTime": 1686060600000,
+        "closeTime": 1686088800000,
+        "entryPrice": 32607,
+        "closePrice": 32640,
+        "commissions": 0,
+        "swaps": -0.04,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999941.63999996,
+        "quantity": 1,
+        "pips": -330
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 234,
+        "net": 4.37,
+        "gross": 4.73,
+        "entryTime": 1686113520000,
+        "closeTime": 1686587220000,
+        "entryPrice": 31960,
+        "closePrice": 32639,
+        "commissions": 0,
+        "swaps": -0.36,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999946.00999996,
+        "quantity": 1,
+        "pips": 6790
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 235,
+        "net": 5.59,
+        "gross": 5.95,
+        "entryTime": 1686124200000,
+        "closeTime": 1686587760000,
+        "entryPrice": 31802,
+        "closePrice": 32656,
+        "commissions": 0,
+        "swaps": -0.36,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999951.59999996,
+        "quantity": 1,
+        "pips": 8540
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 236,
+        "net": 7.2,
+        "gross": 7.49,
+        "entryTime": 1686195360000,
+        "closeTime": 1686597180000,
+        "entryPrice": 31640,
+        "closePrice": 32714,
+        "commissions": 0,
+        "swaps": -0.29000000000000004,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999958.79999997,
+        "quantity": 1,
+        "pips": 10740
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 238,
+        "net": 4.12,
+        "gross": 4.25,
+        "entryTime": 1686904080000,
+        "closeTime": 1687150800000,
+        "entryPrice": 33892,
+        "closePrice": 33282,
+        "commissions": 0,
+        "swaps": -0.13,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999962.91999997,
+        "quantity": 1,
+        "pips": 6100
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 242,
+        "net": 5.29,
+        "gross": 6.01,
+        "entryTime": 1687484820000,
+        "closeTime": 1688342460000,
+        "entryPrice": 32739,
+        "closePrice": 33601,
+        "commissions": 0,
+        "swaps": -0.72,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999968.20999998,
+        "quantity": 1,
+        "pips": 8620
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 243,
+        "net": 6.74,
+        "gross": 7.46,
+        "entryTime": 1687522200000,
+        "closeTime": 1688342460000,
+        "entryPrice": 32530,
+        "closePrice": 33601,
+        "commissions": 0,
+        "swaps": -0.72,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999974.94999997,
+        "quantity": 1,
+        "pips": 10710
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 244,
+        "net": 8.64,
+        "gross": 9.07,
+        "entryTime": 1687828560000,
+        "closeTime": 1688342520000,
+        "entryPrice": 32334,
+        "closePrice": 33636,
+        "commissions": 0,
+        "swaps": -0.43000000000000005,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999983.58999997,
+        "quantity": 1,
+        "pips": 13020
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 248,
+        "net": -3.66,
+        "gross": -2.52,
+        "entryTime": 1688515800000,
+        "closeTime": 1689930000000,
+        "entryPrice": 33091,
+        "closePrice": 32729,
+        "commissions": 0,
+        "swaps": -1.1400000000000003,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999979.92999998,
+        "quantity": 1,
+        "pips": -3620
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 249,
+        "net": -2.1500000000000004,
+        "gross": -1.08,
+        "entryTime": 1688601960000,
+        "closeTime": 1689930000000,
+        "entryPrice": 32884,
+        "closePrice": 32729,
+        "commissions": 0,
+        "swaps": -1.0700000000000003,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999977.77999997,
+        "quantity": 1,
+        "pips": -1550
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 250,
+        "net": -0.5600000000000003,
+        "gross": 0.51,
+        "entryTime": 1688616360000,
+        "closeTime": 1689930000000,
+        "entryPrice": 32656,
+        "closePrice": 32729,
+        "commissions": 0,
+        "swaps": -1.0700000000000003,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999977.21999997,
+        "quantity": 1,
+        "pips": 730
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 252,
+        "net": -6.18,
+        "gross": -5.64,
+        "entryTime": 1707804960000,
+        "closeTime": 1708927200000,
+        "entryPrice": 38388,
+        "closePrice": 39197,
+        "commissions": 0,
+        "swaps": -0.5399999999999999,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999971.03999996,
+        "quantity": 1,
+        "pips": -8090
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 255,
+        "net": 1.47,
+        "gross": 1.47,
+        "entryTime": 1713486720000,
+        "closeTime": 1713531600000,
+        "entryPrice": 37304.43,
+        "closePrice": 37515.93,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999972.50999996,
+        "quantity": 1,
+        "pips": 2115
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 256,
+        "net": 4.85,
+        "gross": 4.85,
+        "entryTime": 1713491100000,
+        "closeTime": 1713531600000,
+        "entryPrice": 36819.43,
+        "closePrice": 37515.93,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999977.35999995,
+        "quantity": 1,
+        "pips": 6965
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 258,
+        "net": 4.9799999999999995,
+        "gross": 5.02,
+        "entryTime": 1713930000000,
+        "closeTime": 1714021200000,
+        "entryPrice": 38409.96,
+        "closePrice": 37690.32,
+        "commissions": 0,
+        "swaps": -0.04,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999982.33999996,
+        "quantity": 1,
+        "pips": 7196.4
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 260,
+        "net": 2.08,
+        "gross": 2.08,
+        "entryTime": 1715035440000,
+        "closeTime": 1715043600000,
+        "entryPrice": 38893.59,
+        "closePrice": 38595.84,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999984.41999996,
+        "quantity": 1,
+        "pips": 2977.5
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 264,
+        "net": 6.38,
+        "gross": 6.88,
+        "entryTime": 1715246340000,
+        "closeTime": 1715863860000,
+        "entryPrice": 37978.23,
+        "closePrice": 38965.52,
+        "commissions": 0,
+        "swaps": -0.5,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999990.79999995,
+        "quantity": 1,
+        "pips": 9872.9
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 265,
+        "net": 5.159999999999999,
+        "gross": 6.02,
+        "entryTime": 1715142900000,
+        "closeTime": 1716164820000,
+        "entryPrice": 38161.19,
+        "closePrice": 39025.48,
+        "commissions": 0,
+        "swaps": -0.8600000000000001,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999995.95999995,
+        "quantity": 1,
+        "pips": 8642.9
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 266,
+        "net": 3.88,
+        "gross": 4.74,
+        "entryTime": 1715134620000,
+        "closeTime": 1716164820000,
+        "entryPrice": 38334.94,
+        "closePrice": 39015.48,
+        "commissions": 0,
+        "swaps": -0.8600000000000001,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999999.83999994,
+        "quantity": 1,
+        "pips": 6805.4
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 268,
+        "net": 0.07,
+        "gross": 0.07,
+        "entryTime": 1717016220000,
+        "closeTime": 1717020000000,
+        "entryPrice": 38175.16,
+        "closePrice": 38185.5,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999999.90999994,
+        "quantity": 1,
+        "pips": 103.39999999999999
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 271,
+        "net": 0.65,
+        "gross": 0.65,
+        "entryTime": 1717026300000,
+        "closeTime": 1717045200000,
+        "entryPrice": 37975.25,
+        "closePrice": 38069,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000000.55999994,
+        "quantity": 1,
+        "pips": 937.5
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 272,
+        "net": 2.09,
+        "gross": 2.09,
+        "entryTime": 1717027500000,
+        "closeTime": 1717045200000,
+        "entryPrice": 37769,
+        "closePrice": 38069,
+        "commissions": 0,
+        "swaps": 0,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 100000002.64999995,
+        "quantity": 1,
+        "pips": 3000
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 275,
+        "net": 1.5,
+        "gross": 1.66,
+        "entryTime": 1717372860000,
+        "closeTime": 1717736400000,
+        "entryPrice": 38841.76,
+        "closePrice": 38604.3,
+        "commissions": 0,
+        "swaps": -0.16,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 100000004.14999995,
+        "quantity": 1,
+        "pips": 2374.6
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 276,
+        "net": 2.77,
+        "gross": 2.93,
+        "entryTime": 1717374660000,
+        "closeTime": 1717736400000,
+        "entryPrice": 39024.26,
+        "closePrice": 38604.3,
+        "commissions": 0,
+        "swaps": -0.16,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 100000006.91999994,
+        "quantity": 1,
+        "pips": 4199.599999999999
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 280,
+        "net": -13.120000000000001,
+        "gross": -12.46,
+        "entryTime": 1719359160000,
+        "closeTime": 1720746000000,
+        "entryPrice": 39380.19,
+        "closePrice": 41167.43,
+        "commissions": 0,
+        "swaps": -0.66,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999993.79999994,
+        "quantity": 1,
+        "pips": -17872.399999999998
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 281,
+        "net": -11.88,
+        "gross": -11.22,
+        "entryTime": 1719365520000,
+        "closeTime": 1720746000000,
+        "entryPrice": 39557.69,
+        "closePrice": 41167.43,
+        "commissions": 0,
+        "swaps": -0.66,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999981.91999994,
+        "quantity": 1,
+        "pips": -16097.4
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 282,
+        "net": -10.45,
+        "gross": -9.79,
+        "entryTime": 1719370920000,
+        "closeTime": 1720746000000,
+        "entryPrice": 39762.69,
+        "closePrice": 41167.43,
+        "commissions": 0,
+        "swaps": -0.66,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999971.46999994,
+        "quantity": 1,
+        "pips": -14047.4
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 286,
+        "net": -30.9,
+        "gross": -29.11,
+        "entryTime": 1721316780000,
+        "closeTime": 1723467600000,
+        "entryPrice": 39849.13,
+        "closePrice": 35672.08,
+        "commissions": 0,
+        "swaps": -1.7900000000000005,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999940.56999993,
+        "quantity": 1,
+        "pips": -41770.5
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 287,
+        "net": -28,
+        "gross": -26.5,
+        "entryTime": 1721628120000,
+        "closeTime": 1723467600000,
+        "entryPrice": 39473.63,
+        "closePrice": 35672.08,
+        "commissions": 0,
+        "swaps": -1.5000000000000004,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999912.56999993,
+        "quantity": 1,
+        "pips": -38015.5
+      },
+      {
+        "symbol": "JP225",
+        "direction": "buy",
+        "id": 288,
+        "net": -25.32,
+        "gross": -23.96,
+        "entryTime": 1721794860000,
+        "closeTime": 1723467600000,
+        "entryPrice": 39110.32,
+        "closePrice": 35672.08,
+        "commissions": 0,
+        "swaps": -1.3600000000000003,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999887.24999994,
+        "quantity": 1,
+        "pips": -34382.399999999994
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 292,
+        "net": 7.1899999999999995,
+        "gross": 8.02,
+        "entryTime": 1723759500000,
+        "closeTime": 1725487200000,
+        "entryPrice": 37721.72,
+        "closePrice": 36571.24,
+        "commissions": 0,
+        "swaps": -0.8300000000000001,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "0",
+        "balance": 99999894.43999994,
+        "quantity": 1,
+        "pips": 11504.8
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 293,
+        "net": 11.94,
+        "gross": 12.52,
+        "entryTime": 1724291400000,
+        "closeTime": 1725487200000,
+        "entryPrice": 38367.94,
+        "closePrice": 36571.24,
+        "commissions": 0,
+        "swaps": -0.58,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "1",
+        "balance": 99999906.37999994,
+        "quantity": 1,
+        "pips": 17967
+      },
+      {
+        "symbol": "JP225",
+        "direction": "sell",
+        "id": 294,
+        "net": 16.76,
+        "gross": 17.01,
+        "entryTime": 1725047460000,
+        "closeTime": 1725487200000,
+        "entryPrice": 39012.27,
+        "closePrice": 36571.24,
+        "commissions": 0,
+        "swaps": -0.25,
+        "volume": 1,
+        "label": "cis_jp225_S8_RVINDEX",
+        "comment": "2",
+        "balance": 99999923.13999994,
+        "quantity": 1,
+        "pips": 24410.3
+      }
+    ]
+  },
+  "entries": {
+    "entriesByHours": {
+      "zero": {
+        "totalTrades": 27
+      },
+      "one": {
+        "totalTrades": 12
+      },
+      "two": {
+        "totalTrades": 8
+      },
+      "three": {
+        "totalTrades": 8
+      },
+      "four": {
+        "totalTrades": 8
+      },
+      "five": {
+        "totalTrades": 6
+      },
+      "six": {
+        "totalTrades": 6
+      },
+      "seven": {
+        "totalTrades": 7
+      },
+      "eight": {
+        "totalTrades": 4
+      },
+      "nine": {
+        "totalTrades": 1
+      },
+      "ten": {
+        "totalTrades": 2
+      },
+      "eleven": {
+        "totalTrades": 2
+      },
+      "twelve": {
+        "totalTrades": 2
+      },
+      "thirteen": {
+        "totalTrades": 5
+      },
+      "fourteen": {
+        "totalTrades": 9
+      },
+      "fifteen": {
+        "totalTrades": 6
+      },
+      "sixteen": {
+        "totalTrades": 6
+      },
+      "seventeen": {
+        "totalTrades": 4
+      },
+      "eighteen": {
+        "totalTrades": 1
+      },
+      "nineteen": {
+        "totalTrades": 5
+      },
+      "twenty": {
+        "totalTrades": 6
+      },
+      "twentyOne": {
+        "totalTrades": 0
+      },
+      "twentyTwo": {
+        "totalTrades": 4
+      },
+      "twentyThree": {
+        "totalTrades": 8
+      }
+    },
+    "entriesByWeekdays": {
+      "sunday": {
+        "totalTrades": 5
+      },
+      "monday": {
+        "totalTrades": 34
+      },
+      "tuesday": {
+        "totalTrades": 27
+      },
+      "wednesday": {
+        "totalTrades": 33
+      },
+      "thursday": {
+        "totalTrades": 26
+      },
+      "friday": {
+        "totalTrades": 22
+      },
+      "saturday": {
+        "totalTrades": 0
+      }
+    },
+    "entriesByMonths": {
+      "january": {
+        "totalTrades": 13
+      },
+      "february": {
+        "totalTrades": 16
+      },
+      "march": {
+        "totalTrades": 6
+      },
+      "april": {
+        "totalTrades": 12
+      },
+      "may": {
+        "totalTrades": 19
+      },
+      "june": {
+        "totalTrades": 24
+      },
+      "july": {
+        "totalTrades": 20
+      },
+      "august": {
+        "totalTrades": 12
+      },
+      "september": {
+        "totalTrades": 5
+      },
+      "october": {
+        "totalTrades": 12
+      },
+      "november": {
+        "totalTrades": 2
+      },
+      "december": {
+        "totalTrades": 6
+      }
+    }
+  },
+  "profitsLosses": {
+    "profitsLossesByHours": {
+      "zero": {
+        "winningTrades": 15,
+        "losingTrades": 12
+      },
+      "one": {
+        "winningTrades": 6,
+        "losingTrades": 6
+      },
+      "two": {
+        "winningTrades": 4,
+        "losingTrades": 4
+      },
+      "three": {
+        "winningTrades": 4,
+        "losingTrades": 4
+      },
+      "four": {
+        "winningTrades": 5,
+        "losingTrades": 3
+      },
+      "five": {
+        "winningTrades": 4,
+        "losingTrades": 2
+      },
+      "six": {
+        "winningTrades": 3,
+        "losingTrades": 3
+      },
+      "seven": {
+        "winningTrades": 5,
+        "losingTrades": 2
+      },
+      "eight": {
+        "winningTrades": 2,
+        "losingTrades": 2
+      },
+      "nine": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "ten": {
+        "winningTrades": 0,
+        "losingTrades": 2
+      },
+      "eleven": {
+        "winningTrades": 1,
+        "losingTrades": 1
+      },
+      "twelve": {
+        "winningTrades": 2,
+        "losingTrades": 0
+      },
+      "thirteen": {
+        "winningTrades": 2,
+        "losingTrades": 3
+      },
+      "fourteen": {
+        "winningTrades": 4,
+        "losingTrades": 5
+      },
+      "fifteen": {
+        "winningTrades": 2,
+        "losingTrades": 4
+      },
+      "sixteen": {
+        "winningTrades": 3,
+        "losingTrades": 3
+      },
+      "seventeen": {
+        "winningTrades": 3,
+        "losingTrades": 1
+      },
+      "eighteen": {
+        "winningTrades": 1,
+        "losingTrades": 0
+      },
+      "nineteen": {
+        "winningTrades": 2,
+        "losingTrades": 3
+      },
+      "twenty": {
+        "winningTrades": 4,
+        "losingTrades": 2
+      },
+      "twentyOne": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      },
+      "twentyTwo": {
+        "winningTrades": 3,
+        "losingTrades": 1
+      },
+      "twentyThree": {
+        "winningTrades": 3,
+        "losingTrades": 5
+      }
+    },
+    "profitsLossesByWeekdays": {
+      "sunday": {
+        "winningTrades": 2,
+        "losingTrades": 3
+      },
+      "monday": {
+        "winningTrades": 17,
+        "losingTrades": 17
+      },
+      "tuesday": {
+        "winningTrades": 18,
+        "losingTrades": 9
+      },
+      "wednesday": {
+        "winningTrades": 18,
+        "losingTrades": 15
+      },
+      "thursday": {
+        "winningTrades": 11,
+        "losingTrades": 15
+      },
+      "friday": {
+        "winningTrades": 13,
+        "losingTrades": 9
+      },
+      "saturday": {
+        "winningTrades": 0,
+        "losingTrades": 0
+      }
+    },
+    "profitsLossesByMonth": {
+      "january": {
+        "winningTrades": 4,
+        "losingTrades": 9
+      },
+      "february": {
+        "winningTrades": 11,
+        "losingTrades": 5
+      },
+      "march": {
+        "winningTrades": 0,
+        "losingTrades": 6
+      },
+      "april": {
+        "winningTrades": 5,
+        "losingTrades": 7
+      },
+      "may": {
+        "winningTrades": 12,
+        "losingTrades": 7
+      },
+      "june": {
+        "winningTrades": 14,
+        "losingTrades": 10
+      },
+      "july": {
+        "winningTrades": 12,
+        "losingTrades": 8
+      },
+      "august": {
+        "winningTrades": 8,
+        "losingTrades": 4
+      },
+      "september": {
+        "winningTrades": 1,
+        "losingTrades": 4
+      },
+      "october": {
+        "winningTrades": 8,
+        "losingTrades": 4
+      },
+      "november": {
+        "winningTrades": 1,
+        "losingTrades": 1
+      },
+      "december": {
+        "winningTrades": 3,
+        "losingTrades": 3
+      }
+    }
+  },
+  "roi": {
+    "period1w": {
+      "totalRoi": 0,
+      "points": [
+        {
+          "timestamp": 1727067600000,
+          "roi": 0
+        }
+      ]
+    },
+    "period1m": {
+      "totalRoi": 2.8700030298732235E-05,
+      "points": [
+        {
+          "timestamp": 1725487200000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1725494400000,
+          "roi": 2.8700030298732235E-05
+        },
+        {
+          "timestamp": 1727067600000,
+          "roi": 2.8700030298732235E-05
+        }
+      ]
+    },
+    "period3m": {
+      "totalRoi": -7.066000437734403E-05,
+      "points": [
+        {
+          "timestamp": 1720746000000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1720828800000,
+          "roi": -2.233000138267196E-05
+        },
+        {
+          "timestamp": 1723507200000,
+          "roi": -0.00010655000660312025
+        },
+        {
+          "timestamp": 1725494400000,
+          "roi": -7.066000437734403E-05
+        },
+        {
+          "timestamp": 1727067600000,
+          "roi": -7.066000437734403E-05
+        }
+      ]
+    },
+    "period6m": {
+      "totalRoi": -4.937001359148629E-05,
+      "points": [
+        {
+          "timestamp": 1713531600000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1713571200000,
+          "roi": 4.850001327304903E-06
+        },
+        {
+          "timestamp": 1714089600000,
+          "roi": 9.830002700479606E-06
+        },
+        {
+          "timestamp": 1715126400000,
+          "roi": 1.1910003270483625E-05
+        },
+        {
+          "timestamp": 1715904000000,
+          "roi": 1.8290005019577737E-05
+        },
+        {
+          "timestamp": 1716249600000,
+          "roi": 2.733000749632977E-05
+        },
+        {
+          "timestamp": 1717027200000,
+          "roi": 2.7400007508420218E-05
+        },
+        {
+          "timestamp": 1717113600000,
+          "roi": 3.014000827118317E-05
+        },
+        {
+          "timestamp": 1717804800000,
+          "roi": 3.441000944083417E-05
+        },
+        {
+          "timestamp": 1720828800000,
+          "roi": -1.0400003073537571E-06
+        },
+        {
+          "timestamp": 1723507200000,
+          "roi": -8.526002345824607E-05
+        },
+        {
+          "timestamp": 1725494400000,
+          "roi": -4.937001359148629E-05
+        },
+        {
+          "timestamp": 1727067600000,
+          "roi": -4.937001359148629E-05
+        }
+      ]
+    },
+    "period1y": {
+      "totalRoi": -4.790001389270567E-05,
+      "points": [
+        {
+          "timestamp": 1708927200000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1708992000000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1713571200000,
+          "roi": 6.320001823119973E-06
+        },
+        {
+          "timestamp": 1714089600000,
+          "roi": 1.1300003269500719E-05
+        },
+        {
+          "timestamp": 1715126400000,
+          "roi": 1.3380003870080753E-05
+        },
+        {
+          "timestamp": 1715904000000,
+          "roi": 1.9760005712960917E-05
+        },
+        {
+          "timestamp": 1716249600000,
+          "roi": 2.8800008322601027E-05
+        },
+        {
+          "timestamp": 1717027200000,
+          "roi": 2.8870008335720474E-05
+        },
+        {
+          "timestamp": 1717113600000,
+          "roi": 3.161000913876145E-05
+        },
+        {
+          "timestamp": 1717804800000,
+          "roi": 3.588001037118148E-05
+        },
+        {
+          "timestamp": 1720828800000,
+          "roi": 4.300001018782646E-07
+        },
+        {
+          "timestamp": 1723507200000,
+          "roi": -8.379002428704874E-05
+        },
+        {
+          "timestamp": 1725494400000,
+          "roi": -4.790001389270567E-05
+        },
+        {
+          "timestamp": 1727067600000,
+          "roi": -4.790001389270567E-05
+        }
+      ]
+    },
+    "periodAll": {
+      "totalRoi": -7.686000005900859E-05,
+      "points": [
+        {
+          "timestamp": 1609545600000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1609632000000,
+          "roi": 0
+        },
+        {
+          "timestamp": 1611187200000,
+          "roi": -1.633000001311302E-05
+        },
+        {
+          "timestamp": 1611878400000,
+          "roi": -1.3890000015497207E-05
+        },
+        {
+          "timestamp": 1612396800000,
+          "roi": -1.3560000017285348E-05
+        },
+        {
+          "timestamp": 1612828800000,
+          "roi": -1.3280000016093255E-05
+        },
+        {
+          "timestamp": 1613779200000,
+          "roi": -2.480000019073486E-06
+        },
+        {
+          "timestamp": 1614124800000,
+          "roi": 1.1399999856948852E-06
+        },
+        {
+          "timestamp": 1620864000000,
+          "roi": 5.499999821186065E-07
+        },
+        {
+          "timestamp": 1623196800000,
+          "roi": -1.1000000029802322E-05
+        },
+        {
+          "timestamp": 1624320000000,
+          "roi": 2.2999999821186064E-06
+        },
+        {
+          "timestamp": 1626134400000,
+          "roi": 5.809999972581864E-06
+        },
+        {
+          "timestamp": 1626393600000,
+          "roi": 5.549999967217445E-06
+        },
+        {
+          "timestamp": 1626480000000,
+          "roi": 5.879999965429306E-06
+        },
+        {
+          "timestamp": 1626739200000,
+          "roi": 6.1199999600648875E-06
+        },
+        {
+          "timestamp": 1626825600000,
+          "roi": 9.549999952316284E-06
+        },
+        {
+          "timestamp": 1626912000000,
+          "roi": 9.889999955892562E-06
+        },
+        {
+          "timestamp": 1627516800000,
+          "roi": 1.4809999957680703E-05
+        },
+        {
+          "timestamp": 1628035200000,
+          "roi": 1.8669999957084655E-05
+        },
+        {
+          "timestamp": 1629158400000,
+          "roi": 3.0469999954104422E-05
+        },
+        {
+          "timestamp": 1629504000000,
+          "roi": 3.077999995648861E-05
+        },
+        {
+          "timestamp": 1629763200000,
+          "roi": 2.9759999960660933E-05
+        },
+        {
+          "timestamp": 1632355200000,
+          "roi": 1.829999953508377E-06
+        },
+        {
+          "timestamp": 1635811200000,
+          "roi": 3.301999996602535E-05
+        },
+        {
+          "timestamp": 1638403200000,
+          "roi": 3.8079999968409535E-05
+        },
+        {
+          "timestamp": 1638489600000,
+          "roi": 3.794999997317791E-05
+        },
+        {
+          "timestamp": 1640044800000,
+          "roi": 5.220999996364117E-05
+        },
+        {
+          "timestamp": 1640304000000,
+          "roi": 3.957999995350838E-05
+        },
+        {
+          "timestamp": 1641859200000,
+          "roi": 3.910999995470047E-05
+        },
+        {
+          "timestamp": 1642636800000,
+          "roi": 3.992999994754791E-05
+        },
+        {
+          "timestamp": 1643068800000,
+          "roi": 3.929999995231629E-05
+        },
+        {
+          "timestamp": 1643328000000,
+          "roi": 3.978999996185303E-05
+        },
+        {
+          "timestamp": 1643673600000,
+          "roi": 3.8889999955892564E-05
+        },
+        {
+          "timestamp": 1643760000000,
+          "roi": 4.07399999499321E-05
+        },
+        {
+          "timestamp": 1645056000000,
+          "roi": 4.5709999948740007E-05
+        },
+        {
+          "timestamp": 1645228800000,
+          "roi": 4.4759999960660935E-05
+        },
+        {
+          "timestamp": 1645747200000,
+          "roi": 4.460999993979931E-05
+        },
+        {
+          "timestamp": 1645833600000,
+          "roi": 4.455999994277954E-05
+        },
+        {
+          "timestamp": 1647302400000,
+          "roi": 3.757999995350838E-05
+        },
+        {
+          "timestamp": 1648684800000,
+          "roi": -6.1900000423192975E-06
+        },
+        {
+          "timestamp": 1649376000000,
+          "roi": -1.1910000041127205E-05
+        },
+        {
+          "timestamp": 1651017600000,
+          "roi": -1.0670000031590461E-05
+        },
+        {
+          "timestamp": 1652832000000,
+          "roi": -1.9190000027418136E-05
+        },
+        {
+          "timestamp": 1654732800000,
+          "roi": -1.8480000033974647E-05
+        },
+        {
+          "timestamp": 1654905600000,
+          "roi": -1.9630000039935113E-05
+        },
+        {
+          "timestamp": 1655424000000,
+          "roi": -2.0480000033974648E-05
+        },
+        {
+          "timestamp": 1656115200000,
+          "roi": -2.0950000032782555E-05
+        },
+        {
+          "timestamp": 1657756800000,
+          "roi": -3.0290000036358835E-05
+        },
+        {
+          "timestamp": 1658361600000,
+          "roi": -3.072000004351139E-05
+        },
+        {
+          "timestamp": 1660521600000,
+          "roi": -3.072000004351139E-05
+        },
+        {
+          "timestamp": 1661817600000,
+          "roi": -3.1020000040531154E-05
+        },
+        {
+          "timestamp": 1663027200000,
+          "roi": -3.687000003457069E-05
+        },
+        {
+          "timestamp": 1663804800000,
+          "roi": -3.674000003933907E-05
+        },
+        {
+          "timestamp": 1664841600000,
+          "roi": -3.458000004291535E-05
+        },
+        {
+          "timestamp": 1664928000000,
+          "roi": -3.479000003635883E-05
+        },
+        {
+          "timestamp": 1665532800000,
+          "roi": -3.504000003635883E-05
+        },
+        {
+          "timestamp": 1665792000000,
+          "roi": -3.4610000044107434E-05
+        },
+        {
+          "timestamp": 1666742400000,
+          "roi": -3.496000003814697E-05
+        },
+        {
+          "timestamp": 1683590400000,
+          "roi": -3.282000005245208E-05
+        },
+        {
+          "timestamp": 1685318400000,
+          "roi": -7.420000004768371E-05
+        },
+        {
+          "timestamp": 1685750400000,
+          "roi": -5.809000004827976E-05
+        },
+        {
+          "timestamp": 1686096000000,
+          "roi": -5.836000004410744E-05
+        },
+        {
+          "timestamp": 1686614400000,
+          "roi": -4.120000003278256E-05
+        },
+        {
+          "timestamp": 1687219200000,
+          "roi": -3.708000002801418E-05
+        },
+        {
+          "timestamp": 1688428800000,
+          "roi": -1.641000002622604E-05
+        },
+        {
+          "timestamp": 1689984000000,
+          "roi": -2.2780000030994415E-05
+        },
+        {
+          "timestamp": 1708992000000,
+          "roi": -2.896000003814697E-05
+        },
+        {
+          "timestamp": 1713571200000,
+          "roi": -2.264000004529953E-05
+        },
+        {
+          "timestamp": 1714089600000,
+          "roi": -1.7660000041127204E-05
+        },
+        {
+          "timestamp": 1715126400000,
+          "roi": -1.5580000042915344E-05
+        },
+        {
+          "timestamp": 1715904000000,
+          "roi": -9.200000047683716E-06
+        },
+        {
+          "timestamp": 1716249600000,
+          "roi": -1.600000560283661E-07
+        },
+        {
+          "timestamp": 1717027200000,
+          "roi": -9.000006318092346E-08
+        },
+        {
+          "timestamp": 1717113600000,
+          "roi": 2.64999994635582E-06
+        },
+        {
+          "timestamp": 1717804800000,
+          "roi": 6.919999942183495E-06
+        },
+        {
+          "timestamp": 1720828800000,
+          "roi": -2.8530000060796738E-05
+        },
+        {
+          "timestamp": 1723507200000,
+          "roi": -0.00011275000005960465
+        },
+        {
+          "timestamp": 1725494400000,
+          "roi": -7.686000005900859E-05
+        },
+        {
+          "timestamp": 1727067600000,
+          "roi": -7.686000005900859E-05
+        }
+      ]
+    }
+  }
+}

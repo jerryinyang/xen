@@ -1,0 +1,84 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © Professeur_X
+
+//@version=5
+
+indicator(title='Market Bias (CEREBR)', shorttitle='Market Bias', overlay=true)
+
+//#region -----> INPUTS, FUCNTIONS
+
+// FUNCTIONS
+//@function This function forces the current timeframe on inputs that shouldn't take lower timeframes
+FORCE_CTF(str_tf) =>
+    i_tf_sec = timeframe.in_seconds(str_tf)
+    ctf_sec = timeframe.in_seconds('')
+    
+    // Returns the CTF if the passed timeframe is lower
+    i_tf_sec < ctf_sec ? '' : str_tf
+//
+
+// INPUTS
+ha_htf = FORCE_CTF(input.timeframe('', 'Timeframe', tooltip="This timeframe must be equal to or greater than the chart's timeframe", group="HA Market Bias"))
+ha_len = input(100, 'Period', group="HA Market Bias")
+ha_len2 = input(100, 'Smoothing', group="HA Market Bias")
+
+show_ha = input.bool(true, "Show HA Candles", inline='ha/mb display', group='Display Settings')
+show_mb = input.bool(true, "Show Market Bias", inline='ha/mb display', group='Display Settings')
+col_bull = input.color(color.lime, 'Color: Bullish', inline='bull/bear color', group='Display Settings', display=display.none)
+col_bear = input.color(color.red, 'Bearish', inline='bull/bear color', group='Display Settings', display=display.none)
+
+
+// These add an offset during data importation to avoid lookahead bias
+indexHighTF = timeframe.in_seconds(ha_htf) == timeframe.in_seconds('') ? 0 : barstate.isrealtime ? 1 : 0
+indexCurrTF = timeframe.in_seconds(ha_htf) == timeframe.in_seconds('') ? 0 : barstate.isrealtime ? 0 : 1
+
+//@function Handles the import of data from other timeframes, while preventing repainting
+//@param _resolution (str) : This is the timeframe to import data from.
+//@param _expression (float | int) : This is the data to be imported
+f_no_repaint_request(string _resolution, _expression) =>
+     request.security(syminfo.tickerid, _resolution, _expression[indexHighTF])[indexCurrTF]
+//#endregion
+
+
+
+//#region -----> CALCULATIONS
+
+// Smoothen the OHLC values 
+o = ta.ema(open, ha_len)
+c = ta.ema(close, ha_len)
+h = ta.ema(high, ha_len)
+l = ta.ema(low, ha_len)
+
+// Calculate the Heikin Ashi OHLC values from it
+haclose = f_no_repaint_request(ha_htf, (o + h + l + c) / 4)
+xhaopen = f_no_repaint_request(ha_htf, (o + c) / 2)
+haopen = na(xhaopen[1]) ? (o + c) / 2 : (xhaopen[1] + haclose[1]) / 2
+hahigh = math.max(h, math.max(haopen, haclose))
+halow = math.min(l, math.min(haopen, haclose))
+
+// Smoothen the Heiken Ashi Candles
+o2 = f_no_repaint_request(ha_htf, ta.ema(haopen, ha_len2))
+c2 = f_no_repaint_request(ha_htf, ta.ema(haclose, ha_len2))
+h2 = f_no_repaint_request(ha_htf, ta.ema(hahigh, ha_len2))
+l2 = f_no_repaint_request(ha_htf, ta.ema(halow, ha_len2))
+
+ha_avg = (h2 + l2) / 2
+
+
+//TODO: Publish the Oscillator version of the indicator
+// Oscillator {
+osc_len = input.int(7, "Oscillator Period", group="HA Market Bias")
+
+osc_bias = 100 * (c2 - o2)
+osc_smooth = ta.ema(osc_bias, osc_len)
+
+sigcolor = switch
+    (osc_bias > 0) and (osc_bias >= osc_smooth) => color.new(col_bull, 35)
+    (osc_bias > 0) and (osc_bias < osc_smooth) => color.new(col_bull, 75)
+    (osc_bias < 0) and (osc_bias <= osc_smooth) => color.new(col_bear, 35)
+    (osc_bias < 0) and (osc_bias > osc_smooth) => color.new(col_bear, 75)
+    => color(na)
+// }
+
+//#endregion
+    
