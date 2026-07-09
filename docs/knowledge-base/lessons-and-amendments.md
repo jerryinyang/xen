@@ -509,3 +509,99 @@ effect were 0" (`CI_EXCLUDES_ZERO_PHRASE`). Declined: BCa (jackknife acceleratio
 unsound on block bootstrap; no decision-flip for the mean at these n). Builds on [[L-19]];
 enforced in `xen.evaluation`, tests in `python/tests/test_evaluation.py`. Companion memory
 `evaluation-ci-hardening`.
+
+## L-21 — The screen→graduation seam is where dimensionless numbers become money claims; pin the unit and floor it in money (EXP-025 / SPDR series) ⭐
+
+**What.** EXP-025's graduation design converted the SPDR screen's +0.26–0.50 ATR effect to
+"30–60 bps" by asserting a **1h HTF ATR(14)** divisor from memory. The screen actually
+normalised by the **5-min LTF ATR(14)[t−1]** (`spdr001_screen.py:204,299`). USTEC TRAIN-median
+1h ATR = 33.9 bps vs 5min ATR = 8.19 bps → the target was inflated **4.1×**. The full T1 run
+(440 cells, 22 symbols, 2.4M trades) was powered against a fictitious 30–60 bps effect; the
+true effect (≈4 bps/trade at h48, ≈0.2–1 at short holds) replicated end-to-end
+(screen→ref-arm→battery) but is untradeable net of spread + one-sided capture. Verdict:
+NOT SUPPORTED (magnitude, not existence) — an honest closure, but the run would have been
+avoided (or re-framed as apparatus test) had the conversion been checked.
+
+**Mechanism (why).** Screen guards test *existence* (blind-base replication, phase-shift
+collapse, seed battery); none checks *magnitude-in-money*. The unit conversion happens exactly
+at the handoff between two documents owned by different stages — nobody owns it, so it is
+asserted, not verified. A dimensionless effect size is only as good as its divisor's bps value.
+
+**How to apply.** (1) Screen artifacts state the normaliser **object** exactly (indicator,
+period, timeframe, lag) with every normalised number. (2) A graduation design converting a
+screen effect to money must state the divisor object verbatim from screen code + its measured
+TRAIN-median bps value + the resulting bps/trade — each verifiable, QA-traced. (3) **Money-unit
+floor at disposition**: convert best-cell effect to bps/trade with the actual normaliser and
+compare vs cost floor (spread + commission + capture dilution ≈ gap/2); at/below floor →
+graduate only as apparatus/characterisation test. Enforced in `docs/references/spdr-lane.md`
+(Graduation §, 2026-07-09). Builds on [[L-11]]. EXP-025: `python/experiments/EXP-025/analysis.md` §5.
+
+## L-22 — A commission-only SUPPORTED band never binds on 0-commission instruments; spread must be a verdict leg (EXP-025 external review F01)
+
+**What.** EXP-025's SUPPORTED band required net-of-commission CI_low > 0; indices carry 0
+commission and spread was disclosure-only. The design's most likely SUPPORTED cell (dense
+index, short hold, thousands of trades) is exactly where spread dominates: a 10–20 bps/trade
+edge can be SUPPORTED while a 1–2 index-point spread erases it live. Qualification then
+selects high-turnover statistical edges — anti-correlated with spread robustness. Moot in
+EXP-025 (0/440 qualified) but structural.
+
+**How to apply.** Future designs make the 1× spread scenario a **binding tier** for any
+SUPPORTED claim (SUPPORTED-GROSS vs SUPPORTED-NET-OF-ALL-COSTS as separate bands, or minimum:
+CI_low > 0 must survive the 1× spread estimate before an instrument counts toward the
+multiplicity family). 0.5×/2× spread remain disclosure. Builds on [[L-21]]; companion memory
+`cost-model-and-injection`.
+
+## L-23 — Pre-measurement amendments must declare their direction (looser/tighter) and keep a running count; re-derive the joint false-qualification rate at the final gate set (EXP-025 external review F03)
+
+**What.** All seven 2026-07-08 pre-measurement amendments to EXP-025's design moved the same
+direction — easier qualification, harder rejection (hostile-neighbour veto removed; per-fold
+sign → pooled; erosion veto → disclosure; 97.5th-pct → 2 seed-SD; redundant CI gate dropped;
+sentinel per-stratum → family-wise; tripwire per-cell → pooled 50%). Each was individually
+well-argued; the aggregate false-qualification rate under the final gate set was never
+re-derived — the "plane is priced" arithmetic was written for the stricter gates. No false
+admit resulted (0/440 qualified), but the pattern is what a motivated design process produces
+even with honest local reasoning.
+
+**How to apply.** (1) Every pre-measurement amendment states its direction (LOOSER/TIGHTER/
+NEUTRAL) and the running directional count for the experiment. (2) After the final amendment,
+re-state the expected number of false qualifiers under the global null with the FINAL gate
+set (simulable from the battery machinery: apply the selection rules to random-direction
+runs); if materially above budget, tighten one gate back. (3) A one-directional streak ≥3 is
+an explicit flag to the operator at the execution gate. Builds on [[L-12]]; companion memory
+`selection-rules-symmetric-outlier-robustness`.
+
+## L-24 — Eligibility/null design gaps surfaced by EXP-025 external review (F02/F04/F06/F07) — future-design rules
+
+**What.** Four design-level gaps, all moot for EXP-025's verdict (no cell qualified; T2 and
+tripwire never ran; no TEST read spent) but binding on future designs:
+
+1. **(F02) Seed-SD prices direction-randomization only, not regime concentration.** A
+   same-timestamps Bernoulli battery shares one market path; a candidate whose entire TRAIN
+   edge sits in one volatility episode clears 2 seed-SD easily. Rule: eligibility includes a
+   time-stability read — TRAIN net positive in ≥2 of 3 chronological thirds, or a
+   concentration ceiling (fraction of net from top decile of trades / top quarter). Cheap,
+   uses existing emissions. Builds on [[L-19]].
+2. **(F04) An exit-dependent statistic needs a null run under the same exit.** Battery trades
+   under a path-dependent exit (e.g. DI-flip) have different hold/exposure distributions than
+   candidate trades; comparing the exit* leg of a max-stat against an entry-cadence-only null
+   mis-specifies variance and drift exposure. Rule: each battery seed re-runs under exit* when
+   exit* ≠ benchmark, so the null max-stat spans identical statistics; the exit-selection step
+   itself goes in the multiplicity registry. If infeasible → exit* demoted to disclosure.
+   Builds on [[L-16]].
+3. **(F06) Tripwire retention thresholds must be derived, not asserted.** EXP-025's 50%/25%
+   phase-shift retention criterion came from DI-autocorrelation intuition. Rule: compute the
+   actual autocorrelation-implied retention (e.g. corr(state[t], state[t+shift]) on the real
+   TRAIN streams per instrument, with CI) and set the REJECT threshold from it — the data
+   exists before any read.
+4. **(F07) The TEST-read n floor must be MDE-consistent.** n ≥ 50 admits reads with MDE
+   17–34 bps against a shrunk effect — near-guaranteed coin flips that burn capped reads.
+   Rule: read-eligibility floor = the n at which MDE ≤ the (shrinkage-adjusted, see F05 note
+   below) TRAIN point estimate of that cell, applied prospectively; keep the absolute
+   UNPOWERED line. Corollary (F05): power claims must compare TEST MDE against a
+   **shrunk** TRAIN effect — estimate the shrinkage factor from F0→F1+F2 attenuation (the
+   folds give it for free), never against the unshrunk selected maximum. Builds on [[L-06]],
+   [[L-19]].
+
+**How to apply.** quant-designer checks all four at design time for any battery-gated,
+multi-cell, capped-read design; QA traces them as clauses. EXP-025 reviews:
+`python/experiments/EXP-025/report.md`.

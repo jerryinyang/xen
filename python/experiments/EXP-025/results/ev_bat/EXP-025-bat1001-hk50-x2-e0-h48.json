@@ -1,0 +1,53 @@
+{
+  "root": "../data/strategy_runs/EXP-025-bat1001-hk50-x2-e0-h48",
+  "n_cells": 1,
+  "manifest": {
+    "ok": true,
+    "expected": [],
+    "emitted": [
+      "HK50"
+    ],
+    "missing": []
+  },
+  "blocking_pass": true,
+  "cells": [
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-bat1001-hk50-x2-e0-h48/htfdi_x2_e0h48_bat1001_hk50_5m_20260708_235716",
+      "instrument": "HK50",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-30 16:50:00",
+        "fence": "2024-12-30T16:51:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -4974.75307663467,
+        "per_leg_realized_total": -4974.753076634674,
+        "abs_diff_bps": 3.637978807091713e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9880789413643623,
+        "n_bars": 173093,
+        "n_legs": 3201,
+        "n_censored_legs": 1,
+        "total_net_bps": -4974.75307663467,
+        "annualised_return": -0.12474058687847228,
+        "per_bar_sharpe_annualised": -0.5423283819263427,
+        "max_drawdown_bps": -6417.404971677966,
+        "occupancy": 0.9059754005072418,
+        "buy_and_hold_annualised_return": -0.07775787428508328,
+        "buy_and_hold_annualised_vol": 0.24315406605427134,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    }
+  ]
+}

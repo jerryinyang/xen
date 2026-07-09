@@ -136,7 +136,16 @@ public sealed record CisTradeRecord(
     string LegSymbol = "",      // HYP-003 both-leg: the leg's traded symbol ("" for single-leg = traded instrument)
     long SpreadPositionId = 0,  // HYP-003 both-leg: groups the N+1 legs of one spread position (0 for single-leg)
     double SlPrice = double.NaN, // HYP-004 E2/E3: frozen outward SL o±D (NaN otherwise); FixedExitPrice = frozen TP under E1-E3
-    int HorizonBars = 0);       // HYP-004 E3: frozen ⌈3·HL_entry⌉ time-stop horizon, cap 48 (0 = none)
+    int HorizonBars = 0,        // HYP-004 E3: frozen ⌈3·HL_entry⌉ time-stop horizon, cap 48 (0 = none)
+    // EXP-025 (CF-HTFDI-001) — per-trade HTF provenance (design §3/§13 golden-trace pins +
+    // the leak-guard audit column). Default sentinels keep every other model's rows unchanged.
+    double BreakoutRef = double.NaN,          // the broken X-bar HH/LL level at the signal close
+    int SignalX = 0,                          // breakout lookback X of this run's vehicle
+    double HtfPlusDi = double.NaN,            // last-closed 1h Wilder +DI(14) at entry decision
+    double HtfMinusDi = double.NaN,           // last-closed 1h Wilder -DI(14) at entry decision
+    double HtfAdx = double.NaN,               // last-closed 1h Wilder ADX(14) at entry decision
+    double HtfAtr = double.NaN,               // last-closed 1h Wilder ATR(14) at entry (E1/E4 barriers)
+    DateTime HtfBarCloseTime = default);      // MUST be < EntryTime's bar open (leak-guard audit)
 
 public sealed record SignalUpdate(
     SignalPositionRecord Position,

@@ -35,7 +35,11 @@ public enum XenStrategy
     // EXP-020 (CF-VOLHARV-001 HYP-002): structure harvest arms — Mode=NativeOrders only
     // (see Xen.StructureHarvest.cs). RebalanceHarvest = ARM R; GridHarvest = ARM G.
     RebalanceHarvest,
-    GridHarvest
+    GridHarvest,
+    // EXP-025 (CF-HTFDI-001/HYP-A): CTRL-02 X-bar breakout gated by last-closed 1h ±DI.
+    // Exits E0/E2/E3/E5/E6 run in Mode=StrategyHost (HtfDiBreakoutModel); exits E1/E4
+    // (native stop/limit brackets, m1 fills) run in Mode=NativeOrders (Xen.HtfDiNative.cs).
+    HtfDiBreakout
 }
 
 [Robot(AccessRights = AccessRights.FullAccess, AddIndicators = false, DefaultTimeFrame="Minute")]
@@ -210,6 +214,36 @@ public partial class Xen : Robot
     [Parameter("SH Delay Bars", DefaultValue = 0)]
     public int ShDelayBars { get; set; }
 
+    // EXP-025 (CF-HTFDI-001/HYP-A) — HtfDiBreakout vehicle parameters (design §3).
+    // X = breakout lookback (grid {2,3,4,5,8}); Hold = E0 fixed-hold bars (grid {12,24,36,48}).
+    [Parameter("HTFDI X", DefaultValue = 3)]
+    public int HtfX { get; set; } = 3;
+
+    [Parameter("HTFDI Hold", DefaultValue = 24)]
+    public int HtfHold { get; set; } = 24;
+
+    // Exit object: e0 (fixed hold) | e2 (trailing X channel) | e3 (Heiken-Ashi trail) |
+    // e5 (HTF-DI flip) | e6 (opposite breakout) run in StrategyHost; e1 (triple-barrier
+    // TP 3.0x/SL 1.5x entry-frozen 1h ATR + 96-bar backstop) | e4 (SL 1.5x only + backstop)
+    // require Mode=NativeOrders (native stop/limit, m1 fills — never StrategyHost self-fill).
+    [Parameter("HTFDI Exit", DefaultValue = "e0")]
+    public string HtfExit { get; set; } = "e0";
+
+    // Gate arm: di (the vehicle) | adx (CTRL-NULLSENT ADX-only sentinel) | battery
+    // (CTRL-RND-BATTERY seeded random direction on the DI-gated event timestamps) |
+    // state (CTRL-REF-RANDOM substrate: per-bar HTF state emission, no trades).
+    [Parameter("HTFDI Gate", DefaultValue = "di")]
+    public string HtfGate { get; set; } = "di";
+
+    // CTRL-RND-BATTERY pre-registered seeds 1001-1025 (design §6). Required iff Gate=battery.
+    [Parameter("HTFDI Battery Seed", DefaultValue = 0)]
+    public int HtfBatterySeed { get; set; }
+
+    // EXP-025 LEAK TRIPWIRE (design §6): rolls the ENTIRE 1h DI/ATR/regime stream back by
+    // this many CLOSED 1h bars (+60 = the registered phase-shift arm). 0 = live.
+    [Parameter("HTFDI Shift Bars", DefaultValue = 0)]
+    public int HtfShiftBars { get; set; }
+
     private TimeBarParquetWriter? _writer;
     private BarAggregator? _strategyAggregator;
     private ISignalModel? _strategyModel;
@@ -246,6 +280,8 @@ public partial class Xen : Robot
                     StartRebalanceHarvest();
                 else if (Strategy == XenStrategy.GridHarvest)
                     StartGridHarvest();
+                else if (Strategy == XenStrategy.HtfDiBreakout)
+                    StartHtfDiNative();
                 else
                     StartNativeOrders();
             }
@@ -296,6 +332,8 @@ public partial class Xen : Robot
                 RunRebalanceHarvestOnBar();
             else if (_gridReady)
                 RunGridHarvestOnBar();
+            else if (_hdReady)
+                RunHtfDiNativeOnBar();
             else if (_nativeReady)
                 RunNativeOrdersOnBar();
             return;
@@ -321,6 +359,8 @@ public partial class Xen : Robot
                     FlushRebalanceSummary();     // EXP-020 ARM R: no leg ledger; summary print only
                 else if (_gridReady)
                     FlushGridCensored();         // EXP-020 ARM G: fence-open inventory → censored rows
+                else if (_hdReady)
+                    FlushHtfDiNativeCensored();  // EXP-025 E1/E4: fence-open bracket leg → censored row
                 else
                     FlushOpenLegsAsCensored();   // EXP-014b: emit still-open legs as censored open_at_end rows
                 _strategyWriter?.Dispose();
@@ -333,6 +373,13 @@ public partial class Xen : Robot
                 // parity harness can rebuild matched controls (no signal oracle).
                 if (_strategyModel is AvwapBounceModel avwapModel)
                     _strategyWriter?.SetAvwapEventDetails(avwapModel.EventDetails);
+                // EXP-025: a fence-open trade is emitted as a censored open_at_end row.
+                if (_strategyModel is HtfDiBreakoutModel htfdiModel && _strategyWriter is not null)
+                {
+                    htfdiModel.FlushOpenAsCensored(DomainLabel(DomainMinutes));
+                    foreach (var row in htfdiModel.DrainTradeRows())
+                        _strategyWriter.AppendCisTrade(row);
+                }
                 _strategyWriter?.Dispose();
             }
             else
@@ -490,6 +537,9 @@ public partial class Xen : Robot
                 return;
             var update = _strategyModel.OnBar(bar, domain);
             _strategyWriter.Append(update);
+            if (_strategyModel is HtfDiBreakoutModel htfdi)
+                foreach (var row in htfdi.DrainTradeRows())
+                    _strategyWriter.AppendCisTrade(row);
             _strategyDomainBars++;
         }
     }
@@ -503,7 +553,12 @@ public partial class Xen : Robot
         var runner = new StrategyHostRunner(_strategyAggregator, _strategyModel, _strategyFence, domain);
         var updates = runner.Run(sourceBars);
         foreach (var update in updates)
+        {
             _strategyWriter.Append(update);
+            if (_strategyModel is HtfDiBreakoutModel htfdi)
+                foreach (var row in htfdi.DrainTradeRows())
+                    _strategyWriter.AppendCisTrade(row);
+        }
 
         _strategySourceBars = sourceBars.Count;
         _strategyDomainBars = updates.Count;
@@ -556,6 +611,7 @@ public partial class Xen : Robot
                 "RandomHold (EXP-019) runs in Mode=NativeOrders (native market orders), not StrategyHost."),
             XenStrategy.RebalanceHarvest or XenStrategy.GridHarvest => throw new InvalidOperationException(
                 "RebalanceHarvest/GridHarvest (EXP-020) run in Mode=NativeOrders, not StrategyHost."),
+            XenStrategy.HtfDiBreakout => CreateHtfDiBreakoutModel(),
             _ => throw new InvalidOperationException($"Unsupported strategy: {Strategy}")
         };
     }
@@ -580,6 +636,46 @@ public partial class Xen : Robot
         Print("Xen CONC-1 S5_SPREAD basket feed for {0}: {1}/{2} mates resolved ({3}); phase_shift_hours={4}.",
             SymbolName, feed.ResolvedCount, mates.Count, string.Join(",", mates), BasketPhaseShiftHours);
         return new CrossDomainMrLimitModel(feed, CrossDomainMrLimitModel.SeriesS5);
+    }
+
+    private ISignalModel CreateHtfDiBreakoutModel()
+    {
+        if (DomainMinutes != 5)
+            throw new InvalidOperationException(
+                $"HtfDiBreakout (EXP-025) is 1h/5min only; DomainMinutes must be 5, got {DomainMinutes}.");
+        var exit = ParseHtfExit(HtfExit);
+        if (exit is null)
+            throw new InvalidOperationException(
+                $"HTFDI Exit '{HtfExit}' runs in Mode=NativeOrders (native stop/limit, m1 fills — L-14), not StrategyHost.");
+        var gate = ParseHtfGate(HtfGate);
+        return new HtfDiBreakoutModel(HtfX, HtfHold, exit.Value, gate, HtfBatterySeed, HtfShiftBars);
+    }
+
+    // e1/e4 → null (NativeOrders-only); anything unknown throws.
+    private static HtfDiExit? ParseHtfExit(string raw)
+    {
+        return raw.Trim().ToLowerInvariant() switch
+        {
+            "e0" => HtfDiExit.E0FixedHold,
+            "e2" => HtfDiExit.E2TrailXChannel,
+            "e3" => HtfDiExit.E3HeikenAshi,
+            "e5" => HtfDiExit.E5DiFlip,
+            "e6" => HtfDiExit.E6OppositeBreak,
+            "e1" or "e4" => null,
+            _ => throw new InvalidOperationException($"Unknown HTFDI Exit '{raw}' (e0|e1|e2|e3|e4|e5|e6).")
+        };
+    }
+
+    private static HtfDiGateMode ParseHtfGate(string raw)
+    {
+        return raw.Trim().ToLowerInvariant() switch
+        {
+            "di" => HtfDiGateMode.Di,
+            "adx" => HtfDiGateMode.AdxSentinel,
+            "battery" => HtfDiGateMode.Battery,
+            "state" => HtfDiGateMode.StateOnly,
+            _ => throw new InvalidOperationException($"Unknown HTFDI Gate '{raw}' (di|adx|battery|state).")
+        };
     }
 
     private static List<string> ParseMates(string raw)
@@ -707,6 +803,23 @@ public partial class Xen : Robot
                 parameters["hold_grid"] = "6;12;24;48_round_robin_in_schedule_order";
                 parameters["sizing"] = "fixed_min_volume_never_varied";
                 parameters["cap_policy"] = "skip_logged_cap_skip_never_deferred";
+                parameters["open_at_end"] = "censored_disclosed_excluded_from_realized";
+                break;
+            case XenStrategy.HtfDiBreakout:
+                // EXP-025 (CF-HTFDI-001/HYP-A) provenance — design §3 vehicle table.
+                parameters["signal"] = "ctrl02_x_bar_breakout_confirmed_close_enter_next_open";
+                parameters["x"] = HtfX;
+                parameters["hold_bars"] = HtfHold;
+                parameters["exit"] = HtfExit;
+                parameters["gate"] = HtfGate;
+                parameters["battery_seed"] = HtfBatterySeed;
+                parameters["htf"] = "clock_aligned_utc_1h_from_5min_wilder_dmi14_atr14";
+                parameters["htf_gate_rule"] = "last_closed_1h_bar_closetime_lt_entry_open_code_asserted";
+                parameters["htf_warmup_closed_bars"] = WilderHtfState.MinClosedBars;
+                parameters["atr_regime"] = "trailing_2016_closed_1h_atr_terciles_unset_until_full";
+                parameters["adx_sentinel_median"] = "trailing_2016_closed_1h_adx_median_D1";
+                parameters["phase_shift_bars"] = HtfShiftBars;   // 0 live; 60 = leak tripwire arm
+                parameters["position"] = "one_at_a_time_fixed_unit_signals_ignored_while_open";
                 parameters["open_at_end"] = "censored_disclosed_excluded_from_realized";
                 break;
             case XenStrategy.RebalanceHarvest:

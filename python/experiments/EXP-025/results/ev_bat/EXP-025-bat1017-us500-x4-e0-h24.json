@@ -1,0 +1,53 @@
+{
+  "root": "../data/strategy_runs/EXP-025-bat1017-us500-x4-e0-h24",
+  "n_cells": 1,
+  "manifest": {
+    "ok": true,
+    "expected": [],
+    "emitted": [
+      "US500"
+    ],
+    "missing": []
+  },
+  "blocking_pass": true,
+  "cells": [
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-bat1017-us500-x4-e0-h24/htfdi_x4_e0h24_bat1017_us500_5m_20260709_004134",
+      "instrument": "US500",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-19 14:55:00",
+        "fence": "2024-12-19T14:59:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 27.143479490212712,
+        "per_leg_realized_total": 27.143479490211803,
+        "abs_diff_bps": 9.094947017729282e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.958000608411286,
+        "n_bars": 255640,
+        "n_legs": 7597,
+        "n_censored_legs": 1,
+        "total_net_bps": 27.143479490212712,
+        "annualised_return": 0.0006857876533047809,
+        "per_bar_sharpe_annualised": 0.004835212046021162,
+        "max_drawdown_bps": -2326.8416239159624,
+        "occupancy": 0.7429197308715381,
+        "buy_and_hold_annualised_return": 0.1142875304460491,
+        "buy_and_hold_annualised_vol": 0.16612341329714936,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    }
+  ]
+}

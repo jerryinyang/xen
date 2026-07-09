@@ -1,0 +1,895 @@
+{
+  "root": "../data/strategy_runs/EXP-025-t1-x2-h12",
+  "n_cells": 22,
+  "manifest": {
+    "ok": true,
+    "expected": [
+      "EURUSD",
+      "GBPUSD",
+      "USDJPY",
+      "USDCHF",
+      "USDCAD",
+      "AUDUSD",
+      "NZDUSD",
+      "EURJPY",
+      "GBPJPY",
+      "AUDJPY",
+      "USTEC",
+      "US500",
+      "US2000",
+      "JP225",
+      "AUS200",
+      "US30",
+      "STOXX50",
+      "DE40",
+      "HK50",
+      "UK100",
+      "XAUUSD",
+      "BTCUSD"
+    ],
+    "emitted": [
+      "AUDJPY",
+      "AUDUSD",
+      "AUS200",
+      "BTCUSD",
+      "DE40",
+      "EURJPY",
+      "EURUSD",
+      "GBPJPY",
+      "GBPUSD",
+      "HK50",
+      "JP225",
+      "NZDUSD",
+      "STOXX50",
+      "UK100",
+      "US2000",
+      "US30",
+      "US500",
+      "USDCAD",
+      "USDCHF",
+      "USDJPY",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "missing": []
+  },
+  "blocking_pass": true,
+  "cells": [
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_audjpy_5m_20260708_201602",
+      "instrument": "AUDJPY",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-12 04:40:00",
+        "fence": "2024-12-12T04:43:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -4352.842197865128,
+        "per_leg_realized_total": -4352.842197865128,
+        "abs_diff_bps": 0.0,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9377424138717774,
+        "n_bars": 290139,
+        "n_legs": 15805,
+        "n_censored_legs": 1,
+        "total_net_bps": -4352.842197865128,
+        "annualised_return": -0.11054156774021194,
+        "per_bar_sharpe_annualised": -1.1440837941230422,
+        "max_drawdown_bps": -4914.102846195378,
+        "occupancy": 0.7080158131102678,
+        "buy_and_hold_annualised_return": 0.0522970282600763,
+        "buy_and_hold_annualised_vol": 0.11780687140530662,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_audusd_5m_20260708_201512",
+      "instrument": "AUDUSD",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-11 17:45:00",
+        "fence": "2024-12-11T17:46:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -2596.088621784352,
+        "per_leg_realized_total": -2596.0886217843527,
+        "abs_diff_bps": 4.547473508864641e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9365160848733742,
+        "n_bars": 286424,
+        "n_legs": 15659,
+        "n_censored_legs": 1,
+        "total_net_bps": -2596.088621784352,
+        "annualised_return": -0.06594888896199849,
+        "per_bar_sharpe_annualised": -0.7241850271323963,
+        "max_drawdown_bps": -3608.2291824147824,
+        "occupancy": 0.7105445074435103,
+        "buy_and_hold_annualised_return": -0.04820767759559381,
+        "buy_and_hold_annualised_vol": 0.11127429669979604,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_aus200_5m_20260708_201737",
+      "instrument": "AUS200",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2025-01-07 04:10:00",
+        "fence": "2025-01-07T04:25:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -1690.41770796354,
+        "per_leg_realized_total": -1690.4177079635397,
+        "abs_diff_bps": 2.2737367544323206e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 4.008812457221081,
+        "n_bars": 187119,
+        "n_legs": 9995,
+        "n_censored_legs": 1,
+        "total_net_bps": -1690.41770796354,
+        "annualised_return": -0.04216754278236657,
+        "per_bar_sharpe_annualised": -0.3844380330572766,
+        "max_drawdown_bps": -4142.677448433494,
+        "occupancy": 0.6931524858512498,
+        "buy_and_hold_annualised_return": 0.0555559047804141,
+        "buy_and_hold_annualised_vol": 0.13490028934900822,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_btcusd_5m_20260708_201908",
+      "instrument": "BTCUSD",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2025-03-12 19:20:00",
+        "fence": "2025-03-12T19:23:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -10582.412375141055,
+        "per_leg_realized_total": -10582.412375141052,
+        "abs_diff_bps": 3.637978807091713e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 4.18585063502928,
+        "n_bars": 337847,
+        "n_legs": 18530,
+        "n_censored_legs": 1,
+        "total_net_bps": -10582.412375141055,
+        "annualised_return": -0.2528139032621509,
+        "per_bar_sharpe_annualised": -0.4656246687932837,
+        "max_drawdown_bps": -18453.099120483712,
+        "occupancy": 0.7129203456002273,
+        "buy_and_hold_annualised_return": 0.21721258352245199,
+        "buy_and_hold_annualised_vol": 0.6518983654603835,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_de40_5m_20260708_201813",
+      "instrument": "DE40",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-11 08:15:00",
+        "fence": "2024-12-11T08:20:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -4661.4141415667855,
+        "per_leg_realized_total": -4661.414141566787,
+        "abs_diff_bps": 1.8189894035458565e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9351946916115295,
+        "n_bars": 251189,
+        "n_legs": 13827,
+        "n_censored_legs": 0,
+        "total_net_bps": -4661.4141415667855,
+        "annualised_return": -0.1184544732056918,
+        "per_bar_sharpe_annualised": -0.8439395986868711,
+        "max_drawdown_bps": -7092.963032027086,
+        "occupancy": 0.7151825915943771,
+        "buy_and_hold_annualised_return": 0.0999044743802511,
+        "buy_and_hold_annualised_vol": 0.1705851181072401,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_eurjpy_5m_20260708_201534",
+      "instrument": "EURJPY",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-12 03:40:00",
+        "fence": "2024-12-12T03:45:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -1776.9655043826424,
+        "per_leg_realized_total": -1776.9655043826422,
+        "abs_diff_bps": 2.2737367544323206e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9376568560346796,
+        "n_bars": 291137,
+        "n_legs": 15796,
+        "n_censored_legs": 0,
+        "total_net_bps": -1776.9655043826424,
+        "annualised_return": -0.04512748493204387,
+        "per_bar_sharpe_annualised": -0.5743936499393002,
+        "max_drawdown_bps": -2203.464503788977,
+        "occupancy": 0.705286514596221,
+        "buy_and_hold_annualised_return": 0.06035210929341979,
+        "buy_and_hold_annualised_vol": 0.09632116814200828,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_eurusd_5m_20260708_201415",
+      "instrument": "EURUSD",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-12 15:10:00",
+        "fence": "2024-12-12T15:11:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -1827.637456314489,
+        "per_leg_realized_total": -1827.63745631449,
+        "abs_diff_bps": 9.094947017729282e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.93896874287018,
+        "n_bars": 286149,
+        "n_legs": 15596,
+        "n_censored_legs": 0,
+        "total_net_bps": -1827.637456314489,
+        "annualised_return": -0.0463988819312833,
+        "per_bar_sharpe_annualised": -0.723283574605476,
+        "max_drawdown_bps": -2198.9345629227964,
+        "occupancy": 0.7083966744598094,
+        "buy_and_hold_annualised_return": -0.038484210565665804,
+        "buy_and_hold_annualised_vol": 0.07877272710224574,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_gbpjpy_5m_20260708_201552",
+      "instrument": "GBPJPY",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-12 09:25:00",
+        "fence": "2024-12-12T09:26:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -1926.3913374441859,
+        "per_leg_realized_total": -1926.3913374441854,
+        "abs_diff_bps": 4.547473508864641e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.93831279945243,
+        "n_bars": 290336,
+        "n_legs": 15828,
+        "n_censored_legs": 1,
+        "total_net_bps": -1926.3913374441859,
+        "annualised_return": -0.0489141273316844,
+        "per_bar_sharpe_annualised": -0.5645883721965129,
+        "max_drawdown_bps": -3112.017817325819,
+        "occupancy": 0.7086375785297035,
+        "buy_and_hold_annualised_return": 0.08216902340280398,
+        "buy_and_hold_annualised_vol": 0.10531266142344554,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_gbpusd_5m_20260708_201423",
+      "instrument": "GBPUSD",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-12 03:50:00",
+        "fence": "2024-12-12T03:53:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -4282.750105247954,
+        "per_leg_realized_total": -4282.750105247955,
+        "abs_diff_bps": 9.094947017729282e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.937675868887368,
+        "n_bars": 287572,
+        "n_legs": 15770,
+        "n_censored_legs": 1,
+        "total_net_bps": -4282.750105247954,
+        "annualised_return": -0.10876339871158797,
+        "per_bar_sharpe_annualised": -1.4383011566841595,
+        "max_drawdown_bps": -4554.4249791490765,
+        "occupancy": 0.712715424311129,
+        "buy_and_hold_annualised_return": -0.017041394318667247,
+        "buy_and_hold_annualised_vol": 0.09271359847797665,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_hk50_5m_20260708_201903",
+      "instrument": "HK50",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-30 16:50:00",
+        "fence": "2024-12-30T16:51:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 1109.8037869677369,
+        "per_leg_realized_total": 1109.8037869677387,
+        "abs_diff_bps": 1.8189894035458565e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9880789413643623,
+        "n_bars": 173093,
+        "n_legs": 9553,
+        "n_censored_legs": 1,
+        "total_net_bps": 1109.8037869677369,
+        "annualised_return": 0.027828029567239752,
+        "per_bar_sharpe_annualised": 0.14007702523105506,
+        "max_drawdown_bps": -2568.618506214412,
+        "occupancy": 0.7169960656987862,
+        "buy_and_hold_annualised_return": -0.07775787428508328,
+        "buy_and_hold_annualised_vol": 0.24315406605427134,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_jp225_5m_20260708_201648",
+      "instrument": "JP225",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-30 00:00:00",
+        "fence": "2024-12-30T00:02:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -3634.237255258223,
+        "per_leg_realized_total": -3634.237255258221,
+        "abs_diff_bps": 1.8189894035458565e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9864153167541256,
+        "n_bars": 237877,
+        "n_legs": 13008,
+        "n_censored_legs": 1,
+        "total_net_bps": -3634.237255258223,
+        "annualised_return": -0.09116554514488827,
+        "per_bar_sharpe_annualised": -0.5713891762236606,
+        "max_drawdown_bps": -5309.38854513413,
+        "occupancy": 0.7100686489236033,
+        "buy_and_hold_annualised_return": 0.09488618205727906,
+        "buy_and_hold_annualised_vol": 0.19439478149455708,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_nzdusd_5m_20260708_201521",
+      "instrument": "NZDUSD",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-11 14:00:00",
+        "fence": "2024-12-11T14:01:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -3441.589389016862,
+        "per_leg_realized_total": -3441.5893890168613,
+        "abs_diff_bps": 4.547473508864641e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9360787892615408,
+        "n_bars": 286416,
+        "n_legs": 15685,
+        "n_censored_legs": 0,
+        "total_net_bps": -3441.589389016862,
+        "annualised_return": -0.08743700452354382,
+        "per_bar_sharpe_annualised": -0.9342262049024392,
+        "max_drawdown_bps": -4553.301370512845,
+        "occupancy": 0.7117758784425451,
+        "buy_and_hold_annualised_return": -0.05497421041547833,
+        "buy_and_hold_annualised_vol": 0.1141878241482007,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_stoxx50_5m_20260708_201758",
+      "instrument": "STOXX50",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2025-01-29 10:35:00",
+        "fence": "2025-01-29T10:39:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -2181.6412090779245,
+        "per_leg_realized_total": -2181.6412090779245,
+        "abs_diff_bps": 0.0,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 4.06884553958476,
+        "n_bars": 112043,
+        "n_legs": 6136,
+        "n_censored_legs": 1,
+        "total_net_bps": -2181.6412090779245,
+        "annualised_return": -0.05361818697351114,
+        "per_bar_sharpe_annualised": -0.3702273320645907,
+        "max_drawdown_bps": -3235.286071071754,
+        "occupancy": 0.7099952696732504,
+        "buy_and_hold_annualised_return": 0.09392945267026262,
+        "buy_and_hold_annualised_vol": 0.17656823790934661,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_uk100_5m_20260708_201914",
+      "instrument": "UK100",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-11 19:25:00",
+        "fence": "2024-12-11T19:28:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -5636.107238324599,
+        "per_leg_realized_total": -5636.107238324601,
+        "abs_diff_bps": 1.8189894035458565e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9363829949045557,
+        "n_bars": 248029,
+        "n_legs": 13520,
+        "n_censored_legs": 1,
+        "total_net_bps": -5636.107238324599,
+        "annualised_return": -0.14317984925806887,
+        "per_bar_sharpe_annualised": -1.2501033237789114,
+        "max_drawdown_bps": -5998.31049577584,
+        "occupancy": 0.708336525164396,
+        "buy_and_hold_annualised_return": 0.06287809600182323,
+        "buy_and_hold_annualised_vol": 0.13989856103430992,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_us2000_5m_20260708_201639",
+      "instrument": "US2000",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-12 14:30:00",
+        "fence": "2024-12-12T14:33:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -7935.049093529182,
+        "per_leg_realized_total": -7935.049093529182,
+        "abs_diff_bps": 0.0,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9387881207696402,
+        "n_bars": 273182,
+        "n_legs": 15000,
+        "n_censored_legs": 1,
+        "total_net_bps": -7935.049093529182,
+        "annualised_return": -0.2014591506379041,
+        "per_bar_sharpe_annualised": -1.0247881786445596,
+        "max_drawdown_bps": -9052.354007871765,
+        "occupancy": 0.7136927030331427,
+        "buy_and_hold_annualised_return": 0.04835595034091695,
+        "buy_and_hold_annualised_vol": 0.24077353833465365,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_us30_5m_20260708_201748",
+      "instrument": "US30",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-11 23:35:00",
+        "fence": "2024-12-11T23:38:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -4064.6999258961805,
+        "per_leg_realized_total": -4064.69992589618,
+        "abs_diff_bps": 4.547473508864641e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9370864704540267,
+        "n_bars": 276345,
+        "n_legs": 15139,
+        "n_censored_legs": 1,
+        "total_net_bps": -4064.6999258961805,
+        "annualised_return": -0.10324131706021272,
+        "per_bar_sharpe_annualised": -0.8404945931417068,
+        "max_drawdown_bps": -4260.392713784288,
+        "occupancy": 0.7121279559970327,
+        "buy_and_hold_annualised_return": 0.09294308635143377,
+        "buy_and_hold_annualised_vol": 0.148929977284152,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_us500_5m_20260708_201620",
+      "instrument": "US500",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-19 14:55:00",
+        "fence": "2024-12-19T14:59:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -2076.5386525683243,
+        "per_leg_realized_total": -2076.5386525683252,
+        "abs_diff_bps": 9.094947017729282e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.958000608411286,
+        "n_bars": 255640,
+        "n_legs": 13959,
+        "n_censored_legs": 0,
+        "total_net_bps": -2076.5386525683243,
+        "annualised_return": -0.05246433383955018,
+        "per_bar_sharpe_annualised": -0.38532333918435174,
+        "max_drawdown_bps": -3065.1938308989793,
+        "occupancy": 0.7096659364731653,
+        "buy_and_hold_annualised_return": 0.1142875304460491,
+        "buy_and_hold_annualised_vol": 0.16612341329714936,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_usdcad_5m_20260708_201504",
+      "instrument": "USDCAD",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-11 15:20:00",
+        "fence": "2024-12-11T15:23:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -3115.5456132484105,
+        "per_leg_realized_total": -3115.5456132484114,
+        "abs_diff_bps": 9.094947017729282e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9362403985093923,
+        "n_bars": 285936,
+        "n_legs": 15671,
+        "n_censored_legs": 1,
+        "total_net_bps": -3115.5456132484105,
+        "annualised_return": -0.07915028803698652,
+        "per_bar_sharpe_annualised": -1.3816667227053285,
+        "max_drawdown_bps": -3138.823288195287,
+        "occupancy": 0.712425158077332,
+        "buy_and_hold_annualised_return": 0.026719645807934327,
+        "buy_and_hold_annualised_vol": 0.07012291166838998,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_usdchf_5m_20260708_201444",
+      "instrument": "USDCHF",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-13 02:20:00",
+        "fence": "2024-12-13T02:23:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -4024.36136938023,
+        "per_leg_realized_total": -4024.3613693802295,
+        "abs_diff_bps": 4.547473508864641e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.940242604000304,
+        "n_bars": 283170,
+        "n_legs": 15484,
+        "n_censored_legs": 0,
+        "total_net_bps": -4024.36136938023,
+        "annualised_return": -0.10213486259182429,
+        "per_bar_sharpe_annualised": -1.484902905221772,
+        "max_drawdown_bps": -4390.905819777121,
+        "occupancy": 0.7105872797259597,
+        "buy_and_hold_annualised_return": 0.002664051795196597,
+        "buy_and_hold_annualised_vol": 0.08430513205954601,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_usdjpy_5m_20260708_201433",
+      "instrument": "USDJPY",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-11 20:15:00",
+        "fence": "2024-12-11T20:16:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -1372.2237142515746,
+        "per_leg_realized_total": -1372.2237142515746,
+        "abs_diff_bps": 0.0,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.936810784090045,
+        "n_bars": 287866,
+        "n_legs": 15776,
+        "n_censored_legs": 1,
+        "total_net_bps": -1372.2237142515746,
+        "annualised_return": -0.03485622727404591,
+        "per_bar_sharpe_annualised": -0.44117183217981193,
+        "max_drawdown_bps": -2308.948420493949,
+        "occupancy": 0.7123314319857156,
+        "buy_and_hold_annualised_return": 0.0993513916625364,
+        "buy_and_hold_annualised_vol": 0.09749665052411655,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_ustec_5m_20260708_201610",
+      "instrument": "USTEC",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-11 17:30:00",
+        "fence": "2024-12-11T17:34:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 2103.6420399271924,
+        "per_leg_realized_total": 2103.6420399271924,
+        "abs_diff_bps": 0.0,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.9363925013308996,
+        "n_bars": 277694,
+        "n_legs": 15290,
+        "n_censored_legs": 0,
+        "total_net_bps": 2103.6420399271924,
+        "annualised_return": 0.05344086086984334,
+        "per_bar_sharpe_annualised": 0.2948247800624073,
+        "max_drawdown_bps": -3200.270704518218,
+        "occupancy": 0.7156942533868215,
+        "buy_and_hold_annualised_return": 0.13276204265124605,
+        "buy_and_hold_annualised_vol": 0.22184593121400928,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "run_dir": "../data/strategy_runs/EXP-025-t1-x2-h12/htfdi_x2_e0h12_di_xauusd_5m_20260708_201847",
+      "instrument": "XAUUSD",
+      "domain": "5m",
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true
+      },
+      "fence": {
+        "ok": true,
+        "last_bar": "2024-12-12 04:05:00",
+        "fence": "2024-12-12T04:10:00.0000000Z"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -1715.5426656812817,
+        "per_leg_realized_total": -1715.5426656812801,
+        "abs_diff_bps": 1.5916157281026244e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 3.93759031105027,
+        "n_bars": 277050,
+        "n_legs": 15172,
+        "n_censored_legs": 1,
+        "total_net_bps": -1715.5426656812817,
+        "annualised_return": -0.04356833825161705,
+        "per_bar_sharpe_annualised": -0.371269027324194,
+        "max_drawdown_bps": -2972.1131517843323,
+        "occupancy": 0.7118606749684172,
+        "buy_and_hold_annualised_return": 0.0890284674042978,
+        "buy_and_hold_annualised_vol": 0.14256016020522708,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    }
+  ]
+}

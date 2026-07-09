@@ -303,7 +303,14 @@ public sealed class StrategyRunParquetWriter : IDisposable
             new DataField<string>("LegSymbol"),
             new DataField<long>("SpreadPositionId"),
             new DataField<double>("SlPrice"),
-            new DataField<int>("HorizonBars")
+            new DataField<int>("HorizonBars"),
+            new DataField<double>("BreakoutRef"),
+            new DataField<int>("SignalX"),
+            new DataField<double>("HtfPlusDi"),
+            new DataField<double>("HtfMinusDi"),
+            new DataField<double>("HtfAdx"),
+            new DataField<double>("HtfAtr"),
+            new DataField<DateTime>("HtfBarCloseTime")
         };
         using var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
         using var writer = ParquetWriter.CreateAsync(new ParquetSchema(fields), stream).GetAwaiter().GetResult();
@@ -341,6 +348,13 @@ public sealed class StrategyRunParquetWriter : IDisposable
         groupWriter.WriteColumnAsync(new DataColumn(fields[27], rows.Select(r => r.SpreadPositionId).ToArray())).GetAwaiter().GetResult();
         groupWriter.WriteColumnAsync(new DataColumn(fields[28], rows.Select(r => r.SlPrice).ToArray())).GetAwaiter().GetResult();
         groupWriter.WriteColumnAsync(new DataColumn(fields[29], rows.Select(r => r.HorizonBars).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[30], rows.Select(r => r.BreakoutRef).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[31], rows.Select(r => r.SignalX).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[32], rows.Select(r => r.HtfPlusDi).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[33], rows.Select(r => r.HtfMinusDi).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[34], rows.Select(r => r.HtfAdx).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[35], rows.Select(r => r.HtfAtr).ToArray())).GetAwaiter().GetResult();
+        groupWriter.WriteColumnAsync(new DataColumn(fields[36], rows.Select(r => r.HtfBarCloseTime).ToArray())).GetAwaiter().GetResult();
     }
 
     private static void WriteEvents(string path, IReadOnlyList<SignalEventRecord> rows)
