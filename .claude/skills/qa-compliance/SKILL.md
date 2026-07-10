@@ -82,6 +82,15 @@ running the implementation to produce its own expectations.
 - Holdout: no code path can touch the final 30%; conf fence set.
 - Any `DEVIATIONS` block: each deviation was operator-approved (evidence, not assertion).
 - Elicitation hygiene: open questions to the operator are plain-language.
+- **XENA runs (INFR-006 clauses; spec `docs/references/xena-lane.md`):** (a) frozen
+  registry verified — `xen.xena.calibration.verify_frozen_registry` passes and the run's
+  thresholds/params match the pinned values byte-for-byte (any mismatch = REJECT: frozen
+  values are never re-derived per run); (b) every candidate leg carries finite `SlPrice`
+  and the universe's `xena_candidate_gate.json` is passing and non-stale; (c) band
+  boundaries (search/ranking/gate) are pre-registered in the run design and folds do not
+  overlap the search band; (d) `new_data_attestation` appears ONLY as an operator-supplied
+  string — an agent-authored attestation is a REJECT; (e) gate ledger state checked before
+  any gate approval (cap 2/universe; identical-failed-subset rule).
 
 ### 4. Verdict
 

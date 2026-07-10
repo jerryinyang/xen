@@ -115,3 +115,41 @@ CONVERSION-PIN:
 Each line is verifiable against data; QA traces this block as a clause. Power statements (§6)
 and interpretation bands (§5) must use the pinned effect, never the raw screen units.
 Full convention: `docs/references/spdr-lane.md` §Unit convention + money-unit floor.
+
+## 10. Spread as a verdict leg (mandatory for any SUPPORTED/tradability band — L-22)
+
+A commission-only net band never binds on 0-commission instruments (indices), and the most
+likely SUPPORTED cell (dense, short-hold, high-turnover) is exactly where spread dominates.
+Any band that can emit a SUPPORTED/tradable claim must make the **1× spread estimate a
+binding leg**: CI_low > 0 must survive commission + 1× spread before the cell counts toward
+the multiplicity family (SUPPORTED-GROSS may be reported separately as disclosure).
+0.5×/2× spread remain disclosure-only sensitivity. Spread pins come from the
+`xen.evaluation.FTMO_COSTS` table; an unpinned spread on a claimed instrument blocks the band.
+
+## 11. Amendment-direction ledger (mandatory once any pre-measurement amendment lands — L-23)
+
+Every pre-measurement amendment to a registered design declares:
+
+```
+AMENDMENT-<n>: <one-line change> — DIRECTION: LOOSER | TIGHTER | NEUTRAL
+  running count: <L> looser / <T> tighter / <N> neutral
+```
+
+After the final amendment, re-derive the expected false-qualifier count under the global null
+with the FINAL gate set (apply the selection rules to the random-direction battery runs); if
+materially above the declared budget, tighten one gate back. A one-directional streak ≥ 3 is
+an explicit operator flag at the execution gate.
+
+## 12. Battery/eligibility/null design rules (mandatory for battery-gated, multi-cell, or capped-read designs — L-24)
+
+1. **Time-stability eligibility (F02):** a seed battery prices direction-randomization only.
+   Eligibility must add a time-stability read — TRAIN net positive in ≥2 of 3 chronological
+   thirds, or a declared concentration ceiling (top-decile trade / top-quarter share).
+2. **Exit-matched nulls (F04):** if a qualifying statistic depends on a path-dependent exit
+   (exit* ≠ benchmark), each battery seed re-runs under exit*, and the exit-selection step is
+   registered in the multiplicity ledger; if infeasible, exit* is demoted to disclosure.
+3. **Derived tripwire thresholds (F06):** phase-shift retention REJECT thresholds are computed
+   from the real TRAIN autocorrelation of the shifted stream (with CI), never asserted.
+4. **MDE-consistent read floors (F07):** the TEST-read n floor = the n at which the cell's MDE
+   ≤ its **shrunk** TRAIN effect (shrinkage from fold attenuation), applied prospectively —
+   never a bare n ≥ 50 against an unshrunk selected maximum.

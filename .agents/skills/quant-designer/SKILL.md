@@ -87,6 +87,12 @@ One artifact, dense (tables/bullets), ~300-line budget. All items below are REQU
 - Real-price outcomes only (RealOpen/High/Low/Close); open-to-open returns; `≤ t-1`
   conditioning throughout.
 - Experiment-level only: no family dispositions in a design.
+- **XENA runs**: the design declares the universe manifest (candidate grid — models ×
+  params × instruments × domains), per-candidate `cost_bps` from the FTMO table, the
+  pre-registered band boundaries (search/ranking/gate, 50/30/20 shape), and cites the
+  frozen registry hash — it never re-derives or proposes threshold values (X, F_floor,
+  gate threshold are pinned; L-12 clause). Per-candidate quality gates are forbidden:
+  every grid cell enters the universe. Spec: `docs/references/xena-lane.md`.
 - Operator questions follow the plain-language elicitation standard: one plain sentence per
   question, concrete options, one-line consequences, recommendation marked. If anything in
   the request is ambiguous, ask BEFORE writing the design — never resolve ambiguity silently.

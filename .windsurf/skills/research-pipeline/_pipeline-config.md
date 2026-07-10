@@ -211,6 +211,18 @@ These binding constraints apply to all Xen research.
 | **Experiment ≠ family** | Experiments produce evidence and experiment-level verdicts. Family open/retire/promote decisions happen only at checkpoint retrospectives, operator-signed. Checkpoints group multiple experiments. |
 | **Protocols, not directives** | Every lesson is codified as a checkable protocol, script, or structural separation — directives ("interrogate raw data") recur; protocols do not. |
 
+### XENA Lane — the DEFAULT route (binding, INFR-006, 2026-07-10)
+
+**Incoming ideas route to XENA by default** (operator decision Q3): no per-candidate
+evaluation — every (model × params × instrument × domain) is a valid candidate, run once
+in cTrader, selected at the **portfolio** level by `xen.xena.*` (oracle → LAHC search →
+plateau + fold certification → counted TEST final gate). EXP/SPDR lanes remain for
+**operator-invoked** exploration/characterisation only. Full spec, frozen-registry values
+(X=0.70, F_floor=0.1811, gate=0.0046; sha256-pinned), gate-ledger rules (cap 2/universe;
+`new_data_attestation` is **operator-only**), and the fills-based emission contract
+(`SlPrice` mandatory): `docs/references/xena-lane.md`. Tuning any frozen registry value
+after seeing a live universe's outcome is a governance violation (L-12 clause).
+
 ### Every Experiment Is Price-Primary (binding, INFR-001)
 
 - All strategy logic runs in cTrader (StrategyHost) via `tools/ctrader-cli/run-experiment.sh`,
@@ -358,6 +370,7 @@ Before creating new modules, check these existing reusable functions:
 | **Signal-quality toolbox** | `xen.evaluation` | Informative-only evidence: block-bootstrap CIs (INFR-004: circular block capped < n → no zero-width CI on sparse strata; 5-seed battery with `ci_low_seed_range`; `block_sensitivity` sweep; `trimmed_mean` robust stat; report "CI excludes zero", not a p-value — L-20), MDE/UNPOWERED labels, exposure-honest economics (avg+peak normalizations, B&H exposure-matched), cost curves, collapse fractions, splits. Composed per candidate by the Quant Designer — no fixed stack. |
 | ~~Frozen referee stack~~ | `xen.referee_*`, `xen.incremental_referee` | **RETIRED FROM SERVICE (INFR-001 WS-7, 2026-07-04)** — byte-frozen for Chapter-01/02 reproducibility only. Never used for new adjudication: its gate conjunctions/readiness floors select fragile gate-threaders (L-17, B-5/B-7). New evaluation = `xen.evaluation` + operator judgment. |
 | Run ingestion | `xen.signals.ingestion` | Emitted-run loading + holdout fence assertion |
+| **XENA portfolio framework** | `xen.xena.{oracle,ingest,search,certify,final_gate,calibration}` | The DEFAULT adjudication route (INFR-006): shared-capital oracle, blocking candidate gate, LAHC search, plateau+fold certification, counted final gate, frozen-registry verification. Spec: `docs/references/xena-lane.md` |
 | *(More to be added as analysis modules are developed)* | `python/src/xen/` | Reusable analysis code |
 
 ---

@@ -68,9 +68,29 @@ running the implementation to produce its own expectations.
   object matches the screen code verbatim, the measured TRAIN-median value is recomputed (not
   recalled), the resulting bps/trade effect and cost-floor comparison follow arithmetically;
   §5 bands and §6 power use the pinned effect (`docs/references/spdr-lane.md`).
+- Spread verdict leg (L-22): any SUPPORTED/tradability band binds on commission + 1× spread
+  (pinned in `xen.evaluation.FTMO_COSTS`); a commission-only band on a 0-commission
+  instrument is a REVISE.
+- Amendment-direction ledger (L-23): every pre-measurement amendment carries a
+  LOOSER/TIGHTER/NEUTRAL declaration + running directional count; the final gate set carries
+  a re-derived false-qualifier expectation; a one-directional streak ≥3 is flagged to the
+  operator at the execution gate.
+- Battery/eligibility/null rules (L-24): for any battery-gated, multi-cell, or capped-read
+  design, trace the four clauses of `quant-designer/references/design-requirements.md` §12 —
+  time-stability eligibility, exit-matched nulls, derived tripwire thresholds,
+  MDE-consistent read floors.
 - Holdout: no code path can touch the final 30%; conf fence set.
 - Any `DEVIATIONS` block: each deviation was operator-approved (evidence, not assertion).
 - Elicitation hygiene: open questions to the operator are plain-language.
+- **XENA runs (INFR-006 clauses; spec `docs/references/xena-lane.md`):** (a) frozen
+  registry verified — `xen.xena.calibration.verify_frozen_registry` passes and the run's
+  thresholds/params match the pinned values byte-for-byte (any mismatch = REJECT: frozen
+  values are never re-derived per run); (b) every candidate leg carries finite `SlPrice`
+  and the universe's `xena_candidate_gate.json` is passing and non-stale; (c) band
+  boundaries (search/ranking/gate) are pre-registered in the run design and folds do not
+  overlap the search band; (d) `new_data_attestation` appears ONLY as an operator-supplied
+  string — an agent-authored attestation is a REJECT; (e) gate ledger state checked before
+  any gate approval (cap 2/universe; identical-failed-subset rule).
 
 ### 4. Verdict
 

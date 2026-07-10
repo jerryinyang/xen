@@ -18,7 +18,9 @@ materiality read is informative — presented as evidence, decided by the operat
 3. Read `docs/references/dataset-reference.md`, `architecture.md`.
 4. Read `python/experiments/INDEX.md`, `docs/experiments-docs/INDEX.md`, the newest active
    checkpoint `design.md`, and `docs/signal-registry/` preconditions.
-5. Determine entry point: new EXP, resume EXP, VAL re-analysis, SPDR speed-run screen (see SPDR carve-out below), or scope-only design.
+5. Determine entry point: **XENA run (the DEFAULT for a new idea — see XENA lane below)**,
+   new EXP, resume EXP, VAL re-analysis, SPDR speed-run screen (see SPDR carve-out below),
+   or scope-only design. EXP/SPDR require explicit operator invocation for new ideas.
 
 ## Stages
 
@@ -50,6 +52,14 @@ A Python backtest of a price strategy is REJECT-class. **VAL carve-out:** re-ana
 already-emitted, still-valid data skips stages 1-3 and enters at the estimand gate →
 `data-analyst`. If the prior emission is invalidated by an identified defect, a rerun (full
 pipeline) is required first.
+
+**XENA lane (DEFAULT route, INFR-006).** An incoming idea becomes candidates in a XENA
+universe: engine emission per candidate (fills-based contract, `SlPrice` mandatory) →
+blocking candidate gate (`xen.xena.ingest.gate_universe`) → LAHC search on the TRAIN
+search band → plateau + disjoint-fold certification (evidence package, operator reviews) →
+operator-approved counted final gate on TEST (`run_final_gate`; ledger cap 2/universe;
+`new_data_attestation` operator-only). All thresholds come from the hash-pinned frozen
+registry — never re-derive or tune them. Spec: `docs/references/xena-lane.md`.
 
 **SPDR carve-out (speed-run screens).** The `SPDR-###` lane is a TRAIN-only availability
 screen that runs vectorised in Python to gate a `WORTH_EXPLORING` disposition **before** a
@@ -132,3 +142,4 @@ cannot be stated plainly, the asker does not understand it yet — investigate f
 | `docs/signal-registry/` | Stage 1 precondition; Stage 6 evidence rows |
 | latest checkpoint in `docs/experiments-docs/checkpoints/` | Start, phase alignment |
 | `docs/references/spdr-lane.md` | Any `SPDR-###` speed-run screen |
+| `docs/references/xena-lane.md` | Any XENA run (the default route for new ideas) |

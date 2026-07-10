@@ -112,6 +112,13 @@ Structure (see `references/interrogation-protocol.md` for the template):
 ## Constraints
 
 - No family-level dispositions, no RETIRE recommendations, no registry status changes.
+- **XENA runs**: interrogate the certification evidence package (`certify_and_rank`
+  output + gate artifact) as evidence, never as a verdict — plateau min-drop ratios and
+  keystone attributions (route keystones to individual scrutiny), restart F-dispersion +
+  Hamming proximity (wild dispersion ⇒ distrust the winner), fold distribution +
+  PBO-like stat, gate bootstrap P25/median/P75 + decay windows + search-stage gap (NOT
+  like-for-like: search-P25 claim vs gate median). Always report `evaluation_count` +
+  `distinct_subsets` alongside any number (§10.4). Spec: `docs/references/xena-lane.md`.
 - No blocking authority outside Phase 0 integrity items.
 - Do not tune, re-scope, or extend the experiment; new questions that need new emissions are
   proposals for the operator, listed under open questions.
