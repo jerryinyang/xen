@@ -1,0 +1,169 @@
+{
+ "registered_scale": {
+  "n_null": 300,
+  "planted_edges_bps": [
+   10.0,
+   20.0,
+   30.0,
+   40.0,
+   60.0
+  ],
+  "n_per_edge": 50,
+  "n_candidates": 24,
+  "n_planted": 5,
+  "n_restarts": 10,
+  "budget": 400,
+  "layout": {
+   "search": [
+    0,
+    120000000000000
+   ],
+   "ranking": [
+    120000000000000,
+    192000000000000
+   ],
+   "gate": [
+    192000000000000,
+    240000000000000
+   ]
+  },
+  "cost_bps": 2.0,
+  "noise_bps": 30.0
+ },
+ "thresholds": {
+  "X": 0.7,
+  "F_floor": 0.4301969674088667,
+  "gate_pass_threshold": 0.05580535791613938,
+  "gate_rule": "max(0, P95 of GROSS null gate bootstrap P25s) \u2014 A-4 regime",
+  "null": {
+   "n": 300,
+   "certification_rate": 0.006666666666666667,
+   "end_to_end_false_pass_rate": 0.0,
+   "n_end_to_end_false": 0,
+   "rule_of_three_fpr_bound_95": 0.01
+  },
+  "target_edge_base_cert_rate_X0": 1.0,
+  "mde_curve": {
+   "10.0": {
+    "n": 50,
+    "gross_edge_bps": 10.0,
+    "net_edge_bps_for_deployability": 8.0,
+    "certification_rate": 0.08,
+    "end_to_end_pass_rate": 0.0,
+    "net_p25_nonneg_among_passers": NaN,
+    "top_planted_frac_mean": 0.3376262653754914
+   },
+   "20.0": {
+    "n": 50,
+    "gross_edge_bps": 20.0,
+    "net_edge_bps_for_deployability": 18.0,
+    "certification_rate": 0.34,
+    "end_to_end_pass_rate": 0.16,
+    "net_p25_nonneg_among_passers": 1.0,
+    "top_planted_frac_mean": 0.38679710597280254
+   },
+   "30.0": {
+    "n": 50,
+    "gross_edge_bps": 30.0,
+    "net_edge_bps_for_deployability": 28.0,
+    "certification_rate": 0.9,
+    "end_to_end_pass_rate": 0.7,
+    "net_p25_nonneg_among_passers": 1.0,
+    "top_planted_frac_mean": 0.3924077306422508
+   },
+   "40.0": {
+    "n": 50,
+    "gross_edge_bps": 40.0,
+    "net_edge_bps_for_deployability": 38.0,
+    "certification_rate": 0.98,
+    "end_to_end_pass_rate": 0.94,
+    "net_p25_nonneg_among_passers": 1.0,
+    "top_planted_frac_mean": 0.39639981922102663
+   },
+   "60.0": {
+    "n": 50,
+    "gross_edge_bps": 60.0,
+    "net_edge_bps_for_deployability": 58.0,
+    "certification_rate": 1.0,
+    "end_to_end_pass_rate": 1.0,
+    "net_p25_nonneg_among_passers": 1.0,
+    "top_planted_frac_mean": 0.38554171104093704
+   }
+  }
+ },
+ "insensitivity": {
+  "L": {
+   "50": {
+    "median": 0.42385812097974745,
+    "min": 0.38336060070637257,
+    "max": 0.4269635517974619
+   },
+   "150": {
+    "median": 0.3326534751724123,
+    "min": 0.3278750258663322,
+    "max": 0.3553477269592851
+   },
+   "500": {
+    "median": 0.3168958515526956,
+    "min": 0.2746174806609226,
+    "max": 0.3553477269592851
+   }
+  },
+  "block_bars": {
+   "32": {
+    "median": 0.38439481173394574,
+    "min": 0.34825305004611673,
+    "max": 0.3937843334347827
+   },
+   "64": {
+    "median": 0.3326534751724123,
+    "min": 0.3278750258663322,
+    "max": 0.3553477269592851
+   },
+   "128": {
+    "median": 0.38564818822614044,
+    "min": 0.3257587834340148,
+    "max": 0.411184565438761
+   }
+  },
+  "move_probs": {
+   "variant0": {
+    "probs": {
+     "add": 0.25,
+     "drop": 0.25,
+     "swap": 0.45,
+     "2swap": 0.05
+    },
+    "median": 0.3326534751724123,
+    "min": 0.3278750258663322,
+    "max": 0.3553477269592851
+   },
+   "variant1": {
+    "probs": {
+     "add": 0.3,
+     "drop": 0.3,
+     "swap": 0.35,
+     "2swap": 0.05
+    },
+    "median": 0.3651838258553861,
+    "min": 0.3197643671096162,
+    "max": 0.4076155080989219
+   },
+   "variant2": {
+    "probs": {
+     "add": 0.2,
+     "drop": 0.2,
+     "swap": 0.55,
+     "2swap": 0.05
+    },
+    "median": 0.34688888468035795,
+    "min": 0.3354849388639388,
+    "max": 0.3849054931027911
+   }
+  }
+ },
+ "wall_stats": {
+  "mean_s": 55.916363636363634,
+  "total_universes": 550
+ }
+}

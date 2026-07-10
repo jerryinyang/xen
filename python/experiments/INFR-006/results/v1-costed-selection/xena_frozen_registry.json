@@ -1,0 +1,100 @@
+{
+ "registry": {
+  "search_params": {
+   "L": 150,
+   "stag_mult": 5,
+   "kick_bits": [
+    2,
+    4
+   ],
+   "move_probs": {
+    "add": 0.25,
+    "drop": 0.25,
+    "swap": 0.45,
+    "2swap": 0.05
+   },
+   "n_boot": 150,
+   "block_bars": 64,
+   "quantile": 0.25,
+   "sign_q": 0.6,
+   "clear_win_sds": 2.0,
+   "init_size": 5
+  },
+  "plateau_threshold": 0.7,
+  "f_floor": 0.1811,
+  "gate_pass_threshold": 0.0046,
+  "segment_layout": {
+   "search": [
+    0,
+    120000000000000
+   ],
+   "ranking": [
+    120000000000000,
+    192000000000000
+   ],
+   "gate": [
+    192000000000000,
+    240000000000000
+   ]
+  },
+  "battery_summary": {
+   "X": 0.7,
+   "F_floor": 0.18106114573174564,
+   "gate_pass_threshold": 0.004600951000570401,
+   "gate_rule": "max(0, null-P95 of gate bootstrap P25)",
+   "null": {
+    "n": 300,
+    "certification_rate": 0.0,
+    "end_to_end_false_pass_rate": 0.0,
+    "n_end_to_end_false": 0,
+    "rule_of_three_fpr_bound_95": 0.01
+   },
+   "target_edge_base_cert_rate_X0": 1.0,
+   "mde_curve": {
+    "10.0": {
+     "n": 50,
+     "gross_edge_bps": 10.0,
+     "net_edge_bps": 8.0,
+     "certification_rate": 0.0,
+     "end_to_end_pass_rate": 0.0,
+     "top_planted_frac_mean": 0.5037574925074925
+    },
+    "20.0": {
+     "n": 50,
+     "gross_edge_bps": 20.0,
+     "net_edge_bps": 18.0,
+     "certification_rate": 0.0,
+     "end_to_end_pass_rate": 0.0,
+     "top_planted_frac_mean": 0.487744338994339
+    },
+    "30.0": {
+     "n": 50,
+     "gross_edge_bps": 30.0,
+     "net_edge_bps": 28.0,
+     "certification_rate": 0.9,
+     "end_to_end_pass_rate": 0.88,
+     "top_planted_frac_mean": 0.4732696470196471
+    },
+    "40.0": {
+     "n": 50,
+     "gross_edge_bps": 40.0,
+     "net_edge_bps": 38.0,
+     "certification_rate": 1.0,
+     "end_to_end_pass_rate": 1.0,
+     "top_planted_frac_mean": 0.5155802530802531
+    },
+    "60.0": {
+     "n": 50,
+     "gross_edge_bps": 60.0,
+     "net_edge_bps": 58.0,
+     "certification_rate": 1.0,
+     "end_to_end_pass_rate": 1.0,
+     "top_planted_frac_mean": 0.49348590736748627
+    }
+   }
+  },
+  "operator_signoff": "Operator sign-off 2026-07-10: X=0.70, F_floor=0.1811, gate=0.0046 \u2014 freeze and proceed to WS-5",
+  "frozen_utc": "2026-07-10T02:33:09.940732+00:00"
+ },
+ "sha256": "97578c09fe1a9d53cfb28025fe4f9da17ea3e5393041aeddfcf0ad046e0b8b63"
+}

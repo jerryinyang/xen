@@ -1,0 +1,133 @@
+{
+ "universe_id": "CALIB-null-77",
+ "subset": [
+  "null0",
+  "null1",
+  "null10",
+  "null11",
+  "null13",
+  "null16",
+  "null18",
+  "null19",
+  "null20",
+  "null21",
+  "null4",
+  "null9"
+ ],
+ "gate_segment_ns": [
+  192000000000000,
+  240000000000000
+ ],
+ "pass_threshold_preregistered": 0.0,
+ "passed": false,
+ "binding_block": "gross",
+ "gross": {
+  "costs_charged": false,
+  "F_point": -0.08595172814188273,
+  "F_boot": {
+   "p25": -0.14537841383297814,
+   "median": -0.08854469166395759,
+   "p75": -0.03739608502291529
+  },
+  "seed_replication": {
+   "n_seeds": 1,
+   "F_min": -0.08595172814188273,
+   "F_max": -0.08595172814188273,
+   "spread": 0.0
+  },
+  "dd_feasibility": {
+   "feasible": false,
+   "worst_total_dd": 0.09030395674646745,
+   "worst_daily_dd": 0.09030395674646745,
+   "daily_limit": 0.05,
+   "total_limit": 0.1
+  },
+  "decay_windows": [
+   {
+    "start_ns": 192000000000000,
+    "end_ns": 204000000000000,
+    "net_money": -678.407105099468,
+    "n_bars": 200
+   },
+   {
+    "start_ns": 204000000000000,
+    "end_ns": 216000000000000,
+    "net_money": 2434.070870397307,
+    "n_bars": 200
+   },
+   {
+    "start_ns": 216000000000000,
+    "end_ns": 228000000000000,
+    "net_money": -2425.743752718059,
+    "n_bars": 200
+   },
+   {
+    "start_ns": 228000000000000,
+    "end_ns": 240000000000000,
+    "net_money": -7566.067385801463,
+    "n_bars": 200
+   }
+  ],
+  "monotone_decay_flag": false,
+  "decay_rank_corr": -0.7999999999999999,
+  "n_admitted": 131,
+  "n_rejected": 3
+ },
+ "net_informational": {
+  "costs_charged": true,
+  "F_point": -0.11162462362584157,
+  "F_boot": {
+   "p25": -0.17321472277902025,
+   "median": -0.11258135378928877,
+   "p75": -0.061011420931811035
+  },
+  "seed_replication": {
+   "n_seeds": 1,
+   "F_min": -0.11162462362584157,
+   "F_max": -0.11162462362584157,
+   "spread": 0.0
+  },
+  "dd_feasibility": {
+   "feasible": false,
+   "worst_total_dd": 0.11105222612331228,
+   "worst_daily_dd": 0.11105222612331228,
+   "daily_limit": 0.05,
+   "total_limit": 0.1
+  },
+  "decay_windows": [
+   {
+    "start_ns": 192000000000000,
+    "end_ns": 204000000000000,
+    "net_money": -1190.4478608461068,
+    "n_bars": 200
+   },
+   {
+    "start_ns": 204000000000000,
+    "end_ns": 216000000000000,
+    "net_money": 1622.5250873360783,
+    "n_bars": 200
+   },
+   {
+    "start_ns": 216000000000000,
+    "end_ns": 228000000000000,
+    "net_money": -3006.0164523393178,
+    "n_bars": 200
+   },
+   {
+    "start_ns": 228000000000000,
+    "end_ns": 240000000000000,
+    "net_money": -7988.068415281348,
+    "n_bars": 200
+   }
+  ],
+  "monotone_decay_flag": false,
+  "decay_rank_corr": -0.7999999999999999,
+  "n_admitted": 131,
+  "n_rejected": 3
+ },
+ "search_stage_gap_p25claim_minus_gate_median": 0.33642111367264477,
+ "search_F_claim_search_segment_p25": 0.24787642200868718,
+ "new_data_attestation": null,
+ "evaluation_count": 3965,
+ "run_utc": "2026-07-10T06:08:37.494892+00:00"
+}
