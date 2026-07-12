@@ -307,3 +307,34 @@ smoke logs `~/smoke_XENA-002_r10*.log`.
    2023-06-12/09-16/12-22, purge 14d, ranking band 2023-03-08→2024-03-28) → evidence
    package to operator. Permutation-null battery before any gate consideration; default
    NO gate spend (ledger 0/2); `new_data_attestation` operator-only.
+
+## Operational addendum (2026-07-12): platform migration + budget-procedure restoration
+
+Operator decision. The 2026-07-11 operator-directed 16000 budget cap is **DROPPED**; the
+ORIGINAL pre-registered §6 procedure is **restored** (3 smoke restarts on this universe,
+budget = iteration where best-F improvement < 1% over the trailing 20% of iterations,
+then fixed for the 12 production restarts). This is a restoration, not an amendment.
+
+All prior EC2 search output (c7i/c7a x86, …526 libm lineage) is archived under
+`results/archive-ec2-c7i/` and is not comparable to new runs (1-ULP libm caveat,
+INFR-007). All three universes rerun from the post-emission stage on ONE new instance —
+c8g.12xlarge (Graviton4, aarch64, us-east-1) — which is the sole adjudication platform
+for these universes' lifetime (search → certification → permutation battery → final-gate
+computation). Pinned parity corpus (`tests/test_xena_fold_parity.py`, pins NOT
+regenerated) must PASS on that instance before any search. Rust kernel per INFR-007/008.
+
+**Amendments (2026-07-12, operator-approved after run-1 on c8g):**
+1. *Budget read v2*: run-1's literal trailing-20% read fired on transient stalls
+   (×1.25 ladder; pinned 767/392 while F̂@34k was ~2.5× higher). Superseded by curve
+   read: full ladder to 34k cap; per rid budget = smallest rung with best-F ≥ 99% of
+   cap-rung best-F; universe budget = max over the 3 smoke rids. Run-1 search /
+   certification / battery artifacts archived as superseded.
+2. *L-18 reconciliation tolerance made scale-aware* (`oracle.py` + `xena_fold`):
+   `tol = 1e-6 × max(initial_equity, |final_equity|)` — the absolute form cannot hold
+   past ~1e12 equity (f64 accumulation; first hit live on XENA-003 smoke, gross
+   costless compounding). Numeric outputs unchanged; parity re-proved after rebuild.
+3. *Permutation battery v2*: price-coherent re-marking rotation (rotate whole trade
+   stream per candidate within the search band, snap to feed mark grid, re-price
+   entry/exit from grid opens at new times; EXP-018 random re-timing lineage). Run-1
+   rotation kept stale prices → garbled MTM paths → systematically negative permuted
+   F̂ even on the RANDOM universe (implementation artifact, not a machinery alarm).

@@ -1,0 +1,120 @@
+{
+ "universe": "XENA-002",
+ "stage": "permutation_null_battery",
+ "design": "battery v2 (operator-approved 2026-07-12): price-coherent re-marking rotation \u2014 whole-stream minute-aligned wraparound rotation per candidate within the search band, entry/exit snapped to the feed mark grid and re-priced from grid opens at the new times (random re-timing matched-hold control, EXP-018 lineage; never P&L permutation, L-14). K=10 permutations x 2 restarts at the pinned budget. Informative read: live-vs-permuted best-F gap; a LARGE gap = leak/artifact alarm -> HARD STOP, operator.",
+ "budget": 34000,
+ "k_perm": 10,
+ "restarts_per_perm": 2,
+ "live_best_F_hats": [
+  4.363720706362444,
+  4.8188629120222295,
+  4.496846245458357,
+  5.26999377835392,
+  4.815579707633274,
+  4.625476365729648,
+  4.922113274723291,
+  4.313819271693179,
+  7.054325986086763,
+  4.859366892867078,
+  4.756045682659418,
+  4.157586960048837
+ ],
+ "permuted": [
+  {
+   "perm": 0,
+   "best_F_hats": [
+    6.1129725677998445,
+    5.973974054628835
+   ],
+   "seconds": 1911.5
+  },
+  {
+   "perm": 1,
+   "best_F_hats": [
+    8.716211957053167,
+    7.753044248094763
+   ],
+   "seconds": 1911.5
+  },
+  {
+   "perm": 2,
+   "best_F_hats": [
+    6.137725205422252,
+    6.940806119952887
+   ],
+   "seconds": 2082.9
+  },
+  {
+   "perm": 3,
+   "best_F_hats": [
+    5.387333884088791,
+    7.02695401611783
+   ],
+   "seconds": 2082.9
+  },
+  {
+   "perm": 4,
+   "best_F_hats": [
+    5.942990678493299,
+    6.670167396306489
+   ],
+   "seconds": 1943.4
+  },
+  {
+   "perm": 5,
+   "best_F_hats": [
+    5.112200058012729,
+    6.02884439682016
+   ],
+   "seconds": 1943.4
+  },
+  {
+   "perm": 6,
+   "best_F_hats": [
+    7.507323509994766,
+    6.730126111177241
+   ],
+   "seconds": 1763.7
+  },
+  {
+   "perm": 7,
+   "best_F_hats": [
+    9.942194516267763,
+    8.24598191268176
+   ],
+   "seconds": 1763.7
+  },
+  {
+   "perm": 8,
+   "best_F_hats": [
+    4.932576503082213,
+    5.865524938655241
+   ],
+   "seconds": 2076.6
+  },
+  {
+   "perm": 9,
+   "best_F_hats": [
+    6.256086163627149,
+    6.0750946495642655
+   ],
+   "seconds": 2076.6
+  }
+ ],
+ "summary": {
+  "live_median": 4.785812695146346,
+  "live_max": 7.054325986086763,
+  "perm_median": 6.196905684524701,
+  "perm_max": 9.942194516267763,
+  "perm_p95": 8.777511085013897,
+  "live_median_pctile_in_perm": 0.0,
+  "live_max_pctile_in_perm": 0.75
+ },
+ "platform": {
+  "instance_type": "unknown",
+  "machine": "aarch64",
+  "python": "3.13.14",
+  "platform": "Linux-6.17.0-1019-aws-aarch64-with-glibc2.39",
+  "utc": "2026-07-12T17:39:34.769673+00:00"
+ }
+}
