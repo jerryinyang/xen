@@ -32,8 +32,11 @@ cTrader; the portfolio framework selects the subset. The optimizer is a candidat
 - **cTrader (per candidate, once):** all signal logic; standard fills-based emission under
   the `AnalysisEndUtc` fence — `positions.parquet` (bar grid + `RealOpen` marks) +
   `cis_trades.parquet` per-leg ledger with **finite `SlPrice` on every leg** (stop distance
-  `|EntryFill − SlPrice|` is the sizing denominator; no engine stop ⇒ gate REJECT).
-  Candidate never sizes, never sees account state.
+  `|EntryFill − SlPrice|` is the sizing denominator; missing/non-finite `SlPrice` ⇒ gate
+  REJECT). **Clarified (operator, 2026-07-10, CF-MTFCTX-001 reconciliation):** the gate
+  requirement is the finite per-leg `SlPrice` FIELD; a live engine stop order is not
+  required — a synthetic sizing-only stop price satisfies the contract. Candidate never
+  sizes, never sees account state.
 - **Python oracle (`xen.xena.oracle`, per subset):** chronological composition ONLY —
   FM(t), `R_i = r·FM·w_i` sizing, global `R_max` admission (rejected signals logged as
   first-class events — the sole interaction channel), cost charging (spread + commission,

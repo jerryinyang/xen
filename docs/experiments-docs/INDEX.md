@@ -7,7 +7,11 @@ Live status + family navigation for the current chapter. Chapter 02 is archived 
 
 ## Current Checkpoint Status
 
-**No active checkpoint — chapter open, first phase design pending operator direction.**
+**Active: [Checkpoint 011 — MTF Context Filters via XENA](checkpoints/2026-07-10-011-mtf-context-xena/design.md)**
+(opened 2026-07-10). Family group [CF-MTFCTX-001](../signal-registry/candidate-families/cf-mtfctx-001.md)
+REGISTERED. Runs XENA-001 (CTRL-01 RANDOM, next), XENA-002 (CTRL-02 MOMENTUM), XENA-003
+(CTRL-03 REVERSION); 2,736 candidates each, 12 instruments (indices 10 + XAUUSD + BTCUSD).
+First live XENA universes; carries C# batch runner + permutation-null battery deliverables.
 
 ## Current Infrastructure Tasks
 
@@ -19,6 +23,7 @@ Live status + family navigation for the current chapter. Chapter 02 is archived 
 
 | Family | EXP range | Status |
 |--------|-----------|--------|
+| [CF-MTFCTX-001](../signal-registry/candidate-families/cf-mtfctx-001.md) — MTF context filters on naive controls | XENA-001..003 (XENA lane) | REGISTERED 2026-07-10 |
 
 ## Checkpoint Retrospectives
 
