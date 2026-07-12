@@ -302,9 +302,12 @@ def evaluate(bitmask: dict[str, bool] | set[str], streams: list[CandidateStream]
                 "RiskRequested": pl.Float64, "OpenRisk": pl.Float64, "RiskCap": pl.Float64})
 
     # ---- reconciliation invariant (L-18): equity delta == ledger net ----
+    # Amendment 2026-07-12 (operator-approved): tolerance scales with max(initial, |final|)
+    # — the absolute form cannot mathematically hold once equity compounds past ~1e12
+    # (f64 accumulation; first hit live on XENA-003 smoke). Numeric outputs unchanged.
     ledger_net = float(ledger.get_column("NetMoney").sum() or 0.0) if ledger.height else 0.0
     diff = abs((equity - config.initial_equity) - ledger_net)
-    if diff > RECONCILE_TOL_MONEY * config.initial_equity:
+    if diff > RECONCILE_TOL_MONEY * max(config.initial_equity, abs(equity)):
         raise AssertionError(
             f"oracle reconciliation failed: equity delta {equity - config.initial_equity:.6f} "
             f"vs ledger net {ledger_net:.6f} (diff {diff:.6f})")
@@ -477,10 +480,12 @@ def _evaluate_rust(bitmask: dict[str, bool] | set[str], streams: list[CandidateS
         rejected = pl.DataFrame(schema=_REJECTED_SCHEMA)
 
     # reconciliation invariant (L-18) re-checked outside the kernel (belt and braces)
+    # Amendment 2026-07-12 (operator-approved): scale-aware tolerance — see fold-path note.
     equity_delta = float(eq_v[-1]) - config.initial_equity if len(eq_v) else 0.0
     ledger_net = float(ledger.get_column("NetMoney").sum() or 0.0) if ledger.height else 0.0
     diff = abs(equity_delta - ledger_net)
-    if diff > RECONCILE_TOL_MONEY * config.initial_equity:
+    if diff > RECONCILE_TOL_MONEY * max(config.initial_equity,
+                                        abs(config.initial_equity + equity_delta)):
         raise AssertionError(
             f"oracle reconciliation failed: equity delta {equity_delta:.6f} "
             f"vs ledger net {ledger_net:.6f} (diff {diff:.6f})")

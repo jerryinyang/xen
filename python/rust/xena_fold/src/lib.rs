@@ -274,8 +274,10 @@ fn fold_impl(
     for j in 0..out.adm_gross.len() {
         ledger_net += out.adm_gross[j] - out.adm_cost[j];
     }
+    // Amendment 2026-07-12 (operator-approved): scale-aware tolerance — the absolute form
+    // cannot hold once equity compounds past ~1e12 (f64 accumulation; XENA-003 smoke).
     let diff = ((equity - initial_equity) - ledger_net).abs();
-    if diff > RECONCILE_TOL_MONEY * initial_equity {
+    if diff > RECONCILE_TOL_MONEY * initial_equity.max(equity.abs()) {
         return Err(format!(
             "kernel reconciliation failed: equity delta {:.6} vs ledger net {:.6} (diff {:.6})",
             equity - initial_equity,
