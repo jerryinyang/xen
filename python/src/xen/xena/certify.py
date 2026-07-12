@@ -27,8 +27,8 @@ import numpy as np
 
 from xen.xena.oracle import CandidateStream, OracleConfig, evaluate
 from xen.xena.search import (EvalCache, EvalRecord, RestartResult, SearchParams,
-                             bootstrap_F, bootstrap_block_starts, grid_increments,
-                             universe_grid)
+                             bootstrap_F, bootstrap_block_starts, clip_grid_covering,
+                             grid_increments, universe_grid)
 
 
 # --------------------------------------------------------------------------- #
@@ -96,9 +96,7 @@ def plateau_screen(subset: frozenset[str], streams: list[CandidateStream],
         # same segment-grid restriction as run_restart — MUST stay in lockstep with the
         # walk's convention or the plateau ratio's numerator (neighbor F̂, computed here)
         # and denominator (candidate F̂, from the walk's cache) decouple
-        grid = grid[(grid >= segment[0]) & (grid < segment[1])]
-        if len(grid) < 2:
-            raise ValueError("segment covers < 2 universe bars")
+        grid = clip_grid_covering(grid, segment, streams)
     starts = bootstrap_block_starts(len(grid), block=params.block_bars,
                                     n_boot=params.n_boot,
                                     seed=1_000_003 * restart_seed + 17)

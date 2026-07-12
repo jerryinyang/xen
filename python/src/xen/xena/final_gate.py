@@ -54,7 +54,7 @@ import numpy as np
 
 from xen.xena.oracle import CandidateStream, OracleConfig, evaluate
 from xen.xena.search import (SearchParams, bootstrap_F, bootstrap_block_starts,
-                             grid_increments, universe_grid)
+                             clip_grid_covering, grid_increments, universe_grid)
 
 GATE_LEDGER_NAME = "xena_gate_ledger.json"
 MAX_GATES_PER_UNIVERSE = 2   # INFR-006 Q2 (operator-locked 2026-07-10)
@@ -206,9 +206,7 @@ def run_final_gate(subset: frozenset[str] | set[str], streams: list[CandidateStr
         max(len(subset & f) / len(subset | f) for f in failed_prior)
         if failed_prior else None)
     grid_all = universe_grid(streams)
-    grid = grid_all[(grid_all >= gate_segment[0]) & (grid_all < gate_segment[1])]
-    if len(grid) < 2:
-        raise ValueError("gate segment covers < 2 universe bars")
+    grid = clip_grid_covering(grid_all, gate_segment, streams)
 
     def walk_forward_block(cfg: OracleConfig) -> dict:
         """One full §A.4 protocol pass (walk-forward + bootstrap + decay + DD) under

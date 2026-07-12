@@ -55,6 +55,37 @@ def universe_grid(streams: list[CandidateStream]) -> np.ndarray:
     return times.astype(np.int64)
 
 
+def clip_grid_covering(grid: np.ndarray, segment: tuple[int, int],
+                       streams: list[CandidateStream] | None = None) -> np.ndarray:
+    """Restrict ``grid`` to ``segment`` while guaranteeing the segment is COVERED:
+    when the universe has within-segment trade events stamped AFTER the last interior
+    bar-close (native m1 fills, XENA-003 Amendment 4), the first universe bar-close
+    >= segment end is appended so those events have a grid bar to bin into.
+
+    The append is event-driven (from the universe's own fill timestamps), so it is
+    deterministic per universe AND identical across walk / certification / gate for
+    that universe — bar-close-fill universes (XENA-001/002) reproduce the original
+    clipped grid exactly, preserving lockstep with any in-flight walk."""
+    clipped = grid[(grid >= segment[0]) & (grid < segment[1])]
+    if len(clipped) >= 2 and streams is not None:
+        seg_end = int(segment[1])
+        last = int(clipped[-1])
+        for s in streams:
+            t = s.trades
+            ev = np.concatenate([
+                t.get_column("EntryTime").to_numpy(),
+                t.filter(~t.get_column("Censored")).get_column("ExitTime").to_numpy()])
+            ev = ev[(ev >= segment[0]) & (ev < seg_end)]
+            if len(ev) and int(ev.max()) > last:
+                tail = grid[grid >= seg_end]
+                if len(tail):
+                    clipped = np.append(clipped, tail[0])
+                break
+    if len(clipped) < 2:
+        raise ValueError("search segment covers < 2 universe bars")
+    return clipped
+
+
 def grid_increments(result: OracleResult, grid: np.ndarray) -> np.ndarray:
     """Per-grid-bar equity increments of one simulation (money). Events are binned to the
     first grid time >= event time; increments telescope to the total equity delta.
@@ -291,9 +322,7 @@ def run_restart(streams: list[CandidateStream], config: OracleConfig, *, budget:
         # structurally-zero calendar and understate F̂'s dispersion relative to the gate
         # (which restricts its grid) — the frozen F_floor and search-gap baselines must
         # be on the same scale (review 2026-07-10, grid/segment consistency)
-        grid = grid[(grid >= segment[0]) & (grid < segment[1])]
-        if len(grid) < 2:
-            raise ValueError("search segment covers < 2 universe bars")
+        grid = clip_grid_covering(grid, segment, streams)
     starts = bootstrap_block_starts(len(grid), block=params.block_bars,
                                     n_boot=params.n_boot, seed=1_000_003 * restart_id + 17)
     rng = np.random.default_rng(restart_id)
