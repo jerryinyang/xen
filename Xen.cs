@@ -14,13 +14,20 @@ public enum XenMode
 {
     StrategyHost,
     TimeBars,
-    StrategyHostParity
+    StrategyHostParity,
+    // XENA-003 (EXP-013 carve-out, rebuilt): real cTrader limit orders,
+    // engine m1 fills — limit strategies must never self-adjudicate on
+    // aggregated-bar OHLC. Wiring: Xen.NativeReversion.cs partial.
+    NativeOrders
 }
 
 public enum XenStrategy
 {
     MaCrossover,
-    Donchian20
+    Donchian20,
+    MtfCtxRandom,
+    MtfCtxMomentum,
+    MtfCtxReversion
 }
 
 [Robot(AccessRights = AccessRights.FullAccess, AddIndicators = false, DefaultTimeFrame="Minute")]
@@ -89,6 +96,20 @@ public partial class Xen : Robot
             return;
         }
 
+        if (IsNativeOrdersMode())
+        {
+            try
+            {
+                StartNativeOrders();
+            }
+            catch (Exception ex)
+            {
+                Print("Xen native-orders host failed to start: {0}", ex.Message);
+                Stop();
+            }
+            return;
+        }
+
         if (IsStrategyHostMode())
         {
             try
@@ -120,6 +141,11 @@ public partial class Xen : Robot
     {
         if (IsStrategyHostParityMode())
             return;
+        if (IsNativeOrdersMode())
+        {
+            OnNativeBar();
+            return;
+        }
         if (IsStrategyHostMode())
         {
             if (_strategyHostReady)
@@ -133,10 +159,22 @@ public partial class Xen : Robot
     {
         try
         {
-            if (IsStrategyHostMode())
+            if (IsNativeOrdersMode())
+            {
+                // Fallback for non-fence completion paths (backtest data end);
+                // FinalizeNativeRun is idempotent.
+                FinalizeNativeRun();
+            }
+            else if (IsStrategyHostMode())
             {
                 if (!_stoppingAtFence && !_strategyFixedRunCompleted)
                     FlushStrategyDomainBars();
+                // Self-emitting multi-candidate models write their candidate dirs FIRST:
+                // the harness's run_complete gate keys on the feed-level writer's artifacts
+                // and docker-stops the container as soon as they land — disposing the feed
+                // writer before the model truncated 45% of XENA-001's candidate emission
+                // (2026-07-11). Candidate dirs must be fully written before the gate can fire.
+                (_strategyModel as IDisposable)?.Dispose();
                 _strategyWriter?.Dispose();
             }
             else
@@ -254,6 +292,14 @@ public partial class Xen : Robot
         {
             _stoppingAtFence = true;
             FlushStrategyDomainBars();
+            // Write ALL artifacts here, before Stop(): the console's shutdown state
+            // machine can crash concurrently with OnStop ("Message expected",
+            // BacktestReportSavingStateStrategy) and killed mid-write candidate
+            // emissions on 2026-07-11. At this point the bot is still running — no
+            // shutdown race. Both disposals are idempotent; OnStop is the fallback
+            // for non-fence completion paths.
+            (_strategyModel as IDisposable)?.Dispose();
+            _strategyWriter?.Dispose();
             Stop();
             return;
         }
@@ -349,6 +395,16 @@ public partial class Xen : Robot
         {
             XenStrategy.MaCrossover => new MovingAverageCrossoverModel(FastMa, SlowMa),
             XenStrategy.Donchian20 => new DonchianBreakoutModel(),
+            // XENA-001: multi-candidate host; self-emits per-candidate dirs under the
+            // strategy output root. Fence timestamp passed for per-candidate metadata.
+            XenStrategy.MtfCtxRandom => new MtfCtxRandomModel(
+                SymbolName, DomainMinutes, StrategyOutputDirectory,
+                _strategyFence!.AnalysisEndUtc),
+            // XENA-002: multi-candidate host; self-emits per-candidate dirs under the
+            // strategy output root. Fence timestamp passed for per-candidate metadata.
+            XenStrategy.MtfCtxMomentum => new MtfCtxMomentumModel(
+                SymbolName, DomainMinutes, StrategyOutputDirectory,
+                _strategyFence!.AnalysisEndUtc),
             _ => throw new InvalidOperationException($"Unsupported strategy: {Strategy}")
         };
     }
@@ -370,6 +426,16 @@ public partial class Xen : Robot
                 break;
             case XenStrategy.Donchian20:
                 parameters["lookback"] = 20;
+                break;
+            case XenStrategy.MtfCtxRandom:
+                parameters["run"] = "XENA-001";
+                parameters["lambda"] = 2;
+                parameters["candidates_per_feed"] = 76;
+                break;
+            case XenStrategy.MtfCtxMomentum:
+                parameters["run"] = "XENA-002";
+                parameters["breakout_lookback"] = 3;
+                parameters["candidates_per_feed"] = 76;
                 break;
         }
         return parameters;
