@@ -1,0 +1,20 @@
+[package]
+name = "xena_fold"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "xena_fold"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.26", features = ["extension-module", "abi3-py313"] }
+numpy = "0.26"
+
+# Float-identity: default codegen only. No fast-math exists in Rust; we additionally
+# never use mul_add/FMA in source, and LTO/codegen-units settings do not license
+# reassociation of f64 ops.
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

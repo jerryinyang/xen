@@ -101,6 +101,13 @@ class OracleConfig:
     # regardless of what it is handed (L-22: costs are a binding verdict leg). Ledger
     # CostMoney is 0.0 when uncharged.
     charge_costs: bool = True
+    # INFR-007 (NEUTRAL amendment): fold-kernel backend. "rust" dispatches the sequential
+    # event loop to the `xena_fold` PyO3 kernel — proven bit-identical to "python" by the
+    # pinned parity corpus (tests/test_xena_fold_parity.py) and the XENA-001 rid-0 replay.
+    # Everything outside the fold (sorting, mark schedules, bootstrap, RNG) stays in
+    # Python either way. NOTE: bit-identity holds within a platform; libm (np.log) differs
+    # ~1 ULP between macOS and Linux for BOTH backends — keep one search on one platform.
+    backend: str = "rust"
 
 
 @dataclass(frozen=True)
@@ -184,6 +191,11 @@ def evaluate(bitmask: dict[str, bool] | set[str], streams: list[CandidateStream]
     ``seed``: threaded for future stochastic elements; unused in v1.
     """
     del seed  # v1: no stochastic elements; parameter kept for interface stability
+    if config.backend == "rust":
+        return _evaluate_rust(bitmask, streams, config, segment=segment,
+                              objective=objective)
+    if config.backend != "python":
+        raise ValueError(f"unknown oracle backend {config.backend!r}")
     included_ids = ({k for k, v in bitmask.items() if v} if isinstance(bitmask, dict)
                     else set(bitmask))
     streams_by_id = {s.candidate_id: s for s in streams}
@@ -295,6 +307,182 @@ def evaluate(bitmask: dict[str, bool] | set[str], streams: list[CandidateStream]
     if diff > RECONCILE_TOL_MONEY * config.initial_equity:
         raise AssertionError(
             f"oracle reconciliation failed: equity delta {equity - config.initial_equity:.6f} "
+            f"vs ledger net {ledger_net:.6f} (diff {diff:.6f})")
+
+    times = np.asarray(eq_t, dtype=np.int64)
+    eqv = np.asarray(eq_v, dtype=float)
+    return OracleResult(times, eqv, ledger, rejected,
+                        objective(times, eqv, config.initial_equity),
+                        ledger.height, rejected.height)
+
+
+# --------------------------------------------------------------------------- #
+# Rust fold-kernel backend (INFR-007) — bit-identical dispatch of the event loop
+# --------------------------------------------------------------------------- #
+# Per-(stream, segment) prepared trade/mark-schedule arrays are subset-independent, so
+# they are computed once and cached for the life of the stream object. The cache holds a
+# strong reference to the stream so its id() cannot be recycled.
+_PREP_CACHE: dict[tuple[int, tuple[int, int] | None], tuple[CandidateStream, dict]] = {}
+
+_LEDGER_SCHEMA = {"CandidateId": pl.Utf8, "TradeSeq": pl.Int64, "EntryTime": pl.Int64,
+                  "ExitTime": pl.Int64, "Direction": pl.Float64, "Units": pl.Float64,
+                  "EntryPrice": pl.Float64, "Risk": pl.Float64, "GrossMoney": pl.Float64,
+                  "CostMoney": pl.Float64, "NetMoney": pl.Float64, "Censored": pl.Boolean}
+_REJECTED_SCHEMA = {"Time": pl.Int64, "CandidateId": pl.Utf8, "TradeSeq": pl.Int64,
+                    "RiskRequested": pl.Float64, "OpenRisk": pl.Float64,
+                    "RiskCap": pl.Float64}
+
+
+def _prepare_candidate(s: CandidateStream, segment: tuple[int, int] | None) -> dict:
+    """Subset-independent flat arrays for one candidate: the exact per-trade inputs the
+    Python loop would compute at each entry event (same sort, same segment clipping/
+    censoring, same `_trade_mark_schedule` calls — numpy stays the tie-break authority)."""
+    key = (id(s), segment)
+    hit = _PREP_CACHE.get(key)
+    if hit is not None:
+        return hit[1]
+    tr = s.trades.sort("EntryTime")
+    et = tr.get_column("EntryTime").cast(pl.Int64).to_numpy()
+    xt = tr.get_column("ExitTime").cast(pl.Int64).to_numpy()
+    d = tr.get_column("Direction").to_numpy().astype(float)
+    ep = tr.get_column("EntryPrice").to_numpy().astype(float)
+    xp = tr.get_column("ExitPrice").to_numpy().astype(float)
+    sd = tr.get_column("StopDistance").to_numpy().astype(float)
+    cz = tr.get_column("Censored").to_numpy().astype(bool)
+    if (sd <= 0).any():
+        raise ValueError(f"{s.candidate_id}: non-positive StopDistance")
+    mk = s.marks.sort("CloseTime")
+    mtimes = mk.get_column("CloseTime").cast(pl.Int64).to_numpy()
+    mopens = mk.get_column("Open").to_numpy().astype(float)
+    if segment is not None:
+        in_seg = mtimes < segment[1]
+        mtimes, mopens = mtimes[in_seg], mopens[in_seg]
+    ks, mark_ts, unit_incs, censored_eff = [], [], [], []
+    for k in range(tr.height):
+        if segment is not None and not (segment[0] <= et[k] < segment[1]):
+            continue
+        censored_k = bool(cz[k]) or (segment is not None and int(xt[k]) >= segment[1])
+        if len(mtimes) == 0 or et[k] > mtimes[-1]:
+            continue
+        mt, inc = _trade_mark_schedule(mtimes, mopens, int(et[k]), int(xt[k]),
+                                       ep[k], xp[k], censored_k)
+        ks.append(k)
+        mark_ts.append(np.asarray(mt, dtype=np.int64))
+        unit_incs.append(np.asarray(inc, dtype=float))
+        censored_eff.append(censored_k)
+    idx = np.asarray(ks, dtype=np.int64)
+    lens = np.asarray([len(m) for m in mark_ts], dtype=np.int64)
+    prepared = {
+        "trade_k": idx,
+        "entry_t": et[idx] if len(idx) else np.empty(0, dtype=np.int64),
+        "direction": d[idx] if len(idx) else np.empty(0),
+        "entry_price": ep[idx] if len(idx) else np.empty(0),
+        "stop_dist": sd[idx] if len(idx) else np.empty(0),
+        "censored": np.asarray(censored_eff, dtype=bool),
+        "mark_lens": lens,
+        "mark_t": (np.concatenate(mark_ts) if mark_ts else np.empty(0, dtype=np.int64)),
+        "unit_inc": (np.concatenate(unit_incs) if unit_incs else np.empty(0)),
+    }
+    _PREP_CACHE[key] = (s, prepared)
+    return prepared
+
+
+def clear_prepared_cache() -> None:
+    """Drop all cached per-(stream, segment) prepared arrays (memory hygiene between
+    universes in one process)."""
+    _PREP_CACHE.clear()
+
+
+def _evaluate_rust(bitmask: dict[str, bool] | set[str], streams: list[CandidateStream],
+                   config: OracleConfig, *, segment: tuple[int, int] | None,
+                   objective: Callable[[np.ndarray, np.ndarray, float], float],
+                   ) -> OracleResult:
+    """Fold-kernel dispatch: assemble pre-sorted flat arrays for the included candidates
+    (sorted-id rank replaces the string compare, order-isomorphic) and run `xena_fold`."""
+    try:
+        import xena_fold  # deferred: only required when backend == "rust"
+    except ImportError as e:
+        raise ImportError(
+            "oracle backend 'rust' needs the xena_fold kernel — build it with "
+            "`uv pip install ./rust/xena_fold` (from python/), or set "
+            "OracleConfig(backend='python') for the bit-identical pure-Python path"
+        ) from e
+
+    included_ids = ({k for k, v in bitmask.items() if v} if isinstance(bitmask, dict)
+                    else set(bitmask))
+    streams_by_id = {s.candidate_id: s for s in streams}
+    unknown = included_ids - set(streams_by_id)
+    if unknown:
+        raise ValueError(f"bitmask includes unknown candidates {sorted(unknown)}")
+    weights = config.weights or {}
+
+    cids = sorted(included_ids)
+    parts = [_prepare_candidate(streams_by_id[c], segment) for c in cids]
+
+    def cat(name: str, dtype) -> np.ndarray:
+        arrs = [p[name] for p in parts]
+        return (np.concatenate(arrs).astype(dtype, copy=False) if arrs
+                else np.empty(0, dtype=dtype))
+
+    ranks = (np.concatenate([np.full(len(p["trade_k"]), r, dtype=np.uint32)
+                             for r, p in enumerate(parts)]) if parts
+             else np.empty(0, dtype=np.uint32))
+    lens = cat("mark_lens", np.int64)
+    mark_off = np.concatenate([[0], np.cumsum(lens)]).astype(np.int64)
+    w_arr = np.asarray([float(weights.get(c, 1.0)) for c in cids], dtype=float)
+    cb_arr = np.asarray([streams_by_id[c].cost_bps for c in cids], dtype=float)
+    mpu_arr = np.asarray([streams_by_id[c].money_per_unit for c in cids], dtype=float)
+
+    (eq_t, eq_v, adm_idx, adm_exit_t, adm_units, adm_risk, adm_gross, adm_cost,
+     rej_idx, rej_t, rej_risk, rej_open, rej_cap) = xena_fold.fold(
+        np.ascontiguousarray(cat("entry_t", np.int64)),
+        np.ascontiguousarray(cat("trade_k", np.int64)),
+        np.ascontiguousarray(ranks),
+        np.ascontiguousarray(cat("direction", float)),
+        np.ascontiguousarray(cat("entry_price", float)),
+        np.ascontiguousarray(cat("stop_dist", float)),
+        np.ascontiguousarray(mark_off),
+        np.ascontiguousarray(cat("mark_t", np.int64)),
+        np.ascontiguousarray(cat("unit_inc", float)),
+        w_arr, cb_arr, mpu_arr,
+        config.initial_equity, config.risk_per_position, config.r_max,
+        config.charge_costs)
+
+    cid_flat = np.asarray([c for r, p in zip(range(len(parts)), parts)
+                           for c in [cids[r]] * len(p["trade_k"])], dtype=object)
+    trade_k = cat("trade_k", np.int64)
+    entry_t = cat("entry_t", np.int64)
+    direction = cat("direction", float)
+    entry_price = cat("entry_price", float)
+    censored = cat("censored", bool)
+
+    if len(adm_idx):
+        ai = adm_idx.astype(np.int64)
+        ledger = pl.DataFrame({
+            "CandidateId": cid_flat[ai].tolist(), "TradeSeq": trade_k[ai],
+            "EntryTime": entry_t[ai], "ExitTime": adm_exit_t,
+            "Direction": direction[ai], "Units": adm_units,
+            "EntryPrice": entry_price[ai], "Risk": adm_risk, "GrossMoney": adm_gross,
+            "CostMoney": adm_cost, "NetMoney": adm_gross - adm_cost,
+            "Censored": censored[ai]}, schema=_LEDGER_SCHEMA)
+    else:
+        ledger = pl.DataFrame(schema=_LEDGER_SCHEMA)
+    if len(rej_idx):
+        ri = rej_idx.astype(np.int64)
+        rejected = pl.DataFrame({
+            "Time": rej_t, "CandidateId": cid_flat[ri].tolist(), "TradeSeq": trade_k[ri],
+            "RiskRequested": rej_risk, "OpenRisk": rej_open, "RiskCap": rej_cap},
+            schema=_REJECTED_SCHEMA)
+    else:
+        rejected = pl.DataFrame(schema=_REJECTED_SCHEMA)
+
+    # reconciliation invariant (L-18) re-checked outside the kernel (belt and braces)
+    equity_delta = float(eq_v[-1]) - config.initial_equity if len(eq_v) else 0.0
+    ledger_net = float(ledger.get_column("NetMoney").sum() or 0.0) if ledger.height else 0.0
+    diff = abs(equity_delta - ledger_net)
+    if diff > RECONCILE_TOL_MONEY * config.initial_equity:
+        raise AssertionError(
+            f"oracle reconciliation failed: equity delta {equity_delta:.6f} "
             f"vs ledger net {ledger_net:.6f} (diff {diff:.6f})")
 
     times = np.asarray(eq_t, dtype=np.int64)

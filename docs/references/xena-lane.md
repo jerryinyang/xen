@@ -42,6 +42,11 @@ cTrader; the portfolio framework selects the subset. The optimizer is a candidat
   first-class events — the sole interaction channel), cost charging (spread + commission,
   L-22 binding), segment-end censoring, reconciliation invariant (raises). Deterministic:
   (bitmask, segment, seed) → bit-identical. It may never alter an entry/exit decision.
+  **INFR-007 (NEUTRAL, 2026-07-12):** the sequential event fold is dispatched to the
+  `xena_fold` Rust kernel (`OracleConfig.backend`, ~15×/eval) — proven bit-identical to
+  the Python loop by the pinned parity corpus (`python/tests/test_xena_fold_parity.py`)
+  and the XENA-001 rid-0 replay credential; sorting, mark schedules, bootstrap RNG, and
+  all search/certify/gate layers stay in Python unchanged.
 - A candidate whose logic depends on account state cannot use this carve-out.
 
 ## Frozen registry (treat like the frozen referee)

@@ -18,6 +18,7 @@ First live XENA universes; carries C# batch runner + permutation-null battery de
 | Item | Status | Detail |
 |------|--------|--------|
 | INFR-006 | **COMPLETE — FROZEN v3 2026-07-10** | XENA portfolio framework = default route (L-12 fix). Gross selection + A-4 dual gate (gross binding / net informational). Battery v3 (realistic correlated null): 0/300 end-to-end false → FPR ≤1%@95%; power 30 bps→70%, 40→94%. Frozen X=0.70/F_floor=0.4302/gate=0.0558, sha256 `537d691a…e672a6`, operator-signed. Spec: `docs/references/xena-lane.md`. At first live universe: C# batch runner, permutation-null battery. |
+| INFR-007 | **COMPLETE 2026-07-12** | NEUTRAL amendment: XENA oracle event fold ported to Rust (`python/rust/xena_fold/`, PyO3). Bit-identical by proof: 500-case pinned parity corpus (bitwise sha256, `python/tests/test_xena_fold_parity.py`) + XENA-001 rid-0 replay (identical walk, 15,569 evals, 29 min local vs 640 min EC2). Default backend `rust`; registry v3 untouched. Finding: 1-ULP macOS↔Linux libm (`np.log`) divergence hits both backends → one universe adjudicates on one platform. Permutation-null battery now ~5 h local, $0. Record: `python/experiments/INFR-007/report.md`. |
 
 ## Family Indexes
 
