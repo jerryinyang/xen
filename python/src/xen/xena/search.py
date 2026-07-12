@@ -102,10 +102,16 @@ def grid_increments(result: OracleResult, grid: np.ndarray) -> np.ndarray:
         raise ValueError(
             f"equity event at {int(ev_t.max())} beyond grid end {int(grid[-1])} — "
             "grid does not cover the simulation segment")
-    bins = np.searchsorted(grid, ev_t, side="left")
-    out = np.zeros(len(grid))
-    np.add.at(out, bins, ev_inc)
-    return out
+    # INFR-008 (bit-identical rework of `np.add.at(out, searchsorted(grid, ev_t), inc)`):
+    # ev_t is monotone (heap-pop order), so bin membership comes cheaper by searching the
+    # grid INTO the events (fewer probes, contiguous scans) — the produced `bins` values
+    # are identical to `searchsorted(grid, ev_t, side="left")`. Per-bin accumulation via
+    # bincount runs sequentially in event order, the same C-loop order as add.at, so the
+    # output bits are unchanged.
+    idx = np.searchsorted(ev_t, grid, side="right")
+    counts = np.diff(idx, prepend=0)
+    bins = np.repeat(np.arange(len(grid)), counts)
+    return np.bincount(bins, weights=ev_inc, minlength=len(grid))
 
 
 def bootstrap_block_starts(n_bars: int, *, block: int, n_boot: int,
