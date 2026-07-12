@@ -1,0 +1,31 @@
+{
+ "stage": "parity_reproof_c8g",
+ "utc": "2026-07-12T03:25:26.386426+00:00",
+ "instance_type": "c8g.12xlarge",
+ "machine": "aarch64",
+ "pytest": "tests/test_xena_fold_parity.py: 6 passed, 1 failed (test_pinned_corpus_rust_backend)",
+ "pins_regenerated": false,
+ "pinned_corpus": {
+  "n_cases": 500,
+  "n_matching": 499,
+  "n_mismatch": 1,
+  "mismatch_cases": [
+   "rand-146"
+  ]
+ },
+ "diagnosis": {
+  "rand-146_box_rust": "161ce06657e7d7a25d8fd8ebfcaf2877075f45c9d97e2f8b59da99b67bb08af0",
+  "rand-146_box_python": "161ce06657e7d7a25d8fd8ebfcaf2877075f45c9d97e2f8b59da99b67bb08af0",
+  "rand-146_pin": "4b672450e3ee495000c8df841c6f225305b692295285f98a3e4085f3dc8e8838",
+  "rand-146_local_macos_rust_and_python": "4b672450e3ee495000c8df841c6f225305b692295285f98a3e4085f3dc8e8838",
+  "F_point_box": 0.24560015007234434,
+  "F_point_local": 0.24560015007234437,
+  "read": "box Rust == box Python bitwise on ALL 500 cases; the single pin mismatch is a 1-ULP cross-platform libm delta (INFR-007 documented caveat, macOS pin lineage). Kernel bit-identity holds ON the adjudication platform; all synthetic adversarial side-by-side tests PASS. Pins NOT regenerated. OPERATOR REVIEW FLAGGED."
+ },
+ "verdict_machine": "KERNEL-PARITY-ON-PLATFORM: PASS; PIN-DIGEST-CROSS-PLATFORM: 499/500",
+ "reproof_after_tolerance_amendment": {
+  "utc": "2026-07-12T09:02:10.661694+00:00",
+  "change": "L-18 reconciliation tolerance made scale-aware (operator-approved 2026-07-12); numeric outputs unchanged",
+  "pytest": "6 passed, 1 failed (pinned corpus rand-146 only \u2014 same accepted 1-ULP libm case, 499/500)"
+ }
+}
