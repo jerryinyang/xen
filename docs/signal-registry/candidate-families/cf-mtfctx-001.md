@@ -61,6 +61,47 @@ certification + counted gate machinery selects.
 | MTFCTX-C2 | CTRL-02 NAIVE MOMENTUM | long: close > highest high of last 3 bars; short: close < lowest low of last 3 bars; ignore while holding | fixed hold-period only |
 | MTFCTX-C3 | CTRL-03 NAIVE REVERSION | trailing limit at lowest low (buy) / highest high (sell) of last 3 bars; re-quote on new signal pre-fill | hold-period OR profit exit: at any LTF bar close, if close is in profit AND ≥ 0.5 × **current** HTF median-TR ATR(14) (latest confirmed HTF bar, ≤ t−1) beyond entry price → close. Distance **floats with current ATR** (not frozen at entry). No adverse target. |
 
+## Evidence (append-only; experiment-level. **Family status is NOT moved here** — open/retire/promote is operator-signed at the checkpoint-011 retrospective)
+
+### 2026-07-13 — XENA-001 (CTRL-01 RANDOM control) — operator verdict **MACHINERY-ALARM**
+
+- Eval counts (§10.4): search **255,142** evals / **255,142** distinct subsets; certify 2,190. Gate slots **0/2**. No counted TEST read.
+- Certified **4/12 finalists (33%)** vs WS-6 null finalist certification **0.75%** — the pre-registered design §8 MACHINERY-ALARM band ("certification rate far above battery null rate").
+- Root cause PROVEN (adjudication layer, not emission): `F_floor` = 0.4302 was calibrated at 24 candidates / 400 budget (null F̂ median 0.19); at live scale (2,736 candidates / budget 21,835) **12/12 finalists clear it by 8.3–13.1×**, leaving the plateau screen — which passes **50.8% of pure-noise finalists** — as the sole certification criterion.
+- Substantively noise-consistent: certified fold medians +0.100 / +0.043 / −0.098 / −0.286; worst fold −0.69; `pbo_like` 0.25.
+- Battery v2 constant for the family: live median F̂ 4.27 vs permuted 5.94 → **no-structure live-vs-permuted bias = −1.67 log-wealth** (live at the 0th percentile).
+- Filter structure (disclosure): V00 share of finalist slots 2.4% vs 5.3% universe = **0.45×** — no informative filter preference on noise.
+- Emission layer clean: candidate gate 2,736/2,736; estimand gate 2,736/2,736 PASS; fence + provenance PASS.
+- Record: `python/experiments/XENA-001/report.md`.
+
+### 2026-07-13 — XENA-002 (CTRL-02 NAIVE MOMENTUM) — operator verdict **NO DETECTABLE STRUCTURE**
+
+- Eval counts (§10.4): search **397,475** evals / **397,475** distinct subsets; certify 1,851. Gate slots **0/2**. No counted TEST read.
+- Live median F̂ 4.79 vs permuted 6.20 (0th percentile; battery delta **−1.41**). Netted against XENA-001's −1.67 no-structure bias → **+0.26 above the random control, well inside XENA-002's own restart dispersion of 2.90**. Statistically it *is* the random control.
+- 7/12 certified — **uninformative** given the `F_floor` defect (12/12 clear the floor by 9.7–16.4×). `pbo_like` 0.50 (worse than the control's 0.25).
+- One genuine difference from the control: all seven certified finalists have **positive fold medians (+0.063 … +0.246)**, which XENA-001 cannot claim. **It does not survive the battery comparison.**
+- Filter structure (thesis read, disclosure): V00 = **1.18×** its universe share among the 322 finalist member slots — filtered variants V01–V18 are **not** preferentially selected.
+- Estimand gate 2,773/2,773 PASS.
+- **Negative evidence for the CF-MTFCTX-001 arc.** Record: `python/experiments/XENA-002/report.md`.
+
+### 2026-07-13 — XENA-003 (CTRL-03 NAIVE REVERSION, native limit orders) — operator verdict **NOT SUPPORTED (magnitude)**
+
+- Eval counts (§10.4): search **322,803** evals / **322,803** distinct subsets; certify 1,104. Gate slots **0/2**. No counted TEST read. Full evidence: `python/experiments/XENA-003/analysis.md`.
+- Gross edge **+1.958 bps/leg**, 95% CI [1.846, 2.073], n = 195,056 legs — real, block- and seed-stable, per-year stable, positive on all 12 instruments.
+- **Cost-fatal:** breakeven round-trip spread **0.564–1.146 bps (median 0.705)**; 5/12 finalists survive 0.5 bps, 2/12 survive 1.0 bps, **0/12 at 1.5 bps (all at F = −32.2, ruin)**. Pre-registered "nets survive" band = 20–40 bps gross/trade ⇒ **1/15th–1/30th of it**. (L-21 shape, as at EXP-025.)
+- **91.2% of the gross edge is the single mark from the limit print to the next grid open.** The registered snap-back mechanism (0.5–4× HTF span) contributes **0.172 bps (8.8%)**; the forward path from the fill bar's open is **−5.54 bps** (continuation, not reversion).
+- Discriminating control (entry times/exits/sizing held; entry price moved to the adjacent grid open): F̂ 23 → **0.09–1.93**, *below* the permuted null ⇒ the live≫permuted gap is **the limit print**, not predictive timing. **The permutation battery is CONFOUNDED for any limit-entry universe** (it destroys the entry-price basis as well as the alignment).
+- RULED OUT: leak/look-ahead (provenance + native-fill physicality PASS), Amendment-4 grid seam (≤0.005% of portfolio money), sizing-leverage compounding (notional/equity 0.93–1.10×), "genuine and cost-surviving". SUPPORTED: passive-limit fill-price advantage (dominant) + a genuine sub-cost reversion residual. The emission is an ~80%-occupancy two-sided passive quoting grid — **P-10 territory**.
+- **Family thesis contradicted:** unfiltered **V00 is 4.0× over-represented** among the 364 finalist member slots (21.2% vs 5.3%); the search maximises **cadence** (1H5M 75.8%, H05X 53.3%), not conditioning. Median gross/trade V00 1.837 vs filtered 1.922 bps — a wash.
+- Certification uninformative: **79.9%** of the 2,736-candidate universe is gross-profitable standalone (94.7% on 1H5M); the 12 restart terminals are near-disjoint (pairwise Jaccard median 0.108) yet all score F̂ 21–25 and all certify — a degenerate landscape.
+- Estimand gate 2,777/2,777 PASS. Record: `python/experiments/XENA-003/report.md`.
+
+### Cross-cutting (all three universes, 2026-07-13)
+
+- **Adjudication-layer audit:** `.ignore/temp/new-referee/post-xena-infr-audit.md` — five root causes (extensive-vs-intensive F statistic; costless cadence-maximizing objective; permutation battery confounded on non-grid-priced entries; plateau screen rewards ubiquity not robustness; governance/process sequencing). Warrants a dedicated INFR redesign. **Audit B2 is load-bearing for this family: a conditioning thesis cannot win under a costless cadence-maximizing objective, regardless of whether it is true** — i.e. the lane as built cannot adjudicate CF-MTFCTX-001's thesis.
+- **Governance near-miss (recorded):** design §4 spread pins were never set (`cost_bps = 0.0` on ten of twelve instruments in every universe manifest); a gate spend would have produced a binding GROSS pass with a **vacuous NET block** (the L-22 failure shape). Nothing in the pipeline blocked it.
+- **Gate ledger: 0/2 for all three universes; the test-read ledger is unchanged; the global holdout was never loaded.**
+
 ## Binding constraints
 
 - XENA fills-based emission contract: finite `SlPrice` every leg (HTF ATR sizing stop);
