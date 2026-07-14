@@ -109,6 +109,46 @@ live read).
   adjudicate short (TEST-band, ~1,100-bar) samples at any edge size. A short-band instrument is
   required before any final TEST read; none exists yet.
 
+## Chapter-03 XENA portfolio referee (INFR-006 → INFR-009; route restored 2026-07-14)
+
+The XENA lane adjudicates a family at the **portfolio-selection** level (search over a
+candidate universe → certify a subset), replacing per-candidate A/B reads. Chapter 03 ran it
+live for the first time (XENA-001..003) and exposed, then fixed, the adjudication layer:
+
+- **INFR-006 v3 (extensive-F/plateau) SUPERSEDED.** `F_floor` was an absolute threshold on
+  log-wealth — an *extensive* statistic — calibrated at 24 candidates/400 budget; at live
+  scale (2,736 cands) every finalist cleared it 8–57×, leaving a plateau screen that passes
+  50.8% of pure noise (RANDOM certified 4/12 finalists vs a 0.75% battery null). Mechanism =
+  **L-25**. Artifacts retained; not binding.
+- **Binding adjudicator: INFR-009 exit-(c) two-stage binder.** Stage 1 selects **exactly one**
+  subset (top-1) on stage-1 data; 0.20-span embargo; stage 2 = leg-studentized LCB on the
+  binding g_gross ratio, per cadence. Selection leak prevented **by construction**:
+  CONFIRM DUAL_CERTIFY e2e α̂ 5.0%/5.0% (n=200, point-α̂ gate, boundary pass — Wilson upper
+  9.0%), selection_inflation ≈0 vs P3d's ~3pp. Blind VAL on the three fixtures matched
+  predeclared (001/002 rejected; 003 gross-real, cost-fatal reproduced).
+- **Net cost binds the objective (L-26 closure):** flat **1.0 bps** RT injected on the net
+  path inside the frozen registry (P5) — engine-costless emissions can no longer produce a
+  vacuous NET verdict. Per-symbol spread pins remain un-pinned (operator data needed before
+  any live deployability claim).
+- **Active pin:** `pc_frozen_registry.json` v2 sha256 `db87dc1a…` (parent P4 `44e1aa3c…`).
+  Do not re-run the (c) confirm (α-shopping); do not revise thresholds on gate outcomes (L-23).
+- **CAL discipline (binding for any recalibration):** e2e α̂ SE ≈ 0.218/√n_null — size n_null
+  to the α resolution needed; design/confirm bank split; predeclared n, no optional stopping;
+  gate on point α̂, not the UCB. After one clean design cycle fails to close a residual,
+  switch **binder form**, not more α/L knobs (the P3→P3d→P-C lesson).
+- **Open notes:** permutation battery confounded on limit-entry universes (**L-27** — a
+  next-open discriminating control is required before any native-fill universe); plateau
+  ubiquity (audit root cause #4) not re-encountered by the (c) binder but unresolved in
+  general.
+- **INFR-010 boundary (2026-07-14): the frozen registry is VOID on the new stack.** The
+  (c) binder *form*, CAL discipline, and lane governance carry forward; the calibration
+  constants are engine+data-specific — a fresh CAL cycle (predeclared n, bank split) is
+  required before adjudicating any Bybit/Nautilus universe (INFR-010 §8 R4).
+
+Oracle kernel: the fold is Rust (`xena_fold`, INFR-007/008) — bit-identical to Python by
+pinned parity corpus + replay; 1-ULP macOS↔Linux libm divergence ⇒ **one universe adjudicates
+on one platform**.
+
 ## Trading-cost model (net-of-cost / tradability tier)
 
 Costs are **analyst-injected in Python only** — the cTrader engine is costless (emits real-OHLC

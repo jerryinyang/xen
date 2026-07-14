@@ -95,6 +95,27 @@ and the traps to avoid, on any new experiment.
 - **Controlled thesis-shopping is the model.** Exploration from refuted hypotheses is allowed —
   gate with registration + multiplicity, never dismiss by origin.
 
+## Chapter 03 additions (XENA lane + calibration discipline)
+
+- **Portfolio-selection adjudication (XENA) is the default route for family verdicts** —
+  search + certify over a candidate universe, no per-candidate A/B. Binding binder + pins:
+  [evaluation-framework.md](evaluation-framework.md) chapter-03 section.
+- **Check gross bps/trade against breakeven spread BEFORE search** (XENA-003). A universe
+  whose gross edge sits within ~3× the round-trip spread is undecidable on costless/coarse
+  data — the search will maximize a print artifact. Route to finer data or park.
+- **Calibrate α with sized nulls.** e2e α̂ SE ≈ 0.218/√n_null: scale n_null (not candidates or
+  budget) to the resolution the gate needs; predeclare n; no optional stopping; gate on the
+  point α̂.
+- **Design/confirm bank split, then binder-FORM pivots.** Estimator knob-turning inside one
+  form converges slowly or not at all (P3→P3d left a ~3pp selection residual three rounds
+  running); prevent the defect **by construction** (sample-split + embargo) instead of
+  correcting it post-hoc.
+- **Sparse-calendar resampling resamples legs, not bars** — bar-level blocks on a sparse trade
+  calendar destroy the leg structure the statistic lives on.
+- **Objectives must carry the binding cost** (L-26). A costless cadence-maximizing objective
+  structurally penalizes any filter/conditioning thesis; net cost is a verdict leg inside the
+  frozen procedure, never informational-only.
+
 ## Statistical defaults
 
 Non-parametric / empirical by default (block / stationary / moving-block bootstrap;

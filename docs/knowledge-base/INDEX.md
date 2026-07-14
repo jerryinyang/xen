@@ -1,8 +1,10 @@
 # Xen Knowledge Base — Read First
 
 The curated, cross-chapter canon for the Xen research programme. Distilled from Chapter 01
-(~98 experiments, ~25 phases) and Chapter 02 (EXP-001–025 + SPDR-001..003, 11 phases,
-2026-06-27 → 2026-07-09; seven family arcs, all closed negative with mechanisms recorded).
+(~98 experiments, ~25 phases), Chapter 02 (EXP-001–025 + SPDR-001..003, 11 phases,
+2026-06-27 → 2026-07-09; seven family arcs, all closed negative with mechanisms recorded),
+and Chapter 03 (XENA-001..003 + INFR-006..009, 2026-07-09 → 2026-07-14; first live XENA
+portfolio universes, CF-MTFCTX-001 retired, referee redesigned and route restored).
 Read this **before** designing any new experiment: it records what is frozen, what is dead,
 what worked, and the lessons that cost a false positive to learn.
 
@@ -55,3 +57,6 @@ copied — it persists across chapters and must never be reset.
   reflections. Reachable for convention reference; not loaded by default.
 - `archive/chapter-02-mr-volharv-htfdi/` — the full Chapter 02 experiments (EXP-001–025,
   SPDR-001..003, VAL-006/007), experiments-docs, thesis-specific cBots, and run tooling.
+- `archive/chapter-03-xena-mtfctx/` — the full Chapter 03 experiments (XENA-001..003,
+  INFR-006..009), experiments-docs (checkpoints 011/012), and the **retired cTrader stack**
+  (Xen.cs, StrategyHost/, tools/ctrader-cli/) archived at the INFR-010 migration.

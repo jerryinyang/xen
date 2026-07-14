@@ -67,6 +67,25 @@ Chapter 02 extends the Chapter-01 2×2 verdicts:
 - **Volatility harvest: substrate exists (FX VR<1), tested structures fail mechanically**
   (CF-VOLHARV-001) — the one cell where the negative is about structure, not substrate.
 
+## Chapter 03 family dispositions (2026-07-09 → 2026-07-14)
+
+One family arc — the first run through the XENA portfolio-adjudication lane — plus the
+referee-redesign infrastructure it forced. Full card:
+`docs/signal-registry/candidate-families/cf-mtfctx-001.md`; archived docs:
+`archive/chapter-03-xena-mtfctx/experiments-docs/`.
+
+| Family | What it was | Disposition (mechanism) |
+|---|---|---|
+| **CF-MTFCTX-001** — MTF context filters on naive controls | HTF context (V01–V18 filter variants) over three control substrates (RANDOM / naive momentum / naive reversion via native limits), adjudicated by XENA portfolio selection across 12 instruments, 2,736 candidates each | **RETIRED 2026-07-14 (substrate-exhaustion; operator-signed, ckpt-011).** The negative filter-structure read (V00 never under-selected; 4.0× **over**-represented on reversion) is **confounded** by the costless cadence-maximizing objective (L-26) and is explicitly NOT the grounds. Grounds: all three substrates independently exhausted — RANDOM is noise; momentum shows no detectable structure even unfiltered (+0.26 vs random control, inside dispersion 2.90); reversion is real gross (+1.958 bps/leg) but **cost-fatal** and 91.2% passive-limit print artifact (P-10 fifth vehicle). Prior P-14 (HTF conditioning ~1–4 bps, sub-cost) unmoved. A fair conditioning test needs a cost-surviving base edge + the net-bound objective = **NEW family with a new D0**, never a re-run of these controls. |
+| **XENA referee (INFR-006 → INFR-009)** | The portfolio-adjudication layer itself | **INFR-006 v3 extensive-F/plateau adjudicator SUPERSEDED** (L-25: absolute floor on an extensive statistic, calibrated at 24 cands/400 budget, inoperative at live scale — RANDOM certified 4/12 finalists vs 0.75% null). **INFR-009 exit-(c) two-stage binder RESTORED the route 2026-07-14** (DUAL_CERTIFY α̂ 5.0%; net 1.0 bps bound into the objective; pin `db87dc1a…`). Registry **VOID on the INFR-010 Nautilus/Bybit stack** — binder form + CAL discipline carry, constants must be re-calibrated. |
+
+Chapter 03 frame update: the XENA-002/003 substrate reads extend the chapter-02 closures —
+naive momentum and naive reversion on the index/commodity CFD basket are dead as base edges
+(no structure / cost-fatal print artifact). The chapter-02 terminal-branch statement stands;
+the programme's answer is the INFR-010 pivot to a **new data frontier** (full Bybit USDT-perp
+universe, anti-survivorship, orderflow store deferred) rather than another price-geometry
+family on the exhausted dataset.
+
 ## Selection discipline going forward
 
 Open the next family by **screening availability first** (TRAIN-only Δ-over-matched-random,

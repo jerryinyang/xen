@@ -13,3 +13,4 @@ as work happens. Append a one-line pointer per memory file below. Distinct from 
 - [renewed-referee-frozen.md](renewed-referee-frozen.md) — the binding referee is the Chapter-02 renewed §10.3a gate + P* gate + 15m domain, hash-pinned.
 - [spdr-speed-run-lane.md](spdr-speed-run-lane.md) — TRAIN-only Python speed-run screening lane (0 runs/reads/slots) for cheap family routing.
 - [unit-pin-money-floor.md](unit-pin-money-floor.md) — L-21/L-22: pin the unit at every screen→graduation seam; floor effects in money.
+- [xena-pc-binder-pin.md](xena-pc-binder-pin.md) — XENA binding adjudicator = INFR-009 exit-(c) binder, pin `db87dc1a…` v2; VOID on the INFR-010 stack (fresh CAL cycle required).

@@ -52,3 +52,8 @@ read confounded, not the grounds); lessons **L-25/L-26/L-27** ratified; P-10 fif
 | Checkpoint | Retrospective | Outcome |
 |---|---|---|
 | [011 — MTF Context via XENA](checkpoints/2026-07-10-011-mtf-context-xena/retrospective.md) | signed 2026-07-14 | First live XENA universes: emission layer clean, adjudication layer scale-defect exposed → **INFR-009 redesign + route restored**. **CF-MTFCTX-001 RETIRED** (substrate-exhaustion). Lessons L-25/L-26/L-27 ratified. 0/2 gate slots all universes; holdout never loaded. |
+| [012 — XENA Referee Redesign](checkpoints/2026-07-13-012-xena-referee-redesign/retrospective.md) | finalized 2026-07-14 (chapter close) | INFR-009 arc P3→P3d→P-BF→P-C→P4→P5: exit-(c) two-stage binder DUAL_CERTIFY (α̂ 5.0% boundary, selection leak killed by construction); blind VAL clean; net 1.0 bps injected; **route RESTORED** under pin `db87dc1a…`. Registry declared VOID on the INFR-010 stack (fresh CAL cycle required). 0 slots; holdout never read. |
+
+**Chapter 03 closed 2026-07-14** (Phase 0 of INFR-010 — migration to NautilusTrader engine +
+Bybit USDT-perp OHLCV universe). This index is archived as a snapshot; the live index restarts
+under Chapter 04.
