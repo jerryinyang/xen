@@ -13,6 +13,17 @@ they do not wipe prior canon). The **signal-registry** (`docs/signal-registry/`)
 operational ledger (multiplicity, test-reads, candidate families) and is referenced here, not
 copied — it persists across chapters and must never be reset.
 
+## Programme status (2026-07-14): INFR-010 migration in progress
+
+The substrate is being replaced (`python/experiments/INFR-010/design.md`): engine → **NautilusTrader**,
+primary data → **Bybit USDT-perp 1m OHLCV derived from trades archives** (full universe incl.
+delisted, anti-survivorship). Chapter 04 research opens only after the migration's end-to-end
+VAL (Phase D). Governance principles (holdout fence, causal-by-construction execution, estimand
+gate, XENA adjudication form, multiplicity/test-read ledgers) carry forward; implementations
+rebind at INFR-012. The XENA frozen registry is **VOID on the new stack** — fresh CAL cycle
+required. See [data-architecture.md](data-architecture.md) (migration banner) and
+[evaluation-framework.md](evaluation-framework.md).
+
 ## What's FROZEN (do not re-derive)
 
 - **The evaluation/referee suite** — the Chapter-02 **renewed §10.3a gate (q\*=0.75) + E6

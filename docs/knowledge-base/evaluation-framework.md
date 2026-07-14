@@ -151,6 +151,13 @@ on one platform**.
 
 ## Trading-cost model (net-of-cost / tradability tier)
 
+> **MIGRATION (INFR-010, 2026-07-14):** the FTMO table below binds only for the archived
+> FX/indices data. The new stack replaces it with **Bybit USDT-perp maker/taker fees +
+> funding accrual + the T1 pseudo-quote spread model** (INFR-010 §4/§5), built at Phase C
+> (INFR-012) into `xen.evaluation`. The **discipline carries unchanged**: engine
+> costless-honest, costs analyst-injected from a single source-of-truth table, netted-turnover
+> rule, no per-signal double-charging.
+
 Costs are **analyst-injected in Python only** — the cTrader engine is costless (emits real-OHLC
 mid/last fills, gross `MtmBps`, no commission/spread applied; bid/ask appear only as disclosure
 flags). The single source of truth is `xen.evaluation.FTMO_COSTS` + `round_trip_cost_bps`, so a

@@ -14,3 +14,4 @@ as work happens. Append a one-line pointer per memory file below. Distinct from 
 - [spdr-speed-run-lane.md](spdr-speed-run-lane.md) — TRAIN-only Python speed-run screening lane (0 runs/reads/slots) for cheap family routing.
 - [unit-pin-money-floor.md](unit-pin-money-floor.md) — L-21/L-22: pin the unit at every screen→graduation seam; floor effects in money.
 - [xena-pc-binder-pin.md](xena-pc-binder-pin.md) — XENA binding adjudicator = INFR-009 exit-(c) binder, pin `db87dc1a…` v2; VOID on the INFR-010 stack (fresh CAL cycle required).
+- [nautilus-bybit-migration.md](nautilus-bybit-migration.md) — INFR-010: NautilusTrader engine + Bybit USDT-perp OHLCV primary (anti-survivorship); global calendar fence; chapter 04 opens after Phase D VAL.

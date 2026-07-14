@@ -1,4 +1,43 @@
-# Data Architecture (Frozen Core)
+# Data Architecture
+
+> **MIGRATION (INFR-010, 2026-07-14) — everything below the marked line is LEGACY.**
+> At the chapter-03 close the programme replaced its substrate
+> (`python/experiments/INFR-010/design.md`, operator decisions D1–D8):
+>
+> - **Engine:** cTrader C# `StrategyHost` → **NautilusTrader** (Python API, Rust core,
+>   event-driven, single-threaded deterministic replay). The principle is
+>   causal-by-construction **event sequencing**, not C# — vectorised Python backtests of
+>   price strategies remain forbidden.
+> - **Data — primary:** 1m OHLCV **derived from Bybit trades archives**
+>   (`public.bybit.com/trading/`), full **USDT linear perpetual universe including delisted
+>   contracts** (strict anti-survivorship; the archive listing is the universe census).
+>   Real traded volume; bar ≡ Σ trades integrity invariant. Ingested to a NautilusTrader
+>   `ParquetDataCatalog` at `data/catalog/`.
+> - **Data — secondary (deferred):** MBP/L2 orderflow feature store, BTC/ETH/SOL perps only
+>   (`docs/references/orderflow-feature-store.md`); contracts + skeleton in INFR-013,
+>   **no collection** until a separately-approved INFR.
+> - **Fill/cost tiers:** **T1** (OHLCV lane) = engine costless-honest, spread (pseudo-quote
+>   from aggressor-side trades, tick-floor) + fees + funding injected at analysis; **T2**
+>   (MBP trio) = honest L1 fills, post-collection only. **Spread-scale routing rule:** gross
+>   edge within ~3× estimated RT spread is undecidable on T1 (XENA-003 class) — confirm on
+>   T2 or park `AWAITING_MBP`.
+> - **Holdout:** **global calendar fence** (D6) — one TRAIN/TEST/HOLDOUT date pair shared by
+>   every symbol, hash-pinned split manifest; catalog query wrapper refuses post-fence reads.
+>   Final 30% never queried.
+>
+> Enforcement lands per INFR-010 §6: fence manifest + admission gate (Phase A / INFR-011),
+> emission contract + determinism check (Phase B), doc/skill/cost-model rebind (Phase C /
+> INFR-012), leak battery (Phase D). Until a phase lands, its legacy counterpart below is
+> the reference for *mechanism*, not for paths.
+>
+> The FX/indices data and cTrader stack are archived at `archive/chapter-03-xena-mtfctx/`
+> (`data/timebars/`, `data/strategy_runs/`, `ctrader-stack/`). **Holdout obligations on the
+> archived FX/indices data remain binding forever.** The XENA frozen registry is **VOID on
+> the new stack** (fresh CAL cycle required).
+
+---
+
+## LEGACY (chapters 01–03, cTrader/FX-indices) — kept for archived-data obligations
 
 Thesis-agnostic data layer. Full detail: `docs/references/architecture.md` and
 `docs/references/dataset-reference.md`. This is the compressed canon.
