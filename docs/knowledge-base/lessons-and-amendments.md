@@ -617,3 +617,63 @@ multi-cell, capped-read design; QA traces them as clauses. EXP-025 reviews:
 **Where enforced.** `quant-designer/references/design-requirements.md` §12 (four mandatory
 rules) + `qa-compliance/SKILL.md` §3 (L-24 clause-trace). Codified at the chapter-02→03
 rollover (2026-07-09).
+
+## L-25 — An absolute threshold on an EXTENSIVE statistic, calibrated at small N, is inoperative at live scale (XENA-001 / INFR-009) ⭐
+
+**What.** The XENA `F_floor` (0.4302, INFR-006 v3) is an absolute threshold on log-wealth — an
+**extensive** statistic that grows with candidate count and budget — calibrated at **24 candidates /
+400 budget** (null F̂ median 0.19). At live scale (2,736 candidates) XENA-001/002/003 finalists cleared
+it **8.3×–57×**, so the floor was inoperative and the plateau screen — which passes **50.8% of
+pure-noise finalists** — became the sole certification criterion. A pure RANDOM control (XENA-001)
+certified **4/12 finalists (33%)** against a **0.75%** battery-null rate (MACHINERY-ALARM). The emission
+layer was clean; the defect was entirely in the adjudication layer.
+
+**How to apply.** Never gate a portfolio/selection statistic with an absolute threshold on an
+**extensive** quantity. Use an **intensive** (per-unit / per-leg / ratio) statistic, or a
+**selection-aware two-stage gate** whose end-to-end FPR is controlled by construction (INFR-009 exit (c):
+stage-1 screen fixes exactly one subset → embargo → stage-2 leg-studentized LCB on a genuinely
+independent band; CONFIRM DUAL_CERTIFY e2e α̂ 5.0%/5.0%). Either the calibration N matches live N or the
+statistic is scale-invariant — otherwise the threshold means nothing at the scale it is used. Supersedes
+the informal `xena-referee-scale-defect` note.
+
+**Where enforced.** INFR-009 restored binder `results/pc_frozen_registry.json` v2 (sha256 `db87dc1a…`);
+INFR-006 v3 extensive-F (`537d691a…`) superseded. Spec: `docs/references/xena-lane.md`;
+`python/experiments/INFR-009/report.md`.
+
+## L-26 — A costless cadence-maximizing objective cannot adjudicate a conditioning/filter thesis (XENA-002 audit B2 / INFR-009 P5) ⭐
+
+**What.** The XENA search objective (`charge_costs=false` log-wealth) pays for **trade count**. Every HTF
+context filter thins cadence, so the objective penalizes any filter **regardless of whether it improves
+signal quality** — a conditioning thesis cannot win under it, whether or not it is true. Across
+XENA-001/002/003 the unfiltered V00 was **never under-selected** (0.45× / 1.18× / **4.0× over**-represented
+of its universe share); the negative filter-structure read is therefore **confounded**, not evidence
+against conditioning. Compounded by a governance near-miss: spread pins (`cost_bps`) were unset on 10/12
+instruments, so a gross gate pass would have carried a **vacuous net block** (the L-22 failure shape) and
+nothing in the pipeline blocked it.
+
+**How to apply.** When the thesis is about trade **quality/selectivity vs quantity**, **net cost must bind
+the selection objective**, not be informational-only. INFR-009 P5 injects a flat RT cost (**1.0 bps**) into
+the binding stage-2 net objective. A filter/conditioning read taken under a costless objective is
+uninterpretable — **do not retire a thesis on it** (repeats the L-12/L-13 broken-adjudicator error).
+Reinforces [[L-22]] (spread must be a verdict leg). Builds on [[L-13]].
+
+**Where enforced.** INFR-009 P5 net-inject registry v2; `docs/references/xena-lane.md`;
+`python/experiments/INFR-009/report.md`.
+
+## L-27 — The permutation-null battery is confounded on limit-entry / non-grid-priced universes (XENA-003) ⭐
+
+**What.** The permutation-null battery (causal alignment-break, not P&L shuffle — L-14) is **confounded on
+limit-entry universes**. XENA-003 (native limit fills) scored live F̂ ≈ 23; the discriminating control that
+moved only the entry-price basis to the adjacent grid open (ARM-NEXTOPEN; times/exits/sizing held) dropped
+F̂ to **0.09–1.93**, *below* the permuted null (5.66). The live≫permuted gap was the **passive-limit print**
+(+7.5 bps/leg, 91.2% of the gross edge), **not** predictive timing — the permutation destroys the
+entry-price basis along with the temporal alignment.
+
+**How to apply.** Before reading any limit-entry / non-grid-priced universe with the battery, add a
+**next-open discriminating control** (re-price entries to the adjacent grid open, hold times/exits/sizing
+fixed) to separate the passive-limit fill advantage from predictive timing. If the battery cannot be
+de-confounded this way, it is **inadmissible** for that universe. Builds on [[L-14]]; companion pitfall
+[[P-10]].
+
+**Where enforced.** Design note for the next native-fill XENA universe; `docs/references/xena-lane.md`;
+`python/experiments/XENA-003/report.md`.

@@ -1,9 +1,24 @@
 # Candidate Family Group: CF-MTFCTX-001 — Multi-Timeframe Context Filters on Naive Controls
 
-**Status:** `REGISTERED` 2026-07-10 (chapter 03, first family group). Route: **XENA lane
+**Status:** `RETIRED` 2026-07-14 (checkpoint-011 retrospective, operator-signed) — was
+`REGISTERED` 2026-07-10 (chapter 03, first family group). Route: **XENA lane
 (default)** — three XENA runs, one universe per control model. No EXP-lane comparative
 claim registered; the thesis is read informatively from portfolio-selection outcomes
 (operator decision 2026-07-10, Q-A below).
+
+**RETIREMENT (operator-signed, checkpoint-011 retrospective 2026-07-14).** Retired on
+**substrate-exhaustion** grounds: the three control entry engines are independently spent —
+CTRL-01 RANDOM (noise; MACHINERY-ALARM was a referee defect, not a substrate edge), CTRL-02
+NAIVE MOMENTUM (no detectable structure even unfiltered), CTRL-03 NAIVE REVERSION (real gross
+but cost-fatal, 91.2% passive-limit print → P-10, fifth vehicle). Prior P-14/CF-HTFDI-001
+(HTF conditioning ≈1–4 bps, sub-cost) stands. **Explicitly NOT retired on the filter-structure
+read** — that read is confounded by the costless cadence-maximizing objective (L-26: filters
+thin cadence ⇒ penalized regardless of truth) and does not refute the conditioning thesis. A
+fair conditioning test needs a substrate with a real cost-surviving base edge **and** the
+INFR-009 net-cost objective → a **NEW family with a new D0**, not a re-run of these controls.
+Lessons ratified same date: [[L-25]] (extensive threshold), [[L-26]] (costless objective can't
+adjudicate filters), [[L-27]] (perm battery confounded on limit entries). Retrospective:
+`docs/experiments-docs/checkpoints/2026-07-10-011-mtf-context-xena/retrospective.md`.
 **Provenance:** operator proposal `.ignore/temp/new-referee/mtf.md` (2026-07-10).
 **Ledger:** rows in `docs/signal-registry/xena-runs.md` are added per-run at design time
 (before search), per ledger rule — with pinned band boundaries + universe manifest.

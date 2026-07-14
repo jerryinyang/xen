@@ -27,9 +27,10 @@ deliverables.
 (`.ignore/temp/new-referee/post-xena-infr-audit.md`, 2026-07-13) identifies five root causes
 (extensive-vs-intensive F statistic; costless cadence-maximizing objective; permutation battery
 confounded on non-grid-priced entries; plateau screen rewards ubiquity; governance sequencing) and
-warrants a dedicated **INFR redesign**. Recorded recommendation: **no XENA universe should reach a
-counted gate until the scale defect is resolved.** Family status + lesson ratification are the
-operator's calls at the checkpoint-011 retrospective (not yet written).
+warranted a dedicated **INFR redesign** — delivered as **INFR-009 (COMPLETE 2026-07-14, route restored)**.
+**Checkpoint-011 retrospective signed 2026-07-14:** CF-MTFCTX-001 **RETIRED** (substrate-exhaustion; filter
+read confounded, not the grounds); lessons **L-25/L-26/L-27** ratified; P-10 fifth vehicle added. See the
+[retrospective](checkpoints/2026-07-10-011-mtf-context-xena/retrospective.md).
 
 ## Current Infrastructure Tasks
 
@@ -44,8 +45,10 @@ operator's calls at the checkpoint-011 retrospective (not yet written).
 
 | Family | EXP range | Status |
 |--------|-----------|--------|
-| [CF-MTFCTX-001](families/cf-mtfctx-001/INDEX.md) — MTF context filters on naive controls ([registry card](../signal-registry/candidate-families/cf-mtfctx-001.md)) | XENA-001..003 (XENA lane) — all COMPLETED 2026-07-13 | REGISTERED 2026-07-10 (family status moves only at the checkpoint-011 retrospective) |
+| [CF-MTFCTX-001](families/cf-mtfctx-001/INDEX.md) — MTF context filters on naive controls ([registry card](../signal-registry/candidate-families/cf-mtfctx-001.md)) | XENA-001..003 (XENA lane) — all COMPLETED 2026-07-13 | **RETIRED 2026-07-14** (ckpt-011 retro, operator-signed) — substrate-exhaustion; filter read confounded (L-26), not the grounds |
 
 ## Checkpoint Retrospectives
 
-(none yet this chapter)
+| Checkpoint | Retrospective | Outcome |
+|---|---|---|
+| [011 — MTF Context via XENA](checkpoints/2026-07-10-011-mtf-context-xena/retrospective.md) | signed 2026-07-14 | First live XENA universes: emission layer clean, adjudication layer scale-defect exposed → **INFR-009 redesign + route restored**. **CF-MTFCTX-001 RETIRED** (substrate-exhaustion). Lessons L-25/L-26/L-27 ratified. 0/2 gate slots all universes; holdout never loaded. |

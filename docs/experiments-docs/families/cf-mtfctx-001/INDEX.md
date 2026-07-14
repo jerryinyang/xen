@@ -10,8 +10,10 @@ signal quality of LTF entry models — adjudicated **not** as an A/B effect clai
 selection: filtered (V01–V18) and unfiltered (V00) variants enter each XENA universe as equal
 candidates and the frozen search + certification machinery selects.
 
-**Family status: REGISTERED (2026-07-10). Status transitions are operator-signed at the
-checkpoint-011 retrospective — not here, and not by any experiment.**
+**Family status: RETIRED (2026-07-14, operator-signed at the checkpoint-011 retrospective)** —
+on substrate-exhaustion grounds (all three control engines noise / no-structure / cost-fatal
+P-10), NOT on the confounded filter-structure read (L-26). Registered 2026-07-10. Retrospective:
+[`checkpoints/2026-07-10-011-mtf-context-xena/retrospective.md`](../../checkpoints/2026-07-10-011-mtf-context-xena/retrospective.md).
 
 ## Contents
 
