@@ -56,20 +56,34 @@ class SegmentLayout:
     Default split of ``[start, end)``: 50% search, 30% ranking, 20% gate — chronological,
     contiguous, disjoint. The walk sees only ``search``; selection folds are carved from
     ``ranking``; the final gate runs on ``gate``.
+
+    INFR-009 P3b (B1): optional ``purge_ns`` inserts an embargo **between ranking end and
+    gate start** so selection cannot leak across an adjacent rank→TEST seam. Within-ranking
+    fold purges remain separate (``contiguous_purged_folds``).
     """
     search: tuple[int, int]
     ranking: tuple[int, int]
     gate: tuple[int, int]
+    purge_ns: int = 0
 
     @classmethod
     def from_span(cls, start_ns: int, end_ns: int, *, search_frac: float = 0.5,
-                  ranking_frac: float = 0.3) -> "SegmentLayout":
+                  ranking_frac: float = 0.3, purge_ns: int = 0) -> "SegmentLayout":
         if not (0 < search_frac and 0 < ranking_frac
                 and search_frac + ranking_frac < 1):
             raise ValueError("fractions must be positive and sum to < 1")
-        a = int(start_ns + (end_ns - start_ns) * search_frac)
-        b = int(start_ns + (end_ns - start_ns) * (search_frac + ranking_frac))
-        return cls((int(start_ns), a), (a, b), (b, int(end_ns)))
+        purge_ns = max(0, int(purge_ns))
+        span = int(end_ns) - int(start_ns)
+        if purge_ns >= span:
+            raise ValueError("purge_ns must be smaller than the span")
+        # Allocate search/ranking/gate fracs over the span *excluding* the purge gap.
+        usable = span - purge_ns
+        a = int(start_ns + usable * search_frac)
+        b = int(start_ns + usable * (search_frac + ranking_frac))
+        gate_start = b + purge_ns
+        if gate_start >= end_ns:
+            raise ValueError("purge leaves empty gate band")
+        return cls((int(start_ns), a), (a, b), (gate_start, int(end_ns)), purge_ns)
 
 
 # --------------------------------------------------------------------------- #
@@ -228,33 +242,58 @@ def run_pipeline_once(streams: list[CandidateStream], config: OracleConfig, *,
                       gate_pass_threshold: float | None = None,
                       gate_workdir: str | Path | None = None,
                       universe_id: str = "CALIB") -> dict:
-    """Search + certification + (optionally) the real final gate, on the disjoint
-    layout bands, exactly as a live run would execute them.
+    """Search + certification + (optionally) the **legacy** final gate on layout bands.
 
-    Search on ``layout.search`` only; folds carved from ``layout.ranking``; when
-    ``gate_pass_threshold`` is given, the top certified portfolio goes through
-    ``run_final_gate`` on ``layout.gate`` (real ledger, in ``gate_workdir``), so gate
-    pass rates are measured through the real code path.
+    Search on ``layout.search`` only; folds from ``layout.ranking``.
+
+    INFR-009 cost guard: synthetic/calibration streams always pass
+    ``skip_economics_precondition=True`` — they are not live universes with a Q1
+    economics_disclosure artifact. Live callers must run Q1 and omit the skip (or
+    pass ``universe_root``). Do not rely on DEFAULT_COST_BPS alone; make the skip explicit.
+
+    **Legacy gate (not the redesigned binder).** When ``gate_pass_threshold`` is set,
+    the top shortlist subset is run through ``run_final_gate`` — the *retired* extensive
+    log-wealth F P25 path. That path exists only for WS-6 continuity / synthetic
+    smoke. It is **NOT** the redesigned counted gate
+    ``LCB(g_gross) > 0`` (P3 CAL). A calibration ``gate["passed"]`` must never be
+    read as redesigned-gate acceptance.
     """
     finalists = [run_restart(streams, config, budget=budget, restart_id=r + 1,
-                             params=params, segment=layout.search)
+                             params=params, segment=layout.search,
+                             skip_economics_precondition=True)
                  for r in range(n_restarts)]
     folds = contiguous_purged_folds(layout.ranking[0], layout.ranking[1],
                                     n_folds=n_folds, purge_ns=purge_ns)
     out = certify_and_rank(finalists, streams, config,
                            plateau_threshold=plateau_threshold, f_floor=f_floor,
-                           folds=folds, params=params, search_segment=layout.search)
+                           folds=folds, params=params, search_segment=layout.search,
+                           include_random_ref=False)
+    # INFR-009: shortlist ≠ cliff-pass. Preserve legacy cliff count for WS-6 continuity
+    # metrics; the evidence package itself always shortlists distinct terminals.
+    out["n_legacy_cliff_pass"] = sum(1 for p in out["plateau"] if p.passed)
     out["gate"] = None
+    out["gate_kind"] = None
     if gate_pass_threshold is not None and out["ranked"]:
         top = out["ranked"][0]
         workdir = Path(gate_workdir) if gate_workdir else Path(tempfile.mkdtemp(
             prefix="xena-calib-gate-"))
         workdir.mkdir(parents=True, exist_ok=True)
-        out["gate"] = run_final_gate(
+        gate_art = run_final_gate(
             top.subset, streams, config, gate_segment=layout.gate,
             pass_threshold=gate_pass_threshold, search_F_claim=top.search_F_hat,
             universe_root=workdir, universe_id=universe_id,
             evaluation_count=out["evaluation_count"], params=params)
+        # Label so no consumer confuses this with P3 LCB(g_gross)>0.
+        gate_art = dict(gate_art)
+        gate_art["gate_kind"] = "LEGACY_EXTENSIVE_F_P25"
+        gate_art["redesign_binder"] = False
+        gate_art["note"] = (
+            "INFR-009: this is the retired extensive log-wealth F gate path "
+            "(run_final_gate). It is NOT LCB(g_gross)>0 (P3). Do not treat "
+            "passed=True as redesigned-gate acceptance."
+        )
+        out["gate"] = gate_art
+        out["gate_kind"] = "LEGACY_EXTENSIVE_F_P25"
     return out
 
 
@@ -268,9 +307,9 @@ def calibration_battery(*, universes: int, make_universe, config: OracleConfig,
     (``make_universe(seed) -> list[CandidateStream]``). Aggregates:
 
     * ``certification_rate`` — FPR when the generator is the null, power when planted.
-    * ``gate_pass_rate`` — fraction of universes whose top certified portfolio PASSES the
-      real final gate (measured, not analytic; None when no gate threshold given). For a
-      null battery this is the null gate pass rate to compare against pre-registered α.
+    * ``gate_pass_rate`` — fraction of universes whose top shortlist clears the
+      **LEGACY extensive-F** ``run_final_gate`` path (not LCB(g_gross); see
+      ``gate_kind``). None when no gate threshold given.
     """
     outcomes = []
     for u in range(universes):
@@ -283,9 +322,13 @@ def calibration_battery(*, universes: int, make_universe, config: OracleConfig,
                                 gate_pass_threshold=gate_pass_threshold,
                                 gate_workdir=wd, universe_id=f"CALIB-u{u + 1}")
         top = sorted(out["ranked"][0].subset) if out["ranked"] else []
-        outcomes.append({"universe_seed": u + 1, "n_certified": out["n_certified"],
+        # n_certified tracks legacy cliff-pass count (WS-6 continuity); shortlist separate
+        outcomes.append({"universe_seed": u + 1,
+                         "n_certified": out.get("n_legacy_cliff_pass", 0),
+                         "n_shortlisted": out.get("n_shortlisted", out["n_certified"]),
                          "top_subset": top,
                          "gate_passed": (out["gate"]["passed"] if out["gate"] else None),
+                         "gate_kind": out.get("gate_kind"),
                          "evaluation_count": out["evaluation_count"],
                          "distinct_subsets": out["distinct_subsets"],
                          "dispersion": out["dispersion"]["F_hat"]})
@@ -293,12 +336,19 @@ def calibration_battery(*, universes: int, make_universe, config: OracleConfig,
     gated = [o for o in outcomes if o["gate_passed"] is not None]
     return {"n_universes": universes,
             "n_certifying": n_certifying,
-            "certification_rate": n_certifying / universes,
+            "certification_rate": n_certifying / universes,  # legacy cliff FPR / power
+            "shortlist_rate": sum(1 for o in outcomes if o["n_shortlisted"] > 0) / universes,
             "n_gated": len(gated),
             "n_gate_passed": sum(1 for o in gated if o["gate_passed"]),
             "gate_pass_rate": (sum(1 for o in gated if o["gate_passed"]) / universes
                                if gate_pass_threshold is not None else None),
-            "outcomes": outcomes}
+            "gate_kind": ("LEGACY_EXTENSIVE_F_P25" if gate_pass_threshold is not None
+                          else None),
+            "outcomes": outcomes,
+            "note": (
+                "INFR-009: certification_rate = legacy cliff; shortlist_rate separate; "
+                "gate_pass_rate is LEGACY extensive-F only — not LCB(g_gross)>0 (P3)"
+            )}
 
 
 def planted_recovery_stats(battery: dict, planted_prefix: str = "plant") -> dict:
@@ -333,7 +383,8 @@ def insensitivity_sweep(streams: list[CandidateStream], config: OracleConfig, *,
     resolve BEFORE freeze, not a knob to tune."""
     def runs(params: SearchParams) -> list[float]:
         return [run_restart(streams, config, budget=budget, restart_id=s + 1,
-                            params=params, segment=layout.search).best_F_hat
+                            params=params, segment=layout.search,
+                            skip_economics_precondition=True).best_F_hat
                 for s in range(n_seeds)]
 
     def stats(values: list[float]) -> dict:

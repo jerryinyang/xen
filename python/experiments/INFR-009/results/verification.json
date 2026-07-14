@@ -1,0 +1,100 @@
+{
+  "redesign": "INFR-009",
+  "scope": [
+    "P0",
+    "P0_prime",
+    "P1",
+    "P2"
+  ],
+  "q1_fixtures": {
+    "XENA-001": {
+      "p50_gross_bps": 0.04280345728478116,
+      "expected": 0.043,
+      "abs_err": 0.00019654271521883648,
+      "within_tol": true,
+      "cost_map_complete": false,
+      "search_allowed": false,
+      "integrity_label": "INTEGRITY_INCOMPLETE",
+      "n_with_legs": 2716,
+      "incomplete_cost_blocks_search": true
+    },
+    "XENA-002": {
+      "p50_gross_bps": -0.28417275353714044,
+      "expected": -0.284,
+      "abs_err": 0.0001727535371404687,
+      "within_tol": true,
+      "cost_map_complete": false,
+      "search_allowed": false,
+      "integrity_label": "INTEGRITY_INCOMPLETE",
+      "n_with_legs": 2716,
+      "incomplete_cost_blocks_search": true
+    },
+    "XENA-003": {
+      "p50_gross_bps": 1.9097069440080834,
+      "expected": 1.91,
+      "abs_err": 0.0002930559919165354,
+      "within_tol": true,
+      "cost_map_complete": false,
+      "search_allowed": false,
+      "integrity_label": "INTEGRITY_INCOMPLETE",
+      "n_with_legs": 2716,
+      "incomplete_cost_blocks_search": true
+    }
+  },
+  "p0_prime_null": {
+    "n_candidates": 24,
+    "entry_edge_mean_of_means_bps": 0.006681690010210022,
+    "entry_edge_median_of_means_bps": -0.026006381202986192,
+    "entry_edge_abs_p95_bps": 0.6015456325240591,
+    "legs_per_candidate_median": 4000.0,
+    "legs_per_candidate_p05": 4000.0,
+    "legs_per_candidate_p95": 4000.0,
+    "cadence_class": "high",
+    "zero_edge_ok": true,
+    "high_cadence_ok": true,
+    "predictive_content": "none (coin-flip direction on shared path)",
+    "search_tuning": false,
+    "role": "P0_prime_prerequisite_for_P3_CAL",
+    "binding_scores_frozen": false
+  },
+  "p1_p2_synthetic": {
+    "package_kind": "evidence_package",
+    "score_kind": "g_gross",
+    "retired_binders": [
+      "F_floor",
+      "gate_pass_threshold",
+      "resim_divergence",
+      "binding_min_drop_ratio",
+      "Hamming_as_similarity",
+      "S_as_pass_threshold"
+    ],
+    "n_shortlisted": 2,
+    "hard_battery": "RETIRED (INFR-009 P2)",
+    "sample_g_gross": 0.48218575938699865,
+    "fill_basis_gridlike_or_ok": true,
+    "fill_basis_print_mean": 0.0
+  },
+  "q1_all_within_tol": true,
+  "q1_all_block_incomplete_cost": true,
+  "p0_prime_ok": true,
+  "q1_note": "design.md \u00a78 targets = honest recompute p50(mean RealizedBps) on search band: 001\u2248+0.043, 002\u2248\u22120.284, 003\u2248+1.910. Supersedes proposal sketch \u22120.065/+0.085/+1.91 for 001/002 (003 matched). Provenance: INFR-009 P0 verification 2026-07-13.",
+  "q1_acceptance_intent": {
+    "XENA-001": "near-zero / no deploy credit",
+    "XENA-002": "sub-zero / no deploy credit",
+    "XENA-003": "real gross ~1.91 bps; sub-cost archetype"
+  },
+  "fill_basis_fixture_sample": {
+    "XENA-001_grid_like": true,
+    "XENA-001_print_mean_bps": 0.0,
+    "XENA-003_limit_print_dominance": true,
+    "XENA-003_print_mean_bps_sample": 21.65,
+    "XENA-003_path_mean_bps_sample": -18.24
+  },
+  "p2_fixture_ok": true,
+  "p0_p2_complete": true,
+  "q1_design_targets": {
+    "XENA-001": 0.043,
+    "XENA-002": -0.284,
+    "XENA-003": 1.91
+  }
+}

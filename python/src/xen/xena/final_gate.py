@@ -1,5 +1,10 @@
 """XENA final gate — continuous walk-forward on the reserved gate segment (spec Appendix A).
 
+**INFR-009 status (P0–P2):** XENA default route is **SUSPENDED**. The extensive-F
+``gate_pass_threshold`` binder is **retired** (audit A2). Do **not** call this module on
+live universes until P3 CAL freezes LCB(g_gross)>0 coverage and P4 restores the route.
+This file remains for legacy calibration replay and ledger mechanics only.
+
 Applied to the single certified portfolio from the selection stage. Per INFR-006 locked
 decisions: the gate segment is the TEST band (Q1); gate runs are counted in a
 **portfolio-level gate ledger, cap 2 per universe** (Q2) — the ledger check is blocking and

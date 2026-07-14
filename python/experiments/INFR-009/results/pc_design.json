@@ -1,0 +1,222 @@
+{
+ "bank": "design",
+ "seeds": {
+  "low": 71000,
+  "high": 72000
+ },
+ "bite": {
+  "low": {
+   "cadence": "low",
+   "n": 8,
+   "stage2_survival_rate": 0.0,
+   "stage1_select_rate": 1.0,
+   "select_ok": true,
+   "survival_ok": true,
+   "bite_ok": true,
+   "thresholds": {
+    "survival_max": 0.125,
+    "select_min": 0.5,
+    "planted_edge_bps": 20.0
+   },
+   "embargo_frac": 0.2,
+   "stage2_start_ns": 288000000000000
+  },
+  "high": {
+   "cadence": "high",
+   "n": 8,
+   "stage2_survival_rate": 0.125,
+   "stage1_select_rate": 1.0,
+   "select_ok": true,
+   "survival_ok": true,
+   "bite_ok": true,
+   "thresholds": {
+    "survival_max": 0.125,
+    "select_min": 0.5,
+    "planted_edge_bps": 20.0
+   },
+   "embargo_frac": 0.2,
+   "stage2_start_ns": 576000000000000
+  }
+ },
+ "bite_rows": {
+  "low": [
+   {
+    "seed": 791000,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -21.909367068167516,
+    "n_legs": 33,
+    "empty": false
+   },
+   {
+    "seed": 791001,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -19.38570110813859,
+    "n_legs": 20,
+    "empty": false
+   },
+   {
+    "seed": 791002,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -25.225955242657495,
+    "n_legs": 13,
+    "empty": false
+   },
+   {
+    "seed": 791003,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -19.62130630154305,
+    "n_legs": 18,
+    "empty": false
+   },
+   {
+    "seed": 791004,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -22.120550572541482,
+    "n_legs": 19,
+    "empty": false
+   },
+   {
+    "seed": 791005,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -4.473152341624386,
+    "n_legs": 33,
+    "empty": false
+   },
+   {
+    "seed": 791006,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -7.669656132717822,
+    "n_legs": 10,
+    "empty": false
+   },
+   {
+    "seed": 791007,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -16.49650677902603,
+    "n_legs": 34,
+    "empty": false
+   }
+  ],
+  "high": [
+   {
+    "seed": 792000,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -3.1144709696139516,
+    "n_legs": 131,
+    "empty": false
+   },
+   {
+    "seed": 792001,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -1.5848211134804633,
+    "n_legs": 1020,
+    "empty": false
+   },
+   {
+    "seed": 792002,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -3.992062417478113,
+    "n_legs": 132,
+    "empty": false
+   },
+   {
+    "seed": 792003,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -1.4817434979997985,
+    "n_legs": 262,
+    "empty": false
+   },
+   {
+    "seed": 792004,
+    "plant_in_top": true,
+    "stage2_pass": true,
+    "gross_lcb": 1.5934089912203846,
+    "n_legs": 132,
+    "empty": false
+   },
+   {
+    "seed": 792005,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -1.0894714475453855,
+    "n_legs": 658,
+    "empty": false
+   },
+   {
+    "seed": 792006,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -4.009624602784146,
+    "n_legs": 132,
+    "empty": false
+   },
+   {
+    "seed": 792007,
+    "plant_in_top": true,
+    "stage2_pass": false,
+    "gross_lcb": -6.961408222280511,
+    "n_legs": 131,
+    "empty": false
+   }
+  ]
+ },
+ "coverage": {
+  "low": {
+   "cadence": "low",
+   "n": 80,
+   "n_lcb_positive": 6,
+   "rate": 0.075,
+   "coverage_ok": false
+  },
+  "high": {
+   "cadence": "high",
+   "n": 80,
+   "n_lcb_positive": 2,
+   "rate": 0.025,
+   "coverage_ok": true
+  }
+ },
+ "frozen_procedure": {
+  "binder": "two_stage_sample_split",
+  "stage1": "search+certify top-1 on stage-1 bands",
+  "stage2": "lcb_g_leg_studentized(g_gross) > 0 on distant embargoed band",
+  "functional": "g_gross_ratio",
+  "estimator": "leg_studentized_bootstrap_t",
+  "embargo_frac": 0.2,
+  "search_frac": 0.5,
+  "ranking_frac": 0.25,
+  "n_boot": 200,
+  "block_legs": 1,
+  "confidence": 0.95,
+  "alpha": 0.05,
+  "one_subset": true,
+  "shortlist": false,
+  "design_seeds": {
+   "low": 71000,
+   "high": 72000
+  },
+  "confirm_seeds": {
+   "low": 81000,
+   "high": 82000
+  },
+  "design_bite_ok": true,
+  "design_cov_low": 0.075,
+  "design_cov_high": 0.025,
+  "held_out_escalation": false,
+  "gate_rule": "per_cadence point \u03b1\u0302\u22645% AND no-search cov\u22645% (Fork A)"
+ },
+ "design_ok": true,
+ "stop_reason": null
+}

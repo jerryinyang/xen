@@ -1,0 +1,140 @@
+{
+  "schema": "xena.infr009.p3c_high_e2e_passers.v1",
+  "source": "results/p3c_calibration.json freeze_grade.alpha_high_rows gross_pass=true",
+  "n_null_high": 200,
+  "n_pass": 11,
+  "alpha_hat": 0.055,
+  "block_lcb": 64,
+  "method": "studentized_bootstrap_t",
+  "passers": [
+    {
+      "seed": 22001,
+      "symbol": "SYNTH",
+      "g_search_hat": 1.5851030149915126,
+      "gross_point": 3.2143638752453585,
+      "gross_lcb": 1.0497193142517767,
+      "n_legs": 263,
+      "n_admitted_test": 263,
+      "empty_bar_fraction": 0.8902795160617438
+    },
+    {
+      "seed": 22023,
+      "symbol": "SYNTH",
+      "g_search_hat": 1.8282923383027558,
+      "gross_point": 4.156672067043036,
+      "gross_lcb": 0.5607731019142355,
+      "n_legs": 131,
+      "n_admitted_test": 131,
+      "empty_bar_fraction": 0.9453483521068001
+    },
+    {
+      "seed": 22034,
+      "symbol": "SYNTH",
+      "g_search_hat": 2.3351385192861067,
+      "gross_point": 6.343126391534062,
+      "gross_lcb": 2.3753140906059764,
+      "n_legs": 131,
+      "n_admitted_test": 131,
+      "empty_bar_fraction": 0.9453483521068001
+    },
+    {
+      "seed": 22038,
+      "symbol": "SYNTH",
+      "g_search_hat": 1.7691780146933969,
+      "gross_point": 2.4330376633323247,
+      "gross_lcb": 0.15082155750597215,
+      "n_legs": 263,
+      "n_admitted_test": 263,
+      "empty_bar_fraction": 0.8902795160617438
+    },
+    {
+      "seed": 22057,
+      "symbol": "SYNTH",
+      "g_search_hat": 1.3152010217516148,
+      "gross_point": 4.282111131842064,
+      "gross_lcb": 0.3527383624070608,
+      "n_legs": 132,
+      "n_admitted_test": 132,
+      "empty_bar_fraction": 0.9449311639549437
+    },
+    {
+      "seed": 22099,
+      "symbol": "SYNTH",
+      "g_search_hat": 0.9792785878465277,
+      "gross_point": 5.721151732882829,
+      "gross_lcb": 1.5686681568931293,
+      "n_legs": 131,
+      "n_admitted_test": 131,
+      "empty_bar_fraction": 0.9453483521068001
+    },
+    {
+      "seed": 22136,
+      "symbol": "SYNTH",
+      "g_search_hat": 1.670602399473057,
+      "gross_point": 2.3218188863560405,
+      "gross_lcb": 0.3016908792053936,
+      "n_legs": 394,
+      "n_admitted_test": 394,
+      "empty_bar_fraction": 0.8356278681685441
+    },
+    {
+      "seed": 22150,
+      "symbol": "SYNTH",
+      "g_search_hat": 1.9442277829373986,
+      "gross_point": 7.5441932757283725,
+      "gross_lcb": 2.976099402046197,
+      "n_legs": 132,
+      "n_admitted_test": 132,
+      "empty_bar_fraction": 0.9449311639549437
+    },
+    {
+      "seed": 22151,
+      "symbol": "SYNTH",
+      "g_search_hat": 2.056471928548085,
+      "gross_point": 3.200528441318157,
+      "gross_lcb": 0.2655926614913975,
+      "n_legs": 132,
+      "n_admitted_test": 132,
+      "empty_bar_fraction": 0.9449311639549437
+    },
+    {
+      "seed": 22180,
+      "symbol": "SYNTH",
+      "g_search_hat": 1.7913742575132785,
+      "gross_point": 6.050618518896596,
+      "gross_lcb": 2.7310584366093,
+      "n_legs": 132,
+      "n_admitted_test": 132,
+      "empty_bar_fraction": 0.9449311639549437
+    },
+    {
+      "seed": 22600,
+      "symbol": "XAUUSD",
+      "g_search_hat": 2.2006014833759258,
+      "gross_point": 3.927933039258654,
+      "gross_lcb": 0.3258589545888779,
+      "n_legs": 131,
+      "n_admitted_test": 131,
+      "empty_bar_fraction": 0.9453483521068001
+    }
+  ],
+  "medians": {
+    "pass": {
+      "g_search_hat": 1.7913742575132785,
+      "gross_point": 4.156672067043036,
+      "gross_lcb": 0.5607731019142355,
+      "n_legs": 132.0
+    },
+    "fail": {
+      "g_search_hat": 1.8137334051909275,
+      "gross_point": -0.2137220190960087,
+      "gross_lcb": -3.0611782410401296,
+      "n_legs": 132.0
+    }
+  },
+  "read": [
+    "search scores pass\u2248fail \u2192 not selection cherry-pick",
+    "passers have large positive TEST g_point; fails near 0/negative",
+    "high no-search @L64 5.5% = high e2e 5.5% \u2192 coverage-driven residual"
+  ]
+}

@@ -1,24 +1,26 @@
-"""XENA search stage — LAHC over the subset lattice with noise-aware acceptance (INFR-006 WS-3).
+"""XENA search stage — LAHC over the subset lattice with noise-aware acceptance.
 
-Implements `xena-model.md` §§4–8: bitmask representation, add/drop/swap/2-swap proposals,
-Late Acceptance Hill Climbing with a stagnation kick, a block-bootstrap lower-quantile
-objective, paired comparison on common data paths + common bootstrap indices, a soft
-sign-stability gate on marginal deltas, and an append-only evaluation cache.
+INFR-006 WS-3 base; **INFR-009 P1 binding objective change**: the walk maximizes
+``ĝ(S) = P25(g_gross)`` — the block-bootstrap lower quantile of the intensive gross
+turnover-edge (``xen.xena.score``) — not log-wealth F. Log-wealth remains available as
+secondary evidence via ``bootstrap_F`` but is **not** the LAHC accept/rank score.
 
-Load-bearing noise machinery (§6):
+Implements bitmask representation, add/drop/swap/2-swap proposals, Late Acceptance Hill
+Climbing with a stagnation kick, paired comparison on common data paths + common
+bootstrap indices, a soft sign-stability gate on marginal deltas, and an append-only
+evaluation cache.
+
+Load-bearing noise machinery:
 * Every subset in one restart is evaluated on the SAME segment and oracle seed, and every
-  bootstrap uses the SAME block-start indices (common random numbers extended into the
-  bootstrap) — so the paired per-resample delta ``Δ_b = F_b(S') − F_b(S)`` isolates the
-  compositional difference.
-* Common indices require a common index space: per-event equity increments are aggregated
-  onto the UNIVERSE's fixed bar grid (union of all candidates' mark times), which is
-  identical for every subset.
-* The objective the walk maximizes is ``F̂(S) = quantile_q0(F_b)`` (default P25), where each
-  ``F_b`` re-scores the recorded per-bar equity increments of ONE full simulation over
-  resampled contiguous blocks (§7 approximation — discharged at deep validation, WS-4).
+  bootstrap uses the SAME block-start indices (common random numbers) — so the paired
+  per-resample delta ``Δ_b = g_b(S') − g_b(S)`` isolates the compositional difference.
+* Common indices require a common index space: per-trade gross P&L and |notional| are
+  aggregated onto the UNIVERSE's fixed bar grid (union of all candidates' mark times).
+* Objective: ``ĝ(S) = quantile_q0(g_b)`` (default P25). Cadence alone no longer raises the
+  score (audit B1/B2).
 
-Parameter registry (spec §11) — all defaults fixed, none tuned:
-L=150, c=5, kick 2–4 bits, proposal probs 0.25/0.25/0.45/0.05, B=150, quantile P25, q=0.6.
+Parameter registry defaults (search engine, not score scale): L=150, c=5, kick 2–4 bits,
+proposal probs 0.25/0.25/0.45/0.05, B=150, quantile P25, q=0.6. No absolute F scalar.
 """
 from __future__ import annotations
 
@@ -29,6 +31,7 @@ import numpy as np
 import polars as pl
 
 from xen.xena.oracle import CandidateStream, OracleConfig, OracleResult, evaluate
+from xen.xena.score import robust_g_hat
 
 # spec §11 registry defaults — fix once, never tune
 DEFAULT_L = 150
@@ -152,13 +155,16 @@ def bootstrap_F(increments: np.ndarray, starts: np.ndarray, *, block: int,
 # --------------------------------------------------------------------------- #
 @dataclass
 class EvalRecord:
-    F_hat: float
-    F_point: float
-    boot: np.ndarray
+    """One subset evaluation. ``F_hat`` / ``F_point`` names retained for API stability;
+    under INFR-009 they hold **g_gross** (intensive bps), not log-wealth."""
+    F_hat: float          # robust score ĝ = P25(g_gross)  [binding]
+    F_point: float        # point g_gross
+    boot: np.ndarray      # bootstrap g_gross vector
     n_admitted: int
     n_rejected: int
     iteration: int
     restart_id: int
+    score_kind: str = "g_gross"  # INFR-009; was implicit "log_wealth"
 
 
 class EvalCache:
@@ -313,13 +319,40 @@ class RestartResult:
 def run_restart(streams: list[CandidateStream], config: OracleConfig, *, budget: int,
                 restart_id: int, segment: tuple[int, int] | None = None,
                 params: SearchParams = SearchParams(), oracle_seed: int = 0,
-                cache: EvalCache | None = None) -> RestartResult:
+                cache: EvalCache | None = None,
+                universe_root: str | None = None,
+                skip_economics_precondition: bool = False) -> RestartResult:
     """One LAHC restart (spec §13 pseudocode). Deterministic given all arguments.
 
     ``restart_id`` seeds the walk rng AND offsets the bootstrap-start seed so different
     restarts explore differently, while WITHIN a restart every evaluation shares one
     block-start matrix (common indices) and one oracle seed (common data path).
+
+    INFR-009 P0 cost guard:
+    * Live: pass ``universe_root`` after Q1, or leave streams with finite non-placeholder
+      ``cost_bps`` (0.0 is the unpinned sentinel).
+    * Synthetic / calibration: pass ``skip_economics_precondition=True`` **explicitly**
+      (``calibration.run_pipeline_once`` does this). Do not rely on DEFAULT_COST_BPS alone
+      — a 0-cost synthetic without the skip gets a clear INTEGRITY_INCOMPLETE error.
     """
+    if skip_economics_precondition:
+        pass
+    elif universe_root is not None:
+        from xen.xena.economics import require_economics_before_search
+        require_economics_before_search(universe_root)
+    else:
+        # Stream-level guard when no universe root (live ad-hoc or mistaken synthetic).
+        from xen.xena.economics import SearchRefusedIntegrity, check_cost_map_integrity
+        st = check_cost_map_integrity(streams)
+        if not st.complete:
+            raise SearchRefusedIntegrity(
+                f"INTEGRITY_INCOMPLETE: cost-map incomplete "
+                f"({st.n_incomplete}/{st.n_candidates}). "
+                "Live: run economics_disclosure (Q1) + pin finite non-placeholder "
+                "cost_bps, then pass universe_root=.... "
+                "Synthetic/calibration: pass skip_economics_precondition=True "
+                "(see xen.xena.calibration.run_pipeline_once)."
+            )
     universe = sorted(s.candidate_id for s in streams)
     grid = universe_grid(streams)
     if segment is not None:
@@ -340,11 +373,13 @@ def run_restart(streams: list[CandidateStream], config: OracleConfig, *, budget:
         if rec is not None:
             return rec
         res = evaluate(subset, streams, config, segment=segment, seed=oracle_seed)
-        inc = grid_increments(res, grid)
-        boot = bootstrap_F(inc, starts, block=params.block_bars,
-                           initial_equity=config.initial_equity)
-        rec = EvalRecord(float(np.quantile(boot, params.quantile)), res.F_point, boot,
-                         res.n_admitted, res.n_rejected, it_counter[0], restart_id)
+        # INFR-009 P1: intensive g_gross P25 is the binding walk score (not log-wealth).
+        g_hat, g_point, boot = robust_g_hat(
+            res, streams, grid, starts,
+            block=params.block_bars, quantile=params.quantile)
+        rec = EvalRecord(g_hat, g_point, boot,
+                         res.n_admitted, res.n_rejected, it_counter[0], restart_id,
+                         score_kind="g_gross")
         cache.put(subset, rec)
         return rec
 

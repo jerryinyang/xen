@@ -1,0 +1,86 @@
+{
+  "bank": "design",
+  "generated_utc": "2026-07-13T23:30:00Z",
+  "seeds": {"low": 51000, "high": 52000},
+  "design_ok": false,
+  "stop_reason": "K_not_converged_and_compute_crash",
+  "recommend": "exit_(c)_two_stage",
+  "note": "Amended P-BF.4 freeze gate failed on DESIGN low cadence (rel q_99 vs q_199 = 0.559, rel q_149 vs q_199 = 0.270; both > tol 0.25). High kconv incomplete: host hung/hard-shutdown under K_pool=199 \u00d7 8 workers (load-average ~55 before crash). Do not freeze K. Do not under-K. Do not launch confirm. Exit (c) is the predeclared path for compute/permutation-validity failure.",
+  "bite": {
+    "ok": true,
+    "recipe": "circular_shift_marks_open_rebuild_fills",
+    "exchangeability_unit": "bar (circular lag on marks Open)",
+    "forbidden": "do not shuffle RealizedBps / per-leg P&L directly",
+    "by_cadence": {
+      "low": {
+        "plant_real_mean_bps": 5.265,
+        "plant_perm_mean_bps": -0.202,
+        "plant_collapse_frac": 0.9615745781586165,
+        "plant_ok": true,
+        "null_real_mean_bps": 0.325,
+        "null_perm_mean_bps": 0.341,
+        "null_shift_bps": 0.016,
+        "null_ok": true,
+        "bite_ok": true
+      },
+      "high": {
+        "plant_real_mean_bps": 19.995,
+        "plant_perm_mean_bps": -0.053,
+        "plant_collapse_frac": 0.9973648347349067,
+        "plant_ok": true,
+        "null_real_mean_bps": 0.025,
+        "null_perm_mean_bps": -0.051,
+        "null_shift_bps": 0.076,
+        "null_ok": true,
+        "bite_ok": true
+      }
+    }
+  },
+  "k_convergence": {
+    "rule": "amended_P-BF.4_qK_vs_q199",
+    "K_diagnostic": [19, 39, 59],
+    "K_certifiable": [99, 149],
+    "K_pool": 199,
+    "stability_tol": 0.25,
+    "K_star": null,
+    "converged": false,
+    "confirm_feasible": false,
+    "host_event": "hard_shutdown_under_kconv_high_8_of_16",
+    "by_cadence": {
+      "low": {
+        "status": "complete",
+        "chosen_K": null,
+        "converged": false,
+        "rel_q99_vs_q199": 0.559,
+        "rel_q149_vs_q199": 0.270,
+        "q99_vs_q199_ok": false,
+        "n_universes": 16,
+        "k_curve": [
+          {"K": 19, "median_rel_vs_Kpool": 1.246, "stable": false, "certifiable": false},
+          {"K": 39, "median_rel_vs_Kpool": 1.388, "stable": false, "certifiable": false},
+          {"K": 59, "median_rel_vs_Kpool": 0.664, "stable": false, "certifiable": false},
+          {"K": 99, "median_rel_vs_Kpool": 0.559, "stable": false, "certifiable": true},
+          {"K": 149, "median_rel_vs_Kpool": 0.270, "stable": false, "certifiable": true},
+          {"K": 199, "median_rel_vs_Kpool": 0.0, "stable": false, "certifiable": false}
+        ]
+      },
+      "high": {
+        "status": "incomplete_host_crash",
+        "completed_universes_at_crash": 8,
+        "n_universes_planned": 16,
+        "chosen_K": null,
+        "converged": null,
+        "note": "kconv-high reached 8/16 then host hung and hard-shut down; no quantile certified."
+      }
+    },
+    "note": "K* requires BOTH cadences certifiable. Low alone blocks freeze. High unfinished is not a reason to under-K or re-open LCB knobs."
+  },
+  "frozen_procedure": null,
+  "confirm_bank": "NOT_TOUCHED",
+  "salvage_source": [
+    "results/pbf_run.log (amended run through kconv-low complete + kconv-high 8/16)",
+    "design.md \u00a7P-BF.4 amendment 2026-07-13",
+    "operator report: laptop hung/hard-shutdown under compute load"
+  ],
+  "pre_amendment_artifact": "results/pbf_design_pre_amendment_K99ref.json (self-ref K-rule; do not freeze from)"
+}

@@ -1,0 +1,151 @@
+{
+ "registry": {
+  "schema": "xena.infr009.pc_registry.v2",
+  "binder": "exit_(c)_two_stage_sample_split",
+  "parent_sha256": "44e1aa3cd7690fe04109533590c768c770b51e44c74bdc5e6bd45ba6a47ec5ee",
+  "amendment": {
+   "id": "P5",
+   "tag": "TIGHTER",
+   "scope": "net_deployability_path_only",
+   "injected_rt_bps": 1.0,
+   "rationale": "Stream cost_bps inert on engine-costless emissions. Operator lock: flat 1.0 bps RT conservative floor (live FTMO index median ~1.5 bps; range ~0.5\u20134.2 on 2026-07-14 snapshot). Per-symbol pins not required.",
+   "alpha_boundary": "confirm \u03b1\u0302=5.0% both cadences ACCEPTED; Wilson upper 9.0% disclosed; no \u03b1 gate rewrite (informal 8\u201310% posture is not a new threshold)."
+  },
+  "frozen_procedure": {
+   "binder": "two_stage_sample_split",
+   "stage1": "search+certify top-1 on stage-1 bands",
+   "stage2": "lcb_g_leg_studentized(g_gross) > 0 on distant embargoed band",
+   "functional": "g_gross_ratio",
+   "estimator": "leg_studentized_bootstrap_t",
+   "embargo_frac": 0.2,
+   "search_frac": 0.5,
+   "ranking_frac": 0.25,
+   "n_boot": 200,
+   "block_legs": 1,
+   "confidence": 0.95,
+   "alpha": 0.05,
+   "one_subset": true,
+   "shortlist": false,
+   "design_seeds": {
+    "low": 71000,
+    "high": 72000
+   },
+   "confirm_seeds": {
+    "low": 81000,
+    "high": 82000
+   },
+   "design_bite_ok": true,
+   "design_cov_low": 0.075,
+   "design_cov_high": 0.025,
+   "held_out_escalation": false,
+   "gate_rule": "per_cadence point \u03b1\u0302\u22645% AND no-search cov\u22645% (Fork A)",
+   "stage2_gross": "lcb_g_leg_studentized(g_gross)>0 costless on gate/SEG_PROXY band",
+   "stage2_net_deployability": "lcb_g_leg_studentized(g_net)>0 with FLAT injected RT=1.0 bps (not stream cost_bps)",
+   "injected_rt_bps": 1.0,
+   "deployability_binding": "top1_net_lcb_positive_after_injection",
+   "finalist_stage2": "disclosure_only",
+   "amendment": "P5_net_path_flat_1bps_TIGHTER_deployability"
+  },
+  "confirm_summary": {
+   "verdict": "DUAL_CERTIFY",
+   "per_cadence": {
+    "low": {
+     "cadence": "low",
+     "no_search_cov": 0.045,
+     "e2e_alpha": 0.05,
+     "selection_inflation": 0.0050000000000000044,
+     "coverage_ok": true,
+     "alpha_ok": true,
+     "certified": true,
+     "alpha_se": 0.015411035007422441,
+     "alpha_wilson_95": {
+      "low": 0.027382349028644986,
+      "high": 0.08957905629784384
+     },
+     "n": 200,
+     "n_gross_lcb_positive": 10,
+     "failure_label": null
+    },
+    "high": {
+     "cadence": "high",
+     "no_search_cov": 0.04,
+     "e2e_alpha": 0.05,
+     "selection_inflation": 0.010000000000000002,
+     "coverage_ok": true,
+     "alpha_ok": true,
+     "certified": true,
+     "alpha_se": 0.015411035007422441,
+     "alpha_wilson_95": {
+      "low": 0.027382349028644986,
+      "high": 0.08957905629784384
+     },
+     "n": 200,
+     "n_gross_lcb_positive": 10,
+     "failure_label": null
+    }
+   },
+   "gate_rule": "per-cadence point \u03b1\u0302\u22645% AND no-search cov\u22645% (Fork A per-cadence)"
+  },
+  "design_bite": {
+   "low": {
+    "cadence": "low",
+    "n": 8,
+    "stage2_survival_rate": 0.0,
+    "stage1_select_rate": 1.0,
+    "select_ok": true,
+    "survival_ok": true,
+    "bite_ok": true,
+    "thresholds": {
+     "survival_max": 0.125,
+     "select_min": 0.5,
+     "planted_edge_bps": 20.0
+    },
+    "embargo_frac": 0.2,
+    "stage2_start_ns": 288000000000000
+   },
+   "high": {
+    "cadence": "high",
+    "n": 8,
+    "stage2_survival_rate": 0.125,
+    "stage1_select_rate": 1.0,
+    "select_ok": true,
+    "survival_ok": true,
+    "bite_ok": true,
+    "thresholds": {
+     "survival_max": 0.125,
+     "select_min": 0.5,
+     "planted_edge_bps": 20.0
+    },
+    "embargo_frac": 0.2,
+    "stage2_start_ns": 576000000000000
+   }
+  },
+  "design_coverage": {
+   "low": {
+    "cadence": "low",
+    "n": 80,
+    "n_lcb_positive": 6,
+    "rate": 0.075,
+    "coverage_ok": false
+   },
+   "high": {
+    "cadence": "high",
+    "n": 80,
+    "n_lcb_positive": 2,
+    "rate": 0.025,
+    "coverage_ok": true
+   }
+  },
+  "integrity_attestation": {
+   "rust_python_bitwise_parity": true,
+   "parity_gate": "tests/test_xena_fold_parity.py",
+   "binding_estimand": "g_gross_ratio (design \u00a73); not mean_per_leg",
+   "parent_p4_sha256": "44e1aa3cd7690fe04109533590c768c770b51e44c74bdc5e6bd45ba6a47ec5ee"
+  },
+  "boundary_pass_disclosure": "\u03b1\u0302 exactly 5.0% both cadences (10/200); Wilson-95 upper 9.0% \u2014 boundary accepted by operator 2026-07-14. Do not re-run confirm to improve (\u03b1-shopping).",
+  "route_restore": "RESTORED under this pin \u2014 default XENA route uses exit (c) + injected net 1.0 bps deployability; INFR-006 v3 extensive-F remains superseded; operator remains final on capital/universe certify.",
+  "operator_signoff": "Jerry Inyang \u2014 2026-07-14: P5 net fix flat 1.0 bps; accept \u03b1 5.0% boundary; route-restore authorized after re-VAL PASS",
+  "frozen_utc": "2026-07-14T02:30:21.146571+00:00"
+ },
+ "sha256": "db87dc1a4d8d5700ae83eb68b7729e6f7003a21a3e0d4b5106ee7800c6268d0a"
+}

@@ -158,16 +158,21 @@ BATTERY_KW = dict(config=CFG, n_restarts=2, budget=120, plateau_threshold=0.4,
 
 
 def test_dogfood_negative_battery_low_fpr(tmp_path):
+    """Null battery still runs end-to-end (INFR-009 smoke).
+
+    Absolute-F / cliff FPR credentials are retired (A1/A2). Shortlist is evidence,
+    not a pass filter; LCB coverage FPR is P3 CAL. This test only asserts the
+    pipeline produces a package + exercises the gate path on nulls.
+    """
     bat = calibration_battery(
         universes=3,
         make_universe=lambda s: dogfood_universe(n_candidates=6, seed=s),
         gate_pass_threshold=0.0, gate_workdir=tmp_path,
         **BATTERY_KW)
     assert bat["n_universes"] == 3
-    assert bat["certification_rate"] <= 1 / 3   # null universes must (almost) never certify
-    # gate pass rate is measured through the real gate path (None only if never certified)
-    assert bat["gate_pass_rate"] is not None
-    assert bat["gate_pass_rate"] <= bat["certification_rate"]
+    assert bat["shortlist_rate"] == 1.0          # evidence package always shortlists
+    assert bat["gate_pass_rate"] is not None     # real gate path exercised
+    assert all(o["n_shortlisted"] >= 1 for o in bat["outcomes"])
 
 
 def test_planted_battery_recovers_edge(tmp_path):

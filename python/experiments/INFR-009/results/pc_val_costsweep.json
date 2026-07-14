@@ -1,0 +1,111 @@
+{
+ "schema": "xena.infr009.pc_val_costsweep.v1",
+ "note": "Corrects the pc_val.json net path (stream cost_bps\u22480 on engine-costless real fixtures). Flat injected RT cost sweep over 003 breakeven\u2192ruin band. Gross axis unchanged/valid; this fixes the deployability read.",
+ "per_fixture": {
+  "XENA-001": {
+   "gross_lcb_top1": -0.24861095504016953,
+   "sweep": [
+    {
+     "flat_cost_bps": 0.0,
+     "top1_net_lcb": -0.24861095504016953,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": null
+    },
+    {
+     "flat_cost_bps": 0.7,
+     "top1_net_lcb": -1.0454318141546732,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": null
+    },
+    {
+     "flat_cost_bps": 1.0,
+     "top1_net_lcb": -1.1374618446151539,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": null
+    },
+    {
+     "flat_cost_bps": 1.5,
+     "top1_net_lcb": -1.6138728904354462,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": null
+    },
+    {
+     "flat_cost_bps": 2.0,
+     "top1_net_lcb": -2.146165428519245,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": null
+    }
+   ]
+  },
+  "XENA-002": {
+   "gross_lcb_top1": -0.2475725786563824,
+   "sweep": [
+    {
+     "flat_cost_bps": 0.0,
+     "top1_net_lcb": -0.2475725786563824,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": null
+    },
+    {
+     "flat_cost_bps": 0.7,
+     "top1_net_lcb": -0.876136668982929,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": null
+    },
+    {
+     "flat_cost_bps": 1.0,
+     "top1_net_lcb": -1.2212998869638954,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": null
+    },
+    {
+     "flat_cost_bps": 1.5,
+     "top1_net_lcb": -1.687633254991502,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": null
+    },
+    {
+     "flat_cost_bps": 2.0,
+     "top1_net_lcb": -1.9840936791883463,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": null
+    }
+   ]
+  },
+  "XENA-003": {
+   "gross_lcb_top1": 1.0769446401735643,
+   "sweep": [
+    {
+     "flat_cost_bps": 0.0,
+     "top1_net_lcb": 1.0769446401735643,
+     "top1_net_pass": true,
+     "n_finalists_net_pass_of_12": 12
+    },
+    {
+     "flat_cost_bps": 0.7,
+     "top1_net_lcb": 0.3154327368389792,
+     "top1_net_pass": true,
+     "n_finalists_net_pass_of_12": 12
+    },
+    {
+     "flat_cost_bps": 1.0,
+     "top1_net_lcb": -0.08527126424162321,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": 2
+    },
+    {
+     "flat_cost_bps": 1.5,
+     "top1_net_lcb": -0.6538174607804882,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": 0
+    },
+    {
+     "flat_cost_bps": 2.0,
+     "top1_net_lcb": -1.2067310138017378,
+     "top1_net_pass": false,
+     "n_finalists_net_pass_of_12": 0
+    }
+   ]
+  }
+ }
+}

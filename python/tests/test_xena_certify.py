@@ -54,18 +54,24 @@ def test_broad_plateau_passes():
     rep = plateau_screen(subset, streams, CFG, threshold=0.5, f_floor=0.0, restart_seed=1,
                          params=FAST)
     assert rep.passed, (rep.min_drop_ratio, rep.drop_scores)
-    assert rep.keystone is None
+    # INFR-009: keystone always recorded as attribution (worst-drop member)
+    assert rep.keystone is not None
     assert rep.min_drop_ratio >= 0.5
 
 
-def test_f_floor_blocks_tiny_objective():
-    """Finding 3: near-zero F̂ is ratio-unstable; a pre-registered floor blocks it."""
+def test_f_floor_legacy_flag_not_binding():
+    """INFR-009: f_floor only affects the legacy ``passed`` flag, not ratio computation.
+
+    When base ĝ is below the (retired) floor, legacy_pass is False but keystone
+    attribution still runs when drop scores exist.
+    """
     streams = [make_stream(f"win{i}", +40.0, seed=i) for i in range(6)]
     subset = frozenset(s.candidate_id for s in streams)
     rep = plateau_screen(subset, streams, CFG, threshold=0.5, f_floor=1e9,
                          restart_seed=1, params=FAST)
-    assert not rep.passed
-    assert np.isnan(rep.min_drop_ratio)
+    assert not rep.passed          # legacy flag
+    assert rep.binding is False    # not a shortlist binder
+    assert rep.keystone is not None or np.isfinite(rep.min_drop_ratio)
 
 
 def test_nonpositive_objective_cannot_certify():
@@ -123,27 +129,34 @@ def test_certify_and_rank_toy_universe():
     n_bars_ns = 4000 * 60 * NS
     folds = contiguous_purged_folds(0, n_bars_ns, n_folds=3, purge_ns=60 * 60 * NS)
     out = certify_and_rank(finalists, streams, CFG, plateau_threshold=0.3, f_floor=0.0, folds=folds,
-                           params=FAST)
-    assert out["n_certified"] >= 1
-    assert out["ranked"], "certified candidates must be ranked"
+                           params=FAST, include_random_ref=False)
+    assert out["n_shortlisted"] >= 1
+    assert out["ranked"], "shortlist candidates must be ranked"
     assert out["evaluation_count"] > 0
+    assert out["score_kind"] == "g_gross"
     # the top-ranked portfolio contains planted winners, not losers
     top = out["ranked"][0].subset
     assert top & {"win0", "win1", "win2"}
     assert len(top & {f"lose{i}" for i in range(5)}) <= 1
 
 
-def test_noise_only_universe_certifies_nothing():
-    """Zero-edge universe: the selection stage must not certify (F̂ ≤ 0 or cliff-fail)."""
+def test_noise_only_universe_still_builds_evidence_package():
+    """INFR-009: zero-edge terminals still enter the evidence package (no F_floor gate).
+
+    Absolute-F cliff certification is retired; noise is diagnosed via fold scores /
+    random-subset reference, not by emptying the shortlist.
+    """
     streams = [make_stream(f"n{i}", 0.0, seed=50 + i) for i in range(6)]
     finalists = [run_restart(streams, CFG, budget=120, restart_id=i, params=FAST)
                  for i in (1, 2)]
     n_bars_ns = 4000 * 60 * NS
     folds = contiguous_purged_folds(0, n_bars_ns, n_folds=3, purge_ns=60 * 60 * NS)
-    out = certify_and_rank(finalists, streams, CFG, plateau_threshold=0.5, f_floor=0.0, folds=folds,
-                           params=FAST)
-    assert out["n_certified"] == 0
-    assert out["keystones"] is not None  # attribution recorded for failures
+    out = certify_and_rank(finalists, streams, CFG, plateau_threshold=0.5, f_floor=0.0,
+                           folds=folds, params=FAST, include_random_ref=False)
+    assert out["n_shortlisted"] >= 1
+    assert out["package_kind"] == "evidence_package"
+    assert "F_floor" in out["retired_binders"]
+    assert out["keystones"] is not None
 
 
 # --------------------------------------------------------------------------- #
@@ -160,18 +173,28 @@ def test_certify_registry_binding_and_resim_divergence(tmp_path):
     freeze_registry(params=FAST, plateau_threshold=0.3, f_floor=0.0,
                     gate_pass_threshold=0.0, layout=layout, battery_summary={},
                     out_path=reg, operator_signoff="JI")
-    # drifted threshold vs pin refuses
-    with pytest.raises(ValueError, match="never re-derived"):
-        certify_and_rank(finalists, streams, CFG, plateau_threshold=0.9, f_floor=0.0,
-                         folds=folds, params=FAST, search_segment=layout.search,
-                         registry_path=str(reg))
+    # INFR-009: retired F_floor/plateau drift is recorded, not hard-raised
+    drifted = certify_and_rank(finalists, streams, CFG, plateau_threshold=0.9, f_floor=0.0,
+                               folds=folds, params=FAST, search_segment=layout.search,
+                               registry_path=str(reg), include_random_ref=False)
+    assert drifted["retired_threshold_drift"] is not None
+    assert drifted["retired_threshold_drift"]["binding"] is False
+    assert drifted["retired_threshold_drift"]["plateau_threshold_arg"] == 0.9
+    # SearchParams pin still enforced
+    from dataclasses import replace
+    bad_params = replace(FAST, L=FAST.L + 1)
+    with pytest.raises(ValueError, match="SearchParams"):
+        certify_and_rank(finalists, streams, CFG, plateau_threshold=0.3, f_floor=0.0,
+                         folds=folds, params=bad_params, search_segment=layout.search,
+                         registry_path=str(reg), include_random_ref=False)
     out = certify_and_rank(finalists, streams, CFG, plateau_threshold=0.3, f_floor=0.0,
                            folds=folds, params=FAST, search_segment=layout.search,
-                           registry_path=str(reg))
+                           registry_path=str(reg), include_random_ref=False)
     import json  # noqa: PLC0415
     assert out["registry_sha256"] == json.loads(reg.read_text())["sha256"]
-    # F04: one divergence row per certified+ranked finalist, evidence fields present
+    assert out["retired_threshold_drift"] is None  # matches pin
+    # resim rows are evidence only (retired binder)
     assert len(out["resim_divergence"]) == len(out["ranked"])
     for row in out["resim_divergence"]:
-        assert 0.0 <= row["frac_folds_below_search_p25"] <= 1.0
+        assert row.get("binding") is False
         assert "search_band_boot_p25" in row and "fold_worst_F" in row

@@ -1,12 +1,22 @@
-# XENA Lane — Portfolio-Construction Workflow + Referee Framework (INFR-006)
+# XENA Lane — Portfolio-Construction Workflow + Referee Framework (INFR-006 → INFR-009)
 
-**The DEFAULT route for incoming ideas** (operator decision Q3, 2026-07-10): operator
-presents an idea → it enters a XENA universe. EXP/SPDR lanes remain available but are
-**operator-invoked only** (exploration/characterisation). XENA replaces per-candidate
-referee adjudication as the tradability route (the L-12 fix pathway).
+**The DEFAULT route for incoming ideas** (operator decision Q3, 2026-07-10; **route RESTORED
+2026-07-14 under INFR-009 P5**): operator presents an idea → it enters a XENA universe.
+EXP/SPDR lanes remain available but are **operator-invoked only** (exploration/characterisation).
+XENA replaces per-candidate referee adjudication as the tradability route (the L-12 fix pathway).
 
-Design record: `python/experiments/INFR-006/design.md` (plan, locked decisions, review-fix
-log, battery results). Spec source: `.ignore/temp/new-referee/xena-model.md`.
+**Active binder (INFR-009 exit (c), P5 pin):** two-stage sample-split — stage-1 costless intensive
+`g_gross` search → fix top-1 → stage-2 leg-studentized LCB on a distant/embargoed band.
+- **Gross structure:** `lcb_g_leg_studentized(g_gross) > 0` (costless).
+- **Deployability:** `lcb_g_leg_studentized(g_net) > 0` after **flat injected RT = 1.0 bps**
+  (not stream `cost_bps` on engine-costless emissions).
+- **Registry:** `python/experiments/INFR-009/results/pc_frozen_registry.json` (schema v2,
+  sha256 `db87dc1a…`; parent P4 `44e1aa3c…`). α̂=5.0% boundary accepted (Wilson upper 9.0% disclosed).
+- **INFR-006 v3** absolute extensive-F binders (X / F_floor / gate 0.0558) remain **superseded** —
+  artifacts retained; do not re-enable on the binding path.
+
+Design record (redesign): `python/experiments/INFR-009/design.md`. Historical INFR-006 plan:
+`python/experiments/INFR-006/design.md`. Spec source: `.ignore/temp/new-referee/xena-model.md`.
 
 ## Principle
 

@@ -1,0 +1,43 @@
+{
+ "schema": "xena.infr009.pc_val_injected.v1",
+ "cost_injection_status": "PER_SYMBOL_EXACT_BLOCKED",
+ "blocker": "fixtures are 12 index/commodity CFDs; FTMO commission ~0 for indices (cost is all spread); spread_pips NOT pinned in FTMO snapshot (round_trip_cost_bps refuses; must be read off live FTMO page). Cannot fabricate per-symbol spread.",
+ "method": "binding top-1 rule (design.md \u00a7P4.2) evaluated across the realistic index-CFD spread band; conclusion is cost-ROBUST so exact per-symbol spread is not required for the verdict.",
+ "realistic_cost_band_bps": [
+  1.0,
+  1.5,
+  2.0
+ ],
+ "per_fixture": {
+  "XENA-001": {
+   "gross_lcb_top1": -0.24861095504016953,
+   "top1_net_lcb_by_cost": {
+    "1.0": -1.1374618446151539,
+    "1.5": -1.6138728904354462,
+    "2.0": -2.146165428519245
+   },
+   "top1_deployable_any_realistic_cost": false
+  },
+  "XENA-002": {
+   "gross_lcb_top1": -0.2475725786563824,
+   "top1_net_lcb_by_cost": {
+    "1.0": -1.2212998869638954,
+    "1.5": -1.687633254991502,
+    "2.0": -1.9840936791883463
+   },
+   "top1_deployable_any_realistic_cost": false
+  },
+  "XENA-003": {
+   "gross_lcb_top1": 1.0769446401735643,
+   "top1_net_lcb_by_cost": {
+    "1.0": -0.08527126424162321,
+    "1.5": -0.6538174607804882,
+    "2.0": -1.2067310138017378
+   },
+   "top1_deployable_any_realistic_cost": false
+  }
+ },
+ "binding_verdict": "VAL_PASS_binding_top1",
+ "deployable_fixtures_at_realistic_cost": [],
+ "conclusion": "On the binding top-1 rule, NO fixture is deployable at any realistic index-CFD spread (>=1.0 bps): 001/002 gross-rejected; 003 gross-certified but top-1 net<0 for all cost>=1.0. Gross certification clean. 003 real-gross-but-cost-fatal reproduced. Exact per-symbol machine verdict pending operator spread_pips."
+}
