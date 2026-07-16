@@ -41,6 +41,13 @@ required. See [data-architecture.md](data-architecture.md) (migration banner) an
 - [families-explored.md](families-explored.md) — every candidate family + disposition, and the
   **availability 2×2** that frames the open frontier.
 - [pitfalls-ledger.md](pitfalls-ledger.md) — refuted directions and dead ends; do not re-run.
+- [reviews/capture-geometry-review.md](reviews/capture-geometry-review.md) — cross-chapter
+  extraction of every **capture geometry / exit** modality tried against "availability exists,
+  cannot capture"; mechanisms, observations, Mode A/B/C failure taxonomy, independent-review
+  checklist.
+- [reviews/capture-geometry-recommendations.md](reviews/capture-geometry-recommendations.md) —
+  diagnosis + design recommendations: proven cores, proven ineffective, genuine gaps, C0–C3
+  capture stack and four-layer D0 contract.
 
 ## How to work
 

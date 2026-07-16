@@ -1,0 +1,59 @@
+{
+  "gate_version": "v2",
+  "emission_type": "nautilus_v1",
+  "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/VAL-008-stubcheck",
+  "instrument": "BTCUSDT",
+  "domain": null,
+  "schema": {
+    "ok": true,
+    "missing_positions_cols": [],
+    "missing_leg_cols": [],
+    "timestamps_strictly_increasing": true,
+    "emission_contract_version": "nautilus-emission-v1",
+    "missing_emission_files": [],
+    "contract_version_ok": true
+  },
+  "fence": {
+    "ok": false,
+    "mode": "nautilus_v2",
+    "reason": "Phase-B STUB fence_attestation \u2014 real experiments require INFR-011 A6 manifest",
+    "status": "STUB",
+    "note": "Fence pin lands in INFR-011 Phase A6; stub for Phase B foundation only."
+  },
+  "manifest": {
+    "ok": true,
+    "expected": [],
+    "emitted": [
+      "BTCUSDT"
+    ],
+    "missing": []
+  },
+  "catalog_attestation": {
+    "ok": true,
+    "note": null,
+    "catalog_version": "INFR-011-A4-2026-07-16",
+    "config_hash": "c37e52bfc53d90faea63035340012f1242fc0e6cf2edda9f9350e3f4567c790b"
+  },
+  "reconciliation": {
+    "ok": true,
+    "per_bar_gross_total": -4023.386213733599,
+    "per_leg_realized_total": -4023.386213733598,
+    "abs_diff_bps": 9.094947017729282e-13,
+    "tol_bps": 1.0
+  },
+  "physicality": {
+    "years": 0.5475701574264202,
+    "n_bars": 288000,
+    "n_legs": 4257,
+    "n_censored_legs": 0,
+    "total_net_bps": -4023.386213733599,
+    "annualised_return": -0.7347709072830986,
+    "per_bar_sharpe_annualised": -1.7488186896410356,
+    "max_drawdown_bps": -5967.482714632626,
+    "occupancy": 0.99965625,
+    "buy_and_hold_annualised_return": 0.7665604780736799,
+    "buy_and_hold_annualised_vol": 0.42083820708208214,
+    "sanity_flags": []
+  },
+  "blocking_pass": false
+}
