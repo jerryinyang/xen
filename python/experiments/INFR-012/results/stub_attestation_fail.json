@@ -1,0 +1,67 @@
+{
+  "gate_version": "v2",
+  "emission_type": "nautilus_v1",
+  "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/INFR-010-smoke-bar-1.230.0",
+  "instrument": null,
+  "domain": null,
+  "schema": {
+    "ok": true,
+    "missing_positions_cols": [],
+    "missing_leg_cols": [],
+    "timestamps_strictly_increasing": true,
+    "emission_contract_version": "nautilus-emission-v1",
+    "missing_emission_files": [],
+    "contract_version_ok": true
+  },
+  "fence": {
+    "ok": false,
+    "mode": "nautilus_v2",
+    "reason": "Phase-B STUB fence_attestation \u2014 real experiments require INFR-011 A6 manifest",
+    "status": "STUB",
+    "note": "Fence pin lands in INFR-011 Phase A6; stub for Phase B foundation only."
+  },
+  "manifest": {
+    "ok": false,
+    "expected": [
+      "BTCUSDT"
+    ],
+    "emitted": [
+      "XRPUSDT"
+    ],
+    "missing": [
+      "BTCUSDT"
+    ]
+  },
+  "catalog_attestation": {
+    "ok": true,
+    "note": "catalog_version/path null \u2014 acceptable for Phase B smokes only",
+    "catalog_version": null,
+    "config_hash": "091b0344a8ee00726ce903669cc85c8642314784f46881bdc1587dae44223235"
+  },
+  "reconciliation": {
+    "ok": true,
+    "per_bar_gross_total": -455.0651429844156,
+    "per_leg_realized_total": -455.0651429844156,
+    "abs_diff_bps": 0.0,
+    "tol_bps": 1.0
+  },
+  "physicality": {
+    "years": 0.0009487413491520268,
+    "n_bars": 500,
+    "n_legs": 19,
+    "n_censored_legs": 0,
+    "total_net_bps": -455.0651429844156,
+    "annualised_return": -47.965142806429505,
+    "per_bar_sharpe_annualised": -18.487403499114905,
+    "max_drawdown_bps": -1616.5941069307028,
+    "occupancy": 0.942,
+    "buy_and_hold_annualised_return": 167.15222962392977,
+    "buy_and_hold_annualised_vol": 2.5860529030556627,
+    "sanity_flags": [
+      "|Sharpe| -18.49 > 3.0 \u2014 non-physical for a single-instrument strategy; interrogate before trusting",
+      "|annualised return| -4796.5% > 100%/yr",
+      "annualised return -4796.5% exceeds 3x buy-and-hold vol (258.6%) on the same instrument"
+    ]
+  },
+  "blocking_pass": false
+}

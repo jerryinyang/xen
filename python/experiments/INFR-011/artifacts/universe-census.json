@@ -1,0 +1,54 @@
+{
+  "generated": "2026-07-14T21:13:10.233980Z",
+  "source": "https://public.bybit.com/trading/",
+  "n_total_dirs": 1763,
+  "n_candidates_filtered": 910,
+  "filter": "STRICT USDT linear perps only (folders ending USDT/; exclude dated, inverse-USD, USDC, and all *PERP USDC-settled). Corrected per D3 and INFR-010 \u00a76 A1.",
+  "history_cap": "MAX 4 YEARS trailing per symbol (amended 2026-07-14). Long symbols use trailing 4y for processing + fence.",
+  "sample_ranges_observed": {
+    "BTCUSDT": {
+      "first": "2020-03-25",
+      "last": "2026-07-13",
+      "days": 2302,
+      "capped_first": "2022-07-14",
+      "capped_days": 1461
+    },
+    "ETHUSDT": {
+      "first": "2020-10-21",
+      "last": "2026-07-13",
+      "days": 2092,
+      "capped_first": "2022-07-14",
+      "capped_days": 1461
+    },
+    "SOLUSDT": {
+      "first": "2021-06-29",
+      "last": "2026-07-13",
+      "days": 1841,
+      "capped_first": "2022-07-14",
+      "capped_days": 1461
+    },
+    "LUNA2USDT": {
+      "first": "2022-05-31",
+      "last": "2026-07-13",
+      "days": 1505,
+      "capped_first": "2022-07-14",
+      "capped_days": 1461
+    },
+    "USTCUSDT": {
+      "first": "2023-11-27",
+      "last": "2026-07-13",
+      "days": 960,
+      "capped_first": "2023-11-27",
+      "capped_days": 960
+    }
+  },
+  "storage_estimate": {
+    "peak_raw_in_flight": "one day-file (memory only; discarded after aggregation)",
+    "peak_raw_gz_gb_approx": 0,
+    "permanent_raw_gb": 0,
+    "final_parquet_gb_approx": 6,
+    "note": "ZERO permanent raw (incl. BTC/ETH/SOL — keep-forever deferred to MBP INFR). Peak = one file in flight. 4y cap. Final Parquet single-digit GB target."
+  },
+  "symbols_file": "candidate_symbols.txt",
+  "pipeline_model": "download-decompress-aggregate-in-stream -> Parquet staging -> discard ALL raw (zero permanent)"
+}

@@ -1,11 +1,24 @@
-# XENA Lane — Portfolio-Construction Workflow + Referee Framework (INFR-006 → INFR-009)
+# XENA Lane v2 — Portfolio-Construction Workflow (INFR-006 → INFR-009 → INFR-012 rebind)
 
-**The DEFAULT route for incoming ideas** (operator decision Q3, 2026-07-10; **route RESTORED
-2026-07-14 under INFR-009 P5**): operator presents an idea → it enters a XENA universe.
-EXP/SPDR lanes remain available but are **operator-invoked only** (exploration/characterisation).
-XENA replaces per-candidate referee adjudication as the tradability route (the L-12 fix pathway).
+**Version:** v2 (INFR-012, 2026-07-15) — Nautilus emissions + Bybit universe
+**The DEFAULT route for incoming ideas** (operator decision Q3, 2026-07-10; route RESTORED
+2026-07-14 under INFR-009 P5): operator presents an idea → it enters a XENA universe.
+EXP/SPDR lanes remain **operator-invoked only**.
 
-**Active binder (INFR-009 exit (c), P5 pin):** two-stage sample-split — stage-1 costless intensive
+## VOID on new stack (binding, INFR-010 R4)
+
+All frozen registry pins from chapter 03 (INFR-006/009) are **VOID for new Bybit/crypto data**.
+No XENA universe may run on the new stack until a fresh calibration cycle (CAL discipline:
+n_null sizing, design/confirm bank split, predeclared n) completes and a new hash-pinned
+registry is operator-signed. Chapter-03 registry artifacts remain for archived reproducibility
+only.
+
+## Archived binder (chapter 03 only — VOID on Bybit/crypto)
+
+The following INFR-009 P5 mechanics are **archived reference** for chapter-03 reproducibility.
+They MUST NOT bind any crypto/Bybit universe until a fresh CAL cycle produces a new pin.
+
+**Archived binder (INFR-009 exit (c), P5 pin):** two-stage sample-split — stage-1 costless intensive
 `g_gross` search → fix top-1 → stage-2 leg-studentized LCB on a distant/embargoed band.
 - **Gross structure:** `lcb_g_leg_studentized(g_gross) > 0` (costless).
 - **Deployability:** `lcb_g_leg_studentized(g_net) > 0` after **flat injected RT = 1.0 bps**
@@ -22,13 +35,13 @@ Design record (redesign): `python/experiments/INFR-009/design.md`. Historical IN
 
 **No per-candidate evaluation.** Every (model × parameters × instrument × domain) is a
 valid candidate — no qualification gates at candidate level. Candidates run once in
-cTrader; the portfolio framework selects the subset. The optimizer is a candidate
+**Nautilus**; the portfolio framework selects the subset. The optimizer is a candidate
 *generator*, never a *certifier*: certification is machinery the search cannot influence.
 
 ## Pipeline
 
 ```
-1 Universe assembly ... manifest + engine emissions → data/strategy_runs/XENA-<univ>/
+1 Universe assembly ... manifest + Nautilus emissions → data/nautilus_runs/XENA-<univ>/
 2 Candidate gate ...... xen.xena.ingest.gate_universe → xena_candidate_gate.json (BLOCKING)
 3 Search .............. xen.xena.search.run_restart ×10–15 (LAHC, TRAIN search band only)
 4 Certification ....... xen.xena.certify.certify_and_rank (plateau screen + fold ranking)
@@ -39,9 +52,9 @@ cTrader; the portfolio framework selects the subset. The optimizer is a candidat
 
 ## Price-primary carve-out (binding)
 
-- **cTrader (per candidate, once):** all signal logic; standard fills-based emission under
-  the `AnalysisEndUtc` fence — `positions.parquet` (bar grid + `RealOpen` marks) +
-  `cis_trades.parquet` per-leg ledger with **finite `SlPrice` on every leg** (stop distance
+- **Nautilus (per candidate, once):** all signal logic; emission contract v1 under catalog
+  fence — `bar_marks.parquet` (bar grid + `RealOpen` marks) + `positions_ledger.parquet`
+  per-leg ledger (shim → `cis_trades`) with **finite `SlPrice` on every leg** (stop distance
   `|EntryFill − SlPrice|` is the sizing denominator; missing/non-finite `SlPrice` ⇒ gate
   REJECT). **Clarified (operator, 2026-07-10, CF-MTFCTX-001 reconciliation):** the gate
   requirement is the finite per-leg `SlPrice` FIELD; a live engine stop order is not
@@ -49,8 +62,9 @@ cTrader; the portfolio framework selects the subset. The optimizer is a candidat
   sizes, never sees account state.
 - **Python oracle (`xen.xena.oracle`, per subset):** chronological composition ONLY —
   FM(t), `R_i = r·FM·w_i` sizing, global `R_max` admission (rejected signals logged as
-  first-class events — the sole interaction channel), cost charging (spread + commission,
-  L-22 binding), segment-end censoring, reconciliation invariant (raises). Deterministic:
+  first-class events — the sole interaction channel), cost charging (Bybit fees + T1 spread +
+  funding via `xen.evaluation`, L-22 binding), segment-end censoring, reconciliation
+  invariant (raises). Deterministic:
   (bitmask, segment, seed) → bit-identical. It may never alter an entry/exit decision.
   **INFR-007 (NEUTRAL, 2026-07-12):** the sequential event fold is dispatched to the
   `xena_fold` Rust kernel (`OracleConfig.backend`, ~15×/eval) — proven bit-identical to
@@ -59,10 +73,11 @@ cTrader; the portfolio framework selects the subset. The optimizer is a candidat
   all search/certify/gate layers stay in Python unchanged.
 - A candidate whose logic depends on account state cannot use this carve-out.
 
-## Frozen registry (treat like the frozen referee)
+## Frozen registry (chapter 03 archive — VOID on new stack)
 
 `python/experiments/INFR-006/results/xena_frozen_registry.json` — verify with
-`xen.xena.calibration.verify_frozen_registry`. **Active pin: v3 (2026-07-10), sha256
+`xen.xena.calibration.verify_frozen_registry` **on archived FX/indices universes only**.
+**Archived pin: v3 (2026-07-10), sha256
 `537d691aaf59c19220ac65b922d780e970167e8b71972ea8d864402b36e672a6`** — operator-signed
 (v2 X/F_floor sign-off + A-4 dual-gate directive). Superseded: v1 costed-selection
 (`results/v1-costed-selection/`), v2 net-binding-gate (`results/v2-net-binding-gate/`).
@@ -86,8 +101,8 @@ observed). End-to-end power: 18 bps gross 16% · 30 bps 70% · 40 bps 94% · 60 
 end-to-end passers were also net-P25-positive (deployability preview 1.0). §11
 insensitivity verified. Raw + summary: `python/experiments/INFR-006/results/`.
 
-**Enforced in code (review F01):** for live universes, `certify_and_rank` and
-`run_final_gate` MUST receive `registry_path`; they hash-verify the pin and refuse
+**Enforced in code (review F01, archived universes only):** for chapter-03 live universes,
+`certify_and_rank` and `run_final_gate` MUST receive `registry_path`; they hash-verify the pin and refuse
 thresholds/params that differ (`threshold_override_attestation` is the operator-only
 escape hatch, recorded verbatim like `new_data_attestation`). Only calibration runs —
 where thresholds are being derived, not consumed — pass None. Artifacts and the gate
@@ -101,7 +116,9 @@ LOOSER/TIGHTER-tagged amendment (L-23).
 
 - **Selection stages (search + certification) run cost-free** (`OracleConfig
   .charge_costs=False`): commissions/spread are excluded from the portfolio-selection
-  process. cTrader emissions are gross as always (engine costless).
+  process. Nautilus T1 emissions are gross as always (engine costless-honest).
+- **T1 spread-scale routing (INFR-010 §4):** candidates with gross edge within ~3× RT spread
+  are undecidable on T1 — park `AWAITING_MBP` or require T2 confirm (BTC/ETH/SOL).
 - **Rationale (operator, 2026-07-10, review F02):** the dual gate separates the
   characterisation of model performance / signal quality (gross) from failure-by-cost
   scenarios (net). A portfolio that dies only under costs is a cost problem, not a
@@ -119,9 +136,8 @@ LOOSER/TIGHTER-tagged amendment (L-23).
   operator-gated as always.
 - **DD feasibility**: FTMO-style limits (daily 5% vs day-start equity, total 10% vs
   initial) — binding on the gross path; disclosed on the net path.
-- Per-candidate `cost_bps` + `money_per_unit` pins stay verdict-bearing for the
-  deployability read (L-21): wrong pin = wrong informational block = wrong deployment
-  decision.
+- Per-candidate cost pins use `bybit_round_trip_cost_bps` + per-symbol pseudo-quote spread
+  series; `money_per_unit` pins stay verdict-bearing for deployability (L-21).
 
 ## Temporal mapping (Q1, tightened)
 
@@ -173,4 +189,4 @@ like-for-like), seed spread. Operator judges value on this package.
 FM(t) = marked equity (no leverage-margin model); `money_per_unit` default 1.0 is
 USD-quote-only (non-USD-quote symbols must pin the factor); deep validation subsumed by
 fold ranking while the oracle is deterministic (multi-seed leg activates with stochastic
-elements); C# batch manifest runner pending first live universe.
+elements); Nautilus batch manifest runner pending first live crypto universe (post-CAL).

@@ -13,8 +13,12 @@ All paths are relative to the project root (`{project-root}`).
 | Experiment Directory | `python/experiments/<EXP-ID>/` |
 | Analysis Package (`xen`) | `python/src/xen/` |
 | Data Files | `data/` |
-| Strategy-run emissions (cTrader) | `data/strategy_runs/<EXP-ID>/` |
-| cTrader-CLI harness | `tools/ctrader-cli/` (`run-experiment.sh`, `experiments/<ID>.conf`, `README.md`) |
+| Nautilus catalog (primary OHLCV) | `data/catalog/` (ParquetDataCatalog, INFR-011) |
+| Strategy-run emissions (Nautilus) | `data/nautilus_runs/<run_id>/` (emission contract v1) |
+| Nautilus runner / smoke | `python/experiments/INFR-010/scripts/run_phase_b.py`; per-EXP runners under `python/experiments/<ID>/code/` |
+| Fence manifest (A6, hash-pinned) | `python/experiments/INFR-011/artifacts/fence-manifest.json` |
+| Universe census (910 USDT perps) | `python/experiments/INFR-011/artifacts/universe-census.md` |
+| Archived cTrader emissions | `archive/chapter-03-xena-mtfctx/data/strategy_runs/` (VAL carve-out only) |
 | **Knowledge Base (read first)** | `docs/knowledge-base/` (INDEX, lessons-and-amendments, pitfalls-ledger, …) |
 | Signal Registry (live ledgers) | `docs/signal-registry/` (multiplicity, test-read, candidate-families) |
 | Experiment Index (brief) | `python/experiments/INDEX.md` |
@@ -31,7 +35,7 @@ All paths are relative to the project root (`{project-root}`).
 python/experiments/<EXP-ID>/
 ├── design.md          # quant-designer: mechanism-first scope + plan (mandatory declaration blocks)
 ├── qa-review.md       # qa-compliance: fresh-context pre-exec review — APPEND-ONLY across reruns
-├── code/              # developer: C# model refs + conf notes (NO Python analysis code)
+├── code/              # developer: Nautilus strategy/runner refs + config notes (NO Python analysis code)
 ├── analysis_code/     # data-analyst's own interrogation scripts (canonical xen estimands only)
 ├── results/           # incl. estimand_validation.json (blocking gate artifact)
 ├── plots/
@@ -80,56 +84,30 @@ The `design.md` of the latest checkpoint serves as the guide for the current pha
 
 ---
 
-## Data Architecture
+## Data Architecture (v2 — Nautilus + Bybit catalog)
 
-Xen uses a **1-minute time-bar base data** architecture. The cAlgo robot collects and stores completed 1-minute bars only. Experiments may add deterministic derived views, such as chart-type transformations or time-bar-native feature tables, only when the approved scope requires them.
+Two-lane model (INFR-010 §4):
 
-### Base Data (cAlgo Output)
+| Lane | Tier | Data | Path |
+|------|------|------|------|
+| **Primary** | T1 | 1m OHLCV from Bybit trades + pseudo-quote spreads | `data/catalog/` |
+| **Secondary** | T2 | MBP/L2 (BTC/ETH/SOL) — deferred | `docs/references/orderflow-feature-store.md` |
 
-Each robot session produces one base Parquet file per symbol/session:
+- **Universe:** 910 USDT linear perpetuals (listed + delisted), census at INFR-011 A1.
+- **InstrumentId:** `{SYMBOL}-LINEAR.BYBIT` via `xen.nautilus.instrument_ids`.
+- **History cap:** trailing 4 years per symbol; global calendar fence (A6).
+- **Chart-type generators:** dormant on new stack until ported.
 
-| Dataset | Path Pattern | Description |
-|---------|-------------|------------|
-| 1-minute time bars | `data/timebars/timebars_<symbol>_<timestamp>_<timestamp>.parquet` | Completed OHLC time bars from cTrader/cAlgo |
+Full schemas: `docs/references/dataset-reference.md` v2, `docs/references/architecture.md` v2.
 
-### Derived Data (Python On-Demand)
+### Emission contract v1 (strategy runs)
 
-Derived data is generated from 1-minute time bars. It is not stored persistently by default. Frequently reused canonical variants may be persisted under `data/<derived_view>/` only when the generator or feature version and parameters are recorded and the variant can be invalidated if logic changes.
+`data/nautilus_runs/<run_id>/` — `bar_marks.parquet`, `positions_ledger.parquet`, fills,
+orders, `event_log.jsonl`, `fence_attestation.json`. Shim: `xen.nautilus.adjudication_shim`.
+Spec: `python/experiments/INFR-010/code/emission_contract_v1.md`.
 
-| Generator | Module | Parameters |
-|-----------|--------|------------|
-| Line Break | `python/src/xen/linebreak_generator.py` | `level` (default: 3) |
-| Renko | `python/src/xen/renko_generator.py` | `atr_period` (default: 14); generated from 1-minute source bars |
-| Heiken Ashi | `python/src/xen/heiken_ashi_generator.py` | None |
-
-Chart-type generators are optional derived views. Each chart-type generator produces DataFrames with a `SourceCloseTime` column (or equivalent) linking chart-type events to real-time coordinates for return evaluation.
-
-### Time Bar Schema (8 columns)
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `Symbol` | string | cTrader symbol |
-| `OpenTime` | datetime | Bar open timestamp |
-| `CloseTime` | datetime | Bar close timestamp |
-| `Open` | double | Bar open price |
-| `High` | double | Bar high price |
-| `Low` | double | Bar low price |
-| `Close` | double | Bar close price |
-| `TickVolume` | int64 | Broker-reported tick volume, if available |
-
-### Chart-Type Schemas
-
-See `docs/references/dataset-reference.md` for full schemas. Key columns:
-
-- **Line Break:** `Open, High, Low, Close, Direction, Level, SourceCount, SourceCloseTime`
-- **Renko:** `Open, High, Low, Close, Direction, BrickSize, ATRPeriod, SourceCount, SourceCloseTime`
-- **Heiken Ashi:** `HAOpen, HAHigh, HALow, HAClose, RealOpen, RealHigh, RealLow, RealClose, Direction, SourceCount`
-
-### Enum Encoding
-
-| Enum | Values |
-|------|--------|
-| `Direction` (all chart types) | `Up=1`, `Down=-1` |
+**STUB fence attestations (Phase B smokes) fail estimand gate v2** — production runs require
+INFR-011 A6 hash-pinned manifest.
 
 ---
 
@@ -142,7 +120,7 @@ Xen data is temporally ordered. The holdout split must respect chronological ord
 ### Nested Chronological Split
 
 ```
-Full Dataset (ordered by CloseTime or SourceCloseTime)
+Full admitted catalog range (ordered by ts_event / SourceCloseTime)
 ├── First 70% = ANALYSIS SET (used for all experiments)
 │   ├── First 70% of analysis set = TRAIN SET
 │   └── Last 30% of analysis set = TEST SET
@@ -161,24 +139,18 @@ Full Dataset (ordered by CloseTime or SourceCloseTime)
 ### Code Pattern
 
 ```python
-import polars as pl
+# Use INFR-011 A6 fence manifest — absolute calendar dates, not ad-hoc row fractions.
+# Catalog query wrapper enforces holdout_start_utc; never read past it.
 from pathlib import Path
+import json
 
-DATA_DIR = Path("data")
-path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
-
-# Load and sort chronologically
-df = pl.scan_parquet(path).sort("CloseTime").collect().to_pandas()
-
-# Chronological split
-analysis_cutoff = int(len(df) * 0.7)
-analysis_set = df.iloc[:analysis_cutoff]
-# holdout = df.iloc[analysis_cutoff:]  # DO NOT UNCOMMENT OR USE
-
-# Within analysis set: train/test split
-train_cutoff = int(len(analysis_set) * 0.7)
-train_set = analysis_set.iloc[:train_cutoff]
-test_set = analysis_set.iloc[train_cutoff:]
+manifest = json.loads(
+    Path("python/experiments/INFR-011/artifacts/fence-manifest.json").read_text()
+)
+train_end = manifest["train_end_utc"]
+holdout_start = manifest["holdout_start_utc"]
+# Query catalog with ts_event <= train_end for TRAIN; TEST band between train_end and holdout_start
+# holdout_start → NEVER QUERY
 ```
 
 ---
@@ -201,8 +173,8 @@ These binding constraints apply to all Xen research.
 | **Single hypothesis per experiment** | Each experiment answers exactly one question. Scope creep is a governance violation. |
 | **Complexity budget enforced** | Every experiment has defined limits on statistical tests, visualisations, and new code modules. |
 | **No premature optimisation** | Characterisation phases must not tune strategy parameters, windows, filters, stops, or targets against analysis-set performance. Optimisation requires an explicit phase and scope. |
-| **Causal-by-construction execution** | Price-primary (edge-generating) experiments run in the cTrader engine where look-ahead is impossible; Python is analysis-only on emitted runs. A vectorized Python backtest of a price strategy is rejected. (Structural fix for the L-01 look-ahead leak.) |
-| **Evaluate-on-bar-open + lagged reference only** | Every decision is evaluated at a bar's **open**, conditioned only on **previous, confirmed (closed) bars** (data through bar `t-1`); the forming bar's own OHLC is unknown at decision time. No signal, filter, regime label, indicator, or exit may read the bar it acts in. The C# `OnBar` model enforces this by construction; analysis code must use the `[t-1]` lag. (Generalizes the L-01 `rct[di]→[di-1]` fix into a standing rule.) |
+| **Causal-by-construction execution** | Price-primary experiments run in the **Nautilus event-driven engine** only (`BacktestNode`); Python is analysis-only on emitted runs. A vectorised Python backtest of a price strategy is rejected. (Principle = event sequencing, not C#.) |
+| **Evaluate-on-bar-open + lagged reference only** | Every decision at bar **open**, conditioned on **confirmed data ≤ t−1**; `ts_event` ns discipline. Nautilus single-threaded replay enforces sequencing; analysis uses `[t-1]` lag on bar marks. |
 | **Open-to-open returns only** | Strategy / signal / P&L returns are measured **open-to-open**, never open-to-close — an `OnClose` execution is impossible in real time (the close is unknown until the bar completes). Close-referenced returns are a non-tradable diagnostic and must be labelled as such. |
 | **Leak resistance is audited independently of the numbers** | Numeric reproduction reproduces a leak. Every price-primary experiment ships a future-destroying control that must collapse the edge; the audit traces verdict-bearing columns' input timestamps. A surviving edge under that control is a leak → REJECT. |
 | **Knowledge-base-first** | Read `docs/knowledge-base/` before designing. Never re-run a `pitfalls-ledger.md` dead end; never re-learn a `lessons-and-amendments.md` mechanism. |
@@ -213,22 +185,17 @@ These binding constraints apply to all Xen research.
 
 ### XENA Lane — the DEFAULT route (binding, INFR-006, 2026-07-10)
 
-**Incoming ideas route to XENA by default** (operator decision Q3): no per-candidate
-evaluation — every (model × params × instrument × domain) is a valid candidate, run once
-in cTrader, selected at the **portfolio** level by `xen.xena.*` (oracle → LAHC search →
-plateau + fold certification → counted TEST final gate). EXP/SPDR lanes remain for
-**operator-invoked** exploration/characterisation only. Full spec, frozen-registry values
-(X=0.70, F_floor=0.1811, gate=0.0046; sha256-pinned), gate-ledger rules (cap 2/universe;
-`new_data_attestation` is **operator-only**), and the fills-based emission contract
-(`SlPrice` mandatory): `docs/references/xena-lane.md`. Tuning any frozen registry value
-after seeing a live universe's outcome is a governance violation (L-12 clause).
+**Incoming ideas route to XENA by default** (operator decision Q3): candidates run once in
+**Nautilus**, selected at portfolio level by `xen.xena.*`. **Frozen registry VOID on new
+stack** (INFR-010 R4) — fresh CAL cycle required before any crypto universe. EXP/SPDR
+operator-invoked only. Fills contract from Nautilus emissions (`positions_ledger` +
+`bar_marks` via shim; `SlPrice` field on legs). Full spec: `docs/references/xena-lane.md` v2.
 
 ### Every Experiment Is Price-Primary (binding, INFR-001)
 
-- All strategy logic runs in cTrader (StrategyHost) via `tools/ctrader-cli/run-experiment.sh`,
-  emitting `data/strategy_runs/<ID>/` under the `AnalysisEndUtc` fence. No Python backtest of
-  a price strategy, ever. No developer-side Python analysis replication — analysis of emitted
-  data is the `data-analyst`'s job, with its own code on canonical `xen` estimands.
+- All strategy logic runs in **NautilusTrader** (`BacktestNode`), emitting
+  `data/nautilus_runs/<run_id>/` under the catalog fence + `fence_attestation.json`.
+  No vectorised Python backtest of a price strategy. Analysis is `data-analyst` only.
 - **VAL carve-out** — re-analysis of already-emitted, still-valid data enters at the estimand
   gate → `data-analyst` directly (no design/QA/execute stages). If the prior emission is
   invalidated by an identified defect, a rerun through the full pipeline is required first.
@@ -275,39 +242,23 @@ docs/experiments-docs/checkpoints/YYYY-MM-DD-###-descriptive-name/
 
 ---
 
-## Available Instruments (baskets)
+## Available Instruments (Bybit USDT perp universe)
 
-The universe is organized as two named baskets — **Currencies** and **Indices** — plus
-an **Other** bucket (metal, crypto). `Loaded` = 5-year m1 file present + admitted
-(VAL-005); `Pending` = scoped for collection, not yet loaded/admitted. Full per-symbol
-detail and broker-name alternates live in `docs/references/dataset-reference.md`.
+**Primary universe (chapter 04):** 910 USDT linear perpetuals from INFR-011 census
+(listed + delisted). Default liquid anchors: BTCUSDT, ETHUSDT, SOLUSDT.
 
-**Currencies basket (10 — complete, all Loaded/VAL-005):**
-EURUSD, GBPUSD, USDJPY, USDCHF, USDCAD, AUDUSD, NZDUSD (majors) · EURJPY, GBPJPY, AUDJPY (crosses).
+| Status | Meaning |
+|--------|---------|
+| `CENSUS_COMPLETE` | 910 symbols enumerated (A1 done) |
+| `INGEST_IN_FLIGHT` | streaming pipeline populating catalog |
+| `ADMITTED` | VAL-style admission PASS (A5) — readable for experiments |
+| `SPEC_INCOMPLETE` | tick/lot unrecoverable — return-level reads only |
 
-**Indices basket (10 — complete, all Loaded):**
+MBP trio (T2 confirm lane): BTCUSDT, ETHUSDT, SOLUSDT — collection deferred.
 
-| Symbol | Index | Status |
-|--------|-------|--------|
-| USTEC (US100) | NASDAQ-100 | Loaded (VAL-005) |
-| US500 | S&P 500 | Loaded (VAL-005) |
-| US2000 | Russell 2000 | Loaded (VAL-005) |
-| JP225 | Nikkei 225 | Loaded (VAL-005) |
-| AUS200 | ASX 200 | Loaded (VAL-007; broker `AUS200`) |
-| US30 (DJ30) | Dow Jones 30 | Loaded (VAL-007; broker `US30`) |
-| EU50 (STOXX50) | Euro Stoxx 50 | Loaded (VAL-007; broker `STOXX50`) |
-| GER40 (DE40) | DAX 40 | Loaded (VAL-007; broker `DE40`) |
-| HK50 | Hang Seng 50 | Loaded (VAL-007; broker `HK50`) |
-| UK100 | FTSE 100 | Loaded (VAL-007; broker `UK100`) |
-
-**Other:** XAUUSD (Gold, metal) · BTCUSD (Bitcoin, crypto) — both Loaded (VAL-005).
-
-`GER40`/`DE40` is collected fresh (live history); it is **not** the retired `DE30`
-(stale m1 to 2026-01-16, dropped at INFR-003 §3.1). INFR-005 collection completed
-2026-07-06; VAL-007 PASSed same date — all 6 symbols admitted.
-
-The original 4-instrument core (EURUSD, XAUUSD, BTCUSD, USTEC) is the default subset.
-Experiments using the expanded universe must justify the inclusion of new instruments in scope.
+**Archived FX/indices universe** (chapter 03): see
+`archive/chapter-03-xena-mtfctx/docs/references/dataset-reference.md` — holdout
+obligations on that data remain binding; not used for new experiments.
 
 ---
 
@@ -369,7 +320,9 @@ Before creating new modules, check these existing reusable functions:
 | **Estimand validation gate** | `xen.estimand_validation` | Blocking pre-analysis gate: reconciliation, schema, fence, manifest + physicality report; `check_no_local_accounting` |
 | **Signal-quality toolbox** | `xen.evaluation` | Informative-only evidence: block-bootstrap CIs (INFR-004: circular block capped < n → no zero-width CI on sparse strata; 5-seed battery with `ci_low_seed_range`; `block_sensitivity` sweep; `trimmed_mean` robust stat; report "CI excludes zero", not a p-value — L-20), MDE/UNPOWERED labels, exposure-honest economics (avg+peak normalizations, B&H exposure-matched), cost curves, collapse fractions, splits. Composed per candidate by the Quant Designer — no fixed stack. |
 | ~~Frozen referee stack~~ | `xen.referee_*`, `xen.incremental_referee` | **RETIRED FROM SERVICE (INFR-001 WS-7, 2026-07-04)** — byte-frozen for Chapter-01/02 reproducibility only. Never used for new adjudication: its gate conjunctions/readiness floors select fragile gate-threaders (L-17, B-5/B-7). New evaluation = `xen.evaluation` + operator judgment. |
-| Run ingestion | `xen.signals.ingestion` | Emitted-run loading + holdout fence assertion |
+| **Nautilus foundation** | `xen.nautilus.{emission,adjudication_shim,instrument_ids,backtest_util}` | Emission v1, shim → adjudication, InstrumentId convention, BacktestNode helpers |
+| Run ingestion (legacy) | `xen.signals.ingestion` | Archived cTrader emissions only |
+| **Bybit T1 cost + routing** | `xen.evaluation` | `bybit_round_trip_cost_bps`, `spread_scale_route`, `t1_round_trip_spread_bps` |
 | **XENA portfolio framework** | `xen.xena.{oracle,ingest,search,certify,final_gate,calibration}` | The DEFAULT adjudication route (INFR-006): shared-capital oracle, blocking candidate gate, LAHC search, plateau+fold certification, counted final gate, frozen-registry verification. Spec: `docs/references/xena-lane.md` |
 | *(More to be added as analysis modules are developed)* | `python/src/xen/` | Reusable analysis code |
 

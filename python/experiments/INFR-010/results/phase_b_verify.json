@@ -1,0 +1,29 @@
+{
+  "all_pass": true,
+  "checks": {
+    "determinism_3x": true,
+    "emission_parses_to_adjudication": true,
+    "instrument_id_convention": true,
+    "pin_hard": true,
+    "smoke_bar": true,
+    "smoke_l2_mbp": true
+  },
+  "determinism_canonical_sha256": "e1baebe5a546ddb7605c8e255075eaebe6680e6924531f367a5d5cac804daaa4",
+  "emission_contract": "nautilus-emission-v1",
+  "phase": "INFR-010 Phase B",
+  "pin": {
+    "machine": "arm64",
+    "one_platform_rule": "INFR-007 caveat: bit-identical / 1-ULP-sensitive artefacts are valid only on the recorded platform. Do not upgrade the pin without an INFR amendment.",
+    "package": "nautilus_trader",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "pyproject": "python/pyproject.toml",
+    "python": "3.13.1",
+    "python_implementation": "CPython",
+    "recorded_utc": "2026-07-14T22:49:08.446483+00:00",
+    "specifier": "nautilus_trader==1.230.0",
+    "uv_lock": "python/uv.lock",
+    "version": "1.230.0"
+  },
+  "stop": "verify block \u2014 Phase B complete when all_pass",
+  "verified_utc": "2026-07-14T22:49:15.835538+00:00"
+}

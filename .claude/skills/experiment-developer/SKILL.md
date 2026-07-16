@@ -1,6 +1,6 @@
 ---
 name: experiment-developer
-description: Implement approved Xen experiment designs as C# cTrader StrategyHost models with ctrader-cli configs. Use when implementing a design, creating or modifying an ISignalModel strategy, adding an experiment .conf, building emission columns, implementing engine-side controls or tripwires, or fixing implementation findings from QA — files under StrategyHost/, tools/ctrader-cli/, or python/src/xen. Trigger on implement, write code, build the model, code the strategy, add the conf, or fix the implementation.
+description: Implement approved Xen experiment designs as NautilusTrader Python strategies with BacktestNode runners emitting contract v1 artifacts. Use when implementing a design, creating or modifying a Nautilus strategy, adding run configs, building emission columns, implementing engine-side controls or tripwires, or fixing implementation findings from QA — files under python/experiments/<ID>/code/, python/src/xen/nautilus/, or python/src/xen. Trigger on implement, write code, build the model, code the strategy, add the conf, or fix the implementation.
 ---
 
 # Experiment Developer
@@ -8,13 +8,12 @@ description: Implement approved Xen experiment designs as C# cTrader StrategyHos
 Translate an approved `design.md` into an engine implementation. Implement only the approved
 design — and when the design is ambiguous, STOP and ask; never resolve ambiguity silently.
 
-**Every experiment is price-primary (INFR-001).** All strategy logic — signals, entries,
-exits, controls that need engine-side variants (e.g. shifted-feed twins) — is a C#
-`ISignalModel` in `StrategyHost/`, run via `tools/ctrader-cli/run-experiment.sh`, emitting
-`data/strategy_runs/<ID>/` under the `AnalysisEndUtc` fence. There is **no Python analysis
-implementation in this role**: analysis of emitted data belongs to the `data-analyst`, who
-writes their own code against the canonical `xen` library. The Python-side replication runs
-this role used to build are abolished — they duplicated (and pre-empted) the analyst's job.
+**Every experiment is price-primary (INFR-001, rebinding INFR-012).** All strategy logic runs
+in **NautilusTrader** (`BacktestNode`), emitting `data/nautilus_runs/<run_id>/` (emission
+contract v1) under the catalog fence + hash-pinned `fence_attestation.json`. Use
+`xen.nautilus.emission.write_emission_v1` and `xen.nautilus.adjudication_shim` for the
+adjudication path. No vectorised Python price-strategy backtest. Analysis belongs to
+`data-analyst` only.
 
 Python is in scope ONLY for: ingestion/validation helpers promoted into `python/src/xen`
 (contract-reviewed, tested), and fixes to canonical `xen` modules requested through QA.
@@ -24,8 +23,8 @@ Python is in scope ONLY for: ingestion/validation helpers promoted into `python/
 1. Read the shared pipeline config: the file ending `/research-pipeline/_pipeline-config.md`.
 2. Read `python/experiments/<ID>/design.md` — including the golden-trace spec, tripwire(s),
    and emission column requirements.
-3. Read `tools/ctrader-cli/README.md` (harness recipe) and an existing model
-   (e.g. `DonchianBreakoutModel.cs`) as the structural template.
+3. Read `python/experiments/INFR-010/code/emission_contract_v1.md` and
+   `python/experiments/INFR-010/scripts/run_phase_b.py` as the structural template.
 4. Read this skill's `references/code-conventions.md` for anything touching `python/src/xen`.
 
 ## Silent-deviation rule (binding — the A-1 fix)
@@ -45,16 +44,13 @@ Three consecutive experiments shipped verdict-material design-to-code drift sile
 
 1. Map every design clause to a code location; keep the mapping — QA will trace it
    clause-by-clause in a fresh context.
-2. Implement the C# model: `OnBar()` uses only current-and-past confirmed bars (`≤ t-1`
-   conditioning is structural); decisions at bar open; native cTrader orders + m1 fills for
-   limit strategies (StrategyHost self-fills on aggregated OHLC are not valid fills — L-14/
-   EXP-013 NativeOrders).
-3. Emit everything the design's estimand and the analyst need: per-leg ledger
-   (`cis_trades.parquet` with fills, `RealizedBps`, `Censored`), per-bar state incl.
-   `OpenLegs`, provenance columns. The emission must be sufficient for
-   `xen.estimand_validation` to pass — run it on a smoke cell before handing off.
-4. Register the model in the `Xen.cs` `XenStrategy` enum + `CreateStrategyModel()`; add
-   `tools/ctrader-cli/experiments/<ID>.conf` (+ engine-side control variants, e.g. `-shift`).
+2. Implement the Nautilus strategy: event handlers use only confirmed data `≤ t-1`; decisions
+   at bar open; T1 lane is costless-honest in-engine (spread/fees injected at analysis).
+3. Emit contract v1: `bar_marks.parquet`, `positions_ledger.parquet`, fills, orders,
+   `event_log.jsonl`, `fence_attestation.json` (must NOT be STUB for real runs — reference
+   INFR-011 A6 manifest sha256). Run `xen.estimand_validation` v2 on a smoke cell before
+   handoff.
+4. Add run config under `python/experiments/<ID>/code/` (+ engine-side control variants).
 5. Implement the design's leak tripwire variant(s).
 6. **Do not generate the golden trace.** The design's golden-trace events are QA's diff
    material; producing "expected" values from your own implementation would make the check
@@ -66,7 +62,7 @@ Three consecutive experiments shipped verdict-material design-to-code drift sile
 - No accounting primitives in experiment dirs: `assemble_realized_bps` and successors live
   only in `xen.adjudication` (`check_no_local_accounting` gates this).
 - No scope extension, no extra emissions/analyses beyond the design.
-- No holdout contact; emissions end at the `AnalysisEndUtc` fence.
+- No holdout contact; emissions end at catalog `analysis_end_utc` (fence attestation).
 - No synthetic prices in any emitted outcome column.
 
 ## Completion summary
@@ -85,5 +81,5 @@ cost-bearing runs yourself.
 | --- | --- |
 | shared pipeline config (`research-pipeline/_pipeline-config.md`) | Always |
 | `python/experiments/<ID>/design.md` | Always |
-| `tools/ctrader-cli/README.md` | Always |
+| `python/experiments/INFR-010/scripts/run_phase_b.py` | Nautilus smoke template |
 | `references/code-conventions.md` (bundled) | Touching `python/src/xen` |

@@ -1,0 +1,25 @@
+{
+  "phase": "INFR-012 Phase C",
+  "verified_utc": "2026-07-15T00:00:00Z",
+  "checks": {
+    "architecture_v2": true,
+    "dataset_reference_v2": true,
+    "pipeline_config_rebind": true,
+    "skill_execution_refs_rebind": true,
+    "estimand_validation_v2": true,
+    "stub_attestation_fails": true,
+    "bybit_cost_model": true,
+    "spread_scale_routing_coded": true,
+    "xena_lane_v2_void": true,
+    "qa_doc_dry_read_approve": true
+  },
+  "estimand_gate_v2_tests": {
+    "pytest_file": "python/tests/test_estimand_validation_v2.py",
+    "passed": 4,
+    "failed": 0,
+    "stub_smoke_run": "data/nautilus_runs/INFR-010-smoke-bar-1.230.0",
+    "stub_blocking_pass": false,
+    "stub_fence_reason": "Phase-B STUB fence_attestation — real experiments require INFR-011 A6 manifest"
+  },
+  "stop": "verify block — Phase C complete; Phase D VAL next"
+}

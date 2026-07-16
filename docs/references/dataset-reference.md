@@ -1,382 +1,216 @@
-# Xen Dataset Reference
+# Xen Dataset Reference v2
 
-**Source:** [Xen.cs](../../Xen.cs) + [Python generators](../../python/src/xen/)
-**Generator:** cAlgo robot running on cTrader
-**Base data unit:** 1-minute time bars
+**Version:** v2 (INFR-012, 2026-07-15)
+**Generator:** INFR-011 streaming pipeline → Nautilus `ParquetDataCatalog`
+**Base data unit:** 1-minute OHLCV bars derived from Bybit trades archives
+**Universe:** Bybit USDT linear perpetuals (listed + delisted), census-based anti-survivorship
 
-Xen does not store or process raw tick data. The 1-minute time bar is the smallest stored unit and the source for all chart-type generators.
+**Supersedes:** v1 cTrader/FX-indices dataset reference. Archived data obligations:
+`archive/chapter-03-xena-mtfctx/data/timebars/` — holdout rules on that data remain binding.
 
-## Canonical Datasets by Era
+---
 
-Xen has two coexisting base-data eras; the **latest-glob convention selects the newest file
-per symbol**, so new work is canonical-by-recency. Older files are retained for closed-family
-reproducibility and must not be mixed with the new dataset within one analysis.
+## Universe (census-based, binding)
 
-| Era | Files | Span | Universe | Governs | Admitted by |
-|---|---|---|---|---|---|
-| **INFR-003 5-year (canonical for CF-CAPGEO-001)** | `timebars_<sym>_20210602_*_2026062*_*.parquet` | ~5y, 2021-06-02 → 2026-06-21 collection date | **16** (VAL-003 universe **minus DE30**) | Phase 018 onward | **VAL-005 (2026-06-21, PASS)** |
-| Old (pre-INFR-003) | `timebars_<sym>_20230102/03_*` and `analysis70_*` | ~3.3y, 2023-01 → 2026-05/06 | 17 | closed families CF-AVWAP-001, CF-HA-HARAMI-001 | VAL-001 / VAL-003 / VAL-004 |
+| Field | Value |
+|-------|-------|
+| Source listing | `https://public.bybit.com/trading/` (Apache directory) |
+| Filter | Folders ending `USDT/` only — excludes `*PERP/` (USDC), inverse `*USD`, dated futures |
+| Census artifact | `python/experiments/INFR-011/artifacts/universe-census.md` |
+| Symbol count | **910** (2026-07-14 census) |
+| History cap | Trailing **4 years** per symbol (operator amendment 2026-07-14) |
+| Delisted | Included when present in archive listing; `listed`/`delisted` flags from announcement reconciliation |
+| Spec gaps | `SPEC_INCOMPLETE` — excluded from fill-sensitive reads, included in return-level reads |
 
-**DE30 dropped from the 5-year dataset** (operator ratification 2026-06-21, INFR-003 §3.1):
-its broker m1 history ended 2026-01-16 (stale) and cannot supply current-edge rows. DE30's
-VAL-003 admission and old-dataset files are unaffected; it may be re-collected via an
-alternate broker symbol in a later INFR item.
+**InstrumentId convention:** `{SYMBOL}-LINEAR.BYBIT` (e.g. `BTCUSDT-LINEAR.BYBIT`).
+Module: `xen.nautilus.instrument_ids`.
 
-**Indices-basket completion (INFR-005, in progress).** The INFR-003 5-year set loaded
-4 of the 10 target index symbols (USTEC, US500, US2000, JP225). INFR-005 collects the
-remaining 6 (AUS200, US30, EU50, GER40, HK50, UK100) into the **same** canonical
-`data/timebars/` set on the same ~5-year window, each holdout-sealed per file at first
-touch. These 6 are **not admitted** — no experiment may read them — until **VAL-007**
-(a VAL-005-analog re-seal + admission gate) PASSes. See the Indices basket table under
-"Instruments (baskets)" for per-symbol status.
+### Sample symbols (illustrative)
 
-**5-year holdout re-seal:** the new final-30% global holdout was sealed per file at first
-touch on each file's own 2021-06 → collection-date timeline (VAL-005 G4, 0 holdout rows
-read); `test-read-ledger.md` was re-materialized on the new 16×{15m,1h,4h} strata (all 0
-counted reads). The old-dataset ledger and the single spent holdout shot (EXP-032) do not
-transfer.
+| Symbol | Role | Notes |
+|--------|------|-------|
+| BTCUSDT | liquid anchor | ~4y capped from 2022-07-14 |
+| ETHUSDT | liquid anchor | idem |
+| SOLUSDT | liquid + future MBP trio | idem |
+| LUNA2USDT | delist tail test | archive present through 2026-07-13 |
+| USTCUSDT | younger listing | shorter capped range |
 
-**Deployed domain-construction fence (CF-CAPGEO-001).** Domain bars (15m/1h/4h) are built
-from the 1-minute analysis slice via `aggregate_ohlc(..., min_coverage=0.90)` **plus an
-analysis-boundary fence**: drop any resample window whose right-labelled `CloseTime` exceeds
-the last available source bar. The coverage-tolerant mode otherwise retains a trailing
-partial window whose nominal grid-boundary label crosses into holdout-minute timestamps
-(causal OHLC, nominal label only); the fence keeps domain bars holdout-clean (VAL-005 G1
-finding, operator decision 2026-06-21). Strict-mode resamples (`min_coverage=None`) drop all
-partial windows and need no fence.
+Full candidate list: `python/experiments/INFR-011/artifacts/candidate_symbols.txt`.
 
-## Data Locations
+---
 
-**Base data:**
-- 1-minute time bars: `data/timebars/timebars_<instrument>_<serverTime>_<localTime>.parquet`
+## Data locations
 
-**Generated data:**
-- Line Break bars: generated by `python/src/xen/linebreak_generator.py`
-- Renko bars: generated by `python/src/xen/renko_generator.py` from 1-minute source bars
-- Heiken Ashi candles: generated by `python/src/xen/heiken_ashi_generator.py`
-- Strategy-host runs: `data/strategy_runs/<strategy>_<symbol>_<domain>_<runTime>/`
+| Dataset | Path | Status |
+|---------|------|--------|
+| Primary catalog (bars) | `data/catalog/` | INGESTED (A4, 2026-07-16; 894 ADMITTED + 9 SPEC_INCOMPLETE) |
+| Pseudo-quote spreads | per-symbol bar parquets at `python/experiments/INFR-011/data/staging/bars/` (SpreadAbs/SpreadBps/MeanBuy/MeanSell cols; 904 files, consolidated 2026-07-16) | retained — T1 spread source for analyst cost injection |
+| Strategy emissions | `data/nautilus_runs/<run_id>/` | emission contract v1 |
+| Fence manifest (A6) | `python/experiments/INFR-011/artifacts/fence-manifest.json` | **PINNED** 2026-07-16 |
+| Admission ledger (A5) | `python/experiments/INFR-011/artifacts/admission-ledger.jsonl` | 910 census rows, explicit exclusions |
+| Instrument specs | `python/experiments/INFR-011/artifacts/instrument-specs.json` | API (612) + INFERRED (282) |
 
-Generated chart-type data is created on demand by deterministic Python scripts. Frequently reused canonical variants may be persisted under `data/<chart_type>/` after they prove useful enough to justify storage and invalidation overhead.
+**Archived cTrader paths (VAL carve-out on old emissions only):**
+`archive/chapter-03-xena-mtfctx/data/timebars/`,
+`archive/chapter-03-xena-mtfctx/data/strategy_runs/`.
 
-## Available Datasets
+---
 
-Each cAlgo session produces one base Parquet file per instrument/session.
+## Primary lane: 1-minute OHLCV (T1)
 
-| Format | Extension | Purpose | Python Read |
-| --- | --- | --- | --- |
-| Parquet (ZSTD) | `.parquet` | Compressed archival, predicate pushdown | `pl.scan_parquet(path)` |
+Derived from trades archives (not klines — klines lack aggressor side and drop delisted symbols).
 
-| Key | Instrument | Date Range | File Pattern |
-| --- | --- | --- | --- |
-| 1-minute time bars | Any cTrader symbol | Per robot session | `timebars/timebars_<symbol>_<yyyyMMdd_HHmmss>_<yyyyMMdd_HHmmss>.parquet` |
-| Strategy-host run | Any cTrader symbol/domain | Per fenced host run | `strategy_runs/<strategy>_<symbol>_<domain>_<yyyyMMdd_HHmmss>/` |
+### Bar invariants (admission-blocking)
 
-## Time Bar Schema (8 columns)
+- Bar volume ≡ Σ trade sizes for the minute
+- `ts_event` strictly monotonic per instrument file
+- OHLC bounds: `High >= max(Open, Close)`, `Low <= min(Open, Close)`
+- Gap ledger: all outages/delistings logged (24/7 market)
 
-One row = one completed 1-minute OHLC bar.
+### Nautilus `Bar` schema (catalog)
 
-| Column | Parquet Type | Description |
-| --- | --- | --- |
-| `Symbol` | string | cTrader symbol, e.g. `EURUSD` |
-| `OpenTime` | datetime | Bar open timestamp |
-| `CloseTime` | datetime | Bar close timestamp |
-| `Open` | double | Bar open price |
-| `High` | double | Bar high price |
-| `Low` | double | Bar low price |
-| `Close` | double | Bar close price |
-| `TickVolume` | int64 | Broker-reported tick volume for the 1-minute bar, if available |
+Timestamps in **nanoseconds** (`ts_event`, `ts_init`). Access via `ParquetDataCatalog` or
+approved query wrapper that enforces the global fence.
 
-**Integrity rules:**
-- `CloseTime` must be strictly increasing within a file.
-- `High >= max(Open, Close)`.
-- `Low <= min(Open, Close)`.
-- The final 30% of each chronologically ordered dataset is the global holdout and must not be inspected by experiments.
+| Field | Description |
+|-------|-------------|
+| `open`, `high`, `low`, `close` | OHLC from first/last trade prints |
+| `volume` | Real traded volume (contracts/coin per instrument spec) |
+| `bar_type` | 1-MINUTE-LAST |
 
-**Python access:**
+### Pseudo-quote spread series (T1 cost input)
+
+Per-minute spread estimate from aggressor-side trades (Buy ≈ ask, Sell ≈ bid), tick-size floor,
+conservative bias. Used by `xen.evaluation.t1_round_trip_spread_bps` at analysis — **not**
+for in-engine fills on T1.
+
+---
+
+## Secondary lane: MBP trio (T2, deferred)
+
+BTCUSDT, ETHUSDT, SOLUSDT USDT perps only. Real `QuoteTick` from depth archives (~July 2023+).
+No bulk collection in INFR-010/011/012/013 skeleton phase.
+
+Spec: `docs/references/orderflow-feature-store.md`.
+
+---
+
+## Emission contract v1 (strategy runs)
+
+Root: `data/nautilus_runs/<run_id>/`
+
+| File | Required | Role |
+|------|----------|------|
+| `run_metadata.json` | yes | config hash, catalog version, nautilus pin, platform |
+| `bar_marks.parquet` | yes | bar OHLC marks → adjudication `positions` |
+| `positions_ledger.parquet` | yes | closed legs → `cis_trades` via shim |
+| `fills.parquet` | yes | economic fills |
+| `orders.parquet` | yes | order lifecycle |
+| `event_log.jsonl` | yes | UUID-stripped deterministic log |
+| `instrument_id_map.json` | yes | archive symbol ↔ InstrumentId |
+| `fence_attestation.json` | yes | analysis fence; **STUB invalid for real experiments** |
+
+Shim: `xen.nautilus.adjudication_shim.adjudicate_emission(run_dir)`.
+
+### `bar_marks` columns (minimum for gate)
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `SourceCloseTime` | datetime[ns] | Bar close known at decision time |
+| `RealOpen` | float | Execution mark (open-to-open discipline) |
+| `RealHigh`, `RealLow`, `RealClose` | float | optional OHLC |
+| `Position`, `OpenLegs` | int | optional position state |
+
+### `positions_ledger` → `cis_trades`
+
+| Nautilus | Adjudication |
+|----------|--------------|
+| `ts_opened` | `EntryTime` |
+| `ts_closed` | `ExitTime` |
+| `avg_px_open` | `EntryFillPrice` |
+| `avg_px_close` | `ExitFillPrice` |
+| `entry` (BUY/SELL) | `Direction` (+1/-1) |
+
+`RealizedBps = Direction * (Exit - Entry) / Entry * 1e4`
+
+---
+
+## Global calendar fence
+
+Single date set for all symbols (INFR-011 A6, **pinned 2026-07-16**,
+manifest sha256 `35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448`):
+
+| Key | Value |
+|-----|-------|
+| `analysis_start_utc` | 2021-06-29T06:53:00Z |
+| `train_end_utc` | 2023-12-18T00:00:00Z (end of TRAIN band; TEST starts here) |
+| `holdout_start_utc` | 2025-01-08T00:00:00Z (global holdout — never queried) |
+| `data_end_utc` | 2026-07-14T23:59:00Z |
+
+Manifest is hash-pinned (`manifest_sha256` in each emission's `fence_attestation.json`).
+Computed from admitted catalog range end — not calendar today (R9).
+Wrapper: `xen.nautilus.catalog_fence` (`load_fence_manifest`, `fenced_bar_query`,
+`fence_attestation_payload`). Note: symbols listed after `holdout_start_utc` have
+zero readable bars until a future fence renewal — accepted consequence of the
+global-fence design.
+
+---
+
+## Holdout rules (non-negotiable)
+
+1. Never load, inspect, or use the final 30% of the admitted range.
+2. Catalog queries must pass through the fence wrapper.
+3. Emissions must not contain bar marks after `analysis_end_utc`.
+4. Phase B `STUB` attestations fail estimand gate v2.
+
+---
+
+## Loading patterns (T1)
 
 ```python
-import polars as pl
 from pathlib import Path
+from nautilus_trader.persistence.catalog import ParquetDataCatalog
 
-DATA_DIR = Path("data")
-path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
+from xen.nautilus.catalog_fence import fenced_bar_query, load_fence_manifest
 
-bars = (
-    pl.scan_parquet(path)
-    .sort("CloseTime")
-    .collect()
+catalog = ParquetDataCatalog(Path("data/catalog"))
+fence = load_fence_manifest()
+bars = fenced_bar_query(
+    catalog,
+    ["BTCUSDT-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL"],
+    start=fence.analysis_start_utc,
+    end=fence.train_end_utc,
+    band="TRAIN",  # "TEST" only under operator-approved counted reads
 )
 ```
 
-## Chart-Type Generator Schemas
-
-All chart-type generators take completed 1-minute bars as input and produce chart-type-specific DataFrames. Experiments must state the generator parameters used.
-
-### Line Break Bar Schema (10 columns)
-
-One row = one confirmed Line Break line.
-
-| Column | Parquet Type | Description |
-| --- | --- | --- |
-| `OpenTime` | datetime | Source timestamp that opened the line |
-| `CloseTime` | datetime | Source timestamp that confirmed the line |
-| `Open` | double | Opening price of the line |
-| `High` | double | Highest price during the line |
-| `Low` | double | Lowest price during the line |
-| `Close` | double | Closing price of the line |
-| `Direction` | int32 | +1 for up-line, -1 for down-line |
-| `Level` | int32 | Line Break level parameter |
-| `SourceCount` | int32 | Number of source 1-minute bars consumed since the prior confirmed line |
-| `SourceCloseTime` | datetime | Time-matched real bar close timestamp for return evaluation |
-
-**Generator:** `python/src/xen/linebreak_generator.py`
-**Parameters:** `level` (default: 3)
-**Input:** 1-minute time bars
-
-### Renko Bar Schema (11 columns)
-
-One row = one Renko brick generated from 1-minute source bars.
-
-| Column | Parquet Type | Description |
-| --- | --- | --- |
-| `OpenTime` | datetime | Source timestamp that opened the brick sequence |
-| `CloseTime` | datetime | Source timestamp that confirmed the brick |
-| `Open` | double | Opening construction price of the brick |
-| `High` | double | Highest construction price during the brick |
-| `Low` | double | Lowest construction price during the brick |
-| `Close` | double | Closing construction price of the brick |
-| `Direction` | int32 | +1 for up-brick, -1 for down-brick |
-| `BrickSize` | double | ATR-derived brick size at time of creation |
-| `ATRPeriod` | int32 | ATR period used |
-| `SourceCount` | int32 | Number of source 1-minute bars consumed since the prior confirmed brick |
-| `SourceCloseTime` | datetime | Time-matched real bar close timestamp |
-
-**Generator:** `python/src/xen/renko_generator.py`
-**Parameters:** `atr_period` (default: 14)
-**Input:** 1-minute time bars
-**Fidelity note:** This is close-based Renko from 1-minute bars, not tick-derived Renko. The trade-off is accepted for memory and performance.
-
-### Heiken Ashi Candle Schema (12 columns)
-
-One row = one Heiken Ashi candle generated from a source time bar.
-
-| Column | Parquet Type | Description |
-| --- | --- | --- |
-| `OpenTime` | datetime | Real bar open timestamp |
-| `CloseTime` | datetime | Real bar close timestamp |
-| `HAOpen` | double | Heiken Ashi open |
-| `HAHigh` | double | Heiken Ashi high |
-| `HALow` | double | Heiken Ashi low |
-| `HAClose` | double | Heiken Ashi close |
-| `RealOpen` | double | Actual source bar open |
-| `RealHigh` | double | Actual source bar high |
-| `RealLow` | double | Actual source bar low |
-| `RealClose` | double | Actual source bar close |
-| `Direction` | int32 | +1 if HA-Close >= HA-Open, else -1 |
-| `SourceCount` | int32 | Number of source bars in this candle, normally 1 |
-
-**Generator:** `python/src/xen/heiken_ashi_generator.py`
-**Parameters:** none
-**Input:** 1-minute time bars or a derived higher timeframe
-
-## Strategy-Host Run Schemas
-
-The cTrader branch writes strategy-run datasets as strategies run **inside cTrader's engine**. The ported C# generators are transcription-validated once against their Python reference, and a run is admitted to experiments by **behavioral reproduction** through the frozen suite (not byte-parity). In INFR-001 the only strategy vehicle is MA crossover; AVWAP and signal exploration remain out of scope.
-
-Run family:
-
-```text
-data/strategy_runs/<strategy>_<symbol>_<domain>_<runTime>/
-├── positions.parquet
-├── events.parquet
-├── trade_blotter.parquet
-└── run_metadata.json
-```
-
-`positions.parquet` is the only strategy-host object admitted into the frozen qualification suite. It is evaluated against next-step real-price returns computed from its **own emitted real OHLC** (`RealClose`), so a cTrader run is self-consistent and decoupled from any local price source.
-
-### Strategy Position Schema
-
-| Column | Parquet Type | Description |
-| --- | --- | --- |
-| `SourceCloseTime` | datetime | Real domain-bar close timestamp known when the position was emitted |
-| `Domain` | string | Trading domain, e.g. `5m`, `1h`, `4h` |
-| `Strategy` | string | Strategy identifier, e.g. `ma_20_50` |
-| `Position` | int32 | Causal position in `{-1, 0, +1}` |
-| `SignalValue` | double | Generic raw signal value; for MA crossover this is `fastMA - slowMA`; `NaN` during warmup |
-| `RealOpen` | double | Real domain-bar open the strategy executed on |
-| `RealHigh` | double | Real domain-bar high the strategy executed on |
-| `RealLow` | double | Real domain-bar low the strategy executed on |
-| `RealClose` | double | Real domain-bar close the strategy executed on; the suite's return basis |
-| `Warmup` | bool | True when the model is not ready and position must be flat |
-| `IsFlat` | bool | True when `Position == 0` |
-
-The position schema is **model-agnostic**: model-specific diagnostics (e.g. MA fast/slow values) are not persisted here — they surface in the event stream or are recomputable from the chart/indicator ports.
-
-### Strategy Event Schema
-
-| Column | Parquet Type | Description |
-| --- | --- | --- |
-| `SourceCloseTime` | datetime | Real domain-bar close timestamp for the event |
-| `Domain` | string | Trading domain |
-| `Strategy` | string | Strategy identifier |
-| `EventType` | string | Event type, e.g. `crossover` |
-| `Position` | int32 | New position after the event |
-| `PreviousPosition` | int32 | Previous position before the event |
-| `SignalValue` | double | Raw signal value at the event |
-
-### Diagnostic Trade Blotter Schema
-
-The trade blotter is diagnostic only in INFR-001. It is not a qualification input and must not replace the position-on-real-returns evaluation basis.
-
-| Column | Parquet Type | Description |
-| --- | --- | --- |
-| `SourceCloseTime` | datetime | Timestamp of the diagnostic transition |
-| `Domain` | string | Trading domain |
-| `Strategy` | string | Strategy identifier |
-| `Action` | string | Transition label, e.g. `enter_long`, `reverse_short` |
-| `PreviousPosition` | int32 | Previous position |
-| `Position` | int32 | New position |
-| `Price` | double | Domain-bar close used for diagnostic marking |
-| `PositionDelta` | double | Absolute position change at the transition, diagnostic only |
-
-### Run Metadata
-
-`run_metadata.json` records strategy parameters, domain configuration, `AnalysisEndUtc`, generation time, the qualification input path, and the flag `trade_blotter_diagnostic_only: true`.
-
-The INFR-001 cTrader host runs in `Mode=StrategyHost` **inside cTrader's engine** (Automate/backtester) over the analysis window; `AnalysisEndUtc` is mandatory and the host stops before emitting any row at or after that timestamp. Setting `Source Parquet Path` replays the same strategy over a fixed collected file under `data/timebars/` as a deterministic developer smoke.
-
-VAL-002 closure is **behavioral**: the Python ingestion harness (`xen.signals`) reads the emitted `positions.parquet` and routes it through the frozen suite to reproduce the EXP-004/009 verdict. `Mode=StrategyHostParity` writes a CSV generator/indicator/MA family for a one-time **transcription smoke** against the Python reference; it is a developer aid, not the closure path.
-
-## Temporal Ordering
-
-All datasets are ordered by close timestamp. Use `CloseTime` for time bars and `SourceCloseTime` for Line Break and Renko events. Never align chart types by bar index or bar count.
-
-## Loading Patterns
-
-### Generating Chart Types On Demand
+For emissions:
 
 ```python
-from pathlib import Path
-import polars as pl
+from xen.nautilus.adjudication_shim import adjudicate_emission
 
-from xen.linebreak_generator import generate_linebreak
-from xen.renko_generator import generate_renko
-from xen.heiken_ashi_generator import generate_heiken_ashi
-
-DATA_DIR = Path("data")
-bars_path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
-bars = pl.read_parquet(bars_path).sort("CloseTime")
-
-lb_bars = generate_linebreak(bars, level=3)
-renko_bars = generate_renko(bars, atr_period=14)
-ha_candles = generate_heiken_ashi(bars)
+bundle = adjudicate_emission("data/nautilus_runs/<run_id>")
 ```
 
-### Cross-Chart-Type Alignment
+---
+
+## Cost reads (T1 analysis)
+
+Use `xen.evaluation` Bybit schedule — not FTMO:
 
 ```python
-aligned_times = lb_bars["SourceCloseTime"].to_list()
-time_bar_prices = time_bars.filter(
-    pl.col("CloseTime").is_in(aligned_times)
-).select("CloseTime", "Close")
+from xen.evaluation import bybit_round_trip_cost_bps, t1_round_trip_spread_bps
+
+rt = bybit_round_trip_cost_bps("BTCUSDT", entry_price=50000.0, liquidity="taker",
+                                spread_bps=t1_round_trip_spread_bps("BTCUSDT", spread_series))
 ```
 
-### Holdout Split
+Funding gaps: flagged `funding_coverage: GAP` with conservative accrual assumption (R7).
 
-```python
-df = pl.scan_parquet(path).sort("CloseTime").collect().to_pandas()
+---
 
-analysis_cutoff = int(len(df) * 0.7)
-analysis_set = df.iloc[:analysis_cutoff]
-# holdout = df.iloc[analysis_cutoff:]  # DO NOT USE IN EXPERIMENTS
+## Legacy reference (archived FX/indices)
 
-train_cutoff = int(len(analysis_set) * 0.7)
-train_set = analysis_set.iloc[:train_cutoff]
-test_set = analysis_set.iloc[train_cutoff:]
-```
-
-## Data Integrity Rules
-
-1. **1-minute time bars are the ground truth.** All chart-type generators must produce identical output from identical time-bar data and parameters.
-2. **Source timestamps are preserved.** Every Line Break and Renko chart bar carries `SourceCloseTime` linking it to real time-bar prices.
-3. **No synthetic chart prices for strategy P&L.** Heiken Ashi prices and Renko brick prices are construction values. Strategy returns always use time-matched real prices.
-4. **Deterministic generation.** Same input plus same parameters must produce the same output.
-5. **Persist generated datasets sparingly.** Default to regeneration; persist only canonical high-use variants under `data/<chart_type>/`.
-6. **Strategy-host holdout fence.** cTrader strategy output must have `SourceCloseTime < AnalysisEndUtc`; the Python validation layer still reapplies the chronological split.
-7. **Validation gate.** cTrader-sourced strategy output is admitted to experiments only after (a) the ported C# generators pass a one-time transcription check against the Python reference, and (b) the run reproduces the expected verdict behaviorally through the frozen suite (the Python ingestion harness reads the emitted `positions.parquet`). Python never re-generates the strategy signal as an oracle.
-
-## Storage Organization
-
-```text
-data/
-├── timebars/
-│   └── timebars_<instrument>_<serverTime>_<localTime>.parquet
-├── linebreak/              # Optional persisted canonical variants
-├── renko/                  # Optional persisted canonical variants
-├── heiken_ashi/            # Optional persisted canonical variants
-└── strategy_runs/          # Holdout-fenced cTrader strategy-host outputs
-```
-
-Per-experiment generated data may also be cached under `python/experiments/<EXP-ID>/cache/` when needed for reproducibility.
-
-## Instruments (baskets)
-
-The universe is documented as two named baskets — **Currencies** and **Indices** —
-plus an **Other** bucket for the two single-instrument asset classes (metal, crypto)
-that belong to neither. `Loaded` = a 5-year m1 file is present under `data/timebars/`
-and admitted (VAL-005 for the INFR-003 set). `Pending` = the symbol is scoped for
-collection but not yet loaded/admitted.
-
-### Currencies basket (10 — complete)
-
-| Symbol | Name | Sub-class | Status |
-| --- | --- | --- | --- |
-| EURUSD | Euro/US Dollar | Major | Loaded (VAL-005) |
-| GBPUSD | British Pound/US Dollar | Major | Loaded (VAL-005) |
-| USDJPY | US Dollar/Japanese Yen | Major | Loaded (VAL-005) |
-| USDCHF | US Dollar/Swiss Franc | Major | Loaded (VAL-005) |
-| USDCAD | US Dollar/Canadian Dollar | Major | Loaded (VAL-005) |
-| AUDUSD | Australian Dollar/US Dollar | Major | Loaded (VAL-005) |
-| NZDUSD | New Zealand Dollar/US Dollar | Major | Loaded (VAL-005) |
-| EURJPY | Euro/Japanese Yen | Cross | Loaded (VAL-005) |
-| GBPJPY | British Pound/Japanese Yen | Cross | Loaded (VAL-005) |
-| AUDJPY | Australian Dollar/Japanese Yen | Cross | Loaded (VAL-005) |
-
-### Indices basket (10 — target; 4 loaded, 6 pending INFR-005)
-
-| Symbol | Alt name | Index | Status |
-| --- | --- | --- | --- |
-| USTEC | US100 | NASDAQ-100 | Loaded (VAL-005) |
-| US500 | — | S&P 500 | Loaded (VAL-005) |
-| US2000 | — | Russell 2000 | Loaded (VAL-005) |
-| JP225 | — | Nikkei 225 | Loaded (VAL-005) |
-| AUS200 | AU200 | ASX 200 | Loaded (VAL-007; broker `AUS200`) |
-| US30 | DJ30/WS30 | Dow Jones 30 | Loaded (VAL-007; broker `US30`) |
-| EU50 | STOXX50 | Euro Stoxx 50 | Loaded (VAL-007; broker `STOXX50`) |
-| GER40 | DE40 | DAX 40 | Loaded (VAL-007; broker `DE40`) |
-| HK50 | HSI50 | Hang Seng 50 | Loaded (VAL-007; broker `HK50`) |
-| UK100 | FTSE100 | FTSE 100 | Loaded (VAL-007; broker `UK100`) |
-
-Broker symbol strings for index CFDs vary; the `Symbol` column lists the operator's
-requested primaries and `Alt name` the known alternates. The collection script
-(`tools/ctrader-cli/run-infr005-collection.sh`) resolves rejections via
-`one <BROKER_SYMBOL>` or the `INFR005_SYMBOLS` override.
-
-**GER40 vs retired DE30.** The old `DE30` symbol (DAX under the broker's legacy
-string) was dropped at INFR-003 §3.1 — its broker m1 history ended 2026-01-16 (stale)
-and it is absent from the 5-year dataset. `GER40`/`DE40` is collected **fresh** as the
-live-history German-index symbol; it is not a re-collection of DE30. DE30's VAL-003
-admission and old-dataset files are retained for closed-family reproducibility only.
-
-### Other (single-instrument classes)
-
-| Symbol | Name | Class | Status |
-| --- | --- | --- | --- |
-| XAUUSD | Gold/US Dollar | Metal | Loaded (VAL-005) |
-| BTCUSD | Bitcoin/US Dollar | Crypto | Loaded (VAL-005) |
-
-The original 4-instrument core (EURUSD, XAUUSD, BTCUSD, USTEC) is the default subset;
-experiments using the expanded universe must justify the inclusion of new instruments
-in scope. The 6 pending index symbols are **not readable** by any experiment until
-INFR-005 collection completes and VAL-007 PASSes.
+Chapter-03 instruments (EURUSD, USTEC, etc.) and `data/timebars/` schemas remain documented in
+`archive/chapter-03-xena-mtfctx/docs/references/` for reproducibility. New experiments use
+the Bybit universe only.

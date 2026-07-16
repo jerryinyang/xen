@@ -1,0 +1,43 @@
+{
+  "adjudication_shim": {
+    "n_legs": 19,
+    "reconcile": {
+      "abs_diff_bps": 0.0,
+      "ok": true,
+      "per_bar_gross_total": -455.0651429844156,
+      "per_leg_realized_total": -455.0651429844156
+    },
+    "reconcile_ok": true
+  },
+  "api": [
+    "BacktestNode",
+    "BacktestEngine"
+  ],
+  "backtest_node": {
+    "iterations": 500,
+    "stats_pnls": {
+      "USDT": {
+        "Avg Loser": -0.06420855666666667,
+        "Avg Winner": 0.158069625,
+        "Expectancy": -0.017413150000000006,
+        "Max Loser": -0.11666115,
+        "Max Winner": 0.3799764,
+        "Min Loser": -0.03679425,
+        "Min Winner": 0.0483933,
+        "PnL (total)": -0.33084985,
+        "PnL% (total)": -0.00033084985001187304,
+        "Win Rate": 0.21052631578947367
+      }
+    },
+    "total_events": 76
+  },
+  "emission_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/INFR-010-smoke-bar-1.230.0",
+  "event_log_sha256": "e1baebe5a546ddb7605c8e255075eaebe6680e6924531f367a5d5cac804daaa4",
+  "instrument_id": "XRPUSDT-LINEAR.BYBIT",
+  "n_bar_marks": 500,
+  "n_fills": 38,
+  "n_orders": 38,
+  "n_positions": 19,
+  "pass": true,
+  "smoke": "ma_cross_bars"
+}

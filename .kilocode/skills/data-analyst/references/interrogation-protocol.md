@@ -77,7 +77,8 @@ Answer all of these for every experiment (add mechanism-specific questions on to
 | Provenance trace (verdict-bearing columns ≤ t-1) | PASS/FAIL | <file:line rows below> |
 | Leak tripwire collapsed + non-vacuous | PASS/FAIL | <control, raw vs destroyed, collapse fraction> |
 | Holdout untouched | PASS/FAIL | <evidence> |
-| Price-primary (engine emission under fence) | PASS/FAIL | <run dirs> |
+| Price-primary (Nautilus emission under fence; STUB attestation = FAIL) | PASS/FAIL | data/nautilus_runs/… |
+| T1 spread-scale routing declared + respected | PASS/FAIL | design SPREAD-SCALE-ROUTING block |
 | No experiment-local accounting defs | PASS/FAIL | check_no_local_accounting |
 
 <Provenance table: column | inputs & timestamps | ≤ t-1? | file:line>

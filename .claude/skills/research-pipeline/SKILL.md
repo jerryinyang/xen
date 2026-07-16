@@ -28,7 +28,7 @@ materiality read is informative — presented as evidence, decided by the operat
 1 Design ............ quant-designer                    → design.md
 2 QA pre-exec ....... qa-compliance (FRESH context)     → qa-review.md (append-only)
     [OPERATOR GATE — execution approval]
-3 Execute ........... cTrader CLI run                   → data/strategy_runs/<ID>/
+3 Execute ........... Nautilus BacktestNode run         → data/nautilus_runs/<run_id>/
 4 Estimand gate ..... xen.estimand_validation (script)  → results/estimand_validation.json
 5 Data analysis ..... data-analyst                      → analysis.md
     [OPERATOR — final experiment verdict]
@@ -47,27 +47,27 @@ materiality read is informative — presented as evidence, decided by the operat
 
 ## Every experiment is price-primary
 
-All strategy logic runs in the cTrader engine (C# `ISignalModel`, `tools/ctrader-cli/`).
-A Python backtest of a price strategy is REJECT-class. **VAL carve-out:** re-analysis of
-already-emitted, still-valid data skips stages 1-3 and enters at the estimand gate →
-`data-analyst`. If the prior emission is invalidated by an identified defect, a rerun (full
-pipeline) is required first.
+All strategy logic runs in the **NautilusTrader** event-driven engine (`BacktestNode`).
+A vectorised Python backtest of a price strategy is REJECT-class. **VAL carve-out:**
+re-analysis of already-emitted, still-valid data skips stages 1-3 and enters at the estimand
+gate → `data-analyst` (archived cTrader emissions under chapter-03 archive only).
 
 **XENA lane (DEFAULT route, INFR-006).** An incoming idea becomes candidates in a XENA
-universe: engine emission per candidate (fills-based contract, `SlPrice` mandatory) →
+universe: Nautilus emission per candidate (shim → adjudication; `SlPrice` on legs) →
 blocking candidate gate (`xen.xena.ingest.gate_universe`) → LAHC search on the TRAIN
 search band → plateau + disjoint-fold certification (evidence package, operator reviews) →
 operator-approved counted final gate on TEST (`run_final_gate`; ledger cap 2/universe;
-`new_data_attestation` operator-only). All thresholds come from the hash-pinned frozen
-registry — never re-derive or tune them. Spec: `docs/references/xena-lane.md`.
+`new_data_attestation` operator-only). **VOID on new stack (INFR-010 R4):** chapter-03
+frozen registry pins are invalid for Bybit/crypto until a fresh CAL INFR produces a new
+hash-pinned registry. Spec: `docs/references/xena-lane.md` v2.
 
 **SPDR carve-out (speed-run screens).** The `SPDR-###` lane is a TRAIN-only availability
 screen that runs vectorised in Python to gate a `WORTH_EXPLORING` disposition **before** a
 full experiment — it is NOT a tradability claim and never touches TEST/holdout, spends a
 read, or registers a family. It is permitted only inside the hard integrity boundary
 (TRAIN-only fence + causal `t-1` lag, code-asserted; matched-control + seed battery;
-per-stratum). A `WORTH_EXPLORING` graduates the idea into the standard cTrader-primary
-pipeline. Full spec + stages + artifacts: `docs/references/spdr-lane.md`.
+per-stratum). A `WORTH_EXPLORING` graduates the idea into the standard Nautilus
+price-primary pipeline. Full spec + stages + artifacts: `docs/references/spdr-lane.md`.
 
 ## Per-experiment artifacts
 
@@ -75,7 +75,7 @@ pipeline. Full spec + stages + artifacts: `docs/references/spdr-lane.md`.
 python/experiments/<ID>/
 ├── design.md          # quant-designer (mandatory declaration blocks)
 ├── qa-review.md       # qa-compliance, append-only across reruns
-├── code/              # developer: C# refs + confs notes (no Python analysis)
+├── code/              # developer: Nautilus strategy/runner refs (no Python analysis)
 ├── analysis_code/     # data-analyst's own scripts
 ├── results/           # incl. estimand_validation.json (gate artifact)
 ├── plots/
@@ -118,9 +118,9 @@ cannot be stated plainly, the asker does not understand it yet — investigate f
 
 - Knowledge base before design; never re-run a `pitfalls-ledger.md` dead end.
 - Never load/inspect the final-30% global holdout (both sanctioned shots spent).
-- Engine execution for all edge generation; real prices; `CloseTime`/`SourceCloseTime`
+- Nautilus execution for all edge generation; real prices; `ts_event`/`SourceCloseTime`
   alignment (never bar indices); decisions at bar open on confirmed bars (`≤ t-1`);
-  open-to-open returns.
+  open-to-open returns; catalog fence + emission attestation (STUB fails v2 gate).
 - Estimands come from `xen.adjudication`; no accounting primitives in experiment dirs
   (`check_no_local_accounting`).
 - No verdict, control read, or TEST read on an emission without a passing estimand gate.
@@ -137,7 +137,8 @@ cannot be stated plainly, the asker does not understand it yet — investigate f
 | `docs/knowledge-base/` | Always, before design |
 | `references/governance-constraints.md` | QA stage; TEST-read gate |
 | `references/scope-design.md`, `experiment-templates.md` | Stage 1 |
-| `tools/ctrader-cli/README.md` | Execution |
+| `python/experiments/INFR-010/code/emission_contract_v1.md` | Execution + estimand gate |
+| `xen.nautilus.*` | Nautilus runner + shim |
 | `python/experiments/INDEX.md`, `docs/experiments-docs/INDEX.md` | Start, completion |
 | `docs/signal-registry/` | Stage 1 precondition; Stage 6 evidence rows |
 | latest checkpoint in `docs/experiments-docs/checkpoints/` | Start, phase alignment |

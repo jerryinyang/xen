@@ -116,17 +116,36 @@ Each line is verifiable against data; QA traces this block as a clause. Power st
 and interpretation bands (§5) must use the pinned effect, never the raw screen units.
 Full convention: `docs/references/spdr-lane.md` §Unit convention + money-unit floor.
 
-## 10. Spread as a verdict leg (mandatory for any SUPPORTED/tradability band — L-22)
+## 10. T1 spread-scale routing (mandatory on Bybit T1 lane — INFR-010 §4, INFR-012)
+
+Before any verdict-bearing T1 read, declare:
+
+```
+SPREAD-SCALE-ROUTING:
+  estimated_rt_spread_bps: <from pseudo-quote series via xen.evaluation.t1_round_trip_spread_bps>
+  gross_edge_bps: <TRAIN gross estimand, same cell>
+  t1_undecidable: <YES if |gross| < 3× rt_spread | NO>
+  if YES: disposition AWAITING_MBP or T2 confirm (BTC/ETH/SOL only, post-collection);
+          pooled T1 reads disclosure-only
+```
+
+Use `xen.evaluation.spread_scale_route(gross_edge_bps, rt_spread_bps)` — do not re-derive
+the 3× threshold. QA blocks a tradability band that ignores `t1_undecidable: YES`.
+
+## 11. Spread as a verdict leg (mandatory for any SUPPORTED/tradability band — L-22)
 
 A commission-only net band never binds on 0-commission instruments (indices), and the most
 likely SUPPORTED cell (dense, short-hold, high-turnover) is exactly where spread dominates.
 Any band that can emit a SUPPORTED/tradable claim must make the **1× spread estimate a
 binding leg**: CI_low > 0 must survive commission + 1× spread before the cell counts toward
 the multiplicity family (SUPPORTED-GROSS may be reported separately as disclosure).
-0.5×/2× spread remain disclosure-only sensitivity. Spread pins come from the
-`xen.evaluation.FTMO_COSTS` table; an unpinned spread on a claimed instrument blocks the band.
+0.5×/2× spread remain disclosure-only sensitivity.
 
-## 11. Amendment-direction ledger (mandatory once any pre-measurement amendment lands — L-23)
+**Chapter 04 (Bybit):** spread pins come from per-symbol pseudo-quote series +
+`xen.evaluation.bybit_round_trip_cost_bps` (fees + spread + funding). FTMO table is
+archived — use only for chapter-03 VAL re-analysis.
+
+## 12. Amendment-direction ledger (mandatory once any pre-measurement amendment lands — L-23)
 
 Every pre-measurement amendment to a registered design declares:
 
@@ -140,7 +159,7 @@ with the FINAL gate set (apply the selection rules to the random-direction batte
 materially above the declared budget, tighten one gate back. A one-directional streak ≥ 3 is
 an explicit operator flag at the execution gate.
 
-## 12. Battery/eligibility/null design rules (mandatory for battery-gated, multi-cell, or capped-read designs — L-24)
+## 13. Battery/eligibility/null design rules (mandatory for battery-gated, multi-cell, or capped-read designs — L-24)
 
 1. **Time-stability eligibility (F02):** a seed battery prices direction-randomization only.
    Eligibility must add a time-stability read — TRAIN net positive in ≥2 of 3 chronological

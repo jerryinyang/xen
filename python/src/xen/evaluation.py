@@ -379,6 +379,96 @@ FTMO_COSTS: dict[str, dict] = {
                "pip_commission_per_lot": 3.33, "spread_pips": None},
 }
 
+# --------------------------------------------------------------------------- #
+# Bybit USDT linear perpetual cost table (INFR-012, replaces FTMO for new stack)
+# --------------------------------------------------------------------------- #
+# Source: Bybit derivatives fee schedule (USDT perpetuals), snapshot 2026-07-15.
+# T1 lane: engine costless-honest; fees + funding + pseudo-quote spread injected here.
+# Netted-turnover rule carries (commission charged on net position change per event).
+BYBIT_COST_SNAPSHOT = "2026-07-15 Bybit USDT linear perpetual fee schedule"
+BYBIT_USDT_PERP_FEES: dict[str, float] = {
+    "maker_bps_per_side": 2.0,    # 0.02% maker
+    "taker_bps_per_side": 5.5,    # 0.055% taker
+}
+# Conservative funding assumption when history missing (R7) — 8h rate, bps of notional
+BYBIT_FUNDING_CONSERVATIVE_BPS_PER_8H = 1.0
+SPREAD_SCALE_ROUTING_MULTIPLIER = 3.0  # gross < 3× RT spread => undecidable on T1 (INFR-010 §4)
+
+
+def t1_round_trip_spread_bps(
+    symbol: str,
+    spread_bps: float,
+    *,
+    stress: float = 1.0,
+) -> float:
+    """T1 pseudo-quote round-trip spread in bps (one full spread per RT, stress-scalable)."""
+    del symbol  # per-symbol series already resolved by caller
+    return float(stress * spread_bps)
+
+
+def bybit_fee_bps_per_side(*, liquidity: str = "taker") -> float:
+    """Published maker/taker fee in bps per side."""
+    liq = liquidity.lower()
+    if liq == "maker":
+        return BYBIT_USDT_PERP_FEES["maker_bps_per_side"]
+    if liq == "taker":
+        return BYBIT_USDT_PERP_FEES["taker_bps_per_side"]
+    raise ValueError(f"liquidity must be maker|taker, got {liquidity!r}")
+
+
+def bybit_round_trip_cost_bps(
+    symbol: str,
+    entry_price: float,
+    *,
+    liquidity: str = "taker",
+    spread_bps: float,
+    funding_bps_per_8h: float | None = None,
+    hold_hours: float = 8.0,
+    funding_coverage: str = "OK",
+    stress: float = 1.0,
+) -> dict:
+    """Declared T1 round-trip cost in bps (informative for analysis, never gating).
+
+    Components: fees (2× per-side for round trip) + T1 spread + funding accrual.
+    ``funding_coverage`` ∈ {OK, GAP} — GAP triggers conservative assumption flag (R7).
+    Returns component breakdown for disclosure.
+    """
+    del symbol, entry_price  # USDT-margined perps: bps of notional is price-free
+    fee_side = bybit_fee_bps_per_side(liquidity=liquidity)
+    fee_rt = 2.0 * fee_side
+    spread_rt = t1_round_trip_spread_bps("", spread_bps, stress=stress)
+    if funding_bps_per_8h is None:
+        funding_bps_per_8h = BYBIT_FUNDING_CONSERVATIVE_BPS_PER_8H
+        if funding_coverage == "OK":
+            funding_coverage = "GAP"
+    funding_rt = funding_bps_per_8h * (hold_hours / 8.0)
+    total = stress * (fee_rt + spread_rt + funding_rt)
+    return {
+        "total_bps": float(total),
+        "fee_rt_bps": float(fee_rt),
+        "spread_rt_bps": float(spread_rt),
+        "funding_rt_bps": float(funding_rt),
+        "funding_coverage": funding_coverage,
+        "liquidity": liquidity,
+        "stress": stress,
+    }
+
+
+def spread_scale_route(gross_edge_bps: float, rt_spread_bps: float) -> dict:
+    """§4 spread-scale routing — undecidable on T1 when gross < 3× RT spread."""
+    threshold = SPREAD_SCALE_ROUTING_MULTIPLIER * rt_spread_bps
+    undecidable = abs(gross_edge_bps) < threshold
+    return {
+        "gross_edge_bps": float(gross_edge_bps),
+        "rt_spread_bps": float(rt_spread_bps),
+        "threshold_bps": float(threshold),
+        "t1_undecidable": undecidable,
+        "route": "AWAITING_MBP" if undecidable else "T1_DECIDABLE",
+        "note": ("verdict-bearing confirmation requires T2 or park AWAITING_MBP"
+                 if undecidable else "T1 may carry verdict-bearing reads (subject to power/cost)"),
+    }
+
+
 def usd_notional_per_lot(symbol: str, price: float, *, base_usd_rate: float | None = None) -> float:
     """USD notional of one standard lot (the denominator for a fixed-USD commission → bps).
 

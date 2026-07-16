@@ -116,14 +116,20 @@ anytime after B; D requires A+B+C.
    delisting announcements. Output `universe-census.md`: symbol, first/last archive date,
    listed/delisted flag. **Delisted-symbol contract specs** (tick size, lot) recovered
    best-effort (archives + announcements) — gaps recorded, not guessed.
-2. **Scraper:** resumable trades downloader, checksum manifest, polite rate limits.
-   Raw CSV.gz retained compressed **until** bar derivation + invariants pass, then deleted
-   (archives remain re-downloadable at Bybit) — **except the MBP trio's trades: keep-forever**
-   (feature-store §4.0 KF class).
-3. **Derivation:** trades → 1m OHLCV bars (real volume; open/close from first/last print) +
-   per-symbol pseudo-quote spread series (aggressor-side straddle, tick-floor). Invariants:
-   bar volume ≡ Σ trade sizes; monotonic ts; OHLC bounds; gap ledger (24/7 market → gaps are
-   outages/delistings, all logged).
+2. **Scraper (streaming, raw-less; amended 2026-07-14):** resumable downloader with checksum
+   manifest + polite rate limits, **max 4 years of history per symbol** (operator cap; long-
+   lived symbols trimmed to trailing 4y; fence computed on capped range). Raw Python
+   (httpx) — Nautilus has no archive downloader; it enters at ingest. Per day-file:
+   download → decompress in-stream → aggregate → append Parquet staging → **discard**;
+   no raw CSV landing (peak disk = one file in flight). **Zero raw retained (amended
+   2026-07-14):** trio (BTC/ETH/SOL) keep-forever deferred to the MBP collection INFR —
+   archive trades are re-downloadable from Bybit; KF class applies to live-captured
+   streams, not archives.
+3. **Derivation (fused into stream step):** trades → 1m OHLCV bars (real volume; open/close
+   from first/last print) + per-symbol pseudo-quote spread series (aggressor-side straddle,
+   tick-floor — the reason klines cannot replace trades: no aggressor/bid-ask in klines, and
+   kline sources drop delisted symbols). Invariants: bar volume ≡ Σ trade sizes; monotonic
+   ts; OHLC bounds; gap ledger (24/7 market → gaps are outages/delistings, all logged).
 4. **Catalog ingest:** instrument definitions + `Bar` objects → `ParquetDataCatalog` at
    `data/catalog/`, partitioned `instrument_id/data_type/date`.
 5. **Admission (VAL-style, blocking):** invariant report, cross-symbol sanity (BTC vs ETH

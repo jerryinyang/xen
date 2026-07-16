@@ -48,8 +48,9 @@ One artifact, dense (tables/bullets), ~300-line budget. All items below are REQU
    per-bar). Never a bespoke accounting construction; the estimand-validation gate
    (`xen.estimand_validation`) must be runnable on the planned emission.
 4. **Scope**: instruments/domains/parameters/time range/exclusions; mandatory final-30%
-   holdout exclusion; complexity budget; C# model + `<ID>.conf` cells + `AnalysisEndUtc`
-   fence (all edge-generating experiments run in the cTrader engine — no Python backtests).
+   holdout exclusion; complexity budget; Nautilus strategy + run config + catalog fence
+   attestation (all edge-generating experiments run in Nautilus `BacktestNode` — no vectorised
+   Python backtests). Declare **SPREAD-SCALE-ROUTING** block on T1 (§10 design-requirements).
 5. **Controls, each with a validity proof** (see `design-requirements.md`):
    - non-degeneracy: the control population is disjoint from the signal population and could
      produce a different answer (B-1);
@@ -88,7 +89,8 @@ One artifact, dense (tables/bullets), ~300-line budget. All items below are REQU
   conditioning throughout.
 - Experiment-level only: no family dispositions in a design.
 - **XENA runs**: the design declares the universe manifest (candidate grid — models ×
-  params × instruments × domains), per-candidate `cost_bps` from the FTMO table, the
+  params × instruments × domains), per-candidate cost from `bybit_round_trip_cost_bps`
+  (chapter 04) or archived FTMO table (chapter-03 VAL only), the
   pre-registered band boundaries (search/ranking/gate, 50/30/20 shape), and cites the
   frozen registry hash — it never re-derives or proposes threshold values (X, F_floor,
   gate threshold are pinned; L-12 clause). Per-candidate quality gates are forbidden:

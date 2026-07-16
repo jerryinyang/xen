@@ -26,8 +26,8 @@ structural, not attitudinal.
 ## Inputs
 
 1. `python/experiments/<ID>/design.md` (with its GATE/approval state).
-2. The implementation: `StrategyHost/` model, `Xen.cs` registration,
-   `tools/ctrader-cli/experiments/<ID>*.conf`, any `python/src/xen` changes.
+2. The implementation: Nautilus strategy/runner under `python/experiments/<ID>/code/`,
+   emission contract v1 artifacts, any `python/src/xen` changes.
 3. Shared pipeline config (file ending `/research-pipeline/_pipeline-config.md`) and
    `research-pipeline/references/governance-constraints.md`.
 4. The developer's design-clause → code-location map (from the completion summary), if
@@ -68,13 +68,16 @@ running the implementation to produce its own expectations.
   object matches the screen code verbatim, the measured TRAIN-median value is recomputed (not
   recalled), the resulting bps/trade effect and cost-floor comparison follow arithmetically;
   §5 bands and §6 power use the pinned effect (`docs/references/spdr-lane.md`).
-- Spread verdict leg (L-22): any SUPPORTED/tradability band binds on commission + 1× spread
-  (pinned in `xen.evaluation.FTMO_COSTS`); a commission-only band on a 0-commission
-  instrument is a REVISE.
+- T1 spread-scale routing (INFR-010 §4): design must declare `SPREAD-SCALE-ROUTING`; if
+  `t1_undecidable: YES`, tradability/SUPPORTED bands on T1 alone are a REVISE.
+- Spread verdict leg (L-22, chapter 04): binds on `bybit_round_trip_cost_bps` (fees + 1×
+  pseudo-quote spread + funding); FTMO table only for archived VAL re-analysis.
 - Amendment-direction ledger (L-23): every pre-measurement amendment carries a
   LOOSER/TIGHTER/NEUTRAL declaration + running directional count; the final gate set carries
   a re-derived false-qualifier expectation; a one-directional streak ≥3 is flagged to the
   operator at the execution gate.
+- XENA VOID on new stack (INFR-010 R4): any design routing to XENA on Bybit/crypto data
+  without a post-CAL hash-pinned registry is a REJECT (chapter-03 pins are archive-only).
 - Battery/eligibility/null rules (L-24): for any battery-gated, multi-cell, or capped-read
   design, trace the four clauses of `quant-designer/references/design-requirements.md` §12 —
   time-stability eligibility, exit-matched nulls, derived tripwire thresholds,

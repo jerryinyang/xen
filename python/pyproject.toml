@@ -9,6 +9,9 @@ dependencies = [
     "ccxt>=4.5.58",
     "diptest>=0.11.0",
     "matplotlib>=3.10.9",
+    # INFR-010 Phase B: hard pin (R5). One-platform rule (INFR-007 caveat):
+    # pin recorded for macosx_15_0_arm64 / CPython 3.14 — do not upgrade without INFR.
+    "nautilus_trader==1.230.0",
     "numpy>=2.4.4",
     "pandas>=3.0.3",
     "polars>=1.40.1",

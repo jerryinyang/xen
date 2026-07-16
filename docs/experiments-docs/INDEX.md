@@ -17,7 +17,8 @@ Chapter 04's first research checkpoint (013) opens only after INFR-010 Phase D p
 
 | Item | Status | Detail |
 |------|--------|--------|
-| INFR-010 | IN PROGRESS — Phase 0 done 2026-07-14 | Master migration plan (design v2, D1–D8 locked). Next: Phase A (INFR-011 OHLCV primary dataset) ∥ Phase B (engine foundation + determinism smoke). XENA frozen registry VOID on the new stack (fresh CAL cycle required). |
+| INFR-010 | IN PROGRESS — Phase 0 done 2026-07-14 | Master migration plan (design v2, D1–D8 locked). Phase A (INFR-011 OHLCV primary dataset) spawned & executing (census done). |
+| INFR-011 | REVISED + bulk approved under constraints | Census corrected to 910 (*USDT only, *PERP USDC excluded). Streaming/raw-less pipeline + 4y cap. Delist reconciliation parallel but blocks A5. Stop at verify. |
 
 ## Family Indexes
 

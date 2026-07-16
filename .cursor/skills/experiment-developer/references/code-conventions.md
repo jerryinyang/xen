@@ -24,18 +24,25 @@ import seaborn as sns
 
 DATA_DIR = Path("data")
 
-# Load time bars — canonical base data for all experiments.
-# Sort before slicing so the first 70% is chronological, not physical row order.
-timebars_path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
-scan = pl.scan_parquet(timebars_path).sort("CloseTime")
-total_rows = int(scan.select(pl.len()).collect().item())
-analysis_cutoff = int(total_rows * 0.7)
-analysis_set = scan.slice(0, analysis_cutoff).collect()
+# Chapter 04: ALL catalog bar reads go through the A6 fence wrapper — never raw catalog.bars().
+# Legacy chapter-03 VAL carve-out only — time bars under archive:
+# timebars_path = sorted(DATA_DIR.glob("timebars/timebars_*.parquet"))[-1]
+from nautilus_trader.persistence.catalog import ParquetDataCatalog
+from xen.nautilus.catalog_fence import fenced_bar_query, load_fence_manifest
 
-# Within analysis set: train/test chronological split
-train_cutoff = int(analysis_cutoff * 0.7)
-train_set = analysis_set.slice(0, train_cutoff)
-test_set = analysis_set.slice(train_cutoff, analysis_cutoff - train_cutoff)
+catalog = ParquetDataCatalog(DATA_DIR / "catalog")
+fence = load_fence_manifest()  # hash-pinned absolute dates (INFR-011 A6 fence-manifest.json)
+train_bars = fenced_bar_query(
+    catalog,
+    ["BTCUSDT-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL"],
+    start=fence.analysis_start_utc,
+    end=fence.train_end_utc,
+    band="TRAIN",
+)
+# TEST band: band="TEST" with start/end inside [train_end_utc, holdout_start_utc] —
+# counted governance events, operator approval required before any TEST read.
+# HOLDOUT (fence.holdout_start_utc onward): never queryable — wrapper raises FenceViolation.
+# Emission attestation: xen.nautilus.catalog_fence.fence_attestation_payload(fence).
 
 # Generate chart types on-demand from the scoped source data.
 # `xen` is installed editable (`uv pip install -e .` in python/), so no sys.path hack.
@@ -75,9 +82,10 @@ The Chapter-01 false positive (L-01) was a one-bar look-ahead in a shared outcom
 (`rct_target[di]` used as the intrabar limit *during* bar `di`; live-actable is `[di-1]`),
 invisible because the audit re-derived from the same module. Code rules:
 
-- **Price-primary signal logic is C#, not Python.** Edge generation runs in the cTrader engine
-  (`StrategyHost/` model + `tools/ctrader-cli`). Python ingests `data/strategy_runs/<ID>/` via
-  `xen.signals.ingestion` and never re-generates a signal. No vectorized price-strategy backtest.
+- **Price-primary signal logic is Nautilus, not analysis Python.** Edge generation runs in
+  `BacktestNode`. Python ingests `data/nautilus_runs/<run_id>/` via
+  `xen.nautilus.adjudication_shim` and never re-generates a signal. No vectorised
+  price-strategy backtest.
 - **Provenance contract on outcome modules.** Any `xen` function emitting an outcome / target /
   excursion / fill column documents, in its docstring, which timestamps each output reads. Never
   use a bar's own close as that bar's intrabar limit. The next-bar-action convention is `[di-1]`.

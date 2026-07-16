@@ -1,0 +1,19 @@
+{
+  "analysis_start_utc": "2021-06-29T06:53:00Z",
+  "data_end_utc": "2026-07-14T23:59:00Z",
+  "generated_utc": "2026-07-16T04:10:47.555153+00:00",
+  "holdout_start_utc": "2025-01-08T00:00:00Z",
+  "nautilus_pin": "1.230.0",
+  "note": "HOLDOUT (holdout_start_utc onward) is never queried; both lifetime shots are governance events. Reads go through xen.nautilus.catalog_fence.fenced_bar_query.",
+  "schema": "xen-fence-manifest/v1",
+  "source": {
+    "admission_ledger": "python/experiments/INFR-011/artifacts/admission-ledger.jsonl",
+    "admission_ledger_sha256": "491213a289f9f026a411efea190c5fc03b9aa392b0628401adb3c3a796f23933",
+    "n_readable_symbols": 903
+  },
+  "split": {
+    "analysis_frac": 0.7,
+    "train_frac_within_analysis": 0.7
+  },
+  "train_end_utc": "2023-12-18T00:00:00Z"
+}
