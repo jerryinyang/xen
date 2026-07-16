@@ -13,16 +13,19 @@ they do not wipe prior canon). The **signal-registry** (`docs/signal-registry/`)
 operational ledger (multiplicity, test-reads, candidate families) and is referenced here, not
 copied — it persists across chapters and must never be reset.
 
-## Programme status (2026-07-14): INFR-010 migration in progress
+## Programme status (2026-07-16): Chapter 04 open — INFR-010 migration COMPLETE
 
-The substrate is being replaced (`python/experiments/INFR-010/design.md`): engine → **NautilusTrader**,
-primary data → **Bybit USDT-perp 1m OHLCV derived from trades archives** (full universe incl.
-delisted, anti-survivorship). Chapter 04 research opens only after the migration's end-to-end
-VAL (Phase D). Governance principles (holdout fence, causal-by-construction execution, estimand
-gate, XENA adjudication form, multiplicity/test-read ledgers) carry forward; implementations
-rebind at INFR-012. The XENA frozen registry is **VOID on the new stack** — fresh CAL cycle
-required. See [data-architecture.md](data-architecture.md) (migration banner) and
-[evaluation-framework.md](evaluation-framework.md).
+**INFR-010 Phases 0/A/B/C/D/E complete** (2026-07-16). Engine is **NautilusTrader**
+(nautilus_trader==1.230.0); primary data is **Bybit USDT-perp 1m OHLCV** in `data/catalog/`
+(894 ADMITTED instruments, fence PINNED). Phase D end-to-end VAL (**VAL-008**) operator
+verdict **SUPPORTED / PASS**. Chapter 04 research is open at checkpoint-013
+(`docs/experiments-docs/checkpoints/2026-07-16-013-chapter04-open-htfcap-epsosc-cal/`) —
+CF-HTFCAP-001 + CF-EPSOSC-001 (SPDR→XENA) and INFR-014 (fresh Bybit XENA CAL). Stack lessons
+L-28..L-31 ratified into [lessons-and-amendments.md](lessons-and-amendments.md). Governance
+principles carry forward (holdout fence, causal-by-construction, estimand gate, XENA form,
+multiplicity/test-read ledgers); rebind verified at INFR-012. The chapter-03 XENA frozen
+registry remains **VOID on Bybit** until INFR-014 pins a new registry. See
+[data-architecture.md](data-architecture.md) and [evaluation-framework.md](evaluation-framework.md).
 
 ## What's FROZEN (do not re-derive)
 

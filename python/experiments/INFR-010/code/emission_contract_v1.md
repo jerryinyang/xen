@@ -55,6 +55,13 @@ RealizedBps = Direction * (ExitFillPrice - EntryFillPrice) / EntryFillPrice * 1e
 
 API: `xen.nautilus.adjudication_shim.adjudicate_emission(run_dir)`.
 
+## Fill-ts alignment (L-29, VAL-008)
+
+Nautilus fill timestamp = **decision-bar close** = wall-clock **open of the fill bar**.
+Naive `searchsorted` on bar-close times mis-indexes the fill bar by one. When joining fills
+to `bar_marks`, map fill-ts to the fill bar open; **anchor check** on smoke/analysis samples:
+`EntryFillPrice == next-bar RealOpen ± 1 tick` (or the design's declared fill basis).
+
 ## What estimand_validation v2 will gate (Phase C)
 
 - schema (required cols; monotonic `SourceCloseTime`)

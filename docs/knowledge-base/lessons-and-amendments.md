@@ -677,3 +677,87 @@ de-confounded this way, it is **inadmissible** for that universe. Builds on [[L-
 
 **Where enforced.** Design note for the next native-fill XENA universe; `docs/references/xena-lane.md`;
 `python/experiments/XENA-003/report.md`.
+
+## L-28 — Destroy permutations must be derangements (VAL-008 / checkpoint-013) ⭐
+
+**What.** VAL-008 Phase D stack smoke: a plain (non-derangement) destroy permutation left
+**11.1% fixed-point alignment** with the true schedule, so the planted edge only partially
+collapsed (collapse fraction **0.87**, not ≈0). A tripwire that "almost" collapses can pass as
+non-vacuous while still leaking plant/true signal through fixed points.
+
+**Mechanism.** A uniform random permutation of n items has **E[fixed points] = 1 for any n**
+and P(≥1 fixed point) = 1 − 1/e ≈ 63% (1/e ≈ 37% is the derangement probability). The leak
+scales inversely with block count: at VAL-008's 18 permuted blocks, one fixed block = 5.6% of
+slots at TRUE alignment (two = 11.1%, the observed case). Those fixed points keep the original
+timing/signal at those indices; the destroy is therefore a **partial** destroy.
+Collapse fraction under a fixed-point-leaking permutation understates residual signal and can
+mis-calibrate tripwire bite (L-14 vacuity / L-19 control-noise shapes compounded).
+
+**Fix / new rule.** Every destroy permutation used as a leak tripwire, attribution control, or
+null battery arm must be a **derangement** (zero fixed points) — regenerate or reject draws
+with any fixed point. State derangement explicitly in the CONTROL / TRIPWIRE block; measured
+alignment after destroy must be 0% fixed points (or disclosed residual if a softer destroy is
+predeclared). Builds on [[L-14]], [[L-19]].
+
+**Enforced at.** `quant-designer/references/design-requirements.md` §3 control blocks + §4
+tripwire (L-28 derangement clause); `qa-compliance` §3 governance clause list. Evidence:
+`python/experiments/VAL-008/report.md` §5; D1-signed at checkpoint-013
+(`docs/experiments-docs/checkpoints/2026-07-16-013-chapter04-open-htfcap-epsosc-cal/design.md` §1).
+
+## L-29 — Nautilus fill-ts = decision-bar close; naive searchsorted on closes is off-by-one (VAL-008)
+
+**What.** On the Nautilus stack, fill timestamp equals the **decision-bar close** (wall-clock
+**open** of the fill bar). Aligning fills to bars with naive `searchsorted` on bar-close times
+mis-indexes the fill bar by **one**.
+
+**Mechanism.** Decision at bar-open on confirmed data ≤ t−1 places the market order for the
+*next* bar; the engine stamps the fill at the decision bar's close timestamp, which is the
+fill bar's open. Treating that stamp as "close of the fill bar" (or `searchsorted` side that
+picks the decision bar) lands one bar early/late. Price anchors then disagree with the ledger.
+
+**Fix / new rule.** When mapping fills → bars, treat fill-ts as the open of the fill bar (=
+close of the decision bar). **Anchor check (mandatory on smoke + analysis):**
+`EntryFillPrice == next-bar RealOpen ± 1 tick` (or the design's declared fill basis). Do not
+use unadjusted close-axis `searchsorted` as the sole bar index.
+
+**Enforced at.** `data-analyst/references/interrogation-protocol.md` fill/alignment probe;
+`experiment-developer/references/code-conventions.md` Nautilus runner conventions;
+emission-contract note in `python/experiments/INFR-010/code/emission_contract_v1.md`.
+Evidence: VAL-008 `report.md` §5; checkpoint-013 §1 D1.
+
+## L-30 — `BacktestRunConfig(dispose_on_completion=False)` required for node-path report capture (VAL-008)
+
+**What.** Default `dispose_on_completion=True` on `BacktestRunConfig` **silently empties**
+engine reports after `BacktestNode.run()` returns; fills/orders/positions capture then yields
+empty frames. Phase B smokes never exercised the node-path report path, so the trap shipped.
+
+**Mechanism.** Node completion disposes the engine/cache before the runner can call
+`generate_*_report()` unless dispose is deferred. Empty reports look like "no trades" rather
+than a config bug.
+
+**Fix / new rule.** All production/experiment runners set
+`BacktestRunConfig(dispose_on_completion=False)`, capture reports from the live engine, then
+`node.dispose()` explicitly. Document in runner templates; optional follow-up patch of
+`xen.nautilus.backtest_util.run_ma_cross_node` (smoke-only path — currently misleading, not
+blocking).
+
+**Enforced at.** `experiment-developer/references/code-conventions.md` Nautilus runner
+conventions; runner templates under experiment `code/`. Evidence: VAL-008 `report.md` §5;
+checkpoint-013 §1 D1.
+
+## L-31 — One BacktestNode per process (Rust logging init panics on a second node) (VAL-008)
+
+**What.** Constructing a second `BacktestNode` in the same Python process panics in Nautilus
+Rust logging init. Multi-cell grids cannot share a process for sequential nodes.
+
+**Mechanism.** Global Rust logger / tracing init is process-once; a second node re-enters init
+and aborts. In-process loop over cells is unsafe regardless of dispose.
+
+**Fix / new rule.** **One BacktestNode per process.** Multi-cell / multi-instrument batching
+uses **subprocess-per-cell** (or an equivalent process boundary). Until multi-instrument
+single-engine is proven (INFR-014 smoke S1), do not assume one process can host N instruments
+either.
+
+**Enforced at.** `experiment-developer/references/code-conventions.md` runner template;
+`qa-compliance` §3 clause (in-process multi-node = REVISE). Evidence: VAL-008 `report.md` §5;
+checkpoint-013 §1 D1.

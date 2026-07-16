@@ -101,9 +101,44 @@ invisible because the audit re-derived from the same module. Code rules:
   for an edge / P&L / deployability claim.
 - **Ship the leak tripwire.** Implement the design's future-destroying control (future-shuffle /
   time-reversal / outcome-label permutation) so the audit can confirm the edge collapses. Make it
-  a runnable mode/flag of `run_experiment.py`, not a manual afterthought.
+  a runnable mode/flag of `run_experiment.py`, not a manual afterthought. **Permutation destroys
+  must be derangements** (zero fixed points; L-28) — plain permutations leak plant/true signal
+  through fixed points.
 - **Booked-vs-real (ports).** Charge binding-leg slippage/cost; keep any look-ahead favourable
   view explicitly labelled non-tradable (L-02).
+
+## Nautilus runner conventions (VAL-008 / L-29..L-31)
+
+Binding for every `BacktestNode` experiment runner under `python/experiments/<ID>/code/`:
+
+1. **Fill-ts semantics (L-29).** Nautilus fill timestamp = **decision-bar close** = wall-clock
+   **open of the fill bar**. Naive `searchsorted` on bar-close arrays mis-indexes by one.
+   Map fills to the fill bar correctly; smoke/anchor check:
+   `EntryFillPrice == next-bar RealOpen ± 1 tick` (or the design's declared fill basis).
+2. **Report capture (L-30).** Set `BacktestRunConfig(dispose_on_completion=False)`. Default
+   `True` silently empties engine reports after `node.run()`. Capture fills/orders/positions
+   from the live engine, then call `node.dispose()` explicitly. (Optional follow-up: patch
+   `xen.nautilus.backtest_util.run_ma_cross_node` — smoke-only path still misleading.)
+3. **One BacktestNode per process (L-31).** A second node in the same process panics Rust
+   logging init. Multi-cell grids use **subprocess-per-cell**. Do not loop `BacktestNode(...)`
+   in one process. Multi-instrument single-engine remains unproven until INFR-014 smoke S1.
+
+Template sketch:
+
+```python
+run_config = BacktestRunConfig(
+    engine=engine_config,
+    venues=[venue_config],
+    data=[data_config],
+    dispose_on_completion=False,  # L-30 — required for report capture
+)
+# One node only in this process (L-31). Multi-cell → subprocess per cell.
+node = BacktestNode(configs=[run_config])
+results = node.run()
+engine = node.get_engine(run_config.id)
+# capture reports from engine.trader.generate_*_report() …
+node.dispose()
+```
 
 ## Existing Analysis Modules
 

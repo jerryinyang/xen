@@ -54,10 +54,12 @@ Answer all of these for every experiment (add mechanism-specific questions on to
 | Off-by-one / lag errors | Recompute one signal by hand at 2-3 timestamps from raw bars |
 | Wrong split | Confirm chronological ordering + 70% cut by timestamp, not row position |
 | Fill plausibility | Fills within bar [Low, High] (tolerance); breach rate |
+| **Nautilus fill-ts off-by-one (L-29)** | Fill-ts = decision-bar close = wall-clock open of fill bar. Naive `searchsorted` on bar closes mis-indexes by one. **Anchor:** `EntryFillPrice == next-bar RealOpen ± 1 tick` (or design fill basis) on a sample of legs |
 | Duplicate/missing events | Event counts vs bar counts; duplicate timestamps |
 | Pooled masking | Per-stratum table vs pooled headline; one stratum vetoing or carrying |
 | Gate-shape blindness | Effect shape (location/tail/asymmetric) vs what the statistic measures |
 | Mean-invariant control | Does the destroy control move the metric's sufficient statistic at all? |
+| Non-derangement destroy (L-28) | Permutation controls: measure fixed-point rate; must be 0 (derangement) or residual disclosed |
 | Acausal favourable-index (L-01) | Own-bar close used as that bar's intrabar limit |
 | Synthetic prices | Any P&L touching HA/Renko constructed prices |
 | Multi-leg accounting (L-18) | Any per-bar series not built by `xen.adjudication` |

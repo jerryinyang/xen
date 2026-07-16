@@ -82,6 +82,15 @@ running the implementation to produce its own expectations.
   design, trace the four clauses of `quant-designer/references/design-requirements.md` §12 —
   time-stability eligibility, exit-matched nulls, derived tripwire thresholds,
   MDE-consistent read floors.
+- Derangement destroy (L-28): any permutation-based leak tripwire, attribution control, or
+  null battery arm must be a **derangement** (zero fixed points) — plain permutations leak
+  signal (VAL-008: 11.1% alignment → collapse 0.87). Design CONTROL/TRIPWIRE block states
+  `destroy form: DERANGEMENT`; code regenerates/rejects draws with fixed points. Missing
+  derangement on a permutation destroy = REVISE.
+- One BacktestNode per process (L-31): multi-cell runners must be **subprocess-per-cell** (or
+  equivalent process boundary). A design/runner that constructs a second `BacktestNode` in the
+  same process (Rust logging init panic) = REVISE. Multi-instrument single-engine is unproven
+  until INFR-014 smoke S1.
 - Holdout: no code path can touch the final 30%; conf fence set.
 - Any `DEVIATIONS` block: each deviation was operator-approved (evidence, not assertion).
 - Elicitation hygiene: open questions to the operator are plain-language.

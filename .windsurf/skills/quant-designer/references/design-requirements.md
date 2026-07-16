@@ -41,6 +41,7 @@ CONTROL <name>:
   non-vacuity: <which sufficient statistic of the metric it moves>              # B-6
   expected outcome if H true: <...>; if H false: <...>
   disclosure: collapse fraction reported (control effect / raw effect)          # B-2
+  destroy form (if permutation): DERANGEMENT (zero fixed points) | other + why  # L-28
 ```
 
 Degeneracy test (B-1): if the strategy fires on every member of the conditioning set, a
@@ -51,12 +52,20 @@ signal series cannot.
 Vacuity test (B-6): a permutation preserving the outcome multiset cannot referee a mean-based
 metric. State the statistic the destroy actually perturbs.
 
+**Derangement rule (L-28):** any control or null arm that *destroys* timing/alignment via
+permutation of a schedule, labels, or indices must use a **derangement** (zero fixed points).
+A plain permutation leaks signal through fixed points (VAL-008: 11.1% alignment → collapse
+only 0.87). State `destroy form: DERANGEMENT` in the block; if a non-derangement destroy is
+intentional, predeclare residual fixed-point rate and why the bite remains valid. Builds on
+L-14 / L-19.
+
 ## 4. Leak tripwire
 
 ```
 TRIPWIRE: <future-shuffle | time-reversal | causal misalignment | ...>
   must collapse the edge; expected collapse fraction ≈ <...>
   vacuity check: <why this destroy can collapse THIS metric>
+  if permutation-based: derangement=YES (zero fixed points; L-28)
 ```
 
 ## 5. Interpretation bands (per stratum — no binaries)
