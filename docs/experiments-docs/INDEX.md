@@ -8,22 +8,30 @@ Live status + family navigation for the current chapter. Chapter 03 is archived 
 
 ## Current Checkpoint Status
 
-No research checkpoint open. The active work is the **INFR-010 migration**
-(`python/experiments/INFR-010/design.md`): engine → NautilusTrader, data → Bybit USDT-perp
-OHLCV universe (anti-survivorship). Phase 0 (chapter-03 close) executed 2026-07-14.
-Chapter 04's first research checkpoint (013) opens only after INFR-010 Phase D passes.
+**INFR-010 Phase D PASSED 2026-07-16 (VAL-008, operator verdict SUPPORTED) — Chapter 04
+research may open.** Next action: design checkpoint-013 (first Chapter 04 research
+checkpoint; ratify VAL-008 §5 stack lessons; XENA CAL INFR for the fresh Bybit registry —
+frozen registry remains VOID per INFR-010 R4). INFR-013 (Phase E MBP skeleton) COMPLETE
+2026-07-16 — all INFR-010 phases closed.
 
 ## Current Infrastructure Tasks
 
 | Item | Status | Detail |
 |------|--------|--------|
-| INFR-010 | IN PROGRESS — Phase 0 done 2026-07-14 | Master migration plan (design v2, D1–D8 locked). Phase A (INFR-011 OHLCV primary dataset) spawned & executing (census done). |
-| INFR-011 | REVISED + bulk approved under constraints | Census corrected to 910 (*USDT only, *PERP USDC excluded). Streaming/raw-less pipeline + 4y cap. Delist reconciliation parallel but blocks A5. Stop at verify. |
+| INFR-010 | Phases 0/A/B/C/D/E **COMPLETE 2026-07-16** | all phases closed (Phase E = INFR-013) |
+| INFR-011 | Phase A COMPLETE 2026-07-16 | 894 ADMITTED, 672M bars, fence PINNED `35d3375e…`, catalog at `data/catalog/` |
+| INFR-012 | Phase C COMPLETE 2026-07-15 | governance rebind verified 10/10 (`results/phase_c_verify.json`) |
+| VAL-008 | COMPLETE 2026-07-16 — **Phase D PASS** | `python/experiments/VAL-008/report.md` |
+| INFR-013 | Phase E COMPLETE 2026-07-16 — verify PASS | `xen.orderflow` contracts + skeleton; NO collection/detectors; spec `docs/references/orderflow-feature-store.md`; sample-day report `INFR-013/results/sample_day_report.json` |
 
 ## Family Indexes
 
-None yet — new families register at `docs/signal-registry/candidate-families/` when the
-chapter opens.
+| Family | Range | Status |
+|--------|-------|--------|
+| [infrastructure-validation](families/infrastructure-validation/INDEX.md) | VAL-008 | Phase D PASS 2026-07-16 |
+
+New candidate families register at `docs/signal-registry/candidate-families/` when research
+opens.
 
 ## Checkpoint Retrospectives
 

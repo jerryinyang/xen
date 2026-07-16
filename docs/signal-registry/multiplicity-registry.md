@@ -1322,6 +1322,74 @@ other sign priors); dependence-matched uncertainty (block ≥ H on overlapping e
 **HTF-bar-boundary** (`CloseTime < Open(t)`) is the load-bearing leak guard, code-asserted +
 golden-trace.
 
+## Chapter 04 · VAL-008 Registration (2026-07-16) — INFR-010 Phase D Pipeline Dry Run (apparatus, throwaway)
+
+**Status:** **COMPLETE 2026-07-16 — operator verdict SUPPORTED / Phase D PASS** (apparatus
+test — NOT a candidate family; informative-only disposition). Gate 39/39 PASS on PINNED
+attestation; planted leak caught 3/3 blind (BASELINE clear 0/3); destroys collapse
+0.977–1.064; STUB negative correctly fails. Report: `python/experiments/VAL-008/report.md`.
+**Vehicle:** SMA(20/100) 1m cross flip on BTCUSDT/ETHUSDT/SOLUSDT (Bybit USDT perps, new
+Nautilus stack), TRAIN sub-window 2023-06-01 → train_end 2023-12-18. Purpose: end-to-end
+pipeline integrity (INFR-010 §6 Phase D) — emission contract v1 on PINNED fence attestation,
+estimand gate v2, leak battery (planted next-bar-sign oracle = bite plant; block-shuffle ×5
+seeds 1000–1004/2000–2004 + causalizing lag must collapse it; predeclared blind leak-catch
+protocol). Amendments 1–4 (2026-07-16, all NEUTRAL): gate invocation wrapper, seed labels,
+overlap wording, shuffle→derangement control repair (L-10 amend-in-place, contaminated SHUF
+emissions hard-deleted + rerun) — see design.md §Amendment ledger.
+**Slot accounting: 0 slots; 0 counted TEST reads; TRAIN-only; holdout sealed.** No family
+opened; no tradability claim permitted from any VAL-008 read. Design:
+`python/experiments/VAL-008/design.md`.
+
+## Chapter 04 · CF-HTFCAP-001 Registration (2026-07-16, checkpoint-013) — HTF Context × Capture Scale
+
+**Status:** **REGISTERED 2026-07-16** (checkpoint-013 D2, operator-signed) — registration
+act only, no status transition. D0 card: `candidate-families/cf-htfcap-001.md`; SPDR pack:
+`docs/references/spdr-pack-htfcap-001.md`; frozen decisions:
+`candidate-families/proposal-ref-ab-open-questions.md`.
+**Route:** SPDR-004 → full XENA (XENA-HTFCAP-001) if `WORTH_EXPLORING`; **EXP lane not
+used.** Mechanism class: conditioning/context filters on LTF bases + hold-scale capture.
+**Universe:** 10 Bybit USDT linear perps via **online instrument selection rule** (default:
+highest trailing 24h volume at each configured rebalance/asset-reset point; selection at t
+uses volume ≤ t−1 only; no fixed pre-run ticker list — rule + frequency are the frozen
+declarations). Anti-survivorship binds project-wide; at SPDR the currently-most-liquid 10
+are acceptable (justification, not characterisation — operator D3 rationale 2026-07-16);
+at XENA the point-in-time universe includes delisted symbols.
+**Promote rule (SPDR pack §6 normative):** cluster K≥3 on primary bps lift vs matched
+baselines (unfiltered + naive momentum + random-sign control), neighbourhood rule,
+TRAIN-only, dependence-honest uncertainty. Hold axis must include 2× and 4× HTF-span holds.
+Funding: disclose @ SPDR, bind @ XENA.
+**Hard bans (card §4):** non-causal HTF/LTF; unit lies (L-21 pin at every seam); costless
+net-edge claims / cadence-max on filter theses (L-26); passive-limit edge without
+decomposition (P-10); SPDR as tradability; chapter-03 XENA registry pins on Bybit without
+fresh CAL (INFR-010 R4 — INFR-014); single-lottery-cell family wins.
+**XENA gate:** blocked until INFR-014 fresh CAL hash-pin exists.
+**Slot accounting: 0 slots; 0 counted TEST reads; TRAIN-only; holdout sealed.** No
+tradability claim permitted from any SPDR read.
+
+## Chapter 04 · CF-EPSOSC-001 Registration (2026-07-16, checkpoint-013) — Episode-Clearing Oscillation Harvest
+
+**Status:** **REGISTERED 2026-07-16** (checkpoint-013 D2, operator-signed) — registration
+act only, no status transition. D0 card: `candidate-families/cf-epsosc-001.md`; SPDR pack:
+`docs/references/spdr-pack-epsosc-001.md`; frozen decisions:
+`candidate-families/proposal-ref-ab-open-questions.md`.
+**Route:** SPDR-005 → full XENA (XENA-EPSOSC-001) if `WORTH_EXPLORING`; **EXP lane not
+used.** Mechanism class: episode-native path / oscillation harvest (structure search).
+Parallel to CF-HTFCAP-001, separate packs/universes (Q3).
+**Universe:** same online selection rule as CF-HTFCAP-001 (10 assets, trailing 24h volume,
+≤ t−1 causal, rule + rebalance frequency frozen — no fixed list; D3/D5 as above).
+**Promote rule (SPDR pack §6 normative):** cluster K≥3 on bps/episode (or declared
+equivalent) vs matched random-timing / shuffled-episode controls; neighbourhood rule; not
+banned-grid-like. Episode objects at SPDR: (1) stretch-from-rolling-anchor fade,
+(2) vol-expansion arm → fade. One-sided required; two-sided ≤25% of cells. VR diagnostic
+parallel facet, not a sole hard-gate. Funding: disclose @ SPDR, bind @ XENA.
+**Hard bans (card §4):** non-causal construction; unit lies / local accounting; costless
+net-edge theater; passive fill as free alpha without decomposition; **identical P-12 grid
+object (banded rebalance + hard inventory cap symmetric grid) out of family**; SPDR as
+deployability; void registry on Bybit without fresh CAL; single-lottery-cell promotes.
+**XENA gate:** blocked until INFR-014 fresh CAL hash-pin exists.
+**Slot accounting: 0 slots; 0 counted TEST reads; TRAIN-only; holdout sealed.** No
+tradability claim permitted from any SPDR read.
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:
