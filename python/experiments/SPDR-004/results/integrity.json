@@ -1,0 +1,201 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "Registration",
+      "pass": true,
+      "detail": "REGISTERED + multiplicity row + 0 slots"
+    },
+    {
+      "id": 2,
+      "name": "TRAIN fence",
+      "pass": true,
+      "detail": "max_exit_ns=1702857000000000000 train_end_ns=1702857600000000000"
+    },
+    {
+      "id": 3,
+      "name": "Causal t-1 / HTF CloseTime < Open(t)",
+      "pass": true,
+      "detail": "all mapped HTF closes strictly before LTF open"
+    },
+    {
+      "id": 4,
+      "name": "Online selection causality",
+      "pass": true,
+      "detail": "volume windows end < rebalance_ts"
+    },
+    {
+      "id": 5,
+      "name": "Matched control + seed battery",
+      "pass": true,
+      "detail": "matched=True seed_regen=True"
+    },
+    {
+      "id": 6,
+      "name": "Per-stratum emission",
+      "pass": true,
+      "detail": "full cell table path"
+    },
+    {
+      "id": 7,
+      "name": "L-28 derangement",
+      "pass": true,
+      "detail": "permutation destroy has 0 fixed points"
+    },
+    {
+      "id": 8,
+      "name": "L-21 unit_pin.json",
+      "pass": true,
+      "detail": "measured TRAIN ATR bps written"
+    },
+    {
+      "id": 9,
+      "name": "Block rule on CIs + L-20 emit",
+      "pass": true,
+      "detail": "block_h_ci / seed_range / block_sens / two-sample lift CI in results"
+    },
+    {
+      "id": 10,
+      "name": "Golden trace G1\u2013G3",
+      "pass": true,
+      "detail": "G1=True G2=True G3=True"
+    },
+    {
+      "id": 11,
+      "name": "No local adjudication P&L",
+      "pass": true,
+      "detail": "screen metrics = xen.evaluation only"
+    }
+  ],
+  "pass_count": 11,
+  "all_pass": true,
+  "golden": {
+    "G1": {
+      "ok": true,
+      "ltf_bar": 349,
+      "htf_idx": 28,
+      "htf_close_ns": 1657861200000000000,
+      "ltf_open_ns": 1657861500000000000,
+      "htf_dir": 1,
+      "r_bps_H12": 5.393743257821771,
+      "forming_bar_not_used": true
+    },
+    "G2": {
+      "ok": true,
+      "ltf_bar": 465,
+      "adx": 35.00333478100789,
+      "htf_close_ns": 1658174400000000000,
+      "exit_open_ns": 1658204100000000000
+    },
+    "G3": {
+      "ok": true,
+      "rebalance_ts": "2023-04-02 00:00:00+00:00",
+      "rank_key": "trailing_24h_notional_usdt",
+      "expected": [
+        [
+          "BTCUSDT",
+          1
+        ],
+        [
+          "ETHUSDT",
+          2
+        ],
+        [
+          "XRPUSDT",
+          3
+        ],
+        [
+          "DOGEUSDT",
+          4
+        ],
+        [
+          "ARBUSDT",
+          5
+        ],
+        [
+          "SOLUSDT",
+          6
+        ],
+        [
+          "ZRXUSDT",
+          7
+        ],
+        [
+          "ICXUSDT",
+          8
+        ],
+        [
+          "ANKRUSDT",
+          9
+        ],
+        [
+          "LTCUSDT",
+          10
+        ]
+      ],
+      "got": [
+        [
+          "BTCUSDT",
+          1
+        ],
+        [
+          "ETHUSDT",
+          2
+        ],
+        [
+          "XRPUSDT",
+          3
+        ],
+        [
+          "DOGEUSDT",
+          4
+        ],
+        [
+          "ARBUSDT",
+          5
+        ],
+        [
+          "SOLUSDT",
+          6
+        ],
+        [
+          "ZRXUSDT",
+          7
+        ],
+        [
+          "ICXUSDT",
+          8
+        ],
+        [
+          "ANKRUSDT",
+          9
+        ],
+        [
+          "LTCUSDT",
+          10
+        ]
+      ]
+    }
+  },
+  "primary_symbols": [
+    "SOLUSDT",
+    "ETHUSDT",
+    "BTCUSDT",
+    "XRPUSDT",
+    "OPUSDT",
+    "DOGEUSDT",
+    "1000PEPEUSDT",
+    "APTUSDT",
+    "LTCUSDT",
+    "LINKUSDT"
+  ],
+  "n_member_symbols": 119,
+  "n_treatment_cells": 720,
+  "n_baseline_cells": 240,
+  "fence": {
+    "analysis_start_utc": "2021-06-29T06:53:00+00:00",
+    "train_end_utc": "2023-12-18T00:00:00+00:00",
+    "holdout_start_utc": "2025-01-08T00:00:00+00:00",
+    "manifest_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448"
+  }
+}

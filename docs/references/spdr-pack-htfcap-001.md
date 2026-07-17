@@ -1,8 +1,9 @@
 # SPDR Pack — HTFCAP (REF-A / proposal CF-HTFCAP-001)
 
-**Status:** `D0-FROZEN` 2026-07-16 — open questions resolved; **SPDR-ID not yet assigned**.  
+**Status:** `D0-FROZEN` 2026-07-16 — open questions resolved; **SPDR-004 assigned**; design
+COMPLETE (`python/experiments/SPDR-004/design.md`) — screen execution separate go.  
 **Lane:** SPDR (TRAIN-only, disposition-only). Integrity boundary: `docs/references/spdr-lane.md`.  
-**Family D0:** `docs/signal-registry/candidate-families/cf-htfcap-001.md`  
+**Family D0:** `docs/signal-registry/candidate-families/cf-htfcap-001.md` (REGISTERED).  
 **Promote target if promising:** full **XENA** universe (not EXP).
 
 ---

@@ -1,0 +1,2456 @@
+{
+  "primary_unit": "gross open-to-open bps/trade (no ATR divisor on promote facet)",
+  "disclosure_atr": "LTF ATR(14)[t-1] on domain LTF bar series",
+  "htf_vol_ratio": "HTF ATR(14)[last closed]/rolling-median ATR(W=100 HTF bars)",
+  "measured_at": "2026-07-16T23:41:36.859531+00:00",
+  "per_stratum": [
+    {
+      "symbol": "BTCUSDT",
+      "domain": "1h/5m",
+      "ltf_min": 5,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 13.455769193167809,
+      "n_bars": 149697
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "4h/15m",
+      "ltf_min": 15,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 26.551881083395905,
+      "n_bars": 49551
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "1d/1h",
+      "ltf_min": 60,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 58.026460041633044,
+      "n_bars": 11807
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "1h/5m",
+      "ltf_min": 5,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 33.21547668065468,
+      "n_bars": 149619
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "4h/15m",
+      "ltf_min": 15,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 62.10229154713888,
+      "n_bars": 49596
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "1d/1h",
+      "ltf_min": 60,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 129.6729873692578,
+      "n_bars": 11827
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "1h/5m",
+      "ltf_min": 5,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 16.937085271089323,
+      "n_bars": 149569
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "4h/15m",
+      "ltf_min": 15,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 32.42347702393151,
+      "n_bars": 49541
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "1d/1h",
+      "ltf_min": 60,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 69.70902577744776,
+      "n_bars": 11807
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "1h/5m",
+      "ltf_min": 5,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 22.73886978683823,
+      "n_bars": 148620
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "4h/15m",
+      "ltf_min": 15,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 42.56247903245227,
+      "n_bars": 49363
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "1d/1h",
+      "ltf_min": 60,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 92.82079667056026,
+      "n_bars": 11800
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "1h/5m",
+      "ltf_min": 5,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 40.47174384866651,
+      "n_bars": 145019
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "4h/15m",
+      "ltf_min": 15,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 74.65660095386653,
+      "n_bars": 48298
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "1d/1h",
+      "ltf_min": 60,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 154.6062673558597,
+      "n_bars": 11604
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "1h/5m",
+      "ltf_min": 5,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 26.323178922636068,
+      "n_bars": 136054
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "4h/15m",
+      "ltf_min": 15,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 49.16039822665997,
+      "n_bars": 44911
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "1d/1h",
+      "ltf_min": 60,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 104.85146451431373,
+      "n_bars": 10962
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "1h/5m",
+      "ltf_min": 5,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 44.262161030125796,
+      "n_bars": 65436
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "4h/15m",
+      "ltf_min": 15,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 81.88787512808042,
+      "n_bars": 21470
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "1d/1h",
+      "ltf_min": 60,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 170.86406105254588,
+      "n_bars": 4799
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "1h/5m",
+      "ltf_min": 5,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 35.84340127810974,
+      "n_bars": 112992
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "4h/15m",
+      "ltf_min": 15,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 66.76535640963387,
+      "n_bars": 37311
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "1d/1h",
+      "ltf_min": 60,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 139.28681225499858,
+      "n_bars": 8806
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "1h/5m",
+      "ltf_min": 5,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 24.172113056785655,
+      "n_bars": 133250
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "4h/15m",
+      "ltf_min": 15,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 46.26190352581385,
+      "n_bars": 44384
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "1d/1h",
+      "ltf_min": 60,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 98.55985012213208,
+      "n_bars": 10918
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "1h/5m",
+      "ltf_min": 5,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 28.12620370652737,
+      "n_bars": 139826
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "4h/15m",
+      "ltf_min": 15,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 52.760873270013064,
+      "n_bars": 46844
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "1d/1h",
+      "ltf_min": 60,
+      "disclosure_atr": "LTF ATR(14)[t-1] via xen.zigzag.wilder_atr; HTF vol_ratio=ATR(14)/med_ATR(W=100)",
+      "atr_file_line": "xen/zigzag.py:wilder_atr + screen_code/spdr006_screen.py:wilder_adx_di+causal_rolling_median",
+      "train_median_atr_bps": 109.00829438597381,
+      "n_bars": 11458
+    }
+  ],
+  "train_median_spread_bps": {
+    "1000PEPEUSDT": 1.7161980492546154,
+    "APTUSDT": 2.3246721683908245,
+    "BTCUSDT": 0.3043344268944463,
+    "DOGEUSDT": 1.6526028758463238,
+    "ETHUSDT": 0.48250240807947353,
+    "LINKUSDT": 1.6894081376620922,
+    "LTCUSDT": 1.6065547433527103,
+    "OPUSDT": 2.8713510140776055,
+    "SOLUSDT": 1.6251570577282772,
+    "XRPUSDT": 2.0601602229157683
+  },
+  "spread_source": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/INFR-011/data/staging/bars",
+  "spread_note": "INFR-011 staging SpreadBps TRAIN median; RT component = full quote width; fees = BYBIT_USDT_PERP_FEES taker 5.5 bps/side (11 bps RT); funding disclosed GAP=1 bps/8h",
+  "money_unit_floor_examples": [
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 0.5,
+      "hold_bars": 6,
+      "hold_hours": 0.5,
+      "spread_bps_measured": 1.7161980492546154,
+      "cost_proxy": {
+        "total_bps": 12.778698049254615,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.7161980492546154,
+        "funding_rt_bps": 0.0625,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 0.5,
+      "hold_bars": 8,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 1.7161980492546154,
+      "cost_proxy": {
+        "total_bps": 12.966198049254615,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.7161980492546154,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 0.5,
+      "hold_bars": 12,
+      "hold_hours": 12.0,
+      "spread_bps_measured": 1.7161980492546154,
+      "cost_proxy": {
+        "total_bps": 14.216198049254615,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.7161980492546154,
+        "funding_rt_bps": 1.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 1.0,
+      "hold_bars": 12,
+      "hold_hours": 1.0,
+      "spread_bps_measured": 1.7161980492546154,
+      "cost_proxy": {
+        "total_bps": 12.841198049254615,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.7161980492546154,
+        "funding_rt_bps": 0.125,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 1.0,
+      "hold_bars": 16,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 1.7161980492546154,
+      "cost_proxy": {
+        "total_bps": 13.216198049254615,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.7161980492546154,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 1.0,
+      "hold_bars": 24,
+      "hold_hours": 24.0,
+      "spread_bps_measured": 1.7161980492546154,
+      "cost_proxy": {
+        "total_bps": 15.716198049254615,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.7161980492546154,
+        "funding_rt_bps": 3.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 2.0,
+      "hold_bars": 24,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 1.7161980492546154,
+      "cost_proxy": {
+        "total_bps": 12.966198049254615,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.7161980492546154,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 2.0,
+      "hold_bars": 32,
+      "hold_hours": 8.0,
+      "spread_bps_measured": 1.7161980492546154,
+      "cost_proxy": {
+        "total_bps": 13.716198049254615,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.7161980492546154,
+        "funding_rt_bps": 1.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 2.0,
+      "hold_bars": 48,
+      "hold_hours": 48.0,
+      "spread_bps_measured": 1.7161980492546154,
+      "cost_proxy": {
+        "total_bps": 18.716198049254615,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.7161980492546154,
+        "funding_rt_bps": 6.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 4.0,
+      "hold_bars": 48,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 1.7161980492546154,
+      "cost_proxy": {
+        "total_bps": 13.216198049254615,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.7161980492546154,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 4.0,
+      "hold_bars": 64,
+      "hold_hours": 16.0,
+      "spread_bps_measured": 1.7161980492546154,
+      "cost_proxy": {
+        "total_bps": 14.716198049254615,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.7161980492546154,
+        "funding_rt_bps": 2.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 4.0,
+      "hold_bars": 96,
+      "hold_hours": 96.0,
+      "spread_bps_measured": 1.7161980492546154,
+      "cost_proxy": {
+        "total_bps": 24.716198049254615,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.7161980492546154,
+        "funding_rt_bps": 12.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 0.5,
+      "hold_bars": 6,
+      "hold_hours": 0.5,
+      "spread_bps_measured": 2.3246721683908245,
+      "cost_proxy": {
+        "total_bps": 13.387172168390824,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.3246721683908245,
+        "funding_rt_bps": 0.0625,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 0.5,
+      "hold_bars": 8,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 2.3246721683908245,
+      "cost_proxy": {
+        "total_bps": 13.574672168390824,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.3246721683908245,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 0.5,
+      "hold_bars": 12,
+      "hold_hours": 12.0,
+      "spread_bps_measured": 2.3246721683908245,
+      "cost_proxy": {
+        "total_bps": 14.824672168390824,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.3246721683908245,
+        "funding_rt_bps": 1.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 1.0,
+      "hold_bars": 12,
+      "hold_hours": 1.0,
+      "spread_bps_measured": 2.3246721683908245,
+      "cost_proxy": {
+        "total_bps": 13.449672168390824,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.3246721683908245,
+        "funding_rt_bps": 0.125,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 1.0,
+      "hold_bars": 16,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 2.3246721683908245,
+      "cost_proxy": {
+        "total_bps": 13.824672168390824,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.3246721683908245,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 1.0,
+      "hold_bars": 24,
+      "hold_hours": 24.0,
+      "spread_bps_measured": 2.3246721683908245,
+      "cost_proxy": {
+        "total_bps": 16.324672168390826,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.3246721683908245,
+        "funding_rt_bps": 3.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 2.0,
+      "hold_bars": 24,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 2.3246721683908245,
+      "cost_proxy": {
+        "total_bps": 13.574672168390824,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.3246721683908245,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 2.0,
+      "hold_bars": 32,
+      "hold_hours": 8.0,
+      "spread_bps_measured": 2.3246721683908245,
+      "cost_proxy": {
+        "total_bps": 14.324672168390824,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.3246721683908245,
+        "funding_rt_bps": 1.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 2.0,
+      "hold_bars": 48,
+      "hold_hours": 48.0,
+      "spread_bps_measured": 2.3246721683908245,
+      "cost_proxy": {
+        "total_bps": 19.324672168390826,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.3246721683908245,
+        "funding_rt_bps": 6.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 4.0,
+      "hold_bars": 48,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 2.3246721683908245,
+      "cost_proxy": {
+        "total_bps": 13.824672168390824,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.3246721683908245,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 4.0,
+      "hold_bars": 64,
+      "hold_hours": 16.0,
+      "spread_bps_measured": 2.3246721683908245,
+      "cost_proxy": {
+        "total_bps": 15.324672168390824,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.3246721683908245,
+        "funding_rt_bps": 2.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "APTUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 4.0,
+      "hold_bars": 96,
+      "hold_hours": 96.0,
+      "spread_bps_measured": 2.3246721683908245,
+      "cost_proxy": {
+        "total_bps": 25.324672168390826,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.3246721683908245,
+        "funding_rt_bps": 12.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 0.5,
+      "hold_bars": 6,
+      "hold_hours": 0.5,
+      "spread_bps_measured": 0.3043344268944463,
+      "cost_proxy": {
+        "total_bps": 11.366834426894446,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.3043344268944463,
+        "funding_rt_bps": 0.0625,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 0.5,
+      "hold_bars": 8,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 0.3043344268944463,
+      "cost_proxy": {
+        "total_bps": 11.554334426894446,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.3043344268944463,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 0.5,
+      "hold_bars": 12,
+      "hold_hours": 12.0,
+      "spread_bps_measured": 0.3043344268944463,
+      "cost_proxy": {
+        "total_bps": 12.804334426894446,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.3043344268944463,
+        "funding_rt_bps": 1.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 1.0,
+      "hold_bars": 12,
+      "hold_hours": 1.0,
+      "spread_bps_measured": 0.3043344268944463,
+      "cost_proxy": {
+        "total_bps": 11.429334426894446,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.3043344268944463,
+        "funding_rt_bps": 0.125,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 1.0,
+      "hold_bars": 16,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 0.3043344268944463,
+      "cost_proxy": {
+        "total_bps": 11.804334426894446,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.3043344268944463,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 1.0,
+      "hold_bars": 24,
+      "hold_hours": 24.0,
+      "spread_bps_measured": 0.3043344268944463,
+      "cost_proxy": {
+        "total_bps": 14.304334426894446,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.3043344268944463,
+        "funding_rt_bps": 3.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 2.0,
+      "hold_bars": 24,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 0.3043344268944463,
+      "cost_proxy": {
+        "total_bps": 11.554334426894446,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.3043344268944463,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 2.0,
+      "hold_bars": 32,
+      "hold_hours": 8.0,
+      "spread_bps_measured": 0.3043344268944463,
+      "cost_proxy": {
+        "total_bps": 12.304334426894446,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.3043344268944463,
+        "funding_rt_bps": 1.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 2.0,
+      "hold_bars": 48,
+      "hold_hours": 48.0,
+      "spread_bps_measured": 0.3043344268944463,
+      "cost_proxy": {
+        "total_bps": 17.304334426894446,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.3043344268944463,
+        "funding_rt_bps": 6.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 4.0,
+      "hold_bars": 48,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 0.3043344268944463,
+      "cost_proxy": {
+        "total_bps": 11.804334426894446,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.3043344268944463,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 4.0,
+      "hold_bars": 64,
+      "hold_hours": 16.0,
+      "spread_bps_measured": 0.3043344268944463,
+      "cost_proxy": {
+        "total_bps": 13.304334426894446,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.3043344268944463,
+        "funding_rt_bps": 2.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "BTCUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 4.0,
+      "hold_bars": 96,
+      "hold_hours": 96.0,
+      "spread_bps_measured": 0.3043344268944463,
+      "cost_proxy": {
+        "total_bps": 23.304334426894446,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.3043344268944463,
+        "funding_rt_bps": 12.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 0.5,
+      "hold_bars": 6,
+      "hold_hours": 0.5,
+      "spread_bps_measured": 1.6526028758463238,
+      "cost_proxy": {
+        "total_bps": 12.715102875846323,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6526028758463238,
+        "funding_rt_bps": 0.0625,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 0.5,
+      "hold_bars": 8,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 1.6526028758463238,
+      "cost_proxy": {
+        "total_bps": 12.902602875846323,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6526028758463238,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 0.5,
+      "hold_bars": 12,
+      "hold_hours": 12.0,
+      "spread_bps_measured": 1.6526028758463238,
+      "cost_proxy": {
+        "total_bps": 14.152602875846323,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6526028758463238,
+        "funding_rt_bps": 1.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 1.0,
+      "hold_bars": 12,
+      "hold_hours": 1.0,
+      "spread_bps_measured": 1.6526028758463238,
+      "cost_proxy": {
+        "total_bps": 12.777602875846323,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6526028758463238,
+        "funding_rt_bps": 0.125,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 1.0,
+      "hold_bars": 16,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 1.6526028758463238,
+      "cost_proxy": {
+        "total_bps": 13.152602875846323,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6526028758463238,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 1.0,
+      "hold_bars": 24,
+      "hold_hours": 24.0,
+      "spread_bps_measured": 1.6526028758463238,
+      "cost_proxy": {
+        "total_bps": 15.652602875846323,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6526028758463238,
+        "funding_rt_bps": 3.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 2.0,
+      "hold_bars": 24,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 1.6526028758463238,
+      "cost_proxy": {
+        "total_bps": 12.902602875846323,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6526028758463238,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 2.0,
+      "hold_bars": 32,
+      "hold_hours": 8.0,
+      "spread_bps_measured": 1.6526028758463238,
+      "cost_proxy": {
+        "total_bps": 13.652602875846323,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6526028758463238,
+        "funding_rt_bps": 1.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 2.0,
+      "hold_bars": 48,
+      "hold_hours": 48.0,
+      "spread_bps_measured": 1.6526028758463238,
+      "cost_proxy": {
+        "total_bps": 18.652602875846323,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6526028758463238,
+        "funding_rt_bps": 6.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 4.0,
+      "hold_bars": 48,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 1.6526028758463238,
+      "cost_proxy": {
+        "total_bps": 13.152602875846323,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6526028758463238,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 4.0,
+      "hold_bars": 64,
+      "hold_hours": 16.0,
+      "spread_bps_measured": 1.6526028758463238,
+      "cost_proxy": {
+        "total_bps": 14.652602875846323,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6526028758463238,
+        "funding_rt_bps": 2.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 4.0,
+      "hold_bars": 96,
+      "hold_hours": 96.0,
+      "spread_bps_measured": 1.6526028758463238,
+      "cost_proxy": {
+        "total_bps": 24.652602875846323,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6526028758463238,
+        "funding_rt_bps": 12.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 0.5,
+      "hold_bars": 6,
+      "hold_hours": 0.5,
+      "spread_bps_measured": 0.48250240807947353,
+      "cost_proxy": {
+        "total_bps": 11.545002408079473,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.48250240807947353,
+        "funding_rt_bps": 0.0625,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 0.5,
+      "hold_bars": 8,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 0.48250240807947353,
+      "cost_proxy": {
+        "total_bps": 11.732502408079473,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.48250240807947353,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 0.5,
+      "hold_bars": 12,
+      "hold_hours": 12.0,
+      "spread_bps_measured": 0.48250240807947353,
+      "cost_proxy": {
+        "total_bps": 12.982502408079473,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.48250240807947353,
+        "funding_rt_bps": 1.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 1.0,
+      "hold_bars": 12,
+      "hold_hours": 1.0,
+      "spread_bps_measured": 0.48250240807947353,
+      "cost_proxy": {
+        "total_bps": 11.607502408079473,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.48250240807947353,
+        "funding_rt_bps": 0.125,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 1.0,
+      "hold_bars": 16,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 0.48250240807947353,
+      "cost_proxy": {
+        "total_bps": 11.982502408079473,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.48250240807947353,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 1.0,
+      "hold_bars": 24,
+      "hold_hours": 24.0,
+      "spread_bps_measured": 0.48250240807947353,
+      "cost_proxy": {
+        "total_bps": 14.482502408079473,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.48250240807947353,
+        "funding_rt_bps": 3.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 2.0,
+      "hold_bars": 24,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 0.48250240807947353,
+      "cost_proxy": {
+        "total_bps": 11.732502408079473,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.48250240807947353,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 2.0,
+      "hold_bars": 32,
+      "hold_hours": 8.0,
+      "spread_bps_measured": 0.48250240807947353,
+      "cost_proxy": {
+        "total_bps": 12.482502408079473,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.48250240807947353,
+        "funding_rt_bps": 1.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 2.0,
+      "hold_bars": 48,
+      "hold_hours": 48.0,
+      "spread_bps_measured": 0.48250240807947353,
+      "cost_proxy": {
+        "total_bps": 17.482502408079473,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.48250240807947353,
+        "funding_rt_bps": 6.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 4.0,
+      "hold_bars": 48,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 0.48250240807947353,
+      "cost_proxy": {
+        "total_bps": 11.982502408079473,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.48250240807947353,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 4.0,
+      "hold_bars": 64,
+      "hold_hours": 16.0,
+      "spread_bps_measured": 0.48250240807947353,
+      "cost_proxy": {
+        "total_bps": 13.482502408079473,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.48250240807947353,
+        "funding_rt_bps": 2.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "ETHUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 4.0,
+      "hold_bars": 96,
+      "hold_hours": 96.0,
+      "spread_bps_measured": 0.48250240807947353,
+      "cost_proxy": {
+        "total_bps": 23.482502408079473,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 0.48250240807947353,
+        "funding_rt_bps": 12.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 0.5,
+      "hold_bars": 6,
+      "hold_hours": 0.5,
+      "spread_bps_measured": 1.6894081376620922,
+      "cost_proxy": {
+        "total_bps": 12.751908137662092,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6894081376620922,
+        "funding_rt_bps": 0.0625,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 0.5,
+      "hold_bars": 8,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 1.6894081376620922,
+      "cost_proxy": {
+        "total_bps": 12.939408137662092,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6894081376620922,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 0.5,
+      "hold_bars": 12,
+      "hold_hours": 12.0,
+      "spread_bps_measured": 1.6894081376620922,
+      "cost_proxy": {
+        "total_bps": 14.189408137662092,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6894081376620922,
+        "funding_rt_bps": 1.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 1.0,
+      "hold_bars": 12,
+      "hold_hours": 1.0,
+      "spread_bps_measured": 1.6894081376620922,
+      "cost_proxy": {
+        "total_bps": 12.814408137662092,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6894081376620922,
+        "funding_rt_bps": 0.125,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 1.0,
+      "hold_bars": 16,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 1.6894081376620922,
+      "cost_proxy": {
+        "total_bps": 13.189408137662092,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6894081376620922,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 1.0,
+      "hold_bars": 24,
+      "hold_hours": 24.0,
+      "spread_bps_measured": 1.6894081376620922,
+      "cost_proxy": {
+        "total_bps": 15.689408137662092,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6894081376620922,
+        "funding_rt_bps": 3.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 2.0,
+      "hold_bars": 24,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 1.6894081376620922,
+      "cost_proxy": {
+        "total_bps": 12.939408137662092,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6894081376620922,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 2.0,
+      "hold_bars": 32,
+      "hold_hours": 8.0,
+      "spread_bps_measured": 1.6894081376620922,
+      "cost_proxy": {
+        "total_bps": 13.689408137662092,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6894081376620922,
+        "funding_rt_bps": 1.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 2.0,
+      "hold_bars": 48,
+      "hold_hours": 48.0,
+      "spread_bps_measured": 1.6894081376620922,
+      "cost_proxy": {
+        "total_bps": 18.68940813766209,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6894081376620922,
+        "funding_rt_bps": 6.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 4.0,
+      "hold_bars": 48,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 1.6894081376620922,
+      "cost_proxy": {
+        "total_bps": 13.189408137662092,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6894081376620922,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 4.0,
+      "hold_bars": 64,
+      "hold_hours": 16.0,
+      "spread_bps_measured": 1.6894081376620922,
+      "cost_proxy": {
+        "total_bps": 14.689408137662092,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6894081376620922,
+        "funding_rt_bps": 2.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LINKUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 4.0,
+      "hold_bars": 96,
+      "hold_hours": 96.0,
+      "spread_bps_measured": 1.6894081376620922,
+      "cost_proxy": {
+        "total_bps": 24.68940813766209,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6894081376620922,
+        "funding_rt_bps": 12.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 0.5,
+      "hold_bars": 6,
+      "hold_hours": 0.5,
+      "spread_bps_measured": 1.6065547433527103,
+      "cost_proxy": {
+        "total_bps": 12.66905474335271,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6065547433527103,
+        "funding_rt_bps": 0.0625,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 0.5,
+      "hold_bars": 8,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 1.6065547433527103,
+      "cost_proxy": {
+        "total_bps": 12.85655474335271,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6065547433527103,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 0.5,
+      "hold_bars": 12,
+      "hold_hours": 12.0,
+      "spread_bps_measured": 1.6065547433527103,
+      "cost_proxy": {
+        "total_bps": 14.10655474335271,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6065547433527103,
+        "funding_rt_bps": 1.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 1.0,
+      "hold_bars": 12,
+      "hold_hours": 1.0,
+      "spread_bps_measured": 1.6065547433527103,
+      "cost_proxy": {
+        "total_bps": 12.73155474335271,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6065547433527103,
+        "funding_rt_bps": 0.125,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 1.0,
+      "hold_bars": 16,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 1.6065547433527103,
+      "cost_proxy": {
+        "total_bps": 13.10655474335271,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6065547433527103,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 1.0,
+      "hold_bars": 24,
+      "hold_hours": 24.0,
+      "spread_bps_measured": 1.6065547433527103,
+      "cost_proxy": {
+        "total_bps": 15.60655474335271,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6065547433527103,
+        "funding_rt_bps": 3.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 2.0,
+      "hold_bars": 24,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 1.6065547433527103,
+      "cost_proxy": {
+        "total_bps": 12.85655474335271,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6065547433527103,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 2.0,
+      "hold_bars": 32,
+      "hold_hours": 8.0,
+      "spread_bps_measured": 1.6065547433527103,
+      "cost_proxy": {
+        "total_bps": 13.60655474335271,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6065547433527103,
+        "funding_rt_bps": 1.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 2.0,
+      "hold_bars": 48,
+      "hold_hours": 48.0,
+      "spread_bps_measured": 1.6065547433527103,
+      "cost_proxy": {
+        "total_bps": 18.60655474335271,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6065547433527103,
+        "funding_rt_bps": 6.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 4.0,
+      "hold_bars": 48,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 1.6065547433527103,
+      "cost_proxy": {
+        "total_bps": 13.10655474335271,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6065547433527103,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 4.0,
+      "hold_bars": 64,
+      "hold_hours": 16.0,
+      "spread_bps_measured": 1.6065547433527103,
+      "cost_proxy": {
+        "total_bps": 14.60655474335271,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6065547433527103,
+        "funding_rt_bps": 2.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "LTCUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 4.0,
+      "hold_bars": 96,
+      "hold_hours": 96.0,
+      "spread_bps_measured": 1.6065547433527103,
+      "cost_proxy": {
+        "total_bps": 24.60655474335271,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6065547433527103,
+        "funding_rt_bps": 12.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 0.5,
+      "hold_bars": 6,
+      "hold_hours": 0.5,
+      "spread_bps_measured": 2.8713510140776055,
+      "cost_proxy": {
+        "total_bps": 13.933851014077606,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.8713510140776055,
+        "funding_rt_bps": 0.0625,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 0.5,
+      "hold_bars": 8,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 2.8713510140776055,
+      "cost_proxy": {
+        "total_bps": 14.121351014077606,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.8713510140776055,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 0.5,
+      "hold_bars": 12,
+      "hold_hours": 12.0,
+      "spread_bps_measured": 2.8713510140776055,
+      "cost_proxy": {
+        "total_bps": 15.371351014077606,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.8713510140776055,
+        "funding_rt_bps": 1.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 1.0,
+      "hold_bars": 12,
+      "hold_hours": 1.0,
+      "spread_bps_measured": 2.8713510140776055,
+      "cost_proxy": {
+        "total_bps": 13.996351014077606,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.8713510140776055,
+        "funding_rt_bps": 0.125,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 1.0,
+      "hold_bars": 16,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 2.8713510140776055,
+      "cost_proxy": {
+        "total_bps": 14.371351014077606,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.8713510140776055,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 1.0,
+      "hold_bars": 24,
+      "hold_hours": 24.0,
+      "spread_bps_measured": 2.8713510140776055,
+      "cost_proxy": {
+        "total_bps": 16.871351014077604,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.8713510140776055,
+        "funding_rt_bps": 3.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 2.0,
+      "hold_bars": 24,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 2.8713510140776055,
+      "cost_proxy": {
+        "total_bps": 14.121351014077606,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.8713510140776055,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 2.0,
+      "hold_bars": 32,
+      "hold_hours": 8.0,
+      "spread_bps_measured": 2.8713510140776055,
+      "cost_proxy": {
+        "total_bps": 14.871351014077606,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.8713510140776055,
+        "funding_rt_bps": 1.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 2.0,
+      "hold_bars": 48,
+      "hold_hours": 48.0,
+      "spread_bps_measured": 2.8713510140776055,
+      "cost_proxy": {
+        "total_bps": 19.871351014077604,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.8713510140776055,
+        "funding_rt_bps": 6.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 4.0,
+      "hold_bars": 48,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 2.8713510140776055,
+      "cost_proxy": {
+        "total_bps": 14.371351014077606,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.8713510140776055,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 4.0,
+      "hold_bars": 64,
+      "hold_hours": 16.0,
+      "spread_bps_measured": 2.8713510140776055,
+      "cost_proxy": {
+        "total_bps": 15.871351014077606,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.8713510140776055,
+        "funding_rt_bps": 2.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "OPUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 4.0,
+      "hold_bars": 96,
+      "hold_hours": 96.0,
+      "spread_bps_measured": 2.8713510140776055,
+      "cost_proxy": {
+        "total_bps": 25.871351014077604,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.8713510140776055,
+        "funding_rt_bps": 12.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 0.5,
+      "hold_bars": 6,
+      "hold_hours": 0.5,
+      "spread_bps_measured": 1.6251570577282772,
+      "cost_proxy": {
+        "total_bps": 12.687657057728277,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6251570577282772,
+        "funding_rt_bps": 0.0625,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 0.5,
+      "hold_bars": 8,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 1.6251570577282772,
+      "cost_proxy": {
+        "total_bps": 12.875157057728277,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6251570577282772,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 0.5,
+      "hold_bars": 12,
+      "hold_hours": 12.0,
+      "spread_bps_measured": 1.6251570577282772,
+      "cost_proxy": {
+        "total_bps": 14.125157057728277,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6251570577282772,
+        "funding_rt_bps": 1.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 1.0,
+      "hold_bars": 12,
+      "hold_hours": 1.0,
+      "spread_bps_measured": 1.6251570577282772,
+      "cost_proxy": {
+        "total_bps": 12.750157057728277,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6251570577282772,
+        "funding_rt_bps": 0.125,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 1.0,
+      "hold_bars": 16,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 1.6251570577282772,
+      "cost_proxy": {
+        "total_bps": 13.125157057728277,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6251570577282772,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 1.0,
+      "hold_bars": 24,
+      "hold_hours": 24.0,
+      "spread_bps_measured": 1.6251570577282772,
+      "cost_proxy": {
+        "total_bps": 15.625157057728277,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6251570577282772,
+        "funding_rt_bps": 3.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 2.0,
+      "hold_bars": 24,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 1.6251570577282772,
+      "cost_proxy": {
+        "total_bps": 12.875157057728277,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6251570577282772,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 2.0,
+      "hold_bars": 32,
+      "hold_hours": 8.0,
+      "spread_bps_measured": 1.6251570577282772,
+      "cost_proxy": {
+        "total_bps": 13.625157057728277,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6251570577282772,
+        "funding_rt_bps": 1.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 2.0,
+      "hold_bars": 48,
+      "hold_hours": 48.0,
+      "spread_bps_measured": 1.6251570577282772,
+      "cost_proxy": {
+        "total_bps": 18.625157057728277,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6251570577282772,
+        "funding_rt_bps": 6.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 4.0,
+      "hold_bars": 48,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 1.6251570577282772,
+      "cost_proxy": {
+        "total_bps": 13.125157057728277,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6251570577282772,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 4.0,
+      "hold_bars": 64,
+      "hold_hours": 16.0,
+      "spread_bps_measured": 1.6251570577282772,
+      "cost_proxy": {
+        "total_bps": 14.625157057728277,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6251570577282772,
+        "funding_rt_bps": 2.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "SOLUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 4.0,
+      "hold_bars": 96,
+      "hold_hours": 96.0,
+      "spread_bps_measured": 1.6251570577282772,
+      "cost_proxy": {
+        "total_bps": 24.625157057728277,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 1.6251570577282772,
+        "funding_rt_bps": 12.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 0.5,
+      "hold_bars": 6,
+      "hold_hours": 0.5,
+      "spread_bps_measured": 2.0601602229157683,
+      "cost_proxy": {
+        "total_bps": 13.12266022291577,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.0601602229157683,
+        "funding_rt_bps": 0.0625,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 0.5,
+      "hold_bars": 8,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 2.0601602229157683,
+      "cost_proxy": {
+        "total_bps": 13.31016022291577,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.0601602229157683,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 0.5,
+      "hold_bars": 12,
+      "hold_hours": 12.0,
+      "spread_bps_measured": 2.0601602229157683,
+      "cost_proxy": {
+        "total_bps": 14.56016022291577,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.0601602229157683,
+        "funding_rt_bps": 1.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 1.0,
+      "hold_bars": 12,
+      "hold_hours": 1.0,
+      "spread_bps_measured": 2.0601602229157683,
+      "cost_proxy": {
+        "total_bps": 13.18516022291577,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.0601602229157683,
+        "funding_rt_bps": 0.125,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 1.0,
+      "hold_bars": 16,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 2.0601602229157683,
+      "cost_proxy": {
+        "total_bps": 13.56016022291577,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.0601602229157683,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 1.0,
+      "hold_bars": 24,
+      "hold_hours": 24.0,
+      "spread_bps_measured": 2.0601602229157683,
+      "cost_proxy": {
+        "total_bps": 16.06016022291577,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.0601602229157683,
+        "funding_rt_bps": 3.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 2.0,
+      "hold_bars": 24,
+      "hold_hours": 2.0,
+      "spread_bps_measured": 2.0601602229157683,
+      "cost_proxy": {
+        "total_bps": 13.31016022291577,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.0601602229157683,
+        "funding_rt_bps": 0.25,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 2.0,
+      "hold_bars": 32,
+      "hold_hours": 8.0,
+      "spread_bps_measured": 2.0601602229157683,
+      "cost_proxy": {
+        "total_bps": 14.06016022291577,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.0601602229157683,
+        "funding_rt_bps": 1.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 2.0,
+      "hold_bars": 48,
+      "hold_hours": 48.0,
+      "spread_bps_measured": 2.0601602229157683,
+      "cost_proxy": {
+        "total_bps": 19.06016022291577,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.0601602229157683,
+        "funding_rt_bps": 6.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "1h/5m",
+      "hold_mult": 4.0,
+      "hold_bars": 48,
+      "hold_hours": 4.0,
+      "spread_bps_measured": 2.0601602229157683,
+      "cost_proxy": {
+        "total_bps": 13.56016022291577,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.0601602229157683,
+        "funding_rt_bps": 0.5,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "4h/15m",
+      "hold_mult": 4.0,
+      "hold_bars": 64,
+      "hold_hours": 16.0,
+      "spread_bps_measured": 2.0601602229157683,
+      "cost_proxy": {
+        "total_bps": 15.06016022291577,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.0601602229157683,
+        "funding_rt_bps": 2.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    },
+    {
+      "symbol": "XRPUSDT",
+      "domain": "1d/1h",
+      "hold_mult": 4.0,
+      "hold_bars": 96,
+      "hold_hours": 96.0,
+      "spread_bps_measured": 2.0601602229157683,
+      "cost_proxy": {
+        "total_bps": 25.06016022291577,
+        "fee_rt_bps": 11.0,
+        "spread_rt_bps": 2.0601602229157683,
+        "funding_rt_bps": 12.0,
+        "funding_coverage": "GAP",
+        "liquidity": "taker",
+        "stress": 1.0
+      },
+      "note": "measured TRAIN-median SpreadBps (not GAP=2)"
+    }
+  ],
+  "fee_rt_taker_bps": 11.0,
+  "fee_taker_bps_per_side": 5.5
+}

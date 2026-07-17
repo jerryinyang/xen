@@ -1,0 +1,232 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "Registration",
+      "pass": true,
+      "detail": "REGISTERED + multiplicity row + 0 slots"
+    },
+    {
+      "id": 2,
+      "name": "TRAIN fence",
+      "pass": true,
+      "detail": "max_exit_ns=1702857000000000000 train_end_ns=1702857600000000000"
+    },
+    {
+      "id": 3,
+      "name": "Causal t-1 / HTF CloseTime < Open(t)",
+      "pass": true,
+      "detail": "all mapped HTF closes strictly before LTF open"
+    },
+    {
+      "id": 4,
+      "name": "Online selection causality",
+      "pass": true,
+      "detail": "volume windows end < rebalance_ts"
+    },
+    {
+      "id": 5,
+      "name": "Matched control + seed battery",
+      "pass": true,
+      "detail": "matched=True seed_regen=True"
+    },
+    {
+      "id": 6,
+      "name": "Per-stratum emission",
+      "pass": true,
+      "detail": "full cell table path"
+    },
+    {
+      "id": 7,
+      "name": "L-28 derangement",
+      "pass": true,
+      "detail": "permutation destroy has 0 fixed points"
+    },
+    {
+      "id": 8,
+      "name": "L-21 unit_pin.json",
+      "pass": true,
+      "detail": "measured TRAIN ATR bps + SpreadBps cost pins written"
+    },
+    {
+      "id": 9,
+      "name": "Block rule on CIs + L-20 emit",
+      "pass": true,
+      "detail": "block_h_ci / seed_range / block_sens / two-sample lift CI in results"
+    },
+    {
+      "id": 10,
+      "name": "Golden trace G1\u2013G3",
+      "pass": true,
+      "detail": "G1=True G2=True G3=True"
+    },
+    {
+      "id": 11,
+      "name": "No local adjudication P&L",
+      "pass": true,
+      "detail": "screen metrics = xen.evaluation only"
+    },
+    {
+      "id": 12,
+      "name": "Joint phase-shift covers vol+DI+ADX",
+      "pass": true,
+      "detail": "Control C shifts every HTF gate input together"
+    },
+    {
+      "id": 13,
+      "name": "No DI-only/DI_ADX-only treatment cell",
+      "pass": true,
+      "detail": "frozen-facet guard; treatments \u2286 VOL_HI/VOL_LO/DI\u00d7VOL_HI/DI_ADX\u00d7VOL_HI"
+    },
+    {
+      "id": 14,
+      "name": "Amplifier disclosure table",
+      "pass": true,
+      "detail": "DI\u00d7VOL_HI / DI_ADX\u00d7VOL_HI vs frozen SPDR-004 cells emitted"
+    }
+  ],
+  "pass_count": 14,
+  "all_pass": true,
+  "golden": {
+    "G1": {
+      "ok": true,
+      "ltf_bar": 5825,
+      "htf_idx": 363,
+      "htf_close_ns": 1663084800000000000,
+      "ltf_open_ns": 1663085700000000000,
+      "htf_dir": -1,
+      "vol_ratio": 1.5727226636426992,
+      "adx": 48.66046392463972,
+      "r_bps_H16": 274.4487056567594,
+      "forming_bar_not_used": true
+    },
+    "G2": {
+      "ok": true,
+      "ltf_bar": 2065,
+      "vol_ratio": 0.7973349937436822,
+      "sign": 1,
+      "htf_close_ns": 1658462400000000000,
+      "exit_open_ns": 1658466300000000000,
+      "long_only_convention": true
+    },
+    "G3": {
+      "ok": true,
+      "rebalance_ts": "2023-04-02 00:00:00+00:00",
+      "rank_key": "trailing_24h_notional_usdt",
+      "expected": [
+        [
+          "BTCUSDT",
+          1
+        ],
+        [
+          "ETHUSDT",
+          2
+        ],
+        [
+          "XRPUSDT",
+          3
+        ],
+        [
+          "DOGEUSDT",
+          4
+        ],
+        [
+          "ARBUSDT",
+          5
+        ],
+        [
+          "SOLUSDT",
+          6
+        ],
+        [
+          "ZRXUSDT",
+          7
+        ],
+        [
+          "ICXUSDT",
+          8
+        ],
+        [
+          "ANKRUSDT",
+          9
+        ],
+        [
+          "LTCUSDT",
+          10
+        ]
+      ],
+      "got": [
+        [
+          "BTCUSDT",
+          1
+        ],
+        [
+          "ETHUSDT",
+          2
+        ],
+        [
+          "XRPUSDT",
+          3
+        ],
+        [
+          "DOGEUSDT",
+          4
+        ],
+        [
+          "ARBUSDT",
+          5
+        ],
+        [
+          "SOLUSDT",
+          6
+        ],
+        [
+          "ZRXUSDT",
+          7
+        ],
+        [
+          "ICXUSDT",
+          8
+        ],
+        [
+          "ANKRUSDT",
+          9
+        ],
+        [
+          "LTCUSDT",
+          10
+        ]
+      ]
+    }
+  },
+  "primary_symbols": [
+    "BTCUSDT",
+    "SOLUSDT",
+    "ETHUSDT",
+    "XRPUSDT",
+    "OPUSDT",
+    "DOGEUSDT",
+    "1000PEPEUSDT",
+    "APTUSDT",
+    "LTCUSDT",
+    "LINKUSDT"
+  ],
+  "n_member_symbols": 119,
+  "n_treatment_cells": 1440,
+  "n_baseline_cells": 240,
+  "htf_filters_treat": [
+    "VOL_HI",
+    "VOL_LO",
+    "DI\u00d7VOL_HI",
+    "DI_ADX\u00d7VOL_HI"
+  ],
+  "membership_sha256": "303500889b92335eba24f62a584b9891501868fa3406eda2a496636149d979d2",
+  "spdr004_membership_sha256": "303500889b92335eba24f62a584b9891501868fa3406eda2a496636149d979d2",
+  "membership_byte_identical_to_spdr004": true,
+  "fence": {
+    "analysis_start_utc": "2021-06-29T06:53:00+00:00",
+    "train_end_utc": "2023-12-18T00:00:00+00:00",
+    "holdout_start_utc": "2025-01-08T00:00:00+00:00",
+    "manifest_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448"
+  }
+}

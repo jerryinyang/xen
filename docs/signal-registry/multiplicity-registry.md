@@ -1365,6 +1365,37 @@ fresh CAL (INFR-010 R4 — INFR-014); single-lottery-cell family wins.
 **XENA gate:** blocked until INFR-014 fresh CAL hash-pin exists.
 **Slot accounting: 0 slots; 0 counted TEST reads; TRAIN-only; holdout sealed.** No
 tradability claim permitted from any SPDR read.
+**SPDR-004 design freeze (2026-07-16):** `python/experiments/SPDR-004/design.md` COMPLETE —
+rebalance frequency frozen **daily 00:00 UTC**; online top-10 trailing 24h volume ≤ t−1;
+thin grid 1h/5m·4h/15m·1d/1h × holds {0.5,1,2,4}× × bases {UNF,MOM,RAND} × HTF {NONE,DI,DI_ADX};
+promote K=3; L-21 unit pin at screen; P-14 distinctness recorded; screen **uncounted**, not run.
+AMENDMENT-1 (2026-07-16, NEUTRAL, pre-execution): UNF×filter baseline = RAND battery at UNF
+cadence (UNF×NONE undefined — no intrinsic sign). AMENDMENTS 2–5 (2026-07-16, post-exec QA
+runs 1–2; ledger in design.md): notional-volume selection (N, rerun), fixed-strata declaration
+(N), two-sample lift CI (T), UNF-vs-battery both-arms bootstrap (T) — final count 0L/2T/3N.
+**SPDR-004 DISPOSITION (2026-07-17, operator-signed): WORTH_EXPLORING** — K=3 met on
+SOLUSDT × 4h/15m × UNF × DI_ADX × all 4 holds (monotone money-unit hold ladder 5.9→50.1
+bps/trade, lift ci_low>0 each rung, battery rank 1.00, Control C collapse ≈1.0, h2/h4 clear
+floors). Caveats binding on XENA-HTFCAP-001 design: single-symbol cluster (cross-symbol
+neighbourhood fails; generalisation = XENA's question); rest of grid P-14-shaped sub-floor;
+GAP spread overstated floors (measured pins from SPDR-006 on); 1d domain unpowered; no
+tradability claim; XENA gate still blocked on INFR-014 pin. 0 slots, 0 reads consumed.
+**SPDR-006 facet screen registered (2026-07-17):** vol-regime axis (VOL_HI/VOL_LO standalone +
+DI×VOL_HI + DI_ADX×VOL_HI amplifier variants; pack's optional vol axis, cut from SPDR-004 for
+budget) — SEPARATE grid + own K=3 (avoids post-results expansion of SPDR-004, L-23); DI-only
+variants NOT re-run (SPDR-004 cells frozen as reference); 1440 cells; 0 slots, uncounted,
+TRAIN-only; `python/experiments/SPDR-006/design.md`; screen not run.
+**SPDR-006 DISPOSITION (2026-07-17, operator-signed): WORTH_EXPLORING** — K=3 met on 4h/15m
+UNF interaction clusters: DI×VOL_HI (BTC+SOL, all 4 holds, med lift +26.6 bps) and
+DI_ADX×VOL_HI (BTC full ladder + SOL h1–h4, med +28.5); monotone capture-scale ladders;
+measured-spread floors cleared at h1+; amplifier claim vs frozen SPDR-004 holds (160/164
+powered CI+ interaction cells above direction-only; BTC frozen DI CI-fail → full 4-hold CI+
+under VOL_HI gating). Caveats binding on XENA-HTFCAP-001 design: interaction filters only
+(standalone VOL_HI/VOL_LO weak/drift-contaminated); multi-name = BTC+SOL exactly (drop-both
+probe kills K≥3; ETH = one seed-fragile cell); holds ≥1× HTF for money; SOL Control C
+collapse incomplete (0.55–0.78); no per-year split; availability-only, XENA gate still
+blocked on INFR-014 pin. Integrity 14/14; independent review pass reproduced all headline
+numbers. 0 slots, 0 reads consumed.
 
 ## Chapter 04 · CF-EPSOSC-001 Registration (2026-07-16, checkpoint-013) — Episode-Clearing Oscillation Harvest
 
@@ -1389,6 +1420,29 @@ deployability; void registry on Bybit without fresh CAL; single-lottery-cell pro
 **XENA gate:** blocked until INFR-014 fresh CAL hash-pin exists.
 **Slot accounting: 0 slots; 0 counted TEST reads; TRAIN-only; holdout sealed.** No
 tradability claim permitted from any SPDR read.
+**SPDR-005 design freeze (2026-07-16):** `python/experiments/SPDR-005/design.md` COMPLETE —
+daily 00:00 UTC online top-10; objects STRETCH+VOLARM **market-on-confirmed-event only**
+(0 resting-limit cells; P-10); P-12 dead grid banned + optional GRID_TWIN sentinel; primary
+promote slice 15m/1h × W{96,192} × k{2.5,3.0} × clear{RET_ANCHOR,HYBRID} × one-sided;
+L-16 bps/episode primary; L-21 unit pin; L-27 next-open control **forwarded to INFR-014**
+battery if any limit-entry universe; VR parallel facet; screen **uncounted**, not run.
+AMENDMENT-1 (2026-07-16, NEUTRAL, pre-execution): RET_ANCHOR episodes open at train_end =
+CENSORED (excluded from mean bps/episode, fraction disclosed per cell, >20% flagged; silent
+drop banned).
+AMENDMENTS 2–3 (2026-07-17, post-exec QA run 1, operator-ratified): fixed top-10 strata by
+full-TRAIN membership-days (LOOSER — hindsight universe reduction, caveat binding) + Control A
+seed tiering 25 primary / 5 disclosure (NEUTRAL-promote/LOOSER-disclosure). Ledger 1L/0T/2N.
+**SPDR-005 DISPOSITION (2026-07-17, operator-signed): WORTH_EXPLORING** — K≥3 clusters on
+primary slice, strongest VOLARM×15m (23–25 cells, 4 symbols, both k & W, med lift +54–60
+bps/episode, derangement collapse ≈0.95, block_h sign-stable 204/205); VR facet not flat
+(half-symbol rule met all lags); GRID_TWIN not sole positive; cluster medians clear measured
+spread floors. Counterweights carried: primary pooled median NEGATIVE (−11.4 mean / −9.2
+lift); edge alt-concentrated (SHIB/XRP/DOGE/JASMY); 1h broadly negative; fixed-strata
+hindsight selection (AMENDMENT-2); ~17-month effective window (membership starts 2022-07-15).
+Caveats binding on XENA-EPSOSC-001 design: seed from VOLARM×15m×{RET_ANCHOR,HYBRID}×
+k{2.5,3.0}×W{96,192} on cleared high-volume names; L-27 next-open control mandatory for any
+limit-entry universe; no BONK/BTT centring; availability-only, XENA gate blocked on INFR-014
+pin. 0 slots, 0 reads consumed. Disposition: `python/experiments/SPDR-005/analysis.md` §9.
 
 ## Amendment Rules
 

@@ -1,0 +1,98 @@
+{
+  "integrity": "PASS 12/12",
+  "amendments": [
+    "AMENDMENT-1"
+  ],
+  "n_cells_total": 3240,
+  "n_treatment": 3240,
+  "n_primary_promote": 640,
+  "primary_symbols": [
+    "SHIB1000USDT",
+    "GALAUSDT",
+    "DOGEUSDT",
+    "RSRUSDT",
+    "1000BONKUSDT",
+    "SLPUSDT",
+    "JASMYUSDT",
+    "XRPUSDT",
+    "1000PEPEUSDT",
+    "1000BTTUSDT"
+  ],
+  "domains": [
+    "5m",
+    "15m",
+    "1h"
+  ],
+  "objects": [
+    "STRETCH",
+    "VOLARM"
+  ],
+  "w_levels": [
+    48,
+    96,
+    192
+  ],
+  "k_levels": [
+    2.0,
+    2.5,
+    3.0
+  ],
+  "clears": [
+    "RET_ANCHOR",
+    "TIME",
+    "HYBRID"
+  ],
+  "sides": [
+    "LONG_ONLY",
+    "SHORT_ONLY"
+  ],
+  "rand_seeds": [
+    2000,
+    2001,
+    2002,
+    2003,
+    2004,
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "membership_rank_key": "trailing_24h_base_volume",
+  "primary_unit": "bps_per_episode",
+  "train_median_spread_bps": {
+    "SHIB1000USDT": 2.6733290951269764,
+    "GALAUSDT": 3.3763672065891708,
+    "DOGEUSDT": 1.6526028758463238,
+    "RSRUSDT": 5.209690023444296,
+    "1000BONKUSDT": 15.325670498084662,
+    "SLPUSDT": 9.64475164764468,
+    "JASMYUSDT": 2.8292544914418807,
+    "XRPUSDT": 2.0601602229157683,
+    "1000PEPEUSDT": 1.7161980492546154,
+    "1000BTTUSDT": 12.666244458518356
+  },
+  "treatment_mean_bps_median": 5.689738751493698,
+  "lift_bps_median": 4.919123502669995,
+  "primary_lift_bps_median": -9.182202401865588,
+  "n_lift_ci_excludes_zero": 557,
+  "n_primary_lift_ci_excludes_zero": 126,
+  "n_unpowered": 897,
+  "n_censored_flag_gt20": 94,
+  "note": "Pooled disclosure-only. K=3 uses primary promote slice only. No disposition here."
+}
