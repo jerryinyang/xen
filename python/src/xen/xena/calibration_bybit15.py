@@ -539,6 +539,9 @@ def amend_registry_episode(
     confirm: dict,
     *,
     out_path: str | Path,
+    design_seeds: dict[str, int] | None = None,
+    confirm_seeds: dict[str, int] | None = None,
+    amended_by: str = "INFR-015",
 ) -> dict:
     """Replace the CLS-EPISODE block; CLS-FILTER byte-identical (canonical JSON).
 
@@ -546,6 +549,15 @@ def amend_registry_episode(
     TERMINAL the existing pin stands and this raises IntegrityError (caller reports
     TERMINAL-2, no write).
     """
+    design_seeds = dict(design_seeds or DESIGN_SEEDS_15)
+    confirm_seeds = dict(confirm_seeds or CONFIRM_SEEDS_15)
+    # provenance guard (QA run 4 Issue 13): pin seed fields must match the frozen
+    # procedure that produced the certifying confirm bank
+    proc = design.get("frozen_procedure") or {}
+    if proc.get("design_seeds") != design_seeds or proc.get("confirm_seeds") != confirm_seeds:
+        raise IntegrityError(
+            f"pin seed fields {design_seeds}/{confirm_seeds} != frozen procedure "
+            f"{proc.get('design_seeds')}/{proc.get('confirm_seeds')}")
     certifiable = {"DUAL_CERTIFY", "HIGH_ONLY_CERTIFY", "LOW_ONLY_CERTIFY"}
     outcome = (confirm.get("outcome") or {})
     verdict = outcome.get("verdict", "TERMINAL")
@@ -568,8 +580,8 @@ def amend_registry_episode(
         "class_id": CLASS_ID,
         "family_prior": "CF-EPSOSC-001",
         "procedure": design["frozen_procedure"],
-        "design_seeds": dict(DESIGN_SEEDS_15),
-        "confirm_seeds": dict(CONFIRM_SEEDS_15),
+        "design_seeds": design_seeds,
+        "confirm_seeds": confirm_seeds,
         "cost_stack": "bybit_round_trip_cost_bps_v1",
         "stage1_score_kind": "g_net",
         "stage1_charge_costs": True,
@@ -584,7 +596,7 @@ def amend_registry_episode(
         },
         "limit_entry_cells": False,
         "design_ok": True,
-        "amended_by": "INFR-015",
+        "amended_by": amended_by,
     }
     reg["class_configs"] = [
         (new_ep if c["class_id"] == CLASS_ID else c) for c in reg["class_configs"]
@@ -604,3 +616,447 @@ def amend_registry_episode(
     path.write_text(json.dumps(artifact, indent=2) + "\n", encoding="utf-8")
     verify_bybit_registry(path)
     return artifact
+
+
+# =========================================================================== #
+# AMENDMENT-4 (design §14) — derived n_legs_floor stage-2 domain guard
+# Operator-directed follow-up (report §8). Fresh banks; block rule kept.
+# =========================================================================== #
+FLOOR_GRID = (0, 4, 6, 8, 10, 12, 16, 20, 24, 32)
+DESIGN_SEEDS_A4 = {"low": 99_000, "high": 100_000}
+CONFIRM_SEEDS_A4 = {"low": 101_000, "high": 102_000}
+BITE_SEEDS_A4 = {"low": 955_000, "high": 956_000}
+_SPENT_15_RANGES = (
+    (95_000, 95_500), (96_000, 96_500), (97_000, 97_500), (98_000, 98_500),
+    (953_000, 953_050), (954_000, 954_050),
+)
+
+
+def assert_seed_disjoint_a4() -> None:
+    d = set(range(DESIGN_SEEDS_A4["low"], DESIGN_SEEDS_A4["low"] + 500)) | set(
+        range(DESIGN_SEEDS_A4["high"], DESIGN_SEEDS_A4["high"] + 500))
+    c = set(range(CONFIRM_SEEDS_A4["low"], CONFIRM_SEEDS_A4["low"] + 500)) | set(
+        range(CONFIRM_SEEDS_A4["high"], CONFIRM_SEEDS_A4["high"] + 500))
+    b = set(range(BITE_SEEDS_A4["low"], BITE_SEEDS_A4["low"] + 50)) | set(
+        range(BITE_SEEDS_A4["high"], BITE_SEEDS_A4["high"] + 50))
+    prior = set()
+    for lo, hi in (_INFR014_SEED_RANGES + _CH03_SEED_RANGES + _SPENT_15_RANGES):
+        prior |= set(range(lo, hi))
+    if d & c or d & b or c & b:
+        raise IntegrityError("A4 bank collision (design/confirm/bite)")
+    for name, s in (("design", d), ("confirm", c), ("bite", b)):
+        if s & prior:
+            raise IntegrityError(
+                f"A4 {name} bank collides with spent INFR-015/INFR-014/ch03 seeds")
+
+
+def eval_lcb_legs_ep_floor(subset, streams, config, segment, *, n_boot: int, seed: int,
+                           n_legs_floor: int, net: bool = False) -> dict:
+    """Blocked stage-2 LCB with n_legs_floor domain guard (design §14.1).
+
+    Same B routing as eval_lcb_legs_ep; floor passed to lcb_g_leg_studentized so
+    n_legs < floor => in_domain False => pass_positive False (never certifiable).
+    """
+    from dataclasses import replace
+    from xen.xena.oracle import evaluate
+
+    cfg = replace(config, charge_costs=bool(net))
+    res = evaluate(subset, streams, cfg, segment=segment, seed=seed)
+    if res.ledger is not None and res.ledger.height > 0:
+        led = res.ledger.sort("EntryTime")
+        b = episode_overlap_block_legs(
+            led.get_column("EntryTime").to_numpy().astype(np.int64),
+            led.get_column("ExitTime").to_numpy().astype(np.int64),
+        )
+    else:
+        b = 1
+    out = lcb_g_leg_studentized(res, streams, n_boot=n_boot, seed=seed + 99,
+                                block_legs=b, confidence=0.95, net=net,
+                                n_legs_floor=int(n_legs_floor))
+    out["n_admitted"] = res.n_admitted
+    out["block_legs_used"] = int(b)
+    out["block_rule"] = BLOCK_RULE_ID
+    out["n_legs_floor"] = int(n_legs_floor)
+    return out
+
+
+def derive_n_legs_floor(design_rows_by_cadence: dict[str, dict],
+                        *, alpha: float = ALPHA,
+                        grid: tuple[int, ...] = FLOOR_GRID) -> dict[str, Any]:
+    """F* = smallest F in grid s.t. cov(F) <= alpha AND alpha_hat(F) <= alpha on BOTH
+    cadences (design §14.2). Post-hoc monotone filtering of floor-OFF design rows —
+    a row false-certifies under F iff gross_pass (or pass) AND n_legs >= F.
+    """
+    curve = []
+    chosen = None
+    for f in grid:
+        entry: dict[str, Any] = {"floor": int(f), "per_cadence": {}}
+        all_ok = True
+        for cad, banks in design_rows_by_cadence.items():
+            cov_rows = banks["coverage_rows"]
+            a_rows = banks["alpha_rows"]
+            n_cov = len(cov_rows)
+            n_a = len(a_rows)
+            cov_k = sum(1 for r in cov_rows
+                        if r["pass"] and (r["n_legs"] or 0) >= f)
+            a_k = sum(1 for r in a_rows
+                      if r["gross_pass"] and (r["n_legs"] or 0) >= f)
+            ood_a = sum(1 for r in a_rows if (r["n_legs"] or 0) < f) / max(n_a, 1)
+            cov_rate = cov_k / max(n_cov, 1)
+            a_rate = a_k / max(n_a, 1)
+            ok = cov_rate <= alpha and a_rate <= alpha
+            all_ok = all_ok and ok
+            entry["per_cadence"][cad] = {
+                "cov": cov_rate, "alpha_hat": a_rate,
+                "out_of_domain_frac": ood_a, "ok": ok,
+            }
+        entry["all_ok"] = all_ok
+        curve.append(entry)
+        if all_ok and chosen is None:
+            chosen = int(f)
+    return {
+        "grid": list(grid), "curve": curve, "floor_star": chosen,
+        "rule": ("F* = smallest F in grid with design cov(F)<=alpha AND "
+                 "alpha_hat(F)<=alpha on BOTH cadences; None => TERMINAL-3"),
+        "alpha": float(alpha),
+    }
+
+
+def _bank_rows_ep(cadence: CadenceSpec, *, scale: ScaleSpec, seeds: dict[str, int],
+                  n_universes_cov: int, n_null_e2e: int) -> dict[str, Any]:
+    """Floor-OFF coverage + e2e rows (with n_legs) for the A4 design bank."""
+    _set_seeds(seeds["low"], seeds["high"])
+    cov = no_search_coverage_ep(cadence, scale=scale, n_universes=n_universes_cov)
+    _set_seeds(seeds["low"], seeds["high"])
+    sc = ScaleSpec(scale.name, n_null=n_null_e2e, n_cand=scale.n_cand,
+                   budget=scale.budget, n_restarts=scale.n_restarts,
+                   n_power=scale.n_power, n_coverage=scale.n_coverage)
+    a = e2e_alpha_ep(cadence, scale=sc)
+    return {"coverage_rows": cov["rows"], "alpha_rows": a["rows"],
+            "cov_rate_floor_off": cov["rate"], "alpha_hat_floor_off": a["alpha_hat"],
+            "seed_bases": a["seed_bases"]}
+
+
+def bite_check_a4(cadence: CadenceSpec, *, scale: ScaleSpec,
+                  n_legs_floor: int, n: int = BITE_N) -> dict[str, Any]:
+    """Bite on A4 banks with floor active in stage-2 (power must survive the guard)."""
+    layout = c_layout(cadence.n_bars, cadence.hold_bars, embargo_frac=EMBARGO_FRAC)
+    stage2_start = layout.gate[0]
+    base = BITE_SEEDS_A4[cadence.name]
+    survive = selected = 0
+    rows = []
+    for i in range(n):
+        seed = base + i
+        streams = make_episode_null_universe(
+            seed, cadence, n_candidates=scale.n_cand, edge_bps=BITE_EDGE_BPS, plant=True)
+        streams = deplant_stage2(streams, edge_bps=BITE_EDGE_BPS,
+                                 stage2_start_ns=stage2_start)
+        streams = _deplant_class_plants(streams, edge_bps=BITE_EDGE_BPS,
+                                        stage2_start_ns=stage2_start)
+        assert_stage1_net_binding(charge_costs=True, score_kind="g_net")
+        config = OracleConfig(charge_costs=True)
+        params = _search_params(cadence)
+        finalists = [
+            run_restart(streams, config, budget=scale.budget, restart_id=r + 1,
+                        params=params, segment=layout.search,
+                        skip_economics_precondition=True, score_kind="g_net")
+            for r in range(scale.n_restarts)
+        ]
+        folds = contiguous_purged_folds(
+            layout.ranking[0], layout.ranking[1], n_folds=3,
+            purge_ns=max(cadence.hold_bars, 1) * 60 * NS)
+        pkg = certify_and_rank(finalists, streams, config, folds=folds, params=params,
+                               search_segment=layout.search, include_random_ref=False,
+                               include_fill_basis=False, score_kind="g_net")
+        if not pkg["ranked"]:
+            rows.append({"seed": seed, "empty": True})
+            continue
+        top = pkg["ranked"][0].subset
+        top_ids = sorted(str(x) for x in top)
+        plant_in = any(t.startswith("epplant") for t in top_ids)
+        lcb_g = eval_lcb_legs_ep_floor(top, streams, config, layout.gate,
+                                       n_boot=N_BOOT, seed=seed,
+                                       n_legs_floor=n_legs_floor, net=False)
+        selected += int(plant_in)
+        survive += int(bool(lcb_g.get("pass_positive")))
+        rows.append({"seed": seed, "plant_in_top": plant_in,
+                     "stage2_pass": bool(lcb_g.get("pass_positive")),
+                     "gross_lcb": lcb_g.get("lcb"), "n_legs": lcb_g.get("n_legs"),
+                     "in_domain": lcb_g.get("in_domain"),
+                     "block_legs_used": lcb_g.get("block_legs_used")})
+    survival_rate = survive / max(n, 1)
+    select_rate = selected / max(n, 1)
+    return {
+        "class_id": CLASS_ID, "cadence": cadence.name, "n": n,
+        "n_legs_floor": int(n_legs_floor),
+        "stage2_survival_rate": survival_rate, "stage1_select_rate": select_rate,
+        "select_ok": bool(select_rate >= BITE_SELECT_MIN),
+        "survival_ok": bool(survival_rate <= BITE_SURVIVAL_MAX),
+        "bite_ok": bool(select_rate >= BITE_SELECT_MIN
+                        and survival_rate <= BITE_SURVIVAL_MAX),
+        "rows": rows,
+    }
+
+
+def run_design_a4(*, scale: ScaleSpec = DESIGN_SCALE_15) -> dict[str, Any]:
+    """A4 design bank: floor-OFF rows -> derive F* -> bite with floor ON -> freeze."""
+    assert_seed_disjoint_a4()
+    print("[INFR-015/A4] DESIGN: floor-OFF cov+e2e rows...", flush=True)
+    rows_by: dict[str, dict] = {}
+    for c in (LOW, HIGH):
+        rows_by[c.name] = _bank_rows_ep(
+            c, scale=scale, seeds=DESIGN_SEEDS_A4,
+            n_universes_cov=scale.n_coverage, n_null_e2e=scale.n_null)
+        r = rows_by[c.name]
+        print(f"  {c.name}: cov(F=0)={r['cov_rate_floor_off']:.4f} "
+              f"alpha(F=0)={r['alpha_hat_floor_off']:.4f} bases={r['seed_bases']}",
+              flush=True)
+    derivation = derive_n_legs_floor(rows_by)
+    fstar = derivation["floor_star"]
+    print(f"[INFR-015/A4] floor curve done; F* = {fstar}", flush=True)
+    if fstar is None:
+        return {"bank": "design_a4", "class_id": CLASS_ID,
+                "seeds": dict(DESIGN_SEEDS_A4), "floor_derivation": derivation,
+                "rows_by_cadence": rows_by, "frozen_procedure": None,
+                "design_ok": False, "stop_reason": "no_floor_in_grid",
+                "terminal": True, "recommend": "TERMINAL-3_no_admissible_floor"}
+
+    print(f"[INFR-015/A4] bite with floor F*={fstar}...", flush=True)
+    bite: dict[str, Any] = {}
+    for c in (LOW, HIGH):
+        b = bite_check_a4(c, scale=scale, n_legs_floor=fstar)
+        bite[c.name] = b
+        print(f"  bite {c.name}: survival={b['stage2_survival_rate']:.3f} "
+              f"select={b['stage1_select_rate']:.3f} ok={b['bite_ok']}", flush=True)
+    bite_ok = all(bite[c]["bite_ok"] for c in ("low", "high"))
+    if not bite_ok:
+        return {"bank": "design_a4", "class_id": CLASS_ID,
+                "seeds": dict(DESIGN_SEEDS_A4), "floor_derivation": derivation,
+                "bite": {k: {kk: vv for kk, vv in v.items() if kk != "rows"}
+                         for k, v in bite.items()},
+                "frozen_procedure": None, "design_ok": False,
+                "stop_reason": "bite_failed_with_floor", "terminal": True,
+                "recommend": "TERMINAL-3_floor_killed_power"}
+
+    frozen = {
+        "binder": "two_stage_sample_split",
+        "stage1": "search+certify top-1 on stage-1 bands",
+        "stage1_score_kind": "g_net",
+        "stage1_charge_costs": True,
+        "stage2": "lcb_g_leg_studentized(g_gross) > 0 on distant embargoed band",
+        "e2e_pass_event": "stage2_gross_lcb_positive",
+        "deployability_binding": "stage2_net_lcb_positive",
+        "functional": "g_gross_ratio",
+        "estimator": "leg_studentized_bootstrap_t",
+        "embargo_frac": EMBARGO_FRAC,
+        "search_frac": STAGE_SEARCH_FRAC,
+        "ranking_frac": STAGE_RANKING_FRAC,
+        "n_boot": N_BOOT,
+        "block_legs": BLOCK_RULE_ID,
+        "n_legs_floor": int(fstar),
+        "n_legs_floor_rule": derivation["rule"],
+        "confidence": 0.95,
+        "alpha": ALPHA,
+        "one_subset": True,
+        "shortlist": False,
+        "design_seeds": dict(DESIGN_SEEDS_A4),
+        "confirm_seeds": dict(CONFIRM_SEEDS_A4),
+        "design_bite_ok": True,
+        "held_out_escalation": False,
+        "gate_rule": "per_cadence point α̂≤5% AND no-search cov≤5% (Fork A)",
+        "cost_stack": "bybit_round_trip_cost_bps_v1",
+        "gap_spread_bps": GAP_SPREAD_BPS,
+        "class_id": CLASS_ID,
+        "amends": "INFR-015 AMENDMENT-4 (floor guard atop overlap blocks)",
+    }
+    return {"bank": "design_a4", "class_id": CLASS_ID, "seeds": dict(DESIGN_SEEDS_A4),
+            "floor_derivation": derivation,
+            "bite": {k: {kk: vv for kk, vv in v.items() if kk != "rows"}
+                     for k, v in bite.items()},
+            "bite_rows": {k: v["rows"] for k, v in bite.items()},
+            "rows_by_cadence": rows_by,
+            "frozen_procedure": frozen, "design_ok": True, "stop_reason": None}
+
+
+def no_search_coverage_a4(cadence: CadenceSpec, *, scale: ScaleSpec, n_universes: int,
+                          n_legs_floor: int, n_boot: int = N_BOOT,
+                          alpha: float = ALPHA) -> dict[str, Any]:
+    config = OracleConfig(charge_costs=True)
+    layout = c_layout(cadence.n_bars, cadence.hold_bars, embargo_frac=EMBARGO_FRAC)
+    hits = 0
+    rows = []
+    seed_bases = {"low": int(p3b.SEED_BASE_LOW), "high": int(p3b.SEED_BASE_HIGH)}
+    for seed, cspec in bank_seeds(cadence, n_universes):
+        streams = make_episode_null_universe(
+            seed, cspec, n_candidates=scale.n_cand, edge_bps=0.0, plant=False)
+        rng = np.random.default_rng(seed + 91)
+        ids = [s.candidate_id for s in streams]
+        k = min(5, len(ids))
+        pick = frozenset(str(x) for x in rng.choice(ids, size=k, replace=False))
+        lcb = eval_lcb_legs_ep_floor(pick, streams, config, layout.gate, n_boot=n_boot,
+                                     seed=seed, n_legs_floor=n_legs_floor, net=False)
+        pos = bool(lcb.get("pass_positive"))
+        hits += int(pos)
+        rows.append({"seed": seed, "pass": pos, "lcb": lcb.get("lcb"),
+                     "n_legs": lcb.get("n_legs"), "in_domain": lcb.get("in_domain"),
+                     "block_legs_used": lcb.get("block_legs_used")})
+    n = len(rows)
+    rate = hits / max(n, 1)
+    return {"class_id": CLASS_ID, "cadence": cadence.name, "n": n,
+            "n_lcb_positive": hits, "rate": rate,
+            "coverage_ok": bool(n > 0 and rate <= float(alpha)), "rows": rows,
+            "seed_bases": seed_bases, "alpha_target": float(alpha),
+            "n_legs_floor": int(n_legs_floor), "block_rule": BLOCK_RULE_ID}
+
+
+def e2e_alpha_a4(cadence: CadenceSpec, *, scale: ScaleSpec, n_legs_floor: int,
+                 n_boot: int = N_BOOT, alpha: float = ALPHA) -> dict[str, Any]:
+    layout_by: dict = {}
+    rows = []
+    seed_bases = {"low": int(p3b.SEED_BASE_LOW), "high": int(p3b.SEED_BASE_HIGH)}
+    config = OracleConfig(charge_costs=True)
+    for seed, cspec in bank_seeds(cadence, scale.n_null):
+        key = (cspec.n_bars, cspec.hold_bars)
+        layout = layout_by.get(key) or c_layout(
+            cspec.n_bars, cspec.hold_bars, embargo_frac=EMBARGO_FRAC)
+        layout_by[key] = layout
+        streams = make_episode_null_universe(
+            seed, cspec, n_candidates=scale.n_cand, edge_bps=0.0, plant=False)
+        params = _search_params(cspec)
+        finalists = [
+            run_restart(streams, config, budget=scale.budget, restart_id=r + 1,
+                        params=params, segment=layout.search,
+                        skip_economics_precondition=True, score_kind="g_net")
+            for r in range(scale.n_restarts)
+        ]
+        folds = contiguous_purged_folds(
+            layout.ranking[0], layout.ranking[1], n_folds=3,
+            purge_ns=max(cspec.hold_bars, 1) * 60 * NS)
+        pkg = certify_and_rank(finalists, streams, config, folds=folds, params=params,
+                               search_segment=layout.search, include_random_ref=False,
+                               include_fill_basis=False, score_kind="g_net")
+        if not pkg["ranked"]:
+            rows.append({"seed": seed, "symbol": cspec.symbol, "gross_pass": False,
+                         "net_pass": False, "empty": True, "n_legs": 0})
+            continue
+        top = pkg["ranked"][0].subset
+        lcb_g = eval_lcb_legs_ep_floor(top, streams, config, layout.gate,
+                                       n_boot=n_boot, seed=seed,
+                                       n_legs_floor=n_legs_floor, net=False)
+        lcb_n = eval_lcb_legs_ep_floor(top, streams, config, layout.gate,
+                                       n_boot=n_boot, seed=seed + 17,
+                                       n_legs_floor=n_legs_floor, net=True)
+        rows.append({
+            "seed": seed, "symbol": cspec.symbol,
+            "gross_pass": bool(lcb_g.get("pass_positive")),
+            "net_pass": bool(lcb_n.get("pass_positive")),
+            "gross_lcb": lcb_g.get("lcb"), "gross_point": lcb_g.get("point"),
+            "net_lcb": lcb_n.get("lcb"), "net_point": lcb_n.get("point"),
+            "n_legs": lcb_g.get("n_legs"), "in_domain": lcb_g.get("in_domain"),
+            "block_legs_used": lcb_g.get("block_legs_used"), "empty": False,
+        })
+    n = len(rows)
+    k = sum(1 for r in rows if r["gross_pass"])
+    ph = k / max(n, 1)
+    lo, hi = wilson(k, n)
+    n_net = sum(1 for r in rows if r["net_pass"])
+    ood = sum(1 for r in rows if not r.get("in_domain", True)) / max(n, 1)
+    return {"class_id": CLASS_ID, "cadence": cadence.name, "n": n,
+            "n_gross_lcb_positive": k, "alpha_hat": ph,
+            "alpha_se": binomial_se(ph, n),
+            "alpha_wilson_95": {"low": lo, "high": hi},
+            "pass_stop": bool(ph <= float(alpha)),
+            "n_net_lcb_positive": n_net, "deployability_rate": n_net / max(n, 1),
+            "out_of_domain_frac": ood,
+            "seed_bases": seed_bases, "alpha_target": float(alpha),
+            "n_legs_floor": int(n_legs_floor), "block_rule": BLOCK_RULE_ID,
+            "rows": rows}
+
+
+def confirm_gate_a4(procedure: dict, *,
+                    scale: ScaleSpec = CONFIRM_SCALE_15) -> dict[str, Any]:
+    """Binding A4 confirm: blocked stage-2 + frozen n_legs_floor; fresh 101k/102k banks."""
+    if not procedure or not procedure.get("design_bite_ok"):
+        raise IntegrityError("confirm blocked unless design_ok procedure exists")
+    required = ("embargo_frac", "n_boot", "block_legs", "alpha", "stage1_score_kind",
+                "stage1_charge_costs", "e2e_pass_event", "n_legs_floor")
+    for k in required:
+        if k not in procedure:
+            raise IntegrityError(f"frozen procedure missing {k} (G4b)")
+    if procedure["block_legs"] != BLOCK_RULE_ID:
+        raise IntegrityError("A4 confirm requires episode_overlap_rule_v1")
+    assert_stage1_net_binding(
+        charge_costs=bool(procedure["stage1_charge_costs"]),
+        score_kind=str(procedure["stage1_score_kind"]))
+    assert_seed_disjoint_a4()
+    n_boot = int(procedure["n_boot"])
+    alpha = float(procedure["alpha"])
+    fstar = int(procedure["n_legs_floor"])
+    if scale.name == "confirm" and scale.n_null != CONFIRM_SCALE_15.n_null:
+        raise IntegrityError("binding confirm n_null must be 200")
+
+    per: dict[str, Any] = {}
+    _set_seeds(CONFIRM_SEEDS_A4["low"], CONFIRM_SEEDS_A4["high"])
+    for c in (LOW, HIGH):
+        print(f"[INFR-015/A4] CONFIRM {c.name}: coverage (F*={fstar})...", flush=True)
+        cov = no_search_coverage_a4(c, scale=scale, n_universes=scale.n_coverage,
+                                    n_legs_floor=fstar, n_boot=n_boot, alpha=alpha)
+        if cov.get("seed_bases") != dict(CONFIRM_SEEDS_A4):
+            raise IntegrityError("A4 confirm coverage seed bases drifted (Issue-9 class)")
+        print(f"  cov {c.name}: {cov['rate']:.4f} ok={cov['coverage_ok']}", flush=True)
+        print(f"[INFR-015/A4] CONFIRM {c.name}: e2e α...", flush=True)
+        a = e2e_alpha_a4(c, scale=scale, n_legs_floor=fstar, n_boot=n_boot, alpha=alpha)
+        if a.get("seed_bases") != dict(CONFIRM_SEEDS_A4):
+            raise IntegrityError("A4 confirm e2e seed bases drifted")
+        print(f"  α̂ {c.name}: {a['alpha_hat']:.4f} ok={a['pass_stop']} "
+              f"ood={a['out_of_domain_frac']:.3f}", flush=True)
+        certified = bool(cov["coverage_ok"] and a["pass_stop"])
+        band = "CERTIFIED" if certified else (
+            "FAIL_ALPHA" if not a["pass_stop"] else "FAIL_COV")
+        deploy = ("DEPLOY_WEAK" if certified and a["deployability_rate"] < 0.5
+                  else ("DEPLOY_OK" if certified else "N/A"))
+        per[c.name] = {
+            "cadence": c.name, "band": band, "deployability": deploy,
+            "no_search_cov": cov["rate"], "e2e_alpha": a["alpha_hat"],
+            "selection_inflation": a["alpha_hat"] - cov["rate"],
+            "coverage_ok": cov["coverage_ok"], "alpha_ok": a["pass_stop"],
+            "certified": certified, "alpha_se": a["alpha_se"],
+            "alpha_wilson_95": a["alpha_wilson_95"], "n": a["n"],
+            "n_gross_lcb_positive": a["n_gross_lcb_positive"],
+            "deployability_rate": a["deployability_rate"],
+            "out_of_domain_frac": a["out_of_domain_frac"],
+            "seed_bases": a.get("seed_bases"), "alpha_target": alpha,
+            "n_legs_floor": fstar,
+            "failure_label": (None if certified
+                              else _failure_label(cov["rate"], a["alpha_hat"])),
+            "coverage_rows": cov["rows"], "alpha_rows": a["rows"],
+        }
+    outcome = _outcome(per["low"]["certified"], per["high"]["certified"])
+    return {
+        "bank": "confirm_a4", "class_id": CLASS_ID, "seeds": dict(CONFIRM_SEEDS_A4),
+        "procedure": procedure,
+        "per_cadence": {k: {kk: vv for kk, vv in v.items()
+                            if kk not in ("coverage_rows", "alpha_rows")}
+                        for k, v in per.items()},
+        "alpha_low_rows": per["low"]["alpha_rows"],
+        "alpha_high_rows": per["high"]["alpha_rows"],
+        "coverage_low_rows": per["low"]["coverage_rows"],
+        "coverage_high_rows": per["high"]["coverage_rows"],
+        "outcome": outcome,
+        "stop_condition": {
+            "alpha_target": alpha, "n_legs_floor": fstar,
+            "gate_rule": (f"point α̂≤{alpha} ∧ no_search_cov≤{alpha} "
+                          "(floor in domain guard; Wilson disclosure-only)"),
+            "low_certified": per["low"]["certified"],
+            "high_certified": per["high"]["certified"],
+            "verdict": outcome["verdict"], "recommend": outcome["recommend"],
+            "terminal": outcome["terminal"],
+            "forbidden": [
+                "no optional stopping", "no peek-and-extend", "no UCB gate",
+                "no chapter-03 pin", "no costless stage-1",
+                "confirm coverage must use confirm seeds (not design)",
+                "no floor adjustment after design freeze",
+                "TERMINAL => fallback paths are NEW designs (report §8)",
+            ],
+        },
+    }

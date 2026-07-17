@@ -1,0 +1,69 @@
+{
+  "producer": "run_cal15_a4.py",
+  "experiment": "INFR-015/AMENDMENT-4",
+  "design_ok": true,
+  "stop_reason": null,
+  "floor_star": 16,
+  "verdict": "LOW_ONLY_CERTIFY",
+  "per_cadence": {
+    "low": {
+      "cadence": "low",
+      "band": "CERTIFIED",
+      "deployability": "DEPLOY_WEAK",
+      "no_search_cov": 0.025,
+      "e2e_alpha": 0.03,
+      "selection_inflation": 0.0049999999999999975,
+      "coverage_ok": true,
+      "alpha_ok": true,
+      "certified": true,
+      "alpha_se": 0.012062338081814818,
+      "alpha_wilson_95": {
+        "low": 0.013820125830748323,
+        "high": 0.06389511973247333
+      },
+      "n": 200,
+      "n_gross_lcb_positive": 6,
+      "deployability_rate": 0.01,
+      "out_of_domain_frac": 0.75,
+      "seed_bases": {
+        "low": 101000,
+        "high": 102000
+      },
+      "alpha_target": 0.05,
+      "n_legs_floor": 16,
+      "failure_label": null
+    },
+    "high": {
+      "cadence": "high",
+      "band": "FAIL_COV",
+      "deployability": "N/A",
+      "no_search_cov": 0.06,
+      "e2e_alpha": 0.03,
+      "selection_inflation": -0.03,
+      "coverage_ok": false,
+      "alpha_ok": true,
+      "certified": false,
+      "alpha_se": 0.012062338081814818,
+      "alpha_wilson_95": {
+        "low": 0.013820125830748323,
+        "high": 0.06389511973247333
+      },
+      "n": 200,
+      "n_gross_lcb_positive": 6,
+      "deployability_rate": 0.0,
+      "out_of_domain_frac": 0.0,
+      "seed_bases": {
+        "low": 101000,
+        "high": 102000
+      },
+      "alpha_target": 0.05,
+      "n_legs_floor": 16,
+      "failure_label": "coverage_limited"
+    }
+  },
+  "pin_amended": true,
+  "new_sha256": "abbb184229236a75f624537ca605668a73f6f85138c150e14a3609c4191bf786",
+  "superseded": [
+    "ac8a1eb679e22290d854ad245ef1620f5f8bdb446a5c0166c618d0c292b2da6f"
+  ]
+}

@@ -109,3 +109,85 @@ def test_seed_disjointness():
 def test_confirm_requires_design_ok():
     with pytest.raises(IntegrityError):
         confirm_gate_ep({}, scale=CONFIRM_SCALE_15)
+
+
+# ---------------------------------------------------------------------------- #
+# AMENDMENT-4 golden traces (design §14.4)
+# ---------------------------------------------------------------------------- #
+from xen.xena.calibration_bybit15 import (  # noqa: E402
+    CONFIRM_SEEDS_A4,
+    DESIGN_SEEDS_A4,
+    assert_seed_disjoint_a4,
+    confirm_gate_a4,
+    derive_n_legs_floor,
+)
+
+
+def test_g4a_floor_filter_arithmetic():
+    rows = {"low": {"coverage_rows": [{"pass": False, "n_legs": 5}],
+                    "alpha_rows": [
+                        {"gross_pass": True, "n_legs": 4},
+                        {"gross_pass": True, "n_legs": 8},
+                        {"gross_pass": False, "n_legs": 50},
+                        {"gross_pass": True, "n_legs": 20},
+                    ]},
+            "high": {"coverage_rows": [{"pass": False, "n_legs": 100}],
+                     "alpha_rows": [{"gross_pass": False, "n_legs": 100}]}}
+    d = derive_n_legs_floor(rows, alpha=0.6)
+    e8 = next(e for e in d["curve"] if e["floor"] == 8)
+    # F=8: counted passes = rows (T,8) and (T,20) => 2/4 = 0.5
+    assert e8["per_cadence"]["low"]["alpha_hat"] == 0.5
+    e0 = next(e for e in d["curve"] if e["floor"] == 0)
+    assert e0["per_cadence"]["low"]["alpha_hat"] == 0.75
+
+
+def test_g4b_confirm_a4_requires_floor():
+    proc = {"design_bite_ok": True, "embargo_frac": 0.2, "n_boot": 200,
+            "block_legs": "episode_overlap_rule_v1", "alpha": 0.05,
+            "stage1_score_kind": "g_net", "stage1_charge_costs": True,
+            "e2e_pass_event": "stage2_gross_lcb_positive"}
+    with pytest.raises(IntegrityError):
+        confirm_gate_a4(proc, scale=CONFIRM_SCALE_15)  # missing n_legs_floor
+
+
+def test_g4c_floor_out_of_domain_not_certifiable():
+    from xen.xena.calibration_bybit15 import eval_lcb_legs_ep_floor, _set_seeds
+    from xen.xena.calibration_pc import c_layout
+    from xen.xena.oracle import OracleConfig
+    _set_seeds(DESIGN_SEEDS_A4["low"], DESIGN_SEEDS_A4["high"])
+    cadence = LOW
+    layout = c_layout(cadence.n_bars, cadence.hold_bars, embargo_frac=0.2)
+    streams = make_episode_null_universe(99_000, cadence, n_candidates=8)
+    config = OracleConfig(charge_costs=True)
+    pick = frozenset([s.candidate_id for s in streams][:3])
+    out = eval_lcb_legs_ep_floor(pick, streams, config, layout.gate, n_boot=50,
+                                 seed=7, n_legs_floor=10**6)
+    assert out["in_domain"] is False
+    assert out["pass_positive"] is False
+    assert out["out_of_calibration_domain"] is True
+
+
+def test_a4_seed_disjointness():
+    assert_seed_disjoint_a4()
+    assert DESIGN_SEEDS_A4 == {"low": 99_000, "high": 100_000}
+    assert CONFIRM_SEEDS_A4 == {"low": 101_000, "high": 102_000}
+
+
+def test_floor_none_when_grid_fails():
+    rows = {"low": {"coverage_rows": [{"pass": True, "n_legs": 10**9}],
+                    "alpha_rows": [{"gross_pass": True, "n_legs": 10**9}]}}
+    d = derive_n_legs_floor(rows, alpha=0.05)
+    assert d["floor_star"] is None
+
+
+def test_issue13_pin_seed_provenance_guard():
+    """amend_registry_episode must refuse when pin seed fields != frozen procedure."""
+    from xen.xena.calibration_bybit15 import amend_registry_episode
+    design = {"frozen_procedure": {
+        "design_seeds": {"low": 99_000, "high": 100_000},
+        "confirm_seeds": {"low": 101_000, "high": 102_000},
+    }}
+    confirm = {"outcome": {"verdict": "LOW_ONLY_CERTIFY"}}
+    # default (INFR-015 seeds) mismatches A4 procedure => IntegrityError before any I/O
+    with pytest.raises(IntegrityError):
+        amend_registry_episode("/nonexistent", design, confirm, out_path="/nonexistent2")

@@ -22,7 +22,7 @@ select 1.000 — **bite PASS** (blocking did not kill power).
 
 ## 2. Evidence FOR the amendment mechanism (partial success)
 
-- HIGH cadence: α̂ 0.080 (INFR-014) → **0.055**; cov 0.065 → 0.050; inflation +0.005.
+- HIGH cadence: α̂ 0.080 (INFR-014) → **0.055**; cov 0.050 → 0.050; inflation +0.005.
   Blocks engaged everywhere (B 12–30, median 23; median n_legs 261). Where legs are
   plentiful and overlap-blocking applies, the fix moved both cov and α̂ toward target.
   0.055 is within 1 SE (0.016) of 0.05 — NEAR-MISS band per design §7, still not certified.
@@ -67,3 +67,70 @@ Per-row interrogation of `alpha_low_rows` (n=200):
 **Recommended experiment verdict: TERMINAL-2 (CLS-EPISODE remains uncertified); the
 amendment is NOT SUPPORTED as sufficient, with the overlap mechanism SUPPORTED on HIGH
 as a partial effect. XENA-EPSOSC stays blocked.**
+
+---
+
+# AMENDMENT-4 Analysis (2026-07-18)
+
+**Artifacts:** `results/design_a4_CLS-EPISODE.json`, `results/confirm_a4_CLS-EPISODE.json`,
+`results/cal15_a4_summary.json`, `results/cal15_a4_run.log`,
+`results/bybit_pc_frozen_registry.json` (amended pin, sha `abbb1842…`).
+
+## A4.1 Headline
+
+| Bank | Cadence | cov | α̂ | ood_frac | band |
+|---|---|---:|---:|---:|---|
+| DESIGN-A4 n=80 (99k/100k), F=0 | low | 0.1375 | 0.1250 | 0 | (floor-off rows) |
+| DESIGN-A4, F=0 | high | 0.0375 | 0.0500 | 0 | (floor-off rows) |
+| **F\* derivation** | — | — | — | — | **F\* = 16** (smallest all-ok in grid) |
+| Bite-A4 (F*=16 ON) | low/high | — | — | — | survival 0.000/0.000, select 0.875/1.000 — PASS |
+| CONFIRM-A4 n=200 (101k/102k) | low | **0.025** | **0.030** (Wilson [0.014, 0.064]) | **0.750** | **CERTIFIED** |
+| CONFIRM-A4 | high | **0.060** | **0.030** | 0.000 | FAIL_COV (coverage_limited) |
+
+**Verdict: LOW_ONLY_CERTIFY.** Write policy fired positively: pin amended,
+new sha `abbb184229236a75f624537ca605668a73f6f85138c150e14a3609c4191bf786`,
+`superseded_pins: [ac8a1eb6…]`, CLS-FILTER block canonical-identical (guarded),
+`amended_by: INFR-015/AMENDMENT-4`. **Operator pin sign-off pending.**
+
+## A4.2 Evidence FOR
+
+- Floor curve is clean and monotone on LOW: cov 0.138→0.050, α̂ 0.125→0.025 as F 0→16 —
+  confirms the small-n LCB diagnosis quantitatively (the defect drains exactly as small-n
+  cells leave the domain).
+- Confirm on fresh banks (101k/102k): LOW certified with margin (α̂ 0.030, cov 0.025);
+  seed bases asserted; F* frozen before confirm contact.
+- Bite with floor ON: plant select unchanged (0.875/1.000), survival 0.000 — the
+  predeclared bite criteria are met (QA note: 5/8 LOW bite plants were sub-floor; power
+  read rests on the select/survival criteria, not on plants clearing F*).
+
+## A4.3 Evidence AGAINST / caveats (operator should weigh)
+
+- **LOW out-of-domain fraction 0.75:** under this pin, ~3 in 4 LOW-cadence top-1 subsets
+  are refused certification for thin legs. Certification is calibrated but RARELY REACHABLE
+  on LOW at this universe shape — a real LOW episode family needs ≥16 gate-band legs to be
+  certifiable. Predeclared domain-starvation flag (design §14.2, >0.5) FIRES on LOW.
+- **HIGH regressed to FAIL_COV (0.060 vs 0.050):** floor is inert on HIGH (ood 0.000 —
+  legs plentiful) so HIGH coverage is bank-to-bank noise around the boundary
+  (0.050 → 0.050 → 0.060 across INFR-014/015/A4 banks — QA run 5 Issue 17 correction;
+  SE₂₀₀ ≈ 0.0154). HIGH α̂ 0.030 is
+  fine; the binding miss is the coverage arm at ~0.6·SE above target. Not certifiable
+  under the predeclared point gate; no retune permitted on this bank.
+- LOW deployability_rate 0.01 — net-deployability disclosure remains weak (as CLS-FILTER).
+
+## A4.4 Bottom line
+
+The n_legs_floor amendment did what it targeted: LOW small-n false-certifies eliminated,
+LOW CERTIFIED. Cost: 75% LOW domain refusal + HIGH still uncertified (coverage boundary
+noise, not the floored defect). Recommended verdict: **AMENDMENT-4 SUPPORTED /
+LOW_ONLY_CERTIFY** — pin acceptance is the operator's; if accepted, XENA-EPSOSC unblocks
+on CLS-EPISODE **low cadence only**, with the ood 0.75 reachability caveat binding on any
+XENA-EPSOSC design (expected leg counts must clear F*=16).
+
+## A4.5 Fallback paths if operator rejects (documented per operator instruction)
+
+1. **Episode-level resampling unit** — resample whole episodes (not leg blocks); attacks
+   HIGH coverage boundary + could lower F* by making small-n LCBs honest instead of refused.
+2. **LOW generator leg-starvation realism review** — top-1 subsets at median 11 legs may be
+   a generator artifact (n_cand 64 × thin episode streams); more realistic episode density
+   would shrink ood at fixed F*.
+Both are NEW designs (new ID or operator-directed amendment; this cycle's banks are spent).

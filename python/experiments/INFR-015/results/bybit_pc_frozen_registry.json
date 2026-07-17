@@ -1,0 +1,270 @@
+{
+  "registry": {
+    "schema": "xena.infr014.bybit_pc_registry.v1",
+    "substrate": "bybit_nautilus",
+    "void_priors": [
+      "db87dc1a",
+      "537d691a"
+    ],
+    "limit_entry_cells": false,
+    "l27_next_open_tool": "xen.xena.fill_basis.next_open_discriminating_control",
+    "next_open_sanity": {
+      "n_legs": 592,
+      "n_legs_next_open": 592,
+      "empty": false,
+      "binding": false,
+      "control": "next_open_discriminating",
+      "lesson": "L-27",
+      "live_gross_mean_bps": -6.199788963007653,
+      "next_open_gross_mean_bps": -5.3349082930025435,
+      "live_minus_next_open_bps": -0.8648806700051095,
+      "discrimination_note": "gap\u22480 expected for market-on-open / market-on-confirmed entries; large positive live\u2212next_open gap flags limit-print dominance",
+      "pin_usage": "limit_print_sole_certify_forbidden when gap dominates"
+    },
+    "pin_usage": {
+      "forbid_chapter03_on_bybit": true,
+      "limit_print_sole_certify_forbidden": true,
+      "note_spdr005_2_3b": "CF-EPSOSC must not be certified solely on limit-print passive edge"
+    },
+    "selection_rule_default_hash": "0dd530374fd3283ba9a82796d719c7bbd019d759e62c6987e0162ba5bcfc5ad2",
+    "class_configs": [
+      {
+        "class_id": "CLS-FILTER",
+        "family_prior": "CF-HTFCAP-001",
+        "procedure": {
+          "binder": "two_stage_sample_split",
+          "stage1": "search+certify top-1 on stage-1 bands",
+          "stage1_score_kind": "g_net",
+          "stage1_charge_costs": true,
+          "stage2": "lcb_g_leg_studentized(g_gross) > 0 on distant embargoed band",
+          "e2e_pass_event": "stage2_gross_lcb_positive",
+          "deployability_binding": "stage2_net_lcb_positive",
+          "functional": "g_gross_ratio",
+          "estimator": "leg_studentized_bootstrap_t",
+          "embargo_frac": 0.2,
+          "search_frac": 0.5,
+          "ranking_frac": 0.25,
+          "n_boot": 200,
+          "block_legs": 1,
+          "confidence": 0.95,
+          "alpha": 0.05,
+          "one_subset": true,
+          "shortlist": false,
+          "design_seeds": {
+            "low": 91000,
+            "high": 92000
+          },
+          "confirm_seeds": {
+            "low": 93000,
+            "high": 94000
+          },
+          "design_bite_ok": true,
+          "design_cov_low": 0.0625,
+          "design_cov_high": 0.0375,
+          "held_out_escalation": false,
+          "gate_rule": "per_cadence point \u03b1\u0302\u22645% AND no-search cov\u22645% (Fork A)",
+          "cost_stack": "bybit_round_trip_cost_bps_v1",
+          "gap_spread_bps": 5.0,
+          "class_id": "CLS-FILTER"
+        },
+        "design_seeds": {
+          "low": 91000,
+          "high": 92000
+        },
+        "confirm_seeds": {
+          "low": 93000,
+          "high": 94000
+        },
+        "cost_stack": "bybit_round_trip_cost_bps_v1",
+        "stage1_score_kind": "g_net",
+        "stage1_charge_costs": true,
+        "e2e_pass_event": "stage2_gross_lcb_positive",
+        "deployability_binding": "stage2_net_lcb_positive",
+        "confirm_summary": {
+          "verdict": "LOW_ONLY_CERTIFY",
+          "certified": true,
+          "per_cadence": {
+            "low": {
+              "cadence": "low",
+              "band": "CERTIFIED",
+              "deployability": "DEPLOY_WEAK",
+              "no_search_cov": 0.035,
+              "e2e_alpha": 0.045,
+              "selection_inflation": 0.009999999999999995,
+              "coverage_ok": true,
+              "alpha_ok": true,
+              "certified": true,
+              "alpha_se": 0.014658615214269049,
+              "alpha_wilson_95": {
+                "low": 0.023852271724704163,
+                "high": 0.08329759366096785
+              },
+              "n": 200,
+              "n_gross_lcb_positive": 9,
+              "deployability_rate": 0.01,
+              "seed_bases": {
+                "low": 93000,
+                "high": 94000
+              },
+              "alpha_target": 0.05,
+              "failure_label": null
+            },
+            "high": {
+              "cadence": "high",
+              "band": "FAIL_ALPHA",
+              "deployability": "N/A",
+              "no_search_cov": 0.065,
+              "e2e_alpha": 0.06,
+              "selection_inflation": -0.0050000000000000044,
+              "coverage_ok": false,
+              "alpha_ok": false,
+              "certified": false,
+              "alpha_se": 0.016792855623746664,
+              "alpha_wilson_95": {
+                "low": 0.0346518499012715,
+                "high": 0.10193263530685089
+              },
+              "n": 200,
+              "n_gross_lcb_positive": 12,
+              "deployability_rate": 0.0,
+              "seed_bases": {
+                "low": 93000,
+                "high": 94000
+              },
+              "alpha_target": 0.05,
+              "failure_label": "coverage_limited"
+            }
+          },
+          "recommend": "route_low_only",
+          "terminal": false
+        },
+        "limit_entry_cells": false,
+        "design_ok": true
+      },
+      {
+        "class_id": "CLS-EPISODE",
+        "family_prior": "CF-EPSOSC-001",
+        "procedure": {
+          "binder": "two_stage_sample_split",
+          "stage1": "search+certify top-1 on stage-1 bands",
+          "stage1_score_kind": "g_net",
+          "stage1_charge_costs": true,
+          "stage2": "lcb_g_leg_studentized(g_gross) > 0 on distant embargoed band",
+          "e2e_pass_event": "stage2_gross_lcb_positive",
+          "deployability_binding": "stage2_net_lcb_positive",
+          "functional": "g_gross_ratio",
+          "estimator": "leg_studentized_bootstrap_t",
+          "embargo_frac": 0.2,
+          "search_frac": 0.5,
+          "ranking_frac": 0.25,
+          "n_boot": 200,
+          "block_legs": "episode_overlap_rule_v1",
+          "n_legs_floor": 16,
+          "n_legs_floor_rule": "F* = smallest F in grid with design cov(F)<=alpha AND alpha_hat(F)<=alpha on BOTH cadences; None => TERMINAL-3",
+          "confidence": 0.95,
+          "alpha": 0.05,
+          "one_subset": true,
+          "shortlist": false,
+          "design_seeds": {
+            "low": 99000,
+            "high": 100000
+          },
+          "confirm_seeds": {
+            "low": 101000,
+            "high": 102000
+          },
+          "design_bite_ok": true,
+          "held_out_escalation": false,
+          "gate_rule": "per_cadence point \u03b1\u0302\u22645% AND no-search cov\u22645% (Fork A)",
+          "cost_stack": "bybit_round_trip_cost_bps_v1",
+          "gap_spread_bps": 5.0,
+          "class_id": "CLS-EPISODE",
+          "amends": "INFR-015 AMENDMENT-4 (floor guard atop overlap blocks)"
+        },
+        "design_seeds": {
+          "low": 99000,
+          "high": 100000
+        },
+        "confirm_seeds": {
+          "low": 101000,
+          "high": 102000
+        },
+        "cost_stack": "bybit_round_trip_cost_bps_v1",
+        "stage1_score_kind": "g_net",
+        "stage1_charge_costs": true,
+        "e2e_pass_event": "stage2_gross_lcb_positive",
+        "deployability_binding": "stage2_net_lcb_positive",
+        "confirm_summary": {
+          "verdict": "LOW_ONLY_CERTIFY",
+          "certified": true,
+          "per_cadence": {
+            "low": {
+              "cadence": "low",
+              "band": "CERTIFIED",
+              "deployability": "DEPLOY_WEAK",
+              "no_search_cov": 0.025,
+              "e2e_alpha": 0.03,
+              "selection_inflation": 0.0049999999999999975,
+              "coverage_ok": true,
+              "alpha_ok": true,
+              "certified": true,
+              "alpha_se": 0.012062338081814818,
+              "alpha_wilson_95": {
+                "low": 0.013820125830748323,
+                "high": 0.06389511973247333
+              },
+              "n": 200,
+              "n_gross_lcb_positive": 6,
+              "deployability_rate": 0.01,
+              "out_of_domain_frac": 0.75,
+              "seed_bases": {
+                "low": 101000,
+                "high": 102000
+              },
+              "alpha_target": 0.05,
+              "n_legs_floor": 16,
+              "failure_label": null
+            },
+            "high": {
+              "cadence": "high",
+              "band": "FAIL_COV",
+              "deployability": "N/A",
+              "no_search_cov": 0.06,
+              "e2e_alpha": 0.03,
+              "selection_inflation": -0.03,
+              "coverage_ok": false,
+              "alpha_ok": true,
+              "certified": false,
+              "alpha_se": 0.012062338081814818,
+              "alpha_wilson_95": {
+                "low": 0.013820125830748323,
+                "high": 0.06389511973247333
+              },
+              "n": 200,
+              "n_gross_lcb_positive": 6,
+              "deployability_rate": 0.0,
+              "out_of_domain_frac": 0.0,
+              "seed_bases": {
+                "low": 101000,
+                "high": 102000
+              },
+              "alpha_target": 0.05,
+              "n_legs_floor": 16,
+              "failure_label": "coverage_limited"
+            }
+          },
+          "recommend": "route_low_only",
+          "terminal": false
+        },
+        "limit_entry_cells": false,
+        "design_ok": true,
+        "amended_by": "INFR-015/AMENDMENT-4"
+      }
+    ],
+    "partial_writes": false,
+    "superseded_pins": [
+      "ac8a1eb679e22290d854ad245ef1620f5f8bdb446a5c0166c618d0c292b2da6f"
+    ]
+  },
+  "sha256": "abbb184229236a75f624537ca605668a73f6f85138c150e14a3609c4191bf786"
+}

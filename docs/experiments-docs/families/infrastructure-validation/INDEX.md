@@ -68,9 +68,15 @@ Not a candidate family — no signals, no slots; apparatus and substrate work on
   [0.031, 0.096]) — TERMINAL-2, write policy refused amendment, pin `ac8a1eb6…` unchanged
   (QA re-hash verified). LOW false-certifies concentrate at top-1 n_legs<8 (pass 0.179,
   B=1 ⇒ fix inert); HIGH (n_legs median 261, B median 23) improved vs INFR-014.
-- **Hypothesis-Specific Conclusion:** amendment NOT sufficient — **TERMINAL-2, operator
-  verdict pending**; XENA-EPSOSC stays blocked.
+- **Hypothesis-Specific Conclusion:** cycle 1 amendment NOT sufficient — TERMINAL-2,
+  operator-approved. **AMENDMENT-4** (operator-directed, 2026-07-18): derived
+  `n_legs_floor` F*=16 atop kept blocks, fresh banks 99k–102k/955k–956k → confirm LOW
+  **CERTIFIED** (cov 0.025, α̂ 0.030, ood 0.75), HIGH FAIL_COV (0.060) →
+  **LOW_ONLY_CERTIFY; pin AMENDED sha `abbb1842…` (supersedes `ac8a1eb6…`,
+  CLS-FILTER canonical-identical) — operator sign-off pending.**
 - **Hypothesis-Agnostic Observations:** overlap correlation real but secondary on LOW; the
-  binding CLS-EPISODE defect is small-sample studentized-LCB fragility at n_legs<~16 —
-  next form candidates: derived n_legs_floor domain guard, episode-level resampling.
-  Report: `python/experiments/INFR-015/report.md`.
+  binding CLS-EPISODE defect was small-sample studentized-LCB fragility at n_legs<~16 —
+  proven by the monotone floor curve (cov 0.138→0.050 as F 0→16). Domain floors trade FPR
+  for reachability (LOW ood 0.75): calibrated certification ≠ reachable certification —
+  XENA designs must budget expected leg counts vs F*. Fallbacks if pin rejected: episode
+  resampling; generator realism. Report: `python/experiments/INFR-015/report.md`.

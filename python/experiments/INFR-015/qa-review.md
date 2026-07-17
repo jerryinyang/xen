@@ -206,3 +206,136 @@ Dirty state at review: untracked `python/experiments/INFR-015/`, `python/src/xen
 
 ### Disposition
 APPROVE. All analysis.md numbers reproduce from the raw artifacts; per-slice table recomputed exactly; seed integrity holds on confirm bases 97000/98000 with no design contamination; write policy held (no registry write, INFR-014 pin ac8a1eb6… re-verified live); frozen harness untouched; no retune/optional stopping; governance clean. Outcome TERMINAL-2 stands: CLS-EPISODE remains uncertified; XENA-EPSOSC stays blocked. Issues 10–12 are informative only.
+
+## QA run 4 — 2026-07-17T10:55:41Z — mode: subagent — HEAD ec87269012ed7dbed60dee4486dc2d1c77c160cc
+Reviewed dirty state: design.md (+§14 append), report.md (§7/§8 update), calibration_bybit15.py (pure append, verified via git diff), test_xena_infr015.py (+A4 tests), new code/run_cal15_a4.py.
+Scope: pre-execution review of AMENDMENT-4 (design §14 + implementation). Runs 1–3 stand unmodified.
+
+Verdict: **REVISE** — one material defect on the CERTIFY write path (Issue 13); all other clauses MATCH.
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §14 direction TIGHTER, ledger 0L/1T/3N | design.md:253-257 | MATCHES | Floor can only remove certifications; ledger arithmetic correct; no streak ≥3 in one direction (3N+1T) |
+| §14 deviation from §13 authorized | report.md:95-105 (operator verbatim) | MATCHES | Operator TERMINAL-2 approval + directed amendment recorded verbatim; spent banks never reused |
+| §14.1 floor via existing `n_legs_floor` param | score.py:306-350; calibration_bybit15.py:641-668 | MATCHES | `n_legs < floor ⇒ in_domain=False ⇒ pass_positive=False`; LCB itself unchanged by the floor (score.py:325-347), so floor-ON pass ≡ floor-OFF pass ∧ n_legs ≥ F — the §14.2 monotone-filter equivalence is exact |
+| §14.1 block rule kept | calibration_bybit15.py:654-663 | MATCHES | Same `episode_overlap_block_legs` routing; `eval_lcb_legs_ep_floor` calls `lcb_g_leg_studentized(seed+99, block_legs=b, confidence=0.95)` even at b==1 — bit-identical to the legacy `eval_lcb_legs` path (p3d:74-81, LCB_CONF=0.95, same seed offset), so G2 identity is preserved without the explicit route |
+| §14.2 grid predeclared | calibration_bybit15.py:613 `FLOOR_GRID` | MATCHES | (0,4,6,8,10,12,16,20,24,32) verbatim |
+| §14.2 one design-bank run, post-hoc filter | run_design_a4:789-810; derive_n_legs_floor:671-710 | MATCHES | Floor-OFF cov+e2e rows collected once (`_bank_rows_ep`); per-floor evaluation is pure counting; filter direction CORRECT: false-certify counted iff `pass ∧ n_legs ≥ F` (cov_rows use `pass`, alpha_rows `gross_pass` — matches emitting row schemas at :293/:325); `n_legs=None→0` conservative |
+| §14.2 F* = smallest F passing both gates both cadences; None ⇒ TERMINAL-3 | derive_n_legs_floor:702-704; run_design_a4:805-810 | MATCHES | `chosen` = first all_ok in ascending grid; None returns design_ok=False, terminal, "TERMINAL-3_no_admissible_floor", no confirm |
+| §14.2 out-of-domain disclosure | derive:692,699; e2e_alpha_a4:951,958 | MATCHES | ood frac per cadence per floor + at confirm; informative only |
+| §14.2 F* frozen before confirm | run_design_a4:844; confirm_gate_a4:970-982 | MATCHES | `n_legs_floor` in frozen procedure; confirm reads it (`fstar = int(procedure["n_legs_floor"])`), never recomputes; forbidden list includes "no floor adjustment after design freeze" |
+| §14.3 banks 99k/100k, 101k/102k, 955k/956k | :614-616 | MATCHES | Constants verbatim |
+| §14.3 disjoint from ALL prior | assert_seed_disjoint_a4:623-638 | MATCHES | Prior set = INFR-014 (91k–94k+500, 951k/952k+50) + ch03 + `_SPENT_15_RANGES` (95k–98k+500, 953k/954k+50); called in run_design_a4 AND confirm_gate_a4 |
+| §14.3 confirm n=200, no optional stopping | confirm_gate_a4:983-984 | MATCHES | Refuses n_null≠200 for scale.name=="confirm"; n fixed by ScaleSpec |
+| §14.3 coverage arm asserts CONFIRM-A4 bases | confirm_gate_a4:992-998 | MATCHES | Both coverage and e2e seed_bases hard-asserted == CONFIRM_SEEDS_A4 (Issue-9 class) |
+| §14.4 everything else verbatim | frozen dict :829-858 vs :386-422 | MATCHES | binder/stage1/embargo/fracs/n_boot/confidence/alpha/gate rule/α̂ event identical; only additions are n_legs_floor(+rule) |
+| §14.4 bite same criteria, floor active | bite_check_a4:728-786; run_design_a4:812-827 | MATCHES | Runs AFTER derivation with F* ON (correct power check — the guard must not kill plant certification); select≥0.5 / survival≤0.125 both cadences; FAIL ⇒ TERMINAL-3, no confirm. See Issue 14 on §14.2 wording |
+| §14.4 G4a/G4b/G4c golden traces | tests :126-141, :144-150, :153-167 | MATCHES | G4a: F=8 counts rows (T,8),(T,20) ⇒ 0.5, F=0 ⇒ 0.75 — hand-checked against §14.4 fixture; G4b missing-floor IntegrityError; G4c out-of-domain flags. Expected values from design, not from running the implementation |
+| §14.5 exit table | run_cal15_a4.py:49-53,60-70 | MATCHES | TERMINAL-3 paths (no floor / bite fail) write summary and stop before confirm; confirm-fail path: `amend_registry_episode` raises on non-certifiable verdict ⇒ `pin_amended=false` + `write_refusal`, no write |
+| §11 write policy reuse | amend_registry_episode:536-606 | DEVIATES | Write policy (refuse non-certifiable, CLS-FILTER canonical-identical, supersede sha) correct — but see Issue 13: A4 path would stamp WRONG seed metadata into a certified pin |
+
+### Golden-trace diff
+- G4a fixture (design §14.4): rows {(T,4),(T,8),(F,50),(T,20)} under F=8 ⇒ numerator {row2,row4} = 2/4. `derive_n_legs_floor` counts `gross_pass ∧ n_legs≥8` ⇒ (T,8)✓,(T,20)✓,(T,4)✗,(F,50)✗ = 0.5. MATCHES (test_g4a asserts exactly this).
+- G4b: procedure with block rule but no `n_legs_floor` ⇒ IntegrityError at confirm_gate_a4:970-973. MATCHES.
+- G4c: `n_legs < F*` ⇒ pass_positive=False, out_of_calibration_domain=True — score.py:325-350 sets exactly these. MATCHES.
+- Monotone-filter equivalence (the §14.2 load-bearing identity): verified by code reading that the floor changes ONLY the pass flag, never the LCB/seed/block path; floor-OFF derivation rows therefore predict floor-ON behaviour exactly on the same bank. Confirm then runs floor-ON on DISJOINT 101k/102k banks — no design-row reuse in the binding gate.
+
+### Faithfulness of duplicated stage-1 (e2e_alpha_a4 / bite_check_a4 vs run_two_stage_ep)
+Line-by-line diff: same `_search_params(cspec)`, budget/restarts from ScaleSpec, `restart_id=r+1`, `segment=layout.search`, `skip_economics_precondition=True`, `score_kind="g_net"`, 3 contiguous purged folds with `purge_ns=max(hold_bars,1)*60*NS`, `certify_and_rank` flags identical, single top-1, gross seed=seed / net seed=seed+17, stage-2 seed+99 inside. No drift found. Minor: `e2e_alpha_a4` omits the per-call `assert_stage1_net_binding` (it is asserted once in confirm_gate_a4 from the frozen procedure, and g_net/charge_costs are hardcoded) — acceptable, noted.
+
+### Governance & boundary
+- Tests: `uv run pytest tests/test_xena_infr015.py tests/test_xena_infr014.py -q` → **25 passed** (12 INFR-015 incl. G4a/G4b/G4c, 13 INFR-014).
+- Frozen `calibration_bybit.py` untouched (git clean; last commit 89fb4fe). INFR-014 artifacts clean. `calibration_bybit15.py` diff is pure append after line 604. Prior INFR-015 artifacts unmodified except design §14 append + report §7/§8 operator-record update. run_cal15.py unchanged. New file: run_cal15_a4.py only.
+- No accounting primitives in experiment code (runner is orchestration + json dump only); no Python strategy backtest; synthetic banks only — holdout untouched.
+- Amendment ledger: L-23 satisfied (0L/1T/3N; TIGHTER declared and correct). Deviation from §13 operator-authorized with verbatim record (report §8) — evidence, not assertion.
+- L-28 derangement: N/A (no permutation destroy — deplant is band removal), declared in §6. L-31: N/A (no BacktestNode). CONVERSION-PIN / SPREAD-SCALE-ROUTING / L-22: N/A per §12, reasons valid. XENA frozen-registry clauses: no registry consumed at run time; the only registry touch is the verified INFR-014 pin on the (gated) amend path. No agent-authored attestation anywhere.
+- No optional stopping: n fixed by ScaleSpecs; forbidden lists present in both confirm gates.
+
+### Issues (numbered from 13)
+13. **MATERIAL (design §11/§14.3 vs calibration_bybit15.py:571-572, run_cal15_a4.py:61-63) — certified A4 pin would record the WRONG seed banks.** `amend_registry_episode` hard-codes `"design_seeds": dict(DESIGN_SEEDS_15)` (95k/96k) and `"confirm_seeds": dict(CONFIRM_SEEDS_15)` (97k/98k) into the class-config block, but the A4 evidence comes from 99k/100k and 101k/102k. The embedded `procedure` dict carries the correct A4 seeds, so a certified pin would be internally contradictory, and top-level seed fields are provenance-bearing (future seed-disjointness reasoning reads pins). Fires only on the CERTIFY path — but that is exactly the path the pin exists for. Required change (experiment-developer): A4-specific amend wrapper (or seed parameters) writing DESIGN_SEEDS_A4/CONFIRM_SEEDS_A4 (and preferably `"amended_by": "INFR-015/AMENDMENT-4"`); one regression test asserting the pin's top-level seeds equal the A4 constants.
+14. **MINOR (design §14.2 wording vs run_design_a4:812-827) — bite floor state ambiguous in design text.** §14.2's sentence groups "bite" into the floor-OFF design-bank run, but bite uses its own 955k/956k banks and the implementation runs it with F* ON — which is the mechanistically correct power check (§14.1: guard must not kill plant certification) and the TIGHTER reading. Recommend a one-line §14.2 clarification (DIRECTION: NEUTRAL) at or before the execution gate; not blocking.
+15. **INFO (assert_seed_disjoint_a4:624-631) — carry-over of Issue 10.** Reserved windows (+500/+50) remain narrower than worst-case consumption (~+605 observed on confirm banks in the original cycle). A4 bases are 1000 apart and 102k+605 collides with nothing, so disjointness holds empirically; widen to +1000 in any successor harness.
+16. **INFO (run_cal15_a4.py:57) — confirm-fail summary verdict label.** On confirm failure the summary records the outcome verdict (e.g. "TERMINAL") plus `write_refusal`, not the literal "TERMINAL-3" of §14.5. Cosmetic; the no-write behaviour is correct.
+
+### Disposition
+REVISE — Issue 13 must be fixed (and covered by a test) before execution; it is the only defect that can corrupt the deliverable. Design §14 itself is coherent, predeclared, properly authorized, and F06-compliant; the monotone floor filter is mathematically exact against the shared estimator; seeds are fully disjoint; duplicated stage-1 logic is faithful; all 25 tests pass; frozen harness and prior artifacts untouched. On the Issue-13 fix (plus optional Issue-14 wording), this reviewer expects APPROVE without re-litigating the above.
+
+## QA run 4b — 2026-07-17T11:01:49Z — mode: subagent — HEAD ec87269012ed7dbed60dee4486dc2d1c77c160cc
+Verdict: **APPROVE**
+
+Scope: fix-verification of run-4 Issues 13-16 only (per run-4 disposition, run-4 MATCHES clauses not re-litigated).
+
+### Fix-verification table
+
+| Issue | Fix claimed | Verified | Evidence |
+|---|---|---|---|
+| 13 (MATERIAL) | Seed params + provenance guard in `amend_registry_episode` | FIXED | calibration_bybit15.py:536-560 — `design_seeds`/`confirm_seeds`/`amended_by` params (defaults = 15-era 95k-98k); guard at :557 raises IntegrityError when params != `design["frozen_procedure"]` seed fields. Guard fires at :557, BEFORE first file I/O (`verify_bybit_registry` at :569) — confirmed by code order and by test using `/nonexistent` paths. Pin block now stamps passed-in seeds (:583-584) + `amended_by` (:599) |
+| 13 — A4 runner | run_cal15_a4.py passes A4 seeds | FIXED | run_cal15_a4.py:66-67 — `design_seeds=DESIGN_SEEDS_A4, confirm_seeds=CONFIRM_SEEDS_A4, amended_by="INFR-015/AMENDMENT-4"`; A4 frozen dict carries A4 seeds (:862-863), so guard passes on CERTIFY path and pin top-level seeds == procedure seeds structurally |
+| 13 — original path | run_cal15.py defaults still correct | VERIFIED | run_cal15.py:52-54 — no seed params → defaults `DESIGN_SEEDS_15`={95k,96k}/`CONFIRM_SEEDS_15`={97k,98k} (:64-65); `run_design_ep` frozen dict includes matching `design_seeds`/`confirm_seeds` (:411-412), so guard passes for a 15-era frozen procedure |
+| 13 — regression test | test_issue13_pin_seed_provenance_guard | PRESENT | tests/test_xena_infr015.py:183-193 — A4 frozen procedure + default (15-era) params ⇒ IntegrityError; nonexistent paths prove pre-I/O firing. Note (INFO): no positive-path test asserting a written pin's top-level seeds, but the guard makes pin-seeds != procedure-seeds unreachable, satisfying run-4 intent |
+| 14 (MINOR) | design §14.2 bite-floor-ON wording | FIXED | design.md:276-277 — "bite then runs with F* ON (power must survive the guard — QA run 4 Issue 14 clarification)"; matches code (run_design_a4 :824-827, `bite_check_a4(..., n_legs_floor=fstar)`). DIRECTION: NEUTRAL (wording only) |
+| 15 (INFO) | none required | ACCEPTED | Reserved-window note stands for successor harness; non-blocking |
+| 16 (INFO) | none required | ACCEPTED | Cosmetic verdict label; no-write behaviour correct; non-blocking |
+
+### Test run
+`uv run pytest tests/test_xena_infr015.py tests/test_xena_infr014.py -q` → **26 passed** in 0.44s.
+
+### Scope check
+`git diff --stat` vs HEAD ec87269: only design.md, qa-review.md, report.md, calibration_bybit15.py, test_xena_infr015.py (+ new run_cal15_a4.py, untracked) — all within the AMENDMENT-4/fix scope; no other files touched.
+
+### Disposition
+APPROVE — Issue 13 fixed with pre-I/O provenance guard and regression test; Issue 14 wording aligned; ready for the operator's execution gate.
+
+## QA run 5 — 2026-07-17T11:31:13Z — mode: subagent — HEAD ec87269012ed7dbed60dee4486dc2d1c77c160cc
+Post-execution audit of AMENDMENT-4. Dirty files at review: analysis.md, design.md, qa-review.md, report.md, calibration_bybit15.py, test_xena_infr015.py (+ untracked run_cal15_a4.py, results/{bybit_pc_frozen_registry,cal15_a4_summary,confirm_a4_CLS-EPISODE,design_a4_CLS-EPISODE}.json) — all in-scope.
+
+Verdict: **APPROVE** (artifacts faithful; governance held; pin ACCEPTANCE remains the operator's). Two editorial corrections requested in analysis (Issues 17–18); neither is verdict-material.
+
+### 1. Numbers vs raw artifacts (all recomputed independently)
+
+| Claim (analysis A4.1/A4.3) | Artifact | Recomputed | Verdict |
+|---|---|---|---|
+| DESIGN F=0 low cov 0.1375 / α̂ 0.1250 | design_a4 curve | 11/80, 10/80 from per-row data | MATCH |
+| DESIGN F=0 high cov 0.0375 / α̂ 0.0500 | design_a4 curve | 3/80, 4/80 | MATCH |
+| F=12 row low cov 0.075 / α̂ 0.025 / ood 0.5125 | curve | recomputed from coverage_rows/alpha_rows (`gross_pass ∧ n_legs≥F`; ood over alpha rows) | MATCH exact |
+| F=16 row low cov 0.050 / α̂ 0.025 / ood 0.750 | curve | recomputed | MATCH exact |
+| CONFIRM low cov 0.025 / α̂ 0.030 / ood 0.750 / Wilson [0.014,0.064] | confirm_a4 | 5/200, 6/200, 150/200 from rows | MATCH |
+| CONFIRM high cov 0.060 / α̂ 0.030 / ood 0.000, FAIL_COV coverage_limited | confirm_a4 | 12/200, 6/200 | MATCH |
+| Bite F*=16 ON: survival 0.000/0.000, select 0.875/1.000 | design_a4.bite + bite_rows (bases 955000/956000 per §14.3) | criteria select≥0.5, survival≤0.125 — PASS | MATCH |
+| cal15_a4_summary.json / cal15_a4_run.log | identical per-cadence blocks; log shows exactly ONE design→bite→confirm→write sequence with matching numbers | — | MATCH |
+
+### 2. F* derivation integrity
+- Full grid {0,4,6,8,10,12,16,20,24,32} reproduced from per-row data; F=16 is the **smallest all_ok** point (F≤12 fail on LOW cov; F∈{16,20,24,32} all ok). Curve monotone non-increasing in cov and α̂ on both cadences. PASS.
+- frozen_procedure carries n_legs_floor=16 + rule string + design_seeds {99000,100000} + confirm_seeds {101000,102000}; confirm procedure block byte-matches it. PASS.
+- Confirm rows: low seeds 101000–101605, high 102000–102605; design seeds 99000–100605; **zero overlap** (and disjoint from 91k–98k, 951k–956k). PASS.
+
+### 3. Amended pin (results/bybit_pc_frozen_registry.json)
+- `verify_bybit_registry` on new pin: **PASS**. Canonical sha independently recomputed (sha256 of sort_keys registry blob) = `abbb184229236a75f624537ca605668a73f6f85138c150e14a3609c4191bf786` — matches embedded sha and summary. PASS.
+- CLS-FILTER block canonical-identical (sort_keys JSON equality) to the block in INFR-014's pin `ac8a1eb6…`. PASS.
+- `superseded_pins == [ac8a1eb679…2da6f]`. PASS.
+- CLS-EPISODE block: `amended_by: INFR-015/AMENDMENT-4`; confirm_summary verdict LOW_ONLY_CERTIFY, certified true (low certified, high FAIL_COV); n_legs_floor 16 in procedure + per-cadence; A4 seeds 99k/100k design + 101k/102k confirm stamped (Issue-13 guard outcome correct). PASS.
+- INFR-014's own pin file UNCHANGED: re-verified in place, sha still `ac8a1eb6…`. PASS.
+
+### 4. Governance
+- No retune: F* frozen in design artifact before confirm (log ordering confirms); single execution sequence in log; `stop_condition.forbidden` carries no-optional-stopping / no-floor-adjustment / no-UCB / no-ch03-pin list. PASS.
+- n=200 fixed both confirm cadences; design n=80 per §14.3. PASS.
+- No chapter-03 pin load: runner reads only INFR-014 pin; void_priors [db87dc1a, 537d691a] intact. PASS. No holdout/TEST contact (synthetic seed banks only). No family transitions (CLS-FILTER untouched; experiment-level only). PASS.
+- Bite ran floor ON (n_legs_floor 16 in bite blocks; QA-4 Issue-14 semantics). PASS.
+- L-23: §14 declares TIGHTER, running count 0 looser / 1 tighter / 3 neutral — no one-directional streak. PASS.
+- Tests: 13/13 pass (test_xena_infr015.py, incl. Issue-13 provenance guard).
+
+### 5. Claims vs evidence
+- Monotone floor curve claim: SUPPORTED (verified above).
+- ood 0.75 domain-starvation flag (§14.2 >0.5): fired and disclosed — faithful.
+- **HIGH boundary-noise sequence "0.065 → 0.050 → 0.060" — MISCITED (Issue 17)**: 0.065 is INFR-014 **CLS-FILTER** high cov; INFR-014 **CLS-EPISODE** high cov is **0.050** (confirm_CLS-EPISODE.json). Correct sequence: 0.050 → 0.050 → 0.060. The boundary-noise framing itself survives (max excursion ≈0.65·SE₂₀₀=0.0154; α̂ 0.030 fine) — conclusion unchanged, citation wrong. Same miscite at analysis.md:25 and report.md:49.
+- Bite power claim "plants carry enough legs" — **overstated on LOW (Issue 18)**: 5/8 LOW bite plant rows have n_legs<16 (in_domain false); only HIGH plants (130–262 legs) clear the floor. Bite PASS rests on the predeclared select≥0.5 / survival≤0.125 criteria, which are met; the parenthetical rationale is story-beyond-evidence for LOW.
+
+### Issues (continuing from 16)
+17. **MINOR (analysis.md:113, :25; report.md:49)** — HIGH cov 0.065 attributed to INFR-014 CLS-EPISODE is actually CLS-FILTER high; CLS-EPISODE high was 0.050. Correct the three-bank sequence to 0.050→0.050→0.060 (framing/verdict unaffected).
+18. **INFO (analysis.md:102-103)** — "plants carry enough legs" holds only for HIGH; LOW bite plants are majority sub-floor. Reword to cite the predeclared bite criteria (select≥0.5, survival≤0.125) as the basis of PASS.
+19. **INFO (confirm_a4 per_cadence)** — `deployability_rate` 0.01 counts net_pass floor-OFF (2/200); net∧gross∧in-domain is 0.005. Disclosure-only metric; note the definition wherever quoted.
+
+### Disposition
+APPROVE — all binding numbers reproduce exactly from raw artifacts; F*=16 derivation and freeze are sound; the amended pin verifies, is provenance-correct, and leaves the INFR-014 pin intact; governance constraints held. Operator pin sign-off remains PENDING and is not granted by this review. Issues 17–18 are editorial corrections for analysis/report before archival.

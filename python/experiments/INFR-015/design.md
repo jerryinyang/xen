@@ -244,3 +244,67 @@ INFORMATIVE (operator judges): α̂, cov, inflation, Wilson, LCB-width ratio, bi
 | design bank: bite FAIL or cov still ≈0.10 | Fork B TERMINAL — no confirm spend, no pin write |
 | confirm: ≥1 cadence CERTIFIED | amend pin (§11) → operator sign-off gate |
 | confirm: TERMINAL-2 | pin stands; next form change = new design (episode-level resampling unit or generator realism), operator chooses at checkpoint |
+
+---
+
+## 14. AMENDMENT-4 — derived n_legs_floor stage-2 domain guard (operator-directed, 2026-07-18)
+
+```
+AMENDMENT-4: add DERIVED n_legs_floor to CLS-EPISODE stage-2 (blocked estimator kept);
+  floor derived on a FRESH design bank, frozen, confirmed on a FRESH confirm bank.
+  DIRECTION: TIGHTER
+  running count: 0 looser / 1 tighter / 3 neutral
+```
+
+**Authorization + deviation.** Operator approved TERMINAL-2 and directed this follow-up run
+as an INFR-015 amendment (report §8), overriding §13's "new design" exit. Discipline
+preserved: the spent 95k–98k banks are NEVER reused; this is a predeclared new cycle on
+fresh seeds with one added form element.
+
+### 14.1 Mechanism (targets the PROVEN defect)
+
+TERMINAL-2 diagnosis: LOW false-certifies concentrate at top-1 n_legs<8 (pass 0.179 on 67
+rows) where studentized bootstrap-t is fragile and blocking is inert (B=1). Fix: stage-2
+refuses to certify below a leg-count domain floor (`lcb_g_leg_studentized(n_legs_floor=F*)`
+— existing param; out-of-domain ⇒ pass_positive=False ⇒ counted as non-certify in α̂ AND
+unavailable to live XENA). Block rule `episode_overlap_rule_v1` kept (SUPPORTED on HIGH).
+
+### 14.2 Floor derivation rule (F06 pattern — computed, never asserted)
+
+- Grid (predeclared): F ∈ {0, 4, 6, 8, 10, 12, 16, 20, 24, 32}.
+- Run the A4 DESIGN bank ONCE (no per-floor reruns): no-search coverage + e2e α̂ with
+  floor OFF, recording per-row `n_legs`; bite then runs with F* ON (power must survive
+  the guard — QA run 4 Issue 14 clarification). Floor evaluation is deterministic post-hoc
+  monotone filtering: under floor F a row false-certifies iff `gross_pass ∧ n_legs ≥ F`.
+- **F\* = smallest F in grid** s.t. design cov(F) ≤ 0.05 AND design α̂(F) ≤ 0.05 on BOTH
+  cadences. No such F ⇒ **TERMINAL-3, no confirm spend, no write**.
+- Disclosure (informative): out-of-domain fraction per cadence at F*; if >0.5 on a cadence,
+  flagged as domain-starved for the operator (certification would rarely be reachable live).
+- F* frozen into the procedure dict before any confirm seed runs; never adjusted after.
+
+### 14.3 Banks (fresh; disjoint from 91k–98k, 951k–954k, all ch03)
+
+| Bank | Seeds | n_null | Role |
+|---|---|---:|---|
+| DESIGN-A4 | low **99000**, high **100000** | 80 | bite + cov/α̂ rows for floor curve; freeze F* |
+| BITE-A4 | low **955000**, high **956000** | — | same criteria (select ≥0.5, survival ≤0.125) |
+| CONFIRM-A4 | low **101000**, high **102000** | 200 | binding α̂ + cov with floor ON; point-α̂ gate |
+
+No optional stopping; incomplete ⇒ no write; coverage arm hard-asserts CONFIRM-A4 bases.
+
+### 14.4 Everything else unchanged
+
+Binder/stage-1/embargo/fracs/n_boot/confidence/α/gate rule/α̂ event/write policy §11 all
+verbatim from §3–§5. Generator byte-identical (fingerprint assert). Golden traces: G4a —
+fixture rows (gross_pass, n_legs) ∈ {(T,4),(T,8),(F,50),(T,20)} under F=8 ⇒ α̂ numerator
+counts rows 2 and 4 only; G4b — confirm procedure missing `n_legs_floor` ⇒ IntegrityError;
+G4c — stage-2 result with n_legs < F* must carry pass_positive=False + out_of_calibration_domain=True.
+
+### 14.5 Exit criteria (amended)
+
+| Outcome | Action |
+|---|---|
+| No F in grid works on design bank | TERMINAL-3 — no confirm, no write; pin stands |
+| Bite-A4 FAIL | TERMINAL-3 — Fork B, no confirm |
+| Confirm-A4 ≥1 cadence CERTIFIED | amend pin per §11 → operator sign-off |
+| Confirm-A4 fails | TERMINAL-3 — pin stands; NEXT paths (operator/checkpoint, each a NEW design): (a) episode-level resampling unit (resample episodes not leg-blocks); (b) LOW generator leg-starvation realism review (top-1 subsets too thin — n_cand/episode-density rework) |
