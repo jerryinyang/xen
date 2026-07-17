@@ -7,6 +7,7 @@ Not a candidate family — no signals, no slots; apparatus and substrate work on
 
 - [VAL-008 — INFR-010 Phase D end-to-end pipeline dry run](#val-008)
 - [INFR-014 — Fresh Bybit XENA CAL + universe_selection](#infr-014)
+- [INFR-015 — CLS-EPISODE overlap-block binder amendment](#infr-015)
 
 ## VAL-008 — INFR-010 Phase D end-to-end pipeline dry run {#val-008}
 
@@ -54,3 +55,22 @@ Not a candidate family — no signals, no slots; apparatus and substrate work on
 - **Hypothesis-Agnostic Observations:** confirm-bank seed contamination is a hard integrity
   bug class (cov must share confirm bases with α̂); multi-instrument single-node admissible
   for batch topology. Report: `python/experiments/INFR-014/report.md`.
+
+## INFR-015 — CLS-EPISODE overlap-block binder amendment {#infr-015}
+
+- **Hypothesis Tests:** does `episode_overlap_rule_v1` (deterministic B from q90 duration /
+  median entry gap, capped n/4) on the stage-2 leg bootstrap restore α̂ ≤ 5% ∧ cov ≤ 5% on
+  CLS-EPISODE? Fresh banks (design 95k/96k n=80, confirm 97k/98k n=200, bite 953k/954k).
+- **Scope:** single form change vs INFR-014 (harness frozen, generator imported
+  byte-identical); synthetic TRAIN-fence banks; no TEST/holdout; CLS-FILTER never touched.
+- **Results / Observations:** bite PASS; design cov 0.0375/0.0500; confirm LOW cov 0.095 /
+  α̂ 0.135 (27/200, selection_unsafe), HIGH cov 0.050 / α̂ 0.055 (11/200, Wilson
+  [0.031, 0.096]) — TERMINAL-2, write policy refused amendment, pin `ac8a1eb6…` unchanged
+  (QA re-hash verified). LOW false-certifies concentrate at top-1 n_legs<8 (pass 0.179,
+  B=1 ⇒ fix inert); HIGH (n_legs median 261, B median 23) improved vs INFR-014.
+- **Hypothesis-Specific Conclusion:** amendment NOT sufficient — **TERMINAL-2, operator
+  verdict pending**; XENA-EPSOSC stays blocked.
+- **Hypothesis-Agnostic Observations:** overlap correlation real but secondary on LOW; the
+  binding CLS-EPISODE defect is small-sample studentized-LCB fragility at n_legs<~16 —
+  next form candidates: derived n_legs_floor domain guard, episode-level resampling.
+  Report: `python/experiments/INFR-015/report.md`.

@@ -1,0 +1,61 @@
+{
+  "producer": "run_cal15.py",
+  "experiment": "INFR-015",
+  "design_ok": true,
+  "design_stop_reason": null,
+  "verdict": "TERMINAL",
+  "per_cadence": {
+    "low": {
+      "cadence": "low",
+      "band": "FAIL_ALPHA",
+      "deployability": "N/A",
+      "no_search_cov": 0.095,
+      "e2e_alpha": 0.135,
+      "selection_inflation": 0.04000000000000001,
+      "coverage_ok": false,
+      "alpha_ok": false,
+      "certified": false,
+      "alpha_se": 0.024163505540380516,
+      "alpha_wilson_95": {
+        "low": 0.09446507976920288,
+        "high": 0.18929250455117141
+      },
+      "n": 200,
+      "n_gross_lcb_positive": 27,
+      "deployability_rate": 0.095,
+      "seed_bases": {
+        "low": 97000,
+        "high": 98000
+      },
+      "alpha_target": 0.05,
+      "failure_label": "selection_unsafe"
+    },
+    "high": {
+      "cadence": "high",
+      "band": "FAIL_ALPHA",
+      "deployability": "N/A",
+      "no_search_cov": 0.05,
+      "e2e_alpha": 0.055,
+      "selection_inflation": 0.0049999999999999975,
+      "coverage_ok": true,
+      "alpha_ok": false,
+      "certified": false,
+      "alpha_se": 0.016120638945153507,
+      "alpha_wilson_95": {
+        "low": 0.030985020801370097,
+        "high": 0.0957879244659355
+      },
+      "n": 200,
+      "n_gross_lcb_positive": 11,
+      "deployability_rate": 0.0,
+      "seed_bases": {
+        "low": 97000,
+        "high": 98000
+      },
+      "alpha_target": 0.05,
+      "failure_label": "coverage_limited"
+    }
+  },
+  "pin_amended": false,
+  "write_refusal": "write policy: CLS-EPISODE verdict 'TERMINAL' not certifiable \u2014 existing pin stands (TERMINAL-2)"
+}

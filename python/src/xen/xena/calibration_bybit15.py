@@ -1,0 +1,606 @@
+"""INFR-015 CLS-EPISODE binder-form amendment — overlap-aware stage-2 blocks.
+
+Single form change vs the frozen INFR-014 harness (calibration_bybit.py, untouched —
+it backs the accepted pin ac8a1eb6…): the CLS-EPISODE stage-2 leg bootstrap uses
+``block_legs = episode_overlap_rule_v1(ledger)`` instead of 1. Everything else is the
+INFR-014 procedure verbatim (design §3). Fresh disjoint seed banks (design §5).
+
+CLS-FILTER is NOT re-measured here; the amended registry carries its block over
+byte-identically (canonical JSON) from the existing pin.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+from copy import deepcopy
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import polars as pl
+
+import xen.xena.calibration_p3b as p3b
+from xen.xena.calibration import SegmentLayout
+from xen.xena.calibration_p3b import HIGH, LOW, CadenceSpec, ScaleSpec, bank_seeds
+from xen.xena.calibration_p3d import binomial_se, eval_lcb_legs, wilson
+from xen.xena.calibration_pc import (
+    BLOCK_LEGS,
+    EMBARGO_FRAC,
+    N_BOOT,
+    STAGE_RANKING_FRAC,
+    STAGE_SEARCH_FRAC,
+    c_layout,
+    deplant_stage2,
+)
+from xen.xena.calibration_bybit import (
+    ALPHA,
+    BITE_EDGE_BPS,
+    BITE_N,
+    BITE_SELECT_MIN,
+    BITE_SURVIVAL_MAX,
+    GAP_SPREAD_BPS,
+    SCHEMA_ID,
+    IntegrityError,
+    _deplant_class_plants,
+    _failure_label,
+    _outcome,
+    _search_params,
+    _set_seeds,
+    assert_stage1_net_binding,
+    make_episode_null_universe,
+    verify_bybit_registry,
+)
+from xen.xena.certify import certify_and_rank, contiguous_purged_folds
+from xen.xena.oracle import CandidateStream, OracleConfig
+from xen.xena.score import ledger_leg_arrays, lcb_g_leg_studentized
+from xen.xena.search import run_restart
+
+NS = 1_000_000_000
+CLASS_ID = "CLS-EPISODE"
+BLOCK_RULE_ID = "episode_overlap_rule_v1"
+
+# INFR-015 fresh banks (design §5) — disjoint from 91k–94k, 951k/952k, all ch03
+DESIGN_SEEDS_15 = {"low": 95_000, "high": 96_000}
+CONFIRM_SEEDS_15 = {"low": 97_000, "high": 98_000}
+BITE_SEEDS_15 = {"low": 953_000, "high": 954_000}
+
+DESIGN_SCALE_15 = ScaleSpec("design", n_null=80, n_cand=64, budget=200, n_restarts=5,
+                            n_power=6, n_coverage=80)
+CONFIRM_SCALE_15 = ScaleSpec("confirm", n_null=200, n_cand=64, budget=200, n_restarts=5,
+                             n_power=6, n_coverage=200)
+
+_INFR014_SEED_RANGES = (
+    (91_000, 91_500), (92_000, 92_500), (93_000, 93_500), (94_000, 94_500),
+    (951_000, 951_050), (952_000, 952_050),
+)
+_CH03_SEED_RANGES = (
+    (71_000, 71_500), (72_000, 72_500), (81_000, 81_500), (82_000, 82_500),
+    (791_000, 791_050), (792_000, 792_050),
+)
+
+
+# --------------------------------------------------------------------------- #
+# episode_overlap_rule_v1 (design §3 — pinned estimators)
+# --------------------------------------------------------------------------- #
+def episode_overlap_block_legs(entry_ns: np.ndarray, exit_ns: np.ndarray) -> int:
+    """B = min(max(1, ceil(q90(dur_h)/median(gap_h))), max(1, floor(n/4))).
+
+    q90 = numpy.quantile(method="linear"); median = numpy.median; gaps from consecutive
+    sorted EntryTime. Single-leg or zero/degenerate-gap stream => 1.
+    """
+    n = int(len(entry_ns))
+    if n <= 1:
+        return 1
+    et = np.sort(np.asarray(entry_ns, dtype=np.int64), kind="mergesort")
+    dur_h = (np.asarray(exit_ns, dtype=np.int64) - np.asarray(entry_ns, dtype=np.int64)
+             ).astype(float) / (3600.0 * NS)
+    dur_h = dur_h[np.isfinite(dur_h) & (dur_h > 0)]
+    gaps_h = np.diff(et).astype(float) / (3600.0 * NS)
+    med_gap = float(np.median(gaps_h)) if len(gaps_h) else 0.0
+    if len(dur_h) == 0 or med_gap <= 0.0:
+        return 1
+    q90 = float(np.quantile(dur_h, 0.9, method="linear"))
+    b_raw = max(1, int(math.ceil(q90 / med_gap)))
+    cap = max(1, n // 4)
+    return min(b_raw, cap)
+
+
+def eval_lcb_legs_ep(subset, streams, config, segment, *, n_boot: int, seed: int,
+                     net: bool = False) -> dict:
+    """Stage-2 LCB with block_legs from episode_overlap_rule_v1 on the evaluated ledger.
+
+    B == 1 routes to the UNMODIFIED legacy path (eval_lcb_legs, block_legs=1) so the
+    degenerate case is bit-for-bit identical to the INFR-014 estimator (golden trace G2).
+    """
+    from dataclasses import replace
+    from xen.xena.oracle import evaluate
+
+    cfg = replace(config, charge_costs=bool(net))
+    res = evaluate(subset, streams, cfg, segment=segment, seed=seed)
+    _pnl, _notional, et = ledger_leg_arrays(res, streams, net=net)
+    if res.ledger is not None and res.ledger.height > 0:
+        led = res.ledger.sort("EntryTime")
+        b = episode_overlap_block_legs(
+            led.get_column("EntryTime").to_numpy().astype(np.int64),
+            led.get_column("ExitTime").to_numpy().astype(np.int64),
+        )
+    else:
+        b = 1
+    if b == 1:
+        out = eval_lcb_legs(subset, streams, config, segment, n_boot=n_boot, seed=seed,
+                            block_legs=1, net=net)
+        out["block_legs_used"] = 1
+        out["block_rule"] = BLOCK_RULE_ID
+        return out
+    out = lcb_g_leg_studentized(res, streams, n_boot=n_boot, seed=seed + 99,
+                                block_legs=b, confidence=0.95, net=net)
+    out["n_admitted"] = res.n_admitted
+    out["block_legs_used"] = int(b)
+    out["block_rule"] = BLOCK_RULE_ID
+    del et
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# Two-stage (stage-1 identical to INFR-014; stage-2 blocked)
+# --------------------------------------------------------------------------- #
+def run_two_stage_ep(
+    streams: list[CandidateStream],
+    cadence: CadenceSpec,
+    layout: SegmentLayout,
+    *,
+    scale: ScaleSpec,
+    seed: int,
+    n_boot: int = N_BOOT,
+    charge_costs: bool = True,
+    score_kind: str = "g_net",
+) -> dict[str, Any]:
+    assert_stage1_net_binding(charge_costs=charge_costs, score_kind=score_kind)
+    config = OracleConfig(charge_costs=True)
+    params = _search_params(cadence)
+    finalists = [
+        run_restart(
+            streams, config, budget=scale.budget, restart_id=r + 1,
+            params=params, segment=layout.search,
+            skip_economics_precondition=True, score_kind="g_net",
+        )
+        for r in range(scale.n_restarts)
+    ]
+    folds = contiguous_purged_folds(
+        layout.ranking[0], layout.ranking[1], n_folds=3,
+        purge_ns=max(cadence.hold_bars, 1) * 60 * NS,
+    )
+    pkg = certify_and_rank(
+        finalists, streams, config, folds=folds, params=params,
+        search_segment=layout.search, include_random_ref=False,
+        include_fill_basis=False, score_kind="g_net",
+    )
+    if not pkg["ranked"]:
+        return {
+            "empty": True, "gross_pass": False, "net_pass": False, "top": [],
+            "g_search_hat": None,
+        }
+    top = pkg["ranked"][0].subset
+    lcb_g = eval_lcb_legs_ep(top, streams, config, layout.gate, n_boot=n_boot,
+                             seed=seed, net=False)
+    lcb_n = eval_lcb_legs_ep(top, streams, config, layout.gate, n_boot=n_boot,
+                             seed=seed + 17, net=True)
+    top_ids = sorted(str(x) for x in top)
+    return {
+        "empty": False,
+        "top": top_ids,
+        "plant_in_top": any(t.startswith("epplant") for t in top_ids),
+        "gross_pass": bool(lcb_g.get("pass_positive")),
+        "gross_lcb": lcb_g.get("lcb"),
+        "gross_point": lcb_g.get("point"),
+        "net_pass": bool(lcb_n.get("pass_positive")),
+        "net_lcb": lcb_n.get("lcb"),
+        "net_point": lcb_n.get("point"),
+        "n_legs": lcb_g.get("n_legs"),
+        "block_legs_used": lcb_g.get("block_legs_used"),
+        "g_search_hat": pkg["ranked"][0].search_F_hat,
+        "stage1_score_kind": "g_net",
+        "stage1_charge_costs": True,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# Seed disjointness (HARD)
+# --------------------------------------------------------------------------- #
+def assert_seed_disjoint_15() -> None:
+    d = set(range(DESIGN_SEEDS_15["low"], DESIGN_SEEDS_15["low"] + 500)) | set(
+        range(DESIGN_SEEDS_15["high"], DESIGN_SEEDS_15["high"] + 500))
+    c = set(range(CONFIRM_SEEDS_15["low"], CONFIRM_SEEDS_15["low"] + 500)) | set(
+        range(CONFIRM_SEEDS_15["high"], CONFIRM_SEEDS_15["high"] + 500))
+    b = set(range(BITE_SEEDS_15["low"], BITE_SEEDS_15["low"] + 50)) | set(
+        range(BITE_SEEDS_15["high"], BITE_SEEDS_15["high"] + 50))
+    prior = set()
+    for lo, hi in _INFR014_SEED_RANGES + _CH03_SEED_RANGES:
+        prior |= set(range(lo, hi))
+    if d & c or d & b or c & b:
+        raise IntegrityError("INFR-015 bank collision (design/confirm/bite)")
+    for name, s in (("design", d), ("confirm", c), ("bite", b)):
+        if s & prior:
+            raise IntegrityError(
+                f"INFR-015 {name} bank collides with INFR-014/chapter-03 seeds")
+
+
+# --------------------------------------------------------------------------- #
+# Bite / coverage / e2e (episode class only)
+# --------------------------------------------------------------------------- #
+def bite_check_ep(cadence: CadenceSpec, *, scale: ScaleSpec,
+                  embargo_frac: float = EMBARGO_FRAC, n: int = BITE_N) -> dict[str, Any]:
+    layout = c_layout(cadence.n_bars, cadence.hold_bars, embargo_frac=embargo_frac)
+    stage2_start = layout.gate[0]
+    base = BITE_SEEDS_15[cadence.name]
+    survive = selected = 0
+    rows = []
+    for i in range(n):
+        seed = base + i
+        streams = make_episode_null_universe(
+            seed, cadence, n_candidates=scale.n_cand, edge_bps=BITE_EDGE_BPS, plant=True)
+        streams = deplant_stage2(streams, edge_bps=BITE_EDGE_BPS,
+                                 stage2_start_ns=stage2_start)
+        streams = _deplant_class_plants(streams, edge_bps=BITE_EDGE_BPS,
+                                        stage2_start_ns=stage2_start)
+        out = run_two_stage_ep(streams, cadence, layout, scale=scale, seed=seed)
+        selected += int(out.get("plant_in_top", False))
+        survive += int(out.get("gross_pass", False))
+        rows.append({
+            "seed": seed, "plant_in_top": out.get("plant_in_top"),
+            "stage2_pass": out.get("gross_pass"), "gross_lcb": out.get("gross_lcb"),
+            "n_legs": out.get("n_legs"), "block_legs_used": out.get("block_legs_used"),
+            "empty": out.get("empty"),
+        })
+    survival_rate = survive / max(n, 1)
+    select_rate = selected / max(n, 1)
+    return {
+        "class_id": CLASS_ID, "cadence": cadence.name, "n": n,
+        "stage2_survival_rate": survival_rate, "stage1_select_rate": select_rate,
+        "select_ok": bool(select_rate >= BITE_SELECT_MIN),
+        "survival_ok": bool(survival_rate <= BITE_SURVIVAL_MAX),
+        "bite_ok": bool(select_rate >= BITE_SELECT_MIN
+                        and survival_rate <= BITE_SURVIVAL_MAX),
+        "thresholds": {"survival_max": BITE_SURVIVAL_MAX, "select_min": BITE_SELECT_MIN,
+                       "planted_edge_bps": BITE_EDGE_BPS},
+        "embargo_frac": embargo_frac, "stage2_start_ns": int(stage2_start), "rows": rows,
+    }
+
+
+def no_search_coverage_ep(cadence: CadenceSpec, *, scale: ScaleSpec,
+                          embargo_frac: float = EMBARGO_FRAC, n_universes: int,
+                          subset_size: int = 5, n_boot: int = N_BOOT,
+                          alpha: float = ALPHA) -> dict[str, Any]:
+    """No-search blocked-LCB pass rate. Uses current p3b.SEED_BASE_* (caller sets)."""
+    config = OracleConfig(charge_costs=True)
+    layout = c_layout(cadence.n_bars, cadence.hold_bars, embargo_frac=embargo_frac)
+    hits = 0
+    rows = []
+    seed_base_low = int(p3b.SEED_BASE_LOW)
+    seed_base_high = int(p3b.SEED_BASE_HIGH)
+    for seed, cspec in bank_seeds(cadence, n_universes):
+        streams = make_episode_null_universe(
+            seed, cspec, n_candidates=scale.n_cand, edge_bps=0.0, plant=False)
+        rng = np.random.default_rng(seed + 91)
+        ids = [s.candidate_id for s in streams]
+        k = min(subset_size, len(ids))
+        pick = frozenset(str(x) for x in rng.choice(ids, size=k, replace=False))
+        lcb = eval_lcb_legs_ep(pick, streams, config, layout.gate, n_boot=n_boot,
+                               seed=seed, net=False)
+        pos = bool(lcb.get("pass_positive"))
+        hits += int(pos)
+        rows.append({"seed": seed, "pass": pos, "lcb": lcb.get("lcb"),
+                     "n_legs": lcb.get("n_legs"),
+                     "block_legs_used": lcb.get("block_legs_used")})
+    n = len(rows)
+    rate = hits / max(n, 1)
+    return {
+        "class_id": CLASS_ID, "cadence": cadence.name, "n": n,
+        "n_lcb_positive": hits, "rate": rate,
+        "coverage_ok": bool(n > 0 and rate <= float(alpha)), "rows": rows,
+        "seed_bases": {"low": seed_base_low, "high": seed_base_high},
+        "alpha_target": float(alpha), "block_rule": BLOCK_RULE_ID,
+    }
+
+
+def e2e_alpha_ep(cadence: CadenceSpec, *, scale: ScaleSpec,
+                 embargo_frac: float = EMBARGO_FRAC, n_boot: int = N_BOOT,
+                 alpha: float = ALPHA) -> dict[str, Any]:
+    layout_by: dict = {}
+    rows = []
+    seed_base_low = int(p3b.SEED_BASE_LOW)
+    seed_base_high = int(p3b.SEED_BASE_HIGH)
+    for seed, cspec in bank_seeds(cadence, scale.n_null):
+        key = (cspec.n_bars, cspec.hold_bars)
+        layout = layout_by.get(key) or c_layout(
+            cspec.n_bars, cspec.hold_bars, embargo_frac=embargo_frac)
+        layout_by[key] = layout
+        streams = make_episode_null_universe(
+            seed, cspec, n_candidates=scale.n_cand, edge_bps=0.0, plant=False)
+        out = run_two_stage_ep(streams, cspec, layout, scale=scale, seed=seed,
+                               n_boot=n_boot)
+        rows.append({
+            "seed": seed, "symbol": cspec.symbol,
+            "gross_pass": bool(out.get("gross_pass")),
+            "net_pass": bool(out.get("net_pass")),
+            "gross_lcb": out.get("gross_lcb"), "gross_point": out.get("gross_point"),
+            "net_lcb": out.get("net_lcb"), "net_point": out.get("net_point"),
+            "g_search_hat": out.get("g_search_hat"), "n_legs": out.get("n_legs"),
+            "block_legs_used": out.get("block_legs_used"),
+            "empty": out.get("empty", False),
+        })
+    n = len(rows)
+    k = sum(1 for r in rows if r["gross_pass"])
+    ph = k / max(n, 1)
+    lo, hi = wilson(k, n)
+    n_net = sum(1 for r in rows if r["net_pass"])
+    return {
+        "class_id": CLASS_ID, "cadence": cadence.name, "n": n,
+        "n_gross_lcb_positive": k, "alpha_hat": ph,
+        "alpha_se": binomial_se(ph, n),
+        "alpha_wilson_95": {"low": lo, "high": hi},
+        "pass_stop": bool(ph <= float(alpha)),
+        "n_net_lcb_positive": n_net,
+        "deployability_rate": n_net / max(n, 1),
+        "seed_bases": {"low": seed_base_low, "high": seed_base_high},
+        "alpha_target": float(alpha), "block_rule": BLOCK_RULE_ID,
+        "rows": rows,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# DESIGN / CONFIRM banks
+# --------------------------------------------------------------------------- #
+def run_design_ep(*, scale: ScaleSpec = DESIGN_SCALE_15) -> dict[str, Any]:
+    assert_seed_disjoint_15()
+    _set_seeds(DESIGN_SEEDS_15["low"], DESIGN_SEEDS_15["high"])
+    print("[INFR-015] DESIGN CLS-EPISODE: bite-check (blocked stage-2)...", flush=True)
+    bite: dict[str, Any] = {}
+    for c in (LOW, HIGH):
+        b = bite_check_ep(c, scale=scale, embargo_frac=EMBARGO_FRAC)
+        bite[c.name] = b
+        print(f"  bite {c.name}: survival={b['stage2_survival_rate']:.3f} "
+              f"select={b['stage1_select_rate']:.3f} ok={b['bite_ok']}", flush=True)
+    bite_ok = all(bite[c]["bite_ok"] for c in ("low", "high"))
+    if not bite_ok:
+        return {
+            "bank": "design", "class_id": CLASS_ID, "seeds": dict(DESIGN_SEEDS_15),
+            "bite": {k: {kk: vv for kk, vv in v.items() if kk != "rows"}
+                     for k, v in bite.items()},
+            "frozen_procedure": None, "design_ok": False,
+            "stop_reason": "bite_failed", "terminal": True,
+            "recommend": "TERMINAL_blocking_killed_power_or_plant_missed",
+            "note": "bite FAIL = TERMINAL, no confirm (Fork B / design §5, §13)",
+        }
+    print("[INFR-015] DESIGN CLS-EPISODE: no-search coverage (blocked)...", flush=True)
+    _set_seeds(DESIGN_SEEDS_15["low"], DESIGN_SEEDS_15["high"])
+    cov: dict[str, Any] = {}
+    for c in (LOW, HIGH):
+        cv = no_search_coverage_ep(c, scale=scale, embargo_frac=EMBARGO_FRAC,
+                                   n_universes=scale.n_coverage, alpha=ALPHA)
+        cov[c.name] = cv
+        print(f"  cov {c.name}: rate={cv['rate']:.4f} ok={cv['coverage_ok']} "
+              f"(n={cv['n']}) bases={cv.get('seed_bases')}", flush=True)
+
+    frozen = {
+        "binder": "two_stage_sample_split",
+        "stage1": "search+certify top-1 on stage-1 bands",
+        "stage1_score_kind": "g_net",
+        "stage1_charge_costs": True,
+        "stage2": "lcb_g_leg_studentized(g_gross) > 0 on distant embargoed band",
+        "e2e_pass_event": "stage2_gross_lcb_positive",
+        "deployability_binding": "stage2_net_lcb_positive",
+        "functional": "g_gross_ratio",
+        "estimator": "leg_studentized_bootstrap_t",
+        "embargo_frac": EMBARGO_FRAC,
+        "search_frac": STAGE_SEARCH_FRAC,
+        "ranking_frac": STAGE_RANKING_FRAC,
+        "n_boot": N_BOOT,
+        "block_legs": BLOCK_RULE_ID,
+        "block_rule_text": (
+            "B = min(max(1, ceil(q90(episode_duration_h)/median(inter_entry_gap_h))), "
+            "max(1, floor(n_legs/4))); q90=numpy.quantile(method='linear'); "
+            "median=numpy.median; gaps from consecutive sorted EntryTime; "
+            "single-leg or zero-gap => 1; B==1 routes to legacy block_legs=1 path"
+        ),
+        "confidence": 0.95,
+        "alpha": ALPHA,
+        "one_subset": True,
+        "shortlist": False,
+        "design_seeds": dict(DESIGN_SEEDS_15),
+        "confirm_seeds": dict(CONFIRM_SEEDS_15),
+        "design_bite_ok": True,
+        "design_cov_low": cov["low"]["rate"],
+        "design_cov_high": cov["high"]["rate"],
+        "held_out_escalation": False,
+        "gate_rule": "per_cadence point α̂≤5% AND no-search cov≤5% (Fork A)",
+        "cost_stack": "bybit_round_trip_cost_bps_v1",
+        "gap_spread_bps": GAP_SPREAD_BPS,
+        "class_id": CLASS_ID,
+        "amends": "INFR-014 CLS-EPISODE (TERMINAL); pin ac8a1eb6… superseded on write",
+    }
+    return {
+        "bank": "design", "class_id": CLASS_ID, "seeds": dict(DESIGN_SEEDS_15),
+        "bite": {k: {kk: vv for kk, vv in v.items() if kk != "rows"}
+                 for k, v in bite.items()},
+        "bite_rows": {k: v["rows"] for k, v in bite.items()},
+        "coverage": {k: {kk: vv for kk, vv in v.items() if kk != "rows"}
+                     for k, v in cov.items()},
+        "frozen_procedure": frozen,
+        "design_ok": True,
+        "stop_reason": None,
+    }
+
+
+def confirm_gate_ep(procedure: dict, *,
+                    scale: ScaleSpec = CONFIRM_SCALE_15) -> dict[str, Any]:
+    if not procedure or not procedure.get("design_bite_ok"):
+        raise IntegrityError("confirm blocked unless design_ok procedure exists")
+    required = ("embargo_frac", "n_boot", "block_legs", "alpha", "stage1_score_kind",
+                "stage1_charge_costs", "e2e_pass_event")
+    for k in required:
+        if k not in procedure:
+            raise IntegrityError(f"frozen procedure missing {k}")
+    if procedure["block_legs"] != BLOCK_RULE_ID:
+        raise IntegrityError(
+            f"INFR-015 confirm requires block_legs={BLOCK_RULE_ID!r}, "
+            f"got {procedure['block_legs']!r}")
+    assert_stage1_net_binding(
+        charge_costs=bool(procedure["stage1_charge_costs"]),
+        score_kind=str(procedure["stage1_score_kind"]))
+    assert_seed_disjoint_15()
+    embargo_frac = float(procedure["embargo_frac"])
+    n_boot = int(procedure["n_boot"])
+    alpha = float(procedure["alpha"])
+    if scale.name == "confirm" and scale.n_null != CONFIRM_SCALE_15.n_null:
+        raise IntegrityError(
+            f"binding confirm n_null must be {CONFIRM_SCALE_15.n_null}, got {scale.n_null}")
+
+    per: dict[str, Any] = {}
+    _set_seeds(CONFIRM_SEEDS_15["low"], CONFIRM_SEEDS_15["high"])
+    for c in (LOW, HIGH):
+        print(f"[INFR-015] CONFIRM {c.name}: no-search coverage...", flush=True)
+        cov = no_search_coverage_ep(c, scale=scale, embargo_frac=embargo_frac,
+                                    n_universes=scale.n_coverage, n_boot=n_boot,
+                                    alpha=alpha)
+        if cov.get("seed_bases") != dict(CONFIRM_SEEDS_15):
+            raise IntegrityError(
+                f"confirm coverage seed_bases {cov.get('seed_bases')} != "
+                f"CONFIRM_SEEDS_15 {CONFIRM_SEEDS_15} (G3 / INFR-014 Issue 9 class)")
+        print(f"  cov {c.name}: {cov['rate']:.4f} ok={cov['coverage_ok']}", flush=True)
+        print(f"[INFR-015] CONFIRM {c.name}: e2e α...", flush=True)
+        a = e2e_alpha_ep(c, scale=scale, embargo_frac=embargo_frac,
+                         n_boot=n_boot, alpha=alpha)
+        if a.get("seed_bases") != dict(CONFIRM_SEEDS_15):
+            raise IntegrityError(
+                f"confirm e2e seed_bases {a.get('seed_bases')} != CONFIRM_SEEDS_15")
+        print(f"  α̂ {c.name}: {a['alpha_hat']:.4f} ok={a['pass_stop']}", flush=True)
+        certified = bool(cov["coverage_ok"] and a["pass_stop"])
+        band = "CERTIFIED" if certified else (
+            "FAIL_ALPHA" if not a["pass_stop"] else "FAIL_COV")
+        deploy = ("DEPLOY_WEAK" if certified and a["deployability_rate"] < 0.5
+                  else ("DEPLOY_OK" if certified else "N/A"))
+        per[c.name] = {
+            "cadence": c.name, "band": band, "deployability": deploy,
+            "no_search_cov": cov["rate"], "e2e_alpha": a["alpha_hat"],
+            "selection_inflation": a["alpha_hat"] - cov["rate"],
+            "coverage_ok": cov["coverage_ok"], "alpha_ok": a["pass_stop"],
+            "certified": certified, "alpha_se": a["alpha_se"],
+            "alpha_wilson_95": a["alpha_wilson_95"], "n": a["n"],
+            "n_gross_lcb_positive": a["n_gross_lcb_positive"],
+            "deployability_rate": a["deployability_rate"],
+            "seed_bases": a.get("seed_bases"), "alpha_target": alpha,
+            "failure_label": (None if certified
+                              else _failure_label(cov["rate"], a["alpha_hat"])),
+            "coverage_rows": cov["rows"], "alpha_rows": a["rows"],
+        }
+    outcome = _outcome(per["low"]["certified"], per["high"]["certified"])
+    return {
+        "bank": "confirm", "class_id": CLASS_ID, "seeds": dict(CONFIRM_SEEDS_15),
+        "procedure": procedure,
+        "per_cadence": {k: {kk: vv for kk, vv in v.items()
+                            if kk not in ("coverage_rows", "alpha_rows")}
+                        for k, v in per.items()},
+        "alpha_low_rows": per["low"]["alpha_rows"],
+        "alpha_high_rows": per["high"]["alpha_rows"],
+        "coverage_low_rows": per["low"]["coverage_rows"],
+        "coverage_high_rows": per["high"]["coverage_rows"],
+        "outcome": outcome,
+        "stop_condition": {
+            "alpha_target": alpha,
+            "gate_rule": (f"point α̂≤{alpha} ∧ no_search_cov≤{alpha} "
+                          "(Wilson disclosure-only; alpha from frozen procedure)"),
+            "low_certified": per["low"]["certified"],
+            "high_certified": per["high"]["certified"],
+            "verdict": outcome["verdict"],
+            "recommend": outcome["recommend"],
+            "terminal": outcome["terminal"],
+            "forbidden": [
+                "no optional stopping", "no peek-and-extend", "no UCB gate",
+                "no chapter-03 pin", "no costless stage-1",
+                "confirm coverage must use confirm seeds (not design)",
+                "no retune on this confirm data (TERMINAL-2 => new design)",
+            ],
+        },
+    }
+
+
+# --------------------------------------------------------------------------- #
+# Registry amendment (design §11)
+# --------------------------------------------------------------------------- #
+def _canon(obj: Any) -> str:
+    return json.dumps(obj, sort_keys=True)
+
+
+def amend_registry_episode(
+    existing_path: str | Path,
+    design: dict,
+    confirm: dict,
+    *,
+    out_path: str | Path,
+) -> dict:
+    """Replace the CLS-EPISODE block; CLS-FILTER byte-identical (canonical JSON).
+
+    Write policy: amend ONLY if the INFR-015 confirm verdict is certifiable; on
+    TERMINAL the existing pin stands and this raises IntegrityError (caller reports
+    TERMINAL-2, no write).
+    """
+    certifiable = {"DUAL_CERTIFY", "HIGH_ONLY_CERTIFY", "LOW_ONLY_CERTIFY"}
+    outcome = (confirm.get("outcome") or {})
+    verdict = outcome.get("verdict", "TERMINAL")
+    if verdict not in certifiable:
+        raise IntegrityError(
+            f"write policy: CLS-EPISODE verdict {verdict!r} not certifiable — "
+            "existing pin stands (TERMINAL-2)")
+
+    old = verify_bybit_registry(existing_path)  # canonical verify incl. hash
+    old_artifact = json.loads(Path(existing_path).read_text(encoding="utf-8"))
+    old_sha = old_artifact["sha256"]
+    reg = deepcopy(old)
+
+    filt_before = [c for c in reg["class_configs"] if c["class_id"] == "CLS-FILTER"]
+    if len(filt_before) != 1:
+        raise IntegrityError("existing pin must contain exactly one CLS-FILTER block")
+    filt_canon_before = _canon(filt_before[0])
+
+    new_ep = {
+        "class_id": CLASS_ID,
+        "family_prior": "CF-EPSOSC-001",
+        "procedure": design["frozen_procedure"],
+        "design_seeds": dict(DESIGN_SEEDS_15),
+        "confirm_seeds": dict(CONFIRM_SEEDS_15),
+        "cost_stack": "bybit_round_trip_cost_bps_v1",
+        "stage1_score_kind": "g_net",
+        "stage1_charge_costs": True,
+        "e2e_pass_event": "stage2_gross_lcb_positive",
+        "deployability_binding": "stage2_net_lcb_positive",
+        "confirm_summary": {
+            "verdict": verdict,
+            "certified": True,
+            "per_cadence": confirm.get("per_cadence") or {},
+            "recommend": outcome.get("recommend"),
+            "terminal": bool(outcome.get("terminal", False)),
+        },
+        "limit_entry_cells": False,
+        "design_ok": True,
+        "amended_by": "INFR-015",
+    }
+    reg["class_configs"] = [
+        (new_ep if c["class_id"] == CLASS_ID else c) for c in reg["class_configs"]
+    ]
+    superseded = list(reg.get("superseded_pins") or [])
+    superseded.append(old_sha)
+    reg["superseded_pins"] = superseded
+
+    filt_after = [c for c in reg["class_configs"] if c["class_id"] == "CLS-FILTER"]
+    if len(filt_after) != 1 or _canon(filt_after[0]) != filt_canon_before:
+        raise IntegrityError("CLS-FILTER block changed — must be byte-identical")
+
+    blob = _canon(reg).encode("utf-8")
+    artifact = {"registry": reg, "sha256": hashlib.sha256(blob).hexdigest()}
+    path = Path(out_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(artifact, indent=2) + "\n", encoding="utf-8")
+    verify_bybit_registry(path)
+    return artifact

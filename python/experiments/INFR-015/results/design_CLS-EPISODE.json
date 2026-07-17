@@ -1,0 +1,264 @@
+{
+  "bank": "design",
+  "class_id": "CLS-EPISODE",
+  "seeds": {
+    "low": 95000,
+    "high": 96000
+  },
+  "bite": {
+    "low": {
+      "class_id": "CLS-EPISODE",
+      "cadence": "low",
+      "n": 8,
+      "stage2_survival_rate": 0.125,
+      "stage1_select_rate": 0.875,
+      "select_ok": true,
+      "survival_ok": true,
+      "bite_ok": true,
+      "thresholds": {
+        "survival_max": 0.125,
+        "select_min": 0.5,
+        "planted_edge_bps": 20.0
+      },
+      "embargo_frac": 0.2,
+      "stage2_start_ns": 288000000000000
+    },
+    "high": {
+      "class_id": "CLS-EPISODE",
+      "cadence": "high",
+      "n": 8,
+      "stage2_survival_rate": 0.0,
+      "stage1_select_rate": 1.0,
+      "select_ok": true,
+      "survival_ok": true,
+      "bite_ok": true,
+      "thresholds": {
+        "survival_max": 0.125,
+        "select_min": 0.5,
+        "planted_edge_bps": 20.0
+      },
+      "embargo_frac": 0.2,
+      "stage2_start_ns": 576000000000000
+    }
+  },
+  "bite_rows": {
+    "low": [
+      {
+        "seed": 953000,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -75.9525139795048,
+        "n_legs": 18,
+        "block_legs_used": 4,
+        "empty": false
+      },
+      {
+        "seed": 953001,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -451.10664223384566,
+        "n_legs": 4,
+        "block_legs_used": 1,
+        "empty": false
+      },
+      {
+        "seed": 953002,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -291.7831809353899,
+        "n_legs": 15,
+        "block_legs_used": 3,
+        "empty": false
+      },
+      {
+        "seed": 953003,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -22.923128900517828,
+        "n_legs": 15,
+        "block_legs_used": 3,
+        "empty": false
+      },
+      {
+        "seed": 953004,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -12.76033151725494,
+        "n_legs": 16,
+        "block_legs_used": 4,
+        "empty": false
+      },
+      {
+        "seed": 953005,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -231.72274268925605,
+        "n_legs": 7,
+        "block_legs_used": 1,
+        "empty": false
+      },
+      {
+        "seed": 953006,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -92.044535179959,
+        "n_legs": 19,
+        "block_legs_used": 4,
+        "empty": false
+      },
+      {
+        "seed": 953007,
+        "plant_in_top": false,
+        "stage2_pass": true,
+        "gross_lcb": 43.93275395281114,
+        "n_legs": 15,
+        "block_legs_used": 3,
+        "empty": false
+      }
+    ],
+    "high": [
+      {
+        "seed": 954000,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -0.06689355410923348,
+        "n_legs": 265,
+        "block_legs_used": 25,
+        "empty": false
+      },
+      {
+        "seed": 954001,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -7.538670230846609,
+        "n_legs": 225,
+        "block_legs_used": 19,
+        "empty": false
+      },
+      {
+        "seed": 954002,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -2.6641204570787362,
+        "n_legs": 242,
+        "block_legs_used": 24,
+        "empty": false
+      },
+      {
+        "seed": 954003,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -7.772679190423739,
+        "n_legs": 270,
+        "block_legs_used": 26,
+        "empty": false
+      },
+      {
+        "seed": 954004,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -14.288784396460978,
+        "n_legs": 160,
+        "block_legs_used": 15,
+        "empty": false
+      },
+      {
+        "seed": 954005,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -1.127623306957589,
+        "n_legs": 245,
+        "block_legs_used": 21,
+        "empty": false
+      },
+      {
+        "seed": 954006,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -11.200654211396147,
+        "n_legs": 224,
+        "block_legs_used": 24,
+        "empty": false
+      },
+      {
+        "seed": 954007,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -9.18060857111474,
+        "n_legs": 229,
+        "block_legs_used": 23,
+        "empty": false
+      }
+    ]
+  },
+  "coverage": {
+    "low": {
+      "class_id": "CLS-EPISODE",
+      "cadence": "low",
+      "n": 80,
+      "n_lcb_positive": 3,
+      "rate": 0.0375,
+      "coverage_ok": true,
+      "seed_bases": {
+        "low": 95000,
+        "high": 96000
+      },
+      "alpha_target": 0.05,
+      "block_rule": "episode_overlap_rule_v1"
+    },
+    "high": {
+      "class_id": "CLS-EPISODE",
+      "cadence": "high",
+      "n": 80,
+      "n_lcb_positive": 4,
+      "rate": 0.05,
+      "coverage_ok": true,
+      "seed_bases": {
+        "low": 95000,
+        "high": 96000
+      },
+      "alpha_target": 0.05,
+      "block_rule": "episode_overlap_rule_v1"
+    }
+  },
+  "frozen_procedure": {
+    "binder": "two_stage_sample_split",
+    "stage1": "search+certify top-1 on stage-1 bands",
+    "stage1_score_kind": "g_net",
+    "stage1_charge_costs": true,
+    "stage2": "lcb_g_leg_studentized(g_gross) > 0 on distant embargoed band",
+    "e2e_pass_event": "stage2_gross_lcb_positive",
+    "deployability_binding": "stage2_net_lcb_positive",
+    "functional": "g_gross_ratio",
+    "estimator": "leg_studentized_bootstrap_t",
+    "embargo_frac": 0.2,
+    "search_frac": 0.5,
+    "ranking_frac": 0.25,
+    "n_boot": 200,
+    "block_legs": "episode_overlap_rule_v1",
+    "block_rule_text": "B = min(max(1, ceil(q90(episode_duration_h)/median(inter_entry_gap_h))), max(1, floor(n_legs/4))); q90=numpy.quantile(method='linear'); median=numpy.median; gaps from consecutive sorted EntryTime; single-leg or zero-gap => 1; B==1 routes to legacy block_legs=1 path",
+    "confidence": 0.95,
+    "alpha": 0.05,
+    "one_subset": true,
+    "shortlist": false,
+    "design_seeds": {
+      "low": 95000,
+      "high": 96000
+    },
+    "confirm_seeds": {
+      "low": 97000,
+      "high": 98000
+    },
+    "design_bite_ok": true,
+    "design_cov_low": 0.0375,
+    "design_cov_high": 0.05,
+    "held_out_escalation": false,
+    "gate_rule": "per_cadence point \u03b1\u0302\u22645% AND no-search cov\u22645% (Fork A)",
+    "cost_stack": "bybit_round_trip_cost_bps_v1",
+    "gap_spread_bps": 5.0,
+    "class_id": "CLS-EPISODE",
+    "amends": "INFR-014 CLS-EPISODE (TERMINAL); pin ac8a1eb6\u2026 superseded on write"
+  },
+  "design_ok": true,
+  "stop_reason": null
+}
