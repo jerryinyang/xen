@@ -1,8 +1,8 @@
 # INFR-015 — CLS-EPISODE Binder-Form Amendment (Overlap-Aware Stage-2 Blocks)
 
 **Type:** INFR infrastructure  
-**Status:** cycle 1 TERMINAL-2 (operator-approved §8) → **AMENDMENT-4 executed 2026-07-18:
-LOW_ONLY_CERTIFY, pin amended `abbb1842…` — operator pin sign-off PENDING (§9.3)**  
+**Status:** COMPLETE 2026-07-18 — cycle 1 TERMINAL-2 (approved §8); AMENDMENT-4
+LOW_ONLY_CERTIFY; **pin `abbb1842…` ACCEPTED (§9.3)**; audit CERTIFICATION SOUND (QA run 6)  
 **Lineage:** amendment attempt on INFR-014 pin `ac8a1eb6…` CLS-EPISODE block (TERMINAL).
 CLS-FILTER untouched throughout. ch03 pin `db87dc1a…` VOID.  
 **QA:** run 1 design REVISE → AMENDMENTS 1–3 (0L/0T/3N) → run 2 **APPROVE** (design+impl,
@@ -143,11 +143,19 @@ corrected in analysis + §4 above.
 - Fallback paths if pin rejected (documented, not executed): episode-level resampling;
   LOW generator leg-starvation review — each a NEW design.
 
-### 9.3 Operator pin sign-off (to be recorded)
+### 9.3 Operator pin sign-off
 
-| Option | Meaning |
-|---|---|
-| **Accept amended pin (Recommended)** | `abbb1842…` becomes the active binding pin (supersedes `ac8a1eb6…`); CLS-FILTER low (unchanged) + **CLS-EPISODE low** certifiable; XENA-EPSOSC unblocks on low cadence with the F*=16 leg-count reachability caveat binding; HIGH stays blocked |
-| Reject amendment | Delete INFR-015 pin file; `ac8a1eb6…` (INFR-014) remains active; EPSOSC stays fully blocked; fallback paths above |
+**ACCEPTED (2026-07-18).** Operator: "Accept as recommended" — following QA run 5 APPROVE
+and QA run 6 adversarial audit (CERTIFICATION SOUND).
 
-_Pending operator._
+- `abbb1842…` is the **active binding pin** (supersedes `ac8a1eb6…`).
+- Certified set: CLS-FILTER **low** (unchanged) + CLS-EPISODE **low** (new). HIGH blocked
+  both classes.
+- Binding caveats carried into acceptance (per audit recommendation):
+  1. True CLS-EPISODE α priced as **plausibly up to ~0.06** (3-cycle sequential
+     multiplicity; Wilson UCB 0.064) — not exactly 0.05.
+  2. **F*=16 reachability**: any XENA-EPSOSC design must budget ≥16 gate-band legs
+     (LOW ood 0.75); leg-count expectation is a mandatory design declaration.
+  3. Any **fourth CLS-EPISODE CAL cycle requires explicit family-wise correction or a
+     doubled confirm bank** — binding on future designs.
+- XENA-EPSOSC unblocks on **low cadence only**.

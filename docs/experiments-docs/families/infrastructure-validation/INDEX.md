@@ -72,8 +72,10 @@ Not a candidate family — no signals, no slots; apparatus and substrate work on
   operator-approved. **AMENDMENT-4** (operator-directed, 2026-07-18): derived
   `n_legs_floor` F*=16 atop kept blocks, fresh banks 99k–102k/955k–956k → confirm LOW
   **CERTIFIED** (cov 0.025, α̂ 0.030, ood 0.75), HIGH FAIL_COV (0.060) →
-  **LOW_ONLY_CERTIFY; pin AMENDED sha `abbb1842…` (supersedes `ac8a1eb6…`,
-  CLS-FILTER canonical-identical) — operator sign-off pending.**
+  **LOW_ONLY_CERTIFY; pin sha `abbb1842…` (supersedes `ac8a1eb6…`, CLS-FILTER
+  canonical-identical) — operator ACCEPTED 2026-07-18** after QA run 6 adversarial audit
+  (CERTIFICATION SOUND; residual 3-cycle multiplicity priced: true α plausibly ≤~0.06;
+  4th CLS-EPISODE cycle requires family-wise correction or doubled confirm bank).
 - **Hypothesis-Agnostic Observations:** overlap correlation real but secondary on LOW; the
   binding CLS-EPISODE defect was small-sample studentized-LCB fragility at n_legs<~16 —
   proven by the monotone floor curve (cov 0.138→0.050 as F 0→16). Domain floors trade FPR

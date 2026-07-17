@@ -12,11 +12,11 @@ Live status + family navigation for the current chapter. Chapter 03 is archived 
 research may open.** Checkpoint-013 open (HTFCAP/EPSOSC + CAL). **INFR-014 COMPLETE
 2026-07-17 — operator ACCEPTED partial pin (QA run 4 APPROVE)** — CLS-FILTER
 LOW_ONLY_CERTIFY; CLS-EPISODE TERMINAL; active pin sha256 `ac8a1eb6…`. XENA-HTFCAP may
-design on CLS-FILTER low; EPSOSC blocked pending new CAL. **INFR-015: cycle 1
-TERMINAL-2 (approved); AMENDMENT-4 (derived n_legs_floor F*=16) executed 2026-07-18 →
-CLS-EPISODE LOW_ONLY_CERTIFY, pin AMENDED sha `abbb1842…` (supersedes `ac8a1eb6…`) —
-operator pin sign-off PENDING; if accepted, XENA-EPSOSC unblocks on low cadence
-(F*=16 leg-count reachability caveat, ood 0.75).** ch03 pin still VOID.
+design on CLS-FILTER low; EPSOSC blocked pending new CAL. **INFR-015 COMPLETE
+2026-07-18 — operator ACCEPTED amended pin `abbb1842…` (supersedes `ac8a1eb6…`; audit
+CERTIFICATION SOUND). Active certified set: CLS-FILTER low + CLS-EPISODE low. XENA-EPSOSC
+unblocked LOW-only — binding caveats: ≥16 gate-band legs (F*), α priced ≤~0.06, 4th
+CLS-EPISODE cycle needs family-wise correction.** ch03 pin still VOID.
 SPDR-004/005/006 complete (three WORTH_EXPLORING). INFR-013 COMPLETE.
 
 ## Current Infrastructure Tasks
@@ -29,7 +29,7 @@ SPDR-004/005/006 complete (three WORTH_EXPLORING). INFR-013 COMPLETE.
 | VAL-008 | COMPLETE 2026-07-16 — **Phase D PASS** | `python/experiments/VAL-008/report.md` |
 | INFR-013 | Phase E COMPLETE 2026-07-16 — verify PASS | `xen.orderflow` contracts + skeleton; NO collection/detectors; spec `docs/references/orderflow-feature-store.md`; sample-day report `INFR-013/results/sample_day_report.json` |
 | INFR-014 | **COMPLETE 2026-07-17 — pin ACCEPTED (partial)** | QA run 4 APPROVE; CLS-FILTER LOW_ONLY_CERTIFY; CLS-EPISODE TERMINAL; active pin sha256 `ac8a1eb6…`; S1 A-vs-B PASS; `python/experiments/INFR-014/report.md` |
-| INFR-015 | cycle 1 TERMINAL-2 approved; **A4 → LOW_ONLY_CERTIFY, pin AMENDED (sign-off pending)** | derived n_legs_floor F*=16 atop overlap blocks; LOW cov 0.025 / α̂ 0.030 CERTIFIED (ood 0.75), HIGH FAIL_COV 0.060; pin `abbb1842…` supersedes `ac8a1eb6…`; `python/experiments/INFR-015/report.md` §9 |
+| INFR-015 | **COMPLETE 2026-07-18 — pin `abbb1842…` ACCEPTED** | n_legs_floor F*=16 atop overlap blocks; LOW CERTIFIED (0.025/0.030, ood 0.75), HIGH FAIL_COV; audit SOUND; EPSOSC unblocked LOW-only; `python/experiments/INFR-015/report.md` §9.3 |
 
 ## Family Indexes
 
