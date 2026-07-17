@@ -1,0 +1,244 @@
+{
+  "bank": "design",
+  "class_id": "CLS-EPISODE",
+  "seeds": {
+    "low": 91000,
+    "high": 92000
+  },
+  "bite": {
+    "low": {
+      "class_id": "CLS-EPISODE",
+      "cadence": "low",
+      "n": 8,
+      "stage2_survival_rate": 0.125,
+      "stage1_select_rate": 0.875,
+      "select_ok": true,
+      "survival_ok": true,
+      "bite_ok": true,
+      "thresholds": {
+        "survival_max": 0.125,
+        "select_min": 0.5,
+        "planted_edge_bps": 20.0
+      },
+      "embargo_frac": 0.2,
+      "stage2_start_ns": 288000000000000
+    },
+    "high": {
+      "class_id": "CLS-EPISODE",
+      "cadence": "high",
+      "n": 8,
+      "stage2_survival_rate": 0.0,
+      "stage1_select_rate": 1.0,
+      "select_ok": true,
+      "survival_ok": true,
+      "bite_ok": true,
+      "thresholds": {
+        "survival_max": 0.125,
+        "select_min": 0.5,
+        "planted_edge_bps": 20.0
+      },
+      "embargo_frac": 0.2,
+      "stage2_start_ns": 576000000000000
+    }
+  },
+  "bite_rows": {
+    "low": [
+      {
+        "seed": 951000,
+        "plant_in_top": true,
+        "stage2_pass": true,
+        "gross_lcb": 86.41023696331904,
+        "n_legs": 4,
+        "empty": false
+      },
+      {
+        "seed": 951001,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -73.01212558270396,
+        "n_legs": 15,
+        "empty": false
+      },
+      {
+        "seed": 951002,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -235.26386497354054,
+        "n_legs": 10,
+        "empty": false
+      },
+      {
+        "seed": 951003,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -131.49057210265332,
+        "n_legs": 5,
+        "empty": false
+      },
+      {
+        "seed": 951004,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -19.031371395703196,
+        "n_legs": 15,
+        "empty": false
+      },
+      {
+        "seed": 951005,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -84.11662932238903,
+        "n_legs": 14,
+        "empty": false
+      },
+      {
+        "seed": 951006,
+        "plant_in_top": false,
+        "stage2_pass": false,
+        "gross_lcb": -178.5357132473996,
+        "n_legs": 6,
+        "empty": false
+      },
+      {
+        "seed": 951007,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -152.00987438067952,
+        "n_legs": 20,
+        "empty": false
+      }
+    ],
+    "high": [
+      {
+        "seed": 952000,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -7.918663309220285,
+        "n_legs": 254,
+        "empty": false
+      },
+      {
+        "seed": 952001,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -4.327640371235603,
+        "n_legs": 247,
+        "empty": false
+      },
+      {
+        "seed": 952002,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -10.565027179907187,
+        "n_legs": 256,
+        "empty": false
+      },
+      {
+        "seed": 952003,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -5.972385304598163,
+        "n_legs": 238,
+        "empty": false
+      },
+      {
+        "seed": 952004,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -8.705624643360132,
+        "n_legs": 258,
+        "empty": false
+      },
+      {
+        "seed": 952005,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -3.5036031141497723,
+        "n_legs": 160,
+        "empty": false
+      },
+      {
+        "seed": 952006,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -6.851632097960775,
+        "n_legs": 241,
+        "empty": false
+      },
+      {
+        "seed": 952007,
+        "plant_in_top": true,
+        "stage2_pass": false,
+        "gross_lcb": -10.499715784615333,
+        "n_legs": 246,
+        "empty": false
+      }
+    ]
+  },
+  "coverage": {
+    "low": {
+      "class_id": "CLS-EPISODE",
+      "cadence": "low",
+      "n": 80,
+      "n_lcb_positive": 6,
+      "rate": 0.075,
+      "coverage_ok": false,
+      "seed_bases": {
+        "low": 91000,
+        "high": 92000
+      },
+      "alpha_target": 0.05
+    },
+    "high": {
+      "class_id": "CLS-EPISODE",
+      "cadence": "high",
+      "n": 80,
+      "n_lcb_positive": 8,
+      "rate": 0.1,
+      "coverage_ok": false,
+      "seed_bases": {
+        "low": 91000,
+        "high": 92000
+      },
+      "alpha_target": 0.05
+    }
+  },
+  "frozen_procedure": {
+    "binder": "two_stage_sample_split",
+    "stage1": "search+certify top-1 on stage-1 bands",
+    "stage1_score_kind": "g_net",
+    "stage1_charge_costs": true,
+    "stage2": "lcb_g_leg_studentized(g_gross) > 0 on distant embargoed band",
+    "e2e_pass_event": "stage2_gross_lcb_positive",
+    "deployability_binding": "stage2_net_lcb_positive",
+    "functional": "g_gross_ratio",
+    "estimator": "leg_studentized_bootstrap_t",
+    "embargo_frac": 0.2,
+    "search_frac": 0.5,
+    "ranking_frac": 0.25,
+    "n_boot": 200,
+    "block_legs": 1,
+    "confidence": 0.95,
+    "alpha": 0.05,
+    "one_subset": true,
+    "shortlist": false,
+    "design_seeds": {
+      "low": 91000,
+      "high": 92000
+    },
+    "confirm_seeds": {
+      "low": 93000,
+      "high": 94000
+    },
+    "design_bite_ok": true,
+    "design_cov_low": 0.075,
+    "design_cov_high": 0.1,
+    "held_out_escalation": false,
+    "gate_rule": "per_cadence point \u03b1\u0302\u22645% AND no-search cov\u22645% (Fork A)",
+    "cost_stack": "bybit_round_trip_cost_bps_v1",
+    "gap_spread_bps": 5.0,
+    "class_id": "CLS-EPISODE"
+  },
+  "design_ok": true,
+  "stop_reason": null
+}

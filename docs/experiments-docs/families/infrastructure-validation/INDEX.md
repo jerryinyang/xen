@@ -6,6 +6,7 @@ Not a candidate family — no signals, no slots; apparatus and substrate work on
 ## ToC
 
 - [VAL-008 — INFR-010 Phase D end-to-end pipeline dry run](#val-008)
+- [INFR-014 — Fresh Bybit XENA CAL + universe_selection](#infr-014)
 
 ## VAL-008 — INFR-010 Phase D end-to-end pipeline dry run {#val-008}
 
@@ -32,3 +33,24 @@ Not a candidate family — no signals, no slots; apparatus and substrate work on
   `dispose_on_completion=False`; one BacktestNode per process (Rust logging); ~34s per
   288k-bar single-instrument run; multi-instrument single-engine untested (deferred to
   XENA CAL INFR). Report: `python/experiments/VAL-008/report.md`.
+
+## INFR-014 — Fresh Bybit XENA CAL + universe_selection {#infr-014}
+
+- **Hypothesis Tests:** re-measure INFR-009 two-stage CONFIRM form on Bybit/Nautilus under
+  net-cost-binding stage-1 (L-26); class nulls CLS-FILTER + CLS-EPISODE; e2e α̂ ≤ 5% +
+  no-search cov ≤ 5% for DUAL_CERTIFY; ship `universe_selection` + S1 multi-instr smoke.
+- **Scope:** synthetic TRAIN-fence null banks only (n_null design 80 / confirm 200); no live
+  family XENA; no TEST/holdout; no ch03 pin load; GAP cost stack disclosed.
+- **Results / Observations:** Post-QA re-exec (Issues 9–13): confirm coverage uses confirm
+  seeds 93k/94k; CLS-FILTER low CERTIFIED (α̂ 0.045, cov 0.035), high FAIL; verdict
+  **LOW_ONLY_CERTIFY**; CLS-EPISODE TERMINAL (α̂ 0.075/0.080); registry written sha256
+  `ac8a1eb679e22290d854ad245ef1620f5f8bdb446a5c0166c618d0c292b2da6f` verify green; S1
+  ADMITTED A-vs-B bitwise + estimand-v2 PASS → multi_instrument_single_node.
+- **Hypothesis-Specific Conclusion:** **operator ACCEPTED partial pin 2026-07-17 (QA run 4
+  APPROVE)** — `bybit_pc_frozen_registry.json` sha256 `ac8a1eb6…` is the active binding pin;
+  CLS-FILTER certified low-cadence only (XENA-HTFCAP may proceed on CLS-FILTER low);
+  CLS-EPISODE TERMINAL (XENA-EPSOSC blocked). Full dual-class / dual-cadence restore not
+  available from this bank.
+- **Hypothesis-Agnostic Observations:** confirm-bank seed contamination is a hard integrity
+  bug class (cov must share confirm bases with α̂); multi-instrument single-node admissible
+  for batch topology. Report: `python/experiments/INFR-014/report.md`.

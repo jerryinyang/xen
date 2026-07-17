@@ -1,0 +1,194 @@
+{
+  "experiment": "INFR-014",
+  "wp": "WP5",
+  "recorded_utc": "2026-07-17T04:32:27.782603+00:00",
+  "outcome": "PASS",
+  "batch_topology": "multi_instrument_single_node",
+  "path_a": {
+    "path": "A",
+    "n_instruments": 3,
+    "instrument_ids": [
+      "BTCUSDT-LINEAR.BYBIT",
+      "ETHUSDT-LINEAR.BYBIT",
+      "SOLUSDT-LINEAR.BYBIT"
+    ],
+    "dispose_on_completion": false,
+    "n_nodes_in_process": 1,
+    "n_results": 1,
+    "per_symbol": {
+      "BTCUSDT": {
+        "fills_digest": "dad36c3bbe576b72e6e9ef1d099a35f8218f2f9d73e5cb02b5c70d747678f24e",
+        "orders_digest": "bf5ea590db34d9ed5955ae263d4dfaa0dc0536bf5c0da915cc7109bca3ec7f59",
+        "positions_digest": "b1efdaa3965a038d594785854a2391b054426c25b413f7f002f079d2fcdef2b4",
+        "fills_n": 3200,
+        "orders_n": 3200,
+        "positions_n": 1600,
+        "fill_ts_anchor": {
+          "checked": true,
+          "sample_fill_px": 27289.0,
+          "nearest_open": 27289.0,
+          "rel_err": 0.0,
+          "pass": true,
+          "note": "L-29 sample: fill near catalog open scale"
+        },
+        "gate_blocking_pass": true
+      },
+      "ETHUSDT": {
+        "fills_digest": "3769e263c89938eb13dc6350443d4010980fdd729963bd2024a4f67aab64c29e",
+        "orders_digest": "2156c4b68a7814217695c644c230cb6562dd5273fe2c5e36fa06152b59c7c4cf",
+        "positions_digest": "19652eba9b7807dd1597a94654312c1247fdd2b7b212a5d1fcb0a5ccb1c5d6f8",
+        "fills_n": 3280,
+        "orders_n": 3280,
+        "positions_n": 1640,
+        "fill_ts_anchor": {
+          "checked": true,
+          "sample_fill_px": 1886.13,
+          "nearest_open": 1886.13,
+          "rel_err": 0.0,
+          "pass": true,
+          "note": "L-29 sample: fill near catalog open scale"
+        },
+        "gate_blocking_pass": true
+      },
+      "SOLUSDT": {
+        "fills_digest": "16065a6f0424c3022c48faef26375f532fab283aa8ddf781bb0259d0eda10885",
+        "orders_digest": "898756052fb79f75db0cbbbaeaf297818cdd40952a96d273174b1cfe779db452",
+        "positions_digest": "d7a34b3ed7d079a7425b3a4120cc02dfa1ab19ac05fd4fa1631552b31cc3fb4c",
+        "fills_n": 3072,
+        "orders_n": 3072,
+        "positions_n": 1536,
+        "fill_ts_anchor": {
+          "checked": true,
+          "sample_fill_px": 20.96,
+          "nearest_open": 20.96,
+          "rel_err": 0.0,
+          "pass": true,
+          "note": "L-29 sample: fill near catalog open scale"
+        },
+        "gate_blocking_pass": true
+      }
+    },
+    "gate_reports": {
+      "BTCUSDT": {
+        "blocking_pass": true,
+        "gate_version": "v2",
+        "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/INFR-014-S1/pathA__BTCUSDT"
+      },
+      "ETHUSDT": {
+        "blocking_pass": true,
+        "gate_version": "v2",
+        "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/INFR-014-S1/pathA__ETHUSDT"
+      },
+      "SOLUSDT": {
+        "blocking_pass": true,
+        "gate_version": "v2",
+        "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/INFR-014-S1/pathA__SOLUSDT"
+      }
+    },
+    "admitted_catalog": true,
+    "window": {
+      "start": "2023-06-01T00:00:00+00:00",
+      "end": "2023-07-01T00:00:00+00:00",
+      "band": "TRAIN"
+    }
+  },
+  "path_b": {
+    "path": "B",
+    "n_instruments": 3,
+    "n_processes": 3,
+    "per_instrument": [
+      {
+        "symbol": "BTCUSDT",
+        "fills_digest": "dad36c3bbe576b72e6e9ef1d099a35f8218f2f9d73e5cb02b5c70d747678f24e",
+        "orders_digest": "bf5ea590db34d9ed5955ae263d4dfaa0dc0536bf5c0da915cc7109bca3ec7f59",
+        "positions_digest": "b1efdaa3965a038d594785854a2391b054426c25b413f7f002f079d2fcdef2b4",
+        "fills_n": 3200,
+        "orders_n": 3200,
+        "positions_n": 1600,
+        "fill_ts_anchor": {
+          "checked": true,
+          "sample_fill_px": 27289.0,
+          "nearest_open": 27289.0,
+          "rel_err": 0.0,
+          "pass": true,
+          "note": "L-29 sample: fill near catalog open scale"
+        },
+        "gate_blocking_pass": true,
+        "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/INFR-014-S1/pathB__BTCUSDT"
+      },
+      {
+        "symbol": "ETHUSDT",
+        "fills_digest": "3769e263c89938eb13dc6350443d4010980fdd729963bd2024a4f67aab64c29e",
+        "orders_digest": "2156c4b68a7814217695c644c230cb6562dd5273fe2c5e36fa06152b59c7c4cf",
+        "positions_digest": "19652eba9b7807dd1597a94654312c1247fdd2b7b212a5d1fcb0a5ccb1c5d6f8",
+        "fills_n": 3280,
+        "orders_n": 3280,
+        "positions_n": 1640,
+        "fill_ts_anchor": {
+          "checked": true,
+          "sample_fill_px": 1886.13,
+          "nearest_open": 1886.13,
+          "rel_err": 0.0,
+          "pass": true,
+          "note": "L-29 sample: fill near catalog open scale"
+        },
+        "gate_blocking_pass": true,
+        "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/INFR-014-S1/pathB__ETHUSDT"
+      },
+      {
+        "symbol": "SOLUSDT",
+        "fills_digest": "16065a6f0424c3022c48faef26375f532fab283aa8ddf781bb0259d0eda10885",
+        "orders_digest": "898756052fb79f75db0cbbbaeaf297818cdd40952a96d273174b1cfe779db452",
+        "positions_digest": "d7a34b3ed7d079a7425b3a4120cc02dfa1ab19ac05fd4fa1631552b31cc3fb4c",
+        "fills_n": 3072,
+        "orders_n": 3072,
+        "positions_n": 1536,
+        "fill_ts_anchor": {
+          "checked": true,
+          "sample_fill_px": 20.96,
+          "nearest_open": 20.96,
+          "rel_err": 0.0,
+          "pass": true,
+          "note": "L-29 sample: fill near catalog open scale"
+        },
+        "gate_blocking_pass": true,
+        "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/INFR-014-S1/pathB__SOLUSDT"
+      }
+    ]
+  },
+  "a_vs_b_identity": {
+    "BTCUSDT": {
+      "match": true,
+      "a_fills_digest": "dad36c3bbe576b72e6e9ef1d099a35f8218f2f9d73e5cb02b5c70d747678f24e",
+      "b_fills_digest": "dad36c3bbe576b72e6e9ef1d099a35f8218f2f9d73e5cb02b5c70d747678f24e",
+      "a_fills_n": 3200,
+      "b_fills_n": 3200
+    },
+    "ETHUSDT": {
+      "match": true,
+      "a_fills_digest": "3769e263c89938eb13dc6350443d4010980fdd729963bd2024a4f67aab64c29e",
+      "b_fills_digest": "3769e263c89938eb13dc6350443d4010980fdd729963bd2024a4f67aab64c29e",
+      "a_fills_n": 3280,
+      "b_fills_n": 3280
+    },
+    "SOLUSDT": {
+      "match": true,
+      "a_fills_digest": "16065a6f0424c3022c48faef26375f532fab283aa8ddf781bb0259d0eda10885",
+      "b_fills_digest": "16065a6f0424c3022c48faef26375f532fab283aa8ddf781bb0259d0eda10885",
+      "a_fills_n": 3072,
+      "b_fills_n": 3072
+    }
+  },
+  "criteria": {
+    "dispose_on_completion_false": true,
+    "one_node_per_process": true,
+    "reports_nonempty": true,
+    "a_vs_b_bitwise_canonical": true,
+    "estimand_v2_blocking_pass_all_cells": true,
+    "admitted_catalog_btc_eth_sol": true,
+    "fill_ts_anchor_l29": true,
+    "n_instruments_ge_3": true,
+    "note": "PASS \u2192 XENA batch may use multi-instrument single-node. FAIL \u2192 subprocess-per-cell (L-31)."
+  },
+  "deviations": []
+}

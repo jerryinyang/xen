@@ -321,7 +321,8 @@ def run_restart(streams: list[CandidateStream], config: OracleConfig, *, budget:
                 params: SearchParams = SearchParams(), oracle_seed: int = 0,
                 cache: EvalCache | None = None,
                 universe_root: str | None = None,
-                skip_economics_precondition: bool = False) -> RestartResult:
+                skip_economics_precondition: bool = False,
+                score_kind: str = "g_gross") -> RestartResult:
     """One LAHC restart (spec §13 pseudocode). Deterministic given all arguments.
 
     ``restart_id`` seeds the walk rng AND offsets the bootstrap-start seed so different
@@ -353,6 +354,9 @@ def run_restart(streams: list[CandidateStream], config: OracleConfig, *, budget:
                 "Synthetic/calibration: pass skip_economics_precondition=True "
                 "(see xen.xena.calibration.run_pipeline_once)."
             )
+    if score_kind not in ("g_gross", "g_net"):
+        raise ValueError(f"score_kind must be g_gross|g_net, got {score_kind!r}")
+    use_net = score_kind == "g_net"
     universe = sorted(s.candidate_id for s in streams)
     grid = universe_grid(streams)
     if segment is not None:
@@ -373,13 +377,14 @@ def run_restart(streams: list[CandidateStream], config: OracleConfig, *, budget:
         if rec is not None:
             return rec
         res = evaluate(subset, streams, config, segment=segment, seed=oracle_seed)
-        # INFR-009 P1: intensive g_gross P25 is the binding walk score (not log-wealth).
+        # INFR-009 P1 default: intensive g_gross P25. INFR-014 CAL: g_net + charge_costs
+        # (L-26 net-cost-binding selection).
         g_hat, g_point, boot = robust_g_hat(
             res, streams, grid, starts,
-            block=params.block_bars, quantile=params.quantile)
+            block=params.block_bars, quantile=params.quantile, net=use_net)
         rec = EvalRecord(g_hat, g_point, boot,
                          res.n_admitted, res.n_rejected, it_counter[0], restart_id,
-                         score_kind="g_gross")
+                         score_kind=score_kind)
         cache.put(subset, rec)
         return rec
 

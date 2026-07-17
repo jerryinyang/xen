@@ -1,0 +1,120 @@
+{
+  "recorded_utc": "2026-07-17T04:50:19.225852+00:00",
+  "classes": {
+    "CLS-FILTER": {
+      "design_ok": true,
+      "verdict": "LOW_ONLY_CERTIFY",
+      "per_cadence": {
+        "low": {
+          "cadence": "low",
+          "band": "CERTIFIED",
+          "deployability": "DEPLOY_WEAK",
+          "no_search_cov": 0.035,
+          "e2e_alpha": 0.045,
+          "selection_inflation": 0.009999999999999995,
+          "coverage_ok": true,
+          "alpha_ok": true,
+          "certified": true,
+          "alpha_se": 0.014658615214269049,
+          "alpha_wilson_95": {
+            "low": 0.023852271724704163,
+            "high": 0.08329759366096785
+          },
+          "n": 200,
+          "n_gross_lcb_positive": 9,
+          "deployability_rate": 0.01,
+          "seed_bases": {
+            "low": 93000,
+            "high": 94000
+          },
+          "alpha_target": 0.05,
+          "failure_label": null
+        },
+        "high": {
+          "cadence": "high",
+          "band": "FAIL_ALPHA",
+          "deployability": "N/A",
+          "no_search_cov": 0.065,
+          "e2e_alpha": 0.06,
+          "selection_inflation": -0.0050000000000000044,
+          "coverage_ok": false,
+          "alpha_ok": false,
+          "certified": false,
+          "alpha_se": 0.016792855623746664,
+          "alpha_wilson_95": {
+            "low": 0.0346518499012715,
+            "high": 0.10193263530685089
+          },
+          "n": 200,
+          "n_gross_lcb_positive": 12,
+          "deployability_rate": 0.0,
+          "seed_bases": {
+            "low": 93000,
+            "high": 94000
+          },
+          "alpha_target": 0.05,
+          "failure_label": "coverage_limited"
+        }
+      }
+    },
+    "CLS-EPISODE": {
+      "design_ok": true,
+      "verdict": "TERMINAL",
+      "per_cadence": {
+        "low": {
+          "cadence": "low",
+          "band": "FAIL_ALPHA",
+          "deployability": "N/A",
+          "no_search_cov": 0.1,
+          "e2e_alpha": 0.075,
+          "selection_inflation": -0.02500000000000001,
+          "coverage_ok": false,
+          "alpha_ok": false,
+          "certified": false,
+          "alpha_se": 0.018624580532189176,
+          "alpha_wilson_95": {
+            "low": 0.04597450705725241,
+            "high": 0.12004459797332036
+          },
+          "n": 200,
+          "n_gross_lcb_positive": 15,
+          "deployability_rate": 0.06,
+          "seed_bases": {
+            "low": 93000,
+            "high": 94000
+          },
+          "alpha_target": 0.05,
+          "failure_label": "coverage_limited"
+        },
+        "high": {
+          "cadence": "high",
+          "band": "FAIL_ALPHA",
+          "deployability": "N/A",
+          "no_search_cov": 0.05,
+          "e2e_alpha": 0.08,
+          "selection_inflation": 0.03,
+          "coverage_ok": true,
+          "alpha_ok": false,
+          "certified": false,
+          "alpha_se": 0.01918332609325088,
+          "alpha_wilson_95": {
+            "low": 0.049840155176266415,
+            "high": 0.12599048979512317
+          },
+          "n": 200,
+          "n_gross_lcb_positive": 16,
+          "deployability_rate": 0.0,
+          "seed_bases": {
+            "low": 93000,
+            "high": 94000
+          },
+          "alpha_target": 0.05,
+          "failure_label": "selection_unsafe"
+        }
+      }
+    }
+  },
+  "registry_written": true,
+  "toy": false,
+  "producer": "experiments/INFR-014/code/run_cal.py"
+}

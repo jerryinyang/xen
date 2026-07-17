@@ -267,3 +267,114 @@ def fill_basis_package(
     summary["binding"] = False
     summary["retired_replacement_for"] = "HARD_permutation_battery"
     return summary
+
+
+def reprice_entries_to_next_open(
+    trades: pl.DataFrame,
+    marks: pl.DataFrame,
+) -> pl.DataFrame:
+    """Re-price entry fills to the next bar open; hold times / exits / sizing fixed (L-27).
+
+    Parameters
+    ----------
+    trades :
+        Columns EntryTime, ExitTime, Direction, EntryPrice, ExitPrice (+ optional).
+    marks :
+        Columns CloseTime (ns int) and Open.
+
+    Returns
+    -------
+    pl.DataFrame
+        Copy of trades with EntryPrice replaced by next-open; adds ``live_entry_price``
+        and ``next_open_entry_price`` for audit.
+    """
+    if trades.height == 0 or marks.height < 2:
+        return trades
+    mt = marks.get_column("CloseTime").to_numpy().astype(np.int64)
+    mo = marks.get_column("Open").to_numpy().astype(float)
+    et = trades.get_column("EntryTime").to_numpy().astype(np.int64)
+    ep = trades.get_column("EntryPrice").to_numpy().astype(float)
+    i0 = np.minimum(np.searchsorted(mt, et, side="left"), len(mt) - 1)
+    i1 = np.minimum(i0 + 1, len(mt) - 1)
+    next_open = mo[i1]
+    return trades.with_columns(
+        pl.Series("live_entry_price", ep),
+        pl.Series("next_open_entry_price", next_open),
+        pl.Series("EntryPrice", next_open),
+    )
+
+
+def next_open_discriminating_control(
+    streams: Sequence[CandidateStream],
+    *,
+    segment: tuple[int, int] | None = None,
+) -> dict[str, Any]:
+    """L-27 next-open discriminating control (INFR-014 WP6).
+
+    Compare live fills-derived gross edge vs the same legs re-priced to the next bar
+    open (exits/holds/sizing fixed). Large live−next_open gap indicates passive-print
+    (limit) edge rather than predictive timing.
+
+    Required apparatus even when all CAL cells are market (proves tooling for future
+    limit-entry universes; SPDR-005 §2.3 forward note).
+    """
+    live_parts: list[pl.DataFrame] = []
+    next_parts: list[pl.DataFrame] = []
+    for s in streams:
+        live = decompose_stream(s, segment=segment)
+        if live.height == 0:
+            continue
+        live_parts.append(live)
+        tr = s.trades
+        if segment is not None:
+            et = tr.get_column("EntryTime").to_numpy().astype(np.int64)
+            sel = (et >= segment[0]) & (et < segment[1])
+            tr = tr.filter(pl.Series(sel))
+        if tr.height == 0:
+            continue
+        tr_next = reprice_entries_to_next_open(tr, s.marks)
+        # recompute fills gross on re-priced entries (exits fixed)
+        d = tr_next.get_column("Direction").to_numpy().astype(float)
+        ep = tr_next.get_column("EntryPrice").to_numpy().astype(float)
+        xp = tr_next.get_column("ExitPrice").to_numpy().astype(float)
+        g = d * (xp - ep) / np.maximum(ep, 1e-12) * 1e4
+        next_parts.append(pl.DataFrame({
+            "candidate_id": [s.candidate_id] * len(g),
+            "symbol": [s.symbol] * len(g),
+            "gross_bps": g,
+        }))
+    if not live_parts:
+        return {
+            "n_legs": 0,
+            "empty": True,
+            "binding": False,
+            "control": "next_open_discriminating",
+            "lesson": "L-27",
+            "note": "no legs in segment",
+        }
+    live_df = pl.concat(live_parts)
+    live_mean = float(live_df.get_column("gross_bps").mean())
+    if next_parts:
+        next_df = pl.concat(next_parts)
+        next_mean = float(next_df.get_column("gross_bps").mean())
+        n_next = int(next_df.height)
+    else:
+        next_mean = float("nan")
+        n_next = 0
+    gap = live_mean - next_mean if np.isfinite(next_mean) else float("nan")
+    return {
+        "n_legs": int(live_df.height),
+        "n_legs_next_open": n_next,
+        "empty": False,
+        "binding": False,
+        "control": "next_open_discriminating",
+        "lesson": "L-27",
+        "live_gross_mean_bps": live_mean,
+        "next_open_gross_mean_bps": next_mean,
+        "live_minus_next_open_bps": float(gap) if np.isfinite(gap) else float("nan"),
+        "discrimination_note": (
+            "gap≈0 expected for market-on-open / market-on-confirmed entries; "
+            "large positive live−next_open gap flags limit-print dominance"
+        ),
+        "pin_usage": "limit_print_sole_certify_forbidden when gap dominates",
+    }

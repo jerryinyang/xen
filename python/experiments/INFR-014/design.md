@@ -575,3 +575,19 @@ python/src/xen/xena/calibration_bybit.py   # or equivalent
 3. **Registry pin sign-off** — after confirm; operator accepts DUAL_CERTIFY / partial / TERMINAL.  
 
 **Stop now:** design complete → QA subagent → present QA verdict. No execution without operator go.
+
+---
+
+## 20. Post-execution amendments (L-23) — 2026-07-17
+
+Independent QA after first execution: REVISE. Fixes re-run with **same** predeclared form
+constants, seed ranges, and α gate (no threshold retune; no optional n_null change).
+
+| ID | Tag | Change |
+|---|---|---|
+| **A-1** | **TIGHTER** (integrity) | Confirm-bank `no_search_coverage` must use **confirm** seed bases (`CONFIRM_SEEDS` 93k/94k), never re-pin `DESIGN_SEEDS` inside the coverage helper (QA Issue 9). Gate asserts `seed_bases == CONFIRM_SEEDS` on confirm. First confirm artifacts contaminated on cov leg — discarded. |
+| **A-2** | **NEUTRAL** (fidelity) | S1 smoke: ADMITTED catalog BTC/ETH/SOL (TRAIN window), Path **A-vs-B** bitwise on canonical columns (not Path-A self-replay alone), estimand-v2 `blocking_pass` per cell emission, PINNED fence attestation (QA Issue 10). Smoke window may be a short TRAIN sub-range for wall-clock; still fenced + ADMITTED. |
+| **A-3** | **NEUTRAL** | Gate α target read from frozen `procedure["alpha"]`, not a free global (QA Issue 13). |
+| **A-4** | **NEUTRAL** | `run_cal.py` always writes `cal_summary.json` (even when registry refuse); `verify_bybit_registry` requires `void_priors` list VOID prefixes (QA Issues 11–12). |
+
+**Unchanged:** form constants §5.4; n_null design 80 / confirm 200; stage-1 g_net + charge_costs; α̂ event = stage-2 gross LCB on top-1; bite thresholds; partial-write policy; ch03 pin VOID.

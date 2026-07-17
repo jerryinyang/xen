@@ -305,22 +305,29 @@ class FoldRanking:
 def rank_on_folds(candidates: list[tuple[frozenset[str], float]],
                   streams: list[CandidateStream], config: OracleConfig,
                   folds: list[tuple[int, int]], *, oracle_seed: int = 0,
-                  rank_by: str = "median") -> tuple[list[FoldRanking], dict]:
-    """Rank shortlist candidates by the DISTRIBUTION of full re-simulation **g_gross**
-    across disjoint contiguous purged folds (median or worst — never best)."""
+                  rank_by: str = "median",
+                  score_kind: str = "g_gross") -> tuple[list[FoldRanking], dict]:
+    """Rank shortlist candidates by the DISTRIBUTION of full re-simulation g score
+    across disjoint contiguous purged folds (median or worst — never best).
+
+    ``score_kind``: ``g_gross`` (default, INFR-009) or ``g_net`` (INFR-014 L-26).
+    """
     if rank_by not in ("median", "worst"):
         raise ValueError("rank_by must be 'median' or 'worst'")
+    if score_kind not in ("g_gross", "g_net"):
+        raise ValueError(f"score_kind must be g_gross|g_net, got {score_kind!r}")
+    use_net = score_kind == "g_net"
     rankings = []
     for subset, search_F in candidates:
         fF = []
         for f in folds:
             res = evaluate(subset, streams, config, segment=f, seed=oracle_seed)
-            fF.append(g_gross_point(res, streams))
+            fF.append(g_gross_point(res, streams, net=use_net))
         finite = [x for x in fF if np.isfinite(x)]
         med = float(np.median(finite)) if finite else float("-inf")
         worst = float(min(finite)) if finite else float("-inf")
         rankings.append(FoldRanking(subset, fF, med, worst, search_F,
-                                    score_kind="g_gross"))
+                                    score_kind=score_kind))
     key = (lambda r: r.median_F) if rank_by == "median" else (lambda r: r.worst_F)
     ranked = sorted(rankings, key=key, reverse=True)
 
@@ -335,7 +342,7 @@ def rank_on_folds(candidates: list[tuple[frozenset[str], float]],
             under += is_winner.fold_F[i] < med
         pbo = under / n_folds
     diag = {"rank_by": rank_by, "n_folds": len(folds), "pbo_like": pbo,
-            "score_kind": "g_gross", "folds_ns": [list(f) for f in folds]}
+            "score_kind": score_kind, "folds_ns": [list(f) for f in folds]}
     return ranked, diag
 
 
@@ -352,7 +359,8 @@ def certify_and_rank(finalists: list[RestartResult], streams: list[CandidateStre
                      n_random_ref: int = 64,
                      random_ref_seed: int = 0,
                      include_random_ref: bool = True,
-                     include_fill_basis: bool = True) -> dict:
+                     include_fill_basis: bool = True,
+                     score_kind: str = "g_gross") -> dict:
     """Build the shortlist **evidence package** over terminal restart candidates.
 
     INFR-009: every distinct restart terminal enters the package (no F_floor /
@@ -410,10 +418,11 @@ def certify_and_rank(finalists: list[RestartResult], streams: list[CandidateStre
         shortlist.append((r.best_subset, r.best_F_hat))
 
     ranked, fold_diag = ([], {"rank_by": rank_by, "n_folds": len(folds),
-                              "pbo_like": float("nan"), "score_kind": "g_gross"})
+                              "pbo_like": float("nan"), "score_kind": score_kind})
     if shortlist:
         ranked, fold_diag = rank_on_folds(shortlist, streams, config, folds,
-                                          oracle_seed=oracle_seed, rank_by=rank_by)
+                                          oracle_seed=oracle_seed, rank_by=rank_by,
+                                          score_kind=score_kind)
 
     # resim_divergence: EVIDENCE only (retired as binder — A3 / INFR-009)
     boot_by_subset = {r.best_subset: r.cache.get(r.best_subset) for r in finalists}

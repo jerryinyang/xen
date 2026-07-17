@@ -24,6 +24,14 @@ from xen.nautilus.adjudication_shim import (
     emission_to_adjudication_frames,
     adjudicate_emission,
 )
+from xen.nautilus.universe_selection import (
+    SelectionRule,
+    build_membership_series,
+    rank_from_volume_panel,
+    rebalance_schedule,
+    rule_hash,
+    select_membership,
+)
 
 __all__ = [
     "VENUE",
@@ -38,4 +46,10 @@ __all__ = [
     "load_emission_v1",
     "emission_to_adjudication_frames",
     "adjudicate_emission",
+    "SelectionRule",
+    "build_membership_series",
+    "rank_from_volume_panel",
+    "rebalance_schedule",
+    "rule_hash",
+    "select_membership",
 ]
