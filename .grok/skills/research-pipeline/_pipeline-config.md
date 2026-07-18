@@ -72,6 +72,52 @@ backup — delete it before commit; do not commit backups). Never run it on `cod
 non-prose files. Compression is a formatting pass — it must not drop a fact, a number, or a
 verdict.
 
+### Operator-facing communication (binding — all skills, all stages)
+
+Applies to **every message meant for the human operator**: questions asking for a decision
+or opinion, status updates, progress reports, stage handoffs, gate prompts, summaries,
+recommendations, and completion notes.
+
+Does **not** force on-disk technical artifacts (`design.md`, `analysis.md`, code, QA tables)
+to drop domain terms — those stay precise for the record. When you **tell the operator**
+about those artifacts, **translate**.
+
+| Rule | Requirement |
+|------|-------------|
+| **Plain first** | Lead with what happened and what it means for the decision. Process/skill jargon is never the lead. |
+| **Concise** | Status default ≤8 short lines; summary default ≤15 unless the operator asked for depth. Bullets over paragraphs. |
+| **De-jargonify** | Replace internal labels with plain meaning. If a label is needed once, put it in parentheses after the plain phrase. |
+| **Decisions, not dumps** | For a gate: state the decision needed; give 2–4 options with one-line consequences; mark the recommendation. |
+| **One ask at a time** | One plain sentence per question (or a short list of independent questions). No compound nested questions. |
+| **Keep useful numbers** | Effect sizes, sample sizes, costs stay — but say what they mean in words first. |
+| **20-second test** | Before send: could a smart non-specialist who owns this project understand it in ~20 seconds? If not, rewrite. |
+
+**Bad:** "estimand_validation `blocking_pass` failed on provenance; SPREAD-SCALE-ROUTING
+`t1_undecidable`; awaiting operator gate before LAHC."
+
+**Good:** "The integrity check failed: we cannot prove decisions only used past data. Results
+are not clean yet. I need your call: (A) fix and re-run — recommended, or (B) stop here."
+
+**Status / summary template:**
+```
+**Where we are:** <one line>
+**What happened:** <1–3 plain bullets>
+**What it means:** <1–2 bullets>
+**Need from you:** <decision, or "nothing — continuing">
+```
+
+**Question template:**
+```
+**Question:** <one plain sentence>
+**Options:**
+- A — <one-line consequence>  ← recommended
+- B — <one-line consequence>
+**Why A:** <one line>
+```
+
+If a question cannot be stated plainly, the asker does not understand it yet — investigate
+first; do not dump jargon on the operator.
+
 ### Checkpoint Structure (Phase-Based Documentation)
 
 ```
@@ -178,10 +224,12 @@ These binding constraints apply to all Xen research.
 | **Open-to-open returns only** | Strategy / signal / P&L returns are measured **open-to-open**, never open-to-close — an `OnClose` execution is impossible in real time (the close is unknown until the bar completes). Close-referenced returns are a non-tradable diagnostic and must be labelled as such. |
 | **Leak resistance is audited independently of the numbers** | Numeric reproduction reproduces a leak. Every price-primary experiment ships a future-destroying control that must collapse the edge; the audit traces verdict-bearing columns' input timestamps. A surviving edge under that control is a leak → REJECT. |
 | **Knowledge-base-first** | Read `docs/knowledge-base/` before designing. Never re-run a `pitfalls-ledger.md` dead end; never re-learn a `lessons-and-amendments.md` mechanism. |
-| **Integrity gates hard, value reads informative** | Only integrity checks block (leak tripwire, holdout, causality/provenance, estimand reconciliation). Quality/materiality/significance reads are evidence for the operator — no auto-verdicts, no threshold stacks, no auto-RETIRE. |
+| **Integrity gates hard, value reads informative** | Only integrity checks block (**future-destroy** leak survival, holdout, causality/provenance, estimand reconciliation). Quality/materiality/significance reads are evidence for the operator — no auto-verdicts, no threshold stacks, no auto-RETIRE. |
+| **Validity attests; value reports (INFR-016)** | The value chain has **two disjoint layers**. (a) **VALIDITY attestations** — holdout fence, causal ≤t-1, estimand reconciliation, non-STUB fence, no-local-accounting, **future-destroy** leak survival — stay HARD; a failure means *emission invalid → fix the data*, never *no edge*. (b) **VALUE reads** — cost floor, cadence, leg-power, search score, fold stability, stage-2 bounds (ALL subsets + per-cell), **within-sample attribution** collapse, sign battery, cost/funding, spread routing, net deployability — are **report layers** (`observed/ideal/interpretation` per candidate, nothing machine-dropped); the operator authorises progression. Interpretation bands (SUPPORTED/WASH/CONTRADICTED/UNPOWERED/SUGGESTIVE/STRONG) are **labels, never gates**. `docs/references/xena-lane.md`. |
 | **Estimand before hypothesis** | No verdict, control read, or TEST read on an emission without a passing `xen.estimand_validation` gate. Controls that validate a hypothesis on an unvalidated estimand certify artifacts (critical-017). |
 | **Experiment ≠ family** | Experiments produce evidence and experiment-level verdicts. Family open/retire/promote decisions happen only at checkpoint retrospectives, operator-signed. Checkpoints group multiple experiments. |
 | **Protocols, not directives** | Every lesson is codified as a checkable protocol, script, or structural separation — directives ("interrogate raw data") recur; protocols do not. |
+| **Operator-facing chat is plain** | Every question, status, summary, or gate prompt to the human is concise and de-jargonified (see § Operator-facing communication). Technical artifacts stay precise; operator messages translate. |
 
 ### XENA Lane — the DEFAULT route (binding, INFR-006, 2026-07-10)
 
@@ -324,6 +372,7 @@ Before creating new modules, check these existing reusable functions:
 | Run ingestion (legacy) | `xen.signals.ingestion` | Archived cTrader emissions only |
 | **Bybit T1 cost + routing** | `xen.evaluation` | `bybit_round_trip_cost_bps`, `spread_scale_route`, `t1_round_trip_spread_bps` |
 | **XENA portfolio framework** | `xen.xena.{oracle,ingest,search,certify,final_gate,calibration}` | The DEFAULT adjudication route (INFR-006): shared-capital oracle, blocking candidate gate, LAHC search, plateau+fold certification, counted final gate, frozen-registry verification. Spec: `docs/references/xena-lane.md` |
+| **XENA report layers (INFR-016)** | `xen.xena.report_layer`, `xen.xena.controls` | Value/quality/significance reads as **report layers** (`observed / ideal / interpretation` per candidate, no `pass` field), not gates: `LayerReport` schema + renderer, `power_layer`/`stage2_bounds_layer` (retire `n_legs_floor`/`one_subset`), `sign_battery` (≥2000 seeds, effect+p+CI — no `at_or_above_p95`), `attribution_derangement` (reported collapse fraction — no `hard_fail_leak`), `final_gate.final_report_layer` (net deployability, no `passed`). |
 | *(More to be added as analysis modules are developed)* | `python/src/xen/` | Reusable analysis code |
 
 ---

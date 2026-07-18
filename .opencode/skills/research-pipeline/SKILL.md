@@ -7,8 +7,14 @@ description: Orchestrate the Xen research experiment lifecycle from idea or EXP-
 
 Coordinate the experiment workflow; route work to specialists; enforce the split:
 **machines gate integrity; the operator judges value.** Hard blocks exist only for integrity
-(leak tripwire, holdout, causality/provenance, estimand reconciliation). Every quality or
-materiality read is informative — presented as evidence, decided by the operator.
+(**future-destroy** leak survival, holdout, causality/provenance, estimand reconciliation).
+Every quality or materiality read is informative — presented as evidence, decided by the operator.
+
+**INFR-016 (2026-07-18):** value/quality/significance reads are **report layers**
+(`observed / ideal / interpretation` per candidate — `xen.xena.report_layer`), never gates.
+Nothing is machine-dropped between layers; the operator authorises which candidates advance.
+The only hard checks are **data-validity attestations** (holdout, causal ≤t-1, estimand
+reconciliation, non-STUB fence, no-local-accounting, future-destroy leak survival).
 
 ## Start
 
@@ -85,11 +91,17 @@ python/experiments/<ID>/
 
 ## Operator gates (the only stops)
 
+The only machine stops are **holdout-safety + data validity** (INFR-016). Everything else is
+**operator-authorised layer progression**: report layers describe every candidate; the operator
+decides which advance.
+
 1. **Execution approval** (mandatory, after QA APPROVE) — operator may rerun QA first.
 2. **Final experiment verdict** (after `analysis.md`).
 3. Spending a counted TEST read — additionally requires a passing
    `estimand_validation.json` for the emission being read (pre-read gate).
 4. Anything holdout-adjacent; any deployability claim.
+5. **Layer progression** — after each report layer, the operator authorises which candidates
+   advance to the next layer. No value read auto-drops a candidate.
 
 ## Experiment vs family (binding separation)
 
@@ -108,11 +120,20 @@ no emission→execution gate; no passing `estimand_validation.json`→estimand g
 `analysis.md`→Analysis; no operator verdict→present evidence; no `report.md`→Document.
 Announce the resume point.
 
-## Elicitation standard (all skills, all stages)
+## Operator-facing communication (binding — all skills, all stages)
 
-Questions to the operator: one plain sentence per question; concrete options with one-line
-consequences; recommendation marked; no compound questions; no jargon walls. If a question
-cannot be stated plainly, the asker does not understand it yet — investigate first.
+**Every message to the human operator** (question, status, progress report, gate prompt,
+summary, handoff, recommendation) must be **concise and de-jargonified**. Full rules and
+templates: `_pipeline-config.md` § *Operator-facing communication*.
+
+Short form (never skip):
+- Lead with plain meaning; technical labels only in parentheses if needed once.
+- Status ≤8 short lines; summary ≤15 unless more was requested.
+- Questions: one plain sentence; options with one-line consequences; recommendation marked.
+- On-disk artifacts may stay precise; chat that reports them must translate.
+- 20-second test: if a smart non-specialist owner would not get it, rewrite.
+
+If a question cannot be stated plainly, investigate first — do not dump process jargon.
 
 ## Hard constraints
 
@@ -127,7 +148,11 @@ cannot be stated plainly, the asker does not understand it yet — investigate f
 - Per-stratum reads; pooled figures are disclosure-only.
 - Register candidates before screening; counted TEST reads recorded (cap 2 lifetime/stratum).
 - No scope expansion after QA APPROVE — new questions are new experiments.
-- No auto-verdicts: quality thresholds do not gate; the operator decides.
+- No auto-verdicts: quality thresholds do not gate; the operator decides. Value/quality/
+  significance reads are **report layers** (`observed/ideal/interpretation`), never gates
+  (INFR-016). Retired auto-verdicts: `at_or_above_p95` sign-battery boolean, `n_legs_floor`
+  veto, `one_subset` top-1 hiding, derangement `hard_fail_leak` collapse<0.5, final-gate
+  `passed`. Only **future-destroy** leak survival + holdout + causal + estimand stay hard.
 
 ## References
 

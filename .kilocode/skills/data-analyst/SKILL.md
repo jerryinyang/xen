@@ -81,6 +81,16 @@ UNANSWERED with a reason. Add follow-up questions as answers raise them.
 - Report effect sizes with uncertainty (bootstrap CIs), sample sizes, and — for any
   survives/dies control read — the **collapse fraction** (control effect / raw effect), not
   just the binary.
+- **Report layers, not verdicts (INFR-016).** Present every value/quality/significance read as
+  a `xen.xena.report_layer.LayerReport` — per candidate, `observed / ideal / interpretation`,
+  **no `pass` field**, nothing dropped; the operator authorises progression. Never emit an
+  auto-verdict: retired are the `at_or_above_p95` sign-battery boolean (use
+  `xen.xena.controls.sign_battery`, **≥2000 seeds** → effect size + one-sided p + CI), the
+  `n_legs_floor` power veto (use `report_layer.power_layer` — report power, never a floor), the
+  `one_subset` top-1 (use `stage2_bounds_layer` for **ALL** subsets + per-cell), the derangement
+  `hard_fail_leak` collapse<0.5 (use `controls.attribution_derangement` — report the fraction),
+  and the final-gate `passed` (use `final_gate.final_report_layer`). Only **future-destroy**
+  leak survival stays a hard data-validity attestation.
 - CI hygiene (INFR-004 / L-20): use `xen.evaluation.block_bootstrap_ci` — it already caps the
   block below n (no zero-width CI on sparse strata) and aggregates a 5-seed battery. For any
   read where `ci` sits near zero, quote the **`ci_low_seed_range`** — if that seed band
@@ -123,8 +133,11 @@ Structure (see `references/interrogation-protocol.md` for the template):
 - Do not tune, re-scope, or extend the experiment; new questions that need new emissions are
   proposals for the operator, listed under open questions.
 - Never load or inspect the final-30% global holdout.
-- Operator questions follow the plain-language elicitation standard: one plain sentence per
-  question, concrete options, one-line consequences, recommendation marked.
+- **Operator-facing communication (binding):** every question, status, summary, or
+  recommended-verdict handoff to the human is concise and de-jargonified. Full rules:
+  `research-pipeline/_pipeline-config.md` § *Operator-facing communication*. Plain meaning
+  first; status ≤8 lines; options + recommendation on decisions; translate jargon (keep
+  precise terms inside `analysis.md`, translate when speaking to the operator).
 
 ## References
 

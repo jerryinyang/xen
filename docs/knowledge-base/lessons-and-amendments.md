@@ -761,3 +761,52 @@ either.
 **Enforced at.** `experiment-developer/references/code-conventions.md` runner template;
 `qa-compliance` §3 clause (in-process multi-node = REVISE). Evidence: VAL-008 `report.md` §5;
 checkpoint-013 §1 D1.
+
+## L-32 — An arbitrary value/significance threshold wired to auto-decide reports absence-of-evidence as evidence-of-absence; retire it to a report layer (XENA-HTFCAP-001 / INFR-016) ⭐
+
+**What.** XENA-HTFCAP-001 (exploratory) reproduced the "arbitrary-gate trap" the programme's
+own principles forbid — twice, on real binding cells. (1) A **25-seed** sign-scramble battery
+with an `at_or_above_p95` BOOLEAN auto-labelled directionally-positive, gate-attributable cells
+as "fails": SOL v1.5 DI_VOL_HI H64 raw median **24.9 bps gross**, percentile-vs-battery **0.80**,
+`at_or_above_p95 = FALSE` (`controls.py:97`; `controls_SOLUSDT__DI_VOL_HI__v1.5__adxna__H64.json:39-40`);
+BTC#2 ~10.7 bps, p≈0.23. (2) The pinned stage-2 binder's **`one_subset` / top-1 only**
+(`calibration_bybit15.py:409,860`) HID those cells entirely — it certified a near-zero (~1 bps)
+leak-class cell and never reported the suggestive ones. (3) Same class: gate-schedule derangement
+collapse **< 0.5 = HARD BTC REJECT** (`controls.py:251,301`).
+
+**Mechanism (why).** 25 seeds cannot resolve a P95 — that bar IS ~the top order statistic of 25
+draws = pure noise. The **same read at ≥2000 seeds** resolves to **~P78, one-sided p≈0.22** —
+"suggestive but underpowered", NOT a refutation. Reproduced exactly in `xen.xena.controls`:
+SOL → **p=0.224, percentile 0.78, effect +23.6 bps, label SUGGESTIVE**. The defect is structural:
+a value/quality/significance quantity is **continuous**, and a threshold wired to DECIDE collapses
+it to one bit at the least-resolved point of the estimator — so absence of evidence at an arbitrary
+bar is reported as evidence of absence, and any subset-selecting binder (`one_subset`) can then hide
+the cells that would contradict it. This is [[L-15]] (binarize noise at the admit bar), [[L-17]]
+(band-length-blind floor), [[L-19]] (a percentile needs a real seed battery), [[L-25]] (scale-broken
+threshold) and [[L-12]] (fixed-threshold conjunctions over-reject), now at gate scale in the XENA
+value chain.
+
+**Fix / new rule (INFR-016, operator-ratified 2026-07-18).** Every value/quality/significance/
+selection GATE becomes a **report layer** (`xen.xena.report_layer.LayerReport`): per candidate,
+`observed / ideal / interpretation`, **no `pass` field**, nothing machine-dropped; the operator
+authorises progression. Split the value chain in two: **VALIDITY attestations** (holdout, causal
+≤t-1, estimand reconciliation, non-STUB fence, no-local-accounting, and **future-destroy** leak
+survival) stay HARD — a failure means *emission invalid → fix the data*; **VALUE reads** are report
+layers. **Control class:** `future_destroy` (edge survives destroying FUTURE info ⇒ acausal L-01
+leak) stays hard; `within_sample_attribution` (timing scrambled, entries still causal — the
+gate-schedule derangement) is a report layer (collapse fraction reported, operator judges
+leak-vs-edge). Retired auto-verdicts: `at_or_above_p95` (→ `controls.sign_battery`, **≥2000 seeds**,
+effect+p+CI), `n_legs_floor` veto (→ `report_layer.power_layer`, report power), `one_subset` top-1
+(→ `stage2_bounds_layer` for ALL subsets+per-cell), derangement `hard_fail_leak` (→
+`controls.attribution_derangement`, reported fraction), final-gate `passed` (→
+`final_gate.final_report_layer`). Interpretation bands (SUPPORTED/WASH/CONTRADICTED/UNPOWERED/
+SUGGESTIVE/STRONG) are **labels, never gates**. **Trade-off signed by the operator:** a partly-
+surviving edge on a within-sample attribution control is no longer auto-blocked — the operator reads
+the collapse fraction and judges. L-01 future-look-ahead protection is untouched.
+
+**Enforced at.** `xen.xena.report_layer` + `xen.xena.controls` (no `pass` field, verdict-key guard);
+`xen.xena.final_gate.final_report_layer`; `research-pipeline` SKILL + `_pipeline-config.md`
+(operator gates = holdout-safety + data validity only); `data-analyst` / `quant-designer` skills;
+`docs/references/xena-lane.md`; `references/governance-constraints.md`. Design + ratification:
+`python/experiments/INFR-016/design.md`; tests `python/tests/test_xena_infr016.py`. Builds on
+[[L-12]], [[L-15]], [[L-17]], [[L-19]], [[L-25]], [[L-26]].

@@ -4,10 +4,18 @@ The constraint framework enforced by **`qa-compliance`** (fresh-context pre-exec
 and at the estimand/TEST-read gates. These constraints are non-negotiable and apply to all
 artifacts in the Xen research pipeline.
 
-**Blocking frame (INFR-001).** Only **integrity** violations block: leak/causality, holdout
-contact, estimand reconciliation failure, silent design deviation, missing tripwire. All
-quality/materiality/significance reads are **informative** — evidence for the operator, never
-auto-verdicts. There are no binding quality thresholds, readiness floors, or gate stacks.
+**Blocking frame (INFR-001; INFR-016 split).** Only **data-validity / integrity** violations
+block: **future-destroy** leak survival / causality, holdout contact, estimand reconciliation
+failure, silent design deviation, missing tripwire. A block here means *emission invalid → fix
+the data*, never *no edge*. All quality/materiality/significance reads are **report layers**
+(`observed / ideal / interpretation` per candidate — `xen.xena.report_layer`), never gates:
+nothing is machine-dropped; the operator authorises progression. There are no binding quality
+thresholds, readiness floors, or gate stacks. **Control class (INFR-016 §4c, operator-ratified
+2026-07-18):** a `future_destroy` control (edge survives destroying FUTURE info ⇒ acausal leak)
+stays a HARD validity attestation; a `within_sample_attribution` control (timing scrambled,
+entries still causal — e.g. gate-schedule derangement) is a **report layer** (collapse fraction
+reported, operator judges leak-vs-edge). Retired auto-verdicts: `at_or_above_p95`,
+`n_legs_floor` veto, `one_subset` top-1, derangement `hard_fail_leak`, final-gate `passed`.
 
 **Artifact mapping.** *Scope Document* + *Analysis Plan* checks → **`design.md`** (plus the
 mandatory declaration blocks in `quant-designer/references/design-requirements.md`);

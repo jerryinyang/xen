@@ -75,11 +75,20 @@ One artifact, dense (tables/bullets), ~300-line budget. All items below are REQU
 
 ## Hard gates vs informative reads (binding frame)
 
-- **Integrity checks are hard** (leak tripwire, holdout, causality, reconciliation): design
-  them in; they block.
-- **Everything about signal QUALITY is informative**: no materiality thresholds, no readiness
-  floors, no multi-gate conjunctions, no auto-RETIRE conditions in the design. The design
-  states what will be measured and the bands for reading it; the operator judges worth.
+- **Data-validity checks are hard** (**future-destroy** leak survival, holdout, causality,
+  reconciliation): design them in; they block, meaning *emission invalid → fix the data*.
+- **Everything about signal QUALITY is a report layer** (INFR-016): no materiality thresholds,
+  no readiness floors, no multi-gate conjunctions, no auto-RETIRE. Each value/quality/
+  significance read is a `xen.xena.report_layer.LayerReport` — per candidate,
+  `observed / ideal / interpretation`, **no `pass` field**, nothing machine-dropped. The
+  design states what each layer measures and the bands for reading it; the operator authorises
+  which candidates advance. Interpretation bands (SUPPORTED/WASH/CONTRADICTED/UNPOWERED/
+  SUGGESTIVE/STRONG) are **labels, never gates**.
+- **Control class (INFR-016 §4c):** every control declares `future_destroy` (HARD validity —
+  edge survives destroying FUTURE info ⇒ acausal leak) vs `within_sample_attribution` (report
+  layer — timing scrambled, entries still causal; report the collapse fraction, operator
+  judges). Sign/attribution batteries: **≥2000 seeds**, report effect size + one-sided p + CI
+  — never an `at_or_above_pXX` boolean, never a collapse-fraction auto-kill.
 
 ## Constraints
 
@@ -95,9 +104,12 @@ One artifact, dense (tables/bullets), ~300-line budget. All items below are REQU
   frozen registry hash — it never re-derives or proposes threshold values (X, F_floor,
   gate threshold are pinned; L-12 clause). Per-candidate quality gates are forbidden:
   every grid cell enters the universe. Spec: `docs/references/xena-lane.md`.
-- Operator questions follow the plain-language elicitation standard: one plain sentence per
-  question, concrete options, one-line consequences, recommendation marked. If anything in
-  the request is ambiguous, ask BEFORE writing the design — never resolve ambiguity silently.
+- **Operator-facing communication (binding):** every question, status, or summary to the
+  human is concise and de-jargonified. Full rules: `research-pipeline/_pipeline-config.md`
+  § *Operator-facing communication*. Short form: plain meaning first; status ≤8 lines;
+  one-sentence questions with options + recommendation; technical labels only in parentheses
+  if needed once. If anything in the request is ambiguous, ask BEFORE writing the design —
+  never resolve ambiguity silently.
 
 ## References
 

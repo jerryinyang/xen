@@ -31,12 +31,40 @@ They MUST NOT bind any crypto/Bybit universe until a fresh CAL cycle produces a 
 Design record (redesign): `python/experiments/INFR-009/design.md`. Historical INFR-006 plan:
 `python/experiments/INFR-006/design.md`. Spec source: `.ignore/temp/new-referee/xena-model.md`.
 
+## INFR-016 — value chain is report layers, not gates (2026-07-18, operator-ratified)
+
+Every value / quality / significance / selection read is a **report layer**
+(`xen.xena.report_layer.LayerReport`): per candidate, `observed / ideal / interpretation`, **no
+`pass` field**, nothing machine-dropped. The operator authorises which candidates advance. Two
+disjoint layers (design §4):
+
+- **VALIDITY attestations (HARD)** — holdout fence, causal ≤t-1, estimand reconciliation,
+  non-STUB fence, no-local-accounting, structural computability, oracle determinism, and
+  **future-destroy leak survival** (edge survives destroying FUTURE info ⇒ acausal L-01 leak).
+  A failure = *emission invalid → fix the data*, never *no edge*.
+- **VALUE reads (REPORT LAYERS)** — cost floor & breakeven, cadence coverage, **leg-power**
+  (`power_layer`, retires `n_legs_floor` veto), search score, fold stability, **stage-2 bounds
+  for ALL subsets AND per-cell** (`stage2_bounds_layer`, retires `one_subset` top-1),
+  **within-sample attribution** collapse (`controls.attribution_derangement` — reported
+  fraction, retires `hard_fail_leak` collapse<0.5), **sign battery** (`controls.sign_battery`,
+  ≥2000 seeds → effect size + one-sided p + CI, retires the 25-seed `at_or_above_p95` boolean),
+  cost/funding sensitivity, spread-scale routing, **net deployability**
+  (`final_gate.final_report_layer`, retires the final gate's `passed`).
+
+Interpretation bands `SUPPORTED / WASH / CONTRADICTED / UNPOWERED / SUGGESTIVE / STRONG` are
+**labels on a layer, never gates**. The counted-read ledger + holdout-safety stay as read-budget
+/ validity controls. Grounding failures (HTFCAP): a 25-seed P95 boolean auto-"failed" SOL 24.9
+bps (p≈0.22, ~P78 at 2000 seeds — SUGGESTIVE, not refuted); `one_subset` hid it and certified a
+~1 bps leak-class cell. `python/experiments/INFR-016/design.md`.
+
 ## Principle
 
 **No per-candidate evaluation.** Every (model × parameters × instrument × domain) is a
 valid candidate — no qualification gates at candidate level. Candidates run once in
 **Nautilus**; the portfolio framework selects the subset. The optimizer is a candidate
 *generator*, never a *certifier*: certification is machinery the search cannot influence.
+**INFR-016:** even the post-search chain never *certifies* — it **reports layers**; the
+operator authorises progression.
 
 ## Pipeline
 
