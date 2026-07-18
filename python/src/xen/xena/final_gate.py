@@ -308,3 +308,52 @@ def run_final_gate(subset: frozenset[str] | set[str], streams: list[CandidateStr
     (root / f"xena_final_gate_{len(spent) + 1}.json").write_text(
         json.dumps(artifact, indent=1), encoding="utf-8")
     return artifact
+
+
+# --------------------------------------------------------------------------- #
+# INFR-016 — the former final gate as a REPORT LAYER (no `passed`)
+# --------------------------------------------------------------------------- #
+def final_report_layer(subset: frozenset[str] | set[str], streams: list[CandidateStream],
+                       config: OracleConfig, *, gate_segment: tuple[int, int],
+                       candidate_id: str, params: SearchParams = SearchParams(),
+                       oracle_seed: int = 0, boot_seed: int = 424243,
+                       n_decay_windows: int = 4, ideal_range: str = "net P25 > 0 with DD feasible"):
+    """Net-deployability read on the reserved segment as a :class:`LayerReport` — INFR-016.
+
+    Same walk-forward mechanics as :func:`run_final_gate` (deterministic; no emission change),
+    but emits **no `passed`** and **no threshold**: it reports net P25/median/P75, DD, and
+    decay for the operator to judge. The counted-ledger + holdout-safety mechanics stay in
+    :func:`run_final_gate` as data-validity/read-budget controls (INFR-016 §4a); the value
+    read is this layer.
+    """
+    from xen.xena.report_layer import LayerReport  # lazy: avoid import cycle at module load
+
+    subset = frozenset(subset)
+    grid = clip_grid_covering(universe_grid(streams), gate_segment, streams)
+    cfg_net = replace(config, charge_costs=True)
+    res = evaluate(subset, streams, cfg_net, segment=gate_segment, seed=oracle_seed)
+    inc = grid_increments(res, grid)
+    starts = bootstrap_block_starts(len(grid), block=params.block_bars,
+                                    n_boot=max(params.n_boot, 200), seed=boot_seed)
+    boot = bootstrap_F(inc, starts, block=params.block_bars,
+                       initial_equity=cfg_net.initial_equity)
+    p25, p50, p75 = (float(np.quantile(boot, q)) for q in (0.25, 0.5, 0.75))
+    dd = dd_feasibility(res.equity_times, res.equity, initial_equity=cfg_net.initial_equity)
+    interp = (f"net P25 {p25:.4g}, median {p50:.4g}; DD "
+              + ("within FTMO limits" if dd["feasible"] else "breaches FTMO limits")
+              + ("; net-positive lower band" if p25 > 0 else
+                 "; net edge not resolved above zero at the lower band"))
+    return LayerReport(
+        layer="net_deployability",
+        candidate_id=candidate_id,
+        observed=f"net P25 {p25:.4g}, median {p50:.4g}",
+        ideal_range=ideal_range,
+        interpretation=interp,
+        interpretation_label=None,
+        supporting={
+            "net_F_boot": {"p25": p25, "median": p50, "p75": p75},
+            "dd_feasibility": dd,
+            "n_admitted": res.n_admitted, "n_rejected": res.n_rejected,
+            "note": "former final gate as a report layer — operator judges deployability (INFR-016)",
+        },
+    )
