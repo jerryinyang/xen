@@ -1,0 +1,198 @@
+{
+  "note": "in-window (shifted-TRAIN) episode counts from 001 RET_ANCHOR emissions, 002 axis",
+  "F_star": 16,
+  "sigma_bps_prior": 150.0,
+  "per_symbol_band_counts": [
+    {
+      "symbol": "SHIB1000USDT",
+      "stage2_gate": 176,
+      "search": 326,
+      "ranking": 189,
+      "purge_or_outside": 173
+    },
+    {
+      "symbol": "SPELLUSDT",
+      "stage2_gate": 166,
+      "search": 187,
+      "ranking": 177,
+      "purge_or_outside": 26
+    },
+    {
+      "symbol": "10000LADYSUSDT",
+      "stage2_gate": 159,
+      "search": 0,
+      "ranking": 9,
+      "purge_or_outside": 140
+    },
+    {
+      "symbol": "LEVERUSDT",
+      "stage2_gate": 152,
+      "search": 0,
+      "ranking": 0,
+      "purge_or_outside": 28
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "stage2_gate": 141,
+      "search": 0,
+      "ranking": 8,
+      "purge_or_outside": 181
+    },
+    {
+      "symbol": "1000BONKUSDT",
+      "stage2_gate": 138,
+      "search": 32,
+      "ranking": 147,
+      "purge_or_outside": 171
+    },
+    {
+      "symbol": "STMXUSDT",
+      "stage2_gate": 126,
+      "search": 21,
+      "ranking": 0,
+      "purge_or_outside": 55
+    },
+    {
+      "symbol": "GALAUSDT",
+      "stage2_gate": 119,
+      "search": 169,
+      "ranking": 176,
+      "purge_or_outside": 121
+    },
+    {
+      "symbol": "FITFIUSDT",
+      "stage2_gate": 119,
+      "search": 31,
+      "ranking": 0,
+      "purge_or_outside": 9
+    },
+    {
+      "symbol": "AKROUSDT",
+      "stage2_gate": 63,
+      "search": 381,
+      "ranking": 151,
+      "purge_or_outside": 92
+    },
+    {
+      "symbol": "SLPUSDT",
+      "stage2_gate": 56,
+      "search": 94,
+      "ranking": 77,
+      "purge_or_outside": 0
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "stage2_gate": 30,
+      "search": 240,
+      "ranking": 224,
+      "purge_or_outside": 170
+    },
+    {
+      "symbol": "1000BTTUSDT",
+      "stage2_gate": 14,
+      "search": 209,
+      "ranking": 0,
+      "purge_or_outside": 0
+    },
+    {
+      "symbol": "HOTUSDT",
+      "stage2_gate": 6,
+      "search": 314,
+      "ranking": 77,
+      "purge_or_outside": 0
+    },
+    {
+      "symbol": "JASMYUSDT",
+      "stage2_gate": 0,
+      "search": 32,
+      "ranking": 120,
+      "purge_or_outside": 106
+    },
+    {
+      "symbol": "REEFUSDT",
+      "stage2_gate": 0,
+      "search": 212,
+      "ranking": 0,
+      "purge_or_outside": 0
+    },
+    {
+      "symbol": "DENTUSDT",
+      "stage2_gate": 0,
+      "search": 307,
+      "ranking": 184,
+      "purge_or_outside": 32
+    },
+    {
+      "symbol": "RSRUSDT",
+      "stage2_gate": 0,
+      "search": 145,
+      "ranking": 112,
+      "purge_or_outside": 37
+    },
+    {
+      "symbol": "LINAUSDT",
+      "stage2_gate": 0,
+      "search": 43,
+      "ranking": 77,
+      "purge_or_outside": 129
+    }
+  ],
+  "n_single_cells_ge_Fstar_on_stage2": 42,
+  "n_binding_cells": 152,
+  "pooled_projections": {
+    "top3_pooled_stage2_legs": 501,
+    "top3_symbols": [
+      "SHIB1000USDT",
+      "SPELLUSDT",
+      "10000LADYSUSDT"
+    ],
+    "top5_pooled_stage2_legs": 794,
+    "top5_symbols": [
+      "SHIB1000USDT",
+      "SPELLUSDT",
+      "10000LADYSUSDT",
+      "LEVERUSDT",
+      "1000PEPEUSDT"
+    ],
+    "top8_pooled_stage2_legs": 1177,
+    "top8_symbols": [
+      "SHIB1000USDT",
+      "SPELLUSDT",
+      "10000LADYSUSDT",
+      "LEVERUSDT",
+      "1000PEPEUSDT",
+      "1000BONKUSDT",
+      "STMXUSDT",
+      "GALAUSDT"
+    ],
+    "top19_pooled_stage2_legs": 1465,
+    "top19_symbols": [
+      "SHIB1000USDT",
+      "SPELLUSDT",
+      "10000LADYSUSDT",
+      "LEVERUSDT",
+      "1000PEPEUSDT",
+      "1000BONKUSDT",
+      "STMXUSDT",
+      "GALAUSDT",
+      "FITFIUSDT",
+      "AKROUSDT",
+      "SLPUSDT",
+      "DOGEUSDT",
+      "1000BTTUSDT",
+      "HOTUSDT",
+      "JASMYUSDT",
+      "REEFUSDT",
+      "DENTUSDT",
+      "RSRUSDT",
+      "LINAUSDT"
+    ]
+  },
+  "mde_bps": {
+    "n16": 75.0,
+    "n50": 42.4,
+    "n100": 30.0,
+    "top3_pooled_stage2": 13.4
+  },
+  "power_target": "pooled n_legs \u2265 50 on stage2 via K\u22653 cross-symbol subsets (design \u00a710)"
+}

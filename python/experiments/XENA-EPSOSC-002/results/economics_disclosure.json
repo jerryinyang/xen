@@ -1,0 +1,158 @@
+{
+  "schema": "xena.economics_disclosure.v1",
+  "universe_id": "XENA-EPSOSC-002",
+  "generated_utc": "2026-07-18T02:12:21Z",
+  "segment_ns": [
+    1656633600000000000,
+    1675123200000000000
+  ],
+  "stage": "Q1_pre_search",
+  "cost_map_integrity": {
+    "complete": true,
+    "n_candidates": 152,
+    "n_incomplete": 0,
+    "reason": "ok",
+    "incomplete_sample": [],
+    "status_label": "OK"
+  },
+  "gross_economics": {
+    "p05": -401.6672101138864,
+    "p25": -100.55140610552355,
+    "p50": -4.659556249845467,
+    "p75": 78.42560565688935,
+    "p95": 255.15733711789494,
+    "mean": -28.343821509364467,
+    "frac_mean_gt_0": 0.4765625,
+    "n_with_legs": 128
+  },
+  "slices": {
+    "domain": {
+      "?": {
+        "n": 128,
+        "median_gross_bps": -4.659556249845467,
+        "mean_gross_bps": -28.343821509364467
+      }
+    },
+    "hold": {
+      "?": {
+        "n": 128,
+        "median_gross_bps": -4.659556249845467,
+        "mean_gross_bps": -28.343821509364467
+      }
+    },
+    "variant": {
+      "?": {
+        "n": 128,
+        "median_gross_bps": -4.659556249845467,
+        "mean_gross_bps": -28.343821509364467
+      }
+    },
+    "symbol": {
+      "1000BONKUSDT": {
+        "n": 8,
+        "median_gross_bps": -82.24433485140729,
+        "mean_gross_bps": -116.65943068175147
+      },
+      "1000BTTUSDT": {
+        "n": 8,
+        "median_gross_bps": -1.025527781743648,
+        "mean_gross_bps": -3.1926223086482812
+      },
+      "AKROUSDT": {
+        "n": 8,
+        "median_gross_bps": 100.88750041034757,
+        "mean_gross_bps": 89.73672672342758
+      },
+      "DENTUSDT": {
+        "n": 8,
+        "median_gross_bps": 68.53650880033753,
+        "mean_gross_bps": 53.92619221925486
+      },
+      "DOGEUSDT": {
+        "n": 8,
+        "median_gross_bps": -58.86401876901098,
+        "mean_gross_bps": -64.45467005283069
+      },
+      "FITFIUSDT": {
+        "n": 8,
+        "median_gross_bps": -147.34793634381802,
+        "mean_gross_bps": -187.51366710786615
+      },
+      "GALAUSDT": {
+        "n": 8,
+        "median_gross_bps": -168.63920440628306,
+        "mean_gross_bps": -180.53248156382892
+      },
+      "HOTUSDT": {
+        "n": 8,
+        "median_gross_bps": 37.59793373584228,
+        "mean_gross_bps": 41.12905247768627
+      },
+      "JASMYUSDT": {
+        "n": 8,
+        "median_gross_bps": -108.85868178683705,
+        "mean_gross_bps": -169.8615738449058
+      },
+      "LINAUSDT": {
+        "n": 8,
+        "median_gross_bps": -8.73393485681222,
+        "mean_gross_bps": -16.845886058476324
+      },
+      "REEFUSDT": {
+        "n": 8,
+        "median_gross_bps": 29.60447841489099,
+        "mean_gross_bps": 34.471711705857814
+      },
+      "RSRUSDT": {
+        "n": 8,
+        "median_gross_bps": -80.4034794272302,
+        "mean_gross_bps": -115.6679073472735
+      },
+      "SHIB1000USDT": {
+        "n": 8,
+        "median_gross_bps": 36.885168856902915,
+        "mean_gross_bps": 39.47824050521458
+      },
+      "SLPUSDT": {
+        "n": 8,
+        "median_gross_bps": 9.40171532243211,
+        "mean_gross_bps": -3.932124290509261
+      },
+      "SPELLUSDT": {
+        "n": 8,
+        "median_gross_bps": 46.78668838455113,
+        "mean_gross_bps": 18.61895770830784
+      },
+      "STMXUSDT": {
+        "n": 8,
+        "median_gross_bps": 168.10194446131516,
+        "mean_gross_bps": 127.79833776651006
+      }
+    }
+  },
+  "cost_context": {
+    "cost_floor_bps_draft": null,
+    "cost_floor_status": "DRAFT_UNFROZEN \u2014 \u00a76.4 formula not frozen (INFR-009)",
+    "pins_complete": true,
+    "net_of_pin_p50_bps": -23.159556249845465,
+    "frac_net_gt_0": 0.4296875
+  },
+  "execution_context": {
+    "note": "print-vs-path fill-basis is computed post-shortlist via xen.xena.fill_basis; Q1 surfaces occupancy/n_legs only",
+    "median_n_legs": 21.0
+  },
+  "operator_routing": {
+    "decision": "proceed_deployability_search",
+    "reason": "operator-approved search/certify 2026-07-17; cost pins finite",
+    "allowed_values": [
+      "proceed_deployability_search",
+      "characterisation_only",
+      "do_not_search"
+    ]
+  },
+  "search_allowed": true,
+  "n_candidates_disclosed": 152,
+  "candidates_summary_only": true,
+  "binding_note": "Discloses only \u2014 removes NO candidate. Incomplete cost map refuses search+gate (integrity), never quality-filters the universe.",
+  "redesign": "INFR-009 P0 (consolidated-03 \u00a74.1)"
+}

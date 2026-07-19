@@ -1,0 +1,48 @@
+{
+  "universe_id": "XENA-EPSOSC-002",
+  "note": "SPEC ONLY (design §13). QA independently DERIVES expected values from features + real prices; the developer must NOT generate these. Anchors point at concrete in-window, in-002-axis events. Position ids reference 001 RET_ANCHOR emissions as the concrete substrate; Stage-3 002 re-emission must reproduce equivalent behaviour under the same causal rules.",
+  "train_start_utc": "2022-07-01T00:00:00Z",
+  "traces": [
+    {
+      "id": "T1_ret_anchor_entry_clear",
+      "scenario": "Confirmed VOLARM armed-stretch → market entry at next 15m bar open → within-episode RET_ANCHOR endogenous clear (no time cap).",
+      "cell": "SPELLUSDT__VOLARM__15m__W96__k2.5__RET_ANCHOR__S",
+      "anchor_position_suffix": "9a-454d-4e41-9241-e548f364cc72",
+      "entry_open_utc": "2022-07-10T11:01:00Z",
+      "clear_utc": "2022-07-10T14:31:00Z",
+      "duration_h_approx": 3.5,
+      "px_open_ref": 0.00103,
+      "px_close_ref": 0.00101,
+      "invariants_QA_must_verify": [
+        "arm+stretch condition evaluated on CONFIRMED bars ≤ t−1 (ATR14[t-1]/ATR56[t-1] ≥ 1.25 AND |RealClose[t-1]−medianAnchor(96)[t-1]|/ATR14[t-1] ≥ 2.5)",
+        "EntryFillPrice == next-bar RealOpen ± 1 tick (L-29 anchor)",
+        "exit trigger = RET_ANCHOR (price returns to anchor within ret_clear_frac 0.25); NO time-cap exit",
+        "SlPrice finite = EntryFill − side × 1.0 × k·ATR14[t-1]",
+        "gross open-to-open bps sign = fade (SHORT_ONLY) direction"
+      ]
+    },
+    {
+      "id": "T2_cap_or_segment_censor_no_hybrid",
+      "scenario": "Longest-hold episode with NO RET_ANCHOR return — verify it is segment-end/construction censored, NOT closed by a time cap (HYBRID removed in 002).",
+      "cell": "SPELLUSDT__VOLARM__15m__W192__k2.5__RET_ANCHOR__S",
+      "selection": "longest-duration in-window episode of this W192 cell",
+      "invariants_QA_must_verify": [
+        "no HYBRID/time-cap exit path exists in the RET_ANCHOR-only strategy (code inspection)",
+        "a non-returning episode ends only by RET_ANCHOR (never fires) OR segment-end censoring",
+        "censored episodes flagged in censoring.json; censored_frac disclosed; >20% flags",
+        "duration bounded by the episode construction horizon at 15m×W192"
+      ]
+    },
+    {
+      "id": "T3_negative_membership_no_entry",
+      "scenario": "Arm+stretch fires on a day the symbol is OUT of the causal top-10 at t−1 → NO entry.",
+      "symbol": "SPELLUSDT",
+      "membership_out_day_utc": "2023-06-28T00:00:00Z",
+      "invariants_QA_must_verify": [
+        "SPELLUSDT absent from membership.parquet rebalance on 2023-06-28 (rule 0dd53037…)",
+        "any VOLARM arm on a non-member day produces NO position (membership gate blocks entry)",
+        "membership evaluated causally at daily 00:00 UTC on trailing-24h volume ≤ t−1"
+      ]
+    }
+  ]
+}

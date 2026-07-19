@@ -1,0 +1,111 @@
+{
+  "universe_id": "XENA-EPSOSC-002",
+  "generated_utc": "2026-07-18T01:28:09.702218Z",
+  "train_start_utc": "2022-07-01T00:00:00Z",
+  "train_end_utc": "2023-12-18T00:00:00Z",
+  "holdout_start_utc_sealed": "2025-01-08T00:00:00Z",
+  "source": "XENA-EPSOSC-001 RET_ANCHOR positions_ledger, in-window re-slice (disclosure)",
+  "warmup_caveat": "001 warmed from 2021-06; fresh 002 loses \u226448h warmup at window start",
+  "monthly_mass_002axis": [
+    {
+      "ym": "2022-07",
+      "n_cells": 76,
+      "n_epis": 287
+    },
+    {
+      "ym": "2022-08",
+      "n_cells": 84,
+      "n_epis": 376
+    },
+    {
+      "ym": "2022-09",
+      "n_cells": 76,
+      "n_epis": 402
+    },
+    {
+      "ym": "2022-10",
+      "n_cells": 79,
+      "n_epis": 298
+    },
+    {
+      "ym": "2022-11",
+      "n_cells": 72,
+      "n_epis": 401
+    },
+    {
+      "ym": "2022-12",
+      "n_cells": 80,
+      "n_epis": 420
+    },
+    {
+      "ym": "2023-01",
+      "n_cells": 100,
+      "n_epis": 564
+    },
+    {
+      "ym": "2023-02",
+      "n_cells": 84,
+      "n_epis": 528
+    },
+    {
+      "ym": "2023-03",
+      "n_cells": 80,
+      "n_epis": 495
+    },
+    {
+      "ym": "2023-04",
+      "n_cells": 84,
+      "n_epis": 432
+    },
+    {
+      "ym": "2023-05",
+      "n_cells": 95,
+      "n_epis": 474
+    },
+    {
+      "ym": "2023-06",
+      "n_cells": 90,
+      "n_epis": 447
+    },
+    {
+      "ym": "2023-07",
+      "n_cells": 76,
+      "n_epis": 368
+    },
+    {
+      "ym": "2023-08",
+      "n_cells": 88,
+      "n_epis": 437
+    },
+    {
+      "ym": "2023-09",
+      "n_cells": 74,
+      "n_epis": 313
+    },
+    {
+      "ym": "2023-10",
+      "n_cells": 88,
+      "n_epis": 509
+    },
+    {
+      "ym": "2023-11",
+      "n_cells": 79,
+      "n_epis": 394
+    },
+    {
+      "ym": "2023-12",
+      "n_cells": 81,
+      "n_epis": 261
+    }
+  ],
+  "search_band_coverage": {
+    "search_band": "2022-07-01T00:00:00Z \u2192 2023-01-31T00:00:00Z",
+    "n_axis_binding_cells": 152,
+    "cells_with_ge1_episode": 128,
+    "coverage": 0.8421,
+    "zero_leg_fraction": 0.1579,
+    "predeclared_X": "coverage \u2265 0.80 (zero-leg \u2264 0.20)",
+    "pass": true
+  },
+  "mass_onset_note": "raw episode mass present from ~2021-11 (see 001 emissions); TRAIN_START=2022-07-01 chosen on the plateau to separate from 2021/2023 single-name drift regimes (fix #1/#4). Predeclared X (search-band coverage \u22650.80) verified on the pinned band."
+}

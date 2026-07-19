@@ -1,0 +1,182 @@
+{
+  "universe_id": "XENA-EPSOSC-002",
+  "tripwire": "episode-label derangement + drift-twin pair (design \u00a77/\u00a78)",
+  "metric": "equal-weight mean gross bps/episode on gate-band legs (recon, L-29)",
+  "gate_band_ns": [
+    1693612800000000000,
+    1702857600000000000
+  ],
+  "hard_rule": "raw_collapse >= 0.5 AND drift_adjusted_collapse >= 0.5 AND anchor_ok AND >=3 distinct symbols; else REJECT (no override)",
+  "n_derange_seeds": 200,
+  "n_twin_seeds": 200,
+  "subsets": {
+    "certified_top1_K3": {
+      "cells": [
+        "10000LADYSUSDT__VOLARM__15m__W96__k2.5__RET_ANCHOR__L",
+        "AKROUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S",
+        "LEVERUSDT__VOLARM__15m__W192__k2.5__RET_ANCHOR__L",
+        "STMXUSDT__VOLARM__15m__W96__k2.5__RET_ANCHOR__S"
+      ],
+      "n_distinct_symbols": 4,
+      "n_real_legs": 62,
+      "live_mean_gross_bps": 94.9631774471948,
+      "live_mean_gross_bps_emitted": 94.54481446371895,
+      "deranged_mean_median": 86.34266674483914,
+      "matched_drift_twin_median": 31.21995003440544,
+      "coin_flip_twin_median": 8.498198009942687,
+      "matched_drift_twin_p95": 131.52006920036757,
+      "coin_flip_twin_p95": 106.23851866865405,
+      "signal_component_live_minus_drift": 63.74322741278935,
+      "raw_collapse_fraction": 0.09077740376946819,
+      "drift_adjusted_collapse_fraction": 0.13523806453242204,
+      "bite_live_gt_p95_both_twins": false,
+      "anchor_ok_L29": true,
+      "single_symbol_or_singleton": false,
+      "n_seeds": {
+        "derange": 200,
+        "drift": 200,
+        "coin": 200
+      },
+      "HARD_pass_raw_and_drift_adjusted_ge_0.5": false
+    },
+    "disclosure_rank0_2sym": {
+      "cells": [
+        "1000BONKUSDT__VOLARM__15m__W192__k2.5__RET_ANCHOR__S",
+        "1000BONKUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S",
+        "AKROUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S"
+      ],
+      "n_distinct_symbols": 2,
+      "n_real_legs": 46,
+      "live_mean_gross_bps": -1511.8168547876865,
+      "live_mean_gross_bps_emitted": -1506.744791373162,
+      "deranged_mean_median": -867.5544050850477,
+      "matched_drift_twin_median": -899.841436131484,
+      "coin_flip_twin_median": 36.61292500260576,
+      "matched_drift_twin_p95": -434.16305479145194,
+      "coin_flip_twin_p95": 956.3261830628272,
+      "signal_component_live_minus_drift": -611.9754186562025,
+      "raw_collapse_fraction": 0.4261511225135245,
+      "drift_adjusted_collapse_fraction": NaN,
+      "bite_live_gt_p95_both_twins": false,
+      "anchor_ok_L29": true,
+      "single_symbol_or_singleton": true,
+      "n_seeds": {
+        "derange": 200,
+        "drift": 200,
+        "coin": 200
+      },
+      "HARD_pass_raw_and_drift_adjusted_ge_0.5": false
+    },
+    "disclosure_rank1_2sym": {
+      "cells": [
+        "AKROUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S",
+        "LEVERUSDT__VOLARM__15m__W96__k3__RET_ANCHOR__L"
+      ],
+      "n_distinct_symbols": 2,
+      "n_real_legs": 28,
+      "live_mean_gross_bps": 232.44235646601098,
+      "live_mean_gross_bps_emitted": 231.29823351445182,
+      "deranged_mean_median": 143.64173938978433,
+      "matched_drift_twin_median": 38.17649999204588,
+      "coin_flip_twin_median": 7.890742544284873,
+      "matched_drift_twin_p95": 155.47362564010052,
+      "coin_flip_twin_p95": 138.94891457956174,
+      "signal_component_live_minus_drift": 194.2658564739651,
+      "raw_collapse_fraction": 0.3820328550541586,
+      "drift_adjusted_collapse_fraction": 0.4571087204308979,
+      "bite_live_gt_p95_both_twins": true,
+      "anchor_ok_L29": true,
+      "single_symbol_or_singleton": true,
+      "n_seeds": {
+        "derange": 200,
+        "drift": 200,
+        "coin": 200
+      },
+      "HARD_pass_raw_and_drift_adjusted_ge_0.5": false
+    },
+    "ranked0_2sym": {
+      "cells": [
+        "1000BONKUSDT__VOLARM__15m__W192__k2.5__RET_ANCHOR__S",
+        "1000BONKUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S",
+        "AKROUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S"
+      ],
+      "n_distinct_symbols": 2,
+      "n_real_legs": 46,
+      "live_mean_gross_bps": -1511.8168547876865,
+      "live_mean_gross_bps_emitted": -1506.744791373162,
+      "deranged_mean_median": -803.6020039777104,
+      "matched_drift_twin_median": -868.2136812087031,
+      "coin_flip_twin_median": -49.09854378651708,
+      "matched_drift_twin_p95": -326.37558860570743,
+      "coin_flip_twin_p95": 926.3020803645746,
+      "signal_component_live_minus_drift": -643.6031735789834,
+      "raw_collapse_fraction": 0.4684528080019553,
+      "drift_adjusted_collapse_fraction": NaN,
+      "bite_live_gt_p95_both_twins": false,
+      "anchor_ok_L29": true,
+      "single_symbol_or_singleton": true,
+      "n_seeds": {
+        "derange": 200,
+        "drift": 200,
+        "coin": 200
+      },
+      "HARD_pass_raw_and_drift_adjusted_ge_0.5": false
+    },
+    "ranked1_2sym": {
+      "cells": [
+        "AKROUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S",
+        "LEVERUSDT__VOLARM__15m__W96__k3__RET_ANCHOR__L"
+      ],
+      "n_distinct_symbols": 2,
+      "n_real_legs": 28,
+      "live_mean_gross_bps": 232.44235646601098,
+      "live_mean_gross_bps_emitted": 231.29823351445182,
+      "deranged_mean_median": 144.65834829956793,
+      "matched_drift_twin_median": 7.328397040922223,
+      "coin_flip_twin_median": -6.188514011900489,
+      "matched_drift_twin_p95": 158.92844030622916,
+      "coin_flip_twin_p95": 113.13134525157405,
+      "signal_component_live_minus_drift": 225.11395942508875,
+      "raw_collapse_fraction": 0.3776592592722201,
+      "drift_adjusted_collapse_fraction": 0.38995364121635,
+      "bite_live_gt_p95_both_twins": true,
+      "anchor_ok_L29": true,
+      "single_symbol_or_singleton": true,
+      "n_seeds": {
+        "derange": 200,
+        "drift": 200,
+        "coin": 200
+      },
+      "HARD_pass_raw_and_drift_adjusted_ge_0.5": false
+    },
+    "ranked2_4sym": {
+      "cells": [
+        "10000LADYSUSDT__VOLARM__15m__W96__k2.5__RET_ANCHOR__L",
+        "AKROUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S",
+        "LEVERUSDT__VOLARM__15m__W192__k2.5__RET_ANCHOR__L",
+        "STMXUSDT__VOLARM__15m__W96__k2.5__RET_ANCHOR__S"
+      ],
+      "n_distinct_symbols": 4,
+      "n_real_legs": 62,
+      "live_mean_gross_bps": 94.9631774471948,
+      "live_mean_gross_bps_emitted": 94.54481446371895,
+      "deranged_mean_median": 89.5324479427219,
+      "matched_drift_twin_median": 19.088841076403032,
+      "coin_flip_twin_median": -4.136933220564276,
+      "matched_drift_twin_p95": 139.44008483180127,
+      "coin_flip_twin_p95": 111.33186050371528,
+      "signal_component_live_minus_drift": 75.87433637079177,
+      "raw_collapse_fraction": 0.057187740032105694,
+      "drift_adjusted_collapse_fraction": 0.07157531471423162,
+      "bite_live_gt_p95_both_twins": false,
+      "anchor_ok_L29": true,
+      "single_symbol_or_singleton": false,
+      "n_seeds": {
+        "derange": 200,
+        "drift": 200,
+        "coin": 200
+      },
+      "HARD_pass_raw_and_drift_adjusted_ge_0.5": false
+    }
+  }
+}

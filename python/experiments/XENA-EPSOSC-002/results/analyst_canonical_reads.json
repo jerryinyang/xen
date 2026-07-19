@@ -1,0 +1,234 @@
+{
+  "universe_id": "XENA-EPSOSC-002",
+  "certified_subset": [
+    "10000LADYSUSDT__VOLARM__15m__W96__k2.5__RET_ANCHOR__L",
+    "AKROUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S",
+    "LEVERUSDT__VOLARM__15m__W192__k2.5__RET_ANCHOR__L",
+    "STMXUSDT__VOLARM__15m__W96__k2.5__RET_ANCHOR__S"
+  ],
+  "gate_band_ns": [
+    1693612800000000000,
+    1702857600000000000
+  ],
+  "estimand": "canonical episode gross bps (adjudication-shim RealizedBps); recon validated by estimand gate",
+  "pooled_equal_weight_leg": {
+    "n": 62,
+    "mean": 94.54481446371895,
+    "median": 137.86721674015394,
+    "ci95_block64": [
+      68.26046430540497,
+      116.42210306669199
+    ],
+    "ci_low_seed_range": [
+      63.284667702635076,
+      71.77769223824089
+    ],
+    "trimmed10_mean_ci95": [
+      76.75592573530781,
+      116.43075589987247
+    ],
+    "block_sensitivity_ci_low": {
+      "32": -53.77244852755361,
+      "64": 68.26046430540497,
+      "128": 68.26046430540497
+    },
+    "ci_excludes_zero": true,
+    "sign_ci_low_stable_across_blocks": false
+  },
+  "per_symbol": {
+    "10000LADYSUSDT": {
+      "n": 16,
+      "mean": 171.0988768312917,
+      "median": 74.92350057294836,
+      "ci95_block64": [
+        34.11927217891461,
+        308.0784814836688
+      ],
+      "ci_low_seed_range": [
+        32.26993258224232,
+        60.67790549127014
+      ],
+      "trimmed10_mean_ci95": [
+        14.123245091913377,
+        251.07577789003855
+      ],
+      "block_sensitivity_ci_low": {
+        "32": 34.11927217891461,
+        "64": 34.11927217891461,
+        "128": 34.11927217891461
+      },
+      "ci_excludes_zero": true,
+      "sign_ci_low_stable_across_blocks": true
+    },
+    "AKROUSDT": {
+      "n": 10,
+      "mean": 450.08316846806474,
+      "median": 474.7079211112675,
+      "ci95_block64": [
+        372.77219565597306,
+        534.1562439297934
+      ],
+      "ci_low_seed_range": [
+        366.0100930063363,
+        385.00681084600194
+      ],
+      "trimmed10_mean_ci95": [
+        386.1850514660125,
+        560.4193507810951
+      ],
+      "block_sensitivity_ci_low": {
+        "32": 372.77219565597306,
+        "64": 372.77219565597306,
+        "128": 372.77219565597306
+      },
+      "ci_excludes_zero": true,
+      "sign_ci_low_stable_across_blocks": true
+    },
+    "LEVERUSDT": {
+      "n": 13,
+      "mean": 0.5711985422505388,
+      "median": 171.89835575485813,
+      "ci95_block64": [
+        -83.22421659416645,
+        81.46744207380416
+      ],
+      "ci_low_seed_range": [
+        -116.60464893603483,
+        -80.74747297850138
+      ],
+      "trimmed10_mean_ci95": [
+        -102.52051498105617,
+        81.38812675547533
+      ],
+      "block_sensitivity_ci_low": {
+        "32": -83.22421659416645,
+        "64": -83.22421659416645,
+        "128": -83.22421659416645
+      },
+      "ci_excludes_zero": false,
+      "sign_ci_low_stable_across_blocks": true
+    },
+    "STMXUSDT": {
+      "n": 23,
+      "mean": -60.176556446956376,
+      "median": 14.587892049598238,
+      "ci95_block64": [
+        -130.0096295452302,
+        10.571930850265193
+      ],
+      "ci_low_seed_range": [
+        -130.82784374958746,
+        -102.47637400519524
+      ],
+      "trimmed10_mean_ci95": [
+        -39.775634168923084,
+        50.629769209946936
+      ],
+      "block_sensitivity_ci_low": {
+        "32": -130.0096295452302,
+        "64": -130.0096295452302,
+        "128": -130.0096295452302
+      },
+      "ci_excludes_zero": false,
+      "sign_ci_low_stable_across_blocks": true
+    }
+  },
+  "per_cell": {
+    "10000LADYSUSDT__VOLARM__15m__W96__k2.5__RET_ANCHOR__L": {
+      "n": 16,
+      "mean": 171.0988768312917,
+      "median": 74.92350057294836,
+      "ci95_block64": [
+        34.11927217891461,
+        308.0784814836688
+      ],
+      "ci_low_seed_range": [
+        32.26993258224232,
+        60.67790549127014
+      ],
+      "trimmed10_mean_ci95": [
+        14.123245091913377,
+        251.07577789003855
+      ],
+      "block_sensitivity_ci_low": {
+        "32": 34.11927217891461,
+        "64": 34.11927217891461,
+        "128": 34.11927217891461
+      },
+      "ci_excludes_zero": true,
+      "sign_ci_low_stable_across_blocks": true
+    },
+    "AKROUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S": {
+      "n": 10,
+      "mean": 450.08316846806474,
+      "median": 474.7079211112675,
+      "ci95_block64": [
+        372.77219565597306,
+        534.1562439297934
+      ],
+      "ci_low_seed_range": [
+        366.0100930063363,
+        385.00681084600194
+      ],
+      "trimmed10_mean_ci95": [
+        386.1850514660125,
+        560.4193507810951
+      ],
+      "block_sensitivity_ci_low": {
+        "32": 372.77219565597306,
+        "64": 372.77219565597306,
+        "128": 372.77219565597306
+      },
+      "ci_excludes_zero": true,
+      "sign_ci_low_stable_across_blocks": true
+    },
+    "LEVERUSDT__VOLARM__15m__W192__k2.5__RET_ANCHOR__L": {
+      "n": 13,
+      "mean": 0.5711985422505388,
+      "median": 171.89835575485813,
+      "ci95_block64": [
+        -83.22421659416645,
+        81.46744207380416
+      ],
+      "ci_low_seed_range": [
+        -116.60464893603483,
+        -80.74747297850138
+      ],
+      "trimmed10_mean_ci95": [
+        -102.52051498105617,
+        81.38812675547533
+      ],
+      "block_sensitivity_ci_low": {
+        "32": -83.22421659416645,
+        "64": -83.22421659416645,
+        "128": -83.22421659416645
+      },
+      "ci_excludes_zero": false,
+      "sign_ci_low_stable_across_blocks": true
+    },
+    "STMXUSDT__VOLARM__15m__W96__k2.5__RET_ANCHOR__S": {
+      "n": 23,
+      "mean": -60.176556446956376,
+      "median": 14.587892049598238,
+      "ci95_block64": [
+        -130.0096295452302,
+        10.571930850265193
+      ],
+      "ci_low_seed_range": [
+        -130.82784374958746,
+        -102.47637400519524
+      ],
+      "trimmed10_mean_ci95": [
+        -39.775634168923084,
+        50.629769209946936
+      ],
+      "block_sensitivity_ci_low": {
+        "32": -130.0096295452302,
+        "64": -130.0096295452302,
+        "128": -130.0096295452302
+      },
+      "ci_excludes_zero": false,
+      "sign_ci_low_stable_across_blocks": true
+    }
+  }
+}
