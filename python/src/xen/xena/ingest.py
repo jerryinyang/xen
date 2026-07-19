@@ -32,7 +32,8 @@ Gate checks (all blocking):
   files / schema / non-empty · holdout fence (every emitted timestamp < AnalysisEndUtc) ·
   causality (entry < exit, entries inside the mark grid, marks strictly monotone) ·
   stop contract · fill self-consistency (`RealizedBps` reconciles with the fills, L-18) ·
-  oracle smoke (single-candidate `evaluate` runs and reconciles bit-deterministically).
+  oracle computability (single-candidate `evaluate` runs and yields a finite F; oracle-wide
+  determinism is proven separately by the pinned parity corpus, not re-proved per candidate).
 """
 from __future__ import annotations
 
@@ -228,19 +229,20 @@ def gate_candidate(run_dir: str | Path, *, candidate_id: str, symbol: str, cost_
     else:
         check("fill_consistency", True, "no completed legs")
 
-    # oracle smoke: single-candidate evaluation runs, reconciles, and is deterministic
+    # oracle computability: this candidate's stream evaluates at all and yields a finite F.
+    # (Bit-identical determinism is an oracle-WIDE property proven once by the pinned parity
+    # corpus `tests/test_xena_fold_parity.py`; re-proving it per candidate bought nothing —
+    # INFR-016 follow-up dropped the second eval + array_equal re-proof, 2026-07-19.)
     if all(c["pass"] for c in checks.values()):
         try:
             r1 = evaluate({candidate_id}, [stream], OracleConfig())
-            r2 = evaluate({candidate_id}, [stream], OracleConfig())
-            det = bool(np.array_equal(r1.equity, r2.equity) and r1.F_point == r2.F_point)
-            check("oracle_smoke", det and math.isfinite(r1.F_point),
+            check("oracle_computable", math.isfinite(r1.F_point),
                   f"n_admitted={r1.n_admitted} n_rejected={r1.n_rejected} "
-                  f"F_point={r1.F_point:.6g} deterministic={det}")
+                  f"F_point={r1.F_point:.6g}")
         except (ValueError, AssertionError) as e:
-            check("oracle_smoke", False, str(e))
+            check("oracle_computable", False, str(e))
     else:
-        check("oracle_smoke", False, "skipped: earlier check failed")
+        check("oracle_computable", False, "skipped: earlier check failed")
 
     report["blocking_pass"] = all(c["pass"] for c in checks.values())
     return report

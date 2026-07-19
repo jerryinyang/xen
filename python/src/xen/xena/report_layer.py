@@ -112,7 +112,6 @@ def power_layer(candidate_id: str, *, n_legs: int, per_leg_vol_bps: float,
     not dropped (INFR-016 §4b). ``powered`` iff a supplied observed edge exceeds the MDE.
     """
     powered = observed_edge_bps is not None and abs(observed_edge_bps) >= mde_bps
-    _interp_unused = None  # noqa: F841 — placeholder anchor (kept minimal)
     interp = (f"{n_legs} legs, per-leg vol {per_leg_vol_bps:.1f} bps, MDE {mde_bps:.1f} bps — "
               + ("enough legs to resolve the observed edge" if powered else
                  "too few legs / too much per-leg vol to resolve an edge this size — underpowered"))

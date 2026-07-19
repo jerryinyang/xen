@@ -30,7 +30,7 @@ from typing import Any
 
 import numpy as np
 
-from xen.xena.report_layer import LayerReport, label_from_p_and_power
+from xen.xena.report_layer import LayerReport, structural_label
 
 DEFAULT_SIGN_BATTERY_SEEDS = 2000     # INFR-016 §7 (operator-ratified 2026-07-18)
 DEFAULT_DERANGE_SEEDS = 25            # ≥15 (L-19); default 25 for a stable percentile read
@@ -102,8 +102,9 @@ def sign_battery(direction: np.ndarray, entry_price: np.ndarray, exit_price: np.
     percentile = float(np.mean(arr <= raw_med))
 
     powered = n_seeds >= min_powered_seeds
-    label = label_from_p_and_power(one_sided_p, powered=powered,
-                                   directional_positive=raw_med > 0)
+    # Structural label only (UNPOWERED / CONTRADICTED / None) — the plain read below carries
+    # the p-strength; no p-cutpoint label (INFR-016 follow-up, retires the L-32-in-miniature).
+    label = structural_label(powered=powered, directional_positive=raw_med > 0)
     interp = (
         f"raw {raw_med:.1f} bps vs sign-null mean {null_mean:.1f} bps "
         f"(effect {effect:+.1f}); one-sided p={one_sided_p:.3f}, "

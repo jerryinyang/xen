@@ -6,8 +6,8 @@ import pytest
 
 from xen.xena.controls import (assert_future_destroy_class, attribution_derangement,
                                make_derangement, sign_battery)
-from xen.xena.report_layer import (LayerReport, label_from_p_and_power, power_layer,
-                                   render_all_layers, render_layer_table, stage2_bounds_layer)
+from xen.xena.report_layer import (LayerReport, power_layer, render_all_layers,
+                                   render_layer_table, stage2_bounds_layer, structural_label)
 
 
 # --------------------------------------------------------------------------- #
@@ -32,13 +32,14 @@ def test_bad_label_rejected():
         LayerReport("l", "c", 1.0, "0-2", "fine", interpretation_label="FAIL")
 
 
-def test_label_bands_are_descriptive():
-    assert label_from_p_and_power(0.5, powered=False, directional_positive=True) == "UNPOWERED"
-    assert label_from_p_and_power(0.01, powered=True, directional_positive=True) == "STRONG"
-    assert label_from_p_and_power(0.10, powered=True, directional_positive=True) == "SUPPORTED"
-    assert label_from_p_and_power(0.22, powered=True, directional_positive=True) == "SUGGESTIVE"
-    assert label_from_p_and_power(0.50, powered=True, directional_positive=True) == "WASH"
-    assert label_from_p_and_power(0.01, powered=True, directional_positive=False) == "CONTRADICTED"
+def test_only_structural_labels_auto_assigned():
+    # UNPOWERED (too few seeds) and CONTRADICTED (wrong sign) are facts about the estimator;
+    # everything else is None — no p-cutpoint label (retires the L-32-in-miniature).
+    assert structural_label(powered=False, directional_positive=True) == "UNPOWERED"
+    assert structural_label(powered=True, directional_positive=False) == "CONTRADICTED"
+    assert structural_label(powered=True, directional_positive=True) is None
+    # not powered dominates sign
+    assert structural_label(powered=False, directional_positive=False) == "UNPOWERED"
 
 
 def test_render_runs_for_all_candidates_drops_nothing():
@@ -66,9 +67,8 @@ def test_sign_battery_reports_effect_p_ci_no_boolean():
     assert set(("one_sided_p", "effect_bps", "null_ci95", "powered")) <= set(s)
     assert s["n_seeds"] == 2000 and s["powered"] is True
     assert 0.0 <= s["one_sided_p"] <= 1.0
-    # label is descriptive, drawn from the band map — never a pass/fail
-    assert rep.interpretation_label in {"STRONG", "SUPPORTED", "SUGGESTIVE", "WASH",
-                                        "CONTRADICTED"}
+    # powered + positive ⇒ no auto p-cutpoint label; only structural labels are assigned
+    assert rep.interpretation_label in {None, "CONTRADICTED"}
 
 
 def test_sign_battery_underpowered_flag_at_25_seeds():
