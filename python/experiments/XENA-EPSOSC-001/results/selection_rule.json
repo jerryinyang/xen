@@ -1,0 +1,19 @@
+{
+  "rule": {
+    "n": 10,
+    "metric": "trailing_volume",
+    "window_bars": 1440,
+    "rebalance": "1d",
+    "rebalance_tz": "UTC",
+    "rebalance_time": "00:00",
+    "hysteresis_rank": 0,
+    "pool": "admitted_listed",
+    "causal": true,
+    "tie_break": "lexicographic_id"
+  },
+  "rule_hash": "0dd530374fd3283ba9a82796d719c7bbd019d759e62c6987e0162ba5bcfc5ad2",
+  "pin_match": true,
+  "membership_source": "universe_selection_trailing_volume_delisted_inclusive",
+  "include_delisted_in_ranking_pool": true,
+  "metric_note": "pin metric trailing_volume = sum of 1m volume over window_bars; not USDT-notional (design text corrected to pin metric)"
+}

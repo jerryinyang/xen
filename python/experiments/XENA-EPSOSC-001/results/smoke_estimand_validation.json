@@ -1,0 +1,71 @@
+{
+  "gate_version": "v2",
+  "emission_type": "nautilus_v1",
+  "run_dir": "../data/nautilus_runs/XENA-EPSOSC-001/DOGEUSDT__VOLARM__15m__W96__k2.5__RET_ANCHOR__S",
+  "instrument": "DOGEUSDT",
+  "domain": null,
+  "schema": {
+    "ok": true,
+    "missing_positions_cols": [],
+    "missing_leg_cols": [],
+    "timestamps_strictly_increasing": true,
+    "emission_contract_version": "nautilus-emission-v1",
+    "missing_emission_files": [],
+    "contract_version_ok": true
+  },
+  "fence": {
+    "ok": true,
+    "mode": "nautilus_v2",
+    "status": "PINNED",
+    "last_bar": "2023-08-01 00:00:00",
+    "analysis_end_utc": "2025-01-08T00:00:00Z",
+    "within_fence": true,
+    "manifest": {
+      "canonical_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/INFR-011/artifacts/fence-manifest.json",
+      "exists": true,
+      "ok": true,
+      "expected_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+      "actual_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448"
+    }
+  },
+  "manifest": {
+    "ok": true,
+    "expected": [
+      "DOGEUSDT"
+    ],
+    "emitted": [
+      "DOGEUSDT"
+    ],
+    "missing": []
+  },
+  "catalog_attestation": {
+    "ok": true,
+    "note": null,
+    "catalog_version": "INFR-011-A4-2026-07-16",
+    "config_hash": "c2cd84ea503abc128f0567ed501c2fe435f14f7e00939d4009bcdabb71b6276c"
+  },
+  "reconciliation": {
+    "ok": true,
+    "per_bar_gross_total": 1866.8281952692244,
+    "per_leg_realized_total": 1866.8281952692244,
+    "abs_diff_bps": 0.0,
+    "tol_bps": 1.0
+  },
+  "physicality": {
+    "years": 0.16700889801505817,
+    "n_bars": 87387,
+    "n_legs": 19,
+    "n_censored_legs": 0,
+    "total_net_bps": 1866.8281952692244,
+    "annualised_return": 1.1178016365935806,
+    "per_bar_sharpe_annualised": 2.704023216762719,
+    "max_drawdown_bps": -907.2557605831066,
+    "occupancy": 0.15417625047203817,
+    "buy_and_hold_annualised_return": 0.49327544289967773,
+    "buy_and_hold_annualised_vol": 0.7670453896026674,
+    "sanity_flags": [
+      "|annualised return| 111.8% > 100%/yr"
+    ]
+  },
+  "blocking_pass": true
+}

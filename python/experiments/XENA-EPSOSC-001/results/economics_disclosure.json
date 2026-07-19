@@ -1,0 +1,168 @@
+{
+  "schema": "xena.economics_disclosure.v1",
+  "universe_id": "XENA-EPSOSC-001",
+  "generated_utc": "2026-07-17T22:42:45Z",
+  "segment_ns": [
+    1624949580000000000,
+    1656112788000000000
+  ],
+  "stage": "Q1_pre_search",
+  "cost_map_integrity": {
+    "complete": true,
+    "n_candidates": 464,
+    "n_incomplete": 0,
+    "reason": "ok",
+    "incomplete_sample": [],
+    "status_label": "OK"
+  },
+  "gross_economics": {
+    "p05": -334.73985067797423,
+    "p25": -108.17714252745935,
+    "p50": 18.08022693142864,
+    "p75": 111.96559072866607,
+    "p95": 372.2456087030052,
+    "mean": 2.4875328148762827,
+    "frac_mean_gt_0": 0.5486111111111112,
+    "n_with_legs": 288
+  },
+  "slices": {
+    "domain": {
+      "?": {
+        "n": 288,
+        "median_gross_bps": 18.08022693142864,
+        "mean_gross_bps": 2.4875328148762827
+      }
+    },
+    "hold": {
+      "?": {
+        "n": 288,
+        "median_gross_bps": 18.08022693142864,
+        "mean_gross_bps": 2.4875328148762827
+      }
+    },
+    "variant": {
+      "?": {
+        "n": 288,
+        "median_gross_bps": 18.08022693142864,
+        "mean_gross_bps": 2.4875328148762827
+      }
+    },
+    "symbol": {
+      "10000NFTUSDT": {
+        "n": 16,
+        "median_gross_bps": 63.16139655963069,
+        "mean_gross_bps": 46.093166665639664
+      },
+      "AKROUSDT": {
+        "n": 16,
+        "median_gross_bps": 349.1563120017834,
+        "mean_gross_bps": 385.9325050229163
+      },
+      "CELRUSDT": {
+        "n": 16,
+        "median_gross_bps": -33.713094503804754,
+        "mean_gross_bps": -53.75650801520307
+      },
+      "DENTUSDT": {
+        "n": 16,
+        "median_gross_bps": -34.30654279075951,
+        "mean_gross_bps": -34.862579000755005
+      },
+      "EOSUSDT": {
+        "n": 16,
+        "median_gross_bps": 12.587199639813676,
+        "mean_gross_bps": 15.808705993453303
+      },
+      "FITFIUSDT": {
+        "n": 16,
+        "median_gross_bps": -85.6027400583964,
+        "mean_gross_bps": -223.4114565023942
+      },
+      "FTMUSDT": {
+        "n": 16,
+        "median_gross_bps": -180.81843060962177,
+        "mean_gross_bps": -194.5465027103864
+      },
+      "HOTUSDT": {
+        "n": 16,
+        "median_gross_bps": 94.08549459726333,
+        "mean_gross_bps": 106.79494567952615
+      },
+      "KEEPUSDT": {
+        "n": 16,
+        "median_gross_bps": 10.703547427187537,
+        "mean_gross_bps": -9.506295906960613
+      },
+      "LINAUSDT": {
+        "n": 16,
+        "median_gross_bps": -123.0662393543017,
+        "mean_gross_bps": -168.01670177392594
+      },
+      "LUNAUSDT": {
+        "n": 16,
+        "median_gross_bps": -11.267136717492802,
+        "mean_gross_bps": -10.373175235296278
+      },
+      "MATICUSDT": {
+        "n": 16,
+        "median_gross_bps": -2.906529033431415,
+        "mean_gross_bps": 14.442450833882017
+      },
+      "OMGUSDT": {
+        "n": 16,
+        "median_gross_bps": -7.591371641085516,
+        "mean_gross_bps": -30.45123008231642
+      },
+      "REEFUSDT": {
+        "n": 16,
+        "median_gross_bps": 142.7289384276317,
+        "mean_gross_bps": 124.76169238554715
+      },
+      "SPELLUSDT": {
+        "n": 16,
+        "median_gross_bps": -28.85183871251877,
+        "mean_gross_bps": -23.81132055480176
+      },
+      "SRMUSDT": {
+        "n": 16,
+        "median_gross_bps": -20.654738621680398,
+        "mean_gross_bps": -45.155232701553444
+      },
+      "STMXUSDT": {
+        "n": 16,
+        "median_gross_bps": 86.04552952925728,
+        "mean_gross_bps": 86.24062881749246
+      },
+      "XEMUSDT": {
+        "n": 16,
+        "median_gross_bps": 78.30685631363971,
+        "mean_gross_bps": 58.592497752909146
+      }
+    }
+  },
+  "cost_context": {
+    "cost_floor_bps_draft": null,
+    "cost_floor_status": "DRAFT_UNFROZEN \u2014 \u00a76.4 formula not frozen (INFR-009)",
+    "pins_complete": true,
+    "net_of_pin_p50_bps": -0.41977306857135943,
+    "frac_net_gt_0": 0.5
+  },
+  "execution_context": {
+    "note": "print-vs-path fill-basis is computed post-shortlist via xen.xena.fill_basis; Q1 surfaces occupancy/n_legs only",
+    "median_n_legs": 19.0
+  },
+  "operator_routing": {
+    "decision": "proceed_deployability_search",
+    "reason": "operator-approved search/certify 2026-07-17; cost pins finite",
+    "allowed_values": [
+      "proceed_deployability_search",
+      "characterisation_only",
+      "do_not_search"
+    ]
+  },
+  "search_allowed": true,
+  "n_candidates_disclosed": 464,
+  "candidates_summary_only": true,
+  "binding_note": "Discloses only \u2014 removes NO candidate. Incomplete cost map refuses search+gate (integrity), never quality-filters the universe.",
+  "redesign": "INFR-009 P0 (consolidated-03 \u00a74.1)"
+}

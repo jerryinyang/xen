@@ -1,0 +1,97 @@
+{
+  "universe_id": "XENA-EPSOSC-001",
+  "tripwire": "episode-label derangement (design \u00a78), alignment-destroy",
+  "metric": "equal-weight mean gross bps/episode on gate-band legs",
+  "gate_band_ns": [
+    1687275996000000000,
+    1702857600000000000
+  ],
+  "hard_rule": "collapse_fraction_median >= 0.5 AND anchor_ok; else REJECT (no override)",
+  "n_seeds": 200,
+  "finalists": {
+    "rank1_AKRO_W192_k3_HYBRID_S": {
+      "cells": [
+        "AKROUSDT__VOLARM__15m__W192__k3__HYBRID__S"
+      ],
+      "n_real_legs": 25,
+      "real_mean_gross_bps_emitted": 160.20404985152018,
+      "real_mean_gross_bps_recon": 161.06357153976253,
+      "deranged_mean_gross_bps_median": 97.47271148118122,
+      "deranged_mean_p05": -70.15526558836824,
+      "deranged_mean_p95": 230.46179233392948,
+      "collapse_fraction_median": 0.3948183903452205,
+      "survival_rate_ge_half": 0.57,
+      "n_seeds": 200,
+      "anchor_ok_L29": true,
+      "anchor_detail": {
+        "AKROUSDT__VOLARM__15m__W192__k3__HYBRID__S": {
+          "n": 25,
+          "median_bps_absdiff": 2.837684449489643,
+          "p90_bps_absdiff": 7.651495531675507
+        }
+      },
+      "single_cell_of_1_symbol": false,
+      "hard_pass_collapse_ge_0.5": false
+    },
+    "rank3_AKRO_dual_RET_S": {
+      "cells": [
+        "AKROUSDT__VOLARM__15m__W192__k2.5__RET_ANCHOR__S",
+        "AKROUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S"
+      ],
+      "n_real_legs": 52,
+      "real_mean_gross_bps_emitted": 171.2668994805263,
+      "real_mean_gross_bps_recon": 172.1312994050654,
+      "deranged_mean_gross_bps_median": 66.78253429085564,
+      "deranged_mean_p05": -43.58591024096691,
+      "deranged_mean_p95": 166.35383712464977,
+      "collapse_fraction_median": 0.6120256192704348,
+      "survival_rate_ge_half": 0.38,
+      "n_seeds": 200,
+      "anchor_ok_L29": true,
+      "anchor_detail": {
+        "AKROUSDT__VOLARM__15m__W192__k2.5__RET_ANCHOR__S": {
+          "n": 27,
+          "median_bps_absdiff": 2.1328783192921605,
+          "p90_bps_absdiff": 7.368332602070407
+        },
+        "AKROUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S": {
+          "n": 25,
+          "median_bps_absdiff": 2.137208805300588,
+          "p90_bps_absdiff": 7.651495531675507
+        }
+      },
+      "single_cell_of_1_symbol": false,
+      "hard_pass_collapse_ge_0.5": true
+    },
+    "rank5_AKRO_RET_S__RSR_HYB_L": {
+      "cells": [
+        "AKROUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S",
+        "RSRUSDT__VOLARM__15m__W96__k3__HYBRID__L"
+      ],
+      "n_real_legs": 25,
+      "real_mean_gross_bps_emitted": 171.22627344657792,
+      "real_mean_gross_bps_recon": 172.00066460133556,
+      "deranged_mean_gross_bps_median": 92.86692095524617,
+      "deranged_mean_p05": -83.66150841325201,
+      "deranged_mean_p95": 229.51066586314494,
+      "collapse_fraction_median": 0.46007812719506735,
+      "survival_rate_ge_half": 0.52,
+      "n_seeds": 200,
+      "anchor_ok_L29": true,
+      "anchor_detail": {
+        "AKROUSDT__VOLARM__15m__W192__k3__RET_ANCHOR__S": {
+          "n": 25,
+          "median_bps_absdiff": 2.137208805300588,
+          "p90_bps_absdiff": 7.651495531675507
+        },
+        "RSRUSDT__VOLARM__15m__W96__k3__HYBRID__L": {
+          "n": 0,
+          "median_bps_absdiff": 0.0,
+          "p90_bps_absdiff": 0.0
+        }
+      },
+      "single_cell_of_1_symbol": true,
+      "hard_pass_collapse_ge_0.5": false
+    }
+  }
+}
