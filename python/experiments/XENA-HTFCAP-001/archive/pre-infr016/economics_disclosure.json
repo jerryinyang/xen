@@ -1,0 +1,88 @@
+{
+  "schema": "xena.economics_disclosure.v1",
+  "universe_id": "XENA-HTFCAP-001",
+  "generated_utc": "2026-07-18T13:33:56Z",
+  "segment_ns": [
+    1657756800000000000,
+    1689171840000000000
+  ],
+  "stage": "Q1_pre_search",
+  "cost_map_integrity": {
+    "complete": true,
+    "n_candidates": 72,
+    "n_incomplete": 0,
+    "reason": "ok",
+    "incomplete_sample": [],
+    "status_label": "OK"
+  },
+  "gross_economics": {
+    "p05": 18.883985498653338,
+    "p25": 26.23366870618874,
+    "p50": 45.86425509667562,
+    "p75": 70.31025306605122,
+    "p95": 94.27627472041628,
+    "mean": 50.27655217123003,
+    "frac_mean_gt_0": 1.0,
+    "n_with_legs": 72
+  },
+  "slices": {
+    "domain": {
+      "?": {
+        "n": 72,
+        "median_gross_bps": 45.86425509667562,
+        "mean_gross_bps": 50.27655217123003
+      }
+    },
+    "hold": {
+      "?": {
+        "n": 72,
+        "median_gross_bps": 45.86425509667562,
+        "mean_gross_bps": 50.27655217123003
+      }
+    },
+    "variant": {
+      "?": {
+        "n": 72,
+        "median_gross_bps": 45.86425509667562,
+        "mean_gross_bps": 50.27655217123003
+      }
+    },
+    "symbol": {
+      "BTCUSDT": {
+        "n": 36,
+        "median_gross_bps": 44.98276944638917,
+        "mean_gross_bps": 47.791376016901545
+      },
+      "SOLUSDT": {
+        "n": 36,
+        "median_gross_bps": 45.99230221066177,
+        "mean_gross_bps": 52.761728325558515
+      }
+    }
+  },
+  "cost_context": {
+    "cost_floor_bps_draft": null,
+    "cost_floor_status": "DRAFT_UNFROZEN \u2014 \u00a76.4 formula not frozen (INFR-009)",
+    "pins_complete": true,
+    "net_of_pin_p50_bps": 28.864255096675617,
+    "frac_net_gt_0": 0.9722222222222222
+  },
+  "execution_context": {
+    "note": "print-vs-path fill-basis is computed post-shortlist via xen.xena.fill_basis; Q1 surfaces occupancy/n_legs only",
+    "median_n_legs": 182.5
+  },
+  "operator_routing": {
+    "decision": "proceed_deployability_search",
+    "reason": "operator-approved exploratory search/certify 2026-07-18",
+    "allowed_values": [
+      "proceed_deployability_search",
+      "characterisation_only",
+      "do_not_search"
+    ]
+  },
+  "search_allowed": true,
+  "n_candidates_disclosed": 72,
+  "candidates_summary_only": true,
+  "binding_note": "Discloses only \u2014 removes NO candidate. Incomplete cost map refuses search+gate (integrity), never quality-filters the universe.",
+  "redesign": "INFR-009 P0 (consolidated-03 \u00a74.1)"
+}

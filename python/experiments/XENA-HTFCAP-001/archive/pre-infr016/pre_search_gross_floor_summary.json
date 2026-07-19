@@ -1,0 +1,24 @@
+{
+  "universe_id": "XENA-HTFCAP-001",
+  "generated_utc": "2026-07-18T12:51:37.814354Z",
+  "n_cells": 108,
+  "n_binding": 72,
+  "n_binding_above_breakeven": 13,
+  "n_binding_sub_breakeven": 59,
+  "entire_binding_mass_sub_breakeven": false,
+  "park_recommendation": "PROCEED \u2014 at least one binding cell \u2265 breakeven (individual sub-floor cells still enter)",
+  "cost_stack": "bybit_round_trip_cost_bps_v1",
+  "funding": "included (GAP conservative 1.0 bps/8h)",
+  "spread_label": "GAP 5.0 bps (per-symbol pin deferred)",
+  "sources": [
+    {
+      "source": "nautilus_emission",
+      "len": 108
+    }
+  ],
+  "binding_median_gross_bps_p50": 2.7745519946265516,
+  "paths": {
+    "parquet": "python/experiments/XENA-HTFCAP-001/results/pre_search_gross_floor.parquet",
+    "csv": "python/experiments/XENA-HTFCAP-001/results/pre_search_gross_floor.csv"
+  }
+}

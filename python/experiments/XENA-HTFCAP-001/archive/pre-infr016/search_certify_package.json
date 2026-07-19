@@ -1,0 +1,524 @@
+{
+  "universe_id": "XENA-HTFCAP-001",
+  "generated_utc": "2026-07-18T13:36:22.842102Z",
+  "class_id": "CLS-FILTER",
+  "run_mode": "EXPLORATORY (AMENDMENT-4/5) \u2014 informative only, NOT certification",
+  "pin_path": "python/experiments/INFR-015/results/bybit_pc_frozen_registry.json",
+  "pin_sha256": "abbb184229236a75f624537ca605668a73f6f85138c150e14a3609c4191bf786",
+  "pin_verified": true,
+  "stage1": {
+    "score_kind": "g_net",
+    "charge_costs": true,
+    "n_restarts": 12,
+    "budget": 200,
+    "search_params": {
+      "L": 40,
+      "stag_mult": 5,
+      "kick_bits": [
+        2,
+        4
+      ],
+      "move_probs": {
+        "add": 0.25,
+        "drop": 0.25,
+        "swap": 0.45,
+        "2swap": 0.05
+      },
+      "n_boot": 80,
+      "block_bars": 64,
+      "quantile": 0.25,
+      "sign_q": 0.6,
+      "clear_win_sds": 2.0,
+      "init_size": 4
+    },
+    "search_segment_ns": [
+      1657756800000000000,
+      1689171840000000000
+    ],
+    "eval_count": 1747,
+    "distinct_restart_terminals": 10,
+    "finalists": [
+      {
+        "restart_id": 1,
+        "best_subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64",
+          "SOLUSDT__DI_VOL_HI__v1.5__adxna__H64"
+        ],
+        "best_F_hat": 65.68339584302433,
+        "n_iterations": 200,
+        "n_kicks": 0,
+        "acceptance_rate": 0.035,
+        "gate_rejection_rate": 0.205,
+        "cache_size": 158
+      },
+      {
+        "restart_id": 2,
+        "best_subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.1__adx30__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx20__H32",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64",
+          "BTCUSDT__DI_VOL_HI__v1.1__adxna__H64",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx20__H64",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx25__H32",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.25__adx25__H64",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64",
+          "SOLUSDT__DI_VOL_HI__v1.25__adxna__H64",
+          "SOLUSDT__DI_VOL_HI__v1.5__adxna__H32"
+        ],
+        "best_F_hat": 26.5926104953538,
+        "n_iterations": 200,
+        "n_kicks": 0,
+        "acceptance_rate": 0.14,
+        "gate_rejection_rate": 0.415,
+        "cache_size": 214
+      },
+      {
+        "restart_id": 3,
+        "best_subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H64"
+        ],
+        "best_F_hat": 61.201445536160136,
+        "n_iterations": 200,
+        "n_kicks": 0,
+        "acceptance_rate": 0.065,
+        "gate_rejection_rate": 0.205,
+        "cache_size": 131
+      },
+      {
+        "restart_id": 4,
+        "best_subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx20__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx25__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64",
+          "SOLUSDT__DI_VOL_HI__v1.5__adxna__H64"
+        ],
+        "best_F_hat": 57.57205561018075,
+        "n_iterations": 200,
+        "n_kicks": 0,
+        "acceptance_rate": 0.195,
+        "gate_rejection_rate": 0.375,
+        "cache_size": 211
+      },
+      {
+        "restart_id": 5,
+        "best_subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64",
+          "SOLUSDT__DI_VOL_HI__v1.5__adxna__H64"
+        ],
+        "best_F_hat": 57.95335981537916,
+        "n_iterations": 200,
+        "n_kicks": 0,
+        "acceptance_rate": 0.065,
+        "gate_rejection_rate": 0.24,
+        "cache_size": 134
+      },
+      {
+        "restart_id": 6,
+        "best_subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64"
+        ],
+        "best_F_hat": 67.38808916769452,
+        "n_iterations": 200,
+        "n_kicks": 0,
+        "acceptance_rate": 0.06,
+        "gate_rejection_rate": 0.305,
+        "cache_size": 156
+      },
+      {
+        "restart_id": 7,
+        "best_subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H64",
+          "SOLUSDT__DI_VOL_HI__v1.5__adxna__H64"
+        ],
+        "best_F_hat": 70.69352205576047,
+        "n_iterations": 200,
+        "n_kicks": 0,
+        "acceptance_rate": 0.055,
+        "gate_rejection_rate": 0.21,
+        "cache_size": 146
+      },
+      {
+        "restart_id": 8,
+        "best_subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H64",
+          "SOLUSDT__DI_VOL_HI__v1.5__adxna__H64"
+        ],
+        "best_F_hat": 54.94712887582726,
+        "n_iterations": 200,
+        "n_kicks": 0,
+        "acceptance_rate": 0.025,
+        "gate_rejection_rate": 0.11,
+        "cache_size": 106
+      },
+      {
+        "restart_id": 9,
+        "best_subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H64"
+        ],
+        "best_F_hat": 53.26789473589669,
+        "n_iterations": 200,
+        "n_kicks": 0,
+        "acceptance_rate": 0.05,
+        "gate_rejection_rate": 0.185,
+        "cache_size": 132
+      },
+      {
+        "restart_id": 10,
+        "best_subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64"
+        ],
+        "best_F_hat": 69.75981428024087,
+        "n_iterations": 200,
+        "n_kicks": 0,
+        "acceptance_rate": 0.075,
+        "gate_rejection_rate": 0.21,
+        "cache_size": 129
+      },
+      {
+        "restart_id": 11,
+        "best_subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64"
+        ],
+        "best_F_hat": 61.81111254639972,
+        "n_iterations": 200,
+        "n_kicks": 0,
+        "acceptance_rate": 0.045,
+        "gate_rejection_rate": 0.21,
+        "cache_size": 127
+      },
+      {
+        "restart_id": 12,
+        "best_subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H64",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64"
+        ],
+        "best_F_hat": 67.60772872440019,
+        "n_iterations": 200,
+        "n_kicks": 0,
+        "acceptance_rate": 0.125,
+        "gate_rejection_rate": 0.465,
+        "cache_size": 177
+      }
+    ]
+  },
+  "certify": {
+    "score_kind": "g_net",
+    "ranking_segment_ns": [
+      1689171840000000000,
+      1704879360000000000
+    ],
+    "folds_ns": [
+      [
+        1689229440000000000,
+        1694350080000000000
+      ],
+      [
+        1694465280000000000,
+        1699585920000000000
+      ],
+      [
+        1699701120000000000,
+        1704821760000000000
+      ]
+    ],
+    "ranked": [
+      {
+        "subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H64"
+        ],
+        "fold_F": [
+          33.41418793898414,
+          82.13065093282121,
+          -35.31413427995918
+        ],
+        "median_F": 33.41418793898414,
+        "worst_F": -35.31413427995918,
+        "search_F_hat": 61.201445536160136,
+        "score_kind": "g_net"
+      },
+      {
+        "subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64"
+        ],
+        "fold_F": [
+          33.41418793898414,
+          82.13065093282121,
+          -23.638994838242937
+        ],
+        "median_F": 33.41418793898414,
+        "worst_F": -23.638994838242937,
+        "search_F_hat": 69.75981428024087,
+        "score_kind": "g_net"
+      },
+      {
+        "subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64",
+          "SOLUSDT__DI_VOL_HI__v1.5__adxna__H64"
+        ],
+        "fold_F": [
+          17.132704809496726,
+          50.134025114874426,
+          -16.257613567943075
+        ],
+        "median_F": 17.132704809496726,
+        "worst_F": -16.257613567943075,
+        "search_F_hat": 65.68339584302433,
+        "score_kind": "g_net"
+      },
+      {
+        "subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H64",
+          "SOLUSDT__DI_VOL_HI__v1.5__adxna__H64"
+        ],
+        "fold_F": [
+          13.89126579643238,
+          40.186591659600744,
+          -13.038393225453277
+        ],
+        "median_F": 13.89126579643238,
+        "worst_F": -13.038393225453277,
+        "search_F_hat": 54.94712887582726,
+        "score_kind": "g_net"
+      },
+      {
+        "subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx20__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx25__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64",
+          "SOLUSDT__DI_VOL_HI__v1.5__adxna__H64"
+        ],
+        "fold_F": [
+          13.388292130656593,
+          28.29841935839797,
+          -25.105827150080977
+        ],
+        "median_F": 13.388292130656593,
+        "worst_F": -25.105827150080977,
+        "search_F_hat": 57.57205561018075,
+        "score_kind": "g_net"
+      },
+      {
+        "subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H64",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64"
+        ],
+        "fold_F": [
+          0.05776248158957591,
+          65.39429451769546,
+          -17.51469766693453
+        ],
+        "median_F": 0.05776248158957591,
+        "worst_F": -17.51469766693453,
+        "search_F_hat": 67.60772872440019,
+        "score_kind": "g_net"
+      },
+      {
+        "subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.1__adx30__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx20__H32",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H64",
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64",
+          "BTCUSDT__DI_VOL_HI__v1.1__adxna__H64",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx20__H64",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx25__H32",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.25__adx25__H64",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64",
+          "SOLUSDT__DI_VOL_HI__v1.25__adxna__H64",
+          "SOLUSDT__DI_VOL_HI__v1.5__adxna__H32"
+        ],
+        "fold_F": [
+          -5.472430418656713,
+          29.401016317183544,
+          -8.934980779553214
+        ],
+        "median_F": -5.472430418656713,
+        "worst_F": -8.934980779553214,
+        "search_F_hat": 26.5926104953538,
+        "score_kind": "g_net"
+      },
+      {
+        "subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64",
+          "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64"
+        ],
+        "fold_F": [
+          -17.783081512872624,
+          57.97177607300216,
+          -8.924708295455916
+        ],
+        "median_F": -8.924708295455916,
+        "worst_F": -17.783081512872624,
+        "search_F_hat": 67.38808916769452,
+        "score_kind": "g_net"
+      },
+      {
+        "subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64",
+          "SOLUSDT__DI_VOL_HI__v1.5__adxna__H64"
+        ],
+        "fold_F": [
+          -11.25199452353329,
+          53.21423845486907,
+          -28.931981388107204
+        ],
+        "median_F": -11.25199452353329,
+        "worst_F": -28.931981388107204,
+        "search_F_hat": 57.95335981537916,
+        "score_kind": "g_net"
+      },
+      {
+        "subset": [
+          "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H64",
+          "SOLUSDT__DI_VOL_HI__v1.5__adxna__H64"
+        ],
+        "fold_F": [
+          -11.25199452353329,
+          54.17958096416886,
+          -30.926556573191295
+        ],
+        "median_F": -11.25199452353329,
+        "worst_F": -30.926556573191295,
+        "search_F_hat": 70.69352205576047,
+        "score_kind": "g_net"
+      }
+    ],
+    "n_ranked": 10,
+    "dispersion": {
+      "n_restarts": 12,
+      "score_kind": "g_gross",
+      "F_hat": {
+        "min": 26.5926104953538,
+        "median": 61.506279041279925,
+        "max": 70.69352205576047,
+        "spread": 44.10091156040667
+      },
+      "hamming": {
+        "min": 0,
+        "median": 3.0,
+        "max": 14,
+        "binding": false
+      },
+      "jaccard": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 1.0,
+        "binding": false
+      },
+      "n_distinct_terminals": 10,
+      "sizes": [
+        1,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        3,
+        3,
+        6,
+        11
+      ]
+    },
+    "fold_diag": null,
+    "purge_ns": 57600000000000
+  },
+  "stage2_gate_band": {
+    "empty": false,
+    "top": [
+      "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H64"
+    ],
+    "gross": {
+      "lcb": -123.21488273230874,
+      "point": -13.21294858335997,
+      "se": 71.8200445857709,
+      "t_crit": 1.5316327744349871,
+      "boot_median": -19.32227292996589,
+      "n_boot_finite": 200,
+      "pass_positive": false,
+      "in_domain": true,
+      "domain_reason": "ok",
+      "out_of_calibration_domain": false,
+      "net": false,
+      "confidence": 0.95,
+      "n_legs": 18,
+      "n_nonempty_blocks": 18,
+      "empty_bar_fraction": NaN,
+      "block_legs": 1,
+      "n_boot": 200,
+      "score_kind": "g_gross",
+      "method": "leg_studentized_bootstrap_t",
+      "resample_unit": "legs",
+      "binder_form": "LCB>0 leg-bootstrap studentized (INFR-009 P3d)",
+      "n_admitted": 18
+    },
+    "net": {
+      "lcb": -140.46844493103913,
+      "point": -31.299325271410492,
+      "se": 76.03634842835059,
+      "t_crit": 1.4357491109991851,
+      "boot_median": -36.528286567171364,
+      "n_boot_finite": 200,
+      "pass_positive": false,
+      "in_domain": true,
+      "domain_reason": "ok",
+      "out_of_calibration_domain": false,
+      "net": true,
+      "confidence": 0.95,
+      "n_legs": 18,
+      "n_nonempty_blocks": 18,
+      "empty_bar_fraction": NaN,
+      "block_legs": 1,
+      "n_boot": 200,
+      "score_kind": "g_net",
+      "method": "leg_studentized_bootstrap_t",
+      "resample_unit": "legs",
+      "binder_form": "LCB>0 leg-bootstrap studentized (INFR-009 P3d)",
+      "n_admitted": 18
+    },
+    "stage2_gross_lcb_positive": false,
+    "stage2_net_lcb_positive": false,
+    "n_legs": 18,
+    "n_legs_floor_informative": 16,
+    "in_domain_16": true,
+    "floor_note": "AMENDMENT-5: floor informative only; verdict language void \u2014 reads are exploratory evidence, not a pin-backed certification",
+    "block_legs": 1,
+    "e2e_pass_event": "stage2_gross_lcb_positive",
+    "deployability_binding": "stage2_net_lcb_positive"
+  },
+  "segments": {
+    "search": [
+      1657756800000000000,
+      1689171840000000000
+    ],
+    "ranking": [
+      1689171840000000000,
+      1704879360000000000
+    ],
+    "gate": [
+      1720586880000000000,
+      1736294400000000000
+    ],
+    "fracs": {
+      "search": 0.5,
+      "ranking": 0.25,
+      "embargo": 0.2
+    },
+    "note": "AMENDMENT-4: gate band lands in TEST (spent); NO reserved OOS"
+  },
+  "n_candidates": 72,
+  "final_gate": {
+    "run": false,
+    "note": "counted TEST final gate NOT run \u2014 exploratory; no deployability claim"
+  }
+}

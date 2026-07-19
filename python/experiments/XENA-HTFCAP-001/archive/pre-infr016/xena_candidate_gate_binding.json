@@ -1,0 +1,2889 @@
+{
+  "universe_id": "XENA-HTFCAP-001",
+  "n_candidates": 72,
+  "n_pass": 72,
+  "duplicate_ids": [],
+  "candidates": [
+    {
+      "candidate_id": "BTCUSDT__DI_VOL_HI__v1.1__adxna__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_VOL_HI__v1.1__adxna__H16/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=1670 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=1670 n_rejected=0 F_point=-0.502005 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_VOL_HI__v1.25__adxna__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_VOL_HI__v1.25__adxna__H16/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=1012 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=1012 n_rejected=0 F_point=-0.167587 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_VOL_HI__v1.5__adxna__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_VOL_HI__v1.5__adxna__H16/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=502 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=502 n_rejected=0 F_point=-0.0141611 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.1__adx20__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.1__adx20__H16/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=1523 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=1523 n_rejected=0 F_point=-0.41024 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.1__adx25__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.1__adx25__H16/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=1299 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=1299 n_rejected=0 F_point=-0.277386 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.1__adx30__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.1__adx30__H16/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=1086 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=1086 n_rejected=0 F_point=-0.202618 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx20__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.25__adx20__H16/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=971 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=971 n_rejected=0 F_point=-0.132811 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx25__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.25__adx25__H16/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=871 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=871 n_rejected=0 F_point=-0.037019 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H16/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=763 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=763 n_rejected=0 F_point=0.00102084 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx20__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.5__adx20__H16/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=481 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=481 n_rejected=0 F_point=-0.00305166 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H16/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=455 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=455 n_rejected=0 F_point=0.019127 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H16/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=425 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=425 n_rejected=0 F_point=0.0072268 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_VOL_HI__v1.1__adxna__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_VOL_HI__v1.1__adxna__H32/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=868 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=868 n_rejected=0 F_point=-0.0474635 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_VOL_HI__v1.25__adxna__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_VOL_HI__v1.25__adxna__H32/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=524 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=524 n_rejected=0 F_point=0.088722 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_VOL_HI__v1.5__adxna__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_VOL_HI__v1.5__adxna__H32/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=262 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=262 n_rejected=0 F_point=0.082133 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.1__adx20__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.1__adx20__H32/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=790 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=790 n_rejected=0 F_point=-0.0197532 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.1__adx25__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.1__adx25__H32/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=674 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=674 n_rejected=0 F_point=0.0875307 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.1__adx30__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.1__adx30__H32/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=561 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=561 n_rejected=0 F_point=0.0590906 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx20__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.25__adx20__H32/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=502 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=502 n_rejected=0 F_point=0.101175 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx25__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.25__adx25__H32/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=451 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=451 n_rejected=0 F_point=0.169321 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H32/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=395 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=395 n_rejected=0 F_point=0.173578 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx20__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.5__adx20__H32/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=252 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=252 n_rejected=0 F_point=0.0829143 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H32/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=236 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=236 n_rejected=0 F_point=0.0956786 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H32/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=221 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=221 n_rejected=0 F_point=0.0933925 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_VOL_HI__v1.1__adxna__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_VOL_HI__v1.1__adxna__H64/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=460 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=460 n_rejected=0 F_point=0.212196 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_VOL_HI__v1.25__adxna__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_VOL_HI__v1.25__adxna__H64/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=277 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=277 n_rejected=0 F_point=0.183161 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_VOL_HI__v1.5__adxna__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_VOL_HI__v1.5__adxna__H64/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=142 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=142 n_rejected=0 F_point=0.113257 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.1__adx20__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.1__adx20__H64/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=418 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=418 n_rejected=0 F_point=0.20402 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.1__adx25__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.1__adx25__H64/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=362 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=362 n_rejected=0 F_point=0.26655 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.1__adx30__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.1__adx30__H64/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=297 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=297 n_rejected=0 F_point=0.161055 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx20__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.25__adx20__H64/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=265 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=265 n_rejected=0 F_point=0.22605 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx25__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.25__adx25__H64/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=240 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=240 n_rejected=0 F_point=0.271005 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.25__adx30__H64/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=210 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=210 n_rejected=0 F_point=0.267661 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=137 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=137 n_rejected=0 F_point=0.112708 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=126 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=126 n_rejected=0 F_point=0.122295 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/BTCUSDT__DI_ADX_VOL_HI__v1.5__adx30__H64/xena",
+      "symbol": "BTCUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=119 marks=1307518"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=119 n_rejected=0 F_point=0.107875 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_VOL_HI__v1.1__adxna__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_VOL_HI__v1.1__adxna__H16/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=1857 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=1857 n_rejected=0 F_point=-0.0758449 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_VOL_HI__v1.25__adxna__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_VOL_HI__v1.25__adxna__H16/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=1245 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=1245 n_rejected=0 F_point=0.0137107 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_VOL_HI__v1.5__adxna__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_VOL_HI__v1.5__adxna__H16/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=696 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=696 n_rejected=0 F_point=-0.0933975 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx20__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.1__adx20__H16/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=1633 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=1633 n_rejected=0 F_point=-0.0548172 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx25__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.1__adx25__H16/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=1402 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=1402 n_rejected=0 F_point=-0.0560938 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx30__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.1__adx30__H16/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=1076 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=1076 n_rejected=0 F_point=-0.0583118 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.25__adx20__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.25__adx20__H16/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=1130 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=1130 n_rejected=0 F_point=-0.0196809 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.25__adx25__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.25__adx25__H16/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=988 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=988 n_rejected=0 F_point=-0.00750792 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.25__adx30__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.25__adx30__H16/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=784 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=784 n_rejected=0 F_point=-0.0246047 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx20__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.5__adx20__H16/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=644 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=644 n_rejected=0 F_point=-0.0854844 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx25__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.5__adx25__H16/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=583 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=583 n_rejected=0 F_point=-0.0746264 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx30__H16",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.5__adx30__H16/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=466 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=466 n_rejected=0 F_point=-0.0641666 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_VOL_HI__v1.1__adxna__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_VOL_HI__v1.1__adxna__H32/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=951 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=951 n_rejected=0 F_point=0.14209 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_VOL_HI__v1.25__adxna__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_VOL_HI__v1.25__adxna__H32/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=637 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=637 n_rejected=0 F_point=0.11861 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_VOL_HI__v1.5__adxna__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_VOL_HI__v1.5__adxna__H32/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=363 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=363 n_rejected=0 F_point=0.00655652 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx20__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.1__adx20__H32/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=840 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=840 n_rejected=0 F_point=0.133546 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx25__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.1__adx25__H32/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=723 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=723 n_rejected=0 F_point=0.0872282 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx30__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.1__adx30__H32/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=554 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=554 n_rejected=0 F_point=0.0855879 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.25__adx20__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.25__adx20__H32/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=581 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=581 n_rejected=0 F_point=0.0924564 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.25__adx25__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.25__adx25__H32/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=508 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=508 n_rejected=0 F_point=0.0958142 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.25__adx30__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.25__adx30__H32/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=404 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=404 n_rejected=0 F_point=0.0824005 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx20__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.5__adx20__H32/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=335 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=335 n_rejected=0 F_point=-0.000956386 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx25__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.5__adx25__H32/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=304 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=304 n_rejected=0 F_point=0.0154531 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx30__H32",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.5__adx30__H32/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=244 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=244 n_rejected=0 F_point=0.0226666 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_VOL_HI__v1.1__adxna__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_VOL_HI__v1.1__adxna__H64/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=497 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=497 n_rejected=0 F_point=0.223591 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_VOL_HI__v1.25__adxna__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_VOL_HI__v1.25__adxna__H64/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=333 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=333 n_rejected=0 F_point=0.183742 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_VOL_HI__v1.5__adxna__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_VOL_HI__v1.5__adxna__H64/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=192 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=192 n_rejected=0 F_point=0.0509341 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx20__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.1__adx20__H64/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=444 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=444 n_rejected=0 F_point=0.207099 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx25__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.1__adx25__H64/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=381 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=381 n_rejected=0 F_point=0.146975 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.1__adx30__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.1__adx30__H64/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=290 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=290 n_rejected=0 F_point=0.143919 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.25__adx20__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.25__adx20__H64/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=306 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=306 n_rejected=0 F_point=0.148932 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.25__adx25__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.25__adx25__H64/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=269 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=269 n_rejected=0 F_point=0.123504 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.25__adx30__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.25__adx30__H64/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=215 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=215 n_rejected=0 F_point=0.0959989 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.5__adx20__H64/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=177 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=177 n_rejected=0 F_point=0.0482721 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.5__adx25__H64/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=160 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=160 n_rejected=0 F_point=0.0703424 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    },
+    {
+      "candidate_id": "SOLUSDT__DI_ADX_VOL_HI__v1.5__adx30__H64",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/XENA-HTFCAP-001/SOLUSDT__DI_ADX_VOL_HI__v1.5__adx30__H64/xena",
+      "symbol": "SOLUSDT",
+      "checks": {
+        "files": {
+          "pass": true,
+          "detail": "positions.parquet + cis_trades.parquet required"
+        },
+        "schema": {
+          "pass": true,
+          "detail": ""
+        },
+        "non_empty": {
+          "pass": true,
+          "detail": "trades=132 marks=1308566"
+        },
+        "fence": {
+          "pass": true,
+          "detail": "latest emitted ts 1736294340000000000 vs AnalysisEndUtc 1736294400000000000"
+        },
+        "causality": {
+          "pass": true,
+          "detail": "marks_monotone=True entries_in_grid=True entry<=exit=True"
+        },
+        "stop_contract": {
+          "pass": true,
+          "detail": "every leg needs finite SlPrice != EntryFillPrice (sizing denominator)"
+        },
+        "fill_consistency": {
+          "pass": true,
+          "detail": "max |RealizedBps - fills-derived| = 0.0000 bps (tol 1.0)"
+        },
+        "oracle_smoke": {
+          "pass": true,
+          "detail": "n_admitted=132 n_rejected=0 F_point=0.0293373 deterministic=True"
+        }
+      },
+      "blocking_pass": true
+    }
+  ],
+  "blocking_pass": true
+}
