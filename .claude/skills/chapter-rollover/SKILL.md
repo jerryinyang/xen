@@ -88,6 +88,13 @@ Follow `references/renew-protocol.md`. Key points:
    ```
    Resolve any `FAIL` before declaring the rollover complete.
 
+## Operator-facing communication (binding)
+
+Phase announcements, confirmation asks, and finish summaries to the human are **concise and
+de-jargonified**. Full rules: `research-pipeline/_pipeline-config.md` § *Operator-facing
+communication* (also project `AGENTS.md` §5). Plain meaning first; irreversible steps as
+clear yes/no with consequence; no process jargon walls.
+
 ## Hard constraints
 
 - Never read, load, or inspect the global holdout during any phase.

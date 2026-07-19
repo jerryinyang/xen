@@ -61,6 +61,25 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+## 5. Operator-Facing Communication
+
+**Every message meant for the human** (question, status update, progress report, summary, gate prompt, recommendation, handoff) must be **concise, clear, and de-jargonified**.
+
+This is project-wide — every skill, every session, every stage. Pipeline skills also load the full standard from `research-pipeline/_pipeline-config.md` § *Operator-facing communication*.
+
+Rules:
+- Lead with what happened and what it means. Not process labels, skill names, or internal acronyms.
+- Keep it short: status ≈ ≤8 short lines; summary ≈ ≤15 unless more was asked.
+- Translate jargon: plain phrase first; technical label in parentheses only if once useful.
+- Decisions need options with one-line consequences and a marked recommendation.
+- One plain question at a time (no compound nested asks).
+- Keep numbers that matter; say what they mean in words first.
+- On-disk technical artifacts may stay precise. Chat that reports them must translate.
+- Self-check: would a smart non-specialist owner understand this in ~20 seconds? If not, rewrite.
+
+Bad: "estimand gate blocking_pass false; awaiting operator before XENA final gate."
+Good: "The integrity check failed, so we cannot treat the results as clean. Stop, or fix and re-run? I recommend fix and re-run."
+
 ---
 
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, clarifying questions come before implementation rather than after mistakes, and operator-facing messages stay plain and short.

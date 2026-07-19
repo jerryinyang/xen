@@ -93,7 +93,11 @@ running the implementation to produce its own expectations.
   until INFR-014 smoke S1.
 - Holdout: no code path can touch the final 30%; conf fence set.
 - Any `DEVIATIONS` block: each deviation was operator-approved (evidence, not assertion).
-- Elicitation hygiene: open questions to the operator are plain-language.
+- **Operator-facing communication (binding):** questions, status, and the APPROVE/REVISE/REJECT
+  summary to the human are concise and de-jargonified (see
+  `research-pipeline/_pipeline-config.md` § *Operator-facing communication*). Plain meaning
+  first; issues listed as what is wrong + what must change; technical file:line detail may
+  stay in `qa-review.md` tables.
 - **XENA runs (INFR-006 clauses; spec `docs/references/xena-lane.md`):** (a) frozen
   registry verified — `xen.xena.calibration.verify_frozen_registry` passes and the run's
   thresholds/params match the pinned values byte-for-byte (any mismatch = REJECT: frozen
@@ -111,6 +115,9 @@ running the implementation to produce its own expectations.
   to `experiment-developer` (implementation) or `quant-designer` (design defect).
 - **REJECT** — fundamental (holdout contact, causality violation, unapproved silent
   deviation, missing tripwire). Cannot be overridden in-session; goes to the operator.
+
+When reporting the verdict in chat: one plain line for the result, then the few issues that
+block progress in ordinary language (detail stays in `qa-review.md`).
 
 ## Output — `python/experiments/<ID>/qa-review.md` (append-only)
 
