@@ -1396,6 +1396,18 @@ probe kills K≥3; ETH = one seed-fragile cell); holds ≥1× HTF for money; SOL
 collapse incomplete (0.55–0.78); no per-year split; availability-only, XENA gate still
 blocked on INFR-014 pin. Integrity 14/14; independent review pass reproduced all headline
 numbers. 0 slots, 0 reads consumed.
+**XENA-HTFCAP-001 OUTCOME (2026-07-19, operator verdict): EXPLORATORY — real sub-cost gross
+edge, NOT deployable.** Analysis re-done under INFR-016 report layers. A real, gate-attributable,
+sign-null-clearing GROSS edge exists on BTC mid-threshold `DI_ADX×VOL_HI adx25` H32/H64
+(embargoed gross LCB +8 to +18, sign p 0.02–0.05, derangement collapse ~0.9) — hidden by the
+old top-1 gate framing. **Net-of-cost: 0 of 72 cells and 0 subsets resolve above zero**
+(~18 bps taker+GAP+funding wall at 8–16h holds; best net LCB −4.6). Binder certified top-1 was a
+selection artifact (worst corner); SOL v1.5/adxna/H64 full-window-suggestive but embargoed-band
+negative. Run was operator-authorized EXPLORATORY (TRAIN+TEST, **no reserved OOS** — AMENDMENT-4/5)
+→ **1 TEST-band read spent (candidate slot 1/2)**; global holdout SEALED (self-test PASS).
+Estimand gate v2 PASS 108/108. Not a certification, not deployability. Item RETAINED (not deleted).
+Report `python/experiments/XENA-HTFCAP-001/report.md`. **Family status transition deferred to
+checkpoint-013 retrospective (operator-signed).**
 
 ## Chapter 04 · CF-EPSOSC-001 Registration (2026-07-16, checkpoint-013) — Episode-Clearing Oscillation Harvest
 
@@ -1443,6 +1455,12 @@ Caveats binding on XENA-EPSOSC-001 design: seed from VOLARM×15m×{RET_ANCHOR,HY
 k{2.5,3.0}×W{96,192} on cleared high-volume names; L-27 next-open control mandatory for any
 limit-entry universe; no BONK/BTT centring; availability-only, XENA gate blocked on INFR-014
 pin. 0 slots, 0 reads consumed. Disposition: `python/experiments/SPDR-005/analysis.md` §9.
+
+**Evidence (2026-07-18) — XENA-EPSOSC-002 NOT SUPPORTED (refuted), 0 slots / 0 counted reads.**
+Mass-aligned RET_ANCHOR cross-symbol redesign. Certified 4-symbol subset fails stage-2 gross LCB
+(−68.2) and derangement tripwire (raw collapse 0.091, drift-adjusted 0.135); residual gross is
+AKRO-concentrated unconditional drift (001 pedestal reproduced). Family status unchanged
+(checkpoint-level). Report: `python/experiments/XENA-EPSOSC-002/report.md`.
 
 ## Amendment Rules
 

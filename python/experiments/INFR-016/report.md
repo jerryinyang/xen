@@ -64,7 +64,44 @@ protection is untouched.
 5. **Determinism/parity tests stay green; no emission changes.** Full `tests/test_xena_*` green;
    pinned CAL registries (INFR-014/015) untouched — INFR-016 changes forward adjudication, not pins. ✅
 
-## 6. Guardrails held
+## 6. Follow-up strips (2026-07-19) + framework validation
+
+**Do-now strip batch** (fragility removed by deletion, not addition):
+- **Retired p-band labels** (`label_from_p_and_power` → `structural_label`): only UNPOWERED
+  (seed count) + CONTRADICTED (sign) auto-assign; STRONG/SUPPORTED/SUGGESTIVE/WASH were
+  hardcoded p-cutpoints that re-read as verdicts — the L-32 trap in miniature. The number + p +
+  CI carries the read.
+- **`oracle_smoke` → `oracle_computable`** (`ingest`): dropped the per-candidate determinism
+  re-proof (an oracle-wide property, proven once by the pinned parity corpus); kept the
+  runs-at-all + finite-F computability check.
+- **Single-source skill mirrors**: `scripts/sync_skills.sh` regenerates the 8 mirror dirs from
+  `.claude/skills`; mirrors gitignored + untracked (1400 files left git tracking) — ends the 9×
+  diff churn. Deferred to an INFR-017 archival bundle (coupled to the chapter-03 calibration
+  cluster): retire the CAL threshold-derivation stack + `run_final_gate` + `PlateauReport`
+  legacy fields; prune the duplicated certify Jaccard.
+
+**Framework validation** (`validation/`, why we can trust the minimal framework — and why the
+old CAL power/FPR test could NOT be trusted):
+- The old CAL battery certified the binder as "FPR ≤1%, power 94%" yet it picked the worst
+  HTFCAP cell. Two design flaws: **circular** (planted the edge in the objective's own units,
+  then checked that objective could detect it) and **detection-not-selection** (2 clean classes,
+  never a graded ranking).
+- **`synth_ranking_validation.py` (12/12)** — a graded universe with ground truth = DEPLOYABLE
+  NET quality (outside any objective) + three adversaries (cost-trap, concentration, negative).
+  Result: the old costless-extensive + `one_subset` top-1 **reproduces the failure** (certifies
+  the non-deployable concentration cell, hides the good). The minimal layers recover the true
+  ranking — but the key finding is that **a single layer is not a gate**: ranking by net-LCB
+  alone is *also* fooled by the concentration cell (mean +9) — only the cross-layer
+  **disagreement** (median/sign says p=0.94 CONTRADICTED) exposes it. The combined read
+  (net-LCB>0 AND sign-clean) = exactly `{strong, modest}`, no adversary; marginal honestly
+  underpowered. This is the INFR-016 thesis proven: safety is showing all layers, not one number.
+- **`htfcap_replay.py` (6/6)** — the report layers over the REAL HTFCAP emissions (108 cells)
+  reproduce the redo on a known-answer case: BTC adx25 H32 p=0.017–0.037, H64 (v1.25) p=0.043,
+  gross +7 to +22 bps; SOL v1.5 DI_VOL_HI H64 p=**0.224** (suggestive, not refuted); a 10-cell
+  sign-clean set the binder had hidden; negatives read CONTRADICTED.
+- Regression-guarded: `python/tests/test_xena_infr016_validation.py`.
+
+## 7. Guardrails held
 
 No holdout/causal/estimand weakening; deterministic; no data re-emission; pinned CAL artifacts
 untouched. Not a family disposition — an INFR framework update.

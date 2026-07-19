@@ -546,3 +546,16 @@ Notes:
   slice only**; each file's final-30% global holdout was sealed at first touch (`holdout_rows_read=0`)
   and is **unspent** (no sanctioned shot yet defined on these symbols). No candidate slot, no edge
   inference; this is a data-admission event. Unblocks EXP-022 (CF-CSRR-001 HYP-002 Indices arm).
+- **XENA-HTFCAP-001 (2026-07-19, `CF-HTFCAP-001`, checkpoint-013 — EXPLORATORY TEST-band read, NO
+  certification, NO holdout shot).** First Chapter-04 XENA TEST-band contact on the Bybit stack.
+  Operator-authorized EXPLORATORY deviation (AMENDMENT-4/5): the majors' TRAIN-only window fell below
+  the LOW leg-count floor, so the operator extended the search to a **TRAIN+TEST window**
+  (2022-07-14 → 2025-01-08 = `holdout_start`) with **no reserved out-of-sample**. This spends **1
+  candidate slot (now 1/2)** on the CF-HTFCAP-001 XENA universe and is recorded as a **read
+  disclosure, not a certification** — with no reserved OOS the result carries no deployability claim.
+  The **global 30% holdout (≥ 2025-01-08) was NOT loaded** (`holdout` sealed; boundary-mark trim
+  receipt `boundary_trim_receipt.json`, last bar 2025-01-07 23:59, 0 trades/data past boundary;
+  holdout-safety self-test PASS). Outcome: EXPLORATORY — real sub-cost gross BTC edge, NOT deployable
+  (see `python/experiments/XENA-HTFCAP-001/report.md`). Gate-slot accounting also mirrored in
+  `docs/signal-registry/xena-runs.md` (1/2). No further slot may be spent on this universe without a
+  materially different subset or new TEST data (operator attestation).

@@ -18,6 +18,11 @@ CERTIFICATION SOUND). Active certified set: CLS-FILTER low + CLS-EPISODE low. XE
 unblocked LOW-only — binding caveats: ≥16 gate-band legs (F*), α priced ≤~0.06, 4th
 CLS-EPISODE cycle needs family-wise correction.** ch03 pin still VOID.
 SPDR-004/005/006 complete (three WORTH_EXPLORING). INFR-013 COMPLETE.
+**Checkpoint-013 CLOSED 2026-07-19 (operator-signed retrospective).** Both registered families
+closed: **CF-EPSOSC-001 RETIRED (REFUTED)** — refuted twice at XENA (001+002), AKRO drift
+pedestal reproduced; **CF-HTFCAP-001 CLOSED (CHARACTERISED, not refuted)** — real gross BTC edge,
+sub-cost at 8–16h holds; re-open path = new design. Holdout SEALED throughout; EPSOSC 0/2 slots,
+HTFCAP 1/2 (exploratory TEST spend). Chapter at a natural rollover boundary.
 
 ## Current Infrastructure Tasks
 
@@ -42,4 +47,6 @@ opens.
 
 ## Checkpoint Retrospectives
 
-None yet this chapter.
+| Checkpoint | Closed | Outcome |
+|---|---|---|
+| [013 — Chapter 04 Open: HTFCAP + EPSOSC + Fresh XENA CAL](checkpoints/2026-07-16-013-chapter04-open-htfcap-epsosc-cal/retrospective.md) | 2026-07-19 | Both families closed — CF-EPSOSC-001 RETIRED (refuted 2×, drift pedestal); CF-HTFCAP-001 CLOSED (characterised — real sub-cost gross BTC edge). Apparatus rebuilt on Bybit (fresh CAL pin `abbb1842…`, report-layer framework INFR-016). Holdout SEALED. |
