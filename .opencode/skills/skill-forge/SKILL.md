@@ -13,6 +13,14 @@ description: >
 
 # Skill Forge
 
+## Operator-facing output (binding)
+
+Every message to the human (question, status, summary, gate, handoff): **concise, plain
+language, de-jargonified**. Lead with meaning; technical labels in parentheses only if
+needed once. See project `AGENTS.md` §5 (and, for research skills,
+`research-pipeline/_pipeline-config.md` § *Operator-facing communication*). On-disk
+technical artifacts may keep precise terms; chat to the operator must translate.
+
 The complete pipeline for creating high-quality, well-architected, and rigorously-tested skills.
 
 ## What This Skill Provides

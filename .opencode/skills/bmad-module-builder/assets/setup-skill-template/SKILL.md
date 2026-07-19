@@ -5,6 +5,14 @@ description: Sets up {module-name} module in a project. Use when the user reques
 
 # Module Setup
 
+## Operator-facing output (binding)
+
+Every message to the human (question, status, summary, gate, handoff): **concise, plain
+language, de-jargonified**. Lead with meaning; technical labels in parentheses only if
+needed once. See project `AGENTS.md` §5 (and, for research skills,
+`research-pipeline/_pipeline-config.md` § *Operator-facing communication*). On-disk
+technical artifacts may keep precise terms; chat to the operator must translate.
+
 ## Overview
 
 Installs and configures a BMad module into a project. Module identity (name, code, version) comes from `./assets/module.yaml`. Collects user preferences and writes them to three files:

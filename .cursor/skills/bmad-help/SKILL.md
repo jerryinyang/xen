@@ -5,6 +5,14 @@ description: 'Analyzes current state and user query to answer BMad questions or 
 
 # BMad Help
 
+## Operator-facing output (binding)
+
+Every message to the human (question, status, summary, gate, handoff): **concise, plain
+language, de-jargonified**. Lead with meaning; technical labels in parentheses only if
+needed once. See project `AGENTS.md` §5 (and, for research skills,
+`research-pipeline/_pipeline-config.md` § *Operator-facing communication*). On-disk
+technical artifacts may keep precise terms; chat to the operator must translate.
+
 ## Purpose
 
 Help the user understand where they are in their BMad workflow and what to do next, and also answer broader questions when asked that could be augmented with remote sources such as module documentation sources.

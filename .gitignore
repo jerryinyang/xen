@@ -63,3 +63,14 @@ docs/planning/*
 
 # Rust kernel build artifacts (INFR-007)
 python/rust/xena_fold/target/
+
+# Skill mirrors — single-source from .claude/skills via scripts/sync_skills.sh (INFR-016 follow-up).
+# Edit .claude/skills ONLY; these are regenerated copies, not tracked (stops the 9x diff churn).
+.agents/skills/
+.cline/skills/
+.codex/skills/
+.cursor/skills/
+.grok/skills/
+.kilocode/skills/
+.opencode/skills/
+.windsurf/skills/

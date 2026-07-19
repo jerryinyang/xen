@@ -5,6 +5,14 @@ description: Authors and updates customization overrides for installed BMad skil
 
 # BMad Customize
 
+## Operator-facing output (binding)
+
+Every message to the human (question, status, summary, gate, handoff): **concise, plain
+language, de-jargonified**. Lead with meaning; technical labels in parentheses only if
+needed once. See project `AGENTS.md` §5 (and, for research skills,
+`research-pipeline/_pipeline-config.md` § *Operator-facing communication*). On-disk
+technical artifacts may keep precise terms; chat to the operator must translate.
+
 Translate the user's intent into a correctly-placed TOML override file under `{project-root}/_bmad/custom/` for a customizable agent or workflow skill. Discover, route, author, write, verify.
 
 Scope v1: per-skill `[agent]` overrides (`bmad-agent-<role>.toml` / `.user.toml`) and per-skill `[workflow]` overrides (`bmad-<workflow>.toml` / `.user.toml`). Central config (`{project-root}/_bmad/custom/config.toml`) is out of scope — point users at the [How to Customize BMad guide](https://docs.bmad-method.org/how-to/customize-bmad/).

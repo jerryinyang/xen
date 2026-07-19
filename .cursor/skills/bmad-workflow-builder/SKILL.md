@@ -5,6 +5,14 @@ description: Builds, converts, and analyzes workflows and skills. Use when the u
 
 # Workflow & Skill Builder
 
+## Operator-facing output (binding)
+
+Every message to the human (question, status, summary, gate, handoff): **concise, plain
+language, de-jargonified**. Lead with meaning; technical labels in parentheses only if
+needed once. See project `AGENTS.md` §5 (and, for research skills,
+`research-pipeline/_pipeline-config.md` § *Operator-facing communication*). On-disk
+technical artifacts may keep precise terms; chat to the operator must translate.
+
 ## Overview
 
 This skill helps you build AI workflows and skills that are **outcome-driven** — describing what to achieve, not micromanaging how to get there. LLMs are powerful reasoners. Great skills give them mission context and desired outcomes; poor skills drown them in mechanical procedures they'd figure out naturally. Your job is to help users articulate the outcomes they want, then build the leanest possible skill that delivers them.

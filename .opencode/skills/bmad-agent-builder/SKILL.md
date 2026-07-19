@@ -5,6 +5,14 @@ description: Builds, edits or analyzes Agent Skills through conversational disco
 
 # Agent Builder
 
+## Operator-facing output (binding)
+
+Every message to the human (question, status, summary, gate, handoff): **concise, plain
+language, de-jargonified**. Lead with meaning; technical labels in parentheses only if
+needed once. See project `AGENTS.md` §5 (and, for research skills,
+`research-pipeline/_pipeline-config.md` § *Operator-facing communication*). On-disk
+technical artifacts may keep precise terms; chat to the operator must translate.
+
 ## Overview
 
 This skill helps you build AI agents that are **outcome-driven** — describing what each capability achieves, not micromanaging how. Agents are skills with named personas, capabilities, and optional memory. Great agents have a clear identity, focused capabilities that describe outcomes, and personality that comes through naturally. Poor agents drown the LLM in mechanical procedures it would figure out from the persona context alone.

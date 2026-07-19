@@ -91,6 +91,10 @@ checkpoint retrospective, operator-signed; append the experiment's evidence to
 - Link artifacts with relative paths.
 - Keep the report concise enough to support future review.
 - Do not introduce new claims that are absent from `analysis.md` or raw outputs.
+- **Operator-facing communication (binding):** status updates and the completion summary to
+  the human are concise and de-jargonified (see
+  `research-pipeline/_pipeline-config.md` § *Operator-facing communication*). Index rows and
+  one-line findings stay plain; full technical detail lives in linked artifacts.
 
 ## References
 

@@ -5,6 +5,14 @@ description: Implement approved Xen experiment designs as NautilusTrader Python 
 
 # Experiment Developer
 
+## Operator-facing output (binding)
+
+Every message to the human (question, status, summary, gate, handoff): **concise, plain
+language, de-jargonified**. Lead with meaning; technical labels in parentheses only if
+needed once. See project `AGENTS.md` §5 (and, for research skills,
+`research-pipeline/_pipeline-config.md` § *Operator-facing communication*). On-disk
+technical artifacts may keep precise terms; chat to the operator must translate.
+
 Translate an approved `design.md` into an engine implementation. Implement only the approved
 design — and when the design is ambiguous, STOP and ask; never resolve ambiguity silently.
 
@@ -33,9 +41,10 @@ Three consecutive experiments shipped verdict-material design-to-code drift sile
 (frozen form-2 exit, moving-anchor TP, size-confounded placebo). Therefore:
 
 - If any design requirement is ambiguous, unimplementable as written, or in tension with the
-  engine's mechanics → **STOP and elicit the operator** before coding. Plain-language
-  standard: one plain sentence per question, concrete options, one-line consequences,
-  recommendation marked. No jargon walls.
+  engine's mechanics → **STOP and elicit the operator** before coding. **Operator-facing
+  communication (binding):** concise, plain, de-jargonified (see
+  `research-pipeline/_pipeline-config.md` § *Operator-facing communication*). One plain
+  sentence per question; options with one-line consequences; recommendation marked.
 - Any deviation you believe is forced must be (a) raised before implementation, (b) recorded
   in a `DEVIATIONS` block at the top of the model file and in your completion summary.
   An unrecorded deviation discovered later is a REJECT-class process violation.
@@ -67,10 +76,14 @@ Three consecutive experiments shipped verdict-material design-to-code drift sile
 
 ## Completion summary
 
+Keep a precise map for QA (files, clause→code, deviations, smoke integrity result). The
+**message to the operator** follows operator-facing communication: short plain status —
+what was built, whether it is ready to run, any decision needed — not a jargon dump.
+
 - files created/modified; conf names; how to run each cell;
 - design-clause → code-location map (QA input);
 - deviations raised and their resolutions (or "none");
-- smoke-cell `xen.estimand_validation` result.
+- smoke-cell integrity check result (`xen.estimand_validation`).
 
 Execution itself is operator-gated: report ready-to-run; do not launch credentialed/
 cost-bearing runs yourself.
