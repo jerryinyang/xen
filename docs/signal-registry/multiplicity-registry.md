@@ -1462,6 +1462,81 @@ Mass-aligned RET_ANCHOR cross-symbol redesign. Certified 4-symbol subset fails s
 AKRO-concentrated unconditional drift (001 pedestal reproduced). Family status unchanged
 (checkpoint-level). Report: `python/experiments/XENA-EPSOSC-002/report.md`.
 
+## Chapter 04 · CF-SIGAUC-001 Registration (2026-07-20, checkpoint-014) — Signed Auction Structure
+
+**Status:** **REGISTERED 2026-07-20** (checkpoint-014 D1, operator-signed) — registration act
+only, no status transition. D1–D6 all signed; source-adherence resolutions (6 items) signed.
+D0 card: `candidate-families/cf-sigauc-001.md`; checkpoint:
+`docs/experiments-docs/checkpoints/2026-07-20-014-signed-auction-structure/design.md`;
+source methodology: `.ignore/what-next/orderflow/ohlc/SIGNAL-SIGNED.md` (normative for signal
+definitions, falsifiers, phase order).
+**Route:** INFR-017 (signed-bar lane) → INFR-018 (instrument build + freeze) → SPDR-007
+(statistical spine, master go/no-go) → SPDR-008 (breadth sweep) → full XENA at
+checkpoint-015 if the spine holds. **EXP lane not used.** Mechanism class: sparse
+session-anchored auction events (breakout / trap / acceptance) + located signed-flow triggers.
+**Information source:** 1m OHLCV **+ exact taker buy/sell volume** (Δ = BuyVolume − SellVolume)
++ per-bar spread proxy + calendar. Verified on disk 2026-07-20 at
+`python/experiments/INFR-011/data/staging/bars/*.parquet` (904 symbols; `Buy+Sell ≡ Volume`
+to max rel dev 3.8e-16 on BTC/ETH/SOL, 0 nulls; `NTrades` present; `SpreadBps` has nulls —
+TRAIN band: BTC 158 / ETH 4,543 / SOL 6,951 null minutes). **Not engine-readable** — catalog `Bar` is OHLCV
+only; INFR-017 builds the signed catalog lane on `xen.orderflow` contracts.
+**Universe:** online instrument selection rule (highest trailing 24h volume, selection at t
+uses volume ≤ t−1 only, daily 00:00 UTC re-evaluation, tie-break lexicographic; rule +
+frequency are the frozen declarations, no fixed pre-run list). **n = 20** for INFR-018
+calibration and SPDR-007 spine (pooled anchor race needs cross-sectional support);
+**the 296 admitted instruments with readable TRAIN data**, point-in-time, delisted included, for
+SPDR-008 breadth (ckpt-014 AMENDMENT-1, operator-signed 2026-07-20, direction NEUTRAL; measured at
+INFR-017 W7 → `admission_reconciliation.json.band_coverage`: 894 admitted / 296 with TRAIN data /
+197 reaching the DESIGN bank). The n=20 calibration and spine sets draw from the 197.
+**Survivorship caveat BINDING on every breadth read** — the covered set is precisely the instruments
+listed before the bank end, so it describes older listings, not the venue as a whole.
+Anti-survivorship binds project-wide.
+**Band mapping (checkpoint-014 §5, declared deviation):** the source's per-phase "strict
+holdout" maps to a TRAIN-internal **CONFIRM bank** — DESIGN `2021-06-29T06:53:00Z →
+2023-03-01T00:00:00Z`, CONFIRM `2023-03-01T00:00:00Z → 2023-12-18T00:00:00Z`, untouched
+during each phase's tuning. Stage I confirmations are TRAIN-internal and must be labelled as
+such — they are NOT out-of-sample in the programme's sense. The TEST band is **reserved** for
+a single counted XENA gate at checkpoint-015; global holdout never queried.
+**Promote rule (SPDR-008, predeclared in its design.md):** cluster **K = 3** — ≥3 cells in a
+connected grid region (same anchor family and signal, varying symbol and/or hold) positive vs
+matched unconditional baselines on the primary bps facet, dependence-honest uncertainty;
+best cell not the only positive in its neighbourhood; cluster median gross bps reported
+against the measured cost floor.
+**Money-unit floor (binding, computed BEFORE the Phase-4 disposition):** taker RT 11.0 bps +
+measured per-symbol spread RT + funding ≤ ~3 bps at ≤24h session holds (`xen.evaluation`).
+TP1 at/below floor ⇒ characterisation only, never a tradability route (L-21 / P-15).
+**Hard bans (card §4):** non-causal construction (closed windows; ≤ t−1; entry at signal-bar
+close earliest); **per-level signed attribution** (per-BAR Δ exact, per-LEVEL Δ estimate-grade —
+barred by the source itself); sub-minute ordering (S15 sequencing is bar-level only);
+**P-10 passive-limit ban OVERRIDDEN for this family** (operator 2026-07-20) — source S13(a)/M3
+limit-style entries admitted; when a cell claims a passive-limit fill it must also emit the
+market-on-confirm twin and/or L-27 next-open control (dual capture for comparison, not a veto);
+unit lies across seams (L-21); costless net-edge claims / cost not binding selection (L-26, L-22);
+screen as tradability; **re-parameterising a refuted mechanism** (source mechanism doctrine —
+mechanisms are binary, grades are not); Stage II results on unfrozen Stage I instruments
+(unattributable, re-run); single-lottery-cell family wins.
+**Anchor method:** primary = pooled/hierarchical across the cross-section; mandatory few-asset
+per-instrument spot-check (default BTC/ETH/SOL) to flag major pooled-vs-local divergence before
+freeze. **Kernel (Phase 3):** calibrate against a finer-grained reference when available, else
+explicit SKIP-NO-REFERENCE — no silent uncalibrated freeze.
+**Distinctness:** **P-07 CLEARED and is the family's principal warrant** — exchange-native taker
+aggressor volume is not broker-reported tick volume; it is the first non-price-derived
+information source the programme has held, the class the KB terminal-branch statement names as
+the remaining frontier. **P-01 tight, operator sign-off required (checkpoint-014 D6)** — the
+S1/S2 spine uses no volume and is single-instrument directional; distinctness rests on the
+calendar-anchored participation-window object, an excursion-quantile target, and
+availability-first screening against matched unconditional base rates, with Phase 4 scoped so it
+cannot itself promote the family. **P-10 overridden** (source passive-limit + dual capture).
+P-12 not in family (no grid object). P-14/P-15 addressed by the money floor + unit pin.
+**Experiment plan fidelity:** source Appendix B phase order and claims preserved; Xen lanes
+(INFR→SPDR→XENA) are packaging only — Phase 6 kill-order and Phase 7 M1–M5 assembly (M5 last)
+must not be reordered at checkpoint-015.
+**XENA gate:** blocked — the active pin `abbb1842…` (CLS-FILTER low + CLS-EPISODE low)
+establishes neither class for sparse session-event objects; a CAL leg shaped to this class is a
+**checkpoint-015 prerequisite**, not a checkpoint-014 blocker.
+**Slot accounting: 0 slots; 0 counted TEST reads; TRAIN-only; holdout sealed.** No tradability
+claim permitted from any INFR or SPDR read in this checkpoint.
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:

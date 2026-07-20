@@ -1,0 +1,743 @@
+{
+  "item": "INFR-017",
+  "work_item": "W1",
+  "hypothesis": "HYP-I1",
+  "question": "Does the stored taker split reproduce from raw Bybit trades?",
+  "generated_utc": "2026-07-20T17:26:39.935156+00:00",
+  "frozen_parameters": {
+    "sample_symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "DOGEUSDT",
+      "XRPUSDT"
+    ],
+    "sample_days": [
+      "2022-09-14",
+      "2023-01-11",
+      "2023-06-07",
+      "2023-11-01"
+    ],
+    "rel_tolerance": 1e-09,
+    "failure_rule": "ANY symbol-day breaching tolerance => HYP-I1 FAIL => family PARKED",
+    "audited_columns": [
+      "Volume",
+      "BuyVolume",
+      "SellVolume",
+      "NTrades"
+    ],
+    "cleaning_rule": "drop rows with null/non-positive price or size (INFR-011 documented rule)",
+    "independence": "recomputed from archive schema; stream_pipeline not imported"
+  },
+  "counts": {
+    "symbol_days_declared": 20,
+    "pass": 20,
+    "fail": 0,
+    "unavailable_or_no_bars": 0
+  },
+  "worst_rel_dev_across_sample": {
+    "Volume": 0.0,
+    "BuyVolume": 0.0,
+    "SellVolume": 0.0
+  },
+  "aggressor_side_convention": {
+    "available": true,
+    "n_symbol_days": 20,
+    "convention": "AGGRESSOR",
+    "unanimous": true,
+    "buy_plus_over_buy_minus": {
+      "min": 5.27,
+      "median": 26.23,
+      "max": 371.98
+    },
+    "sell_minus_over_sell_plus": {
+      "min": 5.36,
+      "median": 29.16,
+      "max": 320.5
+    },
+    "interpretation": "side=Buy is dominated by PlusTick and side=Sell by MinusTick => the archive 'side' column names the AGGRESSOR (taker). delta = buy - sell is net taker aggression with the correct sign."
+  },
+  "verdict": "PASS",
+  "results": [
+    {
+      "symbol": "BTCUSDT",
+      "day": "2022-09-14",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Buy|PlusTick": 138738,
+          "Sell|MinusTick": 138938,
+          "Sell|PlusTick": 1918,
+          "Sell|ZeroMinusTick": 368571,
+          "Buy|ZeroMinusTick": 347282,
+          "Buy|MinusTick": 1834
+        },
+        "buy_plus_over_buy_minus": 75.65,
+        "sell_minus_over_sell_plus": 72.44,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "day": "2023-01-11",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|MinusTick": 67659,
+          "Sell|ZeroMinusTick": 211131,
+          "Buy|ZeroMinusTick": 234060,
+          "Sell|PlusTick": 615,
+          "Buy|MinusTick": 772,
+          "Buy|PlusTick": 69213
+        },
+        "buy_plus_over_buy_minus": 89.65,
+        "sell_minus_over_sell_plus": 110.01,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "day": "2023-06-07",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|MinusTick": 161233,
+          "Sell|ZeroMinusTick": 360514,
+          "Buy|PlusTick": 147417,
+          "Buy|ZeroMinusTick": 389621,
+          "Sell|PlusTick": 5530,
+          "Buy|MinusTick": 5620
+        },
+        "buy_plus_over_buy_minus": 26.23,
+        "sell_minus_over_sell_plus": 29.16,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "day": "2023-11-01",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|MinusTick": 238251,
+          "Sell|PlusTick": 12616,
+          "Buy|MinusTick": 12070,
+          "Buy|PlusTick": 235492,
+          "Buy|ZeroMinusTick": 470859,
+          "Sell|ZeroMinusTick": 446583
+        },
+        "buy_plus_over_buy_minus": 19.51,
+        "sell_minus_over_sell_plus": 18.88,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "day": "2022-09-14",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|ZeroMinusTick": 422354,
+          "Buy|PlusTick": 116916,
+          "Buy|ZeroMinusTick": 411876,
+          "Sell|MinusTick": 115472,
+          "Buy|MinusTick": 2630,
+          "Sell|PlusTick": 2790
+        },
+        "buy_plus_over_buy_minus": 44.45,
+        "sell_minus_over_sell_plus": 41.39,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "day": "2023-01-11",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|ZeroMinusTick": 193277,
+          "Buy|ZeroMinusTick": 209818,
+          "Sell|MinusTick": 55944,
+          "Buy|MinusTick": 1529,
+          "Buy|PlusTick": 57719,
+          "Sell|PlusTick": 1337
+        },
+        "buy_plus_over_buy_minus": 37.75,
+        "sell_minus_over_sell_plus": 41.84,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "day": "2023-06-07",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|MinusTick": 53218,
+          "Sell|ZeroMinusTick": 114532,
+          "Sell|PlusTick": 3084,
+          "Buy|ZeroMinusTick": 108776,
+          "Buy|MinusTick": 2966,
+          "Buy|PlusTick": 46065
+        },
+        "buy_plus_over_buy_minus": 15.53,
+        "sell_minus_over_sell_plus": 17.26,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "day": "2023-11-01",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Buy|ZeroMinusTick": 222525,
+          "Sell|PlusTick": 8540,
+          "Sell|MinusTick": 118841,
+          "Sell|ZeroMinusTick": 217582,
+          "Buy|PlusTick": 120408,
+          "Buy|MinusTick": 8860
+        },
+        "buy_plus_over_buy_minus": 13.59,
+        "sell_minus_over_sell_plus": 13.92,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "SOLUSDT",
+      "day": "2022-09-14",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|MinusTick": 13913,
+          "Buy|MinusTick": 2286,
+          "Buy|ZeroMinusTick": 53252,
+          "Buy|PlusTick": 14012,
+          "Sell|PlusTick": 2147,
+          "Sell|ZeroMinusTick": 51617
+        },
+        "buy_plus_over_buy_minus": 6.13,
+        "sell_minus_over_sell_plus": 6.48,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "SOLUSDT",
+      "day": "2023-01-11",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|PlusTick": 588,
+          "Buy|PlusTick": 31771,
+          "Buy|ZeroMinusTick": 114047,
+          "Sell|MinusTick": 31844,
+          "Buy|MinusTick": 514,
+          "Sell|ZeroMinusTick": 107472
+        },
+        "buy_plus_over_buy_minus": 61.81,
+        "sell_minus_over_sell_plus": 54.16,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "SOLUSDT",
+      "day": "2023-06-07",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Buy|ZeroMinusTick": 93303,
+          "Sell|MinusTick": 37735,
+          "Buy|PlusTick": 35534,
+          "Sell|ZeroMinusTick": 114785,
+          "Buy|MinusTick": 5311,
+          "Sell|PlusTick": 5586
+        },
+        "buy_plus_over_buy_minus": 6.69,
+        "sell_minus_over_sell_plus": 6.76,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "SOLUSDT",
+      "day": "2023-11-01",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Buy|MinusTick": 59855,
+          "Sell|PlusTick": 57624,
+          "Buy|ZeroMinusTick": 862473,
+          "Buy|PlusTick": 491152,
+          "Sell|MinusTick": 488503,
+          "Sell|ZeroMinusTick": 877606
+        },
+        "buy_plus_over_buy_minus": 8.21,
+        "sell_minus_over_sell_plus": 8.48,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "day": "2022-09-14",
+      "status": "PASS",
+      "n_bars_raw": 1299,
+      "n_bars_stored": 1299,
+      "n_bars_matched": 1299,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|ZeroMinusTick": 6681,
+          "Sell|MinusTick": 1244,
+          "Buy|MinusTick": 14,
+          "Buy|ZeroMinusTick": 6743,
+          "Buy|PlusTick": 1274,
+          "Sell|PlusTick": 6
+        },
+        "buy_plus_over_buy_minus": 91.0,
+        "sell_minus_over_sell_plus": 207.33,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "day": "2023-01-11",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Buy|MinusTick": 2270,
+          "Sell|ZeroMinusTick": 29687,
+          "Sell|MinusTick": 11667,
+          "Buy|PlusTick": 11973,
+          "Buy|ZeroMinusTick": 32840,
+          "Sell|PlusTick": 2175
+        },
+        "buy_plus_over_buy_minus": 5.27,
+        "sell_minus_over_sell_plus": 5.36,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "day": "2023-06-07",
+      "status": "PASS",
+      "n_bars_raw": 1439,
+      "n_bars_stored": 1439,
+      "n_bars_matched": 1439,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|MinusTick": 15947,
+          "Sell|ZeroMinusTick": 35969,
+          "Buy|MinusTick": 689,
+          "Sell|PlusTick": 880,
+          "Buy|PlusTick": 15347,
+          "Buy|ZeroMinusTick": 28363
+        },
+        "buy_plus_over_buy_minus": 22.27,
+        "sell_minus_over_sell_plus": 18.12,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "day": "2023-11-01",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|ZeroMinusTick": 73801,
+          "Buy|MinusTick": 1790,
+          "Sell|PlusTick": 1672,
+          "Sell|MinusTick": 27344,
+          "Buy|ZeroMinusTick": 78891,
+          "Buy|PlusTick": 27611
+        },
+        "buy_plus_over_buy_minus": 15.43,
+        "sell_minus_over_sell_plus": 16.35,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "XRPUSDT",
+      "day": "2022-09-14",
+      "status": "PASS",
+      "n_bars_raw": 1428,
+      "n_bars_stored": 1428,
+      "n_bars_matched": 1428,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Buy|ZeroMinusTick": 19815,
+          "Sell|MinusTick": 3876,
+          "Sell|PlusTick": 174,
+          "Buy|MinusTick": 154,
+          "Buy|PlusTick": 3891,
+          "Sell|ZeroMinusTick": 19502
+        },
+        "buy_plus_over_buy_minus": 25.27,
+        "sell_minus_over_sell_plus": 22.28,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "XRPUSDT",
+      "day": "2023-01-11",
+      "status": "PASS",
+      "n_bars_raw": 1439,
+      "n_bars_stored": 1439,
+      "n_bars_matched": 1439,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|MinusTick": 22768,
+          "Sell|ZeroMinusTick": 77219,
+          "Buy|ZeroMinusTick": 84905,
+          "Buy|PlusTick": 23042,
+          "Buy|MinusTick": 719,
+          "Sell|PlusTick": 676
+        },
+        "buy_plus_over_buy_minus": 32.05,
+        "sell_minus_over_sell_plus": 33.68,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "XRPUSDT",
+      "day": "2023-06-07",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Sell|ZeroMinusTick": 205517,
+          "Sell|PlusTick": 399,
+          "Sell|MinusTick": 127881,
+          "Buy|ZeroMinusTick": 203258,
+          "Buy|PlusTick": 127589,
+          "Buy|MinusTick": 343
+        },
+        "buy_plus_over_buy_minus": 371.98,
+        "sell_minus_over_sell_plus": 320.5,
+        "convention": "AGGRESSOR"
+      }
+    },
+    {
+      "symbol": "XRPUSDT",
+      "day": "2023-11-01",
+      "status": "PASS",
+      "n_bars_raw": 1440,
+      "n_bars_stored": 1440,
+      "n_bars_matched": 1440,
+      "max_rel_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "max_abs_dev": {
+        "Volume": 0.0,
+        "BuyVolume": 0.0,
+        "SellVolume": 0.0
+      },
+      "ntrades_mismatches": 0,
+      "detail": "",
+      "side_convention": {
+        "available": true,
+        "counts": {
+          "Buy|ZeroMinusTick": 198073,
+          "Sell|ZeroMinusTick": 191727,
+          "Buy|PlusTick": 49525,
+          "Sell|MinusTick": 49701,
+          "Sell|PlusTick": 745,
+          "Buy|MinusTick": 586
+        },
+        "buy_plus_over_buy_minus": 84.51,
+        "sell_minus_over_sell_plus": 66.71,
+        "convention": "AGGRESSOR"
+      }
+    }
+  ]
+}

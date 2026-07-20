@@ -24,6 +24,29 @@ pedestal reproduced; **CF-HTFCAP-001 CLOSED (CHARACTERISED, not refuted)** — r
 sub-cost at 8–16h holds; re-open path = new design. Holdout SEALED throughout; EPSOSC 0/2 slots,
 HTFCAP 1/2 (exploratory TEST spend). Chapter at a natural rollover boundary.
 
+**Checkpoint-014 OPENED 2026-07-20 — DESIGN SIGNED (D1–D6 approved; 6 source-adherence
+resolutions signed).** New family **CF-SIGAUC-001 — Signed Auction Structure** REGISTERED: session-anchored
+auction events plus located signed-flow triggers, on 1m bars carrying **exact taker buy/sell
+volume**. Scope = instrument build → statistical spine (master go/no-go) → breadth sweep:
+**INFR-017** (signed-bar catalog lane + A8 provenance audit + seasonal baselines), **INFR-018**
+(anchor race, A6 discriminator race, proxy validation → hash-pinned instrument registry),
+**SPDR-007** (spine, master gate), **SPDR-008** (breadth). Signal tests + model assembly deferred
+to checkpoint-015. **0 counted TEST reads; no TEST contact; holdout SEALED.** Chapter rollover
+remains available and deferred — operator's call, not a blocker.
+
+**INFR-017 COMPLETE 2026-07-20 — QA APPROVE (run 4).** Kill-gate **HYP-I1 PASS**: the taker split
+reproduces bit-exactly from raw Bybit trades and the archive `side` column is confirmed the
+**aggressor** side — the family's founding measurement is verified. **`SpreadBps` pinned UNUSABLE**
+(a mean-print differential, negative in 32.4%/39.9% of BTC/ETH TRAIN minutes; the shared
+`t1_round_trip_spread_bps` passes it through unfloored ⇒ negative cost — flagged for the
+retrospective, blast radius NOT investigated). Frozen for INFR-018: `seasonal_baselines.parquet`
+`1b7244c8…`, `column_pins.json` `e3b9fd9b…`, `SignedBar` + `data/catalog_sigbar/`.
+**Two operator decisions OPEN:** (1) adjudicate a disclosed holdout touch behind the design's
+original headline figures (corrected; one data-quality column's distribution; no shot spent);
+(2) baseline coverage — only 296 of 894 admitted instruments have TRAIN data and 197 reach the
+DESIGN bank, a survivorship-shaped subset, against a family whose thesis is cross-sectional breadth.
+Next: **INFR-018** (anchor race, acceptance-discriminator race, proxy validation).
+
 ## Current Infrastructure Tasks
 
 | Item | Status | Detail |
@@ -41,6 +64,7 @@ HTFCAP 1/2 (exploratory TEST spend). Chapter at a natural rollover boundary.
 | Family | Range | Status |
 |--------|-------|--------|
 | [infrastructure-validation](families/infrastructure-validation/INDEX.md) | VAL-008 | Phase D PASS 2026-07-16 |
+| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018, SPDR-007/008 | **REGISTERED 2026-07-20** (ckpt-014 D1) — INFR-017 COMPLETE (QA APPROVE); INFR-018 next |
 
 New candidate families register at `docs/signal-registry/candidate-families/` when research
 opens.
@@ -49,4 +73,5 @@ opens.
 
 | Checkpoint | Closed | Outcome |
 |---|---|---|
+| [014 — Signed Auction Structure](checkpoints/2026-07-20-014-signed-auction-structure/design.md) | OPEN (2026-07-20) | **DESIGN SIGNED** — D1–D6 approved; CF-SIGAUC-001 REGISTERED; 6 adherence resolutions signed. **INFR-017 COMPLETE (QA APPROVE)** — kill-gate PASS, spread column pinned UNUSABLE, 2 defects caught+fixed, 2 operator decisions open. INFR-018 next. |
 | [013 — Chapter 04 Open: HTFCAP + EPSOSC + Fresh XENA CAL](checkpoints/2026-07-16-013-chapter04-open-htfcap-epsosc-cal/retrospective.md) | 2026-07-19 | Both families closed — CF-EPSOSC-001 RETIRED (refuted 2×, drift pedestal); CF-HTFCAP-001 CLOSED (characterised — real sub-cost gross BTC edge). Apparatus rebuilt on Bybit (fresh CAL pin `abbb1842…`, report-layer framework INFR-016). Holdout SEALED. |

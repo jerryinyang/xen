@@ -1,0 +1,495 @@
+{
+  "item": "INFR-017",
+  "work_items": [
+    "W2",
+    "W3",
+    "W4"
+  ],
+  "generated_utc": "2026-07-20T17:52:47.018666+00:00",
+  "band_note": "TWO DISTINCT SCOPES, do not conflate: 'stored_column_full_train' is the whole TRAIN band (OpenTime < train_end_utc); every 'sample' block and both candidate estimators are the 4 pre-declared sample DAYS only. Figures differ by 1-2 points per symbol for that reason.",
+  "frozen_parameters": {
+    "sample_symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "DOGEUSDT",
+      "XRPUSDT"
+    ],
+    "sample_days": [
+      "2022-09-14",
+      "2023-01-11",
+      "2023-06-07",
+      "2023-11-01"
+    ],
+    "candidates": {
+      "A": "stored definition \u2014 minute MeanBuy \u2212 MeanSell, in bps",
+      "C": "flip-pair \u2014 median |\u0394price| over adjacent side-flipping trades, in bps"
+    },
+    "w3_report_threshold": 0.2
+  },
+  "W2_stored_definition_pin": {
+    "source_file": "python/experiments/INFR-011/scripts/stream_pipeline.py",
+    "source_lines": "day_to_bars, ~L330-356",
+    "MeanBuy": "mean(price) over trades in the minute with side == 'buy'  (taker buy)",
+    "MeanSell": "mean(price) over trades in the minute with side == 'sell' (taker sell)",
+    "SpreadAbs": "MeanBuy - MeanSell",
+    "SpreadBps": "1e4 * SpreadAbs / ((MeanBuy + MeanSell) / 2)",
+    "null_when": "a minute contains trades on only one side (MeanBuy or MeanSell null)",
+    "tick_floor_applied": false,
+    "doc_claim": "docs/references/dataset-reference.md describes this column as having a 'tick-size floor, conservative bias' \u2014 NO tick floor exists in the producing code. Doc and artifact disagree.",
+    "consumer": "xen.evaluation.t1_round_trip_spread_bps returns stress*spread_bps unfloored, so a negative value propagates into bybit_round_trip_cost_bps as negative cost."
+  },
+  "W2_decision": {
+    "chosen": "STORED_COLUMN_UNUSABLE_PLUS_SAMPLE_VALIDATED_REPLACEMENT",
+    "stored_column_status": "UNUSABLE",
+    "stored_column_reason": "SpreadBps = MeanBuy - MeanSell over a whole minute is a difference of mean PRINT prices, so it is dominated by intra-minute drift rather than the bid-ask gap. Measured negative on the FULL TRAIN band in {'BTCUSDT': 32.374, 'ETHUSDT': 39.939, 'SOLUSDT': 24.937, 'DOGEUSDT': 11.506, 'XRPUSDT': 7.282} percent of minutes; a spread is non-negative by construction. Must never be used as a cost input.",
+    "evidence_scopes": {
+      "full_train_band_pct_negative": {
+        "BTCUSDT": 32.374,
+        "ETHUSDT": 39.939,
+        "SOLUSDT": 24.937,
+        "DOGEUSDT": 11.506,
+        "XRPUSDT": 7.282
+      },
+      "sample_days_pct_negative": {
+        "BTCUSDT": 30.99,
+        "ETHUSDT": 40.538,
+        "SOLUSDT": 22.814,
+        "DOGEUSDT": 11.708,
+        "XRPUSDT": 7.593
+      },
+      "note": "these two differ by 1-2 points per symbol because they cover different spans; the decision rests on the FULL TRAIN figures"
+    },
+    "replacement_estimator": {
+      "name": "flip_pair_effective_spread",
+      "definition": "per minute, the MEDIAN of |price_t - price_{t-1}| over adjacent trade pairs whose aggressor side FLIPS; same-side runs excluded (they walk the book, not the spread); median for robustness to drift",
+      "status": "VALIDATED_ON_SAMPLE_ONLY",
+      "evidence": "0.0 percent negative on every sampled symbol ({'BTCUSDT': 0.0, 'ETHUSDT': 0.0, 'SOLUSDT': 0.0, 'DOGEUSDT': 0.0, 'XRPUSDT': 0.0}); lands at the tick floor for wide-tick instruments (DOGE, XRP) and above it for fine-tick ones",
+      "known_bias": "CONSERVATIVE UPPER BOUND, not the quoted spread \u2014 adjacent flips also span real price movement. Right direction of error for a cost floor; must be labelled as such wherever used.",
+      "blocker_to_full_adoption": "requires raw trades, which are not retained in bulk. Validated on 20 symbol-days only. Universe-wide recompute is an INFR-011-scale data operation, outside INFR-017's budget."
+    },
+    "interim_cost_input": "taker RT 11.0 bps + max(one tick, flip-pair estimate where measured) + funding; tick-size floor elsewhere. Never the stored column.",
+    "rejected_options": {
+      "(i) recompute and ship universe-wide": "REJECTED FOR NOW, not on merit \u2014 this is the right answer and the estimator is validated, but it needs a bulk raw-trade re-download that INFR-017 does not budget. Retained as the target state.",
+      "(ii) floor-and-flag the stored column": "REJECTED ON MERIT. Flooring a drift measure at zero does not make it a spread; it would yield a confidently wrong small number precisely where the true spread matters, and would preserve the false impression that the column means something."
+    },
+    "downstream_constraint": "xen.evaluation.t1_round_trip_spread_bps passes its argument through unfloored, so feeding it the stored column produces NEGATIVE cost. Callers must not."
+  },
+  "W3_dependence_verdict": {
+    "threshold": 0.2,
+    "breached": false,
+    "per_symbol": {
+      "BTCUSDT": {
+        "corr_delta_ratio_vs_stored_spread": -0.0314,
+        "ci": [
+          -0.0572,
+          -0.0056
+        ],
+        "corr_delta_ratio_vs_flip_pair": -0.0045
+      },
+      "ETHUSDT": {
+        "corr_delta_ratio_vs_stored_spread": -0.0275,
+        "ci": [
+          -0.0533,
+          -0.0017
+        ],
+        "corr_delta_ratio_vs_flip_pair": 0.0071
+      },
+      "SOLUSDT": {
+        "corr_delta_ratio_vs_stored_spread": -0.0191,
+        "ci": [
+          -0.0449,
+          0.0068
+        ],
+        "corr_delta_ratio_vs_flip_pair": 0.0117
+      },
+      "DOGEUSDT": {
+        "corr_delta_ratio_vs_stored_spread": 0.0059,
+        "ci": [
+          -0.0216,
+          0.0335
+        ],
+        "corr_delta_ratio_vs_flip_pair": -0.0021
+      },
+      "XRPUSDT": {
+        "corr_delta_ratio_vs_stored_spread": -0.0478,
+        "ci": [
+          -0.0739,
+          -0.0216
+        ],
+        "corr_delta_ratio_vs_flip_pair": 0.0069
+      }
+    },
+    "constraint": "NOT BINDING: measured dependence is far below threshold; the spread-regime layer may be treated as separable from bar-flow reads despite the shared source",
+    "caveat": "Fisher-z CI assumes independent observations; these are minute-level and autocorrelated, so the CI is NOT dependence-honest. Disclosure only."
+  },
+  "W4_ntrades_verdict": {
+    "usable": true,
+    "quantity": "average trade size = Volume / NTrades",
+    "role": "z-scored participation CONFIDENCE MULTIPLIER only",
+    "never": "a standalone signal (source Part 5)",
+    "mandatory_caveat": "average trade size drifts secularly with order-splitting, so seasonal normalisation per A5 is mandatory before any threshold is applied",
+    "per_symbol_median_base_units": {
+      "BTCUSDT": 0.14561,
+      "ETHUSDT": 1.431715,
+      "SOLUSDT": 29.318583,
+      "DOGEUSDT": 5225.133403,
+      "XRPUSDT": 1333.64878
+    }
+  },
+  "per_symbol": {
+    "BTCUSDT": {
+      "stored_column_full_train": {
+        "n": 750081,
+        "pct_negative": 32.374,
+        "q01": -2.26186,
+        "q25": -0.1223,
+        "median": 0.14727,
+        "q75": 0.50547,
+        "q99": 4.2911,
+        "available": true,
+        "null_count": 158,
+        "scope": "FULL TRAIN band (OpenTime < train_end_utc)"
+      },
+      "sample": {
+        "days_used": [
+          "2022-09-14",
+          "2023-01-11",
+          "2023-06-07",
+          "2023-11-01"
+        ],
+        "tick_size": 0.1,
+        "scope": "4 pre-declared SAMPLE DAYS only \u2014 not the full TRAIN band",
+        "candidate_A_stored_definition": {
+          "n": 5760,
+          "pct_negative": 30.99,
+          "q01": -2.41852,
+          "q25": -0.11159,
+          "median": 0.2789,
+          "q75": 0.65239,
+          "q99": 5.03513
+        },
+        "candidate_C_flip_pair": {
+          "n": 5760,
+          "pct_negative": 0.0,
+          "q01": 0.02822,
+          "q25": 0.03668,
+          "median": 0.24421,
+          "q75": 0.27855,
+          "q99": 0.28821
+        },
+        "median_flips_per_minute": 63.0,
+        "w3_dependence_delta_ratio_vs_spread": {
+          "stored_column": {
+            "n": 5760,
+            "corr": -0.0314,
+            "ci_low": -0.0572,
+            "ci_high": -0.0056
+          },
+          "flip_pair_estimator": {
+            "n": 5760,
+            "corr": -0.0045,
+            "ci_low": -0.0303,
+            "ci_high": 0.0213
+          }
+        },
+        "w4_avg_trade_size": {
+          "n": 5760,
+          "median": 0.14561,
+          "q01": 0.040333,
+          "q99": 0.41023
+        }
+      },
+      "one_tick_bps": 0.04289
+    },
+    "ETHUSDT": {
+      "stored_column_full_train": {
+        "n": 745563,
+        "pct_negative": 39.939,
+        "q01": -3.16937,
+        "q25": -0.34229,
+        "median": 0.07697,
+        "q75": 0.64718,
+        "q99": 4.96568,
+        "available": true,
+        "null_count": 4543,
+        "scope": "FULL TRAIN band (OpenTime < train_end_utc)"
+      },
+      "sample": {
+        "days_used": [
+          "2022-09-14",
+          "2023-01-11",
+          "2023-06-07",
+          "2023-11-01"
+        ],
+        "tick_size": 0.01,
+        "scope": "4 pre-declared SAMPLE DAYS only \u2014 not the full TRAIN band",
+        "candidate_A_stored_definition": {
+          "n": 5760,
+          "pct_negative": 40.538,
+          "q01": -3.44109,
+          "q25": -0.38958,
+          "median": 0.16384,
+          "q75": 0.70704,
+          "q99": 5.41473
+        },
+        "candidate_C_flip_pair": {
+          "n": 5760,
+          "pct_negative": 0.0,
+          "q01": 0.05311,
+          "q25": 0.05435,
+          "median": 0.30495,
+          "q75": 0.35995,
+          "q99": 0.37759
+        },
+        "median_flips_per_minute": 30.0,
+        "w3_dependence_delta_ratio_vs_spread": {
+          "stored_column": {
+            "n": 5760,
+            "corr": -0.0275,
+            "ci_low": -0.0533,
+            "ci_high": -0.0017
+          },
+          "flip_pair_estimator": {
+            "n": 5760,
+            "corr": 0.0071,
+            "ci_low": -0.0188,
+            "ci_high": 0.0329
+          }
+        },
+        "w4_avg_trade_size": {
+          "n": 5760,
+          "median": 1.431715,
+          "q01": 0.303119,
+          "q99": 5.252856
+        }
+      },
+      "one_tick_bps": 0.05836
+    },
+    "SOLUSDT": {
+      "stored_column_full_train": {
+        "n": 744336,
+        "pct_negative": 24.937,
+        "q01": -4.36002,
+        "q25": 0.0,
+        "median": 0.9098,
+        "q75": 2.60346,
+        "q99": 11.59349,
+        "available": true,
+        "null_count": 6951,
+        "scope": "FULL TRAIN band (OpenTime < train_end_utc)"
+      },
+      "sample": {
+        "days_used": [
+          "2022-09-14",
+          "2023-01-11",
+          "2023-06-07",
+          "2023-11-01"
+        ],
+        "tick_size": 0.001,
+        "scope": "4 pre-declared SAMPLE DAYS only \u2014 not the full TRAIN band",
+        "candidate_A_stored_definition": {
+          "n": 5742,
+          "pct_negative": 22.814,
+          "q01": -4.88301,
+          "q25": 0.12445,
+          "median": 1.53241,
+          "q75": 3.26075,
+          "q99": 11.89082
+        },
+        "candidate_C_flip_pair": {
+          "n": 5747,
+          "pct_negative": 0.0,
+          "q01": 0.22799,
+          "q25": 0.48987,
+          "median": 0.72678,
+          "q75": 3.04692,
+          "q99": 3.24359
+        },
+        "median_flips_per_minute": 31.0,
+        "w3_dependence_delta_ratio_vs_spread": {
+          "stored_column": {
+            "n": 5742,
+            "corr": -0.0191,
+            "ci_low": -0.0449,
+            "ci_high": 0.0068
+          },
+          "flip_pair_estimator": {
+            "n": 5747,
+            "corr": 0.0117,
+            "ci_low": -0.0141,
+            "ci_high": 0.0376
+          }
+        },
+        "w4_avg_trade_size": {
+          "n": 5760,
+          "median": 29.318583,
+          "q01": 3.788594,
+          "q99": 184.39862
+        }
+      },
+      "one_tick_bps": 0.37564
+    },
+    "DOGEUSDT": {
+      "stored_column_full_train": {
+        "n": 662099,
+        "pct_negative": 11.506,
+        "q01": -3.14354,
+        "q25": 0.73022,
+        "median": 1.51261,
+        "q75": 3.22946,
+        "q99": 18.01292,
+        "available": true,
+        "null_count": 69125,
+        "scope": "FULL TRAIN band (OpenTime < train_end_utc)"
+      },
+      "sample": {
+        "days_used": [
+          "2022-09-14",
+          "2023-01-11",
+          "2023-06-07",
+          "2023-11-01"
+        ],
+        "tick_size": 1e-05,
+        "scope": "4 pre-declared SAMPLE DAYS only \u2014 not the full TRAIN band",
+        "candidate_A_stored_definition": {
+          "n": 5065,
+          "pct_negative": 11.708,
+          "q01": -2.93397,
+          "q25": 0.65978,
+          "median": 1.4513,
+          "q75": 2.68425,
+          "q99": 16.65279
+        },
+        "candidate_C_flip_pair": {
+          "n": 5311,
+          "pct_negative": 0.0,
+          "q01": 0.0,
+          "q25": 1.3132,
+          "median": 1.47037,
+          "q75": 1.49633,
+          "q99": 16.66667
+        },
+        "median_flips_per_minute": 12.0,
+        "w3_dependence_delta_ratio_vs_spread": {
+          "stored_column": {
+            "n": 5065,
+            "corr": 0.0059,
+            "ci_low": -0.0216,
+            "ci_high": 0.0335
+          },
+          "flip_pair_estimator": {
+            "n": 5311,
+            "corr": -0.0021,
+            "ci_low": -0.029,
+            "ci_high": 0.0248
+          }
+        },
+        "w4_avg_trade_size": {
+          "n": 5618,
+          "median": 5225.133403,
+          "q01": 4.517,
+          "q99": 43622.19381
+        }
+      },
+      "one_tick_bps": 1.47732
+    },
+    "XRPUSDT": {
+      "stored_column_full_train": {
+        "n": 733587,
+        "pct_negative": 7.282,
+        "q01": -2.76946,
+        "q25": 1.22127,
+        "median": 1.98275,
+        "q75": 2.74571,
+        "q99": 8.95501,
+        "available": true,
+        "null_count": 15465,
+        "scope": "FULL TRAIN band (OpenTime < train_end_utc)"
+      },
+      "sample": {
+        "days_used": [
+          "2022-09-14",
+          "2023-01-11",
+          "2023-06-07",
+          "2023-11-01"
+        ],
+        "tick_size": 0.0001,
+        "scope": "4 pre-declared SAMPLE DAYS only \u2014 not the full TRAIN band",
+        "candidate_A_stored_definition": {
+          "n": 5584,
+          "pct_negative": 7.593,
+          "q01": -2.84047,
+          "q25": 1.18736,
+          "median": 2.01456,
+          "q75": 3.06204,
+          "q99": 8.81426
+        },
+        "candidate_C_flip_pair": {
+          "n": 5667,
+          "pct_negative": 0.0,
+          "q01": 0.0,
+          "q25": 1.68152,
+          "median": 1.92901,
+          "q75": 2.77316,
+          "q99": 3.00391
+        },
+        "median_flips_per_minute": 34.0,
+        "w3_dependence_delta_ratio_vs_spread": {
+          "stored_column": {
+            "n": 5584,
+            "corr": -0.0478,
+            "ci_low": -0.0739,
+            "ci_high": -0.0216
+          },
+          "flip_pair_estimator": {
+            "n": 5667,
+            "corr": 0.0069,
+            "ci_low": -0.0191,
+            "ci_high": 0.033
+          }
+        },
+        "w4_avg_trade_size": {
+          "n": 5747,
+          "median": 1333.64878,
+          "q01": 70.679044,
+          "q99": 10001.844
+        }
+      },
+      "one_tick_bps": 1.96541
+    }
+  },
+  "summary": {
+    "BTCUSDT": {
+      "stored_pct_negative": 30.99,
+      "flip_pct_negative": 0.0,
+      "flip_median_bps": 0.24421,
+      "one_tick_bps": 0.04289
+    },
+    "ETHUSDT": {
+      "stored_pct_negative": 40.538,
+      "flip_pct_negative": 0.0,
+      "flip_median_bps": 0.30495,
+      "one_tick_bps": 0.05836
+    },
+    "SOLUSDT": {
+      "stored_pct_negative": 22.814,
+      "flip_pct_negative": 0.0,
+      "flip_median_bps": 0.72678,
+      "one_tick_bps": 0.37564
+    },
+    "DOGEUSDT": {
+      "stored_pct_negative": 11.708,
+      "flip_pct_negative": 0.0,
+      "flip_median_bps": 1.47037,
+      "one_tick_bps": 1.47732
+    },
+    "XRPUSDT": {
+      "stored_pct_negative": 7.593,
+      "flip_pct_negative": 0.0,
+      "flip_median_bps": 1.92901,
+      "one_tick_bps": 1.96541
+    }
+  },
+  "pin_sha256": "e3b9fd9b9b5851b8a9a11f9ce34cd1e0fa8e10ea1fe1b210bd0090da379e6225"
+}

@@ -1,0 +1,100 @@
+{
+  "item": "INFR-017",
+  "work_item": "W7",
+  "generated_utc": "2026-07-20T17:41:12.914827+00:00",
+  "n_staging_files": 904,
+  "n_ledger_rows": 910,
+  "n_admitted": 894,
+  "staged_not_admitted": [
+    "BTTUSDT",
+    "COCOSUSDT",
+    "FDUSDUSDT",
+    "KASUSDT",
+    "LTOUSDT",
+    "PIXFIUSDT",
+    "RAYUSDT",
+    "RONUSDT",
+    "STRAXUSDT",
+    "ZCXUSDT"
+  ],
+  "admitted_not_staged": [],
+  "admission_values": {
+    "ADMITTED": 894,
+    "SPEC_INCOMPLETE": 9,
+    "NO_BARS": 1,
+    "FAIL_CORRUPT": 1,
+    "OMITTED_OPERATOR": 5
+  },
+  "rule": "the signed lane inherits ADMITTED status; non-ADMITTED symbols are excluded with a reason",
+  "band_coverage": {
+    "note": "the 4-year trailing history cap plus late listings mean most admitted instruments have no readable TRAIN data; breadth is bounded by these counts, not by the admitted total",
+    "n_admitted": 894,
+    "n_with_bars_before_train_end": 296,
+    "train_end_utc": "2023-12-18T00:00:00Z",
+    "n_with_bars_before_design_bank_end": 197,
+    "design_bank_end_utc": "2023-03-01T00:00:00Z",
+    "survivorship_caveat": "instruments with DESIGN-bank data are precisely those listed before the bank end \u2014 a survivorship-shaped subset of the cross-section"
+  },
+  "excluded_with_reason": [
+    {
+      "symbol": "BTTUSDT",
+      "admission": "SPEC_INCOMPLETE",
+      "spec_source": "SPEC_INCOMPLETE",
+      "invariants_pass": true
+    },
+    {
+      "symbol": "COCOSUSDT",
+      "admission": "SPEC_INCOMPLETE",
+      "spec_source": "SPEC_INCOMPLETE",
+      "invariants_pass": true
+    },
+    {
+      "symbol": "FDUSDUSDT",
+      "admission": "SPEC_INCOMPLETE",
+      "spec_source": "SPEC_INCOMPLETE",
+      "invariants_pass": true
+    },
+    {
+      "symbol": "KASUSDT",
+      "admission": "FAIL_CORRUPT",
+      "spec_source": null,
+      "invariants_pass": null
+    },
+    {
+      "symbol": "LTOUSDT",
+      "admission": "SPEC_INCOMPLETE",
+      "spec_source": "SPEC_INCOMPLETE",
+      "invariants_pass": true
+    },
+    {
+      "symbol": "PIXFIUSDT",
+      "admission": "SPEC_INCOMPLETE",
+      "spec_source": "SPEC_INCOMPLETE",
+      "invariants_pass": true
+    },
+    {
+      "symbol": "RAYUSDT",
+      "admission": "SPEC_INCOMPLETE",
+      "spec_source": "SPEC_INCOMPLETE",
+      "invariants_pass": true
+    },
+    {
+      "symbol": "RONUSDT",
+      "admission": "SPEC_INCOMPLETE",
+      "spec_source": "SPEC_INCOMPLETE",
+      "invariants_pass": true
+    },
+    {
+      "symbol": "STRAXUSDT",
+      "admission": "SPEC_INCOMPLETE",
+      "spec_source": "SPEC_INCOMPLETE",
+      "invariants_pass": true
+    },
+    {
+      "symbol": "ZCXUSDT",
+      "admission": "SPEC_INCOMPLETE",
+      "spec_source": "SPEC_INCOMPLETE",
+      "invariants_pass": true
+    }
+  ]
+}

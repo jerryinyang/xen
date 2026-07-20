@@ -1,0 +1,106 @@
+{
+  "item": "INFR-017",
+  "work_item": "W5",
+  "generated_utc": "2026-07-20T17:58:51.237492+00:00",
+  "pipeline_version": "sigbar-0.1.0",
+  "catalog_root": "data/catalog_sigbar",
+  "catalog_note": "separate root from data/catalog/ \u2014 the pinned OHLCV catalog and its fence manifest sha are untouched; the signed lane is additive",
+  "fence": {
+    "manifest_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+    "analysis_start_utc": "2021-06-29T06:53:00+00:00",
+    "train_end_utc": "2023-12-18T00:00:00+00:00",
+    "band_used": "TRAIN"
+  },
+  "roundtrip": {
+    "w2_spread_status_from_pin": "UNUSABLE",
+    "w2_pin_sha256": "e3b9fd9b9b5851b8a9a11f9ce34cd1e0fa8e10ea1fe1b210bd0090da379e6225",
+    "validation_day": "2023-01-11",
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT"
+    ],
+    "signed_fields_checked": [
+      "BuyVolume->buy_volume",
+      "Close->close",
+      "Delta->delta",
+      "High->high",
+      "Low->low",
+      "NTrades->n_trades",
+      "Open->open",
+      "SellVolume->sell_volume",
+      "SpreadBps->spread_feature(+status)",
+      "Volume->volume",
+      "ts_event (join key)"
+    ],
+    "per_symbol": {
+      "BTCUSDT": {
+        "compared_against": "staging source (not the written objects)",
+        "n_source_rows": 1440,
+        "n_written": 1440,
+        "n_read_back": 1440,
+        "count_match": true,
+        "field_mismatches": {
+          "Open->open": 0,
+          "High->high": 0,
+          "Low->low": 0,
+          "Close->close": 0,
+          "Volume->volume": 0,
+          "BuyVolume->buy_volume": 0,
+          "SellVolume->sell_volume": 0,
+          "NTrades->n_trades": 0,
+          "Delta->delta": 0,
+          "SpreadBps->spread_feature(+status)": 0
+        },
+        "n_joined_on_ts": 1440,
+        "split_invariant_violations": 0,
+        "exact_match": true
+      },
+      "ETHUSDT": {
+        "compared_against": "staging source (not the written objects)",
+        "n_source_rows": 1440,
+        "n_written": 1440,
+        "n_read_back": 1440,
+        "count_match": true,
+        "field_mismatches": {
+          "Open->open": 0,
+          "High->high": 0,
+          "Low->low": 0,
+          "Close->close": 0,
+          "Volume->volume": 0,
+          "BuyVolume->buy_volume": 0,
+          "SellVolume->sell_volume": 0,
+          "NTrades->n_trades": 0,
+          "Delta->delta": 0,
+          "SpreadBps->spread_feature(+status)": 0
+        },
+        "n_joined_on_ts": 1440,
+        "split_invariant_violations": 0,
+        "exact_match": true
+      },
+      "SOLUSDT": {
+        "compared_against": "staging source (not the written objects)",
+        "n_source_rows": 1440,
+        "n_written": 1440,
+        "n_read_back": 1440,
+        "count_match": true,
+        "field_mismatches": {
+          "Open->open": 0,
+          "High->high": 0,
+          "Low->low": 0,
+          "Close->close": 0,
+          "Volume->volume": 0,
+          "BuyVolume->buy_volume": 0,
+          "SellVolume->sell_volume": 0,
+          "NTrades->n_trades": 0,
+          "Delta->delta": 0,
+          "SpreadBps->spread_feature(+status)": 0
+        },
+        "n_joined_on_ts": 1440,
+        "split_invariant_violations": 0,
+        "exact_match": true
+      }
+    },
+    "all_exact": true
+  }
+}
