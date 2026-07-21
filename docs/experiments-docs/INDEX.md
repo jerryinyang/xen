@@ -81,6 +81,24 @@ NO_MATERIAL_EDGE, bite 0.53–0.92; holdout SEALED). New module `xen.sigbar.trap
 Phases 0–5 COMPLETE.** Signed-value block (S9/S14) = ckpt-015 Phase 6, distinct claim. Family status
 **unchanged (REGISTERED)** — keep/close is the ckpt-014 retrospective. **0 counted reads.**
 
+**Checkpoint-014 CLOSED 2026-07-21 (operator-directed retrospective).** Phases 0–5 complete; four
+TRAIN-only items; 0 counted TEST reads; holdout SEALED throughout. **CF-SIGAUC-001 KEPT `REGISTERED`
+— no transition** (closure gated on a third powered null, S9 absorption, per designer **Addendum v1.1
+§3.3**). Grades converted to empirical state (Addendum v1.1 Part 1): **S1 DEMOTED** (operational anchor
+only), **S3 Δ+ DELETED** (binary-mechanism rule), S2/S3-base/A6/A8 CONFIRMED-as-measurement, §2.5 spread
+layer UNAVAILABLE. The addendum adds 10 protocol rules (Part 2) and a revised path (Part 3) superseding
+Appendix B Phase 6 onward. Retrospective: `checkpoints/2026-07-20-014-signed-auction-structure/retrospective.md`.
+
+**Checkpoint-015 OPENED 2026-07-21 — DESIGN SIGNED (operator D1–D5 approved; rollover DEFERRED
+INDEFINITELY). Next act: SPDR-009 → Stage 1 (quant-designer).**
+The signed-value screen: **SPDR-009** — S9 signed-absorption **marginal-value** master go/no-go (does
+signed absorption add value over the unsigned Climax-hold class on identical events — the thesis that
+exact delta pays *where price is blind*; gate-free, location-qualified); **SPDR-010** — S14 CVD-divergence
+rider (memo-gated so it cannot launder the S3 null); **INFR-019** — tick-floored per-symbol spread
+reconstruction (parallel, non-blocking; prerequisite for any net breadth claim). **Closure rule:** third
+powered null ⇒ close the family on the session horizon; soil ⇒ depth spend authorised. 0 counted reads;
+holdout SEALED. Design: `checkpoints/2026-07-21-015-signed-value-absorption-screen/design.md`.
+
 ## Current Infrastructure Tasks
 
 | Item | Status | Detail |
@@ -98,7 +116,7 @@ Phases 0–5 COMPLETE.** Signed-value block (S9/S14) = ckpt-015 Phase 6, distinc
 | Family | Range | Status |
 |--------|-------|--------|
 | [infrastructure-validation](families/infrastructure-validation/INDEX.md) | VAL-008 | Phase D PASS 2026-07-16 |
-| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018, SPDR-007/008 | **REGISTERED 2026-07-20** (ckpt-014 D1) — INFR-017/018 COMPLETE; **SPDR-007 COMPLETE — NOT_WORTH** (price-only spine, P-01); **SPDR-008 COMPLETE — NOT_WORTH** (signed-trap breadth: measured trap-load monotonicity a powered null on all 3 boundaries; only reproducing edge is unsigned P-01 geometry). **Ckpt-014 Phases 0–5 COMPLETE**; signed-value block (S9/S14) = ckpt-015 |
+| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018, SPDR-007/008 → ckpt-015 SPDR-009/010, INFR-019 | **REGISTERED 2026-07-20** — INFR-017/018 COMPLETE; **SPDR-007 NOT_WORTH** (price-only spine, P-01); **SPDR-008 NOT_WORTH** (signed-trap breadth, powered null; only unsigned P-01 geometry reproduces). **Ckpt-014 CLOSED 2026-07-21 — family KEPT REGISTERED** (Addendum v1.1: closure needs the S9 3rd null). Grades: S1 DEMOTED, S3 Δ+ DELETED, S2/S3-base/A6/A8 CONFIRMED-as-measurement. **Ckpt-015 (DRAFT, D1–D5 pending):** SPDR-009 S9 absorption marginal-value master gate; SPDR-010 S14 divergence; INFR-019 spread |
 
 New candidate families register at `docs/signal-registry/candidate-families/` when research
 opens.
@@ -107,5 +125,6 @@ opens.
 
 | Checkpoint | Closed | Outcome |
 |---|---|---|
-| [014 — Signed Auction Structure](checkpoints/2026-07-20-014-signed-auction-structure/design.md) | OPEN (2026-07-20) | **DESIGN SIGNED** — D1–D6 approved; CF-SIGAUC-001 REGISTERED. **INFR-017/018 COMPLETE** (registry pin `5c386984…`). **SPDR-007 COMPLETE — NOT_WORTH** (price-only spine, P-01). **SPDR-008 COMPLETE — NOT_WORTH** (signed-trap breadth: trap-load monotonicity a powered null on all 3 independent boundaries; K=3 noise; only reproducing edge is unsigned P-01 geometry — measured flow adds nothing). **Phases 0–5 COMPLETE; ready for the ckpt-014 retrospective.** Signed-value block → ckpt-015 Phase 6. |
+| [015 — Signed Value: the Absorption Screen](checkpoints/2026-07-21-015-signed-value-absorption-screen/design.md) | OPEN (2026-07-21) | **DESIGN SIGNED — D1–D5 approved; rollover deferred indefinitely; SPDR-009 → Stage 1 next.** Implements Addendum v1.1 Part 3: **SPDR-009** S9 absorption marginal-value master go/no-go (signed − unsigned on identical events; "delta pays where price is blind"; gate-free, location-qualified), **SPDR-010** S14 divergence rider (memo-gated), **INFR-019** tick-floored spread (parallel). Closure rule: third powered null closes the family (session horizon); soil ⇒ depth spend. 0 reads; holdout SEALED. |
+| [014 — Signed Auction Structure](checkpoints/2026-07-20-014-signed-auction-structure/retrospective.md) | 2026-07-21 | **CLOSED — family CF-SIGAUC-001 KEPT REGISTERED** (no transition; closure gated on the S9 3rd null per Addendum v1.1 §3.3). Phases 0–5 complete, four TRAIN-only items, **0 counted reads, holdout SEALED**. Data premise CONFIRMED (exact taker delta is a measurement, A8 bit-exact); **both tested edges failed** — price-only spine P-01 (SPDR-007), S3 signed trap-load a powered null (SPDR-008). Grades: S1 DEMOTED, S3 Δ+ DELETED, S2/S3-base/A6/A8 CONFIRMED-as-measurement. Flagship claim (S9/S14, "signed value where price is blind") untested → carried to ckpt-015. |
 | [013 — Chapter 04 Open: HTFCAP + EPSOSC + Fresh XENA CAL](checkpoints/2026-07-16-013-chapter04-open-htfcap-epsosc-cal/retrospective.md) | 2026-07-19 | Both families closed — CF-EPSOSC-001 RETIRED (refuted 2×, drift pedestal); CF-HTFCAP-001 CLOSED (characterised — real sub-cost gross BTC edge). Apparatus rebuilt on Bybit (fresh CAL pin `abbb1842…`, report-layer framework INFR-016). Holdout SEALED. |
