@@ -1,0 +1,992 @@
+{
+  "class": "future_destroy (HARD)",
+  "status": "NO_MATERIAL_EDGE_TRIPWIRE_UNINFORMATIVE",
+  "raw_excursion_contrast_median": 0.0898809523809746,
+  "raw_ci": [
+    -0.23134479271990682,
+    0.3203463203463277
+  ],
+  "raw_ci_excludes_zero": false,
+  "swapped_excursion_contrast_median": -0.4136904761904956,
+  "swapped_ci": [
+    -0.7724137931034725,
+    -0.17961711711710665
+  ],
+  "collapse_fraction": -4.602649006621594,
+  "survives": false,
+  "positive_control_bite": {
+    "corr": 0.7711989151117775,
+    "n": 3561,
+    "bite": true,
+    "note": "corr(swapped price MFE, donor real price MFE); >0.5 proves the swap installed the donor outcome into the bars the reads consume"
+  },
+  "coverage": [
+    {
+      "symbol": "10000NFTUSDT",
+      "n_input": 145,
+      "n_spliced": 76,
+      "n_no_donor": 69,
+      "spliced_fraction": 0.5241379310344828
+    },
+    {
+      "symbol": "1000BONKUSDT",
+      "n_input": 18,
+      "n_spliced": 8,
+      "n_no_donor": 10,
+      "spliced_fraction": 0.4444444444444444
+    },
+    {
+      "symbol": "1000LUNCUSDT",
+      "n_input": 45,
+      "n_spliced": 23,
+      "n_no_donor": 22,
+      "spliced_fraction": 0.5111111111111111
+    },
+    {
+      "symbol": "1000XECUSDT",
+      "n_input": 59,
+      "n_spliced": 31,
+      "n_no_donor": 28,
+      "spliced_fraction": 0.5254237288135594
+    },
+    {
+      "symbol": "AAVEUSDT",
+      "n_input": 64,
+      "n_spliced": 31,
+      "n_no_donor": 33,
+      "spliced_fraction": 0.484375
+    },
+    {
+      "symbol": "ACHUSDT",
+      "n_input": 10,
+      "n_spliced": 4,
+      "n_no_donor": 6,
+      "spliced_fraction": 0.4
+    },
+    {
+      "symbol": "ADAUSDT",
+      "n_input": 117,
+      "n_spliced": 63,
+      "n_no_donor": 54,
+      "spliced_fraction": 0.5384615384615384
+    },
+    {
+      "symbol": "AGIXUSDT",
+      "n_input": 10,
+      "n_spliced": 6,
+      "n_no_donor": 4,
+      "spliced_fraction": 0.6
+    },
+    {
+      "symbol": "AKROUSDT",
+      "n_input": 10,
+      "n_spliced": 5,
+      "n_no_donor": 5,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "ALGOUSDT",
+      "n_input": 20,
+      "n_spliced": 8,
+      "n_no_donor": 12,
+      "spliced_fraction": 0.4
+    },
+    {
+      "symbol": "ALPHAUSDT",
+      "n_input": 32,
+      "n_spliced": 17,
+      "n_no_donor": 15,
+      "spliced_fraction": 0.53125
+    },
+    {
+      "symbol": "ANCUSDT",
+      "n_input": 19,
+      "n_spliced": 7,
+      "n_no_donor": 12,
+      "spliced_fraction": 0.3684210526315789
+    },
+    {
+      "symbol": "ANKRUSDT",
+      "n_input": 12,
+      "n_spliced": 8,
+      "n_no_donor": 4,
+      "spliced_fraction": 0.6666666666666666
+    },
+    {
+      "symbol": "ANTUSDT",
+      "n_input": 68,
+      "n_spliced": 34,
+      "n_no_donor": 34,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "APEUSDT",
+      "n_input": 110,
+      "n_spliced": 52,
+      "n_no_donor": 58,
+      "spliced_fraction": 0.4727272727272727
+    },
+    {
+      "symbol": "APTUSDT",
+      "n_input": 49,
+      "n_spliced": 26,
+      "n_no_donor": 23,
+      "spliced_fraction": 0.5306122448979592
+    },
+    {
+      "symbol": "ARPAUSDT",
+      "n_input": 5,
+      "n_spliced": 2,
+      "n_no_donor": 3,
+      "spliced_fraction": 0.4
+    },
+    {
+      "symbol": "ARUSDT",
+      "n_input": 21,
+      "n_spliced": 9,
+      "n_no_donor": 12,
+      "spliced_fraction": 0.42857142857142855
+    },
+    {
+      "symbol": "ATOMUSDT",
+      "n_input": 99,
+      "n_spliced": 52,
+      "n_no_donor": 47,
+      "spliced_fraction": 0.5252525252525253
+    },
+    {
+      "symbol": "AUDIOUSDT",
+      "n_input": 100,
+      "n_spliced": 48,
+      "n_no_donor": 52,
+      "spliced_fraction": 0.48
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "n_input": 85,
+      "n_spliced": 41,
+      "n_no_donor": 44,
+      "spliced_fraction": 0.4823529411764706
+    },
+    {
+      "symbol": "AXSUSDT",
+      "n_input": 74,
+      "n_spliced": 36,
+      "n_no_donor": 38,
+      "spliced_fraction": 0.4864864864864865
+    },
+    {
+      "symbol": "BAKEUSDT",
+      "n_input": 19,
+      "n_spliced": 10,
+      "n_no_donor": 9,
+      "spliced_fraction": 0.5263157894736842
+    },
+    {
+      "symbol": "BALUSDT",
+      "n_input": 18,
+      "n_spliced": 8,
+      "n_no_donor": 10,
+      "spliced_fraction": 0.4444444444444444
+    },
+    {
+      "symbol": "BANDUSDT",
+      "n_input": 17,
+      "n_spliced": 10,
+      "n_no_donor": 7,
+      "spliced_fraction": 0.5882352941176471
+    },
+    {
+      "symbol": "BCHUSDT",
+      "n_input": 31,
+      "n_spliced": 16,
+      "n_no_donor": 15,
+      "spliced_fraction": 0.5161290322580645
+    },
+    {
+      "symbol": "BELUSDT",
+      "n_input": 21,
+      "n_spliced": 10,
+      "n_no_donor": 11,
+      "spliced_fraction": 0.47619047619047616
+    },
+    {
+      "symbol": "BLURUSDT",
+      "n_input": 5,
+      "n_spliced": 3,
+      "n_no_donor": 2,
+      "spliced_fraction": 0.6
+    },
+    {
+      "symbol": "BLZUSDT",
+      "n_input": 22,
+      "n_spliced": 11,
+      "n_no_donor": 11,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "BNBUSDT",
+      "n_input": 107,
+      "n_spliced": 52,
+      "n_no_donor": 55,
+      "spliced_fraction": 0.48598130841121495
+    },
+    {
+      "symbol": "BNXUSDT",
+      "n_input": 32,
+      "n_spliced": 16,
+      "n_no_donor": 16,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "BSWUSDT",
+      "n_input": 42,
+      "n_spliced": 20,
+      "n_no_donor": 22,
+      "spliced_fraction": 0.47619047619047616
+    },
+    {
+      "symbol": "BTCUSDT",
+      "n_input": 114,
+      "n_spliced": 59,
+      "n_no_donor": 55,
+      "spliced_fraction": 0.5175438596491229
+    },
+    {
+      "symbol": "CELOUSDT",
+      "n_input": 5,
+      "n_spliced": 3,
+      "n_no_donor": 2,
+      "spliced_fraction": 0.6
+    },
+    {
+      "symbol": "CELRUSDT",
+      "n_input": 93,
+      "n_spliced": 48,
+      "n_no_donor": 45,
+      "spliced_fraction": 0.5161290322580645
+    },
+    {
+      "symbol": "CHZUSDT",
+      "n_input": 103,
+      "n_spliced": 56,
+      "n_no_donor": 47,
+      "spliced_fraction": 0.5436893203883495
+    },
+    {
+      "symbol": "COREUSDT",
+      "n_input": 6,
+      "n_spliced": 2,
+      "n_no_donor": 4,
+      "spliced_fraction": 0.3333333333333333
+    },
+    {
+      "symbol": "CREAMUSDT",
+      "n_input": 31,
+      "n_spliced": 15,
+      "n_no_donor": 16,
+      "spliced_fraction": 0.4838709677419355
+    },
+    {
+      "symbol": "CROUSDT",
+      "n_input": 11,
+      "n_spliced": 5,
+      "n_no_donor": 6,
+      "spliced_fraction": 0.45454545454545453
+    },
+    {
+      "symbol": "CRVUSDT",
+      "n_input": 55,
+      "n_spliced": 30,
+      "n_no_donor": 25,
+      "spliced_fraction": 0.5454545454545454
+    },
+    {
+      "symbol": "CTCUSDT",
+      "n_input": 8,
+      "n_spliced": 4,
+      "n_no_donor": 4,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "CTKUSDT",
+      "n_input": 5,
+      "n_spliced": 2,
+      "n_no_donor": 3,
+      "spliced_fraction": 0.4
+    },
+    {
+      "symbol": "CTSIUSDT",
+      "n_input": 26,
+      "n_spliced": 14,
+      "n_no_donor": 12,
+      "spliced_fraction": 0.5384615384615384
+    },
+    {
+      "symbol": "DARUSDT",
+      "n_input": 16,
+      "n_spliced": 8,
+      "n_no_donor": 8,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "DENTUSDT",
+      "n_input": 26,
+      "n_spliced": 12,
+      "n_no_donor": 14,
+      "spliced_fraction": 0.46153846153846156
+    },
+    {
+      "symbol": "DGBUSDT",
+      "n_input": 17,
+      "n_spliced": 6,
+      "n_no_donor": 11,
+      "spliced_fraction": 0.35294117647058826
+    },
+    {
+      "symbol": "DODOUSDT",
+      "n_input": 35,
+      "n_spliced": 16,
+      "n_no_donor": 19,
+      "spliced_fraction": 0.45714285714285713
+    },
+    {
+      "symbol": "DOGEUSDT",
+      "n_input": 85,
+      "n_spliced": 45,
+      "n_no_donor": 40,
+      "spliced_fraction": 0.5294117647058824
+    },
+    {
+      "symbol": "DOTUSDT",
+      "n_input": 87,
+      "n_spliced": 43,
+      "n_no_donor": 44,
+      "spliced_fraction": 0.4942528735632184
+    },
+    {
+      "symbol": "DUSKUSDT",
+      "n_input": 15,
+      "n_spliced": 6,
+      "n_no_donor": 9,
+      "spliced_fraction": 0.4
+    },
+    {
+      "symbol": "DYDXUSDT",
+      "n_input": 35,
+      "n_spliced": 20,
+      "n_no_donor": 15,
+      "spliced_fraction": 0.5714285714285714
+    },
+    {
+      "symbol": "ENJUSDT",
+      "n_input": 11,
+      "n_spliced": 5,
+      "n_no_donor": 6,
+      "spliced_fraction": 0.45454545454545453
+    },
+    {
+      "symbol": "ENSUSDT",
+      "n_input": 56,
+      "n_spliced": 25,
+      "n_no_donor": 31,
+      "spliced_fraction": 0.44642857142857145
+    },
+    {
+      "symbol": "EOSUSDT",
+      "n_input": 236,
+      "n_spliced": 127,
+      "n_no_donor": 109,
+      "spliced_fraction": 0.538135593220339
+    },
+    {
+      "symbol": "ETCUSDT",
+      "n_input": 113,
+      "n_spliced": 56,
+      "n_no_donor": 57,
+      "spliced_fraction": 0.49557522123893805
+    },
+    {
+      "symbol": "ETHUSDT",
+      "n_input": 113,
+      "n_spliced": 65,
+      "n_no_donor": 48,
+      "spliced_fraction": 0.5752212389380531
+    },
+    {
+      "symbol": "ETHWUSDT",
+      "n_input": 34,
+      "n_spliced": 18,
+      "n_no_donor": 16,
+      "spliced_fraction": 0.5294117647058824
+    },
+    {
+      "symbol": "FETUSDT",
+      "n_input": 11,
+      "n_spliced": 7,
+      "n_no_donor": 4,
+      "spliced_fraction": 0.6363636363636364
+    },
+    {
+      "symbol": "FILUSDT",
+      "n_input": 19,
+      "n_spliced": 10,
+      "n_no_donor": 9,
+      "spliced_fraction": 0.5263157894736842
+    },
+    {
+      "symbol": "FITFIUSDT",
+      "n_input": 61,
+      "n_spliced": 31,
+      "n_no_donor": 30,
+      "spliced_fraction": 0.5081967213114754
+    },
+    {
+      "symbol": "FLMUSDT",
+      "n_input": 37,
+      "n_spliced": 18,
+      "n_no_donor": 19,
+      "spliced_fraction": 0.4864864864864865
+    },
+    {
+      "symbol": "FLOWUSDT",
+      "n_input": 24,
+      "n_spliced": 13,
+      "n_no_donor": 11,
+      "spliced_fraction": 0.5416666666666666
+    },
+    {
+      "symbol": "FTMUSDT",
+      "n_input": 209,
+      "n_spliced": 113,
+      "n_no_donor": 96,
+      "spliced_fraction": 0.5406698564593302
+    },
+    {
+      "symbol": "FTTUSDT",
+      "n_input": 117,
+      "n_spliced": 58,
+      "n_no_donor": 59,
+      "spliced_fraction": 0.49572649572649574
+    },
+    {
+      "symbol": "FXSUSDT",
+      "n_input": 54,
+      "n_spliced": 29,
+      "n_no_donor": 25,
+      "spliced_fraction": 0.5370370370370371
+    },
+    {
+      "symbol": "GALAUSDT",
+      "n_input": 84,
+      "n_spliced": 42,
+      "n_no_donor": 42,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "GALUSDT",
+      "n_input": 53,
+      "n_spliced": 26,
+      "n_no_donor": 27,
+      "spliced_fraction": 0.49056603773584906
+    },
+    {
+      "symbol": "GLMRUSDT",
+      "n_input": 46,
+      "n_spliced": 21,
+      "n_no_donor": 25,
+      "spliced_fraction": 0.45652173913043476
+    },
+    {
+      "symbol": "GMTUSDT",
+      "n_input": 94,
+      "n_spliced": 44,
+      "n_no_donor": 50,
+      "spliced_fraction": 0.46808510638297873
+    },
+    {
+      "symbol": "GRTUSDT",
+      "n_input": 23,
+      "n_spliced": 12,
+      "n_no_donor": 11,
+      "spliced_fraction": 0.5217391304347826
+    },
+    {
+      "symbol": "GSTUSDT",
+      "n_input": 27,
+      "n_spliced": 15,
+      "n_no_donor": 12,
+      "spliced_fraction": 0.5555555555555556
+    },
+    {
+      "symbol": "GTCUSDT",
+      "n_input": 70,
+      "n_spliced": 30,
+      "n_no_donor": 40,
+      "spliced_fraction": 0.42857142857142855
+    },
+    {
+      "symbol": "HBARUSDT",
+      "n_input": 15,
+      "n_spliced": 5,
+      "n_no_donor": 10,
+      "spliced_fraction": 0.3333333333333333
+    },
+    {
+      "symbol": "HNTUSDT",
+      "n_input": 16,
+      "n_spliced": 9,
+      "n_no_donor": 7,
+      "spliced_fraction": 0.5625
+    },
+    {
+      "symbol": "HOTUSDT",
+      "n_input": 24,
+      "n_spliced": 12,
+      "n_no_donor": 12,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "ICPUSDT",
+      "n_input": 14,
+      "n_spliced": 7,
+      "n_no_donor": 7,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "INJUSDT",
+      "n_input": 46,
+      "n_spliced": 24,
+      "n_no_donor": 22,
+      "spliced_fraction": 0.5217391304347826
+    },
+    {
+      "symbol": "KAVAUSDT",
+      "n_input": 21,
+      "n_spliced": 9,
+      "n_no_donor": 12,
+      "spliced_fraction": 0.42857142857142855
+    },
+    {
+      "symbol": "KDAUSDT",
+      "n_input": 19,
+      "n_spliced": 10,
+      "n_no_donor": 9,
+      "spliced_fraction": 0.5263157894736842
+    },
+    {
+      "symbol": "KEEPUSDT",
+      "n_input": 49,
+      "n_spliced": 23,
+      "n_no_donor": 26,
+      "spliced_fraction": 0.46938775510204084
+    },
+    {
+      "symbol": "KLAYUSDT",
+      "n_input": 62,
+      "n_spliced": 32,
+      "n_no_donor": 30,
+      "spliced_fraction": 0.5161290322580645
+    },
+    {
+      "symbol": "KNCUSDT",
+      "n_input": 26,
+      "n_spliced": 12,
+      "n_no_donor": 14,
+      "spliced_fraction": 0.46153846153846156
+    },
+    {
+      "symbol": "LDOUSDT",
+      "n_input": 82,
+      "n_spliced": 38,
+      "n_no_donor": 44,
+      "spliced_fraction": 0.4634146341463415
+    },
+    {
+      "symbol": "LINAUSDT",
+      "n_input": 32,
+      "n_spliced": 14,
+      "n_no_donor": 18,
+      "spliced_fraction": 0.4375
+    },
+    {
+      "symbol": "LINKUSDT",
+      "n_input": 115,
+      "n_spliced": 54,
+      "n_no_donor": 61,
+      "spliced_fraction": 0.46956521739130436
+    },
+    {
+      "symbol": "LOOKSUSDT",
+      "n_input": 96,
+      "n_spliced": 52,
+      "n_no_donor": 44,
+      "spliced_fraction": 0.5416666666666666
+    },
+    {
+      "symbol": "LRCUSDT",
+      "n_input": 18,
+      "n_spliced": 9,
+      "n_no_donor": 9,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "LTCUSDT",
+      "n_input": 101,
+      "n_spliced": 45,
+      "n_no_donor": 56,
+      "spliced_fraction": 0.44554455445544555
+    },
+    {
+      "symbol": "LUNA2USDT",
+      "n_input": 67,
+      "n_spliced": 31,
+      "n_no_donor": 36,
+      "spliced_fraction": 0.4626865671641791
+    },
+    {
+      "symbol": "LUNAUSDT",
+      "n_input": 109,
+      "n_spliced": 63,
+      "n_no_donor": 46,
+      "spliced_fraction": 0.5779816513761468
+    },
+    {
+      "symbol": "MAGICUSDT",
+      "n_input": 28,
+      "n_spliced": 12,
+      "n_no_donor": 16,
+      "spliced_fraction": 0.42857142857142855
+    },
+    {
+      "symbol": "MANAUSDT",
+      "n_input": 47,
+      "n_spliced": 25,
+      "n_no_donor": 22,
+      "spliced_fraction": 0.5319148936170213
+    },
+    {
+      "symbol": "MASKUSDT",
+      "n_input": 31,
+      "n_spliced": 16,
+      "n_no_donor": 15,
+      "spliced_fraction": 0.5161290322580645
+    },
+    {
+      "symbol": "MATICUSDT",
+      "n_input": 319,
+      "n_spliced": 152,
+      "n_no_donor": 167,
+      "spliced_fraction": 0.47648902821316613
+    },
+    {
+      "symbol": "MINAUSDT",
+      "n_input": 11,
+      "n_spliced": 6,
+      "n_no_donor": 5,
+      "spliced_fraction": 0.5454545454545454
+    },
+    {
+      "symbol": "MKRUSDT",
+      "n_input": 51,
+      "n_spliced": 25,
+      "n_no_donor": 26,
+      "spliced_fraction": 0.49019607843137253
+    },
+    {
+      "symbol": "MTLUSDT",
+      "n_input": 10,
+      "n_spliced": 6,
+      "n_no_donor": 4,
+      "spliced_fraction": 0.6
+    },
+    {
+      "symbol": "NEARUSDT",
+      "n_input": 91,
+      "n_spliced": 46,
+      "n_no_donor": 45,
+      "spliced_fraction": 0.5054945054945055
+    },
+    {
+      "symbol": "NEOUSDT",
+      "n_input": 9,
+      "n_spliced": 6,
+      "n_no_donor": 3,
+      "spliced_fraction": 0.6666666666666666
+    },
+    {
+      "symbol": "OCEANUSDT",
+      "n_input": 73,
+      "n_spliced": 37,
+      "n_no_donor": 36,
+      "spliced_fraction": 0.5068493150684932
+    },
+    {
+      "symbol": "OMGUSDT",
+      "n_input": 110,
+      "n_spliced": 56,
+      "n_no_donor": 54,
+      "spliced_fraction": 0.509090909090909
+    },
+    {
+      "symbol": "ONEUSDT",
+      "n_input": 30,
+      "n_spliced": 12,
+      "n_no_donor": 18,
+      "spliced_fraction": 0.4
+    },
+    {
+      "symbol": "OPUSDT",
+      "n_input": 111,
+      "n_spliced": 62,
+      "n_no_donor": 49,
+      "spliced_fraction": 0.5585585585585585
+    },
+    {
+      "symbol": "PEOPLEUSDT",
+      "n_input": 10,
+      "n_spliced": 5,
+      "n_no_donor": 5,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "REEFUSDT",
+      "n_input": 42,
+      "n_spliced": 22,
+      "n_no_donor": 20,
+      "spliced_fraction": 0.5238095238095238
+    },
+    {
+      "symbol": "RENUSDT",
+      "n_input": 89,
+      "n_spliced": 42,
+      "n_no_donor": 47,
+      "spliced_fraction": 0.47191011235955055
+    },
+    {
+      "symbol": "REQUSDT",
+      "n_input": 5,
+      "n_spliced": 2,
+      "n_no_donor": 3,
+      "spliced_fraction": 0.4
+    },
+    {
+      "symbol": "RNDRUSDT",
+      "n_input": 86,
+      "n_spliced": 41,
+      "n_no_donor": 45,
+      "spliced_fraction": 0.47674418604651164
+    },
+    {
+      "symbol": "RSRUSDT",
+      "n_input": 9,
+      "n_spliced": 5,
+      "n_no_donor": 4,
+      "spliced_fraction": 0.5555555555555556
+    },
+    {
+      "symbol": "RSS3USDT",
+      "n_input": 79,
+      "n_spliced": 41,
+      "n_no_donor": 38,
+      "spliced_fraction": 0.5189873417721519
+    },
+    {
+      "symbol": "RUNEUSDT",
+      "n_input": 44,
+      "n_spliced": 23,
+      "n_no_donor": 21,
+      "spliced_fraction": 0.5227272727272727
+    },
+    {
+      "symbol": "RVNUSDT",
+      "n_input": 11,
+      "n_spliced": 7,
+      "n_no_donor": 4,
+      "spliced_fraction": 0.6363636363636364
+    },
+    {
+      "symbol": "SANDUSDT",
+      "n_input": 102,
+      "n_spliced": 52,
+      "n_no_donor": 50,
+      "spliced_fraction": 0.5098039215686274
+    },
+    {
+      "symbol": "SCRTUSDT",
+      "n_input": 4,
+      "n_spliced": 2,
+      "n_no_donor": 2,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "SHIB1000USDT",
+      "n_input": 86,
+      "n_spliced": 40,
+      "n_no_donor": 46,
+      "spliced_fraction": 0.46511627906976744
+    },
+    {
+      "symbol": "SKLUSDT",
+      "n_input": 8,
+      "n_spliced": 3,
+      "n_no_donor": 5,
+      "spliced_fraction": 0.375
+    },
+    {
+      "symbol": "SNXUSDT",
+      "n_input": 43,
+      "n_spliced": 20,
+      "n_no_donor": 23,
+      "spliced_fraction": 0.46511627906976744
+    },
+    {
+      "symbol": "SOLUSDT",
+      "n_input": 126,
+      "n_spliced": 75,
+      "n_no_donor": 51,
+      "spliced_fraction": 0.5952380952380952
+    },
+    {
+      "symbol": "SRMUSDT",
+      "n_input": 126,
+      "n_spliced": 64,
+      "n_no_donor": 62,
+      "spliced_fraction": 0.5079365079365079
+    },
+    {
+      "symbol": "STGUSDT",
+      "n_input": 27,
+      "n_spliced": 14,
+      "n_no_donor": 13,
+      "spliced_fraction": 0.5185185185185185
+    },
+    {
+      "symbol": "STMXUSDT",
+      "n_input": 15,
+      "n_spliced": 8,
+      "n_no_donor": 7,
+      "spliced_fraction": 0.5333333333333333
+    },
+    {
+      "symbol": "STORJUSDT",
+      "n_input": 13,
+      "n_spliced": 6,
+      "n_no_donor": 7,
+      "spliced_fraction": 0.46153846153846156
+    },
+    {
+      "symbol": "STXUSDT",
+      "n_input": 10,
+      "n_spliced": 7,
+      "n_no_donor": 3,
+      "spliced_fraction": 0.7
+    },
+    {
+      "symbol": "SUNUSDT",
+      "n_input": 6,
+      "n_spliced": 2,
+      "n_no_donor": 4,
+      "spliced_fraction": 0.3333333333333333
+    },
+    {
+      "symbol": "SUSHIUSDT",
+      "n_input": 61,
+      "n_spliced": 29,
+      "n_no_donor": 32,
+      "spliced_fraction": 0.47540983606557374
+    },
+    {
+      "symbol": "SXPUSDT",
+      "n_input": 15,
+      "n_spliced": 6,
+      "n_no_donor": 9,
+      "spliced_fraction": 0.4
+    },
+    {
+      "symbol": "TOMOUSDT",
+      "n_input": 2,
+      "n_spliced": 0,
+      "n_no_donor": 2,
+      "spliced_fraction": 0.0
+    },
+    {
+      "symbol": "TRBUSDT",
+      "n_input": 55,
+      "n_spliced": 28,
+      "n_no_donor": 27,
+      "spliced_fraction": 0.509090909090909
+    },
+    {
+      "symbol": "TRXUSDT",
+      "n_input": 22,
+      "n_spliced": 9,
+      "n_no_donor": 13,
+      "spliced_fraction": 0.4090909090909091
+    },
+    {
+      "symbol": "TWTUSDT",
+      "n_input": 27,
+      "n_spliced": 13,
+      "n_no_donor": 14,
+      "spliced_fraction": 0.48148148148148145
+    },
+    {
+      "symbol": "UNFIUSDT",
+      "n_input": 108,
+      "n_spliced": 57,
+      "n_no_donor": 51,
+      "spliced_fraction": 0.5277777777777778
+    },
+    {
+      "symbol": "USTUSDT",
+      "n_input": 2,
+      "n_spliced": 1,
+      "n_no_donor": 1,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "WAVESUSDT",
+      "n_input": 36,
+      "n_spliced": 18,
+      "n_no_donor": 18,
+      "spliced_fraction": 0.5
+    },
+    {
+      "symbol": "XEMUSDT",
+      "n_input": 57,
+      "n_spliced": 29,
+      "n_no_donor": 28,
+      "spliced_fraction": 0.5087719298245614
+    },
+    {
+      "symbol": "XLMUSDT",
+      "n_input": 7,
+      "n_spliced": 4,
+      "n_no_donor": 3,
+      "spliced_fraction": 0.5714285714285714
+    },
+    {
+      "symbol": "XNOUSDT",
+      "n_input": 6,
+      "n_spliced": 2,
+      "n_no_donor": 4,
+      "spliced_fraction": 0.3333333333333333
+    },
+    {
+      "symbol": "XRPUSDT",
+      "n_input": 118,
+      "n_spliced": 60,
+      "n_no_donor": 58,
+      "spliced_fraction": 0.5084745762711864
+    },
+    {
+      "symbol": "ZILUSDT",
+      "n_input": 29,
+      "n_spliced": 12,
+      "n_no_donor": 17,
+      "spliced_fraction": 0.41379310344827586
+    }
+  ],
+  "threshold": "|cf|>0.25 same-sign AND raw+swapped CIs exclude zero (material-edge precondition; base |cf|>0.25 inherited INFR-018 sealed value)"
+}
