@@ -1,0 +1,506 @@
+{
+  "item": "SPDR-008",
+  "measure": "signed trap-load (poke_side*\u03a3 delta_ratio_resid)",
+  "n_symbols_with_events": 189,
+  "universe": {
+    "a5_fitted_run": 194,
+    "breadth_denominator_design_note": 296
+  },
+  "per_boundary": {
+    "IB": {
+      "DESIGN": {
+        "n_events": 6892,
+        "n_symbols": 189,
+        "T1_load_monotonicity": {
+          "n": 6885,
+          "rho": -0.014973633939904103,
+          "rho_bps_disclosure": -0.04768586848275479,
+          "derangement_null_mean": 0.000312614965563191,
+          "derangement_null_ci": [
+            -0.022963793267849825,
+            0.023521998251134636
+          ],
+          "one_sided_p_ge_observed": 0.8975,
+          "mde_rho_at_n": 0.01985930061724708,
+          "n_seeds": 2000,
+          "SUPPORTED": false,
+          "UNPOWERED": false
+        },
+        "T2_tier_marginal": {
+          "n_high": 2295,
+          "n_low": 2295,
+          "high_mean": 5.692747248845064,
+          "low_mean": 5.837390782227611,
+          "unpaired_diff": -0.14464353338254643,
+          "mde_ibw": 0.5,
+          "paired_day_contrast": {
+            "n_shared_days": 408,
+            "mean": -0.30782418655079424,
+            "ci": [
+              -1.0766077081247494,
+              0.4577978210322866
+            ],
+            "excludes_zero": false
+          }
+        },
+        "T3_unsigned_base": {
+          "n_trap": 6892,
+          "n_ordinary_touch": 7474,
+          "trap_mean": 5.5033165678012805,
+          "ordinary_touch_mean": 4.725420431418504,
+          "contrast_geometry": 0.7778961363827763,
+          "note": "P-01 disclosure: how much reversal is failed-poke GEOMETRY vs a generic touch; the SIGNED warrant is T1/T2, not this"
+        },
+        "T4_availability": {
+          "n_trap": 6892,
+          "n_control": 188498,
+          "trap_mean": 5.5033165678012805,
+          "control_mean": 5.460295929617342,
+          "contrast": 0.043020638183938864,
+          "day_clustered_ci": [
+            0.24172356355512764,
+            1.206518142763408
+          ],
+          "excludes_zero": true,
+          "mde_ibw": 0.0
+        },
+        "tripwire_path_swap": {
+          "n_spliced": 3471,
+          "bite": {
+            "corr": 0.5276401629993064,
+            "n": 3471,
+            "bite": true,
+            "note": "corr(swapped price MFE, donor real price MFE); >0.5 proves the swap installed the donor outcome into the bars the reads consume"
+          },
+          "raw_T1_rho": -0.014973633939904103,
+          "swapped_T1_rho": 0.024104375396769868,
+          "T1_collapse_fraction": -1.609787944163155,
+          "raw_T2_tier": -0.14464353338254643,
+          "swapped_T2_tier": -0.275480337286913,
+          "T2_collapse_fraction": 1.9045465140728797,
+          "material_signed_edge": false,
+          "status": "NO_MATERIAL_EDGE",
+          "note": "adjudicates the SIGNED reads (T1 \u03c1, T2 tier); T4 mean-availability is NOT swap-adjudicable (B-6 mean-vacuity) \u2014 its causality rests on \u2264t\u22121 + the matched control. No material signed edge (T1 \u03c1\u22480, T2 CI spans 0) \u2192 NO_MATERIAL_EDGE, not a leak; bite>0.5 confirms the swap has teeth"
+        }
+      },
+      "CONFIRM": {
+        "n_events": 10942,
+        "n_symbols": 183,
+        "T1_load_monotonicity": {
+          "n": 10874,
+          "rho": 5.314598990757659e-05,
+          "rho_bps_disclosure": -0.0225807373264971,
+          "derangement_null_mean": -0.00011028035711476186,
+          "derangement_null_ci": [
+            -0.019249961458890855,
+            0.018332157272135264
+          ],
+          "one_sided_p_ge_observed": 0.4795,
+          "mde_rho_at_n": 0.015441745821817858,
+          "n_seeds": 2000,
+          "SUPPORTED": false,
+          "UNPOWERED": false
+        },
+        "T2_tier_marginal": {
+          "n_high": 3574,
+          "n_low": 3852,
+          "high_mean": 6.303144684548525,
+          "low_mean": 6.199603914037221,
+          "unpaired_diff": 0.10354077051130428,
+          "mde_ibw": 0.25,
+          "paired_day_contrast": {
+            "n_shared_days": 285,
+            "mean": 0.0007900107862113758,
+            "ci": [
+              -0.44172795587466357,
+              0.4472386869168406
+            ],
+            "excludes_zero": false
+          }
+        },
+        "T3_unsigned_base": {
+          "n_trap": 10942,
+          "n_ordinary_touch": 10322,
+          "trap_mean": 6.015939379789101,
+          "ordinary_touch_mean": 6.032472010563616,
+          "contrast_geometry": -0.016532630774515056,
+          "note": "P-01 disclosure: how much reversal is failed-poke GEOMETRY vs a generic touch; the SIGNED warrant is T1/T2, not this"
+        },
+        "T4_availability": {
+          "n_trap": 10942,
+          "n_control": 313834,
+          "trap_mean": 6.015939379789101,
+          "control_mean": 6.5103865435195445,
+          "contrast": -0.4944471637304435,
+          "day_clustered_ci": [
+            -0.5793631590653916,
+            0.09211597247789821
+          ],
+          "excludes_zero": false,
+          "mde_ibw": 0.75
+        },
+        "tripwire_path_swap": {
+          "n_spliced": 5535,
+          "bite": {
+            "corr": 0.8156173689568106,
+            "n": 5535,
+            "bite": true,
+            "note": "corr(swapped price MFE, donor real price MFE); >0.5 proves the swap installed the donor outcome into the bars the reads consume"
+          },
+          "raw_T1_rho": 5.314598990757659e-05,
+          "swapped_T1_rho": 0.011049270356781608,
+          "T1_collapse_fraction": 207.90412175964386,
+          "raw_T2_tier": 0.10354077051130428,
+          "swapped_T2_tier": 0.0460005367519436,
+          "T2_collapse_fraction": 0.44427462269001944,
+          "material_signed_edge": false,
+          "status": "NO_MATERIAL_EDGE",
+          "note": "adjudicates the SIGNED reads (T1 \u03c1, T2 tier); T4 mean-availability is NOT swap-adjudicable (B-6 mean-vacuity) \u2014 its causality rests on \u2264t\u22121 + the matched control. No material signed edge (T1 \u03c1\u22480, T2 CI spans 0) \u2192 NO_MATERIAL_EDGE, not a leak; bite>0.5 confirms the swap has teeth"
+        }
+      }
+    },
+    "PVA": {
+      "DESIGN": {
+        "n_events": 4687,
+        "n_symbols": 172,
+        "T1_load_monotonicity": {
+          "n": 4684,
+          "rho": 0.022903838780764005,
+          "rho_bps_disclosure": -0.02558680356289147,
+          "derangement_null_mean": -0.0002848717240363783,
+          "derangement_null_ci": [
+            -0.029763253206150232,
+            0.02769510248877369
+          ],
+          "one_sided_p_ge_observed": 0.052,
+          "mde_rho_at_n": 0.02342016099829114,
+          "n_seeds": 2000,
+          "SUPPORTED": false,
+          "UNPOWERED": false
+        },
+        "T2_tier_marginal": {
+          "n_high": 1561,
+          "n_low": 1562,
+          "high_mean": 5.6673097051827765,
+          "low_mean": 5.353886423617997,
+          "unpaired_diff": 0.3134232815647797,
+          "mde_ibw": 0.25,
+          "paired_day_contrast": {
+            "n_shared_days": 359,
+            "mean": 0.026958039547025456,
+            "ci": [
+              -0.4556348341245833,
+              0.5149494323385411
+            ],
+            "excludes_zero": false
+          }
+        },
+        "T3_unsigned_base": {
+          "n_trap": 4687,
+          "n_ordinary_touch": 9188,
+          "trap_mean": 5.457295804194943,
+          "ordinary_touch_mean": 4.4859420874317255,
+          "contrast_geometry": 0.9713537167632174,
+          "note": "P-01 disclosure: how much reversal is failed-poke GEOMETRY vs a generic touch; the SIGNED warrant is T1/T2, not this"
+        },
+        "T4_availability": {
+          "n_trap": 4687,
+          "n_control": 133252,
+          "trap_mean": 5.457295804194943,
+          "control_mean": 4.978452888270344,
+          "contrast": 0.4788429159245986,
+          "day_clustered_ci": [
+            0.40189639777779246,
+            1.2194698812220899
+          ],
+          "excludes_zero": true,
+          "mde_ibw": 0.0
+        },
+        "tripwire_path_swap": {
+          "n_spliced": 2240,
+          "bite": {
+            "corr": 0.9177404810395356,
+            "n": 2240,
+            "bite": true,
+            "note": "corr(swapped price MFE, donor real price MFE); >0.5 proves the swap installed the donor outcome into the bars the reads consume"
+          },
+          "raw_T1_rho": 0.022903838780764005,
+          "swapped_T1_rho": -0.0037532546734170033,
+          "T1_collapse_fraction": -0.16387011406005914,
+          "raw_T2_tier": 0.3134232815647797,
+          "swapped_T2_tier": 0.18057052849849953,
+          "T2_collapse_fraction": 0.5761235336347482,
+          "material_signed_edge": false,
+          "status": "NO_MATERIAL_EDGE",
+          "note": "adjudicates the SIGNED reads (T1 \u03c1, T2 tier); T4 mean-availability is NOT swap-adjudicable (B-6 mean-vacuity) \u2014 its causality rests on \u2264t\u22121 + the matched control. No material signed edge (T1 \u03c1\u22480, T2 CI spans 0) \u2192 NO_MATERIAL_EDGE, not a leak; bite>0.5 confirms the swap has teeth"
+        }
+      },
+      "CONFIRM": {
+        "n_events": 7225,
+        "n_symbols": 176,
+        "T1_load_monotonicity": {
+          "n": 7167,
+          "rho": -0.005799814385714271,
+          "rho_bps_disclosure": -0.043289656915144546,
+          "derangement_null_mean": 8.87365279603127e-05,
+          "derangement_null_ci": [
+            -0.023325669781541596,
+            0.023305219925996695
+          ],
+          "one_sided_p_ge_observed": 0.6885,
+          "mde_rho_at_n": 0.02009678553746483,
+          "n_seeds": 2000,
+          "SUPPORTED": false,
+          "UNPOWERED": false
+        },
+        "T2_tier_marginal": {
+          "n_high": 2383,
+          "n_low": 2530,
+          "high_mean": 6.012224598378339,
+          "low_mean": 5.962807463783192,
+          "unpaired_diff": 0.04941713459514663,
+          "mde_ibw": 0.25,
+          "paired_day_contrast": {
+            "n_shared_days": 283,
+            "mean": 0.46926379121858647,
+            "ci": [
+              -0.19486632319409705,
+              1.3405735305976827
+            ],
+            "excludes_zero": false
+          }
+        },
+        "T3_unsigned_base": {
+          "n_trap": 7225,
+          "n_ordinary_touch": 13358,
+          "trap_mean": 5.846237758963254,
+          "ordinary_touch_mean": 5.1443089535275055,
+          "contrast_geometry": 0.7019288054357489,
+          "note": "P-01 disclosure: how much reversal is failed-poke GEOMETRY vs a generic touch; the SIGNED warrant is T1/T2, not this"
+        },
+        "T4_availability": {
+          "n_trap": 7225,
+          "n_control": 211408,
+          "trap_mean": 5.846237758963254,
+          "control_mean": 5.551156245814856,
+          "contrast": 0.29508151314839814,
+          "day_clustered_ci": [
+            0.06896441748435825,
+            0.8665087006623395
+          ],
+          "excludes_zero": true,
+          "mde_ibw": 0.0
+        },
+        "tripwire_path_swap": {
+          "n_spliced": 3530,
+          "bite": {
+            "corr": 0.5724487417305095,
+            "n": 3530,
+            "bite": true,
+            "note": "corr(swapped price MFE, donor real price MFE); >0.5 proves the swap installed the donor outcome into the bars the reads consume"
+          },
+          "raw_T1_rho": -0.005799814385714271,
+          "swapped_T1_rho": -0.00024690222626732683,
+          "T1_collapse_fraction": 0.04257071172406491,
+          "raw_T2_tier": 0.04941713459514663,
+          "swapped_T2_tier": 0.06868975478181572,
+          "T2_collapse_fraction": 1.3899987391936297,
+          "material_signed_edge": false,
+          "status": "NO_MATERIAL_EDGE",
+          "note": "adjudicates the SIGNED reads (T1 \u03c1, T2 tier); T4 mean-availability is NOT swap-adjudicable (B-6 mean-vacuity) \u2014 its causality rests on \u2264t\u22121 + the matched control. No material signed edge (T1 \u03c1\u22480, T2 CI spans 0) \u2192 NO_MATERIAL_EDGE, not a leak; bite>0.5 confirms the swap has teeth"
+        }
+      }
+    },
+    "PRIOR": {
+      "DESIGN": {
+        "n_events": 5090,
+        "n_symbols": 178,
+        "T1_load_monotonicity": {
+          "n": 5083,
+          "rho": -0.032526235098103276,
+          "rho_bps_disclosure": -0.055129499030193485,
+          "derangement_null_mean": 8.239232226572738e-05,
+          "derangement_null_ci": [
+            -0.028136054093624206,
+            0.026417429204727165
+          ],
+          "one_sided_p_ge_observed": 0.99,
+          "mde_rho_at_n": 0.022634593379146955,
+          "n_seeds": 2000,
+          "SUPPORTED": false,
+          "UNPOWERED": false
+        },
+        "T2_tier_marginal": {
+          "n_high": 1694,
+          "n_low": 1695,
+          "high_mean": 4.701196685331402,
+          "low_mean": 4.9692851763788894,
+          "unpaired_diff": -0.26808849104748766,
+          "mde_ibw": 0.75,
+          "paired_day_contrast": {
+            "n_shared_days": 392,
+            "mean": -0.22014072425892606,
+            "ci": [
+              -0.6294644817295013,
+              0.19375813592813773
+            ],
+            "excludes_zero": false
+          }
+        },
+        "T3_unsigned_base": {
+          "n_trap": 5090,
+          "n_ordinary_touch": 6384,
+          "trap_mean": 4.890981637884021,
+          "ordinary_touch_mean": 3.925247344086939,
+          "contrast_geometry": 0.9657342937970821,
+          "note": "P-01 disclosure: how much reversal is failed-poke GEOMETRY vs a generic touch; the SIGNED warrant is T1/T2, not this"
+        },
+        "T4_availability": {
+          "n_trap": 5090,
+          "n_control": 143611,
+          "trap_mean": 4.890981637884021,
+          "control_mean": 4.406675795935436,
+          "contrast": 0.4843058419485855,
+          "day_clustered_ci": [
+            0.14492199452464483,
+            0.7857793539184919
+          ],
+          "excludes_zero": true,
+          "mde_ibw": 0.0
+        },
+        "tripwire_path_swap": {
+          "n_spliced": 2413,
+          "bite": {
+            "corr": 0.6242612976392312,
+            "n": 2413,
+            "bite": true,
+            "note": "corr(swapped price MFE, donor real price MFE); >0.5 proves the swap installed the donor outcome into the bars the reads consume"
+          },
+          "raw_T1_rho": -0.032526235098103276,
+          "swapped_T1_rho": 0.024225982456514587,
+          "T1_collapse_fraction": -0.7448136061073756,
+          "raw_T2_tier": -0.26808849104748766,
+          "swapped_T2_tier": -0.06450269062141611,
+          "T2_collapse_fraction": 0.24060223685615237,
+          "material_signed_edge": false,
+          "status": "NO_MATERIAL_EDGE",
+          "note": "adjudicates the SIGNED reads (T1 \u03c1, T2 tier); T4 mean-availability is NOT swap-adjudicable (B-6 mean-vacuity) \u2014 its causality rests on \u2264t\u22121 + the matched control. No material signed edge (T1 \u03c1\u22480, T2 CI spans 0) \u2192 NO_MATERIAL_EDGE, not a leak; bite>0.5 confirms the swap has teeth"
+        }
+      },
+      "CONFIRM": {
+        "n_events": 8181,
+        "n_symbols": 176,
+        "T1_load_monotonicity": {
+          "n": 8091,
+          "rho": 0.0038479951073087915,
+          "rho_bps_disclosure": -0.036571683282829025,
+          "derangement_null_mean": -0.0003190627236287772,
+          "derangement_null_ci": [
+            -0.02231833825076282,
+            0.022044992100789453
+          ],
+          "one_sided_p_ge_observed": 0.356,
+          "mde_rho_at_n": 0.018584468550995492,
+          "n_seeds": 2000,
+          "SUPPORTED": false,
+          "UNPOWERED": false
+        },
+        "T2_tier_marginal": {
+          "n_high": 2712,
+          "n_low": 2929,
+          "high_mean": 5.460713484996999,
+          "low_mean": 5.121614334880068,
+          "unpaired_diff": 0.33909915011693137,
+          "mde_ibw": 0.25,
+          "paired_day_contrast": {
+            "n_shared_days": 283,
+            "mean": 0.08295442027357171,
+            "ci": [
+              -0.26416003552401973,
+              0.4239532324769354
+            ],
+            "excludes_zero": false
+          }
+        },
+        "T3_unsigned_base": {
+          "n_trap": 8181,
+          "n_ordinary_touch": 8975,
+          "trap_mean": 5.241619150391606,
+          "ordinary_touch_mean": 4.440190798086492,
+          "contrast_geometry": 0.8014283523051136,
+          "note": "P-01 disclosure: how much reversal is failed-poke GEOMETRY vs a generic touch; the SIGNED warrant is T1/T2, not this"
+        },
+        "T4_availability": {
+          "n_trap": 8181,
+          "n_control": 237551,
+          "trap_mean": 5.241619150391606,
+          "control_mean": 4.9711404839955975,
+          "contrast": 0.27047866639600837,
+          "day_clustered_ci": [
+            0.11952089368838545,
+            0.6659848504102956
+          ],
+          "excludes_zero": true,
+          "mde_ibw": 0.0
+        },
+        "tripwire_path_swap": {
+          "n_spliced": 3986,
+          "bite": {
+            "corr": 0.6710845370154963,
+            "n": 3986,
+            "bite": true,
+            "note": "corr(swapped price MFE, donor real price MFE); >0.5 proves the swap installed the donor outcome into the bars the reads consume"
+          },
+          "raw_T1_rho": 0.0038479951073087915,
+          "swapped_T1_rho": -0.012342155707517682,
+          "T1_collapse_fraction": -3.2074250001189664,
+          "raw_T2_tier": 0.33909915011693137,
+          "swapped_T2_tier": -0.08477147672958907,
+          "T2_collapse_fraction": -0.2499902364849849,
+          "material_signed_edge": false,
+          "status": "NO_MATERIAL_EDGE",
+          "note": "adjudicates the SIGNED reads (T1 \u03c1, T2 tier); T4 mean-availability is NOT swap-adjudicable (B-6 mean-vacuity) \u2014 its causality rests on \u2264t\u22121 + the matched control. No material signed edge (T1 \u03c1\u22480, T2 CI spans 0) \u2192 NO_MATERIAL_EDGE, not a leak; bite>0.5 confirms the swap has teeth"
+        }
+      }
+    }
+  },
+  "symbols_skipped": {
+    "DESIGN": 4,
+    "CONFIRM": 4
+  },
+  "K3_cluster_scan": {
+    "IB": {
+      "n_powered_cells": 96,
+      "n_signed_supported": 6,
+      "cluster_K3_met": true,
+      "supported_symbols": [
+        "1000BONKUSDT",
+        "LTCUSDT",
+        "BCHUSDT",
+        "FLOWUSDT",
+        "DYDXUSDT",
+        "SOLUSDT"
+      ],
+      "n_rho_pos_gt_010": 20,
+      "n_rho_neg_lt_m010": 19
+    },
+    "PVA": {
+      "n_powered_cells": 69,
+      "n_signed_supported": 1,
+      "cluster_K3_met": false,
+      "supported_symbols": [
+        "APEUSDT"
+      ],
+      "n_rho_pos_gt_010": 21,
+      "n_rho_neg_lt_m010": 14
+    },
+    "PRIOR": {
+      "n_powered_cells": 76,
+      "n_signed_supported": 0,
+      "cluster_K3_met": false,
+      "supported_symbols": [],
+      "n_rho_pos_gt_010": 17,
+      "n_rho_neg_lt_m010": 23
+    }
+  }
+}

@@ -66,6 +66,21 @@ ckpt-015; tested the daily US-open session / 15-min IB / single-session hold onl
 status **unchanged (REGISTERED)** — retrospective decides close/keep. **0 counted reads; holdout
 SEALED.** Next: **SPDR-008** (signed-trap breadth, S1+S3).
 
+**SPDR-008 COMPLETE 2026-07-21 — operator disposition NOT_WORTH (S3 signed-trap breadth; the
+family's deferred SIGNED warrant).** Measured trap-load monotonicity (`poke_side × Σ
+delta_ratio_resid`) is a **powered null** on all three boundary types tested INDEPENDENTLY (IB /
+prior value-area / prior extreme): T1 ρ −0.015/+0.023/−0.033, MDE ≈0.02 on thousands of
+events/cell; the one whiff (PVA p=0.052) is below its own MDE and flips negative on CONFIRM; T2
+HIGH−LOW CI spans zero everywhere. **K=3 ruled NOISE** — IB 6/96 = 7 qualifiers vs 6.0 null-expected
++ 10 anti-monotone mirror; scattered non-connected names; sign-only CONFIRM. Only reproducing edge
+= **unsigned P-01 geometry** (traps revert ~30–55 bps more than random-timing on PVA/PRIOR, not
+load-dependent, twice-dead per SPDR-007) → measured flow adds nothing over price shape; recorded as
+market-science, not tradability. Integrity clean (causal ≤t−1 on all 16,669 events; tripwire
+NO_MATERIAL_EDGE, bite 0.53–0.92; holdout SEALED). New module `xen.sigbar.trap`. Amendments 1–8
+(0L/5T/3N); QA runs 1–3 (design REVISE→APPROVE, code REVISE→full-machinery fix). **Checkpoint-014
+Phases 0–5 COMPLETE.** Signed-value block (S9/S14) = ckpt-015 Phase 6, distinct claim. Family status
+**unchanged (REGISTERED)** — keep/close is the ckpt-014 retrospective. **0 counted reads.**
+
 ## Current Infrastructure Tasks
 
 | Item | Status | Detail |
@@ -83,7 +98,7 @@ SEALED.** Next: **SPDR-008** (signed-trap breadth, S1+S3).
 | Family | Range | Status |
 |--------|-------|--------|
 | [infrastructure-validation](families/infrastructure-validation/INDEX.md) | VAL-008 | Phase D PASS 2026-07-16 |
-| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018, SPDR-007/008 | **REGISTERED 2026-07-20** (ckpt-014 D1) — INFR-017/018 COMPLETE; **SPDR-007 COMPLETE — NOT_WORTH** (price-only spine, P-01 confirmation; signed warrant untested); next **SPDR-008** (signed-trap breadth) |
+| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018, SPDR-007/008 | **REGISTERED 2026-07-20** (ckpt-014 D1) — INFR-017/018 COMPLETE; **SPDR-007 COMPLETE — NOT_WORTH** (price-only spine, P-01); **SPDR-008 COMPLETE — NOT_WORTH** (signed-trap breadth: measured trap-load monotonicity a powered null on all 3 boundaries; only reproducing edge is unsigned P-01 geometry). **Ckpt-014 Phases 0–5 COMPLETE**; signed-value block (S9/S14) = ckpt-015 |
 
 New candidate families register at `docs/signal-registry/candidate-families/` when research
 opens.
@@ -92,5 +107,5 @@ opens.
 
 | Checkpoint | Closed | Outcome |
 |---|---|---|
-| [014 — Signed Auction Structure](checkpoints/2026-07-20-014-signed-auction-structure/design.md) | OPEN (2026-07-20) | **DESIGN SIGNED** — D1–D6 approved; CF-SIGAUC-001 REGISTERED. **INFR-017/018 COMPLETE** (registry pin `5c386984…`). **SPDR-007 COMPLETE — NOT_WORTH** (price-only spine reproduces but no edge over matched entry, loses after cost; P-01 confirmation; signed warrant untested). Next: **SPDR-008** breadth (S1+S3 signed-trap). |
+| [014 — Signed Auction Structure](checkpoints/2026-07-20-014-signed-auction-structure/design.md) | OPEN (2026-07-20) | **DESIGN SIGNED** — D1–D6 approved; CF-SIGAUC-001 REGISTERED. **INFR-017/018 COMPLETE** (registry pin `5c386984…`). **SPDR-007 COMPLETE — NOT_WORTH** (price-only spine, P-01). **SPDR-008 COMPLETE — NOT_WORTH** (signed-trap breadth: trap-load monotonicity a powered null on all 3 independent boundaries; K=3 noise; only reproducing edge is unsigned P-01 geometry — measured flow adds nothing). **Phases 0–5 COMPLETE; ready for the ckpt-014 retrospective.** Signed-value block → ckpt-015 Phase 6. |
 | [013 — Chapter 04 Open: HTFCAP + EPSOSC + Fresh XENA CAL](checkpoints/2026-07-16-013-chapter04-open-htfcap-epsosc-cal/retrospective.md) | 2026-07-19 | Both families closed — CF-EPSOSC-001 RETIRED (refuted 2×, drift pedestal); CF-HTFCAP-001 CLOSED (characterised — real sub-cost gross BTC edge). Apparatus rebuilt on Bybit (fresh CAL pin `abbb1842…`, report-layer framework INFR-016). Holdout SEALED. |

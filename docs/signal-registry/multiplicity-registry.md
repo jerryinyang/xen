@@ -1550,6 +1550,25 @@ resampling).** Two developer deviations ratified (D-1 cross-session control; D-2
 tripwire). **No family status change** — retrospective act. Next: **SPDR-008** (S1+S3 signed-trap
 breadth). Report `python/experiments/SPDR-007/report.md`.
 
+**Disposition — SPDR-008 (2026-07-21, uncounted screen; S3 signed-trap breadth, the deferred SIGNED
+warrant).** Operator **NOT_WORTH**. Measured trap-load monotonicity (`trap_load = poke_side × Σ
+delta_ratio_resid`) is a **powered null** on all three boundary types tested INDEPENDENTLY (IB /
+prior value-area / prior extreme): T1 ρ −0.015/+0.023/−0.033, MDE ≈0.02 on 4.6–10.9k events/cell;
+the sole whiff (PVA DESIGN p=0.052) is below its own MDE and flips negative on CONFIRM; T2 HIGH−LOW
+tier CI spans zero on every boundary/band. **Multiplicity (K=3) ruled NOISE:** across 241 powered
+per-cell derangement gates, 7 pass the positive signed gate vs **6.0 expected under the null** and
+vs **10 passing the anti-monotone mirror** — the positive tail is not enriched; IB's 6/96 are
+scattered non-connected names with sign-only (winner's-curse) CONFIRM reproduction atop a negative
+pooled IB ρ. Only reproducing edge = **unsigned P-01 geometry** (T4/T3 availability ~30–55 bps on
+PVA/PRIOR, not load-dependent; the failed-break pattern already NOT_WORTH at SPDR-007) → measured
+flow adds nothing over price shape; recorded as market-science characterisation, not tradability.
+Integrity clean (causal ≤t−1 on all 16,669 events; tripwire NO_MATERIAL_EDGE with bite 0.53–0.92;
+no-per-level-Δ + no-local-accounting + frozen-pin PASS; emission VALID). 194 A5-fitted signed
+universe (breadth denom 296, survivorship binding), 16,669/26,348 traps. Amendments 1–8 (0L/5T/3N);
+QA runs 1–3. **Signed-value block (S9 absorption / S14 CVD divergence) is a distinct claim
+(ckpt-015 Phase 6) — not pre-judged.** **No family status change** — retrospective act. **0 counted
+reads; holdout SEALED.** Report `python/experiments/SPDR-008/report.md`.
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:
