@@ -1,0 +1,2802 @@
+{
+  "item": "INFR-018",
+  "gate": "HYP-I3",
+  "frozen_utc": "2026-07-21T01:41:33.201726+00:00",
+  "selection_rule": "highest separation S on the DESIGN bank; bands are labels and do not select",
+  "disc_id": "D4-t50-w30",
+  "family": "D4",
+  "flow_augmented": false,
+  "params": {
+    "tau": 0.5,
+    "w": 30
+  },
+  "poke_delta": 0.0,
+  "separation": {
+    "S": 0.753050984911184,
+    "n": 4909,
+    "n_yes": 2594,
+    "n_no": 2315,
+    "base_rate": 0.48604603788959055,
+    "call_rate": 0.5284171929109799,
+    "unresolved_rate": 0.39214957899950476
+  },
+  "collapse_fraction": 0.39209500605242537,
+  "day_clustered_ci": {
+    "n": 439,
+    "block": 5,
+    "stat": 0.75,
+    "ci": [
+      0.6666666666666667,
+      0.8
+    ],
+    "ci_low_seed_range": [
+      0.6666666666666667,
+      0.6666666666666667
+    ],
+    "ci_high_seed_range": [
+      0.8,
+      0.8
+    ],
+    "ci_excludes_zero": true,
+    "trimmed_mean_ci": [
+      0.6743141194266333,
+      0.7648116302553041
+    ],
+    "block_sensitivity": [
+      {
+        "block_req": 2,
+        "ci": [
+          0.6666666666666667,
+          0.8
+        ]
+      },
+      {
+        "block_req": 5,
+        "ci": [
+          0.6666666666666667,
+          0.8
+        ]
+      },
+      {
+        "block_req": 10,
+        "ci": [
+          0.6666666666666667,
+          0.8
+        ]
+      }
+    ],
+    "block_fragile": false
+  },
+  "interpretation_band": "SUGGESTIVE",
+  "inherited_anchor": {
+    "anchor_id": "A-USOPEN",
+    "ib_minutes": 15,
+    "freeze_sha256": "60ae790a1a839ef4e3cb6e1027bfc0f0eeffa3562b64a9d63738c5d225bd7000"
+  },
+  "full_table": [
+    {
+      "disc_id": "D4-t50-w30",
+      "family": "D4",
+      "flow_augmented": false,
+      "params": {
+        "tau": 0.5,
+        "w": 30
+      },
+      "poke_delta": 0.0,
+      "separation": {
+        "S": 0.753050984911184,
+        "n": 4909,
+        "n_yes": 2594,
+        "n_no": 2315,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.5284171929109799,
+        "unresolved_rate": 0.39214957899950476
+      },
+      "control_deranged": {
+        "S": 0.2952675304865356,
+        "n": 4909,
+        "n_yes": 2594,
+        "n_no": 2315,
+        "p_accept_given_yes": 0.6252891287586738,
+        "p_accept_given_no": 0.33002159827213823,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.5284171929109799,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 583,
+          "n_unpermuted_singleton_rows": 38,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4871
+        }
+      },
+      "collapse_fraction": 0.39209500605242537,
+      "day_clustered_ci": {
+        "n": 439,
+        "block": 5,
+        "stat": 0.75,
+        "ci": [
+          0.6666666666666667,
+          0.8
+        ],
+        "ci_low_seed_range": [
+          0.6666666666666667,
+          0.6666666666666667
+        ],
+        "ci_high_seed_range": [
+          0.8,
+          0.8
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.6743141194266333,
+          0.7648116302553041
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.6666666666666667,
+              0.8
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.6666666666666667,
+              0.8
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.6666666666666667,
+              0.8
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 144,
+      "power": {
+        "n_days": 439,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.06333333333333326,
+              0.07000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              -0.03333333333333326,
+              0.10000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.016666666666666746,
+              0.15000000000000005
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.06666666666666674,
+              0.20000000000000004
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.11666666666666675,
+              0.25000000000000006
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.21666666666666673,
+              0.35000000000000003
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.31666666666666676,
+              0.45000000000000007
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.41666666666666674,
+              0.55
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.1
+      },
+      "unresolved_rate": 0.3921495789995047,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.8411719352351581,
+        "p_accept_given_no": 0.08812095032397409,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.5284171929109799
+      }
+    },
+    {
+      "disc_id": "D4-t50-w30",
+      "family": "D4",
+      "flow_augmented": false,
+      "params": {
+        "tau": 0.5,
+        "w": 30
+      },
+      "poke_delta": 0.05,
+      "separation": {
+        "S": 0.7463123935129677,
+        "n": 4964,
+        "n_yes": 2756,
+        "n_no": 2208,
+        "base_rate": 0.49858984689766317,
+        "call_rate": 0.5551974214343272,
+        "unresolved_rate": 0.38533927686973746
+      },
+      "control_deranged": {
+        "S": 0.2870489419658821,
+        "n": 4964,
+        "n_yes": 2756,
+        "n_no": 2208,
+        "p_accept_given_yes": 0.6262699564586357,
+        "p_accept_given_no": 0.3392210144927536,
+        "base_rate": 0.49858984689766317,
+        "call_rate": 0.5551974214343272,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 582,
+          "n_unpermuted_singleton_rows": 34,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4930
+        }
+      },
+      "collapse_fraction": 0.3846230405135225,
+      "day_clustered_ci": {
+        "n": 444,
+        "block": 5,
+        "stat": 0.75,
+        "ci": [
+          0.6666666666666666,
+          0.8
+        ],
+        "ci_low_seed_range": [
+          0.6666666666666666,
+          0.6666666666666666
+        ],
+        "ci_high_seed_range": [
+          0.8,
+          0.8
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.6735873752594833,
+          0.7673226356458633
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.6666666666666666,
+              0.8
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.6666666666666666,
+              0.8
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.6666666666666666,
+              0.8
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 138,
+      "power": {
+        "n_days": 444,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.06333333333333337,
+              0.07000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              -0.03333333333333337,
+              0.10000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.016666666666666635,
+              0.15000000000000005
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.06666666666666662,
+              0.20000000000000004
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.11666666666666664,
+              0.25000000000000006
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.21666666666666662,
+              0.35000000000000003
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.31666666666666665,
+              0.45000000000000007
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.41666666666666663,
+              0.55
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.1
+      },
+      "unresolved_rate": 0.3853392768697375,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.8305515239477503,
+        "p_accept_given_no": 0.08423913043478261,
+        "base_rate": 0.49858984689766317,
+        "call_rate": 0.5551974214343272
+      }
+    },
+    {
+      "disc_id": "D3-w30",
+      "family": "D3",
+      "flow_augmented": false,
+      "params": {
+        "w": 30
+      },
+      "poke_delta": 0.0,
+      "separation": {
+        "S": 0.740748492853756,
+        "n": 4909,
+        "n_yes": 2800,
+        "n_no": 2109,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.5703809329802404,
+        "unresolved_rate": 0.39214957899950476
+      },
+      "control_deranged": {
+        "S": 0.28519542098489464,
+        "n": 4909,
+        "n_yes": 2800,
+        "n_no": 2109,
+        "p_accept_given_yes": 0.6085714285714285,
+        "p_accept_given_no": 0.3233760075865339,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.5703809329802404,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 583,
+          "n_unpermuted_singleton_rows": 38,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4871
+        }
+      },
+      "collapse_fraction": 0.3850097890664221,
+      "day_clustered_ci": {
+        "n": 433,
+        "block": 5,
+        "stat": 0.75,
+        "ci": [
+          0.6666666666666666,
+          0.8
+        ],
+        "ci_low_seed_range": [
+          0.6666666666666666,
+          0.6666666666666666
+        ],
+        "ci_high_seed_range": [
+          0.75,
+          0.8
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.6619058680595191,
+          0.7560113457899124
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.6666666666666666,
+              0.75
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.6666666666666666,
+              0.8
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.6666666666666666,
+              0.75
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 150,
+      "power": {
+        "n_days": 433,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.06333333333333337,
+              0.07000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              -0.03333333333333337,
+              0.10000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.016666666666666635,
+              0.15000000000000005
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.06666666666666662,
+              0.20000000000000004
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.11666666666666664,
+              0.25000000000000006
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.21666666666666662,
+              0.35000000000000003
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.31666666666666665,
+              0.45000000000000007
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.41666666666666663,
+              0.55
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.1
+      },
+      "unresolved_rate": 0.3921495789995047,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.8042857142857143,
+        "p_accept_given_no": 0.06353722143195828,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.5703809329802404
+      }
+    },
+    {
+      "disc_id": "D4-t50-w30",
+      "family": "D4",
+      "flow_augmented": false,
+      "params": {
+        "tau": 0.5,
+        "w": 30
+      },
+      "poke_delta": 0.1,
+      "separation": {
+        "S": 0.740555999524249,
+        "n": 5035,
+        "n_yes": 3001,
+        "n_no": 2034,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.5960278053624628,
+        "unresolved_rate": 0.37654779593858345
+      },
+      "control_deranged": {
+        "S": 0.2530611723329196,
+        "n": 5035,
+        "n_yes": 3001,
+        "n_no": 2034,
+        "p_accept_given_yes": 0.6217927357547485,
+        "p_accept_given_no": 0.3687315634218289,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.5960278053624628,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 589,
+          "n_unpermuted_singleton_rows": 43,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4992
+        }
+      },
+      "collapse_fraction": 0.3417178072900526,
+      "day_clustered_ci": {
+        "n": 440,
+        "block": 5,
+        "stat": 0.75,
+        "ci": [
+          0.6666666666666666,
+          0.8
+        ],
+        "ci_low_seed_range": [
+          0.6666666666666666,
+          0.6666666666666666
+        ],
+        "ci_high_seed_range": [
+          0.8,
+          0.8
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.6711013612860203,
+          0.7649726601786262
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.6666666666666666,
+              0.8
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.6666666666666666,
+              0.8
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.6666666666666666,
+              0.8
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 149,
+      "power": {
+        "n_days": 440,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.06333333333333337,
+              0.07000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              -0.03333333333333337,
+              0.10000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.016666666666666635,
+              0.15000000000000005
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.06666666666666662,
+              0.20000000000000004
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.11666666666666664,
+              0.25000000000000006
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.21666666666666662,
+              0.35000000000000003
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.31666666666666665,
+              0.45000000000000007
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.41666666666666663,
+              0.55
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.1
+      },
+      "unresolved_rate": 0.37654779593858345,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.8187270909696768,
+        "p_accept_given_no": 0.07817109144542773,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.5960278053624628
+      }
+    },
+    {
+      "disc_id": "D3-w30",
+      "family": "D3",
+      "flow_augmented": false,
+      "params": {
+        "w": 30
+      },
+      "poke_delta": 0.05,
+      "separation": {
+        "S": 0.7317592585546348,
+        "n": 4964,
+        "n_yes": 2979,
+        "n_no": 1985,
+        "base_rate": 0.49858984689766317,
+        "call_rate": 0.6001208702659145,
+        "unresolved_rate": 0.38533927686973746
+      },
+      "control_deranged": {
+        "S": 0.2633397679643313,
+        "n": 4964,
+        "n_yes": 2979,
+        "n_no": 1985,
+        "p_accept_given_yes": 0.6038939241356159,
+        "p_accept_given_no": 0.34055415617128465,
+        "base_rate": 0.49858984689766317,
+        "call_rate": 0.6001208702659145,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 582,
+          "n_unpermuted_singleton_rows": 34,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4930
+        }
+      },
+      "collapse_fraction": 0.3598721367522947,
+      "day_clustered_ci": {
+        "n": 433,
+        "block": 5,
+        "stat": 0.7,
+        "ci": [
+          0.6666666666666666,
+          0.75
+        ],
+        "ci_low_seed_range": [
+          0.6666666666666666,
+          0.6666666666666666
+        ],
+        "ci_high_seed_range": [
+          0.75,
+          0.75
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.6510910420465018,
+          0.7457449667722655
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.6666666666666666,
+              0.75
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.6666666666666666,
+              0.75
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.6666666666666666,
+              0.75
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 149,
+      "power": {
+        "n_days": 433,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.013333333333333326,
+              0.07000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              0.016666666666666677,
+              0.10000000000000005
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.06666666666666668,
+              0.15000000000000005
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.11666666666666667,
+              0.20000000000000004
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.16666666666666669,
+              0.25000000000000006
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.26666666666666666,
+              0.35000000000000003
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.3666666666666667,
+              0.45000000000000007
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.4666666666666667,
+              0.55
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.05
+      },
+      "unresolved_rate": 0.3853392768697375,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.7912051023833501,
+        "p_accept_given_no": 0.059445843828715365,
+        "base_rate": 0.49858984689766317,
+        "call_rate": 0.6001208702659145
+      }
+    },
+    {
+      "disc_id": "D4-t75-w30",
+      "family": "D4",
+      "flow_augmented": false,
+      "params": {
+        "tau": 0.75,
+        "w": 30
+      },
+      "poke_delta": 0.0,
+      "separation": {
+        "S": 0.7265989378099277,
+        "n": 4909,
+        "n_yes": 1974,
+        "n_no": 2935,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.40211855775106947,
+        "unresolved_rate": 0.39214957899950476
+      },
+      "control_deranged": {
+        "S": 0.30718488562556856,
+        "n": 4909,
+        "n_yes": 1974,
+        "n_no": 2935,
+        "p_accept_given_yes": 0.6697061803444783,
+        "p_accept_given_no": 0.3625212947189097,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.40211855775106947,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 583,
+          "n_unpermuted_singleton_rows": 38,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4871
+        }
+      },
+      "collapse_fraction": 0.4227708982777588,
+      "day_clustered_ci": {
+        "n": 419,
+        "block": 5,
+        "stat": 0.75,
+        "ci": [
+          0.6666666666666667,
+          0.8
+        ],
+        "ci_low_seed_range": [
+          0.6666666666666667,
+          0.6666666666666667
+        ],
+        "ci_high_seed_range": [
+          0.8,
+          0.8
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.6444775203435253,
+          0.7441768492041684
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.6666666666666667,
+              0.8
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.6666666666666667,
+              0.8
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.6666666666666667,
+              0.8
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 164,
+      "power": {
+        "n_days": 419,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.06333333333333326,
+              0.07000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              -0.03333333333333326,
+              0.10000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.016666666666666746,
+              0.15000000000000005
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.06666666666666674,
+              0.20000000000000004
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.11666666666666675,
+              0.25000000000000006
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.21666666666666673,
+              0.35000000000000003
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.31666666666666676,
+              0.45000000000000007
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.41666666666666674,
+              0.55
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.1
+      },
+      "unresolved_rate": 0.3921495789995047,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.9204660587639311,
+        "p_accept_given_no": 0.1938671209540034,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.40211855775106947
+      }
+    },
+    {
+      "disc_id": "D4-t75-w30",
+      "family": "D4",
+      "flow_augmented": false,
+      "params": {
+        "tau": 0.75,
+        "w": 30
+      },
+      "poke_delta": 0.1,
+      "separation": {
+        "S": 0.7253596588284855,
+        "n": 5035,
+        "n_yes": 2336,
+        "n_no": 2699,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.46395233366434957,
+        "unresolved_rate": 0.37654779593858345
+      },
+      "control_deranged": {
+        "S": 0.2837395065143356,
+        "n": 5035,
+        "n_yes": 2336,
+        "n_no": 2699,
+        "p_accept_given_yes": 0.6716609589041096,
+        "p_accept_given_no": 0.387921452389774,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.46395233366434957,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 589,
+          "n_unpermuted_singleton_rows": 43,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4992
+        }
+      },
+      "collapse_fraction": 0.3911707841219042,
+      "day_clustered_ci": {
+        "n": 439,
+        "block": 5,
+        "stat": 0.75,
+        "ci": [
+          0.6666666666666667,
+          0.8
+        ],
+        "ci_low_seed_range": [
+          0.6666666666666667,
+          0.6666666666666667
+        ],
+        "ci_high_seed_range": [
+          0.8,
+          0.8
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.6710063905295591,
+          0.7617228888850698
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.6666666666666667,
+              0.8
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.6666666666666667,
+              0.8
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.6666666666666667,
+              0.8
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 150,
+      "power": {
+        "n_days": 439,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.06333333333333326,
+              0.07000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              -0.03333333333333326,
+              0.10000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.016666666666666746,
+              0.15000000000000005
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.06666666666666674,
+              0.20000000000000004
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.11666666666666675,
+              0.25000000000000006
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.21666666666666673,
+              0.35000000000000003
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.31666666666666676,
+              0.45000000000000007
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.41666666666666674,
+              0.55
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.1
+      },
+      "unresolved_rate": 0.37654779593858345,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.9083904109589042,
+        "p_accept_given_no": 0.18303075213041867,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.46395233366434957
+      }
+    },
+    {
+      "disc_id": "D4-t75-w30",
+      "family": "D4",
+      "flow_augmented": false,
+      "params": {
+        "tau": 0.75,
+        "w": 30
+      },
+      "poke_delta": 0.05,
+      "separation": {
+        "S": 0.7238803133314952,
+        "n": 4964,
+        "n_yes": 2113,
+        "n_no": 2851,
+        "base_rate": 0.49858984689766317,
+        "call_rate": 0.4256647864625302,
+        "unresolved_rate": 0.38533927686973746
+      },
+      "control_deranged": {
+        "S": 0.30198469065329075,
+        "n": 4964,
+        "n_yes": 2113,
+        "n_no": 2851,
+        "p_accept_given_yes": 0.6720302886890677,
+        "p_accept_given_no": 0.3700455980357769,
+        "base_rate": 0.49858984689766317,
+        "call_rate": 0.4256647864625302,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 582,
+          "n_unpermuted_singleton_rows": 34,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4930
+        }
+      },
+      "collapse_fraction": 0.41717489078197834,
+      "day_clustered_ci": {
+        "n": 428,
+        "block": 5,
+        "stat": 0.75,
+        "ci": [
+          0.6666666666666667,
+          0.8
+        ],
+        "ci_low_seed_range": [
+          0.6666666666666667,
+          0.6666666666666667
+        ],
+        "ci_high_seed_range": [
+          0.8,
+          0.8
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.652460358055647,
+          0.7535442781492712
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.6666666666666667,
+              0.8
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.6666666666666667,
+              0.8
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.6666666666666667,
+              0.8
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 154,
+      "power": {
+        "n_days": 428,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.06333333333333326,
+              0.07000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              -0.03333333333333326,
+              0.10000000000000005
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.016666666666666746,
+              0.15000000000000005
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.06666666666666674,
+              0.20000000000000004
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.11666666666666675,
+              0.25000000000000006
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.21666666666666673,
+              0.35000000000000003
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.31666666666666676,
+              0.45000000000000007
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.41666666666666674,
+              0.55
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.1
+      },
+      "unresolved_rate": 0.3853392768697375,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.914339801230478,
+        "p_accept_given_no": 0.19045948789898282,
+        "base_rate": 0.49858984689766317,
+        "call_rate": 0.4256647864625302
+      }
+    },
+    {
+      "disc_id": "D3-w30",
+      "family": "D3",
+      "flow_augmented": false,
+      "params": {
+        "w": 30
+      },
+      "poke_delta": 0.1,
+      "separation": {
+        "S": 0.7205092352465832,
+        "n": 5035,
+        "n_yes": 3238,
+        "n_no": 1797,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.6430983118172791,
+        "unresolved_rate": 0.37654779593858345
+      },
+      "control_deranged": {
+        "S": 0.2238180578914209,
+        "n": 5035,
+        "n_yes": 3238,
+        "n_no": 1797,
+        "p_accept_given_yes": 0.599444101297097,
+        "p_accept_given_no": 0.3756260434056761,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.6430983118172791,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 589,
+          "n_unpermuted_singleton_rows": 43,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4992
+        }
+      },
+      "collapse_fraction": 0.3106387079338721,
+      "day_clustered_ci": {
+        "n": 434,
+        "block": 5,
+        "stat": 0.7142857142857143,
+        "ci": [
+          0.6666666666666666,
+          0.75
+        ],
+        "ci_low_seed_range": [
+          0.6666666666666666,
+          0.6666666666666666
+        ],
+        "ci_high_seed_range": [
+          0.75,
+          0.75
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.6400508098241876,
+          0.7352536807975739
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.6666666666666666,
+              0.75
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.6666666666666666,
+              0.75
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.6666666666666666,
+              0.75
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 155,
+      "power": {
+        "n_days": 434,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.02761904761904767,
+              0.0557142857142857
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              0.002380952380952331,
+              0.0857142857142857
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.052380952380952334,
+              0.1357142857142857
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.10238095238095232,
+              0.1857142857142857
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.15238095238095234,
+              0.2357142857142857
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.2523809523809523,
+              0.3357142857142857
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.35238095238095235,
+              0.4357142857142857
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.45238095238095233,
+              0.5357142857142857
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.05
+      },
+      "unresolved_rate": 0.37654779593858345,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.7767140210006177,
+        "p_accept_given_no": 0.0562047857540345,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.6430983118172791
+      }
+    },
+    {
+      "disc_id": "D2-ft",
+      "family": "D2",
+      "flow_augmented": false,
+      "params": {},
+      "poke_delta": 0.0,
+      "separation": {
+        "S": 0.6074249494139602,
+        "n": 4909,
+        "n_yes": 3778,
+        "n_no": 1131,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.7696068445711958,
+        "unresolved_rate": 0.39214957899950476
+      },
+      "control_deranged": {
+        "S": 0.1880897316541062,
+        "n": 4909,
+        "n_yes": 3778,
+        "n_no": 1131,
+        "p_accept_given_yes": 0.5293806246691372,
+        "p_accept_given_no": 0.34129089301503096,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.7696068445711958,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 583,
+          "n_unpermuted_singleton_rows": 38,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4871
+        }
+      },
+      "collapse_fraction": 0.30965098130324414,
+      "day_clustered_ci": {
+        "n": 381,
+        "block": 5,
+        "stat": 0.5,
+        "ci": [
+          0.5,
+          0.6
+        ],
+        "ci_low_seed_range": [
+          0.5,
+          0.5
+        ],
+        "ci_high_seed_range": [
+          0.6,
+          0.6
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.48420904795535535,
+          0.5842960435082513
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.5,
+              0.6
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.5,
+              0.6
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.5,
+              0.6
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 202,
+      "power": {
+        "n_days": 381,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              0.02,
+              0.11999999999999998
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              0.05,
+              0.14999999999999997
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.1,
+              0.19999999999999998
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.15,
+              0.24999999999999997
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.2,
+              0.3
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.3,
+              0.39999999999999997
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.4,
+              0.5
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.5,
+              0.6
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.02
+      },
+      "unresolved_rate": 0.3921495789995047,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.6259925886712546,
+        "p_accept_given_no": 0.01856763925729443,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.7696068445711958
+      }
+    },
+    {
+      "disc_id": "D8-t75-w30-flow",
+      "family": "D4",
+      "flow_augmented": true,
+      "params": {
+        "tau": 0.75,
+        "w": 30
+      },
+      "poke_delta": 0.0,
+      "separation": {
+        "S": 0.6038830311269222,
+        "n": 4909,
+        "n_yes": 1194,
+        "n_no": 3715,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.24322672642085966,
+        "unresolved_rate": 0.39214957899950476
+      },
+      "control_deranged": {
+        "S": 0.27961994810300944,
+        "n": 4909,
+        "n_yes": 1194,
+        "n_no": 3715,
+        "p_accept_given_yes": 0.6976549413735343,
+        "p_accept_given_no": 0.4180349932705249,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.24322672642085966,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 583,
+          "n_unpermuted_singleton_rows": 38,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4871
+        }
+      },
+      "collapse_fraction": 0.46303660425960835,
+      "day_clustered_ci": {
+        "n": 380,
+        "block": 5,
+        "stat": 0.5,
+        "ci": [
+          0.4083333333333333,
+          0.5
+        ],
+        "ci_low_seed_range": [
+          0.4,
+          0.4083333333333333
+        ],
+        "ci_high_seed_range": [
+          0.5,
+          0.5
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.4141598167913957,
+          0.519245619665995
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.4,
+              0.5227272727272727
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.4083333333333333,
+              0.5
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.4,
+              0.5227272727272727
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 203,
+      "power": {
+        "n_days": 380,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.07166666666666667,
+              0.02
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              -0.04166666666666667,
+              0.05
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.008333333333333331,
+              0.1
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.05833333333333332,
+              0.15
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.10833333333333334,
+              0.2
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.20833333333333331,
+              0.3
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.30833333333333335,
+              0.4
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.4083333333333333,
+              0.5
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.1
+      },
+      "unresolved_rate": 0.3921495789995047,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.9430485762144054,
+        "p_accept_given_no": 0.3391655450874832,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.24322672642085966
+      }
+    },
+    {
+      "disc_id": "D2-ft",
+      "family": "D2",
+      "flow_augmented": false,
+      "params": {},
+      "poke_delta": 0.1,
+      "separation": {
+        "S": 0.6027573424579412,
+        "n": 5035,
+        "n_yes": 4200,
+        "n_no": 835,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.8341608738828202,
+        "unresolved_rate": 0.37654779593858345
+      },
+      "control_deranged": {
+        "S": 0.1490761334473909,
+        "n": 5035,
+        "n_yes": 4200,
+        "n_no": 835,
+        "p_accept_given_yes": 0.5442857142857143,
+        "p_accept_given_no": 0.39520958083832336,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.8341608738828202,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 589,
+          "n_unpermuted_singleton_rows": 43,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4992
+        }
+      },
+      "collapse_fraction": 0.24732362917303333,
+      "day_clustered_ci": {
+        "n": 348,
+        "block": 5,
+        "stat": 0.5227272727272727,
+        "ci": [
+          0.5,
+          0.625
+        ],
+        "ci_low_seed_range": [
+          0.5,
+          0.5
+        ],
+        "ci_high_seed_range": [
+          0.625,
+          0.625
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.4885300922622351,
+          0.5856801198140481
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.5,
+              0.625
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.5,
+              0.625
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.5,
+              0.625
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 241,
+      "power": {
+        "n_days": 348,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.0027272727272727067,
+              0.1222727272727273
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              0.027272727272727296,
+              0.15227272727272728
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.0772727272727273,
+              0.2022727272727273
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.1272727272727273,
+              0.2522727272727273
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.1772727272727273,
+              0.3022727272727273
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.2772727272727273,
+              0.4022727272727273
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.3772727272727273,
+              0.5022727272727273
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.4772727272727273,
+              0.6022727272727273
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.05
+      },
+      "unresolved_rate": 0.37654779593858345,
+      "interpretation_band": "SEPARATES",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.6195238095238095,
+        "p_accept_given_no": 0.016766467065868262,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.8341608738828202
+      }
+    },
+    {
+      "disc_id": "D2-ft",
+      "family": "D2",
+      "flow_augmented": false,
+      "params": {},
+      "poke_delta": 0.05,
+      "separation": {
+        "S": 0.6025262586019559,
+        "n": 4964,
+        "n_yes": 3960,
+        "n_no": 1004,
+        "base_rate": 0.49858984689766317,
+        "call_rate": 0.797743755036261,
+        "unresolved_rate": 0.38533927686973746
+      },
+      "control_deranged": {
+        "S": 0.16054267777375342,
+        "n": 4964,
+        "n_yes": 3960,
+        "n_no": 1004,
+        "p_accept_given_yes": 0.531060606060606,
+        "p_accept_given_no": 0.3705179282868526,
+        "base_rate": 0.49858984689766317,
+        "call_rate": 0.797743755036261,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 582,
+          "n_unpermuted_singleton_rows": 34,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4930
+        }
+      },
+      "collapse_fraction": 0.26644926338357644,
+      "day_clustered_ci": {
+        "n": 371,
+        "block": 5,
+        "stat": 0.5277777777777778,
+        "ci": [
+          0.5,
+          0.6
+        ],
+        "ci_low_seed_range": [
+          0.5,
+          0.5
+        ],
+        "ci_high_seed_range": [
+          0.6,
+          0.6
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.48364597099462564,
+          0.5792559100714931
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.5,
+              0.6
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.5,
+              0.6
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.5,
+              0.6
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 211,
+      "power": {
+        "n_days": 371,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.00777777777777779,
+              0.09222222222222219
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              0.022222222222222213,
+              0.12222222222222219
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.07222222222222222,
+              0.1722222222222222
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.1222222222222222,
+              0.22222222222222218
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.17222222222222222,
+              0.2722222222222222
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.2722222222222222,
+              0.3722222222222222
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.37222222222222223,
+              0.4722222222222222
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.4722222222222222,
+              0.5722222222222222
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.05
+      },
+      "unresolved_rate": 0.3853392768697375,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.6204545454545455,
+        "p_accept_given_no": 0.017928286852589643,
+        "base_rate": 0.49858984689766317,
+        "call_rate": 0.797743755036261
+      }
+    },
+    {
+      "disc_id": "D1-n3",
+      "family": "D1",
+      "flow_augmented": false,
+      "params": {
+        "n": 3
+      },
+      "poke_delta": 0.1,
+      "separation": {
+        "S": 0.596265683237863,
+        "n": 4822,
+        "n_yes": 4213,
+        "n_no": 609,
+        "base_rate": 0.5423060970551639,
+        "call_rate": 0.8737038573206138,
+        "unresolved_rate": 0.38123957397664576
+      },
+      "control_deranged": {
+        "S": 0.16964263790589534,
+        "n": 4822,
+        "n_yes": 4213,
+        "n_no": 609,
+        "p_accept_given_yes": 0.5637313078566343,
+        "p_accept_given_no": 0.39408866995073893,
+        "base_rate": 0.5423060970551639,
+        "call_rate": 0.8737038573206138,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 589,
+          "n_unpermuted_singleton_rows": 47,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4775
+        }
+      },
+      "collapse_fraction": 0.28450847109747435,
+      "day_clustered_ci": {
+        "n": 294,
+        "block": 5,
+        "stat": 0.5,
+        "ci": [
+          0.45227272727272727,
+          0.6
+        ],
+        "ci_low_seed_range": [
+          0.45227272727272727,
+          0.45227272727272727
+        ],
+        "ci_high_seed_range": [
+          0.6,
+          0.6
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.47295193024827853,
+          0.5762389708083281
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.45454545454545453,
+              0.6
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.45227272727272727,
+              0.6
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.44999999999999996,
+              0.6
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 295,
+      "power": {
+        "n_days": 294,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              -0.027727272727272757,
+              0.11999999999999998
+            ],
+            "detected": false
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              0.0022727272727272457,
+              0.14999999999999997
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.05227272727272725,
+              0.19999999999999998
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.10227272727272724,
+              0.24999999999999997
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.15227272727272725,
+              0.3
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.2522727272727272,
+              0.39999999999999997
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.3522727272727273,
+              0.5
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.45227272727272727,
+              0.6
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.05
+      },
+      "unresolved_rate": 0.37654779593858345,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.6176121528601947,
+        "p_accept_given_no": 0.021346469622331693,
+        "base_rate": 0.519563058589871,
+        "call_rate": 0.8737038573206138
+      }
+    },
+    {
+      "disc_id": "D1-n3",
+      "family": "D1",
+      "flow_augmented": false,
+      "params": {
+        "n": 3
+      },
+      "poke_delta": 0.0,
+      "separation": {
+        "S": 0.5918937336201615,
+        "n": 4464,
+        "n_yes": 3769,
+        "n_no": 695,
+        "base_rate": 0.5342741935483871,
+        "call_rate": 0.8443100358422939,
+        "unresolved_rate": 0.40088578714266543
+      },
+      "control_deranged": {
+        "S": 0.16925925431053407,
+        "n": 4464,
+        "n_yes": 3769,
+        "n_no": 695,
+        "p_accept_given_yes": 0.5606261607853542,
+        "p_accept_given_no": 0.39136690647482014,
+        "base_rate": 0.5342741935483871,
+        "call_rate": 0.8443100358422939,
+        "unresolved_rate": 0.0,
+        "class": "within_sample_attribution",
+        "enforcement": "REPORT LAYER \u2014 collapse fraction reported, operator judges",
+        "destroy_form": "DERANGEMENT within calendar-day blocks (zero fixed points)",
+        "derangement_stats": {
+          "n_blocks": 578,
+          "n_unpermuted_singleton_rows": 41,
+          "fixed_point_rate_within_permutable": 0.0,
+          "n_permutable_rows": 4423
+        }
+      },
+      "collapse_fraction": 0.28596223392213427,
+      "day_clustered_ci": {
+        "n": 315,
+        "block": 5,
+        "stat": 0.5,
+        "ci": [
+          0.5,
+          0.5714285714285714
+        ],
+        "ci_low_seed_range": [
+          0.5,
+          0.5
+        ],
+        "ci_high_seed_range": [
+          0.5714285714285714,
+          0.5714285714285714
+        ],
+        "ci_excludes_zero": true,
+        "trimmed_mean_ci": [
+          0.4495879299444892,
+          0.5526993056784139
+        ],
+        "block_sensitivity": [
+          {
+            "block_req": 2,
+            "ci": [
+              0.5,
+              0.5714285714285714
+            ]
+          },
+          {
+            "block_req": 5,
+            "ci": [
+              0.5,
+              0.5714285714285714
+            ]
+          },
+          {
+            "block_req": 10,
+            "ci": [
+              0.5,
+              0.5714285714285714
+            ]
+          }
+        ],
+        "block_fragile": false
+      },
+      "n_days_dropped_no_call": 263,
+      "power": {
+        "n_days": 315,
+        "curve": [
+          {
+            "planted": 0.02,
+            "ci": [
+              0.02,
+              0.0914285714285714
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.05,
+            "ci": [
+              0.05,
+              0.1214285714285714
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.1,
+            "ci": [
+              0.1,
+              0.1714285714285714
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.15,
+            "ci": [
+              0.15,
+              0.2214285714285714
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.2,
+            "ci": [
+              0.2,
+              0.2714285714285714
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.3,
+            "ci": [
+              0.3,
+              0.3714285714285714
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.4,
+            "ci": [
+              0.4,
+              0.4714285714285714
+            ],
+            "detected": true
+          },
+          {
+            "planted": 0.5,
+            "ci": [
+              0.5,
+              0.5714285714285714
+            ],
+            "detected": true
+          }
+        ],
+        "mde": 0.02
+      },
+      "unresolved_rate": 0.3921495789995047,
+      "interpretation_band": "SUGGESTIVE",
+      "band_note": "LABEL, NOT A GATE \u2014 nothing is dropped on it (L-32)",
+      "CALIBRATION_ONLY": {
+        "note": "NOT_AN_EDGE_CLAIM \u2014 absolute conditional rates, for audit of S only",
+        "p_accept_given_yes": 0.6264261077208809,
+        "p_accept_given_no": 0.034532374100719423,
+        "base_rate": 0.48604603788959055,
+        "call_rate": 0.8443100358422939
+      }
+    }
+  ],
+  "race_grid": {
+    "qualify_minutes": 30,
+    "poke_deltas": [
+      0.0,
+      0.05,
+      0.1
+    ],
+    "discriminators": [
+      {
+        "disc_id": "D1-n1",
+        "family": "D1",
+        "flow_augmented": false,
+        "params": {
+          "n": 1
+        }
+      },
+      {
+        "disc_id": "D1-n2",
+        "family": "D1",
+        "flow_augmented": false,
+        "params": {
+          "n": 2
+        }
+      },
+      {
+        "disc_id": "D1-n3",
+        "family": "D1",
+        "flow_augmented": false,
+        "params": {
+          "n": 3
+        }
+      },
+      {
+        "disc_id": "D2-ft",
+        "family": "D2",
+        "flow_augmented": false,
+        "params": {}
+      },
+      {
+        "disc_id": "D3-w15",
+        "family": "D3",
+        "flow_augmented": false,
+        "params": {
+          "w": 15
+        }
+      },
+      {
+        "disc_id": "D3-w30",
+        "family": "D3",
+        "flow_augmented": false,
+        "params": {
+          "w": 30
+        }
+      },
+      {
+        "disc_id": "D4-t50-w15",
+        "family": "D4",
+        "flow_augmented": false,
+        "params": {
+          "tau": 0.5,
+          "w": 15
+        }
+      },
+      {
+        "disc_id": "D4-t50-w30",
+        "family": "D4",
+        "flow_augmented": false,
+        "params": {
+          "tau": 0.5,
+          "w": 30
+        }
+      },
+      {
+        "disc_id": "D4-t75-w15",
+        "family": "D4",
+        "flow_augmented": false,
+        "params": {
+          "tau": 0.75,
+          "w": 15
+        }
+      },
+      {
+        "disc_id": "D4-t75-w30",
+        "family": "D4",
+        "flow_augmented": false,
+        "params": {
+          "tau": 0.75,
+          "w": 30
+        }
+      },
+      {
+        "disc_id": "D5-n1-flow",
+        "family": "D1",
+        "flow_augmented": true,
+        "params": {
+          "n": 1
+        }
+      },
+      {
+        "disc_id": "D5-n2-flow",
+        "family": "D1",
+        "flow_augmented": true,
+        "params": {
+          "n": 2
+        }
+      },
+      {
+        "disc_id": "D5-n3-flow",
+        "family": "D1",
+        "flow_augmented": true,
+        "params": {
+          "n": 3
+        }
+      },
+      {
+        "disc_id": "D6-ft-flow",
+        "family": "D2",
+        "flow_augmented": true,
+        "params": {}
+      },
+      {
+        "disc_id": "D7-w15-flow",
+        "family": "D3",
+        "flow_augmented": true,
+        "params": {
+          "w": 15
+        }
+      },
+      {
+        "disc_id": "D7-w30-flow",
+        "family": "D3",
+        "flow_augmented": true,
+        "params": {
+          "w": 30
+        }
+      },
+      {
+        "disc_id": "D8-t50-w15-flow",
+        "family": "D4",
+        "flow_augmented": true,
+        "params": {
+          "tau": 0.5,
+          "w": 15
+        }
+      },
+      {
+        "disc_id": "D8-t50-w30-flow",
+        "family": "D4",
+        "flow_augmented": true,
+        "params": {
+          "tau": 0.5,
+          "w": 30
+        }
+      },
+      {
+        "disc_id": "D8-t75-w15-flow",
+        "family": "D4",
+        "flow_augmented": true,
+        "params": {
+          "tau": 0.75,
+          "w": 15
+        }
+      },
+      {
+        "disc_id": "D8-t75-w30-flow",
+        "family": "D4",
+        "flow_augmented": true,
+        "params": {
+          "tau": 0.75,
+          "w": 30
+        }
+      }
+    ],
+    "n_cells": 60
+  },
+  "tripwire_outcome_path_swap": {
+    "class": "future_destroy",
+    "enforcement": "HARD \u2014 survival means the emission is invalid, never 'it works'",
+    "adjudication_kind": "i3_path_swap_survival",
+    "cell": "D4-t50-w30",
+    "S_raw": 0.7535814007209768,
+    "S_raw_pooled_race": 0.753050984911184,
+    "S_raw_n": 4804,
+    "S_swapped": 0.027980397618467323,
+    "S_swapped_n": 7799,
+    "collapse_fraction": 0.03712989411853521,
+    "survives": false,
+    "destroy_form": "OUTCOME PRICE PATH swapped between events (derangement within horizon buckets), labels RECOMPUTED from the swapped path",
+    "swap_stats": {
+      "n_blocks": 860,
+      "n_unpermuted_singleton_rows": 165,
+      "fixed_point_rate_within_permutable": 0.0,
+      "n_permutable_rows": 7911,
+      "block_definition": "symbol x horizon-value-decile (same-symbol donors only)",
+      "status": "OK",
+      "n_events_spliced": 7911,
+      "n_events_total": 8076,
+      "n_events_eligible": 7911,
+      "n_self_donor_skipped": 165,
+      "n_no_donor_path": 0,
+      "n_cross_symbol_donors": 0,
+      "spliced_fraction": 1.0,
+      "n_symbols_spliced": 105,
+      "swapped_unresolved_rate": 0.014157502212109721,
+      "median_donor_level_offset_ib_widths": 23.37691254199553
+    },
+    "positive_control": {
+      "kind": "i3_leak_plant",
+      "purpose": "a discriminator that CAN see outcome bars (w=240, read_past_qualify), evaluated on the SAME spliced bars. It reads the donor outcome path and the labels come from the donor outcome path, so its separation MUST PERSIST. If it collapses, the destroy is not reaching what the rule reads and the gate's pass carries no information (AMENDMENT-6).",
+      "required_outcome": "SURVIVES",
+      "read_past_qualify": true,
+      "S_raw": 0.7434265874514563,
+      "S_swapped": 0.9810026683714779,
+      "collapse_fraction": 1.3195689862726825,
+      "survives": true,
+      "survives_rederived": {
+        "same_sign_material": true,
+        "survives": true,
+        "thresholds": {
+          "cf_survival": 0.25
+        }
+      }
+    },
+    "survives_rederived": {
+      "same_sign_material": false,
+      "survives": false,
+      "thresholds": {
+        "cf_survival": 0.25
+      }
+    }
+  },
+  "scope": "STAGE I parameter \u2014 not evidence that anything works",
+  "pin_sha256": "3bdd89ba2afb66a6ea717eb6d783111af075bb1de416b1a58e6826b3cdff5230"
+}

@@ -1,0 +1,147 @@
+{
+  "item": "INFR-018",
+  "generated_utc": "2026-07-21T00:07:55.082775+00:00",
+  "purpose": "pin the units of the MDE plant: what a drift plant of size s does to the contrast the curve is swept in (QA I-13 / I-48)",
+  "cell": {
+    "anchor_id": "A-USOPEN",
+    "ib_minutes": 15
+  },
+  "frozen_inputs": {
+    "baselines_sha256": "1b7244c87aaafe293a945a8ac03a31222c95dcc232e7fb1d835d5227fa41ed72"
+  },
+  "tolerance": 1e-09,
+  "leg1_session_level": {
+    "symbol": "BTCUSDT",
+    "anchor_id": "A-USOPEN",
+    "ib_minutes": 15,
+    "n_sessions_with_asym": 227,
+    "n_sessions_total": 228,
+    "claim": "a post-break drift of s\u00b7IB_width raises MFE by s\u00b7IB_width AND lowers MAE by s\u00b7IB_width, so asym rises by 2s \u2014 NOT s",
+    "sweep": [
+      {
+        "s_drift": 0.02,
+        "mean_asym_shift": 0.040000000000011415,
+        "max_abs_deviation_from_2s": 8.731140810347426e-13,
+        "max_abs_deviation_from_1s": 0.020000000000873114,
+        "n_sessions": 227
+      },
+      {
+        "s_drift": 0.05,
+        "mean_asym_shift": 0.09999999999999125,
+        "max_abs_deviation_from_2s": 1.4551970739518083e-12,
+        "max_abs_deviation_from_1s": 0.050000000000534325,
+        "n_sessions": 227
+      },
+      {
+        "s_drift": 0.1,
+        "mean_asym_shift": 0.19999999999999102,
+        "max_abs_deviation_from_2s": 2.9103941479036166e-12,
+        "max_abs_deviation_from_1s": 0.10000000000072759,
+        "n_sessions": 227
+      },
+      {
+        "s_drift": 0.15,
+        "mean_asym_shift": 0.30000000000000837,
+        "max_abs_deviation_from_2s": 2.9103941479036166e-12,
+        "max_abs_deviation_from_1s": 0.1500000000029104,
+        "n_sessions": 227
+      },
+      {
+        "s_drift": 0.2,
+        "mean_asym_shift": 0.4000000000000102,
+        "max_abs_deviation_from_2s": 1.4551693183761927e-12,
+        "max_abs_deviation_from_1s": 0.20000000000145518,
+        "n_sessions": 227
+      },
+      {
+        "s_drift": 0.3,
+        "mean_asym_shift": 0.5999999999999902,
+        "max_abs_deviation_from_2s": 1.4551693183761927e-12,
+        "max_abs_deviation_from_1s": 0.30000000000053434,
+        "n_sessions": 227
+      },
+      {
+        "s_drift": 0.5,
+        "mean_asym_shift": 1.0,
+        "max_abs_deviation_from_2s": 2.6645352591003757e-14,
+        "max_abs_deviation_from_1s": 0.5000000000000266,
+        "n_sessions": 227
+      },
+      {
+        "s_drift": 0.75,
+        "mean_asym_shift": 1.5,
+        "max_abs_deviation_from_2s": 9.85878045867139e-14,
+        "max_abs_deviation_from_1s": 0.7500000000000986,
+        "n_sessions": 227
+      },
+      {
+        "s_drift": 1.0,
+        "mean_asym_shift": 2.0,
+        "max_abs_deviation_from_2s": 7.105427357601002e-15,
+        "max_abs_deviation_from_1s": 1.000000000000007,
+        "n_sessions": 227
+      }
+    ],
+    "max_abs_deviation_from_2s": 2.9103941479036166e-12
+  },
+  "leg2_pooled_day_contrast": {
+    "anchor_id": "A-USOPEN",
+    "ib_minutes": 15,
+    "n_days": 607,
+    "claim": "adding s to every real-arm session shifts the paired day-contrast series by exactly s",
+    "sweep": [
+      {
+        "s": 0.02,
+        "same_day_set": true,
+        "max_abs_deviation_from_base_plus_s": 7.105427357601002e-15
+      },
+      {
+        "s": 0.05,
+        "same_day_set": true,
+        "max_abs_deviation_from_base_plus_s": 7.105427357601002e-15
+      },
+      {
+        "s": 0.1,
+        "same_day_set": true,
+        "max_abs_deviation_from_base_plus_s": 7.105427357601002e-15
+      },
+      {
+        "s": 0.15,
+        "same_day_set": true,
+        "max_abs_deviation_from_base_plus_s": 7.105427357601002e-15
+      },
+      {
+        "s": 0.2,
+        "same_day_set": true,
+        "max_abs_deviation_from_base_plus_s": 7.105427357601002e-15
+      },
+      {
+        "s": 0.3,
+        "same_day_set": true,
+        "max_abs_deviation_from_base_plus_s": 7.105427357601002e-15
+      },
+      {
+        "s": 0.5,
+        "same_day_set": true,
+        "max_abs_deviation_from_base_plus_s": 1.7763568394002505e-15
+      },
+      {
+        "s": 0.75,
+        "same_day_set": true,
+        "max_abs_deviation_from_base_plus_s": 7.105427357601002e-15
+      },
+      {
+        "s": 1.0,
+        "same_day_set": true,
+        "max_abs_deviation_from_base_plus_s": 7.105427357601002e-15
+      }
+    ],
+    "max_abs_deviation": 7.105427357601002e-15
+  },
+  "measured_relation": "a post-break drift of s\u00b7IB_width shifts the paired day contrast by 2s",
+  "units_of_the_published_mde": "CONTRAST units \u2014 the same units as E. The curve is swept directly on the contrast, so `mde` and `below_own_mde` compare like with like. The equivalent drift plant is HALF the published floor.",
+  "relation_holds": true,
+  "recentring": "mde_curve sweeps values \u2212 median(values) + u. The re-centring is a deliberate choice: it makes the curve a DETECTABILITY floor at the realised n rather than a sweep piled on top of the effect already in the data.",
+  "supersedes": "the 2026-07-21 version of this artifact, whose leg 1 added the plant to the mfe column and then verified asym had moved \u2014 arithmetic on an identity, and wrong by a factor of 2 (QA run 6, I-48)",
+  "scope": "validity attestation \u2014 not a value read, not evidence of anything working"
+}

@@ -1,6 +1,6 @@
 # CF-SIGAUC-001 — Signed Auction Structure from 1-Minute Bars
 
-**Status:** **`REGISTERED` (2026-07-20, checkpoint-014 D1 — operator-signed)** — registration act only, no status transition. 0 slots · 0 counted TEST reads · holdout SEALED. Active sequence: INFR-017 → INFR-018 → SPDR-007 (master gate) → SPDR-008.
+**Status:** **`REGISTERED` (2026-07-20, checkpoint-014 D1 — operator-signed)** — registration act only, no status transition. 0 slots · 0 counted TEST reads · holdout SEALED. Active sequence: INFR-017 ✅ → INFR-018 ✅ → **SPDR-007** (master gate) → SPDR-008.
 **Family ID:** CF-SIGAUC-001
 **Chapter:** 04 (NautilusTrader + Bybit USDT-perp primary, INFR-010+)
 **Route:** **INFR (instrument build) → SPDR (spine + breadth) → full XENA** — EXP lane not used
@@ -157,6 +157,7 @@ Mapped from the source's framework-level falsifiers (§6.10). Stage I gates are 
 
 | 2026-07-20 | **Operator rulings post-INFR-017:** holdout touch **CLEARED** (disclosure stands; holdout SEALED, no shot consumed); **SPDR-008 sized to 296** TRAIN-readable instruments (ckpt-014 AMENDMENT-1, NEUTRAL) with the survivorship caveat binding on every breadth read. |
 | 2026-07-20 | **INFR-017 COMPLETE — QA APPROVE (run 4).** Kill-gate **HYP-I1 PASS**: the stored taker split reproduces bit-exactly from raw Bybit trades (20/20 symbol-days, worst relative deviation 0.0), and the archive `side` column is confirmed the **AGGRESSOR** side (Buy-PlusTick 26.2:1, unanimous) — **delta = buy − sell is verified as exact net taker aggression with the correct sign; the family's founding premise holds.** Frozen for INFR-018: `results/seasonal_baselines.parquet` sha `1b7244c8…` (A5 baselines, 194 instruments, full 10,080-cell grid, DESIGN bank only), `results/column_pins.json` `pin_sha256 e3b9fd9b…`, `SignedBar` contract + `data/catalog_sigbar/`. **`SpreadBps` pinned UNUSABLE** as a spread or cost input. Two defects found and fixed in-flight (aliased seasonal grid; a holdout-crossing scan behind the design's headline figures — corrected and disclosed, **operator adjudication pending**). Breadth limit recorded: 296 of 894 admitted instruments have TRAIN data, 197 reach the DESIGN bank. 0 slots, 0 counted reads, holdout SEALED. Report `python/experiments/INFR-017/report.md`. |
+| 2026-07-21 | **INFR-018 COMPLETE — operator accepted instrument registry.** Stage I freeze only (parameters, not edge): registry `pin_sha256 5c386984…` — anchor **A-USOPEN · L=15**, A6 **D4-t50-w30 · δ=0**, kernel **K-UNIFORM** (calibrated on DESIGN days), class residual thresholds pinned; §2.5 spread regime still **UNAVAILABLE**. DESIGN races 140 symbols / 609 days; CONFIRM train-internal recorded. Integrity: I2 future-shift + I3 path-swap both collapse (do not survive); both leak plants fire. QA runs 1–7 REVISE → run 8 APPROVE. Family status unchanged (REGISTERED). 0 slots, 0 counted TEST reads, holdout SEALED. Report `python/experiments/INFR-018/report.md`. Next: **SPDR-007**. |
 
 ---
 

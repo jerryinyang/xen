@@ -15,6 +15,20 @@ Contents
     :class:`SignedBar` — the custom Nautilus ``Data`` contract.
 ``baselines``
     A5 seasonal baselines: minute-of-day x day-of-week residual normalisation.
+
+INFR-018 instrument-build apparatus (imported directly, not re-exported here,
+so importing the tier does not pull in the whole calibration stack):
+
+``fences``
+    Band fences, frozen-input hash verification, the online universe rule.
+``sessions``
+    A7 anchor candidates, IB windows, breaks, excursions, pseudo-anchor controls.
+``acceptance``
+    A6 discriminator candidates, outcome labels, separation.
+``profile``
+    §2.1 volume-profile kernels and their calibration against trade-level truth.
+``classes``
+    §2.3 signed effort-vs-result classes and the structural-clustering test.
 """
 
 from xen.sigbar.baselines import (

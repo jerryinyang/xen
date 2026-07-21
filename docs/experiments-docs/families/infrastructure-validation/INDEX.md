@@ -8,6 +8,7 @@ Not a candidate family — no signals, no slots; apparatus and substrate work on
 - [VAL-008 — INFR-010 Phase D end-to-end pipeline dry run](#val-008)
 - [INFR-014 — Fresh Bybit XENA CAL + universe_selection](#infr-014)
 - [INFR-015 — CLS-EPISODE overlap-block binder amendment](#infr-015)
+- [INFR-018 — CF-SIGAUC-001 Stage I instrument build + freeze](#infr-018)
 
 ## VAL-008 — INFR-010 Phase D end-to-end pipeline dry run {#val-008}
 
@@ -82,3 +83,22 @@ Not a candidate family — no signals, no slots; apparatus and substrate work on
   for reachability (LOW ood 0.75): calibrated certification ≠ reachable certification —
   XENA designs must budget expected leg counts vs F*. Fallbacks if pin rejected: episode
   resampling; generator realism. Report: `python/experiments/INFR-015/report.md`.
+
+## INFR-018 — CF-SIGAUC-001 Stage I instrument build + freeze {#infr-018}
+
+- **Hypothesis Tests:** Stage I only — freeze a valid session anchor (HYP-I2), A6
+  acceptance discriminator (HYP-I3), and profile/class instruments (HYP-I4); integrity
+  tripwires must collapse real constructions and fire on deliberate leak plants.
+- **Scope:** DESIGN select + CONFIRM train-internal; online top-20 panel (~140 symbols /
+  609 DESIGN days); inherits INFR-017 baselines `1b7244c8…` / pins `e3b9fd9b…`; no P&L;
+  0 TEST / holdout sealed.
+- **Results / Observations:** Freezes: **A-USOPEN×L15**, **D4-t50-w30 δ=0**, kernel
+  **K-UNIFORM** calibrated; registry `pin_sha256 5c386984…`. I2 shift survives=false
+  (cf≈−41.7); I3 path-swap survives=false (cf≈0.037); both leak plants survive. I3
+  winner band SUGGESTIVE (S≈0.75) — value label only. Spread regime UNAVAILABLE.
+- **Hypothesis-Specific Conclusion:** **operator COMPLETE / registry accepted 2026-07-21**
+  (QA run 8 APPROVE after 7 REVISE rounds). Instrument set ready for SPDR-007; family
+  status unchanged (REGISTERED). Not evidence of edge.
+- **Hypothesis-Agnostic Observations:** path-swap must move the bars the rule reads
+  (AMENDMENT-6); bar-frame `session_end` can shadow poke joins; soft-control RNG order is
+  load-bearing for bit-stable parallel races. Report: `python/experiments/INFR-018/report.md`.

@@ -1470,9 +1470,9 @@ D0 card: `candidate-families/cf-sigauc-001.md`; checkpoint:
 `docs/experiments-docs/checkpoints/2026-07-20-014-signed-auction-structure/design.md`;
 source methodology: `.ignore/what-next/orderflow/ohlc/SIGNAL-SIGNED.md` (normative for signal
 definitions, falsifiers, phase order).
-**Route:** INFR-017 (signed-bar lane) → INFR-018 (instrument build + freeze) → SPDR-007
-(statistical spine, master go/no-go) → SPDR-008 (breadth sweep) → full XENA at
-checkpoint-015 if the spine holds. **EXP lane not used.** Mechanism class: sparse
+**Route:** INFR-017 ✅ (signed-bar lane) → INFR-018 ✅ (instrument build + freeze; registry
+`pin_sha256 5c386984…`, 2026-07-21) → **SPDR-007** (statistical spine, master go/no-go) →
+SPDR-008 (breadth sweep) → full XENA at checkpoint-015 if the spine holds. **EXP lane not used.** Mechanism class: sparse
 session-anchored auction events (breakout / trap / acceptance) + located signed-flow triggers.
 **Information source:** 1m OHLCV **+ exact taker buy/sell volume** (Δ = BuyVolume − SellVolume)
 + per-bar spread proxy + calendar. Verified on disk 2026-07-20 at

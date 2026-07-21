@@ -1,0 +1,43 @@
+{
+  "item": "INFR-018",
+  "generated_utc": "2026-07-20T23:55:49.099539+00:00",
+  "reconciliation": {
+    "band": "DESIGN",
+    "n_staged_files_scanned": 904,
+    "n_staged_with_band_bars": 200,
+    "n_admitted_with_band_bars": 197,
+    "staged_with_bars_not_admitted": [
+      "BTTUSDT",
+      "COCOSUSDT",
+      "RAYUSDT"
+    ],
+    "unreadable_staging_files": [],
+    "n_days": 609,
+    "n_distinct_symbols_selected": 140,
+    "membership_sha256": "f11dd7f0aea42f82d0d0a6e58ff71c28fcf47101a475b97533e6ec581acda2d5",
+    "churn": {
+      "churn_rate": 0.09322845612188176,
+      "n_day_pairs": 608,
+      "n_pairs_calendar_adjacent": 608,
+      "definition": "mean over consecutive panel days of |members(d) \\ members(d-1)| / |members(d)|; divisor is that day's panel size",
+      "panel_size": {
+        "max": 20,
+        "min": 2,
+        "n_days_at_full_panel": 351,
+        "n_days_below_full": 258,
+        "n_days_below_half_full": 153
+      },
+      "churn_rate_full_panel_pairs_only": 0.13328402366863903,
+      "n_full_panel_pairs": 338
+    },
+    "rule": {
+      "n": 20,
+      "reeval": "daily 00:00 UTC",
+      "statistic": "trailing-24h QUOTE turnover = sum(Volume * (H+L+C)/3), USDT",
+      "causality": "turnover measured over day D ranks membership for day D+1 (<= t-1)",
+      "eligibility": ">=1200 of 1440 trailing bars AND ADMITTED",
+      "tie_break": "lexicographic by symbol",
+      "delisting": "fails eligibility from that day forward; no backfill, no exclusion of prior days"
+    }
+  }
+}

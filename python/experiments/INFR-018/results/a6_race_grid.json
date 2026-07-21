@@ -1,0 +1,175 @@
+{
+  "qualify_minutes": 30,
+  "poke_deltas": [
+    0.0,
+    0.05,
+    0.1
+  ],
+  "discriminators": [
+    {
+      "disc_id": "D1-n1",
+      "family": "D1",
+      "flow_augmented": false,
+      "params": {
+        "n": 1
+      }
+    },
+    {
+      "disc_id": "D1-n2",
+      "family": "D1",
+      "flow_augmented": false,
+      "params": {
+        "n": 2
+      }
+    },
+    {
+      "disc_id": "D1-n3",
+      "family": "D1",
+      "flow_augmented": false,
+      "params": {
+        "n": 3
+      }
+    },
+    {
+      "disc_id": "D2-ft",
+      "family": "D2",
+      "flow_augmented": false,
+      "params": {}
+    },
+    {
+      "disc_id": "D3-w15",
+      "family": "D3",
+      "flow_augmented": false,
+      "params": {
+        "w": 15
+      }
+    },
+    {
+      "disc_id": "D3-w30",
+      "family": "D3",
+      "flow_augmented": false,
+      "params": {
+        "w": 30
+      }
+    },
+    {
+      "disc_id": "D4-t50-w15",
+      "family": "D4",
+      "flow_augmented": false,
+      "params": {
+        "tau": 0.5,
+        "w": 15
+      }
+    },
+    {
+      "disc_id": "D4-t50-w30",
+      "family": "D4",
+      "flow_augmented": false,
+      "params": {
+        "tau": 0.5,
+        "w": 30
+      }
+    },
+    {
+      "disc_id": "D4-t75-w15",
+      "family": "D4",
+      "flow_augmented": false,
+      "params": {
+        "tau": 0.75,
+        "w": 15
+      }
+    },
+    {
+      "disc_id": "D4-t75-w30",
+      "family": "D4",
+      "flow_augmented": false,
+      "params": {
+        "tau": 0.75,
+        "w": 30
+      }
+    },
+    {
+      "disc_id": "D5-n1-flow",
+      "family": "D1",
+      "flow_augmented": true,
+      "params": {
+        "n": 1
+      }
+    },
+    {
+      "disc_id": "D5-n2-flow",
+      "family": "D1",
+      "flow_augmented": true,
+      "params": {
+        "n": 2
+      }
+    },
+    {
+      "disc_id": "D5-n3-flow",
+      "family": "D1",
+      "flow_augmented": true,
+      "params": {
+        "n": 3
+      }
+    },
+    {
+      "disc_id": "D6-ft-flow",
+      "family": "D2",
+      "flow_augmented": true,
+      "params": {}
+    },
+    {
+      "disc_id": "D7-w15-flow",
+      "family": "D3",
+      "flow_augmented": true,
+      "params": {
+        "w": 15
+      }
+    },
+    {
+      "disc_id": "D7-w30-flow",
+      "family": "D3",
+      "flow_augmented": true,
+      "params": {
+        "w": 30
+      }
+    },
+    {
+      "disc_id": "D8-t50-w15-flow",
+      "family": "D4",
+      "flow_augmented": true,
+      "params": {
+        "tau": 0.5,
+        "w": 15
+      }
+    },
+    {
+      "disc_id": "D8-t50-w30-flow",
+      "family": "D4",
+      "flow_augmented": true,
+      "params": {
+        "tau": 0.5,
+        "w": 30
+      }
+    },
+    {
+      "disc_id": "D8-t75-w15-flow",
+      "family": "D4",
+      "flow_augmented": true,
+      "params": {
+        "tau": 0.75,
+        "w": 15
+      }
+    },
+    {
+      "disc_id": "D8-t75-w30-flow",
+      "family": "D4",
+      "flow_augmented": true,
+      "params": {
+        "tau": 0.75,
+        "w": 30
+      }
+    }
+  ],
+  "n_cells": 60
+}

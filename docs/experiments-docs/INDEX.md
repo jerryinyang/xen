@@ -45,7 +45,13 @@ retrospective, blast radius NOT investigated). Frozen for INFR-018: `seasonal_ba
 original headline figures (corrected; one data-quality column's distribution; no shot spent);
 (2) baseline coverage — only 296 of 894 admitted instruments have TRAIN data and 197 reach the
 DESIGN bank, a survivorship-shaped subset, against a family whose thesis is cross-sectional breadth.
-Next: **INFR-018** (anchor race, acceptance-discriminator race, proxy validation).
+**INFR-018 COMPLETE 2026-07-21 — operator accepted instrument registry.** Stage I freeze:
+anchor **A-USOPEN · L=15**, A6 rule **D4-t50-w30 · δ=0**, kernel **K-UNIFORM** (calibrated),
+class residual thresholds pinned; registry `pin_sha256 5c386984…`. Integrity tripwires clean
+(I2 future-shift + I3 path-swap collapse; both positive-control leak plants fire). CONFIRM
+train-internal recorded (not OOS). Spread regime still **UNAVAILABLE**. QA runs 1–7 REVISE →
+run 8 APPROVE. **0 counted TEST reads; holdout SEALED.** Next: **SPDR-007** (statistical spine
+— master go/no-go) then **SPDR-008** (breadth).
 
 ## Current Infrastructure Tasks
 
@@ -64,7 +70,7 @@ Next: **INFR-018** (anchor race, acceptance-discriminator race, proxy validation
 | Family | Range | Status |
 |--------|-------|--------|
 | [infrastructure-validation](families/infrastructure-validation/INDEX.md) | VAL-008 | Phase D PASS 2026-07-16 |
-| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018, SPDR-007/008 | **REGISTERED 2026-07-20** (ckpt-014 D1) — INFR-017 COMPLETE (QA APPROVE); INFR-018 next |
+| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018, SPDR-007/008 | **REGISTERED 2026-07-20** (ckpt-014 D1) — INFR-017 COMPLETE; **INFR-018 COMPLETE** (registry pin `5c386984…`); next SPDR-007 |
 
 New candidate families register at `docs/signal-registry/candidate-families/` when research
 opens.
@@ -73,5 +79,5 @@ opens.
 
 | Checkpoint | Closed | Outcome |
 |---|---|---|
-| [014 — Signed Auction Structure](checkpoints/2026-07-20-014-signed-auction-structure/design.md) | OPEN (2026-07-20) | **DESIGN SIGNED** — D1–D6 approved; CF-SIGAUC-001 REGISTERED; 6 adherence resolutions signed. **INFR-017 COMPLETE (QA APPROVE)** — kill-gate PASS, spread column pinned UNUSABLE, 2 defects caught+fixed, 2 operator decisions open. INFR-018 next. |
+| [014 — Signed Auction Structure](checkpoints/2026-07-20-014-signed-auction-structure/design.md) | OPEN (2026-07-20) | **DESIGN SIGNED** — D1–D6 approved; CF-SIGAUC-001 REGISTERED. **INFR-017 COMPLETE**; **INFR-018 COMPLETE** (instrument registry pin `5c386984…` — A-USOPEN×15, D4-t50-w30, K-UNIFORM; integrity clean). Next: SPDR-007 spine → SPDR-008 breadth. |
 | [013 — Chapter 04 Open: HTFCAP + EPSOSC + Fresh XENA CAL](checkpoints/2026-07-16-013-chapter04-open-htfcap-epsosc-cal/retrospective.md) | 2026-07-19 | Both families closed — CF-EPSOSC-001 RETIRED (refuted 2×, drift pedestal); CF-HTFCAP-001 CLOSED (characterised — real sub-cost gross BTC edge). Apparatus rebuilt on Bybit (fresh CAL pin `abbb1842…`, report-layer framework INFR-016). Holdout SEALED. |
