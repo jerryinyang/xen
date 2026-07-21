@@ -69,6 +69,48 @@ CANDIDATE_ANCHORS: tuple[AnchorSpec, ...] = (
     AnchorSpec("A-EUOPEN", tz="Europe/London", local_time=(8, 0)),
 )
 
+#: INFR-020 operational anchors for 1h / 4h session framing (design §2 W4).
+#: No breakout-expectancy race is run for these. They are not edge-bearing.
+#: A-H4's grid is a strict superset of A-FUND; A-FUND was raced negative at
+#: INFR-018 for breakout-after-IB — that evidence scopes anchor *quality*, not
+#: absorption detection (AMENDMENT-9).
+OPERATIONAL_ANCHORS: tuple[AnchorSpec, ...] = (
+    AnchorSpec("A-H1", minutes_of_day=tuple(range(0, 1440, 60))),
+    AnchorSpec("A-H4", minutes_of_day=(0, 240, 480, 720, 960, 1200)),
+)
+
+#: Wall-clock minutes of initial balance for the D6 pairs, before the
+#: "minimum one LTF bar" floor. D4's 1h LTF forces 60 min (design §2 W4).
+IB_WALL_CLOCK_MINUTES = 15
+
+
+def ib_minutes_for_ltf(
+    ltf_bar_minutes: int,
+    *,
+    wall_clock_minutes: int = IB_WALL_CLOCK_MINUTES,
+) -> int:
+    """IB length in wall-clock minutes as LTF bars covering it, minimum one bar.
+
+    Holding wall-clock constant makes IB share-of-session vary across pairs
+    (1%→25%); IB-derived objects are not cross-pair comparable without saying so.
+
+    At ``ltf_bar_minutes=1`` and wall-clock 15 this returns 15 — the frozen
+    ``session_breaks(..., ib_minutes=15)`` path for A-USOPEN / D1.
+    """
+    if ltf_bar_minutes < 1:
+        raise ValueError(f"ltf_bar_minutes must be >= 1, got {ltf_bar_minutes}")
+    if wall_clock_minutes < 1:
+        raise ValueError(f"wall_clock_minutes must be >= 1, got {wall_clock_minutes}")
+    return max(wall_clock_minutes, ltf_bar_minutes)
+
+
+def operational_anchor(anchor_id: str) -> AnchorSpec:
+    """Lookup an INFR-020 operational anchor by id; raise if unknown."""
+    for a in OPERATIONAL_ANCHORS:
+        if a.anchor_id == anchor_id:
+            return a
+    raise KeyError(f"unknown operational anchor {anchor_id!r}; known={[a.anchor_id for a in OPERATIONAL_ANCHORS]}")
+
 #: UTC minutes-of-day occupied by each candidate anchor across the year,
 #: including both DST phases of the equity opens.
 OCCUPIED_MINUTES: dict[str, tuple[int, ...]] = {

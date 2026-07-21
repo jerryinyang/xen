@@ -1,0 +1,35 @@
+{
+  "item": "INFR-020",
+  "generated_utc": "2026-07-21T23:11:53.974362+00:00",
+  "frozen_inputs": {
+    "baselines_sha256": "1b7244c87aaafe293a945a8ac03a31222c95dcc232e7fb1d835d5227fa41ed72",
+    "column_pins_sha256": "e3b9fd9b9b5851b8a9a11f9ce34cd1e0fa8e10ea1fe1b210bd0090da379e6225",
+    "fence_manifest_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448"
+  },
+  "artifacts": {
+    "reproduction_battery.json": "c29bf4fece02044a231ce96d8e805dba5f78191dde1040b5899365efb2a77092",
+    "gap_excision_report.json": "c1fe4aaf012ed874787e01db9c2c04867e1732a1a697093166bb64c7a8a88ae0",
+    "seasonal_baselines_mtf.parquet": "86c81937cbee23f76a62bd4051394f59da3deb2230e7dd958fc573cee38a12c1",
+    "class_thresholds_mtf.json": "745fb435eeb9e70fec88d55a32e6dfce38b4c02619824f9cff4d51ca3dcb3ae7",
+    "sessions_mtf.json": "c55cd8806bba048f90e48795fdcab021738d9984a1602ca14f164a0f05b262df",
+    "class_thresholds_1m.json": "dee853ad96f11754f410aa8c0a7632b0a782029dee0b770b500a74a9f959e9fc",
+    "zone_scale_census.json": "f64e0d22355f8c5f3c5acafff598ae43fa0e84cfac9acc6f9e88fbd458487f1e",
+    "zone_scale_census_d1_ibwidth.json": "76c3d4b58c00361d081de9225e226db2fe2aa86a56f17c18ec23e0e046705f0c",
+    "coverage_report.json": "68dac757a4c96f0989da902805e11265e8108f7555f3d02df6a66f2dafc3a424"
+  },
+  "battery": {
+    "mode": "full",
+    "all_ok": true,
+    "generated_utc": "2026-07-21T22:57:46.924235+00:00",
+    "n_symbols": 194,
+    "covers_modules": [
+      "xen.sigbar.ltf",
+      "xen.sigbar.fences",
+      "xen.sigbar.baselines",
+      "xen.sigbar.sessions",
+      "xen.sigbar.classes",
+      "xen.sigbar.profile"
+    ],
+    "covers_runner": false
+  }
+}

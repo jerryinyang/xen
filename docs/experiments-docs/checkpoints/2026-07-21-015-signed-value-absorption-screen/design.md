@@ -1,8 +1,9 @@
 # Checkpoint 015 — Signed Value Where Price Is Blind: the Absorption Screen (design)
 
-**Opened:** 2026-07-21 · **Status:** **DESIGN SIGNED — operator decisions D1–D5 approved 2026-07-21**
-(§Operator decisions; rollover DEFERRED INDEFINITELY). Execution proceeds item-by-item under the §3/§4
-gates: SPDR-009 enters Stage 1 (quant-designer) next. No status transitions (retrospective acts only).
+**Opened:** 2026-07-21 · **Status:** **DESIGN SIGNED — D1–D6 approved; INFR-020 apparatus
+FROZEN 2026-07-22** (§Operator decisions; rollover DEFERRED INDEFINITELY). Execution proceeds
+item-by-item under the §3/§4 gates: SPDR-009 enters developer implementation next. No status
+transitions (retrospective acts only).
 **Container for:** SPDR-009 (S9 signed-absorption marginal-value screen — **master go/no-go**),
 SPDR-010 (S14 CVD-divergence screen — rides along, memo-gated), INFR-019 (tick-floored per-symbol
 spread reconstruction — parallel, non-blocking), plus a cheap analysis follow-up (trimmed/median
@@ -221,3 +222,108 @@ VOID on Bybit · **no net breadth claim until INFR-019** · S1 operational-ancho
 | **D5** | Chapter-04 rollover — defer or roll now? | **DEFERRED INDEFINITELY** — not tied to the S9 screen; the operator will call it separately, not at this checkpoint boundary |
 
 **SIGNED.** SPDR-009 enters Stage 1 (quant-designer) under this container as the next act.
+
+---
+
+## D6 — Multi-timeframe widening of SPDR-009 — SIGNED 2026-07-21
+
+**Operator directive.** SPDR-009 must not test the S9 mechanism at one scale only. In addition to
+the original **1d/1m** pair it tests **1h/5m, 4h/15m, 1d/1h**, all in a single run, with the pairs
+compared internally under one frozen design. Sequencing route **A**: the 1d/1m execution approval
+(granted, then held) is **suspended** until the multi-timeframe apparatus exists; nothing runs until
+all four pairs can run together.
+
+### D6.1 Rationale (operator's, recorded as given)
+
+The 1d/1m pair is *"too large and too frequent to find trades and signals"*. That is a correct
+reading of a real defect in the original scope, and it is confirmed by this design's own numbers:
+
+- **Scale mismatch.** 1,440 detection bars sit inside one level-building session. The object that
+  names the level and the object that detects the event are three orders of magnitude apart.
+- **The cost floor does not shrink with the hold.** The ~11–13 bps round trip is ~85% exchange fee,
+  which is hold-invariant. A 10-minute hold must clear it in 10 minutes; a 10-bar hold at 4h/15m
+  has 2.5 hours to clear the *same* floor. The coarser pairs are strictly better on economics, and
+  this is the strongest argument for the widening.
+- **Event scarcity.** The measured 1d/1m census (SPDR-009 §6.3) yields 19 signal events across ten
+  deep instruments, making INCONCLUSIVE the most likely outcome. Coarser detection changes the
+  event population, not just its count.
+
+### D6.2 The four pre-registered domain pairs
+
+| pair | HTF — session + level construction | LTF — detection bar + hold unit | LTF bars/session | holds H=5/10 |
+|---|---|---|---|---|
+| **D1** | 1d (A-USOPEN, frozen) | 1m | 1440 | 5 / 10 min |
+| **D2** | 1h (clock-aligned UTC) | 5m | 12 | 25 / 50 min |
+| **D3** | 4h (00/04/08/12/16/20 UTC) | 15m | 16 | 75 / 150 min |
+| **D4** | 1d (A-USOPEN, frozen) | 1h | 24 | 5 / 10 h |
+
+All four are **pre-registered, not searched**. Multiplicity is 4 pairs × 2 event pools × 2 holds =
+**16 primary cells**, declared up front and governed by the Addendum §2.2 mirror-tail rule.
+
+### D6.3 The invariant that makes the pairs comparable (adopted from the operator's framing)
+
+The operator's assumption — *"the engine would use the 1-minute bars regardless to simulate fills as
+granular as possible"* — is **factually wrong for this lane** (SPDR is vectorised Python; there is
+no engine and no fill simulation; Nautilus enters only at graduation). **The underlying principle is
+nonetheless correct and is adopted as binding:**
+
+> **HTF and LTF govern session framing and event detection ONLY. Every price-path and
+> volume-at-price measurement stays on 1-minute bars in all four pairs.**
+
+Consequences, each load-bearing:
+- **Outcomes** (forward return, MFE/MAE) are measured minute by minute regardless of detection
+  timeframe — no intrabar ambiguity, and the excursion is honest at every pair.
+- **Volume profiles** (POC, value-area edges) are built from the **1-minute bars of the prior HTF
+  session**, never from LTF bars. This keeps the frozen **K-UNIFORM** kernel inside the regime it
+  was trade-truth-calibrated in, and preserves the full seven-kind level set at every pair. A
+  profile built from 12–24 coarse bars would have been a different, unvalidated object.
+
+### D6.4 Apparatus this requires (prerequisite, blocking)
+
+Not a parameter change. A new INFR item must land first:
+
+1. **Seasonal baselines per LTF timeframe.** `xen.sigbar.baselines` is hard-wired to a 1440×7
+   minute-of-day grid and raises on anything else. Refit per instrument per timeframe
+   (5m→288×7, 15m→96×7, 1h→24×7), frozen and hash-pinned as Stage-I apparatus.
+2. **Class thresholds per (symbol, timeframe)** by the unchanged frozen p90/p10 rule.
+3. **Session/anchor construction for 1h and 4h.** Clock-aligned UTC. **No anchor race is run** —
+   these are asserted **operational anchors** (Addendum §2.7), their selection contrast is
+   unmeasured, and no read may treat them as edge-bearing. The 4h grid coincides with Bybit funding
+   timestamps (00/08/16 UTC), which source A7 names as a candidate anchor family — recorded as a
+   property, not a claim.
+4. **A generalised initial-balance rule.** The IB is **15 minutes of wall-clock in every pair**,
+   expressed as the LTF bars covering it, minimum one bar: D1 = 15×1m, D2 = 3×5m, D3 = 1×15m,
+   D4 = 1×1h. D1 reproduces the frozen 15-minute IB exactly. **D4 deviates**: its minimum bar is 60
+   minutes, not 15 — disclosed, not smoothed.
+5. **A re-picked contact-zone scale.** The zone is currently τ × IB width; at coarse pairs the IB is
+   a single bar and that scale collapses. The zone scale becomes the **prior HTF session's range**,
+   with τ re-picked per pair on **event counts only, never on outcomes**, and frozen before any
+   read. D1's original `0.25 × ib_width` definition is retained as a pre-registered sensitivity so
+   the QA-approved 1d/1m read is not lost.
+
+### D6.5 The consequence the operator flagged — recorded as a live trigger
+
+> *"If these domain pairs show better results than the 1d/1m pair, it might warrant a rerun of the
+> previous checkpoint SPDR experiments."*
+
+**Adopted.** SPDR-007 (price-only spine) and SPDR-008 (signed trap load) are both `NOT_WORTH`, and
+**both were run exclusively on daily-anchored objects**. If a coarser pair carries signal where
+1d/1m does not, those two nulls become **candidates for scale artifacts rather than absent
+mechanisms**, and re-running them across the domain-pair grid is warranted. This is not a
+speculative aside — it is exactly the **horizon-menu clause (Addendum §2.10 / ckpt-015 §4 rule 10)**,
+which requires either one screen per untested horizon class or an explicit session-horizon-only
+scoping before any whole-family close.
+
+**Binding on the ckpt-015 §7 closure rule:** with D6 in force, a third powered null that is null
+**across all four pairs** is a materially stronger close than the session-horizon-scoped one §7
+contemplated. Conversely, **a null at 1d/1m alone can no longer close the family** — the widening
+is precisely the test of whether that null was scale-bound.
+
+| # | Question (plain) | Operator decision (2026-07-21) |
+|---|---|---|
+| **D6** | Widen SPDR-009 across four HTF/LTF domain pairs, building the apparatus first and running all pairs at once (route A)? | **APPROVED (A)** — all four pairs run together under one frozen design; 1d/1m execution approval suspended until the apparatus lands; SPDR-007/008 re-run trigger recorded per D6.5 |
+
+**D6 prerequisite COMPLETE (operator freeze, 2026-07-22).** INFR-020 QA Run 10 APPROVE;
+operator accepted pin manifest `5f170b71…`. SPDR-009's four-pair design now carries the exact
+consumer hashes. Next: developer implementation → fresh-context design-to-code QA → operator
+execution gate.

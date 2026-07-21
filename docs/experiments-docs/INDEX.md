@@ -89,8 +89,9 @@ only), **S3 Δ+ DELETED** (binary-mechanism rule), S2/S3-base/A6/A8 CONFIRMED-as
 layer UNAVAILABLE. The addendum adds 10 protocol rules (Part 2) and a revised path (Part 3) superseding
 Appendix B Phase 6 onward. Retrospective: `checkpoints/2026-07-20-014-signed-auction-structure/retrospective.md`.
 
-**Checkpoint-015 OPENED 2026-07-21 — DESIGN SIGNED (operator D1–D5 approved; rollover DEFERRED
-INDEFINITELY). Next act: SPDR-009 → Stage 1 (quant-designer).**
+**Checkpoint-015 OPENED 2026-07-21 — DESIGN SIGNED (operator D1–D6 approved; rollover DEFERRED
+INDEFINITELY). INFR-020 COMPLETE 2026-07-22 — operator accepted Run-10 pin manifest
+`5f170b71…`; SPDR-009 enters developer implementation.**
 The signed-value screen: **SPDR-009** — S9 signed-absorption **marginal-value** master go/no-go (does
 signed absorption add value over the unsigned Climax-hold class on identical events — the thesis that
 exact delta pays *where price is blind*; gate-free, location-qualified); **SPDR-010** — S14 CVD-divergence
@@ -110,13 +111,14 @@ holdout SEALED. Design: `checkpoints/2026-07-21-015-signed-value-absorption-scre
 | INFR-013 | Phase E COMPLETE 2026-07-16 — verify PASS | `xen.orderflow` contracts + skeleton; NO collection/detectors; spec `docs/references/orderflow-feature-store.md`; sample-day report `INFR-013/results/sample_day_report.json` |
 | INFR-014 | **COMPLETE 2026-07-17 — pin ACCEPTED (partial)** | QA run 4 APPROVE; CLS-FILTER LOW_ONLY_CERTIFY; CLS-EPISODE TERMINAL; active pin sha256 `ac8a1eb6…`; S1 A-vs-B PASS; `python/experiments/INFR-014/report.md` |
 | INFR-015 | **COMPLETE 2026-07-18 — pin `abbb1842…` ACCEPTED** | n_legs_floor F*=16 atop overlap blocks; LOW CERTIFIED (0.025/0.030, ood 0.75), HIGH FAIL_COV; audit SOUND; EPSOSC unblocked LOW-only; `python/experiments/INFR-015/report.md` §9.3 |
+| INFR-020 | **COMPLETE 2026-07-22 — Run-10 pin `5f170b71…` ACCEPTED** | 194-symbol multi-timeframe apparatus; full battery and nine hashes pass; D1–D4 usable floors 194/72/47/31; no outcomes or TEST/holdout; `python/experiments/INFR-020/report.md` |
 
 ## Family Indexes
 
 | Family | Range | Status |
 |--------|-------|--------|
-| [infrastructure-validation](families/infrastructure-validation/INDEX.md) | VAL-008 | Phase D PASS 2026-07-16 |
-| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018, SPDR-007/008 → ckpt-015 SPDR-009/010, INFR-019 | **REGISTERED 2026-07-20** — INFR-017/018 COMPLETE; **SPDR-007 NOT_WORTH** (price-only spine, P-01); **SPDR-008 NOT_WORTH** (signed-trap breadth, powered null; only unsigned P-01 geometry reproduces). **Ckpt-014 CLOSED 2026-07-21 — family KEPT REGISTERED** (Addendum v1.1: closure needs the S9 3rd null). Grades: S1 DEMOTED, S3 Δ+ DELETED, S2/S3-base/A6/A8 CONFIRMED-as-measurement. **Ckpt-015 (DRAFT, D1–D5 pending):** SPDR-009 S9 absorption marginal-value master gate; SPDR-010 S14 divergence; INFR-019 spread |
+| [infrastructure-validation](families/infrastructure-validation/INDEX.md) | VAL-008, INFR-014/015/018/020 | INFR-020 apparatus frozen 2026-07-22 |
+| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018/020, SPDR-007/008 → ckpt-015 SPDR-009/010, INFR-019 | **REGISTERED 2026-07-20** — INFR-017/018/020 COMPLETE; **SPDR-007 NOT_WORTH** (price-only spine, P-01); **SPDR-008 NOT_WORTH** (signed-trap breadth, powered null; only unsigned P-01 geometry reproduces). **Ckpt-014 CLOSED 2026-07-21 — family KEPT REGISTERED** (Addendum v1.1: closure needs the S9 3rd null). Grades: S1 DEMOTED, S3 Δ+ DELETED, S2/S3-base/A6/A8 CONFIRMED-as-measurement. **Ckpt-015 D1–D6 SIGNED; INFR-020 pin `5f170b71…` accepted:** SPDR-009 implementation next; SPDR-010 S14 divergence; INFR-019 spread |
 
 New candidate families register at `docs/signal-registry/candidate-families/` when research
 opens.
@@ -125,6 +127,6 @@ opens.
 
 | Checkpoint | Closed | Outcome |
 |---|---|---|
-| [015 — Signed Value: the Absorption Screen](checkpoints/2026-07-21-015-signed-value-absorption-screen/design.md) | OPEN (2026-07-21) | **DESIGN SIGNED — D1–D5 approved; rollover deferred indefinitely; SPDR-009 → Stage 1 next.** Implements Addendum v1.1 Part 3: **SPDR-009** S9 absorption marginal-value master go/no-go (signed − unsigned on identical events; "delta pays where price is blind"; gate-free, location-qualified), **SPDR-010** S14 divergence rider (memo-gated), **INFR-019** tick-floored spread (parallel). Closure rule: third powered null closes the family (session horizon); soil ⇒ depth spend. 0 reads; holdout SEALED. |
+| [015 — Signed Value: the Absorption Screen](checkpoints/2026-07-21-015-signed-value-absorption-screen/design.md) | OPEN (2026-07-21) | **DESIGN SIGNED — D1–D6 approved; INFR-020 apparatus frozen (`5f170b71…`); SPDR-009 implementation next.** Implements Addendum v1.1 Part 3 across D1–D4: **SPDR-009** S9 absorption marginal-value master go/no-go (signed − unsigned on identical events; gate-free, location-qualified), **SPDR-010** S14 divergence rider (memo-gated), **INFR-019** tick-floored spread (parallel). Closure requires a powered null across all four pairs unless the operator narrows the horizon. 0 reads; holdout SEALED. |
 | [014 — Signed Auction Structure](checkpoints/2026-07-20-014-signed-auction-structure/retrospective.md) | 2026-07-21 | **CLOSED — family CF-SIGAUC-001 KEPT REGISTERED** (no transition; closure gated on the S9 3rd null per Addendum v1.1 §3.3). Phases 0–5 complete, four TRAIN-only items, **0 counted reads, holdout SEALED**. Data premise CONFIRMED (exact taker delta is a measurement, A8 bit-exact); **both tested edges failed** — price-only spine P-01 (SPDR-007), S3 signed trap-load a powered null (SPDR-008). Grades: S1 DEMOTED, S3 Δ+ DELETED, S2/S3-base/A6/A8 CONFIRMED-as-measurement. Flagship claim (S9/S14, "signed value where price is blind") untested → carried to ckpt-015. |
 | [013 — Chapter 04 Open: HTFCAP + EPSOSC + Fresh XENA CAL](checkpoints/2026-07-16-013-chapter04-open-htfcap-epsosc-cal/retrospective.md) | 2026-07-19 | Both families closed — CF-EPSOSC-001 RETIRED (refuted 2×, drift pedestal); CF-HTFCAP-001 CLOSED (characterised — real sub-cost gross BTC edge). Apparatus rebuilt on Bybit (fresh CAL pin `abbb1842…`, report-layer framework INFR-016). Holdout SEALED. |

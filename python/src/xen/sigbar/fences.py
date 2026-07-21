@@ -23,6 +23,7 @@ Three guarantees this module exists to make machine-checked rather than intended
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -215,6 +216,241 @@ def assert_no_per_level_delta(obj: object) -> None:
             f"PER-LEVEL DELTA BARRED: refusing to distribute {name!r} across price levels "
             "(source §2.1/Part 5; cf-sigauc-001 ban 2). Per-bar delta only."
         )
+
+
+# ---------------------------------------------------------------------------
+# INFR-020 hard integrity asserts (design §3)
+# ---------------------------------------------------------------------------
+
+#: Schema-layer outcome ban (A7 / VT-4(e)). Name check is layer (a); provenance
+#: is layer (b) via :func:`assert_no_forward_provenance`.
+FORBIDDEN_OUTCOME_COLUMNS: frozenset[str] = frozenset(
+    {
+        "return",
+        "returns",
+        "fwd_return",
+        "forward_return",
+        "fwd_ret",
+        "hold_return",
+        "mfe",
+        "mae",
+        "mfe_norm",
+        "mae_norm",
+        "asym",
+        "excursion",
+        "pnl",
+        "realized_pnl",
+        "unrealized_pnl",
+        "outcome",
+        "label_y",
+        "y_forward",
+        "forward_excursion",
+        # This programme's own outcome vocabulary (QA-6 I-8): the names
+        # SPDR-007/008/009 actually emit. Generic English alone missed these.
+        "ret",
+        "ret_bps",
+        "ret_norm",
+        "gross_bps",
+        "net_bps",
+        "edge_bps",
+        "trap_load",
+        "mfe_rev_norm",
+        "mae_rev_norm",
+        "bite",
+    }
+)
+
+#: Prefix rule (QA-6 I-8): a column whose name starts with one of these, or
+#: carries one of :data:`FORBIDDEN_OUTCOME_TOKENS` as an underscore-delimited
+#: token, is an outcome name. Underscore-terminated so ``retention`` (a coverage
+#: statistic, not an outcome) is not swept up.
+FORBIDDEN_OUTCOME_PREFIXES: tuple[str, ...] = (
+    "ret_",
+    "pnl_",
+    "mfe_",
+    "mae_",
+    "excursion_",
+    "fwd_",
+    "forward_",
+)
+
+FORBIDDEN_OUTCOME_TOKENS: frozenset[str] = frozenset(
+    {"ret", "pnl", "mfe", "mae", "excursion", "fwd", "forward"}
+)
+
+
+def _is_outcome_name(col: str) -> bool:
+    low = col.lower()
+    if low in FORBIDDEN_OUTCOME_COLUMNS:
+        return True
+    if low.startswith(FORBIDDEN_OUTCOME_PREFIXES):
+        return True
+    return any(tok in FORBIDDEN_OUTCOME_TOKENS for tok in low.split("_"))
+
+
+def check_no_outcome_columns(columns: Iterable[str] | pl.DataFrame, *, context: str = "") -> None:
+    """Raise if any known outcome / forward-result column name is present.
+
+    Layer (a) of the two-layer outcome ban (design §3). A renamed forward
+    column can defeat this alone — pair with :func:`assert_no_forward_provenance`.
+    """
+    cols = (
+        set(columns.columns)
+        if isinstance(columns, pl.DataFrame)
+        else {str(c) for c in columns}
+    )
+    hits = sorted(c for c in cols if _is_outcome_name(c))
+    if hits:
+        where = f" in {context}" if context else ""
+        raise RuntimeError(
+            f"OUTCOME BAN (schema): forbidden column(s){where}: {hits}"
+        )
+
+
+def assert_no_forward_provenance(
+    df: pl.DataFrame,
+    *,
+    time_col: str = "OpenTime",
+    source_max_col: str = "source_max_open",
+    close_col: str | None = "CloseTime",
+    period_minutes: int | None = None,
+) -> None:
+    """Raise if any row's max source OpenTime exceeds the row's own bar close.
+
+    Layer (b) of the outcome ban (QA-1 I-1): a forward-derived column cannot
+    pass by renaming when every emitted row carries its source bound.
+    """
+    if df.height == 0:
+        return
+    if source_max_col not in df.columns:
+        raise RuntimeError(
+            f"FORWARD PROVENANCE: missing {source_max_col!r} — cannot verify source bound"
+        )
+    if close_col and close_col in df.columns:
+        close_expr = pl.col(close_col)
+    elif period_minutes is not None:
+        close_expr = pl.col(time_col) + pl.duration(minutes=period_minutes)
+    else:
+        raise RuntimeError(
+            "FORWARD PROVENANCE: need CloseTime column or period_minutes to bound the row"
+        )
+    bad = df.filter(pl.col(source_max_col) >= close_expr)
+    if bad.height:
+        raise RuntimeError(
+            f"FORWARD PROVENANCE: {bad.height} rows have source_max_open >= bar close"
+        )
+
+
+def assert_windows_complete(
+    df: pl.DataFrame,
+    *,
+    context: str = "fit/event",
+) -> None:
+    """Raise if any non-COMPLETE window reaches a primary fit/event path.
+
+    Single implementation lives in :mod:`xen.sigbar.ltf`; this is a thin
+    re-export so callers that already import fences need not pull the LTF
+    stack (QA-6 I-9d: two copies of a HARD assert can drift).
+    """
+    from xen.sigbar.ltf import assert_windows_complete as _impl
+
+    _impl(df, context=context)
+
+
+def assert_levels_from_1m(
+    levels: pl.DataFrame | None = None,
+    *,
+    source_bars: pl.DataFrame | None = None,
+    level_source_bar_minutes: int | None = None,
+    time_col: str = "OpenTime",
+    context: str = "level construction",
+) -> int:
+    """Raise unless structural levels are priced off 1-minute bars (D6.3).
+
+    VT-4(i). Volume profiles / session levels stay on prior-HTF-session
+    **1-minute** bars so the frozen K-UNIFORM kernel remains in its calibrated
+    regime.
+
+    The check must *trace* provenance, not echo a declared constant (QA-6 I-2):
+
+    * ``source_bars`` — the series the levels were built from; the spacing is
+      measured with :func:`xen.sigbar.ltf.infer_bar_minutes`.
+    * ``levels`` — an emitted level frame; its stamped
+      ``level_source_bar_minutes`` column (written by
+      ``structural_levels_1m`` from the measured spacing) must be 1 on every row.
+
+    ``level_source_bar_minutes`` alone is accepted only when neither frame is
+    available, and is declaration-grade — never sufficient for an emitted artifact.
+
+    Returns the measured (or declared) bar size.
+    """
+    from xen.sigbar.ltf import infer_bar_minutes
+
+    measured: int | None = None
+
+    if source_bars is not None and source_bars.height:
+        measured = infer_bar_minutes(source_bars, time_col=time_col)
+        if measured != 1:
+            raise RuntimeError(
+                f"LEVELS FROM 1M: {context} level source series has measured "
+                f"bar_minutes={measured}; D6.3 requires 1-minute bars"
+            )
+
+    if levels is not None and levels.height:
+        col = "level_source_bar_minutes"
+        if col not in levels.columns:
+            raise RuntimeError(
+                f"LEVELS FROM 1M: {context} level frame lacks {col!r} — "
+                "provenance cannot be traced"
+            )
+        bad = levels.filter((pl.col(col) != 1) | pl.col(col).is_null())
+        if bad.height:
+            raise RuntimeError(
+                f"LEVELS FROM 1M: {context} has {bad.height} level rows priced off "
+                f"bar_minutes={sorted(set(bad[col].to_list()))}"
+            )
+        measured = 1
+
+    if measured is None:
+        if level_source_bar_minutes is None:
+            raise RuntimeError(
+                f"LEVELS FROM 1M: {context} supplied no level frame, no source "
+                "series and no declared bar size — nothing to check"
+            )
+        if level_source_bar_minutes != 1:
+            raise RuntimeError(
+                f"LEVELS FROM 1M: {context} used bar_minutes={level_source_bar_minutes}; "
+                "D6.3 requires every price-path and volume-at-price measurement "
+                "on 1-minute bars"
+            )
+        measured = level_source_bar_minutes
+
+    return measured
+
+
+def assert_design_only_fit(
+    df: pl.DataFrame,
+    *,
+    time_col: str = "OpenTime",
+    context: str = "fit",
+) -> None:
+    """Raise if a fit or W5 census path touches CONFIRM (or later) bars.
+
+    VT-4(a). DESIGN-only for every fit, threshold, and census — including W5.
+    """
+    if df.height == 0:
+        return
+    lo, hi = df[time_col].min(), df[time_col].max()
+    if hi is not None and hi >= DESIGN_BANK_END:
+        raise RuntimeError(
+            f"DESIGN-ONLY FIT: {context} max {time_col} {hi} >= DESIGN end {DESIGN_BANK_END} "
+            "(CONFIRM/TEST/holdout unreachable for fitting and census)"
+        )
+    if lo is not None and lo < ANALYSIS_START:
+        raise RuntimeError(
+            f"DESIGN-ONLY FIT: {context} min {time_col} {lo} < analysis start {ANALYSIS_START}"
+        )
+    assert_band(df, "DESIGN", time_col=time_col)
 
 
 # ---------------------------------------------------------------------------

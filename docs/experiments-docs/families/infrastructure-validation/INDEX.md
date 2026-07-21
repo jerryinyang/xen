@@ -9,6 +9,7 @@ Not a candidate family — no signals, no slots; apparatus and substrate work on
 - [INFR-014 — Fresh Bybit XENA CAL + universe_selection](#infr-014)
 - [INFR-015 — CLS-EPISODE overlap-block binder amendment](#infr-015)
 - [INFR-018 — CF-SIGAUC-001 Stage I instrument build + freeze](#infr-018)
+- [INFR-020 — Multi-timeframe signed-bar apparatus](#infr-020)
 
 ## VAL-008 — INFR-010 Phase D end-to-end pipeline dry run {#val-008}
 
@@ -102,3 +103,20 @@ Not a candidate family — no signals, no slots; apparatus and substrate work on
 - **Hypothesis-Agnostic Observations:** path-swap must move the bars the rule reads
   (AMENDMENT-6); bar-frame `session_end` can shadow poke joins; soft-control RNG order is
   load-bearing for bit-stable parallel races. Report: `python/experiments/INFR-018/report.md`.
+
+## INFR-020 — Multi-timeframe signed-bar apparatus {#infr-020}
+
+- **Hypothesis Tests:** apparatus only — can SPDR-009's D1–D4 grid share one causal candidate,
+  session, structural-level, and availability definition while reproducing the frozen 1m path?
+- **Scope:** DESIGN only; 194 A5-fitted symbols; 1m/5m/15m/1h detection support; 1h/4h session
+  framing; count-only censuses; no return, P&L, TEST, holdout, or candidate disposition.
+- **Results / Observations:** clean W1→W5 rebuild; full reproduction battery passes; all nine
+  artifact hashes match. Coverage medians 0.38505/0.20110/0.08815 at 5m/15m/1h; 0.50-floor
+  usable counts 72/47/31. Raw D4 reconciliation: 640 candidates, 43 straddling, 66 IB-self-made,
+  43 prior-self-made, 634 measured, 6 no-level. Missing/null formation provenance raises.
+- **Hypothesis-Specific Conclusion:** **operator COMPLETE / Run-10 pin manifest accepted
+  2026-07-22** (`5f170b71…`; QA Runs 1–9 REVISE → Run 10 APPROVE). SPDR-009 implementation is
+  unblocked; this is not evidence of an edge.
+- **Hypothesis-Agnostic Observations:** level formation time is part of object identity; coarse
+  pairs measure continuously traded windows and therefore require activity-conditioned wording.
+  Report: `python/experiments/INFR-020/report.md`.
