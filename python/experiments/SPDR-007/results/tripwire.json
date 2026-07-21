@@ -1,6 +1,112 @@
 {
   "class": "future_destroy (HARD)",
   "status": "NO_MATERIAL_EDGE_TRIPWIRE_UNINFORMATIVE",
+  "survives": false,
+  "any_material_edge": false,
+  "per_read": {
+    "R5": {
+      "name": "R5_excursion_asym",
+      "status": "NO_MATERIAL_EDGE_TRIPWIRE_UNINFORMATIVE",
+      "material_edge": false,
+      "survives": false,
+      "raw_contrast_median": 0.0898809523809746,
+      "raw_ci": [
+        -0.23134479271990682,
+        0.3203463203463277
+      ],
+      "raw_ci_excludes_zero": false,
+      "swapped_contrast_median": -0.4136904761904956,
+      "swapped_ci": [
+        -0.7724137931034725,
+        -0.17961711711710665
+      ],
+      "collapse_fraction": -4.602649006621594
+    },
+    "R2": {
+      "name": "R2_race_w",
+      "status": "NO_MATERIAL_EDGE_TRIPWIRE_UNINFORMATIVE",
+      "material_edge": false,
+      "survives": false,
+      "raw_contrast_median": -0.039912366114897777,
+      "raw_ci": [
+        -0.062224986753288636,
+        0.0
+      ],
+      "raw_ci_excludes_zero": false,
+      "swapped_contrast_median": -0.06410256410256412,
+      "swapped_ci": [
+        -0.09743589743589742,
+        -0.012792912147056412
+      ],
+      "collapse_fraction": 1.6060827844189638
+    },
+    "R3": {
+      "name": "R3_rho_contrast",
+      "status": "NO_MATERIAL_EDGE_TRIPWIRE_UNINFORMATIVE",
+      "material_edge": false,
+      "survives": false,
+      "raw_contrast_median": 0.1302390950752652,
+      "raw_ci": [
+        null,
+        null
+      ],
+      "raw_ci_excludes_zero": false,
+      "swapped_contrast_median": 0.08063231096773321,
+      "swapped_ci": [
+        null,
+        null
+      ],
+      "collapse_fraction": 0.6191098834120107,
+      "rho_signal_control_raw": {
+        "rho_signal_normalised": -0.22014877273885058,
+        "rho_control_normalised": -0.3503878678141158,
+        "rho_contrast": 0.1302390950752652,
+        "raw_mfe_disclosure_rho": 0.11879023545849254,
+        "note": "binding statistic is the CONTRAST; raw signal \u03c1 carries the normaliser mechanic (I-3)"
+      },
+      "rho_signal_control_swapped": {
+        "rho_signal_normalised": -0.2697555568463826,
+        "rho_control_normalised": -0.3503878678141158,
+        "rho_contrast": 0.08063231096773321
+      }
+    },
+    "R4_mfe": {
+      "name": "R4_coherence_mfe",
+      "status": "NO_MATERIAL_EDGE_TRIPWIRE_UNINFORMATIVE",
+      "material_edge": false,
+      "survives": false,
+      "raw_contrast_median": 0.07651397701658436,
+      "raw_ci": [
+        null,
+        null
+      ],
+      "raw_ci_excludes_zero": false,
+      "swapped_contrast_median": -8.881784197001252e-15,
+      "swapped_ci": [
+        null,
+        null
+      ],
+      "collapse_fraction": -1.160805455854965e-13
+    },
+    "R4_w": {
+      "name": "R4_coherence_w",
+      "status": "NO_MATERIAL_EDGE_TRIPWIRE_UNINFORMATIVE",
+      "material_edge": false,
+      "survives": false,
+      "raw_contrast_median": 0.011943327888209787,
+      "raw_ci": [
+        null,
+        null
+      ],
+      "raw_ci_excludes_zero": false,
+      "swapped_contrast_median": 0.037256564149514504,
+      "swapped_ci": [
+        null,
+        null
+      ],
+      "collapse_fraction": 3.119445810936283
+    }
+  },
   "raw_excursion_contrast_median": 0.0898809523809746,
   "raw_ci": [
     -0.23134479271990682,
@@ -13,7 +119,6 @@
     -0.17961711711710665
   ],
   "collapse_fraction": -4.602649006621594,
-  "survives": false,
   "positive_control_bite": {
     "corr": 0.7711989151117775,
     "n": 3561,
@@ -988,5 +1093,6 @@
       "spliced_fraction": 0.41379310344827586
     }
   ],
-  "threshold": "|cf|>0.25 same-sign AND raw+swapped CIs exclude zero (material-edge precondition; base |cf|>0.25 inherited INFR-018 sealed value)"
+  "threshold": "|cf|>0.25 same-sign AND raw+swapped CIs exclude zero on ANY adjudicated material contrast (R2/R3/R4/R5); R1 excluded by freeze-order (design \u00a74.3)",
+  "deviation_D2": "HARD fires only on material raw edge; no-material \u2192 UNINFORMATIVE, not a hard fail (operator-ratified 2026-07-21)"
 }

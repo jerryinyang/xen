@@ -53,6 +53,19 @@ train-internal recorded (not OOS). Spread regime still **UNAVAILABLE**. QA runs 
 run 8 APPROVE. **0 counted TEST reads; holdout SEALED.** Next: **SPDR-007** (statistical spine
 — master go/no-go) then **SPDR-008** (breadth).
 
+**SPDR-007 COMPLETE 2026-07-21 — operator disposition NOT_WORTH (price-only S1/S2 spine; a
+P-01 confirmation).** The anchored-breakout Protection quantile **reproduces** on CONFIRM
+(pooled calib_err +0.030/+0.028 — source framework-falsifier #1 not triggered on reproduction),
+**but adds ≈0 over a matched cross-session unconditional entry**: the target-before-stop race
+sits at gross breakeven (contrast −0.010) and is **below cost-adjusted breakeven on all 5
+majors** (w−p0ᶜ −0.05 to −0.14); excursion-asym contrast +0.090 CI [−0.23,+0.32] WASH. P-01
+confirmed. Integrity clean (tripwire NO_MATERIAL_EDGE, bite 0.77; freeze/fence/causal asserted).
+QA run 1 REVISE→resolved, runs 2–3 APPROVE; deviations D-1 (cross-session control) + D-2
+(material-edge tripwire) ratified. **Signed flow (Δ) UNTESTED — family warrant deferred to
+ckpt-015; tested the daily US-open session / 15-min IB / single-session hold only.** Family
+status **unchanged (REGISTERED)** — retrospective decides close/keep. **0 counted reads; holdout
+SEALED.** Next: **SPDR-008** (signed-trap breadth, S1+S3).
+
 ## Current Infrastructure Tasks
 
 | Item | Status | Detail |
@@ -70,7 +83,7 @@ run 8 APPROVE. **0 counted TEST reads; holdout SEALED.** Next: **SPDR-007** (sta
 | Family | Range | Status |
 |--------|-------|--------|
 | [infrastructure-validation](families/infrastructure-validation/INDEX.md) | VAL-008 | Phase D PASS 2026-07-16 |
-| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018, SPDR-007/008 | **REGISTERED 2026-07-20** (ckpt-014 D1) — INFR-017 COMPLETE; **INFR-018 COMPLETE** (registry pin `5c386984…`); next SPDR-007 |
+| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018, SPDR-007/008 | **REGISTERED 2026-07-20** (ckpt-014 D1) — INFR-017/018 COMPLETE; **SPDR-007 COMPLETE — NOT_WORTH** (price-only spine, P-01 confirmation; signed warrant untested); next **SPDR-008** (signed-trap breadth) |
 
 New candidate families register at `docs/signal-registry/candidate-families/` when research
 opens.
@@ -79,5 +92,5 @@ opens.
 
 | Checkpoint | Closed | Outcome |
 |---|---|---|
-| [014 — Signed Auction Structure](checkpoints/2026-07-20-014-signed-auction-structure/design.md) | OPEN (2026-07-20) | **DESIGN SIGNED** — D1–D6 approved; CF-SIGAUC-001 REGISTERED. **INFR-017 COMPLETE**; **INFR-018 COMPLETE** (instrument registry pin `5c386984…` — A-USOPEN×15, D4-t50-w30, K-UNIFORM; integrity clean). Next: SPDR-007 spine → SPDR-008 breadth. |
+| [014 — Signed Auction Structure](checkpoints/2026-07-20-014-signed-auction-structure/design.md) | OPEN (2026-07-20) | **DESIGN SIGNED** — D1–D6 approved; CF-SIGAUC-001 REGISTERED. **INFR-017/018 COMPLETE** (registry pin `5c386984…`). **SPDR-007 COMPLETE — NOT_WORTH** (price-only spine reproduces but no edge over matched entry, loses after cost; P-01 confirmation; signed warrant untested). Next: **SPDR-008** breadth (S1+S3 signed-trap). |
 | [013 — Chapter 04 Open: HTFCAP + EPSOSC + Fresh XENA CAL](checkpoints/2026-07-16-013-chapter04-open-htfcap-epsosc-cal/retrospective.md) | 2026-07-19 | Both families closed — CF-EPSOSC-001 RETIRED (refuted 2×, drift pedestal); CF-HTFCAP-001 CLOSED (characterised — real sub-cost gross BTC edge). Apparatus rebuilt on Bybit (fresh CAL pin `abbb1842…`, report-layer framework INFR-016). Holdout SEALED. |

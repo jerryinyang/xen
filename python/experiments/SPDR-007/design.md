@@ -25,7 +25,7 @@
 | Nautilus `BacktestNode`; `xen.adjudication`; `xen.estimand_validation` gate | **N/A — SPDR lane** (`spdr-lane.md`: vectorised Python, no P&L booked, no estimand-gated verdict). The integrity substitute is the code-asserted band fence + causal `t−1` self-check (§7). A `WORTH_EXPLORING` graduates into the Nautilus pipeline, where these bind. |
 | §10 SPREAD-SCALE-ROUTING | **APPLIES** — §6.4. |
 | §11 spread as a verdict leg | **N/A with reason** — no SUPPORTED/tradability band is emitted. The 1× spread is nonetheless a binding leg of the §6.3 money floor. |
-| §12 amendment ledger | 9 pre-measurement amendments from QA run 1: **0 LOOSER / 5 TIGHTER / 4 NEUTRAL** (§10). |
+| §12 amendment ledger | 9 QA-run-1 + 2 ratified developer deviations: **0 LOOSER / 6 TIGHTER / 5 NEUTRAL** (§10). |
 | §13 battery rules | **APPLIES** — §6.5, §6.6, §7. |
 | L-29/L-30/L-31 (Nautilus) | N/A — no engine run. |
 
@@ -174,30 +174,31 @@ CONTROL matched_unconditional (PRIMARY; class: within_sample_attribution → REP
   question answered: does conditioning on an ACCEPTED anchored break beat entering the same
     session, on the same side, at the SAME SESSION PHASE, with the same normaliser?
     (source §6.3; card §5 P-01 mitigation)
-  population: for each real event, 30 control entries (≥ L-19 floor of 25). Each control
-    entry's minute is set by an ENTRY-PHASE MATCH, not an arbitrary draw (I-2):
-      - build the per-symbol empirical distribution of real events' entry phase, where
-        entry phase = mins_since_anchor at qualify_end (how far into the session the real
-        trade opened);
-      - for each control replicate, draw an entry phase from THAT distribution (seeded,
-        stratified across its quantiles) and place the control entry at that mins_since_anchor
-        in THIS session, EXCLUDING any draw landing in [poke_ts − 30, qualify_end + 30];
-      - keep the same side, the same session_end, and the same ib_width divisor.
-    This makes the control's remaining-horizon (session_end − entry) distribution match the
-    real events' by construction — closing the confound QA I-2 identified: real entries cluster
-    EARLY (first poke + 30 min) and so run LONG windows, and MFE/MAE/race all grow with window
-    length, so an arbitrary-minute control would inflate the contrast by pure horizon asymmetry
-    rather than by the acceptance event. Source §6.3 requires the match on "session phase"
-    exactly for this reason.
-    DISJOINT from the signal population: a different entry bar ⇒ a different entry price, a
-    different outcome window and a different race path; the exclusion band guarantees no
-    control entry can coincide with the event it controls (`assert_no_fixed_points`).
+  population: for each real event (side d, phase φ = entry_phase = mins_since_anchor at
+    qualify_end), 30 control entries (≥ L-19 floor of 25) are drawn CROSS-SESSION
+    (AMENDMENT-10 / D-1, operator-ratified 2026-07-21):
+      - draw 30 DONOR sessions (seeded) from the SYMBOL's own session pool, excluding the
+        event's own session and any session too short to run phase φ;
+      - enter each donor at anchor(donor) + φ minutes on side d — the OPEN of the bar there —
+        normalised by the DONOR session's own IB width.
+    WHY CROSS-SESSION, not within-session (D-1): the design originally drew 30 within-session
+    entries at a phase matched to the real events' entry-phase distribution. That is INFEASIBLE
+    by construction — the real event enters at φ ≈ 45–55 min, which is precisely the
+    [poke − 30, qualify_end + 30] exclusion band, so a within-session phase-matched draw always
+    lands in the exclusion and is forced to a mid-session minute, reintroducing the exact
+    horizon confound QA I-2 fixed (measured on the run: within-session control remaining-horizon
+    723 min vs the real 1391). Phase-matching therefore REQUIRES other sessions. Cross-session
+    donors at the event's own φ reproduce the real events' remaining-horizon by construction
+    (measured 1395 vs 1391), match side, are disjoint (donor ≠ event session), and are
+    unconditional on the A6 call — the source §6.3 / card §5 P-01 "session phase" match.
+    DISJOINT from the signal population: a donor session ≠ the event's session; different entry
+    bar ⇒ different entry price, outcome window and race path.
     HORIZON-MATCH DISCLOSURE: the realised remaining-horizon distributions of the two arms are
     emitted side by side per stratum, so the match is auditable, not asserted.
-  what it can show that the signal series cannot: whether a same-side, same-phase entry in that
-    session produces the same excursion distribution — i.e. whether the number belongs to the
-    ACCEPTANCE EVENT or to the session's own directional drift at that phase. Without it, "the
-    quantile reproduces" is a statement about price having quantiles.
+  what it can show that the signal series cannot: whether a same-side, same-phase entry in an
+    UNCONDITIONAL session produces the same excursion distribution — i.e. whether the number
+    belongs to the ACCEPTANCE EVENT or to sessions' generic directional behaviour at that phase.
+    Without it, "the quantile reproduces" is a statement about price having quantiles.
   bite/MDE: co-designed plant, swept and PUBLISHED BEFORE the real read. Inject an additive
     shift u on the signal arm's mfe_norm and trace the day-clustered CI of the paired day-level
     contrast as u grows; the declared MDE is read OFF THAT CURVE at the realised n per stratum.
@@ -267,22 +268,34 @@ TRIPWIRE outcome_path_swap (class: future_destroy — HARD):
       CONFIRM ordering and the band fence (a frozen q̂ cannot see CONFIRM), both HARD in §7 —
       stated here so the HARD set is not silently assumed to cover R1.
   MUST COLLAPSE: expected |collapse_fraction| ≈ 0 on each adjudicated contrast.
-  SURVIVAL := |collapse_fraction| > 0.25 with the SAME SIGN as that read's raw contrast (the
-  0.25 threshold is INHERITED from the INFR-018 sealed tripwire, operator-ratified 2026-07-20;
-  it is not re-asserted here — L-24 F06).
-  IF ANY ADJUDICATED READ SURVIVES: the construction is reading the outcome ⇒ EMISSION INVALID
-  ⇒ fix and re-run. NEVER read as "no effect".
+  MATERIAL-EDGE PRECONDITION (AMENDMENT-11 / D-2, operator-ratified 2026-07-21). The HARD
+  survival rule fires ONLY when the RAW contrast is a material edge — its day-clustered
+  interval excludes zero. A future-destroy cannot adjudicate a leak on an edge that does not
+  exist: with raw contrast ≈ 0 the collapse ratio is noise/noise and "survival" (|cf|>0.25) is
+  meaningless. When no material raw edge exists the tripwire is reported UNPOWERED
+  (`NO_MATERIAL_EDGE`) — NOT a leak and NOT a hard fail. This cannot hide a real leak: a
+  material surviving edge still HARD-fails. It is the L-32 discipline (no auto-decide at a point
+  of no estimator resolution) applied to the tripwire.
+  SURVIVAL := (raw contrast CI excludes zero) AND (|collapse_fraction| > 0.25 with the SAME SIGN
+  as the raw contrast) AND (swapped contrast CI excludes zero). The 0.25 threshold is INHERITED
+  from the INFR-018 sealed tripwire (operator-ratified 2026-07-20); it is not re-asserted here
+  (L-24 F06).
+  IF A MATERIAL ADJUDICATED READ SURVIVES: the construction is reading the outcome ⇒ EMISSION
+  INVALID ⇒ fix and re-run. NEVER read as "no effect".
   coverage: events with no usable donor are dropped and COUNTED; the spliced fraction is
   reported beside the collapse fraction.
   permutation-based: YES → DERANGEMENT, zero fixed points, asserted.
 
-POSITIVE CONTROL leak_plant (REQUIRED — the screen refuses to emit a disposition without it):
-  a deliberately leaky stratifier — coherence recomputed from the DONOR's outcome-window bars —
-  evaluated on the SAME spliced paths. It reads the outcome path, and the outcome comes from
-  that same path, so its contrast MUST SURVIVE.
-  REQUIRED OUTCOME: SURVIVES. If the plant collapses, the destroy is not reaching the bars the
-  read consumes and the tripwire's pass on the real cells carries no information (INFR-018
-  AMENDMENT-6 — the exact defect that shipped a toothless gate there).
+POSITIVE CONTROL bite test (REQUIRED — the screen refuses to emit a disposition without it):
+  pooled across all symbols (AMENDMENT-11 / D-2 — a per-symbol plant fails on low-n symbols and
+  the original within-arm "sign split" plant was tautological). The genuine, non-tautological
+  bite: the swap installs the DONOR's re-based PRICE path, so each swapped event's price-level
+  MFE is the donor's own raw price MFE over the (possibly truncated) window. The test correlates
+  swapped price MFE against the DONOR's real price MFE pooled: `corr(mfe_swapped, mfe_donor)`.
+  REQUIRED OUTCOME: corr > 0.5 (measured on the run: 0.77). If it fails, the swap reached
+  nothing the reads consume and the tripwire has no teeth (INFR-018 AMENDMENT-6 — the exact
+  defect that shipped a toothless gate there). Price MFE, not the IB-width-normalised asym,
+  because the donor and target divisors differ and would attenuate an otherwise clean signal.
 ```
 
 ---
@@ -575,12 +588,26 @@ AMENDMENT-8 (I-8): regime-percentile warmup rule stated (≥30 priors → shorte
 
 AMENDMENT-9 (I-9): R2 race MDE reported in w-contrast units, not TP1 units.
   DIRECTION: NEUTRAL (units declaration). 0L/5T/4N.
+
+AMENDMENT-10 (D-1, developer deviation, operator-ratified 2026-07-21): the matched-unconditional
+  control is CROSS-SESSION (donor sessions entered at the event's own phase/side), not
+  within-session. The within-session phase match is infeasible — the event occupies the
+  early-session phase = the exclusion band, forcing a within-session draw to mid-session and
+  reintroducing the horizon confound (measured 723 vs 1391 min). §4.2 rewritten.
+  DIRECTION: TIGHTER (removes the horizon confound; the contrast now isolates acceptance). 0L/6T/4N.
+
+AMENDMENT-11 (D-2, developer deviation, operator-ratified 2026-07-21): the HARD future-destroy
+  tripwire fires only on a MATERIAL raw edge (raw contrast CI excludes zero) — a destroy cannot
+  leak-test an edge that does not exist. The positive control is a POOLED bite correlation
+  (swapped price MFE vs donor real price MFE, > 0.5; measured 0.77), replacing the tautological
+  per-symbol sign-split plant. §4.3 rewritten.
+  DIRECTION: NEUTRAL (a soundness precondition; a material surviving edge still HARD-fails, so it
+  cannot hide a leak). 0L/6T/5N.
 ```
 
-**Final count: 0 LOOSER / 5 TIGHTER / 4 NEUTRAL.** No amendment loosened a validity check or an
-acceptance bar; the five TIGHTER are control/enforcement corrections (2 remove a confound or a
-false-positive mechanism, 3 are enforcement/coverage), and there is no auto-qualification to
-price in any case (every value read is a report layer, L-32). The TIGHTER streak is recorded
-here rather than left for a reader to count; it is flagged for the operator at the execution
-gate per L-23, but none of the five moves a threshold that could select, drop, or hide a
-candidate. Any further pre-measurement change appends here with its direction.
+**Final count: 0 LOOSER / 6 TIGHTER / 5 NEUTRAL.** No amendment loosened a validity check or an
+acceptance bar; the six TIGHTER are control/enforcement corrections, and there is no
+auto-qualification to price in any case (every value read is a report layer, L-32). The two
+developer deviations (10, 11) were discovered during implementation, flagged before the run of
+record, and operator-ratified 2026-07-21. Any further pre-measurement change appends here with
+its direction.

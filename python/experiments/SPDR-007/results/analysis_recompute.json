@@ -1,0 +1,770 @@
+{
+  "item": "SPDR-007",
+  "integrity": {
+    "check_no_local_accounting": {
+      "screen_code": {
+        "ok": true,
+        "banned_defs_found": []
+      },
+      "analysis_code": {
+        "ok": true,
+        "banned_defs_found": []
+      },
+      "xen_sigbar": {
+        "ok": true,
+        "banned_defs_found": []
+      },
+      "all_ok": true
+    },
+    "freeze": {
+      "pin_ok": true,
+      "layers_pin_match": true,
+      "pin": "a45eac44a811a7cd76cd5efa916868e247c1e5f8be4ec10caafbfdd7e32b659e",
+      "n_events": 7070,
+      "q_p65_freeze": 2.175101351351344,
+      "q_p70_freeze": 1.7960477941176527,
+      "q_p65_recomputed": 2.175101351351344,
+      "q_p70_recomputed": 1.7960477941176527,
+      "quantile_match": true,
+      "band": "DESIGN"
+    },
+    "bands": {
+      "design_entry_max": "2023-02-27 15:40:00",
+      "confirm_entry_min": "2023-03-01 15:15:00",
+      "confirm_entry_max": "2023-12-16 15:57:00",
+      "design_before_confirm": true,
+      "holdout_untouched": true,
+      "test_touched_flag": false,
+      "holdout_touched_flag": false
+    },
+    "tripwire": {
+      "status": "NO_MATERIAL_EDGE_TRIPWIRE_UNINFORMATIVE",
+      "any_material_edge": false,
+      "survives": false,
+      "hard_fail": false,
+      "uninformative_under_D2": true,
+      "bite_corr": 0.7711989151117775,
+      "bite_n": 3561,
+      "bite_ok": true,
+      "per_read_material": {
+        "R5": false,
+        "R2": false,
+        "R3": false,
+        "R4_mfe": false,
+        "R4_w": false
+      },
+      "per_read_collapse": {
+        "R5": -4.602649006621594,
+        "R2": 1.6060827844189638,
+        "R3": 0.6191098834120107,
+        "R4_mfe": -1.160805455854965e-13,
+        "R4_w": 3.119445810936283
+      }
+    },
+    "horizon_match": {
+      "signal_median_min": 1391.0,
+      "control_median_min": 1391.0,
+      "match": true,
+      "control_n": 198597,
+      "signal_n": 7070,
+      "n_ratio": 28.09009900990099
+    },
+    "causal_entry_ts_eq_qualify_end": true,
+    "population": {
+      "design_evaluable": 7070,
+      "confirm_evaluable": 11375,
+      "design_pokes": 13802,
+      "design_accepts": 7148,
+      "design_missing_entry": 78,
+      "accepts_minus_missing": 7070
+    }
+  },
+  "R0_money_floor": {
+    "q70_ibw": 1.7960477941176527,
+    "q65_ibw": 2.175101351351344,
+    "majors": {
+      "BTCUSDT": {
+        "cost_floor_bps": 14.244,
+        "median_ib_width_bps": 48.74473329793366,
+        "tp1_must_exceed_ibw": 0.2922161849350773,
+        "tp1_bps_pooled_p70": 87.54787071460704,
+        "tp1_bps_pooled_p65": 106.02473526759636,
+        "tp1_bps_per_symbol_p70": 78.68579241321122,
+        "margin_vs_floor_bps_p70": 73.30387071460704,
+        "floor_band": "ABOVE_FLOOR",
+        "spread_source": "audited"
+      },
+      "ETHUSDT": {
+        "cost_floor_bps": 14.305,
+        "median_ib_width_bps": 69.9579803299263,
+        "tp1_must_exceed_ibw": 0.20447988824915622,
+        "tp1_bps_pooled_p70": 125.64787625249026,
+        "tp1_bps_pooled_p65": 152.16569755343346,
+        "tp1_bps_per_symbol_p70": 93.00296208566473,
+        "margin_vs_floor_bps_p70": 111.34287625249027,
+        "floor_band": "ABOVE_FLOOR",
+        "spread_source": "audited"
+      },
+      "SOLUSDT": {
+        "cost_floor_bps": 14.727,
+        "median_ib_width_bps": 96.21692543188384,
+        "tp1_must_exceed_ibw": 0.15306038863636198,
+        "tp1_bps_pooled_p70": 172.81019667871763,
+        "tp1_bps_pooled_p65": 209.28156452976205,
+        "tp1_bps_per_symbol_p70": 129.54373490983502,
+        "margin_vs_floor_bps_p70": 158.08319667871763,
+        "floor_band": "ABOVE_FLOOR",
+        "spread_source": "audited"
+      },
+      "DOGEUSDT": {
+        "cost_floor_bps": 15.477,
+        "median_ib_width_bps": 86.96926760150507,
+        "tp1_must_exceed_ibw": 0.17795941516853891,
+        "tp1_bps_pooled_p70": 156.200961231711,
+        "tp1_bps_pooled_p65": 189.16697148607034,
+        "tp1_bps_per_symbol_p70": 228.22327413074638,
+        "margin_vs_floor_bps_p70": 140.723961231711,
+        "floor_band": "ABOVE_FLOOR",
+        "spread_source": "audited"
+      },
+      "XRPUSDT": {
+        "cost_floor_bps": 15.965,
+        "median_ib_width_bps": 60.753341433778914,
+        "tp1_must_exceed_ibw": 0.26278389999999974,
+        "tp1_bps_pooled_p70": 109.11590486741521,
+        "tp1_bps_pooled_p65": 132.14467505172212,
+        "tp1_bps_per_symbol_p70": 130.37440661720777,
+        "margin_vs_floor_bps_p70": 93.1509048674152,
+        "floor_band": "ABOVE_FLOOR",
+        "spread_source": "audited"
+      }
+    },
+    "n_above_floor_majors": 5,
+    "all_majors_above_floor": true
+  },
+  "R1_calibration": {
+    "pooled": {
+      "p65": {
+        "q_hat_ibw": 2.175101351351344,
+        "nominal_p": 0.65,
+        "confirm_hit": 0.6803516483516483,
+        "calib_err": 0.030351648351648275,
+        "n": 11375,
+        "design_self_hit": 0.6499292786421499,
+        "design_self_err": -7.072135785013423e-05,
+        "day_clustered_calib_err_ci": {
+          "n": 291,
+          "block": 5,
+          "stat": 0.02045411241029472,
+          "ci": [
+            -0.009281377864484694,
+            0.04925048538249837
+          ],
+          "ci_low_seed_range": [
+            -0.009918431662973546,
+            -0.008616925855599445
+          ],
+          "ci_high_seed_range": [
+            0.04908083294090175,
+            0.04987682833962817
+          ]
+        }
+      },
+      "p70": {
+        "q_hat_ibw": 1.7960477941176527,
+        "nominal_p": 0.7,
+        "confirm_hit": 0.727912087912088,
+        "calib_err": 0.02791208791208799,
+        "n": 11375,
+        "design_self_hit": 0.7,
+        "design_self_err": 0.0,
+        "day_clustered_calib_err_ci": {
+          "n": 291,
+          "block": 5,
+          "stat": 0.020851547948130073,
+          "ci": [
+            -0.006957699463528386,
+            0.047629417519875775
+          ],
+          "ci_low_seed_range": [
+            -0.0077933945076420095,
+            -0.006769490884501171
+          ],
+          "ci_high_seed_range": [
+            0.04726070694057299,
+            0.04779994823645556
+          ]
+        }
+      }
+    },
+    "majors": {
+      "BTCUSDT": {
+        "n_design": 114,
+        "n_confirm": 138,
+        "q_hat_p65": 1.876724328506687,
+        "q_hat_p70": 1.6142419311697576,
+        "calib_err_p65_per_sym_q": 0.05289855072463767,
+        "calib_err_p70_per_sym_q": 0.03188405797101457,
+        "label_p65": "DRIFTED",
+        "label_p70": "REPRODUCES",
+        "calib_err_p70_pooled_q": 0.0028985507246377384,
+        "realised_hit_p70": 0.7318840579710145
+      },
+      "ETHUSDT": {
+        "n_design": 113,
+        "n_confirm": 143,
+        "q_hat_p65": 1.559824520895866,
+        "q_hat_p70": 1.3294117647058539,
+        "calib_err_p65_per_sym_q": 0.04930069930069925,
+        "calib_err_p70_per_sym_q": 0.034265734265734316,
+        "label_p65": "REPRODUCES",
+        "label_p70": "REPRODUCES",
+        "calib_err_p70_pooled_q": -0.02167832167832162,
+        "realised_hit_p70": 0.7342657342657343
+      },
+      "SOLUSDT": {
+        "n_design": 126,
+        "n_confirm": 149,
+        "q_hat_p65": 1.7365319865319844,
+        "q_hat_p70": 1.3463715903242481,
+        "calib_err_p65_per_sym_q": 0.08154362416107386,
+        "calib_err_p70_per_sym_q": 0.10536912751677852,
+        "label_p65": "DRIFTED",
+        "label_p70": "BROKEN",
+        "calib_err_p70_pooled_q": 0.02483221476510067,
+        "realised_hit_p70": 0.8053691275167785
+      },
+      "DOGEUSDT": {
+        "n_design": 85,
+        "n_confirm": 142,
+        "q_hat_p65": 2.9086325439266485,
+        "q_hat_p70": 2.624183006535941,
+        "calib_err_p65_per_sym_q": -0.0654929577464789,
+        "calib_err_p70_per_sym_q": -0.04507042253521121,
+        "label_p65": "DRIFTED",
+        "label_p70": "REPRODUCES",
+        "calib_err_p70_pooled_q": 0.04647887323943667,
+        "realised_hit_p70": 0.6549295774647887
+      },
+      "XRPUSDT": {
+        "n_design": 118,
+        "n_confirm": 125,
+        "q_hat_p65": 2.498913043478524,
+        "q_hat_p70": 2.1459627329192377,
+        "calib_err_p65_per_sym_q": 0.006000000000000005,
+        "calib_err_p70_per_sym_q": 0.0040000000000000036,
+        "label_p65": "REPRODUCES",
+        "label_p70": "REPRODUCES",
+        "calib_err_p70_pooled_q": 0.020000000000000018,
+        "realised_hit_p70": 0.704
+      }
+    },
+    "label_census_p70": {
+      "REPRODUCES": 51,
+      "BROKEN": 21,
+      "DRIFTED": 25
+    },
+    "n_symbols_covered": 97,
+    "worst_broken_p70": [
+      {
+        "symbol": "REQUSDT",
+        "n": 3,
+        "calib_err_p70": -0.36666666666666664,
+        "label": "BROKEN",
+        "hit": 0.3333333333333333
+      },
+      {
+        "symbol": "GTCUSDT",
+        "n": 4,
+        "calib_err_p70": 0.30000000000000004,
+        "label": "BROKEN",
+        "hit": 1.0
+      },
+      {
+        "symbol": "STXUSDT",
+        "n": 114,
+        "calib_err_p70": -0.2964912280701754,
+        "label": "BROKEN",
+        "hit": 0.40350877192982454
+      },
+      {
+        "symbol": "BLURUSDT",
+        "n": 95,
+        "calib_err_p70": -0.28947368421052627,
+        "label": "BROKEN",
+        "hit": 0.4105263157894737
+      },
+      {
+        "symbol": "1000XECUSDT",
+        "n": 11,
+        "calib_err_p70": -0.24545454545454543,
+        "label": "BROKEN",
+        "hit": 0.45454545454545453
+      },
+      {
+        "symbol": "TOMOUSDT",
+        "n": 97,
+        "calib_err_p70": -0.21546391752577315,
+        "label": "BROKEN",
+        "hit": 0.4845360824742268
+      },
+      {
+        "symbol": "AKROUSDT",
+        "n": 48,
+        "calib_err_p70": 0.19583333333333341,
+        "label": "BROKEN",
+        "hit": 0.8958333333333334
+      },
+      {
+        "symbol": "TRXUSDT",
+        "n": 57,
+        "calib_err_p70": 0.1947368421052632,
+        "label": "BROKEN",
+        "hit": 0.8947368421052632
+      },
+      {
+        "symbol": "FETUSDT",
+        "n": 119,
+        "calib_err_p70": 0.1907563025210085,
+        "label": "BROKEN",
+        "hit": 0.8907563025210085
+      },
+      {
+        "symbol": "MINAUSDT",
+        "n": 80,
+        "calib_err_p70": -0.1875,
+        "label": "BROKEN",
+        "hit": 0.5125
+      }
+    ],
+    "control_P01": {
+      "note": "If control's own DESIGN quantile self-hits ~p, quantile reproduction is a property of price paths generally (P-01), not acceptance conditioning.",
+      "control_own_q65": 1.9766715116279032,
+      "control_own_q70": 1.6206896551724093,
+      "control_self_hit_p65": 0.6499997482338605,
+      "control_self_hit_p70": 0.7000005035322789,
+      "control_hit_at_signal_q65": 0.6221342719175013,
+      "control_hit_at_signal_q70": 0.6748541015221781,
+      "signal_design_self_hit_p70": 0.7,
+      "signal_confirm_hit_p70": 0.727912087912088,
+      "signal_q70": 1.7960477941176527,
+      "control_q70": 1.6206896551724093,
+      "q_ratio_control_over_signal_p70": 0.9023644362251552
+    }
+  },
+  "R2_race": {
+    "pooled": {
+      "p65": {
+        "tp1_ibw": 2.175101351351344,
+        "w_signal": 0.342296511627907,
+        "w_control": 0.3403770457841309,
+        "w_contrast": 0.0019194658437760581,
+        "n_resolved_signal": 6880,
+        "n_resolved_control": 193080,
+        "vs_gross_p0": 0.00896317829457366
+      },
+      "p70": {
+        "tp1_ibw": 1.7960477941176527,
+        "w_signal": 0.33285488732596524,
+        "w_control": 0.3430097633287328,
+        "w_contrast": -0.010154876002767543,
+        "n_resolved_signal": 6967,
+        "n_resolved_control": 195630,
+        "vs_gross_p0": -0.00047844600736807186
+      }
+    },
+    "majors": {
+      "BTCUSDT": {
+        "w_signal": 0.336283185840708,
+        "w_control": 0.3193099273607748,
+        "w_contrast": 0.016973258479933195,
+        "n_resolved_signal": 113,
+        "n_resolved_control": 3304,
+        "p0_gross": 0.3333333333333333,
+        "p0_cost": 0.44179970633006266,
+        "w_vs_p0_cost": -0.10551652048935467,
+        "w_vs_p0_gross": 0.002949852507374673
+      },
+      "ETHUSDT": {
+        "w_signal": 0.29357798165137616,
+        "w_control": 0.3460613349368611,
+        "w_contrast": -0.052483353285484924,
+        "n_resolved_signal": 109,
+        "n_resolved_control": 3326,
+        "p0_gross": 0.3333333333333333,
+        "p0_cost": 0.40923327650071867,
+        "w_vs_p0_cost": -0.1156552948493425,
+        "w_vs_p0_gross": -0.03975535168195715
+      },
+      "SOLUSDT": {
+        "w_signal": 0.27419354838709675,
+        "w_control": 0.3580048270313757,
+        "w_contrast": -0.08381127864427895,
+        "n_resolved_signal": 124,
+        "n_resolved_control": 3729,
+        "p0_gross": 0.3333333333333333,
+        "p0_cost": 0.3901471104639344,
+        "w_vs_p0_cost": -0.11595356207683766,
+        "w_vs_p0_gross": -0.05913978494623656
+      },
+      "DOGEUSDT": {
+        "w_signal": 0.3493975903614458,
+        "w_control": 0.3288780882948562,
+        "w_contrast": 0.02051950206658959,
+        "n_resolved_signal": 83,
+        "n_resolved_control": 2469,
+        "p0_gross": 0.3333333333333333,
+        "p0_cost": 0.3993892648630639,
+        "w_vs_p0_cost": -0.04999167450161812,
+        "w_vs_p0_gross": 0.016064257028112483
+      },
+      "XRPUSDT": {
+        "w_signal": 0.288135593220339,
+        "w_control": 0.3466704772792226,
+        "w_contrast": -0.05853488405888363,
+        "n_resolved_signal": 118,
+        "n_resolved_control": 3499,
+        "p0_gross": 0.3333333333333333,
+        "p0_cost": 0.4308748727291333,
+        "w_vs_p0_cost": -0.14273927950879428,
+        "w_vs_p0_gross": -0.04519774011299432
+      }
+    },
+    "gross_p0": 0.3333333333333333,
+    "day_clustered_p70": {
+      "n_days": 530,
+      "contrast_median": -0.039912366114897777,
+      "ci": [
+        -0.062224986753288636,
+        0.0
+      ],
+      "ci_excludes_zero": false,
+      "ci_low_seed_range": [
+        -0.06265083412397217,
+        -0.06095791001451378
+      ],
+      "block_sensitivity": [
+        {
+          "block_req": 2,
+          "ci": [
+            -0.062224986753288636,
+            0.0
+          ]
+        },
+        {
+          "block_req": 5,
+          "ci": [
+            -0.062224986753288636,
+            0.0
+          ]
+        },
+        {
+          "block_req": 10,
+          "ci": [
+            -0.06200034977418344,
+            -0.0036258158085569203
+          ]
+        }
+      ],
+      "approx_mde_halfwidth": 0.02231262063839086,
+      "screen_mde_w_units": 0.03
+    }
+  },
+  "R3_regime": {
+    "preferred_finite_only": {
+      "rho_signal_normalised": -0.39040296338213065,
+      "rho_control_normalised": -0.3503878678141158,
+      "rho_contrast": -0.04001509556801486,
+      "n_signal": 5140,
+      "n_control": 154927
+    },
+    "screen_polars_nan_inclusive": {
+      "rho_signal_normalised": -0.39040296338213065,
+      "rho_control_normalised": -0.3503878678141158,
+      "rho_contrast": -0.04001509556801486,
+      "note": "matches layers.json; NaN rows ranked by polars \u2014 attenuated |\u03c1_signal|",
+      "error": null
+    },
+    "raw_mfe_bps_rho_finite": 0.09035727451519736,
+    "n_raw": 5140,
+    "nan_ib_width_pctl_frac_signal": 0.272984441301273,
+    "nan_ib_width_pctl_frac_control": 0.2198925462116749,
+    "majors_finite_only": {
+      "BTCUSDT": {
+        "rho_signal": -0.46645968043588143,
+        "rho_control": -0.3444009701251518,
+        "rho_contrast": -0.12205871031072962,
+        "n_signal": 101,
+        "n_control": 2920
+      },
+      "ETHUSDT": {
+        "rho_signal": -0.4454218565658649,
+        "rho_control": -0.34843990767053235,
+        "rho_contrast": -0.09698194889533257,
+        "n_signal": 101,
+        "n_control": 2881
+      },
+      "SOLUSDT": {
+        "rho_signal": -0.4659901547411471,
+        "rho_control": -0.31123521124679265,
+        "rho_contrast": -0.15475494349435442,
+        "n_signal": 111,
+        "n_control": 3250
+      },
+      "DOGEUSDT": {
+        "rho_signal": -0.3794029062854253,
+        "rho_control": -0.30591197134532694,
+        "rho_contrast": -0.07349093494009834,
+        "n_signal": 71,
+        "n_control": 2129
+      },
+      "XRPUSDT": {
+        "rho_signal": -0.33926815081869643,
+        "rho_control": -0.35085481504183713,
+        "rho_contrast": 0.011586664223140697,
+        "n_signal": 101,
+        "n_control": 3111
+      }
+    },
+    "note": "binding = rho_contrast (finite-only preferred); raw signal \u03c1 carries normaliser mechanic"
+  },
+  "R4_coherence": {
+    "tercile_edges": [
+      -0.03805697471478547,
+      0.11702971375814095
+    ],
+    "n_finite": 6961,
+    "mfe_norm_top_median": 3.7080929243850633,
+    "mfe_norm_bottom_median": 3.631578947368479,
+    "mfe_norm_contrast": 0.07651397701658436,
+    "w_top": 0.3487762237762238,
+    "w_bottom": 0.336832895888014,
+    "w_contrast": 0.011943327888209787,
+    "n_resolved_top": 2288,
+    "n_resolved_bottom": 2286,
+    "control_mfe_contrast": null,
+    "control_note": "control parquet has no coh; R4 control contrast not recomputable from emission alone",
+    "majors": {
+      "BTCUSDT": {
+        "mfe_contrast": -1.5980057383454378,
+        "n_top": 38,
+        "n_bottom": 38,
+        "w_contrast": -0.096728307254623
+      },
+      "ETHUSDT": {
+        "mfe_contrast": 1.325890418391571,
+        "n_top": 38,
+        "n_bottom": 38,
+        "w_contrast": 0.08108108108108109
+      },
+      "SOLUSDT": {
+        "mfe_contrast": 1.0134109200393713,
+        "n_top": 42,
+        "n_bottom": 42,
+        "w_contrast": 0.1614401858304297
+      },
+      "DOGEUSDT": {
+        "mfe_contrast": -1.2418831168830469,
+        "n_top": 28,
+        "n_bottom": 29,
+        "w_contrast": 0.12169312169312169
+      },
+      "XRPUSDT": {
+        "mfe_contrast": 0.6215277777777355,
+        "n_top": 39,
+        "n_bottom": 40,
+        "w_contrast": 0.033333333333333326
+      }
+    }
+  },
+  "R5_asym": {
+    "pooled": {
+      "n_days": 531,
+      "contrast_median": 0.0898809523809746,
+      "ci": [
+        -0.23134479271990682,
+        0.3203463203463277
+      ],
+      "ci_excludes_zero": false,
+      "ci_low_seed_range": [
+        -0.23134479271990682,
+        -0.23134479271990682
+      ],
+      "block_sensitivity": [
+        {
+          "block_req": 2,
+          "ci": [
+            -0.21361061419201244,
+            0.3203463203463277
+          ]
+        },
+        {
+          "block_req": 5,
+          "ci": [
+            -0.23134479271990682,
+            0.3203463203463277
+          ]
+        },
+        {
+          "block_req": 10,
+          "ci": [
+            -0.23134479271990682,
+            0.34037558685448077
+          ]
+        }
+      ],
+      "approx_halfwidth_mde": 0.3212257451008814,
+      "screen_mde": 0.5,
+      "signal_asym_day_mean": -0.012421547146047793,
+      "control_asym_day_mean": 0.36321894793200327,
+      "collapse_fraction_control_over_signal_level": -29.24103927324141,
+      "note": "collapse on LEVELS is ill-defined when signal level \u2248 0; prefer contrast CI"
+    },
+    "majors": {
+      "BTCUSDT": {
+        "n_days": 0,
+        "note": "thin"
+      },
+      "ETHUSDT": {
+        "n_days": 0,
+        "note": "thin"
+      },
+      "SOLUSDT": {
+        "n_days": 0,
+        "note": "thin"
+      },
+      "DOGEUSDT": {
+        "n_days": 0,
+        "note": "thin"
+      },
+      "XRPUSDT": {
+        "n_days": 0,
+        "note": "thin"
+      }
+    }
+  },
+  "time_thirds": {
+    "thirds": [
+      {
+        "third": 1,
+        "n": 2356,
+        "entry_start": "2021-06-29 14:19:00",
+        "entry_end": "2022-06-15 14:16:00",
+        "R1_self_hit_p70": 0.7198641765704584,
+        "R1_self_err_p70": 0.01986417657045847,
+        "R2_w_signal": 0.36328293736501077,
+        "R2_w_control": 0.3500660054835325,
+        "R2_w_contrast": 0.013216931881478267,
+        "R5_asym_contrast_median": -0.21249035084856316
+      },
+      {
+        "third": 2,
+        "n": 2357,
+        "entry_start": "2022-06-15 14:50:00",
+        "entry_end": "2022-11-02 14:23:00",
+        "R1_self_hit_p70": 0.6813746287653797,
+        "R1_self_err_p70": -0.01862537123462027,
+        "R2_w_signal": 0.3045903045903046,
+        "R2_w_control": 0.3362753346080306,
+        "R2_w_contrast": -0.03168503001772599,
+        "R5_asym_contrast_median": 0.7144943045165528
+      },
+      {
+        "third": 3,
+        "n": 2357,
+        "entry_start": "2022-11-02 14:29:00",
+        "entry_end": "2023-02-27 15:40:00",
+        "R1_self_hit_p70": 0.6987696224013576,
+        "R1_self_err_p70": -0.0012303775986423071,
+        "R2_w_signal": 0.33089185695820766,
+        "R2_w_control": 0.3415123931811852,
+        "R2_w_contrast": -0.010620536222977539,
+        "R5_asym_contrast_median": 0.0898809523809746
+      }
+    ],
+    "R5_sign_consistent": false,
+    "R2_sign_consistent": false,
+    "R5_signs": [
+      -1.0,
+      1.0,
+      1.0
+    ],
+    "R2_signs": [
+      1.0,
+      -1.0,
+      -1.0
+    ]
+  },
+  "spread_scale": {
+    "n_symbols": 137,
+    "n_t1_undecidable": 2,
+    "undecidable_symbols": [
+      "APTUSDT",
+      "SANDUSDT"
+    ],
+    "majors": {
+      "BTCUSDT": {
+        "symbol": "BTCUSDT",
+        "contrast_mfe_norm": 0.7165327964167281,
+        "gross_edge_bps": 34.927200060556004,
+        "rt_spread_bps": 0.244,
+        "t1_undecidable": false
+      },
+      "DOGEUSDT": {
+        "symbol": "DOGEUSDT",
+        "contrast_mfe_norm": 1.4255952380952523,
+        "gross_edge_bps": 123.98297375333733,
+        "rt_spread_bps": 1.477,
+        "t1_undecidable": false
+      },
+      "ETHUSDT": {
+        "symbol": "ETHUSDT",
+        "contrast_mfe_norm": -0.32212378833625355,
+        "gross_edge_bps": -22.53512964822897,
+        "rt_spread_bps": 0.305,
+        "t1_undecidable": false
+      },
+      "SOLUSDT": {
+        "symbol": "SOLUSDT",
+        "contrast_mfe_norm": -0.0994505494505531,
+        "gross_edge_bps": -9.568826100643744,
+        "rt_spread_bps": 0.727,
+        "t1_undecidable": false
+      },
+      "XRPUSDT": {
+        "symbol": "XRPUSDT",
+        "contrast_mfe_norm": 0.43028846153843636,
+        "gross_edge_bps": 26.14146181886007,
+        "rt_spread_bps": 1.965,
+        "t1_undecidable": false
+      }
+    }
+  },
+  "side_derangement": {
+    "n_input": 7070,
+    "n_deranged": 60,
+    "n_dropped_singleton": 2694,
+    "n_dropped_infeasible": 4316,
+    "fixed_point_rate": 0.0,
+    "derangeable_frac": 0.008486562942008486,
+    "power_status": "UNPOWERED",
+    "note": "re-derangement needs bar paths; coverage stats taken from emission attestation"
+  },
+  "falsification_P01": {
+    "signal_confirm_calib_err_p70": 0.02791208791208799,
+    "signal_design_self_err_p70": 0.0,
+    "control_design_self_hit_p70": 0.7000005035322789,
+    "control_own_q70_vs_signal_q70": {
+      "control_q": 1.6206896551724093,
+      "signal_q": 1.7960477941176527,
+      "ratio": 0.9023644362251552
+    },
+    "control_hit_rate_at_signal_protection_p70": 0.6748541015221781,
+    "interpretation_anchor": "Control at its own (1-p) quantile self-hits \u2248 p by construction of order statistics. Signal CONFIRM hit \u2248 p is therefore NOT evidence of acceptance-specific protection unless the LEVEL of q\u0302 (IB widths) or the race/asym CONTRAST vs control separates.",
+    "level_comparison": {
+      "signal_protection_p70_ibw": 1.7960477941176527,
+      "control_protection_p70_ibw": 1.6206896551724093,
+      "delta_ibw": 0.17535813894524344
+    }
+  }
+}

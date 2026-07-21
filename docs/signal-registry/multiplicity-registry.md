@@ -1537,6 +1537,19 @@ establishes neither class for sparse session-event objects; a CAL leg shaped to 
 **Slot accounting: 0 slots; 0 counted TEST reads; TRAIN-only; holdout sealed.** No tradability
 claim permitted from any INFR or SPDR read in this checkpoint.
 
+**Disposition — SPDR-007 (2026-07-21, uncounted screen; HYP-S1 master gate).** Operator
+**NOT_WORTH** for the **price-only S1/S2 spine** — a P-01 confirmation. The Protection quantile
+reproduces on the CONFIRM bank (pooled calib_err +0.030/+0.028; source falsifier #1 not
+triggered on reproduction) but adds ≈0 over a matched cross-session unconditional entry: R2 race
+contrast −0.010 at gross breakeven, below cost-adjusted breakeven on all 5 majors (w−p0ᶜ −0.05
+to −0.14); R5 excursion-asym contrast +0.090 CI [−0.23,+0.32] WASH. Integrity clean (tripwire
+NO_MATERIAL_EDGE, bite 0.77). **Signed flow (Δ) UNTESTED — the family warrant is deferred to
+ckpt-015; only the daily US-open session / 15-min IB / single-session hold on 1-min bars was
+exercised (not the 8h funding cadence, not micro/structural holds, no higher-timeframe
+resampling).** Two developer deviations ratified (D-1 cross-session control; D-2 material-edge
+tripwire). **No family status change** — retrospective act. Next: **SPDR-008** (S1+S3 signed-trap
+breadth). Report `python/experiments/SPDR-007/report.md`.
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:

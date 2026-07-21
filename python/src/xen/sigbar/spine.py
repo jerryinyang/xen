@@ -496,7 +496,36 @@ def matched_unconditional(
     # tp1_ibw is accepted for API symmetry; the race is added per-p downstream by the
     # runner (excursion is tp1-independent), so evaluate excursion only here.
     del tp1_ibw
-    return evaluate_entries(bars, ctrl, tp1_ibw=None)
+    out = evaluate_entries(bars, ctrl, tp1_ibw=None)
+    # D-1 / GT-4(e): donor entry must not land inside the event's own session window
+    # (cross-session disjoint — replaces the within-session CONTROL_EXCLUSION_MIN path).
+    assert_control_cross_session_disjoint(events, out)
+    return out
+
+
+def assert_control_cross_session_disjoint(events: pl.DataFrame, control: pl.DataFrame) -> None:
+    """Raise if any control entry lands inside its event's session (D-1 integrity / GT-4e).
+
+    ``CONTROL_EXCLUSION_MIN`` named the old within-session exclusion; under D-1 the
+    hard rule is stronger: donor session ≠ event session, so the control entry
+    cannot fall in ``[event.anchor_ts, event.session_end)``.
+    """
+    if control.height == 0 or events.height == 0:
+        return
+    keys = ["anchor_ts"]
+    if "symbol" in events.columns and "symbol" in control.columns:
+        keys = ["symbol", "anchor_ts"]
+    ev = events.select(*keys, "session_end").unique(subset=keys)
+    j = control.select(*keys, "entry_ts").join(ev, on=keys, how="inner")
+    bad = j.filter(
+        (pl.col("entry_ts") >= pl.col("anchor_ts"))
+        & (pl.col("entry_ts") < pl.col("session_end"))
+    )
+    if bad.height:
+        raise RuntimeError(
+            f"CONTROL DISJOINT FAIL: {bad.height} control entries land inside their event "
+            f"session window (D-1 / design §4.2 / GT-4e; CONTROL_EXCLUSION_MIN={CONTROL_EXCLUSION_MIN})"
+        )
 
 
 def _empty_control() -> pl.DataFrame:
@@ -642,7 +671,26 @@ def outcome_path_swap(
     kept = e.filter(pl.Series(keep)).with_columns(
         pl.from_epoch(pl.col("donor_anchor_ns"), time_unit="ns").cast(e["anchor_ts"].dtype).alias("donor_anchor_ts")
     ).drop("donor_anchor_ns")
-    res = evaluate_entries(bars, kept, tp1_ibw=tp1_ibw, high_override=high, low_override=low)
+    # Excursion always; race at each Protection level when a mapping is supplied.
+    # A bare float/side-dict keeps the legacy single `outcome` column.
+    if isinstance(tp1_ibw, dict) and tp1_ibw and all(
+        isinstance(k, str) and k.startswith("p") for k in tp1_ibw
+    ):
+        res = evaluate_entries(bars, kept, tp1_ibw=None, high_override=high, low_override=low)
+        for name, q in tp1_ibw.items():
+            r = evaluate_entries(
+                bars, kept.select(
+                    [c for c in ("anchor_ts", "entry_ts", "session_end", "entry", "side",
+                                 "ib_width", "day") if c in kept.columns]
+                ),
+                tp1_ibw=q, high_override=high, low_override=low,
+            )
+            res = res.join(
+                r.select("entry_ts", pl.col("outcome").alias(f"outcome_{name}")),
+                on="entry_ts", how="left",
+            )
+    else:
+        res = evaluate_entries(bars, kept, tp1_ibw=tp1_ibw, high_override=high, low_override=low)
     return res, {
         "n_input": n, "n_spliced": int(keep.sum()), "n_no_donor": int(n_no_donor),
         "spliced_fraction": float(keep.mean()),
