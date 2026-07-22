@@ -1,0 +1,36 @@
+{
+  "ret_col": "ret_bps_H10",
+  "hold_ltf": 10,
+  "mde_bps": 10.0,
+  "n_seeds": 200,
+  "n_S9": 311,
+  "n_BASE": 6550,
+  "n_symbols": 162,
+  "by_multiple": {
+    "1.0": {
+      "plant_bps": 10.0,
+      "n_usable_seeds": 0,
+      "cf_star": null,
+      "reason": "planted raw contrast not material at this arm"
+    },
+    "2.0": {
+      "plant_bps": 20.0,
+      "raw_contrast": 16.590649439305523,
+      "n_usable_seeds": 200,
+      "cf_star": 1.122865760654962
+    },
+    "3.0": {
+      "plant_bps": 30.0,
+      "raw_contrast": 26.59064943930553,
+      "n_usable_seeds": 200,
+      "cf_star": 0.7005873340907822
+    }
+  },
+  "prior_cf": 0.25,
+  "prior_is_never_a_fallback": true,
+  "cf_star": null,
+  "applied_multiple": 1.0,
+  "status": "UNDERIVABLE",
+  "reason": "no usable calibration seed at the 1x plant",
+  "cf_star_spread_across_plants": 0.4222784265641797
+}

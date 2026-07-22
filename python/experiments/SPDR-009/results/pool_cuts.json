@@ -1,0 +1,222 @@
+{
+  "band": "DESIGN",
+  "zone_primary": "prior_session_range",
+  "tau_grid": [
+    0.05,
+    0.1,
+    0.15,
+    0.2,
+    0.25,
+    0.35,
+    0.5
+  ],
+  "p_wide_tau_grid": [
+    0.005,
+    0.01,
+    0.02,
+    0.03,
+    0.05,
+    0.1,
+    0.15,
+    0.2
+  ],
+  "min_pool_events": 30,
+  "tau_by_pair": {
+    "D1": {
+      "tau": 0.05,
+      "zone_mode": "prior_session_range",
+      "pool": "P",
+      "n_sample_symbols": 10,
+      "sample_symbols": [
+        "SOLUSDT",
+        "ADAUSDT",
+        "MATICUSDT",
+        "LINKUSDT",
+        "DOGEUSDT",
+        "XRPUSDT",
+        "AVAXUSDT",
+        "LTCUSDT",
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "n_pool_at_tau": 458
+    },
+    "D2": {
+      "tau": 0.05,
+      "zone_mode": "prior_session_range",
+      "pool": "P",
+      "n_sample_symbols": 20,
+      "sample_symbols": [
+        "10000NFTUSDT",
+        "1000BONKUSDT",
+        "1000FLOKIUSDT",
+        "1000LUNCUSDT",
+        "1000XECUSDT",
+        "AAVEUSDT",
+        "ADAUSDT",
+        "AGIXUSDT",
+        "ANCUSDT",
+        "APEUSDT",
+        "APTUSDT",
+        "ATOMUSDT",
+        "AUDIOUSDT",
+        "AVAXUSDT",
+        "AXSUSDT",
+        "BCHUSDT",
+        "BLURUSDT",
+        "BNBUSDT",
+        "BTCUSDT",
+        "CFXUSDT"
+      ],
+      "n_pool_at_tau": 266
+    },
+    "D3": {
+      "tau": 0.05,
+      "zone_mode": "prior_session_range",
+      "pool": "P",
+      "n_sample_symbols": 20,
+      "sample_symbols": [
+        "1000BONKUSDT",
+        "1000FLOKIUSDT",
+        "1000LUNCUSDT",
+        "ADAUSDT",
+        "AGIXUSDT",
+        "APEUSDT",
+        "APTUSDT",
+        "ATOMUSDT",
+        "AVAXUSDT",
+        "AXSUSDT",
+        "BLURUSDT",
+        "BNBUSDT",
+        "BTCUSDT",
+        "CFXUSDT",
+        "CHZUSDT",
+        "COREUSDT",
+        "DOGEUSDT",
+        "DOTUSDT",
+        "EOSUSDT",
+        "ETCUSDT"
+      ],
+      "n_pool_at_tau": 34
+    },
+    "D4": {
+      "tau": 0.05,
+      "zone_mode": "prior_session_range",
+      "pool": "P",
+      "n_sample_symbols": 20,
+      "sample_symbols": [
+        "1000BONKUSDT",
+        "ADAUSDT",
+        "AGIXUSDT",
+        "APEUSDT",
+        "APTUSDT",
+        "ATOMUSDT",
+        "AVAXUSDT",
+        "BLURUSDT",
+        "BNBUSDT",
+        "BTCUSDT",
+        "CFXUSDT",
+        "CHZUSDT",
+        "DOGEUSDT",
+        "ETCUSDT",
+        "ETHUSDT",
+        "FETUSDT",
+        "FTMUSDT",
+        "GMTUSDT",
+        "HIGHUSDT",
+        "HOOKUSDT"
+      ],
+      "n_pool_at_tau": 33
+    }
+  },
+  "p_wide_by_pair": {
+    "D1": {
+      "tau": 0.005,
+      "tau_primary": 0.05,
+      "strictly_tighter_than_P": true,
+      "zone_mode": "prior_session_range",
+      "pool": "P_WIDE",
+      "no_result_leg": "p25_range_resid",
+      "n_pool_at_tau": 324,
+      "count_grid": {
+        "0.005": 324
+      }
+    },
+    "D2": {
+      "tau": 0.005,
+      "tau_primary": 0.05,
+      "strictly_tighter_than_P": true,
+      "zone_mode": "prior_session_range",
+      "pool": "P_WIDE",
+      "no_result_leg": "p25_range_resid",
+      "n_pool_at_tau": 491,
+      "count_grid": {
+        "0.005": 491
+      }
+    },
+    "D3": {
+      "tau": 0.005,
+      "tau_primary": 0.05,
+      "strictly_tighter_than_P": true,
+      "zone_mode": "prior_session_range",
+      "pool": "P_WIDE",
+      "no_result_leg": "p25_range_resid",
+      "n_pool_at_tau": 43,
+      "count_grid": {
+        "0.005": 43
+      }
+    },
+    "D4": {
+      "tau": 0.02,
+      "tau_primary": 0.05,
+      "strictly_tighter_than_P": true,
+      "zone_mode": "prior_session_range",
+      "pool": "P_WIDE",
+      "no_result_leg": "p25_range_resid",
+      "n_pool_at_tau": 47,
+      "count_grid": {
+        "0.005": 14,
+        "0.01": 27,
+        "0.02": 47
+      }
+    }
+  },
+  "count_grid": {
+    "D1": {
+      "P": {
+        "0.05": 458
+      },
+      "P_WIDE": {
+        "0.005": 324
+      }
+    },
+    "D2": {
+      "P": {
+        "0.05": 266
+      },
+      "P_WIDE": {
+        "0.005": 491
+      }
+    },
+    "D3": {
+      "P": {
+        "0.05": 34
+      },
+      "P_WIDE": {
+        "0.005": 43
+      }
+    },
+    "D4": {
+      "P": {
+        "0.05": 33
+      },
+      "P_WIDE": {
+        "0.005": 14,
+        "0.01": 27,
+        "0.02": 47
+      }
+    }
+  },
+  "d1_ib_width_sensitivity_tau": 0.25,
+  "note": "count-only freeze \u2014 no forward returns consulted"
+}

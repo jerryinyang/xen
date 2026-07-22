@@ -19,6 +19,7 @@ hashes; accepted by the operator 2026-07-22).
 **Predecessor reads:** SPDR-007 / SPDR-008 both `NOT_WORTH` on daily-anchored objects only — D6.5 re-run trigger if a coarser pair carries signal where 1d/1m does not.
 **Operator direction — holds:** primary = **5 and 10 LTF detection bars** per pair (wall-clock grows with LTF); session-remainder secondary (disclosure). Source S9 micro horizon scales with detection bar.
 **Operator direction — universe (option A):** keep **all four pairs**; power and disposition on the **liquid-active core** per pair (INFR-020 0.50 retention floor ≈ 194 / 72 / 47 / 31), with **activity-conditioning** stated in every coarse-pair disposition.
+**Operator direction — D7 (2026-07-22), post-census:** pair set **unchanged at four**. **D4 is pre-declared POWER-LIMITED** on the measured candidate census (162 candidates / 12 instruments on its core) — it runs for horizon coverage and an UNPOWERED/INCONCLUSIVE D4 is **not** a null; D3 is not pre-declared. **Closure rule restated:** a powered null on **every pair that reaches power at realised n, minimum D1 and D2** (supersedes "all four pairs", unattainable under the D4 pre-declaration). See §6.3 + AMENDMENT-23/24.
 **Deliverable:** operator-signed disposition on *"does the measured Δ signature add reversal information over identical unsigned climax-hold events at the same levels"*, **per pair**, money floor first. **Never a tradability claim** (SPDR lane): 0 counted reads, no TEST, no holdout.
 
 ---
@@ -383,8 +384,13 @@ CONTROL signed_score_derangement  (attribution null; class: within_sample_attrib
     regime-driven ρ shows up as third-instability; (b) a WITHIN-SYMBOL derangement (each symbol's
     scores permuted among that symbol's own events) is emitted as a second null, removing any
     cross-sectional composition effect. The deranged fraction is reported beside every effect.
-  bite/MDE: plant a synthetic monotone score→return effect of known size on the real arm; confirm
-    the deranged arm reads ≈ 0 across the sweep; MDE published before the read.
+  bite/MDE: on the real arm, standardise `signed_score`, remove the observed monotone component
+    by deterministic Spearman centring, then plant `u × score_z` bps over `u = 0, 0.5, …, 30`.
+    At every point, 200 seeded GLOBAL zero-fixed-point score derangements publish their mean,
+    95% interval and one-sided p. The first positive plant whose rho exceeds the deranged p95
+    with p ≤ 0.05 is the MDE, published both as bps per score-SD and as rho before the read. The
+    full real T2 read still uses ≥2000 derangements; the 200-seed plant sweep is its separate
+    pre-read resolution instrument. If no grid point resolves, T2 is explicitly UNPOWERED.
   non-vacuity: re-pairs score with return ⇒ moves ρ's sufficient statistic.
   disclosure: collapse fraction (deranged ρ / observed ρ) per stratum, with the deranged fraction.
   destroy form: DERANGEMENT (zero fixed points, asserted).
@@ -490,16 +496,32 @@ POSITIVE CONTROL bite (REQUIRED — no disposition emits without it): pooled,
 
 ---
 
-## §5 Interpretation bands — labels, never gates (UNPOWERED evaluated FIRST — L-32 / B-5)
+## §5 Interpretation bands — labels, never gates (CI validity evaluated first — L-32 / B-5)
 
 ```
-T1 / T2 / T3 / T4 contrasts (per stratum):
-  UNPOWERED:    MDE > |plausible effect| at the realised n  (tested FIRST; never a negative)
-  SUPPORTED:    effect ≥ its own MDE and ci_low > 0  (T2 also: derangement one-sided p ≤ 0.05)
-  SUGGESTIVE:   ci_low > 0 but effect < its own MDE
-  WASH:         |effect| < MDE → "cannot distinguish", never a refutation (L-11)
+T1 / T2 / T3 / T4 contrasts (per stratum) — EXHAUSTIVE decision table, no undefined cell:
+  UNPOWERED:    no valid CI (tested FIRST); or, after the interval-sign checks below, MDE
+                unavailable at the realised n for a branch that needs it (never a negative)
   CONTRADICTED: ci_high < 0  (for T2: return ANTI-monotone in aggression-into-level — genuine
-                evidence against the mechanism, and a result in its own right)
+                evidence against the mechanism, and a result in its own right). Tested BEFORE
+                MDE availability because this band has no MDE term.
+  SUPPORTED:    ci_low > 0 and effect ≥ its own MDE  (T2 also: derangement one-sided p ≤ 0.05)
+  SUGGESTIVE:   ci_low > 0 but effect < its own MDE, OR ci_low > 0 with MDE unavailable
+  WASH:         CI spans zero AND |effect| < MDE → "cannot distinguish", never a refutation
+                (L-11). This is the design's POWERED NULL cell.
+  IMPRECISE:    CI spans zero AND |effect| ≥ MDE → the point estimate exceeds what this arm can
+                resolve, yet the interval still spans zero. Added at QA run 13 (AMENDMENT-30):
+                the MDE is defined by planting a CONSTANT shift on every treated event, so it
+                carries no dispersion, while a real effect does — an estimate can therefore beat
+                the MDE and remain indistinguishable from zero when the effect is concentrated
+                in few days rather than uniform. READING: INCONCLUSIVE — the effect is not
+                stable enough to resolve. It is NEVER a powered null (a large point estimate
+                cannot support "nothing is there", B-5) and NEVER a positive. For the
+                AMENDMENT-24 closure rule it behaves exactly like UNPOWERED: horizon-covered
+                but inconclusive, neither blocking nor contributing to a family close. Reported
+                with effect, CI, MDE and per-day n so the analyst can see the dispersion.
+  CI spans zero with MDE unavailable: UNPOWERED — MDE is required to separate WASH from
+                IMPRECISE honestly.
   POOLED:       declared PRIMARY here (§4.1) with the per-symbol census attached, not hidden
 SIGNED-VALUE reading (the screen's point): soil requires ALL THREE §4 legs, not leg (i) alone —
   (i) T1 SUPPORTED **and** S9 − MIRROR materially positive **and** T2 surviving derangement **and**
@@ -656,6 +678,33 @@ class). Therefore:
   MIRROR / BASE counts on the usable universe, plus per-symbol census. MDE curves from plants at
   **realised** n. Nothing above is a result.
 
+#### Measured CANDIDATE census — the upper bound on every pair (INFR-020 pin `5f170b71…`)
+
+The one count-only quantity INFR-020 **does** emit is the shared absorption-candidate population
+(`zone_scale_census.json`, DESIGN band, `absorb_candidate_predicate` on COMPLETE windows). It is
+**not pool P** — it precedes τ contact, refractory de-duplication and the S9/MIRROR/BASE split,
+each of which only reduces it — so it is an **upper bound**, cited as such and never as an event
+projection:
+
+| pair | candidates (194) | candidates on the 0.50 core | core symbols | carrying ≥1 | median / max per carrying symbol |
+|---|---|---|---|---|---|
+| **D1** | **95,836** | 95,836 | 194 | **189** | 194 / 7,469 |
+| **D2** | 9,497 | **5,226** | 72 | **60** | 14 / 746 |
+| **D3** | 2,974 | **933** | 47 | **28** | 8 / 293 |
+| **D4** | **640** | **162** | 31 | **12** | 5 / 98 |
+
+Two facts follow, both binding on the disposition:
+
+1. **The ten-instrument D1 census above is a sample, not a scale property.** Its 986 effort∧no-result
+   events sit inside a 194-instrument candidate population of 95,836. D1's power under option A is
+   therefore far better than the ten-name table suggests — but **the arm ratios (S9 ≈ 6% of P;
+   MIRROR > S9) are what carry the MDE**, and they are measured only on the ten names until
+   `power_census.json` lands. No universe-scaled S9 count is asserted here.
+2. **D4 is pre-declared power-limited** (operator decision **D7**, 2026-07-22): 162 candidates on
+   12 instruments before every reducing cut, one symbol holding 98 of them. D4 runs for horizon
+   coverage; an INCONCLUSIVE/UNPOWERED D4 is the expected outcome and is **not** a null. **D3 is
+   not pre-declared either way** — thin on the same measure, but resolved at run from realised n.
+
 ```
 POWER:
   MDE: plant curves (§4.2) at REALISED n per (pair, stratum), published BEFORE the real read.
@@ -669,14 +718,25 @@ STRATA PREDECLARED UNPOWERED (never negatives — B-5):
   - D1: BTCUSDT and ETHUSDT on pool P at any hold (0 S9 measured)
   - D2–D4: every instrument below the 0.50 retention floor for that pair → liquidity-limited,
     disclosed, never a signed negative
+  - **D4 POOLED (operator decision D7, 2026-07-22): pre-declared POWER-LIMITED on the measured
+    candidate census — 162 candidates / 12 instruments on its core, before τ, refractory and the
+    arm split. D4 runs for HORIZON COVERAGE. An UNPOWERED or INCONCLUSIVE D4 is the expected
+    outcome and is NOT a null; a POWERED D4 result, if realised n contradicts the pre-declaration,
+    reads normally. D3 is NOT pre-declared — its power is read from realised n.**
   - any chronological third of any per-symbol read
   - instruments without the pair's baseline/threshold pin → uncovered
   - every UNPOWERED cell reported WITH n and MDE
-DISPOSITION CONSEQUENCE (binding on ckpt-015 §7 under D6):
+DISPOSITION CONSEQUENCE (binding on ckpt-015 §7 under D6, as restated by D7):
   - A family-closing "third powered null" requires T1 UNPOWERED-or-null **with adequate power**
     on the relevant pool(s) — and under D6, a null **at D1 alone no longer closes the family**
-    (D6.5 / §7 amended). Close requires powered null **across all four pairs**, or an explicit
-    operator scoping statement.
+    (D6.5 / §7 amended).
+  - **D7 restatement (supersedes "powered null across all four pairs"):** close requires a powered
+    null on **every pair that reaches power at its realised n**, and **at minimum on D1 and D2**.
+    A pair that lands UNPOWERED is recorded as **horizon-covered but inconclusive** — it neither
+    blocks the close nor contributes to it. Rationale: with D4 pre-declared power-limited, the
+    all-four-pairs form was unattainable by construction and would have made the family
+    unclosable. The closure statement NAMES every pair's power state, so "closed" is never read
+    as "tested everywhere".
   - If POOLED T1 is UNPOWERED on BOTH P and P_WIDE **for a pair**, that pair is INCONCLUSIVE,
     not a powered null (Addendum §2.4).
   - Every D2/D3/D4 disposition states activity conditioning (option A).
@@ -812,7 +872,9 @@ session per pair) — not designer-pinned here because MTF baselines do not exis
 2. SPDR frozen-input hash verify (INFR-017/018 + INFR-020 pins).
 3. Per-pair usable universe from coverage_report (option A 0.50 floor) → `universe_membership`.
 4. Per-pair τ / P_WIDE cuts frozen on **counts only** → `pool_cuts.json` (+ D1 ib_width sensitivity).
-5. Cost floors + `power_census` + MDE curves **before any contrast**.
+5. Cost floors + `power_census`; then, **for each pair**, all of that pair's MDE curves before
+   that pair's first contrast. Pairs are disjoint estimands and the curves are deterministic, so
+   a completed earlier pair cannot enter or adapt a later pair's population, cuts, plants or MDE.
 6. DESIGN reads T1–T5 + controls **per pair** → tripwire → CONFIRM once → layers + census.
 7. `screen.md` → fresh-context analyst → operator disposition (per pair + overall under D6.5/§7).
 
@@ -971,10 +1033,177 @@ AMENDMENT-22 (INFR-020 operator freeze, 2026-07-22): the accepted Run-10 pin man
   otherwise ambiguous 57-symbol D1 consumer path before implementation. Final measured coverage
   replaces design-time approximations. DIRECTION: TIGHTER (frozen-input enforcement).
   1L/12T/9N.
+AMENDMENT-23 (operator decision D7, 2026-07-22 — census disclosure + D4 pre-declaration): the
+  measured candidate census from INFR-020's W5 is recorded in §6.3 as an explicit UPPER BOUND on
+  each pair's event supply (194-universe / 0.50-core: D1 95,836 / 95,836 on 189 carrying symbols;
+  D2 9,497 / 5,226 on 60; D3 2,974 / 933 on 28; D4 640 / 162 on 12, one symbol holding 98). It is
+  NOT pool P and is never cited as an event projection — every reducing cut (τ contact, refractory
+  dedup, arm split) still applies. Two consequences booked: (a) the ten-instrument D1 table is
+  labelled a SAMPLE, not a property of 1d/1m — D6's motivating "19 events" figure was a
+  ten-name artifact, and the widening now rests on its economic argument (hold-invariant fee, more
+  time to clear it) rather than on event supply; (b) **D4 POOLED is pre-declared POWER-LIMITED**,
+  so an UNPOWERED/INCONCLUSIVE D4 cannot later be presented as a null, and D3 is explicitly NOT
+  pre-declared. DIRECTION: TIGHTER (a pre-registered UNPOWERED cell removes the post-hoc option of
+  reading D4's silence as evidence). 1L/13T/9N.
+AMENDMENT-24 (operator decision D7, 2026-07-22 — closure rule; partially reverses AMENDMENT-20):
+  AMENDMENT-20 required a powered null ACROSS ALL FOUR PAIRS to close CF-SIGAUC-001. With D4
+  pre-declared power-limited (A-23), that condition is unattainable BY CONSTRUCTION and would make
+  the family unclosable regardless of evidence. Restated: close requires a powered null on EVERY
+  PAIR THAT REACHES POWER at its realised n, and AT MINIMUM on D1 and D2; a pair landing UNPOWERED
+  is recorded as HORIZON-COVERED BUT INCONCLUSIVE, neither blocking nor contributing to the close;
+  the closure statement names every pair's power state so "closed" is never read as "tested
+  everywhere". DIRECTION: **LOOSER** — it lowers the bar for closing the family, and is booked
+  LOOSER without hedging even though the removed condition was impossible to satisfy. The
+  horizon-menu clause (Addendum §2.10) is still met: every pair is screened and reported.
+  2L/13T/9N.
 ```
 
-**Running count: 1 LOOSER / 12 TIGHTER / 9 NEUTRAL.** Single LOOSER = AMENDMENT-18 (D6 widen).
-No validity/causality/threshold loosened. No LOOSER streak ≥ 3.
+**POST-MEASUREMENT amendments (run 1 of 2026-07-22 executed and DISCARDED).** Everything below
+this line was written **after** a full DESIGN+CONFIRM execution whose outputs were inspected.
+That run is **hard-deleted, not carried forward**: its `results/` tree was removed and the screen
+re-run from the frozen inputs, per the programme's amend-in-place rule (a frozen-design confound
+is closed by a dated amendment + hard delete + full rerun, never by a follow-up read). What was
+seen before these amendments were written is recorded here so the operator can weigh it:
+**D1 T1 WASH at both holds (+1.8 / −3.2 bps, CI spanning zero, S9 n=310, 168 days); D2/D3/D4
+UNPOWERED; D4 zero signed events; D1 S9 median −0.0 bps against an ~11.3–13 bps floor.**
+
+```
+AMENDMENT-25 (run-1 precondition failure — MDE arm + CF* arm, 2026-07-22): §4.2's MDE was
+  computed on a 30-symbol subsample while the contrast used the full usable universe, so the
+  published MDE (9.5 bps at D1) did not correspond to the realised n of the read (true value
+  13.0 bps). §4.3's CF* was then calibrated by planting 1× that wrong MDE on a SINGLE sample
+  symbol, whose day-clustered CI can never exclude zero — every seed was discarded (0 of 200 at
+  all three plant sizes, all four pairs) and the code silently substituted the inherited
+  INFR-018 prior 0.25, which is exactly what AMENDMENT-4 forbids. Fixed: each pair's arm is
+  built ONCE; the MDE is computed on that arm PER POOL (P and P_WIDE label against their own
+  MDE, §5); CF* plants 1× that MDE on the POOLED arm across symbols; and CF* is NEVER defaulted
+  to the prior — an arm that cannot support a material plant reports `UNDERIVABLE`, the survival
+  rule is marked inapplicable, and the tripwire status says so rather than implying adjudication.
+  Measured after the fix: D1 CF* DERIVED = 3.36 (10/10 seeds usable), and it falls to 1.44 / 0.92
+  at 2× / 3× plants — the §4.3 R20 caveat is now visible and is emitted as
+  `cf_star_spread_across_plants`. The derived value is ~13× the 0.25 prior; reported, not smoothed.
+  DIRECTION: TIGHTER (a derived threshold replaces an inherited one; an inapplicable gate is
+  labelled instead of passing silently). 2L/14T/9N.
+AMENDMENT-26 (run-1 precondition failure — P_WIDE contact zone, 2026-07-22): §3.2 defines P_WIDE
+  as the p25 no-result leg **plus a tighter τ**. Run 1 froze P at the τ-grid floor (0.05) on every
+  pair, and the P_WIDE grid started at the same 0.05, so P_WIDE could only equal P's zone: the
+  "tighter τ" leg went unmet and the §5 zone-dilution sensitivity was half-delivered. Fixed: the
+  P_WIDE grid extends below the P floor (0.005–0.20) and selection is restricted to τ strictly
+  less than the P value, raising if no such value exists. **Outcome-informed risk, stated:** this
+  was written after run-1 outcomes were seen. Mitigations — the selection remains COUNT-ONLY, the
+  new grid values were added below the existing floor rather than chosen against any result, and
+  **P's own τ is unchanged at 0.05**, so the PRIMARY read is not re-picked; only the secondary
+  stratum moves. DIRECTION: TIGHTER (a strictly tighter zone; removes a case where the two pools
+  silently coincided). 2L/15T/9N.
+AMENDMENT-27 (run-1 precondition failure — tripwire positive control, 2026-07-22): the §4.3 bite
+  `corr(swapped_mfe_bps, donor_real_mfe_bps) > 0.5` was computed as ONE pooled correlation. The
+  two quantities divide the same donor excursion by different entry prices (target's vs donor's),
+  and the D1 cross-section spans seven orders of magnitude in price (0.00067 → 20551), so the
+  pooled figure measured divisor dispersion, not whether the swap reached the reads — the exact
+  mismatch AMENDMENT-15 / QA-2 R-4 introduced the bps unit to avoid. It read 0.33 at D1 and
+  FAILED the floor, which under §4.3 blocks a disposition outright. Fixed: the correlation is
+  computed PER SYMBOL, where the divisors are comparable, and the 0.5 floor is applied to the
+  per-symbol median; the pooled figure is still emitted, labelled as an artifact, alongside the
+  per-symbol minimum and the fraction of symbols clearing the floor. Measured after the fix:
+  D1 per-symbol median 0.963 over 131 symbols, 97.7% above the floor (D2/D3/D4 already passed).
+  DIRECTION: **LOOSER** — booked LOOSER without hedging because it converts a failing required
+  control into a passing one, even though the failure was a defect in the statistic rather than
+  in the swap. 3L/15T/9N.
+AMENDMENT-28 (run-1 disclosure defect — contiguity drops, 2026-07-22): §3.4 requires events with
+  no unbroken 1-minute outcome span to be "dropped and COUNTED". Run 1 recorded the count as a
+  per-batch scalar broadcast onto every row, which cannot be aggregated (naive summation gave
+  3.87M against 7,186 kept events). The attrition was large and invisible: 32,433 located D1
+  events became 7,186 with outcomes (78% dropped); D2 68%, D3 55%, D4 69%. Fixed: located,
+  with-outcome and dropped counts are accumulated per pool and emitted in each pair's
+  `coverage` block, and `census.json` now carries the census-vs-layers reconciliation directly.
+  DIRECTION: NEUTRAL (disclosure of an existing quantity; no rule changed). 3L/15T/10N.
+```
+
+```
+AMENDMENT-29 (defect INTRODUCED by AMENDMENT-25, caught at QA run 12 before any re-run,
+  2026-07-22): moving the MDE onto the contrast's own arm made "MDE = 0" and "the raw contrast
+  is already materially positive" the SAME condition, because §4.2's plant sweep starts at 0.0.
+  Two consequences, both fatal in the regime that matters: (a) `calibrate_cf_star` accepted 0.0
+  as a valid 1× plant, so CF* would have been calibrated on the OBSERVED — possibly leaking —
+  edge rather than a known causal one, which is precisely the AMENDMENT-13 defect, and it would
+  have happened only where the tripwire's material-edge precondition is met, i.e. the one regime
+  CF* is ever used in; (b) `label_band` nulls any MDE ≤ 0, so the same condition demoted a
+  strongly positive contrast to SUGGESTIVE and **SUPPORTED — soil leg (i) — became unreachable**.
+  Fixed at the root rather than by a guard: the MDE sweep now CENTRES the treat arm on the base
+  arm (subtracting the observed contrast) before sweeping, so the MDE measures the arm's
+  RESOLUTION at realised n independently of what was observed, u = 0 can never qualify, and the
+  result is strictly positive or None. `calibrate_cf_star` additionally refuses any non-positive
+  plant (UNDERIVABLE, never the prior), and `label_band` treats 0 as a valid resolution so the
+  two consumers finally agree on what 0 means. Verified: on an arm with a 39.3 bps already-
+  material raw edge the MDE is 2.0, not 0.0; SUPPORTED/SUGGESTIVE/CONTRADICTED/WASH/UNPOWERED
+  are each reachable. Regression tests pinned.
+  DIRECTION: **LOOSER** — centring removes the observed effect from the denominator of the
+  `effect ≥ its own MDE` test, which lowers the MDE (D1: 13.0 → ~10) and therefore makes
+  SUPPORTED easier to reach. Booked LOOSER without hedging even though the same change makes the
+  LEAK gate strictly harder to satisfy (CF* can no longer be calibrated on the observed edge) —
+  the label describes the effect on the positive-claim bar, not the net intent. 4L/15T/10N.
+  COUNTER-DIRECTION, recorded at QA run 13's request: a smaller MDE also makes the FAMILY
+  HARDER TO CLOSE, because fewer zero-spanning cells satisfy |effect| < MDE and so fewer land
+  in WASH (the powered-null cell). The two effects point opposite ways and neither is netted.
+  VERIFIED NOT TO MOVE RUN 1: run-1's D1 readings (+1.81 ci [−3.66, 7.10]; −3.22 ci
+  [−12.86, 5.18]) label WASH at MDE 13.0 / 10.0 / 5.0 and only change below ~2, far under the
+  centred value. Both SUGGESTIVE and SUPPORTED require ci_low > 0, which run 1 never had, so
+  the MDE cannot resurrect the discarded null.
+AMENDMENT-30 (§5 label gap found at QA run 13, quant-designer call, 2026-07-22): §5's bands were
+  NOT exhaustive — a contrast with |effect| ≥ MDE and a CI spanning zero matched no band
+  (SUPPORTED/SUGGESTIVE need ci_low > 0; CONTRADICTED needs ci_high < 0; WASH needs
+  |effect| < MDE; UNPOWERED asserts MDE > |effect|, which is false there). The code returned
+  UNPOWERED, which under AMENDMENT-24 means "horizon-covered but inconclusive" — silently
+  converting a measured cell into an untested one on the checkpoint's master go/no-go.
+  AMENDMENT-29's centring makes the gap REACHABLE (a smaller MDE moves cells out of WASH), so
+  it had to be closed before the re-run. WASH was rejected as the fix: it is the design's
+  POWERED NULL cell, and a point estimate larger than the arm's own resolution cannot support
+  "nothing is there" (B-5, and the design's own "T1 UNPOWERED is INCONCLUSIVE, never a null").
+  Resolution — a new band **IMPRECISE**: CI spans zero AND |effect| ≥ MDE. Mechanism: the MDE
+  plants a CONSTANT shift on every treated event and therefore carries no dispersion, while a
+  real effect does, so a day-concentrated effect can exceed the MDE and still fail to exclude
+  zero. Reading: INCONCLUSIVE, never a null and never a positive; for the AMENDMENT-24 closure
+  rule it behaves exactly like UNPOWERED (neither blocks nor contributes). §5 is now an
+  EXHAUSTIVE decision table with no undefined cell, pinned by a test that sweeps effect × CI ×
+  MDE combinations and asserts every result is a defined band. DIRECTION: NEUTRAL — closure
+  semantics are unchanged (the affected cells were already non-contributing as UNPOWERED); the
+  change is accuracy of the reported reason, and it forecloses a later mislabel as WASH that
+  WOULD have been LOOSER. 4L/15T/11N.
+AMENDMENT-31 (QA run 14 ordering defect, operator option A, 2026-07-22): §5's A-30 table said
+  "MDE unavailable ⇒ UNPOWERED, tested first", which pre-empted CONTRADICTED even though that
+  band is defined solely by `ci_high < 0`. A measured negative interval was therefore reported
+  as untested whenever its control MDE was missing. Ordering is corrected: invalid/no CI first;
+  then CONTRADICTED; then positive-CI labels (MDE-less positives are SUGGESTIVE); only a
+  zero-spanning CI needs an MDE to separate WASH from IMPRECISE and is UNPOWERED without one.
+  T4/T5 MDE curves remain mandatory under §4.2 and are implemented independently of this
+  ordering fix; the clarification is not permission to omit them. DIRECTION: **LOOSER** — it
+  makes measured evidence against the signed mechanism reachable, but it also moves an
+  MDE-less positive interval from UNPOWERED to SUGGESTIVE. SUGGESTIVE cannot satisfy soil and
+  does not contribute to family closure, yet booking the change at its permissive component is
+  the conservative L-23 treatment. 5L/15T/11N.
+AMENDMENT-32 (QA run 15 T2 plant specification, 2026-07-22): §4.2 required a known monotone
+  score→return plant but did not pin its centring, grid or seed count, and the runner incorrectly
+  called the real-read derangement-null quantiles an MDE. The plant is now fully specified:
+  deterministic Spearman centring on the real arm; 0–30 bps per score-SD in 0.5-bps steps; 200
+  seeded GLOBAL zero-fixed-point derangements at every evaluated point; and the first positive
+  plant clearing deranged p95 with one-sided p ≤ 0.05 published in both plant-bps and rho units.
+  The real read remains ≥2000 seeds. DIRECTION: **LOOSER** — replacing a misnamed null critical
+  value with a planted resolution can make T2 support easier or harder; the permissive possibility
+  is booked conservatively. 6L/15T/11N.
+AMENDMENT-33 (QA run 15 publication-order clarification, 2026-07-22): §9's global phrase “MDE
+  curves before any contrast” conflicted with its next step's per-pair reads. It now states the
+  contamination-safe operational rule already accepted at QA run 12: every curve for a pair is
+  immutable and published before that pair's first contrast; an earlier pair cannot adapt any
+  later pair input. DIRECTION: NEUTRAL — pair estimands, populations and deterministic plants are
+  disjoint and unchanged; only the scheduling sentence is made literal. 6L/15T/12N.
+```
+
+**Running count: 6 LOOSER / 15 TIGHTER / 12 NEUTRAL.** LOOSERs = AMENDMENT-18 (D6 widen),
+AMENDMENT-24 (closure rule under D7), AMENDMENT-27 (bite computed per symbol), AMENDMENT-29
+(MDE centred on the observed contrast), AMENDMENT-31 (MDE-less positive CI → SUGGESTIVE),
+AMENDMENT-32 (planted T2 resolution). No
+validity/causality threshold loosened. No LOOSER streak ≥ 3
+(A-25 T → A-26 T → A-27 L → A-28 N → A-29 L → A-30 N → A-31 L → A-32 L → A-33 N).
 
 **Contested direction label (QA run 2).** AMENDMENT-2 NEUTRAL vs possible LOOSER — recorded;
 still short of a streak either way.

@@ -318,6 +318,9 @@ scoping before any whole-family close.
 **across all four pairs** is a materially stronger close than the session-horizon-scoped one §7
 contemplated. Conversely, **a null at 1d/1m alone can no longer close the family** — the widening
 is precisely the test of whether that null was scale-bound.
+*(**Superseded in part by D7, 2026-07-22:** the "all four pairs" form is unattainable once D4 is
+pre-declared power-limited. The live rule is D7's — powered null on every pair that reaches power,
+minimum D1 and D2. The clause above stands only in its second half: D1 alone still cannot close.)*
 
 | # | Question (plain) | Operator decision (2026-07-21) |
 |---|---|---|
@@ -327,3 +330,56 @@ is precisely the test of whether that null was scale-bound.
 operator accepted pin manifest `5f170b71…`. SPDR-009's four-pair design now carries the exact
 consumer hashes. Next: developer implementation → fresh-context design-to-code QA → operator
 execution gate.
+
+---
+
+## D7 — Pair set after the INFR-020 census — SIGNED 2026-07-22
+
+**What the frozen apparatus measured.** INFR-020's W5 census emits, count-only, the shared
+absorption-candidate population per pair on the DESIGN band. These are **raw candidates** — before
+τ contact, refractory de-duplication and the S9/MIRROR/BASE arm split, each of which only reduces
+them. They are not SPDR-009's pool P and are never presented as one.
+
+| pair | candidates (194 universe) | candidates on the 0.50-retention core | core symbols | of those, carrying ≥1 candidate | median / max per carrying symbol |
+|---|---|---|---|---|---|
+| **D1** 1d/1m | **95,836** | 95,836 | 194 | **189** | 194 / 7,469 |
+| **D2** 1h/5m | 9,497 | **5,226** | 72 | **60** | 14 / 746 |
+| **D3** 4h/15m | 2,974 | **933** | 47 | **28** | 8 / 293 |
+| **D4** 1d/1h | **640** | **162** | 31 | **12** | 5 / 98 |
+
+Source: `INFR-020/results/zone_scale_census.json` + `coverage_report.json` (pin `5f170b71…`).
+
+**Two things this changes.**
+
+1. **D6's motivating figure was a sample artifact, not a scale property.** The "19 signal events"
+   that triggered the widening came from a **ten-instrument** D1 census (SPDR-009 §6.3), not from
+   1d/1m as such. On the full 194 the D1 candidate population is the largest of the four pairs by
+   two orders of magnitude. The widening's real and unchanged payoff is **economics** — a
+   hold-invariant ~11 bps fee gets 2.5 hours to be earned back at D3 versus 10 minutes at D1 — not
+   event supply. D6 stands on that argument alone.
+2. **D4 cannot plausibly reach power.** 162 candidates on 12 instruments, before every reducing
+   cut. Running it produces an UNPOWERED cell, not a null. D3 is thin on the same measure and may
+   land the same way; that is decided at run by `power_census.json`, not asserted here.
+
+| # | Question (plain) | Operator decision (2026-07-22) |
+|---|---|---|
+| **D7** | Given the measured candidate census, does D4 (and possibly D3) stay in the grid? | **APPROVED (A)** — **keep all four pairs.** D4 is **pre-declared power-limited** on the measured candidate count; it runs for horizon coverage and its disposition may be INCONCLUSIVE/UNPOWERED without that counting as a null. D3 is not pre-declared either way — its power is read from realised n at run. |
+
+**Consequence for the §7 closure rule (binding, and it modifies D6.5).** D6.5 required a powered
+null **across all four pairs** to close CF-SIGAUC-001. Under D7 that is unattainable by
+construction, since D4 is pre-declared unlikely to reach power. The rule is restated:
+
+> A family close requires a **powered null on every pair that reaches power at its realised n**,
+> and **at minimum on D1 and D2**. A pair that lands UNPOWERED is recorded as
+> **horizon-covered but inconclusive** — it neither blocks the close nor contributes to it. The
+> closure statement names every pair's power state explicitly, so "closed" is never read as
+> "tested everywhere".
+
+This keeps the horizon-menu clause satisfied (Addendum §2.10 — each horizon gets a screen on the
+record) without letting a structurally unpowerable cell make the family unclosable. **Reason A was
+chosen:** an honest UNPOWERED label on 162 candidates costs almost nothing to run and is worth more
+at the retrospective than an unscreened horizon.
+
+**SIGNED.** No change to the pair set, the frozen design, or any pin. Next: developer
+implementation of `xen.sigbar.absorb` + screen runner → fresh-context design-to-code QA →
+operator execution gate.

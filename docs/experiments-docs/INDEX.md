@@ -89,16 +89,22 @@ only), **S3 Δ+ DELETED** (binary-mechanism rule), S2/S3-base/A6/A8 CONFIRMED-as
 layer UNAVAILABLE. The addendum adds 10 protocol rules (Part 2) and a revised path (Part 3) superseding
 Appendix B Phase 6 onward. Retrospective: `checkpoints/2026-07-20-014-signed-auction-structure/retrospective.md`.
 
-**Checkpoint-015 OPENED 2026-07-21 — DESIGN SIGNED (operator D1–D6 approved; rollover DEFERRED
-INDEFINITELY). INFR-020 COMPLETE 2026-07-22 — operator accepted Run-10 pin manifest
-`5f170b71…`; SPDR-009 enters developer implementation.**
-The signed-value screen: **SPDR-009** — S9 signed-absorption **marginal-value** master go/no-go (does
-signed absorption add value over the unsigned Climax-hold class on identical events — the thesis that
-exact delta pays *where price is blind*; gate-free, location-qualified); **SPDR-010** — S14 CVD-divergence
-rider (memo-gated so it cannot launder the S3 null); **INFR-019** — tick-floored per-symbol spread
-reconstruction (parallel, non-blocking; prerequisite for any net breadth claim). **Closure rule:** third
-powered null ⇒ close the family on the session horizon; soil ⇒ depth spend authorised. 0 counted reads;
-holdout SEALED. Design: `checkpoints/2026-07-21-015-signed-value-absorption-screen/design.md`.
+**Checkpoint-015 CLOSED 2026-07-22 — family CF-SIGAUC-001 `REGISTERED` → `CLOSED`.**
+The signed-value screen ran and the flagship claim did not reproduce. **SPDR-009** (S9 signed-absorption
+marginal value, four domain pairs D1 1d/1m · D2 1h/5m · D3 4h/15m · D4 1d/1h) is **NOT_WORTH**: at D1 the
+signed signature adds **+1.81 bps against an MDE of 5.5** on identical location-qualified events
+(H10 −3.41), dose-response **ρ = +0.008** inside a 2,000-seed derangement null, matched-random contrast
++2.39 bps with the interval through zero, and the signal arm's **median return is 0.0 bps against an
+11.3–13.0 bps cost floor**. Both zone sensitivities agree and the *tighter* pool is more negative.
+**D2/D3/D4 are UNPOWERED** (16 / 2 / 0 signal events) — horizon-covered but inconclusive, so the
+coarse-scale economic rescue failed structurally: candidate supply collapses 95,836 → 162 across the
+pairs' liquid cores. Sharpest negative: the **MIRROR arm is larger than the signal arm** (325 vs 311)
+and behaves identically — the measured split does not name a losing side at the flat-price bar the
+mechanism singles out. **D8 (2026-07-22)** amended the closure minimum from "D1 **and** D2" to "D1 with
+every pair's power state named". **`CLOSED` is not "tested everywhere": SPDR-010 (S14 divergence) was
+never run and INFR-019 (tick-floored spread) was never built.** Prior item: **INFR-020 COMPLETE
+2026-07-22**, pin `5f170b71…` (apparatus, survives the close). 0 counted reads; holdout SEALED.
+Retrospective: `checkpoints/2026-07-21-015-signed-value-absorption-screen/retrospective.md`.
 
 ## Current Infrastructure Tasks
 
@@ -118,7 +124,7 @@ holdout SEALED. Design: `checkpoints/2026-07-21-015-signed-value-absorption-scre
 | Family | Range | Status |
 |--------|-------|--------|
 | [infrastructure-validation](families/infrastructure-validation/INDEX.md) | VAL-008, INFR-014/015/018/020 | INFR-020 apparatus frozen 2026-07-22 |
-| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018/020, SPDR-007/008 → ckpt-015 SPDR-009/010, INFR-019 | **REGISTERED 2026-07-20** — INFR-017/018/020 COMPLETE; **SPDR-007 NOT_WORTH** (price-only spine, P-01); **SPDR-008 NOT_WORTH** (signed-trap breadth, powered null; only unsigned P-01 geometry reproduces). **Ckpt-014 CLOSED 2026-07-21 — family KEPT REGISTERED** (Addendum v1.1: closure needs the S9 3rd null). Grades: S1 DEMOTED, S3 Δ+ DELETED, S2/S3-base/A6/A8 CONFIRMED-as-measurement. **Ckpt-015 D1–D6 SIGNED; INFR-020 pin `5f170b71…` accepted:** SPDR-009 implementation next; SPDR-010 S14 divergence; INFR-019 spread |
+| CF-SIGAUC-001 (card: [`cf-sigauc-001.md`](../signal-registry/candidate-families/cf-sigauc-001.md)) | INFR-017/018/020, SPDR-007/008/009 | **CLOSED 2026-07-22** (ckpt-015 retrospective, operator-directed) — closed on **three independent powered nulls**: SPDR-007 price-only spine (P-01), SPDR-008 S3 trap-load, **SPDR-009 S9 signed absorption** (D1 +1.81 bps vs MDE 5.5, ρ +0.008, median 0.0 vs 11.3–13.0 bps floor; MIRROR 325 > S9 311). Power states at close: **D1 POWERED-NULL · D2/D3/D4 INCONCLUSIVE** (16/2/0 events). **D8** amended the closure minimum to D1-with-power-states-named. Grades: S1 DEMOTED; **S3 Δ+ and S9 DELETED**; S2/S3-base/A6/A8 CONFIRMED-as-measurement; §2.5 UNAVAILABLE. **Not covered by the close: S14 never run; INFR-019 never built; structural + funding-cadence horizons never screened.** Apparatus retained (`5f170b71…`, `5c386984…`, `1b7244c8…`, `xen.sigbar.{trap,absorb}`) |
 
 New candidate families register at `docs/signal-registry/candidate-families/` when research
 opens.
@@ -127,6 +133,6 @@ opens.
 
 | Checkpoint | Closed | Outcome |
 |---|---|---|
-| [015 — Signed Value: the Absorption Screen](checkpoints/2026-07-21-015-signed-value-absorption-screen/design.md) | OPEN (2026-07-21) | **DESIGN SIGNED — D1–D6 approved; INFR-020 apparatus frozen (`5f170b71…`); SPDR-009 implementation next.** Implements Addendum v1.1 Part 3 across D1–D4: **SPDR-009** S9 absorption marginal-value master go/no-go (signed − unsigned on identical events; gate-free, location-qualified), **SPDR-010** S14 divergence rider (memo-gated), **INFR-019** tick-floored spread (parallel). Closure requires a powered null across all four pairs unless the operator narrows the horizon. 0 reads; holdout SEALED. |
+| [015 — Signed Value: the Absorption Screen](checkpoints/2026-07-21-015-signed-value-absorption-screen/retrospective.md) | 2026-07-22 | **CLOSED — family CF-SIGAUC-001 `REGISTERED` → `CLOSED`.** Two items: **INFR-020** (multi-timeframe apparatus, pin `5f170b71…`, durable) and **SPDR-009** (S9 signed-absorption marginal value across four domain pairs — **NOT_WORTH**, powered null at D1: +1.81 bps vs MDE 5.5, ρ +0.008, T4/T5 WASH, median 0.0 bps vs an 11.3–13.0 bps floor; D2/D3/D4 UNPOWERED at 16/2/0 events; MIRROR arm larger than S9). Coarsening detection to buy wall-clock destroys event supply (95,836 → 162 on the liquid cores). **D8** amended the D7 closure minimum from "D1 and D2" to "D1 with every pair's power state named". **SPDR-010 (S14) never run; INFR-019 never built** — recorded as untested, not negative. 0 counted reads; holdout SEALED. Designer handoff in-directory. |
 | [014 — Signed Auction Structure](checkpoints/2026-07-20-014-signed-auction-structure/retrospective.md) | 2026-07-21 | **CLOSED — family CF-SIGAUC-001 KEPT REGISTERED** (no transition; closure gated on the S9 3rd null per Addendum v1.1 §3.3). Phases 0–5 complete, four TRAIN-only items, **0 counted reads, holdout SEALED**. Data premise CONFIRMED (exact taker delta is a measurement, A8 bit-exact); **both tested edges failed** — price-only spine P-01 (SPDR-007), S3 signed trap-load a powered null (SPDR-008). Grades: S1 DEMOTED, S3 Δ+ DELETED, S2/S3-base/A6/A8 CONFIRMED-as-measurement. Flagship claim (S9/S14, "signed value where price is blind") untested → carried to ckpt-015. |
 | [013 — Chapter 04 Open: HTFCAP + EPSOSC + Fresh XENA CAL](checkpoints/2026-07-16-013-chapter04-open-htfcap-epsosc-cal/retrospective.md) | 2026-07-19 | Both families closed — CF-EPSOSC-001 RETIRED (refuted 2×, drift pedestal); CF-HTFCAP-001 CLOSED (characterised — real sub-cost gross BTC edge). Apparatus rebuilt on Bybit (fresh CAL pin `abbb1842…`, report-layer framework INFR-016). Holdout SEALED. |

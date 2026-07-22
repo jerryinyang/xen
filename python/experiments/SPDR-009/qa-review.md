@@ -1295,3 +1295,1663 @@ No new residual issues found on re-read of the amended clauses. Non-blocking not
 QA-4's blocking set is closed: the HARD IB fence is per-pair (D4 = +60), report-layer scales (ret_norm, T3, §5 sensitivities) sit on the D6 prior-session-range family, header inventory matches the rewrite, and COMPLETE/D6.3 integrity lines are in HARD. Option A four-pair spine and family-close tightening are unchanged.
 
 **Still required before any run:** INFR-020 implementation + pins; then developer implementation of `xen.sigbar.absorb` + screen runner; post-implementation QA (design-to-code); operator execution gate.
+
+---
+
+## QA run 6 — 2026-07-22 — mode: subagent — HEAD `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807`
+
+**Stage:** post-implementation design-to-code QA (pre-execution). Real SPDR-009 screen **not** executed (`--execute` not run). Fresh-context subagent; did not author the implementation.
+
+**Verdict: REVISE**
+**FAILING_ARTIFACT:** `python/src/xen/sigbar/absorb.py` + `python/experiments/SPDR-009/screen_code/absorb_screen.py`
+**REQUIRED_SKILL:** `experiment-developer`
+
+**Dirty tree (implementation under review; git status not re-run in this tooling):**
+- `python/src/xen/sigbar/absorb.py` (NEW shared module)
+- `python/experiments/SPDR-009/screen_code/absorb_screen.py` (NEW runner)
+- `python/tests/test_sigbar_absorb.py` (NEW tests)
+- prior design / `design_derivations/` / this append-only file
+
+**Sources read:** live `design.md` §§0,1–9 + A-22/23/24; `gt_output.json`; `absorb.py` full; `absorb_screen.py` full; `test_sigbar_absorb.py` full; shared `ltf.py` helpers (import surface + COMPLETE/`formed_ts`); `fences.py` band/load; INFR-020 `pins.json` + report freeze line; INFR-018 registry `pin_sha256`; INFR-017 `column_pins.json` pin; SOL cuts in `class_thresholds_1m.json`; governance-constraints + skill protocol. QA runs 1–5 used as history only.
+
+**Developer claims checked independently (not trusted):**
+- Shared LTF imports, no local redefinition — **PASS** (source scan + import surface).
+- Frozen re-hash at entry — **PASS** (contract constants + on-disk pin fields align; runtime path present).
+- COMPLETE / causal next-LTF entry / 1m outcomes / DESIGN·CONFIRM only — **PASS** on core event/outcome path.
+- Fixed-H path-swap (not raw spine) + bite in bps of entry — **PASS** as primitives; runner tripwire incomplete (see Issues).
+- No local accounting / no real screen execution in this QA — **PASS**.
+- Tests: 23 functions; GT parametrize ×4 ⇒ **26** absorb cases as claimed — structure verified; suite not re-executed here (no shell). Full-suite 256 claim **not re-run**.
+- DEVIATIONS block: **none recorded** — matches (none found as approved silent deviation file).
+
+---
+
+### A. Independent pin re-hash (contract consistency)
+
+| Pin | Contracted | Evidence this run | Verdict |
+|---|---|---|---|
+| INFR-020 `pins.json` | `5f170b717e350fb7c0cf1647cd1b78fb88a1fa212ed50dce83ec1049af44f6c5` | `absorb.INFR020_PINS_SHA256`; INFR-020 report operator freeze line | **MATCH** (constant↔report; runtime re-hashes file) |
+| `seasonal_baselines_mtf.parquet` | `86c81937cbee…38a12c1` | design §0 = `pins.json.artifacts` = absorb dict; file **present** under INFR-020/results | **MATCH** (contract; full byte re-hash delegated to `assert_spdr009_frozen_inputs` / test) |
+| `class_thresholds_1m.json` | `dee853ad…e9fc` | same three-way agreement | **MATCH** |
+| `class_thresholds_mtf.json` | `745fb435…3ae7` | same | **MATCH** |
+| `sessions_mtf.json` | `c55cd880…62df` | same | **MATCH** |
+| `zone_scale_census.json` | `f64e0d22…7f1e` | same | **MATCH** |
+| `zone_scale_census_d1_ibwidth.json` | `76c3d4b5…5f0c` | same | **MATCH** |
+| `coverage_report.json` | `68dac757…3a424` | same | **MATCH** |
+| INFR-017 baselines | `1b7244c8…` | `fences.BASELINES_SHA256`; pins.json frozen_inputs; file present | **MATCH** |
+| INFR-017 column_pins | `e3b9fd9b…` | `column_pins.json` field `pin_sha256` exact | **MATCH** |
+| Catalog fence | `35d3375e…` | fences constant + pins.json frozen_inputs | **MATCH** (constant; not re-streamed as a file here) |
+| INFR-018 registry | `5c386984…` | registry `pin_sha256` exact at EOF | **MATCH** |
+
+Nine INFR-020 artifact rows in `pins.json` (battery + gap + seven consumers) agree with the INFR-020 report table. SPDR consumer re-verifies the seven design-§0 consumers + the pins.json envelope (not battery/gap) — acceptable for this item’s consumption surface.
+
+---
+
+### B. Golden-trace re-derivation (from design §8 / `gt_output.json`, not impl fixtures)
+
+SOLUSDT cuts from frozen `class_thresholds_1m.json` (independent read):  
+`volume.high=5.34397`, `range.low=−0.899321`, `delta_abs.high=4.85461`, `delta_ratio.abs_high=1.37780` — matches design GT-4 pin text.
+
+| Event | Design / gt_output | Arm rule re-check | ret H5 / H10 | Verdict |
+|---|---|---|---|---|
+| **GT-1** 2022-12-28 03:27 IB_LOW | into=−1; dr=−1.5016 ⇒ signed=+1.5016; da=9.88 ≥ d_hi; signed ≥ dr_hi | **S9** · side LONG · entry 03:28 / 10.770 | −4.6425 / −9.2851 | **PASS** (design ≡ gt_output) |
+| **GT-2** 2022-12-29 01:24 PRIOR_SESSION_LOW | into=−1; signed=+1.5397; da huge | **S9** · LONG · entry 01:25 / 9.725 | +15.4242 / −5.1414 | **PASS** |
+| **GT-3** 2022-12-26 23:34 PRIOR_VAL | into=+1; dr=−1.382 ⇒ signed=−1.382 ≤ −dr_hi; da huge | **MIRROR** (not S9) · SHORT | −35.5240 / −26.6430 | **PASS** (sign guard) |
+| **GT-4** 2022-11-12 22:08 IB_LOW | into=−1; dr=+1.2096 ⇒ signed=−1.2096; \|signed\| < 1.3778; da=26.0 ≥ d_hi | **BASE** (magnitude without extreme direction) | −43.4783 / −40.1338 | **PASS** |
+| **GT-5** raise set | band / freeze / hash / per-level Δ / IB wall-clock / derange FP / S1 / D6.3 / A-H non-edge / COMPLETE | Unit tests cover most; **e,f,i** not dedicated (see Issues) | — | **PARTIAL** |
+
+Implementation arm primitive `_arm_label` and into_side match §3.3 / §3.2. Tests assert GT rows against designer-pinned `gt_output.json` under D1 `ib_width` τ=0.25 (continuity zone) — correct source of expectation.
+
+---
+
+### C. Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §0 frozen re-hash every entry | `absorb.py:177–242` | **MATCHES** | INFR-017 + registry + pins.json + 7 consumers |
+| §0 four pairs D1–D4 | `absorb.py:125–158` | **MATCHES** | D4 IB wall=60 disclosed |
+| §0 D6.3 1m outcomes/levels | `absorb.py:282–288, 496, 557–563, 765–858` | **MATCHES** | `assert_no_ltf_outcome_path`; levels via `structural_levels_1m` on 1m |
+| §0 DESIGN/CONFIRM only; no TEST | `absorb.py:485–486`; `fences.load_bars` band window | **MATCHES** | TEST/holdout not in `BANDS` |
+| §0 no local accounting | screen calls `check_no_local_accounting`; no banned defs | **MATCHES** |
+| §0 no S1 qualifier | `refuse_s1_as_qualifier` | **MATCHES** (explicit raise helper) |
+| §0 A-H non-edge | `assert_not_edge_bearing_operational`; D2/D3 `edge_bearing_anchor=False` | **MATCHES** (path never sets as_edge=True for A-H*) |
+| §3.1 shared level/session/availability | imports `structural_levels_1m`, `assign_candidate_sessions`, `available_levels_for_candidates` | **MATCHES** | not redefined in absorb |
+| §3.1 formed_ts mandatory | enforced in shared `available_levels_for_candidates` | **MATCHES** (via import) |
+| §3.2 COMPLETE-window candidates | `ltf_complete_bars` + fence on non-COMPLETE rows + `absorb_candidate_predicate(..., require_complete=True)` | **MATCHES** | GT-5(l) raise is partial (filter + traded_fraction raise) |
+| §3.2 effort / no-result / zone / into_side | `build_contact_events` | **MATCHES** for pool P | |
+| §3.2 consecutive same-level → first | `absorb.py:732–734` | **DEVIATES** | Comment only; sort/return — no collapse (refractory partially substitutes) |
+| §3.2 P_WIDE p25 + tighter τ | partial `pool_mode` + threshold override | **MISSING** in runner | No P_WIDE τ freeze; execute path never builds P_WIDE |
+| §3.2 τ count-only freeze | `absorb_screen.step_pool_cuts` | **MATCHES** (intent) | Sample-heuristic MIN_POOL_EVENTS=30 on ≤20 symbols — disclose, not integrity fail |
+| §3.3 three arms | `_arm_label` | **MATCHES** on located pool | |
+| §3.3 MID_RANGE arm (T3 habitat) | `absorb.py:601–656` | **DEVIATES (MAJOR)** | `into = sign(dr)`; `signed = into*dr` ⇒ always \|dr\|; **MIRROR unreachable** |
+| §3.4 entry next LTF open; side=−into | `entry_ts = OpenTime + ltf`; `side: -into` | **MATCHES** | |
+| §3.4 ret_bps / MFE/MAE 1m path | `evaluate_outcomes_1m` | **MATCHES** | open-to-open; path after entry; contiguity drop |
+| §3.4 session-remainder secondary | — | **MISSING** | not emitted |
+| §3.4 ret_norm prior-session-range | `evaluate_outcomes_1m:846–851` | **MATCHES** when zone_mode=prior_session_range | ib_width path leaves ret_norm null |
+| §2 refractory 10 LTF | `apply_refractory` | **MATCHES** | |
+| §4 T1 S9−BASE + mirror companion | `contrast_day_clustered` + screen layers | **PARTIAL** | Primitive OK; **day contrast uses global base mean**, not same-day arm contrast |
+| §4 T2 Spearman + ≥2000 derange | `spearman_finite` + `derange_scores_global`; screen seeds 2000 | **MATCHES** structure | within-symbol second null not in runner |
+| §4 T3 mid-range | pool_mode MID_RANGE exists; **not in runner** | **MISSING / DEVIATES** | broken arm math if used |
+| §4 T4 matched random | `matched_random_timing` primitive | **MISSING** in runner | GT-5(i) raise present in primitive |
+| §4 T5 bare level touch | — | **MISSING** | no primitive |
+| §4.2 MDE plant curves before read | — | **MISSING** | no plant / `mde_curves` artifact |
+| §4.3 fixed-H path-swap + bite bps | `outcome_path_swap_fixed_h` + `path_swap_bite_bps` | **MATCHES** primitives | L-28 zero FP asserted |
+| §4.3 CF* plant calibration + collapse survival | — | **MISSING** | runner only bite; no CF*, no collapse_fraction, no survival rule |
+| §4.3 material-edge precondition | — | **MISSING** | not coded on tripwire path |
+| §5 UNPOWERED-first labels | partial UNPOWERED flags on thin contrast | **PARTIAL** | no full band-label emission |
+| §6.1 cost floor pin | `cost_floor_bps` + `bybit_round_trip_cost_bps` | **MATCHES** | SOL ~11.748 at H=10min in unit test design |
+| §6.2 SPREAD-SCALE-ROUTING | — | **MISSING** in runner | |
+| §6.3 usable universe option A | `usable_universe` from coverage_report | **MATCHES** | tests expect 194/72/31 |
+| §6.3 power_census before contrast | screen order on `--execute` | **MATCHES** order | missing MDE curves step |
+| §6.4 day-clustered block bootstrap | `block_bootstrap_ci` DAY_BLOCK=5 | **PARTIAL** | see T1 day-contrast note |
+| §7 CONFIRM-before-freeze | `assert_confirm_freeze_ready` | **MATCHES** helper | CONFIRM band never run in runner |
+| §7 IB per-pair wall-clock | `ib_minutes_for_pair` + raise in contact | **MATCHES** | D4=60 |
+| §9 import boundary / no spine path-swap reuse | fixed-H in absorb; no `spine.outcome_path_swap` | **MATCHES** | |
+| §9 execution order | prep freezes without outcomes; execute needs flag | **PARTIAL** | prep OK; execute incomplete vs T1–T5+tripwire+CONFIRM |
+
+---
+
+### D. Golden-trace diff (implementation logic vs design)
+
+| Item | Expected (design) | Implemented | Verdict |
+|---|---|---|---|
+| GT-1…4 arms + signed_score construction | §8 + cuts | `_arm_label` / `_into_side` + residual path | **MATCHES** (logic); emission tested against pinned JSON |
+| GT-1…4 returns open-to-open 1m | ret formula §3.4 | `evaluate_outcomes_1m` | **MATCHES** |
+| GT-5a TEST/holdout | raise | `load_bars("TEST")` raises | **MATCHES** |
+| GT-5b CONFIRM before freeze | raise | `assert_confirm_freeze_ready` | **MATCHES** |
+| GT-5c hash mismatch | raise | monkeypatch registry pin | **MATCHES** |
+| GT-5d per-level Δ | raise | fences helper | **MATCHES** |
+| GT-5e IB before complete | raise | contact path raises | **MATCHES** logic; no dedicated test |
+| GT-5f PRIOR_* current session | raise | shared `formed_ts` / availability | **MATCHES** via ltf; no absorb-level test |
+| GT-5g derange FP | raise | trap.derange n=1 | **MATCHES** |
+| GT-5h S1 | raise | `refuse_s1_as_qualifier` | **MATCHES** |
+| GT-5i matched_random own session | raise | primitive raises | **MATCHES** logic; no unit test |
+| GT-5j D6.3 LTF outcome | raise | `assert_no_ltf_outcome_path` | **MATCHES** |
+| GT-5k A-H edge | raise | helper | **MATCHES** |
+| GT-5l non-COMPLETE | raise | filter + traded_fraction raise; series fence | **PARTIAL** |
+
+---
+
+### E. Governance & boundary checklist
+
+| Check | Evidence | Verdict |
+|---|---|---|
+| Holdout sealed; no final 30% | `HOLDOUT_START=2025-01-08`; bands only DESIGN/CONFIRM; `assert_band` | **OK** |
+| Causal t−1 entry | next LTF open after detection close; IB availability via shared mins + fence | **OK** |
+| COMPLETE-window only | complete_only aggregate + predicate + fence | **OK** |
+| D6.3 1m path | outcomes and levels on 1m | **OK** |
+| L-28 derangement (T2 + path-swap) | zero fixed points asserted | **OK** on primitives |
+| No local accounting | `check_no_local_accounting(screen_code)`; no accounting defs in absorb | **OK** |
+| SPDR TRAIN-only; 0 counted reads; no TEST | design + band fence; no registry TEST path | **OK** |
+| No estimand-gated P&L / no BacktestNode | vectorised Python only | **OK** |
+| Tripwire HARD future_destroy present as **complete adjudicator** | path-swap exists; **CF*/collapse/survival missing** | **REVISE** |
+| CONVERSION-PIN L-21 | estimand already bps of entry | **OK** |
+| SPREAD-SCALE-ROUTING declared in design; code | design yes; runner no | **REVISE** (report layer, not integrity) |
+| Amendment ledger L-23 | 2L/13T/9N; no LOOSER streak ≥3 | **OK** (design) |
+| XENA VOID N/A | SPDR screen | **OK** |
+| Shared-code boundary | LTF helpers imported not reimplemented | **OK** |
+| DEVIATIONS | none | **OK** |
+
+---
+
+### F. Issues
+
+1. **MAJOR — MID_RANGE / T3 arm math broken**  
+   **Design §:** §3.3 + §4 T3  
+   **Where:** `absorb.py:624–627`  
+   **Problem:** synthetic `into = sign(delta_ratio_resid)` makes `signed_score = |dr|` always ≥ 0, so MIRROR is impossible and S9 is not “aggression into a level.”  
+   **Required:** define mid-range score without fabricating into_side from |dr| (e.g. use raw `delta_ratio_resid` as the continuous score with the same ±dr_hi split), and add a regression that MIRROR can fire.
+
+2. **MAJOR — Screen execute path incomplete vs design battery**  
+   **Design §:** §4 T1–T5, §4.2 controls, §5, §9 step 5–6  
+   **Where:** `absorb_screen.py:step_design_reads` (~254–341)  
+   **Problem:** only T1 / T1-mirror / T2 (+ thin tripwire). Missing T3, T4, T5, bare-level control wiring, matched-random wiring, within-symbol derangement disclosure, session-remainder secondary, CONFIRM once, floor-vs-arm absolute framing, spread-scale routing. Disposition cannot be formed from current layers alone.  
+   **Required:** implement remaining report layers per pair (or explicitly scope a staged runner in design with operator approval — currently design requires full battery).
+
+3. **MAJOR — Tripwire not design-complete**  
+   **Design §:** §4.3 HARD  
+   **Where:** `absorb_screen.py:313–337`; no CF* code in absorb  
+   **Problem:** no additive-plant CF* calibration (1×/2×/3× MDE), no `collapse_fraction`, no material-edge precondition, no survival rule, no `results/tripwire.json` with seed set **before** real read. Bite alone is not the tripwire.  
+   **Required:** implement fixed-H path-swap adjudication for T1/T2 exactly as §4.3.
+
+4. **MAJOR — MDE plant curves not emitted before contrasts**  
+   **Design §:** §4.2 bite/MDE; §6.3; §9 step 5  
+   **Where:** runner has no `mde_curves` step  
+   **Problem:** MDE must be published from plants at realised n before real T1/T2.  
+   **Required:** plant grid → `results/mde_curves.json` after `power_census`, before DESIGN contrasts.
+
+5. **MAJOR — P_WIDE stratum not frozen or read**  
+   **Design §:** §3.2 secondary pool; multiplicity 4×2×2=16  
+   **Where:** `step_pool_cuts` / `step_design_reads`  
+   **Problem:** only pool P; P_WIDE p25 + tighter τ not count-frozen or executed.  
+   **Required:** freeze P_WIDE cuts on counts only; emit separate stratum (never pool with P).
+
+6. **MEDIUM — Day-clustered contrast uses global BASE mean**  
+   **Design §:** §6.4 per-day arm contrast  
+   **Where:** `absorb.py:1196–1200`  
+   **Problem:** `day_contrast = treat_day_mean − overall_base_mean` is not a same-day arm contrast.  
+   **Required:** form per-day (or day-clustered) S9−BASE contrast with the design’s stated resampling unit.
+
+7. **MEDIUM — Consecutive same-level first-bar rule not implemented**  
+   **Design §:** §3.2  
+   **Where:** `absorb.py:732–734`  
+   **Problem:** comment claims collapse; code only sorts. Refractory of 10 LTF bars partially overlaps but is not the same rule.  
+   **Required:** implement first-bar-at-(symbol,pair,level_kind) collapse before refractory, or design amendment if refractory is accepted as substitute.
+
+8. **LOW — GT-5(e)(f)(i) lack dedicated tests; GT-5(l) is filter-first**  
+   **Design §:** §8 GT-5  
+   **Required:** add raise-path tests for IB-before-complete, current-session PRIOR_*, matched-random own session; align COMPLETE “raises” wording with filter+fence behavior or raise on non-COMPLETE rows in the candidate series.
+
+9. **LOW — D1 ib_width sensitivity / CONFIRM path not scheduled**  
+   **Design §:** §3.2 / §5 / §9  
+   **Required:** emit D1 `0.25×ib_width` census path; wire CONFIRM after freeze with one verify pass.
+
+**Non-issues / verified good:** shared LTF boundary; frozen pin contracts; core pool-P event construction; arm three-way on located events; 1m outcomes; refractory primitive; fixed-H path-swap primitive + bps bite; cost floor pin; option-A universe sizes in unit tests; no local accounting; no TEST/holdout; prep path freezes without outcomes.
+
+---
+
+### G. Verdict
+
+**REVISE.**
+
+Core event object, pins, D1 golden-trace arm/return logic, shared LTF imports, and several integrity fences look sound. The screen is **not ready for the operator execution gate**: T3–T5 and controls are unfinished, the HARD tripwire is incomplete, MDE curves are absent, P_WIDE is absent, and MID_RANGE arm assignment is wrong if T3 is turned on.
+
+After developer fix: re-run this skill (fresh context), then operator `--execute` gate. **QA does not launch the screen.**
+
+---
+
+## QA run 7 — 2026-07-22T12:00Z — mode: subagent — HEAD `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807`
+
+**Stage:** post-REVISE re-review (QA run 6 residuals). Fresh-context subagent; did not author the implementation. `--execute` **not** run.
+
+**Verdict: REVISE**
+**FAILING_ARTIFACT:** `python/src/xen/sigbar/absorb.py` + `python/experiments/SPDR-009/screen_code/absorb_screen.py`
+**REQUIRED_SKILL:** `experiment-developer`
+
+**Dirty tree (implementation under review; full `git status` not available in this tooling):**
+- HEAD matches run 6: `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807` (`.git/refs/heads/main`)
+- Files re-read for this pass: `absorb.py`, `absorb_screen.py`, `test_sigbar_absorb.py`, live `design.md` §§0,3–9, `gt_output.json`, INFR-020 `pins.json` + `class_thresholds_1m.json` (SOL + structure), INFR-018 registry pin, QA run 6 issues as checklist only
+
+**Developer fix claims (independent disposition):**
+
+| # | Claim | Verdict | Evidence |
+|---|---|---|---|
+| 1 | MID_RANGE uses raw `delta_ratio_resid` as signed_score (MIRROR reachable) | **FIXED** | `absorb.py:624–629`: `signed = float(dr)`; no `into=sign(dr)` projection. `_arm_label` + unit test `test_mid_range_score_allows_mirror_arm` |
+| 2 | Screen complete battery T1–T5 + P_WIDE freeze + mid-range T3 + matched random T4 + bare T5 + within-symbol derange disclosure + CONFIRM + spread-scale proxy + D1 ib_width | **PARTIAL** | Runner wires all named layers; residual defects below (P_WIDE p25, T4 CI, §5 labels, session secondary, bare match quality) |
+| 3 | Tripwire CF* + collapse + material-edge + survival + bite bps + `tripwire.json` | **PARTIAL** | Structure present in `_run_tripwire` / `calibrate_cf_star`; T2 not adjudicated; CF* seeds/order/artifact incomplete |
+| 4 | MDE plant curves before DESIGN contrasts | **FIXED** | `step_mde_curves` → `results/mde_curves.json` then `step_design_reads` (`absorb_screen.py:712–715`) |
+| 5 | P_WIDE count-only freeze + separate stratum | **PARTIAL / FAIL on p25 leg** | τ freeze + separate layer present; **no-result cut is still p10** (see Issues) |
+| 6 | Day-clustered shared-day arm contrast when available | **FIXED** | `contrast_day_clustered`: shared days ≥3 → `mt[d]−mb[d]`; else global base fallback + `paired_days` flag (`absorb.py:1226–1232`) |
+| 7 | Consecutive same-level first-bar collapse | **FIXED** | Implemented before return (`absorb.py:735–755`); consecutive LTF gap + same `level_kind`/symbol/pair |
+
+---
+
+### A. Independent pin re-hash (contract consistency)
+
+| Pin | Contracted (design §0 / absorb) | On-disk / code | Verdict |
+|---|---|---|---|
+| INFR-020 `pins.json` envelope | `5f170b717e350fb7c0cf1647cd1b78fb88a1fa212ed50dce83ec1049af44f6c5` | `absorb.INFR020_PINS_SHA256` | **MATCH** (constant; runtime re-hashes) |
+| `seasonal_baselines_mtf.parquet` | `86c81937…38a12c1` | `pins.json.artifacts` = absorb dict | **MATCH** |
+| `class_thresholds_1m.json` | `dee853ad…e9fc` | three-way | **MATCH** |
+| `class_thresholds_mtf.json` | `745fb435…3ae7` | three-way | **MATCH** |
+| `sessions_mtf.json` | `c55cd880…62df` | three-way | **MATCH** |
+| `zone_scale_census.json` | `f64e0d22…7f1e` | three-way | **MATCH** |
+| `zone_scale_census_d1_ibwidth.json` | `76c3d4b5…5f0c` | three-way | **MATCH** |
+| `coverage_report.json` | `68dac757…3a424` | three-way | **MATCH** |
+| INFR-017 baselines | `1b7244c8…` | `pins.json.frozen_inputs` | **MATCH** |
+| INFR-017 column_pins | `e3b9fd9b…` | `pins.json.frozen_inputs` | **MATCH** |
+| Catalog fence | `35d3375e…` | `pins.json.frozen_inputs` | **MATCH** |
+| INFR-018 registry | `5c386984…` | registry EOF `pin_sha256` exact | **MATCH** |
+
+SOL frozen cuts (independent read of `class_thresholds_1m.json`):  
+`volume.high=5.34397`, `range.low=−0.899321`, `delta_abs.high=4.85461`, `delta_ratio.abs_high=1.37780` — match design GT-4 / run-6.  
+**Note:** range blocks carry only p90/p10 (`high`/`low`); **no `range.p25` field** exists in the frozen threshold JSON.
+
+---
+
+### B. Golden-trace re-derivation (design §8 / `gt_output.json` — not impl fixtures)
+
+Arm rule from design §3.3: `signed_score = into_side × delta_ratio_resid`; S9 if `da≥d_hi` and `signed≥dr_hi`; MIRROR if `da≥d_hi` and `signed≤−dr_hi`; else BASE.
+
+| Event | into · dr → signed | da vs d_hi | signed vs ±dr_hi | Arm | Verdict |
+|---|---|---|---|---|---|
+| **GT-1** IB_LOW 03:27 | (−1)×(−1.5016)=+1.5016 | 9.88 ≥ 4.85 | +1.50 ≥ +1.38 | **S9** | **PASS** |
+| **GT-2** PRIOR_SESSION_LOW | (−1)×(−1.5397)=+1.5397 | huge | ≥ +dr_hi | **S9** | **PASS** |
+| **GT-3** PRIOR_VAL | (+1)×(−1.382)=−1.382 | huge | ≤ −dr_hi | **MIRROR** | **PASS** |
+| **GT-4** IB_LOW | (−1)×(+1.2096)=−1.2096 | 26 ≥ d_hi | \|signed\| < 1.3778 | **BASE** | **PASS** |
+
+Implementation `_into_side` / `_arm_label` / located-pool `signed = into * dr` match. Tests bind to designer-pinned `gt_output.json` under D1 `ib_width` τ=0.25. Suite structure: 24 test functions + 4 GT params ≈ **27** cases as claimed (not re-executed here).
+
+---
+
+### C. Design-fidelity trace (post-fix residual focus)
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §0 frozen re-hash | `absorb.py:177–242` | **MATCHES** | |
+| §0 four pairs + D4 IB=60 | `PAIR_SPECS` / `ib_minutes_for_pair` | **MATCHES** | |
+| §0 D6.3 1m path | outcomes + levels | **MATCHES** | |
+| §0 DESIGN/CONFIRM only | band fence | **MATCHES** | |
+| §3.2 consecutive same-level → first | `absorb.py:735–755` | **MATCHES** | by level_kind+adjacency; not level_price (LOW residual) |
+| §3.2 P_WIDE = **p25 range** + tighter τ | `absorb.py:517–526` + screen freeze | **DEVIATES (MAJOR)** | no p25 in thresholds → silent p10; only τ differs from P |
+| §3.2 τ count-only freeze | `step_pool_cuts` | **MATCHES** (intent) | sample-heuristic disclose |
+| §3.3 three arms (located) | `_arm_label` + into×dr | **MATCHES** | |
+| §3.3 MID_RANGE continuous score | raw `dr` | **MATCHES** (QA-6 I-1 closed) | habitat score ≠ into-level by construction; disclosed |
+| §3.4 entry next LTF; side=−into | contact builder | **MATCHES** | mid-range uses fade of measured aggression |
+| §3.4 session-remainder secondary | — | **MISSING** | still not emitted |
+| §3.4 ret_norm prior-session-range | outcomes | **MATCHES** when zone_mode primary | |
+| §4 T1 + mirror companion | `_layers_for_events` + day-clustered | **MATCHES** structure | shared-day when available |
+| §4 T2 Spearman + ≥2000 derange | `_t2_dose` | **MATCHES** global seeds | within-symbol disclosure @ 200 seeds |
+| §4 T3 mid-range | MID_RANGE path + layers | **MATCHES** structure | |
+| §4 T4 matched random + day-clustered CI | `matched_random_timing` + screen | **PARTIAL** | primitive OK; runner emits means only — **no day-clustered CI** |
+| §4 T5 bare touch (30 matched / event) | `bare_level_touch_events` | **PARTIAL** | complement near level; not phase/side matched 30-per-event as §4.2 |
+| §4.2 MDE before read | `step_mde_curves` | **MATCHES** | sample ≤30 symbols |
+| §4.3 path-swap fixed-H + bite bps | primitives + runner | **MATCHES** primitives | |
+| §4.3 CF* plant 1×/2×/3× MDE, ≥200 seeds, **before** real read | `calibrate_cf_star` + `_run_tripwire` | **DEVIATES** | seeds=50; calibration after T1 in same step; T2 not adjudicated |
+| §4.3 collapse + material-edge + survival | `_run_tripwire` | **MATCHES** for T1 | T2 absent |
+| §4.3 `results/tripwire.json` full | `_emit(tripwire.json)` | **DEVIATES** | per-pair overwrite; last pair wins |
+| §5 UNPOWERED-first labels | thin UNPOWERED flags only | **PARTIAL** | no SUPPORTED/WASH/… emission |
+| §6.1 cost floor | `cost_floor_bps` | **MATCHES** | |
+| §6.2 SPREAD-SCALE-ROUTING | SOL proxy in layers | **PARTIAL** | not per-symbol at screen time |
+| §6.3 usable universe option A | `usable_universe` | **MATCHES** | tests 194/72/31 |
+| §6.4 day-clustered unit | shared-day contrast | **MATCHES** | |
+| §7 CONFIRM-before-freeze + CONFIRM once | helper + `step_confirm` | **MATCHES** | CONFIRM samples ≤40 symbols |
+| §9 execution order prep/execute | main() | **PARTIAL** | MDE before contrasts OK; CF* order not |
+
+---
+
+### D. Golden-trace diff (implementation logic vs design)
+
+| Item | Expected | Implemented | Verdict |
+|---|---|---|---|
+| GT-1…4 arms + returns | §8 / gt_output | `_arm_label` + 1m path | **MATCHES** (logic; suite pins JSON) |
+| GT-5a–d,g–h,j–k | raise | dedicated tests | **MATCHES** |
+| GT-5e IB before complete | raise | contact path raise | **MATCHES** logic; no dedicated test |
+| GT-5f PRIOR_* current session | raise | shared `formed_ts` | **MATCHES** via ltf; no absorb test |
+| GT-5i matched_random own session | raise | primitive | **MATCHES** logic; no unit test |
+| GT-5l non-COMPLETE | raise | filter + traded_fraction raise | **PARTIAL** |
+
+---
+
+### E. Governance & boundary checklist
+
+| Check | Evidence | Verdict |
+|---|---|---|
+| Holdout sealed; no TEST | bands + HOLDOUT_START | **OK** |
+| Causal t−1 entry | next LTF open | **OK** |
+| COMPLETE-window | aggregate + predicate + fence | **OK** |
+| D6.3 1m path | outcomes/levels | **OK** |
+| L-28 derangement | path-swap + score derange assert FP=0 | **OK** on primitives |
+| No local accounting | screen + check | **OK** |
+| SPDR TRAIN-only; 0 counted reads | design + band fence | **OK** |
+| No estimand P&L / no BacktestNode | vectorised only | **OK** |
+| Tripwire HARD complete adjudicator | T1 path yes; **T2 missing**; CF* short/order | **REVISE** |
+| CONVERSION-PIN L-21 | estimand already bps | **OK** |
+| SPREAD-SCALE-ROUTING | SOL proxy only | **PARTIAL** |
+| L-23 amendment ledger | design 2L/13T/9N (no LOOSER streak) | **OK** (design) |
+| Shared LTF boundary | imports not redefined | **OK** |
+| DEVIATIONS | none | **OK** — silent P_WIDE p10 fallback is **not** an approved deviation |
+
+---
+
+### F. Issues (open after this re-review)
+
+1. **MAJOR — P_WIDE no-result cut is not p25**  
+   **Design §:** §3.2 secondary pool; multiplicity 4×2×2=16; §5 zone sensitivity  
+   **Where:** `absorb.py:517–526`; frozen `class_thresholds_*.json` have only `range.low` (p10)  
+   **Problem:** Without `range.p25`, code keeps p10 and relies on tighter τ. That is a **different object** than “p25 range residual + tighter τ”. Count freeze and layers still run, but the secondary stratum is mis-defined. Design census scripts compute p25 from residual quantiles at freeze time — production path does not.  
+   **Required:** compute/freeze per-(symbol,tf) range p25 on DESIGN residuals (count-only, before outcomes), write into `pool_cuts.json` (or equivalent), and set `range.low` from that for `pool_mode=="P_WIDE"`. Refuse or hard-fail if P_WIDE would silently equal P’s result cut.
+
+2. **MAJOR — Tripwire does not adjudicate T2**  
+   **Design §:** §4.3 HARD — “ADJUDICATES: T1 … and T2 (ρ)”  
+   **Where:** `absorb_screen.py:_run_tripwire`  
+   **Problem:** collapse/survival only for T1 H10. T2 ρ under fixed-H path-swap is not computed.  
+   **Required:** after path-swap, recompute Spearman(signed_score, swapped ret) vs raw ρ; apply material-edge precondition + CF* survival to T2, or document operator-approved scope cut (none present).
+
+3. **MEDIUM — CF* calibration undersized and ordered after real T1**  
+   **Design §:** §4.3 — ≥200 seeds; publish CF* + three plant sizes **before** any real read  
+   **Where:** `_run_tripwire` `n_seeds=50`; called after `_layers_for_events` builds T1  
+   **Required:** default/run ≥200 seeds; emit full CF* block (1×/2×/3×, seed set, prior 0.25) to `tripwire.json` **before** DESIGN contrasts (after MDE curves); then apply to T1/T2.
+
+4. **MEDIUM — `results/tripwire.json` overwritten per pair**  
+   **Where:** `absorb_screen.py:646`  
+   **Problem:** each pair `_emit`s a single-key object with `_partial: True`; only the last pair remains on disk. Per-pair detail lives in `layers.json` only.  
+   **Required:** accumulate all pairs into one `tripwire.json` (and include CF* calibration block).
+
+5. **MEDIUM — T4 emits means, not day-clustered CI**  
+   **Design §:** §4 T4 “day-clustered CI”  
+   **Where:** `step_design_reads` T4 block (~480–486)  
+   **Required:** resolve donor outcomes with day keys and use `contrast_day_clustered` (or equivalent) for the S9−control contrast.
+
+6. **MEDIUM — bare_level_touch not matched as §4.2 specifies**  
+   **Design §:** §4.2 — same level kind, phase band, side; 30 matched draws **per event**  
+   **Where:** `bare_level_touch_events`  
+   **Problem:** global complement of climax-hold near any level; global subsample; no per-event 30-draw matching; `into_side` drops ties (`prev_close=None`).  
+   **Required:** implement matched draws per pool-P event (or design amendment if global control is accepted).
+
+7. **MEDIUM — §5 band labels not emitted**  
+   **Design §:** §5 UNPOWERED-first labels  
+   **Where:** layers emission  
+   **Problem:** thin UNPOWERED flags only; no SUPPORTED/SUGGESTIVE/WASH/CONTRADICTED vs MDE.  
+   **Required:** label each primary contrast using published MDE + CI before disposition.
+
+8. **LOW — session-remainder secondary hold still missing**  
+   **Design §:** §0 / §3.4 disclosure hold  
+   **Required:** emit session-remainder ret (disclosure only) or explicit design-scoped deferral with operator note.
+
+9. **LOW — GT-5(e)(f)(i) still lack dedicated tests; spread-scale is SOL proxy only**  
+   **Required:** raise-path tests; per-symbol `spread_scale_route` on audited set when practical.
+
+**Closed from QA-6 (verified this run):** I-1 MID_RANGE arm math; I-6 day-clustered shared-day contrast; I-7 consecutive first-bar collapse; MDE curves step; core tripwire *primitives* (path-swap, bite bps, CF* plant function, collapse/survival *for T1*); T1–T5 *wiring presence*; P_WIDE *stratum + τ freeze presence* (definition still broken — Issue 1).
+
+**Non-issues / still good:** shared LTF imports; frozen pin contracts; GT-1…4 arm/return logic; 1m outcomes; refractory; no local accounting; no TEST/holdout; prep freezes without outcomes; option-A universe sizes in tests.
+
+---
+
+### G. Verdict
+
+**REVISE.**
+
+The seven claimed fixes land partially: mid-range arm math, day-cluster contrast, consecutive collapse, MDE-before-contrast, and most battery *wiring* are real. The screen is **still not ready for the operator execution gate** because:
+
+1. **P_WIDE is not the designed secondary pool** (p10 silently, not p25).  
+2. **HARD tripwire is incomplete** (T2 not adjudicated; CF* seeds/order/artifact incomplete).  
+3. Report-layer gaps remain (T4 CI, bare matching, §5 labels).
+
+Route to **experiment-developer**. After fix: fresh-context QA again, then operator `--execute` gate. **QA does not launch the screen.**
+
+---
+
+## QA run 8 — 2026-07-22T18:00Z — mode: subagent — HEAD `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807`
+
+**Stage:** post-REVISE re-review after second developer fix pass (QA run 7 residuals). Fresh-context subagent; did not author the implementation. `--execute` **not** run. Smoke counts (SOL D1 P=203 / P_WIDE@τ0.10=920) **not** re-executed here — logic of p25 vs p10 checked in code only.
+
+**Verdict: APPROVE**
+
+All **MAJOR** run-7 residuals are independently closed. Primary battery (T1–T4, tripwire HARD on T1+T2, P_WIDE p25, MDE-before-contrast, §5 labels on primary contrasts) is design-faithful enough for the operator execution gate. Residual notes below are **non-blocking** (disclosure / report polish).
+
+**Dirty tree (implementation under review; full `git status` not available in this tooling):**
+- HEAD matches runs 6–7: `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807` (`.git/refs/heads/main`)
+- Files re-read: `absorb.py` (P_WIDE cut, CF*, labels, bare, contrast), `absorb_screen.py` (order, tripwire merge, T4/T5), `test_sigbar_absorb.py` (structure), design §§3.2, 4.2–4.3, 5; pin constants + registry EOF; QA run 7 issue list as checklist only
+
+**Developer fix claims (independent disposition):**
+
+| # | Claim | Verdict | Evidence |
+|---|---|---|---|
+| 1 | P_WIDE p25 of `range_resid` on COMPLETE series; raise if unavailable; no silent p10 | **FIXED** | `absorb.py:518–543`: derive `quantile(0.25)` on COMPLETE residuals (`vals.len() >= 20`); override via `range_resid_p25`; else `RuntimeError`. Sets `r["low"]=p25`, `wide_cut_source="p25_range_resid"`. Default `range_resid_cut_key="low"` does **not** fall through to p10 as p25 |
+| 2 | Tripwire CF* n_seeds=200 before real layers; T1 **and** T2 collapse; merge `tripwire.json`; survival both | **FIXED** | `absorb_screen.py:466–486` CF* before `_layers_for_events`; `n_seeds=200`; `_run_tripwire` collapse_t1/t2 + survives_t1/t2; merge at `796–809`. Fallback prior 0.25 only when calibration thin (disclosed) |
+| 3 | T4 day-clustered block-bootstrap CI + label | **FIXED** | T4 block `~526–560`: per-day S9 means − global control mean → `block_bootstrap_ci` (DAY_BLOCK); `label_band` |
+| 4 | T5 bare + n_per_event=30; contrast + label | **PARTIAL** | Contrast + label present; `n_per_event=30` is a **global cap factor** (`×50`), not true 30-per-event matched draws (see residual N-1) |
+| 5 | §5 `label_band` on T1/T1_mirror/T4/T5; T2 SUPPORTED/WASH/CONTRADICTED | **FIXED** | `_layers_for_events` labels T1/T1m/T2; T4/T5 labelled in runner |
+| 6 | Pins / GT-1…4 still green (27 absorb cases) | **STRUCTURE OK** | 24 test fns + GT parametrize ×4 = **27** cases; pin constants still match design §0 / registry EOF. Suite not re-executed this run |
+
+---
+
+### A. Independent pin re-hash (contract consistency)
+
+| Pin | Contracted | Evidence this run | Verdict |
+|---|---|---|---|
+| INFR-020 `pins.json` envelope | `5f170b717e350fb7c0cf1647cd1b78fb88a1fa212ed50dce83ec1049af44f6c5` | `absorb.INFR020_PINS_SHA256` | **MATCH** |
+| `seasonal_baselines_mtf.parquet` | `86c81937…38a12c1` | absorb dict | **MATCH** |
+| `class_thresholds_1m.json` | `dee853ad…e9fc` | absorb dict | **MATCH** |
+| INFR-018 registry | `5c386984…` | registry EOF `pin_sha256` exact | **MATCH** |
+
+(Other INFR-020 consumer rows unchanged from runs 6–7; runtime still re-hashes at entry.)
+
+---
+
+### B. Golden-trace re-derivation (design §8 — not impl fixtures)
+
+Arm rule unchanged. Implementation `_into_side` / `_arm_label` / located `signed = into × dr` unchanged from run 7 **PASS** on GT-1…4 logic. Tests still bind to designer-pinned `gt_output.json` under D1 ib_width τ=0.25.
+
+| Event | Arm | Verdict |
+|---|---|---|
+| GT-1 | S9 | **PASS** (logic) |
+| GT-2 | S9 | **PASS** |
+| GT-3 | MIRROR | **PASS** |
+| GT-4 | BASE | **PASS** |
+
+---
+
+### C. Design-fidelity trace (run-7 residual focus)
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §3.2 P_WIDE = **p25 range** + tighter τ | `absorb.py:518–543` + screen freeze | **MATCHES** | Hard-fail if p25 unavailable; no silent p10 |
+| §3.2 τ count-only freeze | `step_pool_cuts` | **MATCHES** (intent) | p25 re-derived per build (deterministic on frozen residuals); not written into `pool_cuts.json` (disclosure only) |
+| §4 T4 day-clustered CI | `absorb_screen.py:526–560` | **MATCHES** | Cross-session control ⇒ global ctrl mean under day units (disclosed by construction) |
+| §4 T5 bare + contrast | bare + `contrast_day_clustered` | **PARTIAL** | Population not fully §4.2-matched (N-1) |
+| §4.2 30 matched draws / event (kind×phase×side) | `bare_level_touch_events` | **DEVIATES** | Global near-level complement + cap; residual N-1 |
+| §4.3 CF* ≥200 seeds, 1×/2×/3× MDE, before real read | `calibrate_cf_star` + screen order | **MATCHES** | Per-pair CF before that pair’s layers; side-file `tripwire_cf_{pair}.json` then merge |
+| §4.3 adjudicates T1 **and** T2 | `_run_tripwire` | **MATCHES** | T2 dest “excludes zero” ≈ `abs(ρ_sw)>0` (weak proxy; conservative HARD) |
+| §4.3 survival both + material-edge | `_survives` | **MATCHES** | |
+| §4.3 `tripwire.json` all pairs | merge `existing[pair_id]` | **MATCHES** | Reset at step start |
+| §5 labels T1/T1m/T2/T4/T5 | layers + runner | **MATCHES** | T4/T5 often `mde=None` → SUPPORTED unreachable (N-2) |
+| §4.2 MDE before contrasts | `step_mde_curves` then layers | **MATCHES** | |
+| §3.4 session-remainder secondary | outcomes H∈{5,10} only | **MISSING** | residual N-3 (disclosure) |
+| §0 frozen re-hash / D6.3 / COMPLETE / no TEST | unchanged paths | **MATCHES** | |
+| Shared LTF / no local accounting | imports + check | **MATCHES** | |
+
+---
+
+### D. Golden-trace diff (implementation vs design)
+
+| Item | Expected | Implemented | Verdict |
+|---|---|---|---|
+| GT-1…4 arms + 1m returns | §8 / gt_output | `_arm_label` + `evaluate_outcomes_1m` | **MATCHES** (logic; suite pins JSON) |
+| GT-5a–d,g–h,j–k | raise | dedicated tests | **MATCHES** |
+| GT-5e,f,i | raise | contact / ltf / primitive paths | **MATCHES** logic; still no dedicated tests (N-4) |
+| GT-5l non-COMPLETE | raise | filter + fence | **PARTIAL** (unchanged) |
+
+---
+
+### E. Governance & boundary checklist
+
+| Check | Evidence | Verdict |
+|---|---|---|
+| Holdout sealed; no TEST | bands + HOLDOUT_START | **OK** |
+| Causal t−1 entry; COMPLETE; D6.3 1m | contact + outcomes | **OK** |
+| L-28 derangement | path-swap + score derange FP=0 | **OK** on primitives |
+| No local accounting | screen + check | **OK** |
+| SPDR TRAIN-only; 0 counted reads | design + band fence | **OK** |
+| Tripwire HARD complete adjudicator | T1+T2; CF* 200; survival; merge artifact | **OK** |
+| CONVERSION-PIN L-21 | estimand bps of entry | **OK** |
+| SPREAD-SCALE-ROUTING | SOL proxy in layers | **PARTIAL** (unchanged; report) |
+| Shared LTF boundary | imports not redefined | **OK** |
+| DEVIATIONS | none | **OK** — silent p10 P_WIDE **removed** |
+
+---
+
+### F. Disposition of QA-7 issues
+
+| QA-7 # | Severity | Status | Notes |
+|---|---|---|---|
+| 1 P_WIDE not p25 | MAJOR | **CLOSED** | Derive + raise; no silent p10 |
+| 2 Tripwire no T2 | MAJOR | **CLOSED** | collapse + survival T2 |
+| 3 CF* seeds/order | MEDIUM | **CLOSED** | 200 seeds; before layers per pair |
+| 4 tripwire.json overwrite | MEDIUM | **CLOSED** | merge per pair |
+| 5 T4 no day-clustered CI | MEDIUM | **CLOSED** | block bootstrap + label |
+| 6 bare not §4.2 matched | MEDIUM | **OPEN (non-blocking)** | residual N-1 |
+| 7 §5 band labels | MEDIUM | **CLOSED** | T1/T1m/T2/T4/T5 |
+| 8 session-remainder | LOW | **OPEN (non-blocking)** | residual N-3 |
+| 9 GT-5 tests / spread proxy | LOW | **OPEN (non-blocking)** | residual N-4 |
+
+**Closed earlier (runs 6–7, still hold):** MID_RANGE arm math; day-clustered shared-day T1; consecutive first-bar collapse; MDE curves step; battery wiring; pin contracts; GT-1…4 arm/return logic.
+
+---
+
+### G. Residual notes (non-blocking — not REVISE conditions)
+
+**N-1 — MEDIUM (disclosure control) — bare_level_touch still not 30 matched draws per event.**  
+`bare_level_touch_events` builds a global near-level complement of climax-hold, then caps at `n_per_event * 50`. Docstring claims per-event matching; code does not match by level kind × phase × side per pool-P event. T5 is **disclosure** (soil legs use T1–T4 + floor). Operator must not promote T5 without re-matching, or accept global control as a design amendment.
+
+**N-2 — LOW — T4/T5 `label_band(..., mde=None)`.**  
+MDE curves plant T1 only. Positive T4/T5 CI can at best be SUGGESTIVE, never SUPPORTED. Soil leg (ii) needs T4 *positive* (`excludes_zero`), not the SUPPORTED label.
+
+**N-3 — LOW — session-remainder secondary hold not emitted.**  
+Design §0/§3.4 disclosure hold; primary H∈{5,10} only.
+
+**N-4 — LOW — GT-5(e)(f)(i) still lack dedicated tests; spread-scale SOL proxy only.**
+
+---
+
+### H. Verdict
+
+**APPROVE.**
+
+Run-7 blockers are closed: P_WIDE is p25 (hard-fail, no silent p10); HARD tripwire calibrates CF* at 200 seeds before real layers, adjudicates T1 and T2, merges `tripwire.json`, and applies survival on both; T4 has day-clustered CI + label; §5 labels land on primary contrasts. Remaining N-1…N-4 do not block the operator execution gate for the primary soil battery.
+
+**Next:** operator `--execute` gate only (QA does not launch). If T5 is material to disposition narrative, fix N-1 first or record an accepted global-control scope note. **QA APPROVE does not launch the screen.**
+
+---
+
+## QA run 9 — 2026-07-22T00:56Z — mode: operator-session (fresh context) — HEAD `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807`
+
+**Stage:** post-APPROVE residual-fix re-review (QA run 8 residuals N-1…N-4). Fresh context — this session did **not** author the implementation. `--execute` **not** run. No commit.
+
+**Verdict: REVISE**
+**FAILING_ARTIFACT:** `python/src/xen/sigbar/absorb.py` + `python/experiments/SPDR-009/screen_code/absorb_screen.py`
+**REQUIRED_SKILL:** `experiment-developer`
+
+Both blockers are **new defects introduced by the post-run-8 residual-fix pass**, not carry-overs. Run-8's approved primary battery is otherwise intact and independently re-verified below. Both fixes are small.
+
+**Dirty tree at review (`git status --porcelain`):**
+```
+ M docs/experiments-docs/INDEX.md
+ M docs/experiments-docs/checkpoints/2026-07-21-015-signed-value-absorption-screen/design.md
+ M docs/signal-registry/candidate-families/cf-sigauc-001.md
+ M python/experiments/SPDR-009/design.md
+ M python/experiments/SPDR-009/qa-review.md
+?? python/experiments/SPDR-009/screen_code/
+?? python/src/xen/sigbar/absorb.py
+?? python/tests/test_sigbar_absorb.py
+```
+
+**Sources read this run:** `_pipeline-config.md`; `qa-compliance/SKILL.md`; live `design.md` §§0–10 incl. AMENDMENT-22/23/24; `qa-review.md` runs 6–8; `absorb.py` (full, 1772 lines); `absorb_screen.py` (full, 936 lines); `test_sigbar_absorb.py` (full); `ltf.py` import surface; INFR-020 `results/pins.json`; `xen.evaluation.{bybit_round_trip_cost_bps,spread_scale_route}`.
+
+**Executed this run (read-only):** `pytest python/tests/test_sigbar_absorb.py` → **32 passed** (29 test fns, GT parametrize ×4). `shasum -a 256` on INFR-020 `pins.json`. Three targeted reproduction probes (below). **No screen execution.**
+
+---
+
+### A. Independent pin re-hash
+
+| Pin | Contracted | Evidence this run | Verdict |
+|---|---|---|---|
+| INFR-020 `pins.json` | `5f170b717e350fb7c0cf1647cd1b78fb88a1fa212ed50dce83ec1049af44f6c5` | `shasum -a 256` on disk = **exact byte match**; `absorb.INFR020_PINS_SHA256` identical | **MATCH** (re-hashed, not asserted) |
+| 7 INFR-020 consumers (`seasonal_baselines_mtf`, `class_thresholds_1m`, `class_thresholds_mtf`, `sessions_mtf`, `zone_scale_census`, `zone_scale_census_d1_ibwidth`, `coverage_report`) | design §0 table | `test_assert_spdr009_frozen_inputs_matches_contracted_hashes` re-hashes all 7 on disk against `absorb.INFR020_ARTIFACT_SHA256` and against `pins.json.artifacts` — **passed** | **MATCH** |
+| INFR-017 baselines `1b7244c8…`, column_pins `e3b9fd9b…`, fence `35d3375e…` | design §0 | `assert_frozen_inputs` inside the same passing test | **MATCH** |
+| INFR-018 registry `5c386984…` + kernel K-UNIFORM | design §0 | `absorb.py:188–204`; passing test | **MATCH** |
+| Mismatch behaviour | raise | `test_gt5c_frozen_hash_mismatch_raises` — passed | **MATCH** |
+
+---
+
+### B. Golden traces GT-1…GT-4 (re-run, not asserted)
+
+`test_golden_trace_arm_and_returns` executed and **passed for all four**, binding to designer-pinned `design_derivations/gt_output.json` (arm, `into_side`, `signed_score` ±1e-4, `ret_bps_H5`/`H10` ±1e-3, `entry_ts` exact).
+
+| Event | Arm | Verdict |
+|---|---|---|
+| GT-1 2022-12-28 03:27 IB_LOW | S9 | **PASS (executed)** |
+| GT-2 2022-12-29 01:24 PRIOR_SESSION_LOW | S9 | **PASS (executed)** |
+| GT-3 2022-12-26 23:34 PRIOR_VAL | MIRROR (sign guard) | **PASS (executed)** |
+| GT-4 2022-11-12 22:08 IB_LOW | BASE (large \|Δ\|, sub-threshold direction) | **PASS (executed)** |
+
+Arm rule `signed = into × dr`, three-way split at `±dr_hi` under `da ≥ d_hi` — `absorb.py:421–432`, `712–713` — matches §3.3.
+
+---
+
+### C. Disposition of run-8 residuals N-1…N-4
+
+| # | Claimed fix | Verdict | Independent evidence |
+|---|---|---|---|
+| **N-1** | `bare_level_touch`: per-event match, `level_kind × side × phase±30m`, `n_per_event=30` | **CLOSED** | `absorb.py:1578–1633` — donors indexed by `(level_kind, side)`; per pool event `abs(donor.mins_since_close − phase) ≤ 30` **and** `donor.anchor_ts != own_anchor`; `rng.choice(..., size=min(30, len(elig)), replace=False)`; `src_event_ts` stamped. Disjointness from pool P enforced twice (`~(effort ∧ no-result)` at `1494–1496`; `OpenTime ∈ event_times` skip at `1542`). Test `test_bare_level_matches_per_event_not_global_sample` passes. Global `×50` cap is **gone**. |
+| **N-2** | Session-remainder secondary hold + `T1_session_remainder` disclosure | **CLOSED IN INTENT — NEW DEFECT (Issue 1)** | Columns emitted `absorb.py:905–922`; disclosure layer `absorb_screen.py:441–457` with the "no promote claim" note. But the emission introduces a schema-inference crash — reproduced, see Issue 1. |
+| **N-3** | GT-5(e)(f)(i) dedicated tests | **PARTIAL — 2 of 3 real** | (e) `test_gt5e_ib_edge_before_complete_is_unavailable` — real, asserts `level_available=False` + `excluded_not_yet_formed`. (f) `test_gt5f_prior_levels_formed_before_consumer_session` — real, asserts non-null `formed_ts` strictly `< cur`. (i) `test_gt5i_matched_random_own_session_raises` — **vacuous**, see Issue 3. |
+| **N-4** | Per-symbol `spread_scale_route` | **CLOSED (capped)** | `absorb_screen.py:426–440` — loops `s9["symbol"].unique()[:20]`, per-symbol `cost_floor_bps → spread_rt_bps → spread_scale_route`, stamps `spread_label`. Gross = pooled stratum contrast, which is what §6.2 specifies. 20-symbol cap is undisclosed in the artifact (residual R-4). |
+| — | "32 absorb tests pass" | **VERIFIED** | Executed: `32 passed in 8.44s`. |
+
+---
+
+### D. Standing checklist re-verified (runs 6–8 items)
+
+| Check | Evidence this run | Verdict |
+|---|---|---|
+| Shared LTF import boundary | `absorb.py:55–64` imports `absorb_candidate_predicate`, `structural_levels_1m`, `assign_candidate_sessions`, `available_levels_for_candidates`, `aggregate_signed`, `prior_htf_session_ranges`, `design_gap_days`; `test_absorb_imports_shared_ltf_helpers_not_redefined` asserts no `def <name>` in absorb — passed | **OK** |
+| P_WIDE = p25 range residual, no silent p10 | `absorb.py:526–544` — derives `quantile(0.25)` on COMPLETE residuals (`len ≥ 20`), or explicit `range_resid_p25`; default `range_resid_cut_key="low"` makes the p10 branch **unreachable**; else `RuntimeError`. Confirmed no fall-through | **OK** |
+| HARD tripwire complete | `_run_tripwire` (`absorb_screen.py:692–843`): CF* pre-computed at `466–507` **before** `_layers_for_events`, `n_seeds=200`, plants 1×/2×/3× MDE (`absorb.py:1367–1440`); collapse + survival on **both** T1 and T2; material-edge precondition; per-pair merge into one `tripwire.json` with reset at step start (`464`); bite in bps of entry (`path_swap_bite_bps`, `> 0.5`) | **OK** |
+| L-28 derangement, zero fixed points | `derange_scores_global` (index-FP assert `970–971`), `derange_scores_within_symbol` (`1000–1001`), `outcome_path_swap_fixed_h` (`1146–1154`). `test_derange_scores_global_zero_fixed_points`, `test_gt5g_derangement_fixed_point_raises` — passed | **OK** |
+| DESIGN/CONFIRM only; TEST/holdout unreachable | `build_contact_events:487–488` raises on any other band; `test_gt5a` (`load_bars("…","TEST")` raises) and `test_holdout_constant_is_sealed` — passed. No TEST/holdout literal anywhere in either file except docstrings | **OK** |
+| Causal ≤ t−1 | Entry = `event OpenTime + ltf` (`714`, `649`); contiguity `event→entry` re-checked on the 1m grid (`846–850`); IB availability via shared helper + fence (`695–700`); prior-session levels via `structural_levels_1m` `formed_ts` | **OK** |
+| D6.3 1-minute path | `assert_no_ltf_outcome_path(1, …)` at `498`, `823`, `1108`; levels built from `bars_1m`; `assert_levels_from_1m` at `577–581`; `test_gt5j` passed | **OK** |
+| COMPLETE-window only | `ltf_complete_bars` (`complete_only=True`) + explicit non-COMPLETE fence `509–515` + `absorb_candidate_predicate(require_complete=True)`; `test_gt5l` passed | **OK** |
+| No local accounting | `check_no_local_accounting(screen_code)` at runner entry (`61`) and in `test_no_local_accounting_in_spdr009_screen_dir` — passed | **OK** |
+| Card ban 2 / S1 refusal / A-H non-edge | `assert_no_per_level_delta` (`583`), `refuse_s1_as_qualifier` (`270–280`), `assert_not_edge_bearing_operational` (`261–267`, called `492`); `test_gt5d/h/k` passed | **OK** |
+| CONVERSION-PIN L-21 | Estimand already bps of entry price (`872`); `ret_norm` divisor = prior HTF session range only (`895–903`) — matches §3.4 = §6.1 | **OK** |
+| Cost floor §6.1 | `cost_floor_bps` reads INFR-017 `column_pins` per symbol, `max(tick, flip)`, labels `MAX_TICK_FLIP_UPPER_BOUND` / `SPREAD_TICK_FLOOR_ONLY`, `validated_on_sample_only`; `test_cost_floor_audited_symbols_near_design_table` reproduces SOL **11.748** @ H=10min, fee leg 11.0 — passed | **OK** |
+| Option-A universe | `usable_universe` from frozen `coverage_report`; `test_usable_universe_option_a_floors` asserts **194 / 72 / 31** — passed | **OK** |
+| MDE before contrasts | `main()`: `step_power_census → step_mde_curves → step_design_reads` (`908–911`) | **OK** |
+| SPDR lane: 0 counted reads, no TEST, no BacktestNode, no P&L booked | vectorised Python; no registry/TEST path; disposition is an operator act | **OK** |
+| L-23 amendment ledger | design 2L/13T/9N; LOOSERs A-18, A-24; no LOOSER streak ≥ 3 (A-22 T → A-23 T → A-24 L) | **OK** (design) |
+
+---
+
+### E. Issues
+
+1. **MAJOR — session-remainder emission crashes `evaluate_outcomes_1m`, and every caller swallows it → silent loss of instruments from the PRIMARY pooled read**
+   **Design §:** §3.4 secondary hold; §4.1 (pooled per pair is the PRIMARY stratum); §6.3 (`power_census` is the declared census); Code Standards *safe optimization must not change sample membership*.
+   **Where:** `absorb.py:927` `out = pl.DataFrame(out_rows)` — default `infer_schema_length=100`.
+   **Problem:** `rec["ret_bps_session"]` is initialised `None` (`906`) and only overwritten when the session remainder clears its contiguity guard (`910–922`). If the first ≥100 events of a batch have no remainder and a later one does, Polars infers `Null` for the column and then raises
+   `ComputeError: could not append value: … of type: f64 to the builder`.
+   **Reproduced this run** on real SOL DESIGN bars: 120 events with `session_end == entry_ts` followed by one 2-hour remainder → `ComputeError`. This is exactly the regime expected on D2–D4, where COMPLETE-window retention is 0.387 / 0.202 / 0.089 and long remainder spans routinely fail contiguity.
+   **Why it is not merely a crash:** every caller catches `Exception` and continues —
+   `absorb_screen.py:484–485` (DESIGN reads), `293–294` (MDE curves), `859–860` (CONFIRM), `541–543` (T4), `625–626` (T5). The affected symbol vanishes from `layers.json`, `mde_curves.json` and `events_DESIGN_*.parquet`, while `step_power_census` — which never calls `evaluate_outcomes_1m` — still counts it. `layers` and `power_census` would disagree with **no emitted drop count**, on a screen whose disposition turns on powered-null vs UNPOWERED.
+   **Required:** construct with `pl.DataFrame(out_rows, infer_schema_length=None)` (or an explicit schema); add a regression covering the all-None-then-float ordering; and either narrow the runner's `except Exception` or emit a per-pair `n_symbols_failed` count into `layers.json`.
+   **Also fixed by the same change:** `rec["session_exit_ts"]` (`922`) is set only on success and is **silently dropped** when it first appears after row 100 (verified: extra keys past the inference window are discarded without error). Column is unused downstream, so this is cosmetic only.
+
+2. **MEDIUM — T2 `CONTRADICTED` is unreachable; anti-monotone dose-response would be reported as `WASH`**
+   **Design §:** §5 — *"CONTRADICTED … (for T2: return ANTI-monotone in aggression-into-level — genuine evidence against the mechanism, and a result in its own right)"*.
+   **Where:** `absorb_screen.py:405–417`, using `one_sided_p` from `_t2_dose:346–350` (`p = mean(null ≥ ρ)`, right-tailed).
+   **Problem:** the `CONTRADICTED` branch requires `ρ < 0` **and** `one_sided_p ≤ 0.05`. With a right-tailed p, a strongly negative ρ against a null centred near zero gives `p ≈ 1`, so the branch can never fire; every anti-monotone T2 falls through to `WASH`. This suppresses the one T2 outcome the design names as evidence **against** the mechanism — material on a screen whose role is falsification.
+   **Required:** compute the left-tail fraction (`mean(null ≤ ρ)`) for the negative branch and label on that; report both tails in the T2 block.
+
+3. **LOW — GT-5(i) has no effective test (N-3 only 2/3 closed)**
+   **Design §:** §8 GT-5(i).
+   **Where:** `test_sigbar_absorb.py:316–366`.
+   **Problem:** the body is wrapped in `try/except RuntimeError`; the non-raise path guards on `if out.height:` and its only assertion is `assert bad.height == 0 or True`, which is vacuous. Executed in isolation this run: the call **does not raise** and returns `height == 0`, so the test asserts nothing at all. The primitive's guard itself is correct (`absorb.py:1061–1065`, raises when a donor entry lands in `[event.anchor_ts, event.session_end)`), but it is unexercised.
+   **Required:** construct an event whose `session_end` provably spans a donor anchor + phase and assert `pytest.raises(RuntimeError, match="MATCHED_RANDOM")`.
+
+---
+
+### F. Residual notes (non-blocking; carry forward)
+
+- **R-1 — CF\* calibrated on one symbol, applied to a pooled contrast.** `absorb_screen.py:493–504` picks the first symbol with ≥4 events; `_run_tripwire` then applies that CF\* to the cross-symbol pooled T1/T2. Design §4.3 calibrates on *this design's own stream*, which is the pooled arm. Direction of the bias is not obvious; the value is disclosed in `tripwire_cf_<pair>.json`, so it is auditable. Unchanged from run 8.
+- **R-2 — `calibrate_cf_star` degenerate branch.** `absorb.py:1407–1409`: if `base.columns` is not a superset of `s9p.columns`, `pool` falls back to the S9 arm alone and `sw_base` then falls back to the **unswapped** `base` (`1419`, `1422`), mixing a swapped treat arm with a raw control. Unreachable when both arms come from one frame (the normal path), but it should raise rather than degrade silently.
+- **R-3 — T5 coverage caps and fallback.** `absorb_screen.py:606` iterates only `list(bars_by)[:30]`; `607–610` falls back to matching donors against **all** pool-P events when a symbol has no BASE events, while the contrast remains BASE − bare. Both are undisclosed in `layers.json`.
+- **R-4 — Undisclosed caps.** `spread_scale_route` first 20 symbols (`431`); MDE curves first 30 symbols (`288`); CONFIRM first 40 symbols (`854`). All reasonable for cost, none emitted as a coverage line.
+- **R-5 — bare-touch tie-break asymmetry.** Bare donors call `_into_side(..., prev_close=None)` (`1553`), so exact `Close == level` touches are dropped; pool P uses the prior-close tie-break (`701–705`). Small population difference between treated and control.
+- **R-6 — P_WIDE p25 not written to `pool_cuts.json`.** Re-derived deterministically per build from frozen residuals (`absorb.py:529–533`); §3.2/§9 read as if the cut were frozen into the artifact. Unchanged from run 8.
+- **R-7 — T4/T5 label with `mde=None`** (run-8 N-2): positive CI can at best read `SUGGESTIVE`. Soil leg (ii) needs T4 *positive* (`excludes_zero`), not the `SUPPORTED` label — the analyst must read it that way.
+- **R-8 — T2 runtime.** `_t2_dose` runs 2000 global derangements + 200 within-symbol per (hold × pool × pair) — 16 primary cells. Not a correctness issue; flagged so the operator is not surprised by wall-clock at `--execute`.
+- **R-9 — GT-5(e) semantics.** Design says an IB-edge event before IB wall-clock "raises"; the implementation makes it *unavailable* via the shared helper, so the `absorb.py:695–700` raise is defensive and normally unreachable. Integrity effect is identical (the event never enters the pool); wording differs. Unchanged from runs 6–8.
+
+---
+
+### G. Verdict
+
+**REVISE.**
+
+Run-8's approved battery re-verifies clean: pins re-hashed byte-exact including the INFR-020 envelope `5f170b71…`, GT-1…GT-4 executed and passing, shared LTF boundary intact, HARD tripwire complete (CF\* 200 seeds before layers, T1+T2 collapse+survival, merged artifact, bite in bps), P_WIDE genuinely p25 with a hard failure and no p10 fall-through, no local accounting, DESIGN/CONFIRM only, holdout sealed. Residuals **N-1 and N-4 are closed**; **N-3 is 2/3 closed**.
+
+The residual-fix pass introduced two defects that must be fixed before the operator execution gate:
+
+1. The session-remainder emission (N-2) makes `evaluate_outcomes_1m` raise on a plausible batch ordering, and every caller swallows the exception — instruments would silently drop out of the primary pooled read with no count emitted. Reproduced on real bars this run.
+2. T2 can never be labelled `CONTRADICTED`, suppressing the one dose-response outcome the design names as evidence against the mechanism.
+
+Both are small, local fixes. Route to **experiment-developer**; then fresh-context QA run 10; then the operator `--execute` gate. **QA does not launch the screen. Nothing committed.**
+
+---
+
+## QA run 10 — 2026-07-22T01:11Z — mode: subagent (fresh context) — HEAD `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807`
+
+**Stage:** post-REVISE re-review after the developer's QA-9 fix pass (I-1, I-2, I-3), applied without an intervening QA run. Fresh-context subagent; did **not** author the implementation. `--execute` **not** run. Nothing committed. No implementation or design file edited.
+
+**Verdict: REVISE**
+**FAILING_ARTIFACT:** `python/src/xen/sigbar/absorb.py` (`matched_random_timing`) + `python/tests/test_sigbar_absorb.py`
+**REQUIRED_SKILL:** `experiment-developer`
+
+**All three QA-9 issues are independently confirmed CLOSED.** The blocker is a *pre-existing* defect that runs 6–9 did not catch and that this pass's new companion test structurally masks: the **T4 matched-random control emits zero rows on real data**, so soil leg (ii) can never be read.
+
+**Dirty tree at review (`git status --porcelain`):**
+```
+ M docs/experiments-docs/INDEX.md
+ M docs/experiments-docs/checkpoints/2026-07-21-015-signed-value-absorption-screen/design.md
+ M docs/signal-registry/candidate-families/cf-sigauc-001.md
+ M python/experiments/SPDR-009/design.md
+ M python/experiments/SPDR-009/qa-review.md
+?? python/experiments/SPDR-009/screen_code/
+?? python/src/xen/sigbar/absorb.py
+?? python/tests/test_sigbar_absorb.py
+```
+
+**Sources read:** `qa-compliance/SKILL.md`; `research-pipeline/_pipeline-config.md`; live `design.md` §§0–10 incl. AMENDMENT-22/23/24; `qa-review.md` runs 8–9 in full (1–7 as context); `absorb.py` (all 1775 lines); `absorb_screen.py` (all 959 lines); `test_sigbar_absorb.py` (all 621 lines); `ltf.py` import surface; INFR-020 `results/pins.json`.
+
+**Executed (read-only):** `pytest python/tests/test_sigbar_absorb.py` → **34 passed**; full suite (minus the two pre-existing collection errors) → **264 passed / 4 skipped**; `shasum -a 256` on INFR-020 `pins.json`; four targeted reproduction probes (I-1 old-vs-new, dtype/concat, T2 label reachability, GT-5(i) raise, T4 control census). **The screen was not launched.**
+
+---
+
+### A. Independent pin re-hash
+
+| Pin | Contracted | Evidence this run | Verdict |
+|---|---|---|---|
+| INFR-020 `pins.json` | `5f170b717e350fb7c0cf1647cd1b78fb88a1fa212ed50dce83ec1049af44f6c5` | `shasum -a 256` on disk = **byte-exact**; `absorb.INFR020_PINS_SHA256` identical | **MATCH** (re-hashed) |
+| 7 INFR-020 consumer artifacts | design §0 table | `test_assert_spdr009_frozen_inputs_matches_contracted_hashes` re-hashes all 7 on disk vs `INFR020_ARTIFACT_SHA256` **and** vs `pins.json.artifacts` — passed | **MATCH** |
+| INFR-017 `1b7244c8…` / `e3b9fd9b…` / fence `35d3375e…` | design §0 | `assert_frozen_inputs` inside the same passing test | **MATCH** |
+| INFR-018 registry `5c386984…` + K-UNIFORM | design §0 | `absorb.py:188–204`; passing test | **MATCH** |
+| Mismatch ⇒ raise | GT-5(c) | `test_gt5c_frozen_hash_mismatch_raises` — passed | **MATCH** |
+
+---
+
+### B. Golden traces GT-1…GT-4 (executed, not asserted)
+
+`test_golden_trace_arm_and_returns` ran and passed for all four against designer-pinned `design_derivations/gt_output.json` (arm, `into_side`, `signed_score` ±1e-4, `ret_bps_H5`/`H10` ±1e-3, exact `entry_ts`). Arm rule `signed = into × dr`, three-way split at `±dr_hi` under `da ≥ d_hi` — `absorb.py:421–432`, `701–713` — matches §3.3.
+
+| Event | Expected arm (design §8) | Verdict |
+|---|---|---|
+| GT-1 2022-12-28 03:27 IB_LOW | S9 | **PASS (executed)** |
+| GT-2 2022-12-29 01:24 PRIOR_SESSION_LOW | S9 | **PASS (executed)** |
+| GT-3 2022-12-26 23:34 PRIOR_VAL | MIRROR (sign guard) | **PASS (executed)** |
+| GT-4 2022-11-12 22:08 IB_LOW | BASE (large \|Δ\|, sub-threshold direction) | **PASS (executed)** |
+
+---
+
+### C. Disposition of QA-9 issues 1–3 (independently reproduced, not accepted)
+
+| QA-9 # | Severity | Claimed fix | Verdict | Independent evidence |
+|---|---|---|---|---|
+| **I-1** | MAJOR | `infer_schema_length=None` on the five list-of-dicts frames; regression test; per-pair `coverage` counts | **CLOSED — reproduced both ways** | Built QA-9's exact batch (120 events with `session_end == entry_ts`, then one 2-hour remainder) on real SOL DESIGN bars. **Current code:** 121 rows, `ret_bps_session` **Float64**, 1 non-null, `session_remainder_ok` sum 1. **Same batch with `pl.DataFrame` shimmed back to the old default:** `ComputeError: could not append value: -43.093129 of type: f64 to the builder` — the original failure reproduces exactly and is removed by the fix. All five constructions carry the flag (`absorb.py:747, 930, 1094, 1219, 1639`); `1742` is an explicit-schema empty frame. The `session_exit_ts` side-issue is also gone (column now present, Datetime, 1 non-null). |
+| **I-2** | MEDIUM | `_t2_dose` emits `one_sided_p_neg` + `mde_rho_p05`; label branch uses the left tail | **CLOSED — all three labels reachable** | Drove the real `_t2_dose` (`absorb_screen.py:321–367`) and the real label branch (`405–425`) on three synthetic pools: monotone-positive ρ=+0.987, p_pos=0.000 → **SUPPORTED**; monotone-negative ρ=−0.981, p_neg=0.000, p05=−0.163 → **CONTRADICTED**; pure noise ρ=+0.000 → **WASH**. Under the run-9 code the negative case gave p=1.000 and fell through to WASH. |
+| **I-3** | LOW | GT-5(i) rewritten with a 30-day event session so donors provably land inside; `pytest.raises` | **CLOSED for the raise** | With `anchor = entry − 100 min` and `session_end = anchor + 30 d` over 233 DESIGN anchors, **1–6 of the 30 drawn donors land inside the declared session on every seed 1–10**; `matched_random_timing` raises `MATCHED_RANDOM DISJOINT FAIL` on seeds 1–5. The raise is genuinely exercised, not merely reachable. **But the companion test added alongside it is vacuous — see Issue 1.** |
+| — | — | "34 absorb tests; 264 passed / 4 skipped" | **VERIFIED** | `34 passed in 9.08s`; `264 passed, 4 skipped`. The two collection errors (`test_xena_certify.py`, `test_xena_final_gate.py`) are `ModuleNotFoundError: No module named 'tests'` import-mode failures in files untouched by this work — pre-existing and unrelated. |
+
+**New-defect sweep on the I-1/I-2/I-3 changes (the specific risks named at hand-off):**
+
+| Risk | Check | Result |
+|---|---|---|
+| `infer_schema_length=None` changes a dtype | Symbol with **no** remainders → `ret_bps_session` dtype **Null**; symbol **with** remainders → **Float64** | Expected and harmless: every cross-symbol combine is `pl.concat(..., how="diagonal_relaxed")` (`absorb_screen.py:302, 505, 538, 652, 673, 694, 727, 767, 888`). Probed the mixed Null/Float64 concat directly → **OK, resolves to Float64**, height preserved. A plain `how="diagonal"` would have raised; none is used. |
+| `infer_schema_length=None` changes sample membership | Row count and drop counters compared old vs new on the reproduction batch | **No change** — the flag only widens type inference; `n_dropped_gap` logic untouched. |
+| Added `coverage` key breaks a `layers.json` consumer | `_layers_for_events(..., mde_info=...)` reads only `T1_H{h}` / `T1_mirror_H{h}`; `census.json` reads only `P.n` / `P.n_S9` | **No break.** The extra `n_symbols_read` / `n_symbols_failed` keys inside `mde_curves["pairs"][pair]` pass through `mde_info.get(...)` harmlessly and are echoed into `layers["…"]["mde"]`. The `UNPOWERED` early-return branch (`step_mde_curves:300`) still yields `mde_h = None`, and `_run_tripwire`'s `mde.get("mde_bps") or 5.0` still falls back cleanly. |
+
+---
+
+### D. Standing checklist re-verified
+
+| Check | Evidence this run | Verdict |
+|---|---|---|
+| INFR-020 pins re-hashed (not asserted) | §A above; runtime re-hash at every entry point | **OK** |
+| GT-1…GT-4 executed | §B | **OK** |
+| GT-5(a)–(l) raise set | dedicated tests a,b,c,d,e,f,g,h,i,j,k,l present and passing; (e) semantics = "unavailable" not "raise" (R-9) | **OK** |
+| Shared LTF import boundary | `absorb.py:55–64`; `test_absorb_imports_shared_ltf_helpers_not_redefined` asserts no `def <name>` in absorb — passed | **OK** |
+| HARD leak tripwire | CF\* computed at `absorb_screen.py:500–520` **before** `_layers_for_events` (`541`); `n_seeds=200`; plants 1×/2×/3× MDE (`absorb.py:1370–1443`); collapse **and** survival on **both** T1 and T2 (`716–852`); material-edge precondition; per-pair merge into one `tripwire.json` with reset at `472`; bite = `corr(mfe_bps, donor_mfe_bps) > 0.5` in **bps of entry** (`absorb.py:1222–1235`) | **OK** |
+| P_WIDE p25, no p10 fall-through | `absorb.py:526–544` — `quantile(0.25)` on COMPLETE residuals (`len ≥ 20`) or explicit `range_resid_p25`; the `range_resid_cut_key` branch is unreachable at the default `"low"`; otherwise `RuntimeError` | **OK** |
+| No local accounting | `check_no_local_accounting` at runner entry (`61`) + passing test | **OK** |
+| DESIGN/CONFIRM only; TEST/holdout unreachable | `build_contact_events:487–488` raises on any other band; `test_gt5a`, `test_holdout_constant_is_sealed` passed | **OK** |
+| Causal ≤ t−1 entry | entry = event LTF OpenTime + `ltf` (`649`, `714`); contiguity re-checked on the 1m grid (`846–850`); IB availability via shared helper + fence (`695–700`); prior-session levels via `formed_ts` | **OK** (but see Issue 1 — this same guard is what kills T4) |
+| D6.3 1-minute path | `assert_no_ltf_outcome_path(1, …)` at `498`, `823`, `1111`; levels from `bars_1m`; `assert_levels_from_1m` at `577–581`; `test_gt5j` passed | **OK** |
+| COMPLETE-window only | `ltf_complete_bars(complete_only=True)` + explicit fence `509–515` + `absorb_candidate_predicate(require_complete=True)`; `test_gt5l` passed | **OK** |
+| L-28 derangements (zero fixed points) | `derange_scores_global` (`971–974`), `derange_scores_within_symbol` (`1003–1004`), `outcome_path_swap_fixed_h` (`1149–1157`); tests passed | **OK** |
+| CONVERSION-PIN L-21 | estimand already bps of entry (`872`); `ret_norm` divisor = prior HTF session range only (`895–903`) | **OK** |
+| Cost floor §6.1 | `cost_floor_bps` per symbol from INFR-017 `column_pins`, `max(tick, flip)`, labels + `validated_on_sample_only`; SOL **11.748** @ H=10 min with fee leg 11.0 reproduced by passing test | **OK** |
+| Option-A universe | `usable_universe` from frozen `coverage_report`; test asserts **194 / 72 / 31** | **OK** |
+| MDE before contrasts | `main()`: `step_power_census → step_mde_curves → step_design_reads` | **OK** |
+| SPDR lane: 0 counted reads, no TEST, no BacktestNode, no P&L | vectorised Python; disposition is an operator act | **OK** |
+| L-23 amendment ledger | design §10: **2 LOOSER / 13 TIGHTER / 9 NEUTRAL**; LOOSERs A-18, A-24; no LOOSER streak ≥ 3 (A-22 T → A-23 T → A-24 L) | **OK** |
+| **T4 availability control (§4.2 `matched_random_timing`, soil leg ii)** | **Probed on real data: 150 donor rows built, 0 survive** | **FAILS — Issue 1** |
+
+---
+
+### E. Issues
+
+1. **MAJOR — the T4 matched-random control returns ZERO rows on real data, so soil leg (ii) can never be read; the new companion test hides it**
+   **Design §:** §4 T4 (*"Does the S9 arm beat a matched random-timing entry at all"*); §4.2 `CONTROL matched_random_timing`; §4/§5 three-leg conjunction — *"(ii) T4 positive — the S9 arm must beat matched random-timing entries, not merely beat the BASE arm"*; §5 *"Reproduction alone never passes"*.
+   **Where:** `absorb.py:1075` (`matched_random_timing` stamps `"event_ts": e["event_ts"]` — the **original** event's timestamp — on every donor row while `entry_ts` is the **donor's**) colliding with `absorb.py:846–850` in `evaluate_outcomes_1m` (`if event_ts in idx: if (entry_ts − event_ts).total_seconds() != ltf*60 → drop`). `matched_random_timing` ends by calling `evaluate_outcomes_1m` (`1095`).
+   **Problem:** for a genuine cross-session donor the gap between the event's bar and the donor's entry is never one LTF bar, and the original `event_ts` is always a real 1-minute grid timestamp, so the guard fires on **every** donor row. The control is structurally empty for all four pairs.
+   **Reproduced this run** on real SOLUSDT D1 DESIGN bars: 88 pool-P events, 5 in the S9 arm → `matched_random_timing` built **150 donor rows** and returned **0**. Re-running the identical donor frame with a donor-consistent `event_ts` returns **145 of 150**, isolating the guard as the sole cause.
+   **Consequence:** `absorb_screen.py:568` (`if ctrl.height and …`) is never true, so `absorb_screen.py:622–623` writes `T4 = {"UNPOWERED": True}` for every pair and both pools, with no drop count and no error — the same silent-loss shape as QA-9 I-1, on a control the design calls REQUIRED. A screen whose master gate is a three-leg conjunction would report leg (ii) as permanently unpowered while looking healthy.
+   **Also:** the test added in this pass, `test_matched_random_cross_session_donors_do_not_raise` (`test_sigbar_absorb.py:360–400`), wraps its only assertion in `if out.height:` — and `out.height` is **0**, so it asserts nothing. It is vacuous in exactly the way QA-9 I-3 objected to, and it masks this defect.
+   **Required:** stamp each donor row with its own `event_ts` (donor `entry_ts − ltf` minutes), or exempt `pool == "MATCHED_RANDOM"` rows from the event→entry contiguity guard; then make the companion test assert a **non-zero** control row count (e.g. `assert out.height > 0` before the disjointness check) so the control can never silently empty again.
+   **Not introduced by this pass** — the guard and the `event_ts` stamp both predate QA run 9 (cited there at the same line numbers); runs 6–9 did not test the control's yield. Recorded as pre-existing, but blocking: it is verdict-material for the §4 conjunction.
+
+2. **LOW — the new per-pair `coverage` block over-counts reads and mis-describes failures**
+   **Design §:** §6.3 (`power_census` reconciliation); this is the QA-9 I-1 remediation.
+   **Where:** `absorb_screen.py:481–497` and `522–533`.
+   **Problem:** `bars_by[sym]` is populated (`484`) *before* the P / P_WIDE / MID_RANGE builds, and a failure in any one of the three lands the symbol in `skipped` as well — so the same symbol counts in both `n_symbols_read` and `n_symbols_failed`, and `n_symbols_read + n_symbols_failed` can exceed `n_usable`. The emitted note claims *"n_symbols_failed are absent from these layers"*, which is false when only the P_WIDE or MID_RANGE build failed (the P part is already appended at `492`).
+   **Required:** count a symbol as read only if at least one pool build succeeded, record which pool failed, and soften the note to match. Non-blocking on its own; listed because the block exists specifically to make layers reconcilable with `power_census`.
+
+---
+
+### F. Disposition of QA run 9 residual notes R-1…R-9 (non-blocking; not re-escalated)
+
+| # | Status this run | Evidence |
+|---|---|---|
+| **R-1** CF\* calibrated on one symbol, applied pooled | **STANDS** | `absorb_screen.py:506–517` still picks the first symbol with ≥4 events; value disclosed in `tripwire_cf_<pair>.json`, so it stays auditable |
+| **R-2** `calibrate_cf_star` degenerate branch degrades silently | **STANDS** | `absorb.py:1410–1412` / `1421–1425` unchanged; unreachable on the normal single-frame path |
+| **R-3** T5 symbol cap + BASE-less fallback | **STANDS** | `absorb_screen.py:630` `list(bars_by)[:30]`; `631–634` still falls back to all pool-P events while the contrast stays BASE − bare; neither emitted |
+| **R-4** undisclosed caps | **PARTLY IMPROVED, STANDS** | MDE coverage now emits `n_symbols_read` / `n_symbols_failed` (`313–314`); the spread-route 20-symbol cap (`439`) and CONFIRM 40-symbol cap (`878`) are still unemitted |
+| **R-5** bare-touch tie-break asymmetry | **STANDS** | `absorb.py:1556` still `_into_side(..., None)` vs pool P's prior-close tie-break (`701–705`) |
+| **R-6** P_WIDE p25 not written to `pool_cuts.json` | **STANDS** | still re-derived deterministically per build (`526–533`) |
+| **R-7** T4/T5 labelled with `mde=None` | **STANDS**, and now moot for T4 | `absorb_screen.py:602–604`, `657–659`; T4 cannot produce a contrast at all until Issue 1 is fixed |
+| **R-8** T2 runtime | **STANDS, slightly worse** | `_t2_dose` runs 2000 global + 200 within-symbol derangements per hold; now also invoked for the MID_RANGE (T3) and D1 ib_width sensitivity layers, i.e. more than the 16 primary cells. Wall-clock warning only |
+| **R-9** GT-5(e) "unavailable" vs "raises" | **STANDS** | integrity effect identical (the event never enters the pool); wording differs |
+
+No R-item has new evidence warranting escalation.
+
+---
+
+### G. Verdict
+
+**REVISE.**
+
+The three QA-9 issues are independently confirmed closed, each by direct reproduction rather than by reading the fix: the schema crash reproduces under the old default and is gone under the new one; all three T2 labels now fire on constructed data; the GT-5(i) raise fires on 1–6 donors per seed. The fixes introduced no dtype, sample-membership, or downstream-consumer regression — the Null/Float64 `ret_bps_session` split is absorbed by `diagonal_relaxed`, and the new `coverage` / `n_symbols_*` keys pass through every reader untouched. The standing battery re-verifies clean: pins re-hashed byte-exact, GT-1…GT-4 executed, shared LTF boundary intact, HARD tripwire complete, P_WIDE genuinely p25, holdout sealed, DESIGN/CONFIRM only, causal t−1, 1-minute paths, COMPLETE-window, L-28 derangements, ledger 2L/13T/9N with no LOOSER streak.
+
+What blocks the execution gate is a defect this fix pass did not cause but its new test conceals: **the matched-random availability control produces no rows at all**, so T4 — one of the three co-equal legs the design says the screen cannot pass without — would report UNPOWERED on every pair for a mechanical reason, not an evidentiary one. Measured on real bars: 150 donors built, 0 survive.
+
+Route to **experiment-developer** for the `event_ts` stamp (Issue 1) and the coverage-count wording (Issue 2); then a fresh-context QA run 11; then the operator `--execute` gate. **QA does not launch the screen. Nothing committed.**
+
+---
+
+## QA run 11 — 2026-07-22T01:18Z — mode: subagent (fresh context) — HEAD `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807`
+
+**Stage:** post-REVISE re-review after the operator's QA-10 fix pass (Issue 1 empty T4 arm; Issue 2 coverage double-count). Fresh-context subagent; did **not** author the implementation. `--prep` and `--execute` **not** run. Nothing committed. No implementation or design file edited.
+
+**Verdict: APPROVE**
+
+Both QA-10 issues are independently confirmed closed by direct measurement on real bars, not by reading the diff. The fix is provably *field-local*: the matched-random control's donor set, entry prices, sides, phases, holds and exit convention are bit-identical to the pre-fix construction — the only column that changed is the one that was breaking it. No new defect found in the fourth-pass sweep.
+
+**Dirty tree at review (`git status --porcelain`):**
+```
+ M docs/experiments-docs/INDEX.md
+ M docs/experiments-docs/checkpoints/2026-07-21-015-signed-value-absorption-screen/design.md
+ M docs/signal-registry/candidate-families/cf-sigauc-001.md
+ M python/experiments/SPDR-009/design.md
+ M python/experiments/SPDR-009/qa-review.md
+?? python/experiments/SPDR-009/screen_code/
+?? python/src/xen/sigbar/absorb.py
+?? python/tests/test_sigbar_absorb.py
+```
+
+**Executed (read-only):** `pytest python/tests/test_sigbar_absorb.py` → **34 passed**; full suite minus the two pre-existing xena collection errors → **264 passed / 4 skipped**; `shasum -a 256` on INFR-020 `pins.json`; a seven-part reproduction probe on real SOLUSDT D1 DESIGN bars (donor census, revert simulation, field-invariance diff, phase/price/hold checks, `event_ts` collision census, concat safety, disjointness census); a runner-equivalent T4 block replay. **The screen was not launched.**
+
+---
+
+### A. Pin re-hash (unchanged, re-verified)
+
+| Pin | Contracted | Evidence this run | Verdict |
+|---|---|---|---|
+| INFR-020 `pins.json` | `5f170b717e350fb7c0cf1647cd1b78fb88a1fa212ed50dce83ec1049af44f6c5` | `shasum -a 256` on disk = **byte-exact**; `absorb.INFR020_PINS_SHA256` identical | **MATCH** (re-hashed) |
+| 7 INFR-020 consumers + INFR-017 trio + INFR-018 registry | design §0 | `test_assert_spdr009_frozen_inputs_matches_contracted_hashes` re-hashes each on disk and cross-checks `pins.json.artifacts` — passed | **MATCH** |
+| Mismatch ⇒ raise | GT-5(c) | `test_gt5c_frozen_hash_mismatch_raises` — passed | **MATCH** |
+
+---
+
+### B. Golden traces GT-1…GT-4
+
+All four executed and passed against designer-pinned `gt_output.json` (arm, `into_side`, `signed_score` ±1e-4, `ret_bps_H5`/`H10` ±1e-3, exact `entry_ts`). Arm rule and thresholds untouched by this pass — the fix does not reach `build_contact_events`.
+
+---
+
+### C. Disposition of QA-10 issues
+
+| QA-10 # | Severity | Claimed fix | Verdict | Independent evidence |
+|---|---|---|---|---|
+| **1** | MAJOR | donor rows stamp `event_ts = entry_ts − ltf_minutes`; source linkage on `src_event_ts`; test asserts non-empty | **CLOSED — measured** | On real SOLUSDT D1 (88 pool-P events, 5 in the S9 arm): `matched_random_timing` now returns **145 of 150** requested donor rows (was **0**), `ret_bps_H10` and `ret_bps_H5` non-null on all 145, `arm`/`pool` = `MATCHED_RANDOM`. `absorb.py:1079` is the changed line; the guard at `846–850` now sees exactly `ltf × 60` s by construction and no longer fires. |
+| **2** | LOW | `n_symbols_read = len(set(bars_by) − failed_syms)`; `n_symbols_failed` deduplicated; note reworded | **CLOSED** | `absorb_screen.py:521–535`: `failed_syms` is a set built from `skipped`; read and failed are now **disjoint** and sum to ≤ `n_usable`. The note now reads *"a failed symbol is missing from at least one pool (P / P_WIDE / MID_RANGE) of these layers while power_census.json still counts it"* — which is true both when `load_bars` fails (missing from all three) and when only the P_WIDE build fails (missing from one). Matches behaviour. |
+
+---
+
+### D. Did the fix change WHAT the control measures? (the load-bearing question)
+
+Rebuilt the donor set twice under identical seeding — once with the old stamp, once with the new — and diffed every field.
+
+| Property | Check | Result |
+|---|---|---|
+| Donor session draw | `entry_ts`, `anchor_ts` frames compared | **identical** |
+| Side | `side` column compared | **identical** |
+| Phase (`mins_since_anchor`) | `phase` column compared; control phases vs source-event phases | **identical** — control `[128, 655, 747, 778, 1040]` == source `[128, 655, 747, 778, 1040]` |
+| Hold / exit convention | `ltf_minutes` compared; `evaluate_outcomes_1m` resolves `i0 + h × ltf` open-to-open, unchanged | **identical** |
+| Entry price | spot-checked 3 emitted rows: `entry` == `bars.Open` at `entry_ts` (42.73 / 35.76 / 36.63) | **correct** |
+| **Only differing column** | full column diff old vs new | **`event_ts` alone** |
+| Revert simulation | recompiled `matched_random_timing` from its own source with the old stamp restored, ran it on the same input | **0 rows** — so `assert out.height > 0` in `test_matched_random_cross_session_donors_do_not_raise` genuinely fails on revert; the test is no longer vacuous |
+| GT-5(i) disjointness | raise sits at `absorb.py:1064–1068`, **before** the row append — untouched; `test_gt5i_matched_random_own_session_raises` passes; census over the 145 emitted rows | **0 donor entries inside their source event's session** |
+
+---
+
+### E. New-defect sweep (fourth-pass risk, weighted heavily)
+
+| Risk | Check | Result |
+|---|---|---|
+| Derived `event_ts` collides with a real pool-P event | census of all 145 donor `event_ts` against the 88 pool-P `event_ts` on the same symbol | **0 collisions.** Materially it cannot matter either: the control frame is never written to an artifact, never passed to `apply_refractory`, never to `outcome_path_swap_fixed_h` (which runs on `parts_p` only), and never to `contrast_day_clustered` — the runner consumes it as a raw numpy array (`absorb_screen.py:569`) |
+| `src_event_ts` breaks a concat / schema path | dtype check + `diagonal_relaxed` concat of a pool frame (no such column) with the control frame | **OK** — `Datetime('us')`, concat succeeds, missing side filled with nulls. Same column name and dtype as `bare_level_touch_events` emits (`absorb.py:1639`), and the two frames are never combined |
+| Downstream keyed on old donor `event_ts` semantics | `step_design_reads` T4 block, `outcome_path_swap_fixed_h`, `contrast_day_clustered` day keys | **No behavioural change beyond the intended one.** T4 clusters on `day`, derived from `entry_ts` (`absorb.py:868`) — untouched by the stamp. The path-swap never sees the control. `contrast_day_clustered` is not called on the control in the T4 lane |
+| Contiguity guard silently weakened for donors | `event_ts = entry_ts − ltf` makes the `846–850` check pass by construction | **Acceptable, not a hole.** The guard exists to enforce detection-bar→entry adjacency for *real* events; a donor has no detection bar. Forward-window contiguity is still enforced independently at `851–860` and did its job — 5 of 150 donors were dropped for gap/end-of-data |
+| T4 now emits a degenerate contrast | replayed the runner's T4 block on SOL | S9 n=5 across **5 distinct days** (≥3 ⇒ the day-clustered block-bootstrap branch is reachable, not the UNPOWERED fallback); control n=145, mean −3.979 bps; S9 mean −3.360 bps; raw T4 contrast +0.619 bps. **A real, clusterable number where run 10 measured a structural blank** |
+| Coverage counts now under- or over-state | arithmetic re-derivation | Read and failed are disjoint; a symbol failing only its P_WIDE build is now excluded from `n_symbols_read` even though its P rows are in the layers — **conservative direction**, recorded as residual N-2 below |
+
+---
+
+### F. Standing checklist re-confirmed
+
+| Check | Evidence this run | Verdict |
+|---|---|---|
+| INFR-020 pins re-hashed | §A | **OK** |
+| GT-1…GT-4 executed | §B | **OK** |
+| GT-5(a)–(l) raise set | all twelve tests present and passing; (e) semantics per R-9 | **OK** |
+| Shared LTF import boundary | `absorb.py:55–64`; `test_absorb_imports_shared_ltf_helpers_not_redefined` passed | **OK** |
+| HARD leak tripwire | CF\* before layers, `n_seeds=200`, 1×/2×/3× MDE plants, T1 **and** T2 collapse + survival, merged `tripwire.json`, bite in bps of entry | **OK** (untouched this pass) |
+| P_WIDE p25, no p10 fall-through | `absorb.py:533` `quantile(0.25)`; `538` `RuntimeError` when underivable | **OK** |
+| No local accounting | `check_no_local_accounting` at `absorb_screen.py:61` + passing test | **OK** |
+| DESIGN/CONFIRM only; TEST/holdout unreachable | `absorb.py:487`; `test_gt5a`, `test_holdout_constant_is_sealed` passed | **OK** |
+| Causal ≤ t−1 | entry = event LTF OpenTime + `ltf`; forward-span contiguity on the 1m grid; IB fence | **OK** |
+| D6.3 1-minute path | `assert_no_ltf_outcome_path(1, …)` at `498`, `823`, `1116`; `test_gt5j` passed | **OK** |
+| COMPLETE-window only | `absorb.py:513` fence + `require_complete=True`; `test_gt5l` passed | **OK** |
+| L-28 derangements | `absorb.py:972`, `974`, plus within-symbol and path-swap asserts; tests passed | **OK** |
+| L-23 amendment ledger | design §10 **2 LOOSER / 13 TIGHTER / 9 NEUTRAL**; no LOOSER streak ≥ 3 | **OK** |
+| Five list-of-dicts frames carry `infer_schema_length=None` | `747, 930, 1099, 1224, 1644` | **OK** (QA-9 I-1 fix intact) |
+| **T4 availability control (soil leg ii)** | 145 usable donor rows on real bars; day-clustered branch reachable | **OK — was the run-10 blocker** |
+
+---
+
+### G. Residual notes (non-blocking)
+
+QA-9 residuals **R-1 … R-9 all still stand exactly as recorded in run 10** — none was touched by this pass and none has new evidence:
+R-1 CF\* calibrated on one symbol, applied pooled · R-2 `calibrate_cf_star` degenerate branch degrades silently · R-3 T5 symbol cap + BASE-less fallback · R-4 undisclosed caps (spread-route 20, CONFIRM 40; MDE coverage now emitted) · R-5 bare-touch tie-break asymmetry · R-6 P_WIDE p25 not written to `pool_cuts.json` · R-7 T4/T5 labelled with `mde=None` (T4 can now at best read SUGGESTIVE — leg (ii) needs *positive*, i.e. `excludes_zero`, not the SUPPORTED label) · R-8 T2 runtime · R-9 GT-5(e) "unavailable" vs "raises".
+
+Run-10 residuals:
+- **QA-10 Issue 2 (coverage double-count)** — **CLOSED** (§C).
+- **N-1 (new, LOW) — T4 donor drop count not surfaced.** `matched_random_timing` returns the frame with `_batch_dropped_gap` set (5 of 150 on the SOL probe), but `absorb_screen.py:592–605` emits only `n_control`. The realised donor count is therefore visible; the dropped count is not. Disclosure only.
+- **N-2 (new, LOW) — `n_symbols_read` under-counts when a symbol fails only one pool.** Its P rows are in the layers while the symbol counts as failed. Conservative direction; the `failed` list names the symbol and the error, so it is reconcilable.
+- **N-3 (carried, LOW) — T4 control weighting.** Each S9 event contributes up to 30 donor rows to a single global control mean, so symbols with more S9 events dominate the control side. Pre-existing design shape (noted at run 8); disclosed by `n_control`.
+
+---
+
+### H. Verdict
+
+**APPROVE.**
+
+The run-10 blocker is closed by measurement, not assertion: the matched-random control resolves **145 of 150** donors on real bars where it previously resolved none, and the runner's T4 block now produces a day-clusterable contrast (+0.619 bps on the SOL probe, 5 clustering days) instead of a structural `UNPOWERED`. Critically, the fix changed **only** the `event_ts` field — donor sessions, sides, phases, holds, entry prices and exit convention are bit-identical to the pre-fix construction, so the control still measures what §4.2 says it measures. Reverting the stamp reproduces the empty arm, which means the rewritten test is genuinely load-bearing. Cross-session disjointness (GT-5(i)) still raises and still measures zero violations. The coverage counts are now disjoint and the note matches behaviour.
+
+The fourth-pass new-defect sweep found nothing: no `event_ts` collisions with real pool events, no concat or schema breakage from `src_event_ts`, and no downstream consumer keyed on the old donor semantics. The full standing battery re-confirms — pins byte-exact, GT-1…GT-4 executed, GT-5 set complete, shared LTF boundary intact, HARD tripwire complete, P_WIDE genuinely p25, holdout sealed, causal t−1, 1-minute paths, COMPLETE-window, L-28 derangements, ledger 2L/13T/9N with no LOOSER streak. 34 absorb tests and 264 passed / 4 skipped overall.
+
+Ready for the **operator's `--execute` gate**. The residuals above are disclosure items for the analyst, not conditions on execution. **QA APPROVE does not launch the screen. Nothing committed.**
+
+---
+
+## QA run 12 — 2026-07-22T02:34Z — mode: subagent (fresh context) — HEAD `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807`
+
+**Stage:** post-execution precondition review. Run 1 of the screen executed under operator approval after the run-11 APPROVE, three design preconditions were found unmet, the `results/` tree was **hard-deleted**, and four **post-measurement** amendments (A-25…A-28) were appended to design §10. This run reviews the fixes and the governance handling before a re-run. Fresh-context subagent; did **not** author any of it. `--prep` / `--execute` **not** run; nothing written to `results/` (which is correctly absent).
+
+**Verdict: REVISE**
+**FAILING_ARTIFACT:** `python/src/xen/sigbar/absorb.py` (`plant_mde_curve` / `label_band` / `calibrate_cf_star` interaction)
+**REQUIRED_SKILL:** `experiment-developer`
+
+All four fixes are real and I verified each by measurement. The blocker is a **new coupling created by AMENDMENT-25**: now that the MDE is computed on the same arm as the contrast, `mde_bps = 0.0` becomes logically equivalent to "the raw T1 contrast is positively material" — and both downstream consumers mishandle a zero MDE, in exactly the branch the screen exists to detect.
+
+**Dirty tree:** unchanged from run 11 (`design.md`, `qa-review.md` modified; `screen_code/`, `absorb.py`, `test_sigbar_absorb.py` untracked). `results/` absent — intentional.
+
+**Executed (read-only):** `pytest python/tests/test_sigbar_absorb.py` → **34 passed**; full suite minus the two pre-existing xena collection errors → **264 passed / 4 skipped**; `shasum -a 256` on INFR-020 `pins.json`; a six-symbol D1 probe exercising `_build_scored`, `mde_for_arm`, `calibrate_cf_star`, `_swap_pooled`, `path_swap_bite_bps`; a reachability probe on the zero-MDE branch; a replay of the P_WIDE selection logic. **The screen was not run.**
+
+---
+
+### A. Pin re-hash
+
+| Pin | Contracted | This run | Verdict |
+|---|---|---|---|
+| INFR-020 `pins.json` | `5f170b717e350fb7c0cf1647cd1b78fb88a1fa212ed50dce83ec1049af44f6c5` | `shasum -a 256` = **byte-exact** | **MATCH** |
+| 7 INFR-020 consumers + INFR-017 trio + INFR-018 registry + K-UNIFORM | design §0 | `test_assert_spdr009_frozen_inputs_matches_contracted_hashes` re-hashes each on disk — passed | **MATCH** |
+
+---
+
+### B. The four precondition fixes — independently measured
+
+| # | Amendment | Claim | Verdict | Measured evidence (6-symbol D1 arm, τ=0.05, DESIGN) |
+|---|---|---|---|---|
+| 1 | **A-25 MDE/CF\* arm** | MDE per pool on the arm the contrast uses; CF\* on the pooled arm; never defaults to 0.25 | **REAL — but see Issues 1–2** | `mde_for_arm` reports `n_events 338 / n_S9 18 / n_BASE 291 / n_symbols 6`, `T1_H10 = 10.5 bps`; the same computation on a 2-symbol subsample gives **14.5 bps** — the A-25 defect shape reproduced, and the fix removes it. `calibrate_cf_star(bars_by, ev_p, …)` returns **status DERIVED, cf\* = 1.588, 10/10 usable seeds at every plant**, falling 1.588 → 0.691 → 0.442 across 1×/2×/3× with `cf_star_spread_across_plants = 1.147` emitted. Both underivable paths return `cf_star = None`: `mde=None` → `"no MDE at realised n"`, thin arm → `"thin arms"`. `prior_cf: 0.25` is recorded with `prior_is_never_a_fallback: True` and is never substituted. |
+| 2 | **A-26 P_WIDE zone** | grid extended below the P floor; selection restricted to τ strictly < τ_P; raises if none | **REAL** | `TAU_GRID` unchanged (floor still 0.05); `P_WIDE_TAU_GRID = (0.005, 0.01, 0.02, 0.03, 0.05, 0.10, 0.15, 0.20)` — the four new values all sit **below** the old floor. `absorb_screen.py:162–179` filters to `t < chosen` *before* counting, defaults to the loosest strictly-tighter value, and closes with `assert wide_chosen < chosen`. Replayed across every possible τ_P: at τ_P = 0.05 the candidate set is `[0.005, 0.01, 0.02, 0.03]`, default 0.03 — the two pools can no longer coincide. Selection is **count-only**: `_count_pool` calls `build_contact_events` + `apply_refractory` and returns `.height`, touching no outcome. |
+| 3 | **A-27 tripwire bite** | per-symbol correlation; floor on the per-symbol median; pooled retained as artifact | **REAL** | `path_swap_bite_bps` now returns `per_symbol_median_corr`, `per_symbol_min_corr`, `n_symbols`, `frac_symbols_above_floor`, `floor: 0.5`, `applied_to: "per_symbol_median_corr"`, and `bite_ok` keyed on the **median**, with the pooled figure carrying an explicit divisor-dispersion note. On the probe arm: pooled 0.967, per-symbol median **0.9793**, min 0.9558, 6/6 above floor. (This subset spans only 0.075 → 12.1 in price, so the pooled/per-symbol divergence is small here; the 0.00067 → 20551 span that produced the 0.33 pooled reading is a full-universe property I cannot re-measure with `results/` deleted — the *mechanism* is verified, the D1 numbers in A-27 are not independently reproduced.) |
+| 4 | **A-28 contiguity drops** | located / with-outcome / dropped accumulated per pool into `coverage`; `census.json` reconciles | **REAL** | `_build_scored` returns `(frame, n_located)`; the caller accumulates `located` / `kept` per pool and emits `n_events_located`, `n_events_with_outcome`, `n_events_dropped_no_1m_path`. Probe: 394 located → 338 with outcomes → **56 dropped (14.2%)**, and `kept` reconciles exactly with the pooled arm height (338). `census.json` now carries `census_P` from `power_census` alongside `n` and the whole `coverage` block. |
+
+---
+
+### C. §9 execution order — MDE and CF\* before any contrast, on the identical population
+
+Traced statement by statement through `step_design_reads` (`absorb_screen.py:474–753`):
+
+| Order | Line | Action | Contrast run? |
+|---|---|---|---|
+| 1 | `495–514` | build every symbol's P / P_WIDE / MID_RANGE events, accumulate located/kept | no |
+| 2 | `516–517` | `ev_p`, `ev_w` — each pair's arm built **once** | no |
+| 3 | `522–528` | `mde_for_arm(ev_p)` and `mde_for_arm(ev_w)` → `mde_curves["pairs"][pair_id]` → **`_emit(mde_curves.json)`** | plants only |
+| 4 | `532–548` | `calibrate_cf_star(bars_by, ev_p, mde_bps=…)` → **`_emit(tripwire_cf_<pair>.json)`** | plants only |
+| 5 | `574–583` | `_layers_for_events(…, mde_info=mde_by_pool[name])` — **first real contrast** | yes |
+| 6 | `740–746` | `_run_tripwire(…, cf_precomputed=cf_pre)` — CF\* is now a **required** kwarg, no internal fallback calibration | yes |
+
+**Order holds.** Both artifacts are on disk before the first real contrast, and steps 3, 4 and 5 all consume the identical `ev_p` / `ev_w` objects — the population identity A-25 demanded. `step_mde_curves` is fully removed with no dangling references; all three `_build_scored` call sites (`504`, `726`, `915`) unpack the new tuple; `_run_tripwire`'s dropped `mde_curves` arg matches its call site; `main()` no longer deletes `power`, which `census.json` now consumes. Cross-pair note, not a defect: D1's contrasts run before D2's MDE is computed, but each pair's MDE is a deterministic function of that pair's own arm, so no ordering contamination is possible.
+
+---
+
+### D. Governance — post-measurement amendment handling
+
+| Question | Finding |
+|---|---|
+| Hard-delete + full re-run the right response? | **Yes.** This is the programme's amend-in-place rule for a frozen-design confound (dated amendment + hard delete + full rerun, never a follow-up read). `results/` is genuinely absent; nothing from run 1 is reachable by the re-run. |
+| A-25…28 correctly dated and directed? | **Yes.** All four carry the 2026-07-22 date, an explicit POST-MEASUREMENT banner, and a direction. A-25 TIGHTER (derived threshold replaces inherited; inapplicable gate labelled) — correct. A-26 TIGHTER (strictly tighter zone) — correct. A-27 **LOOSER** — correctly booked without hedging, since it converts a failing required control into a passing one even though the failure was in the statistic rather than the swap. A-28 NEUTRAL (disclosure of an existing quantity) — correct. |
+| Run-1 outcomes disclosed? | **Yes**, and prominently: D1 T1 WASH (+1.8 / −3.2 bps, CI spanning zero, S9 n=310, 168 days), D2–D4 UNPOWERED, D4 zero signed events, S9 median −0.0 bps against an ~11.3–13 bps floor. A reader can weigh every amendment against what was already seen. |
+| A-26 outcome-informed risk acceptable? | **Acceptable, with a disclosure requirement.** A-26 does not add a degree of freedom — it *implements* §3.2's pre-registered "tighter τ" leg, which run 1 failed to honour. The three stated mitigations all hold in code (count-only selection; new values appended below the old floor; P's own τ untouched at 0.05). The residual is real but bounded: §3.2 counts P_WIDE among the **16 primary cells**, so the τ for a primary cell was picked after outcomes were seen. Required, non-blocking: the disposition must state that P_WIDE's τ grid was extended post-measurement and that the P_WIDE stratum is therefore outcome-informed, while P is not. |
+| Ledger arithmetic | **Correct.** 2L/13T/9N → A-25 T (2L/14T/9N) → A-26 T (2L/15T/9N) → A-27 L (3L/15T/9N) → A-28 N (3L/15T/10N). Header total **3 LOOSER / 15 TIGHTER / 10 NEUTRAL** matches. |
+| LOOSER streak ≥ 3? | **No.** Sequence is T → T → L → N. The three LOOSERs (A-18, A-24, A-27) are non-adjacent. Correctly stated in the design footer. |
+
+---
+
+### E. New defects from the restructure
+
+1. **MAJOR — CF\* is calibrated on a ZERO plant whenever T1 is positively material, i.e. in the only regime where CF\* is ever applied.**
+   **Design §:** §4.3 CALIBRATION REGIME + AMENDMENT-13 (*"plant a known CAUSAL effect of ~1× the published MDE on the S9 arm so the raw contrast is material by construction"*) + AMENDMENT-4 (CF\* derived, never inherited) + §4.3 MATERIAL-EDGE PRECONDITION.
+   **Where:** `absorb.py:1374` (`grid = np.arange(0.0, 30.01, 0.5)` — the plant sweep starts at **0.0**) → `absorb_screen.py:532` (`mde_bps = pair_mde["T1_H10"]["mde_bps"]`) → `absorb.py:1488` (`calibrate_cf_star` guards only `mde_bps is None`).
+   **Problem:** `plant_mde_curve` returns the smallest grid value whose CI excludes zero, so it returns **0.0** exactly when the unplanted contrast is already positively material. Before A-25 the MDE came from a decoupled 30-symbol subsample and was ~9.5 bps; now that it is computed on the same arm, `mde_bps == 0.0` is *logically equivalent* to `raw T1 is positively material` — which is precisely the tripwire's material-edge precondition. So in every case where the survival rule actually fires, CF\* is derived with `plant_bps = 0.0`, i.e. on the **observed, unplanted** edge rather than a known-causal one. The threshold that decides "is this edge leaking?" would then be calibrated on the possibly-leaking edge itself.
+   **Reproduced this run:** planting a real +40 bps edge into the observed S9 arm gives `mde_for_arm → T1_H10 mde_bps = 0.0`, raw contrast 37.59 bps with CI [30.00, 43.82] excluding zero, and `calibrate_cf_star(mde_bps=0.0)` returns **`status: DERIVED`, `cf_star = 0.317`, `by_multiple["1.0"] = {plant_bps: 0.0, n_usable_seeds: 5}`** — a silently self-referential calibration reported as a clean derivation.
+   **Required:** treat a zero MDE as "this instrument cannot size a plant here". Either start the plant grid at the first strictly positive step and return `raw_already_material: True` separately, or guard `if not mde_bps` (None **or** 0) in `calibrate_cf_star` → `UNDERIVABLE`. Preferably plant a strictly positive known-causal effect so CF\* stays derivable in the material branch — otherwise the tripwire becomes inapplicable exactly when it is needed.
+
+2. **MAJOR — §5 `SUPPORTED` is unreachable whenever the MDE lands at 0.0, which is the same positively-material branch.**
+   **Design §:** §5 (*"SUPPORTED: effect ≥ its own MDE and ci_low > 0"*) and §4/§5 soil leg (i), which requires **T1 SUPPORTED**.
+   **Where:** `absorb.py:1367–1368` — `if mde is not None and (not np.isfinite(mde) or mde <= 0): mde = None`, then `ci[0] > 0` with `mde is None` returns `SUGGESTIVE`.
+   **Problem:** by §5's own arithmetic, MDE = 0 and `ci_low > 0` gives `effect ≥ MDE` and should read **SUPPORTED**. The implementation nulls a zero MDE and downgrades to SUGGESTIVE. **Reproduced:** contrast 37.59 bps, CI [30.00, 43.82], MDE 0.0 → `label_band` returns **`SUGGESTIVE`**. Combined with Issue 1's coupling, the screen's strongest possible positive result is systematically demoted, and soil leg (i) — which names SUPPORTED explicitly — can never be satisfied. This is a design-fidelity **DEVIATES**, not a judgement call.
+   **Required:** make `label_band` honour a genuine zero MDE as SUPPORTED (keeping the `NaN` / negative guard), or fix the MDE instrument per Issue 1 so 0.0 is never emitted — but the two consumers must agree, because today `label_band` treats 0.0 as "no MDE" while `calibrate_cf_star` treats it as a valid plant size.
+
+3. **LOW — `tripwire.survives: false` is emitted when the gate is inapplicable.** `absorb_screen.py:858` computes `survives = bool(None) or bool(None) = False` while `survives_T1`/`survives_T2` are correctly `None`. The `status` string (`CF_STAR_UNDERIVABLE_GATE_INAPPLICABLE`), `cf_star_derived` and `adjudicable` all disambiguate, but a reader keying on `survives` alone would read a clean bill of health where Addendum §2.8 forbids one. Prefer `survives: None`.
+
+4. **LOW — two amendment citations in code comments point at the wrong amendment.** `absorb_screen.py:244` credits the drop-count fix to "AMENDMENT-27" (it is A-28); `absorb.py:1248` credits the per-symbol bite to "AMENDMENT-25" (it is A-27). Cosmetic, but the ledger is a governance artifact and the code is its main cross-reference.
+
+---
+
+### F. Standing battery re-confirmed
+
+| Check | Evidence | Verdict |
+|---|---|---|
+| INFR-020 pins re-hashed | §A | **OK** |
+| GT-1…GT-4 | `test_golden_trace_arm_and_returns` executed, all four pass against designer-pinned `gt_output.json` | **OK** |
+| GT-5(a)–(l) raise set | all twelve tests present and passing | **OK** |
+| Shared LTF import boundary | `absorb.py:55–64`; no-redefinition test passed | **OK** |
+| P_WIDE p25 no-result leg | `absorb.py:526–544` unchanged — `quantile(0.25)` or explicit override, else `RuntimeError`; now paired with a strictly tighter τ | **OK** |
+| Holdout sealed; DESIGN/CONFIRM only | `absorb.py:487`; `test_gt5a`, `test_holdout_constant_is_sealed` passed | **OK** |
+| Causal ≤ t−1 | entry = event LTF OpenTime + `ltf`; forward-span contiguity; IB fence | **OK** |
+| D6.3 1-minute path | `assert_no_ltf_outcome_path(1, …)` at three sites; `test_gt5j` passed | **OK** |
+| COMPLETE-window only | fence + `require_complete=True`; `test_gt5l` passed | **OK** |
+| L-28 derangements | global / within-symbol / path-swap asserts; tests passed | **OK** |
+| No local accounting | `check_no_local_accounting` at runner entry + passing test | **OK** |
+| T4 matched-random (run-11 fix) | `matched_random_timing` unchanged this pass; `_swap_pooled` does not touch it | **OK** |
+| Restructure integrity | `step_mde_curves` removed with no dangling refs; all `_build_scored` call sites unpack the tuple; `_run_tripwire` signature matches its call site; `census.json` shape valid | **OK** |
+| L-23 ledger | 3L/15T/10N, arithmetic checked, no LOOSER streak | **OK** |
+
+---
+
+### G. Residuals
+
+R-1 is **superseded** — CF\* is no longer calibrated on one symbol; it now plants on the pooled arm via `_swap_pooled`, which is what §4.3 asks for. R-2 is **superseded** — the degenerate `calibrate_cf_star` fallback branch is gone; the function now returns `UNDERIVABLE` instead of degrading. R-3, R-4 (spread-route 20 / CONFIRM 40 caps), R-5, R-6, R-7, R-8, R-9 all **stand** unchanged. Run-11 residuals N-1 (T4 donor drop count not surfaced), N-2 (`n_symbols_read` conservative), N-3 (T4 control weighting) all **stand**. New: the bite remains a report layer with no enforcement even though §7 lists it as HARD — unchanged from earlier runs, and A-27's "blocks a disposition outright" is an operator act, not a code gate.
+
+---
+
+### H. Verdict
+
+**REVISE.**
+
+The governance handling is sound: run 1 is genuinely hard-deleted, the four amendments are dated, directed, justified and disclose what was seen before they were written, the ledger arithmetic is right (3L/15T/10N) and there is no LOOSER streak. All four fixes are real and I measured each — the MDE now moves with the arm (10.5 vs 14.5 on a subsample), CF\* derives on the pooled arm with every seed usable and never falls back to the 0.25 prior, the bite floor is applied to a per-symbol median, and the drop counts reconcile exactly (394 located → 338 kept → 56 dropped). §9's order holds: MDE and CF\* are both on disk before the first real contrast and all three read the identical event population. A-26's outcome-informed risk is acceptable because it implements a pre-registered clause rather than adding a new degree of freedom, subject to the P_WIDE stratum being labelled outcome-informed in the disposition.
+
+What blocks the re-run is a coupling the fix itself created. With the MDE now computed on the contrast's own arm, `mde_bps = 0.0` means exactly "T1 is positively material" — and both consumers get that case wrong: `calibrate_cf_star` accepts it as a valid 1× plant and reports a self-referential CF\* as `DERIVED` (reproduced: `plant_bps 0.0`, `cf_star 0.317`, status DERIVED), while `label_band` nulls it and demotes a 37.6 bps contrast with CI [30.0, 43.8] to `SUGGESTIVE` when §5's own rule says SUPPORTED. Together they disable the leak gate and the soil-leg-(i) label in precisely the branch the screen exists to detect. Both are small, local fixes in `absorb.py`, and the two consumers must be made to agree on what a zero MDE means.
+
+Route to **experiment-developer**; then a fresh-context QA run 13; then the operator re-run gate. **QA does not launch the screen. Nothing committed.**
+
+---
+
+## QA run 13 — 2026-07-22T02:45Z — mode: subagent (fresh context) — HEAD `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807`
+
+**Stage:** re-review of the QA-12 fixes (AMENDMENT-29: centred MDE, CF\* non-positive-plant refusal, `label_band` zero handling, `survives: None`, citation corrections). Fresh-context subagent; did **not** author the fixes. Screen **not** run.
+
+**Verdict: REVISE**
+**FAILING_ARTIFACT:** `python/src/xen/sigbar/absorb.py` `label_band` fall-through + design.md §5 (undefined label region)
+**REQUIRED_SKILL:** `quant-designer` (define the label), then `experiment-developer` (one branch)
+
+**Both QA-12 blockers are genuinely closed — verified by measurement on a real D1 arm.** The centring decision is, in my judgement, not merely acceptable but *required* by the design's own text. The remaining blocker is a consequence the fix widens rather than causes: centring systematically lowers every MDE, which pushes cells into a region §5 does not define, and the implementation resolves that region to `UNPOWERED` — the one label with the heaviest governance weight in this design.
+
+**Executed (read-only):** `pytest python/tests/test_sigbar_absorb.py` → **37 passed**; full suite minus the two pre-existing xena collection errors → **267 passed / 4 skipped**; `shasum -a 256` on INFR-020 `pins.json`; a real 6-symbol D1 arm rebuilt from the catalog (n=338, S9=18, BASE=291) exercising `plant_mde_curve`, `calibrate_cf_star`, `label_band`; an uncentred-vs-centred comparison; a full label-branch sweep. **The screen was not run.**
+
+---
+
+### A. Pin re-hash
+
+`shasum -a 256` on `python/experiments/INFR-020/results/pins.json` = `5f170b717e350fb7c0cf1647cd1b78fb88a1fa212ed50dce83ec1049af44f6c5` — **byte-exact**. All seven INFR-020 consumers plus the INFR-017 trio, the INFR-018 registry and K-UNIFORM re-hashed on disk by the passing frozen-inputs test. **MATCH.**
+
+---
+
+### B. QA-12 blockers — closed, measured
+
+| QA-12 # | Claim | Verdict | Measured evidence |
+|---|---|---|---|
+| **1** CF\* on a zero plant | `plant_mde_curve` centres the arm; `calibrate_cf_star` refuses non-positive plants | **CLOSED** | On the QA-12 fixture (real arm + a planted 40 bps S9 edge; raw contrast 37.59, CI excludes zero) the MDE is now **8.0, was 0.0**. `calibrate_cf_star` with that MDE returns **DERIVED, `plant_bps = 8.0`** — a genuinely positive known-causal plant. It returns **UNDERIVABLE with `cf_star = None`** for `mde_bps` of `0.0`, `None` and `-1.0`, and `prior_cf: 0.25` is recorded with `prior_is_never_a_fallback: True`, never substituted. |
+| **2** SUPPORTED unreachable | `label_band` nulls only non-finite or **negative** MDE | **CLOSED** | Same fixture: `label_band(37.59, ci, 8.0)` → **SUPPORTED** (was SUGGESTIVE). Full branch sweep: SUPPORTED (mde 2.0 **and** mde 0.0), SUGGESTIVE, CONTRADICTED, WASH, UNPOWERED all reachable. The two consumers now disagree deliberately and explicitly about zero — `label_band` accepts it as a resolution statement, `calibrate_cf_star` refuses it as a plant size — and each says so in place. |
+| — | LOW items | **CLOSED** | `survives` is `None` (not `false`) when `cf_derived` is False, with the "did not survive / was never applied" distinction commented at `absorb_screen.py:858–862`. Both miscited amendments corrected: `absorb.py:1248` → A-27 (per-symbol bite), `absorb_screen.py:244` → A-28 (drop counts); `:306` → A-25 and `:53` → A-26 were already right. |
+
+**Centring verified as effect-independent (the property the fix claims).** Adding a constant +40 bps to the S9 arm leaves the centred MDE **unchanged at 8.0**, while the *uncentred* sweep on the same two arms collapses from **10.5 → 0.0**. That is the defining test of the change and it passes.
+
+---
+
+### C. Scrutiny of the centring decision itself
+
+**Is an effect-independent MDE the right reading of §4.2/§5? Yes — and I would go further: the design's text requires it.**
+
+- §5 defines `SUPPORTED: effect ≥ its own MDE`. If the MDE is the smallest plant that makes the *observed* contrast significant, the test is a tautology — every material contrast passes with MDE 0, every immaterial one fails. A comparison is only meaningful against a quantity that does not embed its own operand.
+- §4.2 asks for "MDE read off the curve **at the realised n** per stratum". "At the realised n" is a statement about the arm's sample size and noise, not about what the arm happened to show.
+- §6.3 and §9 both require the MDE "published **BEFORE** the real read". An MDE computed by sweeping the uncentred arm cannot honour that literally — it is a function of the read. Centring is what makes the ordering constraint satisfiable rather than nominal.
+
+**Caveat, correctly disclosed:** the centring constant is itself estimated from the same data, so the MDE is independent of the effect's *location* but still uses the data to locate it. That is unavoidable for an MDE at realised n and is disclosed by the new `centred_on_observed` / `observed_contrast` keys.
+
+**Is LOOSER the right direction label? Yes, and conservatively so.** A-29 bundles a genuine loosening (lower MDE ⇒ SUPPORTED easier) with a genuine tightening (`calibrate_cf_star` now refuses plants it previously accepted, so the leak gate is strictly harder to satisfy). Splitting them would have been marginally more precise, but booking the bundle at its most permissive component is the conservative choice L-23 exists to enforce. Ledger arithmetic is right: 3L/15T/10N + A-29 L = **4L/15T/10N**; sequence T→T→L→N→L; the four LOOSERs (A-18, A-24, A-27, A-29) are non-adjacent, so **no streak ≥ 3**.
+
+**One directional consequence A-29 does not book, and should state.** Lowering the MDE also moves the WASH/UNPOWERED boundary — and it moves it *against* closure, not for it. WASH requires `|effect| < MDE`; a smaller MDE means fewer zero-spanning cells qualify as WASH and more fall through to UNPOWERED. Under AMENDMENT-24 a pair reading UNPOWERED is "horizon-covered but inconclusive — neither blocking nor contributing to the close", while a powered WASH is what a family-closing null looks like. So centring makes CF-SIGAUC-001 **harder to close**, which is the opposite direction from the SUPPORTED effect A-29 does book. Required disclosure, not a direction error: A-29's LOOSER label stands, but its rationale should name both consequences so the operator is not surprised if pairs come back UNPOWERED that would previously have read WASH. This is also the mechanism behind Issue 1 below.
+
+**Is post-measurement introduction legitimate? Yes.** A-29 repairs a defect *introduced by A-25* and caught at QA *before any re-run*, so no outcome produced by the fixed code exists. Decisively: the change **cannot** alter run 1's reading (§D), so it cannot have been selected to rescue or bury that result. It touches an instrument (the power yardstick), not the estimand, arms, cuts, τ, holds, bands or nulls.
+
+---
+
+### D. Point 3 — does run 1's D1 reading change label under the new MDE? **No. Plainly: no.**
+
+Run 1 D1 read T1 effect **+1.8 / −3.2 bps with a CI spanning zero**, against an MDE of 13.0. Centring lowers the D1 MDE to roughly 10.
+
+`SUPPORTED` and `SUGGESTIVE` **both require `ci[0] > 0`** — they are unreachable for any MDE whatever when the interval spans zero. I swept the actual `label_band` across MDEs of 13.0, 10.0, 5.0, 1.0, 0.5 and 0.0 at both run-1 effect sizes:
+
+| effect | CI | MDE 13.0 | 10.0 | 5.0 | 1.0 | 0.5 | 0.0 |
+|---|---|---|---|---|---|---|---|
+| +1.8 | spans zero | WASH | WASH | WASH | UNPOWERED | UNPOWERED | UNPOWERED |
+| −3.2 | spans zero | WASH | WASH | WASH | UNPOWERED | UNPOWERED | UNPOWERED |
+
+**At the centred MDE (~10) the label is still WASH** — `|1.8| < 10` and `|−3.2| < 10`. A WASH could only become UNPOWERED if the MDE fell below the effect size (~2–3 bps), roughly four times lower than centring achieves. **So run 1's D1 conclusion is unchanged, and no run-1 reading can be upgraded to SUGGESTIVE or SUPPORTED by this change.** The operator can start the re-run without expecting the previous null to be resurrected by the amendment.
+
+What *does* change for the re-run is the direction shown in the table's right-hand columns — and that is Issue 1.
+
+---
+
+### E. Issues
+
+1. **MEDIUM, verdict-material — `label_band` returns `UNPOWERED` when the effect EXCEEDS its MDE but the CI spans zero, and centring makes that region systematically more reachable.**
+   **Design §:** §5 — `UNPOWERED: MDE > |plausible effect| at the realised n`; `WASH: |effect| < MDE → "cannot distinguish", never a refutation (L-11)`; §6.3 `T1 UNPOWERED is INCONCLUSIVE, never a null (B-5)`; AMENDMENT-24 closure rule.
+   **Where:** `absorb.py` `label_band` — the terminal `return "UNPOWERED"` after the `|effect| < MDE → WASH` test.
+   **Problem:** when the CI spans zero and `|effect| ≥ MDE`, neither §5 label applies — WASH is excluded by its own inequality, and UNPOWERED asserts `MDE > |plausible effect|`, which is the *opposite* of what holds. §5 has a genuine gap here, and the code resolves it to UNPOWERED, i.e. to the assertion that is false. **Reproduced:** `label_band(12.0, [-4.0, 20.0], 1.0)` → `UNPOWERED`. Correct behaviour is retained when the MDE is `None` (an arm that genuinely does not resolve) — the defect is confined to a finite MDE below the observed effect.
+   **Why this pass matters:** centring lowers every MDE (measured: 10.5 → 8.0 on the real arm), and WASH requires `|effect| < MDE`, so the change *systematically* shifts zero-spanning cells out of WASH and into this undefined region. Under A-24 an UNPOWERED pair "neither blocks nor contributes to the close" while a powered WASH is exactly what a family-closing null looks like — so the mislabel silently converts "we measured it and cannot distinguish it from zero" into "we did not test it", on the checkpoint's master go/no-go. D1 is safe (effects 1.8–3.2 vs MDE ~10), but thinner pairs and the P_WIDE strata, where double-digit effects with zero-spanning intervals are ordinary, are not.
+   **Required:** a designer decision on the label for `|effect| ≥ MDE` with a zero-spanning CI — WASH is the closest fit to §5's intent and to L-11 ("cannot distinguish", never a refutation) — recorded as a §5 clause, then the corresponding one-branch change. Route `quant-designer` → `experiment-developer`.
+
+2. **LOW — importing the runner module recreates `results/`.** `absorb_screen.py:47` runs `OUT.mkdir(parents=True, exist_ok=True)` at import time, so any probe that imports the module resurrects the directory that the A-25…28 governance response hard-deleted. `results/` is present but **empty** at this review (almost certainly created by my own QA-12 probe import; no artifact of any kind is in it, and `git status` shows nothing). Not a breach — `assert_confirm_freeze_ready` keys on `pool_cuts.json`, not on the directory — but "hard-deleted" is not an import-safe state, which is worth knowing before the next deletion is relied upon. Prefer creating the directory inside `main()`.
+
+---
+
+### F. New-defect sweep on the four edits
+
+| Risk | Check | Result |
+|---|---|---|
+| Centring breaks the `u = 0` guarantee | swept the real and edged arms | **OK** — MDE strictly positive (8.0) in both; `u = 0` never qualifies once centred |
+| Centring interacts with the unpaired-days fallback | `plant_mde_curve` centres with `contrast_day_clustered`'s own estimator and sweeps with the same function | **OK** — same estimator on both sides, so the centring is exact by construction |
+| `calibrate_cf_star` new early return | `if "arm" not in events.columns or ret_col not in events.columns` returns UNDERIVABLE with the prior recorded but unused | **OK** — replaces a raise; `prior_is_never_a_fallback` still emitted |
+| CF\* refusal too aggressive | `if not mde_bps or float(mde_bps) <= 0` | **OK** — refuses `0.0`, `None`, negatives; accepts the centred 8.0 and derives |
+| `label_band` zero handling regressed another branch | full branch sweep incl. `mde=None` with a live CI | **OK** — `(5.0, [1.0, 9.0], None)` → SUGGESTIVE; `None/None/None` → UNPOWERED |
+| `survives: None` breaks a consumer | grepped; nothing keys on `survives` programmatically; `status`, `cf_star_derived`, `adjudicable` all present | **OK** |
+| Mirror MDE also centred | `mde_for_arm` calls `plant_mde_curve(s9, mirror, …)` | **OK** — same treatment, so T1 and T1_mirror label against comparable denominators |
+| Cost of the extra contrast call | one additional `contrast_day_clustered` per curve | **OK** — negligible against the 61-point sweep |
+
+---
+
+### G. §9 execution order and standing battery
+
+**Order holds, unchanged from run 12 and re-traced:** `mde_for_arm` (`522`, `525`) → `_emit(mde_curves.json)` (`528`) → `calibrate_cf_star` (`540`) → `_emit(tripwire_cf_<pair>.json)` (`548`) → **first real contrast** `_layers_for_events` (`581`) → `_run_tripwire` (`740`). Both artifacts are on disk before any contrast, and all three stages consume the identical `ev_p` / `ev_w`. Centring strengthens this rather than weakening it: the published MDE no longer depends on the read it precedes.
+
+**Standing battery — all OK:** INFR-020 pins byte-exact; GT-1…GT-4 executed and passing against designer-pinned `gt_output.json`; GT-5(a)–(l) raise set complete; shared LTF import boundary intact (no redefinition); P_WIDE p25 no-result leg plus a strictly tighter τ; holdout sealed and DESIGN/CONFIRM only; causal ≤ t−1 entry; D6.3 1-minute paths; COMPLETE-window fence; L-28 derangements zero fixed points; no local accounting; T4 matched-random (run-11 fix) untouched; A-25…28 fixes (per-pool MDE, strictly tighter P_WIDE, per-symbol bite, drop-count reconciliation) all still in place. L-23 ledger 4L/15T/10N with no LOOSER streak. Three new regression tests pinned and passing (`test_mde_strictly_positive_when_raw_edge_already_material`, `test_cf_star_refuses_zero_or_absent_mde`, `test_label_band_all_branches_reachable`); 37 absorb tests, 267 passed / 4 skipped overall.
+
+**Residuals:** R-1 and R-2 remain superseded. R-3, R-4, R-5, R-6, R-8, R-9 stand. R-7 is **closed** — T4/T5 still label with `mde=None`, but SUPPORTED is no longer structurally unreachable elsewhere, and the soil-leg-(ii) reading rule is unchanged. Run-11 N-1/N-2/N-3 stand. The bite remains a report layer with no code-level enforcement despite §7 listing it as HARD — unchanged and an operator act.
+
+---
+
+### H. Verdict
+
+**REVISE** — one branch and one design sentence away from a re-run.
+
+The two QA-12 blockers are closed and I confirmed each by measurement, not by reading: the MDE on an already-material arm is 8.0 where it was 0.0, CF\* plants a real 8.0 bps known-causal effect and refuses 0.0/None/negatives with `UNDERIVABLE`, SUPPORTED is reachable again, and the defining property of the change — effect-independence — holds exactly (a +40 bps shift moves the uncentred MDE 10.5 → 0.0 and leaves the centred MDE at 8.0). Centring is the right call and I would defend it as required by §4.2/§5 rather than merely permitted; the LOOSER booking is correct and conservative; the post-measurement introduction is legitimate because the change provably cannot move run 1's label.
+
+**On the operator's question: run 1's D1 WASH cannot become SUGGESTIVE or SUPPORTED.** Both labels require the CI to exclude zero, and run 1's spans it — the MDE is irrelevant to that test. At the centred MDE (~10) against effects of +1.8 / −3.2 the label remains WASH.
+
+What blocks the re-run is the far side of that same table. Because centring lowers every MDE, more zero-spanning cells now satisfy `|effect| ≥ MDE`, and §5 defines no label for that combination; the code resolves it to `UNPOWERED`, the one reading §6.3 and AMENDMENT-24 treat as "not tested" and exclude from family closure. On a screen whose entire purpose is a powered null, silently relabelling "measured, cannot distinguish" as "inconclusive" is not a cosmetic error — and this change is what widens the region. Define the label in §5 (WASH is the natural fit), make the one-branch change, then a fresh-context QA run 14 and the operator's re-run gate.
+
+**QA does not launch the screen. Nothing committed.**
+
+---
+
+
+## QA run 14 — 2026-07-22T02:54Z — mode: subagent (fresh context) — HEAD `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807`
+
+**Stage:** re-review of the QA-13 fixes — AMENDMENT-30 (new `IMPRECISE` band, §5 rewritten as an exhaustive decision table, `label_band` restructured) and the import-side-effect removal. Fresh-context subagent; did **not** author the changes. Screen **not** run.
+
+**Verdict: REVISE**
+**FAILING_ARTIFACT:** `python/experiments/SPDR-009/screen_code/absorb_screen.py` (`mde_for_arm` coverage) + design §5 UNPOWERED row
+**REQUIRED_SKILL:** `experiment-developer` (compute the missing MDE curves §4.2 already mandates), with a `quant-designer` confirmation on the §5 ordering
+
+**The IMPRECISE call is sound and I accept the rejection of my WASH suggestion — the designer is right and I was wrong.** The import fix is complete. The blocker is a second-order consequence of A-30's new *first* rule, which I verified by measurement: making "no MDE ⇒ UNPOWERED" the pre-emptive test pins five of the design's reads — T3, T4, T5, the D1 ib_width sensitivity and the **entire CONFIRM pass** — to `UNPOWERED` regardless of their data, because the implementation only ever computes an MDE for T1 and T1_mirror.
+
+**Executed (read-only):** `pytest python/tests/test_sigbar_absorb.py` → **38 passed** (coordinator reported 39 — see LOW-3); full suite minus the two pre-existing xena collection errors → **268 passed / 4 skipped**; `shasum -a 256` on INFR-020 `pins.json`; a 1,296-combination exhaustive sweep of `label_band`; a consumer trace of every `label_band` / `mde_info` call site; an import-side-effect test. **The screen was not run.**
+
+---
+
+### A. Pin re-hash
+
+`shasum -a 256` on `python/experiments/INFR-020/results/pins.json` = `5f170b717e350fb7c0cf1647cd1b78fb88a1fa212ed50dce83ec1049af44f6c5` — **byte-exact**; all seven INFR-020 consumers, the INFR-017 trio, the INFR-018 registry and K-UNIFORM re-hashed by the passing frozen-inputs test. **MATCH.**
+
+---
+
+### B. Challenging the designer call — IMPRECISE
+
+**Is IMPRECISE the right resolution? Yes. My WASH suggestion was wrong and the rejection reasoning is correct.**
+
+I proposed WASH in run 13 on the strength of "CI spans zero ⇒ cannot distinguish". That reasoning ignored what WASH *does* in this design. WASH is not a neutral descriptor — §5 names it "the design's POWERED NULL cell", and under AMENDMENT-24 a powered null is exactly what contributes to closing CF-SIGAUC-001. Labelling a cell whose point estimate **exceeds its own resolution** as a powered null would let a large, unstable estimate argue "nothing is there". That is the B-5 overclaim the design forbids in terms ("T1 UNPOWERED is INCONCLUSIVE, never a null"), and it would have been a LOOSER change smuggled in under a NEUTRAL-looking label. The designer caught a real error in my recommendation.
+
+**The stated mechanism is also correct, and it is the part that makes IMPRECISE a distinct state rather than a fudge.** `plant_mde_curve` adds a *constant* to every treated event, so the planted contrast has the arm's own dispersion and nothing more; a real effect concentrated in a few calendar days carries extra between-day variance that the day-clustered bootstrap sees but the plant never simulated. So `|effect| ≥ MDE` with a zero-spanning CI is a genuine physical state — "bigger than what a uniform effect of this size would need to be detectable, yet too lumpy to resolve" — not an arithmetic leftover. Giving it its own band, reading it as inconclusive in both directions, and pinning it to UNPOWERED's closure semantics is the correct treatment.
+
+**Is NEUTRAL the correct direction? Yes.** The affected cells already resolved to UNPOWERED before the amendment, and UNPOWERED and IMPRECISE are identical under A-24 (neither blocks nor contributes). Nothing became easier or harder to claim; what changed is that the reading is now honest about *why* the cell is inconclusive. The counterfactual — my WASH proposal — would have been LOOSER, and A-30 forecloses it. Ledger checks out: 4L/15T/10N + N = **4L/15T/11N**; sequence …A-27 L → A-28 N → A-29 L → A-30 N; **no LOOSER streak ≥ 3**.
+
+**Does adding a band exceed what a post-measurement amendment may do? No, on three grounds.** (i) It defines a region that was previously *undefined* — it does not redraw a boundary between two existing bands, so no cell moves from a claim to a non-claim or back. (ii) It is non-contributing in both directions, so it cannot manufacture either a positive or a family close. (iii) It provably cannot touch run 1: D1's readings sit at WASH for every MDE down to ~2, far below the centred value, so no previously-seen result changes label. That last point is the decisive legitimacy test for a post-measurement change and it holds.
+
+**Downstream consumers of the band string: none break.** I grepped the repository — no `.py` or `.md` outside `absorb.py` and this review file consumes `SUPPORTED`/`SUGGESTIVE`/`WASH`/`CONTRADICTED`/`UNPOWERED` as literals; `screen.md` and the analyst artifacts do not exist yet, so they will be written against the six-value table. The closure logic in §6.3 / A-24 is operator-executed prose, and A-30 states the IMPRECISE ⇒ non-contributing rule inside §5 where that reader will find it. The one thing to carry forward: whoever writes `screen.md` and the analyst prompt must enumerate **six** bands, not five.
+
+---
+
+### C. Blocker — the new first rule pins five reads to UNPOWERED
+
+**Issue 1 (MAJOR).** §5's rewritten table opens with `UNPOWERED: MDE unavailable at the realised n, or no CI (tested FIRST)`, and `label_band` implements it faithfully as a pre-emptive early return. But `mde_for_arm` (`absorb_screen.py:300–323`) computes `plant_mde_curve` for **T1 and T1_mirror only**. Every other labelled contrast is called with `mde=None`:
+
+| Read | Call site | MDE supplied? | Label under A-30 |
+|---|---|---|---|
+| T4 matched-random (**soil leg ii**) | `absorb_screen.py:646` `label_band(stat, ci, None)` | no | **always UNPOWERED** |
+| T5 bare-level touch | `:701` `label_band(…, None)` | no | **always UNPOWERED** |
+| T3 mid-range (**leg (i)'s "T3 ≈ 0"**) | `:720` `mde_info=None` | no | **always UNPOWERED** |
+| D1 ib_width sensitivity | `:740` `mde_info=None` | no | **always UNPOWERED** |
+| **CONFIRM T1 / T1_mirror** (the design's one verification pass) | `:934` `mde_info=None` | no | **always UNPOWERED** |
+
+**Measured on the real `label_band`:**
+
+| Input | Pre-A-30 (run-13 code) | Now |
+|---|---|---|
+| T4 clearly positive, effect +6.0, CI [3.0, 9.0], mde None | SUGGESTIVE | **UNPOWERED** |
+| T4 clearly negative, effect −6.0, CI [−9.0, −3.0], mde None | CONTRADICTED | **UNPOWERED** |
+| CONFIRM T1 positive, effect +8.0, CI [2.0, 14.0], mde None | SUGGESTIVE | **UNPOWERED** |
+| the same three triples with `mde = 5.0` | — | SUPPORTED / CONTRADICTED / SUPPORTED |
+
+**Why this blocks.** Three separate things break. (a) §5 now contains clauses its own table makes unreachable: "T4 SUPPORTED with T1 WASH ⇒ …" and "T5 SUPPORTED with T1 WASH ⇒ …" describe outcomes that cannot occur. (b) `CONTRADICTED: ci_high < 0` carries no MDE term anywhere in §5, yet a T4 or CONFIRM contrast whose interval lies wholly below zero is now reported as "not tested" — an affirmatively false statement about a measured cell, and the same error class as the run-13 blocker, reappearing at a different input. (c) The CONFIRM pass exists to verify DESIGN once (§0, §5 time-stability, §9 step 6); it now emits no usable band on any pair. This is the pre-existing R-7 residual escalated from "reads SUGGESTIVE at best" (a LOW) to "reads UNPOWERED always" (structural), because UNPOWERED is the label with governance weight under §6.3 and A-24.
+
+**The design already requires the missing piece.** §4.2 mandates a `bite/MDE` line for every control, explicitly including `matched_random_timing` — *"MDE in CONTRAST UNITS (bps), published before the real read"* (design line 402) — and `bare_level_touch` (line 416). So the gap is an implementation gap, not a design one: T4 and T5 were always supposed to carry their own MDE curves.
+
+**Required:** extend `mde_for_arm` (or add the equivalent) to publish MDE curves for the T4 and T5 contrasts before their reads, per §4.2, and supply an MDE to the CONFIRM and T3 layer calls — or, if the designer prefers, add an explicit §5 clause defining the label for a contrast that legitimately has no MDE, so that `CONTRADICTED` and `SUGGESTIVE` remain reachable there. The first route is the one §4.2 already asks for.
+
+---
+
+### D. Exhaustiveness of `label_band` — 1,296-combination sweep
+
+Swept 12 effect values × 12 CI shapes × 9 MDE values (including `None`, `NaN`, `±inf`, `0`, negatives, `1e-9`, `1e9`, malformed and inverted intervals).
+
+- **Every label returned is one of the six defined bands** — `{UNPOWERED 891, IMPRECISE 145, WASH 80, SUPPORTED 58, CONTRADICTED 45, SUGGESTIVE 32}`. No `None`, no empty string, no undefined value.
+- **Boundary semantics correct and symmetric:** `|effect| = MDE` with a zero-spanning CI → IMPRECISE; `|effect|` a hair below → WASH; `ci_low = 0` exactly is treated as spanning zero (consistent with `excludes_zero = ci[0] > 0 or ci[1] < 0` used elsewhere); `mde = 0.0` with a zero-spanning CI → IMPRECISE, which is right (an arm that resolves any positive effect, showing one, that still cannot exclude zero).
+- **One exhaustiveness gap (LOW-2):** 45 of 1,296 combinations **raise `TypeError`** rather than returning a band — all of them `ci = [None, None]` with a finite MDE (`'<' not supported between instances of 'NoneType' and 'int'`). Not reachable from `contrast_day_clustered`, which builds `ci` from `block_bootstrap_ci` as floats, and `NaN` bounds are handled without raising. But the "no input yields an undefined label" claim in `test_label_band_imprecise_cell_is_not_a_null` is not literally true, and its own sweep does not cover `None`-valued interval bounds.
+
+---
+
+### E. Import side effect — closed
+
+`OUT.mkdir` is gone from module scope. Directory creation now happens in `_emit` (`absorb_screen.py:62`, on write) and once directly in `step_design_reads` (`:487`) immediately before the `tripwire.json` reset `write_text`. **Verified by execution:** importing `absorb_screen` in a fresh interpreter leaves `results/` absent. No `mkdir`, `write_text` or `write_parquet` remains at module scope in either `absorb_screen.py` or `absorb.py`. The tree is currently clean — `results/` does not exist. Complete.
+
+---
+
+### F. New-defect sweep on these edits (seventh pass)
+
+| Risk | Check | Result |
+|---|---|---|
+| Restructured `label_band` changes an existing label | diffed all six branches against the run-13 behaviour across the sweep | **One change, and it is Issue 1** — every `mde=None` input moved from SUGGESTIVE/CONTRADICTED to UNPOWERED. All `mde`-present labels are unchanged. |
+| IMPRECISE leaks into a positive claim | soil legs read `SUPPORTED` (leg i) and `excludes_zero` (leg ii) | **OK** — IMPRECISE satisfies neither |
+| IMPRECISE contributes to a close | §5 pins it to UNPOWERED's A-24 semantics | **OK** — stated in the design, operator-executed |
+| Duplicated `mde is None` guard | two consecutive guards at the top of `label_band`, the first now subsumed by the second | **Dead code, harmless** — LOW-1 |
+| Band string breaks a consumer | repo-wide grep for the five old literals | **OK** — no consumer outside `absorb.py` |
+| A-29's centring regressed | `plant_mde_curve` untouched this pass | **OK** |
+| §9 order | `mde_for_arm` (`522`, `525`) → `_emit(mde_curves.json)` (`528`) → `calibrate_cf_star` (`540`) → `_emit(tripwire_cf_<pair>.json)` (`548`) → first contrast `_layers_for_events` (`586`) → `_run_tripwire` (`745`) | **OK — holds** |
+
+---
+
+### G. Standing battery
+
+All **OK**: INFR-020 pins byte-exact; GT-1…GT-4 executed and passing against designer-pinned `gt_output.json`; GT-5(a)–(l) complete; shared LTF import boundary intact; P_WIDE p25 leg plus strictly-tighter τ (A-26); holdout sealed and DESIGN/CONFIRM only; causal ≤ t−1; D6.3 1-minute paths; COMPLETE-window fence; L-28 derangements; no local accounting; T4 matched-random donor resolution (run-11 fix) intact; A-25/27/28 fixes in place; CF\* refuses non-positive plants and never substitutes the 0.25 prior; `survives: None` when the gate is inapplicable; L-23 ledger 4L/15T/11N with no streak.
+
+**Residuals:** R-1, R-2 superseded. R-3, R-4, R-5, R-6, R-8, R-9 stand. **R-7 is superseded by Issue 1** — the "T4/T5 label with `mde=None`" residual is no longer a disclosure nit but a structural mislabel, and closing Issue 1 closes R-7 outright. Run-11 N-1/N-2/N-3 stand. The bite remains a report layer with no code-level enforcement despite §7 listing it as HARD.
+
+**LOW-1** — dead guard: `if mde is None and (ci is None or len(ci) < 2): return "UNPOWERED"` is fully subsumed by the next line. Harmless, but it is the kind of leftover that makes the next reader mis-trace the table.
+**LOW-2** — `label_band` raises on `ci = [None, None]` (§D). Unreachable today; the exhaustiveness test should cover it.
+**LOW-3** — test count: the suite collects **38** absorb tests, not the 39 reported. Overall 268 passed / 4 skipped matches.
+
+---
+
+### H. Verdict
+
+**REVISE** — the band work is right; one implementation gap it exposed must be closed first.
+
+I asked for a label for the undefined cell and suggested WASH; the designer rejected that and was correct to. WASH is the powered-null cell, so my suggestion would have let a point estimate that exceeds its own resolution argue for closing CF-SIGAUC-001 — the B-5 overclaim, and a LOOSER change wearing a neutral label. `IMPRECISE` is the right resolution, its constant-shift-plant mechanism is a real physical state rather than an arithmetic patch, NEUTRAL is the right direction, the ledger is correct at 4L/15T/11N with no streak, and introducing it post-measurement is legitimate because it defines a previously undefined region, contributes in neither direction, and provably cannot move run 1's readings. The import side effect is fully closed — verified by importing the runner and finding `results/` still absent. `label_band` returns one of the six defined bands across all 1,296 swept combinations, with correct and symmetric boundary behaviour.
+
+What blocks the re-run is the new *first* rule. "MDE unavailable ⇒ UNPOWERED, tested first" is sound in isolation, but the implementation supplies an MDE only to T1 and T1_mirror, so T3, T4, T5, the D1 sensitivity and every CONFIRM contrast are now pinned to UNPOWERED whatever the data says. Measured: a T4 with CI [3.0, 9.0] reads UNPOWERED, and one with CI [−9.0, −3.0] reads UNPOWERED rather than CONTRADICTED — which §5 defines with no MDE term at all. That makes soil leg (ii) unlabelable, renders §5's own "T4 SUPPORTED with T1 WASH" clause unreachable, and voids the verification pass the design runs CONFIRM for. §4.2 already mandates an MDE for `matched_random_timing` and `bare_level_touch`, so the fix is to publish the curves the design has always asked for rather than to weaken the new rule.
+
+Route to **experiment-developer** (MDE curves for T4/T5, and an MDE for the CONFIRM and T3 layer calls), with a **quant-designer** confirmation if the alternative route — an explicit §5 clause for legitimately MDE-less contrasts — is preferred instead. Then a fresh-context QA run 15 and the operator's re-run gate.
+
+**QA does not launch the screen. Nothing committed.**
+
+---
+
+## QA run 15 — 2026-07-22T03:19:37Z — mode: subagent (fresh context) — HEAD `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807`
+
+**Stage:** re-review after operator option A: AMENDMENT-31 ordering correction, T4/T5 and
+missing-arm MDE publication, constant-shift MDE optimization, immutable bar/control reuse, and
+isolated `--smoke`. Fresh-context subagent; did **not** author the changes. Full `--execute` was
+not approved and was **not run**.
+
+**Verdict: REVISE**
+**FAILING_ARTIFACT:** `python/experiments/SPDR-009/screen_code/absorb_screen.py`
+**REQUIRED_SKILL:** `experiment-developer` (time-stability/CONFIRM/T2 plant fidelity), with
+`quant-designer` only if §9 is intentionally meant to permit per-pair rather than global MDE
+publication.
+
+**Reviewed git state (`git status --porcelain`):**
+```
+ M docs/experiments-docs/INDEX.md
+ M docs/experiments-docs/checkpoints/2026-07-21-015-signed-value-absorption-screen/design.md
+ M docs/signal-registry/candidate-families/cf-sigauc-001.md
+ M python/experiments/SPDR-009/design.md
+ M python/experiments/SPDR-009/qa-review.md
+?? python/experiments/SPDR-009/screen_code/
+?? python/src/xen/sigbar/absorb.py
+?? python/tests/test_sigbar_absorb.py
+```
+
+**Executed:** focused suite `pytest python/tests/test_sigbar_absorb.py -q` -> **40 passed**;
+INFR-020 pin re-hash -> exact `5f170b717e350fb7c0cf1647cd1b78fb88a1fa212ed50dce83ec1049af44f6c5`;
+inspection of the completed isolated smoke at `/private/tmp/spdr009-smoke-nm4_g9tu`.
+`python/experiments/SPDR-009/results` is **absent**. No production screen execution.
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §5 / A-31 band order | `absorb.py:1433-1475` | **MATCHES** | Invalid CI first; negative CI -> CONTRADICTED before MDE; positive CI + missing MDE -> SUGGESTIVE; zero-spanning + missing MDE -> UNPOWERED. Malformed/None bounds return UNPOWERED. |
+| §4.2 T4 matched-random MDE | `absorb_screen.py:355-418,462-493,714-787,857-867` | **MATCHES** | Donor arm built once; exact rows reused by MDE and read. T4 uses the registered global control mean on treated days for both computations. Smoke emits H5/H10 MDE 5.5/4.5 bps. |
+| §4.2 T5 bare-level MDE | `absorb_screen.py:420-459,778-780,869-894` | **MATCHES** | Bare arm built once; exact rows reused. Smoke emits H5/H10 MDE 4.0/8.5 bps. |
+| §4.2/§5 T3 and D1 sensitivity MDE | `absorb_screen.py:787-793,896-919` | **MATCHES** | T3 and D1 sensitivity receive their own same-arm T1/T1-mirror curves. Smoke T3 is explicitly underivable at n=24; D1 sensitivity has finite H5/H10 curves. |
+| §5/§9 CONFIRM MDE | `absorb_screen.py:1091-1132` | **MATCHES for implemented reads** | CONFIRM T1/T1-mirror curves are written before `_layers_for_events`; smoke has finite H5/H10 MDE and WASH labels. See Issue 2: the verification pass itself is incomplete. |
+| §4.2 MDE is arm resolution, not observed edge | `absorb.py:1364-1430` | **MATCHES** | Arm is centred once on its observed contrast; fixed-seed mean bootstrap is translation-equivariant, so adding `u` to the centred lower bound is mathematically identical to rerunning each constant plant. Regression compares against explicit grid sweep and asserts two bootstrap calls. |
+| §4.2/§9 immutable population identity | `absorb_screen.py:677-780,841-894` | **MATCHES** | Polars frames in `bars_by`, event arms, and control frames are immutable; controls are constructed before MDE and reused without rebuild for the read. |
+| §9 MDE publication before contrast | `absorb_screen.py:672-935` | **DEVIATES (literal global order)** | Each pair's curves/CF* are published before that pair's first read, but D1 real contrasts run before D2-D4 curves exist. Earlier QA accepted this as contamination-safe; literal §9 step 5 says all “MDE curves before any contrast.” See Issue 4. |
+| §5 time stability / L-24 F02 | no implementation (`rg` finds no `third`/`chronological` path) | **MISSING** | No T1-T5 read is repeated on the three DESIGN thirds; no per-third n/sign output exists. See Issue 1. |
+| §5/§9 “every read” on CONFIRM | `absorb_screen.py:1091-1132` | **MISSING** | CONFIRM emits T1, mirror, T2 and floor only; T3/T4/T5 controls are absent and population is capped at first 40 symbols without a design declaration. See Issue 2. |
+| §4.2 signed-score control plant/MDE | `absorb_screen.py:496-547` | **DEVIATES** | `mde_rho_p95/p05` are quantiles of the derangement null, not the predeclared synthetic monotone score->return plant curve. See Issue 3. |
+| §7 hard fences | `absorb.py` fences + focused tests | **MATCHES** | DESIGN/CONFIRM only; TEST/holdout unreachable; causal next-open; 1-minute path; COMPLETE windows; derangements; no local accounting all pass. |
+| §10 A-25...A-31 ledger | `design.md:1054-1183` | **MATCHES** | A-31 correctly booked LOOSER because MDE-less positive CI moves UNPOWERED -> SUGGESTIVE. Count 5L/15T/11N; post-measurement sequence T,T,L,N,L,N,L has no LOOSER streak >=3. |
+
+### Golden-trace diff
+
+Focused tests executed GT-1...GT-4 against designer-pinned `design_derivations/gt_output.json`:
+
+| Event | Design expectation | Implemented result | Verdict |
+|---|---|---|---|
+| GT-1 SOL 2022-12-28 03:27 | S9, pinned entry/side/H5/H10 | exact arm/timestamp; returns within pinned tolerance | **MATCHES** |
+| GT-2 SOL 2022-12-29 01:24 | S9 from prior-session level | exact arm/prior-session provenance/returns | **MATCHES** |
+| GT-3 SOL 2022-12-26 23:34 | MIRROR sign guard | MIRROR, not magnitude-only S9 | **MATCHES** |
+| GT-4 SOL 2022-11-12 22:08 | BASE at signed-score boundary | BASE | **MATCHES** |
+| GT-5(a)-(l) | each forbidden path raises/refuses | dedicated focused tests pass | **MATCHES** |
+
+### Governance & boundary
+
+| Check | Evidence | Verdict |
+|---|---|---|
+| Frozen inputs | INFR-020 pins and seven consumers re-hashed by focused tests; manifest hash independently exact | **PASS** |
+| No local accounting | focused `check_no_local_accounting` test | **PASS** |
+| Holdout / TEST | only DESIGN and CONFIRM accepted; holdout constant sealed | **PASS** |
+| Causality / real-price / 1-minute path | next-LTF-open entry; 1-minute outcome and level construction; focused fence tests | **PASS** |
+| L-28 derangement | global, within-symbol and path-swap zero-fixed-point assertions/tests | **PASS** |
+| Isolated smoke semantics | `--smoke` forces a new `/private/tmp/spdr009-smoke-*`, refuses combination with `--execute`, then returns before production completion | **PASS** |
+| Isolated smoke evidence | `smoke_integrity.json: passed=true`; P/P_WIDE/T3/CONFIRM nonempty; T4/T5 donors, T2 derangement, CF* status and path-swap donors present; census reconciles | **PASS** |
+| No result contamination | `python/experiments/SPDR-009/results` absent after tests and smoke inspection | **PASS** |
+| Smoke regression strength | integrity assertion checks donors/nonempty paths but does not assert T4/T5/T3/sensitivity/CONFIRM MDE artifact keys or publication order | **RESIDUAL** |
+| Full execution gate | operator did not approve `--execute`; it was not run | **PASS** |
+
+### Issues
+
+1. **MAJOR — the mandatory time-stability read is absent.**
+   **Design:** §5 lines 549-550; L-24 F02; §4.2 derangement mitigation. **Code:** no
+   chronological-third split or output anywhere in `absorb_screen.py`/`absorb.py`.
+   **Impact:** a concentrated effect can receive the pooled label without the three-third n/sign
+   evidence the design requires, and the declared mitigation for the global derangement is not
+   delivered. **Required:** emit T1-T5 (including T2) by all three DESIGN thirds with per-third n
+   and sign/interval; retain pooled as declared.
+
+2. **MAJOR — CONFIRM is not the registered “every read once” verification and changes the population.**
+   **Design:** §5 lines 549-550; §9 lines 870-872. **Code:** `step_confirm` lines 1105-1129.
+   It takes `u["usable"][:40]` and runs only `_layers_for_events` (T1, mirror, T2, floor), omitting
+   T3, T4 and T5 plus their controls. The first-40 cap is not declared and is not guaranteed to
+   represent the DESIGN pooled cross-section. **Required:** run the complete registered CONFIRM
+   battery on the declared population, or amend the design before execution to name the reduced
+   verification estimands and population with direction/count.
+
+3. **MAJOR — T2's required planted bite/MDE is not implemented.**
+   **Design:** §4.2 lines 387-388 requires a known synthetic monotone score->return plant and an
+   MDE published before the read. **Code:** `_t2_dose` lines 507-545 only deranges observed scores
+   and calls the null p95/p05 `mde_rho_*`; no known effect is planted and nothing is prepublished.
+   **Required:** implement/publish the registered monotone plant curve before T2, or amend §4.2 to
+   define the null critical values as the intended power instrument.
+
+4. **MEDIUM — §9's global publication sentence and the runner's per-pair schedule disagree.**
+   The current order is scientifically contamination-safe: every pair uses deterministic curves
+   written before its own first real contrast, and exact frame identity holds. But literal §9 step
+   5 says all MDE curves precede *any* contrast. **Required:** either split `step_design_reads` into
+   all-pair build/control/MDE publication then all-pair reads, or amend §9 explicitly to say
+   “per pair, before that pair's first contrast.”
+
+### Residuals
+
+- The smoke is genuinely isolated and its retained artifacts directly show the new MDE wiring,
+  but `assert_smoke_integrity` would still pass if those MDE keys disappeared while donors stayed
+  nonempty. Add assertions for T4/T5 curve keys, T3/sensitivity explicit derived-or-underivable
+  state, CONFIRM curve keys, and label presence.
+- Prior disclosed items remain: T5 first-30 and spread-route first-20 caps; conservative
+  `n_symbols_read`; T4 donor drop count/weighting; bare-touch tie-break; P_WIDE p25 not serialized;
+  GT-5(e) wording; bite hard status remains operator-enforced rather than code-enforced.
+
+### Verdict
+
+**REVISE.** The option-A fixes themselves are correct: band ordering is exhaustive and safe,
+T4/T5/T3/D1-sensitivity/CONFIRM MDE wiring is present, the one-bootstrap constant-shift result is
+exact for this fixed-seed mean bootstrap, the same immutable frames feed MDE and read, the focused
+suite passes 40 tests, and the isolated smoke leaves the real results tree absent. The re-run is
+still blocked by three previously missed design-fidelity gaps: no chronological-third reads,
+an incomplete/capped CONFIRM pass, and no planted T2 MDE. Resolve those plus the §9 wording/order
+before returning to the operator execution gate.
+
+**QA does not launch the screen. Nothing committed.**
+
+---
+
+## QA run 16 — 2026-07-22T03:43:28Z — mode: subagent (fresh context) — HEAD `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807`
+
+**Stage:** re-review after QA run 15 fixes: chronological-third reporting, uncapped complete
+T1–T5 CONFIRM controls, the registered T2 monotone plant, A-33 per-pair MDE publication wording,
+and strengthened isolated-smoke assertions. Fresh-context subagent; did **not** author the changes.
+Full `--execute` was not approved and was **not run**.
+
+**Verdict: REVISE**
+**FAILING_ARTIFACT:** `python/experiments/SPDR-009/screen_code/absorb_screen.py`
+**REQUIRED_SKILL:** `experiment-developer` (complete the registered time-stability strata and
+CONFIRM sensitivity), with `quant-designer` only if the intended scope is narrower than the live
+§4.1/§5 registration.
+
+**Reviewed git state (`git status --porcelain`):**
+```
+ M docs/experiments-docs/INDEX.md
+ M docs/experiments-docs/checkpoints/2026-07-21-015-signed-value-absorption-screen/design.md
+ M docs/signal-registry/candidate-families/cf-sigauc-001.md
+ M python/experiments/SPDR-009/design.md
+ M python/experiments/SPDR-009/qa-review.md
+?? python/experiments/SPDR-009/screen_code/
+?? python/src/xen/sigbar/absorb.py
+?? python/tests/test_sigbar_absorb.py
+```
+
+**Evidence:** independently reran the focused suite -> **41 passed**; inspected the completed
+isolated smoke at `/private/tmp/spdr009-smoke-tv3h50qc` -> `smoke_integrity.json` reports **56/56
+checks true** and `passed=true`; coordinator supplied the isolated full-suite result **271 passed /
+4 skipped**. `python/experiments/SPDR-009/results` remains **absent**. No production screen execution.
+
+### QA-15 closure trace
+
+| QA-15 requirement | Code / artifact | Verdict | Notes |
+|---|---|---|---|
+| T1–T5 on chronological thirds with n/sign/interval | `absorb_screen.py:729-854,1112-1117`; smoke `layers.json` | **PARTIAL / BLOCKING** | P emits three ordered equal-count slices and all T1–T5 reads. P_WIDE emits none, despite being a registered primary pool/stratum (§4.1). See Issue 1. |
+| Complete uncapped CONFIRM battery/population | `absorb_screen.py:1283-1417`; smoke `layers_CONFIRM.json` | **PARTIAL / BLOCKING** | The prior first-40 cap is gone and all usable symbols feed P/P_WIDE/T3 plus T4/T5 controls. The registered D1 ib-width sensitivity read is still omitted. See Issue 2. |
+| Genuine planted T2 MDE before read | `absorb.py:1303-1452`; `absorb_screen.py:312-344,647-686,1362-1382` | **MATCHES** | Deterministic Spearman centring; 0–30 bps/score-SD in 0.5-bps steps; 200 zero-fixed-point derangements; first plant clearing p95 and p<=0.05; both bps and rho published before the pair's read. Real T2 remains a separate derangement battery. |
+| Per-pair §9 publication order | `design.md:869-878,1193-1198`; runner module/step docstrings and pair loop | **MATCHES** | A-33 now states the implemented contamination-safe rule: every pair's immutable curves precede that pair's first contrast; earlier pairs cannot adapt later inputs. |
+
+### Adversarial review
+
+| Check | Result |
+|---|---|
+| A-31 label order and complete MDE wiring | **PASS** — negative intervals remain CONTRADICTED before the MDE gate; positive missing-MDE intervals are only SUGGESTIVE; zero-spanning cells need an MDE. T1/mirror/T2/T3/T4/T5 and D1 DESIGN sensitivity have explicit curve state. |
+| A-32 plant fidelity | **PASS** — the published T2 quantity is now a planted resolution, not a renamed null quantile. Finite guards and exact zero-fixed-point assertions remain in the real and planted paths. |
+| A-33 wording/code consistency | **PASS** — live §9 and runner both say per pair. |
+| A-31–A-33 ledger | **PASS** — directions L/L/N; running count **6L/15T/12N**; sequence A-27 L, A-28 N, A-29 L, A-30 N, A-31 L, A-32 L, A-33 N has no LOOSER streak >=3. |
+| Constant-shift MDE optimization / frame reuse | **PASS** — translation-equivalent lower-bound transform is regression-tested against the explicit grid; immutable event/control frames feed both curve and read. |
+| Smoke strength | **IMPROVED, BUT MISSES THE BLOCKERS** — labels, T2/T4/T5 MDEs, T3/sensitivity state, CONFIRM labels/T2 MDE, CF*, donors and path swap are asserted. `DESIGN_thirds_present` checks only that one P object has length three, and no assertion requires P_WIDE thirds or D1 sensitivity on CONFIRM. |
+| Output schemas | **PASS except Issues 1–2** — P/P_WIDE/T3/T4/T5 MDE/label objects and CONFIRM event files are explicit; the absent strata are not represented as explicit underivable states. |
+| Hard fences | **PASS** — DESIGN/CONFIRM only; TEST/holdout inaccessible; causal next-LTF-open entries; 1-minute level/outcome paths; COMPLETE-window fence; L-28 derangements; shared LTF construction; no local accounting. |
+
+### Issues
+
+1. **MAJOR — time stability omits an entire registered primary pool and does not publish one
+   common third definition.** §4.1 declares `pool {P, P_WIDE} × chronological third` and §5 says
+   every read is repeated on the three DESIGN thirds. `_time_stability_thirds` accepts only `ev_p`
+   and P controls (`absorb_screen.py:765-771`), and its only caller supplies `controls["P"]`
+   (`:1112-1117`). The smoke makes the omission concrete: `pairs.D1.time_stability_thirds` contains
+   only `n_P`, while `pairs.D1.P_WIDE` has no thirds object. The implementation also cuts P and T3
+   independently by event rank (`:780-790`), so “third 1” is not serialized as one reusable DESIGN
+   time interval. A regime-instability read can therefore be reported for P while the equally
+   primary P_WIDE cell has no mitigation, and consumers cannot prove that P/T3 slices refer to the
+   same chronological band. **Required:** freeze and publish three disjoint chronological DESIGN
+   boundaries once per pair; apply them to P, P_WIDE, T3 and their source-matched controls; emit
+   T1–T5 for both registered pools with per-third n, sign and available interval (explicit
+   UNPOWERED state where an interval cannot be derived); assert both pools and shared boundaries in
+   smoke/tests.
+
+2. **MAJOR — CONFIRM still omits the registered D1 ib-width sensitivity read.** §3.2 says the D1
+   `0.25 × ib_width` sensitivity is emitted alongside; §5 names it beside every null and then says
+   **every read** is repeated once on CONFIRM. DESIGN constructs and reads it at
+   `absorb_screen.py:1101-1110`, but `step_confirm` builds only P, P_WIDE and MID_RANGE
+   (`:1307-1321`) and emits only those blocks (`:1362-1410`). The uncapped T1–T5 P/P_WIDE core is
+   now complete, so this is no longer QA-15's population/control defect; it is the remaining
+   registered sensitivity stratum. **Required:** build the count-frozen D1 ib-width event arm on
+   CONFIRM, publish its MDE state before its read, emit its registered layers, and require it in
+   smoke; or amend §3.2/§5 before execution with direction/count if the sensitivity was intentionally
+   DESIGN-only.
+
+### Verdict
+
+**REVISE.** QA-15's most serious implementation defects are closed: CONFIRM is uncapped and runs
+T1–T5 for P/P_WIDE plus T3; T2 now has a genuine pre-read monotone plant; A-33 makes the per-pair
+schedule literal; 41 focused tests and the 56-check isolated smoke pass; hard fences remain intact;
+and the official results tree is absent. Execution is still blocked because the time-stability
+report omits all P_WIDE primary cells and does not serialize shared DESIGN-third boundaries, while
+CONFIRM omits the registered D1 ib-width sensitivity. Close those two fidelity gaps, strengthen the
+smoke assertions accordingly, then return for fresh-context QA before any production run.
+
+**QA does not launch the screen. Nothing committed.**
+
+---
+
+## QA run 17 — 2026-07-22T03:57:03Z — mode: subagent (fresh context) — HEAD `99f1a5537f9f37ca459d07f7f0a0bdf8a89e9807`
+
+**Stage:** re-review after QA run 16 fixes: one serialized equal-duration DESIGN-boundary set
+per pair applied to P, P_WIDE, T3 and source-linked controls; complete T1–T5 third reporting for
+both pools; and uncapped D1 ib-width sensitivity on CONFIRM. Fresh-context subagent; did **not**
+author the changes. Full `--execute` was not approved and was **not run**.
+
+**Verdict: APPROVE**
+
+**Reviewed git state (`git status --porcelain`):**
+```
+ M docs/experiments-docs/INDEX.md
+ M docs/experiments-docs/checkpoints/2026-07-21-015-signed-value-absorption-screen/design.md
+ M docs/signal-registry/candidate-families/cf-sigauc-001.md
+ M python/experiments/SPDR-009/design.md
+ M python/experiments/SPDR-009/qa-review.md
+?? python/experiments/SPDR-009/screen_code/
+?? python/src/xen/sigbar/absorb.py
+?? python/tests/test_sigbar_absorb.py
+```
+
+**Evidence:** focused suite `pytest ... test_sigbar_absorb.py -q` -> **41 passed**; broader suite
+excluding the two pre-existing xena import-collection failures -> **271 passed / 4 skipped**;
+inspected isolated smoke `/private/tmp/spdr009-smoke-dl0fgizs` -> `smoke_integrity.json`
+**62/62 checks true**, `passed=true`. Official `python/experiments/SPDR-009/results` is absent.
+No production screen execution.
+
+### QA-16 closure trace
+
+| QA-16 requirement | Code / artifact | Verdict | Notes |
+|---|---|---|---|
+| One immutable, serialized equal-duration DESIGN-boundary set per pair | `absorb_screen.py:729-746,1120-1129`; smoke `layers.json` | **MATCHES** | `_design_third_boundaries` derives three disjoint `[start,end)` intervals once from the frozen DESIGN fence. The same tuple list is serialized once under each pair and passed unchanged to both pool reads. Smoke emits exact thirds ending `2022-01-18 12:35:20`, `2022-08-09 18:17:40`, `2023-03-01 00:00:00`. |
+| Same boundaries on P, P_WIDE and T3 | `absorb_screen.py:738-746,773-849,1131-1144` | **MATCHES** | P and P_WIDE are sliced by the shared `entry_ts` intervals. The same `ev_mid` T3 population is sliced by those same boundaries inside both pool reports; no independent event-rank thirds remain. |
+| Source-matched T4/T5 controls use the same thirds | `absorb_screen.py:749-758,799-837`; `absorb.py:1040-1100,1782-1973` | **MATCHES** | Matched-random and bare-touch rows retain `src_event_ts`; every third filters donors to source events in that exact pool/time slice before T4/T5. Controls are built once and reused. |
+| T1–T5 with n, sign and available interval for both pools | `absorb_screen.py:761-865`; smoke `layers.json` | **MATCHES** | Each pool has exactly three records and 12 keys (`T1`, mirror, `T2`, `T3`, `T4`, `T5` × H5/H10). Every record carries pool/T3 n; each read carries its arm n, explicit sign, and CI/derangement interval when derivable or an explicit `UNPOWERED` state otherwise. Smoke: P and P_WIDE each have all three thirds and all 12 reads. |
+| Uncapped D1 ib-width sensitivity on CONFIRM | `absorb_screen.py:1322-1370,1386-1437,1466-1478`; smoke `layers_CONFIRM.json` | **MATCHES** | The loop uses all `u["usable"]`; no first-N cap. D1 `0.25 × ib_width` events are built on CONFIRM, their realised-n MDE is emitted before the read, and labelled T1/T1-mirror/T2 layers are written. Smoke: **n=388**, S9=52, H5/H10 labels WASH, MDE 5/7 bps. |
+| Smoke regression covers both blockers | `absorb_screen.py:1517-1613`; smoke `smoke_integrity.json` | **MATCHES** | Requires the shared serialized boundaries, complete P and P_WIDE thirds with exact T1–T5 schemas, plus nonempty and explicit-MDE D1 CONFIRM sensitivity. All checks pass. |
+
+### Standing fidelity and governance recheck
+
+| Check | Evidence | Verdict |
+|---|---|---|
+| T2 planted MDE | `absorb.py:1303-1452`; focused tests | **PASS** — deterministic Spearman centring; registered 0–30 bps/score-SD grid; zero-fixed-point plant derangements; real read remains separate. |
+| A-31 band order | `absorb.py:1585-1627`; exhaustive focused test | **PASS** — invalid CI first, CONTRADICTED before MDE, positive missing-MDE SUGGESTIVE, zero-spanning missing-MDE UNPOWERED, WASH/IMPRECISE exhaustive. |
+| A-31–A-33 ledger | `design.md` §10 | **PASS** — directions L/L/N; total **6L/15T/12N**; no LOOSER streak >=3. |
+| Per-pair publication order / immutable arms | `design.md` §9/A-33; `absorb_screen.py:947-1045,1412-1437` | **PASS** — all curves for a pair precede that pair's first contrast; exact event/control frames are reused and earlier pairs cannot adapt later inputs. |
+| Band / holdout / causal fences | `fences.py:37-140`; `ltf.py:297-460,645+`; focused tests | **PASS** — DESIGN/CONFIRM only; TEST/holdout inaccessible; next-LTF-open entry; COMPLETE windows; 1-minute levels/outcomes; formed-time and IB availability guards. |
+| Derangement / tripwire / accounting | `absorb.py` controls and fixed-H path swap; focused tests | **PASS** — zero fixed points asserted; bite and CF* states explicit; `check_no_local_accounting` passes. |
+| Output schema / smoke assertions | isolated smoke, 62 checks | **PASS** — P/P_WIDE/T3/control/CONFIRM paths, MDE states, labels, census reconciliation and tripwire donors are explicit. |
+| Performance safety | runner + shared helpers | **PASS** — each symbol's 1-minute bars are loaded once per band and reused across pools/controls; immutable Polars frames are sliced, not rebuilt; constant-shift MDE uses one bootstrap; T2 seed matrices and per-third loops are bounded. No sample, timing or denominator shortcut. |
+| Official result isolation | filesystem check | **PASS** — `python/experiments/SPDR-009/results` absent; retained evidence is only under `/private/tmp/spdr009-smoke-dl0fgizs`. |
+
+### Golden trace
+
+Focused tests still execute GT-1…GT-4 against the designer-pinned output and all GT-5(a)–(l)
+refusal paths. All pass. The run-17 edits are orchestration/reporting only and do not alter event,
+arm, entry, outcome or fence logic.
+
+### Residuals
+
+- The nested P_WIDE third records retain the generic count key `n_P`; its enclosing `P_WIDE`
+  object, `n_total`, and per-read arm counts make the population unambiguous. This is cosmetic and
+  does not affect the registered n/sign/interval evidence.
+- Prior disclosed, non-blocking implementation residuals remain as recorded in runs 15–16
+  (T5/spread disclosure caps, conservative symbol-count wording, donor weighting/tie-break notes,
+  and operator enforcement of the bite status). None is changed or made verdict-material here.
+
+### Verdict
+
+**APPROVE.** Both QA-16 blockers are closed. Each pair now publishes one reusable equal-duration
+DESIGN time partition and applies it identically to P, P_WIDE, T3 and source-linked controls;
+both registered pools emit complete T1–T5 n/sign/interval evidence. CONFIRM now runs the D1
+ib-width sensitivity over the full usable population, publishes its MDE before the read, and emits
+labelled layers. The focused 41-test suite, broader 271-test suite and 62-check isolated smoke all
+pass; hard fences, A-31–A-33 governance, output schemas and performance safeguards remain intact;
+the official results tree is absent.
+
+Approval returns the item to the **operator execution gate** only. QA does not launch the screen.
+Nothing committed.
