@@ -51,6 +51,12 @@ registry remains **VOID on Bybit** until INFR-014 pins a new registry. See
 - [reviews/capture-geometry-recommendations.md](reviews/capture-geometry-recommendations.md) —
   diagnosis + design recommendations: proven cores, proven ineffective, genuine gaps, C0–C3
   capture stack and four-layer D0 contract.
+- [reviews/unsigned-failed-break-bounce-review.md](reviews/unsigned-failed-break-bounce-review.md)
+  — standalone viability of the one CF-SIGAUC-001 object that clears its cost floor, stripped of
+  the dead signed claim. Reproduces on PVA/PRIOR only (IB is a day-weighting artifact), but the
+  lift is **+5–11% relative** over matched-random on an **MFE ceiling with no realized return ever
+  computed**, MFE:MAE ≈ 1.35:1, and 81% STOP under the only exit tested. **Characterisation, not a
+  candidate** — re-opening needs a new information source (P-01).
 
 ## How to work
 
