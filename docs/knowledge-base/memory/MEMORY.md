@@ -15,3 +15,9 @@ as work happens. Append a one-line pointer per memory file below. Distinct from 
 - [unit-pin-money-floor.md](unit-pin-money-floor.md) — L-21/L-22: pin the unit at every screen→graduation seam; floor effects in money.
 - [xena-pc-binder-pin.md](xena-pc-binder-pin.md) — XENA binding adjudicator = INFR-009 exit-(c) binder, pin `db87dc1a…` v2; VOID on the INFR-010 stack (fresh CAL cycle required).
 - [nautilus-bybit-migration.md](nautilus-bybit-migration.md) — INFR-010: NautilusTrader engine + Bybit USDT-perp OHLCV primary (anti-survivorship); global calendar fence; chapter 04 opens after Phase D VAL.
+- [chapter04-dispositions.md](chapter04-dispositions.md) — EPSOSC refuted, HTFCAP characterised/sub-cost, SIGAUC closed; no deployable Chapter-04 edge.
+- [spreadbps-unusable.md](spreadbps-unusable.md) — staging `SpreadBps` is a mean-print differential, not executable spread.
+- [matched-random-timing.md](matched-random-timing.md) — binding attribution control for timing/event objects.
+- [volatility-amplifies-direction.md](volatility-amplifies-direction.md) — high volatility amplified directional continuation; gross evidence did not survive costs.
+- [signed-volume-provenance.md](signed-volume-provenance.md) — exact Bybit taker-side volume validated 20/20 raw-trade symbol-days.
+- [chapter05-entry-gate.md](chapter05-entry-gate.md) — preflight blocks registration/outcomes; approved route is SPDR → frozen EXP, no XENA or historical TEST.

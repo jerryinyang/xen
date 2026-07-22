@@ -16,7 +16,7 @@
 |-------|-------|
 | Source listing | `https://public.bybit.com/trading/` (Apache directory) |
 | Filter | Folders ending `USDT/` only — excludes `*PERP/` (USDC), inverse `*USD`, dated futures |
-| Census artifact | `python/experiments/INFR-011/artifacts/universe-census.md` |
+| Census artifact | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/universe-census.md` |
 | Symbol count | **910** (2026-07-14 census) |
 | History cap | Trailing **4 years** per symbol (operator amendment 2026-07-14) |
 | Delisted | Included when present in archive listing; `listed`/`delisted` flags from announcement reconciliation |
@@ -35,7 +35,7 @@ Module: `xen.nautilus.instrument_ids`.
 | LUNA2USDT | delist tail test | archive present through 2026-07-13 |
 | USTCUSDT | younger listing | shorter capped range |
 
-Full candidate list: `python/experiments/INFR-011/artifacts/candidate_symbols.txt`.
+Full candidate list: `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/candidate_symbols.txt`.
 
 ---
 
@@ -44,11 +44,11 @@ Full candidate list: `python/experiments/INFR-011/artifacts/candidate_symbols.tx
 | Dataset | Path | Status |
 |---------|------|--------|
 | Primary catalog (bars) | `data/catalog/` | INGESTED (A4, 2026-07-16; 894 ADMITTED + 9 SPEC_INCOMPLETE) |
-| Pseudo-quote spreads | per-symbol bar parquets at `python/experiments/INFR-011/data/staging/bars/` (SpreadAbs/SpreadBps/MeanBuy/MeanSell cols; 904 files, consolidated 2026-07-16) | retained — T1 spread source for analyst cost injection |
+| Mean-price skew fields | per-symbol bar parquets at `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/` (`SpreadAbs`/`SpreadBps`/`MeanBuy`/`MeanSell`; 904 files, consolidated 2026-07-16) | **UNUSABLE AS SPREAD** — retained bytes, not a cost input; access-path quarantine is a Chapter 05 preflight blocker |
 | Strategy emissions | `data/nautilus_runs/<run_id>/` | emission contract v1 |
-| Fence manifest (A6) | `python/experiments/INFR-011/artifacts/fence-manifest.json` | **PINNED** 2026-07-16 |
-| Admission ledger (A5) | `python/experiments/INFR-011/artifacts/admission-ledger.jsonl` | 910 census rows, explicit exclusions |
-| Instrument specs | `python/experiments/INFR-011/artifacts/instrument-specs.json` | API (612) + INFERRED (282) |
+| Fence manifest (A6) | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json` | **PINNED** 2026-07-16 |
+| Admission ledger (A5) | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/admission-ledger.jsonl` | 910 census rows, explicit exclusions |
+| Instrument specs | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/instrument-specs.json` | API (612) + INFERRED (282) |
 
 **Archived cTrader paths (VAL carve-out on old emissions only):**
 `archive/chapter-03-xena-mtfctx/data/timebars/`,

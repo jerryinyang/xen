@@ -722,7 +722,8 @@ use unadjusted close-axis `searchsorted` as the sole bar index.
 
 **Enforced at.** `data-analyst/references/interrogation-protocol.md` fill/alignment probe;
 `experiment-developer/references/code-conventions.md` Nautilus runner conventions;
-emission-contract note in `python/experiments/INFR-010/code/emission_contract_v1.md`.
+emission-contract note in
+`archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-010/code/emission_contract_v1.md`.
 Evidence: VAL-008 `report.md` §5; checkpoint-013 §1 D1.
 
 ## L-30 — `BacktestRunConfig(dispose_on_completion=False)` required for node-path report capture (VAL-008)
@@ -810,3 +811,142 @@ the collapse fraction and judges. L-01 future-look-ahead protection is untouched
 `docs/references/xena-lane.md`; `references/governance-constraints.md`. Design + ratification:
 `python/experiments/INFR-016/design.md`; tests `python/tests/test_xena_infr016.py`. Builds on
 [[L-12]], [[L-15]], [[L-17]], [[L-19]], [[L-25]], [[L-26]].
+
+## L-33 — A statistic can reproduce perfectly and still contain no conditional skill (SPDR-007) ⭐
+
+**What.** The session Protection quantile reproduced on CONFIRM (hit 0.728 versus its 0.70
+target), yet matched unconditional timing hit 0.700 at its own quantile and 0.675 at the signal
+level. The signal race was 0.333 versus control 0.343; the apparent success was not edge.
+
+**Mechanism (why).** Quantiles/order statistics of a stable price process reproduce whether or
+not the event that selected them is informative. Calibration asks whether the statistic is
+stable; it does not ask whether conditioning added value. A positive-control bite likewise
+proves apparatus sensitivity, not a positive companion edge.
+
+**Fix / new rule.** For timing objects require all three: reproduction/calibration, separation
+from matched random timing, and clearance of a valid cost floor. Matched random timing is the
+binding attribution control; future-destroy is a leak tripwire, not its substitute.
+
+**Enforced at.** `python/experiments/SPDR-007/design.md` deviations D-1/D-2 and report R1–R5;
+checkpoint-014/015 retrospectives; [methodology-canon.md](methodology-canon.md). Cross-family
+automation remains a Renew item rather than an already-landed check.
+
+## L-34 — Positive-only K-of-N counts manufacture structure from the expected null tail (SPDR-008) ⭐
+
+**What.** Seven positive signed-load qualifiers appeared to satisfy a K=3 narrative, but the
+permuted null expected 6.0 and the anti-monotone mirror produced ten. The positive tail was not
+enriched and did not reproduce in magnitude.
+
+**Mechanism (why).** A large cell grid necessarily emits chance winners in both directions.
+Counting only the desired tail compares the observed maximum to zero rather than to the realised
+multiple-testing process; sign-only CONFIRM preserves winner's-curse labels without effect size.
+
+**Fix / new rule.** Report positive, anti-monotone and null-expected winner counts together;
+require connected neighbourhoods plus magnitude and sign reproduction on CONFIRM.
+
+**Enforced at.** `python/experiments/SPDR-008/design.md`/`analysis.md` K=3 machinery and the
+checkpoint-014 retrospective; [methodology-canon.md](methodology-canon.md). Generic pipeline
+enforcement is still an explicit Renew gap.
+
+## L-35 — Cross-symbol membership does not prevent a one-name portfolio (XENA-EPSOSC-002)
+
+**What.** A four-symbol certified subset still derived most apparent profit from AKRO (+450 bps),
+while LEVER was near zero and STMX negative. A naive positive mean coexisted with overlap-aware
+gross LCB −68.2 and net LCB −102.1.
+
+**Mechanism (why).** Requiring K symbols constrains labels, not contribution weights or temporal
+overlap. One volatile constituent can carry the pooled point estimate; equal-weight resampling
+understates uncertainty when episodes overlap and contributions are concentrated.
+
+**Fix / new rule.** Every cross-sectional/portfolio read reports contribution concentration,
+per-symbol results, leave-one-name-out behaviour and overlap-aware uncertainty. K is a breadth
+descriptor, never proof of diversification.
+
+**Enforced at.** XENA-EPSOSC-002 matched-drift/overlap-aware analysis, `xen.xena.report_layer`,
+`data-analyst` concentration protocol, and [methodology-canon.md](methodology-canon.md).
+
+## L-36 — A same-stream print differential is not executable spread (INFR-017) ⭐
+
+**What.** `SpreadBps`, previously used as measured spread in SPDR-005/006, was negative in
+roughly 32–40% of BTC/ETH TRAIN minutes. INFR-017 established that it is the difference between
+mean aggressor-buy and mean aggressor-sell trade prices, not contemporaneous best ask minus bid.
+
+**Mechanism (why).** The two means summarize different trades occurring at different times and
+market states. Their ordering can reverse as price moves within the minute; flooring the sign
+would hide the semantic mismatch rather than create a quote. The field shares the same trade
+stream as delta, so it is not independent spread evidence either.
+
+**Fix / new rule.** Pin the field `UNUSABLE`, never read it as spread or cost, and reject negative
+spread inputs at the actual cost-access boundary. Use audited executable pins or a separately
+validated reconstruction. Earlier spread-based floor claims are withdrawn; their gross and
+fee/funding evidence remains.
+
+**Enforced at.** INFR-017 `column_pins.json`; `xen.sigbar.data_types` and
+`xen.sigbar.fences.assert_frozen_inputs`. The ordinary staging/cost path is not yet quarantined;
+that missing enforcement is explicitly assigned to the next infrastructure preflight.
+
+## L-37 — Outcome availability is a post-event conditioning variable (SPDR-009)
+
+**What.** SPDR-009 dropped 25,247 of 32,433 located D1 events because a contiguous 1m outcome
+path was unavailable. Complete-window retention deteriorated with aggregation and surviving
+windows carried 2.4×–27× more volume than partial windows.
+
+**Mechanism (why).** Listings, trading activity and data continuity determine whether a forward
+path exists. Conditioning on complete outcomes therefore selects older/more active instruments
+after event location; it can change absolute return distributions even when same-event marginal
+contrasts remain partly protected.
+
+**Fix / new rule.** Emit located, usable and dropped counts plus covariate comparisons at every
+domain; label absolute-return/floor reads as availability-conditioned; do not interpret an
+unpowered coarse domain as negative evidence.
+
+**Enforced at.** SPDR-009 report population funnel and checkpoint-015 retrospective. A reusable
+availability-attestation check is still a Renew item.
+
+## L-38 — Detection granularity and holding horizon are separate design axes (SPDR-009)
+
+**What.** Candidate supply collapsed 95,836→9,497→2,974→640 across D1→D4, leaving only
+16/2/0 signal events at D2/D3/D4. Coarser detection could not answer the hypothesis, while
+fixed short bar-count holds left 16.3% of D1 H5 outcomes exactly zero.
+
+**Mechanism (why).** Aggregation erases sparse local effort/result events; shortening the hold
+in bar units then measures dead time rather than economic resolution. The data support neither
+“coarser is better” nor “finest is always best”—only that the event scale and P&L scale differ.
+
+**Fix / new rule.** Detect at the finest reliable scale that preserves the event, then choose
+an independently justified economic horizon (time, first-touch, range or ATR); report power and
+coverage at both seams.
+
+**Enforced at.** checkpoint-015 retrospective and [methodology-canon.md](methodology-canon.md);
+the next family must freeze both axes before emission.
+
+## L-39 — Time-of-week keys must be typed before arithmetic (INFR-017)
+
+**What.** The first signed-volume seasonal baseline collapsed 1,440 minute-of-day values into
+256 buckets. Its hash `78dd7988…` is discarded and must never be reused.
+
+**Mechanism (why).** `hour * 60 + minute` was evaluated in an `Int8` expression before the
+result reached its destination column, so arithmetic overflow aliased distinct minutes. A final
+cast cannot recover information already wrapped.
+
+**Fix / new rule.** Cast inputs to a sufficiently wide integer before multiplying; assert key
+ranges and materialise the full 10,080 minute-of-week grid with explicit fallback behaviour.
+
+**Enforced at.** repaired INFR-017 seasonal-baseline builder, range assertions and five
+regression cases covering known wrap timestamps; accepted pin `1b7244c8…`.
+
+## L-40 — An integrity percentage is vacuous without declared coverage and join accounting (INFR-017)
+
+**What.** The original provenance check could pass after downloading only 1/20 declared
+symbol-days, and an inner join could silently hide raw/staged bars that existed on only one side.
+
+**Mechanism (why).** Equality was computed only on successfully downloaded, matched rows. The
+denominator therefore shrank when evidence was missing—the exact condition the gate was meant to
+detect—and inner joins erased unmatched keys before reconciliation.
+
+**Fix / new rule.** Integrity gates require complete declared coverage, exact key-set equality,
+bar-count agreement and per-field reconciliation. A partial download is a failed attestation,
+not a smaller successful sample.
+
+**Enforced at.** INFR-017 provenance audit coverage assertions and NTrades/bar-key checks;
+raw aggressor reconstruction passed all 20/20 declared symbol-days.

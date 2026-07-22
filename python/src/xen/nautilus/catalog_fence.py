@@ -1,6 +1,7 @@
 """Global calendar fence (INFR-011 A6) — manifest loader + fence-enforcing queries.
 
-The fence manifest (``python/experiments/INFR-011/artifacts/fence-manifest.json``)
+The fence manifest
+(``archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json``)
 pins ABSOLUTE dates for the nested chronological split over the admitted catalog
 range (INFR-010 D6):
 
@@ -29,7 +30,9 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from nautilus_trader.persistence.catalog import ParquetDataCatalog
 
-MANIFEST_RELPATH = "python/experiments/INFR-011/artifacts/fence-manifest.json"
+MANIFEST_RELPATH = (
+    "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json"
+)
 _BANDS = ("TRAIN", "TEST")
 
 

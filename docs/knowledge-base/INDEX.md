@@ -4,7 +4,10 @@ The curated, cross-chapter canon for the Xen research programme. Distilled from 
 (~98 experiments, ~25 phases), Chapter 02 (EXP-001–025 + SPDR-001..003, 11 phases,
 2026-06-27 → 2026-07-09; seven family arcs, all closed negative with mechanisms recorded),
 and Chapter 03 (XENA-001..003 + INFR-006..009, 2026-07-09 → 2026-07-14; first live XENA
-portfolio universes, CF-MTFCTX-001 retired, referee redesigned and route restored).
+portfolio universes, CF-MTFCTX-001 retired, referee redesigned and route restored), and
+Chapter 04 (INFR-010..020, VAL-008, SPDR-004..009 and three candidate families,
+2026-07-14 → 2026-07-22; Nautilus/Bybit migration, exact taker-side volume, and the first
+full signed-auction investigation).
 Read this **before** designing any new experiment: it records what is frozen, what is dead,
 what worked, and the lessons that cost a false positive to learn.
 
@@ -13,37 +16,59 @@ they do not wipe prior canon). The **signal-registry** (`docs/signal-registry/`)
 operational ledger (multiplicity, test-reads, candidate families) and is referenced here, not
 copied — it persists across chapters and must never be reset.
 
-## Programme status (2026-07-16): Chapter 04 open — INFR-010 migration COMPLETE
+## Programme status (2026-07-22): Chapter 04 archived; Chapter 05 blocked on preflight
 
-**INFR-010 Phases 0/A/B/C/D/E complete** (2026-07-16). Engine is **NautilusTrader**
-(nautilus_trader==1.230.0); primary data is **Bybit USDT-perp 1m OHLCV** in `data/catalog/`
-(894 ADMITTED instruments, fence PINNED). Phase D end-to-end VAL (**VAL-008**) operator
-verdict **SUPPORTED / PASS**. Chapter 04 research is open at checkpoint-013
-(`docs/experiments-docs/checkpoints/2026-07-16-013-chapter04-open-htfcap-epsosc-cal/`) —
-CF-HTFCAP-001 + CF-EPSOSC-001 (SPDR→XENA) and INFR-014 (fresh Bybit XENA CAL). Stack lessons
-L-28..L-31 ratified into [lessons-and-amendments.md](lessons-and-amendments.md). Governance
-principles carry forward (holdout fence, causal-by-construction, estimand gate, XENA form,
-multiplicity/test-read ledgers); rebind verified at INFR-012. The chapter-03 XENA frozen
-registry remains **VOID on Bybit** until INFR-014 pins a new registry. See
-[data-architecture.md](data-architecture.md) and [evaluation-framework.md](evaluation-framework.md).
+The NautilusTrader/Bybit stack is operational and VAL-008 passed 39/39 reconciliation and
+leak checks. Chapter 04 then closed three candidate arcs: **CF-EPSOSC-001 RETIRED—REFUTED**
+(volatility-window clustering and AKRO drift, not armed reversion), **CF-HTFCAP-001
+CLOSED—CHARACTERISED** (real BTC high-volatility directional gross effect; 0/72 cells net),
+and **CF-SIGAUC-001 CLOSED** (price spine, signed trap load and D1 signed absorption all null
+against their binding controls). Only XENA-HTFCAP-001 touched TEST, as an explicitly
+exploratory read with no reserved OOS. A disclosed INFR-017 path scanned one univariate
+spread-quality column beyond the fence; it exposed no price, return, P&L or signal and the
+operator cleared it with zero sanctioned reads consumed. The global holdout remains formally
+sealed, with that disclosure permanent.
+
+The durable data gain is exchange-native **taker buy/sell volume** with raw-trade provenance.
+The durable economic warning is that stored `SpreadBps` is **not executable spread**: it is a
+mean-print differential, is often negative, and is pinned `UNUSABLE`. No exact net claim may
+use it. The repeated material gross source is directional drift/continuation amplified by
+high volatility; no Chapter-04 implementation established deployable net edge. See
+[data-architecture.md](data-architecture.md), [evaluation-framework.md](evaluation-framework.md),
+and [families-explored.md](families-explored.md).
+
+Chapter 05 may test one bounded volatility-to-direction conversion object, but no family may be
+registered and no outcome-bearing work may begin until the cost/data preflight passes focused tests
+and fresh-context QA. The approved route is one TRAIN-only SPDR characterisation followed, only if
+authorised, by one frozen Nautilus EXP; XENA and historical TEST are excluded. Enforcement lives in
+[`chapter-05-governance.md`](../references/chapter-05-governance.md) and the active
+[`experiments-docs/INDEX.md`](../experiments-docs/INDEX.md). The mechanism is sequencing: invalid
+cost composition or an unusable spread field would make the economic front gate meaningless, so
+infrastructure correctness must precede family registration and outcome contact.
 
 ## What's FROZEN (do not re-derive)
 
-- **The evaluation/referee suite** — the Chapter-02 **renewed §10.3a gate (q\*=0.75) + E6
-  P\*-gate + E7 15m domain**, hash-pinned; plus the Chapter-01 5-check stack it dominated and
-  the per-domain MDE maps. See [evaluation-framework.md](evaluation-framework.md). Reusing it
-  is mandatory; retuning it after seeing a candidate's outcome is a governance violation.
-- **The data layer** — 1-minute time-bar base, deterministic derived views, the cTrader
-  strategy-host contract, the holdout fence. See [data-architecture.md](data-architecture.md).
-- **The global holdout** — final 30% per file. One sanctioned read existed per dataset; both
-  are SPENT (EXP-032 old dataset; EXP-097 new dataset). Never load it outside a sanctioned,
-  governed release.
+- **Evaluation governance** — validity failures remain hard stops; value, significance,
+  power and selection are reported as complete frozen-arm distributions for operator judgement,
+  never automatic winner gates. Historical frozen referees remain calibration evidence, not a
+  licence to hide cells. See [evaluation-framework.md](evaluation-framework.md).
+- **The active data layer** — NautilusTrader, global calendar fence, Bybit USDT-perp OHLCV,
+  exact taker-side volume, deterministic derived views and emission reconciliation. Raw
+  `SpreadBps` is excluded from costs. See [data-architecture.md](data-architecture.md).
+- **Holdout fences** — both sanctioned legacy FX/indices holdout shots are SPENT (EXP-032 and
+  EXP-097). The current Bybit global-calendar holdout remained sealed through Chapter 04.
+  Never load any holdout outside a separately sanctioned, governed release; archived-data
+  obligations do not expire.
 
 ## What's OPEN / what's DEAD
 
 - [families-explored.md](families-explored.md) — every candidate family + disposition, and the
   **availability 2×2** that frames the open frontier.
 - [pitfalls-ledger.md](pitfalls-ledger.md) — refuted directions and dead ends; do not re-run.
+- Chapter-04 boundary: exact signed volume is now an established input, but the tested S3/S9
+  transforms added no marginal directional value. The surviving product question is whether an
+  intentionally directional, risk-managed volatility/trend exposure can clear exact intraday
+  costs—not whether drift can be defined away as a nuisance control.
 - [reviews/capture-geometry-review.md](reviews/capture-geometry-review.md) — cross-chapter
   extraction of every **capture geometry / exit** modality tried against "availability exists,
   cannot capture"; mechanisms, observations, Mode A/B/C failure taxonomy, independent-review
@@ -87,3 +112,6 @@ registry remains **VOID on Bybit** until INFR-014 pins a new registry. See
 - `archive/chapter-03-xena-mtfctx/` — the full Chapter 03 experiments (XENA-001..003,
   INFR-006..009), experiments-docs (checkpoints 011/012), and the **retired cTrader stack**
   (Xen.cs, StrategyHost/, tools/ctrader-cli/) archived at the INFR-010 migration.
+- `archive/chapter-04-nautilus-bybit-sigauc/` — Chapter 04 experiments, complete
+  experiments-docs, source snapshot and deprecated tests; active neutral source was restored from
+  this snapshot.

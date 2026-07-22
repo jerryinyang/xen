@@ -113,7 +113,7 @@ the live catalog.
 
 ## Emission contract v1
 
-Spec: `python/experiments/INFR-010/code/emission_contract_v1.md`.
+Spec: `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-010/code/emission_contract_v1.md`.
 
 - **Phase B smokes** may carry `fence_attestation.status: STUB` — estimand gate v2 **rejects** these for real experiments.
 - **Production emissions** must attest the INFR-011 A6 `fence-manifest.json` sha256.

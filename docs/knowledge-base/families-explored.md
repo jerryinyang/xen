@@ -86,6 +86,24 @@ the programme's answer is the INFR-010 pivot to a **new data frontier** (full By
 universe, anti-survivorship, orderflow store deferred) rather than another price-geometry
 family on the exhausted dataset.
 
+## Chapter 04 family dispositions (2026-07-14 → 2026-07-22)
+
+Chapter 04 established the Nautilus/Bybit substrate and opened three families. Full live cards
+remain in `docs/signal-registry/candidate-families/`; experiments move with the chapter archive.
+
+| Family | What it was | Disposition (mechanism) |
+|---|---|---|
+| **CF-HTFCAP-001** — HTF direction × volatility × capture scale | DI/ADX direction conditioned by high volatility, with 8–16h hold ladders | **CLOSED—CHARACTERISED, not refuted.** BTC `DI_ADX×VOL_HI` H32/H64 produced real gross LCB +8..+18 bps and sign p≈0.02–0.05, but **0/72 cells and 0 subsets net-positive**; best net LCB −4.6 under the run's ~18 bps taker/GAP/funding wall. Volatility is an amplifier of directional drift/continuation, not a standalone signal. The exact family has no untouched OOS and cannot be called deployable; a fixed lower-cost intraday product is a new D0, not continuation. |
+| **CF-EPSOSC-001** — vol-expansion arm → episode reversion | RET_ANCHOR/HYBRID episode clearing after volatility expansion | **RETIRED—REFUTED.** SPDR's positive tail concentrated in a few names; XENA-001 selected an AKRO short/downtrend pedestal; mass-aligned XENA-002 failed overlap-aware gross LCB (−68.2) and net LCB (−102.1), with live performance below the matched-drift P95. The apparent edge was volatility-window clustering/unconditional drift, not the armed reversion mechanism. |
+| **CF-SIGAUC-001** — signed auction structure | Session spine, signed trap load and effort-without-result absorption using exact taker buy/sell volume | **CLOSED.** Three independent negatives: SPDR-007 price spine reproduced a quantile but not skill versus matched unconditional timing; SPDR-008 signed trap-load was powered null on IB/PVA/PRIOR; SPDR-009 D1 signed absorption was powered null (+1.81 bps, CI [−3.62,+7.09], MDE 5.5, score ρ +0.008, median 0 below 11.3–13.0 bps floor). D2/D3/D4 were event-rate-inconclusive (16/2/0); S14 and structural/funding-cadence horizons were untested. S3 and S9 are deleted, not threshold-remineable. Exact taker-side volume and its apparatus survive as data infrastructure, not edge. |
+| **Nautilus/Bybit infrastructure (INFR-010..020, VAL-008)** | Engine migration, fenced catalog, emission/reconciliation, signed bars, Bybit calibration and report-layer correction | **COMPLETE as apparatus, with one blocking cost defect.** VAL-008 passed 39/39. Raw aggressor split reconciled 20/20 symbol-days. Stored `SpreadBps` is not quote spread and is pinned `UNUSABLE`; exact net claims require a corrected cost path and audited executable spread pins. |
+
+Chapter 04 updates the availability frame: a genuinely non-price input was acquired and tested,
+but the first signed transforms added no marginal directional value. The repeatable material
+gross effects remained drift, beta and volatility clustering. If the product permits systematic
+directional exposure, test that product honestly with risk and costs rather than defining its
+only durable return source away; this is not evidence that a net edge already exists.
+
 ## Selection discipline going forward
 
 Open the next family by **screening availability first** (TRAIN-only Δ-over-matched-random,

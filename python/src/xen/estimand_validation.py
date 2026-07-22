@@ -37,7 +37,9 @@ from xen.adjudication import (
 GATE_VERSION = "v2"
 EMISSION_CONTRACT_V1 = "nautilus-emission-v1"
 PHASE_B_STUB_STATUS = "STUB"
-FENCE_MANIFEST_CANONICAL = Path("python/experiments/INFR-011/artifacts/fence-manifest.json")
+FENCE_MANIFEST_CANONICAL = Path(
+    "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json"
+)
 
 SHARPE_SANITY = 3.0
 ANN_RETURN_SANITY = 1.0

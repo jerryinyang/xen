@@ -27,6 +27,16 @@ a new information source — not a re-parameterisation. Live registry detail:
 | **P-14** | **HTF-DI continuation conditioning as a tradable edge** at 1h→5min | EXP-025 T1-terminal: 0/440 qualifiers, MDE ≤5.2 bps, true effect ≈1–4 bps < cost; index positives drift-shaped, no dose-response. | A vehicle whose per-trade capture is ≥10× larger (longer holds / different granularity) — and only via a NEW family with the L-21 unit pin applied at design time. |
 | **P-15** | Trusting a **screen-quoted effect size across the screen→graduation seam** without re-deriving its unit | EXP-025: SPDR screen normalised by 5min ATR, graduation design asserted 1h ATR — target inflated 4.1×; entire graduation chased a fictitious 30–60 bps. | Never. L-21 unit pin + money-unit floor are binding at every seam (`docs/references/spdr-lane.md`). |
 
+## Chapter 04 dead ends
+
+| # | Dead end | Evidence that closed it | Re-open only if |
+|---|----------|------------------------|-----------------|
+| **P-16** | **VOLARM episode fade** as tested in CF-EPSOSC-001 | XENA-EPSOSC-002: overlap-aware gross LCB −68.2, net −102.1; live below matched-drift P95; AKRO/unconditional drift carried the point estimate. | A genuinely different episode object and new D0. Do not re-rank RET_ANCHOR/HYBRID thresholds on the same mechanism. |
+| **P-17** | **Price-only session Protection quantile** as conditional skill | SPDR-007: quantile reproduced but matched unconditional timing reproduced it too; signal race 0.333 vs control 0.343. | A new information source that separates from matched timing; calibration alone never re-opens it. |
+| **P-18** | **Signed trap-load monotonicity (S3)** | SPDR-008 powered null on IB/PVA/PRIOR; 7 positive qualifiers vs 6.0 null-expected and 10 anti-monotone; no magnitude reproduction. | A different signed mechanism, not tighter load thresholds or cherry-picked boundaries. |
+| **P-19** | **Signed absorption marginal value (S9) at D1** | SPDR-009: S9−BASE +1.81 bps, CI [−3.62,+7.09], MDE 5.5; ρ +0.008; MIRROR arm larger; median 0 below 11.3–13.0 bps floor. | A distinct mechanism such as predeclared S14, not S9 threshold re-mining. D2–D4 remain unpowered, not negative. |
+| **P-20** | Using staging **`SpreadBps` as executable spread** | INFR-017: field is a mean-print differential and negative in ~32–40% of BTC/ETH TRAIN minutes; pinned `UNUSABLE`. | Never by flooring/renaming. Use audited quote/execution pins or a separately validated reconstruction. |
+
 ## The terminal branch (state it honestly)
 
 If single-series magnitude, cross-sectional, **and** flow all reproduce ≈-random, then

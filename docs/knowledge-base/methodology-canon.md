@@ -116,6 +116,38 @@ and the traps to avoid, on any new experiment.
   structurally penalizes any filter/conditioning thesis; net cost is a verdict leg inside the
   frozen procedure, never informational-only.
 
+## Chapter 04 additions (Nautilus/Bybit + signed-volume arc)
+
+- **Validity is hard; value is an operator read.** Fence/provenance/reconciliation/leak-plant
+  failures invalidate data. Significance, power, subset ranking and collapse magnitudes are
+  report layers over all frozen arms, not machine verdicts. XENA-HTFCAP's top-1 hid the actual
+  positive-gross cells.
+- **Freeze one event set and emit all conditioning arms together.** Vol state, drift, beta,
+  rank and signed volume should be columns on the same events. Read ordered layers from one
+  artifact; if a layer fails, stop that branch—do not create a new mining run.
+- **Matched random timing is the binding timing control.** A stable target quantile or a
+  future-destroy pass is near-vacuous when unconditional matched times reproduce it. For
+  volatility-window objects add matched random-entry and coin-flip/drift twins because
+  destroying labels at actual event times preserves the volatility pedestal.
+- **Count both tails and the null winner rate.** SPDR-008's 7 positive qualifiers looked like
+  K≥3 until compared with 6.0 null-expected and 10 anti-monotone qualifiers. Require connected
+  neighbourhoods, magnitude reproduction and sign-stable CONFIRM, not a positive-only census.
+- **Breadth is not diversification.** A K-symbol subset can still be economically carried by
+  one name. Report per-symbol census, leave-one-name-out behaviour, contribution concentration
+  and overlap-aware portfolio uncertainty.
+- **Separate detection resolution from economic hold.** Coarser bars reduced candidate supply
+  from 95,836→9,497→2,974→640 in SPDR-009, but this does not prove finest is universally best.
+  Detect at the finest *reliable* scale that preserves the event, then test the independently
+  justified holding horizon; disclose outcome-availability conditioning.
+- **Reproduction is not skill.** A reproduced statistic must also separate from its matched
+  control and clear a valid money floor. Quantile stability alone is market characterisation.
+- **Mechanism deletion means no threshold re-mining.** Once a powered marginal-value test says
+  the signed transform adds nothing (S3/S9), do not tighten the same score until a winner appears.
+- **Directional return sources may be the product.** Drift, beta and volatility clustering are
+  controls when the claim is residual alpha; if the objective is a deployable return product,
+  a risk-managed trend/volatility exposure is legitimate and must be benchmarked and costed
+  honestly rather than automatically residualised away.
+
 ## Statistical defaults
 
 Non-parametric / empirical by default (block / stationary / moving-block bootstrap;

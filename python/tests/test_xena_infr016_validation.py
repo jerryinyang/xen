@@ -6,11 +6,21 @@ from pathlib import Path
 
 import pytest
 
-_VAL = Path(__file__).resolve().parents[1] / "experiments" / "INFR-016" / "validation"
+_REPO = Path(__file__).resolve().parents[2]
+_VAL = (
+    _REPO
+    / "archive"
+    / "chapter-04-nautilus-bybit-sigauc"
+    / "experiments"
+    / "INFR-016"
+    / "validation"
+)
 sys.path.insert(0, str(_VAL))
 
 import htfcap_replay  # noqa: E402
 import synth_ranking_validation as srv  # noqa: E402
+
+htfcap_replay.RUNS = _REPO / "data" / "nautilus_runs" / "XENA-HTFCAP-001"
 
 
 def test_synthetic_ranking_discriminates():

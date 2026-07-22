@@ -149,6 +149,60 @@ Oracle kernel: the fold is Rust (`xena_fold`, INFR-007/008) — bit-identical to
 pinned parity corpus + replay; 1-ULP macOS↔Linux libm divergence ⇒ **one universe adjudicates
 on one platform**.
 
+## Chapter-04 evidence-reporting correction (INFR-014..016)
+
+Chapter 04 proved that the Chapter-03 pick-one binder can be calibrated yet still answer the
+wrong research question. XENA-HTFCAP-001's selected top-1 was its worst embargoed cell
+(gross LCB −123.2 bps), while an all-cell report exposed five positive-gross-LCB BTC cells.
+The correction is binding:
+
+- **Hard validity gates only:** holdout/fence, causal provenance, estimand reconciliation,
+  non-STUB data, no-local-accounting, and positive-control leak bite. Failure invalidates the
+  emission and requires repair.
+- **Value is reported, not auto-decided:** significance labels, leg-count/power floors,
+  subset selection, attribution collapse and final value verdicts are complete report layers
+  over every frozen arm/cell. No `pass` field may silently discard evidence; the operator
+  records the value judgement.
+- **DESIGN/CONFIRM inside TRAIN:** use a frozen design bank, embargo and one confirm read.
+  A TRAIN-internal confirm is not programme OOS and must never be described as certification.
+- **Arm-distribution disclosure:** report per-symbol census, both positive and anti-monotone
+  tails, concentration, all frozen subsets and overlap-aware uncertainty. Cross-symbol K does
+  not by itself prevent one constituent from carrying the result.
+- **Control selection:** for timing/event objects the primary attribution control is matched
+  random timing on the same substrate. Future-destroy remains a leak test only when a material
+  raw effect exists; collapse ratios near zero raw effect are undefined/noisy and cannot certify
+  absence of leakage.
+
+Enforcement: `xen.xena.report_layer`, `xen.xena.controls`,
+`xen.xena.final_gate.final_report_layer`, `python/tests/test_xena_infr016.py`, and the
+research-pipeline/design/analysis skill contracts. The historical frozen gates remain useful
+calibration references; they no longer authorize machine value verdicts.
+
+Active Bybit calibration pin: `abbb184229236a75f624537ca605668a73f6f85138c150e14a3609c4191bf786`
+(INFR-015), superseding `ac8a1eb6…`. It certifies CLS-FILTER LOW and CLS-EPISODE LOW only;
+HIGH is blocked. CLS-EPISODE requires at least 16 gate-band legs, and a fourth CAL cycle needs
+family-wise correction or a doubled CONFIRM bank. These are class-specific apparatus limits,
+not candidate-value thresholds.
+
+## Chapter-04 cost interpretation
+
+- Bybit taker/taker fees are 11.0 bps round trip before spread, funding or slippage.
+- Stored `SpreadBps` is `UNUSABLE`; it is a mean-print differential and can be negative.
+  Any result that previously called it a measured spread keeps its gross/fee/funding evidence
+  but loses the spread-based floor claim.
+- Funding must be charged at actual crossed settlement stamps. A four-hour episode can cross
+  at most one eight-hour funding stamp; continuous hold-rate multiplication is not an equivalent
+  implementation.
+- Stress applies once to the declared aggregate cost, never once per component and then again
+  to the sum. Gross − fee − one executable spread − discrete funding − declared allowance is
+  the economic identity; do not net a result twice.
+- Until the cost path rejects negative spread inputs and exposes an audited executable pin,
+  exact deployability is unresolved. This is an infrastructure defect, not evidence that spread
+  is economically large at hourly horizons.
+- The blast radius of negative/semantic-invalid `SpreadBps` through prior Chapter-04 cost reads
+  has not been quantified. Do not inherit their exact spread-based net conclusions without a
+  corrected replay; gross, fee and separately computed funding evidence remain usable.
+
 ## Trading-cost model (net-of-cost / tradability tier)
 
 > **MIGRATION (INFR-010, 2026-07-14):** the FTMO table below binds only for the archived

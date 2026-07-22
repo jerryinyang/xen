@@ -89,7 +89,14 @@ def test_stub_emission_fails_in_tmp(tmp_path: Path) -> None:
 
 
 def test_pinned_manifest_passes_when_manifest_exists(tmp_path: Path) -> None:
-    manifest_dir = tmp_path / "python" / "experiments" / "INFR-011" / "artifacts"
+    manifest_dir = (
+        tmp_path
+        / "archive"
+        / "chapter-04-nautilus-bybit-sigauc"
+        / "experiments"
+        / "INFR-011"
+        / "artifacts"
+    )
     manifest_dir.mkdir(parents=True)
     manifest = manifest_dir / "fence-manifest.json"
     manifest.write_text(
@@ -106,7 +113,10 @@ def test_pinned_manifest_passes_when_manifest_exists(tmp_path: Path) -> None:
     fence = {
         "status": "PINNED",
         "analysis_end_utc": "2025-06-01T00:00:00Z",
-        "manifest_path": "python/experiments/INFR-011/artifacts/fence-manifest.json",
+        "manifest_path": (
+            "archive/chapter-04-nautilus-bybit-sigauc/experiments/"
+            "INFR-011/artifacts/fence-manifest.json"
+        ),
         "manifest_sha256": manifest_sha,
     }
     run_dir = _write_minimal_emission(tmp_path / "em", fence=fence)

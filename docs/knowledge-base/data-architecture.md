@@ -2,7 +2,7 @@
 
 > **MIGRATION (INFR-010, 2026-07-14) — everything below the marked line is LEGACY.**
 > At the chapter-03 close the programme replaced its substrate
-> (`python/experiments/INFR-010/design.md`, operator decisions D1–D8):
+> (`archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-010/design.md`, operator decisions D1–D8):
 >
 > - **Engine:** cTrader C# `StrategyHost` → **NautilusTrader** (Python API, Rust core,
 >   event-driven, single-threaded deterministic replay). The principle is
@@ -13,17 +13,23 @@
 >   contracts** (strict anti-survivorship; the archive listing is the universe census).
 >   Real traded volume; bar ≡ Σ trades integrity invariant. Ingested to a NautilusTrader
 >   `ParquetDataCatalog` at `data/catalog/`.
-> - **Data — secondary (deferred):** MBP/L2 orderflow feature store, BTC/ETH/SOL perps only
->   (`docs/references/orderflow-feature-store.md`); contracts + skeleton in INFR-013,
->   **no collection** until a separately-approved INFR.
-> - **Fill/cost tiers:** **T1** (OHLCV lane) = engine costless-honest, spread (pseudo-quote
->   from aggressor-side trades, tick-floor) + fees + funding injected at analysis; **T2**
->   (MBP trio) = honest L1 fills, post-collection only. **Spread-scale routing rule:** gross
->   edge within ~3× estimated RT spread is undecidable on T1 (XENA-003 class) — confirm on
->   T2 or park `AWAITING_MBP`.
+> - **Data — signed bar lane (Chapter 04):** the Bybit trade archives also carry aggressor
+>   side. INFR-017 proved the stored `BuyVolume`/`SellVolume` split bit-exact against raw
+>   trades on 20/20 symbol-days and materialised engine-readable signed bars. This is real
+>   buy-side/sell-side traded volume, not broker tick-count volume and not order-book data.
+> - **Secondary-data boundary:** historical MBP/L2 collection remains unavailable and is not
+>   a programme direction. `xen.orderflow` contracts/ingestion are reusable infrastructure;
+>   no result may imply that an uncollected L1/L2 confirmation will rescue a T1 result.
+> - **Cost boundary:** the staging `SpreadBps` field is a same-minute mean-buy-price minus
+>   mean-sell-price differential. It is negative in roughly 32–40% of BTC/ETH TRAIN minutes,
+>   is pinned `UNUSABLE`, and is neither a quote spread nor a valid execution-cost input.
+>   Executable spread must come from an audited external pin or a separately validated
+>   reconstruction; until then exact net deployability is unresolved, not zero-cost.
 > - **Holdout:** **global calendar fence** (D6) — one TRAIN/TEST/HOLDOUT date pair shared by
 >   every symbol, hash-pinned split manifest; catalog query wrapper refuses post-fence reads.
->   Final 30% never queried.
+>   A Chapter-04 exception is permanently disclosed: one INFR-017 path scanned a univariate
+>   spread-quality column beyond the fence, without prices, returns, P&L or signals; the
+>   operator cleared it with zero sanctioned reads consumed. No research outcome was queried.
 >
 > Enforcement lands per INFR-010 §6: fence manifest + admission gate (Phase A / INFR-011),
 > emission contract + determinism check (Phase B), doc/skill/cost-model rebind (Phase C /
@@ -34,6 +40,27 @@
 > (`data/timebars/`, `data/strategy_runs/`, `ctrader-stack/`). **Holdout obligations on the
 > archived FX/indices data remain binding forever.** The XENA frozen registry is **VOID on
 > the new stack** (fresh CAL cycle required).
+
+## Retained Chapter-04 data contracts
+
+- **Base catalog:** `data/catalog/`, Nautilus `Bar` OHLCV, global TRAIN/TEST/HOLDOUT calendar
+  fence, 894 admitted archive instruments at migration. Query through the fenced catalog path.
+- **Signed staging/catalog:** `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/` carries
+  `BuyVolume`, `SellVolume`, `NTrades` and the unusable print-differential fields;
+  `data/catalog_sigbar/` carries the INFR-017 signed-bar contract. `Buy+Sell ≡ Volume` is an
+  internal invariant; raw-trade reconciliation is the provenance proof.
+- **Pinned Chapter-04 apparatus:** seasonal baseline `1b7244c8…`, signed instrument registry
+  `5c386984…`, multi-timeframe baseline manifest `5f170b71…`, and active Bybit/XENA
+  calibration registry `abbb184229236a75f624537ca605668a73f6f85138c150e14a3609c4191bf786`
+  (CLS-FILTER LOW + CLS-EPISODE LOW; HIGH blocked). These pins preserve apparatus and
+  calibration scope; they do not preserve a strategy claim.
+- **Coverage is conditioning:** usable signed universes fell 194→72→47→31 across
+  1m/5m/15m/1h complete-window requirements; surviving windows carried 2.4×–27× the volume
+  of partial windows. Absolute-return reads on complete outcomes therefore describe a selected
+  post-entry-activity subset unless availability is reported explicitly.
+- **Engine contract:** event-driven, causal by construction; fills reconcile to the emitted
+  position ledger. Fill timestamps use the decision-bar close/wall-clock next-bar open
+  convention; one `BacktestNode` per process; defer disposal until reports are captured.
 
 ---
 
