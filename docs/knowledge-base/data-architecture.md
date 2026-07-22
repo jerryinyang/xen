@@ -45,10 +45,12 @@
 
 - **Base catalog:** `data/catalog/`, Nautilus `Bar` OHLCV, global TRAIN/TEST/HOLDOUT calendar
   fence, 894 admitted archive instruments at migration. Query through the fenced catalog path.
-- **Signed staging/catalog:** `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/` carries
-  `BuyVolume`, `SellVolume`, `NTrades` and the unusable print-differential fields;
-  `data/catalog_sigbar/` carries the INFR-017 signed-bar contract. `Buy+Sell ≡ Volume` is an
-  internal invariant; raw-trade reconciliation is the provenance proof.
+- **Signed staging/catalog contract:** the raw signed source is currently readable through the
+  mounted archived staging symlink and carries `BuyVolume`, `SellVolume`, `NTrades` and unusable
+  print-differential fields; INFR-017 proved the mapping. The full TRAIN signed catalog is verified
+  at `data/catalog_sigbar/train/`: 3,731,908 rows across five symbols, tree sha
+  `d4b7bbed7e0c…f7d2b9`, zero mapping/config violations and zero TEST/holdout rows in the SPDR-011
+  attestation. `Buy+Sell ≡ Volume` remains the required invariant.
 - **Pinned Chapter-04 apparatus:** seasonal baseline `1b7244c8…`, signed instrument registry
   `5c386984…`, multi-timeframe baseline manifest `5f170b71…`, and active Bybit/XENA
   calibration registry `abbb184229236a75f624537ca605668a73f6f85138c150e14a3609c4191bf786`

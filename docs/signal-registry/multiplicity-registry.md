@@ -1577,7 +1577,7 @@ reads; holdout SEALED.** Report `python/experiments/SPDR-008/report.md`.
 
 | ID | Vehicle | Registered question / arm | Candidate slot | Status |
 |---|---|---|---:|---|
-| `CF-VOLCONV-001/HYP-001` | SPDR-011 L1 | Base HIGH-vol + completed breakout + fixed 4h episode; partial economics | 0 | REGISTERED; design/census pending |
+| `CF-VOLCONV-001/HYP-001` | SPDR-011 L1 | Base HIGH-vol + completed breakout + fixed 4h episode; partial economics | 0 | PRE-EXECUTION QA PENDING; signed TRAIN catalog verified |
 | `CF-VOLCONV-001/HYP-002` | SPDR-011 L2 | HIGH vs disjoint MID/LOW absolute-movement increment | 0 | REGISTERED; same artifact |
 | `CF-VOLCONV-001/HYP-003` | SPDR-011 L3 | HIGH signed residue vs identical unconditional breakout | 0 | REGISTERED; same artifact |
 | `CF-VOLCONV-001/HYP-004` | SPDR-011 L4 | Fixed TOP2 add-on; TOP1/TOP3 distribution-only | 1 predeclared modifier | REGISTERED; not selected by P&L |
@@ -1591,6 +1591,24 @@ side, horizon or exit is permitted after outcome contact.
 **AMENDMENT-A1:** remove all Chapter-05 spread proxies; report spread as unavailable/null and costs
 as partial — **DIRECTION: LOOSER** economically. Running count: **1L / 0T / 0N**. The mandatory
 understatement/overstatement caveat does not restore the omitted cost or authorize deployability.
+
+**AMENDMENT-A2:** match/time-stability thirds use the effective eligible DESIGN interval because the
+catalog has no core data in the first two nominal thirds — **DIRECTION: NEUTRAL**. Running count:
+**1L / 0T / 1N**.
+
+**AMENDMENT-A3:** retain every located event; missing later marks become explicit null attrition and
+never define eligibility — **DIRECTION: NEUTRAL**. Running count: **1L / 0T / 2N**.
+
+**AMENDMENT-A4:** freeze exact control seed ranges, matching units/strata and the logical
+DESIGN/CONFIRM artifact-bundle seal before outcome contact — **DIRECTION: NEUTRAL**. Running count:
+**1L / 0T / 3N**.
+
+**AMENDMENT-A5:** exclude the realised TOP2 pair from its L4 random-pair null so the control cannot
+reproduce the live selection — **DIRECTION: TIGHTER**. Running count: **1L / 1T / 3N**.
+
+**AMENDMENT-A6:** require a live signed-catalog tree re-hash, a binding supported-edge
+future-destroy survival rule, and event-by-event theoretical-to-Nautilus fill reconciliation —
+**DIRECTION: TIGHTER**. Running count: **1L / 2T / 3N**.
 
 ## Amendment Rules
 

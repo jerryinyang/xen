@@ -44,7 +44,9 @@ Full candidate list: `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-
 | Dataset | Path | Status |
 |---------|------|--------|
 | Primary catalog (bars) | `data/catalog/` | INGESTED (A4, 2026-07-16; 894 ADMITTED + 9 SPEC_INCOMPLETE) |
-| Mean-price skew fields | per-symbol bar parquets at `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/` (`SpreadAbs`/`SpreadBps`/`MeanBuy`/`MeanSell`; 904 files, consolidated 2026-07-16) | **UNUSABLE AS SPREAD** — retained bytes; analytical access renames the bps field to `MeanPriceSkewBps` and stamps `UNUSABLE_AS_SPREAD` |
+| Signed staging fields | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/` | The raw signed source is currently readable through the mounted `/Volumes/SSID/Xen/data/bars`; provenance/admission is recorded for all five Chapter-05 symbols |
+| Signed custom catalog | `data/catalog_sigbar/train/` | The full TRAIN signed catalog is verified: 3,731,908 rows, five symbols, 90 files; tree sha `d4b7bbed7e0c…f7d2b9`; SPDR-011 attestation records zero TEST/holdout rows and zero mapping violations |
+| Mean-price skew fields | same external signed staging files (`SpreadAbs`/`SpreadBps`/`MeanBuy`/`MeanSell`) | **UNUSABLE AS SPREAD** — analytical access renames the bps field to `MeanPriceSkewBps` and stamps `UNUSABLE_AS_SPREAD` |
 | Strategy emissions | `data/nautilus_runs/<run_id>/` | emission contract v1 |
 | Fence manifest (A6) | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json` | **PINNED** 2026-07-16 |
 | Admission ledger (A5) | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/admission-ledger.jsonl` | 910 census rows, explicit exclusions |

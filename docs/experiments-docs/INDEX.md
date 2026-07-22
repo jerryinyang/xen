@@ -2,13 +2,13 @@
 
 ## Current checkpoint status
 
-**CHECKPOINT-016 OPEN — RUN-1 DESIGN PENDING.** `CF-VOLCONV-001` is registered. No census,
-outcome artifact, SPDR execution, EXP execution, historical TEST read, holdout read, or forward
-shadow is active.
+**CHECKPOINT-016 OPEN — RUN-1 PRE-EXECUTION QA PENDING.** `CF-VOLCONV-001` is
+registered. The outcome-free census located 1,390 DESIGN events on 148 dates; no outcome artifact,
+SPDR execution, EXP execution, historical TEST read, holdout read, or forward shadow is active.
 
-The governing route is [Chapter 05 governance](../references/chapter-05-governance.md). The next
-permitted action is the outcome-isolated count-only census and final `SPDR-011/design.md`. Run 1
-execution remains separately unauthorised.
+The governing route is [Chapter 05 governance](../references/chapter-05-governance.md). The
+five-symbol signed TRAIN catalog is verified; complete fresh QA, then request separate Run-1
+execution authority.
 
 ## Current infrastructure tasks
 
@@ -26,7 +26,7 @@ Implementation evidence: [Chapter 05 cost/data preflight](../references/chapter-
 ## Current checkpoint
 
 - [Checkpoint 016 design](checkpoints/2026-07-22-016-volatility-direction-conversion/design.md) —
-  OPEN; Run-1 census/design next; no execution authority.
+  OPEN; Run-1 census/design/data preparation complete; QA run 4 APPROVE — ready for operator execution decision.
 
 ## Checkpoint retrospectives
 

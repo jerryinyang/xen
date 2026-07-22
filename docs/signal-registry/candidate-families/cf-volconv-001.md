@@ -4,6 +4,7 @@
 - **Chapter:** 05
 - **Route:** `SPDR-011 → EXP-099` if separately authorised; no XENA
 - **Reads:** TRAIN only; 0 counted TEST reads; global holdout sealed
+- **Run-1 state:** design/census/data preparation complete; pre-execution QA blocks execution
 - **Checkpoint:** `docs/experiments-docs/checkpoints/2026-07-22-016-volatility-direction-conversion/design.md`
 
 ## 1. Falsifiable thesis
@@ -73,7 +74,9 @@ The pre-trigger move is never credited. Open episodes cannot pyramid, refresh, r
 - Short: completed four-hour close strictly below the prior confirmed UTC-day low.
 - Entry: next four-hour boundary's first available one-minute `RealOpen`.
 - Exit: `RealOpen` exactly four wall-clock hours later.
-- Incomplete entry/path rows are excluded before outcome access and counted as availability failures.
+- Every located trigger remains in the census and emitted artifact. An unavailable entry or full
+  four-hour path receives null outcomes plus a frozen availability reason and is excluded only from
+  outcome estimands and contrasts; it never changes event eligibility or disappears from reporting.
 
 ### 4.3 Fixed conditioning arms
 

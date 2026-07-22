@@ -28,6 +28,11 @@ operator verdicts) are unchanged; implementations rebind per INFR-010 §6 Phase 
 **Spread boundary:** no valid spread observation or secondary-data rescue exists. Chapter 05 does
 not manufacture a proxy or a spread-scale gate; reports label cost accounting partial.
 
+**Current signed-data materialisation:** the raw signed source is currently readable through the
+mounted archived staging symlink. The full TRAIN signed catalog is verified at
+`data/catalog_sigbar/train/`: 3,731,908 rows across five symbols, with tree sha
+`d4b7bbed7e0c…f7d2b9` and a zero-TEST/holdout SPDR-011 attestation. The OHLCV catalog is unaffected.
+
 ## High-level architecture
 
 ```

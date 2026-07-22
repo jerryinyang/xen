@@ -139,14 +139,41 @@ def test_live_cost_guidance_discloses_missing_spread(relative_path: str) -> None
     assert "load_chapter05_cost_pins" not in text
 
 
-def test_chapter05_entry_memory_records_checkpoint_without_authorising_run1() -> None:
+def test_chapter05_entry_memory_records_data_ready_without_authorising_run1() -> None:
     text = (
         PROJECT_ROOT / "docs/knowledge-base/memory/chapter05-entry-gate.md"
     ).read_text(encoding="utf-8")
 
-    assert "Status: CHECKPOINT_OPEN_RUN1_DESIGN_PENDING" in text
+    assert "Status: RUN1_PREEXECUTION_QA_PENDING" in text
     assert "CF-VOLCONV-001 is registered" in text
+    assert "raw five-symbol signed source is currently readable" in text
+    assert "TRAIN signed catalog is verified" in text
     assert "Run 1 execution requires separate operator authorisation" in text
     assert "no outcome exists" in text
     assert "COST_AMENDMENT_QA_PENDING" not in text
     assert "If QA approves" not in text
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    [
+        "docs/references/dataset-reference.md",
+        "docs/references/architecture.md",
+        "docs/knowledge-base/data-architecture.md",
+    ],
+)
+def test_live_docs_record_verified_full_signed_lane(relative_path: str) -> None:
+    text = (PROJECT_ROOT / relative_path).read_text(encoding="utf-8")
+
+    assert "raw signed source is currently readable" in text
+    assert "full TRAIN signed catalog is verified" in text
+    assert "d4b7bbed7e0c" in text
+
+
+def test_spdr011_design_has_executable_future_destroy_tripwire_declaration() -> None:
+    text = (PROJECT_ROOT / "python/experiments/SPDR-011/design.md").read_text(encoding="utf-8")
+
+    assert "TRIPWIRE: FUTURE-PATH-DERANGEMENT" in text
+    assert "derangement=YES" in text
+    assert "99% synthetic-null envelope" in text
+    assert "raw sentinel recovery" in text

@@ -1,0 +1,437 @@
+{
+  "item": "SPDR-011",
+  "stage": "OUTCOME_ISOLATED_CENSUS",
+  "generated_utc": "2026-07-22T22:51:26.089743+00:00",
+  "bands": {
+    "DESIGN": "[2021-06-29T06:53:00+00:00, 2023-03-01T00:00:00+00:00)",
+    "DESIGN_EFFECTIVE_ELIGIBLE": "[2022-09-14T00:00:00+00:00, 2023-03-01T00:00:00+00:00)",
+    "CONFIRM": "[2023-03-01T00:00:00+00:00, 2023-12-18T00:00:00+00:00)",
+    "TEST": "NOT_QUERIED",
+    "HOLDOUT": "NOT_QUERIED"
+  },
+  "fence_manifest_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+  "query_band": "TRAIN",
+  "max_query_end": "2023-12-18T00:00:00+00:00",
+  "source_data_class": "Nautilus Bar OHLCV only",
+  "outcome_isolation": {
+    "status": "PASS",
+    "allowed_event_columns": [
+      "band",
+      "beta60",
+      "calendar_third",
+      "cross_eligible",
+      "cross_rank",
+      "direction",
+      "drift20",
+      "entry_ts",
+      "event_id",
+      "exit_ts",
+      "range_known_ts",
+      "range_source_day",
+      "rv20",
+      "state_known_ts",
+      "state_source_day",
+      "symbol",
+      "top2",
+      "trade_day",
+      "trigger_ts",
+      "utc_slot",
+      "utc_week",
+      "vol_pct",
+      "vol_tercile"
+    ],
+    "forbidden_fields_absent": true,
+    "entry_exit_prices_loaded": false,
+    "forward_path_loaded": false,
+    "returns_or_pnl_computed": false,
+    "post_event_completeness_filter_applied": false
+  },
+  "coverage": {
+    "BTCUSDT": {
+      "n_minute_bars": 750239,
+      "first_ts_event": "2022-07-15 00:01:00+00:00",
+      "last_ts_event": "2023-12-18 00:00:00+00:00",
+      "n_daily_boundary_complete": 521,
+      "n_4h_boundary_complete": 3126
+    },
+    "ETHUSDT": {
+      "n_minute_bars": 750106,
+      "first_ts_event": "2022-07-15 00:01:00+00:00",
+      "last_ts_event": "2023-12-18 00:00:00+00:00",
+      "n_daily_boundary_complete": 521,
+      "n_4h_boundary_complete": 3126
+    },
+    "SOLUSDT": {
+      "n_minute_bars": 751287,
+      "first_ts_event": "2022-07-14 00:01:00+00:00",
+      "last_ts_event": "2023-12-18 00:00:00+00:00",
+      "n_daily_boundary_complete": 522,
+      "n_4h_boundary_complete": 3132
+    },
+    "DOGEUSDT": {
+      "n_minute_bars": 731224,
+      "first_ts_event": "2022-07-15 00:01:00+00:00",
+      "last_ts_event": "2023-12-18 00:00:00+00:00",
+      "n_daily_boundary_complete": 521,
+      "n_4h_boundary_complete": 3126
+    },
+    "XRPUSDT": {
+      "n_minute_bars": 749052,
+      "first_ts_event": "2022-07-15 00:01:00+00:00",
+      "last_ts_event": "2023-12-18 00:00:00+00:00",
+      "n_daily_boundary_complete": 521,
+      "n_4h_boundary_complete": 3126
+    }
+  },
+  "admission_coverage_attestation": {
+    "BTCUSDT": {
+      "first_bar": "2022-07-15 00:00:00",
+      "last_bar": "2026-07-14 23:59:00",
+      "no_trade_minutes": 1,
+      "collection_gap_minutes": 0,
+      "outage_minutes": 0,
+      "unresolved_error_days": 0
+    },
+    "ETHUSDT": {
+      "first_bar": "2022-07-15 00:00:00",
+      "last_bar": "2026-07-14 23:59:00",
+      "no_trade_minutes": 134,
+      "collection_gap_minutes": 0,
+      "outage_minutes": 0,
+      "unresolved_error_days": 0
+    },
+    "SOLUSDT": {
+      "first_bar": "2022-07-14 00:00:00",
+      "last_bar": "2026-07-13 23:59:00",
+      "no_trade_minutes": 393,
+      "collection_gap_minutes": 0,
+      "outage_minutes": 0,
+      "unresolved_error_days": 0
+    },
+    "DOGEUSDT": {
+      "first_bar": "2022-07-15 00:00:00",
+      "last_bar": "2026-07-14 23:59:00",
+      "no_trade_minutes": 19155,
+      "collection_gap_minutes": 0,
+      "outage_minutes": 0,
+      "unresolved_error_days": 0
+    },
+    "XRPUSDT": {
+      "first_bar": "2022-07-15 00:00:00",
+      "last_bar": "2026-07-14 23:59:00",
+      "no_trade_minutes": 1303,
+      "collection_gap_minutes": 0,
+      "outage_minutes": 0,
+      "unresolved_error_days": 0
+    }
+  },
+  "counts": {
+    "DESIGN": {
+      "events": 1390,
+      "unique_dates": 148,
+      "unique_weeks": 25,
+      "by_symbol": {
+        "BTCUSDT": 272,
+        "DOGEUSDT": 276,
+        "ETHUSDT": 289,
+        "SOLUSDT": 285,
+        "XRPUSDT": 268
+      },
+      "by_tercile": {
+        "HIGH": 394,
+        "LOW": 606,
+        "MID": 390
+      },
+      "by_direction": {
+        "LONG": 716,
+        "SHORT": 674
+      },
+      "by_calendar_third": {
+        "1": 482,
+        "2": 506,
+        "3": 402
+      },
+      "cross_eligible": 1390,
+      "top2": 551,
+      "same_timestamp_clusters": {
+        "n_clustered_timestamps": 351,
+        "max_cluster_size": 5,
+        "cluster_size_distribution": {
+          "1": 233,
+          "2": 122,
+          "3": 76,
+          "4": 80,
+          "5": 73
+        }
+      },
+      "prospective_mde": {
+        "BTCUSDT": {
+          "effective_dates_all": 90,
+          "effective_dates_high": 19,
+          "effective_dates_mid_low": 71,
+          "one_sample_mde_bps": {
+            "50": 32.11820274187865,
+            "100": 64.2364054837573,
+            "200": 128.4728109675146
+          },
+          "high_vs_mid_low_mde_bps": {
+            "50": 36.16124009760436,
+            "100": 72.32248019520873,
+            "200": 144.64496039041745
+          }
+        },
+        "ETHUSDT": {
+          "effective_dates_all": 95,
+          "effective_dates_high": 14,
+          "effective_dates_mid_low": 81,
+          "one_sample_mde_bps": {
+            "50": 37.416573867739416,
+            "100": 74.83314773547883,
+            "200": 149.66629547095766
+          },
+          "high_vs_mid_low_mde_bps": {
+            "50": 40.521294508467705,
+            "100": 81.04258901693541,
+            "200": 162.08517803387082
+          }
+        },
+        "SOLUSDT": {
+          "effective_dates_all": 95,
+          "effective_dates_high": 42,
+          "effective_dates_mid_low": 53,
+          "one_sample_mde_bps": {
+            "50": 21.602468994692867,
+            "100": 43.20493798938573,
+            "200": 86.40987597877147
+          },
+          "high_vs_mid_low_mde_bps": {
+            "50": 28.921929178763015,
+            "100": 57.84385835752603,
+            "200": 115.68771671505206
+          }
+        },
+        "DOGEUSDT": {
+          "effective_dates_all": 87,
+          "effective_dates_high": 20,
+          "effective_dates_mid_low": 67,
+          "one_sample_mde_bps": {
+            "50": 31.304951684997054,
+            "100": 62.60990336999411,
+            "200": 125.21980673998821
+          },
+          "high_vs_mid_low_mde_bps": {
+            "50": 35.6726409652108,
+            "100": 71.3452819304216,
+            "200": 142.6905638608432
+          }
+        },
+        "XRPUSDT": {
+          "effective_dates_all": 89,
+          "effective_dates_high": 33,
+          "effective_dates_mid_low": 56,
+          "one_sample_mde_bps": {
+            "50": 24.370871833797697,
+            "100": 48.741743667595394,
+            "200": 97.48348733519079
+          },
+          "high_vs_mid_low_mde_bps": {
+            "50": 30.723596696015164,
+            "100": 61.44719339203033,
+            "200": 122.89438678406066
+          }
+        },
+        "POOLED_DISCLOSURE": {
+          "effective_dates_all": 148,
+          "effective_dates_high": 74,
+          "effective_dates_mid_low": 122,
+          "one_sample_mde_bps": {
+            "50": 16.2746694241347,
+            "100": 32.5493388482694,
+            "200": 65.0986776965388
+          },
+          "high_vs_mid_low_mde_bps": {
+            "50": 20.628150730731605,
+            "100": 41.25630146146321,
+            "200": 82.51260292292642
+          }
+        }
+      }
+    },
+    "CONFIRM": {
+      "events": 2216,
+      "unique_dates": 255,
+      "unique_weeks": 42,
+      "by_symbol": {
+        "BTCUSDT": 393,
+        "DOGEUSDT": 440,
+        "ETHUSDT": 437,
+        "SOLUSDT": 499,
+        "XRPUSDT": 447
+      },
+      "by_tercile": {
+        "HIGH": 490,
+        "LOW": 1022,
+        "MID": 704
+      },
+      "by_direction": {
+        "LONG": 1248,
+        "SHORT": 968
+      },
+      "by_calendar_third": {
+        "1": 810,
+        "2": 643,
+        "3": 763
+      },
+      "cross_eligible": 2216,
+      "top2": 894,
+      "same_timestamp_clusters": {
+        "n_clustered_timestamps": 568,
+        "max_cluster_size": 5,
+        "cluster_size_distribution": {
+          "1": 425,
+          "2": 215,
+          "3": 155,
+          "4": 94,
+          "5": 104
+        }
+      },
+      "prospective_mde": {
+        "BTCUSDT": {
+          "effective_dates_all": 142,
+          "effective_dates_high": 36,
+          "effective_dates_mid_low": 106,
+          "one_sample_mde_bps": {
+            "50": 23.333333333333332,
+            "100": 46.666666666666664,
+            "200": 93.33333333333333
+          },
+          "high_vs_mid_low_mde_bps": {
+            "50": 27.0064826443912,
+            "100": 54.0129652887824,
+            "200": 108.0259305775648
+          }
+        },
+        "ETHUSDT": {
+          "effective_dates_all": 150,
+          "effective_dates_high": 21,
+          "effective_dates_mid_low": 129,
+          "one_sample_mde_bps": {
+            "50": 30.550504633038933,
+            "100": 61.10100926607787,
+            "200": 122.20201853215573
+          },
+          "high_vs_mid_low_mde_bps": {
+            "50": 32.943456373450815,
+            "100": 65.88691274690163,
+            "200": 131.77382549380326
+          }
+        },
+        "SOLUSDT": {
+          "effective_dates_all": 165,
+          "effective_dates_high": 37,
+          "effective_dates_mid_low": 128,
+          "one_sample_mde_bps": {
+            "50": 23.015858222750023,
+            "100": 46.031716445500045,
+            "200": 92.06343289100009
+          },
+          "high_vs_mid_low_mde_bps": {
+            "50": 26.131489236737536,
+            "100": 52.26297847347507,
+            "200": 104.52595694695015
+          }
+        },
+        "DOGEUSDT": {
+          "effective_dates_all": 155,
+          "effective_dates_high": 31,
+          "effective_dates_mid_low": 124,
+          "one_sample_mde_bps": {
+            "50": 25.14474228374849,
+            "100": 50.28948456749698,
+            "200": 100.57896913499395
+          },
+          "high_vs_mid_low_mde_bps": {
+            "50": 28.11267651158746,
+            "100": 56.22535302317492,
+            "200": 112.45070604634984
+          }
+        },
+        "XRPUSDT": {
+          "effective_dates_all": 152,
+          "effective_dates_high": 44,
+          "effective_dates_mid_low": 108,
+          "one_sample_mde_bps": {
+            "50": 21.105794120443456,
+            "100": 42.21158824088691,
+            "200": 84.42317648177382
+          },
+          "high_vs_mid_low_mde_bps": {
+            "50": 25.03869059947079,
+            "100": 50.07738119894158,
+            "200": 100.15476239788316
+          }
+        },
+        "POOLED_DISCLOSURE": {
+          "effective_dates_all": 255,
+          "effective_dates_high": 103,
+          "effective_dates_mid_low": 233,
+          "one_sample_mde_bps": {
+            "50": 13.794609894300105,
+            "100": 27.58921978860021,
+            "200": 55.17843957720042
+          },
+          "high_vs_mid_low_mde_bps": {
+            "50": 16.565368508117835,
+            "100": 33.13073701623567,
+            "200": 66.26147403247134
+          }
+        }
+      }
+    }
+  },
+  "prospective_mde_note": "Count-only normal approximation at 5% two-sided / 80% power; independent unit is unique UTC date and sigma grid is assumed, not estimated from outcomes. Final MDE uses date-block resampling after authorised emission.",
+  "golden_event_keys_no_prices": [
+    {
+      "event_id": "BTCUSDT::2022-09-17T16:00:00+00:00::+1",
+      "symbol": "BTCUSDT",
+      "trigger_ts": "2022-09-17 16:00:00+00:00",
+      "entry_ts": "2022-09-17 16:00:00+00:00",
+      "exit_ts": "2022-09-17 20:00:00+00:00",
+      "direction": 1
+    },
+    {
+      "event_id": "DOGEUSDT::2022-10-27T04:00:00+00:00::+1",
+      "symbol": "DOGEUSDT",
+      "trigger_ts": "2022-10-27 04:00:00+00:00",
+      "entry_ts": "2022-10-27 04:00:00+00:00",
+      "exit_ts": "2022-10-27 08:00:00+00:00",
+      "direction": 1
+    },
+    {
+      "event_id": "ETHUSDT::2022-09-25T20:00:00+00:00::-1",
+      "symbol": "ETHUSDT",
+      "trigger_ts": "2022-09-25 20:00:00+00:00",
+      "entry_ts": "2022-09-25 20:00:00+00:00",
+      "exit_ts": "2022-09-26 00:00:00+00:00",
+      "direction": -1
+    }
+  ],
+  "signed_data": {
+    "raw_source_readable": true,
+    "train_catalog_verified": true,
+    "ready": true,
+    "per_symbol_source_paths": {
+      "BTCUSDT": "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/BTCUSDT.parquet",
+      "ETHUSDT": "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/ETHUSDT.parquet",
+      "SOLUSDT": "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/SOLUSDT.parquet",
+      "DOGEUSDT": "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/DOGEUSDT.parquet",
+      "XRPUSDT": "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/XRPUSDT.parquet"
+    },
+    "catalog_root": "data/catalog_sigbar/train",
+    "catalog_file_count": 90,
+    "catalog_tree_sha256": "d4b7bbed7e0c039cc8c74a05e0f8747796c75016957d1e7c5f7c2feb20f7d2b9",
+    "attestation_path": "python/experiments/SPDR-011/results/signed_train_attestation.json",
+    "attestation_status": "VERIFIED",
+    "execution_consequence": "signed-data preparation cleared; outcome execution still requires runner QA and separate operator authorisation"
+  }
+}

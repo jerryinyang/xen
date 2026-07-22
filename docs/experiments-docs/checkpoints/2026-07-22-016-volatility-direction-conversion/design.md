@@ -1,7 +1,7 @@
 # Checkpoint 016 — Volatility-to-Direction Conversion
 
 - **Opened:** 2026-07-22
-- **Status:** `OPEN — FAMILY REGISTERED / RUN-1 DESIGN PENDING`
+- **Status:** `OPEN — RUN-1 READY FOR OPERATOR EXECUTION DECISION (QA run 4 APPROVE)`
 - **Family:** `CF-VOLCONV-001` (`REGISTERED`)
 - **Container:** `SPDR-011` count-only census + TRAIN characterisation; conditional `EXP-099`
   Nautilus replay
@@ -37,7 +37,11 @@ enters Chapter-05 cost accounting.
 | Historical TEST | Sealed for this family; prior related contact makes it ineligible as confirmation |
 | Global holdout | Sealed; no exception |
 | Family registration | `CF-VOLCONV-001` registered by this checkpoint opening |
-| Run execution | Not authorised |
+| Outcome-free census | Complete: 1,390 DESIGN events / 148 dates; no returns or prices emitted |
+| Signed TRAIN lane | **VERIFIED:** 3,731,908 rows / 5 symbols / 90 files; tree sha `d4b7bbed…f7d2b9` |
+| Run-1 design | Complete at `python/experiments/SPDR-011/design.md` |
+| Run-1 pre-exec QA | Complete: QA run 4 APPROVE (fresh context); A6 integrity fixes closed |
+| Run execution | Not authorised — ready for operator execution decision |
 
 ## 3. Fixed question and mechanism
 
@@ -86,14 +90,15 @@ No threshold, symbol, direction, horizon or exit may be selected by outcome perf
 
 | Order | Item | Purpose | Start gate | Status |
 |---:|---|---|---|---|
-| 1 | `SPDR-011` census | Count eligible events and dependence clusters without opening outcomes; derive prospective MDE and 2–3 golden events | family registered; outcome isolation proven | **NEXT — not run** |
-| 2 | `SPDR-011` design | Freeze schema, controls, plausible effect/MDE bands, golden traces and layer protocol | census artifact only | pending |
-| 3 | `SPDR-011` QA | Fresh-context design/code review | completed design | pending |
-| 4 | `SPDR-011` execution | Emit one TRAIN-only event artifact | QA APPROVE + separate operator approval | unauthorised |
-| 5 | DESIGN layers | L1→L5 sequential operator reads; stop/drop/advance recorded after each | valid frozen artifact | unauthorised |
-| 6 | CONFIRM | One read of one frozen rule; no replacement | rule hash + prospective power | unauthorised |
-| 7 | `EXP-099` | Nautilus reproduction, canonical accounting and physicality | Run-1 rule/evidence accepted + new design/QA/operator approval | reserved only |
-| 8 | Retrospective/shadow | Family disposition or frozen forward observation | operator verdict | pending |
+| 1 | `SPDR-011` census | Count eligible events and dependence clusters without opening outcomes; derive prospective MDE and 2–3 golden events | family registered; outcome isolation proven | **COMPLETE — 1,390 DESIGN events** |
+| 2 | `SPDR-011` design | Freeze schema, controls, plausible effect/MDE bands, golden traces and layer protocol | census artifact only | **COMPLETE** |
+| 3 | Signed-data ingest | Bulk-ingest/fence-attest the five readable primary-data histories into the `SignedBar` TRAIN lane | design §3.4 | **COMPLETE — VERIFIED** |
+| 4 | `SPDR-011` QA | Fresh-context design/code review | completed design + reviewable implementation | **COMPLETE — QA run 4 APPROVE** |
+| 5 | `SPDR-011` execution | Emit one TRAIN-only event artifact | signed data + QA APPROVE + separate operator approval | unauthorised |
+| 6 | DESIGN layers | L1→L5 sequential operator reads; stop/drop/advance recorded after each | valid frozen artifact | unauthorised |
+| 7 | CONFIRM | One read of one frozen rule; no replacement | rule hash + prospective power | unauthorised |
+| 8 | `EXP-099` | Nautilus reproduction, canonical accounting and physicality | Run-1 rule/evidence accepted + new design/QA/operator approval | reserved only |
+| 9 | Retrospective/shadow | Family disposition or frozen forward observation | operator verdict | pending |
 
 The `SPDR → EXP` path is the operator-approved exception. XENA is prohibited because there is no
 candidate grid or portfolio search.
@@ -187,6 +192,11 @@ physicality and value labels. The operator alone advances or stops value layers.
 | Amendment | Direction | Running count |
 |---|---|---|
 | A1 — operator removed all fixed spread proxies; missing spread is null with mandatory partial-cost caveat | `LOOSER` | 1L / 0T / 0N |
+| A2 — matching/stability thirds use effective eligible DESIGN coverage | `NEUTRAL` | 1L / 0T / 1N |
+| A3 — all located events retained; later missing marks are null attrition, not eligibility | `NEUTRAL` | 1L / 0T / 2N |
+| A4 — exact control seeds/match units/strata and logical CONFIRM bundle seal frozen before outcomes | `NEUTRAL` | 1L / 0T / 3N |
+| A5 — realised TOP2 pair excluded from L4 random-pair null to prevent a self-control | `TIGHTER` | 1L / 1T / 3N |
+| A6 — live catalog re-hash, supported-edge destroy survival and event/fill reconciliation made binding | `TIGHTER` | 1L / 2T / 3N |
 
 Any later change to data, instruments, trigger, state, horizon, cost regime, control, threshold,
 direction rule or route requires an amendment before outcome contact. After results exist, it is a new
@@ -194,9 +204,9 @@ design, not a rescue amendment.
 
 ## 13. Stop boundary and deliverables
 
-This opening delivers only the registered family and checkpoint container. It authorises no census,
+The registered family, outcome-free census and final Run-1 design are complete. They authorise no
 outcome column, SPDR execution, EXP execution, TEST, holdout or shadow action.
 
-Next permitted work is an outcome-isolated count-only census and `SPDR-011/design.md`. That design
-must include the full mandatory declaration blocks, prospective MDE, golden traces and fresh-context
-QA before the operator is asked to approve execution.
+Fresh-context QA over the reviewable implementation and verified signed lane is complete (QA run 4
+APPROVE). Next permitted work is the operator's Run-1 execution decision; execution still needs a
+separate operator approval.

@@ -566,3 +566,8 @@ Notes:
   TRAIN-only and conditional `EXP-099` TRAIN reproduction. Historical analysis-TEST is prohibited
   because related `CF-HTFCAP-001` work already contacted that interval; the global holdout remains
   sealed. **0 counted TEST reads, 0 holdout reads.** No read authority is created by registration.
+- **SPDR-011 census/design (2026-07-22):** fenced TRAIN-only event-location census emitted causal
+  keys/counts only (1,390 DESIGN events; 2,216 sealed-CONFIRM keys), with no execution prices,
+  forward paths, returns or P&L. The signed TRAIN preparation then ingested/attested 3,731,908 rows
+  across five symbols without decoding TEST/holdout, and runner verification remained synthetic-only.
+  **0 counted TEST reads, 0 holdout reads.** No outcome run is yet authorised.

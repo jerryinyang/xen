@@ -1,0 +1,156 @@
+{
+  "schema": "spdr011-signed-train-attestation/v1",
+  "status": "VERIFIED",
+  "generated_utc": "2026-07-22T22:49:35.545600+00:00",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "DOGEUSDT",
+    "XRPUSDT"
+  ],
+  "catalog_root": "data/catalog_sigbar/train",
+  "catalog_tree_sha256": "d4b7bbed7e0c039cc8c74a05e0f8747796c75016957d1e7c5f7c2feb20f7d2b9",
+  "pipeline_version": "sigbar-0.1.0",
+  "accepted_infr017_config_hash": "e3b9fd9b9b5851b8a9a11f9ce34cd1e0fa8e10ea1fe1b210bd0090da379e6225",
+  "legacy_mean_price_skew_status": "UNUSABLE",
+  "fence": {
+    "manifest_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+    "band": "TRAIN",
+    "start_utc": "2021-06-29T06:53:00+00:00",
+    "end_utc_exclusive": "2023-12-18T00:00:00+00:00",
+    "test_rows_read": 0,
+    "holdout_rows_read": 0
+  },
+  "mapping": {
+    "buy_volume": "BuyVolume",
+    "sell_volume": "SellVolume",
+    "delta": "BuyVolume - SellVolume",
+    "split_invariant": "BuyVolume + SellVolume == Volume (rtol 1e-9)"
+  },
+  "source_hash_scope": "full parquet container bytes; hash-only, with no non-TRAIN row or column decoded",
+  "train_selection_timestamp": "OpenTime",
+  "boundary_note": "OpenTime < train_end_utc; the final admitted one-minute bar may have CloseTime/ts_event exactly equal to train_end_utc",
+  "per_symbol": {
+    "BTCUSDT": {
+      "path": "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/BTCUSDT.parquet",
+      "source_file_sha256": "b99d110a0fb8d020ce578b236b676dd8064b547c1b14cb05dea8da1cee29fdcc",
+      "train_rows": 750239,
+      "first_open_time": "2022-07-15T00:00:00",
+      "last_open_time": "2023-12-17T23:59:00",
+      "first_close_time": "2022-07-15T00:01:00",
+      "last_close_time": "2023-12-18T00:00:00",
+      "split_invariant_violations": 0,
+      "status": "VERIFIED",
+      "chunked_ingest_rows": 750239,
+      "delta_mapping_violations": 0,
+      "catalog_audit": {
+        "complete": true,
+        "catalog_file_count": 18,
+        "catalog_rows": 750239,
+        "first_ts_event": 1657843260000000000,
+        "last_ts_event": 1702857600000000000,
+        "split_invariant_violations": 0,
+        "delta_mapping_violations": 0,
+        "config_hash_violations": 0,
+        "pipeline_version_violations": 0
+      }
+    },
+    "ETHUSDT": {
+      "path": "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/ETHUSDT.parquet",
+      "source_file_sha256": "88a3230b18d674cef637356ae93571267f904436426cc9245b97dd76556162d3",
+      "train_rows": 750106,
+      "first_open_time": "2022-07-15T00:00:00",
+      "last_open_time": "2023-12-17T23:59:00",
+      "first_close_time": "2022-07-15T00:01:00",
+      "last_close_time": "2023-12-18T00:00:00",
+      "split_invariant_violations": 0,
+      "status": "VERIFIED",
+      "chunked_ingest_rows": 750106,
+      "delta_mapping_violations": 0,
+      "catalog_audit": {
+        "complete": true,
+        "catalog_file_count": 18,
+        "catalog_rows": 750106,
+        "first_ts_event": 1657843260000000000,
+        "last_ts_event": 1702857600000000000,
+        "split_invariant_violations": 0,
+        "delta_mapping_violations": 0,
+        "config_hash_violations": 0,
+        "pipeline_version_violations": 0
+      }
+    },
+    "SOLUSDT": {
+      "path": "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/SOLUSDT.parquet",
+      "source_file_sha256": "2a8fe8dde6ba648eea352c5ff619cdf9a0c54d462cda3395dd5a705ebb7ba062",
+      "train_rows": 751287,
+      "first_open_time": "2022-07-14T00:00:00",
+      "last_open_time": "2023-12-17T23:59:00",
+      "first_close_time": "2022-07-14T00:01:00",
+      "last_close_time": "2023-12-18T00:00:00",
+      "split_invariant_violations": 0,
+      "status": "VERIFIED",
+      "chunked_ingest_rows": 751287,
+      "delta_mapping_violations": 0,
+      "catalog_audit": {
+        "complete": true,
+        "catalog_file_count": 18,
+        "catalog_rows": 751287,
+        "first_ts_event": 1657756860000000000,
+        "last_ts_event": 1702857600000000000,
+        "split_invariant_violations": 0,
+        "delta_mapping_violations": 0,
+        "config_hash_violations": 0,
+        "pipeline_version_violations": 0
+      }
+    },
+    "DOGEUSDT": {
+      "path": "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/DOGEUSDT.parquet",
+      "source_file_sha256": "6a27871e4ff730975976ae72a6b75d834e079e91db9054ec5231de056c9aa529",
+      "train_rows": 731224,
+      "first_open_time": "2022-07-15T00:00:00",
+      "last_open_time": "2023-12-17T23:59:00",
+      "first_close_time": "2022-07-15T00:01:00",
+      "last_close_time": "2023-12-18T00:00:00",
+      "split_invariant_violations": 0,
+      "status": "VERIFIED",
+      "chunked_ingest_rows": 731224,
+      "delta_mapping_violations": 0,
+      "catalog_audit": {
+        "complete": true,
+        "catalog_file_count": 18,
+        "catalog_rows": 731224,
+        "first_ts_event": 1657843260000000000,
+        "last_ts_event": 1702857600000000000,
+        "split_invariant_violations": 0,
+        "delta_mapping_violations": 0,
+        "config_hash_violations": 0,
+        "pipeline_version_violations": 0
+      }
+    },
+    "XRPUSDT": {
+      "path": "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/XRPUSDT.parquet",
+      "source_file_sha256": "46d24562f2d46fa9c2083170e4a35cfa7aff20909304214895385ad1dd6a3282",
+      "train_rows": 749052,
+      "first_open_time": "2022-07-15T00:00:00",
+      "last_open_time": "2023-12-17T23:59:00",
+      "first_close_time": "2022-07-15T00:01:00",
+      "last_close_time": "2023-12-18T00:00:00",
+      "split_invariant_violations": 0,
+      "status": "VERIFIED",
+      "chunked_ingest_rows": 749052,
+      "delta_mapping_violations": 0,
+      "catalog_audit": {
+        "complete": true,
+        "catalog_file_count": 18,
+        "catalog_rows": 749052,
+        "first_ts_event": 1657843260000000000,
+        "last_ts_event": 1702857600000000000,
+        "split_invariant_violations": 0,
+        "delta_mapping_violations": 0,
+        "config_hash_violations": 0,
+        "pipeline_version_violations": 0
+      }
+    }
+  }
+}
