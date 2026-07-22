@@ -4,8 +4,10 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
+import xen.evaluation as evaluation
 from xen.adjudication import MultiLegSeries
 from xen.evaluation import (
+    bybit_round_trip_cost_bps,
     block_bootstrap_ci,
     block_sensitivity,
     collapse_fraction,
@@ -14,6 +16,7 @@ from xen.evaluation import (
     mde,
     powered_label,
     split_by,
+    t1_round_trip_spread_bps,
     trimmed_mean,
 )
 
@@ -81,6 +84,80 @@ def test_cost_sensitivity_monotone() -> None:
     stats = [row["stat"] for row in curve]
     assert stats[0] > stats[1] > stats[2]
     assert stats[0] - stats[2] == pytest.approx(10.0)
+
+
+@pytest.mark.parametrize("stress", [0.5, 1.0, 2.0])
+def test_bybit_cost_components_reconcile_with_stress_applied_once(stress: float) -> None:
+    result = bybit_round_trip_cost_bps(
+        "BTCUSDT",
+        50_000.0,
+        liquidity="taker",
+        spread_bps=0.244,
+        funding_bps_per_8h=1.0,
+        hold_hours=4.0,
+        stress=stress,
+    )
+
+    assert result["fee_rt_bps"] == pytest.approx(11.0 * stress)
+    assert result["spread_rt_bps"] == pytest.approx(0.244 * stress)
+    assert result["funding_rt_bps"] == pytest.approx(0.5 * stress)
+    assert result["total_bps"] == pytest.approx(
+        result["fee_rt_bps"]
+        + result["spread_rt_bps"]
+        + result["funding_rt_bps"]
+    )
+
+
+@pytest.mark.parametrize("spread_bps", [-0.001, np.nan, np.inf, -np.inf])
+def test_t1_round_trip_spread_rejects_invalid_input(spread_bps: float) -> None:
+    with pytest.raises(ValueError, match="spread_bps"):
+        t1_round_trip_spread_bps("BTCUSDT", spread_bps)
+
+
+@pytest.mark.parametrize(
+    ("entry_time", "exit_time", "expected"),
+    [
+        ("2026-07-22T04:00:00Z", "2026-07-22T08:00:00Z", 1),
+        ("2026-07-22T06:00:00Z", "2026-07-22T10:00:00Z", 1),
+        ("2026-07-22T08:00:00Z", "2026-07-22T12:00:00Z", 0),
+        ("2026-07-22T22:00:00Z", "2026-07-23T02:00:00Z", 1),
+    ],
+)
+def test_count_bybit_funding_stamps_for_fixed_four_hour_episode(
+    entry_time: str,
+    exit_time: str,
+    expected: int,
+) -> None:
+    assert hasattr(evaluation, "count_bybit_funding_stamps")
+    counter = getattr(evaluation, "count_bybit_funding_stamps")
+    assert counter(entry_time, exit_time) == expected
+
+
+@pytest.mark.parametrize(
+    ("entry_time", "exit_time", "expected_funding"),
+    [
+        ("2026-07-22T04:00:00Z", "2026-07-22T08:00:00Z", 1.0),
+        ("2026-07-22T08:00:00Z", "2026-07-22T12:00:00Z", 0.0),
+    ],
+)
+def test_bybit_cost_uses_discrete_funding_stamps_for_four_hour_episode(
+    entry_time: str,
+    exit_time: str,
+    expected_funding: float,
+) -> None:
+    stamps = evaluation.count_bybit_funding_stamps(entry_time, exit_time)
+    result = bybit_round_trip_cost_bps(
+        "BTCUSDT",
+        50_000.0,
+        liquidity="taker",
+        spread_bps=0.244,
+        funding_bps_per_8h=1.0,
+        hold_hours=4.0,
+        funding_stamps=stamps,
+    )
+
+    assert result["funding_rt_bps"] == pytest.approx(expected_funding)
+    assert result["funding_method"] == "DISCRETE_STAMPS"
 
 
 def test_collapse_fraction() -> None:

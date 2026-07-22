@@ -31,7 +31,7 @@ Module: `xen.nautilus.instrument_ids`.
 |--------|------|-------|
 | BTCUSDT | liquid anchor | ~4y capped from 2022-07-14 |
 | ETHUSDT | liquid anchor | idem |
-| SOLUSDT | liquid + future MBP trio | idem |
+| SOLUSDT | liquid anchor | idem |
 | LUNA2USDT | delist tail test | archive present through 2026-07-13 |
 | USTCUSDT | younger listing | shorter capped range |
 
@@ -44,7 +44,7 @@ Full candidate list: `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-
 | Dataset | Path | Status |
 |---------|------|--------|
 | Primary catalog (bars) | `data/catalog/` | INGESTED (A4, 2026-07-16; 894 ADMITTED + 9 SPEC_INCOMPLETE) |
-| Mean-price skew fields | per-symbol bar parquets at `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/` (`SpreadAbs`/`SpreadBps`/`MeanBuy`/`MeanSell`; 904 files, consolidated 2026-07-16) | **UNUSABLE AS SPREAD** — retained bytes, not a cost input; access-path quarantine is a Chapter 05 preflight blocker |
+| Mean-price skew fields | per-symbol bar parquets at `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/` (`SpreadAbs`/`SpreadBps`/`MeanBuy`/`MeanSell`; 904 files, consolidated 2026-07-16) | **UNUSABLE AS SPREAD** — retained bytes; analytical access renames the bps field to `MeanPriceSkewBps` and stamps `UNUSABLE_AS_SPREAD` |
 | Strategy emissions | `data/nautilus_runs/<run_id>/` | emission contract v1 |
 | Fence manifest (A6) | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json` | **PINNED** 2026-07-16 |
 | Admission ledger (A5) | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/admission-ledger.jsonl` | 910 census rows, explicit exclusions |
@@ -78,18 +78,25 @@ approved query wrapper that enforces the global fence.
 | `volume` | Real traded volume (contracts/coin per instrument spec) |
 | `bar_type` | 1-MINUTE-LAST |
 
-### Pseudo-quote spread series (T1 cost input)
+### Mean-price skew quarantine (not a cost input)
 
-Per-minute spread estimate from aggressor-side trades (Buy ≈ ask, Sell ≈ bid), tick-size floor,
-conservative bias. Used by `xen.evaluation.t1_round_trip_spread_bps` at analysis — **not**
-for in-engine fills on T1.
+The stored `SpreadBps` field is
+`1e4 × (MeanBuy − MeanSell) / ((MeanBuy + MeanSell) / 2)`. The producing code applies no
+tick floor. Because the two means cover different trades at different times, the value is an
+intraminute mean-price skew and may be negative; it is not a quote or effective spread.
+
+Stored bytes and fence pins remain unchanged. `xen.sigbar.quarantine_mean_price_skew` is the
+only live analytical access seam: it verifies the INFR-017 pin, removes the misleading storage
+name, exposes the value as `MeanPriceSkewBps`, and attaches `MeanPriceSkewStatus =
+UNUSABLE_AS_SPREAD`. Passing this field to any cost function is prohibited.
 
 ---
 
-## Secondary lane: MBP trio (T2, deferred)
+## Secondary lane: MBP/L2 contracts (inactive)
 
-BTCUSDT, ETHUSDT, SOLUSDT USDT perps only. Real `QuoteTick` from depth archives (~July 2023+).
-No bulk collection in INFR-010/011/012/013 skeleton phase.
+Historical contracts describe BTCUSDT, ETHUSDT and SOLUSDT depth data, but no bulk collection
+exists and secondary data is an established programme limitation. Chapter 05 cannot route an
+unresolved T1 result into a T2 rescue branch.
 
 Spec: `docs/references/orderflow-feature-store.md`.
 
@@ -196,16 +203,32 @@ bundle = adjudicate_emission("data/nautilus_runs/<run_id>")
 
 ## Cost reads (T1 analysis)
 
-Use `xen.evaluation` Bybit schedule — not FTMO:
+Use the Bybit schedule and Chapter-05 cost-floor proxy pins in `xen.evaluation` — not FTMO and
+never the stored mean-price skew. The flip-pair proxy is a conservative upper bound, not a
+quoted/executable spread, and was validated on only 20 symbol-days:
 
 ```python
-from xen.evaluation import bybit_round_trip_cost_bps, t1_round_trip_spread_bps
+from xen.evaluation import (
+    bybit_round_trip_cost_bps,
+    count_bybit_funding_stamps,
+    load_chapter05_cost_pins,
+)
 
-rt = bybit_round_trip_cost_bps("BTCUSDT", entry_price=50000.0, liquidity="taker",
-                                spread_bps=t1_round_trip_spread_bps("BTCUSDT", spread_series))
+pins = load_chapter05_cost_pins()  # process-start hash and five-symbol verification
+stamps = count_bybit_funding_stamps(entry_time, exit_time)
+rt = bybit_round_trip_cost_bps(
+    "BTCUSDT",
+    entry_price=50_000.0,
+    liquidity="taker",
+    spread_bps=pins["spread_pins_bps"]["BTCUSDT"],
+    funding_bps_per_8h=1.0,
+    funding_stamps=stamps,
+)
 ```
 
-Funding gaps: flagged `funding_coverage: GAP` with conservative accrual assumption (R7).
+For the fixed Chapter-05 four-hour episode, settlement timestamps are counted in `(entry, exit]`;
+continuous `hold_hours / 8` prorating is forbidden. The adverse missing-history charge is 1.0 bps
+per crossed 00:00/08:00/16:00 UTC timestamp.
 
 ---
 

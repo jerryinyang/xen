@@ -15,9 +15,9 @@ All paths are relative to the project root (`{project-root}`).
 | Data Files | `data/` |
 | Nautilus catalog (primary OHLCV) | `data/catalog/` (ParquetDataCatalog, INFR-011) |
 | Strategy-run emissions (Nautilus) | `data/nautilus_runs/<run_id>/` (emission contract v1) |
-| Nautilus runner / smoke | `python/experiments/INFR-010/scripts/run_phase_b.py`; per-EXP runners under `python/experiments/<ID>/code/` |
-| Fence manifest (A6, hash-pinned) | `python/experiments/INFR-011/artifacts/fence-manifest.json` |
-| Universe census (910 USDT perps) | `python/experiments/INFR-011/artifacts/universe-census.md` |
+| Nautilus runner / smoke | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-010/scripts/run_phase_b.py`; per-EXP runners under `python/experiments/<ID>/code/` |
+| Fence manifest (A6, hash-pinned) | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json` |
+| Universe census (910 USDT perps) | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/universe-census.md` |
 | Archived cTrader emissions | `archive/chapter-03-xena-mtfctx/data/strategy_runs/` (VAL carve-out only) |
 | **Knowledge Base (read first)** | `docs/knowledge-base/` (INDEX, lessons-and-amendments, pitfalls-ledger, …) |
 | Signal Registry (live ledgers) | `docs/signal-registry/` (multiplicity, test-read, candidate-families) |
@@ -136,8 +136,11 @@ Two-lane model (INFR-010 §4):
 
 | Lane | Tier | Data | Path |
 |------|------|------|------|
-| **Primary** | T1 | 1m OHLCV from Bybit trades + pseudo-quote spreads | `data/catalog/` |
-| **Secondary** | T2 | MBP/L2 (BTC/ETH/SOL) — deferred | `docs/references/orderflow-feature-store.md` |
+| **Primary** | T1 | 1m OHLCV from Bybit trades; audited cost pins remain external to bars | `data/catalog/` |
+| **Signed-volume** | T1 | Exact taker buy/sell volume plus quarantined mean-price skew | `data/catalog/` |
+
+Secondary MBP/L2 data is unavailable and is not an active Chapter-05 branch. An unresolved
+T1 spread-scale read is parked; it is not routed to a future secondary-data programme.
 
 - **Universe:** 910 USDT linear perpetuals (listed + delisted), census at INFR-011 A1.
 - **InstrumentId:** `{SYMBOL}-LINEAR.BYBIT` via `xen.nautilus.instrument_ids`.
@@ -150,7 +153,7 @@ Full schemas: `docs/references/dataset-reference.md` v2, `docs/references/archit
 
 `data/nautilus_runs/<run_id>/` — `bar_marks.parquet`, `positions_ledger.parquet`, fills,
 orders, `event_log.jsonl`, `fence_attestation.json`. Shim: `xen.nautilus.adjudication_shim`.
-Spec: `python/experiments/INFR-010/code/emission_contract_v1.md`.
+Spec: `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-010/code/emission_contract_v1.md`.
 
 **STUB fence attestations (Phase B smokes) fail estimand gate v2** — production runs require
 INFR-011 A6 hash-pinned manifest.
@@ -191,7 +194,7 @@ from pathlib import Path
 import json
 
 manifest = json.loads(
-    Path("python/experiments/INFR-011/artifacts/fence-manifest.json").read_text()
+    Path("archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json").read_text()
 )
 train_end = manifest["train_end_utc"]
 holdout_start = manifest["holdout_start_utc"]
@@ -238,6 +241,15 @@ These binding constraints apply to all Xen research.
 stack** (INFR-010 R4) — fresh CAL cycle required before any crypto universe. EXP/SPDR
 operator-invoked only. Fills contract from Nautilus emissions (`positions_ledger` +
 `bar_marks` via shim; `SlPrice` field on legs). Full spec: `docs/references/xena-lane.md` v2.
+
+### Chapter 05 bounded route override (operator-approved, 2026-07-22)
+
+For proposed `CF-VOLCONV-001`, read `docs/references/chapter-05-governance.md` before any
+registration, design, census, or execution. While `docs/experiments-docs/INDEX.md` says the
+cost/data preflight is blocked, stop before outcome contact. After a separately evidenced and
+fresh-QA-approved preflight, the permitted exception is one TRAIN-only SPDR characterisation followed
+by one frozen Nautilus EXP if authorised; no XENA and no historical TEST. Infrastructure clearance
+does not itself authorise family registration or either run.
 
 ### Every Experiment Is Price-Primary (binding, INFR-001)
 
@@ -302,7 +314,7 @@ docs/experiments-docs/checkpoints/YYYY-MM-DD-###-descriptive-name/
 | `ADMITTED` | VAL-style admission PASS (A5) — readable for experiments |
 | `SPEC_INCOMPLETE` | tick/lot unrecoverable — return-level reads only |
 
-MBP trio (T2 confirm lane): BTCUSDT, ETHUSDT, SOLUSDT — collection deferred.
+MBP/L2 is unavailable for the active programme. No T2 confirmation branch is permitted.
 
 **Archived FX/indices universe** (chapter 03): see
 `archive/chapter-03-xena-mtfctx/docs/references/dataset-reference.md` — holdout

@@ -877,8 +877,9 @@ would hide the semantic mismatch rather than create a quote. The field shares th
 stream as delta, so it is not independent spread evidence either.
 
 **Fix / new rule.** Pin the field `UNUSABLE`, never read it as spread or cost, and reject negative
-spread inputs at the actual cost-access boundary. Use audited executable pins or a separately
-validated reconstruction. Earlier spread-based floor claims are withdrawn; their gross and
+spread inputs at the actual cost-access boundary. The current five cost-floor proxies are
+conservative upper bounds, not quotes, validated on only 20 symbol-days; otherwise use a
+separately validated reconstruction. Earlier spread-based floor claims are withdrawn; their gross and
 fee/funding evidence remains.
 
 **Enforced at.** INFR-017 `column_pins.json`; `xen.sigbar.data_types` and

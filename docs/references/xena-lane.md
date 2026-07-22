@@ -145,8 +145,10 @@ LOOSER/TIGHTER-tagged amendment (L-23).
 - **Selection stages (search + certification) run cost-free** (`OracleConfig
   .charge_costs=False`): commissions/spread are excluded from the portfolio-selection
   process. Nautilus T1 emissions are gross as always (engine costless-honest).
-- **T1 spread-scale routing (INFR-010 §4):** candidates with gross edge within ~3× RT spread
-  are undecidable on T1 — park `AWAITING_MBP` or require T2 confirm (BTC/ETH/SOL).
+- **T1 spread-scale routing (INFR-010 §4):** call `spread_scale_route` with secondary-data
+  availability declared. Chapter 05 passes `secondary_available=False`; a gross edge within
+  ~3× round-trip spread is parked `PARKED_T1_UNRESOLVED`. Archived XENA replays retain their
+  historical `AWAITING_MBP` disposition only for reproducibility.
 - **Rationale (operator, 2026-07-10, review F02):** the dual gate separates the
   characterisation of model performance / signal quality (gross) from failure-by-cost
   scenarios (net). A portfolio that dies only under costs is a cost problem, not a
@@ -164,8 +166,10 @@ LOOSER/TIGHTER-tagged amendment (L-23).
   operator-gated as always.
 - **DD feasibility**: FTMO-style limits (daily 5% vs day-start equity, total 10% vs
   initial) — binding on the gross path; disclosed on the net path.
-- Per-candidate cost pins use `bybit_round_trip_cost_bps` + per-symbol pseudo-quote spread
-  series; `money_per_unit` pins stay verdict-bearing for deployability (L-21).
+- Per-candidate cost pins use `bybit_round_trip_cost_bps` plus the conservative upper-bound
+  proxies loaded by `load_chapter05_cost_pins`; they are not quoted/executable spreads and were
+  validated on only 20 symbol-days. Stored `SpreadBps`/`MeanPriceSkewBps` is never a cost input.
+  `money_per_unit` pins stay verdict-bearing for deployability (L-21).
 
 ## Temporal mapping (Q1, tightened)
 

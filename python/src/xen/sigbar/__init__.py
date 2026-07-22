@@ -1,8 +1,8 @@
 """Signed 1-minute bar tier (INFR-017, CF-SIGAUC-001).
 
 The **bar tier** of aggressor-side flow: 1-minute OHLCV plus the exact taker
-buy/sell volume split from Bybit trade archives, plus a trade count and a
-pinned spread feature.
+buy/sell volume split from Bybit trade archives, plus a trade count and the
+legacy mean-price-skew storage field. The latter is never a spread input.
 
 Deliberately separate from :mod:`xen.orderflow`, which is the **MBP/L2** feature
 store (INFR-013 spec). Conflating the two would mix a bar-aggregate tier whose
@@ -12,7 +12,10 @@ book tier that resolves inside the bar.
 Contents
 --------
 ``data_types``
-    :class:`SignedBar` — the custom Nautilus ``Data`` contract.
+    :class:`SignedBar` — the byte-compatible custom Nautilus storage contract.
+``access``
+    Verified analytical access that exposes the legacy field only as
+    ``MeanPriceSkewBps`` with status ``UNUSABLE_AS_SPREAD``.
 ``baselines``
     A5 seasonal baselines: minute-of-day x day-of-week residual normalisation.
 
@@ -36,12 +39,20 @@ from xen.sigbar.baselines import (
     fit_seasonal_baseline,
     residualise,
 )
+from xen.sigbar.access import (
+    MEAN_PRICE_SKEW_COLUMN,
+    UNUSABLE_AS_SPREAD,
+    quarantine_mean_price_skew,
+)
 from xen.sigbar.data_types import SIGBAR_PIPELINE_VERSION, SignedBar
 
 __all__ = [
     "BASELINE_METRICS",
+    "MEAN_PRICE_SKEW_COLUMN",
     "SIGBAR_PIPELINE_VERSION",
     "SignedBar",
+    "UNUSABLE_AS_SPREAD",
     "fit_seasonal_baseline",
+    "quarantine_mean_price_skew",
     "residualise",
 ]

@@ -194,11 +194,14 @@ not candidate-value thresholds.
   at most one eight-hour funding stamp; continuous hold-rate multiplication is not an equivalent
   implementation.
 - Stress applies once to the declared aggregate cost, never once per component and then again
-  to the sum. Gross − fee − one executable spread − discrete funding − declared allowance is
+  to the sum. Gross − fee − one audited conservative spread proxy − discrete funding − declared allowance is
   the economic identity; do not net a result twice.
-- Until the cost path rejects negative spread inputs and exposes an audited executable pin,
-  exact deployability is unresolved. This is an infrastructure defect, not evidence that spread
-  is economically large at hourly horizons.
+- The Chapter-05 preflight now rejects negative/non-finite spread inputs, verifies the five
+  audited conservative spread-proxy pins against the self-hashed INFR-017 artifact, reconciles
+  stressed components exactly once, and counts crossed funding stamps discretely. Fresh-context
+  Fresh-context QA approved the preflight in run 5 on 2026-07-22. The proxies are a conservative upper bound, not
+  quoted/executable or measured spread, and were validated on only 20 symbol-days; passing this
+  infrastructure gate is not itself deployability evidence.
 - The blast radius of negative/semantic-invalid `SpreadBps` through prior Chapter-04 cost reads
   has not been quantified. Do not inherit their exact spread-based net conclusions without a
   corrected replay; gross, fee and separately computed funding evidence remain usable.
@@ -207,8 +210,8 @@ not candidate-value thresholds.
 
 > **MIGRATION (INFR-010, 2026-07-14):** the FTMO table below binds only for the archived
 > FX/indices data. The new stack replaces it with **Bybit USDT-perp maker/taker fees +
-> funding accrual + the T1 pseudo-quote spread model** (INFR-010 §4/§5), built at Phase C
-> (INFR-012) into `xen.evaluation`. The **discipline carries unchanged**: engine
+> audited conservative spread-proxy pins + a declared discrete funding method**, implemented by
+> INFR-012 in `xen.evaluation`. The **discipline carries unchanged**: engine
 > costless-honest, costs analyst-injected from a single source-of-truth table, netted-turnover
 > rule, no per-signal double-charging.
 

@@ -1,13 +1,14 @@
 # Chapter 05 Governance — Volatility-to-Direction Conversion
 
-**State:** `PRE-EXPERIMENT / BLOCKED_PRECHECK`
+**State:** `PRE-EXPERIMENT / PREFLIGHT_PASSED / AWAITING_FAMILY_REGISTRATION`
 
 **Governing brief:** `.ignore/what-next/alts/intraday-way-forward-plan.md`
 
 **Proposed family:** `CF-VOLCONV-001` — not yet registered
 
-This file records the approved route and its enforcement boundary. It does not implement the
-cost/data patch, register a family, approve an experiment, or expose an outcome.
+This file records the approved route and its enforcement boundary. The cost/data preflight is
+complete and independently approved; no family is registered, no experiment is approved, and no
+outcome has been exposed.
 
 ## 1. Fixed route
 
@@ -23,7 +24,7 @@ cost/data patch, register a family, approve an experiment, or expose an outcome.
 - Drift and beta are controls/benchmarks. No multi-day drift product, secondary/L2 branch,
   indicator search, model zoo, exit optimisation, threshold grid, or cheaper-execution rescue.
 
-## 2. Blocking preflight
+## 2. Preflight — passed 2026-07-22
 
 Before family registration, checkpoint design, event census, or outcome-bearing execution:
 
@@ -43,12 +44,15 @@ Before family registration, checkpoint design, event census, or outcome-bearing 
 This is a bounded infrastructure patch. It is not a research run and must not read outcomes,
 analysis-TEST, or the holdout.
 
+Evidence: [`chapter-05-cost-data-preflight.md`](chapter-05-cost-data-preflight.md) and fresh-context
+QA run 5 in [`chapter-05-cost-data-preflight-qa.md`](chapter-05-cost-data-preflight-qa.md).
+
 ## 3. Enforcement
 
-- `docs/experiments-docs/INDEX.md` is the live gate record. It remains
-  `BLOCKED ON COST/DATA PREFLIGHT` until evidence for all eight items is linked there.
-- `.agents/skills/research-pipeline/_pipeline-config.md` requires this file to be read and forbids
-  registration/design/execution while the live gate is blocked.
+- `docs/experiments-docs/INDEX.md` is the live gate record. It records the preflight pass and now
+  blocks on the operator's separate family-registration decision.
+- `.agents/skills/research-pipeline/_pipeline-config.md` requires this file to be read. Research
+  design/execution remains forbidden until the family is registered and separately authorised.
 - After the gate passes, the operator must separately authorise family registration and Run 1.
   Passing infrastructure QA is not research approval.
 - The complete signal, cost, controls, report-layer, power, Run 2, risk, and shadow contracts remain

@@ -9,8 +9,8 @@ Thesis-agnostic research infrastructure for **24/7 crypto perpetual futures**:
 
 1. **Primary lane (T1 — OHLCV):** 1-minute bars derived from Bybit trades archives, full USDT
    linear perpetual universe (listed + delisted), ingested to a Nautilus `ParquetDataCatalog`.
-2. **Secondary lane (T2 — MBP, deferred):** orderflow feature store for BTC/ETH/SOL perps only
-   (`docs/references/orderflow-feature-store.md`); contracts now, collection later.
+2. **Signed-bar lane:** exact taker buy/sell volume plus a quarantined legacy mean-price-skew
+   storage field. The skew is not an execution-cost input.
 3. **Engine:** NautilusTrader event-driven `BacktestNode` — strategies run in-engine; Python
    ingests emissions and adjudicates only.
 
@@ -21,12 +21,13 @@ operator verdicts) are unchanged; implementations rebind per INFR-010 §6 Phase 
 
 | Lane | Tier | Data | Fill/cost | Default |
 |------|------|------|-----------|---------|
-| **Primary** | T1 | 1m OHLCV + per-symbol pseudo-quote spread series (aggressor-side trades) | Engine costless-honest; spread + fees + funding injected at analysis (`xen.evaluation`) | **All experiments** |
-| **Secondary** | T2 | MBP/L2 quotes + trades + feature store (BTC/ETH/SOL) | Honest L1 fills in-engine; passive through-price rule | Post-collection INFR only |
+| **Primary** | T1 | 1m OHLCV from Bybit trades | Engine costless-honest; conservative spread-proxy pin + fees + funding injected at analysis (`xen.evaluation`) | **All experiments** |
+| **Signed bar** | T1 diagnostic | Exact taker buy/sell volume; stored mean-price skew | Skew quarantined as `MeanPriceSkewBps / UNUSABLE_AS_SPREAD`; never cost input | Approved flow diagnostics only |
+| **Secondary** | T2 | MBP/L2 contracts only; no collected dataset | Unavailable | **Not a programme direction** |
 
 **Spread-scale routing (§4):** gross edge within ~3× estimated round-trip spread is
-**undecidable on T1** — verdict-bearing confirmation requires T2 (BTC/ETH/SOL) or park
-`AWAITING_MBP`. Pooled T1 reads on such candidates are disclosure-only.
+**undecidable on T1**. Because secondary data is unavailable by programme decision, such a
+result is parked on this catalog; it does not create a T2 collection branch.
 
 ## High-level architecture
 
@@ -34,7 +35,7 @@ operator verdicts) are unchanged; implementations rebind per INFR-010 §6 Phase 
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  STAGE 1: DATA INGEST (INFR-011, streaming raw-less)                        │
 │  • Census: public.bybit.com/trading/ → 910 USDT linear perps (anti-survivorship) │
-│  • Trades → 1m OHLCV + pseudo-quote spreads (bar volume ≡ Σ trades)         │
+│  • Trades → 1m OHLCV + signed volume + quarantined mean-price skew          │
 │  • ParquetDataCatalog at data/catalog/ (instrument_id/data_type/date)       │
 │  • Global calendar fence manifest (A6, hash-pinned)                       │
 ├─────────────────────────────────────────────────────────────────────────────┤
@@ -45,7 +46,7 @@ operator verdicts) are unchanged; implementations rebind per INFR-010 §6 Phase 
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  STAGE 3: ANALYSIS (Python only — no price-strategy vectorised backtest)    │
 │  • xen.estimand_validation v2 (blocking)                                    │
-│  • T1 cost injection: Bybit fees + funding + pseudo-quote spread            │
+│  • T1 cost injection: Bybit fees + discrete funding + cost-floor proxies   │
 │  • xen.evaluation evidence → operator verdict                               │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -69,7 +70,7 @@ data/
 │       ├── event_log.jsonl
 │       ├── instrument_id_map.json
 │       └── fence_attestation.json
-└── staging/                          # INFR-011 transient (not analysis input)
+└── staging/                          # active transient space; Chapter-04 bars archived
 ```
 
 **Archived (chapter-03, obligations persist on that data):**
@@ -123,9 +124,17 @@ Spec: `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-010/code/emissi
 Engine runs costless-honest (INFR-009 P5 discipline). Analysis layer applies:
 
 - Bybit USDT-perp maker/taker schedule (`xen.evaluation.BYBIT_USDT_PERP_FEES`)
-- Funding accrual (history gaps flagged per R7; conservative assumption when missing)
-- T1 pseudo-quote spread (per-symbol series, tick-floor, conservative bias)
+- Funding: timestamp-counted settlements for the fixed four-hour Chapter-05 episode
+- Cost-floor proxy: five `max(one tick, flip-pair median)` pins verified against INFR-017 at
+  process start. This is a conservative upper bound, not a quoted/executable spread, and its
+  validation covers only 20 symbol-days.
 - Netted-turnover rule carries from legacy programme
+
+The stored `SpreadBps` bytes have no tick floor and are not spread. Live access goes through
+`xen.sigbar.quarantine_mean_price_skew`, which exposes `MeanPriceSkewBps` with status
+`UNUSABLE_AS_SPREAD`. `xen.evaluation.t1_round_trip_spread_bps` rejects negative/non-finite
+inputs; `bybit_round_trip_cost_bps` stresses the complete fee+spread+funding stack exactly once
+and returns components that sum to total.
 
 FTMO cost table is **archived** — retained in `xen.evaluation.FTMO_COSTS` for chapter-03
 VAL re-analysis only.
@@ -137,14 +146,14 @@ VAL re-analysis only.
 | D1 | Bybit official archives only (Binance fallback noted, no MBP fallback) |
 | D2 | OHLCV from trades archives (not klines) |
 | D3 | USDT linear perps only (910 census) |
-| D4 | MBP secondary; BTC/ETH/SOL; collection deferred |
+| D4 | **Superseded for Chapter 05:** MBP/L2 is unavailable; no secondary confirmation branch |
 | D5 | Chapter rollover — cTrader archived |
 | D6 | Global calendar fence |
-| D7 | Pseudo-quotes sufficient for T1 (no live BBO) |
+| D7 | **Superseded by INFR-017:** stored mean-price skew is unusable; Chapter-05 T1 uses five audited conservative pins |
 | D8 | MBP/L2 terminology; no MBO/L3 claims |
 
 ## What this document is not
 
 - Not a strategy thesis — experiments live under `python/experiments/`.
-- Not the MBP feature-store spec — see `orderflow-feature-store.md`.
+- Not an MBP collection plan; secondary data is unavailable for the active programme.
 - Not the XENA adjudication spec — see `xena-lane.md` v2 (registry VOID on new data).

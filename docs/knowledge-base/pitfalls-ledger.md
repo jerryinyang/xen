@@ -35,7 +35,7 @@ a new information source — not a re-parameterisation. Live registry detail:
 | **P-17** | **Price-only session Protection quantile** as conditional skill | SPDR-007: quantile reproduced but matched unconditional timing reproduced it too; signal race 0.333 vs control 0.343. | A new information source that separates from matched timing; calibration alone never re-opens it. |
 | **P-18** | **Signed trap-load monotonicity (S3)** | SPDR-008 powered null on IB/PVA/PRIOR; 7 positive qualifiers vs 6.0 null-expected and 10 anti-monotone; no magnitude reproduction. | A different signed mechanism, not tighter load thresholds or cherry-picked boundaries. |
 | **P-19** | **Signed absorption marginal value (S9) at D1** | SPDR-009: S9−BASE +1.81 bps, CI [−3.62,+7.09], MDE 5.5; ρ +0.008; MIRROR arm larger; median 0 below 11.3–13.0 bps floor. | A distinct mechanism such as predeclared S14, not S9 threshold re-mining. D2–D4 remain unpowered, not negative. |
-| **P-20** | Using staging **`SpreadBps` as executable spread** | INFR-017: field is a mean-print differential and negative in ~32–40% of BTC/ETH TRAIN minutes; pinned `UNUSABLE`. | Never by flooring/renaming. Use audited quote/execution pins or a separately validated reconstruction. |
+| **P-20** | Using staging **`SpreadBps` as executable spread** | INFR-017: field is a mean-print differential and negative in ~32–40% of BTC/ETH TRAIN minutes; pinned `UNUSABLE`. | Never by flooring/renaming. Current five cost-floor proxies are conservative upper bounds validated on only 20 symbol-days, not quotes; otherwise use a separately validated reconstruction. |
 
 ## The terminal branch (state it honestly)
 

@@ -131,15 +131,16 @@ Before any verdict-bearing T1 read, declare:
 
 ```
 SPREAD-SCALE-ROUTING:
-  estimated_rt_spread_bps: <from pseudo-quote series via xen.evaluation.t1_round_trip_spread_bps>
+  estimated_rt_spread_bps: <audited symbol pin from xen.evaluation.load_chapter05_cost_pins>
   gross_edge_bps: <TRAIN gross estimand, same cell>
   t1_undecidable: <YES if |gross| < 3× rt_spread | NO>
-  if YES: disposition AWAITING_MBP or T2 confirm (BTC/ETH/SOL only, post-collection);
-          pooled T1 reads disclosure-only
+  secondary_available: NO
+  if YES: disposition PARKED_T1_UNRESOLVED; no T2 branch
 ```
 
-Use `xen.evaluation.spread_scale_route(gross_edge_bps, rt_spread_bps)` — do not re-derive
-the 3× threshold. QA blocks a tradability band that ignores `t1_undecidable: YES`.
+For Chapter 05 use `xen.evaluation.spread_scale_route(gross_edge_bps, rt_spread_bps,
+secondary_available=False)` — do not re-derive the 3× threshold. QA blocks a tradability
+band that ignores `t1_undecidable: YES` or invents a secondary-data route.
 
 ## 11. Spread as a verdict leg (mandatory for any SUPPORTED/tradability band — L-22)
 
@@ -150,9 +151,12 @@ binding leg**: CI_low > 0 must survive commission + 1× spread before the cell c
 the multiplicity family (SUPPORTED-GROSS may be reported separately as disclosure).
 0.5×/2× spread remain disclosure-only sensitivity.
 
-**Chapter 04 (Bybit):** spread pins come from per-symbol pseudo-quote series +
-`xen.evaluation.bybit_round_trip_cost_bps` (fees + spread + funding). FTMO table is
-archived — use only for chapter-03 VAL re-analysis.
+**Chapter 05 (Bybit):** cost-floor pins are the five values returned by
+`xen.evaluation.load_chapter05_cost_pins`. They are conservative upper bounds, not
+quoted/executable spreads, and were validated on only 20 symbol-days; raw `SpreadBps` and quarantined
+`MeanPriceSkewBps` are prohibited as cost inputs. Apply
+`xen.evaluation.bybit_round_trip_cost_bps` with fees + one spread pin + discrete funding.
+FTMO tables and historical pseudo-quote routes are archive-only.
 
 ## 12. Amendment-direction ledger (mandatory once any pre-measurement amendment lands — L-23)
 

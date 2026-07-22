@@ -17,11 +17,11 @@ Field semantics (source ``SIGNAL-SIGNED.md`` Part 1):
 - ``delta`` = ``buy_volume - sell_volume`` — **P2: a measurement, not an
   estimate**. Exact as a *bar aggregate* only; per-level attribution is barred
   (A3 / Part 5) and no field here supports it.
-- ``spread_feature`` — the W2-pinned liquidity feature. Carries its own
-  ``spread_status`` because the INFR-011 ``SpreadBps`` column was found not to
-  be a spread (negative in 32.4% of BTC and 39.9% of ETH TRAIN minutes — see
-  ``results/column_pins.json`` for the measured per-symbol rates). Consumers
-  must branch on the status rather than assume the number is a spread.
+- ``spread_feature`` — legacy byte-compatible storage for INFR-011's
+  mean-buy-print minus mean-sell-print quantity. It is not a liquidity feature
+  or spread. Consumers must route frames through :mod:`xen.sigbar.access`,
+  which exposes it only as ``MeanPriceSkewBps`` with status
+  ``UNUSABLE_AS_SPREAD``.
 
 Causality: ``ts_event`` is the bar **close** (the instant every field becomes
 known). Consumers apply the programme's ``<= t-1`` rule; nothing in this record
@@ -39,7 +39,7 @@ _NULL_INSTRUMENT = InstrumentId.from_str("NULL-LINEAR.BYBIT")
 
 # spread_feature status values (W2 pin).
 SPREAD_OK = "OK"  # a validated spread estimate in bps
-SPREAD_UNUSABLE = "UNUSABLE"  # stored column is not a spread; do not cost with it
+SPREAD_UNUSABLE = "UNUSABLE"  # frozen storage-wire value; analytical status differs
 SPREAD_MISSING = "MISSING"  # one-sided minute or absent input
 
 
@@ -57,7 +57,7 @@ class SignedBar(Data):
     sell_volume: float = 0.0  # taker-sell (aggressor hit the bid)
     delta: float = 0.0  # buy_volume - sell_volume (exact, bar-aggregate only)
     n_trades: int = 0  # participation count; avg trade size = volume / n_trades
-    spread_feature: float = 0.0  # W2-pinned liquidity feature, bps
+    spread_feature: float = 0.0  # legacy mean-price-skew storage field, bps
     spread_status: str = SPREAD_MISSING
     pipeline_version: str = SIGBAR_PIPELINE_VERSION
     config_hash: str = ""  # sha256 of the W2 column pin this record was built under
