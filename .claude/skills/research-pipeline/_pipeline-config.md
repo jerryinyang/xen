@@ -136,11 +136,11 @@ Two-lane model (INFR-010 §4):
 
 | Lane | Tier | Data | Path |
 |------|------|------|------|
-| **Primary** | T1 | 1m OHLCV from Bybit trades; audited cost pins remain external to bars | `data/catalog/` |
+| **Primary** | T1 | 1m OHLCV from Bybit trades; fees/funding accounting only | `data/catalog/` |
 | **Signed-volume** | T1 | Exact taker buy/sell volume plus quarantined mean-price skew | `data/catalog/` |
 
-Secondary MBP/L2 data is unavailable and is not an active Chapter-05 branch. An unresolved
-T1 spread-scale read is parked; it is not routed to a future secondary-data programme.
+Secondary MBP/L2 data is unavailable and is not an active Chapter-05 branch. Spread cost unavailable
+and not charged; reported cost understates total cost and strategy reports must disclose this.
 
 - **Universe:** 910 USDT linear perpetuals (listed + delisted), census at INFR-011 A1.
 - **InstrumentId:** `{SYMBOL}-LINEAR.BYBIT` via `xen.nautilus.instrument_ids`.
@@ -249,7 +249,9 @@ registration, design, census, or execution. While `docs/experiments-docs/INDEX.m
 cost/data preflight is blocked, stop before outcome contact. After a separately evidenced and
 fresh-QA-approved preflight, the permitted exception is one TRAIN-only SPDR characterisation followed
 by one frozen Nautilus EXP if authorised; no XENA and no historical TEST. Infrastructure clearance
-does not itself authorise family registration or either run.
+does not itself authorise family registration or either run. Chapter-05 costs omit spread rather
+than substitute a proxy: `spread_rt_bps=None`, `PARTIAL_FEES_FUNDING_ONLY`, with the mandatory
+understatement/overstatement caveat in every strategy report.
 
 ### Every Experiment Is Price-Primary (binding, INFR-001)
 

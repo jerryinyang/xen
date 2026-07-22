@@ -203,28 +203,30 @@ bundle = adjudicate_emission("data/nautilus_runs/<run_id>")
 
 ## Cost reads (T1 analysis)
 
-Use the Bybit schedule and Chapter-05 cost-floor proxy pins in `xen.evaluation` — not FTMO and
-never the stored mean-price skew. The flip-pair proxy is a conservative upper bound, not a
-quoted/executable spread, and was validated on only 20 symbol-days:
+Use the Bybit fee schedule and discrete funding in `xen.evaluation`—never the stored mean-price
+skew and no substitute spread proxy:
 
 ```python
 from xen.evaluation import (
     bybit_round_trip_cost_bps,
     count_bybit_funding_stamps,
-    load_chapter05_cost_pins,
+    verify_chapter05_spread_quarantine,
 )
 
-pins = load_chapter05_cost_pins()  # process-start hash and five-symbol verification
+verify_chapter05_spread_quarantine()  # verifies only that the legacy field remains unusable
 stamps = count_bybit_funding_stamps(entry_time, exit_time)
 rt = bybit_round_trip_cost_bps(
     "BTCUSDT",
     entry_price=50_000.0,
     liquidity="taker",
-    spread_bps=pins["spread_pins_bps"]["BTCUSDT"],
     funding_bps_per_8h=1.0,
     funding_stamps=stamps,
 )
 ```
+
+**Spread cost unavailable and not charged.** The result carries `spread_rt_bps=None` and
+`cost_scope=PARTIAL_FEES_FUNDING_ONLY`; reported cost understates total cost and reported net
+performance is overstated. Every Chapter-05 strategy report must repeat this implication.
 
 For the fixed Chapter-05 four-hour episode, settlement timestamps are counted in `(entry, exit]`;
 continuous `hold_hours / 8` prorating is forbidden. The adverse missing-history charge is 1.0 bps

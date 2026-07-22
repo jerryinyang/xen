@@ -125,38 +125,28 @@ Each line is verifiable against data; QA traces this block as a clause. Power st
 and interpretation bands (§5) must use the pinned effect, never the raw screen units.
 Full convention: `docs/references/spdr-lane.md` §Unit convention + money-unit floor.
 
-## 10. T1 spread-scale routing (mandatory on Bybit T1 lane — INFR-010 §4, INFR-012)
+## 10. Missing-spread disclosure (mandatory on Chapter-05 Bybit lane)
 
 Before any verdict-bearing T1 read, declare:
 
 ```
-SPREAD-SCALE-ROUTING:
-  estimated_rt_spread_bps: <audited symbol pin from xen.evaluation.load_chapter05_cost_pins>
-  gross_edge_bps: <TRAIN gross estimand, same cell>
-  t1_undecidable: <YES if |gross| < 3× rt_spread | NO>
-  secondary_available: NO
-  if YES: disposition PARKED_T1_UNRESOLVED; no T2 branch
+SPREAD-COST-DISCLOSURE:
+  spread_cost_status: UNAVAILABLE_NOT_CHARGED
+  spread_rt_bps: null
+  cost_scope: PARTIAL_FEES_FUNDING_ONLY
+  implication: reported cost understates total cost; reported net performance is overstated
+  prohibited_claims: fully-net, cost-complete, tradable, deployable
 ```
 
-For Chapter 05 use `xen.evaluation.spread_scale_route(gross_edge_bps, rt_spread_bps,
-secondary_available=False)` — do not re-derive the 3× threshold. QA blocks a tradability
-band that ignores `t1_undecidable: YES` or invents a secondary-data route.
+Spread cost unavailable and not charged. Do not manufacture a proxy, set spread to zero, or open
+a secondary-data route. Every candidate remains reportable with the caveat above.
 
-## 11. Spread as a verdict leg (mandatory for any SUPPORTED/tradability band — L-22)
+## 11. Cost interpretation (mandatory for Chapter 05)
 
-A commission-only net band never binds on 0-commission instruments (indices), and the most
-likely SUPPORTED cell (dense, short-hold, high-turnover) is exactly where spread dominates.
-Any band that can emit a SUPPORTED/tradable claim must make the **1× spread estimate a
-binding leg**: CI_low > 0 must survive commission + 1× spread before the cell counts toward
-the multiplicity family (SUPPORTED-GROSS may be reported separately as disclosure).
-0.5×/2× spread remain disclosure-only sensitivity.
-
-**Chapter 05 (Bybit):** cost-floor pins are the five values returned by
-`xen.evaluation.load_chapter05_cost_pins`. They are conservative upper bounds, not
-quoted/executable spreads, and were validated on only 20 symbol-days; raw `SpreadBps` and quarantined
-`MeanPriceSkewBps` are prohibited as cost inputs. Apply
-`xen.evaluation.bybit_round_trip_cost_bps` with fees + one spread pin + discrete funding.
-FTMO tables and historical pseudo-quote routes are archive-only.
+Apply `xen.evaluation.bybit_round_trip_cost_bps` with fees plus discrete funding and no
+`spread_bps`. Raw `SpreadBps`, quarantined `MeanPriceSkewBps`, flip-pair values, and the former
+five proxy pins are prohibited as cost inputs. The returned total is partial accounting, not a
+tradability verdict. FTMO tables and historical explicit-spread routes are archive-only.
 
 ## 12. Amendment-direction ledger (mandatory once any pre-measurement amendment lands — L-23)
 

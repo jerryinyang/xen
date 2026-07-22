@@ -93,9 +93,9 @@ The programme's dominant recorded killer is cost, not signal (CF-HTFDI-001 ≈1�
 | Taker fee | 5.5 bps/side → **11.0 bps RT** |
 | Maker fee | 2.0 bps/side → 4.0 bps RT |
 | Funding (conservative) | 1.0 bps/8h → **≤ ~3 bps** at ≤24h session-horizon holds |
-| Spread | **Superseded for any replay:** use the audited symbol pin from `load_chapter05_cost_pins`; stored `SpreadBps`/`MeanPriceSkewBps` is not a spread or cost input |
+| Spread | **Superseded for any replay:** no replacement proxy; stored `SpreadBps`/`MeanPriceSkewBps` is not a spread or cost input |
 
-**Rule.** Before the Phase-4 disposition, the Protection Level (TP1) is converted to bps/trade using the actual normaliser object and compared against `taker RT + conservative spread-proxy RT + funding`. The proxy is an upper bound, not a quote, validated on only 20 symbol-days. A spine whose TP1 sits at or below the floor is recorded as **market science, not strategy** — which is the source's own framework-level falsifier ("surviving edges vanish inside costs at their horizons"). It may still route forward, but only re-framed as characterisation.
+**Rule for any replay.** Compare TP1 with taker fees plus funding only and disclose: spread cost unavailable and not charged; reported cost understates total cost and reported net performance is overstated. No fully-net or deployability claim is permitted.
 
 ---
 
@@ -139,7 +139,7 @@ Mapped from the source's framework-level falsifiers (§6.10). Stage I gates are 
 | A8 provenance audit (raw-trade sample re-download) | Validity of the tier | INFR-017 |
 | Seasonal baselines (A5): minute-of-day × day-of-week residuals for V, range, \|Δ\|, Δ/V, spread | Every threshold in the framework | INFR-017 |
 | Frozen instrument set (pooled anchor + few-asset spot-check table, A6 rule, kernel with calibration-or-SKIP note, class thresholds) — hash-pinned | Stage II attributability | INFR-018 |
-| Bybit cost stack (fees + conservative spread proxy + funding) | Money floor, XENA net | SPDR-007 floor; XENA binding |
+| Bybit partial cost stack (fees + funding; spread unavailable) | Money floor disclosure only | Any replay must carry the missing-spread caveat |
 | **XENA CAL shaped to sparse session-event objects** | Counted portfolio path | checkpoint-015 only — **not** a checkpoint-014 blocker |
 
 ---

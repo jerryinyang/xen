@@ -5,7 +5,7 @@ from pathlib import Path
 
 import polars as pl
 
-from xen.evaluation import load_chapter05_cost_pins
+from xen.evaluation import verify_chapter05_spread_quarantine
 
 MEAN_PRICE_SKEW_COLUMN = "MeanPriceSkewBps"
 MEAN_PRICE_SKEW_STATUS_COLUMN = "MeanPriceSkewStatus"
@@ -27,8 +27,8 @@ def quarantine_mean_price_skew(
         )
     if MEAN_PRICE_SKEW_COLUMN in frame.columns:
         raise ValueError(f"output column {MEAN_PRICE_SKEW_COLUMN!r} already exists")
-    pins = load_chapter05_cost_pins(column_pins_path)
-    if pins["stored_column_status"] != "UNUSABLE":
+    quarantine = verify_chapter05_spread_quarantine(column_pins_path)
+    if quarantine["stored_column_status"] != "UNUSABLE":
         raise ValueError("mean-price-skew storage field is not pinned UNUSABLE")
     return frame.rename({present[0]: MEAN_PRICE_SKEW_COLUMN}).with_columns(
         pl.lit(UNUSABLE_AS_SPREAD).alias(MEAN_PRICE_SKEW_STATUS_COLUMN)

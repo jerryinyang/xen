@@ -6,14 +6,14 @@
 candidate, historical TEST read, or forward shadow is active.
 
 The governing route is [Chapter 05 governance](../references/chapter-05-governance.md). The next
-permitted action is operator-authorised registration of `CF-VOLCONV-001`. The passed preflight
-does not authorise Run 1.
+permitted action is separate operator authorisation to register `CF-VOLCONV-001`. Run 1 remains
+separately unauthorised.
 
 ## Current infrastructure tasks
 
 | Task | Status | Exit condition |
 |---|---|---|
-| Chapter 05 cost/data preflight | **PASSED / FRESH QA APPROVED** | 51 focused tests pass; 222 retained tests pass; cost-proxy scope is enforced; QA run 5 approves |
+| Chapter 05 cost/data preflight | **PASSED / NO-SPREAD AMENDMENT QA APPROVED** | 53 focused and 224 retained tests pass; spread proxies removed; partial-cost caveat enforced; QA run 10 approves |
 
 Implementation evidence: [Chapter 05 cost/data preflight](../references/chapter-05-cost-data-preflight.md).
 

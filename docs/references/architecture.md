@@ -21,13 +21,12 @@ operator verdicts) are unchanged; implementations rebind per INFR-010 §6 Phase 
 
 | Lane | Tier | Data | Fill/cost | Default |
 |------|------|------|-----------|---------|
-| **Primary** | T1 | 1m OHLCV from Bybit trades | Engine costless-honest; conservative spread-proxy pin + fees + funding injected at analysis (`xen.evaluation`) | **All experiments** |
+| **Primary** | T1 | 1m OHLCV from Bybit trades | Engine costless-honest; fees + discrete funding injected at analysis; spread omitted with mandatory caveat | **All experiments** |
 | **Signed bar** | T1 diagnostic | Exact taker buy/sell volume; stored mean-price skew | Skew quarantined as `MeanPriceSkewBps / UNUSABLE_AS_SPREAD`; never cost input | Approved flow diagnostics only |
 | **Secondary** | T2 | MBP/L2 contracts only; no collected dataset | Unavailable | **Not a programme direction** |
 
-**Spread-scale routing (§4):** gross edge within ~3× estimated round-trip spread is
-**undecidable on T1**. Because secondary data is unavailable by programme decision, such a
-result is parked on this catalog; it does not create a T2 collection branch.
+**Spread boundary:** no valid spread observation or secondary-data rescue exists. Chapter 05 does
+not manufacture a proxy or a spread-scale gate; reports label cost accounting partial.
 
 ## High-level architecture
 
@@ -46,7 +45,7 @@ result is parked on this catalog; it does not create a T2 collection branch.
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  STAGE 3: ANALYSIS (Python only — no price-strategy vectorised backtest)    │
 │  • xen.estimand_validation v2 (blocking)                                    │
-│  • T1 cost injection: Bybit fees + discrete funding + cost-floor proxies   │
+│  • T1 cost injection: Bybit fees + discrete funding; spread unavailable   │
 │  • xen.evaluation evidence → operator verdict                               │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -125,16 +124,17 @@ Engine runs costless-honest (INFR-009 P5 discipline). Analysis layer applies:
 
 - Bybit USDT-perp maker/taker schedule (`xen.evaluation.BYBIT_USDT_PERP_FEES`)
 - Funding: timestamp-counted settlements for the fixed four-hour Chapter-05 episode
-- Cost-floor proxy: five `max(one tick, flip-pair median)` pins verified against INFR-017 at
-  process start. This is a conservative upper bound, not a quoted/executable spread, and its
-  validation covers only 20 symbol-days.
 - Netted-turnover rule carries from legacy programme
+
+**Spread cost unavailable and not charged.** `bybit_round_trip_cost_bps` reports
+`spread_rt_bps=None` and `PARTIAL_FEES_FUNDING_ONLY`; reported cost understates total cost and
+reported net performance is overstated. Strategy reports must disclose this and cannot use the
+partial figure as a deployability claim.
 
 The stored `SpreadBps` bytes have no tick floor and are not spread. Live access goes through
 `xen.sigbar.quarantine_mean_price_skew`, which exposes `MeanPriceSkewBps` with status
 `UNUSABLE_AS_SPREAD`. `xen.evaluation.t1_round_trip_spread_bps` rejects negative/non-finite
-inputs; `bybit_round_trip_cost_bps` stresses the complete fee+spread+funding stack exactly once
-and returns components that sum to total.
+inputs. Historical explicit-spread callers remain reproducible, but Chapter 05 supplies no spread.
 
 FTMO cost table is **archived** — retained in `xen.evaluation.FTMO_COSTS` for chapter-03
 VAL re-analysis only.

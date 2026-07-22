@@ -166,10 +166,10 @@ LOOSER/TIGHTER-tagged amendment (L-23).
   operator-gated as always.
 - **DD feasibility**: FTMO-style limits (daily 5% vs day-start equity, total 10% vs
   initial) — binding on the gross path; disclosed on the net path.
-- Per-candidate cost pins use `bybit_round_trip_cost_bps` plus the conservative upper-bound
-  proxies loaded by `load_chapter05_cost_pins`; they are not quoted/executable spreads and were
-  validated on only 20 symbol-days. Stored `SpreadBps`/`MeanPriceSkewBps` is never a cost input.
-  `money_per_unit` pins stay verdict-bearing for deployability (L-21).
+- Chapter-05 callers use `bybit_round_trip_cost_bps` without spread. Spread cost is unavailable
+  and not charged; reported cost understates total cost and reported net performance is overstated.
+  Stored `SpreadBps`/`MeanPriceSkewBps` and former proxy pins are never cost inputs. Archived XENA
+  cost policy remains historical only.
 
 ## Temporal mapping (Q1, tightened)
 

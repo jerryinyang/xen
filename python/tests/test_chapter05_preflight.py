@@ -14,32 +14,26 @@ import xen.sigbar as sigbar
 from xen.sigbar.data_types import SIGBAR_PIPELINE_VERSION, SPREAD_UNUSABLE
 
 
-EXPECTED_SPREAD_PINS = {
-    "BTCUSDT": 0.244,
-    "ETHUSDT": 0.305,
-    "SOLUSDT": 0.727,
-    "DOGEUSDT": 1.477,
-    "XRPUSDT": 1.965,
-}
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_chapter05_cost_pins_verify_against_frozen_infr017_artifact() -> None:
-    assert hasattr(evaluation, "load_chapter05_cost_pins")
-    load_pins = getattr(evaluation, "load_chapter05_cost_pins")
+def test_chapter05_quarantine_verifies_frozen_infr017_artifact_without_cost_pins() -> None:
+    assert hasattr(evaluation, "verify_chapter05_spread_quarantine")
+    verify_quarantine = getattr(evaluation, "verify_chapter05_spread_quarantine")
 
-    bundle = load_pins()
+    bundle = verify_quarantine()
 
     assert bundle["pin_sha256"] == (
         "e3b9fd9b9b5851b8a9a11f9ce34cd1e0fa8e10ea1fe1b210bd0090da379e6225"
     )
     assert bundle["stored_column_status"] == "UNUSABLE"
-    assert bundle["spread_pins_bps"] == EXPECTED_SPREAD_PINS
+    assert "spread_pins_bps" not in bundle
+    assert not hasattr(evaluation, "load_chapter05_cost_pins")
+    assert not hasattr(evaluation, "CHAPTER05_SPREAD_PINS_BPS")
 
 
-def test_chapter05_cost_pin_loader_rejects_tampered_artifact(tmp_path) -> None:
-    assert hasattr(evaluation, "load_chapter05_cost_pins")
-    load_pins = getattr(evaluation, "load_chapter05_cost_pins")
+def test_chapter05_quarantine_verifier_rejects_tampered_artifact(tmp_path) -> None:
+    verify_quarantine = evaluation.verify_chapter05_spread_quarantine
     source = evaluation.CHAPTER05_INFR017_COLUMN_PINS
     payload = json.loads(source.read_text(encoding="utf-8"))
     payload["summary"]["BTCUSDT"]["flip_median_bps"] = 99.0
@@ -47,7 +41,7 @@ def test_chapter05_cost_pin_loader_rejects_tampered_artifact(tmp_path) -> None:
     tampered.write_text(json.dumps(payload), encoding="utf-8")
 
     with pytest.raises(ValueError, match="pin_sha256"):
-        load_pins(tampered)
+        verify_quarantine(tampered)
 
 
 @pytest.mark.parametrize("source_column", ["SpreadBps", "spread_feature"])
@@ -130,12 +124,27 @@ def test_live_governance_has_no_obsolete_pseudo_spread_route(
         "docs/references/architecture.md",
         "docs/references/dataset-reference.md",
         "docs/knowledge-base/evaluation-framework.md",
+        "docs/knowledge-base/memory/chapter05-entry-gate.md",
         ".claude/skills/quant-designer/references/design-requirements.md",
         ".claude/skills/qa-compliance/SKILL.md",
         "python/src/xen/evaluation.py",
     ],
 )
-def test_live_cost_pin_guidance_discloses_proxy_scope(relative_path: str) -> None:
+def test_live_cost_guidance_discloses_missing_spread(relative_path: str) -> None:
     text = (PROJECT_ROOT / relative_path).read_text(encoding="utf-8").lower()
-    assert "conservative upper bound" in text
-    assert "20 symbol-days" in text
+    assert "spread cost unavailable" in text
+    assert "not charged" in text
+    assert "understates" in text
+    assert "load_chapter05_cost_pins" not in text
+
+
+def test_chapter05_entry_memory_records_pass_without_authorising_registration() -> None:
+    text = (
+        PROJECT_ROOT / "docs/knowledge-base/memory/chapter05-entry-gate.md"
+    ).read_text(encoding="utf-8")
+
+    assert "Status: PREFLIGHT_PASSED_AWAITING_FAMILY_REGISTRATION" in text
+    assert "family registration requires separate operator authorisation" in text
+    assert "no outcome exists" in text
+    assert "COST_AMENDMENT_QA_PENDING" not in text
+    assert "If QA approves" not in text

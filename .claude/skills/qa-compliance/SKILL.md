@@ -68,13 +68,12 @@ running the implementation to produce its own expectations.
   object matches the screen code verbatim, the measured TRAIN-median value is recomputed (not
   recalled), the resulting bps/trade effect and cost-floor comparison follow arithmetically;
   §5 bands and §6 power use the pinned effect (`docs/references/spdr-lane.md`).
-- T1 spread-scale routing (INFR-010 §4): design must declare `SPREAD-SCALE-ROUTING`; if
-  `t1_undecidable: YES`, tradability/SUPPORTED bands on T1 alone are a REVISE.
-- Spread verdict leg (L-22, chapter 05): binds on `bybit_round_trip_cost_bps` using fees +
-  one cost-floor proxy + the declared discrete funding method. The proxy is a conservative upper bound,
-  not quoted/executable or measured spread, and was validated on only 20 symbol-days. Verify raw
-  `SpreadBps`/`MeanPriceSkewBps` never enters costs and Chapter-05 routing declares
-  `secondary_available=False`; an undecidable read must be `PARKED_T1_UNRESOLVED`.
+- Missing-spread disclosure (chapter 05): verify `SPREAD-COST-DISCLOSURE` declares
+  `UNAVAILABLE_NOT_CHARGED`, `spread_rt_bps: null`, and `PARTIAL_FEES_FUNDING_ONLY`.
+  Spread cost unavailable and not charged, so reported cost understates total cost and reported
+  net performance is overstated. Any fully-net, cost-complete, tradable, or deployable claim is a
+  REVISE. Verify raw `SpreadBps`, `MeanPriceSkewBps`, flip-pair values, and former proxy pins never
+  enter costs; absence must not be represented as zero.
 - Amendment-direction ledger (L-23): every pre-measurement amendment carries a
   LOOSER/TIGHTER/NEUTRAL declaration + running directional count; the final gate set carries
   a re-derived false-qualifier expectation; a one-directional streak ≥3 is flagged to the

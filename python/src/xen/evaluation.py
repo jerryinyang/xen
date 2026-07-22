@@ -387,7 +387,8 @@ FTMO_COSTS: dict[str, dict] = {
 # Bybit USDT linear perpetual cost table (INFR-012, replaces FTMO for new stack)
 # --------------------------------------------------------------------------- #
 # Source: Bybit derivatives fee schedule (USDT perpetuals), snapshot 2026-07-15.
-# T1 lane: engine costless-honest; fees + funding + a conservative cost-floor proxy injected here.
+# T1 lane: engine costless-honest; Chapter 05 charges fees + funding only.
+# Spread cost unavailable: it is not charged, so reported cost understates total cost.
 # Netted-turnover rule carries (commission charged on net position change per event).
 BYBIT_COST_SNAPSHOT = "2026-07-15 Bybit USDT linear perpetual fee schedule"
 BYBIT_USDT_PERP_FEES: dict[str, float] = {
@@ -404,23 +405,12 @@ CHAPTER05_INFR017_COLUMN_PINS = (
     Path(__file__).resolve().parents[3]
     / "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-017/results/column_pins.json"
 )
-CHAPTER05_SPREAD_PINS_BPS = {
-    "BTCUSDT": 0.244,
-    "ETHUSDT": 0.305,
-    "SOLUSDT": 0.727,
-    "DOGEUSDT": 1.477,
-    "XRPUSDT": 1.965,
-}
 _NS_PER_HOUR = 3_600_000_000_000
 _BYBIT_FUNDING_INTERVAL_NS = 8 * _NS_PER_HOUR
 
 
-def load_chapter05_cost_pins(path: str | Path | None = None) -> dict:
-    """Load five INFR-017 cost-floor proxies: a conservative upper bound, not quotes.
-
-    The sample-only reconstruction was validated on only 20 symbol-days; these values are
-    neither executable nor measured spreads.
-    """
+def verify_chapter05_spread_quarantine(path: str | Path | None = None) -> dict:
+    """Verify the frozen artifact that declares the stored spread field unusable."""
     artifact_path = Path(path) if path is not None else CHAPTER05_INFR017_COLUMN_PINS
     payload = json.loads(artifact_path.read_text(encoding="utf-8"))
     stable_payload = {
@@ -441,22 +431,10 @@ def load_chapter05_cost_pins(path: str | Path | None = None) -> dict:
     status = payload["W2_decision"]["stored_column_status"]
     if status != "UNUSABLE":
         raise ValueError(f"INFR-017 stored column status changed: {status!r}")
-    derived = {
-        symbol: round(
-            max(float(values["flip_median_bps"]), float(values["one_tick_bps"])),
-            3,
-        )
-        for symbol, values in payload["summary"].items()
-    }
-    if derived != CHAPTER05_SPREAD_PINS_BPS:
-        raise ValueError(
-            f"Chapter-05 spread pins disagree with INFR-017: {derived!r}"
-        )
     return {
         "source": str(artifact_path),
         "pin_sha256": actual_sha,
         "stored_column_status": status,
-        "spread_pins_bps": derived,
     }
 
 
@@ -518,7 +496,7 @@ def bybit_round_trip_cost_bps(
     entry_price: float,
     *,
     liquidity: str = "taker",
-    spread_bps: float,
+    spread_bps: float | None = None,
     funding_bps_per_8h: float | None = None,
     hold_hours: float = 8.0,
     funding_stamps: int | None = None,
@@ -527,7 +505,10 @@ def bybit_round_trip_cost_bps(
 ) -> dict:
     """Declared T1 round-trip cost in bps (informative for analysis, never gating).
 
-    Components: fees (2× per-side for round trip) + T1 spread + funding.
+    Chapter 05 omits ``spread_bps`` and receives a partial fees-plus-funding cost.
+    Spread cost unavailable: it is not charged, so reported cost understates total cost and
+    reported net performance is overstated.
+    Explicit spread remains supported only for reproducibility of historical callers.
     Provide ``funding_stamps`` for timestamp-counted settlement charges; otherwise the
     legacy continuous ``hold_hours / 8`` accrual is retained for historical callers.
     ``funding_coverage`` ∈ {OK, GAP} — GAP triggers conservative assumption flag (R7).
@@ -539,7 +520,14 @@ def bybit_round_trip_cost_bps(
     if not np.isfinite(multiplier) or multiplier < 0.0:
         raise ValueError(f"stress must be finite and non-negative, got {stress!r}")
     fee_rt = multiplier * 2.0 * fee_side
-    spread_rt = multiplier * t1_round_trip_spread_bps("", spread_bps)
+    if spread_bps is None:
+        spread_rt = None
+        spread_cost_status = "UNAVAILABLE_NOT_CHARGED"
+        cost_scope = "PARTIAL_FEES_FUNDING_ONLY"
+    else:
+        spread_rt = multiplier * t1_round_trip_spread_bps("", spread_bps)
+        spread_cost_status = "EXPLICIT_INPUT_CHARGED"
+        cost_scope = "FULL_DECLARED_COMPONENTS"
     if funding_bps_per_8h is None:
         funding_bps_per_8h = BYBIT_FUNDING_CONSERVATIVE_BPS_PER_8H
         if funding_coverage == "OK":
@@ -555,11 +543,19 @@ def bybit_round_trip_cost_bps(
         funding_units = float(funding_stamps)
         funding_method = "DISCRETE_STAMPS"
     funding_rt = multiplier * funding_bps_per_8h * funding_units
-    total = fee_rt + spread_rt + funding_rt
+    total = fee_rt + funding_rt + (spread_rt if spread_rt is not None else 0.0)
     return {
         "total_bps": float(total),
         "fee_rt_bps": float(fee_rt),
-        "spread_rt_bps": float(spread_rt),
+        "spread_rt_bps": float(spread_rt) if spread_rt is not None else None,
+        "spread_cost_status": spread_cost_status,
+        "spread_cost_caveat": (
+            "Spread cost unavailable and not charged; reported cost understates total cost "
+            "and reported net performance is overstated."
+            if spread_rt is None
+            else "Explicit caller-supplied spread charged."
+        ),
+        "cost_scope": cost_scope,
         "funding_rt_bps": float(funding_rt),
         "funding_method": funding_method,
         "funding_coverage": funding_coverage,

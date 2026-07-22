@@ -7,8 +7,8 @@
 **Proposed family:** `CF-VOLCONV-001` — not yet registered
 
 This file records the approved route and its enforcement boundary. The cost/data preflight is
-complete and independently approved; no family is registered, no experiment is approved, and no
-outcome has been exposed.
+revised by the operator to omit spread cost and approved by fresh QA; no family is registered, no
+experiment is approved, and no outcome has been exposed.
 
 ## 1. Fixed route
 
@@ -24,7 +24,7 @@ outcome has been exposed.
 - Drift and beta are controls/benchmarks. No multi-day drift product, secondary/L2 branch,
   indicator search, model zoo, exit optimisation, threshold grid, or cheaper-execution rescue.
 
-## 2. Preflight — passed 2026-07-22
+## 2. Preflight — no-spread amendment passed 2026-07-22
 
 Before family registration, checkpoint design, event census, or outcome-bearing execution:
 
@@ -37,20 +37,23 @@ Before family registration, checkpoint design, event census, or outcome-bearing 
    `SpreadBps` is an unusable mean-price skew with no tick floor.
 6. Quarantine that field in the signed-bar/staging access path; preserve stored bytes and expose it
    only as `MeanPriceSkewBps` with status `UNUSABLE_AS_SPREAD`.
-7. Verify the five fixed cost pins against the archived INFR-017 hash-pinned artifact at process
-   start.
+7. Verify the archived INFR-017 hash-pinned artifact only to enforce the `UNUSABLE` quarantine.
+   Expose no spread cost pins. Chapter-05 accounting charges fees plus discrete funding only;
+   spread cost is unavailable and not charged, so reported cost understates total cost and every
+   strategy report must disclose that implication.
 8. Obtain fresh-context QA approval of the patch and focused tests.
 
 This is a bounded infrastructure patch. It is not a research run and must not read outcomes,
 analysis-TEST, or the holdout.
 
 Evidence: [`chapter-05-cost-data-preflight.md`](chapter-05-cost-data-preflight.md) and fresh-context
-QA run 5 in [`chapter-05-cost-data-preflight-qa.md`](chapter-05-cost-data-preflight-qa.md).
+QA history and amendment approval live in
+[`chapter-05-cost-data-preflight-qa.md`](chapter-05-cost-data-preflight-qa.md).
 
 ## 3. Enforcement
 
-- `docs/experiments-docs/INDEX.md` is the live gate record. It records the preflight pass and now
-  blocks on the operator's separate family-registration decision.
+- `docs/experiments-docs/INDEX.md` is the live gate record. The preflight passed; family
+  registration still requires separate operator authorisation.
 - `.agents/skills/research-pipeline/_pipeline-config.md` requires this file to be read. Research
   design/execution remains forbidden until the family is registered and separately authorised.
 - After the gate passes, the operator must separately authorise family registration and Run 1.

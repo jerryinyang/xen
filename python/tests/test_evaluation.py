@@ -92,20 +92,21 @@ def test_bybit_cost_components_reconcile_with_stress_applied_once(stress: float)
         "BTCUSDT",
         50_000.0,
         liquidity="taker",
-        spread_bps=0.244,
         funding_bps_per_8h=1.0,
         hold_hours=4.0,
         stress=stress,
     )
 
     assert result["fee_rt_bps"] == pytest.approx(11.0 * stress)
-    assert result["spread_rt_bps"] == pytest.approx(0.244 * stress)
+    assert result["spread_rt_bps"] is None
     assert result["funding_rt_bps"] == pytest.approx(0.5 * stress)
     assert result["total_bps"] == pytest.approx(
         result["fee_rt_bps"]
-        + result["spread_rt_bps"]
         + result["funding_rt_bps"]
     )
+    assert result["spread_cost_status"] == "UNAVAILABLE_NOT_CHARGED"
+    assert result["cost_scope"] == "PARTIAL_FEES_FUNDING_ONLY"
+    assert "understates" in result["spread_cost_caveat"]
 
 
 @pytest.mark.parametrize("spread_bps", [-0.001, np.nan, np.inf, -np.inf])
@@ -150,7 +151,6 @@ def test_bybit_cost_uses_discrete_funding_stamps_for_four_hour_episode(
         "BTCUSDT",
         50_000.0,
         liquidity="taker",
-        spread_bps=0.244,
         funding_bps_per_8h=1.0,
         hold_hours=4.0,
         funding_stamps=stamps,

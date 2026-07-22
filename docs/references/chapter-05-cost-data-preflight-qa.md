@@ -377,3 +377,300 @@ canonical paths that will exist in a clean checkout. Run-4's compliance verdict 
 
 No required fixes. The canonical-source correction is clean-checkout safe, and the Chapter-05
 cost/data preflight remains approved. Registration and execution remain separate operator gates.
+
+## QA run 6 — 2026-07-22T20:55:29Z — mode: subagent — HEAD `16212e8bdc23e669cc61d2d5177d94a321a9befb`
+
+**Reviewed dirty files (before this append):**
+
+- `.claude/skills/qa-compliance/SKILL.md`
+- `.claude/skills/quant-designer/references/design-requirements.md`
+- `.claude/skills/research-pipeline/_pipeline-config.md`
+- `docs/experiments-docs/INDEX.md`
+- `docs/knowledge-base/evaluation-framework.md`
+- `docs/knowledge-base/families-explored.md`
+- `docs/knowledge-base/lessons-and-amendments.md`
+- `docs/knowledge-base/memory/spreadbps-unusable.md`
+- `docs/knowledge-base/pitfalls-ledger.md`
+- `docs/references/architecture.md`
+- `docs/references/chapter-05-cost-data-preflight.md`
+- `docs/references/chapter-05-governance.md`
+- `docs/references/dataset-reference.md`
+- `docs/references/xena-lane.md`
+- `docs/signal-registry/candidate-families/cf-sigauc-001.md`
+- `python/src/xen/evaluation.py`
+- `python/src/xen/sigbar/access.py`
+- `python/tests/test_chapter05_preflight.py`
+- `python/tests/test_evaluation.py`
+
+**Verdict: REVISE**
+
+The no-spread accounting implementation is correct and all tests pass, but one live Chapter-05
+entry-gate memory still says the superseded proxy-era preflight is approved and registration is the
+next action. The repository therefore gives contradictory instructions about whether research may
+advance.
+
+### Amendment-fidelity trace
+
+| Requirement | Evidence | Verdict |
+|---|---|---|
+| Quarantine raw stored field | `python/src/xen/evaluation.py:412-438` verifies the frozen self-hash and `UNUSABLE` decision only; `python/src/xen/sigbar/access.py:16-36` exposes `MeanPriceSkewBps / UNUSABLE_AS_SPREAD`. Independent call reproduced self-hash `e3b9fd9b...e6225`; adapter retained values `[-0.25, 0.5]` under the quarantined name. | PASS |
+| Remove the five flip-pair proxies from Chapter-05 accounting | `CHAPTER05_SPREAD_PINS_BPS` and `load_chapter05_cost_pins` are absent; the verifier returns only source/hash/status (`evaluation.py:434-438`). Tracked active-tree scan found no loader, five numerical pins, or flip-median cost use outside regression/history text. | PASS |
+| Omitted-spread cost contract | `evaluation.py:494-564`: omitted spread returns `spread_rt_bps=None`, `UNAVAILABLE_NOT_CHARGED`, `PARTIAL_FEES_FUNDING_ONLY`; total is fee + funding; caveat states cost is understated and reported net performance overstated. Independent stress trace at 0.5/1/2 returned totals 5.75/11.5/23.0 bps with exact component reconciliation. | PASS |
+| Historical explicit-spread compatibility | `evaluation.py:511-513,527-530` expressly limits explicit spread and continuous accrual to historical callers. Independent `spread_bps=0.244` trace retained stressed spread 0.122/0.244/0.488 and totals 5.872/11.744/23.488 bps at stress 0.5/1/2. It is labelled `EXPLICIT_INPUT_CHARGED / FULL_DECLARED_COMPONENTS`, not presented as Chapter-05 cost-complete evidence. | PASS |
+| Governing ignored brief | `.ignore/what-next/alts/intraday-way-forward-plan.md:30-38,228-289,642-645` prohibits raw spread and replacements, specifies null/unavailable rather than zero, mandates the caveat, and seals historical TEST/holdout. | PASS |
+| Tracked skills and primary gate docs | Canonical QA/design/pipeline instructions (`.claude/...`) and `chapter-05-{governance,cost-data-preflight}.md` require fees + discrete funding only, no proxy, the exact partial-cost fields, and no tradability claim. `docs/experiments-docs/INDEX.md:5-16` correctly leaves fresh QA pending. | PASS |
+| Durable entry-gate memory | `docs/knowledge-base/memory/chapter05-entry-gate.md:3-5` still says fresh QA passed and the next gate is family registration, contradicting the current gate and governance. | **DEVIATES** |
+| Research boundary | Diff changes no experiment artifact, outcome/result/data artifact, TEST-read ledger, multiplicity registry, holdout fence/artifact, checkpoint, or `CF-VOLCONV-001` family registration. The existing closed-family card edit changes cost guidance only. | PASS |
+
+### Issue
+
+1. **Warning — stale live gate.** Update `docs/knowledge-base/memory/chapter05-entry-gate.md:3-5`
+   to say the no-spread amendment awaits fresh QA and that registration remains blocked. Add this
+   memory file to the focused live-gate consistency regression so a passed preflight cannot remain
+   cached while `docs/experiments-docs/INDEX.md` says QA is pending. Required owner: documentation /
+   infrastructure patch; no accounting-code change is needed.
+
+### Test record
+
+- Focused: `cd python && .venv/bin/pytest -q tests/test_evaluation.py tests/test_chapter05_preflight.py` → **51 passed**.
+- Full retained suite: `cd python && PYTHONPATH=. .venv/bin/pytest -q` → **222 passed, 4 skipped, 1 pre-existing NumPy warning**.
+- `git diff --check 16212e8` → clean.
+
+### Disposition
+
+Keep the Chapter-05 gate blocked. Correct the stale memory and regression-protect it, then rerun
+fresh-context QA. No family registration, outcome contact, historical TEST read, or holdout read is
+authorised.
+
+## QA run 7 — 2026-07-22T20:57:07Z — mode: subagent — HEAD `16212e8bdc23e669cc61d2d5177d94a321a9befb`
+
+**Reviewed dirty files:**
+
+- `.claude/skills/qa-compliance/SKILL.md`
+- `.claude/skills/quant-designer/references/design-requirements.md`
+- `.claude/skills/research-pipeline/_pipeline-config.md`
+- `docs/experiments-docs/INDEX.md`
+- `docs/knowledge-base/evaluation-framework.md`
+- `docs/knowledge-base/families-explored.md`
+- `docs/knowledge-base/lessons-and-amendments.md`
+- `docs/knowledge-base/memory/chapter05-entry-gate.md`
+- `docs/knowledge-base/memory/spreadbps-unusable.md`
+- `docs/knowledge-base/pitfalls-ledger.md`
+- `docs/references/architecture.md`
+- `docs/references/chapter-05-cost-data-preflight-qa.md` (append-only QA output)
+- `docs/references/chapter-05-cost-data-preflight.md`
+- `docs/references/chapter-05-governance.md`
+- `docs/references/dataset-reference.md`
+- `docs/references/xena-lane.md`
+- `docs/signal-registry/candidate-families/cf-sigauc-001.md`
+- `python/src/xen/evaluation.py`
+- `python/src/xen/sigbar/access.py`
+- `python/tests/test_chapter05_preflight.py`
+- `python/tests/test_evaluation.py`
+
+**Verdict: REVISE**
+
+The stale memory text is corrected, and the implementation/test suites remain clean. The requested
+regression protection is incomplete: the new parameter only subjects the memory to missing-spread
+disclosure checks, not to the live-gate state that failed in run 6.
+
+### Run-6 closure trace
+
+| Run-6 requirement | Evidence | Verdict |
+|---|---|---|
+| Memory says amendment QA pending | `docs/knowledge-base/memory/chapter05-entry-gate.md:3` says it awaits fresh-context QA. | CLOSED |
+| Registration remains blocked; no outcome exists | `chapter05-entry-gate.md:3-4` states both facts; `:5-7` makes registration conditional on later QA approval and preserves the SPDR→EXP/no-XENA/no-historical-TEST route. | CLOSED |
+| Missing-spread disclosure | `chapter05-entry-gate.md:4-5` says unavailable/not charged, cost understated, and reported net performance overstated. | CLOSED |
+| Memory included in focused regression | `python/tests/test_chapter05_preflight.py:120-138` includes the memory, but asserts only `spread cost unavailable`, `not charged`, `understates`, and absence of `load_chapter05_cost_pins`. It never asserts QA pending, registration blocked, no outcome, or absence of the superseded “preflight passed” state. | **PARTIAL** |
+| Accounting and research boundaries | Run-6 accounting/quarantine/compatibility evidence is unchanged; no experiment, outcome/result/data, TEST-read ledger, holdout, checkpoint, or proposed-family registration artifact was added. | PASS |
+
+### Issue
+
+1. **Warning — gate-state regression remains unprotected.** Add a focused assertion for
+   `docs/knowledge-base/memory/chapter05-entry-gate.md` that requires the amendment to await fresh
+   QA, requires registration to remain blocked and no outcome to exist, and rejects the superseded
+   “preflight passed” state (or directly checks consistency with `docs/experiments-docs/INDEX.md`).
+   Merely adding the memory to the caveat parameter list cannot detect the run-6 failure mode.
+
+### Test record
+
+- Focused: `cd python && .venv/bin/pytest -q tests/test_evaluation.py tests/test_chapter05_preflight.py` → **52 passed**.
+- Full retained suite: `cd python && PYTHONPATH=. .venv/bin/pytest -q` → **223 passed, 4 skipped, 1 pre-existing NumPy warning**.
+- `git diff --check 16212e8` → clean.
+
+### Disposition
+
+Keep the Chapter-05 gate blocked until the live-gate state itself is regression-protected. No
+accounting-code or memory-text change is otherwise required.
+
+## QA run 8 — 2026-07-22T20:58:33Z — mode: subagent — HEAD `16212e8bdc23e669cc61d2d5177d94a321a9befb`
+
+**Reviewed dirty files:**
+
+- `.claude/skills/qa-compliance/SKILL.md`
+- `.claude/skills/quant-designer/references/design-requirements.md`
+- `.claude/skills/research-pipeline/_pipeline-config.md`
+- `docs/experiments-docs/INDEX.md`
+- `docs/knowledge-base/evaluation-framework.md`
+- `docs/knowledge-base/families-explored.md`
+- `docs/knowledge-base/lessons-and-amendments.md`
+- `docs/knowledge-base/memory/chapter05-entry-gate.md`
+- `docs/knowledge-base/memory/spreadbps-unusable.md`
+- `docs/knowledge-base/pitfalls-ledger.md`
+- `docs/references/architecture.md`
+- `docs/references/chapter-05-cost-data-preflight-qa.md` (append-only QA output)
+- `docs/references/chapter-05-cost-data-preflight.md`
+- `docs/references/chapter-05-governance.md`
+- `docs/references/dataset-reference.md`
+- `docs/references/xena-lane.md`
+- `docs/signal-registry/candidate-families/cf-sigauc-001.md`
+- `python/src/xen/evaluation.py`
+- `python/src/xen/sigbar/access.py`
+- `python/tests/test_chapter05_preflight.py`
+- `python/tests/test_evaluation.py`
+
+**Verdict: APPROVE**
+
+The run-7 blocker is closed. The durable entry-gate memory now matches the live gate, and a focused
+test directly protects every state phrase whose stale value caused run 6. The no-spread accounting,
+quarantine, compatibility, and research-boundary findings from run 6 remain passing.
+
+### Run-7 closure trace
+
+| Requirement | Evidence | Verdict |
+|---|---|---|
+| Explicit pending state | `docs/knowledge-base/memory/chapter05-entry-gate.md:3` records `COST_AMENDMENT_QA_PENDING`; `:5` says fresh-context QA is still awaited. | CLOSED |
+| Registration/outcome gate | `chapter05-entry-gate.md:5-6` states contiguous `family registration remains blocked` and `no outcome exists`; `:7-9` makes registration conditional on later approval and preserves the fixed route. | CLOSED |
+| Missing-spread disclosure | `chapter05-entry-gate.md:6-7` states spread unavailable/not charged, cost understated, and reported net performance overstated. | CLOSED |
+| Gate-state regression | `python/tests/test_chapter05_preflight.py:141-149` requires the pending status, blocked registration, and no-outcome text, and rejects `preflight passed`. This directly detects the run-6 failure shape rather than relying on the separate caveat test. | CLOSED |
+| Full amendment | Prior independent traces remain unchanged: stored spread is quarantined, the five proxy pins/loader do not enter Chapter-05 costs, omitted spread returns the required partial-accounting fields and caveat, historical explicit-spread behavior is retained and labelled historical, and the ignored brief/tracked governance agree. | PASS |
+| Research boundary | No experiment, outcome/result/data, historical TEST-read ledger, holdout, checkpoint, or `CF-VOLCONV-001` registration artifact is changed. | PASS |
+
+### Test record
+
+- Focused: `cd python && .venv/bin/pytest -q tests/test_evaluation.py tests/test_chapter05_preflight.py` → **53 passed**.
+- Full retained suite: `cd python && PYTHONPATH=. .venv/bin/pytest -q` → **224 passed, 4 skipped, 1 pre-existing NumPy warning**.
+- `git diff --check 16212e8` → clean.
+
+### Disposition
+
+The operator may record the no-spread cost/data preflight as QA-approved. This approval clears only
+the infrastructure amendment; family registration, Run 1, outcome contact, historical TEST, and the
+global holdout remain separately blocked or sealed until their explicit gates.
+
+## QA run 9 — 2026-07-22T21:00:04Z — mode: subagent — HEAD `16212e8bdc23e669cc61d2d5177d94a321a9befb`
+
+**Reviewed dirty files:**
+
+- `.claude/skills/qa-compliance/SKILL.md`
+- `.claude/skills/quant-designer/references/design-requirements.md`
+- `.claude/skills/research-pipeline/_pipeline-config.md`
+- `docs/experiments-docs/INDEX.md`
+- `docs/knowledge-base/evaluation-framework.md`
+- `docs/knowledge-base/families-explored.md`
+- `docs/knowledge-base/lessons-and-amendments.md`
+- `docs/knowledge-base/memory/chapter05-entry-gate.md`
+- `docs/knowledge-base/memory/spreadbps-unusable.md`
+- `docs/knowledge-base/pitfalls-ledger.md`
+- `docs/references/architecture.md`
+- `docs/references/chapter-05-cost-data-preflight-qa.md` (append-only QA output)
+- `docs/references/chapter-05-cost-data-preflight.md`
+- `docs/references/chapter-05-governance.md`
+- `docs/references/dataset-reference.md`
+- `docs/references/xena-lane.md`
+- `docs/signal-registry/candidate-families/cf-sigauc-001.md`
+- `python/src/xen/evaluation.py`
+- `python/src/xen/sigbar/access.py`
+- `python/tests/test_chapter05_preflight.py`
+- `python/tests/test_evaluation.py`
+
+**Verdict: REVISE**
+
+The main index, governance, and preflight record the approved exit correctly, and all tests pass.
+One contradictory pre-approval sentence remains in the durable memory, so the post-approval state is
+not yet internally exact.
+
+### Gate-exit consistency trace
+
+| Check | Evidence | Verdict |
+|---|---|---|
+| Live index | `docs/experiments-docs/INDEX.md:5-16` says preflight passed / amendment QA approved, family registration awaits separate authorisation, Run 1 remains unauthorised, and no research stage is active. | PASS |
+| Governance | `docs/references/chapter-05-governance.md:3-11,27,55-60` records the passed amendment, no family/experiment/outcome, and the separate registration and Run-1 gates. | PASS |
+| Preflight record | `docs/references/chapter-05-cost-data-preflight.md:3,52-58` records COMPLETE / QA APPROVED, 53 focused and 224 retained tests, and run-8 approval. | PASS |
+| Durable memory state | `docs/knowledge-base/memory/chapter05-entry-gate.md:3,5-6` correctly records `PREFLIGHT_PASSED_AWAITING_FAMILY_REGISTRATION`, separate registration authorisation, and no outcome. | PASS |
+| Durable memory next-step sentence | `chapter05-entry-gate.md:7-8` still says **“If QA approves, the next gate is”** even though `:3,5` says QA already passed. | **DEVIATES** |
+| Regression fidelity | `python/tests/test_chapter05_preflight.py:141-149` enforces passed status, separate registration authorisation, no outcome, and absence of the pending-status token, but does not reject the stale `If QA approves` conditional. | **PARTIAL** |
+| Research boundary | No family registration, Run 1, outcome/result/data artifact, historical TEST read, holdout read, or checkpoint was added. | PASS |
+
+### Issue
+
+1. **Warning — stale pre-approval conditional.** Replace `If QA approves, the next gate is` at
+   `docs/knowledge-base/memory/chapter05-entry-gate.md:7` with an unconditional post-approval
+   statement such as `The next gate is`. Extend the focused memory test to reject `If QA approves`
+   so the exact post-approval state is protected.
+
+### Test record
+
+- Focused: `cd python && .venv/bin/pytest -q tests/test_evaluation.py tests/test_chapter05_preflight.py` → **53 passed**.
+- Full retained suite: `cd python && PYTHONPATH=. .venv/bin/pytest -q` → **224 passed, 4 skipped, 1 pre-existing NumPy warning**.
+- `git diff --check 16212e8` → clean.
+
+### Disposition
+
+The amendment itself remains technically approved, but the recorded gate exit needs the one-line
+memory/test correction above before the final consistency review can APPROVE. Family registration
+and all research/data gates remain untouched.
+
+## QA run 10 — 2026-07-22T21:01:15Z — mode: subagent — HEAD `16212e8bdc23e669cc61d2d5177d94a321a9befb`
+
+**Reviewed dirty files:**
+
+- `.claude/skills/qa-compliance/SKILL.md`
+- `.claude/skills/quant-designer/references/design-requirements.md`
+- `.claude/skills/research-pipeline/_pipeline-config.md`
+- `docs/experiments-docs/INDEX.md`
+- `docs/knowledge-base/evaluation-framework.md`
+- `docs/knowledge-base/families-explored.md`
+- `docs/knowledge-base/lessons-and-amendments.md`
+- `docs/knowledge-base/memory/chapter05-entry-gate.md`
+- `docs/knowledge-base/memory/spreadbps-unusable.md`
+- `docs/knowledge-base/pitfalls-ledger.md`
+- `docs/references/architecture.md`
+- `docs/references/chapter-05-cost-data-preflight-qa.md` (append-only QA output)
+- `docs/references/chapter-05-cost-data-preflight.md`
+- `docs/references/chapter-05-governance.md`
+- `docs/references/dataset-reference.md`
+- `docs/references/xena-lane.md`
+- `docs/signal-registry/candidate-families/cf-sigauc-001.md`
+- `python/src/xen/evaluation.py`
+- `python/src/xen/sigbar/access.py`
+- `python/tests/test_chapter05_preflight.py`
+- `python/tests/test_evaluation.py`
+
+**Verdict: APPROVE**
+
+The final gate-exit record is internally consistent and regression-protected. The no-spread
+amendment remains approved, while family registration and every research/data gate remain separate.
+
+### Run-9 closure and final consistency
+
+| Check | Evidence | Verdict |
+|---|---|---|
+| Stale conditional removed | `docs/knowledge-base/memory/chapter05-entry-gate.md:7-8` now states unconditionally, `The next gate is separate operator authorisation to register CF-VOLCONV-001`. | CLOSED |
+| Exact post-approval state | `chapter05-entry-gate.md:3,5-9` records passed preflight, separate family-registration authorisation, no outcome, missing-spread caveat, SPDR→EXP route, no XENA/secondary rescue/historical TEST. | PASS |
+| Regression protection | `python/tests/test_chapter05_preflight.py:141-150` requires passed status, separate authorisation, no outcome, rejects the pending token, and rejects `If QA approves`. | CLOSED |
+| Cross-document consistency | Live index, governance, preflight, and memory all say amendment/preflight passed; family registration remains a separate operator gate; Run 1 remains unauthorised; no outcome exists. Active-doc scan found no pending-QA or stale conditional text outside append-only QA history. | PASS |
+| No-spread amendment | Run-6/8 evidence remains unchanged: quarantine, no proxy pins/loader in Chapter-05 accounting, required partial-cost return fields/caveat, historical explicit-spread compatibility, ignored brief/tracked guidance alignment. | PASS |
+| Research boundary | No family registration, Run 1, checkpoint, outcome/result/data, historical TEST read, or holdout read was added. | PASS |
+
+### Test record
+
+- Focused: `cd python && .venv/bin/pytest -q tests/test_evaluation.py tests/test_chapter05_preflight.py` → **53 passed**.
+- Full retained suite: `cd python && PYTHONPATH=. .venv/bin/pytest -q` → **224 passed, 4 skipped, 1 pre-existing NumPy warning**.
+- `git diff --check 16212e8` → clean.
+
+### Disposition
+
+The Chapter-05 no-spread cost/data preflight and its recorded exit are approved. The next permissible
+step is a separate operator decision on family registration; this QA does not register the family,
+authorise Run 1, or open outcomes, historical TEST, or the global holdout.
