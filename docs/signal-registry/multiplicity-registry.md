@@ -1569,6 +1569,29 @@ QA runs 1–3. **Signed-value block (S9 absorption / S14 CVD divergence) is a di
 (ckpt-015 Phase 6) — not pre-judged.** **No family status change** — retrospective act. **0 counted
 reads; holdout SEALED.** Report `python/experiments/SPDR-008/report.md`.
 
+## Chapter 05 — CF-VOLCONV-001 (registered 2026-07-22)
+
+**Checkpoint:** `2026-07-22-016-volatility-direction-conversion`
+**Route:** one TRAIN-only `SPDR-011` artifact with five ordered report layers; conditional frozen-rule
+`EXP-099`. No XENA, TEST or holdout. 0 counted reads.
+
+| ID | Vehicle | Registered question / arm | Candidate slot | Status |
+|---|---|---|---:|---|
+| `CF-VOLCONV-001/HYP-001` | SPDR-011 L1 | Base HIGH-vol + completed breakout + fixed 4h episode; partial economics | 0 | REGISTERED; design/census pending |
+| `CF-VOLCONV-001/HYP-002` | SPDR-011 L2 | HIGH vs disjoint MID/LOW absolute-movement increment | 0 | REGISTERED; same artifact |
+| `CF-VOLCONV-001/HYP-003` | SPDR-011 L3 | HIGH signed residue vs identical unconditional breakout | 0 | REGISTERED; same artifact |
+| `CF-VOLCONV-001/HYP-004` | SPDR-011 L4 | Fixed TOP2 add-on; TOP1/TOP3 distribution-only | 1 predeclared modifier | REGISTERED; not selected by P&L |
+| `CF-VOLCONV-001/HYP-005` | SPDR-011 L5 | Fixed upper-tercile aligned-flow add-on | 1 predeclared modifier | REGISTERED; same events, last layer |
+| `CF-VOLCONV-001/HYP-006` | EXP-099 | Frozen-rule Nautilus membership/accounting/physicality reproduction | 0; implementation confirmation | RESERVED; requires separate design/QA/approval |
+
+The base, TOP2 and flow variants are deterministic branches, not a search grid. Layers open in order
+only after operator decisions. Failed/dropped arms remain recorded. No replacement threshold, symbol,
+side, horizon or exit is permitted after outcome contact.
+
+**AMENDMENT-A1:** remove all Chapter-05 spread proxies; report spread as unavailable/null and costs
+as partial — **DIRECTION: LOOSER** economically. Running count: **1L / 0T / 0N**. The mandatory
+understatement/overstatement caveat does not restore the omitted cost or authorize deployability.
+
 ## Amendment Rules
 
 An amendment is required before measurement if any of these change:

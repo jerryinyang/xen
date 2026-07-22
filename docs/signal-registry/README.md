@@ -68,6 +68,12 @@ Each file in `candidate-families/` must define:
 
 Registered candidate families (full per-phase batches in `multiplicity-registry.md`):
 
+- `CF-VOLCONV-001` — Volatility-to-Direction Conversion. **REGISTERED — 2026-07-22,
+  checkpoint-016.** One fixed five-symbol, four-hour conversion object: lagged daily volatility
+  supplies magnitude state and a completed prior-day-range break supplies direction. Route is
+  `SPDR-011 → EXP-099` if separately authorised; no XENA, historical TEST or holdout. Spread cost
+  is unavailable/not charged, so all net reporting is explicitly partial. See
+  `candidate-families/cf-volconv-001.md`.
 - `CF-HTFDI-001` — Higher-Timeframe DI Conditioning (MTF continuation). **REGISTERED — 2026-07-08,
   G0 PENDING; CORRECTED same day** (promoted from the SPDR CTRL-01/02/03 series, WORTH_EXPLORING,
   operator-signed; independent audit + correction probe in the Phase-010 checkpoint `correction/`);

@@ -50,7 +50,8 @@ One artifact, dense (tables/bullets), ~300-line budget. All items below are REQU
 4. **Scope**: instruments/domains/parameters/time range/exclusions; mandatory final-30%
    holdout exclusion; complexity budget; Nautilus strategy + run config + catalog fence
    attestation (all edge-generating experiments run in Nautilus `BacktestNode` — no vectorised
-   Python backtests). Declare **SPREAD-SCALE-ROUTING** block on T1 (§10 design-requirements).
+   Python backtests). Chapter-05 designs declare **SPREAD-COST-DISCLOSURE** (§10
+   design-requirements); historical lanes retain their archived routing rules.
 5. **Controls, each with a validity proof** (see `design-requirements.md`):
    - non-degeneracy: the control population is disjoint from the signal population and could
      produce a different answer (B-1);

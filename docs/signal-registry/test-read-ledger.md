@@ -559,3 +559,10 @@ Notes:
   (see `python/experiments/XENA-HTFCAP-001/report.md`). Gate-slot accounting also mirrored in
   `docs/signal-registry/xena-runs.md` (1/2). No further slot may be spent on this universe without a
   materially different subset or new TEST data (operator attestation).
+
+## Chapter 05 — CF-VOLCONV-001
+
+- **Registration (2026-07-22, checkpoint-016):** `CF-VOLCONV-001` registered with `SPDR-011`
+  TRAIN-only and conditional `EXP-099` TRAIN reproduction. Historical analysis-TEST is prohibited
+  because related `CF-HTFCAP-001` work already contacted that interval; the global holdout remains
+  sealed. **0 counted TEST reads, 0 holdout reads.** No read authority is created by registration.

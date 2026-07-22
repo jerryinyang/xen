@@ -107,6 +107,7 @@ def test_chapter05_unresolved_spread_route_is_parked_without_t2_rescue() -> None
         ("docs/knowledge-base/pitfalls-ledger.md", "audited quote/execution pins"),
         ("docs/knowledge-base/lessons-and-amendments.md", "audited executable pins"),
         ("docs/knowledge-base/memory/spreadbps-unusable.md", "audited executable"),
+        (".claude/skills/quant-designer/SKILL.md", "Declare **SPREAD-SCALE-ROUTING**"),
     ],
 )
 def test_live_governance_has_no_obsolete_pseudo_spread_route(
@@ -138,13 +139,14 @@ def test_live_cost_guidance_discloses_missing_spread(relative_path: str) -> None
     assert "load_chapter05_cost_pins" not in text
 
 
-def test_chapter05_entry_memory_records_pass_without_authorising_registration() -> None:
+def test_chapter05_entry_memory_records_checkpoint_without_authorising_run1() -> None:
     text = (
         PROJECT_ROOT / "docs/knowledge-base/memory/chapter05-entry-gate.md"
     ).read_text(encoding="utf-8")
 
-    assert "Status: PREFLIGHT_PASSED_AWAITING_FAMILY_REGISTRATION" in text
-    assert "family registration requires separate operator authorisation" in text
+    assert "Status: CHECKPOINT_OPEN_RUN1_DESIGN_PENDING" in text
+    assert "CF-VOLCONV-001 is registered" in text
+    assert "Run 1 execution requires separate operator authorisation" in text
     assert "no outcome exists" in text
     assert "COST_AMENDMENT_QA_PENDING" not in text
     assert "If QA approves" not in text

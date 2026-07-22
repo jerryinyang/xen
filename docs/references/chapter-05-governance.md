@@ -1,14 +1,14 @@
 # Chapter 05 Governance — Volatility-to-Direction Conversion
 
-**State:** `PRE-EXPERIMENT / PREFLIGHT_PASSED / AWAITING_FAMILY_REGISTRATION`
+**State:** `CHECKPOINT-016 OPEN / RUN-1 DESIGN PENDING`
 
 **Governing brief:** `.ignore/what-next/alts/intraday-way-forward-plan.md`
 
-**Proposed family:** `CF-VOLCONV-001` — not yet registered
+**Family:** `CF-VOLCONV-001` — `REGISTERED` 2026-07-22
 
 This file records the approved route and its enforcement boundary. The cost/data preflight is
-revised by the operator to omit spread cost and approved by fresh QA; no family is registered, no
-experiment is approved, and no outcome has been exposed.
+revised by the operator to omit spread cost and approved by fresh QA. The family/checkpoint are now
+registered/open; no run is approved and no outcome has been exposed.
 
 ## 1. Fixed route
 
@@ -52,12 +52,13 @@ QA history and amendment approval live in
 
 ## 3. Enforcement
 
-- `docs/experiments-docs/INDEX.md` is the live gate record. The preflight passed; family
-  registration still requires separate operator authorisation.
-- `.agents/skills/research-pipeline/_pipeline-config.md` requires this file to be read. Research
-  design/execution remains forbidden until the family is registered and separately authorised.
-- After the gate passes, the operator must separately authorise family registration and Run 1.
-  Passing infrastructure QA is not research approval.
+- `docs/experiments-docs/INDEX.md` is the live gate record. The family is registered and
+  checkpoint-016 is open; Run-1 execution still requires separate operator authorisation.
+- `.agents/skills/research-pipeline/_pipeline-config.md` requires this file to be read. The family is
+  registered; execution remains forbidden until the design, fresh QA and separate approval complete.
+- The current authority covers family registration and checkpoint opening only. The count-only
+  census must prove outcome isolation; Run 1 then requires completed design, fresh QA and separate
+  operator execution approval.
 - The complete signal, cost, controls, report-layer, power, Run 2, risk, and shadow contracts remain
   frozen in the governing brief and must be translated without substantive change into the first
   checkpoint design.

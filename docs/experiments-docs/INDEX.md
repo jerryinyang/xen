@@ -2,12 +2,13 @@
 
 ## Current checkpoint status
 
-**PRE-EXPERIMENT — PREFLIGHT PASSED / AWAITING FAMILY REGISTRATION.** No family, checkpoint, SPDR, EXP, XENA
-candidate, historical TEST read, or forward shadow is active.
+**CHECKPOINT-016 OPEN — RUN-1 DESIGN PENDING.** `CF-VOLCONV-001` is registered. No census,
+outcome artifact, SPDR execution, EXP execution, historical TEST read, holdout read, or forward
+shadow is active.
 
 The governing route is [Chapter 05 governance](../references/chapter-05-governance.md). The next
-permitted action is separate operator authorisation to register `CF-VOLCONV-001`. Run 1 remains
-separately unauthorised.
+permitted action is the outcome-isolated count-only census and final `SPDR-011/design.md`. Run 1
+execution remains separately unauthorised.
 
 ## Current infrastructure tasks
 
@@ -19,7 +20,13 @@ Implementation evidence: [Chapter 05 cost/data preflight](../references/chapter-
 
 ## Family indexes
 
-None. Creating `CF-VOLCONV-001` now requires a separate operator authorisation.
+- [`CF-VOLCONV-001`](../signal-registry/candidate-families/cf-volconv-001.md) — `REGISTERED`;
+  checkpoint-016; `SPDR-011 → EXP-099` conditional route; 0 counted reads.
+
+## Current checkpoint
+
+- [Checkpoint 016 design](checkpoints/2026-07-22-016-volatility-direction-conversion/design.md) —
+  OPEN; Run-1 census/design next; no execution authority.
 
 ## Checkpoint retrospectives
 
