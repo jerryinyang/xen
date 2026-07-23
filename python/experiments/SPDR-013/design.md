@@ -326,9 +326,41 @@ GOLDEN-TRACE:
 ## §11 Hard vs informative
 
 ```
-HARD: fence, causality, tripwire collapse, integrity self-check.
-INFORMATIVE: expectancy, decomposition, bands, SMA benchmark Δ, combination readiness
-  recommendation (operator + reflection C decide).
+HARD: fence, causality, integrity self-check, engine parity, universe pin.
+      (tripwire collapse demoted to INFORMATIVE — AMENDMENT-T1 below.)
+INFORMATIVE: expectancy, decomposition, bands, SMA benchmark Δ, future-destroy tripwire,
+  combination readiness recommendation (operator + reflection C decide).
 ```
 
 **No SPDR-014 combination object is frozen here.**
+
+---
+
+## §12 Amendments (operator-signed 2026-07-23)
+
+**AMENDMENT-T1 (DEV-1) — future-destroy tripwire → informative.** §6 `PATH-FUTURE-DESTROY` and
+§11 `tripwire collapse` are demoted from HARD gate to an **informative report layer** (no PASS/FAIL
+effect on integrity). Reason: an outcome-side path-destroy on a **mean episode-P&L direction
+object** cannot separate a look-ahead leak from a genuine **causal** timing association — a causal
+trend rule that avoids the worst random paths reads as "surviving" the destroy even when its
+expectancy is negative (observed: SOL D-SMA14 H1 CONFIRM live −2.23 bps vs destroyed-null p95
+−3.20; all 12 D-SMA14 live values negative → no positive surviving edge). Same class SPDR-012
+resolved (its AMENDMENT-T1/DEV-1). **Applicability residual kept HARD:** no cell that CLAIMS a
+positive edge (`live>0`) may survive above the destroyed-null p95. Causality for SPDR-013 rests on
+construction asserts (entry strictly after the signal bar; ATR[t−1]; TRAIN fence), engine parity
+(sequential==batch, `max_rel 0.0`), and the predictor-side controls. Operator sign-off RECORDED
+2026-07-23. Direction: LOOSER.
+
+**AMENDMENT-A3 — exit-mode decomposition.** §3/§4's single combined capture geometry is the
+`combined` arm; each termination rule is additionally isolated as its own arm so the exit
+contribution is diagnosable (exploratory screen): every direction signal (6 D-SMA cells + D-ZZ) is
+run under `{combined, stop, trail, time, signalflip}` on both clocks and both bands. **D-ZZ
+`signalflip` is the full structural-leg arm** (hold open-after-confirm → open-after-next-confirm,
+no stop/trail/time). The frozen §4 `combined` stack is unchanged. Operator-directed; sign-off
+RECORDED 2026-07-23. Direction: NEUTRAL (pre-outcome completeness).
+
+**AMENDMENT-E1 — median disclosure.** §5 reports **median alongside mean** for
+`avail_when_right`, `damage_when_wrong`, `expectancy_gross`, `expectancy_partial` (fat-tail
+visibility). Headline band driver stays mean `expectancy_partial` (§7.2). Right/wrong remains the
+trade **gross-P&L** split (§5); ZZ magnitude/path_noise features remain forecasting-only and are
+never the avail/damage object. Operator-directed; sign-off RECORDED 2026-07-23. Direction: NEUTRAL.

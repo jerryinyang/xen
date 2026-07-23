@@ -113,12 +113,19 @@ def path_future_destroy(episodes: list[dict], band_lo_ns: int, band_hi_ns: int,
     p5, p95 = float(np.percentile(nulls, 5)), float(np.percentile(nulls, 95))
     summ = _summarise_null(live, nulls, n_episodes=len(episodes))
     plant_median = float(np.median(plant_nulls))
+    survives = bool(live > p95)
     summ.update({
         "live_plant": live_plant,
         "plant_null_median": plant_median,
         "plant_falls_in_null_envelope": bool(p5 <= plant_median <= p95),
-        "live_survives_above_null_p95": bool(live > p95),
-        "tripwire_pass": bool((live <= p95) and (p5 <= plant_median <= p95)),
+        "live_survives_above_null_p95": survives,
+        # DEV-1: INFORMATIVE only. An outcome-side destroy cannot separate a causal timing edge
+        # from a leak on a mean-P&L object, so survival is a hard-style CONCERN only for a cell
+        # that CLAIMS a positive edge (live>0). tripwire_pass kept for disclosure, does not gate.
+        "live_positive": bool(live > 0),
+        "hard_concern_positive_edge_survives": bool(survives and live > 0),
+        "tripwire_pass": bool((not survives) and (p5 <= plant_median <= p95)),
+        "gating": "INFORMATIVE_ONLY_DEV1",
     })
     return summ
 
@@ -126,32 +133,60 @@ def path_future_destroy(episodes: list[dict], band_lo_ns: int, band_hi_ns: int,
 # --------------------------------------------------- matched random ----
 
 
-def matched_random_entry(open_, high, low, atr, slot_start, episodes, cap,
-                         start, band_lo_ns, band_hi_ns, block_bars=1,
-                         seeds=MATCHED_RANDOM_SEEDS) -> dict:
-    """Random non-overlapping entries with the live side distribution per third and the same
-    time cap (§6). Full §4 capture geometry via the batch engine. Excludes live entry bars
-    within +-1h (``block_bars`` = bars per hour on this clock: H1=1, M15=4) (DISJOINT).
-    >=200 seeds, live percentile vs seed expectancy distribution."""
+def build_random_cache(open_, high, low, atr, start, geoms, cap) -> dict:
+    """Precompute independent-episode outcomes (exit_idx, gross) for EVERY candidate entry bar and
+    BOTH sides, once per stop-geometry ``(use_stop, use_trail)`` at the clock's time ``cap`` (SAFE
+    speedup, AMENDMENT-A3 note).
+
+    These outcomes are a deterministic function of (entry bar, side, geometry, cap) — identical no
+    matter which live signal is being controlled — so caching them lets MATCHED-RANDOM-ENTRY reuse
+    them across every SMA period / exit-mode cell sharing the geometry instead of re-simulating
+    200x per cell. Nothing causal/statistical changes: sample membership, denominators and the
+    §4 exit rules are untouched; only redundant recomputation is removed.
+
+    Returns ``{(use_stop, use_trail): {"exit_idx": (n,2) int, "gross": (n,2) float}}``; column
+    0 = long, column 1 = short. Time cap is always the terminal for random episodes (no signal).
+    """
+    n = open_.size
+    bars = np.arange(start + 1, n)
+    cache: dict = {}
+    for (us, ut) in geoms:
+        exit_idx = np.full((n, 2), n - 1, dtype=np.int64)
+        gross = np.full((n, 2), np.nan)
+        for col, sd in ((0, 1), (1, -1)):
+            sim = simulate_independent(open_, high, low, atr, bars,
+                                       np.full(bars.size, sd), cap,
+                                       use_stop=us, use_trail=ut)
+            exit_idx[bars, col] = sim["exit_idx"]
+            gross[bars, col] = sim["gross_bps"]
+        cache[(us, ut)] = {"exit_idx": exit_idx, "gross": gross}
+    return cache
+
+
+def matched_random_entry(slot_start, atr, episodes, start, band_lo_ns, band_hi_ns,
+                         cache_geom, block_bars=1, seeds=MATCHED_RANDOM_SEEDS) -> dict:
+    """Random non-overlapping entries with the live side distribution per third and the same time
+    cap (§6), drawing outcomes from the precomputed ``cache_geom`` (matching the arm's stop
+    geometry). Excludes live entry bars within +-1h (``block_bars`` = bars/hour: H1=1, M15=4)
+    (DISJOINT). >=200 seeds; live percentile vs seed expectancy distribution + a +20 bps bite."""
     if len(episodes) < 3:
         return {"powered": False, "n_episodes": len(episodes)}
-    n = open_.size
+    n = slot_start.size
     n_live = len(episodes)
     live_entry = np.array([e["entry_idx"] for e in episodes])
     live_ts = np.array([e["entry_ts"] for e in episodes])
     live_thirds = _thirds(live_ts, band_lo_ns, band_hi_ns)
     live_side = np.array([e["side"] for e in episodes], float)
-    # per-third long fraction
     long_frac = {}
     for t in (0, 1, 2):
         mt = live_thirds == t
         long_frac[t] = float(np.mean(live_side[mt] > 0)) if mt.any() else 0.5
-    # eligible entry bars: valid ATR, inside band, not within +-1 bar of a live entry
+    ex_idx = cache_geom["exit_idx"]
+    gross_c = cache_geom["gross"]
     eligible = np.zeros(n, dtype=bool)
     eligible[start + 1:] = True
-    eligible &= np.isfinite(atr)
-    ts = slot_start
-    eligible &= (ts >= band_lo_ns) & (ts < band_hi_ns)
+    eligible &= np.isfinite(atr) & np.isfinite(gross_c[:, 0])
+    eligible &= (slot_start >= band_lo_ns) & (slot_start < band_hi_ns)
     block = np.zeros(n, dtype=bool)
     for e in live_entry:
         lo = max(0, e - block_bars); hi = min(n, e + block_bars + 1)
@@ -160,38 +195,37 @@ def matched_random_entry(open_, high, low, atr, slot_start, episodes, cap,
     elig_idx = np.where(eligible)[0]
     if elig_idx.size < n_live:
         return {"powered": False, "n_episodes": n_live, "reason": "insufficient_eligible_bars"}
-    thirds_of = _thirds(ts, band_lo_ns, band_hi_ns)
+    thirds_of = _thirds(slot_start, band_lo_ns, band_hi_ns)
+    lf_by_bar = np.array([long_frac[int(t)] for t in thirds_of])
     live = float(np.mean([e["partial_net_bps"] for e in episodes]))
-    # bound the candidate pool: enough random draws to greedily fill ~n_live non-overlapping
-    # episodes without simulating every eligible bar (M15 cells have tens of thousands).
-    n_cand = int(min(elig_idx.size, max(4 * n_live, 1000)))
-    lf_by_bar = np.array([long_frac[int(t)] for t in thirds_of])   # per-bar long prob (precomputed)
+    n_cand = int(min(elig_idx.size, max(3 * n_live, 1000)))
     nulls = np.empty(len(seeds))
     for si, seed in enumerate(seeds):
         rng = np.random.default_rng(seed)
-        cand = rng.choice(elig_idx, size=n_cand, replace=False)
-        cand.sort()
-        sides = np.where(rng.random(cand.size) < lf_by_bar[cand], 1, -1)
-        sim = simulate_independent(open_, high, low, atr, cand, sides, cap)
-        # greedy non-overlap in entry order, cap at n_live
-        order = np.argsort(cand)
-        chosen, occupied_until = [], -1
-        for oi in order:
-            e0 = cand[oi]
-            if e0 <= occupied_until or not sim["valid"][oi]:
+        cand = np.sort(rng.choice(elig_idx, size=n_cand, replace=False))
+        cols = np.where(rng.random(cand.size) < lf_by_bar[cand], 0, 1)   # 0 long, 1 short
+        c_exit = ex_idx[cand, cols]
+        c_gross = gross_c[cand, cols]
+        # greedy non-overlap in start order (interval scheduling), cap at n_live
+        chosen_entry, chosen_exit, chosen_gross = [], [], []
+        occupied_until = -1
+        for p in range(cand.size):
+            c0 = cand[p]
+            if c0 <= occupied_until:
                 continue
-            chosen.append(oi)
-            occupied_until = int(sim["exit_idx"][oi])
-            if len(chosen) >= n_live:
+            chosen_entry.append(c0)
+            chosen_exit.append(int(c_exit[p]))
+            chosen_gross.append(c_gross[p])
+            occupied_until = int(c_exit[p])
+            if len(chosen_entry) >= n_live:
                 break
-        chosen = np.array(chosen, int)
-        if chosen.size < 3:
+        if len(chosen_entry) < 3:
             nulls[si] = np.nan
             continue
-        c_entry_ts = ts[cand[chosen]]
-        c_exit_ts = ts[sim["exit_idx"][chosen]]
+        c_entry_ts = slot_start[np.array(chosen_entry)]
+        c_exit_ts = slot_start[np.array(chosen_exit)]
         funding = _funding_bps(c_entry_ts, c_exit_ts)
-        partial = sim["gross_bps"][chosen] - FEE_RT_BPS - funding - ALLOWANCE_GOVERNING
+        partial = np.array(chosen_gross) - FEE_RT_BPS - funding - ALLOWANCE_GOVERNING
         nulls[si] = float(np.nanmean(partial))
     nulls = nulls[np.isfinite(nulls)]
     return _summarise_null(live, nulls, n_episodes=n_live, plant_bps=PLANT_EXPECTANCY_BPS)

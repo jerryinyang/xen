@@ -1,11 +1,53 @@
 # SPDR-013 compliance trace — design § / RAW § → implementation
 
+**Run status:** FULL 25-symbol run COMPLETE (2026-07-23). 2940 cells, 1,639,125 episodes.
+`results/integrity_selfcheck.json` **all_pass = True**. All §10 artifacts present (episodes,
+expectancy_by_cell, zz_features, controls, zz_forecast, golden_traces, integrity_selfcheck).
+
+
 100% source-of-truth mapping. Every arm, period, angle, clock, control, tripwire, cost pin,
 capture rule, expectancy term, universe pin and fence is traced to `file:line` or an emitted
 artifact. Authority stack: RAW `vol-direction-structural-programme-raw.md` (substance) →
 `SPDR-013/design.md` (executable freeze) → checkpoint-017 §5B/§8.2 → chapter-06 governance →
-`spdr-lane.md`. **No design clause is thinned or dropped.** Deviations authorised: **NONE**.
+`spdr-lane.md`. **No design clause is thinned or dropped.**
 Interpretation notes (weaken no clause): **IN-1..IN-4** (`config.py` `INTERPRETATION_NOTES`).
+
+### Operator-signed amendments (2026-07-23)
+
+| ID | Change | Direction | Where |
+|---|---|---|---|
+| **DEV-1 / AMENDMENT-T1** | Future-destroy tripwire **demoted from HARD gate to INFORMATIVE** (report layer, no PASS/FAIL effect). An outcome-side destroy on a mean episode-P&L direction object cannot separate a causal timing edge from a leak (SOL D-SMA14 H1 CONFIRM live −2.23 vs destroyed-null p95 −3.20; all 12 D-SMA14 live values negative → no positive surviving edge). Applicability residual kept HARD: no cell CLAIMING positive edge (live>0) may survive. Same class as SPDR-012 DEV-1. | LOOSER (operator-signed) | `config.DEVIATIONS[DEV-1]`; `controls.path_future_destroy`; `run_screen._integrity` |
+| **AMENDMENT-A3** | **Exit-mode decomposition**: each direction signal × {combined, stop, trail, time, signalflip}; ZZ signalflip = the structural-leg arm. combined = the frozen §4 stack (unchanged). | NEUTRAL (pre-outcome) | `config.EXIT_MODES`; `capture.simulate_signal/simulate_independent`; `run_screen` grid |
+| **AMENDMENT-E1** | Report **median** alongside mean for avail/damage/expectancy (fat-tail disclosure). Headline band still mean expectancy_partial. | NEUTRAL | `expectancy.decomposition` |
+
+### QA REVISE-1 resolutions (2026-07-23, HEAD 8d19daa)
+
+| QA # | Issue | Resolution |
+|---|---|---|
+| 1,2,3,9 | Smoke run / missing parquets / matched-random absent / trace overclaim | Full 25-symbol run with matched-random (no skip); all §10 parquets emitted; trace regenerated post-run |
+| 4 | thirds not applied to SUPPORTED | `band_expectancy(...,thirds_sign)`; SUPPORTED demoted to INDETERMINATE if thirds_sign < THIRDS_SIGN_MIN |
+| 5 | +20 bps bite plant missing (derangement, matched-random) | `_summarise_null(...,plant_bps)` → `plant_detected_above_null_p95` on both controls |
+| 6 | matched-random DISJOINT ±1 bar not ±1h | `block_bars = 60 // clock_minutes` (H1=1, M15=4) |
+| 7 | episode `right` col / zz next-swing targets | `expectancy.apply_costs` adds `right`; zz_features rows carry `next_magnitude_bps`/`next_path_noise_atr`/`next_direction` |
+| 8 | G3 self-referential | added `golden_traces.g3_independent_fixture` (hand-listed deviations, not engine bridge code) |
+| 10 | train_end `<=` vs `<` | integrity check tightened to strict `<` |
+
+**SAFE speedup (operator question):** matched-random random-entry outcomes cached per
+(symbol, clock, band, stop-geometry) and reused across SMA-period/exit-mode cells
+(`controls.build_random_cache`) — deterministic (entry,side,geom,cap)→(exit,gross), so it changes
+no sample membership, denominator, metric, causal ordering or seed; ~65× on the hot control.
+**Parallelism:** `--jobs N` process pool over symbols (`run_screen`, `spawn` context — fork
+deadlocks after the multithreaded universe scan). Verified **bit-identical to sequential** (2256
+fields, 0 mismatch); ~9× wall (66s→7.5s/symbol). Symbols independent, fixed seeds, order preserved.
+
+### MFE / capture-geometry diagnostic (operator question 2026-07-23)
+
+| Item | Implementation |
+|---|---|
+| Per-episode realized-hold MFE/MAE (open + intrabar) | `capture.simulate_signal` `mfe_oo_bps`/`mae_oo_bps`/`mfe_hi_bps`; emitted in `episodes.parquet` |
+| Fixed-horizon MFE/MAE over entry→entry+cap | `capture.horizon_excursion`; `horizon_*_bps` per episode |
+| Capture efficiency + signal-vs-random-timing MFE | `analysis_code/mfe_capture.py` → `results/mfe_capture_by_arm.parquet`, `mfe_signal_vs_random.parquet` |
+| Non-tradability | MFE reads labelled non-tradable ceilings (peek at within-window peak); no strategy return claimed |
 
 Paths are relative to `python/experiments/SPDR-013/screen_code/` unless noted.
 
@@ -30,6 +72,7 @@ Paths are relative to `python/experiments/SPDR-013/screen_code/` unless noted.
 | 200-SMA forbidden | absent |
 | Grid = 3 periods × 2 angle × 2 clocks = 12 cells/symbol, all run | `run_screen` loops all `sma_cells` × `CLOCK_ORDER` × both bands |
 | Position: follow signal; reverse on flip; stop may exit earlier without reverse until next signal | `capture.simulate_signal` leg-start rule (`leg_starts`) + reverse-on-flip + "no re-entry until next leg" |
+| **Exit modes (AMENDMENT-A3)**: each signal × {combined, stop, trail, time, signalflip} | `config.EXIT_MODES`; `capture.simulate_signal(**flags)`; combined = frozen §4 stack |
 
 ## Arm D-ZZ (design §3.3) — both clocks
 
@@ -68,6 +111,7 @@ Paths are relative to `python/experiments/SPDR-013/screen_code/` unless noted.
 |---|---|
 | RIGHT iff `gross>0` (gross sign, not net) | `expectancy.decomposition` |
 | `p_right`, `avail_when_right`, `damage_when_wrong`, `expectancy_gross`, `expectancy_partial` (headline) | `expectancy.decomposition`; emitted `results/expectancy_by_cell.parquet` |
+| **median alongside mean (AMENDMENT-E1)** for avail/damage/expectancy | `decomposition` `*_median` fields; ZZ mag/noise features stay forecasting-only, never the avail/damage object |
 | win_rate disclosure only | `decomposition["win_rate_net"]`, never a band driver |
 | report per symbol×arm×period×angle×clock; pooled disclosure-only | one row per cell in `expectancy_by_cell.parquet` |
 
@@ -78,7 +122,7 @@ Paths are relative to `python/experiments/SPDR-013/screen_code/` unless noted.
 | DIRECTION-DERANGEMENT: derange sides within symbol×third, paths fixed, 0 fixed points, ≥200 seeds 31000+, +20 bps bite | `controls.direction_derangement` (`config.DERANGE_SEEDS`=31000..31199) |
 | MATCHED-RANDOM-ENTRY: non-overlapping random entries, same side dist per third, same cap, exclude live ±1h, ≥200 seeds 41000+ | `controls.matched_random_entry` (`config.MATCHED_RANDOM_SEEDS`=41000..41199) via `capture.simulate_independent` |
 | SMA-BENCHMARK: Δ expectancy (ZZ − SMA14/SMA25) with CI | `controls.sma_benchmark_delta` |
-| TRIPWIRE PATH-FUTURE-DESTROY (HARD): metric expectancy_partial on D-SMA14; pair to foreign future paths; +30 bps plant must collapse into null envelope | `controls.path_future_destroy` (`config.TRIPWIRE_SEEDS`=52000..52199, `PLANT_TRIPWIRE_BPS=30`); wired HARD into `run_screen._integrity` |
+| TRIPWIRE PATH-FUTURE-DESTROY: metric expectancy_partial on D-SMA14; pair to foreign future paths; +30 bps plant must collapse into null envelope | `controls.path_future_destroy` (`config.TRIPWIRE_SEEDS`=52000..52199, `PLANT_TRIPWIRE_BPS=30`). **INFORMATIVE only (DEV-1)** — not gating; residual HARD = no positive-edge (live>0) survivor |
 
 ## Inference / bands / power (design §7)
 

@@ -91,6 +91,25 @@ TRAIL_LOCK_ATR = 0.5               # trail to entry + 0.5 x ATR x side
 TRAIL_RATCHET_ATR = 2.0            # then ratchet by HWM - 2.0 x ATR (long) / + (short)
 # time_cap_bars: H1 48 (~48h), M15 192 (~48h) — in CLOCKS above.
 
+# --------------------------------------------------- exit modes (A3) ----
+# AMENDMENT-A3 (operator-directed 2026-07-23): the frozen §4 stack is the `combined` arm; each
+# termination rule is ALSO isolated so its contribution is diagnosable (exploratory screen). For
+# D-ZZ, `signalflip` == the full structural leg (hold open-after-confirm -> open-after-next-confirm,
+# no risk cuts). Non-exhaustive of every subset by design intent — the four single-rule isolations
+# + the combined stack are the operator-specified set.
+
+EXIT_MODES: dict[str, dict] = {
+    "combined":   {"use_stop": True,  "use_trail": True,  "use_time": True,  "use_signalflip": True},
+    "stop":       {"use_stop": True,  "use_trail": False, "use_time": False, "use_signalflip": False},
+    "trail":      {"use_stop": False, "use_trail": True,  "use_time": False, "use_signalflip": False},
+    "time":       {"use_stop": False, "use_trail": False, "use_time": True,  "use_signalflip": False},
+    "signalflip": {"use_stop": False, "use_trail": False, "use_time": False, "use_signalflip": True},
+}
+# matched-random uses the arm's stop geometry (time cap is always its terminal — random has no
+# signal): map each exit mode to (use_stop, use_trail) for the batch engine.
+EXIT_MODE_RANDOM_GEOM = {m: (v["use_stop"], v["use_trail"]) for m, v in EXIT_MODES.items()}
+ZZ_STRUCTURAL_EXIT_MODE = "signalflip"   # D-ZZ__exit-signalflip IS the structural-leg arm
+
 # --------------------------------------------------------------- costs ----
 # design §4 partial cost. Fee RT 11.0 taker (Bybit), funding 1.0 bps/stamp, allowance 0/2/5.
 # Fee + funding via xen.evaluation (no local accounting primitive); allowance subtracted here.
@@ -215,7 +234,78 @@ INTERPRETATION_NOTES = [
     },
 ]
 
-DEVIATIONS: list[dict] = []   # none authorised for SPDR-013
+DEVIATIONS: list[dict] = [
+    {
+        "id": "DEV-1",
+        "clause": "design §6 TRIPWIRE PATH-FUTURE-DESTROY / §11 'tripwire collapse' HARD",
+        "pinned": "HARD future-destroy gate on expectancy_partial of D-SMA14; a cell whose live "
+                  "expectancy survives above the destroyed-null p95 fails integrity.",
+        "implemented": "INFORMATIVE report layer — computed and reported per D-SMA14 cell "
+                       "(live/null/collapse/plant + an applicability flag), but NOT gating "
+                       "integrity all_pass (no PASS/FAIL effect).",
+        "direction": "LOOSER (a hard gate is removed)",
+        "made_after_seeing_outcomes": True,
+        "rationale": (
+            "An outcome-side path-destroy on a mean episode-P&L direction object cannot separate "
+            "a look-ahead leak from a genuine CAUSAL timing association: a causal trend rule that "
+            "avoids the worst random paths reads as 'surviving' the destroy even when its "
+            "expectancy is negative/cost-losing (observed: SOL D-SMA14 H1 CONFIRM live -2.23 vs "
+            "destroyed-null p95 -3.20, all 12 D-SMA14 live values negative — no positive surviving "
+            "edge). Same class SPDR-012 hit (IN-8/DEV-1). Applicability logic retained: the "
+            "future-destroy is only a hard-style CONCERN for a cell that CLAIMS a positive edge "
+            "(SUPPORTED or live>0); for non-positive cells it is disclosure. No cell that claims "
+            "positive edge may be waved through — that flag is reported."
+        ),
+        "known_limitation": (
+            "No outcome-side destroy can prove absence of look-ahead. Causality for SPDR-013 rests "
+            "on construction asserts (entry strictly after the signal bar; ATR[t-1]; TRAIN fence), "
+            "engine parity (sequential==batch, max_rel 0.0), and the predictor-side controls "
+            "(DIRECTION-DERANGEMENT sides fixed-point-free; MATCHED-RANDOM-ENTRY timing)."
+        ),
+        "operator_decision": (
+            "2026-07-23 — operator directed 'follow the objectively-right steps but demote to "
+            "informative only, not gating or effectual for PASS/FAIL, just like in SPDR-012', with "
+            "the applicability refinement (HARD only when a positive edge is claimed)."
+        ),
+        "design_md_amendment": "AMENDMENT-T1 (design.md §6/§11), dated 2026-07-23",
+        "operator_sign_off": "RECORDED 2026-07-23",
+        "consequence": (
+            "SPDR-013 integrity all_pass no longer depends on the future-destroy tripwire. The "
+            "hard surface is fence + causal construction + engine parity + universe pin + golden "
+            "traces. The tripwire numbers remain emitted per D-SMA14 cell in results/controls.json."
+        ),
+    },
+]
+
+AMENDMENTS: list[dict] = [
+    {
+        "id": "AMENDMENT-A3",
+        "clause": "design §3 arm set / §4 single combined capture geometry",
+        "change": (
+            "Add EXIT-MODE decomposition: every direction signal (6 D-SMA cells + D-ZZ) is run "
+            "under 5 exit modes {combined, stop, trail, time, signalflip} on both clocks and both "
+            "bands. The frozen §4 stack is the `combined` arm (unchanged). D-ZZ `signalflip` is "
+            "the full STRUCTURAL-LEG arm (hold open-after-confirm -> open-after-next-confirm, no "
+            "stop/trail/time)."
+        ),
+        "direction": "NEUTRAL (pre-outcome completeness for the new arms; exploratory screen)",
+        "operator_decision": "2026-07-23 — operator directed isolating each exit rule as its own "
+                             "arm plus the ZZ structural-leg arm, to diagnose exit contribution.",
+        "operator_sign_off": "RECORDED 2026-07-23",
+    },
+    {
+        "id": "AMENDMENT-E1",
+        "clause": "design §5 expectancy decomposition (mean-only)",
+        "change": "Report MEDIAN alongside MEAN for avail_when_right / damage_when_wrong / "
+                  "expectancy_gross / expectancy_partial so fat tails are visible (mean-vs-median "
+                  "gap). Headline band still uses mean expectancy_partial (§7.2). Right/wrong stays "
+                  "the trade GROSS-P&L split (§5); ZZ magnitude/path_noise features remain "
+                  "forecasting-only, never the avail/damage object.",
+        "direction": "NEUTRAL (disclosure enrichment)",
+        "operator_decision": "2026-07-23 — operator directed reporting mean and median.",
+        "operator_sign_off": "RECORDED 2026-07-23",
+    },
+]
 
 PROHIBITED_CLAIMS = [
     "tradable", "deployable", "fully-net", "cost-complete",

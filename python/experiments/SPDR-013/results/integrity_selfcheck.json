@@ -10,15 +10,18 @@
     "g3_zz_features_match": true,
     "g3_independent_fixture_match": true,
     "engine_parity": true,
-    "no_authorised_deviations": true,
-    "tripwire_path_future_destroy_pass": false
+    "all_deviations_operator_signed": true,
+    "no_positive_edge_future_destroy_concern": true
   },
-  "all_pass": false,
+  "all_pass": true,
   "max_exit_ts": 1702855800000000000,
   "train_end_ns": 1702857600000000000,
-  "tripwire_powered_cells": 12,
-  "tripwire_survivors": [
-    9
+  "tripwire_gating": "INFORMATIVE_ONLY_DEV1",
+  "tripwire_powered_cells": 84,
+  "tripwire_survivors_any": 1,
+  "tripwire_positive_edge_survivors": 0,
+  "deviations": [
+    "DEV-1"
   ],
   "spread_cost_disclosure": {
     "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",

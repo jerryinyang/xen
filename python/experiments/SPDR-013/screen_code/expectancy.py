@@ -53,24 +53,34 @@ def apply_costs(episodes: list[dict]) -> list[dict]:
 
 
 def decomposition(gross: np.ndarray, partial: np.ndarray) -> dict:
-    """Design §5 decomposition. RIGHT iff gross > 0; WRONG otherwise (incl. flat 0)."""
+    """Design §5 decomposition + AMENDMENT-E1 medians. RIGHT iff gross > 0; WRONG otherwise.
+
+    Right/wrong is the trade GROSS-P&L split (open-to-open bps), never a ZZ swing feature.
+    MEAN is the headline band driver (§7.2); MEDIAN is reported alongside so fat tails show.
+    """
     gross = np.asarray(gross, float)
     partial = np.asarray(partial, float)
+    keys = ("n_episodes", "p_right", "avail_when_right", "damage_when_wrong",
+            "avail_when_right_median", "damage_when_wrong_median",
+            "expectancy_gross", "expectancy_gross_median",
+            "expectancy_partial", "expectancy_partial_median", "win_rate_net")
     n = int(np.isfinite(gross).sum())
     if n == 0:
-        return {k: float("nan") for k in (
-            "n_episodes", "p_right", "avail_when_right", "damage_when_wrong",
-            "expectancy_gross", "expectancy_partial", "win_rate_net")} | {"n_episodes": 0}
+        return {k: float("nan") for k in keys} | {"n_episodes": 0}
     right = gross > 0
     n_right = int(right.sum())
     avail = float(gross[right].mean()) if n_right else 0.0
+    avail_med = float(np.median(gross[right])) if n_right else 0.0
     damage = float(gross[~right].mean()) if (n - n_right) else 0.0
+    damage_med = float(np.median(gross[~right])) if (n - n_right) else 0.0
     return {
         "n_episodes": n,
         "p_right": n_right / n,
-        "avail_when_right": avail,
-        "damage_when_wrong": damage,
+        "avail_when_right": avail, "avail_when_right_median": avail_med,
+        "damage_when_wrong": damage, "damage_when_wrong_median": damage_med,
         "expectancy_gross": float(gross.mean()),
-        "expectancy_partial": float(partial.mean()),   # headline
-        "win_rate_net": float((partial > 0).mean()),    # disclosure only (§5)
+        "expectancy_gross_median": float(np.median(gross)),
+        "expectancy_partial": float(partial.mean()),               # headline (mean)
+        "expectancy_partial_median": float(np.median(partial)),    # fat-tail disclosure
+        "win_rate_net": float((partial > 0).mean()),               # disclosure only (§5)
     }
