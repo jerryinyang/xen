@@ -319,3 +319,75 @@ expects a hard stop if the convention is off, not a silent pass.
 
 **Disposition:** APPROVE for the operator's separate execution gate. QA approval does not authorise
 execution; TEST, holdout, CONFIRM unlock, and any deployability claim remain outside this run.
+
+## QA run 5 — 2026-07-23T00:19:40Z — mode: subagent — HEAD 96a0a4f81d386408ecb82b0281358cbc7f59ae29
+
+Verdict: APPROVE
+
+Reviewed git state: committed HEAD `96a0a4f81d386408ecb82b0281358cbc7f59ae29`; dirty-file
+list before this append: none. Fresh-context reviewer did not implement A7/A8. Per the review
+scope, `data/nautilus_runs/SPDR-011` and all real outcome/value/CONFIRM data were not read.
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| One causal four-hour episode; strict completed breakout; non-overlap (§1-2, §5) | `design_derivations/census.py:249-320,332-371`; `spdr011_strategy.py:22-84` | MATCHES | State/range are fixed from confirmed prior data; strict locator and explicit ENTRY/EXIT schedule preserve the frozen episode. |
+| Daily state, 60-return warm-up, rv20/prior-252 percentile, drift20/beta60 (§5.1) | `design_derivations/census.py:29-38,249-320` | MATCHES | `MIN_DAILY_RETURNS=60`; current rv is excluded from the percentile history. The proposed warm-up change is absent. |
+| Real next-open entry/exit with actual engine fills (A7; §4, §13.10-11) | `run_spdr011.py:229-300,538-625`; `spdr011_strategy.py:121-143`; `runner_contract.py:239-424` | MATCHES | Each scheduled action gets a real-price `TradeTick`: source close `decision+1m`, `ts_event=decision`, `ts_init=decision+1ns`, `NO_AGGRESSOR`; insert latency is 1ns. Reconciliation requires actual fill at `decision+1ns` and source `RealOpen` within relative `1e-9`. |
+| No post-run fill rewriting (A7; §13.11) | `run_spdr011.py:620-679,646-650`; `runner_contract.py:275-368` | MATCHES | Engine reports flow unchanged into emission writing. The catalog open is used only to build the pre-engine tick and later verify the emitted fill; no assignment replaces `avg_px` or `ts_last`. |
+| DESIGN-only Run 1; CONFIRM unexecuted and unstaged (A8; §6, §13.3-4) | `run_spdr011.py:199-219,538-560,627-641,706-776`; `bundle.py:25-50,81-112` | MATCHES | Census is filtered to DESIGN before marks, schedules, engine data, fills, controls, and bundle. Data end is bounded to the final DESIGN exit-open seam. Bundle accepts exactly `{"DESIGN"}` and writes only `design.parquet`; no tracked CONFIRM raw-fill/artifact exists. |
+| Located events retained; unavailable events not scheduled (§5.1, §6, §13.10) | `runner_contract.py:50-122`; `run_spdr011.py:222-226,553-560`; `runner_contract.py:298-420` | MATCHES | Left joins retain every located row and freeze a missing-mark reason. Only `4h_available` rows enter schedules; unscheduled unavailable rows reconcile as `UNAVAILABLE`, while a fill pair on one is rejected. |
+| Open-to-open outcomes and golden prices (§6-7, §12) | `runner_contract.py:38-122`; `test_spdr011_runner.py:45-123` | MATCHES | Entry and 1h/2h/4h marks use real first-minute opens; no trigger-bar move is credited. |
+| Signed flow causal same-slot prior-60 percentile (§5.3) | `run_spdr011.py:464-535`; `runner_contract.py:178-226` | MATCHES | Current imbalance is appended after its percentile is formed; known timestamp must be no later than trigger; zero-volume remains base but flow-ineligible. |
+| Fees, discrete `(entry,exit]` funding, 0/2/5 allowance, no spread (§11) | `runner_contract.py:125-175` | MATCHES | Shared `bybit_round_trip_cost_bps` receives `spread_bps=None`; missing outcomes retain null partial-net values. |
+| Frozen matched timing, unconditional breakout, direction/future derangements (§8) | `controls.py:21-150,153-358,387-545`; `run_spdr011.py:371-461,707-760` | MATCHES | Timing/date and realised-pair exclusions are enforced; all permutation destroys use zero-fixed-point derangements; batteries use 2,000 frozen seeds. |
+| Hard future-destroy sentinel and supported-edge survival rule (§8.1) | `controls.py:78-111,387-485,607-651`; `run_spdr011.py:548,697-721` | MATCHES | Sentinel is calibrated before engine/outcome access; real-edge rule blocks only an authenticated supported edge that survives destruction. |
+| Date dependence, informative bands, ordered layers (§9-10) | `controls.py:547-604,679-728`; `layers.py:22-80` | MATCHES | UTC-date resampling and 1/3/7-day-capable machinery emit measurements; L1-L5 views preserve predeclared arms and contain no value auto-verdict. |
+| Frozen hashes and live-tree identity (§3.1, §13.1,9) | `run_spdr011.py:84-95,116-184,575-579,691-696` | MATCHES | All four committed artifact hashes match design and runner constants; live signed-tree hash is required before engine construction and before flow access. |
+| UTC-aware mark seam retained; rejected warm-up change absent (A7 context) | `run_spdr011.py:342-358`; `design_derivations/census.py:31-38,262-289` | MATCHES | `SourceCloseTime` is explicitly UTC-aware. Census still requires 60 returns and its derivation/event-key hashes are unchanged. |
+| One node/process; operator authority; no CLI (§13, §15) | `run_spdr011.py:538-545,581-625` | MATCHES | One `BacktestNode`, deferred disposal, non-empty operator authority, and no command-line entry point. |
+
+### Golden-trace diff
+
+| Trace | Design expectation | Independent check | Verdict |
+|---|---|---|---|
+| GT-1 LONG | 107 to 104 = -280.374 bps | Open-to-open formula and runner test reproduce `-280.3738`; synthetic engine gap smoke filled ENTRY at 107, not processed-bar close 100. | MATCHES |
+| GT-2 SHORT | 88 to 84 = +454.545 bps | Direction multiplier and exact four-hour open reproduce `+454.5455`. | MATCHES |
+| GT-3 EQUALITY | prior-high equality emits no event | Census uses strict `>`/`<`; existing census test covers equality/no-event behavior. | MATCHES |
+| A7 engine sequence | order decision at boundary; actual fill at real next open one ns later | Temporary real `BacktestNode` smoke used deliberate gaps: bar closes 100/110, execution ticks 107/104. Engine fills were 107/104 with `ts_last=decision+1ns` for both ENTRY and EXIT. | MATCHES |
+| Shared exit/entry boundary | EXIT before ENTRY | Schedule priority sorts EXIT first at equal decision timestamp. | MATCHES |
+
+### Governance & boundary
+
+- PASS — Fresh subagent context; append-only review; committed HEAD and initial clean state recorded.
+- PASS — `51 passed` across `test_spdr011_{census,signed_ingest,runner}.py` using the project
+  Python 3.13/NautilusTrader 1.230.0 environment.
+- PASS — Ruff reports `All checks passed`; `git diff --check` clean before this append;
+  `check_no_local_accounting("python/experiments/SPDR-011/code")` returns
+  `{"ok": true, "banned_defs_found": []}`.
+- PASS — Independent temporary Nautilus gap smoke proves the mixed Bar/TradeTick event order and
+  matching 1ns insert latency produce actual fills at the supplied real opens, not bar closes.
+- PASS — L-41 supersedes only L-29's universal price-anchor claim. L-29's close-axis timestamp
+  warning remains; SPDR-011 now binds price to the separate real-open event and fill timestamp to
+  `decision+1ns`.
+- PASS — Actual hashes: census JSON `94faab2e...13681`, event keys `d1299a08...c7dfd`, census
+  derivation `9fae1731...802bdc`, signed attestation `bdfe839c...180d29`. Census JSON changed only
+  its regeneration timestamp; counts/coverage and event keys are unchanged.
+- PASS — Run-1 code cannot query/schedule CONFIRM events or write a CONFIRM bundle member. Git tracks
+  no SPDR-011 CONFIRM fill/artifact. The forbidden run directory was not inspected.
+- PASS — TEST and holdout remain outside every Run-1 query. Missing spread is null/unavailable; no
+  prohibited spread proxy or deployability claim enters code.
+- PASS — Amendment ledger is directionally correct: A1 1L, A2-A4 3N, A5-A8 4T. The four-amendment
+  tighter streak is explicitly flagged for the execution gate; no qualifier gate makes a false-
+  qualifier re-derivation applicable.
+- PASS — One BacktestNode/process, no Python strategy backtest, no local accounting, no XENA route,
+  and no screen-to-money conversion pin apply.
+
+### Issues
+
+None. A7/A8 close the real-open execution and CONFIRM-exposure defects without introducing a
+design deviation or value gate.
+
+**Disposition:** APPROVE for the operator's separate DESIGN-only Run-1 execution gate. This review
+does not execute the run, authorise CONFIRM, inspect any real result, or permit TEST/holdout access.
