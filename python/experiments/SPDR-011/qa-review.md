@@ -602,3 +602,77 @@ None.
 
 **Disposition:** APPROVE for the operator's separate DESIGN-only Run-1 execution gate. This review
 does not execute the run, authorise any value-layer read or CONFIRM, or permit TEST/holdout access.
+
+## QA run 9 — 2026-07-23T01:07:26Z — mode: subagent — HEAD 03fcf8548fb2dec91b3ab88d77918d85eabd0d25
+
+Verdict: APPROVE
+
+Reviewed git state: committed HEAD `03fcf8548fb2dec91b3ab88d77918d85eabd0d25`; dirty-file
+list before this append: none. Fresh-context reviewer did not implement A11. Per the assigned
+boundary, `data/nautilus_runs/SPDR-011`, real price/outcome/value layers, CONFIRM data, TEST and
+holdout were not inspected. The size-coverage audit projected only frozen DESIGN event timestamps
+plus catalog `ts_event`/`volume`; no OHLC, return, fill, cost or P&L value was read.
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| One causal four-hour episode; strict completed breakout; non-overlap (§1-2, §5) | `design_derivations/census.py:131-154,249-320,333-373`; `spdr011_strategy.py:22-84` | MATCHES | Confirmed state/range sources precede the trigger; equality is no event; overlapping episodes are rejected. |
+| Frozen census, power and signed readiness (§3) | `run_spdr011.py:84-187`; frozen artifacts | MATCHES | Four artifact pins, 3,606 unique event IDs, causal timestamps, signed symbol/fence attestations and the live signed-tree identity are hard-checked before outcomes. |
+| DESIGN-only Run 1; no CONFIRM/TEST/holdout (§4, §6, §13.3-4) | `run_spdr011.py:202-222,557-579,617-637,726-796`; `bundle.py:25-50` | MATCHES | DESIGN is selected before marks, schedule, engine, controls and bundle; Run 1 writes only `design.parquet`. No CONFIRM execution path or TEST/holdout query is reachable. |
+| Daily state, strict trigger/rank and causal signed flow (§5) | `design_derivations/census.py`; `run_spdr011.py:483-554`; `runner_contract.py:178-226` | MATCHES | Prior-only state/range inputs, lexical rank, prior 60 same-slot flow observations and `known_ts <= trigger_ts` match the frozen contract. |
+| Located population, open-to-open episode and explicit missingness (§6) | `runner_contract.py:38-122,233-433`; `run_spdr011.py:225-229` | MATCHES | Left joins retain located rows; only complete 4h episodes are scheduled; unavailable rows retain a reason and cannot masquerade as complete fills. |
+| Ordered L1-L5 reports; no value auto-verdict (§7, §10, §13.5-7) | `layers.py:22-80`; `controls.py:679-728`; `run_spdr011.py:717-796` | MATCHES | All predeclared arms remain visible; bands/effects/MDEs report but do not select candidates or decide progression. |
+| Four controls, zero-fixed derangements and future-destroy (§8-9) | `controls.py:21-150,153-358,387-651`; `run_spdr011.py:567,717-764` | MATCHES | Frozen strata/seeds and realized-pair exclusion match; every permutation destroy rejects fixed points; the synthetic sentinel precedes outcomes and supported-edge survival is the only real-value integrity rule. |
+| UTC-date dependence, five-seed inference and concentration contract (§9-10) | `controls.py:547-604,654-728`; immutable DESIGN artifact | MATCHES | Whole-date resampling machinery, raw/robust statistics and per-stratum report inputs are present; value interrogation remains the later analyst stage. |
+| Partial fees/funding only; no spread or deployment claim (§11) | `runner_contract.py:125-175`; `design.md:330-346,405-408` | MATCHES | Shared cost receives `spread_bps=None`; adapter quantity is explicitly non-economic and supports no capacity, liquidity, impact or deployability inference. |
+| Integer-nanosecond fill reconciliation (§13.10,13; A10/L-43) | `runner_contract.py:273-285,308-351`; `test_spdr011_runner.py:519-580` | MATCHES | Schedule/fill times become integer epochs before row iteration and must equal `decision + symbol offset + 2ns`. |
+| Frozen symbol offsets; alert, insert, own tick sequence (§13.10-12; A10/L-44) | `run_spdr011.py:97-99,232-319`; `spdr011_strategy.py:125-159` | MATCHES | BTC/ETH/SOL/DOGE/XRP offsets are 0/3/6/9/12ns; alert, insertion and own `NO_AGGRESSOR` tick occur one nanosecond apart. |
+| Runtime EXIT-before-ENTRY and distinct multi-instrument engine regression (§13.10-12; A10/L-44) | `spdr011_strategy.py:103-159`; `test_spdr011_runner.py:798-995` | MATCHES | Runtime reload re-derives `EXIT=0 / ENTRY=1`; hostile stored order is corrected. Distinct XRP/ETH states, opens and offsets reconcile every tagged fill. |
+| No post-run fill rewrite (§4, §13.10-11; A10/L-41) | `run_spdr011.py:579-644,646-710`; `runner_contract.py:233-433` | MATCHES | Catalog marks create pre-engine ticks; engine reports pass unchanged into emission/reconciliation. No assignment replaces engine fill price or time. |
+| Minimum-increment unit adapter and pre-engine size gate (§13.14; A11/L-45) | `run_spdr011.py:100-106,232-284,322-333,579-638`; `test_spdr011_runner.py:732-752` | MATCHES | Catalog specs equal BTC 0.001, ETH 0.01, SOL 0.1, DOGE 1, XRP 0.1. Every joined action checks `tick size >= order size` before `BacktestNode` construction; insufficient size raises. |
+| Amendment direction and execution authority (§14-15; L-23/L-45) | `design.md:418-465`; checkpoint design `:190-217`; L-45 `lessons-and-amendments.md:1030-1045` | MATCHES | A1-A11 total is 2 looser / 6 tighter / 3 neutral. A11 is honestly LOOSER because it favourably reduces the adapter after one 100-DOGE order exceeded a 50-DOGE tick; the A5-A10 tighter streak and favourable A11 are both disclosed. No value threshold changes. |
+
+### Golden-trace diff
+
+| Trace | Design expectation | Independent check | Verdict |
+|---|---|---|---|
+| GT-1 LONG | 107 to 104 = -280.374 bps | Synthetic real-open fixture produces `-280.3738` bps. | MATCHES |
+| GT-2 SHORT | 88 to 84 = +454.545 bps | Synthetic exact-four-hour fixture produces `+454.5455` bps. | MATCHES |
+| GT-3 EQUALITY | Close equal to prior high creates no event | Locator uses strict `>` / `<`; equality satisfies neither. | MATCHES |
+| A10 cross-stream collision | Each stream fills its own open at its frozen offset | Real two-instrument test uses distinct XRP/ETH states and prices; every client fill price/time equals its stream expectation. | MATCHES |
+| A10 shared boundary | EXIT precedes next ENTRY despite hostile parquet order | Runtime priority re-sort and real fill order both record EXIT then ENTRY. | MATCHES |
+| A11 all scheduled marks | Every action tick covers its adapter order | Timestamp/volume-only audit: 2,772 actions, 0 insufficient. Counts BTC 544, ETH 578, SOL 568, DOGE 546, XRP 536; minimum coverage multiples 2,975x / 2,188x / 422x / 50x / 107,480x. | MATCHES |
+
+### Governance & boundary
+
+- PASS — Fresh subagent context, append-only run, exact committed HEAD and initially clean tree.
+- PASS — Focused suite: `112 passed` across SPDR-011 census, signed-ingest and runner tests plus
+  Chapter-05 preflight and shared evaluation tests. The required insufficient-size regression passed
+  alone (`1 passed`); the real two-instrument BacktestNode regression also passed. Two upstream
+  `Timestamp.utcnow` deprecation warnings were non-functional.
+- PASS — Outcome-isolated size audit selected only frozen DESIGN keys and physical `ts_event`/`volume`:
+  2,772 scheduled actions, zero missing/insufficient sizes. It did not open outcome columns or the
+  prohibited run directory.
+- PASS — Ruff: `All checks passed`; `git diff --check`, committed-diff check and `git show --check`
+  were clean before this append.
+- PASS — `check_no_local_accounting("python/experiments/SPDR-011/code")` returned
+  `{"ok": true, "banned_defs_found": []}`. There is one multi-instrument Nautilus `BacktestNode`, no
+  vectorized Python strategy backtest and no second node.
+- PASS — SHA-256 matched all design pins: census JSON `94faab2e...13681`, event keys
+  `d1299a08...c7dfd`, derivation `9fae1731...802bdc`, signed attestation
+  `bdfe839c...180d29`; live signed TRAIN tree `d4b7bbed...f7d2b9` also matched.
+- PASS — Mandatory mechanism, object identity, four control proofs, tripwire, bands, power, golden
+  traces, hard/informative split, missing-spread disclosure and A1-A11 amendment ledger remain present.
+  No screen-to-money conversion pin applies to this characterisation design.
+- PASS — Registry remains 0 counted TEST reads / 0 holdout reads. No XENA route, spread proxy,
+  capacity/liquidity/impact/deployability claim, CONFIRM Run-1 path or post-run fill rewrite was found.
+- PASS — QA approval does not execute or authorise the run. Separate operator authority remains the
+  final DESIGN-only gate; CONFIRM, TEST, holdout and value-layer contact remain outside this review.
+
+### Issues
+
+None.
+
+**Disposition:** APPROVE for the operator's separate DESIGN-only Run-1 execution gate. This review
+does not execute the run, authorise a value-layer read or CONFIRM, or permit TEST/holdout access.
