@@ -1,0 +1,91 @@
+{
+  "G1": {
+    "pass": true,
+    "symbol": "BTCUSDT",
+    "clock": "H4",
+    "bar_slot_start_utc": "2022-09-14T00:00:00+00:00",
+    "bar_slot_end_utc": "2022-09-14T04:00:00+00:00",
+    "closes_used": [
+      21566.5,
+      21632.5,
+      21532.0,
+      21596.5,
+      21598.5,
+      21625.5,
+      21607.5,
+      21810.0,
+      21653.5,
+      22177.5,
+      22294.0,
+      22107.5,
+      22409.0,
+      22388.5,
+      22219.5,
+      22268.5,
+      22522.5,
+      20823.0,
+      20274.0,
+      20164.0,
+      20309.5
+    ],
+    "log_returns": [
+      0.0030556286651430265,
+      -0.004656612800045995,
+      0.0029910638249524904,
+      9.260331063460665e-05,
+      0.0012493061036332766,
+      -0.0008326972932749578,
+      0.009328103568881472,
+      -0.00720147601351194,
+      0.02391115721257929,
+      0.005239322554826825,
+      -0.00840066649967866,
+      0.013545746413260423,
+      -0.0009152297083978503,
+      -0.007577152464536202,
+      0.00220284210638496,
+      0.011341685728993519,
+      -0.07845666451790159,
+      -0.02671886806534841,
+      -0.0054404407398234616,
+      0.007189920654296638
+    ],
+    "rv20_manual": 0.02021971063148725,
+    "rv20_screen": 0.02021971063148725,
+    "rel_error": 0.0
+  },
+  "G2": {
+    "pass": true,
+    "symbol": "ETHUSDT",
+    "clock": "H1",
+    "origin_slot_start_utc": "2023-01-09T05:00:00+00:00",
+    "origin_slot_end_utc": "2023-01-09T06:00:00+00:00",
+    "target_bar_start_utc": "2023-01-09T06:00:00+00:00",
+    "feature_vector": {
+      "rv20": 0.005058295897124066,
+      "ewma_vol": 0.004568533358015224,
+      "parkinson": 0.002775018999318446,
+      "gk": 0.0029513510782639956
+    },
+    "target_abs_oo_bps": 7.653744594542378,
+    "origin_known_variant_oo_move_bps": 22.14670281415976,
+    "checks": {
+      "origin_is_bar_close": true,
+      "target_bar_starts_at_origin": true,
+      "features_precede_target_bar": true
+    },
+    "note": "features are realised measures of bars ending at or before slot_end; the target is the open-to-open move of the NEXT bar, entered at that bar's open"
+  },
+  "G3": {
+    "pass": true,
+    "symbol": "SOLUSDT",
+    "clock": "H4",
+    "seed": 101,
+    "n_obs": 611,
+    "circular_shift": 190,
+    "live_ic": 0.26079044227619286,
+    "shuffled_ic": -0.03043091904242046,
+    "delta": 0.2912213613186133,
+    "note": "CIRCULAR_SHIFT has no fixed-point concept; the check is that the IC moves"
+  }
+}

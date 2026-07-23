@@ -160,6 +160,14 @@ Operator-facing written options + recorded decision. Artifact:
 `checkpoints/2026-07-23-017-structural-vol-direction-programme/reflection-mid.md`
 (created when C runs — not at open).
 
+**Primary input for Step C from the vol leg (SPDR-012, run complete 2026-07-23):** the
+**per-arm verdict** in `python/experiments/SPDR-012/analysis.md` **§0** (mirrored in
+`screen.md` §0). It is the ranked survival of the eight RAW §5.1 volatility axes and carries an
+explicit Keep / Drop / Re-label hand-off — the observation set from which the combination design
+must be chosen. Headline: a **range-based volatility level on H1/H4** is the reliable conditioner;
+there is **no hour-resolution skill** and the daily clock fails on close-to-close RV. SPDR-012
+makes **no PASS/STOP call** (AMENDMENT-T2); that call is taken here.
+
 ### Step D — Combination / extraction test
 
 Only then:

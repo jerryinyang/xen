@@ -31,7 +31,7 @@ A SPDR result is never a tradability claim. **0 counted reads, 0 slots.**
 | Nautilus / `xen.adjudication` / estimand gate | **N/A — SPDR lane** (integrity = fence + causal lag self-check §7) |
 | SPREAD-COST-DISCLOSURE | **APPLIES** whenever any bps money unit is shown (§6) |
 | Battery / derangement | **APPLIES** — label/time shuffles §5 |
-| Future-destroy tripwire | **APPLIES** in characterisation form: forecast labels must collapse under future-path destroy of the **target** series (§5) |
+| Future-destroy tripwire | **REPORT LAYER** per **AMENDMENT-T1 (2026-07-23)** — was a hard tripwire; no outcome-side destroy can detect look-ahead. Hard causality now rests on §7 (incl. new §7.3b). Both destroy forms still run and are reported (§5) |
 
 ```
 SPREAD-COST-DISCLOSURE:
@@ -218,6 +218,58 @@ TRIPWIRE: TARGET-FUTURE-DESTROY
   class: future_destroy (HARD for validity of the *forecast claim*; surviving IC ⇒ leak/bug)
 ```
 
+### AMENDMENT-T1 (2026-07-23) — TARGET-FUTURE-DESTROY becomes a report layer
+
+**DIRECTION: LOOSER** (a hard gate is removed). **Operator sign-off: RECORDED 2026-07-23.**
+Raised by fresh-context QA run 1 (`qa-review.md` F-1/F-2/F-3); made **after** first-run
+outcomes were seen — disclosed as such.
+
+**Why.** The clause as frozen cannot do the job it names, in two independent ways.
+
+1. *The pinned destroy form cannot be adjudicated for collapse.* Deranging targets **inside
+   symbol × calendar-month blocks** leaves the between-month component of the association
+   intact by construction, so that null is not centred at zero and its median **rises with
+   the strength of the true relationship** (measured: block null median 0.109 against a live
+   0.259). Adjudicating collapse on it failed 33 of 90 cells — including the strongest ones.
+2. *No outcome-side destroy can detect look-ahead at all.* `E[Spearman(pred, deranged y)] = 0`
+   for **any** fixed predictor, leaking or not. Re-specifying the check onto a full
+   unrestricted derangement makes it pass everywhere (null median −0.0002, max |median|
+   0.005 across 90 cells) — a green gate carrying no information, which is exactly the
+   absence-of-evidence-as-evidence-of-absence failure L-32 was written about.
+
+**What changes.** `TARGET-FUTURE-DESTROY` is reported as a **report layer** — `observed` /
+`ideal` / `interpretation`, **no `pass` field** (INFR-016, L-32). Both destroy forms are still
+run at 2000 seeds and reported per cell: the unrestricted form as the collapse reference, the
+design's pinned block form as the §5 CONTROL it declares itself to be
+("is reported skill an artifact of target marginals only?"), read in the design's own stated
+direction (live IC above null p95).
+
+**What carries the no-leak claim instead.** The construction-level causality asserts, which
+stay **HARD**: §7.1/§7.1b/§7.2 (band fence), §7.3 + **§7.3b** (CONFIRM never enters an
+estimated coefficient, and a DESIGN target's exit price never comes from CONFIRM), §7.4
+(features ≤ origin, target strictly the next bar), §7.5 (derangements fixed-point-free,
+**measured** not asserted). The **predictor-side** `TIME-SHUFFLE-PREDICTORS` circular shift is
+the operative non-vacuity device. An independent fresh-context QA pass re-derived the
+walk-forward path from scratch (max abs difference 0.0 over 608 OOS rows; a deliberately leaky
+variant differs by 20.4 bps) and confirmed the causality construction.
+
+**Consequence, stated plainly:** SPDR-012 ships with **no hard leak gate**. Any downstream
+reader must treat the L-01 (look-ahead) assurance as resting on the construction asserts and
+the independent code review, not on a destroy test.
+
+### AMENDMENT-T2 (2026-07-23) — §6.4 recommendation is not computed
+
+**DIRECTION: NEUTRAL** (no threshold moves). **Operator sign-off: RECORDED 2026-07-23.**
+Raised by QA run 1 finding F-4.
+
+§6.4's PASS clauses are unsatisfiable as frozen: the DESIGN band mostly predates the catalog's
+trailing 4-year history cap, leaving ~100 unique dates per cell against the ~225 that §6.3's
+own UNPOWERED rule requires, and the first literal calendar third is empty for every symbol
+but MATICUSDT. Rather than silently reading the recommendation off the CONFIRM band or off a
+disclosure label variant, `analysis.md` reports **all three candidate bases side by side**
+(CONFIRM + design labels; DESIGN + design labels; DESIGN + disclosure labels) with what each
+would imply, and **declines a PASS/STOP call**. The call is the operator's at the gate.
+
 ---
 
 ## §6 Units, inference, bands, power
@@ -290,8 +342,12 @@ POWER:
 1. Every catalog query `band="TRAIN"`; assert max target timestamp < `train_end_utc`.  
 2. Assert no row with `ts ≥ holdout_start_utc`.  
 3. Assert CONFIRM not used in estimation coefficients (CONFIRM = verify only).  
+   **3b (added by AMENDMENT-T1):** assert a DESIGN target's **exit** price is also inside
+   DESIGN — the open-to-open target exits one bar after the target bar, which clause 3 (an
+   origin-timestamp comparison) cannot see. QA F-7.
 4. Assert feature timestamps ≤ origin; targets use next bar only.  
-5. Assert derangements have 0 fixed points (or abort).  
+5. Assert derangements have 0 fixed points (or abort) — **measured** across the whole seed
+   battery and reported as a count, not inferred from a literal (QA F-10).
 6. Write `results/integrity_selfcheck.json` with all asserts PASS.
 
 ---

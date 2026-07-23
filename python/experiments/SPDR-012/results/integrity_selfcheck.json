@@ -1,0 +1,260 @@
+{
+  "experiment": "SPDR-012",
+  "generated_utc": "2026-07-23T15:45:22.495747+00:00",
+  "fence_manifest_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json",
+  "fence_manifest_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+  "bands": {
+    "DESIGN": [
+      "2021-06-29T06:53:00+00:00",
+      "2023-03-01T00:00:00+00:00"
+    ],
+    "CONFIRM": [
+      "2023-03-01T00:00:00+00:00",
+      "2023-12-18T00:00:00+00:00"
+    ],
+    "TEST": "NEVER READ",
+    "HOLDOUT": "NEVER READ"
+  },
+  "all_pass": true,
+  "checks": [
+    {
+      "id": "7.1",
+      "clause": "every catalog query band=TRAIN; max target timestamp < train_end_utc",
+      "pass": true,
+      "detail": {
+        "max_target_end_utc": "2023-12-17T22:00:00+00:00",
+        "train_end_utc": "2023-12-18T00:00:00+00:00"
+      }
+    },
+    {
+      "id": "7.1b",
+      "clause": "no observation at or after the TEST band start",
+      "pass": true,
+      "detail": {
+        "test_start_utc": "2023-12-18T00:00:00+00:00"
+      }
+    },
+    {
+      "id": "7.2",
+      "clause": "no row with ts >= holdout_start_utc",
+      "pass": true,
+      "detail": {
+        "max_slot_end_utc": "2023-12-17T21:00:00+00:00",
+        "holdout_start_utc": "2025-01-08T00:00:00+00:00"
+      }
+    },
+    {
+      "id": "7.3",
+      "clause": "CONFIRM not used in estimation coefficients (CONFIRM = verify only)",
+      "pass": true,
+      "detail": {
+        "n_models_checked": 855,
+        "violations": []
+      }
+    },
+    {
+      "id": "7.4",
+      "clause": "feature timestamps <= origin; targets use the next bar only",
+      "pass": true,
+      "detail": {
+        "rows_with_target_before_origin": 0,
+        "rule": "target_slot_start >= slot_end for every origin"
+      }
+    },
+    {
+      "id": "7.3b",
+      "clause": "DESIGN target exit price is taken from inside the DESIGN band",
+      "pass": true,
+      "detail": {
+        "design_rows_whose_exit_price_falls_in_CONFIRM": 0
+      }
+    },
+    {
+      "id": "7.5",
+      "clause": "derangements have 0 fixed points (measured, not asserted)",
+      "pass": true,
+      "detail": {
+        "index_fixed_points_observed": 0,
+        "seed_draws": 360000,
+        "batteries": 180
+      }
+    },
+    {
+      "id": "UNIVERSE",
+      "clause": "top-25 recompute == frozen family pin (design \u00a70.1)",
+      "pass": true,
+      "detail": {
+        "family": {
+          "path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/docs/signal-registry/candidate-families/cf-voldir-001-universe.json",
+          "set_equal": true,
+          "missing_from_recompute": [],
+          "extra_in_recompute": []
+        },
+        "results": {
+          "path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-012/results/universe_top25.json",
+          "set_equal": true,
+          "missing_from_recompute": [],
+          "extra_in_recompute": []
+        }
+      }
+    },
+    {
+      "id": "GOLDEN",
+      "clause": "design \u00a78 hand-checkable traces",
+      "pass": true,
+      "detail": {
+        "G1": true,
+        "G2": true,
+        "G3": true
+      }
+    }
+  ],
+  "report_layers": {
+    "future_destroy": {
+      "class": "report_layer (no pass field)",
+      "operator_decision": "2026-07-23 \u2014 demoted from hard tripwire (DEV-1)",
+      "interpretation_counts": {
+        "COLLAPSED_AS_EXPECTED": 71,
+        "LIVE_INSIDE_DESTROYED_NULL": 19
+      },
+      "informative_power": "cannot detect look-ahead; E[Spearman(pred, deranged y)] = 0 for any fixed predictor. The no-leak claim rests on the design \u00a77.4 construction asserts (checks 7.3/7.3b/7.4 above), which ARE hard."
+    },
+    "predictor_side_time_shuffle": {
+      "class": "report_layer (no pass field)",
+      "role": "the operative non-vacuity device for this screen",
+      "cells": 90,
+      "cells_with_live_outside_shuffle_central_90": 73
+    }
+  },
+  "spread_cost_disclosure": {
+    "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+    "spread_rt_bps": null,
+    "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
+    "implication": "any optional cost overlay understates true cost; no fully-net/tradable/deployable claim",
+    "prohibited_claims": [
+      "fully-net",
+      "cost-complete",
+      "tradable",
+      "deployable"
+    ]
+  },
+  "unit_pin": {
+    "primary_magnitude_target": "abs_oo = 1e4 * |O_{t+1}/O_t - 1| in bps on the decision clock",
+    "rv_objects": "dimensionless (log-return scale); not annualised",
+    "money_overlay_normaliser": "none - target already in bps; no ATR divisor"
+  },
+  "prohibited_claims": [
+    "tradable",
+    "deployable",
+    "fully-net",
+    "cost-complete",
+    "direction",
+    "combination",
+    "family status change"
+  ],
+  "interpretation_notes": [
+    {
+      "id": "IN-1",
+      "clause": "design \u00a76.2 'first 40% DESIGN for initial fit'",
+      "ambiguity": "Calendar reading (first 40% of the DESIGN band = up to 2022-03-01) is empty for every symbol: the catalog carries a trailing 4-year history cap, so the earliest 1m bar for all but MATICUSDT is 2022-07-15. The calendar reading yields no initial fit window and therefore no OOS forecast at all.",
+      "resolution": "Initial fit = first 40% of each symbol x clock's own scored DESIGN origins (time-ordered); walk-forward monthly expanding re-fit thereafter, as specified.",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-2",
+      "clause": "design \u00a76.2 'chronological DESIGN thirds (equal elapsed time)'",
+      "ambiguity": "Literal calendar thirds of [2021-06-29, 2023-03-01) put the first third entirely before the catalog history cap (empty) for all symbols except MATICUSDT.",
+      "resolution": "BOTH are computed and reported: thirds_calendar (literal, per design) and thirds_sample (equal elapsed time over the symbol x clock's own scored span). The literal read is never dropped.",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-3",
+      "clause": "design \u00a75 CONTROL TIME-SHUFFLE-PREDICTORS",
+      "ambiguity": "Whether the shuffled features must be re-fitted through the walk-forward model.",
+      "resolution": "The OOS prediction series is a deterministic function of the feature rows, so a circular shift of the prediction series relative to the fixed target series is exactly the specified 'features no longer aligned to true past of the target' with the model held frozen. Applied at 200 seeds; the +0.25 rank-correlation plant is destroyed under the same operation as the bite check.",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-4",
+      "clause": "design \u00a76.3 bands / \u00a76.2 block bootstrap",
+      "ambiguity": "Which (block length, seed) CI assigns the band.",
+      "resolution": "Worst case: ci_low = min over the 3 blocks x 5 seeds, ci_high = max. The full 15-cell grid is emitted (block_sensitivity + ci_low_seed_range, L-20).",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-5",
+      "clause": "design \u00a73.3 'target = next bar'",
+      "ambiguity": "Behaviour when the next COMPLETE bar is not the adjacent clock slot.",
+      "resolution": "The literal design text is implemented (next complete bar). A 'next_contiguous' flag is emitted per origin and the contiguous fraction is disclosed per cell; no rows are dropped.",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-6",
+      "clause": "design \u00a74 V-REGIME-HMM 'on r or rv20'",
+      "ambiguity": "Which sequence the 2-state Gaussian HMM is fitted to.",
+      "resolution": "Fitted to the clock log-return series r with state-specific (mu, sigma^2); HIGH = the larger-sigma state. Standard 2-state volatility-regime formulation and the RAW \u00a75.1 'HMM on returns or RV' wording.",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-7",
+      "clause": "design \u00a73.2 vs \u00a73.3 \u2014 target indexing",
+      "ambiguity": "\u00a73.2 writes abs_oo_i = 1e4*|O_{i+1}/O_i - 1| and calls it the target for origin i, but O_{i+1} is the traded price AT the origin instant slot_end_i, so that quantity is already known at origin i. \u00a73.3 says 'Target = next bar's abs_oo'.",
+      "resolution": "The causal reading is forced by \u00a73.3 and by \u00a77.4 ('targets use next bar only'): the target for origin i is the move realised over bar i+1, entered at O_{i+1}, i.e. target_abs_oo_i = 1e4*|O_{i+2}/O_{i+1} - 1|. The origin-known variant is still emitted per row as oo_move for disclosure.",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-8",
+      "clause": "design \u00a75 TRIPWIRE TARGET-FUTURE-DESTROY \u2014 destroy form adjudicated",
+      "ambiguity": "\u00a75 pins the tripwire destroy as 'another symbol-month deranged target (same as label derangement)'. Adjudicating COLLAPSE on that block-restricted form is self-defeating: deranging inside a calendar month cannot remove the between-month component, so its null median RISES with the strength of the true relationship (measured: block null median 0.109 vs live 0.259) and the strongest cells are flagged as leaks.",
+      "resolution": "DEVIATION, NOT A NEUTRAL READING \u2014 see the DEVIATIONS block below. Resolved by OPERATOR DECISION 2026-07-23: the future-destroy read is demoted to a REPORT LAYER with no pass field (INFR-016 / L-32) rather than re-specified as a hard gate, because no outcome-side destroy can detect look-ahead and a green gate would report absence of evidence as evidence of absence. Both destroy forms are still run at 2000 seeds and reported per cell.",
+      "weakens_clause": true,
+      "see": "DEVIATIONS[0]"
+    },
+    {
+      "id": "IN-9",
+      "clause": "design \u00a76.3 UNPOWERED clause",
+      "ambiguity": "The clause fires on the PROSPECTIVE MDE (>0.10 => needs >=225 unique dates), which the realised DESIGN sample cannot clear: the catalog's trailing 4-year history cap leaves a median of 99-102 unique dates per DESIGN cell.",
+      "resolution": "The literal design label is emitted as band_label and is the one that counts. A disclosure companion band_label_detected (UNPOWERED only when the observed effect is below its own detection floor) is emitted in a separate column. No cell is dropped or re-labelled. Which label rule and which band the \u00a76.4 recommendation is computed from is an OPERATOR decision (QA F-4), not a code default.",
+      "weakens_clause": false
+    }
+  ],
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "clause": "design \u00a75 TRIPWIRE TARGET-FUTURE-DESTROY",
+      "pinned": "HARD tripwire, collapse adjudicated on the symbol x calendar-month block-restricted derangement",
+      "implemented": "REPORT LAYER with no pass field (observed / ideal / interpretation), reporting both the unrestricted and the block-restricted destroy per cell",
+      "direction": "LOOSER (a hard gate was removed)",
+      "made_after_seeing_outcomes": true,
+      "rationale": "The pinned block form retains the between-month component by construction, so its null median scales with the true relationship; adjudicating collapse on it failed 33/90 cells and would have flagged the strongest cells as leaks.",
+      "known_limitation": "The replacement gate is effectively unfailable: E[Spearman(pred, deranged y)] = 0 for any fixed pred, so it is a null-centring sanity check, NOT a look-ahead leak test. Restated: fixed pred, so it is a null-centring sanity check, NOT a look-ahead leak test. No target-side destroy can detect look-ahead. The operative non-vacuity device for this screen is the predictor-side CIRCULAR_SHIFT control plus the construction-level causality asserts (design \u00a77.4).",
+      "operator_decision": "2026-07-23 \u2014 operator chose 'demote it to a report layer' over (a) signing an amendment that kept a hard gate, and (b) reverting to the frozen block-restricted gate that would have failed 33/90 cells for an artifact of its own destroy form.",
+      "design_md_amendment": "AMENDMENT-T1 (design.md \u00a75), dated 2026-07-23",
+      "operator_sign_off": "RECORDED 2026-07-23",
+      "consequence": "SPDR-012 ships with NO hard leak gate. The hard integrity surface is the construction-level causality checks (\u00a77.1/7.1b/7.2/7.3/7.3b/7.4/7.5), which an independent fresh-context QA pass re-derived and confirmed. The predictor-side CIRCULAR_SHIFT control is the operative non-vacuity device."
+    }
+  ],
+  "code_sha256": {
+    "arms.py": "76286876255ae0fb200227bcafc89b3f3fb58aec9ccc9f39bff78e5744e8e7c4",
+    "catalog_io.py": "9f5227ef5f23d245d1b8d3f6e20a7ba0332a7154a2530913e517600bbb3f8ae1",
+    "config.py": "29b1fd42f07f621faaf1fa80d9354b6d192091f2508eee38becf5b549bf9846a",
+    "controls.py": "86279e2ef11cad66eca281a18ece63a0accbc69617da4c29a9e220c58287ec11",
+    "cross_section.py": "687a12f043bf08dc676ad9c513e7e65b771a07a0fdcbb4b6937f9b0f839cab3b",
+    "features.py": "083c6426ca0bf4a73e963570d44acbc35a5c70d1fd3e32af866a1e271c7ae312",
+    "golden_traces.py": "12ae941a351401f835ff6f9cdedd716720bed73c03570fd20d4599f71045b3ba",
+    "hmm.py": "57cc5c5f0820476f634027199a8d810dbcaf8be8f6114b0c0e1d868e4fea0125",
+    "models.py": "87498110302555270dae55c661dd3feafd8b2ea0bd7504fcfad2894c7bedb490",
+    "pipeline.py": "b3deec7f92bb3fcde8d262c3b3cc6278bbd602dcd4665ce5791c47da4b2e28e6",
+    "run_screen.py": "0d045da9d3232d7724381330d8f0c9ec85e0ffddffee523960282c57ff5bedb2",
+    "stats_core.py": "2e92fc0928a6f159c495cbe98dc27259cdfe248452d09e5d0a312732a3479a01",
+    "universe.py": "dc659a589ee62627007b8ab7109997a2863427a8cb38c68ea43c2beac22c5ea2"
+  },
+  "environment": {
+    "python": "3.13.1",
+    "numpy": "2.4.6",
+    "polars": "1.41.2",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O"
+  },
+  "golden_traces_all_pass": true,
+  "wall_seconds": 566.4
+}
