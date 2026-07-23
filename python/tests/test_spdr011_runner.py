@@ -729,6 +729,29 @@ def test_execution_tick_frame_rejects_missing_real_open() -> None:
         runner._execution_tick_frame(schedule, marks)
 
 
+def test_execution_tick_frame_rejects_less_size_than_adapter_order() -> None:
+    runner = _load("run_spdr011")
+    decision = datetime(2022, 10, 1, 4, tzinfo=timezone.utc)
+    schedule = pl.DataFrame(
+        {
+            "client_order_id": ["ENTRY"],
+            "symbol": ["DOGEUSDT"],
+            "decision_ts": [decision],
+        }
+    )
+    marks = pl.DataFrame(
+        {
+            "symbol": ["DOGEUSDT"],
+            "SourceCloseTime": [decision + timedelta(minutes=1)],
+            "RealOpen": [0.0595],
+            "Volume": [0.5],
+        }
+    )
+
+    with pytest.raises(RuntimeError, match="insufficient execution-tick size"):
+        runner._execution_tick_frame(schedule, marks)
+
+
 def test_execution_ticks_use_real_price_after_order_insertion() -> None:
     from nautilus_trader.model.enums import AggressorSide
     from nautilus_trader.persistence.catalog import ParquetDataCatalog

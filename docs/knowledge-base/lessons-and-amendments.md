@@ -1026,3 +1026,20 @@ shared same-symbol boundary, re-derive an explicit runtime EXIT-before-ENTRY pri
 relying on equal-key sort stability.
 
 **Enforced at.** SPDR-011 amendment A10 and the multi-instrument real-engine regression.
+
+## L-45 — Execution-event size can change a market fill even when its price is correct (SPDR-011)
+
+**What.** After price and timestamp sequencing reconciled 2,771 actions, one 100-DOGE exit met a
+real-open tick carrying only 50 DOGE. Nautilus filled the remainder one tick higher, emitting a
+half-tick blended average instead of the tick's `RealOpen`.
+
+**Mechanism (why).** A `TradeTick` is not only a price carrier; its size constrains immediately
+available quantity in the matching engine. An adapter order larger than the tick therefore changes
+the measured fill basis through simulated impact.
+
+**Fix / new rule.** Unit-return characterisation uses one minimum size-increment order and asserts
+that every execution tick covers it before engine construction. The adapter quantity is explicitly
+non-economic and supports no capacity, liquidity, impact or deployability claim. Any later strategy
+replay must size and test physical execution separately rather than inherit this adapter.
+
+**Enforced at.** SPDR-011 amendment A11, pre-engine tick-size gate and insufficient-size regression.

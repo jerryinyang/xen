@@ -2,7 +2,7 @@
 
 - **Family:** `CF-VOLCONV-001`
 - **Checkpoint:** `2026-07-22-016-volatility-direction-conversion`
-- **Status:** `PRE-VALUE AMENDMENT A10 — IMPLEMENTED / FRESH QA PENDING`
+- **Status:** `PRE-VALUE AMENDMENT A11 — IMPLEMENTED / FRESH QA PENDING`
 - **Vehicle:** one TRAIN-only SPDR emission; five ordered report layers
 - **Execution authority:** operator-approved clean DESIGN rerun, conditional on fresh-context QA
 - **TEST / holdout:** prohibited; zero reads
@@ -402,6 +402,10 @@ Implementation must:
     the four-hour boundary. A bar callback may not advance or substitute for a missing alert.
 13. preserve schedule and fill timestamps as integer nanoseconds during reconciliation. Polars
     datetime row conversion may not mediate the `decision+offset+2ns` equality check.
+14. use one minimum size-increment order per symbol solely to exercise the unit-return estimand:
+    BTC `0.001`, ETH `0.01`, SOL `0.1`, DOGE `1`, XRP `0.1`. Require the real-open tick size to
+    cover that adapter order before engine construction. This is not a capacity, impact, liquidity
+    or deployability test; no inference may be drawn from the adapter quantity.
 
 The Run-1 bundle contains `design.parquet` only. CONFIRM prices, orders and fills do not exist in the
 Run-1 directory. After the exact rule/config hash and explicit operator CONFIRM authority are
@@ -436,13 +440,17 @@ AMENDMENT-A9: replace bar-dependent decision submission with exact engine-clock 
 AMENDMENT-A10: preserve nanoseconds in reconciliation and serialize simultaneous symbol execution
   events after multi-stream ties filled non-first symbols from stale prior-close state
   DIRECTION: TIGHTER — running count: 1 looser / 6 tighter / 3 neutral
+AMENDMENT-A11: replace arbitrary larger engine-adapter quantities with minimum size increments after
+  one 100-DOGE order exceeded a 50-DOGE execution tick and produced a half-tick blended fill
+  DIRECTION: LOOSER — running count: 2 looser / 6 tighter / 3 neutral
 ```
 
 There is no qualification gate, so a global-null false-qualifier count is inapplicable. All
 predeclared arms remain visible; no arm is selected by performance.
 
-Operator flag: A5–A10 are six consecutive tighter amendments. They repair independent integrity
-failures and do not add a value threshold, but the streak must be disclosed at the execution gate.
+Operator flag: A5–A10 are six consecutive tighter amendments. A11 then reduces the non-economic
+engine adapter size and is favourable to exact-open reconciliation. Both facts must be disclosed at
+the execution gate; none adds or changes a value threshold.
 
 ## 15. Execution gate
 

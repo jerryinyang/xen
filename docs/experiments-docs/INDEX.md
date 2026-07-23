@@ -2,7 +2,7 @@
 
 ## Current checkpoint status
 
-**CHECKPOINT-016 OPEN — RUN-1 A10 REPAIR / FRESH QA PENDING.** `CF-VOLCONV-001` is
+**CHECKPOINT-016 OPEN — RUN-1 A11 REPAIR / FRESH QA PENDING.** `CF-VOLCONV-001` is
 registered. The outcome-free census located 1,390 DESIGN events on 148 dates; no outcome artifact,
 SPDR execution, EXP execution, historical TEST read, holdout read, or forward shadow is active.
 
@@ -26,8 +26,8 @@ Implementation evidence: [Chapter 05 cost/data preflight](../references/chapter-
 ## Current checkpoint
 
 - [Checkpoint 016 design](checkpoints/2026-07-22-016-volatility-direction-conversion/design.md) —
-  OPEN; the next clean Run-1 exposed nanosecond-checker loss and multi-stream event collisions;
-  A10 is operator-authorised and
+  OPEN; the next clean Run-1 exposed one adapter order larger than its execution tick; A11 is
+  operator-authorised and
   must receive fresh QA APPROVE before the clean DESIGN-only rerun.
 
 ## Checkpoint retrospectives

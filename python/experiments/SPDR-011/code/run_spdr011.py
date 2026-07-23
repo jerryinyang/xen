@@ -98,11 +98,11 @@ EXECUTION_SEQUENCE_OFFSET_NS = {
     symbol: index * 3 for index, symbol in enumerate(SYMBOLS)
 }
 TRADE_SIZE = {
-    "BTCUSDT": "0.01",
-    "ETHUSDT": "0.1",
-    "SOLUSDT": "1",
-    "DOGEUSDT": "100",
-    "XRPUSDT": "100",
+    "BTCUSDT": "0.001",
+    "ETHUSDT": "0.01",
+    "SOLUSDT": "0.1",
+    "DOGEUSDT": "1",
+    "XRPUSDT": "0.1",
 }
 CATALOG_VERSION = "INFR-011-A4-2026-07-16"
 RUN1_END_UTC = datetime(2023, 3, 1, tzinfo=timezone.utc)
@@ -249,6 +249,10 @@ def _execution_tick_frame(schedule: pl.DataFrame, marks: pl.DataFrame) -> pl.Dat
         pl.col("symbol")
         .replace_strict(EXECUTION_SEQUENCE_OFFSET_NS, return_dtype=pl.Int64)
         .alias("sequence_offset_ns"),
+        pl.col("symbol")
+        .replace_strict(TRADE_SIZE, return_dtype=pl.String)
+        .cast(pl.Float64)
+        .alias("order_size"),
     )
     source = marks.select(
         "symbol",
@@ -260,6 +264,11 @@ def _execution_tick_frame(schedule: pl.DataFrame, marks: pl.DataFrame) -> pl.Dat
     missing = joined.filter(pl.col("price").is_null() | (pl.col("size") <= 0))
     if missing.height:
         raise RuntimeError(f"missing real-open execution marks for {missing.height} actions")
+    insufficient = joined.filter(pl.col("size") < pl.col("order_size"))
+    if insufficient.height:
+        raise RuntimeError(
+            f"insufficient execution-tick size for {insufficient.height} actions"
+        )
     return joined.select(
         "client_order_id",
         "symbol",
