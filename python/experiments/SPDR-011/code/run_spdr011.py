@@ -307,7 +307,6 @@ def _strategy_config(symbol: str, schedule_path: Path) -> ImportableStrategyConf
         config_path="spdr011_strategy:Spdr011ScheduleConfig",
         config={
             "instrument_id": instrument_id,
-            "bar_type": f"{instrument_id}-1-MINUTE-LAST-EXTERNAL",
             "trade_size": TRADE_SIZE[symbol],
             "schedule_path": str(schedule_path),
         },

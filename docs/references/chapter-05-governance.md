@@ -1,6 +1,6 @@
 # Chapter 05 Governance — Volatility-to-Direction Conversion
 
-**State:** `CHECKPOINT-016 OPEN / RUN-1 A7/A8 IMPLEMENTATION + FRESH QA`
+**State:** `CHECKPOINT-016 OPEN / RUN-1 A9 IMPLEMENTED + FRESH QA PENDING`
 
 **Governing brief:** `.ignore/what-next/alts/intraday-way-forward-plan.md`
 
@@ -61,7 +61,7 @@ QA history and amendment approval live in
   checkpoint-016 is open; Run-1 execution still requires separate operator authorisation.
 - `.agents/skills/research-pipeline/_pipeline-config.md` requires this file to be read. The family is
   registered; execution remains forbidden until the design, fresh QA and separate approval complete.
-- The operator authorised the A7/A8 repair, fresh QA, and a clean Run 1 on 2026-07-23. Outcome
+- The operator authorised the A9 repair, fresh QA, and a clean Run 1 on 2026-07-23. Outcome
   execution remains conditional on fresh QA APPROVE; CONFIRM remains unexecuted and unauthorised.
 - The complete signal, cost, controls, report-layer, power, Run 2, risk, and shadow contracts remain
   frozen in the governing brief and must be translated without substantive change into the first

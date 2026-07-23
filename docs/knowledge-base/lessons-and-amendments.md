@@ -972,3 +972,22 @@ L-29's close-axis timestamp warning remains valid.
 
 **Enforced at.** SPDR-011 amendments A7/A8, engine-sequencing regression tests, event-to-fill
 reconciliation, and fresh pre-execution QA.
+
+## L-42 — Scheduled decisions cannot depend on a boundary bar existing (SPDR-011) ⭐
+
+**What.** After A7 corrected the fill price, a clean Run-1 still found 24 actions whose orders were
+submitted one minute late and filled two minutes after the decision. Every case occurred where the
+one-minute catalog had no bar exactly at the scheduled four-hour boundary; most continuous-boundary
+actions reconciled and therefore concealed the dependency.
+
+**Mechanism (why).** `on_bar` is a data-arrival callback, not a decision clock. When the exact
+boundary bar is absent, the strategy cannot submit until the next observed bar. The real-open
+execution tick has already passed, so the market order settles against later engine state.
+
+**Fix / new rule.** Time-scheduled strategies must submit from exact engine-clock alerts and test a
+deliberately missing decision-bar case. Market-data callbacks may update state but cannot be the sole
+clock for a predeclared decision. Reconcile every fill timestamp and source price; continuous-tape
+agreement is insufficient.
+
+**Enforced at.** SPDR-011 amendment A9, a real BacktestNode missing-boundary regression test, and
+fresh pre-execution QA before another clean Run-1.

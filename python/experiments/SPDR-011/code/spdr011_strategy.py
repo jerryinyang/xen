@@ -1,9 +1,9 @@
 """Nautilus schedule executor for the frozen SPDR-011 event population.
 
 DEVIATIONS: none. The schedule contains census event times and directions only. A target
-change is submitted when the boundary bar closes. The runner sequences the catalog's real
-next-bar open as an execution event one nanosecond later (L-41); no future price enters the
-schedule and no emitted fill is rewritten.
+change is submitted by an engine-clock alert at the completed boundary. The runner sequences
+the catalog's real next-bar open as an execution event one nanosecond later (L-41/L-42); no
+future price enters the schedule and no emitted fill is rewritten.
 """
 from __future__ import annotations
 
@@ -12,8 +12,8 @@ from decimal import Decimal
 
 import polars as pl
 
+from nautilus_trader.common.component import TimeEvent
 from nautilus_trader.config import StrategyConfig
-from nautilus_trader.model.data import Bar, BarType
 from nautilus_trader.model.enums import OrderSide
 from nautilus_trader.model.identifiers import ClientOrderId, InstrumentId
 from nautilus_trader.trading.strategy import Strategy
@@ -92,13 +92,12 @@ def _client_order_id(event_id: str, action: str) -> str:
 
 class Spdr011ScheduleConfig(StrategyConfig, frozen=True):
     instrument_id: InstrumentId
-    bar_type: BarType
     trade_size: Decimal
     schedule_path: str
 
 
 class Spdr011ScheduleStrategy(Strategy):
-    """Apply frozen target changes; each decision sees confirmed bars only."""
+    """Apply frozen target changes at exact engine-clock decision boundaries."""
 
     def __init__(self, config: Spdr011ScheduleConfig) -> None:
         super().__init__(config)
@@ -116,12 +115,18 @@ class Spdr011ScheduleStrategy(Strategy):
         self.instrument = self.cache.instrument(self.config.instrument_id)
         if self.instrument is None:
             raise RuntimeError(f"instrument not cached: {self.config.instrument_id}")
-        self.subscribe_bars(self.config.bar_type)
+        symbol = str(self.config.instrument_id).split("-LINEAR.", maxsplit=1)[0]
+        for index, decision_ts in enumerate(dict.fromkeys(self._timestamps)):
+            self.clock.set_time_alert_ns(
+                name=f"SPDR011-{symbol}-{index}",
+                alert_time_ns=decision_ts,
+                callback=self._on_decision,
+            )
 
-    def on_bar(self, bar: Bar) -> None:
+    def _on_decision(self, event: TimeEvent) -> None:
         while (
             self._pointer < len(self._timestamps)
-            and self._timestamps[self._pointer] <= bar.ts_event
+            and self._timestamps[self._pointer] <= event.ts_event
         ):
             direction = int(self._directions[self._pointer])
             event_id = self._events[self._pointer]

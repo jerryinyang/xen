@@ -758,6 +758,130 @@ def test_execution_latency_delays_insert_by_exactly_one_nanosecond() -> None:
     }
 
 
+def test_engine_fills_real_open_when_decision_minute_bar_is_missing(tmp_path: Path) -> None:
+    """The decision clock must not depend on a one-minute bar existing at the boundary."""
+    from nautilus_trader.backtest.node import BacktestNode
+    from nautilus_trader.config import (
+        BacktestDataConfig,
+        BacktestEngineConfig,
+        BacktestRunConfig,
+        BacktestVenueConfig,
+        ImportableStrategyConfig,
+        LoggingConfig,
+    )
+    from nautilus_trader.core.datetime import dt_to_unix_nanos
+    from nautilus_trader.model.data import Bar, BarType, TradeTick
+    from nautilus_trader.model.enums import AggressorSide
+    from nautilus_trader.model.identifiers import TradeId
+    from nautilus_trader.persistence.catalog import ParquetDataCatalog
+    from nautilus_trader.test_kit.providers import TestInstrumentProvider
+
+    runner = _load("run_spdr011")
+    strategy = _load("spdr011_strategy")
+    instrument = TestInstrumentProvider.xrpusdt_linear_bybit()
+    bar_type = BarType.from_str(f"{instrument.id}-1-MINUTE-LAST-EXTERNAL")
+    decision = datetime(2024, 1, 1, 4, tzinfo=timezone.utc)
+    exit_ = decision + timedelta(minutes=2)
+    events = pl.DataFrame(
+        {
+            "event_id": ["MISSING-DECISION-BAR"],
+            "symbol": ["XRPUSDT"],
+            "entry_ts": [decision],
+            "exit_ts": [exit_],
+            "direction": [1],
+        }
+    )
+    schedule = strategy.build_target_schedule(events)
+    schedule_path = tmp_path / "schedule.parquet"
+    schedule.write_parquet(schedule_path)
+
+    bars = []
+    for dt, close in [
+        (decision - timedelta(minutes=1), 100.0),
+        (decision + timedelta(minutes=1), 110.0),
+        (exit_, 105.0),
+        (exit_ + timedelta(minutes=1), 106.0),
+    ]:
+        ts_ns = dt_to_unix_nanos(dt)
+        bars.append(
+            Bar(
+                bar_type,
+                instrument.make_price(close),
+                instrument.make_price(close + 1),
+                instrument.make_price(close - 1),
+                instrument.make_price(close),
+                instrument.make_qty(1_000),
+                ts_ns,
+                ts_ns,
+            )
+        )
+    ticks = []
+    for row, price in zip(schedule.iter_rows(named=True), [107.0, 104.0], strict=True):
+        ts_ns = dt_to_unix_nanos(row["decision_ts"])
+        ticks.append(
+            TradeTick(
+                instrument.id,
+                instrument.make_price(price),
+                instrument.make_qty(1_000),
+                AggressorSide.NO_AGGRESSOR,
+                TradeId(f"OPEN-{row['client_order_id']}"),
+                ts_ns,
+                ts_ns + 1,
+            )
+        )
+    catalog_path = tmp_path / "catalog"
+    catalog = ParquetDataCatalog(str(catalog_path))
+    catalog.write_data([instrument])
+    catalog.write_data(bars)
+    catalog.write_data(ticks)
+
+    strategy_config = ImportableStrategyConfig(
+        strategy_path="spdr011_strategy:Spdr011ScheduleStrategy",
+        config_path="spdr011_strategy:Spdr011ScheduleConfig",
+        config={
+            "instrument_id": str(instrument.id),
+            "trade_size": "100",
+            "schedule_path": str(schedule_path),
+        },
+    )
+    run_config = BacktestRunConfig(
+        dispose_on_completion=False,
+        engine=BacktestEngineConfig(
+            logging=LoggingConfig(log_level="ERROR", log_colors=False, print_config=False),
+            strategies=[strategy_config],
+        ),
+        venues=[
+            BacktestVenueConfig(
+                name="BYBIT",
+                oms_type="NETTING",
+                account_type="MARGIN",
+                base_currency="USDT",
+                starting_balances=["1000000 USDT"],
+                book_type="L1_MBP",
+                latency_model=runner._execution_latency_config(),
+            )
+        ],
+        data=[
+            BacktestDataConfig(
+                catalog_path=str(catalog_path),
+                data_cls=data_cls,
+                instrument_id=str(instrument.id),
+            )
+            for data_cls in (Bar, TradeTick)
+        ],
+    )
+    node = BacktestNode(configs=[run_config])
+    node.run()
+    fills = node.get_engine(run_config.id).trader.generate_order_fills_report()
+    node.dispose()
+
+    assert fills["avg_px"].astype(float).tolist() == [107.0, 104.0]
+    assert fills["ts_last"].astype("int64").tolist() == [
+        dt_to_unix_nanos(decision) + 1,
+        dt_to_unix_nanos(exit_) + 1,
+    ]
+
+
 def test_unavailable_event_with_no_schedule_or_fills_reconciles_as_unavailable() -> None:
     contract = _load("runner_contract")
     events, schedule, fills, orders, marks = _fill_reconciliation_fixture()

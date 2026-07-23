@@ -2,9 +2,9 @@
 
 - **Family:** `CF-VOLCONV-001`
 - **Checkpoint:** `2026-07-22-016-volatility-direction-conversion`
-- **Status:** `PRE-VALUE AMENDMENT A7/A8 — IMPLEMENTATION / FRESH QA PENDING`
+- **Status:** `PRE-VALUE AMENDMENT A9 — IMPLEMENTED / FRESH QA PENDING`
 - **Vehicle:** one TRAIN-only SPDR emission; five ordered report layers
-- **Execution authority:** none; operator approval required after fresh-context QA
+- **Execution authority:** operator-approved clean DESIGN rerun, conditional on fresh-context QA
 - **TEST / holdout:** prohibited; zero reads
 
 ## 1. One question and mechanism
@@ -393,6 +393,10 @@ Implementation must:
     `NO_AGGRESSOR`, and apply a matching 1ns order-insert latency. This event represents the real
     open price without claiming a historical bid/ask spread. No catalog open may replace a fill
     after execution.
+12. schedule every ENTRY/EXIT decision with an exact Nautilus engine-clock alert, independent of
+    whether a one-minute bar exists at the four-hour boundary. The alert submits the order at the
+    decision timestamp; the 1ns latency and real-open execution event then determine the actual fill.
+    A bar callback may not advance or substitute for a missing decision alert.
 
 The Run-1 bundle contains `design.parquet` only. CONFIRM prices, orders and fills do not exist in the
 Run-1 directory. After the exact rule/config hash and explicit operator CONFIRM authority are
@@ -421,12 +425,15 @@ AMENDMENT-A7: replace the false bar-close/next-open equivalence with engine-sequ
   DIRECTION: TIGHTER — running count: 1 looser / 3 tighter / 3 neutral
 AMENDMENT-A8: split DESIGN and CONFIRM execution so failed Run-1 files cannot expose CONFIRM fills
   DIRECTION: TIGHTER — running count: 1 looser / 4 tighter / 3 neutral
+AMENDMENT-A9: replace bar-dependent decision submission with exact engine-clock alerts after 24
+  actions on missing boundary minutes submitted one minute late
+  DIRECTION: TIGHTER — running count: 1 looser / 5 tighter / 3 neutral
 ```
 
 There is no qualification gate, so a global-null false-qualifier count is inapplicable. All
 predeclared arms remain visible; no arm is selected by performance.
 
-Operator flag: A5–A8 are four consecutive tighter amendments. They repair independent integrity
+Operator flag: A5–A9 are five consecutive tighter amendments. They repair independent integrity
 failures and do not add a value threshold, but the streak must be disclosed at the execution gate.
 
 ## 15. Execution gate
