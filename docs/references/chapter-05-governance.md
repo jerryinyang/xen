@@ -1,6 +1,6 @@
 # Chapter 05 Governance — Volatility-to-Direction Conversion
 
-**State:** `CHECKPOINT-016 OPEN / RUN-1 PRE-EXECUTION QA PENDING`
+**State:** `CHECKPOINT-016 OPEN / RUN-1 A7/A8 IMPLEMENTATION + FRESH QA`
 
 **Governing brief:** `.ignore/what-next/alts/intraday-way-forward-plan.md`
 
@@ -20,9 +20,10 @@ tree sha `d4b7bbed…f7d2b9`, zero TEST/holdout reads. Fresh QA is now the pre-e
   EXP strategy replay if the operator authorises it.
 - The operator-approved route exception is `SPDR → EXP`; XENA is not used because there is no
   candidate grid or portfolio search.
-- DESIGN report layers are read sequentially from one frozen Run 1 artifact. Each layer requires
+- DESIGN report layers are read sequentially from one frozen Run-1 artifact. Each layer requires
   an operator decision before the next is opened.
-- One rule is frozen before one CONFIRM read. CONFIRM cannot select a replacement.
+- Run 1 executes DESIGN only. One rule is frozen before a separately authorised CONFIRM execution
+  and read. CONFIRM cannot select a replacement.
 - Historical analysis-TEST and the global holdout are not loaded. Independent confirmation, if
   authorised after Run 2, is forward shadow only.
 - Drift and beta are controls/benchmarks. No multi-day drift product, secondary/L2 branch,
@@ -60,8 +61,8 @@ QA history and amendment approval live in
   checkpoint-016 is open; Run-1 execution still requires separate operator authorisation.
 - `.agents/skills/research-pipeline/_pipeline-config.md` requires this file to be read. The family is
   registered; execution remains forbidden until the design, fresh QA and separate approval complete.
-- The current authority covers the completed count-only census and design, not outcomes. Run 1
-  requires fresh QA and separate operator execution approval.
+- The operator authorised the A7/A8 repair, fresh QA, and a clean Run 1 on 2026-07-23. Outcome
+  execution remains conditional on fresh QA APPROVE; CONFIRM remains unexecuted and unauthorised.
 - The complete signal, cost, controls, report-layer, power, Run 2, risk, and shadow contracts remain
   frozen in the governing brief and must be translated without substantive change into the first
   checkpoint design.

@@ -951,3 +951,24 @@ not a smaller successful sample.
 
 **Enforced at.** INFR-017 provenance audit coverage assertions and NTrades/bar-key checks;
 raw aggressor reconstruction passed all 20/20 declared symbol-days.
+
+## L-41 — Nautilus bar callbacks fill market orders at the processed bar close, not the next open (SPDR-011) ⭐
+
+**What.** L-29 correctly located the fill timestamp at the decision boundary but incorrectly
+generalised the fill price to the next bar's `RealOpen`. Nautilus processes a complete external
+OHLC bar through the exchange before dispatching `on_bar`; a market order submitted in that callback
+therefore sees the processed bar's close. Continuous tape hid the defect whenever that close equalled
+the next open. SPDR-011 exposed 3,314 next-open mismatches across 7,212 failed-run actions.
+
+**Mechanism (why).** Timestamp equality is not event-order equality. The exchange traverses O/H/L/C,
+then the strategy receives the bar, then the order is settled against the current L1 state. A later
+ledger rewrite to catalog open creates a synthetic fill and defeats engine reconciliation.
+
+**Fix / new rule.** For an open-to-open design, supply the catalog's real next-open price as a
+separate execution event ordered after the causal decision, and delay order insertion to that event;
+reconcile the actual engine fill to the source `RealOpen`. Never infer price basis from fill timestamp,
+and never replace an emitted fill after execution. L-41 supersedes L-29's universal price-anchor claim;
+L-29's close-axis timestamp warning remains valid.
+
+**Enforced at.** SPDR-011 amendments A7/A8, engine-sequencing regression tests, event-to-fill
+reconciliation, and fresh pre-execution QA.

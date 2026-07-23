@@ -1,7 +1,7 @@
 # Checkpoint 016 — Volatility-to-Direction Conversion
 
 - **Opened:** 2026-07-22
-- **Status:** `OPEN — RUN-1 READY FOR OPERATOR EXECUTION DECISION (QA run 4 APPROVE)`
+- **Status:** `OPEN — RUN-1 PRE-VALUE EXECUTION-SEAM AMENDMENT / FRESH QA PENDING`
 - **Family:** `CF-VOLCONV-001` (`REGISTERED`)
 - **Container:** `SPDR-011` count-only census + TRAIN characterisation; conditional `EXP-099`
   Nautilus replay
@@ -40,8 +40,8 @@ enters Chapter-05 cost accounting.
 | Outcome-free census | Complete: 1,390 DESIGN events / 148 dates; no returns or prices emitted |
 | Signed TRAIN lane | **VERIFIED:** 3,731,908 rows / 5 symbols / 90 files; tree sha `d4b7bbed…f7d2b9` |
 | Run-1 design | Complete at `python/experiments/SPDR-011/design.md` |
-| Run-1 pre-exec QA | Complete: QA run 4 APPROVE (fresh context); A6 integrity fixes closed |
-| Run execution | Not authorised — ready for operator execution decision |
+| Run-1 pre-exec QA | QA run 4 approved the superseded package; A7/A8 require fresh QA |
+| Run execution | Operator authorised a clean rerun after A7/A8 implementation and fresh QA APPROVE |
 
 ## 3. Fixed question and mechanism
 
@@ -93,8 +93,8 @@ No threshold, symbol, direction, horizon or exit may be selected by outcome perf
 | 1 | `SPDR-011` census | Count eligible events and dependence clusters without opening outcomes; derive prospective MDE and 2–3 golden events | family registered; outcome isolation proven | **COMPLETE — 1,390 DESIGN events** |
 | 2 | `SPDR-011` design | Freeze schema, controls, plausible effect/MDE bands, golden traces and layer protocol | census artifact only | **COMPLETE** |
 | 3 | Signed-data ingest | Bulk-ingest/fence-attest the five readable primary-data histories into the `SignedBar` TRAIN lane | design §3.4 | **COMPLETE — VERIFIED** |
-| 4 | `SPDR-011` QA | Fresh-context design/code review | completed design + reviewable implementation | **COMPLETE — QA run 4 APPROVE** |
-| 5 | `SPDR-011` execution | Emit one TRAIN-only event artifact | signed data + QA APPROVE + separate operator approval | unauthorised |
+| 4 | `SPDR-011` QA | Fresh-context design/code review | completed amended design + reviewable implementation | **PENDING — A7/A8** |
+| 5 | `SPDR-011` execution | Emit DESIGN-only event artifact; CONFIRM remains unexecuted | signed data + fresh QA APPROVE + operator approval | authorised conditionally on QA APPROVE |
 | 6 | DESIGN layers | L1→L5 sequential operator reads; stop/drop/advance recorded after each | valid frozen artifact | unauthorised |
 | 7 | CONFIRM | One read of one frozen rule; no replacement | rule hash + prospective power | unauthorised |
 | 8 | `EXP-099` | Nautilus reproduction, canonical accounting and physicality | Run-1 rule/evidence accepted + new design/QA/operator approval | reserved only |
@@ -197,6 +197,8 @@ physicality and value labels. The operator alone advances or stops value layers.
 | A4 — exact control seeds/match units/strata and logical CONFIRM bundle seal frozen before outcomes | `NEUTRAL` | 1L / 0T / 3N |
 | A5 — realised TOP2 pair excluded from L4 random-pair null to prevent a self-control | `TIGHTER` | 1L / 1T / 3N |
 | A6 — live catalog re-hash, supported-edge destroy survival and event/fill reconciliation made binding | `TIGHTER` | 1L / 2T / 3N |
+| A7 — engine-sequenced real-open execution replaces false close/open equivalence | `TIGHTER` | 1L / 3T / 3N |
+| A8 — DESIGN and CONFIRM execution split at the access boundary | `TIGHTER` | 1L / 4T / 3N |
 
 Any later change to data, instruments, trigger, state, horizon, cost regime, control, threshold,
 direction rule or route requires an amendment before outcome contact. After results exist, it is a new
@@ -207,6 +209,6 @@ design, not a rescue amendment.
 The registered family, outcome-free census and final Run-1 design are complete. They authorise no
 outcome column, SPDR execution, EXP execution, TEST, holdout or shadow action.
 
-Fresh-context QA over the reviewable implementation and verified signed lane is complete (QA run 4
-APPROVE). Next permitted work is the operator's Run-1 execution decision; execution still needs a
-separate operator approval.
+The operator authorised A7/A8 implementation, fresh QA and a clean Run-1 on 2026-07-23. Execution
+may start only if that fresh review records APPROVE. A5–A8 form a four-amendment tighter streak and
+must be disclosed at the execution gate.

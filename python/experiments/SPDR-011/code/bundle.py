@@ -1,4 +1,4 @@
-"""Immutable two-member SPDR-011 artifact bundle and audited CONFIRM access guard."""
+"""Immutable DESIGN-only SPDR-011 Run-1 bundle and CONFIRM access guard."""
 from __future__ import annotations
 
 import hashlib
@@ -23,24 +23,21 @@ def _sha256(path: Path) -> str:
 
 
 def write_bundle(root: Path, artifact: pl.DataFrame, *, metadata: dict[str, Any]) -> dict:
-    """Write DESIGN and CONFIRM members once and hash the complete bundle manifest."""
+    """Write one DESIGN member and refuse to stage CONFIRM during Run 1."""
     if root.exists() and any(root.iterdir()):
         raise FileExistsError(f"refusing to overwrite non-empty artifact bundle: {root}")
     if "band" not in artifact.columns:
         raise ValueError("artifact requires band column")
-    invalid = set(artifact["band"].unique().to_list()) - {"DESIGN", "CONFIRM"}
-    if invalid:
-        raise ValueError(f"invalid artifact bands: {sorted(invalid)}")
+    bands = set(artifact["band"].unique().to_list())
+    if bands != {"DESIGN"}:
+        raise ValueError(f"Run-1 bundle must be DESIGN-only, got {sorted(bands)}")
     root.mkdir(parents=True, exist_ok=True)
     design_path = root / "design.parquet"
-    confirm_path = root / "confirm.parquet"
-    artifact.filter(pl.col("band") == "DESIGN").sort("event_id").write_parquet(design_path)
-    artifact.filter(pl.col("band") == "CONFIRM").sort("event_id").write_parquet(confirm_path)
+    artifact.sort("event_id").write_parquet(design_path)
     manifest = {
         "schema": BUNDLE_SCHEMA,
         "members": {
             "design.parquet": {"sha256": _sha256(design_path)},
-            "confirm.parquet": {"sha256": _sha256(confirm_path)},
         },
         "metadata": metadata,
     }
@@ -92,6 +89,8 @@ def read_band(
         return pl.read_parquet(root / "design.parquet")
     if band != "CONFIRM":
         raise ValueError("band must be DESIGN or CONFIRM")
+    if not (root / "confirm.parquet").exists():
+        raise PermissionError("CONFIRM not executed")
     unlock = root / "confirm-unlock.jsonl"
     if not unlock.exists() or supplied_rule_hash is None:
         raise PermissionError("CONFIRM is sealed without an operator unlock record")

@@ -417,30 +417,27 @@ def test_l4_random_top2_matches_date_cluster_occupancy_and_signed_beta() -> None
     }
 
 
-def test_bundle_seals_confirm_until_exact_hash_and_operator_unlock(tmp_path: Path) -> None:
+def test_run1_bundle_contains_design_only_and_never_stages_confirm(tmp_path: Path) -> None:
     bundle = _load("bundle")
     root = tmp_path / "bundle"
+    artifact = pl.DataFrame({"event_id": ["D"], "band": ["DESIGN"], "value": [1]})
+    manifest = bundle.write_bundle(root, artifact, metadata={"experiment": "SPDR-011"})
+
+    assert set(manifest["members"]) == {"design.parquet"}
+    assert not (root / "confirm.parquet").exists()
+    assert bundle.read_band(root, band="DESIGN")["event_id"].to_list() == ["D"]
+    with pytest.raises(PermissionError, match="not executed"):
+        bundle.read_band(root, band="CONFIRM")
+
+
+def test_run1_bundle_rejects_confirm_rows(tmp_path: Path) -> None:
+    bundle = _load("bundle")
     artifact = pl.DataFrame(
         {"event_id": ["D", "C"], "band": ["DESIGN", "CONFIRM"], "value": [1, 2]}
     )
-    manifest = bundle.write_bundle(root, artifact, metadata={"experiment": "SPDR-011"})
 
-    assert set(manifest["members"]) == {"design.parquet", "confirm.parquet"}
-    assert bundle.read_band(root, band="DESIGN")["event_id"].to_list() == ["D"]
-    with pytest.raises(PermissionError, match="sealed"):
-        bundle.read_band(root, band="CONFIRM")
-    bundle.append_confirm_unlock(
-        root,
-        frozen_rule_hash="frozen-config-hash",
-        operator_authority="operator-approved-confirm-read",
-    )
-    with pytest.raises(PermissionError, match="does not match"):
-        bundle.read_band(root, band="CONFIRM", supplied_rule_hash="wrong")
-    assert bundle.read_band(
-        root,
-        band="CONFIRM",
-        supplied_rule_hash="frozen-config-hash",
-    )["event_id"].to_list() == ["C"]
+    with pytest.raises(ValueError, match="DESIGN-only"):
+        bundle.write_bundle(tmp_path / "bundle", artifact, metadata={})
 
 
 def test_conversion_control_batteries_report_effects_without_auto_verdict() -> None:
@@ -540,7 +537,7 @@ def _fill_reconciliation_fixture() -> tuple[pl.DataFrame, pl.DataFrame, pl.DataF
         pl.when(pl.col("action") == "ENTRY").then(pl.lit("BUY")).otherwise(pl.lit("SELL"))
         .alias("side"),
         pl.when(pl.col("action") == "ENTRY").then(100.0).otherwise(105.0).alias("avg_px"),
-        pl.col("decision_ts").dt.epoch("ns").alias("ts_last"),
+        (pl.col("decision_ts").dt.epoch("ns") + 1).alias("ts_last"),
     )
     orders = fills.select("client_order_id").with_columns(pl.lit("FILLED").alias("status"))
     marks = pl.DataFrame(
@@ -611,3 +608,224 @@ def test_unavailable_event_cannot_masquerade_as_complete_fill_pair() -> None:
 
     with pytest.raises(RuntimeError, match="masquerades"):
         contract.reconcile_event_fills(events, schedule, fills, orders, marks)
+
+
+def test_run1_selects_design_events_only() -> None:
+    runner = _load("run_spdr011")
+    events = pl.DataFrame(
+        {
+            "event_id": ["D", "C"],
+            "band": ["DESIGN", "CONFIRM"],
+            "entry_ts": [
+                datetime(2023, 2, 28, 20, tzinfo=timezone.utc),
+                datetime(2023, 3, 1, 4, tzinfo=timezone.utc),
+            ],
+        }
+    )
+
+    selected = runner._run1_events(events)
+
+    assert selected["event_id"].to_list() == ["D"]
+    assert set(selected["band"].to_list()) == {"DESIGN"}
+
+
+def test_run1_data_end_covers_last_exit_open_without_reaching_later_confirm() -> None:
+    runner = _load("run_spdr011")
+    events = pl.DataFrame(
+        {"exit_ts": [datetime(2023, 3, 1, tzinfo=timezone.utc)]}
+    )
+
+    assert runner._run1_data_end(events) == datetime(
+        2023,
+        3,
+        1,
+        0,
+        1,
+        tzinfo=timezone.utc,
+    )
+
+
+def test_executable_events_exclude_missing_outcomes_without_dropping_artifact_rows() -> None:
+    runner = _load("run_spdr011")
+    artifact = pl.DataFrame(
+        {
+            "event_id": ["READY", "MISSING"],
+            "4h_available": [True, False],
+        }
+    )
+
+    executable = runner._executable_events(artifact)
+
+    assert artifact.height == 2
+    assert executable["event_id"].to_list() == ["READY"]
+
+
+def test_execution_tick_frame_sequences_real_open_after_decision() -> None:
+    runner = _load("run_spdr011")
+    decision = datetime(2022, 10, 1, 4, tzinfo=timezone.utc)
+    schedule = pl.DataFrame(
+        {
+            "client_order_id": ["ENTRY"],
+            "symbol": ["BTCUSDT"],
+            "decision_ts": [decision],
+        }
+    )
+    marks = pl.DataFrame(
+        {
+            "symbol": ["BTCUSDT"],
+            "SourceCloseTime": [decision + timedelta(minutes=1)],
+            "RealOpen": [107.0],
+            "Volume": [12.5],
+        }
+    )
+
+    ticks = runner._execution_tick_frame(schedule, marks)
+
+    assert ticks.row(0, named=True) == {
+        "client_order_id": "ENTRY",
+        "symbol": "BTCUSDT",
+        "source_close_ts": decision + timedelta(minutes=1),
+        "ts_event": decision,
+        "ts_init_ns": int(decision.timestamp() * 1_000_000_000) + 1,
+        "price": 107.0,
+        "size": 12.5,
+    }
+
+
+def test_execution_tick_frame_rejects_missing_real_open() -> None:
+    runner = _load("run_spdr011")
+    decision = datetime(2022, 10, 1, 4, tzinfo=timezone.utc)
+    schedule = pl.DataFrame(
+        {
+            "client_order_id": ["ENTRY"],
+            "symbol": ["BTCUSDT"],
+            "decision_ts": [decision],
+        }
+    )
+    marks = pl.DataFrame(
+        schema={
+            "symbol": pl.String,
+            "SourceCloseTime": pl.Datetime("us", "UTC"),
+            "RealOpen": pl.Float64,
+            "Volume": pl.Float64,
+        }
+    )
+
+    with pytest.raises(RuntimeError, match="missing real-open execution marks"):
+        runner._execution_tick_frame(schedule, marks)
+
+
+def test_execution_ticks_use_real_price_and_one_nanosecond_sequence() -> None:
+    from nautilus_trader.model.enums import AggressorSide
+    from nautilus_trader.persistence.catalog import ParquetDataCatalog
+
+    runner = _load("run_spdr011")
+    instrument = ParquetDataCatalog(str(PROJECT_ROOT / "data/catalog")).instruments(
+        instrument_ids=["BTCUSDT-LINEAR.BYBIT"]
+    )[0]
+    decision = datetime(2022, 10, 1, 4, tzinfo=timezone.utc)
+    frame = pl.DataFrame(
+        {
+            "client_order_id": ["ENTRY"],
+            "symbol": ["BTCUSDT"],
+            "source_close_ts": [decision + timedelta(minutes=1)],
+            "ts_event": [decision],
+            "ts_init_ns": [int(decision.timestamp() * 1_000_000_000) + 1],
+            "price": [107.0],
+            "size": [12.5],
+        }
+    )
+
+    ticks = runner._execution_ticks(frame, {"BTCUSDT": instrument})
+
+    assert len(ticks) == 1
+    assert float(ticks[0].price) == 107.0
+    assert ticks[0].ts_event == int(decision.timestamp() * 1_000_000_000)
+    assert ticks[0].ts_init == int(decision.timestamp() * 1_000_000_000) + 1
+    assert ticks[0].aggressor_side == AggressorSide.NO_AGGRESSOR
+
+
+def test_execution_latency_delays_insert_by_exactly_one_nanosecond() -> None:
+    runner = _load("run_spdr011")
+
+    config = runner._execution_latency_config()
+
+    assert config.config == {
+        "base_latency_nanos": 0,
+        "insert_latency_nanos": 1,
+        "update_latency_nanos": 0,
+        "cancel_latency_nanos": 0,
+    }
+
+
+def test_unavailable_event_with_no_schedule_or_fills_reconciles_as_unavailable() -> None:
+    contract = _load("runner_contract")
+    events, schedule, fills, orders, marks = _fill_reconciliation_fixture()
+    events = events.with_columns(
+        pl.lit(False).alias("4h_available"),
+        pl.lit("EXIT_4H_MARK_MISSING").alias("outcome_unavailable_reason"),
+    )
+    empty_schedule = schedule.head(0)
+    empty_fills = fills.head(0)
+    empty_orders = orders.head(0)
+
+    result = contract.reconcile_event_fills(
+        events,
+        empty_schedule,
+        empty_fills,
+        empty_orders,
+        marks,
+    )
+
+    assert result["actions"].is_empty()
+    assert result["events"]["fill_reconciliation_status"].to_list() == ["UNAVAILABLE"]
+
+
+class _FakeBar:
+    def __init__(self, ts_event: int) -> None:
+        self.ts_event = ts_event
+        self.open = 100.0
+        self.high = 101.0
+        self.low = 99.0
+        self.close = 100.5
+        self.volume = 10.0
+
+
+class _FakeFence:
+    analysis_start_utc = datetime(2022, 10, 1, tzinfo=timezone.utc)
+    train_end_utc = datetime(2022, 11, 1, tzinfo=timezone.utc)
+
+
+def test_bar_marks_emits_utc_aware_source_close_time(monkeypatch) -> None:
+    """Real marks must carry UTC tz so they join to the UTC-aware census (Run-1 seam)."""
+    runner = _load("run_spdr011")
+    ts_ns = int(datetime(2022, 10, 1, 4, 1, tzinfo=timezone.utc).timestamp() * 1_000_000_000)
+
+    monkeypatch.setattr(runner, "ParquetDataCatalog", lambda _path: object())
+    monkeypatch.setattr(
+        runner, "fenced_bar_query", lambda *a, **k: [_FakeBar(ts_ns)]
+    )
+
+    marks = runner._bar_marks(
+        pl.DataFrame(
+            {"exit_ts": [datetime(2022, 10, 1, 4, tzinfo=timezone.utc)]}
+        ),
+        _FakeFence(),
+    )
+
+    dtype = marks.schema["SourceCloseTime"]
+    assert isinstance(dtype, pl.Datetime)
+    assert dtype.time_zone == "UTC", f"marks SourceCloseTime must be UTC-aware, got {dtype}"
+
+    # The derived entry_ts must join a UTC-aware census entry_ts without a dtype error.
+    events = pl.DataFrame(
+        {
+            "event_id": ["E1"],
+            "symbol": [runner.SYMBOLS[0]],
+            "entry_ts": [datetime(2022, 10, 1, 4, tzinfo=timezone.utc)],
+            "direction": [1],
+        }
+    )
+    contract = _load("runner_contract")
+    out = contract.attach_open_to_open_outcomes(events, marks)
+    assert out.filter(pl.col("symbol") == runner.SYMBOLS[0])["entry_open"][0] == 100.0

@@ -13,7 +13,7 @@ import importlib.util
 import json
 import platform
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -26,10 +26,13 @@ from nautilus_trader.config import (
     BacktestEngineConfig,
     BacktestRunConfig,
     BacktestVenueConfig,
+    ImportableLatencyModelConfig,
     ImportableStrategyConfig,
     LoggingConfig,
 )
-from nautilus_trader.model.data import Bar
+from nautilus_trader.model.data import Bar, TradeTick
+from nautilus_trader.model.enums import AggressorSide
+from nautilus_trader.model.identifiers import TradeId
 from nautilus_trader.persistence.catalog import ParquetDataCatalog
 
 from xen.estimand_validation import validate_run
@@ -76,9 +79,10 @@ SIGNED_ATTESTATION = EXP / "results/signed_train_attestation.json"
 RUN_ROOT = REPO / "data/nautilus_runs/SPDR-011"
 BUNDLE_ROOT = RUN_ROOT / "artifact-bundle"
 SCHEDULE_ROOT = RUN_ROOT / "schedules"
+EXECUTION_CATALOG = RUN_ROOT / "execution_catalog"
 
 CENSUS_SHA256 = "d1299a08c98461468447289622ac979a6450fc04171c1547ccf950af850c7dfd"
-CENSUS_JSON_SHA256 = "5474955afc85b9e76b409d960dff2af74a8e47538c6dfcab624cba0bbed2b9db"
+CENSUS_JSON_SHA256 = "94faab2ec9b752c8621ea6dac2f1df6988d97650cb17a5ba2d80b25f1db13681"
 CENSUS_DERIVATION_SHA256 = (
     "9fae1731a3afe39a64abb7cbda58b870932b9ea52ae6c83a38ccb470ee802bdc"
 )
@@ -98,6 +102,7 @@ TRADE_SIZE = {
     "XRPUSDT": "100",
 }
 CATALOG_VERSION = "INFR-011-A4-2026-07-16"
+RUN1_END_UTC = datetime(2023, 3, 1, tzinfo=timezone.utc)
 
 
 def _sha256(path: Path) -> str:
@@ -191,6 +196,110 @@ def _for_instrument(frame: pl.DataFrame, instrument_id: str) -> pl.DataFrame:
     return frame.filter(pl.col("instrument_id").cast(pl.Utf8) == instrument_id)
 
 
+def _run1_events(events: pl.DataFrame) -> pl.DataFrame:
+    """Return the DESIGN population authorised for Run 1."""
+    if "band" not in events.columns:
+        raise ValueError("census events require band")
+    selected = events.filter(pl.col("band") == "DESIGN").sort("event_id")
+    if selected.is_empty() or set(selected["band"].unique().to_list()) != {"DESIGN"}:
+        raise RuntimeError("Run 1 requires a non-empty DESIGN-only population")
+    if selected["entry_ts"].max() >= RUN1_END_UTC:
+        raise RuntimeError("Run-1 DESIGN event reaches the CONFIRM boundary")
+    return selected
+
+
+def _run1_data_end(events: pl.DataFrame) -> datetime:
+    """Return the last source-bar close needed for the final DESIGN exit open."""
+    if events.is_empty() or "exit_ts" not in events.columns:
+        raise ValueError("Run-1 events require exit_ts")
+    end = events["exit_ts"].max() + timedelta(minutes=1)
+    latest_allowed = RUN1_END_UTC + timedelta(minutes=1)
+    if end > latest_allowed:
+        raise RuntimeError("Run-1 data end reaches beyond the DESIGN exit seam")
+    return end
+
+
+def _executable_events(artifact: pl.DataFrame) -> pl.DataFrame:
+    """Select events with both real-open marks while retaining all artifact rows."""
+    if "4h_available" not in artifact.columns:
+        raise ValueError("artifact requires 4h_available")
+    return artifact.filter(pl.col("4h_available")).sort("event_id")
+
+
+def _execution_tick_frame(schedule: pl.DataFrame, marks: pl.DataFrame) -> pl.DataFrame:
+    """Map scheduled actions to their real next-minute open and engine sequence time."""
+    required_schedule = {"client_order_id", "symbol", "decision_ts"}
+    required_marks = {"symbol", "SourceCloseTime", "RealOpen", "Volume"}
+    if missing := sorted(required_schedule - set(schedule.columns)):
+        raise ValueError(f"schedule missing execution columns: {missing}")
+    if missing := sorted(required_marks - set(marks.columns)):
+        raise ValueError(f"marks missing execution columns: {missing}")
+    datetime_ns = pl.Datetime("ns", "UTC")
+    actions = schedule.select(
+        "client_order_id",
+        "symbol",
+        pl.col("decision_ts").cast(datetime_ns),
+    ).with_columns(
+        (pl.col("decision_ts") + pl.duration(minutes=1))
+        .cast(datetime_ns)
+        .alias("source_close_ts")
+    )
+    source = marks.select(
+        "symbol",
+        pl.col("SourceCloseTime").cast(datetime_ns).alias("source_close_ts"),
+        pl.col("RealOpen").alias("price"),
+        pl.col("Volume").alias("size"),
+    )
+    joined = actions.join(source, on=["symbol", "source_close_ts"], how="left")
+    missing = joined.filter(pl.col("price").is_null() | (pl.col("size") <= 0))
+    if missing.height:
+        raise RuntimeError(f"missing real-open execution marks for {missing.height} actions")
+    return joined.select(
+        "client_order_id",
+        "symbol",
+        "source_close_ts",
+        pl.col("decision_ts").alias("ts_event"),
+        (pl.col("decision_ts").dt.epoch("ns") + 1).alias("ts_init_ns"),
+        "price",
+        "size",
+    ).sort(["ts_init_ns", "symbol", "client_order_id"])
+
+
+def _execution_ticks(frame: pl.DataFrame, instruments: dict[str, Any]) -> list[TradeTick]:
+    """Construct real-price execution ticks from the audited mapping frame."""
+    ticks = []
+    for row in frame.iter_rows(named=True):
+        instrument = instruments.get(row["symbol"])
+        if instrument is None:
+            raise RuntimeError(f"execution instrument missing for {row['symbol']}")
+        ticks.append(
+            TradeTick(
+                instrument_id=instrument.id,
+                price=instrument.make_price(row["price"]),
+                size=instrument.make_qty(row["size"]),
+                aggressor_side=AggressorSide.NO_AGGRESSOR,
+                trade_id=TradeId(f"OPEN-{row['client_order_id']}"),
+                ts_event=int(row["ts_event"].timestamp() * 1_000_000_000),
+                ts_init=int(row["ts_init_ns"]),
+            )
+        )
+    return ticks
+
+
+def _execution_latency_config() -> ImportableLatencyModelConfig:
+    """Delay order insertion until the sequenced real-open execution event."""
+    return ImportableLatencyModelConfig(
+        latency_model_path="nautilus_trader.backtest.models:LatencyModel",
+        config_path="nautilus_trader.backtest.config:LatencyModelConfig",
+        config={
+            "base_latency_nanos": 0,
+            "insert_latency_nanos": 1,
+            "update_latency_nanos": 0,
+            "cancel_latency_nanos": 0,
+        },
+    )
+
+
 def _strategy_config(symbol: str, schedule_path: Path) -> ImportableStrategyConfig:
     instrument_id = f"{symbol}-LINEAR.BYBIT"
     return ImportableStrategyConfig(
@@ -218,13 +327,14 @@ def _write_schedules(events: pl.DataFrame) -> dict[str, Path]:
 def _bar_marks(events: pl.DataFrame, fence: Any) -> pl.DataFrame:
     catalog = ParquetDataCatalog(str(CATALOG))
     start = fence.analysis_start_utc
+    end = _run1_data_end(events)
     frames = []
     for symbol in SYMBOLS:
         bars = fenced_bar_query(
             catalog,
             [f"{symbol}-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL"],
             start=start,
-            end=fence.train_end_utc,
+            end=end,
             band="TRAIN",
             manifest=fence,
         )
@@ -240,7 +350,9 @@ def _bar_marks(events: pl.DataFrame, fence: Any) -> pl.DataFrame:
                     "Volume": [float(bar.volume) for bar in bars],
                 }
             ).with_columns(
-                pl.from_epoch("SourceCloseTime", time_unit="ns").alias("SourceCloseTime")
+                pl.from_epoch("SourceCloseTime", time_unit="ns")
+                .dt.replace_time_zone("UTC")
+                .alias("SourceCloseTime")
             )
         )
     return pl.concat(frames).sort(["SourceCloseTime", "symbol"])
@@ -349,11 +461,11 @@ def _matched_timing_candidates(
     return pl.DataFrame(records, infer_schema_length=None).sort("candidate_id"), top2_pairs
 
 
-def _signed_slot_frame(fence: Any, start: datetime) -> pl.DataFrame:
+def _signed_slot_frame(fence: Any, start: datetime, end: datetime) -> pl.DataFrame:
     catalog = ParquetDataCatalog(str(SIGNED_CATALOG))
     rows: list[dict[str, Any]] = []
     start_ns = int(start.timestamp() * 1_000_000_000)
-    end_ns = int(fence.train_end_utc.timestamp() * 1_000_000_000)
+    end_ns = int(end.timestamp() * 1_000_000_000)
     for symbol in SYMBOLS:
         instrument_id = f"{symbol}-LINEAR.BYBIT"
         records = catalog.query(
@@ -424,19 +536,42 @@ def _signed_slot_frame(fence: Any, start: datetime) -> pl.DataFrame:
 
 
 def run_train_emission(*, operator_execution_authority: str) -> dict[str, Any]:
-    """Run the one approved TRAIN emission after QA and operator authority.
+    """Run the approved DESIGN emission after QA and operator authority.
 
     This function is deliberately not exposed through a CLI. It calibrates the synthetic
     future-path sentinel before the engine or any real outcome is opened.
     """
     if not operator_execution_authority.strip():
         raise PermissionError("explicit operator execution authority is required")
-    events, signed_attestation = assert_preexecution_inputs()
+    census_events, signed_attestation = assert_preexecution_inputs()
+    events = _run1_events(census_events)
     sentinel = calibrate_future_destroy_sentinel(events, n_seeds=2000, seed0=31_000)
-    schedule_paths = _write_schedules(events)
     fence = load_fence_manifest()
     start = events["entry_ts"].min()
-    assert_within_fence(fence, start, fence.train_end_utc, band="TRAIN")
+    end = _run1_data_end(events)
+    assert_within_fence(fence, start, end, band="TRAIN")
+    marks = _bar_marks(events, fence)
+    artifact = attach_open_to_open_outcomes(events, marks)
+    executable = _executable_events(artifact)
+    schedule_paths = _write_schedules(executable)
+    schedule = pl.concat(
+        [pl.read_parquet(schedule_paths[symbol]) for symbol in SYMBOLS]
+    ).sort(["decision_ts", "symbol", "action"])
+    tick_frame = _execution_tick_frame(schedule, marks)
+    primary_catalog = ParquetDataCatalog(str(CATALOG))
+    instrument_list = primary_catalog.instruments(
+        instrument_ids=[f"{symbol}-LINEAR.BYBIT" for symbol in SYMBOLS]
+    )
+    instruments = {
+        str(instrument.id).split("-LINEAR.", maxsplit=1)[0]: instrument
+        for instrument in instrument_list
+    }
+    if set(instruments) != set(SYMBOLS):
+        raise RuntimeError("execution instrument set does not match Run-1 symbols")
+    execution_ticks = _execution_ticks(tick_frame, instruments)
+    execution_catalog = ParquetDataCatalog(str(EXECUTION_CATALOG))
+    execution_catalog.write_data(instrument_list)
+    execution_catalog.write_data(execution_ticks)
     # A6: this must be the last signed-catalog operation before constructing the engine.
     live_signed_tree_sha256 = assert_signed_catalog_tree(
         SIGNED_CATALOG,
@@ -457,6 +592,7 @@ def run_train_emission(*, operator_execution_authority: str) -> dict[str, Any]:
                 base_currency="USDT",
                 starting_balances=["1000000 USDT"],
                 book_type="L1_MBP",
+                latency_model=_execution_latency_config(),
             )
         ],
         data=[
@@ -465,7 +601,17 @@ def run_train_emission(*, operator_execution_authority: str) -> dict[str, Any]:
                 data_cls=Bar,
                 instrument_id=f"{symbol}-LINEAR.BYBIT",
                 start_time=start.isoformat(),
-                end_time=fence.train_end_utc.isoformat(),
+                end_time=end.isoformat(),
+            )
+            for symbol in SYMBOLS
+        ]
+        + [
+            BacktestDataConfig(
+                catalog_path=str(EXECUTION_CATALOG),
+                data_cls=TradeTick,
+                instrument_id=f"{symbol}-LINEAR.BYBIT",
+                start_time=start.isoformat(),
+                end_time=end.isoformat(),
             )
             for symbol in SYMBOLS
         ],
@@ -478,10 +624,9 @@ def run_train_emission(*, operator_execution_authority: str) -> dict[str, Any]:
     positions = _pandas_to_polars(engine.trader.generate_positions_report())
     node.dispose()
 
-    marks = _bar_marks(events, fence)
     run_payload = {
         "experiment": "SPDR-011",
-        "band": "TRAIN",
+        "band": "DESIGN",
         "symbols": list(SYMBOLS),
         "census_sha256": CENSUS_SHA256,
         "signed_catalog_tree_sha256": live_signed_tree_sha256,
@@ -490,7 +635,8 @@ def run_train_emission(*, operator_execution_authority: str) -> dict[str, Any]:
         },
         "operator_execution_authority": operator_execution_authority,
         "window_start_utc": start.isoformat(),
-        "window_end_utc": fence.train_end_utc.isoformat(),
+        "window_end_utc": end.isoformat(),
+        "execution_basis": "REAL_OPEN_TRADE_TICK_AT_DECISION_PLUS_1NS",
         "dispose_on_completion": False,
     }
     gate_cells: dict[str, dict[str, Any]] = {}
@@ -524,10 +670,6 @@ def run_train_emission(*, operator_execution_authority: str) -> dict[str, Any]:
     if not gate["blocking_pass"]:
         raise RuntimeError("estimand validation failed; artifact assembly blocked")
 
-    artifact = attach_open_to_open_outcomes(events, marks)
-    schedule = pl.concat(
-        [pl.read_parquet(schedule_paths[symbol]) for symbol in SYMBOLS]
-    ).sort(["decision_ts", "symbol", "action"])
     fill_reconciliation = reconcile_event_fills(
         artifact,
         schedule,
@@ -550,7 +692,7 @@ def run_train_emission(*, operator_execution_authority: str) -> dict[str, Any]:
         SIGNED_CATALOG,
         signed_attestation["catalog_tree_sha256"],
     )
-    signed_slots = _signed_slot_frame(fence, fence.analysis_start_utc)
+    signed_slots = _signed_slot_frame(fence, fence.analysis_start_utc, end)
     artifact = attach_signed_flow(artifact, signed_slots)
     raw_sentinel = float(sentinel["raw_sentinel_bps"])
     sentinel_low, sentinel_high = sentinel["synthetic_null_envelope_99"]

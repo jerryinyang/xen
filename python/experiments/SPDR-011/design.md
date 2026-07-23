@@ -2,7 +2,7 @@
 
 - **Family:** `CF-VOLCONV-001`
 - **Checkpoint:** `2026-07-22-016-volatility-direction-conversion`
-- **Status:** `DESIGN COMPLETE — IMPLEMENTATION COMPLETE / PRE-EXECUTION QA PENDING`
+- **Status:** `PRE-VALUE AMENDMENT A7/A8 — IMPLEMENTATION / FRESH QA PENDING`
 - **Vehicle:** one TRAIN-only SPDR emission; five ordered report layers
 - **Execution authority:** none; operator approval required after fresh-context QA
 - **TEST / holdout:** prohibited; zero reads
@@ -46,7 +46,7 @@ The trigger bar's move is never credited. No pyramid, refresh, reversal, stop or
 
 | Artifact | SHA-256 | Contents |
 |---|---|---|
-| `results/census.json` | `5474955afc85b9e76b409d960dff2af74a8e47538c6dfcab624cba0bbed2b9db` | counts, coverage, assumed-sigma MDE curves, data status |
+| `results/census.json` | `94faab2ec9b752c8621ea6dac2f1df6988d97650cb17a5ba2d80b25f1db13681` | regenerated 2026-07-23; counts/coverage unchanged; assumed-sigma MDE curves and data status |
 | `results/census_event_keys.parquet` | `d1299a08c98461468447289622ac979a6450fc04171c1547ccf950af850c7dfd` | causal timestamps/state/ranks only; no prices or outcomes |
 | `design_derivations/census.py` | `9fae1731a3afe39a64abb7cbda58b870932b9ea52ae6c83a38ccb470ee802bdc` | fenced locator and isolation assertions |
 | `results/signed_train_attestation.json` | `bdfe839c4f6ae61b75a3ec2bca270cd9ba23a1bdff90bcbb8351970d9b180d29` | five-symbol TRAIN ingest, mapping and fence proof |
@@ -108,7 +108,7 @@ secondary-data branch. Data readiness does not authorise outcome execution.
 | TEST | `[2023-12-18T00:00Z, 2025-01-08T00:00Z)` — never queried |
 | Holdout | `>=2025-01-08T00:00Z` — never queried |
 | Detection | completed 4h close strictly beyond prior confirmed UTC-day high/low |
-| Entry / exit | boundary's first 1m `RealOpen`; `RealOpen` exactly 4h later |
+| Entry / exit | boundary's first 1m `RealOpen`; `RealOpen` exactly 4h later; engine receives each real open as a sequenced execution event after the causal decision |
 | Overlap | one open episode per symbol; `[entry, exit)` blocks later triggers |
 | Base | HIGH state, all core symbols |
 | Modifier 1 | fixed TOP2; TOP1/TOP3 distribution-only |
@@ -161,9 +161,13 @@ flow_pct      = midrank percentile against prior 60 completed same-UTC-slot 4h b
 Zero-volume trigger bars are flow-ineligible but remain in base. Executable flow condition is
 `flow_pct >= 2/3`; continuous percentile and reversed-sign mirror co-report.
 
-## 6. One emission and located-population rule
+## 6. Gated emissions and located-population rule
 
-One row per **located** breakout. Required groups:
+Run 1 emits DESIGN only. After one rule/config hash is frozen and the operator separately unlocks
+CONFIRM, the identical runner emits CONFIRM into a separate location. This is one research run split
+at the access boundary, not a new hypothesis or another selection opportunity.
+
+One row per **located** breakout in the authorised band. Required groups:
 
 1. identity/timestamps/direction;
 2. `rv20`, `vol_pct`, tercile, drift20, beta60, rank, flow fields;
@@ -369,8 +373,9 @@ Implementation must:
 
 1. assert census/result hashes and reproduce all 3,606 event IDs before outcomes;
 2. bulk-ingest and attest signed TRAIN data before adding flow columns;
-3. emit one immutable TRAIN artifact with DESIGN and sealed CONFIRM columns;
-4. keep CONFIRM unread until one rule/config hash is frozen;
+3. emit one immutable DESIGN artifact; never execute or stage CONFIRM fills during Run 1;
+4. keep CONFIRM unexecuted and unread until one rule/config hash is frozen and the operator supplies
+   separate CONFIRM authority;
 5. run >=2,000-seed controls and the hard tripwire only after schema/fence checks;
 6. write no `pass`, auto-verdict or candidate-drop field;
 7. use shared `xen.evaluation`; no experiment-local P&L/accounting primitive;
@@ -379,17 +384,20 @@ Implementation must:
    with the attested catalog-tree hash;
 10. issue one explicit tagged ENTRY and one explicit tagged EXIT market order per event, including
     contiguous same-direction episodes, then reconcile each complete event to Nautilus fills:
-    exactly one fill per action, correct side, fill source timestamp at `entry_ts+1m` / `exit_ts+1m`,
-    and fill price equal to the corresponding first-minute `RealOpen` within relative `1e-9`.
+    exactly one fill per action, correct side, engine fill timestamp one nanosecond after the decision,
+    fill-source timestamp at `entry_ts+1m` / `exit_ts+1m`, and fill price equal to the corresponding
+    first-minute `RealOpen` within relative `1e-9`.
     An unavailable event must carry its frozen reason and cannot masquerade as a complete fill pair.
+11. derive an execution `TradeTick` only for scheduled actions from the catalog's real first-minute
+    `RealOpen`; preserve its source timestamp, set engine sequencing time to decision `+1ns`, use
+    `NO_AGGRESSOR`, and apply a matching 1ns order-insert latency. This event represents the real
+    open price without claiming a historical bid/ask spread. No catalog open may replace a fill
+    after execution.
 
-The immutable emission is one artifact **bundle** with a manifest hash over two parquet members:
-`design.parquet` and `confirm.parquet`. The analysis entry point may read `design.parquet`
-immediately. It must reject `confirm.parquet` unless a separate append-only unlock record supplies
-the exact pre-frozen rule/config hash and explicit operator CONFIRM authority. Direct filesystem
-readability is not claimed as cryptographic secrecy; the seal is a deterministic access-control and
-audit contract. Any direct CONFIRM read outside that entry point is a governance breach recorded in
-the test-read ledger.
+The Run-1 bundle contains `design.parquet` only. CONFIRM prices, orders and fills do not exist in the
+Run-1 directory. After the exact rule/config hash and explicit operator CONFIRM authority are
+recorded, the same frozen code may create a separately manifested `confirm.parquet`. CONFIRM cannot
+select a replacement rule.
 
 No execution command is supplied until fresh QA approves and the operator separately authorises
 the run.
@@ -409,10 +417,17 @@ AMENDMENT-A5: exclude the realised TOP2 pair from the L4 random-pair null
   DIRECTION: TIGHTER — running count: 1 looser / 1 tighter / 3 neutral
 AMENDMENT-A6: bind live catalog re-hash, supported-edge destroy survival and event-to-fill reconciliation
   DIRECTION: TIGHTER — running count: 1 looser / 2 tighter / 3 neutral
+AMENDMENT-A7: replace the false bar-close/next-open equivalence with engine-sequenced real-open fills
+  DIRECTION: TIGHTER — running count: 1 looser / 3 tighter / 3 neutral
+AMENDMENT-A8: split DESIGN and CONFIRM execution so failed Run-1 files cannot expose CONFIRM fills
+  DIRECTION: TIGHTER — running count: 1 looser / 4 tighter / 3 neutral
 ```
 
 There is no qualification gate, so a global-null false-qualifier count is inapplicable. All
 predeclared arms remain visible; no arm is selected by performance.
+
+Operator flag: A5–A8 are four consecutive tighter amendments. They repair independent integrity
+failures and do not add a value threshold, but the streak must be disclosed at the execution gate.
 
 ## 15. Execution gate
 

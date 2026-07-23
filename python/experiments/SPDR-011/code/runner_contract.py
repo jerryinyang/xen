@@ -297,7 +297,7 @@ def reconcile_event_fills(
         )
     for event_id in event_rows:
         actions = schedule.filter(pl.col("event_id") == event_id)["action"].to_list()
-        if sorted(actions) != ["ENTRY", "EXIT"]:
+        if event_rows[event_id]["4h_available"] and sorted(actions) != ["ENTRY", "EXIT"]:
             errors.append(f"{event_id}: expected exactly one ENTRY and one EXIT schedule action")
     for expected in schedule.iter_rows(named=True):
         event = event_rows[expected["event_id"]]
@@ -327,7 +327,7 @@ def reconcile_event_fills(
                 action_error = f"wrong side {_side_name(fill['side'])}, expected {expected_side}"
             elif str(fill["instrument_id"]) != f"{event['symbol']}-LINEAR.BYBIT":
                 action_error = "wrong instrument"
-            elif _timestamp_ns(fill["ts_last"]) != _timestamp_ns(expected["decision_ts"]):
+            elif _timestamp_ns(fill["ts_last"]) != _timestamp_ns(expected["decision_ts"]) + 1:
                 action_error = "wrong fill timestamp"
             elif mark is None:
                 action_error = "expected fill-source mark missing"
@@ -351,12 +351,10 @@ def reconcile_event_fills(
                 "expected_side": expected_side,
                 "expected_fill_source_ts": expected_source_ts,
                 "actual_fill_source_ts": (
-                    datetime.fromtimestamp(
-                        _timestamp_ns(action_fills[0]["ts_last"]) / 1_000_000_000,
-                        tz=expected_source_ts.tzinfo,
-                    )
-                    + timedelta(minutes=1)
+                    expected_source_ts
                     if len(action_fills) == 1
+                    and _timestamp_ns(action_fills[0]["ts_last"])
+                    == _timestamp_ns(expected["decision_ts"]) + 1
                     else None
                 ),
                 "order_count": order_count,
@@ -369,7 +367,25 @@ def reconcile_event_fills(
             }
         )
 
-    actions = pl.DataFrame(action_records, infer_schema_length=None)
+    actions = (
+        pl.DataFrame(action_records, infer_schema_length=None)
+        if action_records
+        else pl.DataFrame(
+            schema={
+                "event_id": pl.String,
+                "symbol": pl.String,
+                "action": pl.String,
+                "client_order_id": pl.String,
+                "expected_side": pl.String,
+                "expected_fill_source_ts": pl.Datetime("us", "UTC"),
+                "actual_fill_source_ts": pl.Datetime("us", "UTC"),
+                "order_count": pl.Int64,
+                "fill_count": pl.Int64,
+                "action_reconciliation_status": pl.String,
+                "action_reconciliation_reason": pl.String,
+            }
+        )
+    )
     summaries = []
     for event in events.iter_rows(named=True):
         rows = actions.filter(pl.col("event_id") == event["event_id"])

@@ -1,8 +1,9 @@
 """Nautilus schedule executor for the frozen SPDR-011 event population.
 
 DEVIATIONS: none. The schedule contains census event times and directions only. A target
-change is submitted when the boundary bar closes, so Nautilus fills the market order at the
-next bar's open at the same wall-clock boundary (L-29). No future price enters the schedule.
+change is submitted when the boundary bar closes. The runner sequences the catalog's real
+next-bar open as an execution event one nanosecond later (L-41); no future price enters the
+schedule and no emitted fill is rewritten.
 """
 from __future__ import annotations
 
