@@ -1,0 +1,54 @@
+{
+  "interpretation_notes": [
+    "IN-1",
+    "IN-2",
+    "IN-3",
+    "IN-4"
+  ],
+  "G3_independent": {
+    "expected": {
+      "magnitude_bps": 1000.0,
+      "angle": 250.0,
+      "path_noise": 0.2,
+      "direction": 1
+    },
+    "got": {
+      "magnitude_bps": 1000.0,
+      "angle": 250.0,
+      "path_noise": 0.2,
+      "direction": 1
+    },
+    "match": true
+  },
+  "G1": {
+    "found": true,
+    "flip_idx": 1468,
+    "flip_ts": 1663128000000000000,
+    "sma14_engine": 20370.071428571428,
+    "sma14_hand": 20370.071428571428,
+    "sma_match": true,
+    "close_at_flip": 20380.5,
+    "signal_side": 1,
+    "entry_next_open": 20380.5,
+    "side_confirms": true
+  },
+  "engine_parity_BTC_H1": {
+    "checked": 16,
+    "max_rel_diff": 0.0,
+    "parity_ok": true
+  },
+  "G3": {
+    "found": true,
+    "start_idx": 14,
+    "end_idx": 43,
+    "confirm_idx": 47,
+    "direction": 1,
+    "magnitude_bps": 1381.6368436491618,
+    "magnitude_hand": 1381.6368436491618,
+    "angle": 47.64264978100558,
+    "angle_hand": 47.64264978100558,
+    "path_noise": 1.4610423094608087,
+    "path_noise_hand": 1.4610423094608087,
+    "match": true
+  }
+}

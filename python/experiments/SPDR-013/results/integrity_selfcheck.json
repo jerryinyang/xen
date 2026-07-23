@@ -1,0 +1,47 @@
+{
+  "checks": {
+    "train_only_max_exit_lt_train_end": true,
+    "no_holdout_contact": true,
+    "entry_after_signal_bar": true,
+    "universe_pin_set_equal": true,
+    "g1_sma_match": true,
+    "g1_side_confirms": true,
+    "g2_stop_next_open": true,
+    "g3_zz_features_match": true,
+    "g3_independent_fixture_match": true,
+    "engine_parity": true,
+    "no_authorised_deviations": true,
+    "tripwire_path_future_destroy_pass": false
+  },
+  "all_pass": false,
+  "max_exit_ts": 1702855800000000000,
+  "train_end_ns": 1702857600000000000,
+  "tripwire_powered_cells": 12,
+  "tripwire_survivors": [
+    9
+  ],
+  "spread_cost_disclosure": {
+    "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+    "spread_rt_bps": null,
+    "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
+    "implication": "partial_net understates true cost; reported expectancy overstated vs full cost",
+    "prohibited_claims": [
+      "fully-net",
+      "cost-complete",
+      "tradable",
+      "deployable"
+    ]
+  },
+  "unit_pin": {
+    "gross_signed_oo_bps": "direction * (exit_open/entry_open - 1) * 1e4",
+    "atr_object": "per-clock Wilder ATR(14)[t-1] in price; stops in price space from that clock's own ATR (design \u00a73.1 'never mix H1 ATR into M15 stops or vice versa'; \u00a74 UNIT-PIN '1h' is the H1 exemplar \u2014 see IN-1)",
+    "expectancy_unit": "mean partial_net_bps per episode (bps of notional)"
+  },
+  "interpretation_notes": [
+    "IN-1",
+    "IN-2",
+    "IN-3",
+    "IN-4"
+  ],
+  "primary_band": "DESIGN"
+}
