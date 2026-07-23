@@ -1,0 +1,376 @@
+{
+  "gate_version": "v2",
+  "root": "data/nautilus_runs/SPDR-011",
+  "n_cells": 5,
+  "expectation_note": "Per-cell expectation is the cell's own symbol; the five-symbol expectation is asserted at family level. validate_family forwards one list to every cell (src/xen/estimand_validation.py:367), which cannot hold for per-symbol cells.",
+  "family_manifest": {
+    "ok": true,
+    "expected": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "DOGEUSDT",
+      "XRPUSDT"
+    ],
+    "emitted": [
+      "BTCUSDT",
+      "DOGEUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "XRPUSDT"
+    ],
+    "missing": []
+  },
+  "cells": {
+    "BTCUSDT": {
+      "gate_version": "v2",
+      "emission_type": "nautilus_v1",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/SPDR-011/BTCUSDT",
+      "instrument": "BTCUSDT",
+      "domain": null,
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true,
+        "emission_contract_version": "nautilus-emission-v1",
+        "missing_emission_files": [],
+        "contract_version_ok": true
+      },
+      "fence": {
+        "ok": true,
+        "mode": "nautilus_v2",
+        "status": "PINNED",
+        "last_bar": "2023-03-01 00:01:00",
+        "analysis_end_utc": "2025-01-08T00:00:00Z",
+        "within_fence": true,
+        "manifest": {
+          "canonical_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json",
+          "exists": true,
+          "ok": true,
+          "expected_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+          "actual_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448"
+        }
+      },
+      "manifest": {
+        "ok": true,
+        "expected": [
+          "BTCUSDT"
+        ],
+        "emitted": [
+          "BTCUSDT"
+        ],
+        "missing": []
+      },
+      "catalog_attestation": {
+        "ok": true,
+        "note": null,
+        "catalog_version": "INFR-011-A4-2026-07-16",
+        "config_hash": "4bf451c36c097828c2fa5e62abb599632fe8896a15b9f89e4d05caabb314034e"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 3091.185295520475,
+        "per_leg_realized_total": 3091.1852955204745,
+        "abs_diff_bps": 4.547473508864641e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 0.6269678302532512,
+        "n_bars": 329761,
+        "n_legs": 272,
+        "n_censored_legs": 0,
+        "total_net_bps": 3091.185295520475,
+        "annualised_return": 0.49303730532264345,
+        "per_bar_sharpe_annualised": 1.7747756323782091,
+        "max_drawdown_bps": -1515.540550506281,
+        "occupancy": 0.19824357640836848,
+        "buy_and_hold_annualised_return": 0.1861168475035921,
+        "buy_and_hold_annualised_vol": 0.5507228692523163,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    "ETHUSDT": {
+      "gate_version": "v2",
+      "emission_type": "nautilus_v1",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/SPDR-011/ETHUSDT",
+      "instrument": "ETHUSDT",
+      "domain": null,
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true,
+        "emission_contract_version": "nautilus-emission-v1",
+        "missing_emission_files": [],
+        "contract_version_ok": true
+      },
+      "fence": {
+        "ok": true,
+        "mode": "nautilus_v2",
+        "status": "PINNED",
+        "last_bar": "2023-03-01 00:01:00",
+        "analysis_end_utc": "2025-01-08T00:00:00Z",
+        "within_fence": true,
+        "manifest": {
+          "canonical_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json",
+          "exists": true,
+          "ok": true,
+          "expected_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+          "actual_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448"
+        }
+      },
+      "manifest": {
+        "ok": true,
+        "expected": [
+          "ETHUSDT"
+        ],
+        "emitted": [
+          "ETHUSDT"
+        ],
+        "missing": []
+      },
+      "catalog_attestation": {
+        "ok": true,
+        "note": null,
+        "catalog_version": "INFR-011-A4-2026-07-16",
+        "config_hash": "178b7cbfe5bbb29bc085d1769219c6f4d3077a852dcbcbfec742204c49068d28"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 2679.568830502897,
+        "per_leg_realized_total": 2679.5688305028953,
+        "abs_diff_bps": 1.8189894035458565e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 0.6269678302532512,
+        "n_bars": 329758,
+        "n_legs": 289,
+        "n_censored_legs": 0,
+        "total_net_bps": 2679.568830502897,
+        "annualised_return": 0.4273853778782459,
+        "per_bar_sharpe_annualised": 1.1265159684841424,
+        "max_drawdown_bps": -2244.5714712104846,
+        "occupancy": 0.21061202457559786,
+        "buy_and_hold_annualised_return": 0.47322851521749076,
+        "buy_and_hold_annualised_vol": 0.7660576999272787,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    "SOLUSDT": {
+      "gate_version": "v2",
+      "emission_type": "nautilus_v1",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/SPDR-011/SOLUSDT",
+      "instrument": "SOLUSDT",
+      "domain": null,
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true,
+        "emission_contract_version": "nautilus-emission-v1",
+        "missing_emission_files": [],
+        "contract_version_ok": true
+      },
+      "fence": {
+        "ok": true,
+        "mode": "nautilus_v2",
+        "status": "PINNED",
+        "last_bar": "2023-03-01 00:01:00",
+        "analysis_end_utc": "2025-01-08T00:00:00Z",
+        "within_fence": true,
+        "manifest": {
+          "canonical_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json",
+          "exists": true,
+          "ok": true,
+          "expected_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+          "actual_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448"
+        }
+      },
+      "manifest": {
+        "ok": true,
+        "expected": [
+          "SOLUSDT"
+        ],
+        "emitted": [
+          "SOLUSDT"
+        ],
+        "missing": []
+      },
+      "catalog_attestation": {
+        "ok": true,
+        "note": null,
+        "catalog_version": "INFR-011-A4-2026-07-16",
+        "config_hash": "afc6bbc56ced520b9a0e0fb270c18914453ac781760d4322217d8b76c80367ee"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 8733.23798321853,
+        "per_leg_realized_total": 8733.237983218532,
+        "abs_diff_bps": 1.8189894035458565e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 0.6297056810403833,
+        "n_bars": 330836,
+        "n_legs": 284,
+        "n_censored_legs": 0,
+        "total_net_bps": 8733.23798321853,
+        "annualised_return": 1.3868761623350296,
+        "per_bar_sharpe_annualised": 1.4405032379349456,
+        "max_drawdown_bps": -5799.346404677259,
+        "occupancy": 0.2061958190765213,
+        "buy_and_hold_annualised_return": -0.7419344586367206,
+        "buy_and_hold_annualised_vol": 1.5136501092307129,
+        "sanity_flags": [
+          "|annualised return| 138.7% > 100%/yr"
+        ]
+      },
+      "blocking_pass": true
+    },
+    "DOGEUSDT": {
+      "gate_version": "v2",
+      "emission_type": "nautilus_v1",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/SPDR-011/DOGEUSDT",
+      "instrument": "DOGEUSDT",
+      "domain": null,
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true,
+        "emission_contract_version": "nautilus-emission-v1",
+        "missing_emission_files": [],
+        "contract_version_ok": true
+      },
+      "fence": {
+        "ok": true,
+        "mode": "nautilus_v2",
+        "status": "PINNED",
+        "last_bar": "2023-03-01 00:01:00",
+        "analysis_end_utc": "2025-01-08T00:00:00Z",
+        "within_fence": true,
+        "manifest": {
+          "canonical_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json",
+          "exists": true,
+          "ok": true,
+          "expected_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+          "actual_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448"
+        }
+      },
+      "manifest": {
+        "ok": true,
+        "expected": [
+          "DOGEUSDT"
+        ],
+        "emitted": [
+          "DOGEUSDT"
+        ],
+        "missing": []
+      },
+      "catalog_attestation": {
+        "ok": true,
+        "note": null,
+        "catalog_version": "INFR-011-A4-2026-07-16",
+        "config_hash": "ed82a8b20118b60b91b9215a257bc61b1685779b7fe2f2a94cd13e86c20d3236"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 7837.259651400931,
+        "per_leg_realized_total": 7837.259651400929,
+        "abs_diff_bps": 1.8189894035458565e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 0.6269678302532512,
+        "n_bars": 313428,
+        "n_legs": 273,
+        "n_censored_legs": 0,
+        "total_net_bps": 7837.259651400931,
+        "annualised_return": 1.2500258024778121,
+        "per_bar_sharpe_annualised": 1.8755798623610036,
+        "max_drawdown_bps": -3255.076850389296,
+        "occupancy": 0.2050550684686754,
+        "buy_and_hold_annualised_return": 0.415113856402795,
+        "buy_and_hold_annualised_vol": 1.1789682890740707,
+        "sanity_flags": [
+          "|annualised return| 125.0% > 100%/yr"
+        ]
+      },
+      "blocking_pass": true
+    },
+    "XRPUSDT": {
+      "gate_version": "v2",
+      "emission_type": "nautilus_v1",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/SPDR-011/XRPUSDT",
+      "instrument": "XRPUSDT",
+      "domain": null,
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true,
+        "emission_contract_version": "nautilus-emission-v1",
+        "missing_emission_files": [],
+        "contract_version_ok": true
+      },
+      "fence": {
+        "ok": true,
+        "mode": "nautilus_v2",
+        "status": "PINNED",
+        "last_bar": "2023-03-01 00:01:00",
+        "analysis_end_utc": "2025-01-08T00:00:00Z",
+        "within_fence": true,
+        "manifest": {
+          "canonical_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json",
+          "exists": true,
+          "ok": true,
+          "expected_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+          "actual_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448"
+        }
+      },
+      "manifest": {
+        "ok": true,
+        "expected": [
+          "XRPUSDT"
+        ],
+        "emitted": [
+          "XRPUSDT"
+        ],
+        "missing": []
+      },
+      "catalog_attestation": {
+        "ok": true,
+        "note": null,
+        "catalog_version": "INFR-011-A4-2026-07-16",
+        "config_hash": "bbee8d0a93d0a50e47884c65c5d9e1a3fe2d7b6ed961e515ab432125238a72fd"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": -1415.8761303857214,
+        "per_leg_realized_total": -1415.8761303857218,
+        "abs_diff_bps": 4.547473508864641e-13,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 0.6269678302532512,
+        "n_bars": 328747,
+        "n_legs": 268,
+        "n_censored_legs": 0,
+        "total_net_bps": -1415.8761303857214,
+        "annualised_return": -0.22582915136392348,
+        "per_bar_sharpe_annualised": -0.5355336930812257,
+        "max_drawdown_bps": -4457.90625726944,
+        "occupancy": 0.1958496959668073,
+        "buy_and_hold_annualised_return": 0.19173583447184994,
+        "buy_and_hold_annualised_vol": 0.8013377573525639,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    }
+  },
+  "blocking_pass": true
+}

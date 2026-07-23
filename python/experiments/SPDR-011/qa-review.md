@@ -720,3 +720,117 @@ aligns the runtime aggregate-join signed-volume check with the already-attested 
 tolerance; the change is minimal, honestly LOOSER, adds no value threshold, introduces no leak, and
 leaves every A11-approved integrity item intact. This review does not execute the run, authorise a
 value-layer read or CONFIRM, or permit TEST/holdout access.
+
+## QA run 11 — 2026-07-23T03:04:00Z — mode: subagent — HEAD 77e9dad0165624e28e5f58744bdf8df36ee9f48f
+Verdict: APPROVE
+
+**Scope:** INCREMENTAL fresh QA for amendment **A13 only** (commit `77e9dad`). QA run 10 (`d87fa5d`)
+covers the design and implementation through A12; those findings are inherited, not re-litigated.
+Working tree clean at review start (`git status --porcelain` empty); reviewed state is the exact
+committed HEAD. Central question answered: **is A13 bit-identical, or does it change a selection?**
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §13.16 "exact-match cell index constructed once in `candidate_id` order" | `code/controls.py:187,193-195` | **MATCHES** | `candidate_rows = candidates.sort("candidate_id").to_dicts()` (187) feeds a single `setdefault(...).append(row)` bucket pass (195). Buckets are therefore filled in `candidate_id` order and each bucket is the candidate_id-ordered subsequence the full scan produced. |
+| §13.16 "not from a per-event rescan of every candidate" | `code/controls.py:203` | **MATCHES** | Pool source changed from `candidate_rows` (all ~12k rows) to `cells.get(key, ())`. Missing key returns `()`, so the empty-pool branch is reached identically. |
+| §13.16 pool **contents** identical | `code/controls.py:203` vs pre-A13 `d87fa5d:...controls.py:198` | **MATCHES** | The replaced predicate `all(row[n] == event[n] for n in exact)` is the same relation as tuple-key dict equality: every element is a builtin obeying the `a == b ⟹ hash(a) == hash(b)` invariant, so a dict lookup selects exactly the `==`-equal cell. Verified empirically below beyond the declared regime. |
+| §13.16 pool **order** identical | `code/controls.py:195` | **MATCHES** | Bucket append order = `candidate_id` order = scan order. (Also provably immaterial: selection is driven only by `sorted(..., key=(distance, candidate_id))`, a total order — see Issue N-2.) |
+| §13.16 `used` exclusion unchanged | `code/controls.py:204, 229` | **MATCHES** | Line-identical to pre-A13. `used` is per-seed, reset at each `rng` construction. |
+| §13.16 same-`trade_day` exclusion unchanged | `code/controls.py:205` | **MATCHES** | Line-identical to pre-A13. |
+| §13.16 beta ordering unchanged | `code/controls.py:220-226` | **MATCHES** | Byte-identical: `abs(float(row["beta60"]) - float(event["beta60"]))`, `sorted(range(len(pool)), key=(distances[i], pool[i]["candidate_id"]))`. |
+| §13.16 `candidate_id` tie-break unchanged | `code/controls.py:225` | **MATCHES** | Second element of the sort key; untouched by the diff. |
+| §13.16 five-nearest truncation unchanged | `code/controls.py:227` | **MATCHES** | `ordered_indices[:5]`; untouched. |
+| §13.16 RNG draw unchanged | `code/controls.py:201, 228` | **MATCHES** | `np.random.default_rng(seed)` per seed; exactly one `rng.choice(nearest_five)` per successful match, zero draws on the `NO_EXACT_CELL_CANDIDATE` branch. Consumption stream identical in both algorithms. |
+| §13.16 "pinned parity corpus must prove bit-identical output, incl. exhausted-pool and `NO_EXACT_CELL_CANDIDATE`" | `python/tests/test_spdr011_controls_parity.py` | **MATCHES** | Reference verified verbatim (below); four corpora; both outcomes present in all four. |
+| §13.16 "compute-path optimisation may never alter a selection" | whole diff | **MATCHES** | Diff is +9/−2 lines, all inside `matched_random_timing`; 8 of the 9 added lines are the index build and its comment. |
+| §14 AMENDMENT-A13 `DIRECTION: NEUTRAL` | `design.md:459-463` | **MATCHES** | Correct: no threshold, band, seed, stratum, cost or eligibility rule moves in either direction. |
+
+**Emitted-schema invariance.** `results` dict literals (`controls.py:208-218`, `230-243`) are unchanged;
+`pl.DataFrame(results, infer_schema_length=None).sort(["seed","event_id"])` unchanged. Parity test asserts
+`actual.schema == expected.schema` *and* `actual.equals(expected)` — schema equality is checked, not assumed.
+
+### Golden-trace diff — bit-identity evidence (derived independently, not from the developer's claim)
+
+| Check | Method | Result |
+|---|---|---|
+| Parity reference is genuinely the pre-A13 code | `diff` of `test_spdr011_controls_parity.py:53-103` against `git show d87fa5d:python/experiments/SPDR-011/code/controls.py:186-236` | **VERBATIM.** Only three differing lines, all the identifier `EXACT` (module constant) vs `exact` (local). `EXACT` at `test:22-30` is the same 7-tuple in the same order as `exact` at `controls.py:166-174`. No relaxation, no reordering, no dropped filter. |
+| Committed suite | `.venv/bin/python -m pytest tests/ -q` | **289 passed, 4 skipped**, 9.78s. Only pre-existing upstream deprecation warnings. |
+| Corpora exercise the exhausted-pool path | Instrumented all four `PARITY_CASES` and joined the no-match rows back onto the raw candidate cell counts | **YES.** `dense-pool`: 204 matched / 36 no-match, of which **18 are cells that hold candidates but were exhausted or day-blocked**. `scarce-pool-exhaustion`: 156/204, **12 exhausted**. `tight-days`: 36/144. `wide-candidate-scan`: 144/6. Not trivially passing. |
+| Corpora exercise `NO_EXACT_CELL_CANDIDATE` | same probe | **YES** — 18 / 192 / 144 / 6 truly-absent-cell rows across the four corpora, plus the dedicated `test_parity_corpus_exercises_both_match_outcomes`. |
+| **Mutation kill** — would the corpora actually catch a wrong A13? | Ran five plausible near-miss mutants against the committed reference on all four corpora | `used` filter dropped → **KILLED** (2/4 corpora). `trade_day` filter dropped → **KILLED** (2/4). five-nearest → four-nearest → **KILLED** (2/4). Bucket order reversed → not killed (order is provably immaterial, N-2). Key shortened by one field → not killed (N-1). The three semantically load-bearing filters are all genuinely under test. |
+| Null keys | 6 differential trials with `None` injected into `symbol` and `vol_tercile` on both sides | **0 divergences.** `None == None` is True and `None` hashes; both algorithms agree. |
+| Float NaN keys | 6 trials with `float("nan")` in `calendar_third` on both sides | **0 divergences.** Pre-A13 `nan != nan` → no match; post-A13 the NaN key lands in an unreachable bucket → no match. Same outcome, same row. |
+| Float-vs-int dtype coercion through `to_dicts()` | 6 trials with candidates carrying `direction`/`utc_slot` as float while live carries int | **0 divergences.** Python's numeric hash invariant (`hash(1) == hash(1.0)`) makes the bucket lookup agree with `==`. |
+| Combined nulls + NaN | 6 trials | **0 divergences.** |
+| **Total adversarial differential trials** | 30 trials × 4 seeds × 45 live events | **0 divergences, 0 schema mismatches.** |
+| Real-data key dtypes match the code's stated precondition | `results/census_event_keys.parquet` (3,606 rows) | `symbol` String, `band` String, `direction` Int64 ∈ {−1,+1}, `utc_slot` Int64 ∈ {0,4,8,12,16,20}, `vol_tercile` String, `calendar_third` Int64 ∈ {1,2,3} — **all null_count 0**. `occupancy` is a synthetic constant `1` on both sides (`controls.py:504`, `run_spdr011.py:477`). The A13 comment's precondition ("non-null string, integer or ±1 direction") is **verified against real data**, not asserted. |
+
+### Performance claim — independently re-measured
+
+Synthetic frame at the real shape (1,390 live events — independently confirmed as the exact DESIGN-band
+count in `census_event_keys.parquet`; 12,000 candidates), one seed each, this machine:
+
+| | measured (1 seed) | projected 2,000 seeds | commit claim |
+|---|---|---|---|
+| pre-A13 full scan | 3.6391 s | **2.02 h** | "~2.5 hours" |
+| A13 indexed | 0.0490 s | **1.63 min** | "0.039s / ~1.3 minutes" |
+
+Speed-up **74×**, reproduced. The claim is **not overstated in the direction that matters** — the problem
+is real and roughly two orders of magnitude. The stated 2.5 h is ~24% above my 2.02 h and the stated
+0.039 s is ~20% below my 0.049 s; both gaps are corpus/machine variance at the same order, and the
+optimisation's *benefit ratio* is if anything understated. Cross-check of "every other battery finished
+in under a minute": `stratified_derangement` at 1,390 rows costs 0.0039 s/seed → **0.13 min per 2,000-seed
+battery**; `random_top2_cluster_matches` already hoists its candidate construction outside the seed loop.
+The matched-timing battery was genuinely the singular outlier.
+
+### Governance & boundary
+- **PASS — Fresh context.** Subagent; this context contains no SPDR-011 implementation work. Append-only; prior runs 1–10 untouched.
+- **PASS — Nothing moved but the compute path.** SHA-256 of every file in `code/` compared pre (`d87fa5d`) vs post (`77e9dad`): `run_spdr011.py`, `runner_contract.py`, `spdr011_strategy.py`, `bundle.py`, `layers.py` **byte-identical**; only `controls.py` changed. Numeric-literal multiset of `controls.py` differs by exactly two tokens, both inside the new comment ("A13", "+/-1"). **No value threshold, seed, seed range, stratum, cost, causal lag, horizon or fence moved.** `n_seeds=2000, seed0=41_000` unchanged in the signature; `exact` tuple unchanged; `STRATA` unchanged.
+- **PASS — Pins intact.** `design_derivations/census.py` → `9fae1731…802bdc` and `results/signed_train_attestation.json` → `bdfe839c…d180d29` both recompute to the design-pinned values (`design.md:51-52`).
+- **PASS — Accounting boundary.** `check_no_local_accounting("experiments/SPDR-011/code")` → `{'ok': True, 'banned_defs_found': []}`. A13 adds no accounting primitive.
+- **PASS — Amendment-direction ledger (L-23).** Recomputed from the A1→A13 chain in `design.md` §14: A1 L; A2,A3,A4 N; A5–A10 T; A11,A12 L; A13 N → **3L / 6T / 4N**, 13 amendments, and every intermediate running count in the block is arithmetically correct. Verified consistent across all six surfaces: `design.md:5` status line (A13), `design.md:463` (`3 looser / 6 tighter / 4 neutral`), checkpoint `design.md:206` (`3L / 6T / 4N`) and `:43,44,96,218-219` (A13), `docs/references/chapter-05-governance.md:3,67` (A13), `python/experiments/INDEX.md:7,10` (A13), `docs/experiments-docs/INDEX.md:5` (A13). No surface still reads A12 as current. No new one-directional streak ≥3 (A11 L, A12 L, A13 N). The A5–A10 six-tighter streak plus A11/A12/A13 disclosure obligation is carried at `design.md:469-472` and checkpoint `:217-220`.
+- **PASS — L-47 vs code.** `docs/knowledge-base/lessons-and-amendments.md` L-47 states the mechanism (seed counts chosen for power, not compute; no intermediate artifact between estimand gate and bundle, so slow is indistinguishable from hung) and the rule (hoist the seed-invariant computation, keep selection untouched, prove bit-identical against a pinned pre-optimisation corpus covering the exhausted-pool and no-candidate paths). All three are what the code and the parity test actually do. See N-3 for one clause of L-47 not yet self-applied.
+- **PASS — Missing-spread disclosure unchanged.** `design.md:338-343` still declares `UNAVAILABLE_NOT_CHARGED`, `spread_rt_bps: null`, `PARTIAL_FEES_FUNDING_ONLY`, the overstatement implication and the prohibited-claims list. A13 introduces no fully-net / cost-complete / tradable / deployable claim.
+- **PASS — Holdout / TEST.** No code path added that touches TEST or holdout; `run_spdr011.py` byte-identical; TRAIN fence `2023-12-18T00:00Z` untouched; 0 counted reads; CONFIRM remains unexecuted.
+- **PASS — Derangement destroy (L-28).** `stratified_derangement` and its two consumers untouched by A13.
+- **PASS — One BacktestNode per process (L-31).** Runner untouched.
+- **PASS — No XENA route; no registry or family status change.**
+- **PASS — `git diff --check d87fa5d 77e9dad` clean.**
+- **PASS — A13 is pre-measurement.** It does not execute the run, open a value layer, or contact an outcome.
+
+### Issues
+None blocking.
+
+**N-1 (LOW, informational, no change required).** The parity corpora hold `band` and `occupancy` at a
+single value (`test:129,134`), so 2 of the 7 `exact` fields have zero discriminating power in the test —
+a mutant that dropped either field from the bucket key passes all four corpora. This is not reachable
+in the shipped code, because `controls.py:195` and `:203` both build their tuple from the *same*
+`exact` literal, so a key-set divergence is not expressible. Recorded so a future edit does not lean on
+this corpus for key-completeness. (`occupancy` is constant `1` in production too; `band` is not — the
+candidate frame carries both DESIGN and CONFIRM, and CONFIRM candidates are correctly unreachable for
+DESIGN live events. Pre-existing and unchanged.)
+
+**N-2 (LOW, informational).** §13.16's "its order" requirement is satisfied by construction
+(`controls.py:195`) but is *not* independently proven by the corpus: reversing the bucket order leaves
+every output row identical. That is because selection depends on `pool` only through
+`sorted(..., key=(distance, candidate_id))`, a strict total order (candidate_ids are unique), so pool
+order cannot reach the result. The design clause is therefore stronger than necessary — which is the
+safe direction — and the property holds either way.
+
+**N-3 (LOW, informational, forward-looking).** L-47's new rule has three parts: measure per-seed cost on
+a real-shape synthetic frame, **record the projected wall clock in the design**, and hoist + prove
+bit-identical. Parts one and three are done and enforced (§13.16 + the parity test). Part two is not:
+neither `design.md` §13 nor §14 records a projected wall clock for any of the four ≥2,000-seed batteries.
+This review supplies the numbers above; folding them into the design at the next amendment would close
+the lesson against itself. Non-blocking — it affects no selection, threshold or reported control.
+
+**Disposition:** APPROVE for the operator's separate DESIGN-only Run-1 execution gate. A13 is a genuine
+bit-identical compute-path optimisation: the bucket-index relation is provably the same relation as the
+per-field comparison it replaces for every value type these columns can hold, the parity reference is a
+verbatim copy of the pre-A13 algorithm, the corpora exercise both the exhausted-pool and
+`NO_EXACT_CELL_CANDIDATE` paths and kill the three load-bearing filters under mutation, 30 additional
+adversarial differential trials (nulls, NaN, mixed dtypes) diverge zero times, and the 74× speed-up
+reproduces at the real data shape. No control value changes. This review does not execute the run,
+authorise a value-layer read or CONFIRM, or permit TEST/holdout access.
