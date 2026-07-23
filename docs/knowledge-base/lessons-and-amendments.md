@@ -991,3 +991,36 @@ agreement is insufficient.
 
 **Enforced at.** SPDR-011 amendment A9, a real BacktestNode missing-boundary regression test, and
 fresh pre-execution QA before another clean Run-1.
+
+## L-43 — Nanosecond contracts must not round-trip through Python datetime (SPDR-011)
+
+**What.** The engine emitted every A9 fill at the intended nanosecond, but reconciliation rejected
+them. Polars `iter_rows` converted `datetime[ns]` values to Python `datetime`, which has microsecond
+precision and silently erased the final nanosecond.
+
+**Mechanism (why).** A precision-bearing column was converted to a lower-precision scalar before
+the equality check. The checker then compared the rounded fill time to the exact scheduled offset.
+
+**Fix / new rule.** Convert timestamp columns to integer nanoseconds inside Polars before row
+iteration and compare those integers. Every sub-microsecond contract requires a regression using a
+real `datetime[ns]` column, not only integer fixtures.
+
+**Enforced at.** SPDR-011 amendment A10 and fill-reconciliation nanosecond regression.
+
+## L-44 — Simultaneous multi-instrument market events require collision-free sequencing (SPDR-011) ⭐
+
+**What.** With five market orders and five execution ticks sharing one venue timestamp, the first
+instrument's tick could settle other instruments' pending orders against their stale prior-close
+state. Fills had the expected timestamp but 128–253 non-BTC actions per symbol missed `RealOpen`;
+BTC, whose tick led the merged stream, reconciled completely.
+
+**Mechanism (why).** Equal timestamps do not define cross-stream event order. In the multi-instrument
+engine, venue processing of one data event can advance pending market orders before another
+instrument's same-time price event has updated its state.
+
+**Fix / new rule.** Serialize simultaneous symbol actions with frozen nanosecond offsets. For each
+symbol, issue the clock alert, insert its order one nanosecond later, then process only that symbol's
+real-open tick one nanosecond after insertion; do not leave another symbol's order pending. Test at
+least two instruments in one BacktestNode with deliberately different prior closes and opens.
+
+**Enforced at.** SPDR-011 amendment A10 and the multi-instrument real-engine regression.

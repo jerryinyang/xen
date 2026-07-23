@@ -94,6 +94,9 @@ SIGNED_CATALOG_TREE_SHA256 = (
 )
 EXPECTED_EVENTS = 3_606
 SYMBOLS = ("BTCUSDT", "ETHUSDT", "SOLUSDT", "DOGEUSDT", "XRPUSDT")
+EXECUTION_SEQUENCE_OFFSET_NS = {
+    symbol: index * 3 for index, symbol in enumerate(SYMBOLS)
+}
 TRADE_SIZE = {
     "BTCUSDT": "0.01",
     "ETHUSDT": "0.1",
@@ -242,7 +245,10 @@ def _execution_tick_frame(schedule: pl.DataFrame, marks: pl.DataFrame) -> pl.Dat
     ).with_columns(
         (pl.col("decision_ts") + pl.duration(minutes=1))
         .cast(datetime_ns)
-        .alias("source_close_ts")
+        .alias("source_close_ts"),
+        pl.col("symbol")
+        .replace_strict(EXECUTION_SEQUENCE_OFFSET_NS, return_dtype=pl.Int64)
+        .alias("sequence_offset_ns"),
     )
     source = marks.select(
         "symbol",
@@ -259,7 +265,11 @@ def _execution_tick_frame(schedule: pl.DataFrame, marks: pl.DataFrame) -> pl.Dat
         "symbol",
         "source_close_ts",
         pl.col("decision_ts").alias("ts_event"),
-        (pl.col("decision_ts").dt.epoch("ns") + 1).alias("ts_init_ns"),
+        (
+            pl.col("decision_ts").dt.epoch("ns")
+            + pl.col("sequence_offset_ns")
+            + 2
+        ).alias("ts_init_ns"),
         "price",
         "size",
     ).sort(["ts_init_ns", "symbol", "client_order_id"])
@@ -287,7 +297,7 @@ def _execution_ticks(frame: pl.DataFrame, instruments: dict[str, Any]) -> list[T
 
 
 def _execution_latency_config() -> ImportableLatencyModelConfig:
-    """Delay order insertion until the sequenced real-open execution event."""
+    """Insert before the sequenced real-open event, never at its timestamp."""
     return ImportableLatencyModelConfig(
         latency_model_path="nautilus_trader.backtest.models:LatencyModel",
         config_path="nautilus_trader.backtest.config:LatencyModelConfig",
@@ -309,6 +319,7 @@ def _strategy_config(symbol: str, schedule_path: Path) -> ImportableStrategyConf
             "instrument_id": instrument_id,
             "trade_size": TRADE_SIZE[symbol],
             "schedule_path": str(schedule_path),
+            "decision_offset_ns": EXECUTION_SEQUENCE_OFFSET_NS[symbol],
         },
     )
 
@@ -635,7 +646,7 @@ def run_train_emission(*, operator_execution_authority: str) -> dict[str, Any]:
         "operator_execution_authority": operator_execution_authority,
         "window_start_utc": start.isoformat(),
         "window_end_utc": end.isoformat(),
-        "execution_basis": "REAL_OPEN_TRADE_TICK_AT_DECISION_PLUS_1NS",
+        "execution_basis": "ORDER_INSERT_PLUS_1NS_REAL_OPEN_TICK_PLUS_2NS",
         "dispose_on_completion": False,
     }
     gate_cells: dict[str, dict[str, Any]] = {}
@@ -675,6 +686,7 @@ def run_train_emission(*, operator_execution_authority: str) -> dict[str, Any]:
         fills,
         orders,
         marks,
+        execution_offset_ns_by_symbol=EXECUTION_SEQUENCE_OFFSET_NS,
     )
     artifact = artifact.join(
         fill_reconciliation["events"],

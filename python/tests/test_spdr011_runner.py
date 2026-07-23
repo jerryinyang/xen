@@ -537,7 +537,7 @@ def _fill_reconciliation_fixture() -> tuple[pl.DataFrame, pl.DataFrame, pl.DataF
         pl.when(pl.col("action") == "ENTRY").then(pl.lit("BUY")).otherwise(pl.lit("SELL"))
         .alias("side"),
         pl.when(pl.col("action") == "ENTRY").then(100.0).otherwise(105.0).alias("avg_px"),
-        (pl.col("decision_ts").dt.epoch("ns") + 1).alias("ts_last"),
+        (pl.col("decision_ts").dt.epoch("ns") + 2).alias("ts_last"),
     )
     orders = fills.select("client_order_id").with_columns(pl.lit("FILLED").alias("status"))
     marks = pl.DataFrame(
@@ -563,6 +563,20 @@ def test_event_fill_reconciliation_accepts_exact_tagged_actions() -> None:
     assert result["actions"]["actual_fill_source_ts"].to_list() == result["actions"][
         "expected_fill_source_ts"
     ].to_list()
+    assert result["events"]["fill_reconciliation_status"].to_list() == ["RECONCILED"]
+
+
+def test_event_fill_reconciliation_preserves_polars_nanoseconds() -> None:
+    contract = _load("runner_contract")
+    events, schedule, fills, orders, marks = _fill_reconciliation_fixture()
+    fills = fills.with_columns(
+        pl.from_epoch("ts_last", time_unit="ns")
+        .dt.replace_time_zone("UTC")
+        .alias("ts_last")
+    )
+
+    result = contract.reconcile_event_fills(events, schedule, fills, orders, marks)
+
     assert result["events"]["fill_reconciliation_status"].to_list() == ["RECONCILED"]
 
 
@@ -686,7 +700,7 @@ def test_execution_tick_frame_sequences_real_open_after_decision() -> None:
         "symbol": "BTCUSDT",
         "source_close_ts": decision + timedelta(minutes=1),
         "ts_event": decision,
-        "ts_init_ns": int(decision.timestamp() * 1_000_000_000) + 1,
+        "ts_init_ns": int(decision.timestamp() * 1_000_000_000) + 2,
         "price": 107.0,
         "size": 12.5,
     }
@@ -715,7 +729,7 @@ def test_execution_tick_frame_rejects_missing_real_open() -> None:
         runner._execution_tick_frame(schedule, marks)
 
 
-def test_execution_ticks_use_real_price_and_one_nanosecond_sequence() -> None:
+def test_execution_ticks_use_real_price_after_order_insertion() -> None:
     from nautilus_trader.model.enums import AggressorSide
     from nautilus_trader.persistence.catalog import ParquetDataCatalog
 
@@ -730,7 +744,7 @@ def test_execution_ticks_use_real_price_and_one_nanosecond_sequence() -> None:
             "symbol": ["BTCUSDT"],
             "source_close_ts": [decision + timedelta(minutes=1)],
             "ts_event": [decision],
-            "ts_init_ns": [int(decision.timestamp() * 1_000_000_000) + 1],
+            "ts_init_ns": [int(decision.timestamp() * 1_000_000_000) + 2],
             "price": [107.0],
             "size": [12.5],
         }
@@ -741,11 +755,11 @@ def test_execution_ticks_use_real_price_and_one_nanosecond_sequence() -> None:
     assert len(ticks) == 1
     assert float(ticks[0].price) == 107.0
     assert ticks[0].ts_event == int(decision.timestamp() * 1_000_000_000)
-    assert ticks[0].ts_init == int(decision.timestamp() * 1_000_000_000) + 1
+    assert ticks[0].ts_init == int(decision.timestamp() * 1_000_000_000) + 2
     assert ticks[0].aggressor_side == AggressorSide.NO_AGGRESSOR
 
 
-def test_execution_latency_delays_insert_by_exactly_one_nanosecond() -> None:
+def test_execution_latency_inserts_one_nanosecond_before_real_open_tick() -> None:
     runner = _load("run_spdr011")
 
     config = runner._execution_latency_config()
@@ -758,8 +772,8 @@ def test_execution_latency_delays_insert_by_exactly_one_nanosecond() -> None:
     }
 
 
-def test_engine_fills_real_open_when_decision_minute_bar_is_missing(tmp_path: Path) -> None:
-    """The decision clock must not depend on a one-minute bar existing at the boundary."""
+def test_engine_fills_real_open_across_multiple_instrument_streams(tmp_path: Path) -> None:
+    """Data-stream merge order must not change the scheduled real-open fill."""
     from nautilus_trader.backtest.node import BacktestNode
     from nautilus_trader.config import (
         BacktestDataConfig,
@@ -774,81 +788,98 @@ def test_engine_fills_real_open_when_decision_minute_bar_is_missing(tmp_path: Pa
     from nautilus_trader.model.enums import AggressorSide
     from nautilus_trader.model.identifiers import TradeId
     from nautilus_trader.persistence.catalog import ParquetDataCatalog
-    from nautilus_trader.test_kit.providers import TestInstrumentProvider
 
     runner = _load("run_spdr011")
     strategy = _load("spdr011_strategy")
-    instrument = TestInstrumentProvider.xrpusdt_linear_bybit()
-    bar_type = BarType.from_str(f"{instrument.id}-1-MINUTE-LAST-EXTERNAL")
+    source_catalog = ParquetDataCatalog(str(PROJECT_ROOT / "data/catalog"))
+    instruments = {
+        symbol: source_catalog.instruments(
+            instrument_ids=[f"{symbol}-LINEAR.BYBIT"]
+        )[0]
+        for symbol in ("XRPUSDT", "ETHUSDT")
+    }
     decision = datetime(2024, 1, 1, 4, tzinfo=timezone.utc)
     exit_ = decision + timedelta(minutes=2)
-    events = pl.DataFrame(
-        {
-            "event_id": ["MISSING-DECISION-BAR"],
-            "symbol": ["XRPUSDT"],
-            "entry_ts": [decision],
-            "exit_ts": [exit_],
-            "direction": [1],
-        }
-    )
-    schedule = strategy.build_target_schedule(events)
-    schedule_path = tmp_path / "schedule.parquet"
-    schedule.write_parquet(schedule_path)
-
+    schedules = {}
     bars = []
-    for dt, close in [
-        (decision - timedelta(minutes=1), 100.0),
-        (decision + timedelta(minutes=1), 110.0),
-        (exit_, 105.0),
-        (exit_ + timedelta(minutes=1), 106.0),
-    ]:
-        ts_ns = dt_to_unix_nanos(dt)
-        bars.append(
-            Bar(
-                bar_type,
-                instrument.make_price(close),
-                instrument.make_price(close + 1),
-                instrument.make_price(close - 1),
-                instrument.make_price(close),
-                instrument.make_qty(1_000),
-                ts_ns,
-                ts_ns,
-            )
-        )
     ticks = []
-    for row, price in zip(schedule.iter_rows(named=True), [107.0, 104.0], strict=True):
-        ts_ns = dt_to_unix_nanos(row["decision_ts"])
-        ticks.append(
-            TradeTick(
-                instrument.id,
-                instrument.make_price(price),
-                instrument.make_qty(1_000),
-                AggressorSide.NO_AGGRESSOR,
-                TradeId(f"OPEN-{row['client_order_id']}"),
-                ts_ns,
-                ts_ns + 1,
-            )
+    expected = {}
+    for symbol, instrument in instruments.items():
+        events = pl.DataFrame(
+            {
+                "event_id": [f"{symbol}-STREAM"],
+                "symbol": [symbol],
+                "entry_ts": [decision],
+                "exit_ts": [exit_],
+                "direction": [1],
+            }
         )
+        schedule = strategy.build_target_schedule(events)
+        schedule_path = tmp_path / f"{symbol}-schedule.parquet"
+        schedule.write_parquet(schedule_path)
+        schedules[symbol] = schedule_path
+        bar_type = BarType.from_str(f"{instrument.id}-1-MINUTE-LAST-EXTERNAL")
+        bar_points = [
+            (decision - timedelta(minutes=1), 100.0),
+            (decision + timedelta(minutes=1), 110.0),
+            (exit_, 105.0),
+            (exit_ + timedelta(minutes=1), 106.0),
+        ]
+        if symbol == "ETHUSDT":
+            bar_points.append((decision, 100.0))
+        for dt, close in sorted(bar_points):
+            ts_ns = dt_to_unix_nanos(dt)
+            bars.append(
+                Bar(
+                    bar_type,
+                    instrument.make_price(close),
+                    instrument.make_price(close + 1),
+                    instrument.make_price(close - 1),
+                    instrument.make_price(close),
+                    instrument.make_qty(1_000),
+                    ts_ns,
+                    ts_ns,
+                )
+            )
+        offset_ns = runner.EXECUTION_SEQUENCE_OFFSET_NS[symbol]
+        for row, price in zip(schedule.iter_rows(named=True), [107.0, 104.0], strict=True):
+            ts_ns = dt_to_unix_nanos(row["decision_ts"])
+            ticks.append(
+                TradeTick(
+                    instrument.id,
+                    instrument.make_price(price),
+                    instrument.make_qty(1_000),
+                    AggressorSide.NO_AGGRESSOR,
+                    TradeId(f"OPEN-{row['client_order_id']}"),
+                    ts_ns,
+                    ts_ns + offset_ns + 2,
+                )
+            )
+            expected[row["client_order_id"]] = (price, ts_ns + offset_ns + 2)
     catalog_path = tmp_path / "catalog"
     catalog = ParquetDataCatalog(str(catalog_path))
-    catalog.write_data([instrument])
+    catalog.write_data(list(instruments.values()))
     catalog.write_data(bars)
     catalog.write_data(ticks)
 
-    strategy_config = ImportableStrategyConfig(
-        strategy_path="spdr011_strategy:Spdr011ScheduleStrategy",
-        config_path="spdr011_strategy:Spdr011ScheduleConfig",
-        config={
-            "instrument_id": str(instrument.id),
-            "trade_size": "100",
-            "schedule_path": str(schedule_path),
-        },
-    )
+    strategy_configs = [
+        ImportableStrategyConfig(
+            strategy_path="spdr011_strategy:Spdr011ScheduleStrategy",
+            config_path="spdr011_strategy:Spdr011ScheduleConfig",
+            config={
+                "instrument_id": str(instrument.id),
+                "trade_size": "1",
+                "schedule_path": str(schedules[symbol]),
+                "decision_offset_ns": runner.EXECUTION_SEQUENCE_OFFSET_NS[symbol],
+            },
+        )
+        for symbol, instrument in instruments.items()
+    ]
     run_config = BacktestRunConfig(
         dispose_on_completion=False,
         engine=BacktestEngineConfig(
             logging=LoggingConfig(log_level="ERROR", log_colors=False, print_config=False),
-            strategies=[strategy_config],
+            strategies=strategy_configs,
         ),
         venues=[
             BacktestVenueConfig(
@@ -864,10 +895,18 @@ def test_engine_fills_real_open_when_decision_minute_bar_is_missing(tmp_path: Pa
         data=[
             BacktestDataConfig(
                 catalog_path=str(catalog_path),
-                data_cls=data_cls,
+                data_cls=Bar,
                 instrument_id=str(instrument.id),
             )
-            for data_cls in (Bar, TradeTick)
+            for instrument in instruments.values()
+        ]
+        + [
+            BacktestDataConfig(
+                catalog_path=str(catalog_path),
+                data_cls=TradeTick,
+                instrument_id=str(instrument.id),
+            )
+            for instrument in instruments.values()
         ],
     )
     node = BacktestNode(configs=[run_config])
@@ -875,11 +914,11 @@ def test_engine_fills_real_open_when_decision_minute_bar_is_missing(tmp_path: Pa
     fills = node.get_engine(run_config.id).trader.generate_order_fills_report()
     node.dispose()
 
-    assert fills["avg_px"].astype(float).tolist() == [107.0, 104.0]
-    assert fills["ts_last"].astype("int64").tolist() == [
-        dt_to_unix_nanos(decision) + 1,
-        dt_to_unix_nanos(exit_) + 1,
-    ]
+    actual = {
+        str(client_order_id): (float(row["avg_px"]), int(row["ts_last"].value))
+        for client_order_id, row in fills.iterrows()
+    }
+    assert actual == expected
 
 
 def test_unavailable_event_with_no_schedule_or_fills_reconciles_as_unavailable() -> None:

@@ -226,12 +226,6 @@ def attach_signed_flow(events: pl.DataFrame, signed_slots: pl.DataFrame) -> pl.D
     )
 
 
-def _timestamp_ns(value: Any) -> int:
-    if isinstance(value, datetime):
-        return int(value.timestamp() * 1_000_000_000)
-    return int(value)
-
-
 def _side_name(value: Any) -> str:
     return str(value).upper().split(".")[-1]
 
@@ -244,6 +238,7 @@ def reconcile_event_fills(
     bar_marks: pl.DataFrame,
     *,
     relative_price_tolerance: float = 1e-9,
+    execution_offset_ns_by_symbol: dict[str, int] | None = None,
 ) -> dict[str, pl.DataFrame]:
     """Reconcile every tagged event action to one Nautilus order/fill and first-minute open."""
     _required(
@@ -275,8 +270,18 @@ def reconcile_event_fills(
     event_rows = {row["event_id"]: row for row in events.iter_rows(named=True)}
     if len(event_rows) != events.height:
         raise RuntimeError("fill reconciliation: event_id is not unique")
+    schedule_rows = schedule.with_columns(
+        pl.col("decision_ts").dt.epoch("ns").alias("_decision_ts_ns")
+    )
+    fill_ts_expr = (
+        pl.col("ts_last").dt.epoch("ns")
+        if isinstance(fills.schema["ts_last"], pl.Datetime)
+        else pl.col("ts_last").cast(pl.Int64)
+    )
     fill_rows: dict[str, list[dict[str, Any]]] = {}
-    for row in fills.iter_rows(named=True):
+    for row in fills.with_columns(fill_ts_expr.alias("_ts_last_ns")).iter_rows(
+        named=True
+    ):
         fill_rows.setdefault(str(row["client_order_id"]), []).append(row)
     order_rows: dict[str, list[dict[str, Any]]] = {}
     for row in orders.iter_rows(named=True):
@@ -288,6 +293,7 @@ def reconcile_event_fills(
 
     action_records: list[dict[str, Any]] = []
     errors: list[str] = []
+    execution_offsets = execution_offset_ns_by_symbol or {}
     expected_clients = set(schedule["client_order_id"].to_list())
     unknown_fills = sorted(set(fill_rows) - expected_clients)
     unknown_orders = sorted(set(order_rows) - expected_clients)
@@ -296,14 +302,17 @@ def reconcile_event_fills(
             f"unknown tagged activity fills={unknown_fills[:3]} orders={unknown_orders[:3]}"
         )
     for event_id in event_rows:
-        actions = schedule.filter(pl.col("event_id") == event_id)["action"].to_list()
+        actions = schedule_rows.filter(pl.col("event_id") == event_id)["action"].to_list()
         if event_rows[event_id]["4h_available"] and sorted(actions) != ["ENTRY", "EXIT"]:
             errors.append(f"{event_id}: expected exactly one ENTRY and one EXIT schedule action")
-    for expected in schedule.iter_rows(named=True):
+    for expected in schedule_rows.iter_rows(named=True):
         event = event_rows[expected["event_id"]]
         client_id = expected["client_order_id"]
         action = expected["action"]
         complete = bool(event["4h_available"])
+        expected_fill_ns = (
+            expected["_decision_ts_ns"] + execution_offsets.get(event["symbol"], 0) + 2
+        )
         expected_source_ts = expected["decision_ts"] + timedelta(minutes=1)
         mark = mark_rows.get((event["symbol"], expected_source_ts))
         action_fills = fill_rows.get(client_id, [])
@@ -327,7 +336,7 @@ def reconcile_event_fills(
                 action_error = f"wrong side {_side_name(fill['side'])}, expected {expected_side}"
             elif str(fill["instrument_id"]) != f"{event['symbol']}-LINEAR.BYBIT":
                 action_error = "wrong instrument"
-            elif _timestamp_ns(fill["ts_last"]) != _timestamp_ns(expected["decision_ts"]) + 1:
+            elif fill["_ts_last_ns"] != expected_fill_ns:
                 action_error = "wrong fill timestamp"
             elif mark is None:
                 action_error = "expected fill-source mark missing"
@@ -353,8 +362,8 @@ def reconcile_event_fills(
                 "actual_fill_source_ts": (
                     expected_source_ts
                     if len(action_fills) == 1
-                    and _timestamp_ns(action_fills[0]["ts_last"])
-                    == _timestamp_ns(expected["decision_ts"]) + 1
+                    and action_fills[0]["_ts_last_ns"]
+                    == expected_fill_ns
                     else None
                 ),
                 "order_count": order_count,

@@ -1,9 +1,9 @@
 """Nautilus schedule executor for the frozen SPDR-011 event population.
 
 DEVIATIONS: none. The schedule contains census event times and directions only. A target
-change is submitted by an engine-clock alert at the completed boundary. The runner sequences
-the catalog's real next-bar open as an execution event one nanosecond later (L-41/L-42); no
-future price enters the schedule and no emitted fill is rewritten.
+change is submitted by a deterministic engine-clock alert immediately after the completed
+boundary. The runner sequences each symbol's catalog real-open event after its order insertion
+(L-41/L-44); no future price enters the schedule and no emitted fill is rewritten.
 """
 from __future__ import annotations
 
@@ -94,6 +94,7 @@ class Spdr011ScheduleConfig(StrategyConfig, frozen=True):
     instrument_id: InstrumentId
     trade_size: Decimal
     schedule_path: str
+    decision_offset_ns: int
 
 
 class Spdr011ScheduleStrategy(Strategy):
@@ -119,7 +120,7 @@ class Spdr011ScheduleStrategy(Strategy):
         for index, decision_ts in enumerate(dict.fromkeys(self._timestamps)):
             self.clock.set_time_alert_ns(
                 name=f"SPDR011-{symbol}-{index}",
-                alert_time_ns=decision_ts,
+                alert_time_ns=decision_ts + self.config.decision_offset_ns,
                 callback=self._on_decision,
             )
 

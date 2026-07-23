@@ -2,7 +2,7 @@
 
 - **Family:** `CF-VOLCONV-001`
 - **Checkpoint:** `2026-07-22-016-volatility-direction-conversion`
-- **Status:** `PRE-VALUE AMENDMENT A9 — IMPLEMENTED / FRESH QA PENDING`
+- **Status:** `PRE-VALUE AMENDMENT A10 — IMPLEMENTED / FRESH QA PENDING`
 - **Vehicle:** one TRAIN-only SPDR emission; five ordered report layers
 - **Execution authority:** operator-approved clean DESIGN rerun, conditional on fresh-context QA
 - **TEST / holdout:** prohibited; zero reads
@@ -384,19 +384,22 @@ Implementation must:
    with the attested catalog-tree hash;
 10. issue one explicit tagged ENTRY and one explicit tagged EXIT market order per event, including
     contiguous same-direction episodes, then reconcile each complete event to Nautilus fills:
-    exactly one fill per action, correct side, engine fill timestamp one nanosecond after the decision,
+    exactly one fill per action, correct side, engine fill timestamp at the frozen symbol sequence
+    offset plus two nanoseconds after the decision,
     fill-source timestamp at `entry_ts+1m` / `exit_ts+1m`, and fill price equal to the corresponding
     first-minute `RealOpen` within relative `1e-9`.
     An unavailable event must carry its frozen reason and cannot masquerade as a complete fill pair.
 11. derive an execution `TradeTick` only for scheduled actions from the catalog's real first-minute
-    `RealOpen`; preserve its source timestamp, set engine sequencing time to decision `+1ns`, use
-    `NO_AGGRESSOR`, and apply a matching 1ns order-insert latency. This event represents the real
-    open price without claiming a historical bid/ask spread. No catalog open may replace a fill
-    after execution.
-12. schedule every ENTRY/EXIT decision with an exact Nautilus engine-clock alert, independent of
-    whether a one-minute bar exists at the four-hour boundary. The alert submits the order at the
-    decision timestamp; the 1ns latency and real-open execution event then determine the actual fill.
-    A bar callback may not advance or substitute for a missing decision alert.
+    `RealOpen`; preserve its source timestamp and use `NO_AGGRESSOR`. Freeze symbol sequencing as
+    BTC/ETH/SOL/DOGE/XRP offsets `0/3/6/9/12ns`: alert at `decision+offset`, order insertion one
+    nanosecond later, and the symbol's real-open tick one further nanosecond later. This prevents a
+    venue-level data event from settling another symbol's pending market order against stale state.
+    No catalog open may replace a fill after execution.
+12. schedule every ENTRY/EXIT decision with a Nautilus engine-clock alert derived only from its
+    frozen decision timestamp and symbol offset, independent of whether a one-minute bar exists at
+    the four-hour boundary. A bar callback may not advance or substitute for a missing alert.
+13. preserve schedule and fill timestamps as integer nanoseconds during reconciliation. Polars
+    datetime row conversion may not mediate the `decision+offset+2ns` equality check.
 
 The Run-1 bundle contains `design.parquet` only. CONFIRM prices, orders and fills do not exist in the
 Run-1 directory. After the exact rule/config hash and explicit operator CONFIRM authority are
@@ -428,12 +431,15 @@ AMENDMENT-A8: split DESIGN and CONFIRM execution so failed Run-1 files cannot ex
 AMENDMENT-A9: replace bar-dependent decision submission with exact engine-clock alerts after 24
   actions on missing boundary minutes submitted one minute late
   DIRECTION: TIGHTER — running count: 1 looser / 5 tighter / 3 neutral
+AMENDMENT-A10: preserve nanoseconds in reconciliation and serialize simultaneous symbol execution
+  events after multi-stream ties filled non-first symbols from stale prior-close state
+  DIRECTION: TIGHTER — running count: 1 looser / 6 tighter / 3 neutral
 ```
 
 There is no qualification gate, so a global-null false-qualifier count is inapplicable. All
 predeclared arms remain visible; no arm is selected by performance.
 
-Operator flag: A5–A9 are five consecutive tighter amendments. They repair independent integrity
+Operator flag: A5–A10 are six consecutive tighter amendments. They repair independent integrity
 failures and do not add a value threshold, but the streak must be disclosed at the execution gate.
 
 ## 15. Execution gate
