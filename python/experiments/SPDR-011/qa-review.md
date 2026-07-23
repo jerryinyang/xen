@@ -391,3 +391,68 @@ design deviation or value gate.
 
 **Disposition:** APPROVE for the operator's separate DESIGN-only Run-1 execution gate. This review
 does not execute the run, authorise CONFIRM, inspect any real result, or permit TEST/holdout access.
+
+## QA run 6 — 2026-07-23T00:34:39Z — mode: subagent — HEAD c6bc99074aec7587378f59eb9839cfe032e18ae5
+
+Verdict: APPROVE
+
+Reviewed git state: committed HEAD `c6bc99074aec7587378f59eb9839cfe032e18ae5`; dirty-file
+list before this append: none. Fresh-context reviewer did not implement A9. Per the assigned
+boundary, `data/nautilus_runs/SPDR-011`, real outcome/value layers, CONFIRM data, TEST and holdout
+were not inspected.
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| One causal four-hour episode; strict completed breakout; non-overlap (§1-2, §5) | `design_derivations/census.py:131-154,249-320,333-373`; `spdr011_strategy.py:22-84` | MATCHES | State/range inputs are confirmed before the trigger; equality is not an event; schedule construction rejects overlap. |
+| Daily state, 60-return warm-up, rv20/prior-252 percentile, drift20/beta60 (§5.1) | `design_derivations/census.py:29-38,249-320` | MATCHES | Current rv is excluded from its prior-history percentile; beta/drift use the frozen causal windows and lexical rank tie-break. |
+| Exact engine-clock decisions independent of boundary bars (A9; §13.12) | `spdr011_strategy.py:114-148` | MATCHES | `on_start` registers one `set_time_alert_ns` callback per exact decision timestamp; no `on_bar` callback advances the schedule. |
+| Shared EXIT-before-ENTRY order at contiguous boundaries (§2, §13.10) | `spdr011_strategy.py:43-84,126-148` | MATCHES | One shared schedule assigns EXIT priority 0 and ENTRY priority 1 at equal timestamps; the alert drains that ordered schedule, preserving explicit same-direction round trips. |
+| Actual engine fill at catalog `RealOpen`, decision `+1ns` (A7/A9; §4, §13.10-11) | `run_spdr011.py:229-300,537-625`; `runner_contract.py:239-368` | MATCHES | Each scheduled action joins the source mark at `decision+1m`, builds a `NO_AGGRESSOR` tick sequenced at `decision+1ns`, and uses matching 1ns insert latency. Reconciliation requires engine fill time `decision+1ns` and price equal to source `RealOpen` within relative `1e-9`. |
+| No post-run fill rewrite (§13.11) | `run_spdr011.py:620-689`; `runner_contract.py:275-368` | MATCHES | Engine-generated fill/order reports are written and then checked. Code never assigns catalog prices or timestamps into the fill report. |
+| DESIGN-only Run 1; CONFIRM/TEST/holdout outcome access excluded (A8; §4, §6, §13.3-4) | `run_spdr011.py:199-219,537-560,597-617,626-640,705-775`; `bundle.py:25-50` | MATCHES | Runner filters to DESIGN before any mark query, schedule, engine input, control or bundle; the bounded data end covers only the final DESIGN exit open. Bundle accepts only `DESIGN` and writes only `design.parquet`. |
+| Located population and unavailable-event handling (§5.1, §6, §13.10) | `runner_contract.py:50-122,239-424`; `run_spdr011.py:222-226,553-560` | MATCHES | Left joins retain every located event with a frozen missing reason. Only complete 4h rows are scheduled; unavailable rows remain in the artifact, and a complete fill pair on one is rejected. |
+| Open-to-open real prices and golden fixtures (§6-7, §12) | `runner_contract.py:38-122`; `test_spdr011_runner.py:45-123` | MATCHES | Entry and 1h/2h/4h marks use first-minute `RealOpen`; trigger-bar movement is not credited. |
+| Signed flow, fees/funding, and missing-spread boundary (§5.3, §11) | `run_spdr011.py:463-535,689-695`; `runner_contract.py:125-226` | MATCHES | Flow percentile uses prior 60 completed same-slot values; source-known time is causal. Shared Bybit cost receives `spread_bps=None`; partial nets stay null when 4h outcome is unavailable. |
+| Frozen controls, derangements and future-destroy tripwire (§8-9) | `controls.py:21-150,153-358,387-651`; `run_spdr011.py:547-548,696-743` | MATCHES | Permutation destroys are zero-fixed-point, frozen seed ranges are used, sentinel calibrates before outcome access, and only the registered supported-edge survival failure blocks. |
+| Ordered informative layers; no value auto-verdict (§7, §10, §13.5-7) | `layers.py:22-80`; `controls.py:679-728`; `run_spdr011.py:705-775` | MATCHES | L1-L5 populations remain visible and ordered; outputs contain measurements, not candidate-drop or value-pass machinery. |
+| Frozen census/attestation and live signed-tree identity (§3.1, §13.1-2,9) | `run_spdr011.py:84-184,574-578,689-695` | MATCHES | All four file hashes match the design and runner pins; independent live-tree rehash equals `d4b7bbed...f7d2b9` before any authorised engine run. Attestation is VERIFIED for five symbols with zero TEST/holdout rows read. |
+| One BacktestNode/process, operator authority, no CLI (§13, §15) | `run_spdr011.py:537-545,580-625` | MATCHES | Exactly one node is constructed; execution requires a non-empty operator authority and the module exposes no command-line runner. |
+| A9 authority and amendment direction (§14-15) | `chapter-05-governance.md:58-65`; checkpoint design `:190-215`; `design.md:409-448` | MATCHES | Operator authorised A9 implementation and a clean DESIGN rerun conditional on this QA. Ledger is 1 looser / 5 tighter / 3 neutral; A5-A9's five-tighter streak is explicitly flagged for the execution gate. False-qualifier re-derivation is inapplicable because no arm qualifies or drops by value. |
+
+### Golden-trace diff
+
+| Trace | Design expectation | Independent check | Verdict |
+|---|---|---|---|
+| GT-1 LONG | 107 to 104 = -280.374 bps | Open-to-open formula produces `-280.3738` bps; the real BacktestNode missing-bar regression fills 107/104 rather than adjacent bar closes. | MATCHES |
+| GT-2 SHORT | 88 to 84 = +454.545 bps | Direction multiplier and exact four-hour opens produce `+454.5455` bps. | MATCHES |
+| GT-3 EQUALITY | Close equal to prior high emits no event | Locator uses strict `>` and `<`; equality fails both predicates. | MATCHES |
+| A9 missing decision bar | Alert still submits at the exact boundary; fill is real open at `+1ns` | Independently reran committed real `BacktestNode` regression with no bar at the entry boundary: asserted fills 107/104 and `ts_last=entry+1ns/exit+1ns`; test passed. | MATCHES |
+| Shared boundary | EXIT precedes ENTRY when one episode ends as the next begins | Builder regression and explicit priority show `ENTRY(old), EXIT(old), ENTRY(new), EXIT(new)` with EXIT before the equal-time new ENTRY. | MATCHES |
+
+### Governance & boundary
+
+- PASS — Fresh subagent context; append-only run; requested committed HEAD and initial clean state recorded.
+- PASS — Focused suite: `87 passed` across SPDR-011 census, signed-ingest, runner and Chapter-05
+  preflight tests. The separate real-engine missing-bar regression passed (`1 passed`); its only
+  output was Nautilus's upstream `Timestamp.utcnow` deprecation warning.
+- PASS — Ruff: `All checks passed`; `check_no_local_accounting("python/experiments/SPDR-011/code")`
+  returned `{"ok": true, "banned_defs_found": []}`; `git diff --check` was clean before append.
+- PASS — Independent SHA-256: census JSON `94faab2e...13681`, event keys `d1299a08...c7dfd`, census
+  derivation `9fae1731...802bdc`, signed attestation `bdfe839c...180d29`. Independent live signed
+  TRAIN tree hash exactly matched `d4b7bbed...f7d2b9`.
+- PASS — No Python strategy backtest, second BacktestNode, local accounting definition, XENA path,
+  spread proxy, CONFIRM execution path in Run 1, TEST/holdout query, or deployment claim was found.
+- PASS — L-42 is enforced by an exact clock alert and a deliberately missing-boundary real-engine
+  regression; L-41 remains enforced by real-open tick sequencing, actual engine-fill reconciliation,
+  and the absence of any post-execution fill replacement.
+- PASS — A9 is operator-authorised but does not itself launch the run. A5-A9's five consecutive
+  tighter amendments must still be disclosed when the operator opens the execution gate.
+
+### Issues
+
+None.
+
+**Disposition:** APPROVE for the operator's separate DESIGN-only Run-1 execution gate. This QA does
+not execute the run, authorise any value-layer read or CONFIRM, or permit TEST/holdout access.
