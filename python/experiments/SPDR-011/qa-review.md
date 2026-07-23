@@ -456,3 +456,81 @@ None.
 
 **Disposition:** APPROVE for the operator's separate DESIGN-only Run-1 execution gate. This QA does
 not execute the run, authorise any value-layer read or CONFIRM, or permit TEST/holdout access.
+
+## QA run 7 — 2026-07-23T00:50:08Z — mode: subagent — HEAD 53136599001772a3317c6a81dc538c964a04f48b
+
+Verdict: REVISE
+
+Reviewed git state: committed HEAD `53136599001772a3317c6a81dc538c964a04f48b`; dirty-file
+list before this append: none. Fresh-context reviewer did not implement A10. Per the assigned
+boundary, `data/nautilus_runs/SPDR-011`, real outcome/value layers, CONFIRM data, TEST and holdout
+were not inspected.
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| One causal four-hour episode; strict completed breakout; non-overlap (§1-2, §5) | `design_derivations/census.py:131-154,249-320,333-373`; `spdr011_strategy.py:22-84` | MATCHES | State and range use confirmed prior data; equality is not an event; overlapping episodes are rejected. |
+| Fixed daily state, rank, warm-up and causal source times (§5.1-2) | `design_derivations/census.py:29-38,249-320`; `run_spdr011.py:144-187` | MATCHES | Current `rv20` is excluded from prior-252 history; beta/drift windows and lexical tie-break match; source-known times must not exceed the trigger. |
+| Frozen symbol serialization: offsets 0/3/6/9/12ns, alert, insert +1ns, own tick +1ns (§13.11-12; L-42/L-44) | `run_spdr011.py:95-99,232-323`; `spdr011_strategy.py:93-125` | MATCHES | `index*3` over frozen BTC/ETH/SOL/DOGE/XRP gives the required offsets; strategy alert is `decision+offset`, latency inserts at `+1ns`, and the own `NO_AGGRESSOR` real-open tick initializes at `+2ns`. |
+| Integer-nanosecond reconciliation at `decision+symbol_offset+2ns` (§13.10,13; L-43) | `runner_contract.py:233-280,308-351`; `run_spdr011.py:683-690`; `test_spdr011_runner.py:519-580` | MATCHES | Schedule and `datetime[ns]` fill columns are converted to integer epochs inside Polars. An independent ETH fixture with offset `3ns` reconciled exactly at `decision+5ns`. |
+| EXIT before ENTRY at one symbol's shared boundary (§2, §13.10) | `spdr011_strategy.py:76-83,103-113`; `test_spdr011_runner.py:233-294` | DEVIATES | Builder creates EXIT priority, but runtime reload immediately sorts only `decision_ts` with Polars `maintain_order=False`; equal-time order is therefore not guaranteed. The pinned DESIGN census has 926 contiguous boundaries (922 same-direction). |
+| Real multi-instrument stale-state regression (§13.11; L-44) | `test_spdr011_runner.py:775-921` | DEVIATES | One node, two instruments, and one present/one missing decision bar are covered, but both streams use prior close `100` and execution opens `107/104`. The required deliberately different per-symbol prior closes and opens are absent. |
+| Real first-minute `RealOpen` fills and no post-run fill rewrite (§4, §13.10-11; L-41) | `run_spdr011.py:232-310,581-690`; `runner_contract.py:233-433` | MATCHES | Catalog opens create pre-engine ticks; engine reports flow unchanged into emission and are checked against source marks. No assignment replaces emitted fill price or time. |
+| Located population retained; unavailable paths explicit (§5.1, §6, §13.10) | `runner_contract.py:50-122,233-433`; `run_spdr011.py:225-229,564-570` | MATCHES | Left joins retain located rows and freeze reasons; only complete rows are scheduled; an unavailable row cannot carry a complete fill pair. |
+| DESIGN-only Run 1; no CONFIRM/TEST/holdout execution (§4, §6, §13.3-4) | `run_spdr011.py:202-222,548-570,608-628,717-787`; `bundle.py:25-50` | MATCHES | Events are filtered to DESIGN before mark reads, schedules, engine data, controls and bundle; bundle accepts only `DESIGN` and writes only `design.parquet`. |
+| Signed flow and partial cost boundary (§5.3, §11) | `run_spdr011.py:474-545,701-707`; `runner_contract.py:125-226` | MATCHES | Flow uses prior 60 completed same-slot imbalances and a causal known time. Shared Bybit cost receives `spread_bps=None`; 0/2/5-bps allowances remain reports, not gates. |
+| Frozen controls, zero-fixed derangements and future-destroy (§8-9) | `controls.py:21-150,153-358,387-651`; `run_spdr011.py:558,718-755` | MATCHES | Seed ranges, strata, realised-pair exclusion and derangements match. Sentinel calibrates before outcome access; only the registered supported-edge future-destroy rule can invalidate. |
+| Ordered informative layers; no value auto-verdict (§7, §9-10, §13.5-7) | `layers.py:22-80`; `controls.py:679-728`; `run_spdr011.py:717-787` | MATCHES | All five populations remain visible; effect/MDE/band reads do not drop candidates or decide progression. |
+| Frozen hashes, live signed tree and census membership (§3.1, §13.1-2,9) | `run_spdr011.py:84-187,585-589,701-707` | MATCHES | Four artifact hashes match; 3,606 unique event IDs reproduce; live signed-tree hash matches attested/frozen `d4b7bbed...f7d2b9`; attestation records zero TEST/holdout rows. |
+| One BacktestNode/process, explicit authority, no CLI (§13, §15) | `run_spdr011.py:548-555,591-635` | MATCHES | One node is constructed only after non-empty operator authority; import has no run side effect and no execution command is exposed. |
+| Amendment ledger and execution disclosure (§14-15; L-23) | `design.md:410-450`; checkpoint design `:190-216` | MATCHES | A1-A10 running count is 1 looser / 6 tighter / 3 neutral. A5-A10's six consecutive tighter amendments are explicitly disclosed; no qualification gate makes false-qualifier re-derivation applicable. |
+
+### Golden-trace diff
+
+| Trace | Design expectation | Independent check | Verdict |
+|---|---|---|---|
+| GT-1 LONG | 107 to 104 = -280.374 bps | Open-to-open implementation and focused fixture produce `-280.3738` bps. | MATCHES |
+| GT-2 SHORT | 88 to 84 = +454.545 bps | Direction multiplier and exact four-hour opens produce `+454.5455` bps. | MATCHES |
+| GT-3 EQUALITY | Close equal to prior high emits no event | Locator uses strict `>` and `<`; equality satisfies neither. | MATCHES |
+| A10 nanosecond trace | ETH offset 3ns; insert at +4ns; fill at +5ns | Independent real `datetime[ns]` reconciliation passed at `decision+3+2ns`; integer conversion preserved the final nanoseconds. | MATCHES |
+| A10 cross-stream trace | Distinct stale states and distinct own opens cannot cross-fill | Standalone real-engine regression passed, but both instruments were fed the same stale close and same execution-open sequence. | DEVIATES |
+| Shared episode boundary | EXIT before next ENTRY | Builder fixture orders EXIT first, but runtime's equal-key re-sort does not guarantee preservation. | DEVIATES |
+
+### Governance & boundary
+
+- PASS — Fresh subagent context, append-only review, exact committed HEAD, and initially clean tree.
+- PASS — Focused suite: `111 passed` across SPDR-011 census, signed ingest, runner, Chapter-05
+  preflight and shared evaluation tests. Standalone real multi-instrument test: `1 passed`; only two
+  upstream `Timestamp.utcnow` deprecation warnings.
+- PASS — Ruff: `All checks passed`; `git diff --check` clean before append;
+  `check_no_local_accounting("python/experiments/SPDR-011/code")` returned
+  `{"ok": true, "banned_defs_found": []}`.
+- PASS — SHA-256 matched design pins: census JSON `94faab2e...13681`, event keys
+  `d1299a08...c7dfd`, derivation `9fae1731...802bdc`, signed attestation
+  `bdfe839c...180d29`; signed tree matched `d4b7bbed...f7d2b9`.
+- PASS — Missing spread remains null/unavailable with partial-cost disclosure; no spread proxy,
+  deployability claim, Python strategy backtest, second node, XENA route or post-run fill rewrite.
+- PASS — Family is registered, 0 counted TEST reads are recorded, holdout remains sealed, and
+  A5-A10's six-tighter streak is disclosed at the execution gate.
+- REVISE — L-44's durable regression is under-discriminating, and shared-boundary execution order
+  is not preserved by an explicit runtime tie-break.
+
+### Issues
+
+1. **REVISE — runtime EXIT-before-ENTRY is not guaranteed.** Design §2/§13.10 requires EXIT before
+   ENTRY at a contiguous boundary. `spdr011_strategy.py:79-83` creates that priority, but
+   `spdr011_strategy.py:105` reloads with `.sort("decision_ts")`; installed Polars defaults to
+   `maintain_order=False` for equal keys. This is material for 926 DESIGN boundaries. Required
+   change: preserve an explicit action-priority key (or a stable-order equivalent) through runtime
+   load and add a runtime/real-engine contiguous same-symbol regression. `FAILING_ARTIFACT: code/`
+   `REQUIRED_SKILL: experiment-developer`.
+2. **REVISE — L-44 regression does not use distinct per-symbol market states.**
+   `test_spdr011_runner.py:807-858` gives XRP and ETH the same prior close and the same `107/104`
+   execution opens. Required change: retain one missing and one present decision bar, but give both
+   instruments deliberately different prior closes and different entry/exit opens, then assert
+   every tagged fill uses its own stream and frozen offset. `FAILING_ARTIFACT: python/tests/`
+   `REQUIRED_SKILL: experiment-developer`.
+
+**Disposition:** REVISE before any DESIGN Run-1 execution. No outcome emission is authorised; QA
+must be rerun after both ordering regressions are made discriminating and deterministic.
