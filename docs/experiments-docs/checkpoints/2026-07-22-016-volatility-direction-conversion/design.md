@@ -40,8 +40,8 @@ enters Chapter-05 cost accounting.
 | Outcome-free census | Complete: 1,390 DESIGN events / 148 dates; no returns or prices emitted |
 | Signed TRAIN lane | **VERIFIED:** 3,731,908 rows / 5 symbols / 90 files; tree sha `d4b7bbed…f7d2b9` |
 | Run-1 design | Complete at `python/experiments/SPDR-011/design.md` |
-| Run-1 pre-exec QA | QA run 8 approved A10; the next blocked run exposed A11, which requires fresh QA |
-| Run execution | Operator authorised a clean rerun after A11 implementation and fresh QA APPROVE |
+| Run-1 pre-exec QA | QA run 9 approved A11; the next blocked run exposed A12, which requires fresh QA |
+| Run execution | Operator authorised a clean rerun after A12 implementation and fresh QA APPROVE |
 
 ## 3. Fixed question and mechanism
 
@@ -93,7 +93,7 @@ No threshold, symbol, direction, horizon or exit may be selected by outcome perf
 | 1 | `SPDR-011` census | Count eligible events and dependence clusters without opening outcomes; derive prospective MDE and 2–3 golden events | family registered; outcome isolation proven | **COMPLETE — 1,390 DESIGN events** |
 | 2 | `SPDR-011` design | Freeze schema, controls, plausible effect/MDE bands, golden traces and layer protocol | census artifact only | **COMPLETE** |
 | 3 | Signed-data ingest | Bulk-ingest/fence-attest the five readable primary-data histories into the `SignedBar` TRAIN lane | design §3.4 | **COMPLETE — VERIFIED** |
-| 4 | `SPDR-011` QA | Fresh-context design/code review | completed amended design + reviewable implementation | **PENDING — A11** |
+| 4 | `SPDR-011` QA | Fresh-context design/code review | completed amended design + reviewable implementation | **PENDING — A12** |
 | 5 | `SPDR-011` execution | Emit DESIGN-only event artifact; CONFIRM remains unexecuted | signed data + fresh QA APPROVE + operator approval | authorised conditionally on QA APPROVE |
 | 6 | DESIGN layers | L1→L5 sequential operator reads; stop/drop/advance recorded after each | valid frozen artifact | unauthorised |
 | 7 | CONFIRM | One read of one frozen rule; no replacement | rule hash + prospective power | unauthorised |
@@ -202,6 +202,7 @@ physicality and value labels. The operator alone advances or stops value layers.
 | A9 — exact engine-clock decision alerts replace bar-dependent submission at missing boundary minutes | `TIGHTER` | 1L / 5T / 3N |
 | A10 — integer-nanosecond reconciliation and collision-free per-symbol event sequencing | `TIGHTER` | 1L / 6T / 3N |
 | A11 — minimum-increment engine adapter orders replace arbitrary larger quantities | `LOOSER` | 2L / 6T / 3N |
+| A12 — runtime signed-volume check uses the attested relative `1e-9` tolerance, not an accidental absolute threshold | `LOOSER` | 3L / 6T / 3N |
 
 Any later change to data, instruments, trigger, state, horizon, cost regime, control, threshold,
 direction rule or route requires an amendment before outcome contact. After results exist, it is a new
@@ -212,6 +213,7 @@ design, not a rescue amendment.
 The registered family, outcome-free census and final Run-1 design are complete. They authorise no
 outcome column, SPDR execution, EXP execution, TEST, holdout or shadow action.
 
-The operator authorised A11 implementation, fresh QA and a clean Run-1 on 2026-07-23. Execution
-may start only if that fresh review records APPROVE. A5–A10's six-amendment tighter streak and A11's
-favourable adapter-size reduction must be disclosed at the execution gate.
+The operator authorised governed pre-value repairs, fresh QA and a clean Run-1 on 2026-07-23.
+Execution may start only if the A12 review records APPROVE. A5–A10's six-amendment tighter streak,
+A11's favourable adapter-size reduction and A12's favourable false-rejection removal must be
+disclosed at the execution gate.

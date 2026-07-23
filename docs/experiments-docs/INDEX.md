@@ -2,13 +2,14 @@
 
 ## Current checkpoint status
 
-**CHECKPOINT-016 OPEN — RUN-1 A11 REPAIR / FRESH QA PENDING.** `CF-VOLCONV-001` is
-registered. The outcome-free census located 1,390 DESIGN events on 148 dates; no outcome artifact,
-SPDR execution, EXP execution, historical TEST read, holdout read, or forward shadow is active.
+**CHECKPOINT-016 OPEN — RUN-1 A12 REPAIR / FRESH QA PENDING.** `CF-VOLCONV-001` is
+registered. The outcome-free census located 1,390 DESIGN events on 148 dates; governed Run-1
+attempts have stopped before bundle emission. No completed outcome artifact, EXP execution, historical
+TEST read, holdout read, or forward shadow is active.
 
 The governing route is [Chapter 05 governance](../references/chapter-05-governance.md). The
-five-symbol signed TRAIN catalog is verified; complete fresh QA, then request separate Run-1
-execution authority.
+five-symbol signed TRAIN catalog is verified; complete fresh QA, then use the operator's conditional
+Run-1 execution authority.
 
 ## Current infrastructure tasks
 

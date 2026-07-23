@@ -2,7 +2,7 @@
 
 - **Family:** `CF-VOLCONV-001`
 - **Checkpoint:** `2026-07-22-016-volatility-direction-conversion`
-- **Status:** `PRE-VALUE AMENDMENT A11 — IMPLEMENTED / FRESH QA PENDING`
+- **Status:** `PRE-VALUE AMENDMENT A12 — IMPLEMENTED / FRESH QA PENDING`
 - **Vehicle:** one TRAIN-only SPDR emission; five ordered report layers
 - **Execution authority:** operator-approved clean DESIGN rerun, conditional on fresh-context QA
 - **TEST / holdout:** prohibited; zero reads
@@ -406,6 +406,9 @@ Implementation must:
     BTC `0.001`, ETH `0.01`, SOL `0.1`, DOGE `1`, XRP `0.1`. Require the real-open tick size to
     cover that adapter order before engine construction. This is not a capacity, impact, liquidity
     or deployability test; no inference may be drawn from the adapter quantity.
+15. enforce the attested signed-volume partition with the frozen relative tolerance:
+    `abs(BuyVolume + SellVolume - Volume) <= 1e-9 * max(abs(Volume), 1)`. The same rule applies
+    after four-hour aggregation; an absolute `1e-9` threshold is not the data contract.
 
 The Run-1 bundle contains `design.parquet` only. CONFIRM prices, orders and fills do not exist in the
 Run-1 directory. After the exact rule/config hash and explicit operator CONFIRM authority are
@@ -443,14 +446,18 @@ AMENDMENT-A10: preserve nanoseconds in reconciliation and serialize simultaneous
 AMENDMENT-A11: replace arbitrary larger engine-adapter quantities with minimum size increments after
   one 100-DOGE order exceeded a 50-DOGE execution tick and produced a half-tick blended fill
   DIRECTION: LOOSER — running count: 2 looser / 6 tighter / 3 neutral
+AMENDMENT-A12: replace the runtime's accidental absolute signed-volume tolerance with the attested
+  relative 1e-9 rule after 265 of 5,009 aggregate slots false-failed despite a worst relative error
+  of 2.04e-15
+  DIRECTION: LOOSER — running count: 3 looser / 6 tighter / 3 neutral
 ```
 
 There is no qualification gate, so a global-null false-qualifier count is inapplicable. All
 predeclared arms remain visible; no arm is selected by performance.
 
-Operator flag: A5–A10 are six consecutive tighter amendments. A11 then reduces the non-economic
-engine adapter size and is favourable to exact-open reconciliation. Both facts must be disclosed at
-the execution gate; none adds or changes a value threshold.
+Operator flag: A5–A10 are six consecutive tighter amendments. A11 reduces the non-economic engine
+adapter size, and A12 removes a false absolute-tolerance rejection; both are favourable to a clean
+run. All three facts must be disclosed at the execution gate; none adds or changes a value threshold.
 
 ## 15. Execution gate
 

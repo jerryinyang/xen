@@ -192,8 +192,10 @@ def attach_signed_flow(events: pl.DataFrame, signed_slots: pl.DataFrame) -> pl.D
         },
         "signed_slots",
     )
+    volume_scale = pl.max_horizontal(pl.col("Volume").abs(), pl.lit(1.0))
     volume_error = signed_slots.filter(
-        (pl.col("BuyVolume") + pl.col("SellVolume") - pl.col("Volume")).abs() > 1e-9
+        (pl.col("BuyVolume") + pl.col("SellVolume") - pl.col("Volume")).abs()
+        > 1e-9 * volume_scale
     )
     if volume_error.height:
         raise ValueError("BuyVolume + SellVolume must equal Volume")

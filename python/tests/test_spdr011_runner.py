@@ -122,7 +122,7 @@ def test_short_golden_trace_uses_real_open_at_exact_four_hour_boundary() -> None
     assert out["gross_signed_4h_bps"].item() == pytest.approx(454.5454545455)
 
 
-def test_signed_flow_join_requires_exact_volume_identity_and_causal_timestamp() -> None:
+def test_signed_flow_join_requires_relative_volume_identity_and_causal_timestamp() -> None:
     runner = _load("runner_contract")
     events = _events().head(1)
     trigger = events["trigger_ts"][0]
@@ -149,6 +149,13 @@ def test_signed_flow_join_requires_exact_volume_identity_and_causal_timestamp() 
     assert short["aligned_flow"].item() == pytest.approx(-0.4)
     assert short["flow_pct"].item() == pytest.approx(0.25)
     assert short["flow_upper_tercile"].item() is False
+
+    large = signed.with_columns(
+        pl.lit(70_000_000.0).alias("BuyVolume"),
+        pl.lit(30_000_000.0).alias("SellVolume"),
+        pl.lit(100_000_000.01).alias("Volume"),
+    )
+    runner.attach_signed_flow(events, large)
 
     with pytest.raises(ValueError, match=r"BuyVolume \+ SellVolume"):
         runner.attach_signed_flow(events, signed.with_columns(pl.lit(99.0).alias("Volume")))

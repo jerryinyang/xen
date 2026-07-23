@@ -1043,3 +1043,20 @@ non-economic and supports no capacity, liquidity, impact or deployability claim.
 replay must size and test physical execution separately rather than inherit this adapter.
 
 **Enforced at.** SPDR-011 amendment A11, pre-engine tick-size gate and insufficient-size regression.
+
+## L-46 — Floating-point partition checks must preserve their declared scale (SPDR-011)
+
+**What.** The signed-data ingest and attestation accepted
+`abs(BuyVolume + SellVolume - Volume) <= 1e-9 * max(abs(Volume), 1)`, but the Run-1 join later
+rechecked four-hour aggregates against an absolute `1e-9` threshold. That false-rejected 265 of
+5,009 slots even though the worst relative discrepancy was only `2.04e-15`.
+
+**Mechanism (why).** Summing many binary floating-point values increases absolute rounding residue
+with the scale of volume. An absolute epsilon silently changes a relative source contract and makes
+valid high-volume aggregates fail more often than low-volume ones.
+
+**Fix / new rule.** Reuse the attested scale-aware expression at every downstream validation
+boundary, including after aggregation. Regression fixtures must include a large-volume row whose
+absolute residue exceeds `1e-9` while its relative residue remains inside the frozen tolerance.
+
+**Enforced at.** SPDR-011 amendment A12 and the signed-flow relative-tolerance regression.
