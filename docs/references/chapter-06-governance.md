@@ -1,6 +1,6 @@
 # Chapter 06 Governance — Structural Volatility + Direction Programme
 
-**State:** `CHECKPOINT-017 OPEN / FAMILY REGISTERED / SPDR DESIGNS PENDING`
+**State:** `CHECKPOINT-017 OPEN / SPDR-012+013 DESIGNS COMPLETE / EXECUTION PENDING`
 
 **Governing RAW brief:** `.ignore/what-next/alts/vol-direction-structural-programme-raw.md`
 
@@ -22,6 +22,12 @@ vol → direction expectancy → combination programme. It is **not** a reopenin
 
 All SPDR stages are TRAIN-only, disposition/characterisation screens under
 `docs/references/spdr-lane.md`. Historical analysis-TEST and the global holdout are never loaded.
+
+**Universe (AMENDMENT-U1):** top **25** instruments by 30-day total USD traded volume
+(`sum(close×volume)` on fenced 1m bars), ranked on TRAIN only with
+`asof = train_end_utc` (window `[train_end−30d, train_end)`). Pin:
+`docs/signal-registry/candidate-families/cf-voldir-001-universe.json`. Applies to SPDR-012/013/014
+and any later XENA universe definition unless the operator freezes a subset at reflection C.
 
 ## 2. Cost boundary (inherits Chapter-05 no-spread amendment)
 

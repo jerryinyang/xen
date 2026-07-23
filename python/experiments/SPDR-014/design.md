@@ -3,6 +3,7 @@
 - **Family:** `CF-VOLDIR-001`
 - **Checkpoint:** `2026-07-23-017-structural-vol-direction-programme`
 - **Status:** `DESIGN PENDING / BLOCKED ON MID-CHECKPOINT REFLECTION C`
+- **Universe:** family-wide top-25 30d volume pin (AMENDMENT-U1); same as SPDR-012/013
 - **Authority:** do not design for execution until reflection-mid.md freezes the object; do not run
   until operator authorises.
 

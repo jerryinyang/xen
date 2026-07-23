@@ -1603,8 +1603,8 @@ graduates a base. **Not** a reopening of CF-VOLCONV-001.
 
 | ID | Vehicle | Registered question / arm | Candidate slot | Status |
 |---|---|---|---:|---|
-| `CF-VOLDIR-001/HYP-A` | SPDR-012 | Vol predictability/reliability under frozen metrics (clustering, level, regime, realised measures, clock, XS rank, tail) | 0 | REGISTERED; design pending |
-| `CF-VOLDIR-001/HYP-B` | SPDR-013 | Fast direction expectancy bps (SMA 14/25/≤50 + angle; ZigZag ATR + path-local features; magnitude and/or vol of next whole move) — **not win-rate** | 0 | REGISTERED; blocked on A gate default |
+| `CF-VOLDIR-001/HYP-A` | SPDR-012 | Vol predictability/reliability under frozen metrics (clustering, level, regime, realised measures, clock, XS rank, tail); **universe = top-25 30d USD volume** | 0 | DESIGN COMPLETE (+U1); execution unauthorised |
+| `CF-VOLDIR-001/HYP-B` | SPDR-013 | Fast direction expectancy bps (SMA 14/25/≤50 + angle; ZigZag ATR + path-local features; magnitude and/or vol of next whole move) — **not win-rate**; **same top-25 universe** | 0 | DESIGN COMPLETE (+U1); default after SPDR-012 gate |
 | `CF-VOLDIR-001/HYP-C` | Reflection | Mid-checkpoint freeze of combination / stop / direction-agnostic branch | 0 | REGISTERED; not result-producing |
 | `CF-VOLDIR-001/HYP-D` | SPDR-014 | Vol×direction or authorised direction-agnostic extraction under partial-cost disclosure | 0 | REGISTERED; blocked on C |
 | `CF-VOLDIR-001/HYP-E` | XENA-VOLDIR-001 | Portfolio/search on graduated D bases only | 0 | RESERVED; requires D graduation + separate design/QA/approval |

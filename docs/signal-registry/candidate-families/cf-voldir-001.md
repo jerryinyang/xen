@@ -5,6 +5,7 @@
 - **Route:** `SPDR-012` (vol) → `SPDR-013` (direction expectancy) → mid-checkpoint reflection →
   `SPDR-014` (combination / extraction) → conditional `XENA-VOLDIR-001`
 - **Reads:** TRAIN only; 0 counted TEST reads; global holdout sealed
+- **SPDR-012/013:** designs complete 2026-07-23; execution not authorised
 - **Checkpoint:** `docs/experiments-docs/checkpoints/2026-07-23-017-structural-vol-direction-programme/design.md`
 - **Governing RAW brief:** `.ignore/what-next/alts/vol-direction-structural-programme-raw.md`
 - **Distinct from:** `CF-VOLCONV-001` (closed L1 path: assumed vol + late range-break direction)
@@ -83,12 +84,31 @@ re-parameterisation of SPDR-011’s range-break object.
 - Chapter-05/06 cost rule: **spread unavailable / not charged**;
   `cost_scope=PARTIAL_FEES_FUNDING_ONLY`; every money figure carries the understatement caveat.
 
-### 5.2 Core instruments (default liquid set)
+### 5.2 Instruments (family-wide freeze — AMENDMENT-U1)
 
-`BTCUSDT`, `ETHUSDT`, `SOLUSDT`, `DOGEUSDT`, `XRPUSDT`.
+**Universe:** the **top 25** Bybit USDT linear perps by **30 calendar-day total traded volume**
+(USD notional proxy = `sum(close × volume)` on fenced 1m bars).
 
-Broader names only as predeclared gross supply / robustness disclosure — cannot select the rule
-unless a SPDR design freezes expansion **before** outcome contact.
+```
+UNIVERSE-PIN:
+  metric: sum(close * volume) over 1m bars, band=TRAIN only
+  window: [asof − 30d, asof)
+  asof_exclusive: train_end_utc from INFR-011 fence (= 2023-12-18T00:00:00Z)
+  n: 25
+  pin file: docs/signal-registry/candidate-families/cf-voldir-001-universe.json
+  recompute: screen code must rebuild ranking from the same rule and assert symbol set equality
+```
+
+**Pinned symbols (descending volume):**  
+BTCUSDT, ETHUSDT, SOLUSDT, AVAXUSDT, ORDIUSDT, 1000BONKUSDT, TIAUSDT, DOGEUSDT, XRPUSDT,
+LINKUSDT, ADAUSDT, BIGTIMEUSDT, BLURUSDT, 1000PEPEUSDT, 1000LUNCUSDT, MATICUSDT, INJUSDT,
+SEIUSDT, BNBUSDT, WLDUSDT, PYTHUSDT, DYDXUSDT, GALAUSDT, OPUSDT, 1000RATSUSDT.
+
+**Coverage rule:** names with insufficient DESIGN warm-up remain in the universe; cells with too
+few dates are **UNPOWERED**, never silently dropped from reporting. No post-outcome universe edit.
+
+**AMENDMENT-U1 (2026-07-23):** expand instruments from fixed five to top-25 30d volume —
+DIRECTION: **NEUTRAL** (scope expansion pre-execution; no outcome contact yet).
 
 ### 5.3 Volatility toolkit (permitted axes — freeze concrete arms in SPDR-012 design)
 
@@ -183,3 +203,7 @@ spread not charged; reported net **overstated** relative to true cost.
   `vol-direction-structural-programme-raw.md` (including magnitude **and/or** volatility next-move
   target; SPDR-lane pointer). Assigned SPDR-012/013/014; reserved XENA-VOLDIR-001. 0 counted reads;
   no outcome contact yet. |
+| 2026-07-23 | **AMENDMENT-U1 (NEUTRAL):** instruments = top 25 by 30d USD volume (TRAIN rank at
+  `train_end`). Pin `cf-voldir-001-universe.json`. SPDR-012/013 designs updated. 0 outcomes. |
+| 2026-07-23 | **AMENDMENT-A2 (NEUTRAL):** full first-pass options mandatory — V-REGIME-HMM; D1 primary
+  clock; M15 clock; SMA 14/25/50; angle on+off; ZZ mag and vol forecast heads. 0 outcomes. |

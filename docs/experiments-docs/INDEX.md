@@ -2,11 +2,10 @@
 
 ## Current checkpoint status
 
-**CHECKPOINT-017 OPEN — CF-VOLDIR-001 REGISTERED; SPDR DESIGNS PENDING.** Structural programme:
+**CHECKPOINT-017 OPEN — SPDR-012/013 DESIGNS COMPLETE; EXECUTION PENDING.** Structural programme:
 volatility reliability (`SPDR-012`) → direction expectancy bps (`SPDR-013`) → mid reflection →
 combination (`SPDR-014`) → conditional `XENA-VOLDIR-001`. TRAIN only; 0 counted TEST reads; holdout
-sealed. No SPDR execution authorised until each leg’s `design.md` exists and the operator approves
-the run.
+sealed. Next: operator execution authority for SPDR-012 (then 013 after gate).
 
 Governing brief: `.ignore/what-next/alts/vol-direction-structural-programme-raw.md`  
 Governance: [Chapter 06 governance](../references/chapter-06-governance.md)  
@@ -35,7 +34,7 @@ Checkpoint design:
 ## Current checkpoint
 
 - [Checkpoint 017 design](checkpoints/2026-07-23-017-structural-vol-direction-programme/design.md) —
-  OPEN; next = `SPDR-012/design.md`.
+  OPEN; SPDR-012/013 designs complete; next = SPDR-012 execution authority.
 
 ## Prior checkpoint
 

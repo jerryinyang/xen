@@ -2,12 +2,12 @@
 
 ## Chapter 06 — active
 
-Checkpoint-017 open. Family `CF-VOLDIR-001` registered. Next work: `SPDR-012` design (vol characterisation).
+Checkpoint-017 open. Family `CF-VOLDIR-001` registered. SPDR-012/013 designs complete; execution not yet authorised.
 
 | ID | Family | Status | Purpose |
 |---|---|---|---|
-| SPDR-012 | CF-VOLDIR-001 | **REGISTERED / DESIGN PENDING** | Volatility characterisation — reliability of prediction/modelling |
-| SPDR-013 | CF-VOLDIR-001 | **REGISTERED / BLOCKED ON A GATE** | Direction expectancy bps (SMA + ZigZag; not win-rate) |
+| SPDR-012 | CF-VOLDIR-001 | **DESIGN COMPLETE — AWAITING EXECUTION AUTHORITY** | Volatility characterisation — reliability of prediction/modelling |
+| SPDR-013 | CF-VOLDIR-001 | **DESIGN COMPLETE — DEFAULT AFTER SPDR-012 GATE** | Direction expectancy bps (SMA + ZigZag; not win-rate) |
 | SPDR-014 | CF-VOLDIR-001 | **REGISTERED / BLOCKED ON REFLECTION C** | Combination / extraction after mid-checkpoint freeze |
 | XENA-VOLDIR-001 | CF-VOLDIR-001 | **RESERVED** — requires SPDR-014 graduation + separate design/QA/approval | Portfolio/search on graduated bases only |
 

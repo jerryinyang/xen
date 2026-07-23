@@ -1,7 +1,9 @@
 # Checkpoint 017 — Structural Volatility + Direction Programme
 
 - **Opened:** 2026-07-23
-- **Status:** `OPEN — FAMILY REGISTERED; NO SPDR DESIGN/EXECUTION YET`
+- **Status:** `OPEN — SPDR-012/013 DESIGNS COMPLETE; UNIVERSE=TOP25; EXECUTION UNAUTHORISED`
+- **AMENDMENT-U1:** instruments = top 25 by 30d USD volume (family-wide) — DIRECTION: NEUTRAL
+- **AMENDMENT-A2:** full arm/option set mandatory (HMM; D1 primary; M15; SMA50; ZZ mag/vol) — DIRECTION: NEUTRAL
 - **Family:** `CF-VOLDIR-001` (`REGISTERED`)
 - **Container:** `SPDR-012` (vol) → `SPDR-013` (direction) → mid-checkpoint reflection →
   `SPDR-014` (combination) → conditional `XENA-VOLDIR-001`
@@ -200,11 +202,11 @@ no local accounting primitives for verdict P&L; dependence-matched uncertainty.
 | Order | Item | Purpose | Start gate | Status |
 |---:|---|---|---|---|
 | 1 | Family + checkpoint open | Register `CF-VOLDIR-001`; freeze sequence | Operator accept RAW brief | **COMPLETE 2026-07-23** |
-| 2 | `SPDR-012` design | Freeze vol definitions, arms, reliability bars, universe, horizons | Checkpoint open | **PENDING** |
-| 3 | `SPDR-012` run + analysis | Vol reliability characterisation | SPDR-012 design + lean self-check | unauthorised |
+| 2 | `SPDR-012` design | Freeze vol definitions, arms, reliability bars, universe, horizons | Checkpoint open | **COMPLETE 2026-07-23** |
+| 3 | `SPDR-012` run + analysis | Vol reliability characterisation | SPDR-012 design + lean self-check | unauthorised — awaiting operator execution |
 | 4 | Operator gate A | PASS / STOP combination path | SPDR-012 analysis | unauthorised |
-| 5 | `SPDR-013` design | Freeze SMA/ZigZag params, capture geometry, expectancy unit | Prefer A PASS; operator may allow B after A data even if STOP combo | **PENDING** |
-| 6 | `SPDR-013` run + analysis | Direction expectancy bps | SPDR-013 design | unauthorised |
+| 5 | `SPDR-013` design | Freeze SMA/ZigZag params, capture geometry, expectancy unit | Prefer A PASS; operator may allow B after A data even if STOP combo | **COMPLETE 2026-07-23** |
+| 6 | `SPDR-013` run + analysis | Direction expectancy bps | SPDR-013 design + gate | unauthorised |
 | 7 | Operator gate B | Expectancy adequacy | SPDR-013 analysis | unauthorised |
 | 8 | Mid reflection C | Freeze combination or stop/branch | A+B complete | unauthorised |
 | 9 | `SPDR-014` design | Freeze extraction object from C | Reflection signed | unauthorised |
@@ -249,18 +251,20 @@ amendment):**
 **Stop rule:** if no predeclared reliability bar is met → do not open Step D vol-conditioned
 extraction (RAW §5.1).
 
-**SPDR-012 first-pass arm freeze (concrete minimum covering the axes — expandable only by
-predeclared amendment before outcomes):**
+**SPDR-012 first-pass arm freeze (all mandatory; AMENDMENT-A2):**
 
 | Arm ID | Axis coverage | Spec sketch (detail in SPDR-012 design.md) |
 |---|---|---|
 | V-PERSIST | Persistence / clustering | Lagged RV / \|r\| autocorr; half-life; multi-horizon HAR lags |
 | V-LEVEL | Level forecasting | Causal EWMA + OLS/ridge on lagged RV → next-horizon RV and \|move\| |
-| V-REGIME | Regime | 2-state Markov on RV (HMM optional second registered arm if power allows) |
+| V-REGIME | Regime | 2-state Markov on RV |
+| V-REGIME-HMM | Regime | 2-state HMM — **mandatory first-pass** |
 | V-MEASURE | Realised measures | Close-to-close primary; Parkinson and Garman–Klass co-reported |
 | V-CLOCK | Calendar / clock | Session / DOW effects as residual after V-LEVEL (not standalone edge claim) |
-| V-XS | Cross-sectional rank | Relative vol percentile on core five (if multi-symbol frame) |
+| V-XS | Cross-sectional rank | Relative vol percentile across top-25 universe (same-timestamp) |
 | V-TAIL | Distributional / tail | Conditional quantiles / HIGH-state exceedance co-reported with means |
+
+**Clocks:** H1, H4, **D1** — all three **primary** (full arm suite each).
 
 ### 8.2 Direction (SPDR-013) — intentionally simple and fast
 
@@ -270,10 +274,11 @@ part of the model, not an afterthought.
 
 #### Benchmark — mid-term SMA
 
-- Periods: **14-SMA, 25-SMA, or at most 50-SMA** (intraday-relevant).  
+- Periods: **14, 25, and 50** — all mandatory (intraday-relevant).  
 - **Not 200-SMA** (too long / over-smoothed for intraday).  
 - Rule sketch: buy above, sell below.  
-- Optional **angle / slope filter** to drop flat markets.  
+- **Angle filter ON and OFF** both mandatory.  
+- **Clocks H1 and M15** both mandatory.  
 - **Benchmark** that other arms must beat on **expectancy bps**, not win-rate.
 
 #### Proposed — ZigZag ATR-based (deterministic structure)
@@ -312,8 +317,8 @@ path-local volatility in relation to the structure.
 
 | Arm ID | Spec |
 |---|---|
-| D-SMA | 14 and 25 primary; 50 optional sensitivity; angle filter on/off predeclared; TF capture geometry frozen in design |
-| D-ZZ | ATR ZigZag params frozen; line features above; signed next-leg policy + optional magnitude/vol forecast head |
+| D-SMA | Periods **14, 25, 50** all mandatory; angle **on+off** both mandatory; clocks **H1+M15** both mandatory |
+| D-ZZ | ATR ZigZag on **H1+M15**; line features; signed next-leg; **mandatory** mag **and** vol next-move heads (AR+ridge) |
 
 **Not in first-pass direction set:** HTF-DI (may be named benchmark only if reflection C
 predeclares it). **Not primary:** SPDR-011 daily-range breakout.
@@ -325,8 +330,9 @@ predeclares it). **Not primary:** SPDR-011 daily-range breakout.
 | Item | Decision |
 |---|---|
 | Catalog | Bybit USDT linear perps; INFR-011 fence |
-| Core symbols | BTCUSDT, ETHUSDT, SOLUSDT, DOGEUSDT, XRPUSDT |
-| Broader universe | Gross supply / robustness only unless SPDR design freezes expansion pre-outcome |
+| Universe | **Top 25 by 30d USD volume** (TRAIN-only rank); pin `cf-voldir-001-universe.json` |
+| Ranking rule | `sum(close×volume)` on 1m bars over `[train_end−30d, train_end)`; assert at run |
+| Coverage | Sparse DESIGN history → UNPOWERED cells, not silent drop |
 | TRAIN | All screens; code-asserted fence |
 | DESIGN window (default) | Prefer DESIGN-eligible TRAIN slice aligned to fence; exact dates freeze in each SPDR design |
 | CONFIRM | Only if a later frozen rule requires it; not default for A/B characterisation |
