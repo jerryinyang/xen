@@ -1,6 +1,6 @@
 # Chapter 05 Governance — Volatility-to-Direction Conversion
 
-**State:** `CHECKPOINT-016 OPEN / RUN-1 A12 IMPLEMENTED + FRESH QA PENDING`
+**State:** `CHECKPOINT-016 OPEN / RUN-1 A13 IMPLEMENTED + FRESH QA PENDING`
 
 **Governing brief:** `.ignore/what-next/alts/intraday-way-forward-plan.md`
 
@@ -64,8 +64,9 @@ QA history and amendment approval live in
   registered; execution remains forbidden until the design, fresh QA and separate approval complete.
 - The operator authorised governed pre-value repairs, fresh QA, and a clean Run 1 on 2026-07-23.
   A12 aligns runtime signed-volume validation with the already-attested relative tolerance after the
-  clean attempt stopped before artifact emission. Execution remains conditional on fresh QA
-  APPROVE; CONFIRM remains unexecuted and unauthorised.
+  clean attempt stopped before artifact emission. A13 replaces the matched-timing full rescan with a
+  bit-identical exact-cell index after the unoptimised battery made Run-1 a multi-hour serial job.
+  Execution remains conditional on fresh QA APPROVE; CONFIRM remains unexecuted and unauthorised.
 - The complete signal, cost, controls, report-layer, power, Run 2, risk, and shadow contracts remain
   frozen in the governing brief and must be translated without substantive change into the first
   checkpoint design.

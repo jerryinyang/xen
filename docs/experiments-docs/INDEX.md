@@ -2,7 +2,7 @@
 
 ## Current checkpoint status
 
-**CHECKPOINT-016 OPEN — RUN-1 A12 REPAIR / FRESH QA PENDING.** `CF-VOLCONV-001` is
+**CHECKPOINT-016 OPEN — RUN-1 A13 REPAIR / FRESH QA PENDING.** `CF-VOLCONV-001` is
 registered. The outcome-free census located 1,390 DESIGN events on 148 dates; governed Run-1
 attempts have stopped before bundle emission. No completed outcome artifact, EXP execution, historical
 TEST read, holdout read, or forward shadow is active.

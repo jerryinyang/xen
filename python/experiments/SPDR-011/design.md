@@ -2,7 +2,7 @@
 
 - **Family:** `CF-VOLCONV-001`
 - **Checkpoint:** `2026-07-22-016-volatility-direction-conversion`
-- **Status:** `PRE-VALUE AMENDMENT A12 — IMPLEMENTED / FRESH QA PENDING`
+- **Status:** `PRE-VALUE AMENDMENT A13 — IMPLEMENTED / FRESH QA PENDING`
 - **Vehicle:** one TRAIN-only SPDR emission; five ordered report layers
 - **Execution authority:** operator-approved clean DESIGN rerun, conditional on fresh-context QA
 - **TEST / holdout:** prohibited; zero reads
@@ -409,6 +409,12 @@ Implementation must:
 15. enforce the attested signed-volume partition with the frozen relative tolerance:
     `abs(BuyVolume + SellVolume - Volume) <= 1e-9 * max(abs(Volume), 1)`. The same rule applies
     after four-hour aggregation; an absolute `1e-9` threshold is not the data contract.
+16. build the matched-timing candidate pool from an exact-match cell index constructed once in
+    `candidate_id` order, not from a per-event rescan of every candidate. The pool a live event sees
+    — its contents, its order, the `used` exclusion, the same-`trade_day` exclusion, the beta
+    ordering, the five-nearest truncation and the RNG draw — must be identical to the pre-A13 full
+    scan. A pinned parity corpus must prove bit-identical output, including the exhausted-pool and
+    `NO_EXACT_CELL_CANDIDATE` paths. Compute-path optimisation may never alter a selection.
 
 The Run-1 bundle contains `design.parquet` only. CONFIRM prices, orders and fills do not exist in the
 Run-1 directory. After the exact rule/config hash and explicit operator CONFIRM authority are
@@ -450,6 +456,11 @@ AMENDMENT-A12: replace the runtime's accidental absolute signed-volume tolerance
   relative 1e-9 rule after 265 of 5,009 aggregate slots false-failed despite a worst relative error
   of 2.04e-15
   DIRECTION: LOOSER — running count: 3 looser / 6 tighter / 3 neutral
+AMENDMENT-A13: index matched-timing candidates by their exact-match cell once instead of rescanning
+  every candidate for every live event of every seed, after the unoptimised scan made the 2000-seed
+  L4 timing battery a ~2.5-hour serial run; selection logic, seeds, strata and tie-breaks unchanged
+  and proven bit-identical against a pinned pre-A13 parity corpus
+  DIRECTION: NEUTRAL — running count: 3 looser / 6 tighter / 4 neutral
 ```
 
 There is no qualification gate, so a global-null false-qualifier count is inapplicable. All
@@ -457,7 +468,8 @@ predeclared arms remain visible; no arm is selected by performance.
 
 Operator flag: A5–A10 are six consecutive tighter amendments. A11 reduces the non-economic engine
 adapter size, and A12 removes a false absolute-tolerance rejection; both are favourable to a clean
-run. All three facts must be disclosed at the execution gate; none adds or changes a value threshold.
+run. A13 is a compute-path change only and is bit-identity-constrained. All four facts must be
+disclosed at the execution gate; none adds or changes a value threshold.
 
 ## 15. Execution gate
 

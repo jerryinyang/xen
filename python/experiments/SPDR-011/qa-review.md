@@ -676,3 +676,47 @@ None.
 
 **Disposition:** APPROVE for the operator's separate DESIGN-only Run-1 execution gate. This review
 does not execute the run, authorise a value-layer read or CONFIRM, or permit TEST/holdout access.
+
+## QA run 10 — 2026-07-23T01:56:46Z — mode: subagent — HEAD d87fa5d679b67a49aaaf5b715c53004903d4496c
+Verdict: APPROVE
+
+Scope: incremental fresh QA for amendment **A12 only** (prior run 9 APPROVED through A11).
+A12 code change is commit `d87fa5d`. Tree clean at review start (`git status --porcelain` empty).
+
+### Design-fidelity trace (A11→A12 delta)
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §14/A12 + §13 clause 15: signed-volume partition uses frozen **relative** tolerance `abs(Buy+Sell-Vol) <= 1e-9 * max(abs(Vol),1)`, and the same rule applies after 4h aggregation | `runner_contract.py:195-201` | MATCHES | Runtime join now computes `volume_scale = max_horizontal(Volume.abs(), 1.0)` and tests `... > 1e-9 * volume_scale`. Replaces the prior accidental absolute `> 1e-9`. Byte-identical to the attested ingest expression. |
+| A12 aligns runtime to the **attested** contract (not a new rule) | attestation `signed_ingest.py:154-159`, `234-235`, `267`, label `490` ("rtol 1e-9") | MATCHES | Attestation and ingest already enforce the scale-aware relative rule; A12 makes the downstream aggregate join consistent with it. No other absolute signed-volume check remains anywhere (grep). |
+| Direction declared LOOSER | `design.md:449-452` (ledger), `design.md:458-460` (operator flag) | MATCHES | Relative threshold `1e-9*scale >= 1e-9` for all `|Vol|>=1`; equals absolute at `|Vol|<=1`. Never tighter → LOOSER is honest (NEUTRAL at unit scale). |
+| Amendment ledger running count | `design.md:452`; §2 table `design.md:205`; KB `L-46`; `INDEX.md`, governance, checkpoint design | MATCHES | 3 looser / 6 tighter / 3 neutral, consistent across all six ledger surfaces. |
+| No value threshold added or changed; no leak introduced | `runner_contract.py:202-228` | MATCHES | Change touches only a validation guard that raises `ValueError`. Imbalance, `flow_pct`, upper-tercile (`>= 2/3`), costs and the causal `signed_known_ts > trigger_ts` check (`208-213`) are all unchanged. |
+| A11-approved integrity items intact | reconciliation `runner_contract.py:239-424`; frozen offsets/EXIT-before-ENTRY/no post-run fill rewrite (unchanged by diff) | MATCHES | `git show d87fa5d` touches only the one tolerance expression in code plus docs/test; no reconciliation, offset, ordering or bundle-write line changed. Estimand/local-accounting boundary unchanged. |
+
+### Golden-trace diff
+A12 alters no golden trace. The regression fixture added at `test_spdr011_runner.py:153-159`
+(`BuyVolume=70e6`, `SellVolume=30e6`, `Volume=100_000_000.01` → absolute residue `0.01 > 1e-9`
+but relative residue `1e-10 < 1e-9`) is accepted by the new rule and would have false-failed under
+the old absolute check — matching the A12 rationale (worst observed relative error `2.04e-15`,
+265/5,009 slots). The existing mismatch case (`Volume=99.0`) still raises. Expected behaviour
+derived from design §14, confirmed by hand against the code.
+
+### Governance & boundary
+- PASS — Fresh subagent context; append-only; exact committed HEAD `d87fa5d`; clean tree at start.
+- PASS — Focused suite `tests/test_spdr011_runner.py test_spdr011_census.py test_spdr011_signed_ingest.py`: **54 passed** (2 non-functional upstream `Timestamp.utcnow` deprecation warnings). Includes the new relative-tolerance regression.
+- PASS — `check_no_local_accounting("experiments/SPDR-011/code")` → `{"ok": true, "banned_defs_found": []}`. No accounting primitive outside `xen.adjudication`.
+- PASS — `git diff --check` on the A12 diff clean (no whitespace/conflict markers).
+- PASS — Amendment-direction ledger (L-23): A12 carries LOOSER + running count; the six-tighter A5–A10 streak plus favourable A11/A12 are disclosed at the execution gate (§14). No new one-directional streak ≥3 is created (A11, A12 are looser).
+- PASS — Missing-spread disclosure, holdout prohibition, DESIGN-only bundle, and execution-gate §15 unchanged by A12; no tradable/deployable/cost-complete claim introduced.
+- PASS — No XENA route; no registry/TEST/holdout state change; 0 counted reads.
+- PASS — A12 is a pre-measurement tolerance repair only; does not execute, authorise, or contact any outcome/value layer.
+
+### Issues
+None.
+
+**Disposition:** APPROVE for the operator's separate DESIGN-only Run-1 execution gate. A12 faithfully
+aligns the runtime aggregate-join signed-volume check with the already-attested relative `1e-9`
+tolerance; the change is minimal, honestly LOOSER, adds no value threshold, introduces no leak, and
+leaves every A11-approved integrity item intact. This review does not execute the run, authorise a
+value-layer read or CONFIRM, or permit TEST/holdout access.

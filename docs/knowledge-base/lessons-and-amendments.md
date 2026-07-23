@@ -1060,3 +1060,27 @@ boundary, including after aggregation. Regression fixtures must include a large-
 absolute residue exceeds `1e-9` while its relative residue remains inside the frozen tolerance.
 
 **Enforced at.** SPDR-011 amendment A12 and the signed-flow relative-tolerance regression.
+
+## L-47 — A control battery's cost must be measured before it gates a run (SPDR-011)
+
+**What.** The SPDR-011 matched-timing battery rebuilt its candidate pool by scanning all ~12,000
+timing candidates, comparing seven fields, for every one of ~1,390 live events, on every one of
+2,000 seeds. Two governed Run-1 attempts were launched, and ~80 minutes of wall clock spent, before
+anyone established that this single battery needed roughly 2.5 hours while every other battery in
+the run finished in well under a minute.
+
+**Mechanism (why).** Seed counts are chosen for statistical power, not for compute, so an O(n_live x
+n_candidates) inner loop is invisible in the design and only surfaces at execution. The run emits no
+intermediate artifact between the estimand gate and the final bundle, so a battery that is merely
+slow is indistinguishable from one that is hung. Both attempts were killed on suspicion rather than
+on evidence, which is how an experiment silently converts operator patience into a stopping rule.
+
+**Fix / new rule.** Before a run is gated, measure per-seed cost of every >=2,000-seed battery on a
+synthetic frame of the real shape and record the projected wall clock in the design. Where a battery
+repeats a seed-invariant computation, hoist it: precompute the index once, keep the selection logic
+untouched, and prove the optimisation bit-identical against a pinned pre-optimisation parity corpus
+covering the exhausted-pool and no-candidate paths. A compute-path change may never alter a
+selection, and its parity proof is the amendment's evidence, not a claim.
+
+**Enforced at.** SPDR-011 amendment A13, design clause §13.16, and
+`python/tests/test_spdr011_controls_parity.py`.

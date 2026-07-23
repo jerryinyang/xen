@@ -185,6 +185,14 @@ def matched_random_timing(
 
     live_rows = live.sort("event_id").to_dicts()
     candidate_rows = candidates.sort("candidate_id").to_dicts()
+    # A13: bucket candidates by their exact-match cell once instead of rescanning every
+    # candidate for every live event of every seed. Buckets are filled in candidate_id
+    # order, so each pool is the same list, in the same order, that the full scan built.
+    # Every `exact` field is a non-null string, integer or +/-1 direction, so tuple-key
+    # equality is the same relation as the per-field comparison it replaces.
+    cells: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+    for row in candidate_rows:
+        cells.setdefault(tuple(row[name] for name in exact), []).append(row)
     results: list[dict[str, Any]] = []
     for seed in range(seed0, seed0 + n_seeds):
         rng = np.random.default_rng(seed)
@@ -192,10 +200,9 @@ def matched_random_timing(
         for event in live_rows:
             pool = [
                 row
-                for row in candidate_rows
+                for row in cells.get(tuple(event[name] for name in exact), ())
                 if row["candidate_id"] not in used
                 and row["trade_day"] != event["trade_day"]
-                and all(row[name] == event[name] for name in exact)
             ]
             if not pool:
                 results.append(
