@@ -1,11 +1,23 @@
-# Chapter 05 Experiment Index
+# Chapter 05–06 Experiment Index
 
-No experiment is executing. One TRAIN-only screen is at pre-execution QA.
+## Chapter 06 — active
+
+Checkpoint-017 open. Family `CF-VOLDIR-001` registered. Next work: `SPDR-012` design (vol characterisation).
 
 | ID | Family | Status | Purpose |
 |---|---|---|---|
-| SPDR-011 | CF-VOLCONV-001 | PRE-VALUE A13 REPAIR — A12 (relative `1e-9` signed-volume tolerance) approved by QA run 10; the ensuing clean Run-1 was stopped by the operator when the matched-timing battery proved a ~2.5-hour serial rescan, and A13 replaced it with a bit-identical exact-cell index; fresh QA pending; clean DESIGN rerun operator-authorised after APPROVE | One frozen DESIGN event table and ordered L1–L5 volatility-to-direction characterisation |
-| EXP-099 | CF-VOLCONV-001 | RESERVED — conditional; no design or execution | Frozen-rule Nautilus reproduction and physicality only |
+| SPDR-012 | CF-VOLDIR-001 | **REGISTERED / DESIGN PENDING** | Volatility characterisation — reliability of prediction/modelling |
+| SPDR-013 | CF-VOLDIR-001 | **REGISTERED / BLOCKED ON A GATE** | Direction expectancy bps (SMA + ZigZag; not win-rate) |
+| SPDR-014 | CF-VOLDIR-001 | **REGISTERED / BLOCKED ON REFLECTION C** | Combination / extraction after mid-checkpoint freeze |
+| XENA-VOLDIR-001 | CF-VOLDIR-001 | **RESERVED** — requires SPDR-014 graduation + separate design/QA/approval | Portfolio/search on graduated bases only |
 
-The next permitted work is A13 verification and fresh pre-execution QA. No value layer, CONFIRM execution, historical TEST or holdout may be opened. See
-checkpoint-016 and `docs/references/chapter-05-governance.md`.
+See checkpoint-017 and `docs/references/chapter-06-governance.md`.
+
+## Chapter 05 — closed path (no further authorised work)
+
+| ID | Family | Status | Purpose |
+|---|---|---|---|
+| SPDR-011 | CF-VOLCONV-001 | **CLOSED** — operator 2026-07-23: L1 **NOT SUPPORTED** (also UNPOWERED for ~10 bps); L2–L5 not opened; see `report.md` | One frozen DESIGN event table; L1 partial-cost characterisation only |
+| EXP-099 | CF-VOLCONV-001 | **RESERVED / NOT AUTHORISED** — Run-1 evidence not accepted for graduation | Frozen-rule Nautilus reproduction and physicality only |
+
+Checkpoint-016 retrospective (family disposition for CF-VOLCONV-001) still pending and independent of Chapter 06.

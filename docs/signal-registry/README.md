@@ -68,8 +68,15 @@ Each file in `candidate-families/` must define:
 
 Registered candidate families (full per-phase batches in `multiplicity-registry.md`):
 
+- `CF-VOLDIR-001` — Structural Volatility + Direction Programme. **REGISTERED — 2026-07-23,
+  checkpoint-017.** Ordered claims: (A) vol reliability, (B) direction expectancy bps (not win-rate;
+  SMA + ZigZag ATR), mid reflection, (D) combination / conditional direction-agnostic extraction,
+  (E) XENA only if D graduates a base. Route `SPDR-012 → SPDR-013 → reflection → SPDR-014 →
+  XENA-VOLDIR-001`. TRAIN only; 0 counted reads; holdout sealed; partial-cost / no-spread caveat.
+  **Not** a reopening of CF-VOLCONV-001. See `candidate-families/cf-voldir-001.md`.
 - `CF-VOLCONV-001` — Volatility-to-Direction Conversion. **REGISTERED — 2026-07-22,
-  checkpoint-016.** One fixed five-symbol, four-hour conversion object: lagged daily volatility
+  checkpoint-016** (SPDR-011 L1 closed NOT SUPPORTED 2026-07-23; family retrospective pending).
+  One fixed five-symbol, four-hour conversion object: lagged daily volatility
   supplies magnitude state and a completed prior-day-range break supplies direction. Route is
   `SPDR-011 → EXP-099` if separately authorised; no XENA, historical TEST or holdout. Spread cost
   is unavailable/not charged, so all net reporting is explicitly partial. See

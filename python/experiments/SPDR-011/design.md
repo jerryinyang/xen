@@ -2,7 +2,7 @@
 
 - **Family:** `CF-VOLCONV-001`
 - **Checkpoint:** `2026-07-22-016-volatility-direction-conversion`
-- **Status:** `PRE-VALUE AMENDMENT A13 — IMPLEMENTED / FRESH QA PENDING`
+- **Status:** `CLOSED — L1 NOT SUPPORTED (operator 2026-07-23); see report.md`
 - **Vehicle:** one TRAIN-only SPDR emission; five ordered report layers
 - **Execution authority:** operator-approved clean DESIGN rerun, conditional on fresh-context QA
 - **TEST / holdout:** prohibited; zero reads

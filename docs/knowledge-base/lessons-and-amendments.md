@@ -1084,3 +1084,36 @@ selection, and its parity proof is the amendment's evidence, not a claim.
 
 **Enforced at.** SPDR-011 amendment A13, design clause §13.16, and
 `python/tests/test_spdr011_controls_parity.py`.
+
+## L-48 — A cost convention adopted in one chapter is not a programme rule until it is enforced in code (INFR-018) ⭐
+
+**What.** Chapter 05 removed spread from cost accounting: no stored field, no flip-pair proxy, no
+fixed pin. The rule was implemented as a *call-site convention* — omit `spread_bps` and
+`bybit_round_trip_cost_bps` returns `PARTIAL_FEES_FUNDING_ONLY`. Nine months of XENA
+infrastructure kept charging a hardcoded `GAP_SPREAD_BPS = 5.0` through the same shared function,
+which happily returned `FULL_DECLARED_COMPONENTS` because a caller had passed a spread. The two
+lanes disagreed by 5.0 bps on a 17.0-bps round trip — 29% of total cost — while both claimed to
+use "the" Bybit cost stack.
+
+**Mechanism (why).** A policy expressed as "callers should omit this argument" is invisible at the
+place it is violated. The function's own docstring said explicit spread survived "only for
+reproducibility of historical callers", but the live crypto CAL lane was a *current* caller, so
+the escape hatch silently became the default for a whole subsystem. Worse, the guard that existed
+— `verify_chapter05_spread_quarantine` — only checks that the *stored* `SpreadBps` column stays
+flagged UNUSABLE. It cannot see a hardcoded constant, so it passed while the proxy was live.
+Governance text scoped the rule to "Chapter-05 accounting", so nothing was formally broken; the
+framework simply had two cost truths and no place where they had to meet.
+
+**Fix / new rule.** A cost convention is enforced at the boundary or it does not exist.
+`bybit_round_trip_cost_bps` now **raises** if any caller passes `spread_bps`;
+`economics.check_cost_map_integrity` refuses a XENA universe whose declared `cost_scope` is
+anything but `PARTIAL_FEES_FUNDING_ONLY`. Undeclared scope stays loadable (existing manifests
+predate the field) but a *wrong* declaration is refused — one universe may not mix conventions.
+Corollary: changing a cost stack invalidates every calibration measured against it. Retiring the
+proxy moved the synthetic round trip 17.0 → 12.0 bps under net-binding stage-1, so the accepted
+Bybit CAL pin was marked STALE and must be re-measured before it authorises another search or gate.
+
+**Enforced at.** `xen.evaluation.bybit_round_trip_cost_bps`,
+`xen.xena.economics.is_valid_cost_scope` / `check_cost_map_integrity`,
+`tests/test_evaluation.py::test_bybit_round_trip_refuses_to_charge_spread`,
+`tests/test_xena_economics.py::test_cost_map_refuses_a_universe_declaring_spread_in_scope`.

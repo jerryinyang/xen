@@ -12,6 +12,12 @@ Placeholder cost policy (programme convention for this redesign):
   * ``cost_bps`` missing / non-finite → incomplete
   * ``cost_bps == 0.0`` → incomplete (unpinned; fixtures XENA-001/002/003 ship 0.0)
   * ``money_per_unit`` missing / non-finite / ≤ 0 → incomplete
+  * ``cost_scope`` present and ≠ ``PARTIAL_FEES_FUNDING_ONLY`` → incomplete
+
+Cost-scope policy (programme-wide): spread is never charged — no quote or effective spread
+exists on the T1 lane and a fixed proxy is not a substitute. A manifest may therefore not
+declare a scope that includes spread. The field is optional so existing manifests stay
+loadable, but a *wrong* declaration is refused rather than silently mixed into one universe.
 
 Gross economics are always disclosed (even when integrity fails) so the operator can
 see day-one economics. Search refusal is separate from disclosure.
@@ -40,6 +46,9 @@ ROUTING_STOP = "do_not_search"
 # Programme: 0.0 is the historical "unpinned" sentinel in XENA-00x manifests.
 PLACEHOLDER_COST_BPS = 0.0
 
+# Programme-wide cost scope: fees + discrete funding, spread never charged.
+PROGRAMME_COST_SCOPE = "PARTIAL_FEES_FUNDING_ONLY"
+
 
 @dataclass(frozen=True)
 class CostMapStatus:
@@ -65,6 +74,15 @@ def is_placeholder_cost(cost_bps: float | None) -> bool:
     return c == PLACEHOLDER_COST_BPS
 
 
+def is_valid_cost_scope(cost_scope: Any) -> bool:
+    """True when the declared scope matches the programme's (spread never charged).
+
+    Undeclared is allowed — existing manifests predate the field. A declared scope that
+    charges spread is refused: one universe may not mix cost conventions.
+    """
+    return cost_scope is None or str(cost_scope) == PROGRAMME_COST_SCOPE
+
+
 def is_valid_money_per_unit(mpu: float | None) -> bool:
     if mpu is None:
         return False
@@ -86,20 +104,24 @@ def check_cost_map_integrity(
     for c in candidates:
         if isinstance(c, CandidateStream):
             cid, cost, mpu, sym = c.candidate_id, c.cost_bps, c.money_per_unit, c.symbol
+            scope = None  # CandidateStream carries no scope field; costs come pre-pinned
         else:
             cid = str(c.get("candidate_id", "?"))
             cost = c.get("cost_bps")
             mpu = c.get("money_per_unit", 1.0)
             sym = str(c.get("symbol", "?"))
+            scope = c.get("cost_scope")
         reasons = []
         if is_placeholder_cost(cost if cost is None else float(cost)):
             reasons.append("placeholder_or_missing_cost_bps")
         if not is_valid_money_per_unit(mpu if mpu is None else float(mpu)):
             reasons.append("invalid_money_per_unit")
+        if not is_valid_cost_scope(scope):
+            reasons.append("cost_scope_charges_spread")
         if reasons:
             incomplete.append({
                 "candidate_id": cid, "symbol": sym,
-                "cost_bps": cost, "money_per_unit": mpu,
+                "cost_bps": cost, "money_per_unit": mpu, "cost_scope": scope,
                 "reasons": reasons,
             })
     n = len(candidates)

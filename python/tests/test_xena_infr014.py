@@ -72,8 +72,9 @@ def test_seed_disjoint():
 
 def test_bybit_cost_positive_gap():
     c = bybit_cost_bps_for_hold("BTCUSDT", hold_hours=8.0)
-    # fee RT 11.0 + spread 5.0 + funding 1.0 = 17.0 at 8h hold
-    assert c >= 16.0
+    # fee RT 11.0 + funding 1.0 = 12.0 at 8h hold. Spread is NOT charged anywhere in the
+    # programme; the retired GAP proxy used to add a fixed 5.0 bps here.
+    assert c == 12.0
 
 
 def test_next_open_control_runs():

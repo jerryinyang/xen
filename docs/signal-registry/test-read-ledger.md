@@ -570,4 +570,16 @@ Notes:
   keys/counts only (1,390 DESIGN events; 2,216 sealed-CONFIRM keys), with no execution prices,
   forward paths, returns or P&L. The signed TRAIN preparation then ingested/attested 3,731,908 rows
   across five symbols without decoding TEST/holdout, and runner verification remained synthetic-only.
-  **0 counted TEST reads, 0 holdout reads.** No outcome run is yet authorised.
+  **0 counted TEST reads, 0 holdout reads.**
+- **SPDR-011 L1 close (2026-07-23):** DESIGN-only Nautilus emission + L1 partial-cost analysis.
+  Operator verdict **NOT SUPPORTED** (also UNPOWERED for ~10 bps target). L2–L5 / CONFIRM / EXP-099
+  not authorised. **0 counted TEST reads, 0 holdout reads.** Report
+  `python/experiments/SPDR-011/report.md`.
+
+## Chapter 06 — CF-VOLDIR-001
+
+- **Registration (2026-07-23, checkpoint-017):** `CF-VOLDIR-001` registered for structural vol
+  reliability → direction expectancy → combination programme (`SPDR-012` / `SPDR-013` / reflection /
+  `SPDR-014` / conditional `XENA-VOLDIR-001`). TRAIN-only screens; historical TEST prohibited; global
+  holdout sealed. **0 counted TEST reads, 0 holdout reads.** No outcome run authorised by
+  registration alone.

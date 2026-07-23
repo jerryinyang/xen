@@ -180,13 +180,24 @@ calibration references; they no longer authorize machine value verdicts.
 
 Active Bybit calibration pin: `abbb184229236a75f624537ca605668a73f6f85138c150e14a3609c4191bf786`
 (INFR-015), superseding `ac8a1eb6…`. It certifies CLS-FILTER LOW and CLS-EPISODE LOW only;
-HIGH is blocked. CLS-EPISODE requires at least 16 gate-band legs, and a fourth CAL cycle needs
+HIGH is blocked. **STALE as of 2026-07-23** — the programme-wide no-spread cost change retired
+the fixed 5.0-bps `GAP_SPREAD_BPS` proxy from the CAL stack, so the synthetic round trip fell
+from 17.0 to 12.0 bps. Stage-1 is net-binding (`charge_costs=True`, `score_kind=g_net`), so the
+measured false-positive rate α̂ was calibrated against a cost that no longer exists. The pin
+must be re-measured before it authorises another XENA search or gate. CLS-EPISODE requires at least 16 gate-band legs, and a fourth CAL cycle needs
 family-wise correction or a doubled CONFIRM bank. These are class-specific apparatus limits,
 not candidate-value thresholds.
 
 ## Chapter-04 cost interpretation
 
 - Bybit taker/taker fees are 11.0 bps round trip before spread, funding or slippage.
+- **Spread is never charged, programme-wide (2026-07-23).** No quote or effective spread exists
+  on the T1 lane and a fixed pin is not a substitute, so every cost read is
+  `cost_scope=PARTIAL_FEES_FUNDING_ONLY` with `spread_rt_bps=None`. Reported cost understates
+  total cost and reported net performance is overstated — the caveat travels on every record
+  and must be repeated in every report. `bybit_round_trip_cost_bps` raises if a caller passes
+  `spread_bps`; `check_cost_map_integrity` refuses a universe declaring any other scope. Spread
+  remains legitimate for *decidability routing* (`spread_scale_route`), which is not a charge.
 - Stored `SpreadBps` is `UNUSABLE`; it is a mean-print differential and can be negative.
   Any result that previously called it a measured spread keeps its gross/fee/funding evidence
   but loses the spread-based floor claim.

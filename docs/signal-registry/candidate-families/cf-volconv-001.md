@@ -1,10 +1,11 @@
 # CF-VOLCONV-001 — Volatility-to-Direction Conversion
 
-- **Status:** `REGISTERED` — 2026-07-22, checkpoint-016, operator-authorised
+- **Status:** `REGISTERED` — 2026-07-22, checkpoint-016, operator-authorised  
+  *(no status transition from this experiment; retrospective pending)*
 - **Chapter:** 05
-- **Route:** `SPDR-011 → EXP-099` if separately authorised; no XENA
+- **Route:** `SPDR-011` closed at L1; `EXP-099` **not authorised**; no XENA
 - **Reads:** TRAIN only; 0 counted TEST reads; global holdout sealed
-- **Run-1 state:** design/census/data preparation complete; pre-execution QA blocks execution
+- **Run-1 state:** SPDR-011 **CLOSED** — L1 NOT SUPPORTED (operator 2026-07-23)
 - **Checkpoint:** `docs/experiments-docs/checkpoints/2026-07-22-016-volatility-direction-conversion/design.md`
 
 ## 1. Falsifiable thesis
@@ -162,3 +163,4 @@ outcome-isolated, SPDR execution, EXP execution, TEST, holdout, shadow or deploy
 | Date | Action |
 |---|---|
 | 2026-07-22 | Operator authorised family registration and checkpoint-016 opening after the no-spread cost/data preflight passed QA run 10. Assigned SPDR-011; reserved EXP-099. 0 counted reads; no outcome contact. |
+| 2026-07-23 | **Evidence only (no family status change):** SPDR-011 L1 closed **NOT SUPPORTED** (operator). HIGH partial-cost residue not trustworthy; concentration/regime artifact; UNPOWERED for ~10 bps; L2–L5/CONFIRM not opened; EXP-099 not authorised. 0 counted TEST reads. Report `python/experiments/SPDR-011/report.md`. Checkpoint retrospective still required for any RETIRE/promote. |

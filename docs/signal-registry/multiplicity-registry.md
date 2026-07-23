@@ -1577,12 +1577,12 @@ reads; holdout SEALED.** Report `python/experiments/SPDR-008/report.md`.
 
 | ID | Vehicle | Registered question / arm | Candidate slot | Status |
 |---|---|---|---:|---|
-| `CF-VOLCONV-001/HYP-001` | SPDR-011 L1 | Base HIGH-vol + completed breakout + fixed 4h episode; partial economics | 0 | PRE-EXECUTION QA PENDING; signed TRAIN catalog verified |
-| `CF-VOLCONV-001/HYP-002` | SPDR-011 L2 | HIGH vs disjoint MID/LOW absolute-movement increment | 0 | REGISTERED; same artifact |
-| `CF-VOLCONV-001/HYP-003` | SPDR-011 L3 | HIGH signed residue vs identical unconditional breakout | 0 | REGISTERED; same artifact |
-| `CF-VOLCONV-001/HYP-004` | SPDR-011 L4 | Fixed TOP2 add-on; TOP1/TOP3 distribution-only | 1 predeclared modifier | REGISTERED; not selected by P&L |
-| `CF-VOLCONV-001/HYP-005` | SPDR-011 L5 | Fixed upper-tercile aligned-flow add-on | 1 predeclared modifier | REGISTERED; same events, last layer |
-| `CF-VOLCONV-001/HYP-006` | EXP-099 | Frozen-rule Nautilus membership/accounting/physicality reproduction | 0; implementation confirmation | RESERVED; requires separate design/QA/approval |
+| `CF-VOLCONV-001/HYP-001` | SPDR-011 L1 | Base HIGH-vol + completed breakout + fixed 4h episode; partial economics | 0 | **CLOSED — NOT SUPPORTED** (operator 2026-07-23); also UNPOWERED for ~10 bps; report `python/experiments/SPDR-011/report.md` |
+| `CF-VOLCONV-001/HYP-002` | SPDR-011 L2 | HIGH vs disjoint MID/LOW absolute-movement increment | 0 | **NOT OPENED** — STOP after L1 |
+| `CF-VOLCONV-001/HYP-003` | SPDR-011 L3 | HIGH signed residue vs identical unconditional breakout | 0 | **NOT OPENED** — STOP after L1 |
+| `CF-VOLCONV-001/HYP-004` | SPDR-011 L4 | Fixed TOP2 add-on; TOP1/TOP3 distribution-only | 1 predeclared modifier | **NOT OPENED** — STOP after L1 |
+| `CF-VOLCONV-001/HYP-005` | SPDR-011 L5 | Fixed upper-tercile aligned-flow add-on | 1 predeclared modifier | **NOT OPENED** — STOP after L1 |
+| `CF-VOLCONV-001/HYP-006` | EXP-099 | Frozen-rule Nautilus membership/accounting/physicality reproduction | 0; implementation confirmation | **RESERVED / NOT AUTHORISED** — Run-1 evidence not accepted |
 
 The base, TOP2 and flow variants are deterministic branches, not a search grid. Layers open in order
 only after operator decisions. Failed/dropped arms remain recorded. No replacement threshold, symbol,
@@ -1591,6 +1591,26 @@ side, horizon or exit is permitted after outcome contact.
 **AMENDMENT-A1:** remove all Chapter-05 spread proxies; report spread as unavailable/null and costs
 as partial — **DIRECTION: LOOSER** economically. Running count: **1L / 0T / 0N**. The mandatory
 understatement/overstatement caveat does not restore the omitted cost or authorize deployability.
+
+---
+
+## Chapter 06 — CF-VOLDIR-001 (registered 2026-07-23)
+
+**Checkpoint:** `2026-07-23-017-structural-vol-direction-programme`  
+**Route:** `SPDR-012` (vol reliability) → `SPDR-013` (direction expectancy) → mid reflection →
+`SPDR-014` (combination) → conditional `XENA-VOLDIR-001`. TRAIN only; 0 counted reads; no XENA until D
+graduates a base. **Not** a reopening of CF-VOLCONV-001.
+
+| ID | Vehicle | Registered question / arm | Candidate slot | Status |
+|---|---|---|---:|---|
+| `CF-VOLDIR-001/HYP-A` | SPDR-012 | Vol predictability/reliability under frozen metrics (clustering, level, regime, realised measures, clock, XS rank, tail) | 0 | REGISTERED; design pending |
+| `CF-VOLDIR-001/HYP-B` | SPDR-013 | Fast direction expectancy bps (SMA 14/25/≤50 + angle; ZigZag ATR + path-local features; magnitude and/or vol of next whole move) — **not win-rate** | 0 | REGISTERED; blocked on A gate default |
+| `CF-VOLDIR-001/HYP-C` | Reflection | Mid-checkpoint freeze of combination / stop / direction-agnostic branch | 0 | REGISTERED; not result-producing |
+| `CF-VOLDIR-001/HYP-D` | SPDR-014 | Vol×direction or authorised direction-agnostic extraction under partial-cost disclosure | 0 | REGISTERED; blocked on C |
+| `CF-VOLDIR-001/HYP-E` | XENA-VOLDIR-001 | Portfolio/search on graduated D bases only | 0 | RESERVED; requires D graduation + separate design/QA/approval |
+
+Failed/dropped arms remain recorded. No replacement primary direction device (including SPDR-011
+range-break) without new predeclared evidence. No unbounded ML/indicator zoo after outcomes.
 
 **AMENDMENT-A2:** match/time-stability thirds use the effective eligible DESIGN interval because the
 catalog has no core data in the first two nominal thirds — **DIRECTION: NEUTRAL**. Running count:

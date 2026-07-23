@@ -505,29 +505,37 @@ def bybit_round_trip_cost_bps(
 ) -> dict:
     """Declared T1 round-trip cost in bps (informative for analysis, never gating).
 
-    Chapter 05 omits ``spread_bps`` and receives a partial fees-plus-funding cost.
-    Spread cost unavailable: it is not charged, so reported cost understates total cost and
-    reported net performance is overstated.
-    Explicit spread remains supported only for reproducibility of historical callers.
+    **Spread is never charged, programme-wide.** No quote, effective or proxy spread is
+    available for the Bybit T1 lane, so the cost stack is fees plus discrete funding only:
+    every result carries ``cost_scope=PARTIAL_FEES_FUNDING_ONLY``. Reported cost therefore
+    understates total cost and reported net performance is overstated — that caveat travels on
+    every returned record and must be repeated in any report derived from it.
+
+    ``spread_bps`` is retained only to reject callers that still try to charge one; passing a
+    value raises. Spread remains legitimate as a *routing* input (``spread_scale_route``,
+    ``t1_round_trip_spread_bps``), which decides whether T1 can resolve a candidate at all —
+    that is a decidability read, not a cost charge.
+
     Provide ``funding_stamps`` for timestamp-counted settlement charges; otherwise the
     legacy continuous ``hold_hours / 8`` accrual is retained for historical callers.
     ``funding_coverage`` ∈ {OK, GAP} — GAP triggers conservative assumption flag (R7).
     Returns component breakdown for disclosure.
     """
     del symbol, entry_price  # USDT-margined perps: bps of notional is price-free
+    if spread_bps is not None:
+        raise ValueError(
+            "spread cost is not charged programme-wide: no quote or effective spread exists "
+            "for the Bybit T1 lane, and a fixed proxy is not a substitute. Omit spread_bps. "
+            "For decidability routing use spread_scale_route / t1_round_trip_spread_bps."
+        )
     fee_side = bybit_fee_bps_per_side(liquidity=liquidity)
     multiplier = float(stress)
     if not np.isfinite(multiplier) or multiplier < 0.0:
         raise ValueError(f"stress must be finite and non-negative, got {stress!r}")
     fee_rt = multiplier * 2.0 * fee_side
-    if spread_bps is None:
-        spread_rt = None
-        spread_cost_status = "UNAVAILABLE_NOT_CHARGED"
-        cost_scope = "PARTIAL_FEES_FUNDING_ONLY"
-    else:
-        spread_rt = multiplier * t1_round_trip_spread_bps("", spread_bps)
-        spread_cost_status = "EXPLICIT_INPUT_CHARGED"
-        cost_scope = "FULL_DECLARED_COMPONENTS"
+    spread_rt = None
+    spread_cost_status = "UNAVAILABLE_NOT_CHARGED"
+    cost_scope = "PARTIAL_FEES_FUNDING_ONLY"
     if funding_bps_per_8h is None:
         funding_bps_per_8h = BYBIT_FUNDING_CONSERVATIVE_BPS_PER_8H
         if funding_coverage == "OK":
@@ -547,13 +555,11 @@ def bybit_round_trip_cost_bps(
     return {
         "total_bps": float(total),
         "fee_rt_bps": float(fee_rt),
-        "spread_rt_bps": float(spread_rt) if spread_rt is not None else None,
+        "spread_rt_bps": spread_rt,
         "spread_cost_status": spread_cost_status,
         "spread_cost_caveat": (
             "Spread cost unavailable and not charged; reported cost understates total cost "
             "and reported net performance is overstated."
-            if spread_rt is None
-            else "Explicit caller-supplied spread charged."
         ),
         "cost_scope": cost_scope,
         "funding_rt_bps": float(funding_rt),

@@ -192,3 +192,22 @@ def test_exposure_metrics_normalizations() -> None:
     assert m["ann_return_on_peak_exposure"] == pytest.approx(
         m["ann_return_on_unit_notional"] / 4.0)
     assert m["bh_exposure_time_matched_return"] == pytest.approx(0.0)
+
+
+def test_bybit_round_trip_refuses_to_charge_spread() -> None:
+    """Programme-wide policy: spread is never charged, and a caller may not opt back in."""
+    with pytest.raises(ValueError, match="spread cost is not charged programme-wide"):
+        bybit_round_trip_cost_bps(
+            "BTCUSDT", 50_000.0, liquidity="taker", spread_bps=5.0,
+        )
+
+
+def test_bybit_round_trip_scope_is_always_partial() -> None:
+    out = bybit_round_trip_cost_bps(
+        "BTCUSDT", 50_000.0, liquidity="taker", funding_bps_per_8h=1.0, funding_stamps=1,
+    )
+    assert out["spread_rt_bps"] is None
+    assert out["spread_cost_status"] == "UNAVAILABLE_NOT_CHARGED"
+    assert out["cost_scope"] == "PARTIAL_FEES_FUNDING_ONLY"
+    assert "understates total cost" in out["spread_cost_caveat"]
+    assert out["total_bps"] == 12.0  # 11.0 fees + 1.0 funding, no spread

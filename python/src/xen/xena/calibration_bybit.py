@@ -59,7 +59,9 @@ CONFIRM_SCALE = ScaleSpec("confirm", n_null=200, n_cand=64, budget=200, n_restar
                           n_power=6, n_coverage=200)
 
 # Synthetic cost defaults (design §6.1)
-GAP_SPREAD_BPS = 5.0
+# Spread is not charged anywhere in the programme (no quote/effective spread exists on the
+# Bybit T1 lane and a fixed pin is not a substitute). The former GAP_SPREAD_BPS = 5.0 proxy
+# is retired; the cost stack is fees + discrete funding only.
 FUNDING_BPS_PER_8H = 1.0  # conservative GAP default
 HOLD_DEFAULT_H = {"low": 8.0, "high": 2.0}
 CLASS_IDS = ("CLS-FILTER", "CLS-EPISODE")
@@ -94,15 +96,17 @@ def bybit_cost_bps_for_hold(
     *,
     hold_hours: float,
     entry_price: float = 100.0,
-    spread_bps: float = GAP_SPREAD_BPS,
     funding_bps_per_8h: float = FUNDING_BPS_PER_8H,
 ) -> float:
-    """COST-STACK via bybit_round_trip_cost_bps (design §6)."""
+    """COST-STACK via bybit_round_trip_cost_bps (design §6).
+
+    Fees + discrete funding only; spread is not charged (programme-wide policy). This lane's
+    costs are therefore identical in scope to every other lane's.
+    """
     out = bybit_round_trip_cost_bps(
         symbol,
         entry_price,
         liquidity="taker",
-        spread_bps=spread_bps,
         funding_bps_per_8h=funding_bps_per_8h,
         hold_hours=hold_hours,
         funding_coverage="GAP",
@@ -735,8 +739,9 @@ def run_design(
         "design_cov_high": cov["high"]["rate"],
         "held_out_escalation": False,
         "gate_rule": "per_cadence point α̂≤5% AND no-search cov≤5% (Fork A)",
-        "cost_stack": "bybit_round_trip_cost_bps_v1",
-        "gap_spread_bps": GAP_SPREAD_BPS,
+        "cost_stack": "bybit_round_trip_cost_bps_v2_no_spread",
+        "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+        "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
         "class_id": class_id,
     }
     return {
@@ -1041,11 +1046,12 @@ def next_open_sanity_artifact(seed: int = 42) -> dict[str, Any]:
 
 
 def cost_pins_payload() -> dict[str, Any]:
-    """Disclosed GAP spread defaults for synthetic CAL banks."""
+    """Disclosed cost defaults for synthetic CAL banks (spread never charged)."""
     return {
-        "stack": "bybit_round_trip_cost_bps_v1",
-        "spread_bps": GAP_SPREAD_BPS,
-        "spread_label": "GAP",
+        "stack": "bybit_round_trip_cost_bps_v2_no_spread",
+        "spread_rt_bps": None,
+        "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+        "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
         "funding_bps_per_8h": FUNDING_BPS_PER_8H,
         "funding_coverage": "GAP",
         "liquidity": "taker",
