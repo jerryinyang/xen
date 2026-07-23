@@ -800,33 +800,60 @@ def test_engine_fills_real_open_across_multiple_instrument_streams(tmp_path: Pat
     }
     decision = datetime(2024, 1, 1, 4, tzinfo=timezone.utc)
     exit_ = decision + timedelta(minutes=2)
+    final_exit = exit_ + timedelta(minutes=2)
     schedules = {}
     bars = []
     ticks = []
     expected = {}
     for symbol, instrument in instruments.items():
+        event_ids = (
+            [f"{symbol}-STREAM-1", f"{symbol}-STREAM-2"]
+            if symbol == "XRPUSDT"
+            else [f"{symbol}-STREAM-1"]
+        )
         events = pl.DataFrame(
             {
-                "event_id": [f"{symbol}-STREAM"],
-                "symbol": [symbol],
-                "entry_ts": [decision],
-                "exit_ts": [exit_],
-                "direction": [1],
+                "event_id": event_ids,
+                "symbol": [symbol] * len(event_ids),
+                "entry_ts": [decision, exit_][: len(event_ids)],
+                "exit_ts": [exit_, final_exit][: len(event_ids)],
+                "direction": [1] * len(event_ids),
             }
         )
         schedule = strategy.build_target_schedule(events)
         schedule_path = tmp_path / f"{symbol}-schedule.parquet"
-        schedule.write_parquet(schedule_path)
+        runtime_schedule = (
+            schedule.with_columns(
+                pl.when(pl.col("action") == "ENTRY")
+                .then(0)
+                .otherwise(1)
+                .alias("_reverse_priority")
+            )
+            .sort(["decision_ts", "_reverse_priority"])
+            .drop("_reverse_priority")
+        )
+        runtime_schedule.write_parquet(schedule_path)
         schedules[symbol] = schedule_path
         bar_type = BarType.from_str(f"{instrument.id}-1-MINUTE-LAST-EXTERNAL")
-        bar_points = [
-            (decision - timedelta(minutes=1), 100.0),
-            (decision + timedelta(minutes=1), 110.0),
-            (exit_, 105.0),
-            (exit_ + timedelta(minutes=1), 106.0),
-        ]
-        if symbol == "ETHUSDT":
-            bar_points.append((decision, 100.0))
+        if symbol == "XRPUSDT":
+            bar_points = [
+                (decision - timedelta(minutes=1), 100.0),
+                (decision + timedelta(minutes=1), 110.0),
+                (exit_, 105.0),
+                (exit_ + timedelta(minutes=1), 106.0),
+                (final_exit, 103.0),
+                (final_exit + timedelta(minutes=1), 104.0),
+            ]
+            execution_prices = {decision: 107.0, exit_: 104.0, final_exit: 102.0}
+        else:
+            bar_points = [
+                (decision - timedelta(minutes=1), 199.0),
+                (decision, 200.0),
+                (decision + timedelta(minutes=1), 210.0),
+                (exit_, 205.0),
+                (exit_ + timedelta(minutes=1), 206.0),
+            ]
+            execution_prices = {decision: 207.0, exit_: 204.0}
         for dt, close in sorted(bar_points):
             ts_ns = dt_to_unix_nanos(dt)
             bars.append(
@@ -842,7 +869,8 @@ def test_engine_fills_real_open_across_multiple_instrument_streams(tmp_path: Pat
                 )
             )
         offset_ns = runner.EXECUTION_SEQUENCE_OFFSET_NS[symbol]
-        for row, price in zip(schedule.iter_rows(named=True), [107.0, 104.0], strict=True):
+        for row in schedule.iter_rows(named=True):
+            price = execution_prices[row["decision_ts"]]
             ts_ns = dt_to_unix_nanos(row["decision_ts"])
             ticks.append(
                 TradeTick(
@@ -919,6 +947,29 @@ def test_engine_fills_real_open_across_multiple_instrument_streams(tmp_path: Pat
         for client_order_id, row in fills.iterrows()
     }
     assert actual == expected
+    xrp_shared_ids = strategy.build_target_schedule(
+        pl.DataFrame(
+            {
+                "event_id": ["XRPUSDT-STREAM-1", "XRPUSDT-STREAM-2"],
+                "symbol": ["XRPUSDT", "XRPUSDT"],
+                "entry_ts": [decision, exit_],
+                "exit_ts": [exit_, final_exit],
+                "direction": [1, 1],
+            }
+        )
+    ).filter(pl.col("decision_ts") == exit_)["client_order_id"].to_list()
+    shared_fill_ns = (
+        dt_to_unix_nanos(exit_)
+        + runner.EXECUTION_SEQUENCE_OFFSET_NS["XRPUSDT"]
+        + 2
+    )
+    actual_shared_ids = [
+        str(client_order_id)
+        for client_order_id, row in fills.iterrows()
+        if int(row["ts_last"].value) == shared_fill_ns
+        and str(row["instrument_id"]).startswith("XRPUSDT-")
+    ]
+    assert actual_shared_ids == xrp_shared_ids
 
 
 def test_unavailable_event_with_no_schedule_or_fills_reconciles_as_unavailable() -> None:

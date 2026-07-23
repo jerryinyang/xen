@@ -102,7 +102,17 @@ class Spdr011ScheduleStrategy(Strategy):
 
     def __init__(self, config: Spdr011ScheduleConfig) -> None:
         super().__init__(config)
-        schedule = pl.read_parquet(config.schedule_path).sort("decision_ts")
+        schedule = (
+            pl.read_parquet(config.schedule_path)
+            .with_columns(
+                pl.when(pl.col("action") == "EXIT")
+                .then(0)
+                .otherwise(1)
+                .alias("_runtime_priority")
+            )
+            .sort(["decision_ts", "_runtime_priority", "event_id"])
+            .drop("_runtime_priority")
+        )
         self._timestamps = (
             schedule.select(pl.col("decision_ts").dt.epoch("ns"))["decision_ts"].to_list()
         )

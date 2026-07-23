@@ -383,7 +383,9 @@ Implementation must:
 9. re-hash the live signed-catalog tree immediately before the engine read and require exact equality
    with the attested catalog-tree hash;
 10. issue one explicit tagged ENTRY and one explicit tagged EXIT market order per event, including
-    contiguous same-direction episodes, then reconcile each complete event to Nautilus fills:
+    contiguous same-direction episodes. Runtime schedule loading must re-derive and sort an explicit
+    `EXIT=0 / ENTRY=1` priority at equal decision timestamps before submitting orders. Then reconcile
+    each complete event to Nautilus fills:
     exactly one fill per action, correct side, engine fill timestamp at the frozen symbol sequence
     offset plus two nanoseconds after the decision,
     fill-source timestamp at `entry_ts+1m` / `exit_ts+1m`, and fill price equal to the corresponding

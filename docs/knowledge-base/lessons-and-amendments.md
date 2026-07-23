@@ -1021,6 +1021,8 @@ instrument's same-time price event has updated its state.
 **Fix / new rule.** Serialize simultaneous symbol actions with frozen nanosecond offsets. For each
 symbol, issue the clock alert, insert its order one nanosecond later, then process only that symbol's
 real-open tick one nanosecond after insertion; do not leave another symbol's order pending. Test at
-least two instruments in one BacktestNode with deliberately different prior closes and opens.
+least two instruments in one BacktestNode with deliberately different prior closes and opens. At a
+shared same-symbol boundary, re-derive an explicit runtime EXIT-before-ENTRY priority rather than
+relying on equal-key sort stability.
 
 **Enforced at.** SPDR-011 amendment A10 and the multi-instrument real-engine regression.
