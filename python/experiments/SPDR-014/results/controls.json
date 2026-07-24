@@ -1,0 +1,2503 @@
+{
+  "by_symbol": {
+    "BTCUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "BTCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 341,
+          "mean_r_h": -1.2628097651304975,
+          "median_r_h": -4.753840211545457,
+          "p_momo": 0.46920821114369504,
+          "p_mr": 0.49560117302052786,
+          "p_event": 0.9941690962099126,
+          "n_origins": 343
+        },
+        "control_arm": {
+          "n": 282,
+          "mean_r_h": 6.188925484309767,
+          "median_r_h": 2.512545570735325,
+          "p_momo": 0.4858156028368794,
+          "p_mr": 0.475177304964539,
+          "p_event": 0.8840125391849529,
+          "n_origins": 319
+        },
+        "delta_mean_r_h": -7.451735249440264,
+        "delta_p_event": 0.11015655702495963,
+        "collapse": -4.900916713825229,
+        "plant_mean": 18.7371902348695,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "BTCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": -1.2628097651304975,
+        "null_mean_mean": -2.0650692229289866,
+        "null_p95": 15.631783927072743,
+        "live_percentile": 0.565,
+        "n_seeds": 200,
+        "collapse": 1.6352971603094821,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "BTCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": -1.2628097651304975,
+        "null_mean_mean": -1.1121162443171462,
+        "null_p95": 13.656004829798176,
+        "live_percentile": 0.475,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4393,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "BTCUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": 26.681716389378234,
+        "null_mean": -1.7190559561696301,
+        "live_percentile": 0.915,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "BTCUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -13.58678665552704,
+        "null_p95": -7.186388568449017,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "ETHUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "ETHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 340,
+          "mean_r_h": 11.613735881622048,
+          "median_r_h": -4.7364713541075965,
+          "p_momo": 0.47352941176470587,
+          "p_mr": 0.5,
+          "p_event": 1.0,
+          "n_origins": 340
+        },
+        "control_arm": {
+          "n": 292,
+          "mean_r_h": -5.712561202373524,
+          "median_r_h": -10.484033319224096,
+          "p_momo": 0.4520547945205479,
+          "p_mr": 0.5136986301369864,
+          "p_event": 0.9299363057324841,
+          "n_origins": 314
+        },
+        "delta_mean_r_h": 17.326297083995573,
+        "delta_p_event": 0.07006369426751591,
+        "collapse": -0.49187972419910686,
+        "plant_mean": 31.61373588162205,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "ETHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 11.613735881622048,
+        "null_mean_mean": -0.7289657333015858,
+        "null_p95": 19.203272838225757,
+        "live_percentile": 0.81,
+        "n_seeds": 200,
+        "collapse": -0.06276754876569259,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "ETHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 11.613735881622048,
+        "null_mean_mean": 0.9579461712573055,
+        "null_p95": 23.768013911350543,
+        "live_percentile": 0.745,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4396,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "ETHUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": 23.826347528737305,
+        "null_mean": 18.117140578518143,
+        "live_percentile": 0.585,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "ETHUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -14.342135600204008,
+        "null_p95": -2.7188843474668256,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "SOLUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "SOLUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 347,
+          "mean_r_h": 18.835269369841352,
+          "median_r_h": -6.432936635574205,
+          "p_momo": 0.48703170028818443,
+          "p_mr": 0.5072046109510087,
+          "p_event": 1.0,
+          "n_origins": 347
+        },
+        "control_arm": {
+          "n": 294,
+          "mean_r_h": 21.95932868003368,
+          "median_r_h": 0.0,
+          "p_momo": 0.48639455782312924,
+          "p_mr": 0.4965986394557823,
+          "p_event": 0.9365079365079365,
+          "n_origins": 315
+        },
+        "delta_mean_r_h": -3.124059310192326,
+        "delta_p_event": 0.06349206349206349,
+        "collapse": 1.1658622050393666,
+        "plant_mean": 38.835269369841356,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "SOLUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 18.835269369841352,
+        "null_mean_mean": -0.6578770790330276,
+        "null_p95": 45.458005512952,
+        "live_percentile": 0.77,
+        "n_seeds": 200,
+        "collapse": -0.03492793578447075,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "SOLUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 18.835269369841352,
+        "null_mean_mean": 1.648793530857688,
+        "null_p95": 43.866491823609806,
+        "live_percentile": 0.705,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4389,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "SOLUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": 65.80138322984683,
+        "null_mean": 16.513144481306146,
+        "live_percentile": 0.85,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "SOLUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -11.492088229858547,
+        "null_p95": 12.743911035668487,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "AVAXUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "AVAXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 314,
+          "mean_r_h": -14.750883727732017,
+          "median_r_h": -35.1212141007462,
+          "p_momo": 0.43630573248407645,
+          "p_mr": 0.5445859872611465,
+          "p_event": 1.0,
+          "n_origins": 315
+        },
+        "control_arm": {
+          "n": 291,
+          "mean_r_h": -16.14857018087109,
+          "median_r_h": -8.99766060824092,
+          "p_momo": 0.46048109965635736,
+          "p_mr": 0.5189003436426117,
+          "p_event": 0.97,
+          "n_origins": 300
+        },
+        "delta_mean_r_h": 1.3976864531390731,
+        "delta_p_event": 0.030000000000000027,
+        "collapse": 1.094752726611992,
+        "plant_mean": 5.249116272267983,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "AVAXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": -14.750883727732017,
+        "null_mean_mean": 1.6503340716073591,
+        "null_p95": 35.19054461224849,
+        "live_percentile": 0.235,
+        "n_seeds": 200,
+        "collapse": -0.11188035253133284,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "AVAXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": -14.750883727732017,
+        "null_mean_mean": -0.7496852586687006,
+        "null_p95": 35.23869294114479,
+        "live_percentile": 0.255,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4052,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "AVAXUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": -9.071914403554537,
+        "null_mean": -16.41465361820424,
+        "live_percentile": 0.605,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "AVAXUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -19.018254384239544,
+        "null_p95": 4.990447718793811,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "ORDIUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "ORDIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "collapse": NaN,
+        "plant_mean": NaN,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "ORDIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "collapse": NaN,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "ORDIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "ORDIUSDT",
+        "n": 0
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "ORDIUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "1000BONKUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "1000BONKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 74,
+          "mean_r_h": 28.44080601113677,
+          "median_r_h": 24.20708071504296,
+          "p_momo": 0.5135135135135135,
+          "p_mr": 0.47297297297297297,
+          "p_event": 1.0,
+          "n_origins": 74
+        },
+        "control_arm": {
+          "n": 54,
+          "mean_r_h": 164.69359347197968,
+          "median_r_h": 122.12631889860714,
+          "p_momo": 0.5740740740740741,
+          "p_mr": 0.42592592592592593,
+          "p_event": 0.8307692307692308,
+          "n_origins": 65
+        },
+        "delta_mean_r_h": -136.2527874608429,
+        "delta_p_event": 0.16923076923076918,
+        "collapse": 5.790749861571765,
+        "plant_mean": 48.44080601113677,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "1000BONKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 28.44080601113677,
+        "null_mean_mean": -9.649740295853404,
+        "null_p95": 128.83889391446849,
+        "live_percentile": 0.72,
+        "n_seeds": 200,
+        "collapse": -0.3392920823718844,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "1000BONKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 28.44080601113677,
+        "null_mean_mean": -7.230780300403618,
+        "null_p95": 145.95270929950578,
+        "live_percentile": 0.66,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 894,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "1000BONKUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": 338.2444260368481,
+        "null_mean": 4.685529937892203,
+        "live_percentile": 0.81,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "1000BONKUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": 14.076528201713263,
+        "null_p95": 34.87816543121759,
+        "n_seeds": 200,
+        "positive_edge_claimed": true,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "TIAUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "TIAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "collapse": NaN,
+        "plant_mean": NaN,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "TIAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "collapse": NaN,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "TIAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "TIAUSDT",
+        "n": 0
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "TIAUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "DOGEUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "DOGEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 304,
+          "mean_r_h": 29.099880151491902,
+          "median_r_h": 12.875666215894643,
+          "p_momo": 0.506578947368421,
+          "p_mr": 0.4769736842105263,
+          "p_event": 1.0,
+          "n_origins": 304
+        },
+        "control_arm": {
+          "n": 268,
+          "mean_r_h": -34.6297117474792,
+          "median_r_h": -43.0125430125422,
+          "p_momo": 0.3880597014925373,
+          "p_mr": 0.585820895522388,
+          "p_event": 0.9305555555555556,
+          "n_origins": 288
+        },
+        "delta_mean_r_h": 63.7295918989711,
+        "delta_p_event": 0.06944444444444442,
+        "collapse": -1.1900293598186449,
+        "plant_mean": 49.0998801514919,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "DOGEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 29.099880151491902,
+        "null_mean_mean": -1.8167695119487541,
+        "null_p95": 35.50113823261919,
+        "live_percentile": 0.885,
+        "n_seeds": 200,
+        "collapse": -0.062432199118717384,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "DOGEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 29.099880151491902,
+        "null_mean_mean": -2.4544718526523797,
+        "null_p95": 34.150842185174966,
+        "live_percentile": 0.93,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 3959,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "DOGEUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": 53.40031787021474,
+        "null_mean": 30.296025432721404,
+        "live_percentile": 0.74,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "DOGEUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -23.196342560706345,
+        "null_p95": -4.07261587713135,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "XRPUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "XRPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 336,
+          "mean_r_h": -7.395367622046881,
+          "median_r_h": -13.257343545418632,
+          "p_momo": 0.4732142857142857,
+          "p_mr": 0.5208333333333334,
+          "p_event": 0.9970414201183432,
+          "n_origins": 338
+        },
+        "control_arm": {
+          "n": 301,
+          "mean_r_h": -17.69183400593983,
+          "median_r_h": -17.937219730943532,
+          "p_momo": 0.4684385382059801,
+          "p_mr": 0.521594684385382,
+          "p_event": 0.9525316455696202,
+          "n_origins": 316
+        },
+        "delta_mean_r_h": 10.296466383892948,
+        "delta_p_event": 0.04450977454872296,
+        "collapse": 2.3922859430540524,
+        "plant_mean": 12.60463237795312,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "XRPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": -7.395367622046881,
+        "null_mean_mean": 2.6897368085514914,
+        "null_p95": 27.166179578253207,
+        "live_percentile": 0.245,
+        "n_seeds": 200,
+        "collapse": -0.36370562573967474,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "XRPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": -7.395367622046881,
+        "null_mean_mean": 0.37559947427791557,
+        "null_p95": 25.92282682581393,
+        "live_percentile": 0.3,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4377,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "XRPUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": -30.729551743085835,
+        "null_mean": -11.560847432008554,
+        "live_percentile": 0.21,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "XRPUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -17.462577434093994,
+        "null_p95": -1.9433627495468724,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "LINKUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "LINKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 332,
+          "mean_r_h": 0.1706566794483747,
+          "median_r_h": -15.006769319068635,
+          "p_momo": 0.463855421686747,
+          "p_mr": 0.5120481927710844,
+          "p_event": 1.0,
+          "n_origins": 332
+        },
+        "control_arm": {
+          "n": 309,
+          "mean_r_h": -10.632337040155395,
+          "median_r_h": 15.115253810302764,
+          "p_momo": 0.5048543689320388,
+          "p_mr": 0.47249190938511326,
+          "p_event": 0.96875,
+          "n_origins": 320
+        },
+        "delta_mean_r_h": 10.80299371960377,
+        "delta_p_event": 0.03125,
+        "collapse": -62.30249571550922,
+        "plant_mean": 20.170656679448374,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "LINKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 0.1706566794483747,
+        "null_mean_mean": -3.7139111173588786,
+        "null_p95": 24.352196152970272,
+        "live_percentile": 0.59,
+        "n_seeds": 200,
+        "collapse": -21.762471468234402,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "LINKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 0.1706566794483747,
+        "null_mean_mean": 2.324515845497208,
+        "null_p95": 29.845909776543035,
+        "live_percentile": 0.45,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4252,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "LINKUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": -28.011138677672285,
+        "null_mean": 3.377304235248183,
+        "live_percentile": 0.14,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "LINKUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -14.046208868712753,
+        "null_p95": -12.993530280782647,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "ADAUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "ADAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 342,
+          "mean_r_h": 13.599660571085723,
+          "median_r_h": -4.855412078138555,
+          "p_momo": 0.4766081871345029,
+          "p_mr": 0.5,
+          "p_event": 1.0,
+          "n_origins": 342
+        },
+        "control_arm": {
+          "n": 311,
+          "mean_r_h": 13.10793289502893,
+          "median_r_h": -5.627462014632378,
+          "p_momo": 0.48231511254019294,
+          "p_mr": 0.5016077170418006,
+          "p_event": 0.971875,
+          "n_origins": 320
+        },
+        "delta_mean_r_h": 0.4917276760567919,
+        "delta_p_event": 0.028124999999999956,
+        "collapse": 0.9638426508156934,
+        "plant_mean": 33.59966057108572,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "ADAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 13.599660571085723,
+        "null_mean_mean": 0.7921982508917023,
+        "null_p95": 25.544416288211018,
+        "live_percentile": 0.825,
+        "n_seeds": 200,
+        "collapse": 0.05825132522616022,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "ADAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 13.599660571085723,
+        "null_mean_mean": 0.9524961074566324,
+        "null_p95": 23.985172896248855,
+        "live_percentile": 0.825,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4279,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "ADAUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": -2.6238560618487967,
+        "null_mean": 14.469358708572795,
+        "live_percentile": 0.25,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "ADAUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -24.70388319922303,
+        "null_p95": -1.7316889250008263,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "BIGTIMEUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "BIGTIMEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "collapse": NaN,
+        "plant_mean": NaN,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "BIGTIMEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "collapse": NaN,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "BIGTIMEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "BIGTIMEUSDT",
+        "n": 0
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "BIGTIMEUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "BLURUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "BLURUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 18,
+          "mean_r_h": 157.2906367509803,
+          "median_r_h": 137.2439684175264,
+          "p_momo": 0.5,
+          "p_mr": 0.5,
+          "p_event": 1.0,
+          "n_origins": 18
+        },
+        "control_arm": {
+          "n": 16,
+          "mean_r_h": -60.015052597748564,
+          "median_r_h": -142.30873468436545,
+          "p_momo": 0.375,
+          "p_mr": 0.625,
+          "p_event": 1.0,
+          "n_origins": 16
+        },
+        "delta_mean_r_h": 217.30568934872886,
+        "delta_p_event": 0.0,
+        "collapse": -0.38155515062707335,
+        "plant_mean": 177.2906367509803,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "BLURUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 157.2906367509803,
+        "null_mean_mean": 8.780503003628478,
+        "null_p95": 276.6316862010589,
+        "live_percentile": 0.805,
+        "n_seeds": 200,
+        "collapse": 0.05582343097465879,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "BLURUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 157.2906367509803,
+        "null_mean_mean": 11.70536517208081,
+        "null_p95": 272.89197988019464,
+        "live_percentile": 0.84,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 194,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "BLURUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": NaN,
+        "null_mean": NaN,
+        "live_percentile": NaN,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "BLURUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": 91.45701385563358,
+        "null_p95": 199.87870745443817,
+        "n_seeds": 200,
+        "positive_edge_claimed": true,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "1000PEPEUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "1000PEPEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "collapse": NaN,
+        "plant_mean": NaN,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "1000PEPEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "collapse": NaN,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "1000PEPEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "1000PEPEUSDT",
+        "n": 0
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "1000PEPEUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "1000LUNCUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "1000LUNCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 196,
+          "mean_r_h": 31.000780642221475,
+          "median_r_h": 10.540749071626387,
+          "p_momo": 0.5,
+          "p_mr": 0.49489795918367346,
+          "p_event": 1.0,
+          "n_origins": 196
+        },
+        "control_arm": {
+          "n": 154,
+          "mean_r_h": 47.85046435709471,
+          "median_r_h": -5.910165484633856,
+          "p_momo": 0.4805194805194805,
+          "p_mr": 0.5,
+          "p_event": 0.875,
+          "n_origins": 176
+        },
+        "delta_mean_r_h": -16.849683714873233,
+        "delta_p_event": 0.125,
+        "collapse": 1.543524497312975,
+        "plant_mean": 51.00078064222147,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "1000LUNCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 31.000780642221475,
+        "null_mean_mean": -2.7921271289976097,
+        "null_p95": 65.32066051879463,
+        "live_percentile": 0.805,
+        "n_seeds": 200,
+        "collapse": -0.0900663490129947,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "1000LUNCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 31.000780642221475,
+        "null_mean_mean": 2.9967818202028202,
+        "null_p95": 66.01588412845548,
+        "live_percentile": 0.77,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 2460,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "1000LUNCUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": 73.37868325303482,
+        "null_mean": 25.379649836008348,
+        "live_percentile": 0.7,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "1000LUNCUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -75.84875307489062,
+        "null_p95": -15.407101852817982,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "MATICUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "MATICUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 904,
+          "mean_r_h": 18.555719108677803,
+          "median_r_h": -2.2593144946236876,
+          "p_momo": 0.48672566371681414,
+          "p_mr": 0.4889380530973451,
+          "p_event": 1.0,
+          "n_origins": 904
+        },
+        "control_arm": {
+          "n": 814,
+          "mean_r_h": -11.83382589909587,
+          "median_r_h": 12.128588413157226,
+          "p_momo": 0.5110565110565111,
+          "p_mr": 0.47788697788697787,
+          "p_event": 0.9498249708284714,
+          "n_origins": 857
+        },
+        "delta_mean_r_h": 30.389545007773673,
+        "delta_p_event": 0.05017502917152861,
+        "collapse": -0.6377454751167063,
+        "plant_mean": 38.555719108677806,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "MATICUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 18.555719108677803,
+        "null_mean_mean": -0.41286742944678706,
+        "null_p95": 21.820161896137623,
+        "live_percentile": 0.89,
+        "n_seeds": 200,
+        "collapse": -0.022250144390992894,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "MATICUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 18.555719108677803,
+        "null_mean_mean": 0.5105277461065129,
+        "null_p95": 21.93735197300438,
+        "live_percentile": 0.91,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 11702,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "MATICUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": 43.58458144640497,
+        "null_mean": 16.916536941428223,
+        "live_percentile": 0.86,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "MATICUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -7.636242159870102,
+        "null_p95": -2.893353883820243,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "INJUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "INJUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 183,
+          "mean_r_h": 6.778874808143652,
+          "median_r_h": -17.462165308499422,
+          "p_momo": 0.46994535519125685,
+          "p_mr": 0.5136612021857924,
+          "p_event": 1.0,
+          "n_origins": 184
+        },
+        "control_arm": {
+          "n": 171,
+          "mean_r_h": 10.33981985350366,
+          "median_r_h": 34.88372093023217,
+          "p_momo": 0.5146198830409356,
+          "p_mr": 0.4678362573099415,
+          "p_event": 1.0,
+          "n_origins": 171
+        },
+        "delta_mean_r_h": -3.5609450453600076,
+        "delta_p_event": 0.0,
+        "collapse": 1.5253003110607892,
+        "plant_mean": 26.77887480814365,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "INJUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 6.778874808143652,
+        "null_mean_mean": 1.9004157592573734,
+        "null_p95": 74.26921472348737,
+        "live_percentile": 0.545,
+        "n_seeds": 200,
+        "collapse": 0.28034383478720554,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "INJUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 6.778874808143652,
+        "null_mean_mean": 4.281685929847033,
+        "null_p95": 74.6396600752548,
+        "live_percentile": 0.545,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 2235,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "INJUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": 84.53545059013533,
+        "null_mean": 0.6246216592198252,
+        "live_percentile": 0.875,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "INJUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": 18.741760217488505,
+        "null_p95": 20.174147588704148,
+        "n_seeds": 200,
+        "positive_edge_claimed": true,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "SEIUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "SEIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "collapse": NaN,
+        "plant_mean": NaN,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "SEIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "collapse": NaN,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "SEIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "SEIUSDT",
+        "n": 0
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "SEIUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "BNBUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "BNBUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 332,
+          "mean_r_h": -0.14681163969296743,
+          "median_r_h": -7.71202435600804,
+          "p_momo": 0.46987951807228917,
+          "p_mr": 0.5030120481927711,
+          "p_event": 1.0,
+          "n_origins": 333
+        },
+        "control_arm": {
+          "n": 289,
+          "mean_r_h": 8.323013874618226,
+          "median_r_h": -24.884464984002985,
+          "p_momo": 0.4359861591695502,
+          "p_mr": 0.5536332179930796,
+          "p_event": 0.9413680781758957,
+          "n_origins": 307
+        },
+        "delta_mean_r_h": -8.469825514311193,
+        "delta_p_event": 0.05863192182410426,
+        "collapse": -56.691784738760845,
+        "plant_mean": 19.853188360307033,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "BNBUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": -0.14681163969296743,
+        "null_mean_mean": -0.512120570541,
+        "null_p95": 18.084079532682225,
+        "live_percentile": 0.48,
+        "n_seeds": 200,
+        "collapse": 3.488283160735869,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "BNBUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": -0.14681163969296743,
+        "null_mean_mean": 1.4326980274043308,
+        "null_p95": 20.171631320687577,
+        "live_percentile": 0.445,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4192,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "BNBUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": 8.629621038579701,
+        "null_mean": -2.220113397736898,
+        "live_percentile": 0.665,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "BNBUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -22.979027712950582,
+        "null_p95": -7.351962514734426,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "WLDUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "WLDUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "collapse": NaN,
+        "plant_mean": NaN,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "WLDUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "collapse": NaN,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "WLDUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "WLDUSDT",
+        "n": 0
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "WLDUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "PYTHUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "PYTHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "collapse": NaN,
+        "plant_mean": NaN,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "PYTHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "collapse": NaN,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "PYTHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "PYTHUSDT",
+        "n": 0
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "PYTHUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "DYDXUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "DYDXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 210,
+          "mean_r_h": 46.18065929607806,
+          "median_r_h": -21.188136422251034,
+          "p_momo": 0.48095238095238096,
+          "p_mr": 0.5047619047619047,
+          "p_event": 1.0,
+          "n_origins": 211
+        },
+        "control_arm": {
+          "n": 201,
+          "mean_r_h": 5.725941790491941,
+          "median_r_h": 0.0,
+          "p_momo": 0.48258706467661694,
+          "p_mr": 0.4975124378109453,
+          "p_event": 0.995049504950495,
+          "n_origins": 202
+        },
+        "delta_mean_r_h": 40.45471750558612,
+        "delta_p_event": 0.004950495049504955,
+        "collapse": 0.12399003993817434,
+        "plant_mean": 66.18065929607806,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "DYDXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 46.18065929607806,
+        "null_mean_mean": -3.0567300742676933,
+        "null_p95": 62.621189205820905,
+        "live_percentile": 0.91,
+        "n_seeds": 200,
+        "collapse": -0.06619069802945167,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "DYDXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 46.18065929607806,
+        "null_mean_mean": -3.306191449550833,
+        "null_p95": 68.83672464381156,
+        "live_percentile": 0.875,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 2635,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "DYDXUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": 36.73380568431126,
+        "null_mean": 43.89519202766151,
+        "live_percentile": 0.495,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "DYDXUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -10.004277020959286,
+        "null_p95": 7.3737823375202325,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "GALAUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "GALAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 298,
+          "mean_r_h": 3.271929134881128,
+          "median_r_h": 7.12386365009976,
+          "p_momo": 0.5,
+          "p_mr": 0.48322147651006714,
+          "p_event": 1.0,
+          "n_origins": 298
+        },
+        "control_arm": {
+          "n": 275,
+          "mean_r_h": 45.4521788767838,
+          "median_r_h": 3.4965034965028785,
+          "p_momo": 0.4909090909090909,
+          "p_mr": 0.48727272727272725,
+          "p_event": 0.9786476868327402,
+          "n_origins": 281
+        },
+        "delta_mean_r_h": -42.18024974190267,
+        "delta_p_event": 0.02135231316725983,
+        "collapse": 13.891553576827425,
+        "plant_mean": 23.271929134881127,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "GALAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 3.271929134881128,
+        "null_mean_mean": -2.43435490239253,
+        "null_p95": 37.33481379154185,
+        "live_percentile": 0.58,
+        "n_seeds": 200,
+        "collapse": -0.744012110910517,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "GALAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": 3.271929134881128,
+        "null_mean_mean": 4.518940844027263,
+        "null_p95": 52.78660351595865,
+        "live_percentile": 0.54,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 3723,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "GALAUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": -44.62136853717577,
+        "null_mean": 3.422098971325046,
+        "live_percentile": 0.11,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "GALAUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -2.6492062402028314,
+        "null_p95": 25.40145512312943,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "OPUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "OPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 333,
+          "mean_r_h": -61.19187216173817,
+          "median_r_h": -28.33434527423684,
+          "p_momo": 0.46846846846846846,
+          "p_mr": 0.5285285285285285,
+          "p_event": 1.0,
+          "n_origins": 334
+        },
+        "control_arm": {
+          "n": 302,
+          "mean_r_h": -20.6324432760638,
+          "median_r_h": -32.344752495506725,
+          "p_momo": 0.48013245033112584,
+          "p_mr": 0.5132450331125827,
+          "p_event": 0.9617834394904459,
+          "n_origins": 314
+        },
+        "delta_mean_r_h": -40.559428885674365,
+        "delta_p_event": 0.03821656050955413,
+        "collapse": 0.3371762057145357,
+        "plant_mean": -41.19187216173817,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "OPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": -61.19187216173817,
+        "null_mean_mean": -1.6003684818745816,
+        "null_p95": 46.53882741681346,
+        "live_percentile": 0.02,
+        "n_seeds": 200,
+        "collapse": 0.026153285155986028,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "OPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": -61.19187216173817,
+        "null_mean_mean": -2.516008639529961,
+        "null_p95": 47.92692067615917,
+        "live_percentile": 0.025,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4288,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "OPUSDT",
+        "band": "DESIGN",
+        "live_high_mean_r_h": -219.72409219697101,
+        "null_mean": -64.39452467544231,
+        "live_percentile": 0.005,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "OPUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -25.99720996060158,
+        "null_p95": 11.325386854928492,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    },
+    "1000RATSUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "1000RATSUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "collapse": NaN,
+        "plant_mean": NaN,
+        "class": "within_sample_attribution"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "1000RATSUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "collapse": NaN,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "1000RATSUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "Z-VOL",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "gate_shuffle": {
+        "control": "GATE-LABEL-SHUFFLE",
+        "symbol": "1000RATSUSDT",
+        "n": 0
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "1000RATSUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1/DEV-1 class \u2014 informative; within-third foreign-path re-pair, partial_net recomputed causally; residual HARD only on positive money survivors"
+      }
+    }
+  },
+  "primary_cell": {
+    "source": "Z-VOL",
+    "z": 1.5,
+    "H": 12,
+    "event": "E-TOUCH",
+    "h": 12
+  },
+  "class_notes": {
+    "uncond": "within_sample_attribution",
+    "time_shuffle": "within_sample_attribution DERANGEMENT (zero fixed points)",
+    "matched_random": "within_sample_attribution; DISJOINT excl live anchors \u00b11",
+    "gate_shuffle": "within_sample_attribution DERANGEMENT (zero fixed points, >=200 seeds)",
+    "tripwire": "INFORMATIVE T1; within-third foreign-path re-pair, causal recompute; residual HARD on positive money survivors"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "all_pass": true,
+  "checks": {
+    "universe_pin_equal": true,
+    "golden_traces_pass": true,
+    "train_fence_asserted": true,
+    "o3_sot_path_present": true,
+    "no_signed_product": true,
+    "shock_not_regime": true,
+    "straddle_not_headline": true,
+    "both_momo_mr_emitted": true,
+    "tripwire_positive_survivors": [],
+    "tripwire_hard_fail": false
+  },
+  "deviations": [],
+  "interpretation_notes": [
+    {
+      "id": "IN-1",
+      "clause": "design \u00a75 money subset does not pin zone H",
+      "resolution": "Money policies use z=1.5, h=12, E-TOUCH, Z-VOL|Z-MAG, and zone H=12 (O3 freeze sketch primary H).",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-2",
+      "clause": "design \u00a72.2 Z-MAG 'ridge walk-forward monthly refit (013 recipe)'",
+      "resolution": "Use expanding walk-forward ridge on completed swings (SPDR-013 recipe). Monthly refit \u2261 retrain at each new swing with all prior swings (expanding).",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-3",
+      "clause": "design \u00a74.4 last-k state (O3 'last-k states / last X labels')",
+      "resolution": "HIGH/LOW label == slow_regime (SPDR-012 V-REGIME rolling-median split of rv20 \u2014 the only HIGH/LOW regime series the design defines; O3 'slow Markov'). Per AMENDMENT-S2 (2026-07-24), emit the ORDERED label sequence over the last K bars (last_k_state_1/2/3; operator-directed K\u2208{1,2,3}; chronological oldest\u2192newest; 'H'/'L'/'?'=NaN; decision bar = last char; causal \u2264t) \u2014 preserves order + run-length that O3 \u00a72.1/\u00a72.2 requires. Supersedes the earlier count-of-HIGH (K\u2208{4,12}) reading. Emitted on zones/events/post_event.",
+      "weakens_clause": false
+    }
+  ],
+  "train_end_utc": "2023-12-18T00:00:00+00:00",
+  "o3_sot": ".ignore/what-next/alts/cf-voldir-o3-zone-event-sequence.md",
+  "spread_cost_disclosure": {
+    "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+    "spread_rt_bps": null,
+    "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
+    "implication": "partial_net overstated vs full cost",
+    "prohibited_claims": [
+      "fully-net",
+      "cost-complete",
+      "tradable",
+      "deployable"
+    ]
+  },
+  "n_symbols": 25,
+  "n_cells": 8450,
+  "n_zones": 749456,
+  "n_events": 749456,
+  "n_posts": 560652,
+  "runtime_sec": 180.3
+}

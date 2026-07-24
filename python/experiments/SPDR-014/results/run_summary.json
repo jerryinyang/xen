@@ -1,0 +1,51 @@
+{
+  "n_symbols": 25,
+  "n_cell_rows": 8450,
+  "grid": {
+    "sources": [
+      "Z-VOL",
+      "Z-MAG"
+    ],
+    "z": [
+      1.0,
+      1.5,
+      2.0
+    ],
+    "H": [
+      4,
+      12,
+      24
+    ],
+    "events": [
+      "E-TOUCH",
+      "E-CLOSE",
+      "E-HORIZON"
+    ],
+    "h": [
+      4,
+      12,
+      24
+    ],
+    "bands": [
+      "DESIGN",
+      "CONFIRM"
+    ],
+    "money_subset": {
+      "sources": [
+        "Z-VOL",
+        "Z-MAG"
+      ],
+      "z": 1.5,
+      "H": 12,
+      "event": "E-TOUCH",
+      "h": 12,
+      "policies": [
+        "P-MOMO",
+        "P-MR"
+      ]
+    }
+  },
+  "residual_pin": "NONE",
+  "016_start_allowed": false,
+  "integrity_all_pass": true
+}

@@ -1,0 +1,87 @@
+{
+  "source": "results/014_residual_pin.json primary_cells re-aggregated by analysis_code (DESIGN, z=1.5, E-TOUCH, h=12)",
+  "note": "Scripts interrogate_from_json.py / interrogate_014.py re-derive from post_event.parquet when executed; pin cells are expectancy aggregates for the primary residual grid.",
+  "Z-VOL_H12": {
+    "n_with_data": 17,
+    "n_empty": 8,
+    "med_mean_r_h": 16.54427426016236,
+    "med_p_momo": 0.5135135135135135,
+    "med_p_mr": 0.46745562130177515,
+    "n_mean_pos": 11,
+    "n_mean_neg": 6,
+    "frac_momo_gt_mr": 0.7058823529411765,
+    "frac_mr_gt_momo": 0.29411764705882354,
+    "all_unpowered": true,
+    "mde_min_finite": 38.47538070280624,
+    "mde_med": 86.4861315700084,
+    "per_symbol": [
+      {"symbol": "1000BONKUSDT", "mean_r_h": -21.996720807216548, "median_r_h": -119.76047904191711, "p_momo": 0.4634146341463415, "p_mr": 0.5365853658536586, "n_decided": 41, "mde_bps": 289.4713645319044, "ci_low": -227.47435444281527, "ci_high": 177.05302812853182, "label": null},
+      {"symbol": "1000LUNCUSDT", "mean_r_h": 58.64453016354502, "median_r_h": 16.920473773266444, "p_momo": 0.5135135135135135, "p_mr": 0.4864864864864865, "n_decided": 111, "mde_bps": 197.84044192345615, "ci_low": -64.97139460940308, "ci_high": 215.10601395256606, "label": null},
+      {"symbol": "ADAUSDT", "mean_r_h": 20.891310934801076, "median_r_h": 22.040302267003486, "p_momo": 0.5284974093264249, "p_mr": 0.44559585492227977, "n_decided": 193, "mde_bps": 52.23314291557624, "ci_low": -16.653077605182474, "ci_high": 57.597705660706566, "label": "MOMO_RATE"},
+      {"symbol": "AVAXUSDT", "mean_r_h": -7.5439698664234385, "median_r_h": -11.570432137613107, "p_momo": 0.48333333333333334, "p_mr": 0.5111111111111111, "n_decided": 180, "mde_bps": 86.4861315700084, "ci_low": -69.26640039536397, "ci_high": 53.03964045096032, "label": null},
+      {"symbol": "BLURUSDT", "mean_r_h": 491.08174513138977, "median_r_h": 546.5490282785823, "p_momo": 0.7, "p_mr": 0.3, "n_decided": 10, "mde_bps": 763.6633932387133, "ci_low": -14.198192992222847, "ci_high": 1051.9307631241534, "label": null},
+      {"symbol": "BNBUSDT", "mean_r_h": -24.265696034419577, "median_r_h": -20.475020475020365, "p_momo": 0.42857142857142855, "p_mr": 0.5555555555555556, "n_decided": 189, "mde_bps": 47.19177866992774, "ci_low": -58.18627153983113, "ci_high": 8.613093561680353, "label": "MR_RATE"},
+      {"symbol": "BTCUSDT", "mean_r_h": 2.4110091938836895, "median_r_h": 3.3287253205471767, "p_momo": 0.4744897959183674, "p_mr": 0.4642857142857143, "n_decided": 196, "mde_bps": 38.47538070280624, "ci_low": -23.96086198797641, "ci_high": 30.883030739459365, "label": null},
+      {"symbol": "DOGEUSDT", "mean_r_h": -15.647939495654162, "median_r_h": 4.492362982928544, "p_momo": 0.49714285714285716, "p_mr": 0.4742857142857143, "n_decided": 175, "mde_bps": 58.814328458437, "ci_low": -56.63038386558982, "ci_high": 26.142025336330786, "label": null},
+      {"symbol": "DYDXUSDT", "mean_r_h": 76.46060786018154, "median_r_h": 57.63688760806907, "p_momo": 0.5462184873949579, "p_mr": 0.453781512605042, "n_decided": 119, "mde_bps": 174.4587343621273, "ci_low": -41.14413364001346, "ci_high": 206.38779352119704, "label": "MOMO_RATE"},
+      {"symbol": "ETHUSDT", "mean_r_h": 26.160529886445513, "median_r_h": 15.064325125669908, "p_momo": 0.5309278350515464, "p_mr": 0.44329896907216493, "n_decided": 194, "mde_bps": 48.773876778162304, "ci_low": -7.770548888847161, "ci_high": 61.64886618768079, "label": "MOMO_RATE"},
+      {"symbol": "GALAUSDT", "mean_r_h": 26.35814133893825, "median_r_h": 40.106951871656804, "p_momo": 0.5207100591715976, "p_mr": 0.46745562130177515, "n_decided": 169, "mde_bps": 97.64222388727237, "ci_low": -44.04883726234611, "ci_high": 94.1400781764737, "label": "MOMO_RATE"},
+      {"symbol": "INJUSDT", "mean_r_h": 36.43927525910935, "median_r_h": 71.37394850879386, "p_momo": 0.5242718446601942, "p_mr": 0.46601941747572817, "n_decided": 103, "mde_bps": 193.3340083600691, "ci_low": -110.98332202994257, "ci_high": 164.80499374484893, "label": "MOMO_RATE"},
+      {"symbol": "LINKUSDT", "mean_r_h": 11.799831772591633, "median_r_h": 2.128243872372426, "p_momo": 0.4946808510638298, "p_mr": 0.4787234042553192, "n_decided": 188, "mde_bps": 63.92803700444567, "ci_low": -33.248454556280215, "ci_high": 56.99605971665672, "label": null},
+      {"symbol": "MATICUSDT", "mean_r_h": -10.158637250295577, "median_r_h": -4.501665616276629, "p_momo": 0.4816247582205029, "p_mr": 0.4990328820116054, "n_decided": 517, "mde_bps": 61.10344989053725, "ci_low": -52.741212012987866, "ci_high": 32.47372119088547, "label": null},
+      {"symbol": "OPUSDT", "mean_r_h": -20.904879977678036, "median_r_h": -11.242270938729426, "p_momo": 0.48148148148148145, "p_mr": 0.5079365079365079, "n_decided": 189, "mde_bps": 102.17339973601271, "ci_low": -93.43219251813836, "ci_high": 51.596218104886375, "label": null},
+      {"symbol": "SOLUSDT", "mean_r_h": 43.695965565184416, "median_r_h": 18.214936247721305, "p_momo": 0.5177664974619289, "p_mr": 0.4619289340101523, "n_decided": 197, "mde_bps": 105.1205890076343, "ci_low": -22.479914558048023, "ci_high": 125.53678922068387, "label": "MOMO_RATE"},
+      {"symbol": "XRPUSDT", "mean_r_h": 16.54427426016236, "median_r_h": 12.499999999999734, "p_momo": 0.5181347150259067, "p_mr": 0.46632124352331605, "n_decided": 193, "mde_bps": 54.6869418551047, "ci_low": -22.164062892114405, "ci_high": 55.748037907689096, "label": "MOMO_RATE"}
+    ],
+    "empty_symbols": ["1000PEPEUSDT", "1000RATSUSDT", "BIGTIMEUSDT", "ORDIUSDT", "PYTHUSDT", "SEIUSDT", "TIAUSDT", "WLDUSDT"]
+  },
+  "Z-VOL_H4_summary": {
+    "med_mean_r_h_approx": 10.6,
+    "note": "H=4 full per-symbol in residual_pin; med across n>0 aligns screen ~+10.6"
+  },
+  "Z-VOL_H24_summary": {
+    "note": "Often equals H=12 for non-overlapping engine occupancy on this grid; see pin"
+  },
+  "controls_matched_random_DESIGN_primary_cell": {
+    "n": 17,
+    "per_symbol_delta_live_minus_null": [
+      {"symbol": "AVAXUSDT", "live": -14.750883727732017, "null": -0.8471714995471359, "delta": -13.903712228184881, "pct": 0.22},
+      {"symbol": "BNBUSDT", "live": -0.14681163969296743, "null": -0.5345258331369531, "delta": 0.38771419344398567, "pct": 0.46},
+      {"symbol": "BTCUSDT", "live": -1.2628097651304975, "null": -0.7628992469823447, "delta": -0.4999105181481528, "pct": 0.45},
+      {"symbol": "DOGEUSDT", "live": 29.099880151491902, "null": -5.279823663810691, "delta": 34.37970381530259, "pct": 0.93},
+      {"symbol": "DYDXUSDT", "live": 46.18065929607806, "null": 1.246334021924971, "delta": 44.93432527415309, "pct": 0.835},
+      {"symbol": "ETHUSDT", "live": 11.613735881622048, "null": 0.042760845666934985, "delta": 11.570975035955113, "pct": 0.785},
+      {"symbol": "GALAUSDT", "live": 3.271929134881128, "null": -0.2059279390293915, "delta": 3.4778570739105195, "pct": 0.57},
+      {"symbol": "INJUSDT", "live": 6.778874808143652, "null": 1.8674914514393601, "delta": 4.911383356704292, "pct": 0.54},
+      {"symbol": "LINKUSDT", "live": 0.1706566794483747, "null": -1.0138829634550615, "delta": 1.1845396429034362, "pct": 0.53},
+      {"symbol": "MATICUSDT", "live": 18.555719108677803, "null": -0.9485430580892859, "delta": 19.50426216676709, "pct": 0.925},
+      {"symbol": "OPUSDT", "live": -61.19187216173817, "null": -6.084169183341239, "delta": -55.10770297839693, "pct": 0.025},
+      {"symbol": "SOLUSDT", "live": 18.835269369841352, "null": -2.708099175943453, "delta": 21.543368545784805, "pct": 0.795},
+      {"symbol": "XRPUSDT", "live": -7.395367622046881, "null": 0.7782310456706094, "delta": -8.17359866771749, "pct": 0.255},
+      {"symbol": "ADAUSDT", "live": 13.599660571085723, "null": -0.5870036543648603, "delta": 14.186664225450583, "pct": 0.845},
+      {"symbol": "1000BONKUSDT", "live": 28.44080601113677, "null": -13.014428793426955, "delta": 41.455234804563725, "pct": 0.65},
+      {"symbol": "1000LUNCUSDT", "live": 31.000780642221475, "null": 2.0690193102943804, "delta": 28.931761331927095, "pct": 0.735},
+      {"symbol": "BLURUSDT", "live": 157.2906367509803, "null": 10.807475160680388, "delta": 146.4831615902999, "pct": 0.83}
+    ],
+    "med_delta": 11.570975035955113,
+    "med_live_pct": 0.65,
+    "n_delta_pos": 12,
+    "n_delta_neg": 5,
+    "note": "Control live residual population denser than non-overlapping expectancy cells; live means differ from pin mean_r_h (e.g. BTC control −1.3 vs pin +2.4)."
+  },
+  "tripwire_partial_net": {
+    "class": "INFORMATIVE T1",
+    "n_integrity_concern": 0,
+    "n_survives_above_p95": 0,
+    "positive_claimed_symbols": ["1000BONKUSDT", "BLURUSDT", "INJUSDT"],
+    "med_live_partial_net_approx": -14.0
+  },
+  "pin_status": {
+    "residual_status": "NONE",
+    "016_start_allowed": false,
+    "n_powered_momo": 0,
+    "n_powered_mr": 0,
+    "n_rate_momo_suggestive": 18,
+    "n_rate_mr_suggestive": 7
+  }
+}
