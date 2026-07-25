@@ -1,11 +1,23 @@
 # CF-VOLDIR-001 — Structural Volatility + Direction Programme
 
-- **Status:** `REGISTERED` — 2026-07-23, checkpoint-017, operator-authorised
+- **Status:** `REGISTERED` — 2026-07-23, checkpoint-017, operator-authorised (**no status change**)
 - **Chapter:** 06
-- **Route:** `SPDR-012` (vol) → `SPDR-013` (direction expectancy) → mid-checkpoint reflection →
-  `SPDR-014` (combination / extraction) → conditional `XENA-VOLDIR-001`
+- **Route:** `SPDR-012` → `SPDR-013` → Reflection C (O3 + Decision A) →
+  `SPDR-014` (zone/event — screen done, pin NONE) → `SPDR-015` (conditioners) → `SPDR-016` (refine 014 residual — open by override) →
+  `SPDR-017` (independent predicted-price mispricing; operator original #3) →
+  conditional `XENA-VOLDIR-001`
 - **Reads:** TRAIN only; 0 counted TEST reads; global holdout sealed
-- **SPDR-012/013:** designs complete 2026-07-23; execution not authorised
+- **SPDR-012/013:** complete (analyses binding). **Reflection C:** signed 2026-07-23.
+  **SPDR-014:** screen complete 2026-07-24 — INCONCLUSIVE / UNPOWERED_NOT_NULL (B-5), `residual_status=NONE`,
+  0 powered cells, integrity PASS, 0 TEST reads; **SPDR-016 OPENED by operator override** on coherent SUGGESTIVE
+  leads (not a powered residual). **SPDR-017:** screen complete, `residual_status=NONE`.
+  **SPDR-015:** screen complete 2026-07-24 — **WORTH_EXPLORING (per-arm, operator-signed)**; integrity PASS
+  (hard_pass; golden G1–G4); QA run1 REVISE→run2 APPROVE; 0 TEST reads. Ordinal swing-size gate (T-GT-CUR;
+  21/21 coins × 3 models, hit ~+20pt over base, IC≈0.37, CI-backed) + vol level-state labels (next-|oo| gap
+  +35 bps HMM / +16 bps R-MARKOV) + R-MARKOV multi-bar gate k=4/12 (16/16 coins H1; ΔBrier −0.025 k4 / −0.114
+  k12, CI excl 0) route on; k=1 next-bar NOT_WORTH. Conditioners fold into 014/016 by amendment only; no
+  family status change; no XENA. (No `residual_status` — conditioner science, not a residual object.)
+- **O3 sequence brief:** `.ignore/what-next/alts/cf-voldir-o3-zone-event-sequence.md`
 - **Checkpoint:** `docs/experiments-docs/checkpoints/2026-07-23-017-structural-vol-direction-programme/design.md`
 - **Governing RAW brief:** `.ignore/what-next/alts/vol-direction-structural-programme-raw.md`
 - **Distinct from:** `CF-VOLCONV-001` (closed L1 path: assumed vol + late range-break direction)
@@ -48,11 +60,14 @@ re-parameterisation of SPDR-011’s range-break object.
 
 | Step | Item | Pass gate to next |
 |---|---|---|
-| **A** | SPDR-012 vol characterisation | Predeclared reliability bar met |
-| **B** | SPDR-013 direction expectancy | Honest expectancy object; primary metric ≠ win-rate |
-| **C** | Mid-checkpoint reflection | Operator freezes combination design or stop/branch |
-| **D** | SPDR-014 combination / extraction | Cost-surviving base under partial-cost disclosure, or terminal diagnosis |
-| **E** | XENA-VOLDIR-001 (conditional) | Only if D graduates a base; not for A–C |
+| **A** | SPDR-012 vol characterisation | **COMPLETE** — H1/H4 range level adequate for conditioning |
+| **B** | SPDR-013 direction expectancy | **COMPLETE** — signed not adequate; ZZ mag positive |
+| **C** | Mid-checkpoint reflection | **SIGNED** — O3 only; Decision A sequence |
+| **D1** | SPDR-014 zone/event / MOMO–MR | **SCREEN COMPLETE (2026-07-24)** — INCONCLUSIVE / UNPOWERED (B-5); `residual_status=NONE` (0 powered cells); no terminal residual named; SPDR-016 opened by operator override on SUGGESTIVE leads |
+| **D2** | SPDR-015 conditioner science | **SCREEN COMPLETE (2026-07-24)** — **WORTH_EXPLORING** (operator-signed): ordinal swing-size gate + vol level-state labels + R-MARKOV multi-bar gate (k=4/12) route on; k=1 next-bar NOT_WORTH. Improves gates/labels for 014/016 by amendment only |
+| **D3a** | SPDR-016 refine 014 residual | **OPEN by operator override** (2026-07-24) — pin is NONE; opened on 014's coherent SUGGESTIVE leads, residual object + policy deferred to 016 design |
+| **D3b** | SPDR-017 independent mispricing (#3) | Own model; **not** gated on 014 residual NONE |
+| **E** | XENA-VOLDIR-001 (conditional) | Only if a base graduates; not for A–C |
 
 **Stop rules:**
 
@@ -70,8 +85,11 @@ re-parameterisation of SPDR-011’s range-break object.
 | `CF-VOLDIR-001/HYP-A` | SPDR-012 | Is volatility reliably predictable/modelable on the retained catalog under frozen metrics? |
 | `CF-VOLDIR-001/HYP-B` | SPDR-013 | Do frozen fast direction models (SMA benchmark; ZigZag ATR) deliver positive **expectancy bps** under availability-when-right / damage-when-wrong scoring? |
 | `CF-VOLDIR-001/HYP-C` | Reflection | Given A+B, which combination or stop/branch is justified? (not a result-producing hypothesis) |
-| `CF-VOLDIR-001/HYP-D` | SPDR-014 | Does frozen vol×direction (or authorised direction-agnostic) extraction clear predeclared TRAIN floors under partial-cost disclosure? |
-| `CF-VOLDIR-001/HYP-E` | XENA-VOLDIR-001 | Conditional portfolio/search among graduated D bases only |
+| `CF-VOLDIR-001/HYP-D1` | SPDR-014 | Zone / mispricing event / post-event MOMO vs MR residual ≠ ambient? |
+| `CF-VOLDIR-001/HYP-D2` | SPDR-015 | Level-regime transition skill vs persistence; ordinal ZZ “bigger than” skill? |
+| `CF-VOLDIR-001/HYP-D3` | SPDR-016 | Do error-dynamics features refine the **014 residual** without open ML zoo? (014-gated) |
+| `CF-VOLDIR-001/HYP-D4` | SPDR-017 | Independent predicted-price mispricing (proven + error dynamics + weak-dir features) characterised like 014 — residual ≠ ambient? |
+| `CF-VOLDIR-001/HYP-E` | XENA-VOLDIR-001 | Conditional portfolio/search among graduated bases only |
 
 ## 5. Frozen scope (programme defaults; per-SPDR designs may narrow, not expand silently)
 
@@ -156,13 +174,17 @@ independent evidence.
 
 **Forbidden primary metric:** win-rate / “right X of Y.”
 
-### 5.5 Combination (SPDR-014 — frozen only after reflection C)
+### 5.5 O3 extraction sequence (frozen after Reflection C Decision A)
 
-- Default path: vol state × direction policy under partial costs.
-- Conditional path: direction-agnostic (grid-like / both-side / straddle-class) **only if** C
-  authorises after compatibility diagnosis and risk is manageable.
-- HTF-DI is **not** smuggled as a third direction arm unless separately predeclared as a named
-  benchmark at C — first pass is SMA + ZigZag only.
+- **Signed vol×direction product: closed** (013 evidence).
+- **SPDR-014:** likelihood zone from vol level / ZZ mag → breach event → characterise MOMO vs MR
+  (do not assume). Primary product science.
+- **SPDR-015:** level-HMM/Markov transitions vs persistence; ordinal ZZ magnitude gates.
+- **SPDR-016 (3a):** refine named 014 residual; start-gated on 014 pin — **opened by operator override 2026-07-24** (pin NONE; on 014's SUGGESTIVE leads).
+- **SPDR-017 (3b):** operator original #3 — independent predicted-price mispricing + 014-style
+  MOMO/MR characterisation; **not** gated on 014 residual success.
+- **AMENDMENT-S1:** per-symbol SUPPORTED allowed; multi-symbol agreement = credibility only.
+- HTF-DI not a direction arm unless separately predeclared. No range-break primary.
 
 ## 6. Scoring contracts
 
@@ -207,3 +229,24 @@ spread not charged; reported net **overstated** relative to true cost.
   `train_end`). Pin `cf-voldir-001-universe.json`. SPDR-012/013 designs updated. 0 outcomes. |
 | 2026-07-23 | **AMENDMENT-A2 (NEUTRAL):** full first-pass options mandatory — V-REGIME-HMM; D1 primary
   clock; M15 clock; SMA 14/25/50; angle on+off; ZZ mag and vol forecast heads. 0 outcomes. |
+| 2026-07-23 | **Reflection C SIGNED:** O3 only; Decision A. Sequence brief
+  `cf-voldir-o3-zone-event-sequence.md`. SPDR-014/015/016 designs registered. **AMENDMENT-S1
+  (NEUTRAL):** per-symbol sufficiency for O3 screens. Status remains REGISTERED. 0 outcomes. |
+| 2026-07-24 | **SPDR-017 registered (NEUTRAL):** operator original Group-3 intent as independent
+  predicted-price mispricing (HYP-D4). SPDR-016 kept as 014-gated refine (3a). Design complete.
+  Status remains REGISTERED. |
+| 2026-07-24 | **SPDR-014 / HYP-D1 disposition (evidence only):** screen complete. Analyst INCONCLUSIVE /
+  UNPOWERED_NOT_NULL (B-5); `residual_status=NONE`, 0/927 powered cells; integrity PASS; band non-selective
+  (p_event≈1), continuation ≈ coin-flip; DESIGN→CONFIRM sign flip (12/17). Coherent SUGGESTIVE leads:
+  shock-MOMO (pooled CI excl 0), E-TOUCH/E-CLOSE asymmetry, L→H vol-flip MOMO. 0 counted TEST reads.
+  **SPDR-016 OPENED by operator signed override** (`016_start_basis=OPERATOR_OVERRIDE`) on the SUGGESTIVE
+  leads — NOT a powered residual; residual object + policy deferred to 016 design. Status remains REGISTERED. |
+| 2026-07-24 | **SPDR-015 / HYP-D2 disposition (evidence only):** screen complete, operator-signed
+  **WORTH_EXPLORING (per-arm)**. Integrity PASS (hard_pass; golden G1–G4); control = true L-28 derangement both
+  arms (collapse≈0; +0.05 bite detected 98%/73%); QA run1 REVISE→run2 APPROVE; 0 counted TEST reads.
+  **Route on:** 2b ordinal swing-size gate T-GT-CUR (21/21 coins × 3 models; hit ~+20pt over base; IC≈0.37;
+  CI-backed) + 2a vol level-state HIGH/LOW labels (next-|oo| gap +35 bps HMM / +16 bps R-MARKOV) + 2a R-MARKOV
+  multi-bar gate k=4/12 (16/16 coins H1; ΔBrier −0.025 k4 / −0.114 k12 = ~15%/33% less error than persistence,
+  CI excl 0). **NOT_WORTH:** k=1 next-bar (R-MARKOV thin; H4 k1; R-HMM-RV forecast); R-SHOCK comparator only.
+  Conditioner science — folds into 014/016 gates/labels by amendment only; no `residual_status`; no XENA. Status
+  remains REGISTERED. |

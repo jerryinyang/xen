@@ -1,14 +1,17 @@
 # Checkpoint 017 — Structural Volatility + Direction Programme
 
 - **Opened:** 2026-07-23
-- **Status:** `OPEN — SPDR-012/013 DESIGNS COMPLETE; UNIVERSE=TOP25; EXECUTION UNAUTHORISED`
+- **Status:** `OPEN — SPDR-012/013 COMPLETE; REFLECTION-C SIGNED (O3 + Decision A); SPDR-014/015/016/017 DESIGNS COMPLETE; EXECUTION PER OPERATOR GATE`
+- **O3 sequence SoT (100% compliance for SPDR-014/015/016/017):**  
+  `.ignore/what-next/alts/cf-voldir-o3-zone-event-sequence.md`
 - **AMENDMENT-U1:** instruments = top 25 by 30d USD volume (family-wide) — DIRECTION: NEUTRAL
 - **AMENDMENT-A2:** full arm/option set mandatory (HMM; D1 primary; M15; SMA50; ZZ mag/vol) — DIRECTION: NEUTRAL
 - **Family:** `CF-VOLDIR-001` (`REGISTERED`)
-- **Container:** `SPDR-012` (vol) → `SPDR-013` (direction) → mid-checkpoint reflection →
-  `SPDR-014` (combination) → conditional `XENA-VOLDIR-001`
-- **Authority:** checkpoint opening and family registration approved; **no** SPDR execution,
-  outcome read, combination freeze, XENA, TEST, or holdout approved by this open alone
+- **Container:** `SPDR-012` → `SPDR-013` → Reflection C (O3+A) → `SPDR-014`/`015`/`016`/`017` →
+  conditional `XENA-VOLDIR-001`
+- **AMENDMENT-S1:** per-symbol sufficiency on O3 screens — DIRECTION: NEUTRAL
+- **Authority:** family REGISTERED; Reflection C signed; designs complete for 014/015/016/017.
+  **No** XENA/TEST/holdout without operator gates; SPDR runs only when operator authorises
 - **Governing RAW brief (substance precedence):**  
   `.ignore/what-next/alts/vol-direction-structural-programme-raw.md`  
   This design **translates** that brief 1-to-1; it does not replace or thin it.
@@ -211,16 +214,22 @@ no local accounting primitives for verdict P&L; dependence-matched uncertainty.
 |---:|---|---|---|---|
 | 1 | Family + checkpoint open | Register `CF-VOLDIR-001`; freeze sequence | Operator accept RAW brief | **COMPLETE 2026-07-23** |
 | 2 | `SPDR-012` design | Freeze vol definitions, arms, reliability bars, universe, horizons | Checkpoint open | **COMPLETE 2026-07-23** |
-| 3 | `SPDR-012` run + analysis | Vol reliability characterisation | SPDR-012 design + lean self-check | unauthorised — awaiting operator execution |
-| 4 | Operator gate A | PASS / STOP combination path | SPDR-012 analysis | unauthorised |
+| 3 | `SPDR-012` run + analysis | Vol reliability characterisation | SPDR-012 design + lean self-check | **COMPLETE 2026-07-23** (no machine PASS/STOP; C owns call) |
+| 4 | Operator gate A | PASS / STOP combination path | SPDR-012 analysis | **folded into Reflection C** (AMENDMENT-T2) |
 | 5 | `SPDR-013` design | Freeze SMA/ZigZag params, capture geometry, expectancy unit | Prefer A PASS; operator may allow B after A data even if STOP combo | **COMPLETE 2026-07-23** |
-| 6 | `SPDR-013` run + analysis | Direction expectancy bps | SPDR-013 design + gate | unauthorised |
-| 7 | Operator gate B | Expectancy adequacy | SPDR-013 analysis | unauthorised |
-| 8 | Mid reflection C | Freeze combination or stop/branch | A+B complete | unauthorised |
-| 9 | `SPDR-014` design | Freeze extraction object from C | Reflection signed | unauthorised |
-| 10 | `SPDR-014` run + analysis | Combination / extraction + diagnosis | SPDR-014 design | unauthorised |
-| 11 | Operator gate D | Graduate base / terminal diagnosis | SPDR-014 analysis | unauthorised |
-| 12 | `XENA-VOLDIR-001` | Portfolio/search on graduated bases | D graduates + separate design/QA/approval | **RESERVED** |
+| 6 | `SPDR-013` run + analysis | Direction expectancy bps | SPDR-013 design + gate | **COMPLETE 2026-07-23** (signed not adequate; ZZ mag positive) |
+| 7 | Operator gate B | Expectancy adequacy | SPDR-013 analysis | **folded into Reflection C** |
+| 8 | Mid reflection C | Freeze combination or stop/branch | A+B complete | **SIGNED 2026-07-23** — O3 + Decision A; sequence brief registered |
+| 9 | `SPDR-014` design | Group 1: zone / event / MOMO–MR | Reflection signed | **COMPLETE** |
+| 10 | `SPDR-015` design | Group 2: level-regime transitions + ordinal ZZ | Reflection Decision A | **COMPLETE** |
+| 11 | `SPDR-016` design | Group 3a: refine 014 residual (gated) | Reflection Decision A | **COMPLETE** |
+| 11b | `SPDR-017` design | Group 3b: independent predicted-price mispricing (operator #3) | Operator 2026-07-24 | **COMPLETE** |
+| 12 | `SPDR-014` run + analysis | Zone/event characterisation + residual | design + execution authority | per operator / run state |
+| 13 | `SPDR-015` run + analysis | Conditioner science | design + execution authority | **SCREEN COMPLETE — WORTH_EXPLORING** (operator-signed 2026-07-24): swing-size gate + vol level-state labels + multi-bar gate route on; k=1 next-bar NOT_WORTH; folds into 014/016 by amendment |
+| 14 | `SPDR-016` run + analysis | Residual refine | **014 residual pin** + execution authority | **unauthorised** |
+| 14b | `SPDR-017` run + analysis | Independent mispricing + MOMO/MR | design + execution authority | **unauthorised** (not 014-gated) |
+| 15 | Operator gate D | Graduate base / terminal diagnosis | 014 and/or 017 (+ optional 015/016) | unauthorised |
+| 16 | `XENA-VOLDIR-001` | Portfolio/search on graduated bases | D graduates + separate design/QA/approval | **RESERVED** |
 
 No historical TEST. No holdout. No automatic family verdict.
 
@@ -424,8 +433,8 @@ Exactly one of:
 | Checkpoint | `2026-07-23-017-structural-vol-direction-programme` |
 | Vol SPDR | `SPDR-012` |
 | Direction SPDR | `SPDR-013` |
-| Combination SPDR | `SPDR-014` |
+| Combination / extraction SPDRs | `SPDR-014` (zone/event), `SPDR-015` (conditioners), `SPDR-016` (014-gated refine), `SPDR-017` (independent #3 mispricing) |
 | Conditional XENA | `XENA-VOLDIR-001` |
 
-**Next authorised work:** write `python/experiments/SPDR-012/design.md` (vol characterisation freeze).
-No execution until that design exists and operator authorises the SPDR run under lane rules.
+**IDs:** designs for 014/015/016/017 complete. Runs only under operator execution authority.
+**016** requires 014 residual pin; **017** does not.
