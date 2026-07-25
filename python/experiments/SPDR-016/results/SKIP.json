@@ -1,0 +1,20 @@
+{
+  "status": "SKIP",
+  "reason_class": "START_GATE_FAIL_NO_NAMED_RESIDUAL",
+  "residual_status": "NONE",
+  "policy_for_016": "NONE",
+  "016_start_allowed": true,
+  "operator_force_detected": true,
+  "start_gate_pass": false,
+  "did_run_models": false,
+  "did_emit_oos": false,
+  "invented_residual": false,
+  "message": "SPDR-016 SKIPPED: pin has 016_start_allowed=true via OPERATOR_OVERRIDE, but residual_status=NONE and policy_for_016=NONE (DEFERRED). Design \u00a7B.4 and O3 Group 3 require a named residual + P-MR/P-MOMO. Will not invent residual. Terminal/extraction wait path until residual object is frozen.",
+  "next_options": [
+    "A \u2014 Freeze residual+policy on pin (e.g. rate_lean MOMO_SUGGESTIVE \u2192 exploratory P-MOMO on SUGGESTIVE cells only) then re-run 016",
+    "B \u2014 Amend 016 design for SUGGESTIVE-only refine object (explicit non-powered target set) then re-run",
+    "C \u2014 Accept terminal extraction path for Group 3 (016 not run); optional 015 science only"
+  ],
+  "recommended": "C if integrity/honesty preferred; A/B only with explicit operator residual freeze",
+  "evaluated_at_utc": "2026-07-24T02:37:03Z"
+}

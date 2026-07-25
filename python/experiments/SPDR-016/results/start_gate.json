@@ -1,0 +1,65 @@
+{
+  "experiment": "SPDR-016",
+  "family": "CF-VOLDIR-001",
+  "hypothesis": "HYP-D3",
+  "evaluated_at_utc": "2026-07-24T02:37:03Z",
+  "o3_sot": ".ignore/what-next/alts/cf-voldir-o3-zone-event-sequence.md",
+  "design_clause": "design.md \u00a7B",
+  "checks": {
+    "pin_loaded": true,
+    "pin_path": "python/experiments/SPDR-016/results/014_residual_pin.json",
+    "residual_status": "NONE",
+    "016_start_allowed": true,
+    "016_start_basis": "OPERATOR_OVERRIDE",
+    "operator_force_detected": true,
+    "policy_for_016": "NONE",
+    "policy_in_P_MR_or_P_MOMO": false,
+    "residual_in_named_set": false,
+    "primary_cells_present": true,
+    "n_primary_cells": 150,
+    "n_powered_momo": 0,
+    "n_powered_mr": 0,
+    "rate_lean": "MOMO_SUGGESTIVE"
+  },
+  "clause2_start_or_force": true,
+  "clause3_none_without_force_skip": false,
+  "clause4_policy_ok": false,
+  "can_run_without_inventing_residual": false,
+  "start_gate_pass": false,
+  "decision": "SKIP",
+  "reasons": [
+    "residual_status=NONE (0 powered SUPPORTED cells); O3 Group 3 requires a named residual to refine",
+    "policy_for_016='NONE' not in {P-MR, P-MOMO}; design \u00a7B.4 / \u00a73 cannot assign side or target without inventing",
+    "operator force opens the experiment shell, but override explicitly left residual_status=NONE and policy DEFERRED \u2014 still no named object to refine"
+  ],
+  "artifacts_emitted": [
+    "results/014_residual_pin.json",
+    "results/start_gate.json",
+    "results/SKIP.json",
+    "screen.md"
+  ],
+  "artifacts_not_emitted": [
+    "results/features.parquet",
+    "results/model_oos.parquet",
+    "results/vs_014_baseline.parquet",
+    "results/expectancy_by_cell.parquet",
+    "results/golden_traces.json",
+    "results/integrity_selfcheck.json",
+    "analysis.md"
+  ],
+  "operator_note": "No model/train/predict/money run. No residual or policy invented. To proceed: freeze residual_status \u2208 {MOMO_DOMINANT, MR_DOMINANT, SPLIT} and policy_for_016 \u2208 {P-MR, P-MOMO} on the pin (or signed 016 amendment), then re-invoke.",
+  "partial_cost_disclosure": {
+    "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+    "spread_rt_bps": null,
+    "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
+    "implication": "partial_net overstated vs full cost",
+    "prohibited_claims": [
+      "fully-net",
+      "cost-complete",
+      "tradable",
+      "deployable"
+    ]
+  },
+  "no_xena_no_family_status_change": true,
+  "terminal_extraction_path": true
+}
