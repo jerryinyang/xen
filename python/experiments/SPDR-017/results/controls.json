@@ -1,0 +1,3671 @@
+{
+  "by_symbol": {
+    "BTCUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "BTCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 254,
+          "mean_r_h": -1.5552778528167814,
+          "median_r_h": -3.8822277545758066,
+          "p_momo": 0.4448818897637795,
+          "p_mr": 0.4881889763779528,
+          "p_event": 0.8438538205980066,
+          "n_origins": 301
+        },
+        "control_arm": {
+          "n": 282,
+          "mean_r_h": 6.188925484309767,
+          "median_r_h": 2.512545570735325,
+          "p_momo": 0.4858156028368794,
+          "p_mr": 0.475177304964539,
+          "p_event": 0.8840125391849529,
+          "n_origins": 319
+        },
+        "delta_mean_r_h": -7.744203337126548,
+        "delta_p_event": -0.04015871858694631,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "BTCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 254,
+          "mean_r_h": -1.5552778528167814,
+          "median_r_h": -3.8822277545758066,
+          "p_momo": 0.4448818897637795,
+          "p_mr": 0.4881889763779528
+        },
+        "control_arm": {
+          "n": 341,
+          "mean_r_h": -1.2628097651304975,
+          "median_r_h": -4.753840211545457,
+          "p_momo": 0.46920821114369504,
+          "p_mr": 0.49560117302052786
+        },
+        "delta_mean_r_h": -0.29246808768628396,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "BTCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -1.5552778528167814,
+        "null_mean_mean": 0.19178158427043981,
+        "null_p95": 18.555456970584427,
+        "live_percentile": 0.415,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "BTCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -1.5552778528167814,
+        "null_mean_mean": -0.2721290813512066,
+        "null_p95": 18.966909578305575,
+        "live_percentile": 0.425,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4651,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "BTCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -1.5552778528167814,
+        "null_mean_mean": 0.8514479427234276,
+        "null_p95": 12.864061332396014,
+        "live_percentile": 0.42,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "BTCUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -2.7471324018448353,
+        "null_p95": -1.4903256807594925,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "ETHUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "ETHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 250,
+          "mean_r_h": 16.945107229283906,
+          "median_r_h": -6.35578694293093,
+          "p_momo": 0.464,
+          "p_mr": 0.504,
+          "p_event": 0.8305647840531561,
+          "n_origins": 301
+        },
+        "control_arm": {
+          "n": 292,
+          "mean_r_h": -5.712561202373524,
+          "median_r_h": -10.484033319224096,
+          "p_momo": 0.4520547945205479,
+          "p_mr": 0.5136986301369864,
+          "p_event": 0.9299363057324841,
+          "n_origins": 314
+        },
+        "delta_mean_r_h": 22.65766843165743,
+        "delta_p_event": -0.09937152167932795,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "ETHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 250,
+          "mean_r_h": 16.945107229283906,
+          "median_r_h": -6.35578694293093,
+          "p_momo": 0.464,
+          "p_mr": 0.504
+        },
+        "control_arm": {
+          "n": 340,
+          "mean_r_h": 11.613735881622048,
+          "median_r_h": -4.7364713541075965,
+          "p_momo": 0.47352941176470587,
+          "p_mr": 0.5
+        },
+        "delta_mean_r_h": 5.331371347661857,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "ETHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 16.945107229283906,
+        "null_mean_mean": -1.2883310826665373,
+        "null_p95": 24.255774106384976,
+        "live_percentile": 0.9,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "ETHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 16.945107229283906,
+        "null_mean_mean": -0.19135680437191538,
+        "null_p95": 24.30818025922815,
+        "live_percentile": 0.84,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4663,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "ETHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 16.945107229283906,
+        "null_mean_mean": 5.163653120657841,
+        "null_p95": 21.01917676045247,
+        "live_percentile": 0.86,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "ETHUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -15.558706179949896,
+        "null_p95": 0.973902867217709,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "SOLUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "SOLUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 271,
+          "mean_r_h": 24.68316529203236,
+          "median_r_h": -12.028869286287991,
+          "p_momo": 0.46863468634686345,
+          "p_mr": 0.5129151291512916,
+          "p_event": 0.9155405405405406,
+          "n_origins": 296
+        },
+        "control_arm": {
+          "n": 294,
+          "mean_r_h": 21.95932868003368,
+          "median_r_h": 0.0,
+          "p_momo": 0.48639455782312924,
+          "p_mr": 0.4965986394557823,
+          "p_event": 0.9365079365079365,
+          "n_origins": 315
+        },
+        "delta_mean_r_h": 2.7238366119986814,
+        "delta_p_event": -0.02096739596739594,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "SOLUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 271,
+          "mean_r_h": 24.68316529203236,
+          "median_r_h": -12.028869286287991,
+          "p_momo": 0.46863468634686345,
+          "p_mr": 0.5129151291512916
+        },
+        "control_arm": {
+          "n": 347,
+          "mean_r_h": 18.835269369841352,
+          "median_r_h": -6.432936635574205,
+          "p_momo": 0.48703170028818443,
+          "p_mr": 0.5072046109510087
+        },
+        "delta_mean_r_h": 5.847895922191007,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "SOLUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 24.68316529203236,
+        "null_mean_mean": -5.396276090949288,
+        "null_p95": 47.20949395724873,
+        "live_percentile": 0.81,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "SOLUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 24.68316529203236,
+        "null_mean_mean": 2.1050513148623726,
+        "null_p95": 56.092394688790975,
+        "live_percentile": 0.795,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4614,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "SOLUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 24.68316529203236,
+        "null_mean_mean": 0.4623590551431827,
+        "null_p95": 31.09048619997493,
+        "live_percentile": 0.86,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "SOLUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": 6.2138402495462195,
+        "null_p95": 13.54777098525586,
+        "n_seeds": 200,
+        "positive_edge_claimed": true,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "AVAXUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "AVAXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 205,
+          "mean_r_h": 60.78083078329644,
+          "median_r_h": -2.7374760470844084,
+          "p_momo": 0.4878048780487805,
+          "p_mr": 0.4926829268292683,
+          "p_event": 0.7142857142857143,
+          "n_origins": 287
+        },
+        "control_arm": {
+          "n": 291,
+          "mean_r_h": -16.14857018087109,
+          "median_r_h": -8.99766060824092,
+          "p_momo": 0.46048109965635736,
+          "p_mr": 0.5189003436426117,
+          "p_event": 0.97,
+          "n_origins": 300
+        },
+        "delta_mean_r_h": 76.92940096416753,
+        "delta_p_event": -0.25571428571428567,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "AVAXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 205,
+          "mean_r_h": 60.78083078329644,
+          "median_r_h": -2.7374760470844084,
+          "p_momo": 0.4878048780487805,
+          "p_mr": 0.4926829268292683
+        },
+        "control_arm": {
+          "n": 314,
+          "mean_r_h": -14.750883727732017,
+          "median_r_h": -35.1212141007462,
+          "p_momo": 0.43630573248407645,
+          "p_mr": 0.5445859872611465
+        },
+        "delta_mean_r_h": 75.53171451102845,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "AVAXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 60.78083078329644,
+        "null_mean_mean": 5.601681998738059,
+        "null_p95": 50.881375416778575,
+        "live_percentile": 0.97,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "AVAXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 60.78083078329644,
+        "null_mean_mean": 0.8265463889168478,
+        "null_p95": 40.941324920188066,
+        "live_percentile": 1.0,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4376,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "AVAXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 60.78083078329644,
+        "null_mean_mean": 0.9752600626324359,
+        "null_p95": 34.058215444481064,
+        "live_percentile": 1.0,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "AVAXUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -17.200246870788206,
+        "null_p95": 5.594540233171315,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "ORDIUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "ORDIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "ORDIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "delta_mean_r_h": NaN,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "ORDIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "ORDIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "ORDIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "ORDIUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "1000BONKUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "1000BONKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 23,
+          "mean_r_h": -24.221046212488964,
+          "median_r_h": 11.273957158963732,
+          "p_momo": 0.5217391304347826,
+          "p_mr": 0.4782608695652174,
+          "p_event": 0.6388888888888888,
+          "n_origins": 36
+        },
+        "control_arm": {
+          "n": 54,
+          "mean_r_h": 164.69359347197968,
+          "median_r_h": 122.12631889860714,
+          "p_momo": 0.5740740740740741,
+          "p_mr": 0.42592592592592593,
+          "p_event": 0.8307692307692308,
+          "n_origins": 65
+        },
+        "delta_mean_r_h": -188.91463968446865,
+        "delta_p_event": -0.19188034188034198,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "1000BONKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 23,
+          "mean_r_h": -24.221046212488964,
+          "median_r_h": 11.273957158963732,
+          "p_momo": 0.5217391304347826,
+          "p_mr": 0.4782608695652174
+        },
+        "control_arm": {
+          "n": 74,
+          "mean_r_h": 28.44080601113677,
+          "median_r_h": 24.20708071504296,
+          "p_momo": 0.5135135135135135,
+          "p_mr": 0.47297297297297297
+        },
+        "delta_mean_r_h": -52.661852223625736,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "1000BONKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -24.221046212488964,
+        "null_mean_mean": 0.3852140428046832,
+        "null_p95": 147.8582104276238,
+        "live_percentile": 0.375,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "1000BONKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -24.221046212488964,
+        "null_mean_mean": 7.068939553690447,
+        "null_p95": 287.9157373767124,
+        "live_percentile": 0.415,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 1044,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "1000BONKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -24.221046212488964,
+        "null_mean_mean": 75.6881436687746,
+        "null_p95": 222.96992022369966,
+        "live_percentile": 0.1,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "1000BONKUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -101.91301800216668,
+        "null_p95": 96.24665366349217,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "TIAUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "TIAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "TIAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "delta_mean_r_h": NaN,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "TIAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "TIAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "TIAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "TIAUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "DOGEUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "DOGEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 227,
+          "mean_r_h": 2.834511154920758,
+          "median_r_h": -35.842293906811484,
+          "p_momo": 0.45374449339207046,
+          "p_mr": 0.5286343612334802,
+          "p_event": 0.8407407407407408,
+          "n_origins": 270
+        },
+        "control_arm": {
+          "n": 268,
+          "mean_r_h": -34.6297117474792,
+          "median_r_h": -43.0125430125422,
+          "p_momo": 0.3880597014925373,
+          "p_mr": 0.585820895522388,
+          "p_event": 0.9305555555555556,
+          "n_origins": 288
+        },
+        "delta_mean_r_h": 37.46422290239995,
+        "delta_p_event": -0.08981481481481479,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "DOGEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 227,
+          "mean_r_h": 2.834511154920758,
+          "median_r_h": -35.842293906811484,
+          "p_momo": 0.45374449339207046,
+          "p_mr": 0.5286343612334802
+        },
+        "control_arm": {
+          "n": 304,
+          "mean_r_h": 29.099880151491902,
+          "median_r_h": 12.875666215894643,
+          "p_momo": 0.506578947368421,
+          "p_mr": 0.4769736842105263
+        },
+        "delta_mean_r_h": -26.265368996571144,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "DOGEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 2.834511154920758,
+        "null_mean_mean": -0.6310455117428312,
+        "null_p95": 42.5989524401783,
+        "live_percentile": 0.535,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "DOGEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 2.834511154920758,
+        "null_mean_mean": -2.8747635793441755,
+        "null_p95": 38.914142137358446,
+        "live_percentile": 0.6,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4187,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "DOGEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 2.834511154920758,
+        "null_mean_mean": -6.395847753636397,
+        "null_p95": 28.772148758017163,
+        "live_percentile": 0.7,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "DOGEUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -12.29341573584278,
+        "null_p95": 1.830155018916326,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "XRPUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "XRPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 242,
+          "mean_r_h": -20.03139992753644,
+          "median_r_h": -19.163304723588404,
+          "p_momo": 0.45454545454545453,
+          "p_mr": 0.5330578512396694,
+          "p_event": 0.8127090301003345,
+          "n_origins": 299
+        },
+        "control_arm": {
+          "n": 301,
+          "mean_r_h": -17.69183400593983,
+          "median_r_h": -17.937219730943532,
+          "p_momo": 0.4684385382059801,
+          "p_mr": 0.521594684385382,
+          "p_event": 0.9525316455696202,
+          "n_origins": 316
+        },
+        "delta_mean_r_h": -2.3395659215966127,
+        "delta_p_event": -0.13982261546928576,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "XRPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 242,
+          "mean_r_h": -20.03139992753644,
+          "median_r_h": -19.163304723588404,
+          "p_momo": 0.45454545454545453,
+          "p_mr": 0.5330578512396694
+        },
+        "control_arm": {
+          "n": 336,
+          "mean_r_h": -7.395367622046881,
+          "median_r_h": -13.257343545418632,
+          "p_momo": 0.4732142857142857,
+          "p_mr": 0.5208333333333334
+        },
+        "delta_mean_r_h": -12.636032305489561,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "XRPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -20.03139992753644,
+        "null_mean_mean": 3.2394976792794457,
+        "null_p95": 31.6638060497613,
+        "live_percentile": 0.075,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "XRPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -20.03139992753644,
+        "null_mean_mean": 0.42827171926794655,
+        "null_p95": 28.838879712139597,
+        "live_percentile": 0.12,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4656,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "XRPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -20.03139992753644,
+        "null_mean_mean": -10.940114573091698,
+        "null_p95": 14.975996668346825,
+        "live_percentile": 0.34,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "XRPUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -5.215066571001238,
+        "null_p95": 1.1296654858010151,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "LINKUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "LINKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 247,
+          "mean_r_h": 2.4126375640834192,
+          "median_r_h": -1.4413375612565282,
+          "p_momo": 0.4817813765182186,
+          "p_mr": 0.4939271255060729,
+          "p_event": 0.8464163822525598,
+          "n_origins": 293
+        },
+        "control_arm": {
+          "n": 309,
+          "mean_r_h": -10.632337040155395,
+          "median_r_h": 15.115253810302764,
+          "p_momo": 0.5048543689320388,
+          "p_mr": 0.47249190938511326,
+          "p_event": 0.96875,
+          "n_origins": 320
+        },
+        "delta_mean_r_h": 13.044974604238813,
+        "delta_p_event": -0.12233361774744023,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "LINKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 247,
+          "mean_r_h": 2.4126375640834192,
+          "median_r_h": -1.4413375612565282,
+          "p_momo": 0.4817813765182186,
+          "p_mr": 0.4939271255060729
+        },
+        "control_arm": {
+          "n": 332,
+          "mean_r_h": 0.1706566794483747,
+          "median_r_h": -15.006769319068635,
+          "p_momo": 0.463855421686747,
+          "p_mr": 0.5120481927710844
+        },
+        "delta_mean_r_h": 2.2419808846350446,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "LINKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 2.4126375640834192,
+        "null_mean_mean": -0.5203558214497248,
+        "null_p95": 30.716849806515864,
+        "live_percentile": 0.565,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "LINKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 2.4126375640834192,
+        "null_mean_mean": 0.813366752798411,
+        "null_p95": 34.384691575551095,
+        "live_percentile": 0.56,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4504,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "LINKUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 2.4126375640834192,
+        "null_mean_mean": -4.665463581232903,
+        "null_p95": 16.991373515517818,
+        "live_percentile": 0.66,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "LINKUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -13.269147313769428,
+        "null_p95": -2.945777665782475,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "ADAUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "ADAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 287,
+          "mean_r_h": 19.445462158264643,
+          "median_r_h": 0.0,
+          "p_momo": 0.4843205574912892,
+          "p_mr": 0.4878048780487805,
+          "p_event": 0.9379084967320261,
+          "n_origins": 306
+        },
+        "control_arm": {
+          "n": 311,
+          "mean_r_h": 13.10793289502893,
+          "median_r_h": -5.627462014632378,
+          "p_momo": 0.48231511254019294,
+          "p_mr": 0.5016077170418006,
+          "p_event": 0.971875,
+          "n_origins": 320
+        },
+        "delta_mean_r_h": 6.337529263235712,
+        "delta_p_event": -0.0339665032679739,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "ADAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 287,
+          "mean_r_h": 19.445462158264643,
+          "median_r_h": 0.0,
+          "p_momo": 0.4843205574912892,
+          "p_mr": 0.4878048780487805
+        },
+        "control_arm": {
+          "n": 342,
+          "mean_r_h": 13.599660571085723,
+          "median_r_h": -4.855412078138555,
+          "p_momo": 0.4766081871345029,
+          "p_mr": 0.5
+        },
+        "delta_mean_r_h": 5.84580158717892,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "ADAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 19.445462158264643,
+        "null_mean_mean": 1.722260794539739,
+        "null_p95": 27.477893510581428,
+        "live_percentile": 0.855,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "ADAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 19.445462158264643,
+        "null_mean_mean": 0.2121697184981801,
+        "null_p95": 20.220150291392414,
+        "live_percentile": 0.925,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4441,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "ADAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 19.445462158264643,
+        "null_mean_mean": -2.8200025168614764,
+        "null_p95": 21.848513091535917,
+        "live_percentile": 0.9,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "ADAUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -12.974103163212732,
+        "null_p95": 0.4939869145065356,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "BIGTIMEUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "BIGTIMEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "BIGTIMEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "delta_mean_r_h": NaN,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "BIGTIMEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "BIGTIMEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "BIGTIMEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "BIGTIMEUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "BLURUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "BLURUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 16,
+          "mean_r_h": -60.015052597748564,
+          "median_r_h": -142.30873468436545,
+          "p_momo": 0.375,
+          "p_mr": 0.625,
+          "p_event": 1.0,
+          "n_origins": 16
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": -1.0,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "BLURUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "control_arm": {
+          "n": 18,
+          "mean_r_h": 157.2906367509803,
+          "median_r_h": 137.2439684175264,
+          "p_momo": 0.5,
+          "p_mr": 0.5
+        },
+        "delta_mean_r_h": NaN,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "BLURUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "BLURUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": -40.19741844800982,
+        "null_p95": 1186.716316161561,
+        "live_percentile": NaN,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 242,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "BLURUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "BLURUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "1000PEPEUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "1000PEPEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "1000PEPEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "delta_mean_r_h": NaN,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "1000PEPEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "1000PEPEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "1000PEPEUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "1000PEPEUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "1000LUNCUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "1000LUNCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 128,
+          "mean_r_h": -44.228677619839786,
+          "median_r_h": -55.7245385103583,
+          "p_momo": 0.4453125,
+          "p_mr": 0.546875,
+          "p_event": 0.8311688311688312,
+          "n_origins": 154
+        },
+        "control_arm": {
+          "n": 154,
+          "mean_r_h": 47.85046435709471,
+          "median_r_h": -5.910165484633856,
+          "p_momo": 0.4805194805194805,
+          "p_mr": 0.5,
+          "p_event": 0.875,
+          "n_origins": 176
+        },
+        "delta_mean_r_h": -92.0791419769345,
+        "delta_p_event": -0.043831168831168776,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "1000LUNCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 128,
+          "mean_r_h": -44.228677619839786,
+          "median_r_h": -55.7245385103583,
+          "p_momo": 0.4453125,
+          "p_mr": 0.546875
+        },
+        "control_arm": {
+          "n": 196,
+          "mean_r_h": 31.000780642221475,
+          "median_r_h": 10.540749071626387,
+          "p_momo": 0.5,
+          "p_mr": 0.49489795918367346
+        },
+        "delta_mean_r_h": -75.22945826206126,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "1000LUNCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -44.228677619839786,
+        "null_mean_mean": 3.2316823276404945,
+        "null_p95": 68.88461076120306,
+        "live_percentile": 0.12,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "1000LUNCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -44.228677619839786,
+        "null_mean_mean": 1.3316978186961188,
+        "null_p95": 84.18453428647894,
+        "live_percentile": 0.19,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 2661,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "1000LUNCUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -44.228677619839786,
+        "null_mean_mean": -35.87285139600526,
+        "null_p95": 51.12984395994053,
+        "live_percentile": 0.42,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "1000LUNCUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -56.00456202625487,
+        "null_p95": -8.699004437118854,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "MATICUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "MATICUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 834,
+          "mean_r_h": 22.97171912797463,
+          "median_r_h": -5.429456698595736,
+          "p_momo": 0.4832134292565947,
+          "p_mr": 0.5011990407673861,
+          "p_event": 0.9675174013921114,
+          "n_origins": 862
+        },
+        "control_arm": {
+          "n": 814,
+          "mean_r_h": -11.83382589909587,
+          "median_r_h": 12.128588413157226,
+          "p_momo": 0.5110565110565111,
+          "p_mr": 0.47788697788697787,
+          "p_event": 0.9498249708284714,
+          "n_origins": 857
+        },
+        "delta_mean_r_h": 34.8055450270705,
+        "delta_p_event": 0.017692430563640005,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "MATICUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 834,
+          "mean_r_h": 22.97171912797463,
+          "median_r_h": -5.429456698595736,
+          "p_momo": 0.4832134292565947,
+          "p_mr": 0.5011990407673861
+        },
+        "control_arm": {
+          "n": 904,
+          "mean_r_h": 18.555719108677803,
+          "median_r_h": -2.2593144946236876,
+          "p_momo": 0.48672566371681414,
+          "p_mr": 0.4889380530973451
+        },
+        "delta_mean_r_h": 4.416000019296828,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "MATICUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 22.97171912797463,
+        "null_mean_mean": -0.23339673704253927,
+        "null_p95": 27.31734619527591,
+        "live_percentile": 0.93,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "MATICUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 22.97171912797463,
+        "null_mean_mean": -0.05370066630779803,
+        "null_p95": 23.016188022688997,
+        "live_percentile": 0.94,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 11909,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "MATICUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 22.97171912797463,
+        "null_mean_mean": 6.907512673929534,
+        "null_p95": 24.70980077997511,
+        "live_percentile": 0.9,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "MATICUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -15.807270113335454,
+        "null_p95": -1.5641928196356425,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "INJUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "INJUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 120,
+          "mean_r_h": -35.90663625432059,
+          "median_r_h": -98.86662653128874,
+          "p_momo": 0.39166666666666666,
+          "p_mr": 0.6083333333333333,
+          "p_event": 0.7792207792207793,
+          "n_origins": 154
+        },
+        "control_arm": {
+          "n": 171,
+          "mean_r_h": 10.33981985350366,
+          "median_r_h": 34.88372093023217,
+          "p_momo": 0.5146198830409356,
+          "p_mr": 0.4678362573099415,
+          "p_event": 1.0,
+          "n_origins": 171
+        },
+        "delta_mean_r_h": -46.246456107824244,
+        "delta_p_event": -0.22077922077922074,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "INJUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 120,
+          "mean_r_h": -35.90663625432059,
+          "median_r_h": -98.86662653128874,
+          "p_momo": 0.39166666666666666,
+          "p_mr": 0.6083333333333333
+        },
+        "control_arm": {
+          "n": 183,
+          "mean_r_h": 6.778874808143652,
+          "median_r_h": -17.462165308499422,
+          "p_momo": 0.46994535519125685,
+          "p_mr": 0.5136612021857924
+        },
+        "delta_mean_r_h": -42.68551106246424,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "INJUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -35.90663625432059,
+        "null_mean_mean": -8.498601706645696,
+        "null_p95": 80.57849710081254,
+        "live_percentile": 0.33,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "INJUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -35.90663625432059,
+        "null_mean_mean": 1.306623061776725,
+        "null_p95": 82.86697334485315,
+        "live_percentile": 0.215,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 2421,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "INJUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -35.90663625432059,
+        "null_mean_mean": -25.27366087029855,
+        "null_p95": 36.99162906322425,
+        "live_percentile": 0.4,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "INJUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": 1.06454547616342,
+        "null_p95": 32.6788517790985,
+        "n_seeds": 200,
+        "positive_edge_claimed": true,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "SEIUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "SEIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "SEIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "delta_mean_r_h": NaN,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "SEIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "SEIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "SEIUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "SEIUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "BNBUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "BNBUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 240,
+          "mean_r_h": -13.826471483526115,
+          "median_r_h": -7.104554328217771,
+          "p_momo": 0.44166666666666665,
+          "p_mr": 0.5041666666666667,
+          "p_event": 0.8135593220338984,
+          "n_origins": 295
+        },
+        "control_arm": {
+          "n": 289,
+          "mean_r_h": 8.323013874618226,
+          "median_r_h": -24.884464984002985,
+          "p_momo": 0.4359861591695502,
+          "p_mr": 0.5536332179930796,
+          "p_event": 0.9413680781758957,
+          "n_origins": 307
+        },
+        "delta_mean_r_h": -22.14948535814434,
+        "delta_p_event": -0.12780875614199738,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "BNBUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 240,
+          "mean_r_h": -13.826471483526115,
+          "median_r_h": -7.104554328217771,
+          "p_momo": 0.44166666666666665,
+          "p_mr": 0.5041666666666667
+        },
+        "control_arm": {
+          "n": 332,
+          "mean_r_h": -0.14681163969296743,
+          "median_r_h": -7.71202435600804,
+          "p_momo": 0.46987951807228917,
+          "p_mr": 0.5030120481927711
+        },
+        "delta_mean_r_h": -13.679659843833148,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "BNBUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -13.826471483526115,
+        "null_mean_mean": 1.7520345386274931,
+        "null_p95": 28.214451879926155,
+        "live_percentile": 0.145,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "BNBUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -13.826471483526115,
+        "null_mean_mean": 0.011792421693760175,
+        "null_p95": 25.25566313337257,
+        "live_percentile": 0.17,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4465,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "BNBUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -13.826471483526115,
+        "null_mean_mean": -6.093586590040395,
+        "null_p95": 15.932245851752123,
+        "live_percentile": 0.32,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "BNBUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -17.40786157597204,
+        "null_p95": -9.532799160342668,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "WLDUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "WLDUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "WLDUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "delta_mean_r_h": NaN,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "WLDUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "WLDUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "WLDUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "WLDUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "PYTHUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "PYTHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "PYTHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "delta_mean_r_h": NaN,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "PYTHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "PYTHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "PYTHUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "PYTHUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "DYDXUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "DYDXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 144,
+          "mean_r_h": -11.033534094797366,
+          "median_r_h": 19.88647408732225,
+          "p_momo": 0.5069444444444444,
+          "p_mr": 0.4652777777777778,
+          "p_event": 0.8430232558139535,
+          "n_origins": 172
+        },
+        "control_arm": {
+          "n": 201,
+          "mean_r_h": 5.725941790491941,
+          "median_r_h": 0.0,
+          "p_momo": 0.48258706467661694,
+          "p_mr": 0.4975124378109453,
+          "p_event": 0.995049504950495,
+          "n_origins": 202
+        },
+        "delta_mean_r_h": -16.759475885289305,
+        "delta_p_event": -0.1520262491365415,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "DYDXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 144,
+          "mean_r_h": -11.033534094797366,
+          "median_r_h": 19.88647408732225,
+          "p_momo": 0.5069444444444444,
+          "p_mr": 0.4652777777777778
+        },
+        "control_arm": {
+          "n": 210,
+          "mean_r_h": 46.18065929607806,
+          "median_r_h": -21.188136422251034,
+          "p_momo": 0.48095238095238096,
+          "p_mr": 0.5047619047619047
+        },
+        "delta_mean_r_h": -57.21419339087543,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "DYDXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -11.033534094797366,
+        "null_mean_mean": -7.3009495086600005,
+        "null_p95": 90.41087827665417,
+        "live_percentile": 0.48,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "DYDXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -11.033534094797366,
+        "null_mean_mean": 2.7816242605228636,
+        "null_p95": 97.65986763487075,
+        "live_percentile": 0.38,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 2830,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "DYDXUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -11.033534094797366,
+        "null_mean_mean": 10.754306239987637,
+        "null_p95": 82.68743116135096,
+        "live_percentile": 0.38,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "DYDXUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": 4.318154809651162,
+        "null_p95": 26.533593223686946,
+        "n_seeds": 200,
+        "positive_edge_claimed": true,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "GALAUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "GALAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 240,
+          "mean_r_h": 12.463073001540332,
+          "median_r_h": -15.330603721344648,
+          "p_momo": 0.4791666666666667,
+          "p_mr": 0.5125,
+          "p_event": 0.9305019305019305,
+          "n_origins": 259
+        },
+        "control_arm": {
+          "n": 275,
+          "mean_r_h": 45.4521788767838,
+          "median_r_h": 3.4965034965028785,
+          "p_momo": 0.4909090909090909,
+          "p_mr": 0.48727272727272725,
+          "p_event": 0.9786476868327402,
+          "n_origins": 281
+        },
+        "delta_mean_r_h": -32.98910587524347,
+        "delta_p_event": -0.04814575633080964,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "GALAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 240,
+          "mean_r_h": 12.463073001540332,
+          "median_r_h": -15.330603721344648,
+          "p_momo": 0.4791666666666667,
+          "p_mr": 0.5125
+        },
+        "control_arm": {
+          "n": 298,
+          "mean_r_h": 3.271929134881128,
+          "median_r_h": 7.12386365009976,
+          "p_momo": 0.5,
+          "p_mr": 0.48322147651006714
+        },
+        "delta_mean_r_h": 9.191143866659203,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "GALAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 12.463073001540332,
+        "null_mean_mean": -4.136065731404199,
+        "null_p95": 39.99110897486219,
+        "live_percentile": 0.65,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "GALAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 12.463073001540332,
+        "null_mean_mean": 0.5421862718677146,
+        "null_p95": 44.63619133259433,
+        "live_percentile": 0.66,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 3894,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "GALAUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": 12.463073001540332,
+        "null_mean_mean": 15.65148254691823,
+        "null_p95": 49.23577771244714,
+        "live_percentile": 0.48,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "GALAUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": 9.154298287176568,
+        "null_p95": 21.64351192005146,
+        "n_seeds": 200,
+        "positive_edge_claimed": true,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "OPUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "OPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 267,
+          "mean_r_h": -51.36359623505709,
+          "median_r_h": -42.90004290004479,
+          "p_momo": 0.4419475655430712,
+          "p_mr": 0.550561797752809,
+          "p_event": 0.9050847457627119,
+          "n_origins": 295
+        },
+        "control_arm": {
+          "n": 302,
+          "mean_r_h": -20.6324432760638,
+          "median_r_h": -32.344752495506725,
+          "p_momo": 0.48013245033112584,
+          "p_mr": 0.5132450331125827,
+          "p_event": 0.9617834394904459,
+          "n_origins": 314
+        },
+        "delta_mean_r_h": -30.731152958993288,
+        "delta_p_event": -0.05669869372773395,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "OPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 267,
+          "mean_r_h": -51.36359623505709,
+          "median_r_h": -42.90004290004479,
+          "p_momo": 0.4419475655430712,
+          "p_mr": 0.550561797752809
+        },
+        "control_arm": {
+          "n": 333,
+          "mean_r_h": -61.19187216173817,
+          "median_r_h": -28.33434527423684,
+          "p_momo": 0.46846846846846846,
+          "p_mr": 0.5285285285285285
+        },
+        "delta_mean_r_h": 9.82827592668108,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "OPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -51.36359623505709,
+        "null_mean_mean": 4.091938510524699,
+        "null_p95": 56.97180638738437,
+        "live_percentile": 0.055,
+        "n_seeds": 200,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "OPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -51.36359623505709,
+        "null_mean_mean": 1.4928721247152037,
+        "null_p95": 60.475813672293064,
+        "live_percentile": 0.055,
+        "n_seeds": 200,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 4483,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "OPUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": -51.36359623505709,
+        "null_mean_mean": -3.7483410776517547,
+        "null_p95": 41.311460968347454,
+        "live_percentile": 0.08,
+        "n_seeds": 50,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "OPUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": -26.231172926526547,
+        "null_p95": 4.5009216613693255,
+        "n_seeds": 200,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    },
+    "1000RATSUSDT": {
+      "uncond": {
+        "control": "UNCOND-BAND",
+        "symbol": "1000RATSUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN,
+          "p_event": 0.0,
+          "n_origins": 0
+        },
+        "delta_mean_r_h": NaN,
+        "delta_p_event": 0.0,
+        "class": "within_sample_attribution"
+      },
+      "level_only_zvol": {
+        "control": "LEVEL-ONLY-ZVOL",
+        "symbol": "1000RATSUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "control_arm": {
+          "n": 0,
+          "mean_r_h": NaN,
+          "median_r_h": NaN,
+          "p_momo": NaN,
+          "p_mr": NaN
+        },
+        "delta_mean_r_h": NaN,
+        "class": "within_sample_attribution",
+        "note": "014 Z-VOL baseline \u2014 informative, not a start gate"
+      },
+      "time_shuffle": {
+        "control": "TIME-SHUFFLE-EVENT",
+        "symbol": "1000RATSUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "destroy_form": "DERANGEMENT",
+        "class": "within_sample_attribution"
+      },
+      "matched_random": {
+        "control": "MATCHED-RANDOM-ANCHOR",
+        "symbol": "1000RATSUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "disjoint_excl_live_pm1": true,
+        "n_candidates": 0,
+        "class": "within_sample_attribution"
+      },
+      "feature_shuffle": {
+        "control": "FEATURE-SHUFFLE",
+        "symbol": "1000RATSUSDT",
+        "band": "DESIGN",
+        "cell": {
+          "source": "M-ZONE",
+          "z": 1.5,
+          "H": 12,
+          "event": "E-TOUCH",
+          "h": 12,
+          "ablation": "A2",
+          "model": "M-RIDGE"
+        },
+        "live_mean_r_h": NaN,
+        "null_mean_mean": NaN,
+        "null_p95": NaN,
+        "live_percentile": NaN,
+        "n_seeds": 0,
+        "class": "model_skill"
+      },
+      "tripwire": {
+        "control": "PATH-FUTURE-DESTROY",
+        "symbol": "1000RATSUSDT",
+        "band": "DESIGN",
+        "live_mean_partial_net": NaN,
+        "null_p95": NaN,
+        "n_seeds": 0,
+        "positive_edge_claimed": false,
+        "survives_above_p95": false,
+        "integrity_concern": false,
+        "destroy_form": "DERANGEMENT_CAUSAL_PATH_REPAIR",
+        "class": "INFORMATIVE",
+        "note": "T1 informative path-destroy; residual HARD only on positive money survivors",
+        "plant_bps_ref": 20.0
+      }
+    }
+  },
+  "primary_cell": {
+    "source": "M-ZONE",
+    "z": 1.5,
+    "H": 12,
+    "event": "E-TOUCH",
+    "h": 12,
+    "ablation": "A2",
+    "model": "M-RIDGE"
+  },
+  "class_notes": {
+    "uncond": "within_sample_attribution",
+    "level_only_zvol": "014 Z-VOL informative baseline",
+    "time_shuffle": "within_sample_attribution DERANGEMENT",
+    "matched_random": "within_sample_attribution DISJOINT",
+    "feature_shuffle": "model_skill",
+    "tripwire": "INFORMATIVE T1 path-destroy"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "G1": {
+    "found": true,
+    "symbol": "BTCUSDT",
+    "t_idx": 643,
+    "H": 12,
+    "ablation": "A2",
+    "n_train": 80,
+    "yhat_hand": 1926.3325918542923,
+    "yhat_engine": 1926.3325918542923,
+    "abs_diff": 0.0,
+    "rel_diff": 0.0,
+    "pass": true,
+    "note": "expanding prior rows at t (month-refit engine may share fit within month)"
+  },
+  "G2": {
+    "found": true,
+    "symbol": "ETHUSDT",
+    "t_idx": 636,
+    "yhat": -390.1807267389568,
+    "zvol": 58.156412485131796,
+    "sigma_hand": 390.1807267389568,
+    "upper": 1929.2185825277127,
+    "lower": 1715.881417472287,
+    "anchor": 1822.55,
+    "ewma_match": true,
+    "sigma_floor_ok": true,
+    "pass": true
+  },
+  "G3": {
+    "found": true,
+    "r_h_hand": 69.7906281156535,
+    "r_h_engine": 69.7906281156535,
+    "label": "MOMO",
+    "match": true,
+    "pass": true
+  },
+  "G4": {
+    "found": true,
+    "symbol": "SOLUSDT",
+    "n_paired": 11942,
+    "mean_abs_diff_a0_a2": 35.878715569189566,
+    "weak_dir_active": true,
+    "pass": true,
+    "note": "A0\u2260A2 when WEAK-DIR varies; discloses load-bearing risk if only A2 wins"
+  },
+  "all_pass": true
+}

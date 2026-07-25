@@ -1,0 +1,63 @@
+{
+  "all_pass": true,
+  "checks": {
+    "universe_pin_equal": true,
+    "golden_traces_pass": true,
+    "train_fence_asserted": true,
+    "o3_sot_path_present": true,
+    "no_signed_product": true,
+    "no_014_start_gate": true,
+    "both_momo_mr_emitted": true,
+    "ablation_a0_a1_a2": true,
+    "tripwire_positive_survivors": [],
+    "tripwire_hard_fail": false
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "clause": "design \u00a72.4 M-GBM (sklearn not in project venv)",
+      "resolution": "Pure-numpy depth-limited residual tree ensemble (depth\u22643, n_est\u2264100, min_leaf\u226550, lr=0.05) \u2014 same hyperparams; sensitivity only.",
+      "weakens_clause": false
+    }
+  ],
+  "interpretation_notes": [
+    {
+      "id": "IN-1",
+      "clause": "design \u00a72.1 optional hmm_rv / ord_gt_cur (SPDR-015)",
+      "resolution": "SPDR-015 design-only at implement time \u2014 optional features omitted.",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-2",
+      "clause": "design \u00a73.1 return head primary",
+      "resolution": "\u0177 = next H-bar open-to-open return (bps) from anchor open[t+1].",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-3",
+      "clause": "design \u00a76 own residual pin (not 016)",
+      "resolution": "Emit results/017_residual_pin.json parallel schema to 014; residual_status NONE unless \u22651 powered SUPPORTED cell. No hard gate on 014 pin.",
+      "weakens_clause": false
+    }
+  ],
+  "train_end_utc": "2023-12-18T00:00:00+00:00",
+  "o3_sot": ".ignore/what-next/alts/cf-voldir-o3-zone-event-sequence.md",
+  "spread_cost_disclosure": {
+    "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+    "spread_rt_bps": null,
+    "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
+    "implication": "partial_net overstated vs full cost",
+    "prohibited_claims": [
+      "fully-net",
+      "cost-complete",
+      "tradable",
+      "deployable"
+    ]
+  },
+  "n_symbols": 25,
+  "n_cells": 6025,
+  "n_zones": 277509,
+  "n_events": 277509,
+  "n_posts": 700802,
+  "runtime_sec": 289.9
+}
