@@ -1,0 +1,151 @@
+{
+  "hard_pass": true,
+  "checks": {
+    "train_only_fence": {
+      "pass": true,
+      "max_ts_seen": 1702854000000000000,
+      "train_end_ns": 1702857600000000000,
+      "test_start": "2023-12-18T00:00:00+00:00",
+      "holdout_start": "2025-01-08T00:00:00+00:00"
+    },
+    "hmm_fit_causality": {
+      "pass": true,
+      "n_fits": 621,
+      "rule": "fit_end_ts < first origin ts of segment"
+    },
+    "zz_features_le_confirm": {
+      "pass": true,
+      "n_sampled": 125,
+      "rule": "confirm_idx >= end_idx (features known at confirm)"
+    },
+    "universe_pin": {
+      "pass": true,
+      "report": {
+        "recomputed": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT",
+          "AVAXUSDT",
+          "ORDIUSDT",
+          "1000BONKUSDT",
+          "TIAUSDT",
+          "DOGEUSDT",
+          "XRPUSDT",
+          "LINKUSDT",
+          "ADAUSDT",
+          "BIGTIMEUSDT",
+          "BLURUSDT",
+          "1000PEPEUSDT",
+          "1000LUNCUSDT",
+          "MATICUSDT",
+          "INJUSDT",
+          "SEIUSDT",
+          "BNBUSDT",
+          "WLDUSDT",
+          "PYTHUSDT",
+          "DYDXUSDT",
+          "GALAUSDT",
+          "OPUSDT",
+          "1000RATSUSDT"
+        ],
+        "checks": {
+          "family": {
+            "path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/docs/signal-registry/candidate-families/cf-voldir-001-universe.json",
+            "set_equal": true,
+            "missing_from_recompute": [],
+            "extra_in_recompute": []
+          },
+          "results": {
+            "path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-015/results/universe_top25.json",
+            "set_equal": true,
+            "missing_from_recompute": [],
+            "extra_in_recompute": []
+          }
+        },
+        "set_equal_all": true
+      }
+    },
+    "shock_not_regime": {
+      "pass": true,
+      "note": "R-SHOCK rows carry is_shock_comparator=True"
+    },
+    "delta_vs_persistence_emitted": {
+      "pass": true,
+      "n_rows": 600
+    },
+    "golden_traces": {
+      "pass": true,
+      "detail": {
+        "G1": true,
+        "G2": true,
+        "G3": true,
+        "G4": true
+      }
+    },
+    "no_test_holdout_contact": {
+      "pass": true,
+      "note": "all loads use band=TRAIN end=CONFIRM_END"
+    }
+  },
+  "o3_sot": {
+    "path": ".ignore/what-next/alts/cf-voldir-o3-zone-event-sequence.md",
+    "role": "BINDING substance Group 2",
+    "hard_object": "2a level-regime + transition skill BEATS persistence; 2b ordinal next-swing size; shock \u2260 regime"
+  },
+  "deviations": [],
+  "interpretation_notes": [
+    {
+      "id": "IN-1",
+      "clause": "design \u00a72.4 logistic-ridge monthly walk-forward",
+      "resolution": "Initial fit = first 40% of scored DESIGN origins (per symbol\u00d7clock); monthly expanding re-fit thereafter (same catalog-cap reading as SPDR-012 IN-1).",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-2",
+      "clause": "design \u00a72.1 R-HMM-RV on raw rv20",
+      "resolution": "Observation = raw rv20 (not log); HIGH = larger-mean state on rv20.",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-3",
+      "clause": "design \u00a75 T1 TARGET-FUTURE-DESTROY informative",
+      "resolution": "Construction asserts carry HARD causality (HMM fit end < origin; ZZ features \u2264 confirm). Label derangement is informative collapse fraction.",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-4",
+      "clause": "design \u00a72.5/\u00a73.4 band CI + \u00a75 blocks 1/3/7 multi-seed",
+      "resolution": "\u0394-Brier (2a) and hit/\u0394-Brier (2b) CIs use the canonical circular block bootstrap (xen.evaluation.block_bootstrap_ci): blocks 1/3/7 (days for 2a origins, swings for 2b) \u00d7 5-seed envelope (base 101) \u00d7 2000 resamples. 2a day-blocks are converted to origin-positions and floored at H=k so block\u2265H on every cell (fixes the H4 k=12 under-blocking). The SUPPORTED band uses the CONSERVATIVE envelope across the sweep (2a: max ci_hi<0; 2b: min hit ci_lo>base or max \u0394-Brier ci_hi<0), so block-fragile inference cannot earn SUPPORTED. Tightens, never loosens, the frozen band.",
+      "weakens_clause": false
+    },
+    {
+      "id": "IN-5",
+      "clause": "design \u00a74 CONTROL LABEL-SHUFFLE (destroy_form DERANGEMENT, bite/MDE)",
+      "resolution": "Collapse uses a true L-28 zero-fixed-point index derangement (xen.xena.controls.make_derangement), asserted per seed, over the 200-seed DERANGE_SEEDS battery read as a percentile (collapse_frac). Run on BOTH 2a (level-regime \u00d7 fitted method \u00d7 horizon) and 2b (target \u00d7 model) powered cells. A +0.05 hit-rate bite plant verifies the test detects a small real edge. Replaces the QA-flagged plain rng.shuffle (2b-only, single seed, no bite).",
+      "weakens_clause": false
+    }
+  ],
+  "spread_cost_disclosure": {
+    "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+    "spread_rt_bps": null,
+    "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
+    "implication": "any optional money overlay understates true cost; no fully-net/tradable/deployable claim",
+    "prohibited_claims": [
+      "fully-net",
+      "cost-complete",
+      "tradable",
+      "deployable"
+    ]
+  },
+  "prohibited_claims": [
+    "tradable",
+    "deployable",
+    "fully-net",
+    "cost-complete",
+    "shock as regime",
+    "stickiness as transition skill",
+    "family status change",
+    "silent 014 rewrite"
+  ],
+  "role": "conditioner science only \u2014 not standalone trade"
+}

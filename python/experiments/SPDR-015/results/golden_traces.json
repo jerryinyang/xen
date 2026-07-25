@@ -1,0 +1,46 @@
+{
+  "G1": {
+    "pass": true,
+    "all_fits_causal": true,
+    "n_fits": 17,
+    "sample_fit": {
+      "idx": 407,
+      "n_fit": 387,
+      "fit_end_ts": 1659308400000000000,
+      "first_origin_ts": 1659312000000000000,
+      "fit_end_lt_origin": true
+    },
+    "hand_state": 0,
+    "screen_state": 0,
+    "state_match": true,
+    "note": "R-HMM-RV on rv20; fit end < origin"
+  },
+  "G2": {
+    "pass": true,
+    "screen_brier": 0.059429622815087395,
+    "hand_brier_from_stay": 0.059429622815087346,
+    "stickiness": 0.9405703771849127,
+    "n": 5435,
+    "note": "persistence Brier == 1 - empirical stay frequency"
+  },
+  "G3": {
+    "pass": true,
+    "mag_k": 537.4999999999997,
+    "mag_k1": 982.2064056939503,
+    "hand_y": 1.0,
+    "row_y": 1.0,
+    "ridge_p": 0.6738389036151777,
+    "note": "T-GT-CUR = 1{mag_{k+1} > mag_k}"
+  },
+  "G4": {
+    "pass": true,
+    "idx": 6262,
+    "hand_p90": 0.007651966312070929,
+    "screen_p90": 0.007651966312070929,
+    "hand_label": 0,
+    "screen_label": 0,
+    "title": "R-SHOCK shock flag \u2014 NOT regime",
+    "note": "O3: never report as regime success"
+  },
+  "all_pass": true
+}
