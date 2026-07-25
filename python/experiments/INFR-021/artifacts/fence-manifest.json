@@ -1,0 +1,45 @@
+{
+  "analysis_start_utc": "2021-06-02T00:01:00Z",
+  "data_end_utc": "2026-06-19T20:56:00Z",
+  "generated_utc": "2026-07-25T03:39:23.610819+00:00",
+  "holdout_start_utc": "2024-12-13T00:00:00Z",
+  "instrument_id_convention": "{SYMBOL}.CTrader",
+  "nautilus_pin": "1.230.0",
+  "note": "Independent of Bybit INFR-011 fence. Holdout obligations on chapter-03 data remain binding.",
+  "schema": "xen-fence-manifest/v1",
+  "source": {
+    "catalog": "data/catalog_ctrader",
+    "files": {
+      "EURUSD": {
+        "instrument_id": "EURUSD.CTrader",
+        "n_bars": 1870801,
+        "path": "archive/chapter-03-xena-mtfctx/data/timebars/timebars_eurusd_20210602_000000_20260621_183431.parquet",
+        "sha256": "58dd554da60c775f6bfb0b6e5fc29b6a8916b0dd6f70ee101031e5ac3c860b88"
+      },
+      "USTEC": {
+        "instrument_id": "USTEC.CTrader",
+        "n_bars": 1784619,
+        "path": "archive/chapter-03-xena-mtfctx/data/timebars/timebars_ustec_20210602_000000_20260621_190833.parquet",
+        "sha256": "bdeec2300f993e017204200570d401ca95d574411ed7f096405d41d2886ac4c7"
+      },
+      "XAUUSD": {
+        "instrument_id": "XAUUSD.CTrader",
+        "n_bars": 1784390,
+        "path": "archive/chapter-03-xena-mtfctx/data/timebars/timebars_xauusd_20210602_000000_20260621_190824.parquet",
+        "sha256": "f156a31f2c626b83f16311fd6a814b1211bd34151b3845b4ffd0d9fe2f56d459"
+      }
+    },
+    "note": "Chapter-03 cTrader 1m timebars; TickVolume as bar volume; HOLDOUT (holdout_start_utc onward) never queried.",
+    "symbols": [
+      "EURUSD",
+      "USTEC",
+      "XAUUSD"
+    ]
+  },
+  "split": {
+    "analysis_frac": 0.7,
+    "train_frac_within_analysis": 0.7
+  },
+  "train_end_utc": "2023-11-22T00:00:00Z",
+  "universe": "ctrader-chapter03"
+}

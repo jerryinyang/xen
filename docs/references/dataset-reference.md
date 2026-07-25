@@ -56,6 +56,8 @@ Full candidate list: `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-
 `archive/chapter-03-xena-mtfctx/data/timebars/`,
 `archive/chapter-03-xena-mtfctx/data/strategy_runs/`.
 
+**cTrader Nautilus catalog (INFR-021, 2026-07-25):** `data/catalog_ctrader/` — EURUSD, XAUUSD, USTEC as `{SYMBOL}.CTrader` 1m bars from chapter-03 timebars. Fence pin (independent of Bybit): `python/experiments/INFR-021/artifacts/fence-manifest.json`. Volume = TickVolume (no signed buy/sell). Same standard Nautilus `Bar` contract as Bybit `data/catalog/` for plain-OHLCV strategies (swap catalog path + InstrumentId + fence); not interchangeable with `data/catalog_sigbar/` (SignedBar). Not the Chapter 05–06 primary universe.
+
 ---
 
 ## Primary lane: 1-minute OHLCV (T1)
