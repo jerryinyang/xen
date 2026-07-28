@@ -50,8 +50,9 @@ MECHANISM: A three-bar pivot-plus-momentum breakout commits capital when price t
   SPDR-012/013/015 established at rank IC ~0.33 (H1/H4) and which rescales the entire magnitude
   distribution (top/bottom decile 3.71x, P90 ratio matching the mean ratio to two decimals), can be
   used to place the exit boundaries of that episode so that the realised payoff sits OFF the
-  driftless mirror W/L = (1-p)/p. Event cadence: pivot events, ~1-5% of H1 bars per symbol. The
-  falsifier is log R indistinguishable from zero under every layer at a stated MDE.
+  driftless mirror W/L = (1-p)/p. Event cadence: pivot events; the realised signal rate is
+  MEASURED and EMITTED per delta level, never assumed. The falsifier is log R indistinguishable
+  from zero under every layer at a stated MDE.
 DERIVED:
   estimand = per-EPISODE signed gross return in bps, decomposed per cell into
              (p, W, L, W_L, p_be, log R); log R is the primary read. Episode-level because the
@@ -92,6 +93,13 @@ EXIT:   close after `activeHold` periods (Layer-4 variants replace this; L0 does
 `ATR20` = **Wilder ATR(20) on the decision clock, evaluated at `[0]`, causal `≤ t−1`.** Single
 definition, shared by every arm (see the CONVERSION-PIN, §7).
 
+**`deltaThreshold` is FROZEN as a swept axis, not calibrated** (QA finding). It takes exactly three
+values — **`δ ∈ {0.25, 0.5, 1.0}`** — and **all three are reported side by side**. There is no
+calibration step, no selection of a "best" δ, and no tuning against any outcome: δ selects how
+extreme the momentum bar must be, which is an entry property, and tuning it would be researching
+direction (SoT §1.2). The realised **signal rate at each δ is emitted** so the population is
+visible. `δ = 0.5` is the golden-trace anchor and carries no privileged status.
+
 **Fill rule (declared; resolved causally, not approximated).** Stop-order fills are resolved on the
 **1-minute bar stream** (`data/catalog/`, T1 lane), never on the decision clock's OHLC:
 
@@ -104,6 +112,20 @@ definition, shared by every arm (see the CONVERSION-PIN, §7).
 Unfilled signals are emitted and counted. **Fill rate is a reported quantity per cell**, because a
 capture variant that changes the fill rate changes the population and would otherwise silently
 re-select it.
+
+**Exit fill rule (declared; the L4 devices need it and the entry rule does not cover them).** All
+exits are resolved on the same **M1 stream**, causally:
+
+| Exit | Fill |
+|---|---|
+| **Profit target** | first M1 bar trading through the target → fill **at the target price**; if an M1 bar **opens beyond** it, fill at that open |
+| **Trailing stop** | the trail ratchets **once per M1 bar, on that bar's close**, and never intra-bar; it triggers on the first M1 bar trading through the trail level, filling **at the trail level** (or at the open if gapped through) |
+| **Time exit** | at the **open of the first decision-clock bar at or after `activeHold`** — an open-to-open exit, matching the entry convention |
+| **Precedence within one M1 bar** | if target and trail/stop are both reachable in the same M1 bar, the **adverse one fills** (trail/stop). Never assume the favourable ordering |
+| **Precedence with the time exit** | a target or trail triggering **at or before** the time-exit bar's open takes precedence |
+
+The adverse-precedence rule is deliberate: intrabar ordering is unknowable at M1 resolution, so the
+screen takes the pessimistic branch every time rather than manufacturing a favourable path.
 
 **No slippage model, no queue model, no partial fills.** This is a screen; SoT §6.1 is explicit that
 booked P&L requires a native execution vehicle. Nothing here is a tradability claim.
@@ -167,10 +189,15 @@ swept.
 
 > **Phase (a) determines WHETHER phase (b) runs. It does NOT determine WHAT is in it.**
 
-**Trigger, pre-declared here, before phase (a) runs:** phase (b) is proposed to the operator if any
-phase-(a) cell has a `log R` block-bootstrap CI excluding zero **from above**, at that cell's stated
-MDE, on the CONFIRM band. That is the whole condition. Deciding afterwards what counted as
-"promising" is optional stopping and is refused.
+**Trigger: the operator decides, on the full phase-(a) report.** No numeric cutoff is written here.
+An earlier draft made phase (b) conditional on a cell's CI clearing zero on CONFIRM — that was
+another invented gate, and the wrong shape for the same reason as the rest (INFR-016: machines gate
+integrity, the operator judges value).
+
+**What IS pre-declared, and what actually prevents the overfitting, is the SCOPE — not the
+trigger.** Phase (a) may inform *whether* the operator authorises phase (b); it may never shrink
+what phase (b) contains. That is the protection, and it survives the trigger being a judgement
+call.
 
 **Scope, fixed and independent of the (a) outcome:** the complete {L1, L2, L3} × {target, trail,
 hold, sizing} cross on the same episode population. **Individually-flat layers stay in the grid on
@@ -186,7 +213,10 @@ final cell count and per-cell MDE. It is not authorised by this document.
 ## §5 Estimand and the primary read
 
 ```
-Per episode:  r = signed gross open-to-open return, bps, entry fill -> exit fill
+Per episode:  r = signed gross return in bps, from the ENTRY FILL price to the EXIT FILL price,
+              both defined in SS2. (The time exit is open-to-open; target and trail exits fill at
+              their own trigger prices. 'Open-to-open' describes the TIME exit only - it is not a
+              blanket statement about every exit, and an earlier draft's wording implied it was.)
 Per cell:     p     = P(r > 0)                    W = E[ r | r>0]     L = E[-r | r<0]
               W_L   = W/L                         p_be = L/(W+L)
               log R = log(W_L) - log((1-p)/p)     <-- THE PRIMARY READ
@@ -332,29 +362,55 @@ scaling MDE ∝ 1/√n from a median powered cell of n = 3,427 episodes:
 | 0.05 | **6.0×** | ~21,200 |
 | 0.03 | **16.8×** | ~58,800 |
 
+**The available population, read from the artifact — not from date arithmetic.**
+`SPDR-018/results/unit_pin.json` records the actual TRAIN bar count:
+
 ```
-POWER:
-  expected episodes: pooled across 25 symbols on H1 over TRAIN (~21,600 H1 bars/symbol), a pivot
-    cadence of 1-5% of bars and a fill rate < 1 yields an ESTIMATED 10k-25k pooled episodes per
-    cell. Cells re-use the same entry population across capture variants, so n is shared, not
-    multiplied.
-  MDE: emitted PER CELL in log units BEFORE any effect is read, using the dependence-matched
-    block bootstrap (M-1, block >= holding horizon). The iid form is companion-only and may never
-    drive a band label.
-  strata PREDECLARED UNPOWERED for the log R read (can never be reported as negatives, B-5):
-    - EVERY per-symbol cell. A single symbol cannot reach ~10,800 episodes on this catalog.
-      Per-symbol is emitted for heterogeneity disclosure ONLY.
-    - Every cell at target Delta log R <= 0.03.
-    - Sizing cells for any mean-based read (they are a variance object by construction).
-    - Any cell whose realised fill rate leaves n below its own stated requirement.
-  A cell that misses its target is reported NOT_RESOLVABLE with realised n, block MDE, target,
-  the multiple short, and the n that WOULD be required - a first-class answer, not silence.
+pooled H1 bars, 25 symbols, full TRAIN = 229,646     <-- NOT 25 x 21,648 = 541,200
+  only MATICUSDT (21,582) spans the window; median symbol = 12,444; smallest = 555
+  catalog history cap: the panel is one symbol deep before 2022-07-14 (M-4)
 ```
 
-**Consequence, stated plainly at design time:** this experiment is a **pooled** experiment. Its
-`log R` reads live at the pooled-across-symbols level, and per-symbol cells exist to show
-heterogeneity, never to carry a conclusion. Any design revision that moves the primary read to
-per-symbol cells is refused by this power statement.
+*(An earlier draft assumed ~541k bars from the TRAIN date range. That was wrong by 2.35× and the
+correct figure was in the file this section already cited. Corrected here against the artifact.)*
+
+**Two power levers are applied, both for power alone** (operator directive 2026-07-28):
+
+| Lever | Effect on `n` | Cost |
+|---|---|---|
+| **Full TRAIN is the primary read**; DESIGN/CONFIRM scored as verification | **~2×** | The band split becomes a stability check rather than the primary object. SPDR-018's own power lever 2 |
+| **M15 added as a capture clock**, with the scale forecast ŝ still computed on **H1** | **~4×** | Multiplicity: two clocks reported separately, never pooled. Legitimate because the capture question is about exit geometry, not intraday forecast skill — V4's "no within-day skill" constrains the *forecast*, which stays on H1 |
+
+```
+POWER:
+  H1  pooled, full TRAIN: 229,646 bars (artifact-grounded)
+  M15 pooled, full TRAIN: ~4x the H1 count; COMPUTED AT RUN, never assumed
+  signal rate: MEASURED and EMITTED per delta level, not assumed. Indicative measurement at
+    delta = 0.5 puts it near 10% of bars - an earlier draft's "1-5%" was wrong.
+  fill rate:   MEASURED and EMITTED per cell (stop orders do not all fill).
+  => indicative baseline episode counts, full TRAIN, pooled across symbols:
+       H1  ~13k-16k   -> reaches Delta log R ~0.07
+       M15 ~50k-60k   -> reaches ~0.05 comfortably, approaches 0.03
+  MDE: emitted PER CELL in log units BEFORE any effect is read (M-1, block >= holding horizon).
+    The iid form is companion-only and may never drive a band label.
+  strata PREDECLARED UNPOWERED for the log R read (never reportable as negatives, B-5):
+    - EVERY per-symbol cell. No single symbol reaches ~10,800 episodes on this catalog.
+      Per-symbol is emitted for heterogeneity disclosure ONLY.
+    - The DESIGN and CONFIRM verification cells on H1, which halve an already-marginal n.
+      They are a stability read, not a primary read.
+    - NARROW selection layers on H1 - a top-decile s_hat cut leaves ~10% of episodes and is
+      expected NOT_RESOLVABLE. On M15 the same cut is expected marginal. COARSE selections
+      (halves, state labels) are expected resolvable on M15.
+    - Sizing cells for any mean-based read (a variance object by construction).
+  Every one of these expectations is a PREDICTION, not a result: realised n, block MDE, target,
+  the multiple short and the required n are emitted per cell, and a cell that misses is reported
+  NOT_RESOLVABLE.
+```
+
+**Consequence, stated plainly:** the primary reads live on **M15, full TRAIN, pooled across
+symbols**. H1 is the co-report and the clock-effect check; per-symbol is heterogeneity disclosure.
+A design revision moving the primary read to per-symbol cells, or to a band-split cell on H1, is
+refused by this power statement.
 
 ---
 
@@ -388,13 +444,14 @@ advances (INFR-016). Nothing is machine-dropped between layers.
 | Primary catalog | Bybit USDT linear perps, `data/catalog/`, INFR-011 fence |
 | Fill resolution | **M1 (T1 lane) bars**, causal, no intrabar look-ahead |
 | Universe | top-25 30d USD volume (AMENDMENT-U1); pin `cf-voldir-001-universe.json`; recompute + assert set equality |
-| Clocks | **H1 primary, H4 co-report.** No D1 (no within-day skill; V4), no M15 |
+| Clocks | **M15 primary** (power), **H1 co-report** (the clock-effect check). The scale forecast ŝ stays on **H1** — V4's no-within-day-skill finding constrains the forecast, not the trade clock. No D1. Clocks reported separately, **never pooled** |
 | TRAIN fence | `analysis_start 2021-06-29T06:53Z` → `train_end 2023-12-18T00:00Z`; asserted in code |
-| DESIGN / CONFIRM | `[2021-06-29, 2023-03-01)` / `[2023-03-01, 2023-12-18)` — **both scored explicitly** |
+| Primary band | **Full TRAIN** (power lever 2). DESIGN `[2021-06-29, 2023-03-01)` / CONFIRM `[2023-03-01, 2023-12-18)` both scored as **verification**, `n`-weighted |
 | Global holdout | `2025-01-08T00:00Z` — **never queried** |
 | cTrader | **Not in phase (a).** Replication is a separate leg under AMENDMENT-C1 if the operator authorises it; never pooled into `n` |
 | Complexity | 1 entry module, 1 layer module, 4 device modules, 1 metrics layer, 1 control module; ≤ 8 plots |
-| Cell count | phase (a): **≤ 60 cells** (L0 1 + L1 4 + L2 5 + L3 3 + L4 ~44 + L5 ≤4) × 2 bands. Disclosed, not rationed (AMENDMENT-C3 precedent) |
+| `deltaThreshold` | **frozen**: `{0.25, 0.5, 1.0}`, all reported, none selected (§2) |
+| Cell count | phase (a): **≤ 60 cells** (L0 1 + L1 4 + L2 5 + L3 3 + L4 ~44 + L5 ≤4) × 2 clocks × 3 δ, on full TRAIN, + the two verification bands. Disclosed, not rationed (AMENDMENT-C3 precedent) |
 
 ---
 
@@ -496,8 +553,30 @@ pass (P-23). No required check lives in a manual post-step (L-52).
 ## §14 Amendment ledger
 
 ```
-No amendments to this design. Registered 2026-07-28.
-running count: 0 looser / 0 tighter / 0 neutral
+AMENDMENT-1: full TRAIN becomes the primary read; DESIGN/CONFIRM scored as verification.
+  - DIRECTION: LOOSER (more n per cell; the band split stops halving the primary read)
+  - Operator directive 2026-07-28, for POWER. SPDR-018's own power lever 2.
+AMENDMENT-2: add M15 as the primary capture clock; H1 becomes co-report. The scale forecast
+  s_hat REMAINS on H1.
+  - DIRECTION: LOOSER (~4x the bars)
+  - Operator directive 2026-07-28, for POWER. V4's no-within-day-skill result constrains the
+    FORECAST clock, which is unchanged; the trade clock is a separate object.
+AMENDMENT-3: freeze deltaThreshold as a swept axis {0.25, 0.5, 1.0}, all reported, none selected.
+  - DIRECTION: TIGHTER (removes an unpinned parameter that swung power ~7x)
+  - QA finding, run 1.
+AMENDMENT-4: specify exit fill resolution for target / trail / time, with ADVERSE precedence
+  inside an M1 bar; correct the SS5 open-to-open wording to apply to the time exit only.
+  - DIRECTION: TIGHTER (pessimistic branch taken every time; a specification gap closed)
+  - QA finding, run 1.
+AMENDMENT-5: correct the SS8 population figure to the artifact value (229,646 pooled H1 bars,
+  not the ~541k implied by the TRAIN date range) and the signal rate to a measured quantity.
+  - DIRECTION: NEUTRAL (a factual correction; it makes the power statement harsher, not looser)
+  - QA finding, run 1.
+
+running count: 2 looser / 2 tighter / 1 neutral
+NOTE per L-23: no one-directional streak. Neither loosening touches an integrity check, fence,
+causality rule or claim boundary - both act only on population size. Both tightenings close real
+specification gaps.
 ```
 
 Checkpoint/family amendments in force: **U1** (top-25 universe, NEUTRAL), **S1** (per-symbol

@@ -28,9 +28,9 @@ SPREAD-COST-DISCLOSURE:
 
 ## §1 What this experiment is
 
-> **Falsifiable question.** On the SPDR-014 breach-event entry — a band the design forces to
-> actually select — does any layer of the opportunity model move the payoff residual
-> `log R = log(W/L) − log((1−p)/p)` reliably above zero, relative to the unmodulated baseline?
+> **Falsifiable question.** On the SPDR-014 breach-event entry, taken as it comes, does any layer
+> of the opportunity model move the payoff residual `log R = log(W/L) − log((1−p)/p)` reliably
+> above zero, relative to the unmodulated baseline?
 
 Same question as `SPDR-019`, same protocol, **different entry object**. SPDR-019's entry is a
 price-pattern breakout with a momentum prior; this one is a volatility-band breach with an explicit
@@ -68,7 +68,7 @@ requires this object measured under *designed* capture rather than the parent's 
 
 ---
 
-## §2 The entry — inherited from SPDR-014, with two binding carry-forward fixes
+## §2 The entry — inherited from SPDR-014
 
 ### 2.1 The inherited grammar (unchanged)
 
@@ -83,29 +83,45 @@ requires this object measured under *designed* capture rather than the parent's 
 | **Exit (parent)** | `open[entry + h]`, `h ∈ {4, 12, 24}` — **this is what the L4 devices replace** |
 | **Side** | **MOMO** (with the breach) and **MR** (against it) both emitted; neither assumed |
 
-### 2.2 Carry-forward fix 1 — **the band must actually select** (BINDING)
+### 2.2 The `z` grid, and why there is no selectivity gate (operator directive 2026-07-28)
 
-SPDR-014's `p_event` ran **0.938–0.998** at `z = 1.5`: nearly every zone breached, so the "event"
-selected nothing and the residual was an ambient sample wearing an event's name. The checkpoint
-design makes fixing this binding.
+`z ∈ {1.5, 2.0, 2.5, 3.0}`. `z = 1.0` is dropped — it is not an outlier band. **Every signal the
+grid produces is taken.**
 
-```
-BAND-SELECTIVITY RULE (code-asserted, HARD):
-  p_event = P(breach within H | zone) is COMPUTED AND EMITTED for every cell, per event type.
-  The PRIMARY grid is restricted to cells with p_event <= 0.60 - i.e. the band actually
-  discriminates. Cells above 0.60 are EMITTED and REPORTED as the parent-comparability arm,
-  clearly labelled NON-SELECTIVE, and carry no primary conclusion.
-  z is swept UPWARD until the selectivity condition is reachable: z in {1.5, 2.0, 2.5, 3.0, 3.5}.
-  z = 1.5 is retained SOLELY as the parent-parity anchor.
-```
+**There is no selectivity threshold, and this is deliberate.** An earlier draft of this design gated
+the primary grid on `p_event ≤ 0.60`. That gate is **removed entirely**, for three reasons:
 
-**This is a grid extension, not an estimand substitution.** `z` is a registered parameter of the
-014 object; the object, its anchor, its event types and its residual definition are untouched. The
-extension is disclosed in the cell count (§10) and in the multiplicity ledger.
+1. **It was an invented number.** No source document specifies 0.60; it appeared in no SoT, no
+   checkpoint design and no registered hypothesis.
+2. **It is the wrong shape.** A hard cutoff deciding which cells may carry a conclusion is exactly
+   the class of arbitrary value-gate the programme retired under **INFR-016 / L-32** — value and
+   quality reads are **report layers**, and the operator decides what advances. Nothing is
+   machine-dropped.
+3. **It contradicts the purpose of this experiment.** This is a **capture-geometry** experiment. It
+   is not searching for the best-selecting signal — the opposite: the entry is fixed and
+   deliberately unimpressive, and the research variable is the geometry wrapped around it. A gate
+   that deletes cells for being unselective is optimising the entry, which this checkpoint forbids
+   (SoT §1.2, direction is measured, not targeted).
+
+**`p_event` is still computed and emitted on every cell, per event type — as a reported covariate,
+never as a filter.** It is a *dose-response axis*: breach rate varies across the `z` grid, and
+reading `log R` against it is strictly more informative than a pass/fail line would have been. The
+checkpoint's binding carry-forward requirement — *the band's selectivity must be visible rather than
+assumed* — is satisfied by measuring and reporting it, which is what SPDR-014 failed to do.
+
+**This remains a grid extension, not an estimand substitution.** `z` is a registered parameter of
+the 014 object; the object, its anchor, its event types and its residual definition are untouched.
+SPDR-014's frozen grid was `{1.0, 1.5, 2.0}`; this design **drops 1.0 and adds 2.5 and 3.0**, which
+is disclosed here, in the cell count (§10) and in the amendment ledger (§14).
 
 **Parent parity is asserted:** at `z = 1.5, H = 12, h = 12, E-TOUCH, Z-VOL, DESIGN`, this screen must
-reproduce SPDR-014's published per-symbol cells to a declared tolerance. That is the proof the
-object was not silently re-specified.
+reproduce SPDR-014's published per-symbol cells to a **declared numeric tolerance** (stated in
+`results/parent_parity.json`, not left implicit). That is the proof the object was not silently
+re-specified.
+
+**Two parent rules are restored, not replaced** (QA finding): SPDR-014's **UNDECIDED-side rule** and
+its **5 bps flat deadband** are inherited verbatim. The `r == 0` flat test in an earlier draft
+silently changed the parent's deadband and is withdrawn.
 
 ### 2.3 Carry-forward fix 2 — the DESIGN→CONFIRM sign flip is **discharged**
 
@@ -168,10 +184,12 @@ never pooled. It is **not** an edge and carries no expectancy claim.
 
 > **Phase (a) determines WHETHER phase (b) runs. It does NOT determine WHAT is in it.**
 
-**Trigger, pre-declared before phase (a) runs:** any phase-(a) cell with a `log R` block-bootstrap CI
-excluding zero **from above**, at that cell's stated MDE, on the CONFIRM band, within the
-**selective** (`p_event ≤ 0.60`) grid. Deciding afterwards what counted as promising is optional
-stopping and is refused.
+**Trigger: the operator decides, on the full phase-(a) report.** No numeric cutoff is written here
+(same reasoning as §2.2 — invented thresholds are the wrong shape; INFR-016).
+
+**What IS pre-declared, and what actually prevents the overfitting, is the SCOPE — not the
+trigger.** Phase (a) may inform *whether* the operator authorises phase (b); it may never shrink
+what phase (b) contains.
 
 **Scope, fixed and independent of the (a) outcome:** the complete {L1, L2, L3} × {target, trail,
 hold, sizing} cross on the same episode population, with **individually-flat layers retained on equal
@@ -191,7 +209,8 @@ Per episode:  r = side-signed gross open-to-open return, bps (SPDR-014's r_h obj
 Per cell:     p, W, L, W_L, p_be, and  log R = log(W_L) - log((1-p)/p)   <-- PRIMARY
               identity assertion: |p*W - (1-p)*L - mean(r)| < 0.01 bps, EVERY cell
 DISCLOSED REFERENCE ONLY: cost, p_be_net, net mean, distance to the cost floor
-ALSO EMITTED PER CELL: p_event (the selectivity fix), event type, side arm
+ALSO EMITTED PER CELL: p_event (a reported covariate and dose-response axis, NEVER a filter),
+              event type, side arm
 ```
 
 **The mirror is exact, not fitted** (slope 1, intercept 0). The fitted-slope form is refused as a
@@ -218,7 +237,7 @@ CONTROL MIRROR-NULL (primary):
   non-vacuity: log R is a joint function of p, W and L; the null perturbs none of them - it is an
     analytic reference value, so vacuity does not arise. What could refute it: any cell whose CI
     excludes 0.
-  expected outcome if H true: log R CI-low > 0 on some selective cell. If H false: CI covers 0
+  expected outcome if H true: log R CI-low > 0 on some cell. If H false: CI covers 0
     (arm C's SPDR-018 centre sat at log R < 0 with p 0.0007 from its own gross break-even).
   disclosure: distance in log units AND the implied bps, both reported.
 
@@ -305,50 +324,66 @@ CONVERSION-PIN:
 
 ---
 
-## §8 Power statement — and the constraint the selectivity fix creates
+## §8 Power statement
 
 Same derivation as `SPDR-019` §8, computed from SPDR-018's emitted cells:
 
 ```
 Delta log R ~= Delta mean / ((1-p)*L);  arm C: p 0.467, L 124.5 -> (1-p)*L ~= 66.4 bps
-=> at arm C's median block MDE, a cell resolves Delta log R ~= MDE_bps / 66.4
+=> a cell resolves Delta log R ~= its block MDE in bps / 66.4
 ```
 
-| Target `Δlog R` | Required mean-MDE | n multiple vs a median SPDR-018 powered cell |
+| Target `Δlog R` | Required mean-MDE | Required episodes (from arm C's MDE-vs-n scaling) |
 |---|---:|---:|
-| 0.07 | 4.6 bps | ~3.1× |
-| 0.05 | 3.3 bps | ~6.0× |
-| 0.03 | 2.0 bps | ~16.8× |
+| 0.07 | 4.6 bps | ~10,800 |
+| 0.05 | 3.3 bps | ~21,200 |
+| 0.03 | 2.0 bps | ~58,800 |
 
-**The selectivity fix cuts `n` and this is stated up front, not discovered.** Forcing
-`p_event ≤ 0.60` where the parent ran 0.938–0.998 removes roughly **40% or more of the event
-population per zone**, and raising `z` removes more. That is the correct scientific trade — a
-non-selective band measures ambient — but it moves cells toward `NOT_RESOLVABLE`.
+**Population, read from the parent's emission — not from its report's headline.** Counts below come
+from `SPDR-014/results/zones.parquet` and `post_event.parquet` directly:
+
+| `z` | zones | post-event rows |
+|---|---:|---:|
+| 1.0 *(dropped)* | 234,785 | 190,467 |
+| **1.5** | **261,305** | **211,872** |
+| **2.0** | **253,366** | **158,313** |
+| **2.5 / 3.0** | new — computed at run; expected to continue the decline | — |
+
+*(An earlier draft attributed the parent's whole-grid total of 749,456 zones to `z = 1.5` alone.
+That was wrong; 749,456 spans all three `z` levels. Corrected here against the artifact.)*
+
+**Removing the selectivity gate is what makes this experiment powered.** The gated draft would have
+discarded most of the event population; taking every signal retains it. At `z = 1.5`, `Z-VOL`,
+`h = 12`, the parent emitted ~86.8k post-event rows across event types — so a pooled cell at one
+`(z, event, h, source, side)` combination lands in the **20k–45k** range depending on how the band
+split is handled, which reaches `Δlog R = 0.05` and approaches 0.03.
+
+**Full TRAIN is the primary read; DESIGN and CONFIRM are scored as verification.** This is
+SPDR-018's own power lever 2, applied here for the same reason: splitting the band halves `n` on a
+read that needs every episode. Both bands are still emitted and compared — the split is a stability
+check, not the primary object.
 
 ```
 POWER:
-  expected episodes: SPDR-014 emitted 749,456 zones / 560,652 post-event rows across 25 symbols at
-    z=1.5. Under the selectivity restriction the retained population is ESTIMATED at 15-40% of
-    that per z-level, pooled across symbols -> an estimated 8k-25k episodes per pooled cell at the
-    lower z-levels, materially fewer at z >= 3.0.
+  expected episodes: artifact-grounded above. Pooled across 25 symbols, full TRAIN, a low-z Z-VOL
+    cell is expected in the 20k-45k range; high-z and Z-MAG cells materially fewer. Realised n is
+    EMITTED per cell - none of these figures is trusted at analysis time.
   MDE: emitted PER CELL in log units BEFORE any effect is read (M-1, block >= h). The iid form is
     companion-only and may never drive a band label.
   strata PREDECLARED UNPOWERED for the log R read (never reportable as negatives, B-5):
-    - EVERY per-symbol cell (SPDR-014's per-symbol n ran 10-517; the requirement is ~10,800).
+    - EVERY per-symbol cell (SPDR-014's per-symbol n ran 10-517 against a ~10,800 requirement).
       Per-symbol is emitted for heterogeneity disclosure ONLY.
-    - Every cell at target Delta log R <= 0.03.
-    - The high-z tail (z >= 3.0) on any symbol subset; likely on the pool too - to be reported
-      with its realised n and shortfall, not silently.
-    - Z-MAG and Z-MAG-SENS sources, which were already sparse in the parent (223 and 876 rows at
-      the primary cell). They are emitted for completeness and are expected NOT_RESOLVABLE.
+    - Every cell targeting Delta log R <= 0.03 outside the largest pooled cells.
+    - The high-z tail (z = 3.0), to be reported with its realised n and shortfall, not silently.
+    - Z-MAG and Z-MAG-SENS, already sparse in the parent (223 and 876 rows at the primary cell);
+      emitted for completeness and expected NOT_RESOLVABLE.
     - Sizing cells for any mean-based read.
   A cell that misses its target is reported NOT_RESOLVABLE with realised n, block MDE, target,
   the multiple short, and the n that WOULD be required.
 ```
 
-**Consequence, stated plainly:** like `SPDR-019`, this is a **pooled** experiment, and the
-selectivity fix makes that more true, not less. A design revision moving the primary read to
-per-symbol cells is refused by this power statement.
+**Consequence, stated plainly:** like `SPDR-019`, this is a **pooled** experiment. A design revision
+moving the primary read to per-symbol cells is refused by this power statement.
 
 ---
 
@@ -364,8 +399,8 @@ BANDS (per cell, on log R):
   CONTRADICTED:  log R <= -0.03 with ci_high < 0 (a measured negative residual IS a finding)
   UNPOWERED:     block MDE > 0.07 log units, or n below the §8 requirement. Permanently excluded
                  from negatives (B-5).
-NON-SELECTIVE cells (p_event > 0.60) carry NO primary conclusion in any band; they are the
-  parent-comparability arm and are labelled as such on every row.
+NO cell is excluded, down-weighted or labelled by its breach rate. `p_event` is emitted on every
+  row as a covariate and is read AGAINST log R as a dose-response axis, never applied to it.
 POOLED figures are the primary read by construction (§8), reported WITH a homogeneity statistic.
   Per-symbol is disclosure. Event types are NEVER pooled with each other (they are different
   commitment states, §3).
@@ -382,17 +417,17 @@ EVIDENCE CLASS on every row: [P] / [S] / [D] / [U] per reflection §2.0.
 | Universe | top-25 30d USD volume (AMENDMENT-U1); pin `cf-voldir-001-universe.json`; recompute + assert set equality |
 | Clock | **H1 primary** (SPDR-014's own clock), **H4 co-report** |
 | Sources | `Z-VOL` primary; `Z-MAG`, `Z-MAG-SENS` completeness-only (predeclared likely `NOT_RESOLVABLE`) |
-| `z` | `{1.5, 2.0, 2.5, 3.0, 3.5}` — 1.5 retained **solely** as the parent-parity anchor |
+| `z` | `{1.5, 2.0, 2.5, 3.0}` — 1.0 dropped (not an outlier band); 1.5 doubles as the parent-parity anchor. **No selectivity gate; every signal is taken** |
 | `H` (event window) | inherited: 12 primary, parent's alternatives co-reported |
 | `h` (hold) | inherited: `{4, 12, 24}` |
 | Events | E-TOUCH, E-CLOSE, E-HORIZON — separate, never pooled |
 | Sides | MOMO and MR both emitted; **neither assumed** |
 | TRAIN fence | `analysis_start 2021-06-29T06:53Z` → `train_end 2023-12-18T00:00Z`; asserted in code |
-| DESIGN / CONFIRM | `[2021-06-29, 2023-03-01)` / `[2023-03-01, 2023-12-18)` — **both scored**, `n`-weighted |
+| Primary band | **Full TRAIN** (power lever 2). DESIGN `[2021-06-29, 2023-03-01)` / CONFIRM `[2023-03-01, 2023-12-18)` both scored as **verification**, `n`-weighted |
 | Global holdout | `2025-01-08T00:00Z` — **never queried** |
 | cTrader | **Not in phase (a)**; separate leg under C1 if authorised; never pooled into `n` |
 | Complexity | 1 inherited event module (from `SPDR-014/screen_code/`), 1 layer module, 4 device modules, 1 metrics layer, 1 control module; ≤ 8 plots |
-| Cell count | phase (a): **≤ 120 cells** × 2 bands (the z-sweep and the 3 event types multiply SPDR-019's grid). **Disclosed, not rationed** |
+| Cell count | phase (a): **≤ 120 cells** on full TRAIN, + the two verification bands. **Disclosed, not rationed** |
 
 ---
 
@@ -405,10 +440,11 @@ G1 (parent parity - the anti-drift proof):
   entry open[j+1], the exit open[entry+12], r_h in bps - and asserts these equal SPDR-014's
   published values for the same cell to the declared tolerance.
 
-G2 (the selectivity fix):
-  The same symbol and source at z=1.5 and at z=3.0. QA computes p_event at both and confirms
-  z=1.5 lands ABOVE 0.60 (reproducing the parent's 0.938-0.998 problem) and that the z=3.0 cell's
-  p_event is emitted and used to set its NON-SELECTIVE / selective label.
+G2 (p_event is measured, and measured correctly):
+  The same symbol and source at z=1.5 and at z=3.0. QA computes p_event at BOTH from the emitted
+  zones and confirms (a) the z=1.5 value reproduces SPDR-014's published 0.995-1.000 for that
+  cell, (b) p_event FALLS as z rises, and (c) NO code path uses p_event to filter, exclude or
+  label any cell. This trace exists to prove the covariate is measured and not applied.
 
 G3 (event-type distinctness, the B-4 guard):
   A zone that produces BOTH an E-TOUCH and a later E-CLOSE. QA confirms two DISTINCT events with
@@ -444,7 +480,7 @@ G7 (leak discrimination):
 | Causality | band width `≤ t`; anchor `open[t+1]`; breach entry `open[j+1]`; exit `open[entry+h]`; every layer's state at the **breach bar**; TRIPWIRE-1 |
 | Breach detection | no post-`j` information used to detect the event at `j`; TRIPWIRE-2 |
 | **Parent parity** | reproduces SPDR-014's published cells at `z=1.5` on the parent's band, to a declared tolerance — **the proof the object was not re-specified** |
-| **`p_event` emitted** | on every cell, per event type; the selective/non-selective label derives from it and from nothing else |
+| **`p_event` emitted** | on every cell, per event type, as a **reported covariate**. Asserted **not** to filter, gate or label any cell (INFR-016 / L-32) |
 | Universe pin | top-25 recompute == pin file, set equality |
 | **Identity reconstruction** | `\|p·W − (1−p)·L − mean\| < 0.01 bps` on **every** cell |
 | **`log R` definition** | asserted equal to `log(W/L) − log((1−p)/p)` with **slope 1**; a fitted-slope residual anywhere is a **hard failure** |
@@ -479,7 +515,7 @@ pass (P-23). No required check lives in a manual post-step (L-52).
 - **Any expectancy, tradability, deployability or cost-complete claim** (AMENDMENT-C2, unchanged).
 - **The fitted-slope residual as a target** (audit A1).
 - **Scoring any capture variant against zero P&L** rather than against the mirror.
-- **A primary conclusion from a non-selective cell** (`p_event > 0.60`) — the parent's defect.
+- **Any selectivity gate, breach-rate cutoff, or cell exclusion on `p_event`** — removed by operator directive 2026-07-28 (§2.2). `p_event` is measured and reported, never applied.
 - **Re-litigating the DESIGN→CONFIRM sign flip** — discharged by SPDR-018 C7 (§2.3).
 - **Pooling event types with each other**, or pooling MOMO with MR.
 - **Assuming a side.** Both arms are emitted; the registered direction is not privileged.
@@ -500,10 +536,24 @@ pass (P-23). No required check lives in a manual post-step (L-52).
 No amendments to this design. Registered 2026-07-28.
 running count: 0 looser / 0 tighter / 0 neutral
 
-NOTE on the z-sweep: extending z to {2.0, 2.5, 3.0, 3.5} is recorded as part of the ORIGINAL
-registration of this design, not as an amendment to it. It implements the checkpoint design's
-binding carry-forward fix ("the band must actually select") and is TIGHTER in effect - it removes
-the parent's non-selective cells from primary status. Disclosed in the cell count.
+AMENDMENT-1: remove the p_event <= 0.60 selectivity gate entirely; z grid set to
+  {1.5, 2.0, 2.5, 3.0} (1.0 dropped as not an outlier band); every signal taken; p_event retained
+  as an emitted covariate and dose-response axis, never a filter.
+  - DIRECTION: LOOSER (no cell is excluded; the population grows)
+  - Operator directive 2026-07-28. Rationale in 2.2: the threshold was invented, was the wrong
+    SHAPE for this programme (INFR-016/L-32 retired arbitrary value-gates), and contradicted the
+    purpose of a capture-geometry experiment, which is not to find better-selecting signals.
+AMENDMENT-2: full TRAIN becomes the primary read; DESIGN/CONFIRM scored as verification.
+  - DIRECTION: LOOSER (more n per cell; the band split stops halving the primary read)
+  - SPDR-018 power lever 2, applied for power.
+AMENDMENT-3: restore SPDR-014's UNDECIDED-side rule and its 5 bps flat deadband, both of which an
+  earlier draft silently replaced.
+  - DIRECTION: NEUTRAL (parent fidelity restored)
+
+running count: 2 looser / 0 tighter / 1 neutral
+NOTE: a 2-looser streak is disclosed here per L-23. Neither loosening touches an integrity check,
+a fence, a causality rule or a claim boundary; both act ONLY on population size, and the second is
+a power lever SPDR-018 already used. No band label, control or refusal is relaxed.
 ```
 
 Checkpoint/family amendments in force: **U1** (NEUTRAL), **S1** (NEUTRAL), **C1** (NEUTRAL),
