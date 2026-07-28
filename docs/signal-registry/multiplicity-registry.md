@@ -1606,7 +1606,12 @@ graduates a base. **Not** a reopening of CF-VOLCONV-001.
 | `CF-VOLDIR-001/HYP-A` | SPDR-012 | Vol predictability/reliability under frozen metrics (clustering, level, regime, realised measures, clock, XS rank, tail); **universe = top-25 30d USD volume** | 0 | DESIGN COMPLETE (+U1); execution unauthorised |
 | `CF-VOLDIR-001/HYP-B` | SPDR-013 | Fast direction expectancy bps (SMA 14/25/≤50 + angle; ZigZag ATR + path-local features; magnitude and/or vol of next whole move) — **not win-rate**; **same top-25 universe** | 0 | DESIGN COMPLETE (+U1); default after SPDR-012 gate |
 | `CF-VOLDIR-001/HYP-C` | Reflection | Mid-checkpoint freeze of combination / stop / direction-agnostic branch | 0 | REGISTERED; not result-producing |
-| `CF-VOLDIR-001/HYP-D` | SPDR-014 | Vol×direction or authorised direction-agnostic extraction under partial-cost disclosure | 0 | SCREEN COMPLETE (2026-07-24) — INCONCLUSIVE / UNPOWERED_NOT_NULL (B-5); `residual_status=NONE` (0/927 powered); 0 counted reads; SPDR-016 opened by operator override on SUGGESTIVE leads |
+| `CF-VOLDIR-001/HYP-D` | SPDR-014 | Vol×direction or authorised direction-agnostic extraction under partial-cost disclosure | 0 | SCREEN COMPLETE (2026-07-24) — INCONCLUSIVE / UNPOWERED_NOT_NULL (B-5); `residual_status=NONE` (0/927 powered); 0 counted reads |
+| `CF-VOLDIR-001/HYP-D3` | SPDR-016 | Refine the named 014 residual with error-dynamics features (014-gated) | 0 | **CLOSED — SUPERSEDED, NEVER RUN** (2026-07-25): feature layer measured inert by SPDR-017; target carried into `SPDR-018`. 0 reads consumed |
+| `CF-VOLDIR-001/HYP-D4` | SPDR-017 | Independent predicted-price mispricing characterised like 014 | 0 | **CLOSED — NOT_WORTH** (2026-07-24); model IC ≈ 0; DERIVED inert; destroys indistinguishable |
+| `CF-VOLDIR-001/HYP-D5` | SPDR-018 | For every question checkpoint-017 left **UNPOWERED or INCONCLUSIVE**, measured in its **original statement**: can it be resolved to its own target precision on this data, and if so what is the answer? Complete residue of SPDR-012/013/014/015 across four arms; uniform `(p, W, L, W/L, p_be_net, edge)` layer on every signed cell | 0 | **DESIGN COMPLETE 2026-07-25**; execution unauthorised. Multiplicity **disclosed, not rationed** (operator directive — follow-up confirmations of registered open questions, not new candidate mining). Only authorised drop: SPDR-017. Parent parity asserted in code. `NOT_RESOLVABLE` is a first-class result |
+| `CF-VOLDIR-001/HYP-D6` | SPDR-019 | Given the `(p, W, L)` picture from D5, does opportunity-modulated capture geometry on a fixed signed breakout entry lift partial-net expectancy above the cost floor vs the unmodulated baseline? | 0 | **REGISTERED 2026-07-25**; start-gated on the SPDR-018 reflection |
+| `CF-VOLDIR-001/HYP-D7` | SPDR-020 | Same question on the SPDR-014 E-TOUCH/E-CLOSE event object under direction-aware capture, with a band that actually selects | 0 | **REGISTERED 2026-07-25**; start-gated on the SPDR-018 reflection |
 | `CF-VOLDIR-001/HYP-E` | XENA-VOLDIR-001 | Portfolio/search on graduated D bases only | 0 | RESERVED; requires D graduation + separate design/QA/approval |
 
 Failed/dropped arms remain recorded. No replacement primary direction device (including SPDR-011
@@ -1629,6 +1634,63 @@ reproduce the live selection — **DIRECTION: TIGHTER**. Running count: **1L / 1
 **AMENDMENT-A6:** require a live signed-catalog tree re-hash, a binding supported-edge
 future-destroy survival rule, and event-by-event theoretical-to-Nautilus fill reconciliation —
 **DIRECTION: TIGHTER**. Running count: **1L / 2T / 3N**.
+
+**AMENDMENT-C1 (2026-07-25, checkpoint-018):** admit the cTrader instruments (EURUSD, XAUUSD, USTEC;
+INFR-021 catalog + fence) to `CF-VOLDIR-001` as an **independent replication read only** — never
+pooled into the powered crypto estimate. Separate fence (`train_end` 2023-11-22 vs the Bybit
+2023-12-18), so no shared DESIGN/CONFIRM split; cTrader holdout 2024-12-13+ sealed. Rationale:
+pooling different vol scales, session structure, funding and cost basis raises heterogeneity and can
+*reduce* effective power, whereas out-of-class reproduction is worth more as credibility.
+**DIRECTION: NEUTRAL** (scope clarification pre-execution; 0 outcome contact).
+Running count: **1L / 2T / 4N**.
+
+**AMENDMENT-C2 (2026-07-25, checkpoint-018):** three binding tightenings for the capture-geometry
+branch — (i) **no expectancy claim from exits, holds, or sizing on a joint `(p, W, L)` that does not
+clear `p_be_net = (L+cost)/(W+L)` at power** (the analytic `E[gross]=0` kill:
+`CF-VOLHARV-001/HYP-001`, reproduced by SPDR-013's `time` arm), and no rule phrased against
+`p > 0.5` — an edge can exist at `p < 0.5` whenever `W > L`; (ii) a blended opportunity score may
+not be reported without its term-level decomposition (`p`, `W`, `L`, `W/L`, `edge`) or without its
+components' individual contributions; (iii) a **per-symbol spread pin is a prerequisite** for any
+checkpoint-018 money read, since a capture-geometry branch is more spread-sensitive than a
+forecasting branch. **DIRECTION: TIGHTER**. Running count: **1L / 3T / 4N**.
+
+
+
+
+**AMENDMENT-C3 (2026-07-25, operator directive): SPDR-018 multiplicity is disclosed, not rationed.**
+The four arms sweep the complete 017 residue in its original statement, no omissions (only
+authorised drop: SPDR-017). Justification: these are **follow-up confirmations of already-registered
+open questions**, not new candidate mining — no new hypothesis is created by re-measuring a cell that
+017 already registered and left unpowered, and the parents' own `screen_code/` is reused with parent
+parity asserted. The full cell count is disclosed; no cell is dropped for budget. **DIRECTION: NEUTRAL** (scope
+statement, no gate moved). Running count: **1L / 3T / 5N**.
+
+**AMENDMENT-C4 (2026-07-26, disclosure): SPDR-018 and SPDR-018B outcomes recorded; multiplicity
+disclosed as run, and the tail counts must be read against it.** SPDR-018 emitted **37,791 cells**
+(24,098 signed) and SPDR-018B **7,578** (6,156 signed), under AMENDMENT-C3's disclosed-not-rationed
+directive. Per **L-34** the correct comparison for any tail count is the realised testing process, not
+zero. As run:
+
+- **SPDR-018:** of 1,413 powered signed cells, **130 have a gross-mean CI excluding zero — 129 negative,
+  1 positive.** Under a nominal 95% CI on 1,413 cells you would expect ~35 per tail, so the **positive
+  tail is depleted well below chance while the negative tail is enriched ~3.7×**. The two single-cell
+  positives in the run (one +8.24 bps cell with CI-low 0.12, and the C2 `shock_flag` M-3 control at
+  one-sided p = 0.05, n = 505) are **each one cell against a 37,791-cell grid** and are discounted on
+  exactly those grounds.
+- **SPDR-018B:** of 315 powered signed cells, **12 negative and 2 positive** — close to the nominal
+  expectation for 315 correlated cells, i.e. **no enriched tail at all**. Additionally, **five
+  separately-cut M-3 reads were taken on the single C2 object** (full-panel, primary cell, `P-MOMO`,
+  `P-MR`, and a three-way session split); none is multiplicity-treated, and the session split was an
+  analyst probe rather than a predeclared cut.
+
+**DIRECTION: NEUTRAL** (disclosure of what was run; no gate moved, no slot spent). Running count:
+**1L / 3T / 6N**.
+
+**Slots:** checkpoint-017 consumed **0** slots. `HYP-D5/D6/D7` are registered at **0 slots**.
+**`HYP-D5` is now COMPLETE across both universes (SPDR-018 SUPPORTED, SPDR-018B PARTIALLY SUPPORTED)
+having consumed 0 slots and 0 counted TEST reads.** D6/D7 are sequenced after the mid-checkpoint
+reflection, which sets their **parameterisation**; neither is gated on a D5 outcome (checkpoint design
+§2 — SPDR-018 carries no gating verdict).
 
 ## Amendment Rules
 
