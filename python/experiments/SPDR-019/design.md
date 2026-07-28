@@ -245,8 +245,8 @@ CONTROL MIRROR-NULL (primary):
     requirement (B-1) applies to matched-control designs; stated here explicitly so QA does not
     read its absence as an omission.
   bite/MDE: block-bootstrap CI on log R, block >= holding horizon. Per-cell MDE in log units is
-    emitted BEFORE the read (see §8). A cell whose MDE exceeds 0.07 log units is predeclared
-    UNPOWERED for this control.
+    emitted BEFORE the read (see SS8), together with the control's own sensitivity ladder. No
+    adequacy cutoff is applied; the reader judges resolution from the ladder.
   non-vacuity: log R is a function of p, W and L jointly; the null perturbs none of them - it is
     an analytic reference value, so vacuity does not arise. What could refute it: any cell whose
     CI excludes 0.
@@ -341,7 +341,7 @@ its own units.
 
 ---
 
-## §8 Power statement — the binding constraint on this design
+## §8 Resolution statement — sensitivity across a range, not a single bar
 
 Derived from SPDR-018's emitted cells, **computed not asserted**
 (`results/analyst_per_cell_magnitudes.parquet`, 1,413 powered cells):
@@ -382,58 +382,86 @@ correct figure was in the file this section already cited. Corrected here agains
 | **M15 added as a capture clock**, with the scale forecast ŝ still computed on **H1** | **~4×** | Multiplicity: two clocks reported separately, never pooled. Legitimate because the capture question is about exit geometry, not intraday forecast skill — V4's "no within-day skill" constrains the *forecast*, which stays on H1 |
 
 ```
-POWER:
+RESOLUTION (replaces the pass/fail POWER block; operator mandate 2026-07-28):
+  Every cell emits a SENSITIVITY LADDER instead of a powered/unpowered verdict. For a fixed
+  ladder of candidate effect sizes, the cell reports the fraction of block-bootstrap replicates
+  in which a PLANTED effect of that size would have been detected at its own realised n:
+
+      ladder = { 0.02, 0.03, 0.05, 0.075, 0.10, 0.15 }  log units
+
+  Emitted per cell:  realised n | block MDE | CI width | detection rate at each ladder rung |
+                     the n that WOULD be required at each rung.
+  The ladder is a PRESENTATION grid, not a set of thresholds: no rung admits, excludes, labels or
+  ranks any cell. It exists so the reader sees WHERE a cell's resolution falls rather than being
+  handed a boolean.
+  No cell is flagged powered, unpowered or NOT_RESOLVABLE. A cell with poor resolution reports
+  poor resolution, in numbers, and is still reported in full.
+  MDE is always the dependence-matched BLOCK form (M-1, block >= the holding horizon); the iid
+  form is companion-only and may never be presented as the cell's resolution.
+```
+
+**What this changes and what it does not.** The conversion `Δlog R ≈ Δmean / ((1−p)·L)` and the
+`n`-scaling below are **derivations** and stand unchanged — they are how resolution is computed. What
+is removed is the single canonical bar that used to turn them into a verdict.
+
+```
+EXPECTED RESOLUTION (a prediction, never a result - realised values are emitted per cell):
   H1  pooled, full TRAIN: 229,646 bars (artifact-grounded)
   M15 pooled, full TRAIN: ~4x the H1 count; COMPUTED AT RUN, never assumed
-  signal rate: MEASURED and EMITTED per delta level, not assumed. Indicative measurement at
-    delta = 0.5 puts it near 10% of bars - an earlier draft's "1-5%" was wrong.
+  signal rate: MEASURED and EMITTED per delta level. Indicative measurement at delta = 0.5 puts
+    it near 10% of bars - an earlier draft's "1-5%" was wrong.
   fill rate:   MEASURED and EMITTED per cell (stop orders do not all fill).
   => indicative baseline episode counts, full TRAIN, pooled across symbols:
-       H1  ~13k-16k   -> reaches Delta log R ~0.07
-       M15 ~50k-60k   -> reaches ~0.05 comfortably, approaches 0.03
-  MDE: emitted PER CELL in log units BEFORE any effect is read (M-1, block >= holding horizon).
-    The iid form is companion-only and may never drive a band label.
-  strata PREDECLARED UNPOWERED for the log R read (never reportable as negatives, B-5):
-    - EVERY per-symbol cell. No single symbol reaches ~10,800 episodes on this catalog.
-      Per-symbol is emitted for heterogeneity disclosure ONLY.
-    - The DESIGN and CONFIRM verification cells on H1, which halve an already-marginal n.
-      They are a stability read, not a primary read.
-    - NARROW selection layers on H1 - a top-decile s_hat cut leaves ~10% of episodes and is
-      expected NOT_RESOLVABLE. On M15 the same cut is expected marginal. COARSE selections
-      (halves, state labels) are expected resolvable on M15.
-    - Sizing cells for any mean-based read (a variance object by construction).
-  Every one of these expectations is a PREDICTION, not a result: realised n, block MDE, target,
-  the multiple short and the required n are emitted per cell, and a cell that misses is reported
-  NOT_RESOLVABLE.
+       H1  ~13k-16k    -> resolution lands around the 0.07 rung
+       M15 ~50k-60k    -> around the 0.05 rung, approaching 0.03
+     Narrow selections (top-decile s_hat) cut n ~10x and land several rungs coarser; coarse
+     selections (halves, state labels) land close to the baseline. Per-symbol cells land at the
+     coarse end of the ladder throughout.
+  Sizing cells are reported on DISPERSION only and carry no log R resolution read at all.
 ```
 
 **Consequence, stated plainly:** the primary reads live on **M15, full TRAIN, pooled across
-symbols**. H1 is the co-report and the clock-effect check; per-symbol is heterogeneity disclosure.
-A design revision moving the primary read to per-symbol cells, or to a band-split cell on H1, is
-refused by this power statement.
+symbols**, because that is where resolution is finest. H1 is the co-report and the clock-effect
+check; per-symbol is heterogeneity disclosure. None of these is an admissibility rule — every cell
+is reported with its own resolution attached, and the reader weighs them.
 
 ---
 
-## §9 Interpretation bands (labels, never gates — INFR-016)
+## §9 Interpretation bands — CI-relative, with no adequacy label (operator mandate 2026-07-28)
+
+**Precision-first.** No cell carries a `powered` / `unpowered` / `NOT_RESOLVABLE` flag. Every cell
+reports its **effect, its block-bootstrap CI, its CI width, its block MDE, and its resolution curve**
+(§8), and the reader judges adequacy. Powering is left to later verification, not asserted here.
 
 ```
-BANDS (per cell, on log R):
-  SUPPORTED:     log R >= +0.03 with block-bootstrap ci_low > 0
-  WASH:          |log R| < the cell's own block MDE  -> report as "indistinguishable from the
-                 mirror", with the measured value and CI. NEVER as a refutation.
-  CONTRADICTED:  log R <= -0.03 with ci_high < 0  (a measured negative residual IS a finding -
-                 SPDR-018's centre sat at -0.0301)
-  UNPOWERED:     block MDE > 0.07 log units, or n below the §8 requirement. Excluded from
-                 negatives, permanently (B-5).
-POOLED: pooled-across-symbol figures are the PRIMARY read here by construction (§8) and are
-  reported WITH a homogeneity statistic (I^2 across symbols) so that pooling is justified, not
-  assumed. Per-symbol figures are disclosure.
-EVIDENCE CLASS: every emitted row carries [P] powered-at-target / [S] scored-without-target /
-  [D] disclosure / [U] unpowered, per reflection §2.0. A row's class limits what may be built on it.
+BANDS (per cell, on log R - defined by the CI's relation to the mirror, NOT by any magnitude):
+  ABOVE THE MIRROR:  ci_low  > 0     the residual is resolvably positive on this cell's own data
+  COVERS THE MIRROR: ci spans 0      report the point estimate, the CI WIDTH and the MDE together,
+                     so a wide-CI cell and a genuinely-null cell are visibly different. This is
+                     NEVER a refutation and NEVER a negative.
+  BELOW THE MIRROR:  ci_high < 0     the residual is resolvably negative - itself a finding
+                     (SPDR-018's centre sat at -0.0301)
+No magnitude threshold appears in any band. An earlier draft used +-0.03 and a 0.07 adequacy
+cutoff; both were anchored on sd(log R)=0.0729 and median log R=-0.0301, which are DISPERSION and
+LOCATION of the observed residual - neither is a statement about what effect size matters. Removed
+by operator mandate.
+
+POOLED: pooled-across-symbol figures are the PRIMARY read by construction (SS8), reported WITH a
+  homogeneity statistic (I^2 across symbols) so pooling is justified rather than assumed.
+  Per-symbol figures are disclosure.
+EVIDENCE CLASS: rows still carry [S] scored / [D] disclosure per reflection SS2.0 - these describe
+  WHAT KIND of read a row is, not whether it is adequate. The [P]/[U] adequacy classes are
+  RETIRED for this experiment; adequacy is read off the MDE and resolution curve.
 ```
 
-**No band is a gate.** Every value/quality read is a report layer; the operator authorises what
-advances (INFR-016). Nothing is machine-dropped between layers.
+**No band is a gate, and no band is an adequacy claim.** Every value/quality read is a report layer;
+the operator authorises what advances (INFR-016). Nothing is machine-dropped between layers.
+
+**The B-5 protection is strengthened, not weakened.** B-5 exists so a thin cell is never read as a
+negative. A boolean `UNPOWERED` flag delivered that with an invented cutoff; **binding every effect
+to its own MDE and CI width on the same row delivers it without one** — no effect can be quoted
+without its precision travelling alongside it, which is a stricter constraint than a label that can
+be dropped in summary.
 
 ---
 
@@ -505,7 +533,9 @@ G6 (leak discrimination):
 | **Identity reconstruction** | `\|p·W − (1−p)·L − mean\| < 0.01 bps` on **every** cell |
 | **`log R` definition** | asserted equal to `log(W/L) − log((1−p)/p)` with **slope 1**; a fitted-slope residual appearing anywhere is a **hard failure** |
 | **Cost isolation** | no cost term enters any estimand, threshold, band or comparison; `p_be_net` present and flagged `DISCLOSURE_ONLY` (AMENDMENT-C5) |
-| **MDE column** | the band-driving column is the **block** MDE in log units; the iid column is labelled companion-only (M-1) |
+| **MDE column** | the reported resolution column is the **block** MDE in log units; the iid column is labelled companion-only (M-1) |
+| **No adequacy flag** | asserted that **no** `powered` / `unpowered` / `at_target` / `NOT_RESOLVABLE` column is emitted anywhere, and that no single canonical MDE threshold appears in code (operator mandate 2026-07-28) |
+| **Ladder emitted** | the sensitivity ladder is present on **every** cell, with its detection rates and required-`n` values |
 | **Span disclosure** | exact-span subset and span distribution per horizon cell (M-2) |
 | Episode exclusivity | at most one open episode per symbol; suppression count emitted |
 | Fill rate | emitted per cell; unfilled and suppressed signals counted, never dropped |
@@ -542,8 +572,9 @@ pass (P-23). No required check lives in a manual post-step (L-52).
   its calibration is emitted so QA can verify which was optimised.
 - **Combining layers before characterising them individually** (AMENDMENT-C6).
 - **Pruning phase (b) to phase (a)'s winners** — the scope is fixed and includes flat layers.
-- **Reading UNPOWERED or NOT_RESOLVABLE as a negative**; reading SUGGESTIVE as SUPPORTED (B-5).
-- **A per-symbol `log R` conclusion** — predeclared UNPOWERED by §8.
+- **Reading a coarse-resolution cell as a negative** (B-5), or reading a CI that covers the mirror as a refutation.
+- **Emitting any `powered` / `unpowered` / `NOT_RESOLVABLE` flag, or any single canonical adequacy threshold** — retired by operator mandate 2026-07-28; resolution is reported as a ladder and adequacy is the reader's judgement.
+- **A per-symbol `log R` conclusion carried without its resolution ladder** — per-symbol cells resolve coarsely (§8) and are heterogeneity disclosure.
 - **A blended score without its term-level decomposition** (SoT §7).
 - **A sizing cell reported as improving expectancy** (SoT §4.4).
 - Any family status change; any XENA; any TEST or holdout contact.
@@ -573,7 +604,16 @@ AMENDMENT-5: correct the SS8 population figure to the artifact value (229,646 po
   - DIRECTION: NEUTRAL (a factual correction; it makes the power statement harsher, not looser)
   - QA finding, run 1.
 
-running count: 2 looser / 2 tighter / 1 neutral
+AMENDMENT-6: retire the powered/unpowered adequacy label and the +-0.03 / 0.07 magnitude
+  thresholds; report a SENSITIVITY LADDER per cell and define bands by the CI's relation to the
+  mirror instead.
+  - DIRECTION: NEUTRAL (nothing is admitted or excluded either way; a boolean is replaced by the
+    numbers behind it, and every effect is now bound to its own MDE and CI width on the same row)
+  - Operator mandate 2026-07-28. The retired thresholds were anchored on sd(log R)=0.0729 and
+    median log R=-0.0301 - the DISPERSION and LOCATION of the observed residual, neither of which
+    is a statement about what effect size matters. Powering is left to later verification.
+
+running count: 2 looser / 2 tighter / 2 neutral
 NOTE per L-23: no one-directional streak. Neither loosening touches an integrity check, fence,
 causality rule or claim boundary - both act only on population size. Both tightenings close real
 specification gaps.
@@ -592,12 +632,12 @@ sufficiency, NEUTRAL), **C1** (cTrader replication-only, NEUTRAL), **C2** (claim
 | `screen_code/` | entry module, layer module, 4 device modules, metrics layer, control module |
 | `results/episodes.parquet` | every episode: signal ts, decision state, stop price, fill ts/price, exit ts/price/reason, `r` bps, layer tags |
 | `results/signals.parquet` | every signal incl. **unfilled** and **suppressed**, with reason |
-| `results/metrics_by_cell.parquet` | per cell: `p`,`W`,`L`,`W_L`,`p_be`,**`log R`**, block + iid MDE in log units, CIs, band label, evidence class, fill rate, `p_flat`, κ, `n`, homogeneity, cost overlay flagged `DISCLOSURE_ONLY` |
+| `results/metrics_by_cell.parquet` | per cell: `p`,`W`,`L`,`W_L`,`p_be`,**`log R`**, block + iid MDE in log units, CIs, CI width, ladder detection rates, band label (CI-relative), evidence class, fill rate, `p_flat`, κ, `n`, homogeneity, cost overlay flagged `DISCLOSURE_ONLY` |
 | `results/layer_deltas.parquet` | Δ`log R` per stage vs L0, with the L2 interaction term |
 | `results/controls.json` | all four controls: percentiles, **null means and quantiles**, **plant curves** (P-24), derangement fixed-point counts |
 | `results/selection_check.json` | the L-51 three-number check on every powered subset (P-22) |
 | `results/unit_pin.json` | measured ATR20 and σ̂ medians (computed, not asserted) |
-| `results/not_resolvable.json` | every cell missing its target: realised n, block MDE, target, multiple short, required n |
+| `results/resolution_ladder.parquet` | per cell: realised n, block MDE, CI width, detection rate at each ladder rung, and the n required at each rung. **No adequacy flag** |
 | `results/golden_traces.json` | G1–G6 |
 | `results/integrity_selfcheck.json` | check-count reconciliation, fences, causality, pin, identity, `log R` definition, cost isolation, code sha256 |
 | `screen.md` | neutral quantification (subordinate) |

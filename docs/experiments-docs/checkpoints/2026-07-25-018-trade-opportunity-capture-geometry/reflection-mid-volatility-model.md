@@ -313,9 +313,15 @@ the exact driftless mirror:
 - Under the parents' incidental exit geometries: **median −0.0301, mean −0.0356, sd 0.0729**, positive
   in **459 of 1,413 (32.5%)** — exactly the cells that clear gross break-even, by identity.
 - A designed capture policy is a **finding** if and only if it produces `log R` **reliably above zero**.
-- **Pre-registrable MDE:** with sd(`log R`) ≈ 0.0729, a policy must shift the residual by roughly
-  **+0.03 to +0.07 log units** to be distinguishable from the mirror — and the design must state the
-  cell count and block structure that resolves that **before** it runs (M-1, SoT §7).
+- **Resolution, not a bar (operator mandate 2026-07-28).** An earlier version of this section named
+  **+0.03 to +0.07 log units** as the effect a policy must reach. Those numbers were anchored on
+  `sd(log R) = 0.0729` and `median log R = −0.0301` — the **dispersion** and **location** of the
+  observed residual, neither of which is a statement about what effect size *matters*. **They are
+  withdrawn as thresholds.** SPDR-019/020 instead emit a **sensitivity ladder** per cell —
+  `{0.02, 0.03, 0.05, 0.075, 0.10, 0.15}` log units, with the detection rate and required `n` at
+  each rung — alongside the block MDE and CI width, and **no cell carries a powered / unpowered /
+  `NOT_RESOLVABLE` flag**. Adequacy is the reader's judgement; powering is left to later
+  verification. The design still states its block structure before it runs (M-1, SoT §7).
 - **Do not substitute the regression residual.** Using the fitted slope 0.9408 produces a quantity
   centred at zero by construction that no policy can beat on average (audit A1).
 

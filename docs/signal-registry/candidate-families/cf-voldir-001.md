@@ -445,3 +445,19 @@ spread not charged; reported net **overstated** relative to true cost.
   operator directive** — recorded as an open gap, not a blocker; any future citation of 018B's §5 guard reads
   must carry the caveat. **0 counted TEST reads; 0 multiplicity slots; no XENA; no family action; status
   remains REGISTERED.** Family transitions remain retrospective-only. |
+| 2026-07-28 | **AMENDMENT-C7 (NEUTRAL — operator mandate): retire the single canonical power threshold across `SPDR-019` and `SPDR-020`.**
+  The mid-checkpoint reflection originally named **+0.03 to +0.07 log units** as the effect a capture policy must
+  reach on the payoff residual `log R`, and the two designs turned 0.07 into a `powered` / `unpowered` adequacy
+  label. **Both are withdrawn.** The numbers were anchored on `sd(log R) = 0.0729` and `median log R = −0.0301` —
+  the **dispersion** and **location** of the observed residual — neither of which is a statement about what effect
+  size matters to the research. Two replacements, both operator-approved: **(1) sensitivity analysis** — every cell
+  emits a **ladder** `{0.02, 0.03, 0.05, 0.075, 0.10, 0.15}` log units carrying the detection rate and the required
+  `n` at each rung, as a presentation grid that admits, excludes, labels and ranks nothing; **(2) precision-first** —
+  **no `powered` / `unpowered` / `at_target` / `NOT_RESOLVABLE` flag is emitted anywhere**, each cell reports its
+  effect with its **block MDE and CI width bound to the same row**, and adequacy is the reader's judgement, with
+  powering left to later verification. Interpretation bands are correspondingly redefined by the **CI's relation to
+  the mirror** (above / covers / below) rather than by any magnitude. **B-5 is strengthened, not weakened:** a
+  boolean label could be dropped in summary, whereas an effect that cannot be quoted without its own precision
+  cannot be read as a negative by omission. Both designs carry the change in their amendment ledgers
+  (SPDR-019 AMENDMENT-6, SPDR-020 AMENDMENT-4) and both remain **execution-unauthorised** pending QA run 2.
+  **0 counted TEST reads; 0 multiplicity slots; no family action; status remains REGISTERED.** |
