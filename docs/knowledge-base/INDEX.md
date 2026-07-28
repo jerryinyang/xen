@@ -90,7 +90,12 @@ infrastructure correctness must precede family registration and outcome contact.
   per-stratum non-pooling, inverted-inference predeclaration) and the ones that wasted effort.
 - [lessons-and-amendments.md](lessons-and-amendments.md) — **the most important file.** Every
   observation that forced an amendment, each with its **mechanism (why)**. The look-ahead that
-  shipped a false `DEPLOYABLE_CONFIRMED` is lesson L-01.
+  shipped a false `DEPLOYABLE_CONFIRMED` is lesson L-01. Newest (SPDR-018/018B, 2026-07-26):
+  **L-50** absolute-bps thresholds are not portable across volatility scales (state them in σ units);
+  **L-51** a precision gate is a dispersion gate and is not sign-neutral on skewed P&L;
+  **L-52** a check depending on transient state silently does not run — assert the check *count*;
+  **L-53** a deflator derived from a selected subset is circular — report its range.
+  Corresponding dead ends: **P-21…P-25**.
 
 ## Project memory
 

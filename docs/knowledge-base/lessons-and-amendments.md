@@ -1117,3 +1117,280 @@ Bybit CAL pin was marked STALE and must be re-measured before it authorises anot
 `xen.xena.economics.is_valid_cost_scope` / `check_cost_map_integrity`,
 `tests/test_evaluation.py::test_bybit_round_trip_refuses_to_charge_spread`,
 `tests/test_xena_economics.py::test_cost_map_refuses_a_universe_declaring_spread_in_scope`.
+
+---
+
+## L-49 — A rate × magnitude decomposition is only valid when wins and losses are the same size; near a coin-flip rate the payoff asymmetry carries the sign ⭐
+
+**What.** The exact decomposition of a signed per-trade return is
+
+```
+E[gross] = p·W − (1−p)·L        W = E[r | r > 0]      L = E[−r | r < 0]
+```
+
+This reduces to the familiar `(2p − 1) × E[|move|]` **only when `W = L`**. Whenever wins and losses
+differ in size the two forms diverge, and near `p ≈ 0.5` the rate term contributes almost nothing —
+**`W/L` carries the sign of the mean**. A design that reads only the rate will book a positive-mean
+cell as a null, and a budget built on the rate×magnitude form will be wrong by whatever the payoff
+asymmetry is worth.
+
+A second, related error: multiplying by a capture ratio such as `κ = median(r / mfe)`. `E[|move|]`
+is *already* the realised hold-to-horizon magnitude; κ is a **ceiling-relative diagnostic** against
+an in-window peak that peeks. Realised magnitude × peak-relative ratio is a quantity with no
+referent.
+
+**Mechanism (why).** "Hit rate times average move" *feels* like an expectancy formula, and it is the
+shape most trading folklore uses. It silently assumes a symmetric payoff. Any strategy with a
+path-dependent exit — a stop, a target, a trail, a time cap — deliberately breaks that symmetry;
+that is what those devices are *for*. So the one decomposition that cannot describe a
+capture-geometry programme is the one that assumes the capture geometry does nothing. The error is
+self-concealing: it agrees with the truth exactly at `W = L`, and its error grows precisely in the
+regime such research is aimed at.
+
+**Consequences.**
+
+- The research target is **not** `p > 0.5`. It is `p > p_be_net = (L + cost)/(W + L)`, satisfiable
+  at `p < 0.5` whenever `W > L`. Any gate, refusal, or band phrased against 0.5 is void.
+- `W/L` is a **first-class, measurable degree of freedom**, not a residual. Exits, targets, stops
+  and holds move it directly, so it is the natural handle for any capture-geometry branch — and it
+  must be measured per cell *before* such a branch is designed.
+- κ is a diagnostic ("what fraction of the best available point did the policy retain"), reported as
+  non-tradable. It multiplies nothing.
+- The martingale result survives intact and is sharpened: on a driftless path with a fixed-horizon
+  exit `E[r] = 0` forces `p·W = (1−p)·L`, so `p` and `W/L` are locked together and a path-dependent
+  exit trades one against the other **along the zero line**. Capture geometry redistributes the
+  payoff; it does not create expectancy (cf. `CF-VOLHARV-001/HYP-001`, L-14).
+
+**Fix / new rule.** Any design whose estimand is a signed per-trade return must (a) emit `p`, `W`,
+`L`, `W/L`, `p_be_net` and `edge = p − p_be_net` per cell, (b) **assert the reconstruction
+numerically** — `|p·W − (1−p)·L − mean| < 0.01 bps` — as an integrity check, not a report line, and
+(c) state break-even against `p_be_net`, never against 0.5. A blended "opportunity score" may not be
+reported without this term-level decomposition.
+
+**Meta-lesson.** An organising identity registered in a checkpoint brief is load-bearing
+infrastructure and deserves the same numerical verification as a cost model or a fill rule: check it
+against emitted quantities on the first run that can, and prefer an identity that is **exact by
+construction** over one that is merely intuitive. An identity that is only *usually* right is a
+premise defect, and premise defects propagate into every downstream budget.
+
+**Enforced at.** `.ignore/what-next/alts/opportunity.md` §2;
+`docs/references/chapter-06-governance.md` §1b + §3;
+`docs/signal-registry/candidate-families/cf-voldir-001.md` §0;
+`docs/signal-registry/multiplicity-registry.md` AMENDMENT-C2;
+`python/experiments/SPDR-018/design.md` §4.1 + §12 (identity-reconstruction integrity check).
+
+---
+
+## L-50 — A precision target stated in absolute units is not portable across universes with different volatility scales (SPDR-018B) ⭐
+
+**What.** SPDR-018B carried SPDR-013/014's target-precision rule — **block MDE ≤ 10 bps** — unchanged
+from the Bybit crypto universe (pooled σ̂ **73.00 bps**) onto the cTrader universe (pooled σ̂
+**13.03 bps**). The rule looked identical. In σ units it was not: **0.137σ on crypto against 0.767σ on
+cTrader — a silent 5.6× loosening.**
+
+Three separate headline conclusions were wrong, all in the same direction:
+
+| Figure | On the imported absolute bar | Re-derived at the σ-scaled bar (1.785 bps) |
+|---|---|---|
+| powered signed cells | 2,401 | **315** |
+| cells clearing net break-even | 12.9% | **0.0%** |
+| `W/L`-mirror fit R² | 0.311 — written up as "the mirror does not fit here" | **0.9746** — the mirror replicates *more tightly* than crypto's 0.9667 |
+
+The third is the most instructive: a loosened power bar admitted ~2,100 noisy cells whose `log R`
+scatter tripled the residual variance, and the resulting bad fit was then *explained* with a plausible
+mechanism ("`W/L` has too narrow a dynamic range here"). **A wrong threshold produced a wrong number,
+and the wrong number recruited a wrong story.**
+
+**Mechanism (why it slipped through).** A target precision is a statement about a **signal-to-noise
+ratio**, but it is written down in the units of the numerator alone. Once written, it looks like a
+constant of the methodology rather than a property of the universe it was calibrated on — so it
+travels. Nothing in the design references σ̂ at the point where the threshold is applied, so no
+consistency check can fire, and the parent screen (which set the bar honestly for *its* universe)
+looks like the authority. The defect is self-concealing in the favourable direction: a loosened bar
+*increases* the powered-cell count, which reads as the powering experiment succeeding.
+
+**Fix / new rule.**
+
+- **State every precision, materiality and target threshold in σ̂ units, or re-derive it per universe
+  at run time from that universe's own measured σ̂.** A threshold inherited across a universe boundary
+  in absolute units is void.
+- Emit the threshold **and its σ-equivalent** on every cell, so the two can never diverge silently.
+- When two universes are compared, **assert that their bars are equal in σ units** as an integrity
+  check, not a report line.
+- **Power counts computed on different precision bases are not comparable** and must be labelled as
+  such wherever they appear side by side.
+
+**Relationship to L-21 / P-15.** Same class, one level up. L-21 pins the **normaliser object** (which
+ATR, which clock) so that an effect size means what it says. L-50 pins the **threshold's units** so
+that a *decision rule about* effect sizes means what it says. L-21 protects the numerator; L-50
+protects the comparison.
+
+**Meta-lesson.** A "true speed run" that reuses a parent's code and protocol verbatim inherits its
+parent's **calibrations** as well as its logic, and calibrations are the part that does not travel.
+When reusing a screen on new data, enumerate every constant in it and ask of each: *is this a property
+of the method, or of the universe it was fitted to?*
+
+**Enforced at.** `python/experiments/SPDR-018B/analysis.md` §2.2 + §9 (Finding 1);
+`python/experiments/SPDR-018B/report.md` §2 + §10;
+`docs/references/spdr-lane.md` (target precision must be σ-stated or re-derived per universe);
+`docs/knowledge-base/pitfalls-ledger.md` **P-21**.
+
+---
+
+## L-51 — A precision gate is a dispersion gate, and on skewed P&L it is not sign-neutral (SPDR-018B)
+
+**What.** SPDR-018B's powered subset contained **ten arm-B trailing-stop cells with gross means of
++7.13 to +22.97 bps**, every one with a bootstrap CI-low above zero, clearing every floor in the run.
+They were drawn from a population of **116 excluded cells averaging −27.610 bps**. Their signature:
+`p` **0.80–0.89** *together with* `W/L` up to **6.67** — arithmetically impossible for a stable
+distribution, and the exact shape of a truncating exit whose loss tail has not yet fired.
+
+**Mechanism.** A target-precision filter keeps cells whose **realised dispersion** is small relative
+to `n`. On a fat-tailed, one-sided-truncated P&L distribution, *low realised dispersion is itself the
+event of not having sampled the tail.* The filter is therefore correlated with the tail's absence, and
+a trailing stop is precisely the device that concentrates all of a cell's loss into rare large events.
+The gate selects the cells where the rare event has not happened yet — and those cells look like
+skill.
+
+**The refinement, which is the part worth carrying:** the bias direction follows the **population's
+skew, not the gate**. On arm B as a whole the same gate ran the *other* way — excluded cells averaged
+**+6.63 bps with 51.8% positive** against powered cells at **−0.14 bps with 28.7% positive**. So a
+dispersion gate is not reliably optimistic; it is reliably **non-neutral**, and its direction must be
+measured, never assumed.
+
+**Two further facts that keep this honest.** (a) The named instance is now **moot** — 0 of those 126
+cells survive the corrected σ-scaled bar (L-50), so fixing the portability defect deleted this
+artifact's own example. (b) The mechanism is nonetheless general, and the same population reappears
+elsewhere: **99 of the 159 native B3 "positive-mean" cells are `trail`/`stop`**, all unpowered.
+
+**Fix / new rule.** Before any powered subset's **magnitudes** are read, emit the **three-number
+selection check** comparing powered against excluded cells:
+
+1. **payoff-scale ratio** — median `(W+L)` powered ÷ excluded (SPDR-018B: **0.43** — the gate halved
+   the payoff scale);
+2. **sign-share differential** — share of positive-mean cells, powered vs excluded (**28.7% vs
+   51.8%**);
+3. **mean-vs-median gap in the excluded set** — the unfired-tail indicator (**32 bps**).
+
+Any powered subset drawn from a fat-tailed population is a **selected** sample, and its magnitudes are
+uninterpretable until this check is reported. A per-cell CI does not protect against this: all ten
+cells had CI-lows above zero.
+
+**Meta-lesson.** Power filters are usually treated as neutral hygiene — "we only read cells we can
+measure". They are a **selection rule on the outcome's own second moment**, and on skewed data the
+second moment is not independent of the first. Any filter applied to cells *after* their outcomes
+exist needs the same scrutiny as a signal.
+
+**Enforced at.** `python/experiments/SPDR-018B/analysis.md` §8 + §9 (Finding 2);
+`python/experiments/SPDR-018B/report.md` §7; `docs/knowledge-base/pitfalls-ledger.md` **P-22**.
+
+---
+
+## L-52 — A declared check that depends on transient state silently does not run, and "checks held" without a count cannot detect it (SPDR-018 / SPDR-018B) ⭐
+
+**What.** **Four** failures across one build shared a single cause: a check that was declared, believed
+to be running, and not running — while the run reported success.
+
+| # | Failure | How it hid |
+|---|---|---|
+| 1 | **SPDR-018 `TRIPWIRE-2` and `Determinism`** — both declared HARD in design §12 | TRIPWIRE-2 was absent from the self-check entirely; determinism was silently emitted as `INFORMATIVE` with the detail *"parallel-vs-sequential comparison not requested this run"*. `screen.md` §9 said **"Deviations: none"** |
+| 2 | **SPDR-018B arm-C controls** | A resumed run left the in-memory arm-C panel empty; the controls computed over nothing and reported success |
+| 3 | **SPDR-018B post-run fixes** | `panel_C.parquet` had been deleted and was never persisted, so a later stage silently had no input |
+| 4 | **SPDR-018B ambient-base + `TRIPWIRE-1/2/3`** | Appended by a manual post-step (`add_missing_controls.py`), then **wiped** when a later re-run regenerated `controls.json` and `integrity_selfcheck.json` from scratch |
+
+Failure 4 was caught **only by manually counting HARD entries** — 8 against the expected 11. Nothing
+else in the pipeline would have noticed, because every artifact was internally consistent and every
+surviving check passed.
+
+**Mechanism.** Two distinct dependencies, one symptom:
+
+- **Transient state.** A check whose input is an in-memory object cannot distinguish "verified" from
+  "there was nothing to verify". An empty panel passes every assertion over it.
+- **Regenerated artifacts.** A check appended to a file that a later stage rebuilds from scratch is
+  deleted by a *successful* run of that stage. The more reliably the pipeline reproduces its outputs,
+  the more reliably it erases the manual additions.
+
+And one reporting defect that made both invisible: **"18 HARD checks, 0 failed" is a statement about
+the checks that exist, not about the checks that were declared.** It is literally true and materially
+incomplete. A count-free "all HARD checks held" is strictly worse — it cannot even be audited.
+
+**Fix / new rule.**
+
+- **Every check must depend on an emitted artifact**, not on in-memory state. If the artifact is
+  missing or empty, the check **fails**; it does not pass vacuously.
+- **Assert the expected NUMBER of checks** as a HARD check in its own right, and reconcile the
+  self-check against the design's declared list **by name**. A declared-but-absent check is a
+  failure, not a silence.
+- **No check may live in a manual post-step.** If it is required, it is in the runner. (Outstanding
+  work: `SPDR-018B/screen_code/add_missing_controls.py` is still a manual post-step that any re-run
+  silently undoes.)
+- Determinism must execute **unconditionally whenever `--jobs > 1`, independent of `--resume`** — a
+  resumed run is exactly the case it exists to catch, and is the case where it was skipped.
+- Analysts must audit **declared-HARD vs actually-emitted, with counts**, as a Phase-0 step. Doing so
+  is what caught items 1 and 4, and enumerating SPDR-018B's **seven missing inherited HARD checks**.
+
+**Meta-lesson.** An integrity system's failure mode is not a check that fails — that is the system
+working. It is a check that **does not exist while everyone believes it does**. Design the reporting so
+that absence is loud: counts, names, reconciliation against the declared list. Trust no summary
+statistic over a set you have not enumerated.
+
+**Enforced at.** `python/experiments/SPDR-018/analysis.md` §1.1 + §1.2 and its ADDENDUM;
+`python/experiments/SPDR-018B/analysis.md` §1.1; `python/experiments/SPDR-018B/report.md` §9.1 + §11;
+`python/experiments/SPDR-018B/screen_code/run18b.py` (persists `panel_C.parquet`; guard
+parameterised); `docs/knowledge-base/pitfalls-ledger.md` **P-23**.
+
+---
+
+## L-53 — A deflator or normaliser derived from a selected subset is circular, and its range must be reported (SPDR-018B)
+
+**What.** SPDR-018B's cross-universe cost deflator was derived from **realised payoff scale**, median
+`(W+L)`, giving arm B **0.2611** and arm C **0.3118** — a defensible improvement over the ~2×-wrong
+bar-volatility ratio it replaced. But the payoff scales were computed on the **absolute-powered cell
+subset**, i.e. the very selection that the L-50 precision correction invalidated.
+
+Recomputed on other defensible bases, the same statistic gives:
+
+| Basis | arm B | arm C |
+|---|---|---|
+| absolute-powered subset (**as shipped**) | 0.261 | 0.312 |
+| corrected σ-scaled powered subset (315 cells) | **0.185** | 0.196 |
+| all signed cells | **0.703** | 0.386 |
+
+```
+DEFLATOR: defensible range 0.185 - 0.703  ->  a factor of 3.8, i.e. +/-2x on EVERY net figure.
+```
+
+**Mechanism.** The deflator calibrates the cost charge; the cost charge enters `p_be_net`; `p_be_net`
+is one of the quantities the powered subset is selected and then judged against. Deriving the deflator
+*from* that subset closes the loop. The circularity is invisible because each step is individually
+reasonable and the artifact records only the final ratio, with no statement of what it would have been
+on any other basis.
+
+**Why it did not change the conclusion, and why that is luck rather than method.** The headline read —
+**0 of 315 powered cells clear net break-even** — is robust because the best powered cell earns
+**+1.389 bps gross**, and the deflator at which that cell exactly breaks even is **0.1785**. The
+conclusion therefore survives the defensible range **but only by 4%** at its lower bound (0.185 vs
+0.1785) — at a deflator of 0.165 two cells clear and at 0.06 thirty-two do. The margin is thin, not
+comfortable, and the earlier "~0.06" figure in this lesson was wrong. The conclusion survives
+the entire defensible range. Had the best cell been near the charge, the deflator's factor-of-3.8
+ambiguity would have decided the result.
+
+**Fix / new rule.**
+
+- **A deflator, normaliser or cost scale may not be derived from a subset that is itself selected by a
+  quantity the deflator feeds.** Derive it on the full emitted population, or on a subset defined
+  without reference to the outcome.
+- **Report the deflator's range across every defensible basis**, and state which conclusions are
+  invariant to it and which are not. A single point value is an under-specification.
+- Any **cross-universe comparison of net magnitudes** is void while the deflator is unidentified.
+  Gross remains primary. (Compounding disclosure for SPDR-018B: the cost is also **doubly
+  synthetic** — borrowed from Bybit and rescaled — and the per-symbol spread pin is still blocking.)
+
+**Meta-lesson.** Cost and normalisation constants are usually treated as inputs fixed before the
+analysis, so nobody re-audits them once results exist. When such a constant is *estimated from the
+data*, it becomes part of the model and inherits every selection applied to that data. Estimated
+constants need provenance, a basis statement, and a sensitivity range — the same as any other
+estimate.
+
+**Enforced at.** `python/experiments/SPDR-018B/analysis.md` §2.3;
+`python/experiments/SPDR-018B/report.md` §6; `python/experiments/SPDR-018B/results/deflators.json`.
