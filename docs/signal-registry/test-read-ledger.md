@@ -583,3 +583,18 @@ Notes:
   `SPDR-014` / conditional `XENA-VOLDIR-001`). TRAIN-only screens; historical TEST prohibited; global
   holdout sealed. **0 counted TEST reads, 0 holdout reads.** No outcome run authorised by
   registration alone.
+- **SPDR-018 close (2026-07-26, checkpoint-018):** TRAIN-only powering sweep over the complete
+  checkpoint-017 residue; 37,791 cells on 25 Bybit perps. Fence and both holdouts asserted in code and
+  independently verified from the emitted parquets: **zero rows at or after 2025-01-08 (Bybit) or
+  2024-12-13 (cTrader)**. **Bybit** `max(exit_ts)` = 2023-11-21, inside the Bybit TRAIN fence of
+  2023-12-18; the cTrader leg is fenced separately at `train_end` 2023-11-22. Operator verdict `HYP-D5`
+  **SUPPORTED** (powering succeeded; no gating verdict). **0 counted TEST reads, 0 holdout reads, 0
+  multiplicity slots.** Report `python/experiments/SPDR-018/report.md`.
+- **SPDR-018B close (2026-07-26, checkpoint-018):** TRAIN-only replication on the cTrader catalog
+  (EURUSD/XAUUSD/USTEC), INFR-021 fence sha256 `4cdc7b01…6de0` verified; 7,578 cells. cTrader holdout
+  **2024-12-13 onward never queried**; Bybit holdout untouched. **Recorded exposure:** the design §5
+  cross-universe identity guard reads *Bybit* bars, and **no HARD check asserts that those reads stayed
+  inside the Bybit TRAIN fence** — the only residual Phase-0 gap in the run (follow-up P4). No holdout
+  violation is evidenced; the assertion is simply absent. Operator verdict `HYP-D5` **PARTIALLY
+  SUPPORTED**. **0 counted TEST reads, 0 holdout reads, 0 multiplicity slots.** Report
+  `python/experiments/SPDR-018B/report.md`.

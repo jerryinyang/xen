@@ -18,9 +18,47 @@
   k12, CI excl 0) route on; k=1 next-bar NOT_WORTH. Conditioners fold into 014/016 by amendment only; no
   family status change; no XENA. (No `residual_status` — conditioner science, not a residual object.)
 - **O3 sequence brief:** `.ignore/what-next/alts/cf-voldir-o3-zone-event-sequence.md`
-- **Checkpoint:** `docs/experiments-docs/checkpoints/2026-07-23-017-structural-vol-direction-programme/design.md`
-- **Governing RAW brief:** `.ignore/what-next/alts/vol-direction-structural-programme-raw.md`
+- **Checkpoint-017:** `docs/experiments-docs/checkpoints/2026-07-23-017-structural-vol-direction-programme/design.md`
+  — **CLOSED 2026-07-25** (`retrospective.md`): `STRUCTURAL PACKAGE DELIVERED / EXTRACTION
+  UNRESOLVED-AT-POWER`. **SPDR-016 CLOSED — SUPERSEDED, NEVER RUN.** 0 TEST reads, 0 slots,
+  status unchanged.
+- **Checkpoint-018 (current):**
+  `docs/experiments-docs/checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/design.md`
+  — **OPEN 2026-07-25**, trade-opportunity modelling / capture geometry; an **extension** of 017,
+  not a new family. SoT: `.ignore/what-next/alts/opportunity.md`
+- **Governing RAW brief (017):** `.ignore/what-next/alts/vol-direction-structural-programme-raw.md`
 - **Distinct from:** `CF-VOLCONV-001` (closed L1 path: assumed vol + late range-break direction)
+
+## 0. Checkpoint-018 binding premise and identity
+
+> **Unconditional direction is dead. Conditional direction is unpowered, not refuted. Volatility is
+> a multiplier on a direction term, never a substitute for it.**
+
+**Identity:**
+
+```
+E[net per leg] = p·W − (1−p)·L − cost
+  p = P(r_h > 0 | state)   W = E[r_h | r_h > 0]   L = E[−r_h | r_h < 0]
+  p_be_net = (L + cost)/(W + L)        edge = p − p_be_net
+```
+
+Exact by the definition of conditional expectation.
+
+- **The target is not "`p > 0.5`"** — it is "`p` above its own `p_be_net`", satisfiable at
+  `p < 0.5` when `W > L`.
+- **`W/L` is a real, measurable, unclaimed degree of freedom** and is the natural handle for the
+  capture branch.
+- **κ is a diagnostic, never a multiplicative term.**
+- **Direction is measured, not targeted** — no work in this checkpoint tries to improve `p`,
+  select a better entry, or build a direction model. Entries stay simple and fixed.
+
+Axis A (`p`) and axis B (`W`, `L`, `W/L`) are `SPDR-018`. Axis C (`E[|move|]`) is proven and
+supplies **selection + parameter scale, never edge**. Axis D (capture) is `SPDR-019`/`SPDR-020`.
+Axis E (cost) is blocked on a per-symbol spread pin.
+
+**Refused by construction:** any expectancy claim from exits, holds, or sizing on a joint
+`(p, W, L)` that does not clear `p_be_net` at power (the analytic `E[gross]=0` kill —
+`CF-VOLHARV-001/HYP-001`, reproduced by SPDR-013's `time` arm).
 
 ## 1. Falsifiable thesis (programme-level)
 
@@ -65,9 +103,12 @@ re-parameterisation of SPDR-011’s range-break object.
 | **C** | Mid-checkpoint reflection | **SIGNED** — O3 only; Decision A sequence |
 | **D1** | SPDR-014 zone/event / MOMO–MR | **SCREEN COMPLETE (2026-07-24)** — INCONCLUSIVE / UNPOWERED (B-5); `residual_status=NONE` (0 powered cells); no terminal residual named; SPDR-016 opened by operator override on SUGGESTIVE leads |
 | **D2** | SPDR-015 conditioner science | **SCREEN COMPLETE (2026-07-24)** — **WORTH_EXPLORING** (operator-signed): ordinal swing-size gate + vol level-state labels + R-MARKOV multi-bar gate (k=4/12) route on; k=1 next-bar NOT_WORTH. Improves gates/labels for 014/016 by amendment only |
-| **D3a** | SPDR-016 refine 014 residual | **OPEN by operator override** (2026-07-24) — pin is NONE; opened on 014's coherent SUGGESTIVE leads, residual object + policy deferred to 016 design |
-| **D3b** | SPDR-017 independent mispricing (#3) | Own model; **not** gated on 014 residual NONE |
-| **E** | XENA-VOLDIR-001 (conditional) | Only if a base graduates; not for A–C |
+| **D3a** | SPDR-016 refine 014 residual | **CLOSED — SUPERSEDED, NEVER RUN** (2026-07-25). DERIVED feature layer measured inert by SPDR-017; target carried into `SPDR-018` arm C, in the original event-nested form. 0 reads |
+| **D3b** | SPDR-017 independent mispricing (#3) | **CLOSED — NOT_WORTH** (2026-07-24) — model IC ≈ 0; DERIVED layer inert; destroys indistinguishable; M-ZONE ≤ Z-VOL |
+| **D5** | SPDR-018 power the complete 017 residue | **DESIGN COMPLETE** 2026-07-25 (checkpoint-018); execution unauthorised |
+| **D6** | SPDR-019 strategy #1 (naive baseline) + opportunity score + capture test set | **REGISTERED** 2026-07-25 — start-gated on the SPDR-018 reflection |
+| **D7** | SPDR-020 event-grammar direction-aware capture | **REGISTERED** 2026-07-25 — start-gated on the SPDR-018 reflection |
+| **E** | XENA-VOLDIR-001 (conditional) | Only if a base graduates; not for A–C. **RESERVED, never opened** |
 
 **Stop rules:**
 
@@ -89,7 +130,18 @@ re-parameterisation of SPDR-011’s range-break object.
 | `CF-VOLDIR-001/HYP-D2` | SPDR-015 | Level-regime transition skill vs persistence; ordinal ZZ “bigger than” skill? |
 | `CF-VOLDIR-001/HYP-D3` | SPDR-016 | Do error-dynamics features refine the **014 residual** without open ML zoo? (014-gated) |
 | `CF-VOLDIR-001/HYP-D4` | SPDR-017 | Independent predicted-price mispricing (proven + error dynamics + weak-dir features) characterised like 014 — residual ≠ ambient? |
+| `CF-VOLDIR-001/HYP-D5` | SPDR-018 | For every question checkpoint-017 left **UNPOWERED or INCONCLUSIVE**, measured in its **original statement**: can it be resolved to its own target precision on this data, and if so what is the answer? Covers the complete residue of SPDR-012/013/014/015 (only authorised drop: SPDR-017), plus a uniform `(p, W, L, W/L, p_be_net, edge)` decomposition on every cell carrying a signed return |
+| `CF-VOLDIR-001/HYP-D6` | SPDR-019 | Given the `(p, W, L)` picture from D5, does opportunity-modulated capture geometry on a **fixed signed breakout entry** (selection, hold, exits, sizing scaled to forecast move) lift partial-net expectancy above the cost floor versus the unmodulated baseline? |
+| `CF-VOLDIR-001/HYP-D7` | SPDR-020 | Same question on the SPDR-014 E-TOUCH / E-CLOSE event object under direction-aware capture, with a band that actually selects |
 | `CF-VOLDIR-001/HYP-E` | XENA-VOLDIR-001 | Conditional portfolio/search among graduated bases only |
+
+**Checkpoint-018 hypothesis notes.** `HYP-D5` is a **precision experiment**, not a mechanism
+experiment: each arm inherits its parent screen's mechanism, object and estimand verbatim, and only
+the data behind each estimate changes (parent parity asserted in code). `NOT_RESOLVABLE` — a cell
+that cannot reach its target precision in its original form — is a **first-class result**, not a
+failure. `HYP-D6`/`HYP-D7` are start-gated on the D5 reflection: no capture rule can produce
+expectancy from a joint `(p, W, L)` sitting at `p_be_net`. `HYP-D3` (SPDR-016) is closed superseded;
+its intent survives inside D5's arm C.
 
 ## 5. Frozen scope (programme defaults; per-SPDR designs may narrow, not expand silently)
 
@@ -250,3 +302,88 @@ spread not charged; reported net **overstated** relative to true cost.
   CI excl 0). **NOT_WORTH:** k=1 next-bar (R-MARKOV thin; H4 k1; R-HMM-RV forecast); R-SHOCK comparator only.
   Conditioner science — folds into 014/016 gates/labels by amendment only; no `residual_status`; no XENA. Status
   remains REGISTERED. |
+| 2026-07-25 | **CHECKPOINT-017 CLOSED** (`STRUCTURAL PACKAGE DELIVERED / EXTRACTION UNRESOLVED-AT-POWER`).
+  Neither frozen end-state honestly claimable: no cost-surviving base graduated, **and** the extraction
+  failure was never established (SPDR-014 0/927 powered cells, MDE 20/172/796 bps vs a ≤10 floor — B-5
+  forbids reading unpowered as negative). **SPDR-016 CLOSED — SUPERSEDED, NEVER RUN**: its DERIVED
+  error-dynamics layer was independently measured inert by SPDR-017 (A1−A0 median −5.8 bps; 5/16 improve),
+  and its target (powering the 014 leads) is carried forward as SPDR-018 with ~60–100× the n. Supersede-and-retain;
+  0 reads consumed. 0 counted TEST reads; 0 multiplicity slots; XENA never opened. Status remains REGISTERED. |
+| 2026-07-25 | **CHECKPOINT-018 OPENED — Trade Opportunity Modelling / Capture Geometry** (extension of 017,
+  not a new family). SoT `.ignore/what-next/alts/opportunity.md` operator-signed. Binding premise recorded
+  (**unconditional direction dead; conditional direction unpowered-not-refuted; volatility multiplies a
+  direction term, never substitutes for it**) together with the organising identity
+  `E[net] = p·W − (1−p)·L − cost` (`p_be_net = (L+cost)/(W+L)`, `edge = p − p_be_net`).
+  **Registered `SPDR-018` (`HYP-D5`),
+  `SPDR-019` (`HYP-D6`), `SPDR-020` (`HYP-D7`)** — designs pending, execution unauthorised; 019/020
+  start-gated on the SPDR-018 mid-checkpoint reflection. **AMENDMENT-C1 (NEUTRAL):** cTrader instruments
+  (EURUSD/XAUUSD/USTEC, INFR-021 fence) admitted as an **independent replication read only** — never
+  pooled into the powered crypto estimate; separate fence (`train_end` 2023-11-22), holdout 2024-12-13+
+  sealed. **AMENDMENT-C2 (TIGHTER):** expectancy claims from exits/holds/sizing are refused unless the joint
+  `(p, W, L)` clears `p_be_net` at power; blended opportunity scores must carry their term-level decomposition; per-symbol
+  spread pin is a prerequisite for checkpoint-018 money reads. Pure direction-agnostic objects deferred by
+  operator (parked, not refuted). 0 outcomes, 0 reads. Status remains REGISTERED. |
+| 2026-07-25 | **SPDR-018 design complete (execution unauthorised).** A **powering sweep over the complete checkpoint-017 residue**, each item in
+  its **original statement, no omissions** — arm A (SPDR-012 residue), arm B (SPDR-013 residue, where
+  `W`/`L` are measured on real episodes), arm C (SPDR-014 residue in the original event-nested form,
+  incl. `DA-STRADDLE` as **characterisation only**, an operator exception to the direction-agnostic
+  deferral), arm D (SPDR-015 residue incl. the never-scored CONFIRM slice). **Only authorised drop:
+  SPDR-017** (NOT_WORTH on decisive mechanism grounds — powering an absent mechanism buys nothing).
+  Multiplicity **disclosed, not rationed** (operator directive: these are follow-up confirmations of
+  registered open questions, not new candidate mining). Reuses the parents' `screen_code/` with **parent
+  parity asserted in code**. `NOT_RESOLVABLE` is a first-class result. 0 outcomes, 0 reads. Status remains
+  REGISTERED. |
+| 2026-07-26 | **SPDR-018 COMPLETE AND CLOSED — `HYP-D5` SUPPORTED (evidence row; NOT a status transition).**
+  Powering succeeded and carries **no gating verdict** (checkpoint design §2). Code pin `44c720f82af52b8b…`;
+  37,791 cells / 24,098 signed; **18 HARD checks, 0 failed**; parent parity 4.5e-13 / 1.8e-12 / 9.1e-13 / 0.0
+  across arms A–D proves **no estimand was re-specified**. **1,413 powered signed cells against SPDR-014's
+  0 of 927**; all 27 residue items carry cells; **3,559 `NOT_RESOLVABLE`** delivered as a quantified answer
+  (median 7.87× short, p90 27.3×). **Axis-B is discharged — `W`, `L`, `W/L` are now measured**, identity
+  `p·W − (1−p)·L = mean` reconstructing to **1.46e-11 bps**: `p` **0.3887**, `W` **128.65**, `L` **75.55**,
+  `W/L` **1.4844**, `p_be` 0.4025, `p_be_net` **0.4992**, **edge −0.0728**, gross **−1.18 bps**, net −15.16
+  (all medians across powered cells; cross-cell means: `p` 0.3781, `W` 128.81, `L` 84.69, `W/L` 1.7548,
+  `p_be_net` 0.4641, edge −0.0860, gross −1.19 — **`edge` is not the difference of the other medians;
+  read it from its own column**).
+  **0 of 1,413 clear `p_be_net`; 32.5% clear gross break-even.** The gap is **90.7% cost, not rate** (arm C
+  98.8%; its rate sits 0.0007 from its own gross break-even). **`W/L` is NOT a free degree of freedom:**
+  R² **0.9667** against the driftless mirror `(1−p)/p`, exit geometry moves it **67×** while `p` moves
+  inversely, free residual `log R` sd 0.073 with a **negative median (−0.0301) and mean (−0.0356)** — though `log R > 0` in **459 of 1,413 cells (32.5%)**, which is the *same* 32.5% that clears gross break-even, by identity; it is the CENTRE that is negative, never every cell, **82.8%** of powered cells
+  indistinguishable from the mirror. **Powered counter-outcome exists and does NOT route** (129 negative
+  CI-excl-0 cells vs 1 positive; best flipped +12.93 bps against a 13.1–16.0 floor) → **end-state 3 checked
+  and not satisfied at this cost floor**. Surviving live thread: **C2 shock-MOMO**, M-3 live +22.6 bps,
+  pct 0.95, n 505. Still `UNPOWERED`-not-refuted: **C3** (1,946 cells = 55% of the unresolved population).
+  Recorded gaps: arm-C parity 72.5% complete, median/trimmed CIs on 1.0% of cells while the three statistics
+  disagree by 13 bps, M-2 span missing on 13.9%. **0 counted TEST reads; 0 multiplicity slots; no XENA;
+  status remains REGISTERED.** Family action deferred to the checkpoint retrospective. |
+| 2026-07-26 | **SPDR-018B COMPLETE AND CLOSED — `HYP-D5` PARTIALLY SUPPORTED (evidence row; NOT a status
+  transition).** Second universe under AMENDMENT-C1: cTrader EURUSD/XAUUSD/USTEC, INFR-021 fence, **3
+  instruments against 25**; 7,578 cells; **11 HARD checks + 1 INFORMATIVE, 0 failed**. **REPLICATION AND
+  CREDIBILITY ONLY — never pooled into crypto `n`, never cited as power for the crypto estimate**
+  (AMENDMENT-C1 / S1). Cost is **DOUBLY SYNTHETIC** (borrowed from Bybit *and* rescaled); gross primary;
+  per-symbol spread pin still **BLOCKING**. **The structural result replicates, and more tightly than on
+  crypto:** `p` **0.4868** vs `p_be` **0.4855** (gap **+0.0013**), gross mean **−0.080 bps = 0.006σ**,
+  `W` 24.66 / `L` 20.99 / `W/L` 1.0597, `p_be_net` 0.5334, **edge −0.0544**, cost = **95.8%** of the gap,
+  **0 of 315 powered cells clear `p_be_net` — at both charges and at ANY charge above 1.39 bps** (best cell
+  +1.389 bps gross). **`W/L` mirror replicates at R² 0.9746 / slope 0.9656** (tighter than crypto's 0.9667 /
+  0.9408), 93% of cells indistinguishable from the mirror, `W/L` **36.4×** movable with `p` inverse and no
+  improvement in the mean — measured with **all five exit geometries**, which SPDR-018's cTrader leg could
+  not do. **C2 — the replication target — is NOT REPLICATED AND NOT REFUTED**, and its 018B evidence may be
+  cited only as a *"does not transport cleanly"* flag: the comparator is not a neutral yardstick (own mean
+  +0.97 EU → +3.46 US → +12.05 Asia; the Asia null lies entirely above zero; blind upward at +20 bps), the
+  effect **vanishes in EU** (+0.62, pct 0.443) and concentrates in **Asia** (−13.57, n 184), the like-for-like cell
+  (n 290) **was** powered for an effect of crypto's size (its plant curve reads 1.000 at +20 and +40
+  bps) and measured the OPPOSITE sign at pct 0.043 — a powered non-replication on that cell, which
+  strengthens "not replicated" and removes one of the four supports for "not refuted"; and an independent rebuild reproduces every live
+  value but **flips `P-MR`** (pct 0.067 → 0.826). **Three prior headline figures corrected:** powered
+  2,401 → **315**, net-clearing 12.9% → **0.0%**, mirror R² 0.311 → **0.9746** — all three traceable to an
+  absolute-bps precision bar imported across a 5.6× volatility-scale boundary (**L-50**; correction applies
+  to 018B only, SPDR-018 **not reopened** by operator ruling). Coverage gaps closed under **native**
+  definitions: C7 (627 pairs, flip rate 40.99% below chance, bands agree to 0.65 bps `n`-weighted), C8 (339
+  cells, weightings agree to 0.0009), B3 (159 cells — **0 of 159 powered, 16.4× short**). **OPEN / NOT RUN and
+  never to be read as nulls: C9 (`DA-STRADDLE`), D3, D4.** Recorded exposures: **seven inherited HARD checks do
+  not exist** (determinism among them, on a resumed run; plus the Bybit-holdout assertion on the §5 guard =
+  the only residual Phase-0 exposure), the cost deflator is **circular with a defensible range 0.185–0.703**
+  (**L-53**), no median/trimmed CIs and no fragility sweeps emitted at all, power flag not regenerable
+  (317 vs 315). New unregistered lead **P6**: Asia magnitude×shock ≈ +10 bps vs ≈ 0 in EU on 162–184 rows —
+  **must be registered before it is screened**. **0 counted TEST reads; 0 multiplicity slots; no XENA; status
+  remains REGISTERED.** |
