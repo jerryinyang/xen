@@ -1,0 +1,64 @@
+{
+  "cost_model": {
+    "applied_to": [
+      "EURUSD",
+      "XAUUSD",
+      "USTEC"
+    ],
+    "doubly_synthetic": "this cost is BORROWED and RESCALED. It is not any instrument's real cost and supports exactly one claim: cross-universe comparability in volatility units.",
+    "gross_is_primary": true,
+    "operator_directive": "2026-07-25 \u2014 reuse the crypto universe's cost model for simplicity",
+    "source": "SPDR-014 screen_code/costs.py -> xen.evaluation (Bybit taker fee 11.0 bps round trip + discrete funding stamps + 2.0 bps allowance)",
+    "spread": "UNAVAILABLE_NOT_CHARGED \u2014 per-symbol spread pin remains blocking for a money read",
+    "status": "BORROWED",
+    "vol_scaling": "costs are SCALED by the measured sigma ratio (cTrader/crypto) so the charge is equivalent in volatility units across the two universes \u2014 operator directive 2026-07-25. BOTH legs are emitted per cell: the vol-scaled net (headline) and the unscaled borrowed net (companion). Gross remains primary.",
+    "what_it_is_not": "a cTrader cost model, a cTrader cost measurement, or grounds for any tradability claim. Perp funding does not exist on these instruments and the fee schedule is a different broker's.",
+    "what_it_supports": "comparability of net figures ACROSS the two universes on one common yardstick \u2014 and nothing else"
+  },
+  "deviations": [],
+  "disposition": "NONE \u2014 binding read is analysis.md; disposition is the operator's",
+  "experiment": "SPDR-018B",
+  "family": "CF-VOLDIR-001",
+  "hard_all_held": true,
+  "hypothesis": "HYP-D5",
+  "interpretation_notes": [
+    {
+      "clause": "design \u00a74 \u2014 objects rebuilt from parent code rather than re-scored",
+      "id": "IN-B1",
+      "resolution": "No parent screen ever ran on cTrader, so there is no emitted panel to re-score. Each arm drives its parent's own modules against cTrader bars, with catalog and band constants rebound across every loaded parent module (retarget.py). Parent source is never edited. The claim that this changed the DATA and not the OBJECT is checked by the \u00a75 cross-universe identity guard, not asserted.",
+      "weakens_clause": false
+    },
+    {
+      "clause": "design \u00a73 \u2014 borrowed cost model",
+      "id": "IN-B2",
+      "resolution": "Operator-directed simplification. Every net figure on this universe carries the BORROWED label in the emission, and gross is reported alongside net on every cell. No cTrader net figure may be cited as that instrument's cost.",
+      "weakens_clause": false
+    }
+  ],
+  "n_cells_by_arm": {
+    "A": 675,
+    "B": 630,
+    "C": 5526,
+    "D": 747
+  },
+  "n_cells_total": 7578,
+  "power_note": "3 instruments against 25. Cells powered on crypto may be NOT_RESOLVABLE here purely on n. That is a statement about this universe's size, NEVER evidence against the crypto result (B-5). An unpowered non-replication says nothing.",
+  "prohibited_claims": [
+    "tradable",
+    "deployable",
+    "fully-net",
+    "cost-complete",
+    "this is the cTrader cost",
+    "pooled with crypto",
+    "cTrader as power",
+    "p > 0.5",
+    "family status change",
+    "XENA",
+    "graduation",
+    "unpowered non-replication as a negative"
+  ],
+  "purpose": "the SPDR-018 residue on a second universe \u2014 SPDR-018 replicated arm B only, at one exit geometry, leaving C2 shock-MOMO with zero external replication",
+  "spdr_018_status": "COMPLETE and FROZEN \u2014 not modified by this experiment",
+  "universe": "CTRADER (EURUSD, XAUUSD, USTEC)",
+  "wall_clock_s": 1669.2
+}

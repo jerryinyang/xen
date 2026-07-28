@@ -1,0 +1,24 @@
+{
+  "cost_deflator": {
+    "basis": "realised payoff scale, median (W+L), DERIVED PER ARM",
+    "per_arm": {
+      "B": {
+        "crypto_payoff_scale_bps": 165.29689878666352,
+        "ctrader_payoff_scale_bps": 43.165921721854424,
+        "ratio": 0.26114175183386523
+      },
+      "C": {
+        "crypto_payoff_scale_bps": 266.2179111333536,
+        "ctrader_payoff_scale_bps": 83.01517868406692,
+        "ratio": 0.31183168078605744
+      }
+    },
+    "default_for_other_arms": 0.28648671630996136,
+    "supersedes": "the 0.17855 bar-volatility ratio, which was ~2x too low"
+  },
+  "precision_deflator": {
+    "basis": "pooled sigma-hat ratio (a NOISE quantity)",
+    "ratio": 0.17854965954623905,
+    "why_different": "cost scales with what a trade pays; the MDE scales with bar noise. One ratio for both was the original error."
+  }
+}

@@ -1,0 +1,1560 @@
+{
+  "arm_B_side_derangement": {
+    "class": "within_sample_attribution -> REPORT LAYER",
+    "collapse_fraction": 1.0185021538809402,
+    "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+    "collapse_fraction_status": "DISCLOSURE_ONLY",
+    "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+    "control": "SIDE-DERANGEMENT",
+    "destroy_form": "DERANGEMENT",
+    "exclusion_reason": "a singleton (symbol x calendar-month) group cannot be deranged in place \u2014 keeping it would be a fixed point, which L-28 forbids. The excluded mass is disclosed here, never dropped quietly.",
+    "fixed_points_per_seed": 0.0,
+    "fixed_points_total": 0,
+    "live_effect_bps": -1.4409142403947477,
+    "n": 2263,
+    "n_eligible_rows": 2263,
+    "n_excluded_singleton_group_rows": 0,
+    "n_seeds": 2000,
+    "n_seeds_effective": 2000,
+    "null_mean": 0.02666001700502183,
+    "null_q": [
+      -3.6501460200368565,
+      -1.2944166517921978,
+      0.05305350352226758,
+      1.3451084005459846,
+      3.6671800944197623
+    ],
+    "null_sd": 1.9051425753013869,
+    "p_one_sided": 0.229,
+    "p_two_sided": 0.458,
+    "percentile": 0.229,
+    "plant_curve": [
+      {
+        "live_effect": 3.559085759605252,
+        "n_seeds_effective": 200,
+        "null_mean": -0.001171629458197927,
+        "null_q": [
+          -3.8905628209303518,
+          -1.2904955062092058,
+          0.27698112501155825,
+          1.3274753246828843,
+          3.768168755866646
+        ],
+        "null_sd": 1.9666175341270584,
+        "p_one_sided": 0.03,
+        "p_two_sided": 0.06,
+        "percentile": 0.97,
+        "plant_bps": 5.0
+      },
+      {
+        "live_effect": 8.559085759605253,
+        "n_seeds_effective": 200,
+        "null_mean": -0.001171629458197927,
+        "null_q": [
+          -3.8905628209303518,
+          -1.2904955062092058,
+          0.27698112501155825,
+          1.3274753246828843,
+          3.768168755866646
+        ],
+        "null_sd": 1.9666175341270584,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 1.0,
+        "plant_bps": 10.0
+      },
+      {
+        "live_effect": 18.559085759605253,
+        "n_seeds_effective": 200,
+        "null_mean": -0.001171629458197927,
+        "null_q": [
+          -3.8905628209303518,
+          -1.2904955062092058,
+          0.27698112501155825,
+          1.3274753246828843,
+          3.768168755866646
+        ],
+        "null_sd": 1.9666175341270584,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 1.0,
+        "plant_bps": 20.0
+      },
+      {
+        "live_effect": 38.55908575960525,
+        "n_seeds_effective": 200,
+        "null_mean": -0.001171629458197927,
+        "null_q": [
+          -3.8905628209303518,
+          -1.2904955062092058,
+          0.27698112501155825,
+          1.3274753246828843,
+          3.768168755866646
+        ],
+        "null_sd": 1.9666175341270584,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 1.0,
+        "plant_bps": 40.0
+      }
+    ],
+    "side_label_agreement_mean": 0.479775961113566,
+    "side_label_agreement_note": "index derangement is exact (0 fixed points). Side is a BINARY label, so a deranged row can still receive the same value by coincidence; that residual agreement is disclosed here rather than hidden inside the fixed-point count."
+  },
+  "arm_C_ambient_base": {
+    "ambient": {
+      "L": 44.0976231154941,
+      "W": 46.339811361828254,
+      "W_L": 1.0508460113703122,
+      "block_mde_mean_bps": 1.1407082876276498,
+      "mean": -4.600916880150329,
+      "mean_ci_high": -3.465182903370201,
+      "mean_ci_low": -5.741625167777979,
+      "median": -4.676034072440604,
+      "p": 0.43672961825611917,
+      "trimmed_mean_10": -4.427983679065549
+    },
+    "class": "disclosure -> BASE-CONDITIONAL OBLIGATION",
+    "control": "AMBIENT-BASE",
+    "delta_L": 7.743844993533386,
+    "delta_W": 6.670805727569565,
+    "delta_W_L": -0.02829362188335738,
+    "delta_dispersion_iqr_bps": 13.771381115043035,
+    "delta_dispersion_sd_bps": 6.70628726237554,
+    "delta_mean": -0.05308321682641459,
+    "delta_median": -0.166491084859401,
+    "delta_p": 0.013308813719284385,
+    "framing": "the cell's own conditional effect on the outcome distribution, independent of profitability \u2014 NOT a lift-vs-baseline read",
+    "live": {
+      "L": 51.84146810902749,
+      "L_ci_high": 56.30433938784001,
+      "L_ci_low": 47.678929462834255,
+      "W": 53.01061708939782,
+      "W_L": 1.0225523894869548,
+      "W_L_ci_high": 1.1240148055598118,
+      "W_L_ci_low": 0.9300289719094019,
+      "W_ci_high": 57.50508804540667,
+      "W_ci_low": 48.5685134015766,
+      "block_mde_mean_bps": 3.3379912064241104,
+      "mean": -4.654000096976744,
+      "mean_ci_high": -1.1939615749568848,
+      "mean_ci_low": -7.991991303400854,
+      "median": -4.842525157300005,
+      "p": 0.45003843197540355,
+      "p_ci_high": 0.47095042513223073,
+      "p_ci_low": 0.4294937424334174,
+      "trimmed_mean_10": -4.210547832452053
+    },
+    "n_ambient": 210691,
+    "n_live": 2602
+  },
+  "arm_C_side_derangement": {
+    "class": "within_sample_attribution -> REPORT LAYER",
+    "collapse_fraction": 1.1453307447474461,
+    "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+    "collapse_fraction_status": "DISCLOSURE_ONLY",
+    "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+    "control": "SIDE-DERANGEMENT",
+    "destroy_form": "DERANGEMENT",
+    "exclusion_reason": "a singleton (symbol x calendar-month) group cannot be deranged in place \u2014 keeping it would be a fixed point, which L-28 forbids. The excluded mass is disclosed here, never dropped quietly.",
+    "fixed_points_per_seed": 0.0,
+    "fixed_points_total": 0,
+    "live_effect_bps": -2.631873135991228,
+    "n": 2602,
+    "n_eligible_rows": 2602,
+    "n_excluded_singleton_group_rows": 0,
+    "n_seeds": 2000,
+    "n_seeds_effective": 2000,
+    "null_mean": 0.3824920829344019,
+    "null_q": [
+      -2.568208640275502,
+      -0.6599665363267924,
+      0.3448431660245166,
+      1.4426068590175296,
+      3.4990393315371513
+    ],
+    "null_sd": 1.551113554666725,
+    "p_one_sided": 0.023,
+    "p_two_sided": 0.046,
+    "percentile": 0.023,
+    "plant_curve": [
+      {
+        "live_effect": 2.368126864008772,
+        "n_seeds_effective": 200,
+        "null_mean": 0.32070723482471764,
+        "null_q": [
+          -2.6086674058126063,
+          -0.6065650751003664,
+          0.33018073892661637,
+          1.2783504943372428,
+          3.1812119636087117
+        ],
+        "null_sd": 1.5005768976043696,
+        "p_one_sided": 0.08,
+        "p_two_sided": 0.16,
+        "percentile": 0.92,
+        "plant_bps": 5.0
+      },
+      {
+        "live_effect": 7.368126864008771,
+        "n_seeds_effective": 200,
+        "null_mean": 0.32070723482471764,
+        "null_q": [
+          -2.6086674058126063,
+          -0.6065650751003664,
+          0.33018073892661637,
+          1.2783504943372428,
+          3.1812119636087117
+        ],
+        "null_sd": 1.5005768976043696,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 1.0,
+        "plant_bps": 10.0
+      },
+      {
+        "live_effect": 17.368126864008772,
+        "n_seeds_effective": 200,
+        "null_mean": 0.32070723482471764,
+        "null_q": [
+          -2.6086674058126063,
+          -0.6065650751003664,
+          0.33018073892661637,
+          1.2783504943372428,
+          3.1812119636087117
+        ],
+        "null_sd": 1.5005768976043696,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 1.0,
+        "plant_bps": 20.0
+      },
+      {
+        "live_effect": 37.36812686400877,
+        "n_seeds_effective": 200,
+        "null_mean": 0.32070723482471764,
+        "null_q": [
+          -2.6086674058126063,
+          -0.6065650751003664,
+          0.33018073892661637,
+          1.2783504943372428,
+          3.1812119636087117
+        ],
+        "null_sd": 1.5005768976043696,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 1.0,
+        "plant_bps": 40.0
+      }
+    ],
+    "side_label_agreement_mean": 0.49848808608762496,
+    "side_label_agreement_note": "index derangement is exact (0 fixed points). Side is a BINARY label, so a deranged row can still receive the same value by coincidence; that residual agreement is disclosed here rather than hidden inside the fixed-point count."
+  },
+  "controls_completeness_note": "ambient-base and TRIPWIRE-1/2/3 were ABSENT from the original SPDR-018B emission and are added here. screen.md \u00a77's 'Deviations: none' was inaccurate and is corrected.",
+  "cost_model": {
+    "applied_to": [
+      "EURUSD",
+      "XAUUSD",
+      "USTEC"
+    ],
+    "doubly_synthetic": "this cost is BORROWED and RESCALED. It is not any instrument's real cost and supports exactly one claim: cross-universe comparability in volatility units.",
+    "gross_is_primary": true,
+    "operator_directive": "2026-07-25 \u2014 reuse the crypto universe's cost model for simplicity",
+    "source": "SPDR-014 screen_code/costs.py -> xen.evaluation (Bybit taker fee 11.0 bps round trip + discrete funding stamps + 2.0 bps allowance)",
+    "spread": "UNAVAILABLE_NOT_CHARGED \u2014 per-symbol spread pin remains blocking for a money read",
+    "status": "BORROWED",
+    "vol_scaling": "costs are SCALED by the measured sigma ratio (cTrader/crypto) so the charge is equivalent in volatility units across the two universes \u2014 operator directive 2026-07-25. BOTH legs are emitted per cell: the vol-scaled net (headline) and the unscaled borrowed net (companion). Gross remains primary.",
+    "what_it_is_not": "a cTrader cost model, a cTrader cost measurement, or grounds for any tradability claim. Perp funding does not exist on these instruments and the fee schedule is a different broker's.",
+    "what_it_supports": "comparability of net figures ACROSS the two universes on one common yardstick \u2014 and nothing else"
+  },
+  "magnitude_matched": {
+    "mag_high": {
+      "class": "within_sample_attribution -> REPORT LAYER",
+      "collapse_fraction": 0.39228332287934387,
+      "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+      "comparator_n_mean": 1145.0,
+      "control": "MAGNITUDE-MATCHED-COMPARATOR",
+      "decile_supply": [
+        {
+          "abs_r_hi": 5.050479317587397,
+          "abs_r_lo": -Infinity,
+          "decile": 0,
+          "live_n": 115,
+          "pool_n": 163
+        },
+        {
+          "abs_r_hi": 11.242663723909807,
+          "abs_r_lo": 5.050479317587397,
+          "decile": 1,
+          "live_n": 114,
+          "pool_n": 165
+        },
+        {
+          "abs_r_hi": 18.003974742646815,
+          "abs_r_lo": 11.242663723909807,
+          "decile": 2,
+          "live_n": 115,
+          "pool_n": 182
+        },
+        {
+          "abs_r_hi": 24.922838864621877,
+          "abs_r_lo": 18.003974742646815,
+          "decile": 3,
+          "live_n": 114,
+          "pool_n": 132
+        },
+        {
+          "abs_r_hi": 35.798208253781105,
+          "abs_r_lo": 24.922838864621877,
+          "decile": 4,
+          "live_n": 114,
+          "pool_n": 191
+        },
+        {
+          "abs_r_hi": 49.44352997452706,
+          "abs_r_lo": 35.798208253781105,
+          "decile": 5,
+          "live_n": 115,
+          "pool_n": 145
+        },
+        {
+          "abs_r_hi": 66.13669625000053,
+          "abs_r_lo": 49.44352997452706,
+          "decile": 6,
+          "live_n": 114,
+          "pool_n": 155
+        },
+        {
+          "abs_r_hi": 94.68016551376836,
+          "abs_r_lo": 66.13669625000053,
+          "decile": 7,
+          "live_n": 115,
+          "pool_n": 133
+        },
+        {
+          "abs_r_hi": 147.96259262173365,
+          "abs_r_lo": 94.68016551376836,
+          "decile": 8,
+          "live_n": 114,
+          "pool_n": 126
+        },
+        {
+          "abs_r_hi": Infinity,
+          "abs_r_lo": 147.96259262173365,
+          "decile": 9,
+          "live_n": 115,
+          "pool_n": 65
+        }
+      ],
+      "deciles_with_no_comparator_supply": [],
+      "expected_if_H_false": "live inside the comparator distribution",
+      "expected_if_H_true": "live outside the comparator distribution",
+      "live_effect_bps": -3.402450585871955,
+      "n_live": 1145,
+      "n_pool_available": 1457,
+      "n_seeds": 2000,
+      "n_seeds_effective": 2000,
+      "neighbourhood_excluded_bars": 1,
+      "null_mean": -2.0677259641133343,
+      "null_q": [
+        -6.417179141049901,
+        -3.591526589212338,
+        -1.974514674427326,
+        -0.5613189094499977,
+        2.1350828603216945
+      ],
+      "null_sd": 2.2189906210430017,
+      "p_one_sided": 0.2735,
+      "p_two_sided": 0.547,
+      "percentile": 0.2735,
+      "plant_curve": [
+        {
+          "live_effect": 1.5975494141280453,
+          "n_seeds_effective": 200,
+          "null_mean": -1.9034648473601203,
+          "null_q": [
+            -6.496801837626914,
+            -3.456985518682634,
+            -1.7981471907121362,
+            -0.3754484619979184,
+            2.2231822536112564
+          ],
+          "null_sd": 2.2700399421280304,
+          "p_one_sided": 0.045,
+          "p_two_sided": 0.09,
+          "percentile": 0.955,
+          "plant_bps": 5.0
+        },
+        {
+          "live_effect": 6.5975494141280455,
+          "n_seeds_effective": 200,
+          "null_mean": -1.9034648473601203,
+          "null_q": [
+            -6.496801837626914,
+            -3.456985518682634,
+            -1.7981471907121362,
+            -0.3754484619979184,
+            2.2231822536112564
+          ],
+          "null_sd": 2.2700399421280304,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 1.0,
+          "plant_bps": 10.0
+        },
+        {
+          "live_effect": 16.597549414128043,
+          "n_seeds_effective": 200,
+          "null_mean": -1.9034648473601203,
+          "null_q": [
+            -6.496801837626914,
+            -3.456985518682634,
+            -1.7981471907121362,
+            -0.3754484619979184,
+            2.2231822536112564
+          ],
+          "null_sd": 2.2700399421280304,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 1.0,
+          "plant_bps": 20.0
+        },
+        {
+          "live_effect": 36.597549414128046,
+          "n_seeds_effective": 200,
+          "null_mean": -1.9034648473601203,
+          "null_q": [
+            -6.496801837626914,
+            -3.456985518682634,
+            -1.7981471907121362,
+            -0.3754484619979184,
+            2.2231822536112564
+          ],
+          "null_sd": 2.2700399421280304,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 1.0,
+          "plant_bps": 40.0
+        }
+      ],
+      "rule": "M-3",
+      "status": "MATCHED"
+    },
+    "shock_flag": {
+      "class": "within_sample_attribution -> REPORT LAYER",
+      "collapse_fraction": 0.8310423055970744,
+      "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+      "comparator_n_mean": 290.0,
+      "control": "MAGNITUDE-MATCHED-COMPARATOR",
+      "decile_supply": [
+        {
+          "abs_r_hi": 4.738475990950231,
+          "abs_r_lo": -Infinity,
+          "decile": 0,
+          "live_n": 29,
+          "pool_n": 224
+        },
+        {
+          "abs_r_hi": 10.981905022195315,
+          "abs_r_lo": 4.738475990950231,
+          "decile": 1,
+          "live_n": 29,
+          "pool_n": 262
+        },
+        {
+          "abs_r_hi": 16.064336770956313,
+          "abs_r_lo": 10.981905022195315,
+          "decile": 2,
+          "live_n": 29,
+          "pool_n": 205
+        },
+        {
+          "abs_r_hi": 20.95188119914848,
+          "abs_r_lo": 16.064336770956313,
+          "decile": 3,
+          "live_n": 29,
+          "pool_n": 167
+        },
+        {
+          "abs_r_hi": 28.07696327152054,
+          "abs_r_lo": 20.95188119914848,
+          "decile": 4,
+          "live_n": 29,
+          "pool_n": 197
+        },
+        {
+          "abs_r_hi": 43.41553691170663,
+          "abs_r_lo": 28.07696327152054,
+          "decile": 5,
+          "live_n": 29,
+          "pool_n": 329
+        },
+        {
+          "abs_r_hi": 58.5475186844564,
+          "abs_r_lo": 43.41553691170663,
+          "decile": 6,
+          "live_n": 29,
+          "pool_n": 230
+        },
+        {
+          "abs_r_hi": 79.27158081183588,
+          "abs_r_lo": 58.5475186844564,
+          "decile": 7,
+          "live_n": 29,
+          "pool_n": 226
+        },
+        {
+          "abs_r_hi": 125.15854488207837,
+          "abs_r_lo": 79.27158081183588,
+          "decile": 8,
+          "live_n": 29,
+          "pool_n": 247
+        },
+        {
+          "abs_r_hi": Infinity,
+          "abs_r_lo": 125.15854488207837,
+          "decile": 9,
+          "live_n": 29,
+          "pool_n": 225
+        }
+      ],
+      "deciles_with_no_comparator_supply": [],
+      "expected_if_H_false": "live inside the comparator distribution",
+      "expected_if_H_true": "live outside the comparator distribution",
+      "live_effect_bps": -9.383195493320075,
+      "n_live": 290,
+      "n_pool_available": 2312,
+      "n_seeds": 2000,
+      "n_seeds_effective": 2000,
+      "neighbourhood_excluded_bars": 1,
+      "null_mean": -1.5853630766832827,
+      "null_q": [
+        -10.302729966246986,
+        -4.55326250186527,
+        -1.683949543767947,
+        1.4247395491940622,
+        6.910573096526669
+      ],
+      "null_sd": 4.454088408619404,
+      "p_one_sided": 0.043,
+      "p_two_sided": 0.086,
+      "percentile": 0.043,
+      "plant_curve": [
+        {
+          "live_effect": -4.383195493320075,
+          "n_seeds_effective": 200,
+          "null_mean": -2.208479892465749,
+          "null_q": [
+            -11.991949175419457,
+            -4.878239350963437,
+            -2.1298596376464456,
+            0.4357844616911498,
+            5.730665202700273
+          ],
+          "null_sd": 4.334387535552323,
+          "p_one_sided": 0.285,
+          "p_two_sided": 0.57,
+          "percentile": 0.285,
+          "plant_bps": 5.0
+        },
+        {
+          "live_effect": 0.6168045066799253,
+          "n_seeds_effective": 200,
+          "null_mean": -2.208479892465749,
+          "null_q": [
+            -11.991949175419457,
+            -4.878239350963437,
+            -2.1298596376464456,
+            0.4357844616911498,
+            5.730665202700273
+          ],
+          "null_sd": 4.334387535552323,
+          "p_one_sided": 0.245,
+          "p_two_sided": 0.49,
+          "percentile": 0.755,
+          "plant_bps": 10.0
+        },
+        {
+          "live_effect": 10.616804506679927,
+          "n_seeds_effective": 200,
+          "null_mean": -2.208479892465749,
+          "null_q": [
+            -11.991949175419457,
+            -4.878239350963437,
+            -2.1298596376464456,
+            0.4357844616911498,
+            5.730665202700273
+          ],
+          "null_sd": 4.334387535552323,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 1.0,
+          "plant_bps": 20.0
+        },
+        {
+          "live_effect": 30.616804506679923,
+          "n_seeds_effective": 200,
+          "null_mean": -2.208479892465749,
+          "null_q": [
+            -11.991949175419457,
+            -4.878239350963437,
+            -2.1298596376464456,
+            0.4357844616911498,
+            5.730665202700273
+          ],
+          "null_sd": 4.334387535552323,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 1.0,
+          "plant_bps": 40.0
+        }
+      ],
+      "rule": "M-3",
+      "status": "MATCHED"
+    }
+  },
+  "magnitude_matched_C2_MOMO_by_session": {
+    "ASIA": {
+      "class": "within_sample_attribution -> REPORT LAYER",
+      "collapse_fraction": 1.8879911065587072,
+      "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+      "comparator_n_mean": 184.0,
+      "control": "MAGNITUDE-MATCHED-COMPARATOR",
+      "decile_supply": [
+        {
+          "abs_r_hi": 12.997617103530645,
+          "abs_r_lo": -Infinity,
+          "decile": 0,
+          "live_n": 18,
+          "pool_n": 546
+        },
+        {
+          "abs_r_hi": 19.21319944955324,
+          "abs_r_lo": 12.997617103530645,
+          "decile": 1,
+          "live_n": 19,
+          "pool_n": 350
+        },
+        {
+          "abs_r_hi": 25.515596219463088,
+          "abs_r_lo": 19.21319944955324,
+          "decile": 2,
+          "live_n": 17,
+          "pool_n": 315
+        },
+        {
+          "abs_r_hi": 37.65421390450774,
+          "abs_r_lo": 25.515596219463088,
+          "decile": 3,
+          "live_n": 18,
+          "pool_n": 461
+        },
+        {
+          "abs_r_hi": 44.52330672230165,
+          "abs_r_lo": 37.65421390450774,
+          "decile": 4,
+          "live_n": 20,
+          "pool_n": 229
+        },
+        {
+          "abs_r_hi": 58.78388883517793,
+          "abs_r_lo": 44.52330672230165,
+          "decile": 5,
+          "live_n": 18,
+          "pool_n": 294
+        },
+        {
+          "abs_r_hi": 68.93434025898651,
+          "abs_r_lo": 58.78388883517793,
+          "decile": 6,
+          "live_n": 19,
+          "pool_n": 149
+        },
+        {
+          "abs_r_hi": 89.75961728588501,
+          "abs_r_lo": 68.93434025898651,
+          "decile": 7,
+          "live_n": 18,
+          "pool_n": 175
+        },
+        {
+          "abs_r_hi": 118.48232409048754,
+          "abs_r_lo": 89.75961728588501,
+          "decile": 8,
+          "live_n": 16,
+          "pool_n": 148
+        },
+        {
+          "abs_r_hi": Infinity,
+          "abs_r_lo": 118.48232409048754,
+          "decile": 9,
+          "live_n": 21,
+          "pool_n": 141
+        }
+      ],
+      "deciles_with_no_comparator_supply": [],
+      "expected_if_H_false": "live inside the comparator distribution",
+      "expected_if_H_true": "live outside the comparator distribution",
+      "live_effect_bps": -13.57210759723505,
+      "n_live": 184,
+      "n_pool_available": 2808,
+      "n_seeds": 2000,
+      "n_seeds_effective": 2000,
+      "neighbourhood_excluded_bars": 1,
+      "null_mean": 12.051910843602588,
+      "null_q": [
+        2.0928562094757326,
+        8.540406068255882,
+        12.129351756396638,
+        15.516229853893993,
+        22.164188311808726
+      ],
+      "null_sd": 5.137096778757205,
+      "p_one_sided": 0.0,
+      "p_two_sided": 0.0,
+      "percentile": 0.0,
+      "plant_curve": [
+        {
+          "live_effect": -8.57210759723505,
+          "n_seeds_effective": 200,
+          "null_mean": 12.23661522733873,
+          "null_q": [
+            3.373388627865917,
+            8.959871365657508,
+            12.27121316908924,
+            15.506981369588683,
+            22.112760380186835
+          ],
+          "null_sd": 4.853323638608031,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 0.0,
+          "plant_bps": 5.0
+        },
+        {
+          "live_effect": -3.5721075972350507,
+          "n_seeds_effective": 200,
+          "null_mean": 12.23661522733873,
+          "null_q": [
+            3.373388627865917,
+            8.959871365657508,
+            12.27121316908924,
+            15.506981369588683,
+            22.112760380186835
+          ],
+          "null_sd": 4.853323638608031,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 0.0,
+          "plant_bps": 10.0
+        },
+        {
+          "live_effect": 6.427892402764948,
+          "n_seeds_effective": 200,
+          "null_mean": 12.23661522733873,
+          "null_q": [
+            3.373388627865917,
+            8.959871365657508,
+            12.27121316908924,
+            15.506981369588683,
+            22.112760380186835
+          ],
+          "null_sd": 4.853323638608031,
+          "p_one_sided": 0.115,
+          "p_two_sided": 0.23,
+          "percentile": 0.115,
+          "plant_bps": 20.0
+        },
+        {
+          "live_effect": 26.427892402764947,
+          "n_seeds_effective": 200,
+          "null_mean": 12.23661522733873,
+          "null_q": [
+            3.373388627865917,
+            8.959871365657508,
+            12.27121316908924,
+            15.506981369588683,
+            22.112760380186835
+          ],
+          "null_sd": 4.853323638608031,
+          "p_one_sided": 0.005,
+          "p_two_sided": 0.01,
+          "percentile": 0.995,
+          "plant_bps": 40.0
+        }
+      ],
+      "rule": "M-3",
+      "status": "MATCHED"
+    },
+    "EU": {
+      "class": "within_sample_attribution -> REPORT LAYER",
+      "collapse_fraction": -0.5599908985056281,
+      "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+      "comparator_n_mean": 557.0,
+      "control": "MAGNITUDE-MATCHED-COMPARATOR",
+      "decile_supply": [
+        {
+          "abs_r_hi": 6.926167059150279,
+          "abs_r_lo": -Infinity,
+          "decile": 0,
+          "live_n": 55,
+          "pool_n": 432
+        },
+        {
+          "abs_r_hi": 11.897501783554532,
+          "abs_r_lo": 6.926167059150279,
+          "decile": 1,
+          "live_n": 57,
+          "pool_n": 350
+        },
+        {
+          "abs_r_hi": 17.552805507072833,
+          "abs_r_lo": 11.897501783554532,
+          "decile": 2,
+          "live_n": 54,
+          "pool_n": 495
+        },
+        {
+          "abs_r_hi": 23.108732668449818,
+          "abs_r_lo": 17.552805507072833,
+          "decile": 3,
+          "live_n": 55,
+          "pool_n": 394
+        },
+        {
+          "abs_r_hi": 30.302477136232575,
+          "abs_r_lo": 23.108732668449818,
+          "decile": 4,
+          "live_n": 57,
+          "pool_n": 493
+        },
+        {
+          "abs_r_hi": 38.97469286312694,
+          "abs_r_lo": 30.302477136232575,
+          "decile": 5,
+          "live_n": 56,
+          "pool_n": 471
+        },
+        {
+          "abs_r_hi": 49.19592298980868,
+          "abs_r_lo": 38.97469286312694,
+          "decile": 6,
+          "live_n": 54,
+          "pool_n": 405
+        },
+        {
+          "abs_r_hi": 62.15744754606845,
+          "abs_r_lo": 49.19592298980868,
+          "decile": 7,
+          "live_n": 57,
+          "pool_n": 362
+        },
+        {
+          "abs_r_hi": 94.79050649294174,
+          "abs_r_lo": 62.15744754606845,
+          "decile": 8,
+          "live_n": 56,
+          "pool_n": 439
+        },
+        {
+          "abs_r_hi": Infinity,
+          "abs_r_lo": 94.79050649294174,
+          "decile": 9,
+          "live_n": 56,
+          "pool_n": 509
+        }
+      ],
+      "deciles_with_no_comparator_supply": [],
+      "expected_if_H_false": "live inside the comparator distribution",
+      "expected_if_H_true": "live outside the comparator distribution",
+      "live_effect_bps": 0.6197078923829485,
+      "n_live": 557,
+      "n_pool_available": 4350,
+      "n_seeds": 2000,
+      "n_seeds_effective": 2000,
+      "neighbourhood_excluded_bars": 1,
+      "null_mean": 0.966738671849505,
+      "null_q": [
+        -3.92802312119057,
+        -0.7064111680238307,
+        0.9307341755316061,
+        2.642441316212527,
+        5.932616125303323
+      ],
+      "null_sd": 2.4926031612198445,
+      "p_one_sided": 0.443,
+      "p_two_sided": 0.886,
+      "percentile": 0.443,
+      "plant_curve": [
+        {
+          "live_effect": 5.619707892382949,
+          "n_seeds_effective": 200,
+          "null_mean": 1.1471599181867074,
+          "null_q": [
+            -3.2414670980698763,
+            -0.45488236311969843,
+            1.0791713841011008,
+            2.8682638744659457,
+            5.366232594789009
+          ],
+          "null_sd": 2.3764049978642316,
+          "p_one_sided": 0.02,
+          "p_two_sided": 0.04,
+          "percentile": 0.98,
+          "plant_bps": 5.0
+        },
+        {
+          "live_effect": 10.61970789238295,
+          "n_seeds_effective": 200,
+          "null_mean": 1.1471599181867074,
+          "null_q": [
+            -3.2414670980698763,
+            -0.45488236311969843,
+            1.0791713841011008,
+            2.8682638744659457,
+            5.366232594789009
+          ],
+          "null_sd": 2.3764049978642316,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 1.0,
+          "plant_bps": 10.0
+        },
+        {
+          "live_effect": 20.61970789238295,
+          "n_seeds_effective": 200,
+          "null_mean": 1.1471599181867074,
+          "null_q": [
+            -3.2414670980698763,
+            -0.45488236311969843,
+            1.0791713841011008,
+            2.8682638744659457,
+            5.366232594789009
+          ],
+          "null_sd": 2.3764049978642316,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 1.0,
+          "plant_bps": 20.0
+        },
+        {
+          "live_effect": 40.61970789238295,
+          "n_seeds_effective": 200,
+          "null_mean": 1.1471599181867074,
+          "null_q": [
+            -3.2414670980698763,
+            -0.45488236311969843,
+            1.0791713841011008,
+            2.8682638744659457,
+            5.366232594789009
+          ],
+          "null_sd": 2.3764049978642316,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 1.0,
+          "plant_bps": 40.0
+        }
+      ],
+      "rule": "M-3",
+      "status": "MATCHED"
+    },
+    "US": {
+      "class": "within_sample_attribution -> REPORT LAYER",
+      "collapse_fraction": 2.740529440034851,
+      "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+      "comparator_n_mean": 853.0,
+      "control": "MAGNITUDE-MATCHED-COMPARATOR",
+      "decile_supply": [
+        {
+          "abs_r_hi": 5.145028961535125,
+          "abs_r_lo": -Infinity,
+          "decile": 0,
+          "live_n": 85,
+          "pool_n": 280
+        },
+        {
+          "abs_r_hi": 11.231758935501324,
+          "abs_r_lo": 5.145028961535125,
+          "decile": 1,
+          "live_n": 86,
+          "pool_n": 332
+        },
+        {
+          "abs_r_hi": 16.050333846943097,
+          "abs_r_lo": 11.231758935501324,
+          "decile": 2,
+          "live_n": 84,
+          "pool_n": 206
+        },
+        {
+          "abs_r_hi": 23.622902406883917,
+          "abs_r_lo": 16.050333846943097,
+          "decile": 3,
+          "live_n": 86,
+          "pool_n": 355
+        },
+        {
+          "abs_r_hi": 30.585412744186247,
+          "abs_r_lo": 23.622902406883917,
+          "decile": 4,
+          "live_n": 83,
+          "pool_n": 248
+        },
+        {
+          "abs_r_hi": 41.08399059318532,
+          "abs_r_lo": 30.585412744186247,
+          "decile": 5,
+          "live_n": 88,
+          "pool_n": 352
+        },
+        {
+          "abs_r_hi": 50.60920552465209,
+          "abs_r_lo": 41.08399059318532,
+          "decile": 6,
+          "live_n": 84,
+          "pool_n": 171
+        },
+        {
+          "abs_r_hi": 68.13576829865941,
+          "abs_r_lo": 50.60920552465209,
+          "decile": 7,
+          "live_n": 84,
+          "pool_n": 257
+        },
+        {
+          "abs_r_hi": 102.77901346334154,
+          "abs_r_lo": 68.13576829865941,
+          "decile": 8,
+          "live_n": 87,
+          "pool_n": 232
+        },
+        {
+          "abs_r_hi": Infinity,
+          "abs_r_lo": 102.77901346334154,
+          "decile": 9,
+          "live_n": 86,
+          "pool_n": 167
+        }
+      ],
+      "deciles_with_no_comparator_supply": [],
+      "expected_if_H_false": "live inside the comparator distribution",
+      "expected_if_H_true": "live outside the comparator distribution",
+      "live_effect_bps": -1.9875934551764687,
+      "n_live": 853,
+      "n_pool_available": 2600,
+      "n_seeds": 2000,
+      "n_seeds_effective": 2000,
+      "neighbourhood_excluded_bars": 1,
+      "null_mean": 3.459464923555234,
+      "null_q": [
+        0.03166858764386024,
+        2.3861661004250387,
+        3.443439805328067,
+        4.5505070366363345,
+        6.690402496359999
+      ],
+      "null_sd": 1.6734071026386528,
+      "p_one_sided": 0.0,
+      "p_two_sided": 0.0,
+      "percentile": 0.0,
+      "plant_curve": [
+        {
+          "live_effect": 3.012406544823531,
+          "n_seeds_effective": 200,
+          "null_mean": 3.4228004528822806,
+          "null_q": [
+            0.235017059980769,
+            2.3859289042067524,
+            3.3889296978340573,
+            4.488533998623353,
+            6.553597752328656
+          ],
+          "null_sd": 1.5492041039331597,
+          "p_one_sided": 0.42,
+          "p_two_sided": 0.84,
+          "percentile": 0.42,
+          "plant_bps": 5.0
+        },
+        {
+          "live_effect": 8.012406544823532,
+          "n_seeds_effective": 200,
+          "null_mean": 3.4228004528822806,
+          "null_q": [
+            0.235017059980769,
+            2.3859289042067524,
+            3.3889296978340573,
+            4.488533998623353,
+            6.553597752328656
+          ],
+          "null_sd": 1.5492041039331597,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 1.0,
+          "plant_bps": 10.0
+        },
+        {
+          "live_effect": 18.01240654482353,
+          "n_seeds_effective": 200,
+          "null_mean": 3.4228004528822806,
+          "null_q": [
+            0.235017059980769,
+            2.3859289042067524,
+            3.3889296978340573,
+            4.488533998623353,
+            6.553597752328656
+          ],
+          "null_sd": 1.5492041039331597,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 1.0,
+          "plant_bps": 20.0
+        },
+        {
+          "live_effect": 38.012406544823534,
+          "n_seeds_effective": 200,
+          "null_mean": 3.4228004528822806,
+          "null_q": [
+            0.235017059980769,
+            2.3859289042067524,
+            3.3889296978340573,
+            4.488533998623353,
+            6.553597752328656
+          ],
+          "null_sd": 1.5492041039331597,
+          "p_one_sided": 0.0,
+          "p_two_sided": 0.0,
+          "percentile": 1.0,
+          "plant_bps": 40.0
+        }
+      ],
+      "rule": "M-3",
+      "status": "MATCHED"
+    }
+  },
+  "magnitude_matched_C2_MOMO_gross": {
+    "class": "within_sample_attribution -> REPORT LAYER",
+    "collapse_fraction": 2.5590285154357626,
+    "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+    "collapse_fraction_status": "DISCLOSURE_ONLY",
+    "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+    "comparator_n_mean": 1594.0,
+    "control": "MAGNITUDE-MATCHED-COMPARATOR",
+    "decile_supply": [
+      {
+        "abs_r_hi": 6.393698370885659,
+        "abs_r_lo": -Infinity,
+        "decile": 0,
+        "live_n": 159,
+        "pool_n": 972
+      },
+      {
+        "abs_r_hi": 12.445206790917318,
+        "abs_r_lo": 6.393698370885659,
+        "decile": 1,
+        "live_n": 160,
+        "pool_n": 1038
+      },
+      {
+        "abs_r_hi": 17.49726928711448,
+        "abs_r_lo": 12.445206790917318,
+        "decile": 2,
+        "live_n": 158,
+        "pool_n": 960
+      },
+      {
+        "abs_r_hi": 24.944067330592294,
+        "abs_r_lo": 17.49726928711448,
+        "decile": 3,
+        "live_n": 161,
+        "pool_n": 1249
+      },
+      {
+        "abs_r_hi": 31.624476592180816,
+        "abs_r_lo": 24.944067330592294,
+        "decile": 4,
+        "live_n": 159,
+        "pool_n": 918
+      },
+      {
+        "abs_r_hi": 42.075551334810335,
+        "abs_r_lo": 31.624476592180816,
+        "decile": 5,
+        "live_n": 157,
+        "pool_n": 1244
+      },
+      {
+        "abs_r_hi": 51.92369369388432,
+        "abs_r_lo": 42.075551334810335,
+        "decile": 6,
+        "live_n": 162,
+        "pool_n": 805
+      },
+      {
+        "abs_r_hi": 68.97352868306461,
+        "abs_r_lo": 51.92369369388432,
+        "decile": 7,
+        "live_n": 159,
+        "pool_n": 885
+      },
+      {
+        "abs_r_hi": 103.43973241937476,
+        "abs_r_lo": 68.97352868306461,
+        "decile": 8,
+        "live_n": 157,
+        "pool_n": 868
+      },
+      {
+        "abs_r_hi": Infinity,
+        "abs_r_lo": 103.43973241937476,
+        "decile": 9,
+        "live_n": 162,
+        "pool_n": 819
+      }
+    ],
+    "deciles_with_no_comparator_supply": [],
+    "expected_if_H_false": "live inside the comparator distribution",
+    "expected_if_H_true": "live outside the comparator distribution",
+    "live_effect_bps": -2.4137438639268973,
+    "n_live": 1594,
+    "n_pool_available": 9758,
+    "n_seeds": 2000,
+    "n_seeds_effective": 2000,
+    "neighbourhood_excluded_bars": 1,
+    "null_mean": 3.763095512820132,
+    "null_q": [
+      1.090399529756011,
+      2.822848871856614,
+      3.7435933220458866,
+      4.688334597265679,
+      6.472183531614184
+    ],
+    "null_sd": 1.3890900099624681,
+    "p_one_sided": 0.0,
+    "p_two_sided": 0.0,
+    "percentile": 0.0,
+    "plant_curve": [
+      {
+        "live_effect": 2.5862561360731027,
+        "n_seeds_effective": 200,
+        "null_mean": 3.5664740122518865,
+        "null_q": [
+          0.8346108518270672,
+          2.5257065594452053,
+          3.5737851915612096,
+          4.651860691417957,
+          6.072871765008921
+        ],
+        "null_sd": 1.4634450166364352,
+        "p_one_sided": 0.27,
+        "p_two_sided": 0.54,
+        "percentile": 0.27,
+        "plant_bps": 5.0
+      },
+      {
+        "live_effect": 7.586256136073103,
+        "n_seeds_effective": 200,
+        "null_mean": 3.5664740122518865,
+        "null_q": [
+          0.8346108518270672,
+          2.5257065594452053,
+          3.5737851915612096,
+          4.651860691417957,
+          6.072871765008921
+        ],
+        "null_sd": 1.4634450166364352,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 1.0,
+        "plant_bps": 10.0
+      },
+      {
+        "live_effect": 17.5862561360731,
+        "n_seeds_effective": 200,
+        "null_mean": 3.5664740122518865,
+        "null_q": [
+          0.8346108518270672,
+          2.5257065594452053,
+          3.5737851915612096,
+          4.651860691417957,
+          6.072871765008921
+        ],
+        "null_sd": 1.4634450166364352,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 1.0,
+        "plant_bps": 20.0
+      },
+      {
+        "live_effect": 37.586256136073104,
+        "n_seeds_effective": 200,
+        "null_mean": 3.5664740122518865,
+        "null_q": [
+          0.8346108518270672,
+          2.5257065594452053,
+          3.5737851915612096,
+          4.651860691417957,
+          6.072871765008921
+        ],
+        "null_sd": 1.4634450166364352,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 1.0,
+        "plant_bps": 40.0
+      }
+    ],
+    "rule": "M-3",
+    "status": "MATCHED"
+  },
+  "magnitude_matched_C2_MR_gross": {
+    "class": "within_sample_attribution -> REPORT LAYER",
+    "collapse_fraction": 14.240975990419846,
+    "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+    "collapse_fraction_status": "DISCLOSURE_ONLY",
+    "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+    "comparator_n_mean": 1670.0,
+    "control": "MAGNITUDE-MATCHED-COMPARATOR",
+    "decile_supply": [
+      {
+        "abs_r_hi": 7.302780539157339,
+        "abs_r_lo": -Infinity,
+        "decile": 0,
+        "live_n": 167,
+        "pool_n": 1149
+      },
+      {
+        "abs_r_hi": 12.872067099511941,
+        "abs_r_lo": 7.302780539157339,
+        "decile": 1,
+        "live_n": 165,
+        "pool_n": 964
+      },
+      {
+        "abs_r_hi": 18.935851786845323,
+        "abs_r_lo": 12.872067099511941,
+        "decile": 2,
+        "live_n": 169,
+        "pool_n": 1152
+      },
+      {
+        "abs_r_hi": 27.786904482516306,
+        "abs_r_lo": 18.935851786845323,
+        "decile": 3,
+        "live_n": 165,
+        "pool_n": 1400
+      },
+      {
+        "abs_r_hi": 34.05479224237118,
+        "abs_r_lo": 27.786904482516306,
+        "decile": 4,
+        "live_n": 169,
+        "pool_n": 855
+      },
+      {
+        "abs_r_hi": 42.80092548895677,
+        "abs_r_lo": 34.05479224237118,
+        "decile": 5,
+        "live_n": 167,
+        "pool_n": 995
+      },
+      {
+        "abs_r_hi": 57.22796811109746,
+        "abs_r_lo": 42.80092548895677,
+        "decile": 6,
+        "live_n": 167,
+        "pool_n": 1054
+      },
+      {
+        "abs_r_hi": 75.98466406627226,
+        "abs_r_lo": 57.22796811109746,
+        "decile": 7,
+        "live_n": 167,
+        "pool_n": 840
+      },
+      {
+        "abs_r_hi": 116.65816698236742,
+        "abs_r_lo": 75.98466406627226,
+        "decile": 8,
+        "live_n": 166,
+        "pool_n": 812
+      },
+      {
+        "abs_r_hi": Infinity,
+        "abs_r_lo": 116.65816698236742,
+        "decile": 9,
+        "live_n": 168,
+        "pool_n": 635
+      }
+    ],
+    "deciles_with_no_comparator_supply": [],
+    "expected_if_H_false": "live inside the comparator distribution",
+    "expected_if_H_true": "live outside the comparator distribution",
+    "live_effect_bps": -0.1489597569525845,
+    "n_live": 1670,
+    "n_pool_available": 9856,
+    "n_seeds": 2000,
+    "n_seeds_effective": 2000,
+    "neighbourhood_excluded_bars": 1,
+    "null_mean": 1.9723725653479474,
+    "null_q": [
+      -0.8606579334203802,
+      1.0193925823338699,
+      1.973536246736975,
+      2.949452456343643,
+      4.752102359319087
+    ],
+    "null_sd": 1.417262006980011,
+    "p_one_sided": 0.0665,
+    "p_two_sided": 0.133,
+    "percentile": 0.0665,
+    "plant_curve": [
+      {
+        "live_effect": 4.851040243047415,
+        "n_seeds_effective": 200,
+        "null_mean": 2.1004013168785924,
+        "null_q": [
+          -0.7826984953235665,
+          1.2950840214472736,
+          2.0563363067140656,
+          3.0141701705101753,
+          4.872692592734705
+        ],
+        "null_sd": 1.4017048199706688,
+        "p_one_sided": 0.035,
+        "p_two_sided": 0.07,
+        "percentile": 0.965,
+        "plant_bps": 5.0
+      },
+      {
+        "live_effect": 9.851040243047416,
+        "n_seeds_effective": 200,
+        "null_mean": 2.1004013168785924,
+        "null_q": [
+          -0.7826984953235665,
+          1.2950840214472736,
+          2.0563363067140656,
+          3.0141701705101753,
+          4.872692592734705
+        ],
+        "null_sd": 1.4017048199706688,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 1.0,
+        "plant_bps": 10.0
+      },
+      {
+        "live_effect": 19.85104024304741,
+        "n_seeds_effective": 200,
+        "null_mean": 2.1004013168785924,
+        "null_q": [
+          -0.7826984953235665,
+          1.2950840214472736,
+          2.0563363067140656,
+          3.0141701705101753,
+          4.872692592734705
+        ],
+        "null_sd": 1.4017048199706688,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 1.0,
+        "plant_bps": 20.0
+      },
+      {
+        "live_effect": 39.851040243047414,
+        "n_seeds_effective": 200,
+        "null_mean": 2.1004013168785924,
+        "null_q": [
+          -0.7826984953235665,
+          1.2950840214472736,
+          2.0563363067140656,
+          3.0141701705101753,
+          4.872692592734705
+        ],
+        "null_sd": 1.4017048199706688,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 1.0,
+        "plant_bps": 40.0
+      }
+    ],
+    "rule": "M-3",
+    "status": "MATCHED"
+  },
+  "magnitude_matched_full_panel_shock_flag": {
+    "SUPERSEDED": "net, and over all shock bars incl. rows carrying no momentum policy; use magnitude_matched_C2_MOMO_gross"
+  },
+  "seeds": {
+    "forward_path": 2000,
+    "side_derangement": 2000
+  },
+  "tripwires": [
+    {
+      "all_held": true,
+      "checks": [
+        {
+          "check": "entry strictly after the decision bar",
+          "detail": "min(entry-decision)=1",
+          "held": true
+        },
+        {
+          "check": "exit at the declared offset",
+          "detail": "declared h=[12 12 12 ... 12 12 12]; observed offsets [12]",
+          "held": true
+        }
+      ],
+      "n_rows": 2602,
+      "severity": "HARD",
+      "tripwire": "TRIPWIRE-1 CONSTRUCTION ASSERTIONS"
+    },
+    {
+      "abs_ratio_leaky_over_legal": 412.17277469406457,
+      "emitted_variant": "legal",
+      "leaky_effect_bps": 203.65205870786204,
+      "legal_effect_bps": 0.4940939120955354,
+      "n_matched_rows": 106,
+      "severity": "HARD",
+      "tripwire": "TRIPWIRE-2 LEAKY-VARIANT DISCRIMINATION",
+      "vacuity_check": "the leaky threshold selects rows using the outcome, which shifts the conditional mean materially"
+    },
+    {
+      "collapse_fraction": 1.0725553319972543,
+      "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+      "destroy_form": "DERANGEMENT (decision row -> forward path)",
+      "fixed_points_total": 0,
+      "live_effect_bps": -4.654000096976745,
+      "n": 2602,
+      "n_eligible_rows": 2602,
+      "n_excluded_singleton_group_rows": 0,
+      "n_seeds": 2000,
+      "n_seeds_effective": 2000,
+      "non_vacuity": "the side-to-path pairing is broken, which moves the mean of a signed return directly; permuting realised P&L would be mean-invariant (L-14)",
+      "not_the_causality_claim": "SPDR-012 AMENDMENT-T1: no outcome-side destroy can detect look-ahead for a fixed predictor. Causality rests on TRIPWIRE-1 and TRIPWIRE-2.",
+      "null_mean": 0.3376725221514018,
+      "null_q": [
+        -2.7685537080837137,
+        -0.6907020349975804,
+        0.3675209339697265,
+        1.3397447238016627,
+        3.4035076932118558
+      ],
+      "null_sd": 1.5441924701480214,
+      "p_one_sided": 0.0,
+      "p_two_sided": 0.0,
+      "percentile": 0.0,
+      "severity": "REPORT LAYER (not the causality claim)",
+      "tripwire": "TRIPWIRE-3 FORWARD-PATH DERANGEMENT"
+    }
+  ],
+  "universe": "CTRADER"
+}

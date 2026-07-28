@@ -1,0 +1,47 @@
+{
+  "band": "TRAIN [2021-06-29T06:53Z, 2023-12-18T00:00Z)",
+  "coverage_gap_statement": "all requested symbols carry a measured sigma",
+  "divisor_object": "sigma_t = LTF H1 Parkinson EWMA(lambda=0.94), 60 H1-bar warm-up, causal <= t-1, in bps; horizon-scaled sigma_t*sqrt(h). Identical object to SPDR-014's Z-VOL width.",
+  "n_symbols_measured": 3,
+  "n_symbols_requested": 3,
+  "per_symbol": {
+    "EURUSD": {
+      "median_sigma_bps": 7.68599754395478,
+      "n": 15363,
+      "p25_sigma_bps": 6.102286741114041,
+      "p75_sigma_bps": 10.183810770857011
+    },
+    "USTEC": {
+      "median_sigma_bps": 20.623650658741013,
+      "n": 14571,
+      "p25_sigma_bps": 15.063544800574977,
+      "p75_sigma_bps": 28.772358364858558
+    },
+    "XAUUSD": {
+      "median_sigma_bps": 13.706544623719031,
+      "n": 14589,
+      "p25_sigma_bps": 11.613195681344179,
+      "p75_sigma_bps": 16.2364723187735
+    }
+  },
+  "pooled_median_sigma_bps": 13.034237315995593,
+  "pooled_n": 44523,
+  "provenance": "COMPUTED AT RUN from data/catalog (never recalled, never asserted)",
+  "reporting_rule": "bps is primary. sigma-normalisation buys power for pooling only; it is never a headline in sigma units and never compared to the cost floor (P-15 / L-21).",
+  "symbols_without_a_value": [],
+  "unit_pin_spec": {
+    "divisor_object": "sigma_t = LTF H1 Parkinson EWMA(lambda=0.94), 60 H1-bar warm-up, causal <= t-1, in bps; horizon-scaled sigma_t*sqrt(h). Identical object to SPDR-014's Z-VOL width.",
+    "horizon_scaling": "sigma_t * sqrt(h)",
+    "indicator": "Parkinson range estimator",
+    "lag": "t-1 (causal; the decision bar is excluded)",
+    "lambda": 0.94,
+    "measured_value": "COMPUTED AT RUN -> results/unit_pin.json (never asserted)",
+    "primary_reporting_unit": "bps",
+    "sigma_unit_role": "buys power for pooling only; never a headline in sigma units, never compared to the cost floor (P-15 / L-21 / design \u00a74.3)",
+    "smoother": "EWMA",
+    "timeframe": "H1",
+    "units": "bps",
+    "warmup_bars": 60
+  },
+  "universe": "CTRADER"
+}

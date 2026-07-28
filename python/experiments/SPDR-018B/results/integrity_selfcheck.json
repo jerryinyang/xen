@@ -1,0 +1,301 @@
+{
+  "bands": {
+    "CONFIRM": [
+      "2023-02-02 00:00:00+00:00",
+      "2023-11-22 00:00:00+00:00"
+    ],
+    "DESIGN": [
+      "2021-06-02 00:01:00+00:00",
+      "2023-02-02 00:00:00+00:00"
+    ],
+    "TRAIN": [
+      "2021-06-02 00:01:00+00:00",
+      "2023-11-22 00:00:00+00:00"
+    ]
+  },
+  "checks": [
+    {
+      "check": "cTrader TRAIN fence \u2014 max ts < 2023-11-22T00:00Z",
+      "detail": {
+        "A.slot_end": 1700596800000000000,
+        "A.slot_start": 1700593200000000000,
+        "B.entry_ts": 1700609400000000000,
+        "B.exit_ts": 1700609400000000000,
+        "C.entry_ts": 1700582400000000000,
+        "C.exit_ts": 1700596800000000000
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "cTrader holdout \u2014 zero rows at or after 2024-12-13",
+      "detail": null,
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "cTrader fence provenance \u2014 sha256 matches the pin",
+      "detail": {
+        "expected": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0",
+        "measured": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0"
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "Identity reconstruction \u2014 |p*W-(1-p)*L-mean| < 0.01 bps",
+      "detail": {
+        "max_residual_bps": 8.526512829121202e-14
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "M-1 \u2014 band labels driven by the BLOCK MDE",
+      "detail": [
+        "block"
+      ],
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "No `pass` field / no at_or_above_pXX",
+      "detail": [],
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "Derangements \u2014 fixed-point count == 0",
+      "detail": [
+        0,
+        0
+      ],
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "CROSS-UNIVERSE OBJECT IDENTITY (design \u00a75)",
+      "detail": {
+        "check": "CROSS-UNIVERSE OBJECT IDENTITY",
+        "guard_symbol": "BTCUSDT",
+        "held": true,
+        "max_abs_diff_gross_bps": 1.1368683772161603e-13,
+        "max_abs_diff_n": 0.0,
+        "n_cells_compared": 70,
+        "severity": "HARD",
+        "statement": "the retargeted code path, run on a BYBIT symbol, must reproduce SPDR-018's emitted cells for that symbol exactly \u2014 proving the retarget changed the DATA and not the OBJECT",
+        "tolerance_bps": 0.01
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "TRIPWIRE-1 CONSTRUCTION ASSERTIONS held",
+      "detail": {
+        "all_held": true,
+        "checks": [
+          {
+            "check": "entry strictly after the decision bar",
+            "detail": "min(entry-decision)=1",
+            "held": true
+          },
+          {
+            "check": "exit at the declared offset",
+            "detail": "declared h=[12 12 12 ... 12 12 12]; observed offsets [12]",
+            "held": true
+          }
+        ],
+        "n_rows": 2602,
+        "severity": "HARD",
+        "tripwire": "TRIPWIRE-1 CONSTRUCTION ASSERTIONS"
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "TRIPWIRE-2 LEAKY-VARIANT DISCRIMINATION",
+      "detail": {
+        "abs_ratio_leaky_over_legal": 412.17277469406457,
+        "emitted_variant": "legal",
+        "leaky_effect_bps": 203.65205870786204,
+        "legal_effect_bps": 0.4940939120955354,
+        "n_matched_rows": 106,
+        "severity": "HARD",
+        "tripwire": "TRIPWIRE-2 LEAKY-VARIANT DISCRIMINATION",
+        "vacuity_check": "the leaky threshold selects rows using the outcome, which shifts the conditional mean materially"
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "TRIPWIRE-3 FORWARD-PATH DERANGEMENT (report layer)",
+      "detail": {
+        "collapse_fraction": 1.0725553319972543,
+        "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+        "collapse_fraction_status": "DISCLOSURE_ONLY",
+        "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+        "destroy_form": "DERANGEMENT (decision row -> forward path)",
+        "fixed_points_total": 0,
+        "live_effect_bps": -4.654000096976745,
+        "n": 2602,
+        "n_eligible_rows": 2602,
+        "n_excluded_singleton_group_rows": 0,
+        "n_seeds": 2000,
+        "n_seeds_effective": 2000,
+        "non_vacuity": "the side-to-path pairing is broken, which moves the mean of a signed return directly; permuting realised P&L would be mean-invariant (L-14)",
+        "not_the_causality_claim": "SPDR-012 AMENDMENT-T1: no outcome-side destroy can detect look-ahead for a fixed predictor. Causality rests on TRIPWIRE-1 and TRIPWIRE-2.",
+        "null_mean": 0.3376725221514018,
+        "null_q": [
+          -2.7685537080837137,
+          -0.6907020349975804,
+          0.3675209339697265,
+          1.3397447238016627,
+          3.4035076932118558
+        ],
+        "null_sd": 1.5441924701480214,
+        "p_one_sided": 0.0,
+        "p_two_sided": 0.0,
+        "percentile": 0.0,
+        "severity": "REPORT LAYER (not the causality claim)",
+        "tripwire": "TRIPWIRE-3 FORWARD-PATH DERANGEMENT"
+      },
+      "severity": "INFORMATIVE"
+    },
+    {
+      "check": "AMBIENT-BASE control present",
+      "detail": "added post-hoc; see controls.json arm_C_ambient_base",
+      "held": true,
+      "severity": "HARD"
+    }
+  ],
+  "cost_model": {
+    "applied_to": [
+      "EURUSD",
+      "XAUUSD",
+      "USTEC"
+    ],
+    "doubly_synthetic": "this cost is BORROWED and RESCALED. It is not any instrument's real cost and supports exactly one claim: cross-universe comparability in volatility units.",
+    "gross_is_primary": true,
+    "operator_directive": "2026-07-25 \u2014 reuse the crypto universe's cost model for simplicity",
+    "source": "SPDR-014 screen_code/costs.py -> xen.evaluation (Bybit taker fee 11.0 bps round trip + discrete funding stamps + 2.0 bps allowance)",
+    "spread": "UNAVAILABLE_NOT_CHARGED \u2014 per-symbol spread pin remains blocking for a money read",
+    "status": "BORROWED",
+    "vol_scaling": "costs are SCALED by the measured sigma ratio (cTrader/crypto) so the charge is equivalent in volatility units across the two universes \u2014 operator directive 2026-07-25. BOTH legs are emitted per cell: the vol-scaled net (headline) and the unscaled borrowed net (companion). Gross remains primary.",
+    "what_it_is_not": "a cTrader cost model, a cTrader cost measurement, or grounds for any tradability claim. Perp funding does not exist on these instruments and the fee schedule is a different broker's.",
+    "what_it_supports": "comparability of net figures ACROSS the two universes on one common yardstick \u2014 and nothing else"
+  },
+  "experiment": "SPDR-018B",
+  "failed_checks": [],
+  "hard_all_held": true,
+  "lane": "SPDR \u2014 TRAIN-only, 0 counted TEST reads, no family action, no XENA",
+  "late_addition_note": "ambient-base and TRIPWIRE-1/2/3 were ABSENT from the original SPDR-018B emission and are added here. screen.md \u00a77's 'Deviations: none' was inaccurate and is corrected.",
+  "n_symbols": 3,
+  "power_note": "3 instruments against 25. Cells powered on crypto may be NOT_RESOLVABLE here purely on n. That is a statement about this universe's size, NEVER evidence against the crypto result (B-5). An unpowered non-replication says nothing.",
+  "retarget_applied": {
+    "SPDR-012": {
+      "arms": [
+        "DESIGN_END",
+        "DESIGN_START"
+      ],
+      "catalog_io": [
+        "BAR_TYPE_SUFFIX",
+        "CATALOG_BAR_DIR"
+      ],
+      "config": [
+        "BAR_TYPE_SUFFIX",
+        "CATALOG_BAR_DIR",
+        "CONFIRM_END",
+        "CONFIRM_START",
+        "DESIGN_END",
+        "DESIGN_START",
+        "HOLDOUT_START",
+        "TEST_START"
+      ],
+      "pipeline": [
+        "CONFIRM_END",
+        "CONFIRM_START",
+        "DESIGN_END",
+        "DESIGN_START"
+      ]
+    },
+    "SPDR-013": {
+      "catalog_io": [
+        "BAR_TYPE_SUFFIX",
+        "CATALOG_BAR_DIR"
+      ],
+      "config": [
+        "BANDS",
+        "BAR_TYPE_SUFFIX",
+        "CATALOG_BAR_DIR",
+        "CONFIRM_END",
+        "CONFIRM_START",
+        "DESIGN_END",
+        "DESIGN_START",
+        "HOLDOUT_START",
+        "TEST_START"
+      ],
+      "run_screen": [
+        "BANDS",
+        "CONFIRM_END",
+        "DESIGN_START"
+      ]
+    },
+    "SPDR-014": {
+      "catalog_io": [
+        "BAR_TYPE_SUFFIX",
+        "CATALOG_BAR_DIR"
+      ],
+      "config": [
+        "BANDS",
+        "BAR_TYPE_SUFFIX",
+        "CATALOG_BAR_DIR",
+        "CONFIRM_END",
+        "CONFIRM_START",
+        "DESIGN_END",
+        "DESIGN_START",
+        "HOLDOUT_START",
+        "TEST_START",
+        "TRAIN_END"
+      ],
+      "engine": [
+        "TRAIN_END"
+      ],
+      "prepare": [
+        "BANDS",
+        "CONFIRM_END",
+        "DESIGN_END",
+        "DESIGN_START"
+      ]
+    },
+    "SPDR-015": {
+      "catalog_io": [
+        "BAR_TYPE_SUFFIX",
+        "CATALOG_BAR_DIR"
+      ],
+      "config": [
+        "BAR_TYPE_SUFFIX",
+        "CATALOG_BAR_DIR",
+        "CONFIRM_END",
+        "CONFIRM_START",
+        "DESIGN_END",
+        "DESIGN_START",
+        "HOLDOUT_START",
+        "TEST_START"
+      ]
+    }
+  },
+  "spread_cost_disclosure": {
+    "cost_scope": "PARTIAL_FEES_FUNDING_ONLY (BORROWED MODEL)",
+    "implication": "reported cost understates total cost; reported net performance is overstated",
+    "prohibited_claims": [
+      "fully-net",
+      "cost-complete",
+      "tradable",
+      "deployable",
+      "this is the cTrader cost"
+    ],
+    "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+    "spread_rt_bps": null
+  },
+  "universe": "CTRADER"
+}
