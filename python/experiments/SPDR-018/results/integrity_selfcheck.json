@@ -1,0 +1,606 @@
+{
+  "checks": [
+    {
+      "check": "TRAIN fence \u2014 max(exit_ts) < 2023-12-18T00:00Z",
+      "detail": {
+        "max_ts_per_column": {
+          "SPDR-012.vol_reliability.slot_end": 1702846800000000000,
+          "SPDR-012.vol_reliability.slot_start": 1702843200000000000,
+          "SPDR-013.episodes.entry_ts": 1702855800000000000,
+          "SPDR-013.episodes.exit_ts": 1702855800000000000,
+          "SPDR-014.post_event.entry_ts": 1702767600000000000,
+          "SPDR-014.post_event.event_ts": 1702767600000000000,
+          "SPDR-014.post_event.exit_ts": 1702843200000000000,
+          "SPDR-015.zz_ordinal.confirm_slot_end": 1702807200000000000
+        },
+        "train_end_ns": 1702857600000000000,
+        "violations": {}
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "Global holdout \u2014 zero rows at or after 2025-01-08T00:00Z",
+      "detail": {
+        "holdout_start_ns": 1736294400000000000,
+        "violations": {}
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "cTrader fence provenance \u2014 sha256 matches the design's pin",
+      "detail": {
+        "expected": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0",
+        "measured": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0",
+        "path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/INFR-021/artifacts/fence-manifest.json"
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "cTrader TRAIN fence \u2014 max ts < 2023-11-22T00:00Z",
+      "detail": {
+        "max_ts": 1700609400000000000,
+        "train_end_ns": 1700611200000000000
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "cTrader holdout \u2014 zero rows at or after 2024-12-13T00:00Z",
+      "detail": {
+        "holdout_start_ns": 1734048000000000000,
+        "max_ts": 1700609400000000000
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "Universe pin \u2014 top-25 recompute equals the pin (set equality)",
+      "detail": {
+        "extra_in_recompute": [],
+        "missing_from_recompute": [],
+        "n_pinned": 25,
+        "n_recomputed": 25,
+        "pin_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/docs/signal-registry/candidate-families/cf-voldir-001-universe.json",
+        "universe_n_required": 25
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "Identity reconstruction \u2014 |p*W - (1-p)*L - mean| < 0.01 bps on every signed cell",
+      "detail": {
+        "cells_outside_tolerance": [],
+        "max_residual_by_arm": {
+          "B": 1.4551915228366852e-11,
+          "C": 9.094947017729282e-13
+        },
+        "n_signed_cells_checked": 23270,
+        "tolerance_bps": 0.01
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "M-1 \u2014 every band label is driven by the BLOCK MDE, never the iid form",
+      "detail": {
+        "iid_column_present_and_labelled_companion_only": {
+          "A": true,
+          "B": true,
+          "C": true,
+          "D": true
+        },
+        "observed_mde_sources": [
+          "block"
+        ]
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "M-2 \u2014 exact-span subset and span distribution emitted for every horizon cell",
+      "detail": {
+        "C": {
+          "cells_with_a_horizon": 22044,
+          "cells_with_span_disclosed": 18990
+        }
+      },
+      "severity": "INFORMATIVE"
+    },
+    {
+      "check": "No `pass` field / no at_or_above_pXX boolean anywhere (INFR-016, L-32)",
+      "detail": {
+        "offending_columns": {}
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "No local accounting primitive (cost is an xen.evaluation overlay only)",
+      "detail": {
+        "cost_source": "SPDR-014 costs.py -> xen.evaluation (fees + counted funding stamps + 2.0 allowance); spread never charged",
+        "offenders": {}
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "Spread is never charged as a cost (P-20 / L-36)",
+      "detail": {
+        "disclosure": {
+          "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
+          "implication": "reported cost understates total cost; reported net performance is overstated",
+          "prohibited_claims": [
+            "fully-net",
+            "cost-complete",
+            "tradable",
+            "deployable"
+          ],
+          "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+          "spread_rt_bps": null
+        },
+        "offenders": {}
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "Derangements \u2014 fixed-point count == 0, measured and reported",
+      "detail": {
+        "fixed_points_by_control": {
+          "arm_B_side_derangement": 0,
+          "arm_C_side_derangement": 0
+        },
+        "n_controls_checked": 2
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "TRIPWIRE-3 FORWARD-PATH DERANGEMENT",
+      "detail": {
+        "collapse_fraction": 0.1606478376814855,
+        "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+        "collapse_fraction_status": "DISCLOSURE_ONLY",
+        "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+        "destroy_form": "DERANGEMENT (decision row -> forward path)",
+        "fixed_points_total": 0,
+        "live_effect_bps": -1.3018787156874365,
+        "n": 9693,
+        "n_eligible_rows": 9694,
+        "n_excluded_singleton_group_rows": 1,
+        "n_seeds": 2000,
+        "n_seeds_effective": 2000,
+        "non_vacuity": "the side-to-path pairing is broken, which moves the mean of a signed return directly; permuting realised P&L would be mean-invariant (L-14)",
+        "not_the_causality_claim": "SPDR-012 AMENDMENT-T1: no outcome-side destroy can detect look-ahead for a fixed predictor. Causality rests on TRIPWIRE-1 and TRIPWIRE-2.",
+        "null_mean": -1.0927347150887003,
+        "null_q": [
+          -17.26719416673628,
+          -8.120840175860636,
+          -1.4754902441651658,
+          5.892543428637741,
+          15.974730343136555
+        ],
+        "null_sd": 9.073573214356244,
+        "p_one_sided": 0.4925,
+        "p_two_sided": 0.985,
+        "percentile": 0.5075,
+        "severity": "REPORT LAYER (not the causality claim)",
+        "tripwire": "TRIPWIRE-3 FORWARD-PATH DERANGEMENT"
+      },
+      "severity": "INFORMATIVE"
+    },
+    {
+      "check": "TRIPWIRE-1 CONSTRUCTION ASSERTIONS held",
+      "detail": {
+        "all_held": true,
+        "checks": [
+          {
+            "check": "entry strictly after the decision bar",
+            "detail": "min(entry-decision)=1",
+            "held": true
+          },
+          {
+            "check": "exit at the declared offset",
+            "detail": "declared h=[15 22 13 ...  7 85 56]; observed offsets [1, 2, 3, 4, 5]",
+            "held": true
+          }
+        ],
+        "n_rows": 9694,
+        "severity": "HARD",
+        "tripwire": "TRIPWIRE-1 CONSTRUCTION ASSERTIONS"
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "TRIPWIRE-3 FORWARD-PATH DERANGEMENT",
+      "detail": {
+        "collapse_fraction": 0.9036902976966509,
+        "collapse_fraction_never_used_as": "auto-kill / hard_fail_leak threshold (retired, INFR-016 / L-32)",
+        "collapse_fraction_status": "DISCLOSURE_ONLY",
+        "collapse_fraction_why": "M-5: the denominator is the live mean; near zero the ratio is uninterpretable. The usable objects are the percentile and the null distribution.",
+        "destroy_form": "DERANGEMENT (decision row -> forward path)",
+        "fixed_points_total": 0,
+        "live_effect_bps": -12.221094135400955,
+        "n": 6861,
+        "n_eligible_rows": 6861,
+        "n_excluded_singleton_group_rows": 0,
+        "n_seeds": 2000,
+        "n_seeds_effective": 2000,
+        "non_vacuity": "the side-to-path pairing is broken, which moves the mean of a signed return directly; permuting realised P&L would be mean-invariant (L-14)",
+        "not_the_causality_claim": "SPDR-012 AMENDMENT-T1: no outcome-side destroy can detect look-ahead for a fixed predictor. Causality rests on TRIPWIRE-1 and TRIPWIRE-2.",
+        "null_mean": -1.1770099380016714,
+        "null_q": [
+          -10.005725613221824,
+          -4.15470419645332,
+          -1.2472317525017358,
+          1.8792813303660663,
+          7.974638187323725
+        ],
+        "null_sd": 4.60038976360269,
+        "p_one_sided": 0.0085,
+        "p_two_sided": 0.017,
+        "percentile": 0.0085,
+        "severity": "REPORT LAYER (not the causality claim)",
+        "tripwire": "TRIPWIRE-3 FORWARD-PATH DERANGEMENT"
+      },
+      "severity": "INFORMATIVE"
+    },
+    {
+      "check": "TRIPWIRE-2 LEAKY-VARIANT DISCRIMINATION held",
+      "detail": {
+        "abs_ratio_leaky_over_legal": 7.554976119930651,
+        "emitted_variant": "legal",
+        "leaky_effect_bps": 644.7107239445771,
+        "legal_effect_bps": 85.33590493340898,
+        "n_matched_rows": 58,
+        "severity": "HARD",
+        "tripwire": "TRIPWIRE-2 LEAKY-VARIANT DISCRIMINATION",
+        "vacuity_check": "the leaky threshold selects rows using the outcome, which shifts the conditional mean materially"
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "Parent parity \u2014 each arm reproduces its parent's published cells",
+      "detail": {
+        "all_reproduced": true,
+        "arms": [
+          {
+            "arm": "A",
+            "band": "the parent's own DESIGN + CONFIRM cells",
+            "checks": [
+              {
+                "max_abs_diff": 4.547473508864641e-13,
+                "mean_abs_diff": 6.372069029408238e-14,
+                "n_compared": 109,
+                "n_outside_tolerance": 0,
+                "n_parent_cells": 109,
+                "quantity": "gap_high_low_bps",
+                "reproduced": true,
+                "tolerance": 0.01,
+                "worst_cell": "DOGEUSDT|D1|DESIGN"
+              }
+            ],
+            "enough_cells": true,
+            "min_cells_required": 20,
+            "parent": "SPDR-012",
+            "reproduced": true
+          },
+          {
+            "arm": "B",
+            "band": "the parent's own DESIGN + CONFIRM cells",
+            "checks": [
+              {
+                "max_abs_diff": 1.8189894035458565e-12,
+                "mean_abs_diff": 1.137757216482899e-14,
+                "n_compared": 2940,
+                "n_outside_tolerance": 0,
+                "n_parent_cells": 2940,
+                "quantity": "expectancy_partial (cell mean, bps)",
+                "reproduced": true,
+                "tolerance": 0.01,
+                "worst_cell": "1000BONKUSDT|H1|CONFIRM|D-SMA14_angle-off|trail"
+              },
+              {
+                "max_abs_diff": 0.0,
+                "mean_abs_diff": 0.0,
+                "n_compared": 2940,
+                "n_outside_tolerance": 0,
+                "n_parent_cells": 2940,
+                "quantity": "n_episodes",
+                "reproduced": true,
+                "tolerance": 0.0,
+                "worst_cell": "BTCUSDT|H1|DESIGN|D-SMA14_angle-off|combined"
+              }
+            ],
+            "enough_cells": true,
+            "min_cells_required": 20,
+            "parent": "SPDR-013",
+            "reproduced": true
+          },
+          {
+            "arm": "C",
+            "band": "the parent's own DESIGN + CONFIRM cells",
+            "checks": [
+              {
+                "max_abs_diff": 9.094947017729282e-13,
+                "mean_abs_diff": 8.935421750615034e-15,
+                "n_compared": 6127,
+                "n_outside_tolerance": 0,
+                "n_parent_cells": 8450,
+                "quantity": "mean_r_h (residual mean, bps)",
+                "reproduced": true,
+                "tolerance": 0.01,
+                "worst_cell": "SEIUSDT|Z-MAG|2.0|12|E-CLOSE|4|CONFIRM|H1|P-NONE"
+              },
+              {
+                "max_abs_diff": 0.0,
+                "mean_abs_diff": 0.0,
+                "n_compared": 6127,
+                "n_outside_tolerance": 0,
+                "n_parent_cells": 8450,
+                "quantity": "n_decided",
+                "reproduced": true,
+                "tolerance": 0.0,
+                "worst_cell": "BTCUSDT|Z-VOL|1.0|4|E-TOUCH|4|DESIGN|H1|P-NONE"
+              }
+            ],
+            "enough_cells": true,
+            "min_cells_required": 20,
+            "parent": "SPDR-014",
+            "reproduced": true
+          },
+          {
+            "arm": "D",
+            "band": "the parent's own scored origins (full TRAIN span \u2014 see D8)",
+            "checks": [
+              {
+                "max_abs_diff": 0.0,
+                "mean_abs_diff": 0.0,
+                "n_compared": 189,
+                "n_outside_tolerance": 0,
+                "n_parent_cells": 189,
+                "quantity": "hit_rate",
+                "reproduced": true,
+                "tolerance": 1e-06,
+                "worst_cell": "1000BONKUSDT|T-GT-CUR|ar1_threshold"
+              },
+              {
+                "max_abs_diff": 0.0,
+                "mean_abs_diff": 0.0,
+                "n_compared": 189,
+                "n_outside_tolerance": 0,
+                "n_parent_cells": 189,
+                "quantity": "n_oos",
+                "reproduced": true,
+                "tolerance": 0.0,
+                "worst_cell": "1000BONKUSDT|T-GT-CUR|ar1_threshold"
+              }
+            ],
+            "enough_cells": true,
+            "min_cells_required": 20,
+            "parent": "SPDR-015",
+            "reproduced": true
+          }
+        ],
+        "check": "PARENT PARITY",
+        "severity": "HARD",
+        "statement": "each arm reproduces its parent's published cell values on the parent's own band \u2014 the proof that no object was silently re-specified (design \u00a712)",
+        "tolerances_declared_before_run": {
+          "brier": 1e-09,
+          "ic": 1e-06,
+          "mean_bps": 0.01,
+          "n": 0,
+          "rate": 1e-06
+        }
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "Golden traces G1-G6 computed on the self-check side",
+      "detail": {
+        "all_computed": true,
+        "check": "GOLDEN TRACES G1-G6",
+        "provenance": "recomputed on the self-check side from the fenced catalog and the parents' own primitives; no expected value is hardcoded and no arm module is imported (design \u00a711)",
+        "severity": "HARD",
+        "traces": [
+          {
+            "agrees_with_emission": true,
+            "emitted_next_abs_oo_bps": 5.21856581532365,
+            "emitted_state": 1,
+            "fit_window_end_ns": 1668978000000000000,
+            "fit_window_ends_strictly_before_origin": true,
+            "initial_fit_index": 1621,
+            "n_monthly_refits": 4,
+            "n_scored_origins": 4054,
+            "origin_slot_end_ns": 1668981600000000000,
+            "origin_slot_start_ns": 1668978000000000000,
+            "population_source": "the parent's own scored DESIGN origins (row set only \u2014 every state below is recomputed from the catalog)",
+            "recomputed_high_prob": 0.9999877046002139,
+            "recomputed_next_abs_oo_bps": 5.21856581532365,
+            "recomputed_state": 1,
+            "spec": "BTCUSDT H1 DESIGN \u2014 first causal HMM state == HIGH",
+            "status": "COMPUTED",
+            "trace": "G1"
+          },
+          {
+            "emitted_gross_bps": -21.42474558114671,
+            "emitted_match_found": true,
+            "emitted_partial_net_bps": -35.42474558114671,
+            "gross_abs_diff": 0.0,
+            "recomputed_episode": {
+              "allowance_bps": 2.0,
+              "contributes_to": "L",
+              "entry_idx": 48,
+              "entry_open": 37.34,
+              "entry_ts_ns": 1657929600000000000,
+              "exit_idx": 63,
+              "exit_open": 37.42,
+              "exit_reason": "signalflip",
+              "exit_ts_ns": 1657983600000000000,
+              "fee_rt_bps": 11.0,
+              "funding_bps": 1.0,
+              "funding_stamps": 1,
+              "gross_bps": -21.42474558114671,
+              "partial_net_bps": -35.42474558114671,
+              "side": -1.0
+            },
+            "spec": "SOLUSDT H1 DESIGN D-ZZ signalflip \u2014 first completed episode",
+            "status": "COMPUTED",
+            "trace": "G2"
+          },
+          {
+            "abs_diff": 0.0,
+            "breach_side": 1,
+            "conditioner_read_inside_event_grammar": true,
+            "decision_bar_last_k_state_2": "LH",
+            "declared_h": 12,
+            "emitted_r_h_bps": 195.08351717617333,
+            "entry_open": 1586.5,
+            "entry_strictly_after_event": false,
+            "entry_ts_ns": 1658952000000000000,
+            "event_ts_ns": 1658952000000000000,
+            "exit_offset_bars": 12,
+            "exit_open": 1617.45,
+            "exit_ts_ns": 1658995200000000000,
+            "recomputed_r_h_bps": 195.08351717617333,
+            "spec": "ETHUSDT DESIGN Z-VOL z=1.5 H=12 E-TOUCH h=12, last_k_state_2 == 'LH'",
+            "status": "COMPUTED",
+            "trace": "G3"
+          },
+          {
+            "band": "CONFIRM",
+            "brier_contribution": 0.36189450192989686,
+            "confirm_slot_end_ns": 1677632400000000000,
+            "hit": false,
+            "mag_k1_bps": 186.15626638699513,
+            "mag_k_bps": 238.92617449664482,
+            "model": "ar1_threshold",
+            "note": "SPDR-015 pooled both bands into one 2b number; this origin was never scored alone",
+            "prediction_p": 0.6015766800083734,
+            "realised_y": 0.0,
+            "spec": "XRPUSDT H1 CONFIRM 2b T-GT-CUR \u2014 first scored origin",
+            "status": "COMPUTED",
+            "swing_k": 246,
+            "threshold": 238.92617449664482,
+            "trace": "G4"
+          },
+          {
+            "L_bps": 240.17113585677035,
+            "W_bps": 536.6867959993664,
+            "abs_residual_bps": 8.526512829121202e-14,
+            "cell": "SOLUSDT|H1|DESIGN|D-ZZ|signalflip",
+            "emitted_mean_bps": 32.52185246824081,
+            "n": 245,
+            "n_flat": 0,
+            "n_signed": 245,
+            "p": 0.3510204081632653,
+            "reconstruction_p_W_minus_1mp_L": 32.521852468240894,
+            "spec": "identity reconstruction on G2's parent cell",
+            "status": "COMPUTED",
+            "tolerance_bps": 0.01,
+            "trace": "G5",
+            "within_tolerance": true
+          },
+          {
+            "abs_diff_bps": 559.3748190111681,
+            "abs_ratio_leaky_over_legal": 7.554976119930651,
+            "emitted_variant": "legal",
+            "leaky_twin_construction": "selection threshold computed over a window INCLUDING the forward horizon (the outcome itself), same row count as the legal conditioner; illegal by construction, never emitted",
+            "leaky_twin_mean_bps": 644.7107239445771,
+            "legal_block_ci_bps": null,
+            "legal_variant_mean_bps": 85.33590493340898,
+            "materiality_rule": "the leaky twin must sit far outside the legal variant's own dispersion; reported as a ratio and a difference, judged by the self-check against the legal cell's block CI",
+            "n_rows": 1049,
+            "n_selected_leaky": 58,
+            "n_selected_legal": 58,
+            "spec": "TRIPWIRE-2 leak discrimination on G3's cell",
+            "status": "COMPUTED",
+            "trace": "G6",
+            "why_not_an_outcome_side_destroy": "SPDR-012 AMENDMENT-T1: no outcome-side destroy can detect look-ahead for a fixed predictor. The causality claim rests on TRIPWIRE-1 and TRIPWIRE-2."
+          }
+        ]
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "Bootstrap speed path == xen.evaluation.block_bootstrap_ci (bit-identical)",
+      "detail": {
+        "abs_diff": [
+          1.4210854715202004e-14,
+          0.0
+        ],
+        "block": 3,
+        "canonical_ci": [
+          -21.499139012161667,
+          -5.770898510581529
+        ],
+        "equivalent": true,
+        "n_boot": 500,
+        "statistic": "mean",
+        "tol": 1e-09,
+        "vectorised_ci": [
+          -21.499139012161653,
+          -5.770898510581529
+        ]
+      },
+      "held": true,
+      "severity": "HARD"
+    },
+    {
+      "check": "Determinism \u2014 parallel is bit-identical to sequential",
+      "detail": {
+        "columns_differing": [],
+        "columns_match": true,
+        "n_parallel": 630,
+        "n_sequential": 630
+      },
+      "held": true,
+      "severity": "HARD"
+    }
+  ],
+  "experiment": "SPDR-018",
+  "hard_all_held": true,
+  "lane": "SPDR \u2014 TRAIN-only, 0 counted TEST reads, no family action, no XENA",
+  "n_hard": 18,
+  "n_hard_failed": 0,
+  "parent_parity_detail_is_in": "the PARENT PARITY check above",
+  "per_file_sha256": {
+    "arm_a.py": "ef8e53a115a5095ae0e924e876c468f346bacca74cf1f09b1ba6c213a6e3dcd3",
+    "arm_b.py": "e4a02cade32ed7fe6cbe85e056bacbdc0142485f0ff0487a10bbe9e53965b3ce",
+    "arm_c.py": "b801201508e585d09559b9f41fa295c8090f02fe684fb2f059b0d7ab318a441b",
+    "arm_d.py": "78062506b94155a8f4ac5cbe705240f35b6e3b1aaabda0802bfdc649396c1884",
+    "barpanel.py": "39e740d12c12146919b26f8c7dba0119eb7fce14cb7359a154a4f63e5768306b",
+    "cells.py": "b314489b583c059d2daa194636fe86c8af28c271264720bf4381df0d763fa59e",
+    "config.py": "a54e9f0b71dd210d2d5d546af7cf0e17fe725888719bcd58f04427e755f46574",
+    "ctrader.py": "fff947fd5fb12ed1bc8034a0d6953680dd78c830a687fd7c85ce38d048aab30b",
+    "golden.py": "6afcb7f6325a3934037c307f35f768914c55696ce321432d0683843338045373",
+    "metrics.py": "3c5eb0859416ab34f5165ec5fac99daff3e46c706379b418253e85462115bf04",
+    "parents.py": "384de0507bf3e4303ae9a6ad5ddbac1dd1f5a679a35be6aedc07edb891182444",
+    "parity.py": "7620883fe26401f66c79f8a3cafe79400a806a13ea999406279e5b5f725b4825",
+    "run_screen.py": "12655faf5898e454b03c11fe302296606c445bc1bbf2327231b2e6b64b736b39",
+    "selfcheck.py": "4e5ba5998d67d8ee9f74f22296063d627572801ef5fde02d519270f472010f3c",
+    "uniform_controls.py": "fff36c73693aa18ba4c8a83610f25b2ec2a44e34c51d77f859232bea9c0793d2",
+    "unitpin.py": "ea535b33d35a80cd19fe9826e47a3ab0ba9ba741291e6628ee4c605effe3e3ac"
+  },
+  "screen_code_sha256": "44c720f82af52b8b36e8f1effe9cf20eb9c633a1ba489d04fc57156f1c7abdf1",
+  "spread_cost_disclosure": {
+    "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
+    "implication": "reported cost understates total cost; reported net performance is overstated",
+    "prohibited_claims": [
+      "fully-net",
+      "cost-complete",
+      "tradable",
+      "deployable"
+    ],
+    "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+    "spread_rt_bps": null
+  },
+  "stage": "stage-2 code-asserted self-check (design \u00a712)"
+}

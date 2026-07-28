@@ -1,0 +1,132 @@
+{
+  "all_reproduced": true,
+  "arms": [
+    {
+      "arm": "A",
+      "band": "the parent's own DESIGN + CONFIRM cells",
+      "checks": [
+        {
+          "max_abs_diff": 4.547473508864641e-13,
+          "mean_abs_diff": 6.372069029408238e-14,
+          "n_compared": 109,
+          "n_outside_tolerance": 0,
+          "n_parent_cells": 109,
+          "quantity": "gap_high_low_bps",
+          "reproduced": true,
+          "tolerance": 0.01,
+          "worst_cell": "DOGEUSDT|D1|DESIGN"
+        }
+      ],
+      "enough_cells": true,
+      "min_cells_required": 20,
+      "parent": "SPDR-012",
+      "reproduced": true
+    },
+    {
+      "arm": "B",
+      "band": "the parent's own DESIGN + CONFIRM cells",
+      "checks": [
+        {
+          "max_abs_diff": 1.8189894035458565e-12,
+          "mean_abs_diff": 1.137757216482899e-14,
+          "n_compared": 2940,
+          "n_outside_tolerance": 0,
+          "n_parent_cells": 2940,
+          "quantity": "expectancy_partial (cell mean, bps)",
+          "reproduced": true,
+          "tolerance": 0.01,
+          "worst_cell": "1000BONKUSDT|H1|CONFIRM|D-SMA14_angle-off|trail"
+        },
+        {
+          "max_abs_diff": 0.0,
+          "mean_abs_diff": 0.0,
+          "n_compared": 2940,
+          "n_outside_tolerance": 0,
+          "n_parent_cells": 2940,
+          "quantity": "n_episodes",
+          "reproduced": true,
+          "tolerance": 0.0,
+          "worst_cell": "BTCUSDT|H1|DESIGN|D-SMA14_angle-off|combined"
+        }
+      ],
+      "enough_cells": true,
+      "min_cells_required": 20,
+      "parent": "SPDR-013",
+      "reproduced": true
+    },
+    {
+      "arm": "C",
+      "band": "the parent's own DESIGN + CONFIRM cells",
+      "checks": [
+        {
+          "max_abs_diff": 9.094947017729282e-13,
+          "mean_abs_diff": 8.935421750615034e-15,
+          "n_compared": 6127,
+          "n_outside_tolerance": 0,
+          "n_parent_cells": 8450,
+          "quantity": "mean_r_h (residual mean, bps)",
+          "reproduced": true,
+          "tolerance": 0.01,
+          "worst_cell": "SEIUSDT|Z-MAG|2.0|12|E-CLOSE|4|CONFIRM|H1|P-NONE"
+        },
+        {
+          "max_abs_diff": 0.0,
+          "mean_abs_diff": 0.0,
+          "n_compared": 6127,
+          "n_outside_tolerance": 0,
+          "n_parent_cells": 8450,
+          "quantity": "n_decided",
+          "reproduced": true,
+          "tolerance": 0.0,
+          "worst_cell": "BTCUSDT|Z-VOL|1.0|4|E-TOUCH|4|DESIGN|H1|P-NONE"
+        }
+      ],
+      "enough_cells": true,
+      "min_cells_required": 20,
+      "parent": "SPDR-014",
+      "reproduced": true
+    },
+    {
+      "arm": "D",
+      "band": "the parent's own scored origins (full TRAIN span \u2014 see D8)",
+      "checks": [
+        {
+          "max_abs_diff": 0.0,
+          "mean_abs_diff": 0.0,
+          "n_compared": 189,
+          "n_outside_tolerance": 0,
+          "n_parent_cells": 189,
+          "quantity": "hit_rate",
+          "reproduced": true,
+          "tolerance": 1e-06,
+          "worst_cell": "1000BONKUSDT|T-GT-CUR|ar1_threshold"
+        },
+        {
+          "max_abs_diff": 0.0,
+          "mean_abs_diff": 0.0,
+          "n_compared": 189,
+          "n_outside_tolerance": 0,
+          "n_parent_cells": 189,
+          "quantity": "n_oos",
+          "reproduced": true,
+          "tolerance": 0.0,
+          "worst_cell": "1000BONKUSDT|T-GT-CUR|ar1_threshold"
+        }
+      ],
+      "enough_cells": true,
+      "min_cells_required": 20,
+      "parent": "SPDR-015",
+      "reproduced": true
+    }
+  ],
+  "check": "PARENT PARITY",
+  "severity": "HARD",
+  "statement": "each arm reproduces its parent's published cell values on the parent's own band \u2014 the proof that no object was silently re-specified (design \u00a712)",
+  "tolerances_declared_before_run": {
+    "brier": 1e-09,
+    "ic": 1e-06,
+    "mean_bps": 0.01,
+    "n": 0,
+    "rate": 1e-06
+  }
+}

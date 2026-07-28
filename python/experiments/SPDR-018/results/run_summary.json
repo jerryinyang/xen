@@ -1,0 +1,114 @@
+{
+  "checkpoint": "2026-07-25-018-trade-opportunity-capture-geometry",
+  "deviations": [],
+  "disposition": "NONE \u2014 this script takes no disposition. The binding read is the fresh-context analyst's analysis.md; the disposition is the operator's.",
+  "experiment": "SPDR-018",
+  "family": "CF-VOLDIR-001",
+  "hard_all_held": true,
+  "hypothesis": "HYP-D5",
+  "interpretation_notes": [
+    {
+      "clause": "design \u00a71.1 / \u00a715 'reuse the parents' screen_code; arm runners importing the parent modules'",
+      "id": "IN-1",
+      "resolution": "Each arm imports its parent's modules for constants, band rules, control seeds, cost constants and pure helper functions (screen_code/parents.py, isolated sys.path loader), and re-scores the parent's OWN emitted row-level panel (012 vol_reliability/xs_panel, 013 episodes, 014 post_event/straddle, 015 regime_states/zz_ordinal). Those panels already span the full TRAIN fence with a band column, so power levers 1-4 apply without re-specifying any object. Where a parent never computed a band at all (D8: SPDR-015 masked is_origin to DESIGN), the parent's own module is RE-RUN on the CONFIRM origins. Parent parity (\u00a712) is asserted against each parent's published values, which is what makes the re-score verifiable.",
+      "weakens_clause": false
+    },
+    {
+      "clause": "design \u00a77 uniform controls at >=2000 seeds",
+      "id": "IN-2",
+      "resolution": "The three uniform controls run on each arm's DESIGNATED PRIMARY CELLS (its parent's own registered CONTROL_PRIMARY_CELL, plus the arm's pooled cell and its powered cells), not on every one of the several thousand grid cells \u2014 the parents' own control blocks are scoped the same way. The scope is emitted in controls.json so nothing is hidden; no cell is dropped from the metrics table.",
+      "weakens_clause": false
+    },
+    {
+      "clause": "design \u00a76.2 'xen.evaluation.block_bootstrap_ci'",
+      "id": "IN-3",
+      "resolution": "Called with the per-calendar-day sufficient statistics as the resampled series (x[i] = [sum_i, count_i] for day i) and a stat that recovers the count-weighted mean, so the day-block resample is exact for a weighted mean. Blocks are in DAYS, so the minimum block (1 day = 24 H1 bars) is >= every horizon in scope, as \u00a76.2 requires. For the mean/p/W/L/W_L/edge family the resample loop is vectorised so all six statistics come out of ONE pass per (block, seed) \u2014 the index construction is identical to block_bootstrap_ci's (same rng, same circular full-range starts, same cap to [1, n-1]) and equality with the canonical implementation is ASSERTED at run in the integrity self-check (metrics.assert_canonical_equivalence; measured |diff| <= 2e-14). It is a speed path over the same referee, not a second referee. Median and 10% trimmed mean, which need the raw rows, keep the canonical call.",
+      "weakens_clause": false
+    },
+    {
+      "clause": "design \u00a76.1 \u2014 'mean, median, 10% trimmed mean ... block-bootstrap CI on each, all three always co-reported'",
+      "id": "IN-5",
+      "raised_to_operator": true,
+      "resolution": "All three point statistics are emitted on EVERY cell, always. Their block-bootstrap CIs are computed on the cells whose band label can depend on them \u2014 the levers-exhausted (pooled, sigma-normalised, full-TRAIN) cells, which are the ones that decide RESOLVED vs NOT_RESOLVABLE. The mean family (mean/p/W/L/W_L/edge) carries its envelope CI on every cell without exception, because it decomposes into per-day sufficient statistics; median and trimmed mean do not decompose and cost ~190s per large pooled cell even fully vectorised, so bootstrapping them across all ~30k grid cells is not tractable. Scope is emitted per cell (`median_ci_low`/`median_ci_high` present or absent), never hidden.",
+      "weakens_clause": false
+    },
+    {
+      "clause": "design \u00a72 arm B item B3 \u2014 'the 125 positive-mean cells, every one UNPOWERED'",
+      "id": "IN-4",
+      "raised_to_operator": true,
+      "resolution": "The count 125 does not reconcile against SPDR-013's published expectancy_by_cell.parquet under any slice: positive expectancy_partial AND band_label==UNPOWERED gives 830 cells grid-wide (352 on DESIGN, 187 on DESIGN x H1, 284 on CONFIRM x H1, 471 on H1 across both bands); on gross it is 1237. Since the mandate forbids narrowing the residue, B3 is tagged as the SUPERSET \u2014 all 830 positive-mean UNPOWERED cells \u2014 so no cell the SoT could have meant is dropped. The discrepancy is RAISED to the operator, not silently resolved.",
+      "weakens_clause": false
+    }
+  ],
+  "jobs": 8,
+  "kind": "PRECISION experiment \u2014 proposes no new market regularity",
+  "lane": "SPDR \u2014 TRAIN-only, 0 counted TEST reads, 0 multiplicity slots, no family action",
+  "n_boot": 2000,
+  "n_cells_by_arm": {
+    "A": 3047,
+    "B": 5110,
+    "C": 22194,
+    "D": 7440
+  },
+  "n_cells_total": 37791,
+  "n_symbols": 25,
+  "prohibited_claims": [
+    "tradable",
+    "deployable",
+    "fully-net",
+    "cost-complete",
+    "p > 0.5",
+    "win-rate as the direction metric",
+    "family status change",
+    "XENA",
+    "graduation",
+    "sizing improves expectancy",
+    "straddle as a strategy branch"
+  ],
+  "screen_code_sha256": "44c720f82af52b8b36e8f1effe9cf20eb9c633a1ba489d04fc57156f1c7abdf1",
+  "spread_cost_disclosure": {
+    "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
+    "implication": "reported cost understates total cost; reported net performance is overstated",
+    "prohibited_claims": [
+      "fully-net",
+      "cost-complete",
+      "tradable",
+      "deployable"
+    ],
+    "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+    "spread_rt_bps": null
+  },
+  "target_precision_inherited_per_arm": {
+    "A": {
+      "gap_mde_ceiling_bps": 15.0,
+      "mde_ic_ceiling": 0.1,
+      "mde_ic_const": 1.5,
+      "min_dates": 225,
+      "rule": "SPDR-012 \u00a76.3: MDE(IC) = 1.5/sqrt(n_dates) <= 0.10  =>  n_dates >= 225"
+    },
+    "B": {
+      "mde_ceiling_bps": 10.0,
+      "min_dates": 30,
+      "min_episodes": 80,
+      "rule": "SPDR-013: MDE <= 10 bps AND n_dates >= 30 AND thirds-stable",
+      "thirds_sign_min": 2
+    },
+    "C": {
+      "mde_ceiling_bps": 10.0,
+      "min_dates": 30,
+      "min_events": 80,
+      "rule": "SPDR-014 \u00a78.1: n_events >= 80 AND n_dates >= 30 AND MDE <= 10 bps"
+    },
+    "D": {
+      "min_dates": 30,
+      "min_origins": 80,
+      "min_swings": 80,
+      "min_trans": 50,
+      "rule": "SPDR-015: n_origins >= 80 AND n_dates >= 30"
+    },
+    "uniform_edge": {
+      "rule": "block MDE on p below the cell's own |edge|"
+    }
+  },
+  "wall_clock_s": 440.3
+}
