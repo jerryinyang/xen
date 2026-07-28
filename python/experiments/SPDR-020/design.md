@@ -66,6 +66,32 @@ null is that object's own zero line; the horizon is the parent's frozen post-eve
 thing deliberately inherited whole is SPDR-014's event grammar — which is the point: the checkpoint
 requires this object measured under *designed* capture rather than the parent's incidental exits.
 
+### 1.1 The named mechanism for `R > 1` — required before any capture design (SoT §10)
+
+Governance demands the mechanism, not a search: *"any 019/020 proposal must NAME the mechanism that
+puts `R > 1`, because five distinct exit devices spanning a 5.3× powered `W/L` range did not."*
+This design names one, and it is falsifiable:
+
+> **Claim.** The driftless mirror binds when the exit boundaries are placed *independently of the
+> conditional dispersion of the path*. A breach event is a state in which the forward dispersion is
+> both **elevated and forecastable** (V1, V11, V20). If the exit boundaries are placed as multiples
+> of that *conditional* forecast rather than as constants, the truncation points sit at a fixed
+> quantile of the actual forward distribution rather than at a drifting one — and a fixed-quantile
+> truncation does not have to reproduce the unconditional `(1−p)/p` relation.
+
+**Why this may still be nothing, stated up front (P-02, and the reflection's own finding).** The same
+argument would have predicted a lift for SPDR-018's `stop` and `trail` modes, and it did not appear:
+`W/L` moved 5.3× across powered cells with the mean pinned on the zero line, on two asset classes.
+The mechanism above is therefore a **hypothesis with a known prior against it**, not a rationale. It
+survives only in the specific form "boundaries scaled to a *forecast* of conditional dispersion",
+which the parents' incidental geometries never tested — that gap, and nothing broader, is what this
+design probes.
+
+**Pre-registered expectation (reflection §5.6).** The predictions this design commits to in advance:
+ŝ-scaling every boundary leaves `log R` unchanged; selection raises `W` and `L` together with `W/L`
+moving less than ~0.3; shock- and level-gated selections are close to additive. A result contrary to
+any of these is a finding; a result matching them is the expected outcome.
+
 ---
 
 ## §2 The entry — inherited from SPDR-014
@@ -82,6 +108,7 @@ requires this object measured under *designed* capture rather than the parent's 
 | **Entry** | breach bar `j` → fill at `open[j+1]` |
 | **Exit (parent)** | `open[entry + h]`, `h ∈ {4, 12, 24}` — **this is what the L4 devices replace** |
 | **Side** | **MOMO** (with the breach) and **MR** (against it) both emitted; neither assumed |
+| **UNDECIDED side** | SPDR-014's rule inherited verbatim: an event whose side cannot be resolved is marked **UNDECIDED**, excluded from the signed cells, and **counted and reported** — never silently dropped |
 
 ### 2.2 The `z` grid, and why there is no selectivity gate (operator directive 2026-07-28)
 
@@ -109,15 +136,26 @@ reading `log R` against it is strictly more informative than a pass/fail line wo
 checkpoint's binding carry-forward requirement — *the band's selectivity must be visible rather than
 assumed* — is satisfied by measuring and reporting it, which is what SPDR-014 failed to do.
 
+**Reconciliation with the registered `HYP-D7` wording.** `HYP-D7` is registered as the capture
+question *"…with a band that actually selects"*. This design satisfies the **intent** of that clause
+— SPDR-014's defect was that selectivity was **invisible**, not that it was high — by measuring and
+reporting `p_event` on every cell and reading `log R` against it. It does **not** satisfy a literal
+reading in which unselective cells are excluded, and the operator directive of 2026-07-28 removes
+that reading deliberately (an exclusion rule would be optimising the entry, which the checkpoint
+forbids). **This departure is disclosed here and in the amendment ledger**; it narrows nothing and
+excludes nothing.
+
 **This remains a grid extension, not an estimand substitution.** `z` is a registered parameter of
 the 014 object; the object, its anchor, its event types and its residual definition are untouched.
 SPDR-014's frozen grid was `{1.0, 1.5, 2.0}`; this design **drops 1.0 and adds 2.5 and 3.0**, which
 is disclosed here, in the cell count (§10) and in the amendment ledger (§14).
 
 **Parent parity is asserted:** at `z = 1.5, H = 12, h = 12, E-TOUCH, Z-VOL, DESIGN`, this screen must
-reproduce SPDR-014's published per-symbol cells to a **declared numeric tolerance** (stated in
-`results/parent_parity.json`, not left implicit). That is the proof the object was not silently
-re-specified.
+reproduce SPDR-014's published per-symbol cells to a **declared numeric tolerance: |Δ| ≤ 1e-9 on
+`mean_r_h`, `p_momo`, `p_mr` and `n_decided`, per cell**. SPDR-018 achieved 9.1e-13 on this same
+arm-C object, so 1e-9 is loose enough to absorb float ordering and tight enough that any real
+re-specification fails it. Emitted to `results/parent_parity.json`. That is the proof the object
+was not silently re-specified.
 
 **Two parent rules are restored, not replaced** (QA finding): SPDR-014's **UNDECIDED-side rule** and
 its **5 bps flat deadband** are inherited verbatim. The `r == 0` flat test in an earlier draft
@@ -153,7 +191,10 @@ OBJECT-IDENTITY:
     window). Residual dependence handled by block bootstrap with block >= h (B-9).
 ```
 
-**Flat legs** (`r == 0`) are excluded from `p`, counted as `p_flat`, and disclosed per cell.
+**Flat legs** use **SPDR-014's own 5 bps deadband**, not an `r == 0` test: `|r| < 5 bps` is FLAT,
+excluded from `p`, counted as `p_flat` and disclosed per cell. (An earlier draft wrote `r == 0`,
+silently narrowing the parent's rule; withdrawn per QA run 1 and corrected here in the one place
+that still carried it.)
 
 ---
 
@@ -260,32 +301,70 @@ Object-specific controls and their known priors on **this** object:
 
 ```
 CONTROL SIDE-DERANGEMENT (within_sample_attribution - REPORT LAYER):
-  KNOWN NON-VACUOUS ON THIS OBJECT: SPDR-018 ran it on arm C and measured live -12.221 bps at
-  percentile 0.0065, ~2.4 null sd below the null mean - the strongest single control result in
-  that run. It establishes that this object's SIDES carry real directional information AND that
-  it points against the registered direction. That prior is stated here so the read is
-  interpreted, not rediscovered.
-  destroy form: DERANGEMENT (zero fixed points, counted; L-28). >= 2000 seeds. Plant curve
-  co-designed at +5/+10/+20/+40 bps.
-  disclosure: percentile + the null's OWN mean, sd and quantiles (P-24).
+  question answered: does the entry's SIDE carry information, or would random sides produce the
+    same payoff geometry?
+  population: the same episodes with sides deranged; DISJOINT in labelling from the live series -
+    every episode's side differs from its own (zero fixed points).
+  bite/MDE: >= 2000 seeds; plant curve co-designed at +5/+10/+20/+40 bps, detection rate reported
+    per rung. The control is declared UNUSABLE for any effect below its own plant resolution.
+  non-vacuity: deranging the side flips the sign of r, moving the mean, p, W and L - the
+    sufficient statistics of log R. Not mean-preserving (B-6 satisfied).
+  expected outcome if H true: live log R above the null distribution. If H false: inside it.
+  disclosure: percentile + the null's OWN mean, sd and quantiles (P-24), never a bare percentile.
+  destroy form: DERANGEMENT (zero fixed points, asserted and counted; L-28).
+  KNOWN PRIOR ON THIS OBJECT: SPDR-018 ran it on arm C and measured live -12.221 bps at percentile
+    0.0065, ~2.4 null sd below the null mean - the strongest single control result in that run. It
+    establishes that this object's SIDES carry real directional information AND that it points
+    against the registered direction. Stated so the read is interpreted, not rediscovered.
 
 CONTROL AMBIENT-BASE (disclosure layer, [D]):
   question answered: what does the EVENT select, relative to unconditional bars at matched hold?
-  population: matched-hold ambient episodes, DISJOINT from the event population.
-  KNOWN PRIOR: on arm C the event selected a higher-rate, smaller-win, MORE SYMMETRIC
-  distribution (rate +0.0255, W -33.7, W/L -0.124) whose net effect on the mean was ~zero because
-  the terms offset. A MEAN-ONLY read called this "nothing happened" and was wrong. This control is
-  therefore emitted on (p, W, L, W_L) SEPARATELY, never on the mean alone.
-  bite/MDE: mean CI ~+-10 bps on the parent's n; reported as disclosure, never as a gate.
+  population: matched-hold ambient episodes drawn from bars carrying NO breach in their window.
+    DISJOINT from the event population by construction; disjointness asserted in code.
+  bite/MDE: mean CI ~+-10 bps at the parent's n; emitted with the same ladder as every other cell.
+    Reported as disclosure, never as a gate.
+  non-vacuity: it substitutes a different episode population entirely - p, W and L all move.
+  expected outcome if H true: the event population's log R differs from ambient. If H false: equal.
+  disclosure: reported on (p, W, L, W_L) SEPARATELY, never on the mean alone.
+  destroy form: N/A (a matched comparator, not a permutation).
+  KNOWN PRIOR: on arm C the event selected a higher-rate, smaller-win, MORE SYMMETRIC distribution
+    (rate +0.0255, W -33.7, W/L -0.124) whose net effect on the mean was ~zero because the terms
+    offset. A MEAN-ONLY read called this "nothing happened" and was wrong.
 
-CONTROL MAGNITUDE-MATCHED (M-3) - MANDATORY, and it has bitten here before:
-  SPDR-018 measured `mag_high` at percentile 0.46 against this comparator - i.e. the "magnitude
-  state" effect on this very object was "the bar was large", not "the volatility state". Any L1/L3
-  layer defined on move size MUST carry it, with the comparator's own mean, null quantiles and
-  plant curve emitted alongside every percentile (P-24). A percentile alone is refused.
+CONTROL MAGNITUDE-MATCHED (M-3) - MANDATORY for any layer defined on move size:
+  question answered: is the effect "the volatility state" or merely "this bar was large"?
+  population: episodes NOT selected by the layer, matched on realised |decision-bar move| decile.
+    DISJOINT from the selected population by construction; disjointness asserted PER DECILE.
+  bite/MDE: plant curve per decile, emitted; the comparator is declared UNUSABLE in any decile
+    where its own plant curve is blind.
+  non-vacuity: it substitutes a different episode population at matched magnitude - p, W, L move.
+  expected outcome if H true: selected log R above matched. If H false: equal.
+  disclosure: MANDATORY per P-24 - the comparator's OWN mean, its null quantiles AND its plant
+    curve accompany every percentile. A percentile alone is uninterpretable and is refused.
+  destroy form: N/A (a matched comparator).
+  KNOWN PRIOR: SPDR-018 measured `mag_high` at percentile 0.46 against this comparator on this very
+    object - the "magnitude state" effect was "the bar was large", not "the volatility state".
+
+### 6.1 Battery / eligibility / null rules (L-24 — all three clauses)
+
+```
+L-24.1 TIME-STABILITY ELIGIBILITY (F02): a seed battery prices side-randomisation only. Every
+  cell additionally reports its log R computed on each of THREE CHRONOLOGICAL THIRDS of full
+  TRAIN, with the sign agreement across thirds emitted. This is REQUIRED because full TRAIN is
+  now the primary read (AMENDMENT-2) - promoting it removed the DESIGN/CONFIRM split that used to
+  supply the stability signal, so the thirds read replaces it rather than being optional.
+  It is a REPORTED quantity, never a gate.
+L-24.2 EXIT-MATCHED NULLS (F04): the L4 devices are PATH-DEPENDENT, so every derangement seed is
+  re-run UNDER THE SAME EXIT RULE as the live arm it is refereeing. A null that exits on the
+  parent's fixed horizon cannot referee a trailing stop. Where a device's null cannot be
+  exit-matched, that device's control is demoted to DISCLOSURE and labelled as such.
+L-24.3 DERIVED TRIPWIRE THRESHOLDS (F06): TRIPWIRE-1's expected separation is COMPUTED from the
+  realised autocorrelation of the shifted conditioning stream on TRAIN, with a CI - never
+  asserted. The tripwire is HARD on DISCRIMINATION (legal vs leaky must be distinguishable), not
+  on a magnitude someone picked.
 ```
 
-### 6.1 Leak tripwire (HARD — blocking)
+### 6.2 Leak tripwire (HARD — blocking)
 
 ```
 TRIPWIRE-1 (causal misalignment):
@@ -327,18 +406,39 @@ CONVERSION-PIN:
 
 ## §8 Resolution statement — sensitivity across a range, not a single bar
 
-Same derivation as `SPDR-019` §8, computed from SPDR-018's emitted cells:
+Same derivation as `SPDR-019` §8, computed from SPDR-018's emitted cells — **with the scaling
+constant taken from the FULL population, not the powered subset** (QA run 2):
 
 ```
 Delta log R ~= Delta mean / ((1-p)*L);  arm C: p 0.467, L 124.5 -> (1-p)*L ~= 66.4 bps
-=> a cell resolves Delta log R ~= its block MDE in bps / 66.4
+MDE scales as k/sqrt(n).  Measured k = MDE * sqrt(n) on SPDR-018's emitted cells:
+
+    powered subset (1,413 cells) : k = 370      <-- WRONG BASIS. Cells enter this subset
+                                                    BECAUSE their MDE is small; using it is
+                                                    the P-22 selection bias, committed inside
+                                                    a power derivation. An earlier draft did
+                                                    exactly this.
+    FULL population (23,700)     : k = 948      <-- 2.56x larger
+    by horizon                   : h=4 -> 569   h=12 -> 955   h=24 -> 1,384
+
+k is HORIZON-DEPENDENT, so a single required-n table is invalid on a design whose block rule is
+block >= h. Required n is computed PER HORIZON at run.
 ```
 
-| Target `Δlog R` | Required mean-MDE | Required episodes (from arm C's MDE-vs-n scaling) |
-|---|---:|---:|
-| 0.07 | 4.6 bps | ~10,800 |
-| 0.05 | 3.3 bps | ~21,200 |
-| 0.03 | 2.0 bps | ~58,800 |
+| Target `Δlog R` | required `n`, h=4 | h=12 | h=24 |
+|---|---:|---:|---:|
+| 0.15 | ~6,300 | ~17,700 | ~37,100 |
+| 0.10 | ~14,200 | ~39,900 | ~83,400 |
+| 0.075 | ~25,300 | ~70,800 | ~148,000 |
+| 0.05 | ~57,000 | ~159,000 | ~333,000 |
+
+*(`n ≈ (k / (Δ·66.4))²`. An earlier draft's "~21,200 at the 0.05 rung" used the powered-subset
+`k` and no horizon split; it understated the requirement by roughly 6.6× at h=12.)*
+
+**The direct check agrees with the arithmetic, and is the more convincing evidence.** In
+SPDR-018's own emission the largest pooled arm-C cells (n ≈ 21k) realise **0.08–0.16 log units**,
+and **0 of 18,632 arm-C cells reach 0.03**. Any prediction that this design will "approach 0.03"
+is refuted by the parent's own data before it runs.
 
 **Population, read from the parent's emission — not from its report's headline.** Counts below come
 from `SPDR-014/results/zones.parquet` and `post_event.parquet` directly:
@@ -372,15 +472,41 @@ RESOLUTION (replaces the pass/fail POWER block; operator mandate 2026-07-28):
 
       ladder = { 0.02, 0.03, 0.05, 0.075, 0.10, 0.15 }  log units
 
-  Emitted per cell:  realised n | block MDE | CI width | detection rate at each ladder rung |
-                     the n that WOULD be required at each rung.
-  The ladder is a PRESENTATION grid, not a set of thresholds: no rung admits, excludes, labels or
-  ranks any cell. It exists so the reader sees WHERE a cell's resolution falls rather than being
-  handed a boolean.
-  No cell is flagged powered, unpowered or NOT_RESOLVABLE. A cell with poor resolution reports
-  poor resolution, in numbers, and is still reported in full.
+  PLANT OPERATOR (must be stated, or the ladder is ambiguous - QA run 2):
+    PRIMARY: plant delta on the residual by scaling W/L by exp(delta) with p HELD FIXED. This is
+      the operator a capture policy actually acts through - exits move payoff asymmetry.
+    CO-REPORT: the same delta planted through p at fixed W/L. Detection rates differ between the
+      two, and BOTH are emitted per rung. Neither is privileged; the pair shows how
+      operator-dependent the cell's resolution is.
+
+  CURVE SUMMARY, replacing a single bar (three points, none canonical):
+      mde50 / mde80 / mde95 = the effect size detectable in 50% / 80% / 95% of replicates,
+      interpolated from the ladder.
+    These are DESCRIPTIVE re-parameterisations of the same curve. They restore separability -
+    cells can be counted, sorted and compared - WITHOUT any rung or rate being the admission
+    bar. No cell is admitted, excluded, labelled or ranked by them.
+    (QA run 2 proposed a `finest_rung_detected` field; that requires picking a privileged
+    detection rate, which would reintroduce exactly the cutoff this mandate removed. Reporting
+    three points of the curve achieves the same separability with no privileged value.)
+
+  Emitted per cell:  realised n | block MDE | CI width | detection rate at each rung, per plant
+                     operator | mde50/mde80/mde95 | the n required at each rung.
+  No cell is flagged powered, unpowered or NOT_RESOLVABLE. A cell with coarse resolution reports
+  coarse resolution, in numbers, and is still reported in full.
   MDE is always the dependence-matched BLOCK form (M-1, block >= the holding horizon); the iid
   form is companion-only and may never be presented as the cell's resolution.
+
+  B-5 ENFORCEMENT (QA run 2 - the label was categorical and therefore countable; these restore
+  that property without a threshold, and are HARD schema checks, not conventions):
+    1. No `log R` value ships in ANY artifact without `ci_low`, `ci_high`, `ci_width` and
+       `block_mde` present on the SAME ROW. Asserted over metrics_by_cell, layer_deltas and the
+       resolution ladder alike.
+    2. Any AGGREGATE statement over cells ("N of M covered the mirror") must carry the
+       resolution distribution of those cells - median mde50 and the count below each rung.
+       An aggregate without it is a negative-by-omission, which B-5 forbids as squarely as a
+       dropped label does.
+    3. The expected-resolution table (below) is PREDECLARED per stratum. Predeclaration was the
+       real content of the retired POWER block and is orthogonal to the label; it is retained.
 ```
 
 **What this changes and what it does not.** The conversion `Δlog R ≈ Δmean / ((1−p)·L)` and the
@@ -388,12 +514,22 @@ RESOLUTION (replaces the pass/fail POWER block; operator mandate 2026-07-28):
 is removed is the single canonical bar that used to turn them into a verdict.
 
 ```
-EXPECTED RESOLUTION (a prediction, never a result - realised values are emitted per cell):
-  Population is artifact-grounded above. Pooled across 25 symbols on full TRAIN, a low-z Z-VOL
-  cell is expected in the 20k-45k range -> resolution around the 0.05 rung, approaching 0.03.
-  The z = 3.0 tail, the Z-MAG and Z-MAG-SENS sources (223 and 876 rows at the parent's primary
-  cell) and every per-symbol cell (parent n ran 10-517) land at the coarse end of the ladder.
-  Sizing cells are reported on DISPERSION only and carry no log R resolution read at all.
+EXPECTED RESOLUTION, PER STRATUM (predeclared; a prediction, never a result):
+  Population is artifact-grounded above. Pooled across symbols on full TRAIN:
+
+    stratum                          expected n      expected resolution (mde50)
+    Z-VOL, low z, h=4                20k-45k         ~0.09 - 0.13
+    Z-VOL, low z, h=12               20k-45k         ~0.14 - 0.21
+    Z-VOL, low z, h=24               20k-45k         ~0.21 - 0.31
+    Z-VOL, z=3.0                     materially less coarser still
+    Z-MAG / Z-MAG-SENS               223 / 876 rows at the parent's primary cell -> very coarse
+    per-symbol (any stratum)         parent n ran 10-517 -> very coarse throughout
+    sizing cells                     DISPERSION only; no log R resolution read at all
+
+  STATED PLAINLY: on this population NO stratum is expected to resolve 0.05, and the finest
+  expected resolution is around 0.09-0.13 at the shortest horizon. This is a PREDICTION about
+  precision, not a prediction about the effect, and it is emitted so that a covering CI is read
+  as "we could not see an effect this small here" rather than as "there is no effect" (B-5).
 ```
 
 **Consequence, stated plainly:** like `SPDR-019`, this is a **pooled** experiment — that is where
@@ -445,9 +581,10 @@ be dropped in summary.
 | Item | Freeze |
 |---|---|
 | Primary catalog | Bybit USDT linear perps, `data/catalog/`, INFR-011 fence |
-| Universe | top-25 30d USD volume (AMENDMENT-U1); pin `cf-voldir-001-universe.json`; recompute + assert set equality |
+| Universe | top-25 30d USD volume (AMENDMENT-U1); pin `cf-voldir-001-universe.json`; recompute + assert set equality. **Z-VOL resolves on 17 of the 25** — see the coverage row below |
 | Clock | **H1 primary** (SPDR-014's own clock), **H4 co-report** |
 | Sources | `Z-VOL` primary; `Z-MAG`, `Z-MAG-SENS` completeness (expected to resolve coarsely; still reported in full) |
+| **Z-VOL symbol coverage** | **17 of 25 symbols.** 8 carry no `s_symbol` in the parent (ORDI, TIA, BIGTIME, 1000PEPE, SEI, WLD, PYTH, 1000RATS — empty on warm-up). Every 'pooled' figure in this design is pooled over **17**, and the effective-coverage rule (M-4) is applied to that figure, not to 25 |
 | `z` | `{1.5, 2.0, 2.5, 3.0}` — 1.0 dropped (not an outlier band); 1.5 doubles as the parent-parity anchor. **No selectivity gate; every signal is taken** |
 | `H` (event window) | inherited: 12 primary, parent's alternatives co-reported |
 | `h` (hold) | inherited: `{4, 12, 24}` |
@@ -517,6 +654,8 @@ G7 (leak discrimination):
 | **`log R` definition** | asserted equal to `log(W/L) − log((1−p)/p)` with **slope 1**; a fitted-slope residual anywhere is a **hard failure** |
 | **Cost isolation** | no cost term in any estimand, threshold, band or comparison; `p_be_net` present, flagged `DISCLOSURE_ONLY` (AMENDMENT-C5) |
 | **MDE column** | the reported resolution column is the **block** MDE in log units; iid is companion-only (M-1) |
+| **`log R` never unaccompanied** | HARD schema check: no `log R` ships in **any** artifact without `ci_low`, `ci_high`, `ci_width` and `block_mde` on the **same row** — asserted over `metrics_by_cell`, `layer_deltas` and the resolution ladder alike (B-5 enforcement, QA run 2) |
+| **Ladder plant operator** | both plant operators (via `W/L` at fixed `p`; via `p` at fixed `W/L`) computed and emitted per rung; neither omitted |
 | **No adequacy flag** | asserted that **no** `powered` / `unpowered` / `at_target` / `NOT_RESOLVABLE` column is emitted anywhere, and that no single canonical MDE threshold appears in code (operator mandate 2026-07-28) |
 | **Ladder emitted** | the sensitivity ladder is present on **every** cell, with its detection rates and required-`n` values |
 | **Span disclosure** | exact-span subset and span distribution per horizon cell (M-2) |
@@ -557,6 +696,7 @@ pass (P-23). No required check lives in a manual post-step (L-52).
 - **Combining layers before characterising them individually** (AMENDMENT-C6).
 - **Pruning phase (b) to phase (a)'s winners.**
 - **Reading a coarse-resolution cell as a negative** (B-5), or reading a CI that covers the mirror as a refutation.
+- **Any aggregate statement over cells** ("N of M covered the mirror") **without the resolution distribution of those cells** — median `mde50` and the count below each rung. An aggregate without it is a negative-by-omission, which B-5 forbids exactly as it forbids a dropped label (QA run 2).
 - **Emitting any `powered` / `unpowered` / `NOT_RESOLVABLE` flag, or any single canonical adequacy threshold** — retired by operator mandate 2026-07-28; resolution is reported as a ladder and adequacy is the reader's judgement.
 - **A per-symbol `log R` conclusion carried without its resolution ladder** — per-symbol cells resolve coarsely (§8) and are heterogeneity disclosure.
 - **A blended score without its term-level decomposition**; **a sizing cell reported as expectancy**.
@@ -591,7 +731,19 @@ AMENDMENT-4: retire the powered/unpowered adequacy label and the +-0.03 / 0.07 m
     its own MDE and CI width on the same row)
   - Operator mandate 2026-07-28. Same rationale as SPDR-019 AMENDMENT-6.
 
-running count: 2 looser / 0 tighter / 2 neutral
+AMENDMENT-5: correct the required-n scaling constant from the powered-subset basis (k=370) to
+  the full-population, horizon-split basis (k = 569 / 955 / 1384 at h = 4 / 12 / 24); add the
+  per-stratum predeclared resolution table; disclose Z-VOL's 17-of-25 symbol coverage.
+  - DIRECTION: TIGHTER (the requirement rises ~6.6x at h=12; no cell's status improves)
+  - QA run 2. The old basis was the P-22 selection bias committed inside a power derivation.
+AMENDMENT-6: fill the three thin control blocks; add the three L-24 clauses (thirds stability,
+  exit-matched nulls, derived tripwire threshold); declare the parent-parity tolerance
+  numerically (|d| <= 1e-9); restore the 5 bps deadband and the UNDECIDED rule in the grammar
+  table and SS3; name the mechanism for R > 1 in SS1.1 with its prior-against stated.
+  - DIRECTION: TIGHTER (adds required checks and a falsifiable mechanism claim)
+  - QA runs 1 and 2.
+
+running count: 2 looser / 2 tighter / 2 neutral
 NOTE: a 2-looser streak is disclosed here per L-23. Neither loosening touches an integrity check,
 a fence, a causality rule or a claim boundary; both act ONLY on population size, and the second is
 a power lever SPDR-018 already used. No band label, control or refusal is relaxed.
@@ -615,7 +767,7 @@ Checkpoint/family amendments in force: **U1** (NEUTRAL), **S1** (NEUTRAL), **C1*
 | `results/controls.json` | all controls: percentiles, **null means and quantiles**, **plant curves** (P-24), derangement fixed-point counts |
 | `results/selection_check.json` | the L-51 three-number check on every powered subset (P-22) |
 | `results/unit_pin.json` | measured σ̂ and ATR20 medians (computed, not asserted) |
-| `results/resolution_ladder.parquet` | per cell: realised n, block MDE, CI width, detection rate at each ladder rung, and the n required at each rung. **No adequacy flag** |
+| `results/resolution_ladder.parquet` | per cell: realised n, block MDE, CI width, detection rate at each rung **per plant operator**, `mde50`/`mde80`/`mde95`, and the n required at each rung. **No adequacy flag** |
 | `results/golden_traces.json` | G1–G7 |
 | `results/integrity_selfcheck.json` | check-count reconciliation, fences, causality, parity, pin, identity, `log R` definition, cost isolation, code sha256 |
 | `screen.md` | neutral quantification (subordinate) |

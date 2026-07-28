@@ -430,3 +430,459 @@ computable by QA from the design text plus the catalog**, which is their stated 
 
 **Nothing found rises to REJECT.** There is no holdout contact, no causality violation, no
 missing tripwire, no cost smuggling, no fitted-slope target, and no unapproved silent deviation.
+
+---
+
+## QA run 2 — 2026-07-28T18:56:49Z — mode: subagent — HEAD 51d6a281ef2f0833cbc15c3fa062f70409a1b983 (clean tree)
+
+**Target:** `python/experiments/SPDR-019/design.md` (644 lines; 525 at run 1)
+**Stage:** DESIGN-STAGE review. `screen_code/` still does not exist; that is the expected state and
+is **not** a finding. No design-to-code fidelity trace is possible or attempted.
+**Independence:** this reviewer did not author the design or the run-1 review, and re-derived every
+number below from the cited artifacts rather than from the design's own account of its fixes.
+
+**Verdict: REVISE**
+
+Findings: **3 HIGH · 6 MEDIUM · 5 LOW · 1 INFO**
+
+Plain reading: the three run-1 blockers are **substantively fixed** — the population figure now
+reproduces exactly from the artifact, the exit fills are fully specified with an adverse-precedence
+rule, and `deltaThreshold` is genuinely frozen as a three-value swept axis. Nothing about the exact
+mirror or the cost quarantine has regressed; both are still the strongest parts of the document.
+What blocks it now is different: **the two power levers were adopted without their scientific
+costs**, one of which is contradicted by the family's own M15 evidence; **the phase-(b) trigger
+change contradicts a registered in-force amendment** the design lists as binding on itself; and the
+**sensitivity ladder that replaced the power statement has no stated computation**. Six run-1
+findings were also never touched.
+
+---
+
+### PART A — closure of the run-1 blockers
+
+#### Blocker 1 (run-1 F1: bar count 2.35× too large) — **CLOSED**, verified independently
+
+Re-derived from `SPDR-018/results/unit_pin.json` and `analyst_per_cell_magnitudes.parquet`:
+
+| §8 claim | Design | Re-derived | Verdict |
+|---|---|---|---|
+| pooled H1 TRAIN bars, 25 symbols | 229,646 | `sum(per_symbol.n)` = **229,646**, `pooled_n` = **229,646** | REPRODUCES |
+| MATICUSDT the only symbol spanning the window | 21,582 | 21,582; next largest 12,468 | REPRODUCES |
+| median symbol | 12,444 | 12,444 | REPRODUCES |
+| smallest symbol | 555 | 555 (`1000RATSUSDT`) | REPRODUCES |
+| the 2.35× overstatement | 541,200 / 229,646 | **2.357** | REPRODUCES |
+| powered cells | 1,413 | 1,413 | REPRODUCES |
+| median `(1−p)·L` | 48.54 bps | 48.53908 | REPRODUCES |
+| median block MDE on the mean | 6.51 bps | 6.51313 | REPRODUCES |
+| typical cell resolves `Δlog R` | ≈0.123 (IQR 0.099–0.151) | 0.12280 (0.09849–0.15092) | REPRODUCES |
+| median powered-cell `n` | 3,427 | 3,427 | REPRODUCES |
+| n-multiples | 3.1 / 6.0 / 16.8 | 3.08 / 6.03 / 16.76 | REPRODUCES |
+| implied episodes | 10,800 / 21,200 / 58,800 | **10,547 / 20,671 / 57,420** | **DOES NOT REPRODUCE** — see R2-11 |
+
+The correction is real, it is sourced to the artifact, and the design says plainly that the earlier
+figure was wrong and by how much. Governance's binding M-4 rule ("power plans use effective, not
+nominal, multi-symbol coverage", `chapter-06-governance.md:105`) is now satisfied in §8. **Closed.**
+Two residues carry forward: no M-4 assertion reached §12 (run-1 F1(iv), see R2-13), and the
+per-stratum expected-`n` statement run-1 F1(ii) demanded was **deleted rather than answered** (see
+R2-04).
+
+#### Blocker 2 (run-1 F2: exit fills unspecified; open-to-open contradiction) — **CLOSED on specification, OPEN on verification**
+
+§2's new exit table answers all four sub-items: profit-target price, trailing-stop ratchet clock
+(once per M1 bar, on that bar's close, never intra-bar), time-exit price (open of the first
+decision-clock bar at or after `activeHold`), intrabar precedence (**adverse fills**), and
+target-vs-time precedence. §5 now states explicitly that open-to-open describes the **time exit
+only** and names the earlier draft's wording as the error. This is a clean, pessimistic, causally
+resolvable specification. **Specification closed.**
+
+But run-1's required fix had a second half — *"extend TRIPWIRE-2 (or add TRIPWIRE-3) to cover exit
+resolution"* — and its golden-trace section required *"a G7 on an L4 device … once F2 is
+specified"*. Neither landed. §6.1 TRIPWIRE-2 still reads "re-resolve **stop fills**"; §11 still ends
+at G6. See R2-06.
+
+#### Blocker 3 (run-1 F3: `deltaThreshold` unpinned) — **CLOSED in §2/§10/§14, CONTRADICTED in §13**
+
+§2 now freezes `δ ∈ {0.25, 0.5, 1.0}`, all three reported side by side, none selected, with the
+realised signal rate emitted per level; §10's freeze table repeats it; §14 records it as
+AMENDMENT-3 TIGHTER. That is exactly the fix. **But §13 line 571–572 still carries the original
+text run-1 quoted as the failing clause:** "`deltaThreshold` is **calibrated for sample size**, not
+for `p` — and **its calibration is emitted** so QA can verify which was optimised." §2 says "There
+is no calibration step". One of the two is wrong, and the surviving sentence is the one that
+describes the defect. See R2-08.
+
+---
+
+### PART B — defects in the changes
+
+#### R2-01 — HIGH — §4.3 replaces the phase-(b) trigger with operator judgement, which is the exact thing registered AMENDMENT-C6 forbids, and no amendment row records the change
+
+**Fails:** `docs/signal-registry/candidate-families/cf-voldir-001.md` AMENDMENT-C6 (TIGHTER,
+operator directive 2026-07-28, listed by this design's own §14 as **in force**): *"the (b) trigger is
+**pre-declared before (a) runs** (deciding afterwards what counted as promising is optional
+stopping)"*; reflection §5.9.1 Consequences table, row **Trigger**: *"Pre-declared **before phase (a)
+runs**, in the design, as a stated condition on the (a) reads. **Deciding afterwards what counted as
+'promising' is optional stopping**"*; design §4.3; design §14.
+
+§4.3 states: *"Trigger: the operator decides, on the full phase-(a) report. No numeric cutoff is
+written here."* That is the clause C6 was written to prohibit, verbatim in substance.
+
+**On the substance, the design's own defence is half right and I record that plainly.** The
+protection C6 lists under **Scope** — that (a) may not shrink (b) — **does survive intact**. §4.3
+holds the {L1,L2,L3} × {target, trail, hold, sizing} cross fixed, keeps individually-flat layers on
+equal footing, and keeps the interaction estimand. I checked this against C6's two recorded grounds
+and both are still answered. The design is correct that the shrink protection never depended on the
+trigger being numeric.
+
+**But the trigger clause protects a different thing, and that protection is now gone.** Phase (b) is
+a further read on the **same episode population**; conditioning whether it happens on a post-hoc
+reading of (a) is optional stopping on a shared sample, which is precisely what C6 names. INFR-016
+("machines gate integrity, the operator judges value") is real but does not reach here: INFR-016
+retired *arbitrary value gates that machine-dropped cells*, and §4.3's trigger drops nothing — it
+only decides whether more data is read.
+
+There are two separate defects and they need separating:
+
+1. **Governance.** A design may not silently override a registered TIGHTER amendment it lists as in
+   force. Either amend C6 on the family contract, or restore a pre-declared condition.
+2. **Ledger.** §14 has **no row** for this change, and its "running count: 2 looser / 2 tighter /
+   2 neutral" is therefore wrong. Retiring a pre-declared trigger is **LOOSER**; adding it makes the
+   count 3 looser / 2 tighter / 2 neutral, and L-23's one-directional-streak flag then needs
+   re-checking at the execution gate.
+
+**Required fix (quant-designer + operator).** Either (a) restore a condition stated before (a) runs
+that is *not* a value bar — e.g. "phase (b) is authorised unless every phase-(a) cell's CI on
+`Δlog R` covers zero at a resolution finer than the 0.05 rung", which is a resolution statement, not
+a magnitude gate and not a machine drop — or (b) carry an operator-signed amendment to C6 on the
+family contract, and add the §14 row with `DIRECTION: LOOSER`.
+
+#### R2-02 — HIGH — M15 is made the primary read on power grounds alone; SPDR-013 measured this entry class's *direction* on M15 as **worse than shuffled**, which would bias every M15 cell below the mirror
+
+**Fails:** design §10 Clocks row; §8 "Consequence, stated plainly: the primary reads live on **M15**
+…"; §14 AMENDMENT-2 ("Cost: multiplicity"); §1 MECHANISM ("this design **assumes p sits at its own
+break-even**"); §9 BANDS (`BELOW THE MIRROR` is "itself a finding").
+
+I read `SPDR-013/analysis.md` for the family's own M15 evidence. Two results, pointing opposite ways,
+and the design cites neither:
+
+**Supporting the amendment** (§7, §0 item 3): the ZZ next-swing **magnitude** forecast is
+*better* on M15 than H1 — "OOS IC 0.34–0.46, ridge ≥ AR1, **M15 > H1**, all 25 symbols". Scale
+forecastability at M15 is measured, in-family, on the whole universe. This is a materially stronger
+warrant for AMENDMENT-2 than the argument §10 actually gives, and it should be cited.
+
+**Against the primary-read choice** (§6 controls, §5 table, §4): on M15 the signed direction reads
+**worse than random** — DIRECTION-DERANGEMENT live percentile **0.20–0.28 on M15** against 0.48–0.57
+on H1, with a +20 bps bite plant detected (so the control is not blind); M15 combined gross **−2 to
+−3 bps** against H1 "breakeven-to-slightly-positive"; `p_right` 0.28–0.43.
+
+The consequence is structural, not stylistic. §1 assumes `p` sits at its own break-even, so a zero
+baseline `log R` is the predeclared expectation. If M15 direction sits below shuffled, the **L0
+baseline `log R` on M15 sits measurably below zero**, and under §9's CI-relative bands *every* M15
+cell reads `BELOW THE MIRROR` — a finding about the entry on that clock, which §9 explicitly calls
+"itself a finding", with no clause anywhere separating it from a finding about capture geometry.
+The design would then have put its **primary** read on the clock where its own null is displaced.
+
+The entry differs (three-bar pivot breakout vs SPDR-013's trend/ZZ arms), so this is a prior, not a
+refutation. But it is a powered, same-universe, same-fence prior on the exact object being moved to
+the primary slot, and §14's cost column for AMENDMENT-2 says only "Multiplicity".
+
+**Required fix (quant-designer).** (i) Cite both SPDR-013 M15 results in §8/§14 and correct
+AMENDMENT-2's cost column. (ii) Pre-register the M15 baseline expectation (`L0 log R` may sit below
+zero) as a falsifiable prediction. (iii) State that on M15 the primary comparison is **Δ`log R` vs
+that clock's own L0**, with level `log R` co-reported, so a displaced baseline cannot be read as a
+capture-geometry result — or move the primary read to H1 and keep M15 as the power co-report.
+
+#### R2-03 — HIGH — the L4 modulated and unmodulated arms are in different units with no scale-match declared; the comparator that is supposed to isolate "information" also carries a level shift
+
+**Fails:** §4.2 ("Each device runs twice: unmodulated (`a × ATR20`) and modulated (`a × ŝ(h)`) …
+**the unmodulated run is the comparator that separates the device from the information**"); §7
+CONVERSION-PIN (divisor object 1 in price/ATR units on the decision clock; divisor object 2 "in bps,
+horizon-scaled `ŝ*√h`", computed on **H1**); L-21 / P-15; the QA-skill failure shape "a comparator
+that differs from the design's control in size/population".
+
+Three unbridged seams, none declared:
+
+1. **Units.** `a × ATR20` is a decision-clock ATR (price/ATR units); `a × ŝ(h)` is a bps quantity.
+   No conversion is stated anywhere. Even after converting ATR to bps the two estimators do not have
+   the same expectation: Wilder ATR ≈ mean true range, while Parkinson σ ≈ range / (2√ln 2) ≈ 0.6 ×
+   range. At the same `a` the two arms get **systematically different exit widths** (order 1.5–1.7×).
+2. **Clock.** On the M15 primary clock, ATR20 is a 20-**M15**-bar object while ŝ is an **H1**
+   object horizon-scaled by `√h` — and §7 never says what `h` is counted in on the M15 clock.
+   Reading `h` as M15 periods against an H1-per-bar ŝ inflates every modulated width by **2×**. This
+   is the EXP-025 units-seam shape (4× ATR-unit inflation at a screen seam) that L-21…L-24 exist for.
+3. **Holds.** §4.2 bounds `activeHold ∈ {1,4,12,20}` by "`E[run]` 18.9–23.1 **H1 bars**". On M15,
+   20 bars = 5 H1 bars — the sweep does not reach the stated scale at all — and the modulated arm
+   ("`activeHold` scaled to the state's `E[run]`") needs an H1→M15 conversion that is not written.
+
+The consequence is that the unmodulated arm is **not** a matched comparator. It differs from the
+modulated arm in mean width as well as in whether width varies with ŝ, so every `Δlog R` per device
+confounds a level effect with the information effect the pair exists to isolate. Exit width moves
+`W`, `L` and `p` — all three sufficient statistics of the primary read.
+
+**Required fix (quant-designer).** Add a scale-match clause to §4.2/§7: express the modulated arm as
+`a × ATR20 × (ŝ / median_TRAIN(ŝ))` (or equivalently normalise both arms to the same TRAIN-median
+width per symbol and clock), so the two arms are matched on mean width by construction and differ
+only in cross-sectional variation. State the H1→M15 conversion for `√h` and for `E[run]` explicitly,
+and add it to §12's causality/unit assertions.
+
+#### R2-04 — MEDIUM — the sensitivity ladder has no stated computation, and it is now the design's entire resolution object
+
+**Fails:** §8 RESOLUTION block ("the fraction of block-bootstrap replicates in which a **PLANTED
+effect of that size** would have been detected at its own realised `n`"); §12 "Ladder emitted";
+§15 `resolution_ladder.parquet`; AMENDMENT-C7 (which makes the ladder the replacement for the power
+statement); L-24 §12 clause "MDE-consistent read floors".
+
+Planting an effect of `Δlog R = 0.05` on an episode series is **not a unique operation.** `log R` is
+a function of `p`, `W` and `L` jointly, and a 0.05 log-unit shift can be planted by moving `p`, by
+moving `W`, by moving `L`, or by any combination — and the three routes give *different* detection
+rates, because they perturb the block-bootstrap variance differently. The design nowhere states
+which. A ladder whose plant route is a developer choice is an unpinned researcher degree of freedom
+sitting directly under the only resolution number the design now reports.
+
+This is structurally the same gap as run-1's F2: a new primary device introduced without its
+resolution rule. It matters more here because C7 removed the fallback.
+
+**Required fix (quant-designer).** State the plant operator explicitly — e.g. "planted by scaling
+every winning episode's `r` by `exp(Δ)` with losses unchanged, which moves `W` alone; the `p`-route
+and `L`-route are co-reported on the L0 cell as a sensitivity" — and add the plant route to §12's
+asserted list.
+
+#### R2-05 — MEDIUM — the M15 power gain is stated in bars, but block dependence is calendar-based, so the ~4× is an overstatement of independent information
+
+**Fails:** §8 AMENDMENT-2 lever table ("**~4×**"); §1 DERIVED `test` and §6 MIRROR-NULL
+("block >= holding horizon"); `docs/references/spdr-lane.md:37` dependence-matched-uncertainty rule
+and its Phase-010 precedent (block=5 on H=48 overlapping windows understated uncertainty 2–3× and
+manufactured a thread that did not exist).
+
+The design's block rule is stated in **bars** ("block ≥ the holding horizon"). On M15 a 20-bar block
+spans 5 hours; on H1 it spans 20 hours. Volatility clustering and regime persistence — the very
+things ŝ and the L2 state axes condition on — are **calendar** phenomena, so four M15 episodes inside
+one hour are far from four independent H1 episodes. The lever table's "~4× n" therefore does not
+translate into a 2× MDE improvement; the realised gain will be smaller and is not bounded anywhere in
+the design.
+
+I verified the *unit* half of the conversion is sound: the noise constant `c = MDE_mean·√n /
+((1−p)·L)` is clock-invariant to first order (both numerator and denominator scale with σ), and it
+reproduces stably across bases — median **7.28** on the powered subset, **6.60** on all 23,527 cells
+with IQRs that overlap heavily. So the *arithmetic* transports; it is the *independence* assumption
+that does not.
+
+**Required fix (quant-designer).** State the block length in **calendar time**, matched across
+clocks (e.g. block ≥ max(holding horizon, 20 H1-equivalents)), and emit the realised effective
+sample size per cell alongside `n`. Restate AMENDMENT-2's lever as "~4× raw episodes; effective gain
+smaller and measured at run".
+
+#### R2-06 — MEDIUM — the new exit rules have no tripwire and no golden trace
+
+**Fails:** §6.1 TRIPWIRE-2 ("re-resolve **stop fills**"); §11 (G1–G6, none on an L4 device); run-1
+F2's required fix, both halves; §12 HARD list.
+
+§2's exit specification is good, but nothing verifies it. The three clauses most likely to invert in
+code are exactly the three with no check attached: the **adverse-precedence** rule inside one M1 bar
+(an optimistic implementation manufactures the high-`p` / high-`W/L` signature P-22 documents as an
+artifact), the **once-per-M1-bar-on-close** trail ratchet (an intra-bar ratchet is a materially
+better device and reads as an effect), and the **time-exit open** convention. TRIPWIRE-2 as written
+does not reach them.
+
+**Required fix (quant-designer).** Extend TRIPWIRE-2 to re-resolve **exits** on decision-clock OHLC
+as well (or add TRIPWIRE-3), and add **G7** on one L4 target+trail cell where both levels lie inside
+a single M1 bar, with QA computing the adverse fill independently. Both HARD.
+
+#### R2-07 — MEDIUM — after C7, "powered subset" is an undefined term, and the L-51 selection check that governance makes mandatory now has no anchor
+
+**Fails:** `chapter-06-governance.md:98` (binding on any 019/020 design: *"no powered subset's
+magnitudes may be read without the three-number selection check (**L-51**)"*); P-22; reflection §5.9
+L3 row ("the selection check is **mandatory**, not optional"); design §4.1 L3 row and §15, both of
+which say "every **powered** subset"; design §9 ("The `[P]`/`[U]` adequacy classes are **RETIRED**");
+design §12 (no L-51 row, not in HARD).
+
+Run-1's F6 flagged the scope and HARD-ness. AMENDMENT-6 made it worse rather than better: the two
+places the check is still attached (§4.1, §15) both key it to "powered subset", and §9 has abolished
+the concept. As written the check can be argued to apply to nothing.
+
+C7 does remove one genuine L-51 trigger — there is no longer a precision filter selecting cells, so
+the SPDR-018B dispersion-gate mechanism does not arise. That is a real benefit and worth recording.
+But **L1's ŝ-decile cuts, L2's state cells and L3's swing gate are still selections on a fat-tailed
+P&L distribution**, which is L-51's actual subject.
+
+**Required fix (quant-designer).** Re-anchor: "the L-51 three-number check runs on **every selected
+subset at every layer (L1, L2, L3, L5)** against its own complement", move it into §12, and place it
+in the **HARD** list — or state explicitly why a missing selection check is INFORMATIVE here.
+
+#### R2-08 — MEDIUM — §13 still describes `deltaThreshold` as calibrated, contradicting §2's freeze
+
+**Fails:** §13 bullet 6 vs §2 ("There is no calibration step, no selection of a 'best' δ") and §10's
+freeze row. Run-1 F3's required fix landed everywhere except the clause run-1 quoted.
+
+**Required fix.** Replace §13's bullet with: "no tuning of any entry parameter to improve `p`;
+`deltaThreshold` is frozen at `{0.25, 0.5, 1.0}` with all three reported and none selected (§2)".
+
+#### R2-09 — MEDIUM — C6's `NOT_RESOLVABLE` booking and C7's prohibition on it are in direct conflict, and the design silently drops C6's obligation
+
+**Fails:** AMENDMENT-C6 as registered (*"a grid that cannot resolve the interaction is booked
+`NOT_RESOLVABLE` rather than run and explained"*) and reflection §5.9.1 Power row; AMENDMENT-C7
+(*"no `powered` / `unpowered` / `at_target` / `NOT_RESOLVABLE` flag is emitted anywhere"*); design
+§12 "No adequacy flag" (asserts the C7 side, HARD) and §4.3 (silent on the C6 side).
+
+Both are operator-mandated and both are dated 2026-07-28. C7 is the later and more specific, so it
+plausibly supersedes — but the design must say so rather than assert one and drop the other, and
+§4.3 must state what replaces C6's protection against running an unresolvable phase-(b) grid.
+
+**Required fix.** Add a §14 row reconciling C6 and C7 explicitly, and give §4.3 a resolution
+statement for the (b) grid that carries C6's intent without the retired flag (e.g. "the (b)
+amendment states each cell's expected ladder rung before the run; a grid whose cells all sit above
+the 0.10 rung is reported as such and the operator decides").
+
+---
+
+### PART C — is the B-5 argument sound?
+
+**Short answer: the critique is sound, the "strengthened" claim is not, and the current text does
+not deliver B-5's protection. It delivers more information and less enforcement.**
+
+**What the design gets right, and I want it on the record.** Retiring the 0.07 adequacy cutoff and
+the ±0.03 bands is correct. Both were anchored on `sd(log R) = 0.0729` and `median log R = −0.0301`
+— dispersion and location of the *observed* residual, which are not statements about what effect
+size matters. The ladder is strictly more information than a boolean. And the specific mechanism the
+design names is real: an effect quoted without its precision is a documented failure mode, and
+binding them to one row addresses it. Run-1's F5 (bands did not partition) is **fully closed** as a
+by-product — `ci_low > 0` / spans 0 / `ci_high < 0` is exhaustive and mutually exclusive.
+
+**Where the argument fails.** B-5 is a rule about **reading**, not about **emission**. `UNPOWERED`
+was not protective because it was hard to drop; it was protective because it was **categorical, and
+therefore countable and separable**. It let a reader say "these 40 cells are not evidence of
+anything" as a set. The replacement collapses two categorically different states — *resolved and
+null* and *unresolved* — into the single band `COVERS THE MIRROR`. §9's answer is that a wide-CI cell
+and a genuinely-null cell will be "visibly different" because the width and MDE sit alongside. That
+is a presentation hope, not a constraint. Three specific gaps follow:
+
+1. **Nothing forbids aggregation.** A summary reading "38 of 60 cells covered the mirror" is a
+   negative by aggregation, is fully compliant with §9 as written, and is *easier* to produce now
+   than under a boolean, because there is no longer a category to exclude first.
+2. **The "cannot be quoted without its precision" claim is asserted, not enforced.** §12 has a HARD
+   check for the **absence** of the old flag and **no** check for the **presence** of the new
+   binding. Nothing requires `ci_width` and `block_mde` to travel with `log R` into
+   `results/layer_deltas.parquet`, `screen.md`, or `analysis.md`. The one protective property the
+   design claims over the boolean is the one property it does not machine-enforce.
+3. **The forecast was deleted along with the label.** `design-requirements.md` §6's real content is
+   *predeclaration* — saying **before the run** which strata will not resolve, so a thin stratum
+   cannot be reinterpreted afterwards. That is orthogonal to labelling: you can predeclare expected
+   per-stratum resolution without any adequacy verdict. §8's EXPECTED RESOLUTION block gives
+   baseline pooled figures only; it says nothing about L1's `d≥9` decile cut, L2's shock/level cells
+   or L3's swing gate — the strata that carry HYP-D6's entire content and that run-1's F1(ii)
+   specifically required. Those strata cut `n` by roughly 10× (§8 says so itself, in one clause,
+   with no table), landing them several rungs coarser. **Run-1's F1(ii) was removed, not answered.**
+
+**What would fix it** — none of these reintroduces a threshold, and all are consistent with C7:
+
+- **(a)** A **HARD** §12 check: no artifact may emit a `log R` or `Δlog R` value without
+  `ci_low`, `ci_high`, `ci_width` and `block_mde` on the same row. Extend the schema rule to
+  `layer_deltas.parquet`, `screen.md` and `analysis.md` tables. This converts the design's central
+  claim from an assertion into an invariant.
+- **(b)** Emit a **descriptive** resolution field per cell — `finest_rung_detected` = the smallest
+  ladder rung whose detection rate ≥ 0.8, or `none`. It admits, excludes, labels and ranks nothing
+  (C7 satisfied), but it restores the **categorical separability** B-5's reader-protection actually
+  needs, straight off the ladder the design already computes.
+- **(c)** Restore §6's predeclaration as a **per-stratum expected-resolution table** — expected `n`
+  and expected finest rung for L1 (`d≥5 / d≥7 / d≥9` / continuous), L2's three cells, L3's gate,
+  L4's devices and per-symbol — with **no adequacy verdict attached**. This is F1(ii), and it costs
+  one table.
+- **(d)** A §13 refusal: **no summary may count or aggregate cells by band label without carrying
+  the resolution distribution of the cells counted.**
+
+With (a)–(d) the design's claim would be true. Without them, "strengthened" overstates it: what
+exists today is a richer emission with weaker guardrails.
+
+---
+
+### Run-1 findings not touched (carry-forward)
+
+| Run-1 | Status in run 2 | Note |
+|---|---|---|
+| **F4** — L4 modulation narrowed to ŝ only vs reflection §5.9 ("modulated **by each volatility layer**"); §10's count `1+4+5+3+44+4` = **61** against a stated cap of **≤ 60**; §4.2 yields **~20** L4 cells, not ~44 | **OPEN, and now worse** | Arithmetic re-checked: §4.2 gives target 3+3, trail 2+2, hold 4+4, sizing 1+1 = **20**. §10 now also multiplies "≤ 60 cells" by "× 2 clocks × 3 δ" = **366**, so the cap sentence contradicts itself twice. §4.1 says L3 = "2 (+ co-report)"; §10 counts 3. No §14 row for the §5.9 narrowing. **R2-10, MEDIUM** |
+| **F5** — bands did not partition | **CLOSED** | The CI-relative bands are exhaustive and mutually exclusive |
+| **F6** — L-51 not HARD, scoped to L3 | **OPEN, and worse after C7** | Promoted to **R2-07** |
+| **F7** — `activeHold = 20` expands the checkpoint's frozen `h ∈ {4,12,24}` with no amendment row | **OPEN** | Reflection §5.5 authorises the `E[run]` bound, so the substance is fine; §14 still has no row. **R2-12, LOW.** Compounded by R2-03(3) on M15 |
+| **F8** — implied-episode column uses base ~3,499, not 3,427 | **OPEN, unchanged** | Recomputed: **10,547 / 20,671 / 57,420** vs the design's 10,800 / 21,200 / 58,800 (+2.3%). Direction conservative. **R2-11, LOW** |
+| **F9** — cadence 1–5% contradicted by measurement | **CLOSED** | §1 now says "MEASURED and EMITTED per delta level, never assumed"; §8 says "near 10%" and names the earlier figure as wrong |
+| **F10** — C5 labelled `NARROWING`; C3 citation dangling | **OPEN, unchanged** | §624 still `NARROWING` (not one of LOOSER/TIGHTER/NEUTRAL); §10 still cites "AMENDMENT-C3 precedent" while §14's in-force list omits C3. **R2-14, LOW** |
+| **F11** — 4 of 5 reflection §5.6 predictions uncarried | **OPEN** | Non-binding. **INFO** |
+| **F12** — P-02 / P-04 unnamed in §13 | **OPEN** | Non-binding; still worth one line. **INFO** |
+
+---
+
+### Additional run-2 findings
+
+#### R2-10 — MEDIUM — §10's cell-count row is internally contradictory in three ways
+See the F4 row above. **Required fix:** reconcile §4.1, §4.2 and §10 on one number; state whether
+the cap is per-clock-per-δ or total; add the §5.9 L4-narrowing amendment row with a direction label.
+
+#### R2-11 — LOW — §8's implied-episode column does not follow from its own stated base `n`
+Conservative direction, but §8 is the design's only resolution forecast. **Fix:** 10,547 / 20,671 /
+57,420, or state the base actually used.
+
+#### R2-12 — LOW — `activeHold = 20` still carries no amendment row
+**Fix:** one §14 row, `DIRECTION: LOOSER`, citing reflection §5.5's `E[run]` bound.
+
+#### R2-13 — LOW — no M-4 effective-coverage assertion reached §12
+§8 now uses effective coverage correctly, but §12 has only M-2 span disclosure. Governance:105 makes
+M-4 binding. **Fix:** add an assertion that the pooled bar count used in any resolution statement is
+the measured `unit_pin.json` value, not a date-range product.
+
+#### R2-14 — LOW — amendment-ledger labelling, unchanged from F10
+**Fix:** C5 → `TIGHTER`; note C3's registry location (`multiplicity-registry.md`) in §14.
+
+#### R2-15 — LOW — §8's resolution constant is derived from SPDR-018's *powered* subset, which is the L-53/P-25 shape; I checked it and the conclusion is invariant
+**Fails (in form):** P-25 / L-53 (*"Derive on the full emitted population, or on a subset defined
+without reference to the outcome; **report the range across every defensible basis** and state which
+conclusions are invariant to it"*); §8 ("1,413 powered cells", median `(1−p)·L` and median block MDE
+both taken on that subset).
+
+There is a mild irony here: the design retires powering for the L-50 reason while still importing
+SPDR-018's powered-subset-derived numbers as its resolution anchor. I recomputed across bases:
+
+| Basis | cells | median `(1−p)·L` | median block MDE | median `Δlog R` | median `c = Δlog R·√n` |
+|---|---:|---:|---:|---:|---:|
+| powered (design's) | 1,413 | 48.54 | 6.51 | 0.1228 | **7.28** |
+| all emitted cells | 23,527 | 147.97 | 87.02 | 0.5517 | **6.60** |
+| not-powered | 22,114 | 154.90 | 96.26 | 0.5869 | **6.60** |
+
+The *level* figures differ 4.5×, but the **scaling constant the design actually uses** is stable
+(7.28 vs 6.60, IQRs overlapping). Every §8 conclusion is invariant to the basis, and the design's
+choice is the conservative one. **Fix is one sentence** stating the range and the invariance, per
+P-25's own remedy.
+
+---
+
+### Checks re-verified clean in run 2
+
+| Check | Result |
+|---|---|
+| **Exact-mirror target, slope 1** | **CLEAN, unchanged.** `log R = log(W/L) − log((1−p)/p)` in §1, §5, §9, §12, G4, G5. **0.9408 appears exactly once (§5:229) and only to be refused**, with the correct reason (residual centred at zero by construction). §12 makes a fitted-slope residual anywhere a **hard failure**; §13 refuses it again; G5 exists solely to make audit A1 non-repeatable. Matches reflection §5.4 verbatim in substance |
+| **AMENDMENT-C5 cost isolation** | **CLEAN, and now stronger.** Traced every cost mention: header NOTE, §5 `DISCLOSED REFERENCE ONLY`, §7 ("no read in this design is compared against it"), §12 HARD cost-isolation check with `p_be_net` flagged `DISCLOSURE_ONLY`, §13, §15 column flag. C7 *improves* this — the bands now carry **no magnitude at all**, so there is even less surface for a cost term to enter |
+| §8 population and precision figures | **All reproduce** from `unit_pin.json` and `analyst_per_cell_magnitudes.parquet` except the implied-episode column (R2-11). See the Part A table |
+| L-28 derangements | **CLEAN.** Both permutation controls declare `DERANGEMENT (zero fixed points)`; §12 asserts a measured fixed-point count of 0; TRIPWIRE-1 correctly declares `N/A` (index shift) |
+| L-52 / P-23 check integrity | **CLEAN.** Expected HARD-check **count** asserted and reconciled **by name**; every check depends on an emitted artifact; determinism unconditional at `--jobs > 1` independent of `--resume`; no required check in a manual post-step |
+| P-24 comparator disclosure | **CLEAN.** M-3 block mandates the comparator's own mean, null quantiles **and** plant curve with every percentile; a bare percentile is refused |
+| L-50 / P-21 threshold portability | **CLEAN, improved by C7.** All remaining numbers are dimensionless log units; after C7 no magnitude threshold exists at all. cTrader excluded from phase (a) under C1 |
+| L-21 / P-15 unit pin (numerator) | **CLEAN** for the pin itself — object 2's wording matches `SPDR-018/results/unit_pin.json.divisor_object`; measured values computed at run. **But see R2-03** for the ATR↔ŝ and H1↔M15 seams the pin does not bridge |
+| Interpretation bands partition | **CLEAN** (closes run-1 F5) |
+| B-9 / object identity | **CLEAN.** One open episode per symbol, suppression counted, block ≥ holding horizon (subject to R2-05 on the M15 block unit) |
+| Holdout / XENA / family action / TEST | **CLEAN.** §10 holdout never queried; §12 assertion; §13 refuses family status change, XENA, TEST and holdout contact; header declares execution unauthorised |
+| SPREAD-COST-DISCLOSURE | **CLEAN.** All five fields verbatim, unchanged |
+| `check_no_local_accounting` | **DEFERRED** to post-implementation QA; §12 declares the check |
+| Start gate | **STILL FLAGGED.** `reflection-inputs.md` §9 operator decision remains **unsigned**. Design registration does not require it; **execution does** |
+
+---
+
+### Verdict and routing
+
+**REVISE.** Everything found routes to **`quant-designer`**; no code exists.
+
+Implementation-blocking: **R2-01** (contradicts a registered in-force amendment; also invalidates
+the §14 direction count), **R2-02** (the primary clock is chosen against the family's own M15
+direction evidence), **R2-03** (the L4 comparator confounds level with information, and the M15
+`√h` seam is the EXP-025 shape). **R2-04** and **R2-06** are blocking in the weaker sense that the
+ladder and the exit rules are unverifiable as written.
+
+**Nothing rises to REJECT.** No holdout contact, no causality violation, no missing tripwire, no
+cost smuggling, no fitted-slope target, no unapproved silent deviation. The exact mirror and the
+cost quarantine are intact and remain the strongest parts of the document.
