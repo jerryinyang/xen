@@ -362,7 +362,7 @@ before SPDR-019/020 are designed, or in parallel with them?
 | Item | Value |
 |---|---|
 | Counted TEST reads consumed by SPDR-018 + SPDR-018B | **0** (lifetime cap untouched) |
-| Multiplicity slots consumed | **0** (AMENDMENT-C3 disclosed-not-rationed; AMENDMENT-C4 records the tail counts) |
+| Multiplicity slots consumed | **0** (AMENDMENT-C3 disclosed-not-rationed; AMENDMENT-C4 records the tail counts — **both are `docs/signal-registry/multiplicity-registry.md` amendments, not family-contract amendments**; the family contract's own C-series runs C1, C2, C5, C6) |
 | Holdout contact | **none** — Bybit 2025-01-08 and cTrader 2024-12-13 never queried. One recorded gap: no HARD assertion that 018B's §5 cross-universe guard reads stayed inside the Bybit TRAIN fence (P6); no violation is evidenced |
 | Family status | `CF-VOLDIR-001` **REGISTERED**, unchanged. Transitions are retrospective-only |
 | XENA | `XENA-VOLDIR-001` **RESERVED**; not discussable until Step 3 graduates a cost-surviving base under separate authority |
