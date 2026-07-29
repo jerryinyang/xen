@@ -178,6 +178,31 @@ was not silently re-specified.
 its **5 bps flat deadband** are inherited verbatim. The `r == 0` flat test in an earlier draft
 silently changed the parent's deadband and is withdrawn.
 
+### 2.2a Exit fill resolution for the L4 devices (QA run 6)
+
+The parent exits at `open[entry+h]` and needs no fill rule. **This design adds a profit target and
+a trailing stop, which are path-dependent and therefore do need one**, and the two candidate
+parents disagree — SPDR-014 fills at the next bar open after a touch, SPDR-019 fills on the M1
+stream at the level. A design that leaves this open makes the developer choose the exit price,
+which is the most consequential single number in a payoff-geometry experiment.
+
+**This design inherits SPDR-019 §2's rule verbatim**, so the two experiments' capture devices are
+the same object and their `log R` values are comparable:
+
+| Exit | Fill |
+|---|---|
+| **Profit target** | first **M1** bar trading through the target → fill **at the target price**; if an M1 bar **opens beyond** it, fill at that open |
+| **Trailing stop** | the trail ratchets **once per M1 bar, on that bar's close**, never intra-bar; it triggers on the first M1 bar trading through the trail level, filling **at the trail level** (or at the open if gapped through) |
+| **Time exit** | at the **open of the first H1/H4 bar at or after `entry + h`** — the parent's own open-to-open exit, unchanged |
+| **Precedence inside one M1 bar** | if target and trail are both reachable, the **adverse one fills**. Intrabar ordering is unknowable at M1 resolution, so the pessimistic branch is taken every time |
+| **Precedence with the time exit** | a target or trail triggering **at or before** the time-exit bar's open takes precedence |
+
+**The entry is untouched:** it remains the parent's `open[j+1]`, resolved on the decision clock.
+Only the L4 exit legs read M1. **The parent-parity cell (§2.2) uses the parent's fixed exit and is
+therefore unaffected by this clause** — parity would break if it were not.
+
+**No slippage, queue or partial-fill model.** This is a screen.
+
 ### 2.3 Carry-forward fix 2 — the DESIGN→CONFIRM sign flip is **discharged**
 
 SPDR-014 flagged a 12/17-symbol sign flip between bands. **SPDR-018 resolved it (C7):** 2,714 pairs,
@@ -524,6 +549,12 @@ BASIS PROVENANCE AND ITS LIMIT (recorded because reusing c across CI rules is un
   transported c prior: its expected-resolution rows remain null until the realised H4 c is
   measured. Reusing the H1 c under H4's different sweep is forbidden.
 
+POPULATION - ONE, DECLARED AND ENFORCED: the basis is computed on SPDR-018 ARM C ONLY and the
+  artifact pins the filter, the row accounting and the exclusions by reason - 24,098 source rows
+  -> 18,988 matched by `arm == 'C'` -> 18,479 retained, 509 excluded, all 509 for a missing
+  required value. It also carries `horizon_summaries` per band, because c is NOT asserted flat
+  across horizons: in the 15,000+ band the arm-C horizon medians are 11.855 / 8.363 / 11.744.
+
 THINNESS IS DISCLOSED, NOT FLATTERED (the artifact carries `cells` AND `distinct_n` per band):
   the 15,000+ band - the band this design's E-TOUCH strata land in - holds 26 rows but only
   8 DISTINCT sample sizes across 3 bases. Its interquartile spread (c 8.36-12.09) is therefore
@@ -535,7 +566,7 @@ THINNESS IS DISCLOSED, NOT FLATTERED (the artifact carries `cells` AND `distinct
 
 **The direct check, computed the same way.** In SPDR-018's own emission, arm-C pooled cells with
 `n ≥ 10,000` realise 0.053–0.107 log units, and the three largest realise 0.073–0.094 at every
-horizon — flat, as `c` predicts. **0 of 18,632 arm-C cells reach 0.03**, other than three degenerate
+horizon — flat, as `c` predicts. **0 of the 18,479 retained arm-C cells reach 0.03** (`row_counts.retained` in the basis artifact), other than three degenerate
 `n = 2`, `p = 0` cells which carry no information. Any prediction that this design will "approach
 0.03" is refuted by the parent's own data before it runs.
 
@@ -665,7 +696,7 @@ EXPECTED RESOLUTION, PER STRATUM - PREDECLARED BY GENERATION, NOT BY TYPING.
         prior_path, basis_path, output_path,
         generated_at_utc="2026-07-29T00:00:00Z",
         source_hashes=<the six SHA-256 pins embedded in the output>)
-  Expected output SHA-256: 39db9012791d37bd210e1272e0635d5690cf54a121a3a8a7cdfb7acb1b8ac077.
+  Expected output SHA-256: 4c8c42c91ea2ab029d2a8321cbd5b295e57b46c2f55c4708c2712f137b9c7b6d.
 
   The generated artifact already exists, is dated, and pins the SHA-256 of both JSON inputs, the
   shared module, and every parent artifact used. Implementation must verify those hashes before
@@ -782,6 +813,7 @@ comparison audits the forecast; it does not referee inference, and nothing acts 
 | Primary catalog | Bybit USDT linear perps, `data/catalog/`, INFR-011 fence |
 | Universe | top-25 30d USD volume (AMENDMENT-U1); pin `cf-voldir-001-universe.json`; recompute + assert set equality. **Z-VOL resolves on 17 of the 25** — see the coverage row below |
 | Clock | **H1 primary** (SPDR-014's own clock), **H4 co-report** |
+| Fill resolution | entries on the decision clock at `open[j+1]` (parent, unchanged); **L4 target and trail exits on M1 (T1 lane) bars**, causal, no intrabar look-ahead (§2.2a) |
 | Sources | `Z-VOL` primary; `Z-MAG`, `Z-MAG-SENS` completeness (expected to resolve coarsely; still reported in full) |
 | **Z-VOL symbol coverage** | **17 of 25 symbols.** 8 carry no `s_symbol` in the parent (ORDI, TIA, BIGTIME, 1000PEPE, SEI, WLD, PYTH, 1000RATS — empty on warm-up). Every 'pooled' figure in this design is pooled over **17**, and the effective-coverage rule (M-4) is applied to that figure, not to 25 |
 | `z` | `{1.5, 2.0, 2.5, 3.0}` — 1.0 dropped (not an outlier band); 1.5 doubles as the parent-parity anchor. **No selectivity gate; every signal is taken** |
@@ -846,6 +878,13 @@ G6 (the mirror null is the exact one):
   The same cell. QA asserts the emitted null reference is 0 for log R at SLOPE 1, and that NO
   fitted-slope residual appears anywhere in the emission (audit A1, non-repeatable by construction).
 
+G8 (exit fill precedence - the clauses most likely to invert in code):
+  Any symbol, H1, full TRAIN, Z-VOL, z=1.5, E-TOUCH, P-MOMO, target a=2 with trail b=1. The FIRST
+  episode in which BOTH the target and the trailing stop are reachable inside the SAME M1 bar.
+  QA computes: which fills under SS2.2a's ADVERSE precedence rule, the fill price and r in bps -
+  and separately confirms (a) the trail ratcheted on M1 CLOSES only, never intra-bar, and (b) a
+  time-exit episode fills at the open of the first decision-clock bar at or after `entry + h`.
+
 G7 (leak discrimination):
   The G1 rows under TRIPWIRE-1's leaky twin; QA asserts `changed_conditioning_rows > 0` and
   `event_key_symmetric_difference_count > 0`, and confirms that only the legal variant enters
@@ -863,6 +902,7 @@ G7 (leak discrimination):
 | Holdout | zero queries `>= 2025-01-08` |
 | Causality | band width `≤ t`; anchor `open[t+1]`; breach entry `open[j+1]`; exit `open[entry+h]`; every layer's state at the **breach bar**; TRIPWIRE-1 |
 | Breach detection | no post-`j` information used to detect the event at `j`; TRIPWIRE-2 |
+| **Exit fill causality** | every L4 target/trail fill's M1 timestamp is `>` its entry bar's open; the trail level updates only on M1 **closes**; where target and trail are reachable in one M1 bar the **adverse** one is recorded; asserted per episode (§2.2a) |
 | **Parent parity** | reproduces SPDR-014's published cells at `z=1.5` on the parent's band, to a declared tolerance — **the proof the object was not re-specified** |
 | **`p_event` emitted** | on every cell, per event type, as a **reported covariate**. Asserted not to filter, exclude, gate, weight, label or rank any row or cell (INFR-016 / L-32) |
 | Universe pin | top-25 recompute == pin file, set equality |
@@ -884,24 +924,37 @@ G7 (leak discrimination):
 | Episode exclusivity | one open episode per symbol; suppression count emitted |
 | Derangements | fixed-point count == 0, measured and reported (L-28) |
 | Determinism | runs **unconditionally** whenever `--jobs > 1`, independent of `--resume`; parallel bit-identical to sequential (P-23) |
-| Golden traces | G1–G7 pass |
+| Golden traces | G1–G8 pass |
 | No local accounting | availability/residual bps, not booked P&L; no `xen.adjudication` mimicry |
 | Code hash | sha256 of `screen_code/` pinned into `results/integrity_selfcheck.json` |
 
 ```
 HARD (block execution / invalidate emission):
-  check-count reconciliation, TRIPWIRE-1, TRIPWIRE-2, TRAIN fence, holdout, causality, breach
-  detection, parent parity, universe pin, identity reconstruction, log R definition, cost
-  isolation, derangement fixed-point count, golden traces, determinism, BLOCK RULE (calendar),
-  s_symbol PROVENANCE, UNDECIDED accounting, L-51 SELECTION CHECK, `log R` never unaccompanied,
-  PREDECLARED vs REALISED resolution.
-  (The last four are HARD on PRESENCE and FORM - they assert that the check ran and that the
-  columns exist. None adjudicates a value; no cell is admitted or excluded by any of them. L-51
-  is HARD because governance SS1b makes it mandatory, and a selection check that is silently
+  EVERY SS12 ROW IS CLASSIFIED - a row with no class is a row nobody has to run (QA run 6).
+  HARD, EXPECTED COUNT = 29, reconciled BY NAME by the check-count assertion (P-23 / L-52):
+    1  check-count reconciliation     2  TRIPWIRE-1                3  TRIPWIRE-2
+    4  TRAIN fence                    5  holdout                   6  causality
+    7  breach detection               8  EXIT FILL CAUSALITY       9  parent parity
+    10 universe pin                   11 identity reconstruction   12 log R definition
+    13 cost isolation                 14 MDE column (block, not iid)
+    15 BLOCK RULE (H1 verbatim + H4 co-report)                     16 s_symbol PROVENANCE
+    17 UNDECIDED accounting           18 M-4 effective coverage    19 `p_event` NON-APPLICATION
+    20 NO ADEQUACY FLAG               21 LADDER EMITTED            22 LADDER PLANT OPERATOR
+    23 L-51 SELECTION CHECK           24 `log R` never unaccompanied
+    25 PREDECLARED vs REALISED resolution                          26 NO LOCAL ACCOUNTING
+    27 derangement fixed-point count  28 golden traces G1-G8       29 determinism
+  (Rows 19-26 are HARD on PRESENCE and FORM: they assert the check ran, the required columns
+  exist, and no prohibited column exists. None adjudicates a value; no cell is admitted or
+  excluded by any of them. `p_event` non-application and `no adequacy flag` are HARD precisely
+  because they are the INFR-016 and C7 protections - a protection nobody verifies is a comment.
+  L-51 is HARD because governance SS1b makes it mandatory, and a selection check that is silently
   skipped is indistinguishable from one that passed.)
-INFORMATIVE (operator judges, no auto-verdict):
-  every effect size, control percentile, collapse fraction, band label, p_event, dose-response,
-  kappa, cost overlay, heterogeneity statistic, event-type ordering.
+  INFORMATIVE, and never a pass condition: episode exclusivity counts, code hash, span
+  disclosure values, every effect size, control percentile, collapse fraction, band label,
+  p_event VALUE, dose-response shape, kappa, cost overlay, heterogeneity statistic, event-type
+  ordering. (Episode exclusivity and code hash are emitted and checked, but a violation is
+  reported rather than blocking: the first is a population disclosure, the second a provenance
+  record.)
 ```
 
 Every check depends on an **emitted artifact** — missing or empty is a **failure**, never a vacuous
@@ -927,6 +980,7 @@ pass (P-23). No required check lives in a manual post-step (L-52).
 - **Any aggregate statement over cells** ("N of M covered the mirror") **without the resolution distribution of those cells** — median `mde50` and the count below each rung. An aggregate without it is a negative-by-omission, which B-5 forbids exactly as it forbids a dropped label (QA run 2).
 - **Emitting any `powered` / `unpowered` / `NOT_RESOLVABLE` flag, or any single canonical adequacy threshold** — retired by operator mandate 2026-07-28; resolution is reported as a ladder and adequacy is the reader's judgement.
 - **A per-symbol `log R` conclusion carried without its resolution ladder** — per-symbol cells resolve coarsely (§8) and are heterogeneity disclosure.
+- **An aggregate over strata whose predeclared-vs-realised discrepancy distribution is not reported.** `analysis.md` must carry the full signed `(realised_mde50 − expected_mde50)` distribution for the strata any aggregate spans; a calibration audit nobody is required to read is not an audit.
 - **A blended score without its term-level decomposition**; **a sizing cell reported as expectancy**.
 - Any family status change; any XENA; any TEST or holdout contact.
 
@@ -979,7 +1033,8 @@ AMENDMENT-7: replace SS8's required-n arithmetic with the dimensionless constant
   - QA run 3. The withdrawn table's twelve printed values implied a divisor of 47.7-47.9 against
     the 66.4 stated beside them - carried over from SPDR-019's powered-subset basis rather than
     recomputed - and the withdrawn sentence was contradicted by the required-n table above it, the
-    predeclared table below it, and the "0 of 18,632 cells reach 0.03" two paragraphs earlier.
+    predeclared table below it, and the "0 of 18,632 cells reach 0.03" two paragraphs earlier
+    (that cell count was itself wrong: the retained arm-C population is 18,479).
 AMENDMENT-8: state the block-bootstrap block in CALENDAR TIME, matched across clocks
   (block >= max(h in hours, 20 hours)); emit the realised effective sample size per cell.
   - DIRECTION: TIGHTER (a bar-stated block understates dependence and narrows CIs; c was measured
@@ -998,7 +1053,9 @@ AMENDMENT-10: L1 becomes a DISTINCT-ENTRY arm with its own L0 baseline; its delt
     the layer protocol exists to prevent)
   - QA runs 2 and 3. **SUPERSEDED by AMENDMENT-16.**
 AMENDMENT-11: count the cell grid out rather than capping it (~2,160 primary, ~13,000 including
-  declared co-reports, against an earlier "<= 120"); re-anchor the L-51 selection check to every
+  declared co-reports, against an earlier "<= 120") - **those two counts are SUPERSEDED BY
+  AMENDMENT-16's 1,872 primary / 33,696 with the declared co-report axes; the rest of this row
+  stands**; re-anchor the L-51 selection check to every
   SELECTED subset and make it HARD; add M-4 effective coverage, UNDECIDED accounting, the block
   rule and the predeclared-vs-realised check to SS12; make the pooled-primary read revert to the
   lane default if homogeneity does not support it; state collapse fraction as disclosure-only near
@@ -1057,9 +1114,25 @@ AMENDMENT-17: restore the pre-declared phase-(b) trigger of registered AMENDMENT
     checkable; nothing is admitted or excluded)
   - QA run 5.
 
-historical row count: 3 looser / 10 tighter / 4 neutral
+AMENDMENT-18: specify L4 exit fill resolution (SS2.2a: M1 target/trail fills, ratchet on M1
+  closes, ADVERSE precedence, parent time exit unchanged), declare the M1 lane in SS10, add golden
+  trace G8 and an exit-fill causality row to SS12; classify every SS12 row HARD or INFORMATIVE and
+  state the expected HARD count; correct the retained arm-C cell count to 18,479; require
+  `analysis.md` to report the predeclared-vs-realised discrepancy distribution; re-pin the
+  resolution artifacts after the shared basis was regenerated so its `source_ci_rule` quotes
+  SPDR-018 SS6.2's own text and nothing else.
+  - DIRECTION: TIGHTER (the exit price stops being the developer's choice; four checks added or
+    classified; no cell is admitted or excluded)
+  - QA run 6.
+
+historical row count: 3 looser / 11 tighter / 4 neutral
 ACTIVE rows after supersessions (AMENDMENT-8 by -13, -10 and -14 by -16, -15 by -17):
-2 looser / 8 tighter / 3 neutral.
+2 looser / 9 tighter / 3 neutral.
+L-23 STREAK FLAG (clause 3, and it applies to the conservative direction too): AMENDMENTS 8-13
+are SIX consecutive TIGHTER rows, and 16-18 add three more. A one-directional streak is flagged
+for the operator at the execution gate regardless of its sign - a design that only ever tightens
+after review is a design whose first draft was systematically under-specified, which is exactly
+what this ledger shows and what the operator should weigh.
 NOTE per L-23: LOOSER now stands at 2 (AMENDMENT-1 gate removal, -2 full TRAIN) and is FLAGGED for
 the operator at the execution gate. Both act only on population size. Neither
 loosening touches an integrity check, a fence, a causality rule or a claim boundary; both act ONLY
@@ -1073,7 +1146,10 @@ Checkpoint/family amendments in force: **U1** (NEUTRAL), **S1** (NEUTRAL), **C1*
 **C2** (TIGHTER), **C5** (**NARROWING** — transcribed from the family ledger's own label at
 `cf-voldir-001.md`; TIGHTER in L-23's three-way vocabulary), **C6** (TIGHTER), **C7** (retire the
 canonical power threshold, NEUTRAL — the authority for §8, §9 and AMENDMENT-4; omitted from this
-list in an earlier draft).
+list in an earlier draft). **C7 supersedes ONE clause of C6**: C6's instruction to book an
+unresolvable grid as `NOT_RESOLVABLE` is retired, because C7 forbids emitting that flag anywhere.
+The obligation behind it survives — the phase-(b) amendment states the expected resolution of its
+grid at every ladder rung before it runs (§4.1) — so what C7 removed is the label, not the duty.
 
 ---
 
@@ -1083,7 +1159,7 @@ list in an earlier draft).
 |---|---|
 | `python/src/xen/resolution_basis.py` | shared, tested basis and deterministic expected-resolution generator |
 | `screen_code/` | inherited SPDR-014 event module, layer module, 4 device modules, metrics layer, control module |
-| `results/resolution_basis.json` | c bands derived from SPDR-018, including cells, distinct n and the complete source CI rule |
+| `results/resolution_basis.json` | arm-C `c` bands derived from SPDR-018: `cells`, `distinct_n`, `horizon_summaries`, `input_filter`, `row_counts` incl. exclusions by reason, the complete `source_ci_rule` (SPDR-018 §6.2's own text), generator + source SHA-256 |
 | `results/expected_resolution_prior.json` | complete 1,296-row base-grain declaration inputs; two known signed parent cells and explicit unknowns elsewhere |
 | `results/expected_resolution.json` | dated pre-implementation expansion with input/source SHA-256 pins; null expected n/MDE where no parent signed arm exists |
 | `results/zones.parquet` | every zone: anchor, width, source, `z`, `H`, breach outcome |
@@ -1095,7 +1171,7 @@ list in an earlier draft).
 | `results/selection_check.json` | L-51 rows for every reported selected subset (L2, L3, L5, event type, above/below median mde50), each with complement key, payoff-scale ratio, sign-share differential and excluded-set mean-minus-median gap. HARD schema only; no pass value |
 | `results/unit_pin.json` | measured σ̂ and ATR20 medians (computed, not asserted) |
 | `results/resolution_ladder.parquet` | per cell: realised `n`, **realised effective sample size**, block MDE, CI width, detection rate at each rung **per plant operator**, `mde50`/`mde80`/`mde95`, the `n` required at each rung, and — on the **same row** — the stratum's **predeclared expected `n` and expected `mde50`** from §8. **No adequacy flag** |
-| `results/golden_traces.json` | G1–G7 |
+| `results/golden_traces.json` | G1–G8 |
 | `results/integrity_selfcheck.json` | check-count reconciliation, fences, causality, parity, pin, identity, `log R` definition, cost isolation, code sha256 |
 | `screen.md` | neutral quantification (subordinate) |
 | `analysis.md` | **fresh-context analyst — binding read** (SPDR stage 5, mandatory) |

@@ -2043,3 +2043,321 @@ missing pre-execution artifact that `screen_code/` would otherwise have to inven
 **What I did not reach:** I did not recompute the predicted M15/H1 event counts from the catalog,
 because the promised per-stratum artifact does not exist and no generator specifies those inputs.
 I did not audit SPDR-020.
+
+## QA run 6 — 2026-07-29T04:56:38Z — mode: subagent — HEAD ac6d91c (clean tree)
+
+**Reviewed git state:** `HEAD ac6d91c584d069a914e29050f33f2ecd6be6a706`, working tree clean
+(`git status --porcelain` empty). Target: `python/experiments/SPDR-019/design.md` (1,202 lines).
+**Stage:** DESIGN-STAGE. `screen_code/` absent — expected, not a finding.
+**Independence:** fresh subagent context. I authored neither the design nor any of its fixes. Runs 4
+and 5 were read in full. Every number below was recomputed by me from
+`SPDR-018/results/analyst_per_cell_magnitudes.parquet` (sha256 `c06c58f5…`),
+`SPDR-018/results/unit_pin.json`, the three committed resolution JSONs and the registry/reflection
+sources. The design's prose was treated as an untrusted claim throughout.
+
+**Verdict: REVISE.** **Implementation of `screen_code/` is NOT authorised.**
+
+R5-01 … R5-09 are **all genuinely closed** — I could not break any of them. The block is a new,
+narrower set: two clauses still force the developer to invent a design decision that changes
+episode membership (R6-01, R6-02), and one control is not exit-matched for the path-dependent exits
+the L4 stage exists to measure (R6-03).
+
+Findings: **2 HIGH · 2 MEDIUM · 7 LOW.**
+
+---
+
+### PART A — run-5 closure, verified independently
+
+| # | Run-5 finding | Status | Independent evidence |
+|---|---|---|---|
+| R5-01 | tripwires had no implementable pass rule | **CLOSED** | §6.1 now states, for each tripwire, named emitted fields and a boolean conjunction over counts and identities: TRIPWIRE-1 = `shift_is_exact_one_row == true AND changed_state_rows > 0 AND changed_selection_episodes > 0` (`design.md:465–472`); TRIPWIRE-2 = `count(clock_vs_m1_differing_fill_ids) > 0 AND count(favourable_precedence_differing_fill_ids) == count(both_reachable_bar_ids) > 0 AND` a per-id price-direction assertion (`:490–497`). No magnitude, no invented constant, every term computable from the emission. Direction is explicitly reported-not-required. This is a *structural discrimination* check rather than design-requirements §4's "expected collapse fraction", which is the correct substitution for a design whose null is an analytic zero line — there is no edge to collapse. Residue: G6 (R6-07), and a degenerate-equality trap (R6-06) |
+| R5-02 | L4 comparator changed estimator at the §4/§7 seam | **CLOSED** | §4.1 L4 row reads "a fixed multiple of the **TRAIN-median ŝ per symbol** — the SAME estimator as the modulated arm" (`:182`); §7 divisor object 1 reads "This is the `deltaThreshold` normaliser **AND NOTHING ELSE** … never appears in any L4 arm" (`:509–516`); §12 carries a new HARD **L4 comparator identity** row asserting shared estimator/unit/clock/horizon-scaling/multiplier and making an ATR-derived exit boundary a hard failure (`:945`). All three now agree |
+| R5-03 | block rule not inherited verbatim | **CLOSED** | I read SPDR-018 `design.md:245–252` myself. Its §6.2 is: (1) per-calendar-day sufficient statistics; (2) day-blocks `{1,3,7}`; (3) min block = 1 day = 24 H1 bars ≥ every horizon; (4) min/max envelope over blocks × seeds, 5-seed battery, `xen.evaluation.block_bootstrap_ci`, effective block capped `< n`. SPDR-019 §8.1 (`:706–715`) reproduces all four as five numbered clauses; §12 (`:943`) asserts all five separately and names each omission a hard failure; `resolution_basis.json.source_ci_rule` carries the same complete text. Residue is the string-equality mechanics only (R6-05) |
+| R5-04 | basis on the wrong population; horizon-flat claim false | **CLOSED** | The JSON now declares `input_filter: {column: arm, operator: ==, value: C}` with full row accounting, and I reproduced every number (Part B). The categorical flatness claim is gone: §8 now says "**THE ARTIFACT REFUTES THAT AS A CATEGORICAL CLAIM AT THE TARGET SCALE**" and prints the measured 11.855 / 8.363 / 11.744 (`:549–555`); the JSON emits `horizon_summaries` per band and the string "flat" appears nowhere in it (asserted by `tests/test_resolution_basis.py:278`). The silent-drop defect is fixed: `_terms()` now tallies four exclusion reasons and `write_basis` raises if they do not sum to the drop count (`resolution_basis.py:103–108, 408–409`). Residue: the module docstring still asserts flatness (R6-09) |
+| R5-05 | `expected_resolution.json` was a promissory note | **CLOSED** | The file exists, is dated `2026-07-29T00:00:00Z`, carries 5,148 rows, and its hashes reconcile against the files on disk *now*: `input_sha256.basis = 74c4b2b7…` = sha256 of the committed `resolution_basis.json`; `input_sha256.prior = 961cec28…` = sha256 of `expected_resolution_prior.json`; `source_sha256.generator_code = 2489bd5b…` = sha256 of `python/src/xen/resolution_basis.py`; `source_sha256.spdr018_analyst_per_cell_magnitudes = c06c58f5…` = sha256 of the parent emission. All four recomputed by me. No placeholder, no `COMPUTED AT RUN` string anywhere in the payload. `PYTHONPATH=src python -m pytest -q tests/test_resolution_basis.py` → **9 passed**, and two of those tests pin the committed artifacts rather than synthetic fixtures |
+| R5-06 | realised `c` exposes but does not repair B-5 | **CLOSED as asked** | §8 (`:788–794`) and §9 (`:849–861`) now say explicitly that **all inference and every aggregate use the realised CI/MDE/resolution curve only**, that the predeclared-vs-realised pair is a calibration audit reported as a full signed discrepancy distribution, and that the two forecast errors are *not* equivalent in consequence. The overstated symmetry claim is withdrawn in the design's own words |
+| R5-07 | L-23 half-discharged; three stale ledger sentences | **CLOSED** | Independent row-by-row tally (Part B) matches the stated `4 looser / 8 tighter / 5 neutral` and the active `3 / 7 / 5`. The false-qualifier expectation is now stated and its arithmetic is right. The three stale sentences are repaired: "the **seven** active tightenings" (`:1170`), AMENDMENT-2 defensible "ONLY WITH AMENDMENT-15 (which superseded AMENDMENT-11)" (`:1159`), and AMENDMENT-10 restated as "ADDS 1 hour and DROPS 24 hours; 20 is INSIDE the frozen range" (`:1069–1074`) |
+| R5-08 | phase-(b) "0.10 rung" privileged | **CLOSED** | §4.3 now requires "the fraction of the (b) grid whose expected mde50 sits above **EACH** of the six registered ladder rungs … the whole six-number distribution" and states that no rung is privileged (`:341–347`) |
+| R5-09 | disclosure fields/artifacts unmapped | **CLOSED** | Collapse fraction now in all four control blocks, including the mirror null's explicit `collapse_fraction: null, reason: POINT_NULL` (`:399–402, 417–418, 431–432, 448`); §15 names `span_exact_frac` / `span_p50` / `span_p90` and `collapse_fraction` on `metrics_by_cell`, and lists `resolution_basis.json`, `expected_resolution_prior.json`, `expected_resolution.json` and `python/src/xen/resolution_basis.py` (`:1186–1198`); §10 discloses the 5,148-row per-symbol expansion (`:879`); G1/G2 now say "1 HOUR" / "2 HOURS" (`:892, 897`) |
+
+**Standing execution blocker 1 (AMENDMENT-7 vs registered C6) is DISCHARGED, and I verified this
+against the registry, not the design.** `docs/signal-registry/candidate-families/cf-voldir-001.md`
+C6 requires "the (b) trigger is **pre-declared before (a) runs** (deciding afterwards what counted
+as promising is optional stopping)"; reflection §5.9.1's Trigger row says the same. §4.3 (`:297–316`)
+now states the condition on the phase-(a) reads themselves, in the §9 CI-relative vocabulary, before
+(a) runs. **No INFR-016 conflict:** the condition names no magnitude, admits/excludes/labels/ranks no
+cell, drops nothing, and every phase-(a) cell is reported in full either way; phase (b) additionally
+needs its own operator authority and its own design amendment, and the operator may decline a fired
+trigger. That is a stopping rule on a phase, not a machine value gate. AMENDMENT-17's supersession
+of AMENDMENT-7 is correctly booked and the ledger's active-row arithmetic reflects it.
+
+---
+
+### PART B — independent numeric audit
+
+Recomputed with my own code from the parent emission (no reuse of the module under review for the
+band table).
+
+| Quantity | Design / artifact | My recomputation | Verdict |
+|---|---|---|---|
+| Source rows / arm-C matched / retained / excluded | 24,098 / 18,988 / 18,479 / 509 | **24,098 / 18,988 / 18,479 / 509** | REPRODUCES |
+| Exclusions by reason | 509 missing_required_value, 0 / 0 / 0 | **509 / 0 / 0 / 0** | REPRODUCES |
+| Row-accounting identity (§12) | `filter_matched − retained == excluded == Σ by_reason` | 18,988 − 18,479 = 509 = 509 | RECONCILES |
+| 15,000+ band: cells / distinct `n` / bases | 26 / 8 / 3 | **26 / 8 / 3** (`pooled_raw`, `pooled_sigma_normalised`, `dose_response`) | REPRODUCES |
+| 15,000+ horizon medians (h=4/12/24) | 11.855 / 8.363 / 11.744 on 6 / 14 / 6 cells | **11.8547 / 8.3628 / 11.7438** on **6 / 14 / 6** | REPRODUCES |
+| Horizon spread at the target band | "1.42×" | 11.8547 / 8.3628 = **1.4176** | REPRODUCES |
+| Band medians `c` (arm C) | JSON: 5.634 / 6.648 / 7.353 / 7.418 / 11.304 | **identical to 4 d.p.** | REPRODUCES |
+| Arm-C pooled `n ≥ 10,000` | 0.053–0.107 over 41 cells | **0.05343–0.10680**, **41** cells | REPRODUCES |
+| Three largest `n` | 20,977 / 20,572 / 20,279; 0.0727–0.0945 over 9 cells | **exact**; 9 cells, **0.07271–0.09447** | REPRODUCES |
+| Per-horizon spans of those nine | h=4 0.078–0.094 · h=12 0.076–0.082 · h=24 0.073–0.090 | **0.0781–0.0945 · 0.0756–0.0823 · 0.0727–0.0904** | REPRODUCES |
+| Cells reaching 0.03 | 0, other than three degenerate `n=2, p=0` | **exactly 3**, all `n=2, p=0` (min 0.01015) | REPRODUCES |
+| Pooled H1 TRAIN bars | 229,646; MATIC 21,582; median 12,444; min 555 | **229,646** = Σ per-symbol `n` over 25 symbols; **21,582 / 12,444 / 555 (1000RATSUSDT)** | REPRODUCES |
+| `25 × 21,648` | 541,200 | **541,200** | REPRODUCES |
+| σ̂ pooled / plant rungs | 73.00 bps; 0.068 / 0.137 / 0.274 / 0.548 σ̂ | **73.0006**; 5/10/20/40 ÷ 73.0006 = **0.0685 / 0.1370 / 0.2740 / 0.5479** | REPRODUCES |
+| Cell arithmetic | L4 = 3+3+2+2+4+4+1+1 = 20; 1+4+5+3+20 = **33**; 33 × 2 × 3 = **198**; +L5≤4 → **≤222**; 198 × 26 = **5,148** | all exact; `expected_resolution_prior.declared_axes.variant_id` holds **33** ids matching §4.1a name for name; `expected_resolution.json.row_count` = **5,148** with **5,148 distinct** grain tuples | REPRODUCES |
+| L-23 false-qualifier disclosure | 2.5% → 4.95 of 198; 128.7 of 5,148 | 0.025 × 198 = **4.95**; 0.025 × 5,148 = **128.7** | REPRODUCES |
+| Amendment tally | 4 looser / 8 tighter / 5 neutral (17 rows); active 3 / 7 / 5 | LOOSER {1,2,7,10}=4; TIGHTER {3,4,8,11,13,15,16,17}=8; NEUTRAL {5,6,9,12,14}=5; total 17; less superseded 7 and 11 → **3 / 7 / 5** | REPRODUCES |
+| Reflection citations | E[run] 18.9–23.1, MAE ~12, class [D]; V9/V10 51–62%; V15 ΔBrier −0.1085 (k=12) vs −0.0199 (k=4); σ̂ 73.00 vs 13.03; cost floor 13.1–16.1 | verified verbatim at reflection `:150`, `:145–146`, `:151`, `:174`, `:180` | REPRODUCES |
+| Registry text | C5 NARROWING; C6 pre-declared trigger + `NOT_RESOLVABLE` booking; C7 ladder `{0.02,0.03,0.05,0.075,0.10,0.15}`; no C8 | verified at `cf-voldir-001.md` C5/C6/C7 rows; the 2026-07-29 clarification row is scoped to HYP-D7 and to **SPDR-020's** trigger blocker only | CORRECT |
+| Universe | prior scope axis = POOLED + 25 symbols | set- and order-identical to `docs/signal-registry/candidate-families/cf-voldir-001-universe.json`; the pinned hash is SPDR-014's `universe_recomputed.json` (`89b9ba96…`, verified) — see R6-11 | EQUAL, differently pinned |
+
+**On question 4 — is the all-UNKNOWN predeclaration honest, or is it hiding an available forecast?**
+It is honest, with one wording caveat. The generator's inputs are the declared axes, the universe pin
+and the arm-C basis; it reads no episode, return or outcome of this experiment, and none exists. I
+checked the parent claim directly: no emission in the programme carries a signal, fill or episode
+count for the SoT §6.1 breakout at any `(clock, δ)` — SPDR-018's cells are the parents' own exit
+geometries on different entry objects. The mechanism is not a blanket abstention either: SPDR-020's
+sibling artifact carries two `KNOWN_PARENT_SIGNED_ARM` rows (`expected_n` 15,041 / 15,331), so a
+prior is attached exactly where one exists. The caveat: a bar-level *signal-rate* forecast is in
+principle computable from the catalog before any outcome is touched, so "an invented number" (`:771`)
+overstates it — the accurate statement is that any such count requires running this entry, which
+cannot precede the predeclaration. Since nothing consumes the forecast (all inference uses the
+realised curve), the all-null table costs the reader nothing. **Not a finding on its own; but §8 then
+contradicts itself in prose — R6-04.**
+
+---
+
+### PART C — findings
+
+#### R6-01 — HIGH — the R-MARKOV k=4 / k=12 gate reads a forecast no parent ever emitted, so the HARD parent-gate provenance check cannot be satisfied as written
+
+**Fails:** `design.md:216–219` (§4.1a parent rows — *"These layers consume forecasts already emitted
+by registered parents"*); `design.md:948` (§12 HARD **Parent-gate provenance**); §4.1 L2 row (`:180`);
+`design-requirements.md` §1/§2.
+
+I searched every emitted parquet under `SPDR-015/017/018/results/`. Three of the four pinned gates
+resolve to real emitted series:
+
+- `s_hmm_rv` — `SPDR-015/results/regime_states.parquet` (H1, 25 symbols, 212,224 rows spanning
+  2021-06-29 → 2023-12-17, i.e. the whole TRAIN fence). **Available.**
+- `T-GT-CUR` / `logit_ridge` and `T-GT-MED5` / `ridge_cont` — `SPDR-015/results/zz_ordinal.parquet`
+  (82,377 rows, `p` and `pred_cont` per swing, H1, 25 symbols, targets `T-GT-CUR` / `T-GT-MED5` /
+  `T-GT-MED10`). **Available.**
+- **R-MARKOV k=4 / k=12 `logistic_ridge` — NOT emitted anywhere.** The forecast is computed inside
+  `SPDR-015/screen_code/transitions.py` (`_logistic_ridge_fit`, `:85`; `FORECAST_METHODS` at
+  `config.py:82`) and only *skill metrics* were persisted (`transition_metrics.parquet` — accuracy,
+  Brier, log-loss per symbol × model × k). `regime_states.parquet` carries `s_markov`,
+  `n_high_4_markov`, `n_high_12_markov`, `dur_markov` — states and counts, **not** the
+  `P(HIGH_{t+k}) ≥ 0.5` forecast the design fires on.
+
+So a developer implementing §4.1a must re-fit the parent model and choose its feature set, ridge
+alpha, training window and OOS fold protocol — none of which SPDR-019 states — while §12 asserts as
+a **hard failure** that the gate "reads exactly the model/field/rule pinned in §4.1a". This decides
+membership of `L2_LEVEL_RMARKOV_K4`, `L2_LEVEL_RMARKOV_K12`, `L2_JOINT_HMM_HIGH_AND_K12_HIGH` and
+`L2_INTERACTION_HMM_X_K12` — 4 of the 5 L2 variants and the whole of prediction 4.
+
+**Required fix (quant-designer).** For each of the four gates, name the **source artifact path and
+column**. For R-MARKOV, either (a) point at `SPDR-015/screen_code/transitions.py` with its frozen
+config and state that the forecast is regenerated under it, unchanged, on the H1 decision grid — with
+the fit window and causality stated — or (b) substitute an emitted field (`s_markov` /
+`n_high_{4,12}_markov`) and restate the firing rule against it. Then make §12's provenance row check
+the named path+column.
+
+#### R6-02 — HIGH — L1's ŝ-decile cuts have no declared reference population and no declared causality
+
+**Fails:** `design.md:179` (§4.1 L1 — *"4 (ŝ-decile cuts d≥5, d≥7, d≥9, and the ŝ-continuous rank
+reported as a dose-response)"*); §3 OBJECT-IDENTITY (`:152–155`); §12 Causality row (`:936`) and
+**L1 fixed-entry subset** row (`:944`).
+
+Deciles of *what*? Per symbol or pooled across the 25? Over the full TRAIN band, or an expanding
+causal window ending at `t−1`? The design says only that ŝ itself is causal `≤ t−1`. Both open
+choices are verdict-material:
+
+- **Population:** pooled deciles on a 25-symbol panel with σ̂ running 13 → 129 bps per symbol are
+  largely a *symbol* selector, not a scale selector; per-symbol deciles are not. The two produce
+  different `L1` populations and therefore different `p`, `W`, `L` and `n` on every L1 row.
+- **Causality:** full-TRAIN decile boundaries use the whole sample's ŝ distribution to decide which
+  episodes are kept — a cross-sectional look-ahead into the selection rule. §12's causality assertion
+  covers state *indices*, not threshold estimation, so nothing in the checklist would catch it. The
+  §12 subset check catches only "did ŝ move the entry", which is a different failure.
+
+The same gap applies to the `ŝ-continuous rank` variant (rank within what?) and to the
+magnitude-matched comparator's `|decision-bar move| decile` (`:439`).
+
+**Required fix (quant-designer).** State, for the L1 axis, the ŝ-decile reference population
+(per-symbol recommended, stated either way) and the estimation window (causal expanding, ≤ t−1, with
+a declared minimum history), and the identical convention for the continuous rank and for the M-3
+comparator's magnitude deciles; add a §12 assertion that decile boundaries use no data dated at or
+after each episode's decision bar.
+
+#### R6-03 — MEDIUM — the side and entry-timing derangements are not exit-matched, so on every path-dependent L4 arm the control's null is mechanically wrong
+
+**Fails:** `design.md:404–421` (CONTROL SIDE-DERANGEMENT — *"deranging the side flips the sign of
+r"*), `:423–433` (CONTROL ENTRY-TIMING DERANGEMENT); **L-24 clause 2 / F04** (exit-matched nulls),
+which `qa-compliance` §3 makes binding on any multi-cell design; §2 exit fill rules (`:128–134`).
+
+On the L0 / time-exit arms a side flip does negate `r` exactly, and the block as written is correct
+there. On the L4 **target** and **trail** arms it is not: which barrier is reached, and when, depends
+on the side. A LONG episode stopped out by its trail becomes, under a flipped side, a SHORT episode
+whose target may fire at a different M1 bar and a different price. Negating `r` therefore fabricates
+a null distribution no strategy could realise, on precisely the arms whose payoff asymmetry the L4
+stage exists to measure. The entry-timing block has the mirror problem: "holding length and side
+preserved" does not say whether the deranged episode's exit path is re-resolved on M1 or its old `r`
+is transplanted.
+
+**Required fix (quant-designer).** State in both control blocks that on any arm carrying a target or
+trail the deranged twin **re-resolves the exit path on the M1 stream** under the deranged side /
+timestamp, using §2's adverse-precedence rule unchanged; permit sign negation only on time-exit-only
+arms and say so; add a §12 assertion that the deranged arm's exit-reason mix is recomputed, not
+inherited.
+
+#### R6-04 — MEDIUM — §8 still asserts, in the present tense, the population forecast the predeclaration declares UNKNOWN and §8.1 says was withdrawn
+
+**Fails:** `design.md:579` (*"the 15,000+ band — **where the M15 pooled strata land**"*) and
+`:583–584` (*"at c = 5.4 the 0.03 rung needs 32,400 episodes and **this design predicts 50k-60k for
+its primary stratum**"*) against `:770–772` (*"the withdrawn '~13-16k on H1 / ~50-60k on M15' figures
+were exactly that: a date-range-shaped guess (M-4)"*) and against
+`expected_resolution.json`, where all 5,148 rows carry `expected_n: null`.
+
+The arithmetic in the paragraph is right — `(5.4/0.03)² = 32,400` — but the design cannot both
+withdraw the 50–60k forecast as an M-4 violation and use it as a live premise 190 lines earlier. This
+is the exact shape M-4 exists to stop, and it is the number a downstream analyst would quote. The
+`c = 5.4` anchor is also stale: on the arm-C basis the smallest band median is **5.634**, so 5.4 is
+now a value from the superseded all-arms computation.
+
+**Required fix.** Rewrite the withdrawal paragraph so it contains no live `n` prediction — state the
+crossing `n` at the measured band endpoints (`(5.634/0.03)² = 35,268`, already in the artifact's
+`required_n_by_band`) and say that whether any stratum reaches it is unknown until measured. Same for
+"where the M15 pooled strata land".
+
+#### R6-05 — LOW — §12's block-rule string-equality check has no canonical string to compare against, and the JSON's "verbatim" string is not verbatim
+
+`design.md:943` requires "The rule string asserted here must equal `source_ci_rule` in
+`results/resolution_basis.json`", but §8.1 states the rule as a five-clause list, not as a literal.
+The only literal in the repository is the JSON's own field, so the check as written is either
+self-comparing or requires the developer to compose the canonical string. Separately, that field is
+labelled *"SPDR-018 §6.2, verbatim:"* and then appends "emit per-seed bound spreads and per-block
+sensitivity", which is SPDR-019's own requirement and appears nowhere in SPDR-018 `design.md:245–252`.
+**Fix:** make §12 a clause-by-clause check of the five clauses (each independently asserted, as §12
+already promises), and relabel the JSON string as "SPDR-018 §6.2 (clauses 1–5 verbatim) plus this
+design's emission requirement".
+
+#### R6-06 — LOW — TRIPWIRE-2's equality clause false-fails on a degenerate but legal case
+
+`design.md:492` requires `count(favourable_precedence_differing_fill_ids) == count(both_reachable_bar_ids) > 0`.
+If a target price and a trail level coincide inside an M1 bar, the two twins fill at the same price,
+the id does not enter the differing set, the counts diverge, and a **HARD** check fails on a correctly
+implemented screen. **Fix:** define the differing set by price inequality and require
+`count(both_reachable) − count(differing) == count(price_identical)`, with `price_identical` emitted.
+
+#### R6-07 — LOW — G6 still asks QA to confirm a "material difference"
+
+`design.md:923`. §6.1's TRIPWIRE-1 is now structural, so the golden trace should be too, otherwise
+the trace QA computes at execution has no criterion. **Fix:** restate G6 as the structural comparison
+— the G1 episode's conditioning row differs by exactly one decision-clock shift, its selection or exit
+placement changes, and the emitted variant is the legal one.
+
+#### R6-08 — LOW — the predeclaration grain omits the band axis the design scores
+
+`expected_resolution.json` grain is `(clock, delta, variant_id, scope)`; §10 (`:874`) scores DESIGN and
+CONFIRM as verification bands alongside full TRAIN, and §12 (`:952`) requires the predeclared values
+to ship on the **same row** as the realised ones in `resolution_ladder.parquet`. If that ladder carries
+a band column the join key is under-specified. Harmless today because every predeclared value is null,
+but it is a schema the developer must otherwise invent. **Fix:** state the join key explicitly (or add
+`band` to the grain and regenerate — which would require fresh QA, per §12).
+
+#### R6-09 — LOW — the shared module still asserts the withdrawn flatness claim
+
+`python/src/xen/resolution_basis.py:22`: *"`c` is flat across holding horizons — `block_mde_bps` and
+`(1-p)*L` both rise with `h` and cancel"*. AMENDMENT-17(d) withdrew exactly this, the artifact refutes
+it at the target band (1.42×), and the test suite bans the word from the JSON but not from the module.
+The design pins this module as its authority in §15. **Fix:** correct the docstring to match
+`horizon_interpretation` in the emitted artifact.
+
+#### R6-10 — LOW — the modulated sizing arm's constant is undefined
+
+`design.md:240`: modulated sizing is `c / ŝ` with `c` unstated. Sizing changes `W` and `L` (not `p`),
+so it does move `log R`, which is why the design forbids a sizing cell carrying a `log R` claim — but
+the developer still has to pick `c`. **Fix:** pin the normalisation (e.g. `c` = per-symbol TRAIN-median
+ŝ, so mean weight is 1 and the arm is comparable to the fixed-notional twin).
+
+#### R6-11 — LOW (informational) — the predeclaration pins a different file from the one §10 names as the universe pin
+
+`expected_resolution.json.source_sha256.spdr014_universe_recomputed = 89b9ba96…` is the sha256 of
+`python/experiments/SPDR-014/results/universe_recomputed.json`, whereas §10 (`:871`) names
+`cf-voldir-001-universe.json` as the pin. I verified the 25 symbols are identical **and identically
+ordered** in both files and in the prior's `scope` axis, so nothing is wrong substantively. **Fix:**
+pin the family universe file itself, or record the equivalence in the prior.
+
+**Advisory (not a finding):** §12's fixed-entry-subset assertion (`:944`) covers L1 only. L2 and L3
+are also selection layers on the same frozen entry; extending the same subset assertion to them is
+free and closes the symmetric failure.
+
+---
+
+### Checks independently verified clean
+
+| Check | Result |
+|---|---|
+| Exact mirror, slope 1 | **CLEAN.** `log R = log(W/L) − log((1−p)/p)` in §1, §4.1, §5, §8, §9, §12, G4, G5, §13. `0.9408` appears once (`:371`) and only to refuse it, with the correct reason. §12 makes a fitted-slope residual a hard failure |
+| Cost isolation (C5) | **CLEAN.** Header NOTE, §5 DISCLOSED REFERENCE ONLY, §7 (`:525–527`), §12 HARD row, §13 first bullet, §15 column flag. No band, threshold or comparison carries a cost term |
+| SPREAD-COST-DISCLOSURE | **CLEAN.** All five fields verbatim per `design-requirements.md` §10, unchanged across six runs |
+| No adequacy flag / no canonical threshold | **CLEAN.** §12 asserts the absence HARD; ladder `{0.02,0.03,0.05,0.075,0.10,0.15}` matches registered C7 exactly; `mde50/mde80/mde95` are three points of one curve; the committed predeclaration contains none of `powered`/`unpowered`/`at_target`/`not_resolvable` (asserted by test) |
+| Phase-(b) trigger vs C6 / reflection §5.9.1 / INFR-016 | **CLEAN.** Pre-declared before (a), stated on the (a) reads, no magnitude, nothing machine-dropped, operator authority still required. Execution blocker 1 discharged |
+| Block rule vs SPDR-018 §6.2 | **CLEAN on substance.** All five clauses present in §8.1 and §12 and in `source_ci_rule`; the mechanics of the equality check are R6-05 |
+| Basis population | **CLEAN.** One declared population (`arm == 'C'`), accounting reconciles, exclusions tallied by reason, generator raises if they do not sum |
+| Predeclaration integrity | **CLEAN.** Dated, hash-pinned on four inputs (all four recomputed and matching), 5,148 distinct strata, no placeholder, no outcome input, generator deterministic and tested (9/9 pass) |
+| Cell arithmetic | **CLEAN.** 33 named variants = the 33 in the prior; 198 fixed cells; 5,148 disclosure rows = the artifact's row count |
+| L-23 ledger | **CLEAN.** Direction on every row, tally correct, active tally correct after two supersessions, streak flagged for the operator, false-qualifier expectation stated with correct arithmetic |
+| L-28 derangements | **CLEAN.** Both permutation controls declare and count zero fixed points; TRIPWIRE-1 correctly declares N/A (index shift, not a permutation) |
+| L-50 / P-21 | **CLEAN.** Plant rungs in σ̂ units, re-derived per universe at run; recomputed against σ̂ = 73.0006 |
+| L-21 / P-15 unit pin | **CLEAN.** Divisor object 2 matches `SPDR-018/results/unit_pin.json.divisor_object` verbatim; ATR20 bound to `deltaThreshold` only; medians computed at run |
+| M-4 effective coverage | **CLEAN in §8** (229,646 measured, not date-arithmetic) and asserted in §12. Residue is the prose contradiction R6-04 |
+| Governance "name the mechanism" (chapter-06 §1) | **SATISFIED.** §1 names forecastable move *scale* placing the exit boundaries as the mechanism putting `R > 1`; whether it persuades is the operator's call, not QA's |
+| L-51 HARD status | **DEFENSIBLE.** HARD on presence and form only; re-anchored to every separately reported subset; `chapter-06-governance.md:101` makes it mandatory |
+| Holdout / TEST / XENA / family action | **CLEAN.** TRAIN-only; §12 asserts zero queries ≥ 2025-01-08; §13 refuses family status change, XENA, TEST and holdout contact; header declares execution unauthorised |
+| L-52 / P-23 | **CLEAN.** Check-count reconciliation by name; every check bound to an emitted artifact; determinism unconditional at `--jobs > 1` |
+| Lane compliance (`spdr-lane.md`) | **CLEAN.** TRAIN-only, causal `t−1`, M1 fill resolution, ≥2000-seed control batteries (lane floor is 25), per-stratum reporting with multiplicity disclosed, pooled reverts to disclosure-only without homogeneity, no local accounting, dependence-matched CI |
+| Shared-code boundary | **CLEAN.** `python/src/xen/resolution_basis.py` contains no threshold and no admit/exclude/label/rank path; `required_n` and `mde50` are pure conversions; 9/9 tests pass, two of them pinning the committed artifacts |
+
+---
+
+### Standing execution blockers
+
+1. **DISCHARGED** — the AMENDMENT-7 / registered-C6 departure. Verified against
+   `cf-voldir-001.md` and reflection §5.9.1, not against the design's assertion.
+2. **STANDS** — `reflection-inputs.md` §9 remains explicitly unsigned ("OPERATOR DECISION NOT TAKEN
+   … deliberately blank"). This blocks **execution**, not implementation.
+3. **STANDS (lane-wide, unchanged)** — the per-symbol spread pin is open; every money read stays
+   blocked. It does not block this measurement (C5).
+
+### Golden-trace and boundary verdict
+
+Design-stage: no code and no smoke emission to diff. G1–G7 cover entry, expiry, suppression, the
+identity, the exact mirror, exit precedence and leak discrimination, and G1/G2 now carry hour units.
+G7 is deterministic and computable by QA from the catalog. G6 remains non-executable until R6-07.
+
+**FAILING_ARTIFACT:** `python/experiments/SPDR-019/design.md`
+(the pinned resolution artifacts and `python/src/xen/resolution_basis.py` are clean apart from the
+R6-09 docstring).
+**REQUIRED_SKILL:** `quant-designer`.
+**Implementation authorisation: NO.** R6-01 and R6-02 each force the developer to invent a decision
+that changes which episodes exist in a cell; R6-03 leaves a control's null undefined on the arms the
+experiment is built to measure. R6-04 … R6-11 are prose, schema and hygiene and change no line of
+code.
+
+**What I did not reach.** I did not recompute M15 or H1 episode counts from the catalog — no parent
+emission carries them and the design correctly declares them unknown. I did not audit
+`xen.evaluation.block_bootstrap_ci`'s internals beyond the L-20 contract. I did not review SPDR-020,
+which shares `resolution_basis.py`, the block rule and the control blocks — R6-03, R6-05 and R6-09
+are likely to apply there verbatim.

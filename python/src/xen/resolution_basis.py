@@ -19,9 +19,13 @@ For a cell with `n` episodes, mean-MDE `block_mde_bps`, win rate `p` and mean lo
     c       = mde_log * sqrt(n)                  # dimensionless, but reusable only
                                                  # under the same CI construction
 
-`c` is flat across holding horizons -- `block_mde_bps` and `(1-p)*L` both rise with `h`
-and cancel -- but it RISES with `n`, which is the block-dependence penalty. That rise is
-the reason a single constant fitted on thin cells understates the requirement at scale.
+The derivation EXPECTS `c` to be flat across holding horizons -- `block_mde_bps` and
+`(1-p)*L` both rise with `h` and should cancel -- but that is a hypothesis, not a
+result: on SPDR-018's arm-C cells the 15,000+ band's horizon medians are 11.855 /
+8.363 / 11.744, a 1.42x spread. `c_bands(horizon_col=...)` therefore emits the
+per-horizon breakdown and no caller may assume flatness. `c` does RISE with `n`, which
+is the block-dependence penalty, and that is the reason a single constant fitted on thin
+cells understates the requirement at scale.
 
 `c` is only comparable across cells whose CIs were built the same way. It carries no
 meaning if the block rule, block sweep or seed battery differ between the source emission

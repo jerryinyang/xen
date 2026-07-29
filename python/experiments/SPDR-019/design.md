@@ -176,7 +176,7 @@ because an earlier one read flat.**
 | Stage | What runs | Variants | Read |
 |---|---|---|---|
 | **L0** | The entry with a **fixed** capture policy: `activeHold` = **1 hour**, `inactiveHold` = **2 hours** (§4.2 — hours on both clocks), no target, no stop, no selection | 1 | The baseline `(p, W, L, log R)` and κ. **Mandatory first** — the entry carries a momentum prior, so without it every later change is misattributed |
-| **L1** | **Scale alone, on the FIXED entry.** ŝ = H1 Parkinson-EWMA forecast, used ONLY to select among the signals the frozen `deltaThreshold` already produced — `δ` stays at its swept value, no new signal is created, and every retained episode keeps L0's own signal bar, stop price, fill and exit. The L1 population is a strict SUBSET of the L0 population (asserted, §12) | 4 (ŝ-decile cuts d≥5, d≥7, d≥9, and the ŝ-continuous rank reported as a dose-response) | Δ`log R` vs L0; the full decomposition |
+| **L1** | **Scale alone, on the FIXED entry.** ŝ = H1 Parkinson-EWMA forecast, used ONLY to select among the signals the frozen `deltaThreshold` already produced — `δ` stays at its swept value, no new signal is created, and every retained episode keeps L0's own signal bar, stop price, fill and exit. The L1 population is a strict SUBSET of the L0 population (asserted, §12) | 4 (ŝ-decile cuts d≥5, d≥7, d≥9, and the ŝ-continuous rank reported as a dose-response — decile definition pinned in §4.1b) | Δ`log R` vs L0; the full decomposition |
 | **L2** | **State alone**, three cells, not one: **(i)** shock axis (HMM HIGH/LOW label), **(ii)** level axis (R-MARKOV k=4 and k=12 state), **(iii)** both jointly | 5 (see §4.1a) | Δ`log R` per axis **and the interaction term**. Their near-independence (51–62% agreement, V9/V10) is a pre-registered prediction under test |
 | **L3** | **Swing gate alone.** `T-GT-CUR` fires / does not fire; parameters left at L0 values | 3 (fires / does not fire / T-GT-MED5 co-report) | Δ`log R`; **plus the mandatory L-51 three-number selection check** on **every selected subset**, per the §15 anchor — the term "powered subset" no longer denotes a population (§9) |
 | **L4** | **Capture devices, one at a time.** Each device runs **twice**: unmodulated (a fixed multiple of the **TRAIN-median ŝ per symbol** — the SAME estimator as the modulated arm, §4.2) and modulated (the same multiple × ŝ(t,h)) | see 4.2 | Δ`log R` per device; the unmodulated run is the comparator that separates the device from the information |
@@ -213,22 +213,90 @@ not a predeclaration.
 consume forecasts already emitted by registered parents. The model, the field and the firing rule
 are fixed here because each choice changes episode membership and therefore every count:
 
+Each gate names its SOURCE ARTIFACT AND COLUMN, because "the R-MARKOV forecast" is not a field
+and a developer cannot read it (QA run 6):
+
 ```
-HMM shock label      : SPDR-015 `s_hmm_rv`.  HIGH = 1, LOW = 0.
-R-MARKOV k=4 / k=12  : `logistic_ridge` forecast.  HIGH when p >= 0.5.
-T-GT-CUR             : `logit_ridge` forecast.     FIRES when p >= 0.5.
-T-GT-MED5            : `ridge_cont` forecast.      FIRES above the CAUSAL five-swing median
-                       (the median of the five most recent swings CLOSED strictly before t).
-ALIGNMENT            : every label is generated on H1 and HELD FORWARD to each H1/M15 decision
-                       close from its latest availability timestamp. NO backfill, no
-                       interpolation, no forward fill across the TRAIN fence.
-FORBIDDEN AS A GATE INPUT: the realised outcome label `y`, the realised swing magnitude, and any
-                       quantity dated at or after the decision bar close [0]. Asserted in SS12.
+HMM shock label  : SPDR-015/results/regime_states.parquet, column `s_hmm_rv`, rows for the
+                   symbol at clock H1.  HIGH = 1, LOW = 0, and s_hmm_rv < 0 means NO STATE -
+                   such an event is INELIGIBLE for the L2 shock rows and is excluded from them
+                   with a count and reason, never coerced to LOW.
+                   Availability timestamp = `slot_end`.
+
+T-GT-CUR         : SPDR-015/results/zz_ordinal.parquet, rows `target == 'T-GT-CUR'` and
+                   `model == 'logit_ridge'`.  FIRES when the emitted `p` >= 0.5.
+                   Availability timestamp = `confirm_slot_end` (the swing's confirmation).
+
+T-GT-MED5        : same artifact, rows `target == 'T-GT-MED5'` and `model == 'ridge_cont'`.
+                   FIRES when the emitted `pred_cont` > the emitted `threshold` ON THE SAME ROW.
+                   That `threshold` IS the parent's causal five-swing median (`_median_last_k(
+                   mags, 5, k)`, swings closed at or before k, predicting k+1) - it is read from
+                   the artifact, never recomputed here, so there is no second definition to drift.
+
+R-MARKOV k=4/k=12: THE PARENT PERSISTED NO PER-BAR PROBABILITY. `transition_metrics.parquet`
+                   holds skill summaries only; the walk-forward `logistic_ridge` probability
+                   lives inside SPDR-015/screen_code/transitions.py and was never emitted. Two
+                   honest routes existed and the second is taken:
+                     (a) using the emitted state `s_markov` directly - REFUSED: that is the k=1
+                         gate, which V15 measured inert and SS3 of the reflection refuses;
+                     (b) REGENERATE the k=4 and k=12 probabilities by calling the PARENT'S OWN
+                         FROZEN function `walk_forward_probs(state, X, slot_end, is_origin, k)`
+                         from SPDR-015/screen_code/transitions.py, on the feature matrix that
+                         function itself defines, built ONLY from columns the parent emitted in
+                         regime_states.parquet: `s_markov`, `dur_markov`, `rv20`, `park_ewma`,
+                         `lvl_pct`, `n_high_4_markov`, `n_high_12_markov`, `s_shock`.
+                         `n_high_{4,12}_markov` are BACKWARD-looking counts over the last k bars
+                         (`_n_high_last_k`), verified causal.
+                   HIGH when the regenerated p >= 0.5. The parent's code is imported, not
+                   reimplemented - a second implementation is a second object (L-13).
+                   PARENT PARITY, HARD (SS12): the regenerated probabilities must reproduce
+                   SPDR-015's own emitted `delta_brier_vs_pers` at k=4 and k=12, per symbol,
+                   to |d| <= 1e-9, written to results/parent_gate_parity.json. If parity fails,
+                   the gate is not the parent's gate and the emission is invalid.
+
+ALIGNMENT        : every label is generated on H1 and HELD FORWARD to each H1/M15 decision close
+                   from its own availability timestamp above. NO backfill, no interpolation, no
+                   fill across the TRAIN fence. An event with no available label yet is excluded
+                   from that layer's rows with a count and reason.
+FORBIDDEN AS A GATE INPUT: the realised outcome label `y` (present in both parent artifacts and
+                   trivially joinable - which is exactly why it is named), the realised swing
+                   magnitude `mag_k1`, `next_abs_oo`, `run_len_*`, and any quantity dated at or
+                   after the decision bar close [0]. Asserted by name in SS12.
 ```
 
 `p >= 0.5` here is not an adequacy threshold and is not tuned: it is the decision boundary of the
 parent's own binary forecast, i.e. the label the parent itself emits. No cell is admitted,
 excluded or ranked by it.
+
+### 4.1b How every decile is defined (QA run 6)
+
+A decile is not a quantity until its reference population and its estimation window are stated,
+and both choices change which episodes enter L1:
+
+```
+POPULATION : PER SYMBOL, always. A POOLED decile on a panel whose per-symbol sigma-hat runs from
+             ~13 to ~129 bps is a SYMBOL SELECTOR wearing a scale label - the high deciles would
+             fill with the loudest symbols and L1 would measure cross-sectional selection, not
+             scale. L-50/P-21 forbid a threshold that crosses a universe boundary, and this is the
+             same rule applied inside the universe.
+WINDOW     : EXPANDING and CAUSAL. The decile edges at decision bar [0] are the empirical
+             quantiles of that symbol's own s_hat over every H1 bar STRICTLY BEFORE [0], after
+             the 60-bar warm-up. Full-TRAIN quantiles are refused: they are a look-ahead, and
+             they are the kind that survives a fence check because no future BAR is read - only
+             a future DISTRIBUTION.
+WARM-UP    : a symbol needs at least 250 prior H1 s_hat values before any L1 decile row is
+             emitted for it; below that the event is INELIGIBLE for L1 rows only, counted with a
+             reason, and still present in every other layer.
+CONTINUOUS : `L1_SHAT_RANK_CONTINUOUS` uses the same per-symbol expanding empirical rank in
+             [0,1], not a z-score - the forecast rescales a distribution rather than shifting a
+             mean (V5), so a rank is the right summary and needs no distributional assumption.
+M-3 DECILES: the magnitude-matched comparator's |decision-bar move| deciles use the SAME rule -
+             per symbol, expanding, causal. A comparator matched on pooled deciles would be
+             matched on the wrong thing.
+```
+
+Asserted in §12: no decile edge is computed from data at or after the decision bar close, and no
+decile edge is shared across symbols.
 
 ### 4.2 The L4 device grid (SoT §6.3, all four devices)
 
@@ -237,7 +305,7 @@ excluded or ranked by it.
 | **Dynamic profit target** | `a × ŝ_uncond`, `a ∈ {1, 2, 3}` | `a × ŝ(h)` | `W` up, `p` down |
 | **Trailing stop** | `b × ŝ_uncond`, `b ∈ {1, 2}` | `b × ŝ(h)` | `W` and `L` jointly, path-dependently |
 | **Holding period** | `activeHold ∈ {1, 4, 12, 20}` **HOURS** — on H1 that is 1/4/12/20 bars, on M15 it is 4/16/48/80 bars | `activeHold` scaled to the state's `E[run]` by the exact equation below, also in hours | the horizon over which `W`, `L`, `p` are realised |
-| **Position sizing** | fixed notional | `c / ŝ` | **variance and comparability ONLY.** Reported on dispersion, never on the mean (SoT §4.4). A sizing cell may not carry a `log R` claim |
+| **Position sizing** | fixed notional `N0` (1 unit of account per episode) | `N0 × (ŝ_uncond / ŝ(t,h))`, clipped to `[0.25, 4]` — i.e. the constant `c` is pinned to `N0 × ŝ_uncond` per symbol, so the modulated arm has the SAME average notional as its comparator by construction and only its dispersion differs | **variance and comparability ONLY.** Reported on dispersion, never on the mean (SoT §4.4). A sizing cell may not carry a `log R` claim |
 
 **Comparator units are identical by construction** (QA run 2). An earlier draft set the unmodulated
 arm in `ATR20` (price units, decision clock) against the modulated arm in `ŝ` (bps, H1) — two
@@ -401,6 +469,16 @@ CONTROL MIRROR-NULL (primary):
     there is no control effect to divide by the raw effect. Recorded as `collapse_fraction:
     null, reason: POINT_NULL` so the field is never silently absent.
 
+EXIT-MATCHING, BINDING ON BOTH DERANGEMENTS (L-24.2 / F04, QA run 6): every deranged seed is
+  RE-RESOLVED on the M1 stream UNDER THE SAME EXIT RULE as the live arm it referees. Negating r
+  is exact only where the exit is time-based; on a target or trailing-stop arm the SIDE decides
+  WHICH BARRIER IS HIT AND WHEN, so a sign flip would referee a path the deranged position never
+  took. Concretely: the deranged side/timing is applied first, then the entry fill, the barrier
+  levels and the exit are resolved again from M1 exactly as SS2 specifies, and r is computed from
+  the re-resolved fills. The cheap negation shortcut is PERMITTED ONLY on the time-exit arms
+  (L0, the hold devices) and is asserted per arm in SS12. Where a device's null cannot be
+  exit-matched at all, that device's control is demoted to DISCLOSURE and labelled as such.
+
 CONTROL SIDE-DERANGEMENT (within_sample_attribution - REPORT LAYER):
   question answered: does the entry's SIDE carry information, or would random sides produce the
     same payoff geometry?
@@ -489,7 +567,11 @@ TRIPWIRE-2 (fill-rule look-ahead) - COVERS ENTRIES AND EXITS (QA run 1 required 
     count; per differing id, the two fill prices; plus paired payoff deltas with CIs.
   HARD PASS, fixed before the run - ALL THREE:
     `count(clock_vs_m1_differing_fill_ids) > 0`
-    AND `count(favourable_precedence_differing_fill_ids) == count(both_reachable_bar_ids) > 0`
+    AND `count(both_reachable_bar_ids) > 0`, where `both_reachable_bar_ids` counts only M1 bars
+        in which the target and the trail/stop levels are DISTINCT prices; bars where the two
+        levels coincide cannot differ under either precedence and are counted separately as
+        `price_identical_bars`, never as a failure
+    AND `count(favourable_precedence_differing_fill_ids) == count(both_reachable_bar_ids)`
     AND for EVERY id in `favourable_precedence_differing_fill_ids`, the favourable twin's fill
         price is mechanically no worse for the position than the emitted arm's
         (LONG: favourable exit price >= emitted; SHORT: <=), asserted per id.
@@ -576,13 +658,15 @@ BASIS PROVENANCE AND ITS LIMIT (recorded because reusing c across CI rules is un
   design's own uncertainty - the failure direction that matters.
 
 THINNESS IS DISCLOSED, NOT FLATTERED (the artifact carries `cells` AND `distinct_n` per band):
-  the 15,000+ band - where the M15 pooled strata land - holds 26 rows but only 8 DISTINCT sample
-  sizes across 3 bases. Its interquartile spread is therefore NOISE, not a defensible range, and
-  NO "range across bases" claim is made from it. An earlier draft treated it as a range, picked
-  anchors of c = 7.5 and 9 that were measured on neither band, and then asserted that "0.03 is out
-  of reach at EVERY basis" - which is false on its own stated range, since at c = 5.4 the 0.03
-  rung needs 32,400 episodes and this design predicts 50k-60k for its primary stratum. Withdrawn:
-  the design makes NO invariance claim it has not computed.
+  the 15,000+ band holds 26 rows but only 8 DISTINCT sample sizes across 3 bases. WHICH band this
+  design's strata land in is NOT predicted - no n is forecast anywhere (SS8.1), so the band is
+  assigned from the realised n when it exists. Its interquartile spread is therefore NOISE, not a defensible range, and
+  NO "range across bases" claim is made from it. An earlier draft treated it as a range, picked anchors of c = 7.5 and 9 that were measured on
+  neither band, asserted that "0.03 is out of reach at EVERY basis", and then rebutted itself with
+  a c = 5.4 anchor and a predicted "50k-60k episodes for the primary stratum". All of it is
+  WITHDRAWN: c = 5.4 appears nowhere in the arm-C artifact (its smallest band median is 5.634),
+  and this design forecasts NO episode count for any stratum (SS8.1). The crossing point is read
+  off the artifact's own `required_n_by_band` grid when a realised n exists, not predicted here.
 ```
 
 **The direct check, computed the same way.** Arm-C pooled cells with `n ≥ 10,000` realise
@@ -712,12 +796,18 @@ their own sweep and calling it compliance (QA run 5):
     3. minimum block = 1 day = 24 H1 bars, >= every horizon in scope;
     4. envelope = MIN/MAX over blocks x seeds (CONSERVATIVE), 5-SEED battery;
     5. call `xen.evaluation.block_bootstrap_ci`, with the EFFECTIVE BLOCK CAPPED < n
-       (INFR-004 / L-20).
-  The same complete string is pinned as `source_ci_rule` in results/resolution_basis.json, so the
-  rule this design runs under and the rule c was measured under are the same text.
-  EMITTED, not just the final envelope: the PER-SEED bound spreads and the PER-BLOCK-LENGTH
-  sensitivity, per cell. A single collapsed envelope hides exactly the fragility INFR-004 added
-  the sweep and battery to expose.
+       (INFR-004 / L-20);
+    6. THE REPORTED MDE IS THE BLOCK MDE (SoT SS9 M-1); the iid 2.8sigma/sqrt(n) form is emitted
+       ONLY as a labelled companion column and may not drive a band label.
+  THIS SIX-CLAUSE LIST IS THE CANONICAL LITERAL. `source_ci_rule` in
+  results/resolution_basis.json quotes SPDR-018 SS6.2's own text and nothing else, so the rule
+  this design runs under and the rule c was measured under are the same text; SS12 checks it
+  CLAUSE BY CLAUSE against this list rather than by string equality, because a string comparison
+  fails on whitespace and passes on a paraphrase.
+  ADDITIONALLY REQUIRED BY THIS DESIGN (an emission requirement, NOT part of the inherited rule
+  and deliberately not folded into the pinned string): the PER-SEED bound spreads and the
+  PER-BLOCK-LENGTH sensitivity are emitted per cell, not just the final envelope. A single
+  collapsed envelope hides exactly the fragility INFR-004 added the sweep and battery to expose.
   - A DAY is a calendar unit, so the rule is identical on M15 and H1 by construction. This is what
     closes the M15 problem: a block stated in BARS would span 3 hours at h=12 on M15 against 12
     hours on H1, while the clustering the L2 state axes and s_hat condition on is calendar
@@ -777,6 +867,19 @@ EXPECTED RESOLUTION, PER STRATUM - PREDECLARED BY GENERATION, AND IT ALREADY EXI
   declaration; a promise to fill a field in later is not.
   The <=4 L5 combinations are excluded by construction and require their own dated, hash-pinned
   addendum from the same generator before L5 runs (SS4.1a).
+
+  BAND AXIS AND THE JOIN KEY (QA run 6): the predeclaration is stated at the FULL-TRAIN grain,
+  which is the primary read (SS10). The DESIGN and CONFIRM verification rows are the same strata
+  scored on a sub-band, so they carry `band` as a fourth reporting column and JOIN to the
+  predeclaration on `(clock, delta, variant_id, scope)` alone, inheriting that stratum's row.
+  This is exact here BECAUSE every predeclared value is null: a band-specific expected n would
+  otherwise need its own row rather than an inherited one, and this clause would be wrong.
+
+  UNIVERSE PIN, stated because two files exist: the predeclaration's 25 symbols are hash-pinned
+  from `SPDR-014/results/universe_recomputed.json`, while SS10 names the family pin
+  `cf-voldir-001-universe.json` as the run-time authority. SS12 asserts SET EQUALITY between them
+  before the run; if they ever differ, the predeclaration is regenerated and re-reviewed rather
+  than reconciled by hand.
 
   OUTCOME FENCE: the generator's only inputs are the declared axes, the pinned universe file and
   the SPDR-018 arm-C basis. It reads no episode, no return and no outcome of this experiment,
@@ -920,8 +1023,10 @@ G7 (exit fill precedence - the three clauses most likely to invert in code):
   decision-clock bar at or after activeHold.
 
 G6 (leak discrimination):
-  The G1 rows under TRIPWIRE-1's leaky twin. QA confirms a material difference and that the legal
-  variant is the one emitted.
+  The G1 rows under TRIPWIRE-1's leaky twin. QA confirms SS6.1's three structural conditions -
+  `shift_is_exact_one_row`, `changed_state_rows > 0`, `changed_selection_episodes > 0` - and that
+  the legal variant is the one that entered the research emission. No magnitude is asserted: the
+  payoff delta is reported and carries no pass rule.
 ```
 
 ---
@@ -940,7 +1045,11 @@ G6 (leak discrimination):
 | **`log R` definition** | asserted equal to `log(W/L) − log((1−p)/p)` with **slope 1**; a fitted-slope residual appearing anywhere is a **hard failure** |
 | **Cost isolation** | no cost term enters any estimand, threshold, band or comparison; `p_be_net` present and flagged `DISCLOSURE_ONLY` (AMENDMENT-C5) |
 | **MDE column** | the reported resolution column is the **block** MDE in log units; the iid column is labelled companion-only (M-1) |
-| **Block rule (inherited)** | block bootstrap uses SPDR-018 §6.2's rule verbatim, **all five clauses asserted separately**: per-calendar-day sufficient statistics; day-blocks of **`{1,3,7}`**; minimum 1 day = 24 H1 bars ≥ every horizon; **min/max envelope over blocks × 5 seeds**; `xen.evaluation.block_bootstrap_ci` with **effective block `< n`** (§8.1). A single-block-length CI, a different or partial sweep, a missing seed battery, a missing daily aggregation, a missing small-`n` cap, or a block computed in bars is a **hard failure**. **Per-seed bound spreads and per-block-length sensitivity are emitted per cell**, not just the envelope; realised effective sample size and realised `c` emitted per cell alongside `n`. The rule string asserted here must equal `source_ci_rule` in `results/resolution_basis.json` |
+| **Block rule (inherited)** | block bootstrap uses SPDR-018 §6.2's rule verbatim, **checked clause by clause against §8.1's canonical six-clause list** (never by string equality): per-calendar-day sufficient statistics; day-blocks of **`{1,3,7}`**; minimum 1 day = 24 H1 bars ≥ every horizon; **min/max envelope over blocks × 5 seeds**; `xen.evaluation.block_bootstrap_ci` with **effective block `< n`** (§8.1). A single-block-length CI, a different or partial sweep, a missing seed battery, a missing daily aggregation, a missing small-`n` cap, or a block computed in bars is a **hard failure**. **Per-seed bound spreads and per-block-length sensitivity are emitted per cell**, not just the envelope; realised effective sample size and realised `c` emitted per cell alongside `n`. `source_ci_rule` in `results/resolution_basis.json` is asserted to be SPDR-018 §6.2's own text — this design's extra emission requirements are deliberately not part of that string |
+| **Decile causality** | every ŝ decile edge, every ŝ continuous rank and every M-3 magnitude decile is computed **per symbol** on an **expanding** window using only bars strictly before the decision close, after the declared warm-up; a pooled or full-TRAIN decile edge anywhere is a **hard failure** (§4.1b) |
+| **Exit-matched nulls** | each derangement seed is re-resolved on M1 **under the live arm's own exit rule**; the sign-negation shortcut is asserted present **only** on time-exit arms (L-24.2/F04, §6) |
+| **Parent-gate parity** | the regenerated R-MARKOV k=4/k=12 probabilities reproduce SPDR-015's emitted `delta_brier_vs_pers` per symbol to `|Δ| ≤ 1e-9`, written to `results/parent_gate_parity.json`. A parity failure means the gate is not the parent's gate — **hard failure** (§4.1a) |
+| **Universe file equality** | `SPDR-014/results/universe_recomputed.json` (the predeclaration's pin) and `cf-voldir-001-universe.json` (§10's run-time pin) are asserted to hold the **same 25 symbols** |
 | **L1 fixed-entry subset** | every L1 episode key `(symbol, signal_ts, side, δ)` is asserted present in the L0 population at the same `δ`, with identical stop price, fill ts/price and signal bar. An L1 episode absent from L0 means ŝ moved the entry itself, which is a **hard failure** — reflection §5.9 requires every layer to be characterised against the same fixed signed entry, and §5.5's ŝ-decile axis is a selection axis, not an entry re-parameterisation |
 | **L4 comparator identity** | for **every** L4 device pair, the unmodulated and modulated arms are asserted to share **estimator (Parkinson-EWMA ŝ), unit (bps), clock (H1 forecast), horizon scaling (`√h`, `h` in hours) and multiplier**, differing **only** in constant-per-symbol-TRAIN-median ŝ vs conditional ŝ(t,h). An ATR-derived exit boundary anywhere in an L4 arm is a **hard failure** — Wilder ATR(20) may appear only as the `deltaThreshold` normaliser (§7) |
 | **Predeclaration present** | `results/expected_resolution.json` exists, is dated, carries the SHA-256 of every input, expands **all 5,148** declared strata (§8.1 schema) with **no** placeholder status and **no** `COMPUTED AT RUN` string, and its `input_sha256.basis` equals the sha256 of the committed `results/resolution_basis.json`. Regenerating it after implementation begins is a design change requiring fresh QA |
@@ -967,10 +1076,12 @@ G6 (leak discrimination):
 HARD (block execution / invalidate emission):
   check-count reconciliation, TRIPWIRE-1, TRIPWIRE-2, TRAIN fence, holdout, causality,
   fill causality, universe pin, identity reconstruction, log R definition, cost isolation,
-  derangement fixed-point count, golden traces, determinism, BLOCK RULE (all five clauses),
-  L4 COMPARATOR IDENTITY, PARENT-GATE PROVENANCE, MOD-HOLD ELIGIBILITY, PREDECLARATION PRESENT,
-  BASIS POPULATION, L-51 SELECTION CHECK, `log R` never unaccompanied,
-  PREDECLARED vs REALISED resolution.
+  derangement fixed-point count, golden traces, determinism, BLOCK RULE (all six clauses),
+  L4 COMPARATOR IDENTITY, PARENT-GATE PROVENANCE, PARENT-GATE PARITY, DECILE CAUSALITY,
+  EXIT-MATCHED NULLS, L1 FIXED-ENTRY SUBSET, MOD-HOLD ELIGIBILITY, PREDECLARATION PRESENT,
+  BASIS POPULATION, UNIVERSE FILE EQUALITY, L-51 SELECTION CHECK,
+  `log R` never unaccompanied, PREDECLARED vs REALISED resolution.
+  EXPECTED HARD-CHECK COUNT: 28, reconciled BY NAME by the check-count assertion (P-23 / L-52).
   (The last four are HARD on PRESENCE and FORM - they assert that the check ran and that the
   columns exist. None of them adjudicates a value; no cell is admitted or excluded by any of
   them. L-51 is HARD because governance SS1b makes it mandatory, and a selection check that is

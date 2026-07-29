@@ -1,6 +1,6 @@
 {
   "source": "SPDR-018/results/analyst_per_cell_magnitudes.parquet",
-  "source_ci_rule": "SPDR-018 \u00a76.2, verbatim: aggregate to per-calendar-day sufficient statistics; resample day-blocks of {1,3,7} days; minimum block = 1 day = 24 H1 bars >= every horizon in scope; envelope = min/max over blocks x seeds (conservative) with a 5-seed battery; xen.evaluation.block_bootstrap_ci; effective block capped < n (INFR-004 / L-20); emit per-seed bound spreads and per-block sensitivity.",
+  "source_ci_rule": "SPDR-018 \u00a76.2, verbatim: \"aggregate to per-calendar-day sufficient statistics; resample day-blocks of {1,3,7} days; minimum block = 1 day = 24 H1 bars >= every horizon in scope; envelope = min/max over blocks x seeds (conservative), 5-seed battery, xen.evaluation.block_bootstrap_ci, effective block capped < n (INFR-004 / L-20); the reported MDE is the block MDE (SoT \u00a79 M-1). The iid 2.8\u03c3/\u221an form inherited from SPDR-014 is emitted only as a labelled companion column and may not drive a band label.\"",
   "provenance": "COMPUTED from the source emission by xen.resolution_basis; never typed",
   "definition": "c = (block_mde_bps / ((1-p)*L)) * sqrt(n); dimensionless",
   "caveat": "c is comparable only across cells whose CIs used the SAME block rule, block sweep and seed battery. Reusing c under a weaker rule understates uncertainty. Bands whose distinct_n or distinct_groups is small do not support a range claim -- the spread there is noise.",

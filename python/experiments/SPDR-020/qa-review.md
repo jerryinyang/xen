@@ -1910,3 +1910,300 @@ artifacts.
 **Implementation authorisation:** **NO.** The missing resolution predeclaration, incomplete H4/block
 rule, unauthorised L1 estimand departure and undefined HARD tripwire rules would otherwise force the
 developer to invent design decisions.
+
+## QA run 6 — 2026-07-29T04:58:06Z — mode: subagent — HEAD ac6d91c (clean tree)
+
+**Reviewed git state:** `HEAD ac6d91c` ("fix(spdr-019,020): close QA run-5 findings; commit the
+resolution predeclarations"), working tree **clean** — no modified, no untracked files. The three
+`SPDR-020/results/*.json` artifacts, `python/src/xen/resolution_basis.py` and
+`python/tests/test_resolution_basis.py` are now **git-tracked** (`git ls-files` confirms all five).
+
+**Target:** `python/experiments/SPDR-020/design.md` (1,101 lines).
+**Stage:** DESIGN-STAGE. `screen_code/` is absent — expected, not a finding.
+**Independence:** fresh subagent context. This reviewer authored neither the design, nor
+AMENDMENT-16/17, nor any earlier QA run. Runs 4 and 5 were read in full. Every number below was
+re-derived from the parquet/JSON artifacts with my own code before being accepted; where I could not
+reproduce a figure I say so.
+
+**Verdict: REVISE.** One HIGH finding is a genuine implementation blocker.
+
+Findings: **1 HIGH · 1 MEDIUM · 5 LOW.**
+
+**Plain reading.** The AMENDMENT-16/17 remediation is the strongest round this design has had.
+All nine run-5 findings are closed or substantially closed, and I verified each against the
+artifacts rather than against the design's description of them: the expected-resolution
+predeclaration now genuinely exists, is committed, is dated, pins eight SHA-256 values that all
+verify, expands to the complete 1,296-row grain with 1,294 explicit unknowns and no imputation, and
+**regenerates byte-for-byte to the SHA the design pins**. The block rule is now literally verbatim
+SPDR-018 §6.2, the H4 sweep is coherent against the inherited bar horizons, L1 is back inside the
+single-entry protocol, both tripwires carry deterministic count inequalities, the golden traces name
+their policy arms, and the multiplicity count reproduces at every step.
+
+**What still blocks implementation is new and was not raised before.** L4 — the payoff-bearing
+layer, 1,008 of the 1,872 primary cells — introduces **path-dependent exits (dynamic profit target,
+trailing stop) with no fill-resolution rule anywhere in the document.** The parent SPDR-014 resolves
+its stop at the next H1 bar open after touch; sibling SPDR-019 resolves target and trail on M1 bars
+with an explicit adverse-precedence rule and its own AMENDMENT-4. SPDR-020 says only "the SPDR-019
+grid unchanged", which imports the parameter grid, not the mechanics. A developer must invent the
+fill price, the target-vs-trail precedence, the time-exit precedence, gap handling, and the clock
+that resolves them — and no golden trace would catch a wrong choice.
+
+---
+
+### Run-5 closure, re-derived independently
+
+| Run-5 finding | Status | Independent evidence |
+|---|---|---|
+| **R5-01** `expected_resolution.json` absent; predeclaration promissory | **CLOSED** | File exists, is **git-tracked**, `generated_at_utc` `2026-07-29T00:00:00Z`. `row_count` **1,296**, `len(strata)` 1,296, **1,296 unique grain tuples**; grain 3×2×3×3×4×3×2 = 1,296 exactly. **2** rows `KNOWN_PARENT_SIGNED_ARM`, **1,294** `UNKNOWN_NO_PARENT_SIGNED_ARM` with `expected_n` / `n_band` / `c_median` / `expected_mde50` all `null` — no imputation, nothing omitted. `source_sha256` carries six pins; I recomputed **all six** and all six match (`resolution_basis.py` 2489bd5b…, SPDR-014 `expectancy_by_cell` 7427e20e…, `post_event` 8abd40c8…, `zones` c66402f2…, `zvol_scale.json` 3c1046d5…, SPDR-018 `analyst_per_cell_magnitudes` c06c58f5…). `input_sha256` for prior (04f7755b…) and basis (74c4b2b7…) both match the on-disk files. **Regeneration check:** re-running `write_expected_resolution` from the pinned inputs reproduces SHA-256 **`39db9012791d37bd210e1272e0635d5690cf54a121a3a8a7cdfb7acb1b8ac077`** — **identical to the design's §8 pin**. `PYTHONPATH=src pytest -q tests/test_resolution_basis.py` → **9 passed**. The withdrawn "straddles" and "no stratum reaches 0.03" claims do not survive |
+| **R5-02** block rule not verbatim; H4 incoherent | **CLOSED** | SPDR-018 `design.md:247-250` reads: per-calendar-day sufficient statistics · day-blocks `{1,3,7}` · minimum block 1 day = 24 H1 bars ≥ every horizon · min/max envelope over blocks × seeds, 5-seed battery, `xen.evaluation.block_bootstrap_ci`, effective block capped `< n` · block MDE reported, iid `2.8σ/√n` companion-only. §8.1's H1 block reproduces **all five clauses**, and §12's Block-rule row names all five again. H4: `h`={4,12,24} bars on H4 = {16,48,96} hours = max **4 days**; the declared `{4,12,28}`-day sweep has minimum 4 days ≥ 4 days, and is exactly `{1×,3×,7×}` of it. Coherent. §8/§8.1/§12 all forbid H4 consuming the H1 `c` prior. `xen.evaluation.block_bootstrap_ci` imports |
+| **R5-03** L1 violates single-entry protocol | **CLOSED** | §4's L1 row is now "Scale alone, **on the fixed L0 entry** … event keys, breach bar, side and entry fill bit-identical to L0", at the central settings of the L4 devices (`a=2`, `b=1`, `h=12`), **3 paired reads = 6 physical rows already inside L4's 18, adding zero rows**. The §4 "L1 fixed-entry assertion" paragraph forbids changing `z`, band width, event eligibility, event index, side, entry index or entry price, and withdraws the ŝ-conditioned entry arm. This satisfies registered C6 (`cf-voldir-001.md:430ff`, "one fixed entry") and reflection §5.9 ("ŝ used **only** to set parameter magnitudes"). §1.1 prediction 1 ("ŝ-scaling every capture **parameter**") is now tested by the layer it is assigned to. AMENDMENT-16 supersedes -10 and -14 |
+| **R5-04** tripwires lack an implementable pass rule | **CLOSED** | §6.2 TRIPWIRE-1 HARD PASS is now `changed_conditioning_rows > 0` **AND** `event_key_symmetric_difference_count > 0` — two deterministic counts, no magnitude, no CI. TRIPWIRE-2 defines the illegal detector by its window (`[anchor_idx, anchor_idx+H]` inspected at the anchor) and passes on `future_touch_zones > 0` AND `early_entry_count > 0` AND `leaky_event_idx = anchor_idx < legal_event_idx` for **every** counted early entry. The ambiguous "bars after `j`" phrasing is explicitly excluded. Both are executable without developer judgement and neither uses a payoff magnitude (L-24.3 / F06 satisfied) |
+| **R5-05** golden values correct only for unnamed policies | **CLOSED, verified to the digit** | G1 now names **`policy P-MR`**. Re-derived from `post_event.parquet` (ETHUSDT, H1, DESIGN, Z-VOL, z=1.5, H=12, E-TOUCH, h=12, P-MR, first decided event): `anchor_idx` **61**, `event_idx` **61**, `entry_idx` **62**, `exit_idx` **74**, `entry_ts` **2022-07-17T14:00:00Z**, `exit_ts` **2022-07-18T02:00:00Z**, `side` **−1**, `label` **MR**, `exit_reason` **time**, `r_h` **−157.37141148**. The same event under P-MOMO carries `exit_reason` `stop` and under P-NONE `NaN`, so naming P-MR is what makes the assertion unambiguous. G2 now names **`policy P-NONE`**: `p_event` **0.994872** (`n_events` 194) DESIGN and **1.000000** (249) CONFIRM reproduce exactly and **only** on the P-NONE rows |
+| **R5-06** ~13,000 omits a declared axis | **CLOSED, arithmetic reproduces** | Base points `z`(4)×`h`(3)×event(3)×side(2) = **72**. Non-L4 = L0 1 + L2 5 + L3 2 + L5 ≤4 = **12** → **864**. L1 adds **0** physical rows (R5-03). L4 = (target 6 + trail 4 + sizing 2) × 72 = 864, plus hold 6 × 24 `h`-free points = 144 → **1,008**. Primary = **1,872**. Declared expansion clock(2)×source(3)×H(3) = **18** → **1,872 × 18 = 33,696**, as printed. The count fell from 2,160 because AMENDMENT-16 removed L1's four rows per base point (4 × 72 = 288) |
+| **R5-07** predeclared/realised is an audit, not the protection | **PARTIALLY CLOSED** | First half done: §8:685-690 and §9:769-774 now state that inference and every aggregate use the **realised** CI/MDE only, that the comparison referees nothing, and that the operative protections are the same-row realised CI/MDE, the aggregate-resolution requirement and the ban on negative-by-omission. Second half **not** done — see finding 4 |
+| **R5-08** stale indexes / registry wording | **CLOSED** | `python/experiments/INDEX.md:41` no longer carries "20–45k"; it states the parity anchor's known counts (P-MOMO 15,041; P-MR 15,331) and that every other declared base stratum is explicitly unknown until measured. `docs/experiments-docs/INDEX.md:8,91` now says the designs are complete. `docs/signal-registry/candidate-families/cf-voldir-001.md:135` and its dated **2026-07-29 HYP-D7 WORDING CLARIFICATION** replace "with a band that actually selects" with the executable requirement that selectivity is measured and reported, `p_event` a covariate that "may never admit, exclude, weight, label or rank a cell". No prohibited-filter reading of the registry survives |
+| **R5-09** stale ledger tally | **CLOSED** | Counted all **17** rows by their own labels: LOOSER {1, 2, 15}=3, TIGHTER {5, 6, 8, 9, 10, 11, 12, 13, 16, 17}=10, NEUTRAL {3, 4, 7, 14}=4 → **3/10/4**, exactly as printed. Removing the four superseded rows (8 by 13, 10 and 14 by 16, 15 by 17) leaves 13 rows: **2 looser / 8 tighter / 3 neutral**, exactly as printed. AMENDMENT-8 now carries "**SUPERSEDED by AMENDMENT-13**". "six tightenings" is gone. The L-23 final-set false-qualifier expectation is stated as **N/A / zero machine qualifiers** with its reason (C7 removed every machine qualification field). Residual: see finding 5 |
+
+**Standing execution blockers.** AMENDMENT-15's blocker is **genuinely discharged**, not merely
+declared discharged: §4.1 now pre-declares the phase-(b) trigger *before* phase (a) runs, as a stated
+condition on the (a) reads — exactly the form registered AMENDMENT-C6 and reflection §5.9.1's
+"Trigger" row require ("Pre-declared **before phase (a) runs**, in the design, as a stated condition
+on the (a) reads"). It uses only the §9 CI-relative vocabulary (`ci_low > 0`), introduces **no
+magnitude**, drops no cell, and admits/excludes/labels/ranks nothing — so it does not reintroduce an
+INFR-016 / L-32 value gate: it is a stopping rule on a **phase**, not a machine verdict on a cell,
+and INFR-016's "machines gate integrity only" is intact. §4.1 keeps the scope protection (phase (a)
+may not shrink phase (b)) and states the condition is necessary-not-sufficient, preserving operator
+authority. **One standing execution blocker remains: `reflection-inputs.md` §9 is unsigned.** It
+blocks execution, not implementation.
+
+---
+
+### Independent numeric audit
+
+Every figure below was recomputed; none was taken from the design or from an earlier run.
+
+| Quantity | Design says | Re-derived |
+|---|---|---|
+| Parent signed arms, `Z-VOL/H1/H=12/h=12/z=1.5/E-TOUCH` | 15,041 / 15,331 | **15,041 / 15,331** — and every other `(z, event_type)` at that filter is P-NONE only, exactly as §8's table states |
+| Parent unsigned counts at the same filter | 6,861 / 6,484 / 4,485; others 4,284–6,994 | **6,861 / 6,484 / 4,485**; `z`∈{1.0, 2.0} span **4,284–6,994**. All nine reproduce, and match `expected_resolution_prior.json`'s `parent_population_evidence` row for row |
+| Band assignment of the two known arms | both in the **15,000+** band | **Correct.** `_band_for_n` uses `lo < n ≤ hi`; 15,041 and 15,331 both fall in `15,000-inf`, not the 5k–15k band. No "straddle" |
+| `c_median` of the 15,000+ band | (not typed; artifact) | **11.303596531036092** — reproduced from the parquet independently of the module |
+| `expected_mde50` for the two arms | (artifact) | 11.3036/√15,041 = **0.0921676**; 11.3036/√15,331 = **0.0912917** — both match the artifact exactly |
+| 15,000+ band thinness | 26 rows, 8 distinct `n`, 3 bases, IQR `c` 8.36–12.09 | **26 rows, 8 distinct `n` (15,041 / 15,331 / 18,339 / 19,383 / 19,942 / 20,279 / 20,572 / 20,977), `distinct_groups` 3, p25 8.3628, p75 12.0899** |
+| Arm-C basis population | **18,632** cells | **18,479.** The pinned artifact's own `row_counts` says source 24,098 → arm-C filter 18,988 → excluded 509 (all `missing_required_value`) → **retained 18,479**, and my recomputation gives 18,988 / 509 / 18,479 and band counts 8,111 / 7,150 / 2,791 / 401 / 26 summing to 18,479. **See finding 3** |
+| Cells reaching 0.03 | 0, other than three degenerate `n`=2, `p`=0 cells | **Exactly 3**, all `n`=2, `p`=0, `mde_log` 0.010148 / 0.011893 / 0.015225. Substance correct; only the denominator is stale |
+| `n ≥ 10,000` arm-C realised resolution | 0.053–0.107 | **41 cells, 0.05343–0.10680** |
+| Three largest cells | 0.073–0.094 | `n` 20,977 / 20,572 / 20,279 → **0.07271–0.09447** at every horizon |
+| Zones by `z` | 234,785 / 261,305 / 253,366 | **exact** |
+| Post-event rows by `z` | 190,467 / 211,872 / 158,313 | **exact** |
+| `s_symbol` | BTC 6384.3 · ETH 6547.2 · SOL 6215.6; range ~4,606–7,338; 17 finite / 8 NaN | **6384.32135 / 6547.22311 / 6215.59765**; min INJUSDT **4606.417**, max LINKUSDT **7338.341**; **17 finite, 8 NaN** and the eight are exactly ORDI, TIA, BIGTIME, 1000PEPE, SEI, WLD, PYTH, 1000RATS |
+| SPDR-018 priors (§1, §2.3, §6, §9) | 121 cells @ 7.87 bps vs 0/927 · p 0.467, W 142.1, L 124.5, W/L 1.136 · 0.0007 from gross BE · side-derangement −12.221 @ pct 0.0065, ~2.4 null sd · C7 2,714 pairs, 44.14%, 6.63%, 0.33 bps · median log R −0.0301 | **All verified** against `SPDR-018/report.md:61,87,91,108,109,154,157,189` and `analysis.md:290,311,419-430,553,559` |
+| §1.1 / §4 reflection citations | 5.3× powered `W/L`; W/L moves <~0.3 under selection (V21); 51–62% agreement (V9/V10); ~1/5.6 σ̂ ratio (V28); E-TOUCH > E-HORIZON > E-CLOSE ≈3–4 bps, ~1/5 on cTrader (V27) | **All faithful.** V25 [P] span is 5.3× (0.998→5.25) — the reflection explicitly says "the powered statement is the one to carry", so 5.3× is the correct figure and the governance file's 36–67× is the [U] descriptive span. V21 W/L 1.10→1.40 = 0.30. V9 51–62%. V28 73.00/13.03 = 5.60. V27 exact |
+| σ̂-unit plant conversions | 0.068 / 0.137 / 0.274 / 0.548 at σ̂ = 73.00 | 5/73 = 0.06849, 10/73 = 0.13699, 20/73 = 0.27397, 40/73 = 0.54795 — **all four correct to the printed digit** |
+| L4 device grid (via SPDR-019 §4.2) | target 3+3, trail 2+2, hold 3+3, sizing 1+1 = 18 | SPDR-019 `design.md:237-240`: `a ∈ {1,2,3}`, `b ∈ {1,2}`, sizing 1 — so 6 + 4 + 2 = 12, plus hold 6 = **18**. L1's named central settings `a=2` (middle of {1,2,3}), `b=1`, `h=12` are all inside the grid |
+| Fences / pins | TRAIN `2021-06-29T06:53Z → 2023-12-18T00:00Z`; DESIGN/CONFIRM split at 2023-03-01; holdout 2025-01-08 | Match SPDR-018 `design.md:421-422` and `dataset-reference.md:158`. `cf-voldir-001-universe.json` exists, `top_n` 25, band TRAIN, asof 2023-12-18 |
+
+---
+
+### Findings
+
+#### QA6-01 — HIGH — L4's path-dependent exits have no fill-resolution rule anywhere in the design
+
+**Fails:** §3:198 (*"exit at the variant's exit rule"* — undefined for L4); §4 L4 row (lines 237,
+240–242, *"**L4 device grid** is the SPDR-019 grid unchanged (dynamic target, trailing stop, holding
+period, sizing)"*); §11 G1–G7 (no trace covers a target or trail fill); §12 Causality row (asserts
+only `exit open[entry+h]`, the time exit); §6.1 L-24.2, which makes every derangement seed re-run
+"UNDER THE SAME EXIT RULE" — a rule that does not exist cannot be matched; design-requirements §1
+(the P&L-bearing object) and §7 (golden trace).
+
+L4 is 1,008 of the 1,872 primary cells and is the layer the entire mechanism claim in §1.1 rests on
+("the exit boundaries are placed as multiples of that *conditional* forecast"). Introducing a
+dynamic profit target and a trailing stop onto an object whose parent exits only at
+`open[entry + h]` requires, at minimum:
+
+1. **the fill price** when a bar trades through the boundary, and the gap case (bar *opens* beyond
+   it);
+2. **precedence when target and trail are both reachable inside the same bar** — SPDR-019 mandates
+   the **adverse** branch precisely because assuming the favourable ordering manufactures edge;
+3. **precedence against the time exit**;
+4. **the clock the boundary is monitored on.** §10 Scope declares **H1 primary / H4 co-report** and
+   no M1 catalog, so an M1-resolved fill is not even in scope as written;
+5. **the trail's ratchet cadence** (per bar on close, or intra-bar).
+
+The document answers none of these, and the two candidate parents disagree: **SPDR-014**
+(`design.md:243`) resolves its stop as *"adverse excursion ≥ 1.5 × ATR(14) Wilder H1 at entry−1 →
+exit **next bar open** after touch"*, while **SPDR-019** (`design.md:130-134`, and its own
+AMENDMENT-4 written specifically for this) fills **at the boundary price on M1 bars** with adverse
+precedence. "The SPDR-019 grid unchanged" imports the *parameter grid*; it does not import mechanics
+that SPDR-019 states in a different section. §7 additionally forbids Wilder ATR for exit boundaries,
+so the SPDR-014 convention cannot be inherited wholesale either.
+
+This is the exact class the QA skill flags as a shipped failure shape ("an exit that never updates";
+"a reference that moves when the design says fixed"), and it is the one seam in this design that
+still forces the developer to invent a design decision. It is also un-checkable: no golden trace
+would expose a wrong choice, and no §12 assertion constrains it.
+
+**Required fix (quant-designer).** Add an exit-fill resolution block to §2 or §4 stating, verbatim
+and per device: fill price on trade-through, fill price on gap-through, target-vs-trail precedence
+(declare the adverse branch), precedence against the time exit, the ratchet cadence, and the clock
+and bar granularity on which boundaries are monitored — with §10 Scope updated if a sub-H1 series is
+required. Add one golden trace (a G8) on an episode where target and trail are both reachable in the
+same bar, with the hand-derived fill price and `r` in bps, and a §12 causality row asserting that no
+post-fill bar information is used. Record it as an amendment with its L-23 direction.
+
+#### QA6-02 — MEDIUM — 10 of §12's 29 checks are in neither the HARD nor the INFORMATIVE list, and the expected HARD-check count is never stated
+
+**Fails:** §12 table (lines 859–889) vs the HARD/INFORMATIVE block (lines 891–905); §12's own
+first row (*"the self-check asserts the **expected NUMBER** of HARD checks and reconciles them **by
+name** against this table"*, P-23 / L-52); design-requirements §8 (integrity-vs-informative split).
+
+The table carries **29** check rows. The HARD block names **21** items. The INFORMATIVE block names
+only *quantities* the operator judges (effect sizes, control percentiles, collapse fraction, band
+label, `p_event`, dose-response, κ, cost overlay, heterogeneity statistic, event-type ordering) — not
+checks. That leaves **10 table rows with no declared class**:
+
+`p_event` emitted · MDE column (M-1 block form) · M-4 effective coverage · Ladder plant operator ·
+**No adequacy flag** · Ladder emitted · Span disclosure (M-2) · Episode exclusivity · No local
+accounting · Code hash.
+
+Two of these are the design's own headline protections: the **"No adequacy flag"** assertion is the
+operative AMENDMENT-C7 guarantee, and the **`p_event` emitted / never-filters** assertion is the
+operative INFR-016 guarantee. `No local accounting` is a hard lane rule
+(`spdr-lane.md` integrity boundary; `check_no_local_accounting` exists at
+`python/src/xen/estimand_validation.py:387`). Leaving their blocking class undeclared means the
+developer decides whether a failure invalidates the emission — and, because the check-count
+reconciliation is itself HARD and must reconcile "by name against this table", the developer cannot
+even compute the expected number unambiguously (21? 29? something between?).
+
+**Required fix (quant-designer).** Assign every §12 table row to HARD or INFORMATIVE explicitly, and
+state the expected HARD-check count as a literal number in §12 so the reconciliation has a
+predeclared target. `No adequacy flag`, `p_event` non-application and `No local accounting` should be
+HARD on presence and form, on the same basis §12 already gives for L-51 ("a check that is silently
+skipped is indistinguishable from one that passed").
+
+#### QA6-03 — LOW — §8's "18,632 arm-C cells" contradicts the artifact the same section pins
+
+**Fails:** §8:539 (*"**0 of 18,632 arm-C cells** reach 0.03"*); §8:503-504 (*"**No resolution figure
+is typed into this document.** Every one is computed by `xen.resolution_basis` … and pinned to
+`results/resolution_basis.json`"*).
+
+`resolution_basis.json`'s own `row_counts` — added in this very commit to make the population
+checkable — reads source 24,098 → arm-C filter matched **18,988** → excluded **509** → retained
+**18,479**, and its band cells (8,111 + 7,150 + 2,791 + 401 + 26) sum to **18,479**. I reproduce all
+of it independently. **18,632** is a stale figure from the pre-filter era and reproduces on no filter
+I can construct. The substantive claim is unaffected (exactly 3 cells reach 0.03, all `n`=2, `p`=0),
+but §8's population arithmetic has been the blocking defect at three prior reviews, so a live number
+that its own pinned artifact contradicts should not stand.
+
+**Required fix.** Replace `18,632` with `18,479`, or state the count by reference to
+`resolution_basis.json` `row_counts.retained` rather than typing it.
+
+#### QA6-04 — LOW — R5-07 residue: nothing requires the predeclared-vs-realised gap to be read
+
+**Fails:** §13:927 (the aggregate-disclosure refusal requires median `mde50` and the count below each
+rung, but **not** the predeclared-vs-realised gap); §15:1101 (`analysis.md` carries no such
+requirement); §8:688-692.
+
+Run 4 (F4-08) and run 5 (R5-07) both asked for the same one-clause wiring. The design implemented the
+half that costs nothing to state (inference and aggregates use realised CI/MDE only) and argued in
+§9:769-774 why the comparison is a calibration audit rather than a referee — which I accept as
+sound and correctly reasoned. But the instrument still has no reader: `analysis.md` is the binding
+read, and nothing obliges it to report the signed `(realised − expected)` distribution the emission
+now carries on every row.
+
+**Required fix, no threshold.** Add to §13 (or §15's `analysis.md` row) that the fresh-context
+analyst must report the signed predeclared-minus-realised `mde50` distribution for the strata any
+aggregate spans. It admits, excludes, labels and ranks nothing.
+
+#### QA6-05 — LOW — the ≥3 one-directional TIGHTER streak is not flagged, as L-23 requires
+
+**Fails:** §14:1063-1069; L-23 clause 3 (`lessons-and-amendments.md:575`, *"A one-directional streak
+≥3 is an explicit flag to the operator at the execution gate"*); design-requirements §12.
+
+The L-23 note flags only the two LOOSER rows. AMENDMENTS 8–13 are **six consecutive TIGHTER** rows
+(and the active tally is 8 tighter), which is a one-directional streak ≥3 and is flagged nowhere.
+L-23 does not exempt the conservative direction. Run 4 raised this as "worth a line at the gate"; it
+is still absent.
+
+**Required fix.** Add one line to §14's L-23 note recording the tighter streak and its length, for
+the operator at the execution gate.
+
+#### QA6-06 — LOW — AMENDMENT-11 is an active row carrying two counts the design has withdrawn
+
+**Fails:** §14:1000-1009 (*"count the cell grid out rather than capping it (**~2,160 primary,
+~13,000** including declared co-reports …)"*) vs §10:797 (*"Primary maximum = **1,872** cells …
+**33,696**"*) and §10's own parenthetical (*"the withdrawn '≈13,000'"*).
+
+AMENDMENT-16 supersedes only -10 and -14. AMENDMENT-11 therefore remains an **active** ledger row
+whose text states a primary count (2,160) that AMENDMENT-16 changed and a co-report count (~13,000)
+that §10 explicitly withdraws. Every other superseded row in this ledger carries an explicit
+supersession note; this one does not.
+
+**Required fix.** Add to AMENDMENT-11 a line noting that its cell counts are superseded by
+AMENDMENT-16 (1,872 primary / 33,696 with co-reports), leaving its other content active.
+
+#### QA6-07 — LOW — the in-force amendment list still carries C6 and C7 without noting the `NOT_RESOLVABLE` conflict
+
+**Fails:** §14:1072-1076; registered C6 (`cf-voldir-001.md:441-443`, *"a grid that cannot resolve the
+interaction is booked `NOT_RESOLVABLE` rather than run and explained"*) vs C7 (*"**no `powered` /
+`unpowered` / `at_target` / `NOT_RESOLVABLE` flag is emitted anywhere**"*).
+
+The design follows C7, which is later and correct, and §12 asserts the absence of the flag as a
+check. But the in-force list presents both amendments as jointly binding with no note that C7
+supersedes C6 on this one clause. Carried unclosed from run 4 (F4-16); run 5 did not re-raise it.
+
+**Required fix.** One clause in §14's in-force list: C7 supersedes C6's `NOT_RESOLVABLE` booking
+requirement; an unresolvable phase-(b) grid is reported through the resolution ladder instead.
+
+---
+
+### Checks independently verified clean
+
+| Check | Result |
+|---|---|
+| **Predeclaration integrity (the run-5 centrepiece)** | **CLEAN and strong.** Complete 1,296-row grain, dated, 8 SHA-256 pins all verified, byte-reproducible to the design's stated hash, 1,294 explicit `UNKNOWN_NO_PARENT_SIGNED_ARM` nulls, zero imputation, generator unit-tested (9 passing). The chain design → `expected_resolution.json` → `input_sha256` → prior + basis → `generator_sha256` + `source_sha256` closes end to end |
+| **Phase-(b) trigger vs C6 / §5.9.1 / INFR-016** | **CLEAN.** Pre-declared before (a), stated on the (a) reads, CI-relative only, no magnitude, no cell dropped, necessary-not-sufficient with operator authority retained. Scope remains fixed and complete with individually-flat layers retained; estimand is the interaction. AMENDMENT-15's execution blocker is genuinely discharged |
+| **Exact mirror, slope 1** | **CLEAN.** `log R = log(W/L) − log((1−p)/p)` in §1 DERIVED, §5, §12, G5, G6, §13. `0.9408` appears zero times; the fitted-slope form is refused as a target in §5, is a HARD failure in §12, is refused in §13, and G6 asserts slope 1 |
+| **Cost isolation (AMENDMENT-C5)** | **CLEAN.** Header NOTE, §5 `DISCLOSED REFERENCE ONLY`, §7 cost-floor line, §12 HARD row, §13 first bullet, §15 column flag. `p_be_net` is disclosure-only everywhere; no threshold, band or comparison uses cost |
+| **No adequacy flag / no canonical threshold** | **CLEAN.** Ladder `{0.02, 0.03, 0.05, 0.075, 0.10, 0.15}` matches C7's registered set exactly; `mde50/mde80/mde95` are three points of one curve; the invented 20-hour block is gone and no replacement picked number survives. Every remaining use of "powered" is a historical reference to SPDR-018 |
+| **`p_event` quarantine** | **CLEAN.** Swept every occurrence (§2.2, §5, §8, §9, §10, §11 G2, §12, §13, §15): covariate and dose-response axis only; §12 asserts non-application; G2(c) exists to prove no code path applies it; §13 refuses any selectivity gate. Registry now matches |
+| **Parent fidelity** | **CLEAN.** §2.1's grammar table faithful row by row; **5 bps deadband** governs `p` in §3 (not `r == 0`); **UNDECIDED** rule in §2.1, §3's exclusion clause and a §12 HARD row; parity tolerance `|Δ| ≤ 1e-9` declared on `mean_r_h`, `p_momo`, `p_mr`, `n_decided` — **all four columns exist** in `expectancy_by_cell.parquet`, and SPDR-018 achieved 9.1e-13 on the same arm-C object |
+| **L-28 derangements** | **CLEAN.** Both permutation controls declare `DERANGEMENT (zero fixed points, asserted and counted)`; §12 asserts a measured fixed-point count of 0; the two matched comparators correctly declare `N/A` |
+| **L-21 / P-15 unit pin** | **CLEAN and exact.** `sigma_bps = s_symbol × EWMA_park`; EWMA alone declared dimensionless; `zvol_scale.json` named as the read source; 17/25 coverage with the 8 NaN symbols named exactly; Wilder ATR explicitly excluded from every exit boundary with the EXP-025 rationale |
+| **L-50 / P-21 portability** | **CLEAN.** All bands and rungs dimensionless; plant curves in σ̂ as well as bps, re-derived per universe at run; no absolute-bps bar crosses a universe |
+| **P-24 comparator disclosure** | **CLEAN.** All three comparator blocks carry own mean, null quantiles and plant curve with every percentile; a bare percentile is refused; the SPDR-018 priors are labelled as priors |
+| **L-24 (three clauses)** | **CLEAN.** Thirds stability reported-not-gated; exit-matched nulls declared (though see QA6-01 — the exit rule they must match is undefined); tripwire thresholds structural, not effect-size |
+| **L-51 vs INFR-016** | **CLEAN.** HARD on presence/form only, re-anchored to every reported selected subset, no statistic carries a pass value, nothing is gated. `chapter-06-governance.md:99-100` makes it mandatory |
+| **M-1 / M-2 / M-4 / M-5** | **CLEAN.** Block MDE is the reported form with iid as a labelled companion; span disclosure present; effective coverage over 17 not 25; collapse fraction disclosure-only near a zero mean and absent from the HARD list |
+| **B-1 / B-4 / B-6 / B-8 / B-9** | **CLEAN.** Point-null disjointness argued explicitly rather than omitted; conditioning at the breach bar; three event types kept as separate commitment states and never pooled; episode-level `p`, `W`, `L`; one open episode per symbol with suppression counted |
+| **Bands partition** | **CLEAN.** `ci_low > 0` / spans 0 / `ci_high < 0` is exhaustive, mutually exclusive, magnitude-free; POOLED reverts to the `spdr-lane.md` disclosure-only default if homogeneity does not support it |
+| **Declaration blocks (design-requirements §1–§13)** | **PRESENT.** Mechanism + DERIVED, OBJECT-IDENTITY, five control blocks with validity proofs, two tripwires, bands, resolution (C7-substituted power), golden traces, hard/informative split (but see QA6-02), CONVERSION-PIN, SPREAD-COST-DISCLOSURE (all five fields verbatim + the C5 note), amendment ledger, L-24 battery clauses |
+| **Artifact map internal consistency** | **CLEAN.** §15 covers every file §8, §11 and §12 name; no orphan in either direction; `resolution_basis.py`, `resolution_basis.json`, `expected_resolution_prior.json` and `expected_resolution.json` are all listed |
+| **Holdout / XENA / TEST / family action** | **CLEAN.** Holdout `2025-01-08` matches `dataset-reference.md:158` and is never queried; §12 asserts zero queries at or after it; TRAIN fence matches SPDR-018 exactly; §13 refuses family status change, XENA, TEST and holdout contact; header declares execution unauthorised |
+| `check_no_local_accounting` | **DEFERRED** to post-implementation QA; the function exists at `estimand_validation.py:387`; §12 declares the check (unclassified — QA6-02) |
+| **Golden-trace diff** | **Design-stage only.** No code or smoke emission exists to diff. G1 and G2 are now falsifiable before the run and both reproduce exactly against the named artifacts with their policy keys. G3, G4, G5, G6, G7 are executable as written. **No trace covers an L4 target/trail fill (QA6-01)** |
+
+---
+
+### Verdict and routing
+
+**REVISE.** All findings route to **`quant-designer`**; no implementation exists.
+
+**Nothing rises to REJECT.** No holdout contact, no causality violation, no missing tripwire, no cost
+smuggling, no fitted-slope target, no `p_event` application, no unapproved silent deviation, and — for
+the first time in this design's history — no false or unreproducible resolution arithmetic in the
+artifacts. The predeclaration chain, the `p_event` quarantine, the unit pin, the parent-fidelity
+restorations and the restored C6 trigger are all sound.
+
+**Standing execution blockers:** one — `reflection-inputs.md` §9 remains unsigned. It blocks
+execution, not implementation. AMENDMENT-15's blocker is discharged.
+
+**FAILING_ARTIFACT:** `python/experiments/SPDR-020/design.md` (§3, §4, §11, §12, §13, §14).
+**REQUIRED_SKILL:** `quant-designer`.
+**Implementation authorisation:** **NO.** QA6-01 alone blocks it: the L4 capture devices — the layer
+the whole experiment is about — have no exit-fill resolution rule, so the developer would have to
+invent the fill price, the target-vs-trail precedence, the time-exit precedence, the ratchet cadence
+and the monitoring clock, with no golden trace or integrity check able to catch a wrong choice.
+QA6-02 compounds it by leaving the blocking class of ten integrity checks undeclared. The remaining
+five findings are corrections to prose and to the ledger and do not, on their own, block
+implementation.
