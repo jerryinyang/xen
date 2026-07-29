@@ -268,6 +268,39 @@ with block CIs, its MDE in log units, its evidence class, its `p_event`, and its
 sizing), with holds bounded by the parent's frozen `h ∈ {4, 12, 24}` rather than by regime run-length
 — because this object's horizon is inherited, not chosen.
 
+**L4 source-to-boundary provenance (QA8-10 clarification).** The mechanism in §1/§1.1 selects
+the source-specific interpretation: a `Z-MAG` or `Z-MAG-SENS` co-report does **not** reuse a
+`Z-VOL` exit boundary. For the same causal origin `t0` that set the event band, freeze:
+
+```
+q_ZVOL(t0)     = s_symbol * EWMA_park(t0)                         # bps per H1 hour
+q_ZMAG(t0)     = max(ridge_next_swing_mag_bps(t0), 1.0)           # bps per next swing
+q_ZMAG-SENS(t0)= q_ZMAG(t0) / 2                                  # mandatory sensitivity source
+
+G_ZVOL(q, h) = q * sqrt(h_hours)                                  # h_hours on H1/H4
+G_ZMAG(q, h) = G_ZMAG-SENS(q, h) = q                              # already a next-swing magnitude
+qbar_S       = TRAIN median of q_S over eligible decision-clock origins, per symbol and clock
+```
+
+`EWMA_park` keeps §2.1's `lambda=0.94`, 60-bar warm-up and frozen
+`SPDR-014/results/zvol_scale.json` pin. `ridge_next_swing_mag_bps` is SPDR-014 §2.2's frozen
+causal object: H1 Wilder ATR(14)[t-1], ZigZag reversal `2.0 * ATR`, features
+`{magnitude_bps,direction,angle_bps_per_bar,path_noise_atr,bars_in_swing}`, ridge `alpha=1.0`,
+minimum 20 confirmed swings, and the forecast held from a swing's confirmation until the next;
+no usable confirmed-swing forecast means ineligible.
+
+For source `S`, target distance is `a * G_S(qbar_S,h)` (UNMOD) versus
+`a * G_S(q_S(t0),h)` (MOD), `a ∈ {1,2,3}`; target price is
+`entry_price * (1 + trade_side * distance_bps / 1e4)`. Trail width uses the identical pair with
+`b ∈ {1,2}` and the §2.2a ratchet/fill rule. Size uses `1` (UNMOD) versus
+`clip(qbar_S / q_S(t0), 0.25, 4)` (MOD); horizon scaling cancels in this ratio. Hold rows use the
+§4 hold rule and have no forecast-set price boundary. Every L4 row emits `cell_source`,
+`forecast_origin_t0`, `forecast_value_bps`, `forecast_median_bps`, and `boundary_source`:
+`S` for target/trail, `NONE_TIME_EXIT` for hold, `NONE` for size. A missing source value makes
+that source/device row ineligible with a count; it may never fall back to `Z-VOL`. Thus comparison
+source is merely reported only where the device has no forecast-set price boundary; target/trail
+boundaries and size modulation remain source-specific.
+
 **L1 fixed-entry assertion.** L1 may change only the capture parameter named by the pair. It may
 not alter `z`, band width, event eligibility, event index, side, entry index or entry price. The
 three paired reads are the central target, trail and hold rows of L4, so L1 tests prediction 1
@@ -1128,9 +1161,17 @@ AMENDMENT-18: specify L4 exit fill resolution (SS2.2a: M1 target/trail fills, ra
     classified; no cell is admitted or excluded)
   - QA run 6.
 
-historical row count: 3 looser / 11 tighter / 4 neutral
+AMENDMENT-19: make L4 source-to-boundary provenance explicit: Z-VOL, Z-MAG and Z-MAG-SENS
+  target/trail boundaries and size modulation use their own frozen causal forecast object; hold
+  and size rows explicitly declare that they have no forecast-set price boundary; missing source
+  values never fall back to Z-VOL.
+  - DIRECTION: NEUTRAL (clarifies the mechanism and formulas already required by §1/§1.1; no
+    entry, estimand, population, device, parameter or claim boundary changes)
+  - QA run 8 remediation (QA8-10).
+
+historical row count: 3 looser / 11 tighter / 5 neutral
 ACTIVE rows after supersessions (AMENDMENT-8 by -13, -10 and -14 by -16, -15 by -17):
-2 looser / 9 tighter / 3 neutral.
+2 looser / 9 tighter / 4 neutral.
 L-23 STREAK FLAG (clause 3, and it applies to the conservative direction too): AMENDMENTS 8-13
 are SIX consecutive TIGHTER rows, and 16-18 add three more. A one-directional streak is flagged
 for the operator at the execution gate regardless of its sign - a design that only ever tightens

@@ -2465,3 +2465,882 @@ unreproducible arithmetic.
 **REQUIRED_SKILL:** `quant-designer` for QA7-01 through QA7-04 (all small, all mechanical);
 `experiment-developer` may proceed in parallel.
 **Implementation authorisation:** **YES.** `screen_code/` may begin.
+
+## QA Run 8 — 2026-07-29T11:30:01Z — implementation review
+
+**Mode:** independent fresh-context subagent.
+**Verdict:** **REJECT**
+**Execution authorisation:** **NO.** Do not run the SPDR-020 screen, TEST, or holdout until the
+blocking findings below are fixed and a fresh QA review approves the implementation.
+
+### Review identity and repository state
+
+- Reviewed commit: `a41cb7ce1c71f77faebf011234b3e1aa9bf9589d`
+  (`docs: reconcile checkpoint-018 to programme-wide no-spread rule`).
+- The reviewer read the design before the prior QA record, then read all seven prior QA runs,
+  the complete implementation, imported shared code, and the emitted developer-smoke artifacts.
+- This QA did not run `run_screen.py`, a backtest, TEST, or holdout. It performed only static
+  inspection, compilation, existing unit tests, and read-only artifact checks.
+- The implementation and result artifacts were untracked at review time. The exact pre-review
+  dirty-file list was:
+
+```text
+ M python/experiments/SPDR-019/qa-review.md
+?? python/experiments/SPDR-019/screen_code/catalog_io.py
+?? python/experiments/SPDR-019/screen_code/config.py
+?? python/experiments/SPDR-019/screen_code/controls.py
+?? python/experiments/SPDR-019/screen_code/engine.py
+?? python/experiments/SPDR-019/screen_code/entry.py
+?? python/experiments/SPDR-019/screen_code/fills.py
+?? python/experiments/SPDR-019/screen_code/golden.py
+?? python/experiments/SPDR-019/screen_code/indicators.py
+?? python/experiments/SPDR-019/screen_code/metrics.py
+?? python/experiments/SPDR-019/screen_code/panel.py
+?? python/experiments/SPDR-019/screen_code/parent_gates.py
+?? python/experiments/SPDR-019/screen_code/run_screen.py
+?? python/experiments/SPDR-019/screen_code/selection.py
+?? python/experiments/SPDR-019/screen_code/selfcheck.py
+?? python/experiments/SPDR-020/results/controls.json
+?? python/experiments/SPDR-020/results/golden_traces.json
+?? python/experiments/SPDR-020/results/integrity_selfcheck.json
+?? python/experiments/SPDR-020/results/parent_parity.json
+?? python/experiments/SPDR-020/results/run_summary.json
+?? python/experiments/SPDR-020/results/selection_check.json
+?? python/experiments/SPDR-020/results/unit_pin.json
+?? python/experiments/SPDR-020/screen_code/catalog_io.py
+?? python/experiments/SPDR-020/screen_code/config.py
+?? python/experiments/SPDR-020/screen_code/controls.py
+?? python/experiments/SPDR-020/screen_code/event_engine.py
+?? python/experiments/SPDR-020/screen_code/fills_bridge.py
+?? python/experiments/SPDR-020/screen_code/golden.py
+?? python/experiments/SPDR-020/screen_code/indicators.py
+?? python/experiments/SPDR-020/screen_code/layers.py
+?? python/experiments/SPDR-020/screen_code/metrics.py
+?? python/experiments/SPDR-020/screen_code/parent_parity.py
+?? python/experiments/SPDR-020/screen_code/prepare.py
+?? python/experiments/SPDR-020/screen_code/run_screen.py
+?? python/experiments/SPDR-020/screen_code/selection.py
+?? python/experiments/SPDR-020/screen_code/selfcheck.py
+```
+
+The ignored SPDR-020 parquet outputs were also inspected. They are developer-smoke outputs, not
+execution evidence: two symbols, 50 bootstrap replicates, one horizon/source/event slice, and
+`smoke=true`.
+
+### Clause-by-clause design-to-code trace
+
+| Design obligation | Implementation trace and evidence | Result |
+|---|---|---|
+| TRAIN-only minute input; no TEST/holdout contact | `catalog_io.load_minute_bars` fences reads to `[DESIGN_START, CONFIRM_END)` and labels them TRAIN. No TEST/holdout query was found. | PASS |
+| Frozen 25-symbol universe and parent source | `catalog_io.py`, `config.py`, and `parent_parity.py` load the declared catalog and parent artifacts. However, CLI `--symbols` permits arbitrary subsets and the self-check does not require all 25 symbols. | FAIL |
+| Parent-parity cell must reproduce the parent | `parent_parity.py` compares the symbols actually run. The smoke output matches BTC/ETH exactly, but it proves only 2/25 symbols and does not enforce the required count. | PARTIAL |
+| Causal band construction and event assignment | `indicators.py`, `event_engine.py`, and `prepare.py` use lagged state and fenced TRAIN bars. Static review found no forward read in the ordinary event path. | PASS, subject to missing tripwire below |
+| `p_event` is reporting-only and computed for every band/cell | No direct `p_event` filter was found. But `layers.run_grid_for_pack` computes one full-TRAIN value, attaches it to every episode, and `_score_cells` takes the first episode's value instead of recomputing a pooled cell statistic. Smoke evidence: one cell reports `0.9932735` for DESIGN, CONFIRM, and pooled, while coverage counts imply approximately `0.997449`, `0.993976`, and `0.995506`. | FAIL |
+| UNDECIDED count is reported for every cell | The same first-episode/full-TRAIN attachment is used for `n_undecided`; the self-check then sums repeated episode fields. It is not a per-cell band statistic. | FAIL |
+| L0 baseline and declared entry types | L0/E-TOUCH is implemented and the ordinary fill resolver follows causal, adverse-first tie handling. Other event types exist in code but were not exercised by the smoke. | PARTIAL |
+| L1 structural filters and paired effect versus L0 | Filters are present, but `metrics.delta_logR` subtracts marginal point estimates and constructs a “CI” from marginal CI widths. It is not the required paired calendar-block bootstrap. | FAIL |
+| L2 selection and interaction effect | Selection paths exist. `_add_interaction_rows` subtracts already-aggregated deltas and adds marginal widths; it does not bootstrap the interaction on paired resamples. | FAIL |
+| L3 side/forecast stratification | The layer exists, but selection diagnostics compare selected rows with the full L0 base rather than each selected row's own complement. `selection.py` explicitly treats this as an approximation. | FAIL |
+| L4 exit variants and exit-matched nulls | Exit variants exist, but mandatory exit-matched control families are absent. The hold grid is also nested under every outer base horizon, so each h-free hold variant is repeated and labelled with the unrelated outer `h`; smoke rows for HOLD-4/12/24 all carry `h=12`. | FAIL |
+| Same forecast setting supplies exit boundaries | `_exit_params` always uses the pack's Z-VOL scale/median, including co-reported source variants. It does not demonstrate that the same source-specific forecast setting supplies each variant's boundary. | FAIL |
+| Frozen missing Z-VOL coverage remains missing | `prepare.prepare_symbol` refits a scale whenever the supplied pinned value is non-finite. This silently manufactures Z-VOL coverage for the eight symbols whose frozen parent pin is NaN, while the returned unit-pin field retains the original NaN and hides the refit. | FAIL |
+| No local accounting or cost contamination | Canonical `check_no_local_accounting` passed. Spread is disclosed but not subtracted from the estimand. | PASS |
+| Episode object, W/L/logR, adverse-first tie policy | `fills_bridge.py` imports the SPDR-019 fill implementation and `layers.py` forms episode rows. The imported file is untracked and excluded from SPDR-020's code hash, so the result is not reproducibly pinned. | PARTIAL |
+| Calendar-day bootstrap with consecutive 1/3/7 and 4/12/28 day blocks | `metrics.day_index` includes only days containing events. Missing calendar dates are compressed away, so a “one-day” block is an event-day block. A smoke primary cell spans 517 calendar days but contains only 494 indexed days. | FAIL |
+| Five-seed envelope and declared bootstrap count | CI code exists, but uses seeds 101–105 rather than the frozen seed tuple in `config.py`. CLI/smoke can use 50 replicates and still receive `hard_pass=true`; no self-check enforces the declared 2,000. | FAIL |
+| Resolution ladder: planted effects detected across bootstrap replicates, every cell | `metrics.sensitivity_ladder` compares a point estimate plus a rung with a half-width and emits deterministic 0/1 values. It never plants an effect in bootstrap replicates. All finite smoke detection entries are `{0,1}`, and interaction rows omit the ladder fields. | FAIL |
+| ENTRY-TIMING derangement | `entry_timing_derangement` permutes the already-realized return vector and recomputes an order-invariant mean. Timestamps are unused and exits are not rerun. Smoke null SD is `9.93e-17`, with live, mean, q05, and q95 effectively identical. | FAIL — vacuous control |
+| SIDE derangement and planted-effect calibration | Code shuffles realized magnitudes and assigns outcome signs rather than deranging entry-side labels and rerunning the estimand. Fixed-point evidence is hard-coded, and the plant is an additive log-residual shift rather than the specified return-basis-point plant/recalibration. | FAIL |
+| AMBIENT-BASE control | No implementation or emitted artifact was found. | FAIL — missing control |
+| MAGNITUDE-MATCHED control | No implementation or emitted artifact was found. | FAIL — missing control |
+| Exit-matched nulls for each path-dependent device | `run_primary_controls` executes one L0 cell only; no exit-matched control family is emitted. | FAIL — missing control |
+| Tripwire 1 rebuilds band width and all conditioning state from `t+1`, reruns identically, and reports event-key plus paired-estimand changes | `run_screen.py` merely shifts the HMM-state array. `tripwire_1_structural` compares legal-mask rows, labels that comparison an event-key difference, and does not rebuild Z-VOL, layers, events, fills, or paired p/W/L/logR. | FAIL — required tripwire absent in substance |
+| Tripwire 2 must detect a deliberately leaky construction | The emitted hard pass is supplied through `integrity_extra` booleans; no independently evaluated leaky detector and failure evidence were found. | FAIL |
+| Integrity self-check derives, rather than asserts, hard conditions | `run_screen.py` sets `causality_ok`, `breach_ok`, `p_event_never_filters`, block-rule status, and the adverse-first sample to literal `True`; `selfcheck.py` trusts them. The 29/29 smoke pass is therefore self-attestation, not evidence. | FAIL |
+| Golden traces G1–G8 must compare specified inputs/outputs | Several golden checks read only a subset, read the parent rather than current emission, or return constants. Detailed diff follows below. | FAIL |
+| Selection reports compare each selected group with its complement | `selection.py` compares L2/L3 selections against the full L0 base. Smoke JSON confirms complement counts are the full base and even permits an empty event complement. | FAIL |
+| Full declared grid/count and mandatory co-reports | The runner has `--smoke`, `--symbols`, and `--primary-only` modes that can omit most cells/co-reports while still producing `hard_pass=true`. The self-check does not verify the declared 25 symbols, 1,872 primary maximum, all co-reports, or the unique cell manifest. | FAIL |
+| Resume/determinism/reproducibility | Multi-job determinism has a comparison path, but jobs=1 passes automatically. Resume restores episode shards without reconstructing every companion artifact. The code hash excludes imported SPDR-019 fill logic. | FAIL |
+| Required artifacts and provenance | Named JSON/parquet files are emitted, but schema-presence checks allow incomplete/under-specified content. The smoke summary truthfully says `smoke=true`, yet also claims integrity and parent parity pass. | FAIL |
+| Reflection sign-off before execution | `reflection-inputs.md` §9 remains unsigned, as in QA Run 7. | BLOCKS EXECUTION |
+
+### Golden-trace diff
+
+| Trace | Required comparison | Implemented comparison | Result |
+|---|---|---|---|
+| G1 | Parent-parity inputs, fill, exits, and estimand to `1e-9` | Checks parent/current `r_h`, anchor, and event only; no complete fill/exit/input diff | FAIL |
+| G2 | Current emitted `p_event` for the specified CONFIRM cell, including the `z=3` drop | Reads the parent artifact rather than the current emitted band/cell value | FAIL |
+| G3 | All declared event-type exclusivity/suppression cases | Returns held even when smoke evidence lists only `E-TOUCH` | FAIL |
+| G4 | Recomputed layer suppression/precedence trace | Returns a supplied constant flag | FAIL |
+| G5 | Exact specified L0 pooled H1/CONFIRM/E-TOUCH/MOMO calculation | Selects the first available primary cell rather than enforcing the specified cell | FAIL |
+| G6 | Actual calendar-block and seed-envelope trace | Returns a constant true result | FAIL |
+| G7 | Resolution arithmetic and pinned hashes | Resolution arithmetic is covered by existing tests/pins | PASS |
+| G8 | Concrete same-bar adverse-first episode with fill/price/exit evidence | Trusts a hard-coded `both_reachable_sample` dictionary | FAIL |
+
+### Governance and leakage checklist
+
+- **TEST/holdout untouched by this QA:** PASS. Static code search found the ordinary loader fenced to
+  TRAIN; this review did not execute it.
+- **Research execution authorised:** FAIL. The reflection sign-off is missing and this review rejects
+  the implementation.
+- **Causality demonstrated by a working perturbation tripwire:** FAIL.
+- **Population and frozen pins preserved:** FAIL. Missing Z-VOL pins are refitted.
+- **No fitted-slope target / no threshold promotion:** PASS by static inspection.
+- **No local accounting / no spread in estimand:** PASS.
+- **`p_event` not used as a filter:** PASS by static inspection, but its reporting values are wrong.
+- **Controls capable of falsifying the mechanism:** FAIL.
+- **Resolution protection and identifiability:** FAIL. The ladder is not a planted-effect bootstrap
+  curve and does not cover every cell.
+- **Deterministic, complete, reproducible provenance:** FAIL.
+
+### Findings and required changes
+
+**QA8-01 — CRITICAL — Required integrity tripwires are absent in substance and the hard pass is
+self-attested.**
+Design: §5 Tripwire 1/2 and §11 integrity gates require genuine perturbation/rebuild evidence and a
+leak detector.
+Code: `run_screen.py`, `controls.tripwire_1_structural`, `selfcheck.py`, and `golden.py` substitute a
+shifted state mask or literal booleans for the required reruns/diffs.
+Required change: implement both tripwires exactly as designed; emit changed conditioning rows,
+event-key symmetric differences, paired p/W/L/logR deltas, and a demonstrably caught leaky case.
+Remove all constant truth values from verdict-bearing checks. Add failing tests that prove each
+tripwire rejects a broken implementation.
+
+**QA8-02 — CRITICAL — Mandatory mechanism controls are missing or mathematically vacuous.**
+Design: §4 requires ENTRY-TIMING, SIDE, AMBIENT-BASE, MAGNITUDE-MATCHED, planted-effect calibration,
+and exit-matched L4 nulls.
+Code: `controls.py` permutes realized returns for the timing null, approximates the side null, and
+does not implement the other required families.
+Required change: retime entries and rerun fills/exits; derange entry-side labels and rerun the
+estimand; implement ambient-base, magnitude-matched, planted-effect, and every exit-matched control.
+Emit fixed-point/change counts and tests showing each null changes the intended input while
+preserving its specified invariants.
+
+**QA8-03 — CRITICAL — Frozen Z-VOL population coverage is silently expanded.**
+Design: §§6, 8, and 12 preserve the eight NaN parent pins and the 17-symbol Z-VOL coverage.
+Code: `prepare.prepare_symbol` refits any non-finite supplied scale and then reports the original
+NaN in the unit-pin artifact.
+Required change: never refit a frozen missing pin. Exclude those symbol/source cells as designed,
+emit observed coverage and missing membership, and make the hard check require exact equality to
+the 17/8 frozen partition.
+
+**QA8-04 — HIGH — Verdict-bearing bootstrap, paired deltas, interactions, and sensitivity ladders do
+not implement the predeclared estimands.**
+Design: §§7–10 require consecutive calendar-day blocks, paired resamples, and replicate-level
+planted-effect detection curves for every cell.
+Code: `metrics.py` compresses missing dates, builds delta/interaction intervals from marginal
+widths, and emits point-threshold 0/1 ladder values.
+Required change: materialize the complete fenced calendar, use consecutive calendar-day blocks,
+compute deltas/interactions on identical resamples, and implement both planted-effect ladder paths
+at the replicate level for every ordinary and interaction cell. Enforce the frozen seeds and 2,000
+replicates in any verdict-bearing run.
+
+**QA8-05 — HIGH — The L4 hold grid is duplicated and mislabelled.**
+Design: §9 declares six h-free hold variants and a maximum of 1,872 primary cells.
+Code: `layers.run_grid_for_pack` nests each hold variant beneath every base `h`, while episode
+grouping records outer `h` rather than the actual hold horizon.
+Required change: enumerate h-free variants once, label/group them by their actual predeclared
+parameter, and hard-check the unique cell manifest and expected count before scoring.
+
+**QA8-06 — HIGH — `p_event`, UNDECIDED, and selection-complement reports are not computed for their
+declared cell/band populations.**
+Design: §§2, 10, and 12 require per-cell/per-band reporting and each selection against its own
+complement.
+Code: `layers.py`, `metrics.py`, and `selection.py` attach full-TRAIN/first-symbol values and use the
+full base as the complement.
+Required change: aggregate denominators from the exact symbol/band/event/source cell, recompute
+pooled values from sufficient statistics, and compare every selected set with its disjoint
+complement. Add exact hand-calculation fixtures for DESIGN, CONFIRM, pooled, and empty groups.
+
+**QA8-07 — HIGH — Golden traces do not validate the specified paths.**
+Design: §11 specifies G1–G8 as concrete diffs.
+Code: `golden.py` uses partial parent reads, “first available” cells, and constant truth values.
+Required change: turn every golden trace into an independently reconstructed, exact comparison with
+the specified identifiers, inputs, fills, exits, and tolerances. A missing specified case must fail,
+not fall back to another cell.
+
+**QA8-08 — HIGH — Incomplete developer modes can receive a hard integrity pass.**
+Design: §§8–12 freeze the universe, grid, co-reports, bootstrap budget, and artifact set.
+Code: `--symbols`, `--primary-only`, `--smoke`, and resume can omit required work; `selfcheck.py`
+does not distinguish a developer smoke validation from an execution-grade hard pass.
+Required change: label smoke/subset outputs non-verdict-bearing and force `hard_pass=false`; for an
+execution candidate, require the exact universe, bands, cell manifest, co-reports, bootstrap count,
+and artifact row/schema coverage.
+
+**QA8-09 — HIGH — Result provenance excludes imported, untracked fill logic.**
+Design: §11 requires reproducible code/data provenance.
+Code: `fills_bridge.py` imports `SPDR-019/screen_code/fills.py`, but the SPDR-020 code hash covers
+only its own screen directory; both implementations were untracked.
+Required change: place the shared fill logic in a tracked, canonical module or include the exact
+imported file hash and repository status in the run provenance. Refuse execution-grade output when
+any executed code dependency is untracked or unhashed.
+
+**QA8-10 — MEDIUM — Source-specific L4 boundary provenance is not demonstrated.**
+Design: the mechanism requires the same forecast setting used for the cell to place its exit
+boundaries.
+Code: `_exit_params` always consumes the pack's Z-VOL scale/median.
+Required change: make the boundary source explicit in every L4 row and use the declared source's
+frozen forecast setting; add a fixture showing Z-VOL and magnitude co-reports resolve their
+intended boundaries.
+
+**QA8-11 — LOW — The implementation has no SPDR-020-specific unit suite and fails lint.**
+Evidence: compilation passed, but `ruff check` reported 20 issues, including an unused fixed-point
+variable in control code. Existing tests cover shared resolution arithmetic, not the new screen
+logic.
+Required change: add focused tests for the findings above and clear the lint failures before the
+next QA review.
+
+### Verification evidence
+
+```text
+python -m compileall -q python/experiments/SPDR-020/screen_code
+PASS
+
+cd python && PYTHONPATH=src pytest -q \
+  tests/test_resolution_basis.py tests/test_estimand_validation.py
+11 passed, 1 skipped
+
+canonical check_no_local_accounting('experiments/SPDR-020/screen_code')
+{'ok': True, 'banned_defs_found': []}
+
+ruff check python/experiments/SPDR-020/screen_code
+20 errors
+```
+
+Read-only artifact probes also established:
+
+- `controls.json`: timing live and null mean agree to floating-point noise; null SD
+  `9.93e-17`.
+- `metrics_by_cell.parquet`: every finite detection value is exactly `0` or `1`; interaction rows
+  omit detection fields.
+- `integrity_selfcheck.json`: 29/29 passes, despite the smoke using two symbols and 50 bootstrap
+  replicates and despite several checks being literal booleans.
+- `golden_traces.json`: G3 reports held with only `E-TOUCH` present; G8 reports held from supplied
+  booleans rather than an episode trace.
+- `run_summary.json`: `smoke=true`, `n_symbols=2`, `n_boot=50`, while also reporting
+  `integrity_pass=true` and `parent_parity_pass=true`.
+
+### Verdict rationale and route
+
+This is a **REJECT**, not a REVISE, because a required causality tripwire is missing in substance,
+mandatory controls are absent/vacuous, frozen population coverage is silently changed, and the
+execution-grade hard pass is manufactured from asserted booleans. Those are explicit rejection
+conditions, even though ordinary static compilation and the shared resolution tests pass.
+
+**FAILING_ARTIFACT:** `python/experiments/SPDR-020/screen_code/` and the resulting
+`python/experiments/SPDR-020/results/integrity_selfcheck.json`,
+`controls.json`, `golden_traces.json`, `metrics_by_cell.parquet`,
+`layer_deltas.parquet`, `selection_check.json`, and `unit_pin.json`.
+
+**REQUIRED_SKILL:** `experiment-developer` for QA8-01 through QA8-11. The design is sufficiently
+specific for these repairs; no new design discretion is authorised. If the developer believes the
+source-specific L4 boundary requirement is ambiguous, route only QA8-10 to `quant-designer` for a
+written clarification before coding that point.
+
+After repair, run a fresh implementation QA before any execution request. The existing smoke
+outputs must not be cited as scientific evidence or as approval to access TEST/holdout.
+
+## QA run 9 — 2026-07-29T12:13:34Z — mode: subagent — HEAD 0d08f48e2b809fcad3a18f189c5b7a5b272facc0
+
+**Verdict: REJECT**
+
+**Execution authorisation: NO.** This review did not run `run_screen.py`, query TEST, or touch the
+global holdout. An APPROVE would only reopen the operator's execution gate; this REJECT keeps it
+closed.
+
+### Review identity and repository state
+
+Fresh-context implementation review after QA Run 8 remediation and AMENDMENT-19. The reviewer
+authored neither the implementation nor its tests. Inputs read independently: pipeline config and
+governance constraints, mandatory design declarations, SPDR lane, the complete current design, all
+eight prior QA entries, all SPDR-020 implementation modules, the focused QA8 tests, the imported
+SPDR-019 fill module, and directly imported shared code.
+
+Dirty state at verdict:
+
+```text
+ M python/experiments/SPDR-020/design.md
+ M python/experiments/SPDR-020/qa-review.md
+?? python/experiments/SPDR-020/results/controls.json
+?? python/experiments/SPDR-020/results/golden_traces.json
+?? python/experiments/SPDR-020/results/integrity_selfcheck.json
+?? python/experiments/SPDR-020/results/parent_parity.json
+?? python/experiments/SPDR-020/results/run_summary.json
+?? python/experiments/SPDR-020/results/selection_check.json
+?? python/experiments/SPDR-020/results/unit_pin.json
+?? python/experiments/SPDR-020/screen_code/
+?? python/tests/test_spdr020_qa8.py
+```
+
+The tracked-clean refusal is active on this state: the dependency manifest reports `complete=false`
+and all 15 SPDR-020 code files as untracked. The existing JSONs remain developer outputs, not
+execution evidence.
+
+### QA8 repair trace
+
+| QA8 clause | Design-to-code evidence | Verdict |
+|---|---|---|
+| **QA8-01 real tripwires; derived hard pass** | `run_screen.py:75-158` rebuilds the primary Z-VOL/E-TOUCH slice with shifted inputs and `controls.py:146-227` derives both tripwire results. However, Tripwire 1 runs L0/L2/L3 only (`run_screen.py:96-112`), omitting every L4 conditioning/exit path despite §6.2 requiring every layer to rerun identically. Tripwire 2 is a bounded hand-coded first-400-origin detector (`run_screen.py:457-515`), not a second run through the event pipeline. | **FAIL — partial repair** |
+| **QA8-02 all mandatory, non-vacuous, exit-matched controls** | Rerun callbacks now exist (`run_screen.py:161-236`) and ambient/magnitude shells are emitted. But exit-matched controls group only by `variant_id` across incompatible clocks, sources, horizons, events, policies and cells (`controls.py:518-536`), then derange within symbol. Repeated entry indices make `derange_indices` raise; `[1,1,2,2]` reproduces `AssertionError`. SIDE uses the same forced sign flip for every seed (`controls.py:292-315`): five seeds yield one unique null and null SD 0. Magnitude-matched output has no required plant curve/null quantiles (`controls.py:334-354`). No chronological-thirds read exists. | **FAIL — mandatory controls absent in substance** |
+| **QA8-03 frozen 17/8 Z-VOL partition** | `prepare.py:103-111,186-188` preserves NaN pins; no refit path exists. `selfcheck.py:37-62,282-292` requires exact set equality to the frozen 17 covered and eight named missing symbols. | **MATCHES** |
+| **QA8-04 calendar bootstrap, paired replicates, ladders, frozen 2,000** | `metrics.py:31-60` materialises missing calendar dates; `207-346` uses identical calendar resamples for deltas/interactions; seeds match `config.py:223`. Ordinary ladder planting is replicate-level, but `config.py:231` and `metrics.py:591-598` cap it at **200**, even when the execution candidate declares 2,000. | **FAIL — 2,000-replicate repair incomplete** |
+| **QA8-05 unique h-free L4 hold manifest** | `layers.py:52-132` emits 144 unique h-free hold cells and rejects duplicate keys. Focused synthetic checks reproduce 1,584 no-L5 phase-(a) primary / 28,512 full cells. The design's maxima remain 1,872 / 33,696 only when four later-authorised L5 rows are included; the runner labels this distinction explicitly. | **MATCHES for authorised no-L5 phase (a)** |
+| **QA8-06 exact populations and complements** | Per-band `p_event`/UNDECIDED counts are now pooled from symbol-band sufficient counts (`run_screen.py:645-673`). Selection still emits one aggregate row per variant over the whole primary base (`selection.py:40-101`), not each reported selected cell against its own matching L0 complement; unrelated strata remain in the comparator. Empty subsets still satisfy the schema. | **FAIL — population repair partial** |
+| **QA8-07 G1-G8 exact golden diffs** | Exact-case refusal exists, but several traces remain partial or self-confirming; see golden table below. | **FAIL** |
+| **QA8-08 developer-grade refusal and complete execution manifest** | `selfcheck.py:65-97,481-504` forces smoke/subset/primary-only/reduced-bootstrap runs to `DEVELOPER_ONLY` and prevents `hard_pass`. `run_screen.py:1094-1107` checks pooled manifest row coverage. | **MATCHES** |
+| **QA8-09 complete dependency hashing and clean tracking** | `provenance.py:13-44` hashes named files and requires each tracked+clean; current untracked code correctly refuses execution grade. The list in `run_screen.py:1339-1349` is not transitively complete: `xen.evaluation` executes `xen.adjudication`, and SPDR-015 controls execute `xen.xena.controls`; neither file is hashed. | **FAIL — tracked-clean works, dependency closure does not** |
+| **QA8-10 source-specific L4 formulas / AMENDMENT-19** | `prepare.py:211-224` freezes per-source medians. `layers.py:239-263,390-470` implements `Z-VOL=q*sqrt(h_hours)`, `Z-MAG=q`, `Z-MAG-SENS=q`, source-local medians, source-local sizing, explicit `NONE_TIME_EXIT`/`NONE`, and refusal on missing source values. Episode rows emit the five provenance fields. | **MATCHES** |
+| **QA8-11 tests, lint, compilation** | `28 passed`; `ruff check` clean; `compileall` clean; canonical `check_no_local_accounting` returns `ok=true`. | **MATCHES** |
+
+### Golden-trace diff
+
+| Trace | Required design comparison | Current implementation | Verdict |
+|---|---|---|---|
+| **G1** | Independently recompute band width, anchor/touch, side, entry/exit prices and `r_h` against the named current event | `golden.py:281-328` checks indices, side and `r_h`; it omits band width, anchor price, entry price, exit price, label and exit reason in the current diff | **FAIL** |
+| **G2** | Current DESIGN/CONFIRM `p_event` at z=1.5 and z=3, plus non-application | `golden.py:48-98,330-335` reconstructs exact current sufficient counts and checks the fixed direction/non-application | **MATCHES** |
+| **G3** | Same zone produces distinct touch/close commitments, each conditioned on its own breach | `golden.py:101-127` finds two distinct event indices but does not reconstruct each conditioning state | **PARTIAL** |
+| **G4** | First suppressed breach, counted, with proof no second episode opened | `golden.py:130-152` finds a suppressed row then writes `second_episode_opened: false` without searching for a conflicting live row | **FAIL** |
+| **G5** | Recompute the exact cell from episode rows | `golden.py:340-374` recomputes the formula from the already-aggregated metrics row, not from emitted episodes | **FAIL** |
+| **G6** | Same G5 cell carries null 0 at slope 1; no fitted residual emitted | `golden.py:376-393` scans source text for three strings and supplies 0/1 itself; it does not inspect the cell emission | **FAIL** |
+| **G7** | G1 under the complete Tripwire-1 twin | It trusts Tripwire-1's partial slice (`golden.py:397-403`) | **FAIL** |
+| **G8** | Actual emitted same-M1 adverse-first episode, fill and return | `find_g8_evidence` computes both values locally and sets `emitted_r_bps` equal to `recomputed_r_bps` (`golden.py:237-260`); it never locates the emitted episode | **FAIL** |
+
+### Governance and boundary
+
+| Check | Evidence | Result |
+|---|---|---|
+| TRAIN-only / TEST and holdout sealed | Loader calls the canonical fence with `[DESIGN_START, CONFIRM_END)` and `band="TRAIN"`; no TEST loader path found; this QA executed none | **PASS** |
+| Causal ordinary event path / M1 adverse-first exits | Static trace through `event_engine.py`, `layers.py`, and imported fills; target/trail source origin is `post["t_idx"]` | **PASS**, but the incomplete perturbation tripwire cannot certify all layers |
+| Frozen 17/8 membership | Exact set check and no refit | **PASS** |
+| Calendar-day dependence handling | Missing dates remain zero sufficient-statistic rows; H1/H4 block ladders are correct | **PASS** |
+| Paired deltas/interactions | Same calendar and same sampled indices | **PASS** |
+| L-24 time stability | No chronological-thirds computation or emission exists | **FAIL** |
+| Derangement destroy | Intended zero fixed points, but repeated-valued L4 timing populations can raise and SIDE's seed battery is 2,000 copies of one flip | **FAIL** |
+| Missing spread / cost isolation | Required disclosure is present; no spread proxy enters the estimand; no local accounting definitions | **PASS** |
+| Reflection start gate | `reflection-mid.md` §9 is signed 2026-07-29, option B | **PASS** |
+| Amendment ledger | AMENDMENT-19 is NEUTRAL; historical 3/11/5 and active 2/9/4 tallies are arithmetically consistent; tighter streak is flagged; false machine qualifiers N/A | **PASS** |
+| Complete reproducibility | Current dirty/untracked code is refused, but transitive executed-code dependencies are not all in the hash manifest | **FAIL** |
+| Python price backtest / XENA / family action | None introduced; this remains a TRAIN-only SPDR screen | **PASS** |
+
+### Independent verification evidence
+
+- `PYTHONPATH=python/src python -m pytest -q python/tests/test_spdr020_qa8.py` → **28 passed**.
+- `ruff check python/experiments/SPDR-020/screen_code python/tests/test_spdr020_qa8.py` →
+  **All checks passed**.
+- `python -m compileall -q ...` → **PASS**.
+- `check_no_local_accounting(Path("python/experiments/SPDR-020/screen_code"))` →
+  `{"ok": true, "banned_defs_found": []}`.
+- Safe derangement boundary: `derange_indices([1,1,2,2], seed=41000)` →
+  **AssertionError**, proving the L4 pooled control population is not executable as formed.
+- Safe SIDE battery: five seeds → **one unique null `log_R`, null_sd=0.0**.
+- Dependency audit: 28 named dependencies, `complete=false` on the current state; all 15
+  SPDR-020 modules are untracked as expected. `python/src/xen/adjudication.py` and
+  `python/src/xen/xena/controls.py` are executed transitively but absent from the manifest.
+
+### Issues
+
+1. **QA9-01 — CRITICAL — mechanism controls are still not valid control families.**  
+   Design §6/§6.1; `controls.py:230-354,454-556`; `run_screen.py:1166-1190`. Build every timing and
+   side null at the declared cell class, never across clocks/sources/horizons/events/policies;
+   derange row identity while allowing repeated entry values; make the side seed battery produce
+   actual random label assignments subject to zero fixed points; emit the mandated plant
+   curve/null quantiles for magnitude matching; implement the chronological-thirds read. Each L4
+   device cell must rerun under its own exit and source boundary.
+
+2. **QA9-02 — CRITICAL — the causal tripwire and golden evidence still do not cover the
+   verdict-bearing paths.**  
+   Design §6.2/§11; `run_screen.py:75-158,443-515`; `golden.py:270-405`. Tripwire 1 must include
+   L4 source-conditioned boundaries and exits and emit a complete legal/leaky diff. Tripwire 2
+   must be an independently callable illegal detector applied through the same event pipeline.
+   G1/G3-G8 must reconstruct the specified fields from actual emitted rows; a value written by the
+   checker itself is not evidence.
+
+3. **QA9-03 — HIGH — selection complements are not the declared per-cell complements.**  
+   Design §4/§12 L-51; `selection.py:34-138`. Partition each reported selected cell's matching L0
+   population on identical symbol/clock/source/z/H/event/h/policy/band keys; fail on missing or
+   empty required partitions rather than passing schema presence.
+
+4. **QA9-04 — HIGH — sensitivity ladders do not use the frozen execution replicate budget.**  
+   Design §8 and QA8-04; `config.py:223-231`; `metrics.py:591-618`. Remove the 200-replicate cap
+   from execution-grade ordinary and interaction ladders, enforce 2,000, and emit the actual count
+   as a hard-checked field.
+
+5. **QA9-05 — HIGH — executed-code provenance is not transitively complete.**  
+   Design §11/§12 and QA8-09; `run_screen.py:1317-1356`. Hash and require tracked-clean status for
+   every repository module actually imported, including `xen.adjudication` and
+   `xen.xena.controls`, or derive the manifest from a recorded import closure. Preserve the current
+   correct refusal while any dependency is untracked or dirty.
+
+**Route:** `experiment-developer` for QA9-01 through QA9-05. AMENDMENT-19 itself is sufficiently
+determinate and its source-specific formulas match; no further design amendment is required for
+QA8-10.
+
+**Verdict rationale:** REJECT, not REVISE, because the controls meant to falsify the mechanism and
+the future-destroying tripwire/golden path remain absent in substance on the full declared
+population. Passing focused tests cannot substitute for those integrity objects.
+
+## QA run 10 — 2026-07-29T12:39:46Z — mode: subagent — HEAD 0d08f48e2b809fcad3a18f189c5b7a5b272facc0
+
+**Verdict: REVISE**
+
+**Execution authorisation: NO.** This review did not run `run_screen.py`, query TEST, or access the
+global holdout. The implementation is materially closer, but four design-to-code gaps remain.
+
+### Review identity and git state
+
+Fresh-context implementation QA after QA Run 9 remediation. Read independently: the complete
+pipeline configuration and governance constraints, SPDR lane, mandatory design requirements, full
+current design including AMENDMENT-19, QA Runs 1–9, all 15 SPDR-020 modules, the imported SPDR-019
+fill module, SPDR-015 imported modules, directly imported `xen` modules, and the focused QA suite.
+
+Dirty state at review:
+
+```text
+ M python/experiments/SPDR-020/design.md
+ M python/experiments/SPDR-020/qa-review.md
+?? python/experiments/SPDR-020/results/controls.json
+?? python/experiments/SPDR-020/results/golden_traces.json
+?? python/experiments/SPDR-020/results/integrity_selfcheck.json
+?? python/experiments/SPDR-020/results/parent_parity.json
+?? python/experiments/SPDR-020/results/run_summary.json
+?? python/experiments/SPDR-020/results/selection_check.json
+?? python/experiments/SPDR-020/results/unit_pin.json
+?? python/experiments/SPDR-020/screen_code/catalog_io.py
+?? python/experiments/SPDR-020/screen_code/config.py
+?? python/experiments/SPDR-020/screen_code/controls.py
+?? python/experiments/SPDR-020/screen_code/event_engine.py
+?? python/experiments/SPDR-020/screen_code/fills_bridge.py
+?? python/experiments/SPDR-020/screen_code/golden.py
+?? python/experiments/SPDR-020/screen_code/indicators.py
+?? python/experiments/SPDR-020/screen_code/layers.py
+?? python/experiments/SPDR-020/screen_code/metrics.py
+?? python/experiments/SPDR-020/screen_code/parent_parity.py
+?? python/experiments/SPDR-020/screen_code/prepare.py
+?? python/experiments/SPDR-020/screen_code/provenance.py
+?? python/experiments/SPDR-020/screen_code/run_screen.py
+?? python/experiments/SPDR-020/screen_code/selection.py
+?? python/experiments/SPDR-020/screen_code/selfcheck.py
+?? python/tests/test_spdr020_qa8.py
+```
+
+The tracked-clean refusal correctly keeps this state developer-only.
+
+### Design-fidelity trace
+
+| Design clause | Code | Verdict | Independent evidence |
+|---|---|---|---|
+| Exact-cell timing/side controls; row-identity derangement with duplicate values | `controls.py:33-51,230-327,548-632` | **MATCHES in grouping/identity** | L0 controls group on symbol/clock/source/z/H/event/h/policy/band/variant; every L4 arm groups on the same exact cell including source and variant. `derangement_permutation(4)` has zero row fixed points and works on values `[1,1,2,2]`. A 20-seed mixed-side probe produced 16 unique assignments and non-zero null SD |
+| Side battery diversity/non-vacuity | `controls.py:283-327`; `selfcheck.py:443-445` | **PARTIAL** | Seeded assignments now vary, closing QA9's deterministic-flip defect. However, no execution check requires `unique_assignment_count > 1`, changed labels, finite null spread, or usable plant resolution; thin/uniform-side cells can still emit a vacuous battery while the sole hard check sees only row fixed points |
+| Magnitude control null statistics and plant curve | `controls.py:345-384` | **MATCHES** | Per decile: disjoint selected/comparator populations, comparator summary, null mean/sd/q05/q95/percentile, and +5/+10/+20/+40 bps plant curve with run-derived sigma units |
+| Three chronological TRAIN thirds | `controls.py:387-394` | **DEVIATES** | Sorts episodes then `array_split`s row positions into equal-count thirds. The design requires three chronological thirds of the full TRAIN time interval. No interval boundaries or promised sign-agreement field are emitted |
+| Every L4 device/source exit-matched null | `controls.py:600-632`; `run_screen.py:274-344` | **PARTIAL** | Exact source/device/cell reruns are implemented and use source-local `_exit_params`. Required-cell completeness/non-vacuity is not reconciled to the L4 manifest; cells with fewer than two rows are silently skipped and `all_mandatory_controls_present` is not checked by `selfcheck.py` |
+| Full L0–L4 Tripwire 1 | `run_screen.py:76-195`; `controls.py:154-179` | **MATCHES** | Rebuilds every non-derived L0/L2/L3/L4 variant for all three sources from `t+1` conditioning, requires actual variant/source coverage, event-key symmetric difference, changed conditioning, and a changed G1 twin |
+| Pipeline-based illegal Tripwire 2 | `event_engine.py:63-111,153-263`; `run_screen.py:198-271` | **MATCHES** | Legal and deliberately illegal detectors use the same `walk_zones` path; illegal detection assigns the anchor entry while retaining the actual future touch, with all early-index inequalities checked |
+| G1 and G3–G7 reconstructed from emitted rows | `golden.py:101-178,321-542` | **MATCHES** | G1 now carries current band/anchor/fill/exit reconstruction; G3 validates each breach's own state; G4 searches conflicting live rows; G5 rebuilds p/W/L/logR from episodes; G6 reads the emitted mirror record; G7 requires complete Tripwire-1 coverage and a changed G1 twin |
+| G8 same-bar adverse precedence | `golden.py:181-318` | **DEVIATES** | The target is computed locally, but the matched emitted row is `L4_TRAIL_B1_MOD`, a trail-only arm. Therefore both target and trail were not active in the emitted fill being used as evidence; the trace cannot prove the resolver chose the adverse branch when both active exits were reachable |
+| Exact per-cell L-51 complements; missing/empty refusal | `selection.py:39-196`; `selfcheck.py:379-383` | **MATCHES** | Matching includes symbol/clock/source/z/H/event/h/policy/band; selected and complement are disjoint/exhaustive. Missing required subsets or empty complements populate `failures`, making `schema_ok=false` and the hard check fail |
+| Ordinary 2,000-replicate two-operator ladder | `config.py:223-231`; `metrics.py:355-405,513-627`; `selfcheck.py:336-377` | **MATCHES** | No 200 cap remains. `cell_metrics(..., n_boot=2000)` passes 2,000 through, emits the per-seed count, and self-check requires it on every finite ordinary row. W/L-fixed-p and p-fixed-W/L plants are distinct sufficient-statistic transformations |
+| Delta/interaction 2,000-replicate two-operator ladder | `metrics.py:194-204,207-346`; `run_screen.py:767-919` | **DEVIATES** | The paired bootstrap uses the requested 2,000 per seed, but its ladder merely adds `delta` to already-computed effect replicates and copies the same rates into `via_WL` and `via_p`. Interaction/delta rows omit the nested emitted per-seed plant count. Safe probe: requested 20 → 300 block×seed replicates, operators identical, nested count absent |
+| Transitive executed-code provenance | `run_screen.py:1386-1405`; `provenance.py:13-44` | **DEVIATES** | Prior omissions `xen.adjudication` and `xen.xena.controls` are now named, and dirty/untracked refusal works. The manifest remains a hand list rather than import closure: `xen.xena.controls` imports `xen.xena.report_layer`, which is executed but absent from the dependency list |
+| Frozen 17/8 coverage, source-local L4 formulas, exact mirror, cost isolation, no adequacy flag | `prepare.py`, `layers.py`, `metrics.py`, `selfcheck.py` | **MATCHES** | No Z-VOL refit; AMENDMENT-19 formulas and missing-source refusal are present; exact slope-1 mirror is used; canonical no-local-accounting check passes; cost remains disclosure-only; no retired adequacy field found |
+
+### Golden-trace diff
+
+| Trace | Result | Evidence |
+|---|---|---|
+| G1 | MATCHES | Named current event; reconstructed width, anchor, entry/exit prices, side, label, reason and signed return, with parent values/tolerance |
+| G2 | MATCHES | Exact current DESIGN/CONFIRM sufficient counts at z=1.5 and z=3.0; non-application asserted |
+| G3 | MATCHES | One zone, distinct touch and later close events, each checked against its own OHLC/boundary state |
+| G4 | MATCHES | Actual suppressed row plus explicit search proving no live row opened at the suppressed entry |
+| G5 | MATCHES | p/W/L/mean/logR reconstructed from exact emitted CONFIRM episodes and compared to the exact metrics row |
+| G6 | MATCHES | Same cell's emitted mirror-null record is zero at slope 1 and has no fitted-residual field |
+| G7 | MATCHES | Complete L0–L4/source Tripwire-1 evidence plus changed G1 legal/leaky twin |
+| G8 | **DEVIATES** | Uses an emitted trail-only row while treating a locally computed target as simultaneously active |
+
+### Governance and boundary
+
+| Check | Result | Evidence |
+|---|---|---|
+| TRAIN-only; TEST/holdout sealed | PASS | Loader is fenced to `[DESIGN_START, CONFIRM_END)`; no QA execution or forbidden read |
+| Causal ordinary path; future-destroying controls | PASS | Static trace plus substantive full Tripwire 1 and pipeline Tripwire 2 |
+| Frozen population/source pins | PASS | Exact 17 covered / 8 missing partition; source-specific L4 values; no fallback |
+| No local accounting | PASS | Canonical `check_no_local_accounting` → `ok=true` |
+| Missing spread / cost isolation | PASS | Required disclosure present; spread and cost do not enter the estimand |
+| L-24 thirds and exit-matched nulls | **FAIL** | Equal-row rather than equal-time thirds; L4 null completeness/non-vacuity is not manifest-checked |
+| Dependence handling and 2,000 ordinary ladders | PASS | Consecutive full-calendar blocks; frozen seeds; ordinary per-seed count enforced |
+| 2,000 interaction ladders | **FAIL** | Count is not emitted in the required nested schema and plants do not implement the two operators |
+| Complete reproducibility | **FAIL** | Dirty/untracked refusal works, but transitive imported module `xen.xena.report_layer` is unhashed |
+| Python backtest / TEST / holdout / XENA / family action | PASS | None introduced or accessed |
+
+### Verification evidence
+
+```text
+PYTHONPATH=python/src python -m pytest -q python/tests/test_spdr020_qa8.py
+32 passed
+
+ruff check python/experiments/SPDR-020/screen_code python/tests/test_spdr020_qa8.py
+All checks passed
+
+python -m compileall -q python/experiments/SPDR-020/screen_code
+PASS
+
+check_no_local_accounting("python/experiments/SPDR-020/screen_code")
+{"ok": true, "banned_defs_found": []}
+```
+
+### Issues
+
+1. **QA10-01 — HIGH — the control artifact can still certify incomplete or temporally wrong control families.**  
+   Design §6/§6.1; `controls.py:283-394,548-632`; `selfcheck.py:443-445`. Split full TRAIN by
+   timestamp boundaries, emit the promised thirds sign agreement, reconcile every required primary
+   and L4 source/device cell to a control manifest, and refuse missing/thin/vacuous cells unless
+   explicitly labelled unusable with their plant resolution. Hard-check seed diversity and
+   changed-label/input counts, not only row-identity fixed points.
+
+2. **QA10-02 — HIGH — delta and interaction sensitivity ladders are not the registered two-operator planted ladders and omit the execution count.**  
+   Design §8/§12; `metrics.py:194-204,207-346`; `run_screen.py:767-919`; `selfcheck.py:336-377`.
+   Plant W/L at fixed p and p at fixed W/L in the paired sufficient statistics on every replicate,
+   retain the paired interaction formula, emit the requested and realised counts on each
+   delta/interaction row, and extend the hard check and focused tests to those rows.
+
+3. **QA10-03 — HIGH — G8 still does not test both active exits.**  
+   Design §2.2a/§11 G8; `golden.py:181-318`. Exercise the actual fill resolver with target and trail
+   simultaneously active on the found M1 bar, then compare its chosen adverse fill with a concrete
+   emitted/trace record. A trail-only emission plus a locally calculated inactive target is not
+   precedence evidence.
+
+4. **QA10-04 — MEDIUM — executed-code provenance is still not transitively closed.**  
+   Design §12/§15; `run_screen.py:1386-1405`; `xen/xena/controls.py:33`. Add
+   `python/src/xen/xena/report_layer.py` and any further repository-local import closure, or derive
+   and record the actual imported-module closure rather than maintaining a hand list.
+
+**Route:** `experiment-developer` for QA10-01 through QA10-04. No design amendment is required.
+
+**Verdict rationale:** REVISE rather than REJECT. Both required tripwires now exist in substance,
+the exact-cell complement and ordinary-ladder repairs are real, and no holdout/causality violation
+was found. The remaining defects are bounded implementation gaps, but they block execution because
+controls, a hard golden trace, interaction resolution evidence, and reproducibility are incomplete.
+
+## QA run 11 — 2026-07-29T16:15:00Z — mode: subagent — HEAD 0d08f48e2b809fcad3a18f189c5b7a5b272facc0
+
+**Verdict: REVISE**
+
+**Execution authorisation: NO.** This review did not run `run_screen.py`, query TEST, or touch the
+global holdout. QA10 closed three of four prior issues in substance; one control-manifest defect
+still hard-fails a full execution path.
+
+### Review identity and git state
+
+Fresh-context implementation QA after claimed QA10 permanent fixes. Reviewer did not author the
+implementation. Inputs re-read independently: full current design (incl. AMENDMENT-19), QA runs
+9–10, all 15 SPDR-020 `screen_code/` modules, `python/tests/test_spdr020_qa8.py`, SPDR-019 fills
+bridge target, pipeline/governance constraints, and SPDR lane requirements.
+
+Tracked HEAD: `0d08f48e2b809fcad3a18f189c5b7a5b272facc0` (branch `main`).
+
+Dirty / untracked (implementation still untracked; tracked-clean refusal correctly keeps this
+developer-only until code is committed clean):
+
+```text
+ M python/experiments/SPDR-020/design.md
+ M python/experiments/SPDR-020/qa-review.md
+?? python/experiments/SPDR-020/results/  (stale developer JSONs; not execution evidence)
+?? python/experiments/SPDR-020/screen_code/
+?? python/tests/test_spdr020_qa8.py
+```
+
+Stale `results/controls.json` / `golden_traces.json` still show pre-repair shapes (no
+`control_manifest`; G8 still `"structural": true`) and must not be read as current code evidence.
+
+### QA10 closure status (independent)
+
+| QA10 issue | Status | Evidence |
+|---|---|---|
+| **QA10-01** control artifact incomplete / wrong thirds / vacuous batteries | **PARTIAL** | Time thirds, diversity, labelling, and manifest machinery are real; primary×L4 expansion still invents impossible HOLD cells (see Issues) |
+| **QA10-02** delta/interaction ladders not two-operator + missing counts | **CLOSED** | `metrics.py:194-308,350-380,424-452`; `run_screen.py:806-912`; `selfcheck.py:336-431`; focused tests `test_paired_ladders_*` / `test_plant_operators_*` |
+| **QA10-03** G8 not dual-exit precedence evidence | **CLOSED** | `golden.py:185-468,678`; dual probe invokes `resolve_target_trail_time` with **both** target and trail active; rejects trail-only; independent adverse fill fixed before resolver |
+| **QA10-04** provenance not transitively closed | **CLOSED** | `provenance.py:48-103` `expand_local_import_closure`; `run_screen.py:1404-1430` uses it; static import chain includes `xen.xena.report_layer` via `xen.xena.controls` and `xen.adjudication` via `xen.evaluation` |
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §6 ENTRY-TIMING / SIDE derangement, zero row fixed points, seed battery, plant curve | `controls.py:113-130,318-407,554-576` | **MATCHES** | Row-identity derangement works with duplicate values; unique assignment + changed counts recorded |
+| §6.1 L-24.1 chronological thirds of full TRAIN + sign agreement | `controls.py:467-501,816-841`; `selfcheck.py:500-511` | **MATCHES** | `np.linspace(DESIGN_START_NS, TRAIN_END_NS, 4)`; emits interval bounds + `sign_agreement` |
+| §6.1 L-24.2 exit-matched L4 nulls + complete accountable manifest | `controls.py:36-102,533-576,689-975`; `selfcheck.py:513-557` | **DEVIATES** | Manifest labels thin/vacuous; but primary-base expansion stamps **every** L4 variant onto primary `h=12`, including `L4_HOLD_4_*` / `L4_HOLD_24_*` which emit only at `h ∈ {4,24}` (`layers.py:819-823`). Those required keys are permanent **MISSING**; hard check 27 refuses any MISSING |
+| §6.2 Tripwire 1 full L0–L4/source | `run_screen.py:76-195` | **MATCHES** | All non-derived variants × sources; coverage + G1 twin required |
+| §6.2 Tripwire 2 pipeline illegal detector | `event_engine.py:64-`; `run_screen.py:198-271` | **MATCHES** | Same walker; leaky at anchor before legal |
+| §8 ordinary ladder 2,000 + two operators | `config.py:224-231`; `metrics.py:455-511,613-733` | **MATCHES** | `LADDER_PLANT_N = BOOT_RESAMPLES = 2000`; via_WL and via_p |
+| §8/§12 delta + interaction two-operator planted ladders + counts | `metrics.py:218-308,311-452`; `run_screen.py:763-912`; `selfcheck.py:336-431` | **MATCHES** | Distinct operators on sufficient stats; per-seed requested/realised counts; `all_replicate_counts_match` |
+| §11 G1–G7 | `golden.py:51-183,471-689` | **MATCHES** | Emitted-row reconstruction (G1/G3–G6); tripwire twin G7 |
+| §11 G8 dual-exit adverse precedence | `golden.py:185-468` | **MATCHES** | Dual-active resolver probe; independent adverse expectation; residual hardcode of ratchet flag is structural (resolver property) not a trail-only stand-in |
+| §4/§12 L-51 exact-cell complements | `selection.py`; `selfcheck.py:433-437` | **MATCHES** | Prior QA10 match retained |
+| §7 frozen 17/8 Z-VOL partition | `prepare.py`; `selfcheck.py:37-62` | **MATCHES** | Exact set equality; no refit |
+| AMENDMENT-19 source-local L4 | `layers.py:230-263,390-470` | **MATCHES** | Z-VOL `q*sqrt(h_hours)`; Z-MAG/SENS `q`; missing-source refuse |
+| Cost isolation / missing-spread disclosure | `config.py:205-216`; design header | **MATCHES** | `UNAVAILABLE_NOT_CHARGED`; cost not in estimand |
+| §12 transitive executed-code provenance | `provenance.py:14-103`; `run_screen.py:1404-1430` | **MATCHES** | Closure expansion + tracked/clean/hash gate |
+| Developer-only refusal while dirty/untracked | `selfcheck.py:65-97,606-618` | **MATCHES** | `hard_pass` requires eligibility + `dependency_manifest.complete` |
+
+### Golden-trace diff
+
+| Trace | Design expectation | Implemented logic | Verdict |
+|---|---|---|---|
+| G1 | Named current residual event; band/anchor/fill/exit/r | Parent + emitted reconstruction | **MATCHES** |
+| G2 | Current DESIGN/CONFIRM p_event at z=1.5/3.0; non-filter | Coverage counts + filter assertion | **MATCHES** |
+| G3 | One zone, distinct touch/close, own conditioning | `reconstruct_g3` | **MATCHES** |
+| G4 | Suppressed + no second live open | Conflict search | **MATCHES** |
+| G5 | p/W/L/logR from emitted episodes vs metrics row | Episode rebuild | **MATCHES** |
+| G6 | Mirror null 0 at slope 1; no fitted residual | Controls record | **MATCHES** |
+| G7 | Tripwire-1 complete + changed G1 twin | Coverage + twin fields | **MATCHES** |
+| G8 | Same-M1 both exits active → adverse trail fill + r | Dual resolver probe + independent adverse | **MATCHES** |
+
+### Governance & boundary
+
+| Check | Result | Evidence |
+|---|---|---|
+| TRAIN-only; TEST/holdout sealed | **PASS** | Loader fenced to TRAIN; this QA ran no catalog screen |
+| Causality / tripwires | **PASS** | Full L0–L4 TW1; pipeline TW2 |
+| L-28 derangement form | **PASS** for row-identity path | `derangement_permutation` asserts zero row fixed points |
+| L-24 thirds + exit-matched nulls | **FAIL** | Thirds OK; required-cell expansion invents impossible HOLD×h=12 keys → hard-fail MISSING |
+| 2,000 ordinary + paired ladders | **PASS** | No 200 cap; two operators + counts on deltas/interactions |
+| No local accounting | **PASS** (static) | No banned `def` accounting primitives in `screen_code/` |
+| Missing spread / cost isolation | **PASS** | Disclosure present; cost disclosure-only |
+| Provenance closure | **PASS** (static) | Import-closure expander includes report_layer/adjudication |
+| Amendment ledger / AMENDMENT-19 | **PASS** | NEUTRAL; formulas match §1 |
+| Python backtest / XENA / family action | **PASS** | None introduced |
+| Stale results as evidence | **N/A rejected** | Existing JSONs predate repairs |
+
+### Independent verification evidence
+
+**Static / unit-path reconstruction (this environment had no shell execution surface):**
+
+1. **Derangement + duplicate values** — `derangement_permutation` permutes indices, not values; `[1,1,2,2]` is legal (`controls.py:113-130`; test `test_derangement_is_over_row_identity_even_with_duplicate_values`).
+2. **Thirds** — equal-time intervals via `np.linspace(DESIGN_START_NS, TRAIN_END_NS, 4)`; test asserts n-per-third `[3,1,1]` under clustered timestamps (`test_chronological_thirds_use_equal_time_intervals_not_equal_rows`).
+3. **Paired ladders** — `_plant_totals_via_wl` changes column 3 only; `_plant_totals_via_p` changes n_pos/n_neg; `_paired_effect_replicate_ladder` records per-seed requested/realised for base + both plants.
+4. **G8 dual-exit** — `find_g8_evidence` requires both hits on one M1 bar, computes independent adverse **before** `resolve_target_trail_time(..., target_price=..., trail_width_price=...)`, requires `reason==TRAIL` and price match; `reconstruct_g8` rejects `dual_exit_probe=False`.
+5. **Provenance closure** — AST walk from roots including `xen/xena/controls.py` and `xen/evaluation.py` resolves `report_layer.py` and `adjudication.py` (test `test_provenance_expands_repository_local_import_closure`).
+6. **HOLD expansion fail** — static: `expand_required_control_cells` lines 89–92; `layers.run_grid_for_pack` skips HOLD when `int(meta["h_bars"]) != h` (819–823); `selfcheck` hard check 27 requires zero MISSING (543). Therefore a full VARIANT_IDS run that includes HOLD_4/24 produces MISSING primary×HOLD cells and cannot hard-pass.
+
+**Commands the operator / next agent must still re-run before execution (not executed here):**
+
+```text
+PYTHONPATH=python/src python -m pytest -q python/tests/test_spdr020_qa8.py
+ruff check python/experiments/SPDR-020/screen_code python/tests/test_spdr020_qa8.py
+python -m compileall -q python/experiments/SPDR-020/screen_code
+# check_no_local_accounting on screen_code
+```
+
+Focused suite content (static inventory) covers derangement, thirds, paired ladders, G8 dual-exit,
+provenance closure, and MISSING labelling — **not** the HOLD×primary-h expansion trap.
+
+### Issues
+
+1. **QA11-01 — HIGH — primary×L4 control expansion invents impossible HOLD cells; hard check then refuses them.**  
+   Design §6.1 L-24.2 / §12 derangements; QA10-01 residual.  
+   `controls.py:83-92` (expand attaches every L4 variant to primary base including `h=12`);  
+   `layers.py:819-823` (HOLD emitted only when `hold_bars == h`);  
+   `selfcheck.py:543-545` (`MISSING` fails hard check 27).  
+   **Required change:** when expanding primary-base required cells, set `h` for `L4_HOLD_*` from the
+   variant’s hold bars (4/12/24), not from the residual primary `h`. Keep observed-L4 reconciliation.
+   Add a focused test that full `VARIANT_IDS` L4 list + primary L0 at `h=12` produces **no**
+   `MISSING` for HOLD_4/HOLD_24 once matching hold episodes exist, and that required HOLD keys use
+   the hold’s own `h`. Until fixed, a full execution candidate cannot hard-pass control integrity
+   even with complete L4 emissions.  
+   **Route:** `experiment-developer`.
+
+**Residual notes (non-blocking alone):**
+
+- G8 still hardcodes `trail_ratcheted_on_close_only: True` rather than proving ratchet from the
+  found path (`golden.py:452`); dual-exit precedence itself is closed.
+- On-disk `results/*.json` are stale developer artifacts; discard/overwrite before any read as
+  evidence.
+- Code remains untracked → provenance `complete=false` until clean commit (correct refusal).
+
+### Route
+
+- `experiment-developer` for **QA11-01**.
+- No design amendment required.
+
+### Verdict rationale
+
+**REVISE**, not APPROVE: QA10-02/03/04 are independently closed; controls/thirds/diversity/
+manifest labelling are largely real; but the remaining HOLD-horizon expansion bug makes the
+control hard check fail on the declared full variant set. Execution stays unauthorised.
+
+## QA run 12 — 2026-07-29T18:40:00Z — mode: subagent — HEAD 0d08f48e2b809fcad3a18f189c5b7a5b272facc0
+
+**Verdict: APPROVE**
+
+**Execution authorisation: NO** (QA APPROVE ≠ launch). Operator gate remains: clean tracked
+commit of `screen_code/` + tests, then full non-smoke execution. This review did not run
+`run_screen.py`, query TEST, or touch the global holdout.
+
+### Review identity and git state
+
+Fresh-context implementation QA after claimed permanent fix for **QA11-01**. Reviewer did not
+author the implementation. Inputs re-read independently: design §6.1 / hold h-free rule /
+§11–§12, QA runs 10–11, `controls.expand_required_control_cells` /
+`hold_bars_for_variant`, `layers` HOLD emission gate + episode `h`, selfcheck hard check 27
+(derangement/control quality incl. zero `MISSING`), golden G8 dual-exit path, metrics paired
+ladders, provenance import closure, focused tests in `test_spdr020_qa8.py`.
+
+Tracked HEAD: `0d08f48e2b809fcad3a18f189c5b7a5b272facc0` (branch `main`, from
+`.git/refs/heads/main`).
+
+Dirty / untracked (implementation still untracked; tracked-clean refusal correctly keeps a live
+run developer-only until code is committed clean):
+
+```text
+# porcelain not executed in this surface; identity matches prior QA11 tree + claimed fix:
+ M python/experiments/SPDR-020/design.md
+ M python/experiments/SPDR-020/qa-review.md
+?? python/experiments/SPDR-020/results/  (stale developer JSONs; not execution evidence)
+?? python/experiments/SPDR-020/screen_code/
+?? python/tests/test_spdr020_qa8.py
+```
+
+Shell surface unavailable this run (same constraint as QA11). Verification is static +
+unit-path reconstruction; operator / next session must re-run the command block below before
+execution.
+
+### QA11 / QA10 closure status (independent)
+
+| Issue | Status | Evidence |
+|---|---|---|
+| **QA11-01** primary×L4 invents impossible HOLD@h=12 → hard MISSING | **CLOSED** | See HOLD probe below; expansion permanent rule + focused test |
+| **QA10-01** control artifact incomplete / wrong thirds / vacuous batteries | **CLOSED** | Thirds, diversity, thin/vacuous labels, manifest complete (QA11 PARTIAL residual was only HOLD) |
+| **QA10-02** delta/interaction two-operator ladders + counts | **CLOSED** | Unchanged: `metrics.py:194-308`; selfcheck ladder counts; `test_paired_ladders_*` |
+| **QA10-03** G8 dual-exit precedence | **CLOSED** | Unchanged: `golden.py:185-468`; dual-active resolver + independent adverse |
+| **QA10-04** provenance transitive closure | **CLOSED** | Unchanged: `provenance.expand_local_import_closure`; includes report_layer/adjudication |
+
+### HOLD expansion probe (QA11-01 — independent reconstruction)
+
+**Design (§4 / cell table + §6.1 L-24.2):** hold devices are **h-free** — 6 hold variants × 24
+base points, with cell `h` equal to the hold length `{4,12,24}`, not nested under residual
+primary `h=12`. Residual-bound L4 (target/trail/size) remain on residual horizons.
+
+**Emission (`layers.py:819-823,700`):** HOLD variants skip unless `int(meta["h_bars"]) == h`
+in the residual grid loop; episode column `h` is that grid `h`, so `L4_HOLD_4_*` only appears
+with `h=4`, never `h=12`. Exit length may further modulate for `_MOD` via `h_use`
+(`layers.py:377-387,601-603`) without changing cell identity `h`.
+
+**Required-cell expansion (`controls.py:36-142`) — current rule:**
+
+1. `hold_bars_for_variant` parses `L4_HOLD_{N}_*` → `N`.
+2. Residual primary cells (filter `CONTROL_PRIMARY` incl. residual `h=12`) expand
+   `L0_BASELINE` + residual L4 only (explicitly **excludes** `L4_HOLD_*`).
+3. HOLD block groups primary base **without** `h`, then stamps `cell["h"] = hold_bars_for_variant(...)`.
+4. Observed L4 groups still reconcile every emitted L4 cell.
+
+**Static full-variant walk** (primary L0 only at `h=12` + `VARIANT_IDS` L4 list):
+
+| Required variant | Required `h` | Impossible? |
+|---|---|---|
+| residual L4 (target/trail/size) | 12 | no — matches residual emission |
+| `L4_HOLD_4_{UNMOD,MOD}` | **4** | no |
+| `L4_HOLD_12_{UNMOD,MOD}` | **12** | no |
+| `L4_HOLD_24_{UNMOD,MOD}` | **24** | no |
+| `L4_HOLD_4_*` @ `h=12` | — | **absent** (was the QA11 fail mode) |
+
+**Hard check 27 path:** `selfcheck.py:513-545` still refuses any manifest row with
+`status == "MISSING"`. After this expansion, a full emission that produces HOLD episodes at
+device horizons can label those cells USABLE/THIN/VACUOUS rather than permanent MISSING from
+impossible keys. Incomplete developer subsets that omit HOLD rows still correctly get MISSING —
+that is accountability, not the invention bug.
+
+**Focused test:** `test_hold_control_requirements_use_device_horizon_not_primary_h`
+(`test_spdr020_qa8.py:929-969`) asserts TARGET@12, HOLD_4@4, HOLD_12@12, HOLD_24@24, and
+rejects HOLD_4@12.
+
+### Design-fidelity trace (delta + reconfirm)
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §6.1 L-24.2 exit-matched L4 nulls + accountable manifest | `controls.py:36-142,785-978`; `selfcheck.py:513-557` | **MATCHES** | HOLD h-free expansion permanent; residual L4 inherits primary residual h; MISSING only when truly absent |
+| §4 hold h-free grid (6×24) | `layers.py:76-111,819-823`; `controls.py:117-132` | **MATCHES** | Manifest + emission + control keys agree on device horizon |
+| §6 ENTRY-TIMING / SIDE derangement, seed battery | `controls.py:153-171,634+` | **MATCHES** | Row-identity derangement retained |
+| §6.1 L-24.1 chronological thirds of full TRAIN | `controls.py` thirds; `selfcheck.py:500-511` | **MATCHES** | Equal-time intervals + sign agreement |
+| §8 ordinary + paired two-operator ladders + counts | `metrics.py:194-308,455-511`; `selfcheck.py:336-` | **MATCHES** | via_WL / via_p; per-seed requested/realised |
+| §11 G8 dual-exit adverse precedence | `golden.py:185-468` | **MATCHES** | Both exits active; independent adverse before resolver |
+| §12 transitive provenance | `provenance.py:48-103`; `run_screen.py:1404-1430` | **MATCHES** | Closure expander; complete requires tracked+clean |
+| Cost isolation / spread disclosure | `config.py:204-216`; design header | **MATCHES** | `UNAVAILABLE_NOT_CHARGED`; estimand cost-free |
+| AMENDMENT-19 source-local L4 | `layers.py` exit params | **MATCHES** | Prior closure retained |
+| Developer-only while dirty/untracked | `selfcheck.py:65-97,606-618` | **MATCHES** | Correct hard_pass refusal until clean commit |
+
+### Golden-trace diff
+
+| Trace | Design expectation | Implemented logic | Verdict |
+|---|---|---|---|
+| G1–G7 | As design §11 | Emitted reconstruction / coverage / twin | **MATCHES** (unchanged from QA11) |
+| G8 | Same-M1 both exits → adverse trail fill | Dual resolver probe + independent adverse | **MATCHES** |
+
+Non-blocking residual: G8 still hardcodes `trail_ratcheted_on_close_only: True`
+(`golden.py:452`) rather than proving ratchet from the found path; dual-exit precedence itself
+is closed.
+
+### Governance & boundary
+
+| Check | Result | Evidence |
+|---|---|---|
+| TRAIN-only; TEST/holdout sealed | **PASS** | Loader fenced; this QA ran no catalog screen |
+| Causality / tripwires | **PASS** | TW1 full L0–L4; TW2 pipeline illegal detector |
+| L-28 derangement form | **PASS** | Zero row fixed points on timing path |
+| L-24 thirds + exit-matched nulls | **PASS** | Thirds OK; HOLD keys use device horizon |
+| 2,000 ordinary + paired ladders | **PASS** | Two operators + counts |
+| No local accounting | **PASS** (static) | No `def` of banned `assemble_realized_bps` / `assemble_multileg_bps` / `per_leg_net` / `build_episodes` under `screen_code/` |
+| Missing spread / cost isolation | **PASS** | Disclosure present; cost disclosure-only |
+| Provenance closure | **PASS** (static logic) | Import expander correct; live `complete` needs clean commit |
+| Amendment ledger / AMENDMENT-19 | **PASS** | Prior match retained |
+| Python backtest / XENA / family action | **PASS** | None introduced |
+| Stale results as evidence | **N/A rejected** | Existing JSONs predate repairs |
+
+### Independent verification evidence
+
+1. **HOLD expansion (closed QA11-01)** — reconstructed from `hold_bars_for_variant` +
+   `expand_required_control_cells` + emission gate; table above; focused test asserts device
+   horizons and forbids HOLD_4@12.
+2. **Hard check 27 interaction** — zero MISSING still required; impossible HOLD keys no longer
+   forced into the required set.
+3. **QA10-02 ladders** — `_plant_totals_via_wl` multiplies col 3; `_plant_totals_via_p` shifts
+   n_pos/n_neg; `_paired_effect_replicate_ladder` records per-seed counts and
+   `all_replicate_counts_match`.
+4. **G8** — `independent_adverse_fill` fixed before `resolve_target_trail_time` with both target
+   and trail active; `reconstruct_g8` rejects non-dual probes.
+5. **Provenance** — AST closure from `xen.xena.controls` / `xen.evaluation` reaches
+   `report_layer` and `adjudication` (test present).
+6. **Accounting** — banned def names absent from screen_code (static grep).
+
+**Commands not executed here (operator / next agent must re-run before execution):**
+
+```text
+git rev-parse HEAD && git status --porcelain
+PYTHONPATH=python/src python -m pytest -q python/tests/test_spdr020_qa8.py
+ruff check python/experiments/SPDR-020/screen_code python/tests/test_spdr020_qa8.py
+python -m compileall -q python/experiments/SPDR-020/screen_code
+# check_no_local_accounting("python/experiments/SPDR-020/screen_code")
+```
+
+### Issues
+
+None blocking design-to-code fidelity for pre-execution APPROVE.
+
+**Operator preconditions (not REVISE findings):**
+
+1. Commit `screen_code/` + `test_spdr020_qa8.py` cleanly so provenance `complete=true` and
+   hard_pass eligibility can hold on a full run.
+2. Re-run the command block above; discard stale `results/*.json` before treating any artifact
+   as evidence.
+3. Execution remains the operator's gate.
+
+### Route
+
+- No `experiment-developer` code work required for the prior HIGH list.
+- No design amendment required.
+
+### Verdict rationale
+
+**APPROVE:** QA11-01 is independently closed by the permanent HOLD vs residual-h split in
+`expand_required_control_cells` / `hold_bars_for_variant`, aligned with emission and the hard
+MISSING refusal. QA10-01–04 remain closed. Residual notes (G8 ratchet flag hardcode, untracked
+tree, stale results) do not re-open a design-fidelity fail. Ready for the **operator** execution
+gate after clean commit and local test green.
