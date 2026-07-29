@@ -253,6 +253,17 @@ R-MARKOV k=4/k=12: THE PARENT PERSISTED NO PER-BAR PROBABILITY. `transition_metr
                    SPDR-015's own emitted `delta_brier_vs_pers` at k=4 and k=12, per symbol,
                    to |d| <= 1e-9, written to results/parent_gate_parity.json. If parity fails,
                    the gate is not the parent's gate and the emission is invalid.
+                   PARITY-EXEMPT SYMBOLS: the parent emitted a NULL metric wherever a symbol had
+                   fewer than 40 usable origins (transitions.py returns all-NaN there), which on
+                   H1 / R-MARKOV / logistic_ridge is 8 of 25 symbols - 1000PEPEUSDT, 1000RATSUSDT,
+                   BIGTIMEUSDT, ORDIUSDT, PYTHUSDT, SEIUSDT, TIAUSDT, WLDUSDT (the same warm-up
+                   gap that costs SPDR-020 its 8 Z-VOL symbols). There is nothing to reproduce, so
+                   those symbols are declared PARITY-EXEMPT BY NAME in parent_gate_parity.json and
+                   the HARD check runs on the 17 with a finite parent metric. `|NaN - NaN| <= 1e-9`
+                   is false, so without this clause a correct screen fails its own check.
+                   CONSEQUENCE, DISCLOSED not hidden: the 4 L2 level/joint/interaction variants
+                   run on 17 of 25 symbols. Per-variant symbol coverage is emitted in
+                   metrics_by_cell, and M-4 effective coverage is applied to those pooled figures.
 
 ALIGNMENT        : every label is generated on H1 and HELD FORWARD to each H1/M15 decision close
                    from its own availability timestamp above. NO backfill, no interpolation, no
@@ -305,7 +316,7 @@ decile edge is shared across symbols.
 | **Dynamic profit target** | `a × ŝ_uncond`, `a ∈ {1, 2, 3}` | `a × ŝ(h)` | `W` up, `p` down |
 | **Trailing stop** | `b × ŝ_uncond`, `b ∈ {1, 2}` | `b × ŝ(h)` | `W` and `L` jointly, path-dependently |
 | **Holding period** | `activeHold ∈ {1, 4, 12, 20}` **HOURS** — on H1 that is 1/4/12/20 bars, on M15 it is 4/16/48/80 bars | `activeHold` scaled to the state's `E[run]` by the exact equation below, also in hours | the horizon over which `W`, `L`, `p` are realised |
-| **Position sizing** | fixed notional `N0` (1 unit of account per episode) | `N0 × (ŝ_uncond / ŝ(t,h))`, clipped to `[0.25, 4]` — i.e. the constant `c` is pinned to `N0 × ŝ_uncond` per symbol, so the modulated arm has the SAME average notional as its comparator by construction and only its dispersion differs | **variance and comparability ONLY.** Reported on dispersion, never on the mean (SoT §4.4). A sizing cell may not carry a `log R` claim |
+| **Position sizing** | fixed notional `N0` (1 unit of account per episode) | `N0 × (ŝ_uncond / ŝ(t,h))`, clipped to `[0.25, 4]` — i.e. the constant `c` is pinned to `N0 × ŝ_uncond` per symbol, so the modulated arm is **anchored at the same scale** as its comparator. Its realised mean weight is **not** identical (Jensen, plus the clip): the **mean and sd of the realised weight are emitted per symbol** rather than assumed | **variance and comparability ONLY.** Reported on dispersion, never on the mean (SoT §4.4). A sizing cell may not carry a `log R` claim |
 
 **Comparator units are identical by construction** (QA run 2). An earlier draft set the unmodulated
 arm in `ATR20` (price units, decision clock) against the modulated arm in `ŝ` (bps, H1) — two
@@ -565,7 +576,7 @@ TRIPWIRE-2 (fill-rule look-ahead) - COVERS ENTRIES AND EXITS (QA run 1 required 
   emitted statistics: `clock_vs_m1_differing_fill_ids` and its count;
     `both_reachable_bar_ids` and its count; `favourable_precedence_differing_fill_ids` and its
     count; per differing id, the two fill prices; plus paired payoff deltas with CIs.
-  HARD PASS, fixed before the run - ALL THREE:
+  HARD PASS, fixed before the run - ALL FOUR:
     `count(clock_vs_m1_differing_fill_ids) > 0`
     AND `count(both_reachable_bar_ids) > 0`, where `both_reachable_bar_ids` counts only M1 bars
         in which the target and the trail/stop levels are DISTINCT prices; bars where the two
@@ -1050,7 +1061,7 @@ G6 (leak discrimination):
 | **Exit-matched nulls** | each derangement seed is re-resolved on M1 **under the live arm's own exit rule**; the sign-negation shortcut is asserted present **only** on time-exit arms (L-24.2/F04, §6) |
 | **Parent-gate parity** | the regenerated R-MARKOV k=4/k=12 probabilities reproduce SPDR-015's emitted `delta_brier_vs_pers` per symbol to `|Δ| ≤ 1e-9`, written to `results/parent_gate_parity.json`. A parity failure means the gate is not the parent's gate — **hard failure** (§4.1a) |
 | **Universe file equality** | `SPDR-014/results/universe_recomputed.json` (the predeclaration's pin) and `cf-voldir-001-universe.json` (§10's run-time pin) are asserted to hold the **same 25 symbols** |
-| **L1 fixed-entry subset** | every L1 episode key `(symbol, signal_ts, side, δ)` is asserted present in the L0 population at the same `δ`, with identical stop price, fill ts/price and signal bar. An L1 episode absent from L0 means ŝ moved the entry itself, which is a **hard failure** — reflection §5.9 requires every layer to be characterised against the same fixed signed entry, and §5.5's ŝ-decile axis is a selection axis, not an entry re-parameterisation |
+| **L1 fixed-entry subset** | every L1 episode key `(symbol, signal_ts, side, δ)` is asserted present in the L0 population at the same `δ`, with identical stop price, fill ts/price and signal bar. An L1 episode absent from L0 means ŝ moved the entry itself, which is a **hard failure**. **Authority: reflection §5.9's single-fixed-entry rule**, which binds over §5.5's suggestion that `deltaThreshold` be *calibrated* on ŝ deciles — that reading would re-parameterise the entry, and the departure is booked in AMENDMENT-18 rather than smuggled |
 | **L4 comparator identity** | for **every** L4 device pair, the unmodulated and modulated arms are asserted to share **estimator (Parkinson-EWMA ŝ), unit (bps), clock (H1 forecast), horizon scaling (`√h`, `h` in hours) and multiplier**, differing **only** in constant-per-symbol-TRAIN-median ŝ vs conditional ŝ(t,h). An ATR-derived exit boundary anywhere in an L4 arm is a **hard failure** — Wilder ATR(20) may appear only as the `deltaThreshold` normaliser (§7) |
 | **Predeclaration present** | `results/expected_resolution.json` exists, is dated, carries the SHA-256 of every input, expands **all 5,148** declared strata (§8.1 schema) with **no** placeholder status and **no** `COMPUTED AT RUN` string, and its `input_sha256.basis` equals the sha256 of the committed `results/resolution_basis.json`. Regenerating it after implementation begins is a design change requiring fresh QA |
 | **Basis population** | `results/resolution_basis.json` declares exactly one population (`input_filter: arm == 'C'`) and its row accounting reconciles: `filter_matched − retained == excluded == Σ excluded_by_reason` |
@@ -1250,9 +1261,43 @@ AMENDMENT-17: QA run-5 remediation, in one row because the items are one repair 
     signals exist and broken reflection SS5.9's single-fixed-entry requirement - the same defect
     QA found in SPDR-020's L1.
 
-running count (all rows as labelled, including superseded): 4 looser / 8 tighter / 5 neutral
-ACTIVE rows after supersessions (AMENDMENT-7 by -17, AMENDMENT-11 by -15): 3 looser / 7 tighter /
+AMENDMENT-18: QA run-6 remediation, booked as one row because it is one repair pass:
+  (a) name every layer gate's SOURCE ARTIFACT AND COLUMN, and regenerate the R-MARKOV k=4/k=12
+  probabilities via SPDR-015's own frozen `walk_forward_probs` - the parent persisted skill
+  summaries only - with a HARD parity check and a named PARITY-EXEMPT list for the 8 symbols whose
+  parent metric is null; (b) pin every decile as PER-SYMBOL, EXPANDING and CAUSAL (SS4.1b);
+  (c) require every derangement seed to be RE-RESOLVED under the live arm's own exit rule, with
+  sign-negation allowed only on time-exit arms (L-24.2/F04); (d) withdraw the residual n forecast
+  ("50k-60k") and the c = 5.4 anchor, neither of which exists in the arm-C artifact; (e) check the
+  block rule CLAUSE BY CLAUSE against SS8.1's canonical six-clause list and trim the pinned
+  `source_ci_rule` to SPDR-018 SS6.2's own text; (f) exclude price-identical bars from TRIPWIRE-2's
+  equality; (g) restate G6 structurally; (h) pin the sizing normalisation; (i) state the
+  DESIGN/CONFIRM join key; (j) assert universe-file set equality.
+  - DIRECTION: TIGHTER (four checks added, two forecasts withdrawn, no cell admitted or excluded)
+  - QA run 6.
+  - THREE DEPARTURES FROM THE BINDING REFLECTION, BOOKED HERE RATHER THAN LEFT IMPLICIT. All three
+    are narrowings and all three follow SS5.9, which binds over the looser readings elsewhere in
+    the same document:
+      1. SS5.5 offers the ŝ-decile as the CALIBRATION AXIS for `deltaThreshold`. Taken literally
+         that re-parameterises the entry and creates signals the frozen entry never produced, so
+         L1 is implemented as a SELECTION on the fixed entry instead (SS4.1, SS4.1b).
+      2. SS5.9's L1 row says ŝ is used "only to set parameter magnitudes". This design's L1 sets
+         no magnitude at all - the magnitudes are L4's - so L1 is a pure selection layer and the
+         ŝ-scaled magnitudes are tested in L4's modulated arms, where their comparator lives.
+      3. SS5.9 says the L4 UNMODULATED arm is "a fixed multiple of ATR". This design uses the
+         per-symbol TRAIN-median of the SAME Parkinson-EWMA ŝ instead, because an ATR arm against
+         a Parkinson arm is a ~1.5-1.7x estimator seam (L-21 / EXP-025) that would swamp the
+         information effect the pair exists to measure.
+    Each keeps the reflection's INTENT - one fixed entry, layers characterised alone, a comparator
+    that isolates the information - and none widens scope.
+
+running count (all rows as labelled, including superseded): 4 looser / 9 tighter / 5 neutral
+ACTIVE rows after supersessions (AMENDMENT-7 by -17, AMENDMENT-11 by -15): 3 looser / 8 tighter /
 5 neutral.
+L-23 STREAK NOTE (clause 3 applies to the conservative direction too): AMENDMENTS 12-18 are seven
+consecutive TIGHTER rows. Flagged for the operator at the execution gate: a design that only ever
+tightens after review is one whose first draft was systematically under-specified, which is what
+this ledger records.
 NOTE per L-23: LOOSER now stands at 3 (AMENDMENT-1 full TRAIN, -2 M15, -10 hold grid) and is
 FLAGGED for the operator at the execution gate, as L-23 requires.
 EXPECTED FALSE-QUALIFIER COUNT UNDER THE FINAL SET (L-23, mandatory): **N/A - ZERO machine
@@ -1278,7 +1323,7 @@ Assessment, item by item:
   - AMENDMENT-10 (hold horizon): defensible. Reflection SS5.5's measured E[run] bound authorises
     the scale; the alternative was a hold axis that did not reach the scale it claimed.
 No loosening touches an integrity check, fence, causality rule or claim boundary - verified against
-SS10, SS12 and SS13. The seven active tightenings close real specification gaps.
+SS10, SS12 and SS13. The eight active tightenings close real specification gaps.
 ```
 
 Checkpoint/family amendments in force: **U1** (top-25 universe, NEUTRAL), **S1** (per-symbol

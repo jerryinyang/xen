@@ -6,8 +6,10 @@
 SoT signed. `SPDR-018` + `SPDR-018B` COMPLETE AND CLOSED 2026-07-26 (`HYP-D5` SUPPORTED /
 PARTIALLY SUPPORTED; no gating verdict from either). NEXT = the mid-checkpoint reflection
 (inputs assembled, operator decision unsigned). `SPDR-019` / `SPDR-020` designs are complete;
-QA run-5 fixes were applied to BOTH on 2026-07-29 and await fresh QA approval. Execution remains
-unauthorised. TRAIN only; holdouts sealed.**
+both passed fresh QA on 2026-07-29 (run 7, APPROVE) and **implementation of `screen_code/` is
+authorised**. **Execution remains unauthorised**: `reflection-inputs.md` §9 is unsigned and the
+family contract still needs the amendment row narrowing HYP-D6/D7 to the gross residual. TRAIN
+only; holdouts sealed.**
 
 **Closed threads since:** **P4** — C3 is *terminally unpowerable* in its registered form (median cell
 needs ~201 years of 25-symbol history); **P3** — CI fragility swept, seed spans ~4.8% of CI width, so

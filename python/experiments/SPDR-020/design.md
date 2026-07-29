@@ -698,7 +698,7 @@ EXPECTED RESOLUTION, PER STRATUM - PREDECLARED BY GENERATION, NOT BY TYPING.
         prior_path, basis_path, output_path,
         generated_at_utc="2026-07-29T00:00:00Z",
         source_hashes=<the six SHA-256 pins embedded in the output>)
-  Expected output SHA-256: 4c8c42c91ea2ab029d2a8321cbd5b295e57b46c2f55c4708c2712f137b9c7b6d.
+  Expected output SHA-256: f174eaf655be0ef7bcf376618d1d82ff49bed2b49cc1cca1f6ab9e4f95b19341.
 
   The generated artifact already exists, is dated, and pins the SHA-256 of both JSON inputs, the
   shared module, and every parent artifact used. Implementation must verify those hashes before

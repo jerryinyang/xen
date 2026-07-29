@@ -2361,3 +2361,322 @@ emission carries them and the design correctly declares them unknown. I did not 
 `xen.evaluation.block_bootstrap_ci`'s internals beyond the L-20 contract. I did not review SPDR-020,
 which shares `resolution_basis.py`, the block rule and the control blocks — R6-03, R6-05 and R6-09
 are likely to apply there verbatim.
+
+---
+
+## QA run 7 — 2026-07-29T05:15:22Z — mode: subagent — HEAD 112242c (clean tree)
+
+**Reviewed git state:** `HEAD 112242c8b6fc81e86116699e567e9bfea941b3ba`, working tree clean.
+Target: `python/experiments/SPDR-019/design.md` (1,314 lines).
+**Stage:** DESIGN-STAGE. `screen_code/` absent — expected, not a finding.
+**Independence:** fresh subagent context. I authored neither the design nor any of its fixes. Run 6
+was read in full, run 5 skimmed. Every number below was recomputed by me from
+`SPDR-018/results/analyst_per_cell_magnitudes.parquet`, `SPDR-015/results/{regime_states,
+zz_ordinal,transition_metrics}.parquet`, `SPDR-015/screen_code/{transitions,features}.py`,
+`SPDR-018/design.md` §6.2, the three committed resolution JSONs, and the registry/reflection
+sources. The design's prose was treated as an untrusted claim throughout. For R6-01 I did not stop
+at reading the parent code — I **executed** the proposed regeneration route.
+
+**Verdict: APPROVE.** **Implementation of `screen_code/` IS authorised.**
+
+R6-01 … R6-11 are **all genuinely closed**. R6-01, the largest of them, is closed by construction
+rather than by assertion: I ran the parent's own frozen function over the parent's own emitted
+columns and reproduced its published skill metric **exactly** (see Part A). Six new findings remain
+— one check-convention gap, one stale provenance hash, one ledger row, one prose overclaim, one
+citation-accuracy issue and one wrong number-word. **None of them forces the developer to invent an
+estimand, a population, a comparator or an integrity check**; all six are fixable during or after
+implementation without touching a line of screen logic. Under the pipeline's own standard that is
+an APPROVE.
+
+Findings: **1 MEDIUM · 5 LOW.** No HIGH. No REJECT-class issue.
+
+---
+
+### PART A — run-6 closure, verified independently
+
+| # | Run-6 finding | Status | Independent evidence |
+|---|---|---|---|
+| R6-01 | R-MARKOV gate reads a forecast no parent emitted | **CLOSED — verified by execution** | §4.1a now names, per gate, the source artifact **and column**. I checked each against the emission: (i) `s_hmm_rv` exists in `SPDR-015/results/regime_states.parquet` (H1: 212,224 rows, 25 symbols) with values `{0: 149,121, 1: 52,954, −1: 10,149}` — the design's `< 0 means NO STATE, INELIGIBLE, never coerced to LOW` matches the real value domain; (ii) `zz_ordinal.parquet` carries `target`, `model`, `p`, `pred_cont`, `threshold`, `confirm_slot_end` — every field the T-GT-CUR / T-GT-MED5 rules name; (iii) the R-MARKOV route: `walk_forward_probs(state, X, slot_end, is_origin, k)` exists at `transitions.py:170` with **exactly** that signature; the feature matrix is `_feature_matrix_for_model(cols,'R-MARKOV')` at `:134`, whose eight inputs are `s_markov, dur_markov, rv20, park_ewma, lvl_pct, n_high_4_markov, n_high_12_markov, s_shock` — **name for name the list §4.1a pins**, and all eight are emitted in `regime_states.parquet`. Causality: `_n_high_last_k` (`features.py:96–105`) windows `[i−k+1, i]` — backward-looking, as claimed; the forward-looking `run_len_markov` / `run_len_hmm` are in the artifact but **excluded from the feature matrix** and named in the FORBIDDEN list. `run_screen.py:289–311` emits the same frame, in the same row order, that `transitions.py:478` builds `cols` from, so the regeneration is exactly reproducible. **I ran it.** For 1000BONKUSDT and 1000LUNCUSDT at k=4 and k=12 the regenerated `delta_brier_vs_pers` matched the parent's published value with **diff = 0.0** (bit-identical, not merely within 1e-9). The parity check is therefore both meaningful (Brier over the whole OOS probability vector is a checksum of that vector — any differing probability moves it far above 1e-9) and achievable. Residue: the NaN case, R7-01 |
+| R6-02 | L1 deciles had no reference population and no causality | **CLOSED** | New §4.1b (`design.md:271–299`) pins all four: POPULATION per symbol (with the 13→129 bps σ̂ rationale); WINDOW expanding and causal, quantiles over bars **strictly before** `[0]`, full-TRAIN edges explicitly refused as "a look-ahead that survives a fence check"; WARM-UP 250 prior H1 ŝ values, sub-warm-up events INELIGIBLE for L1 rows only, counted with reason, retained everywhere else; CONTINUOUS rank on the same per-symbol expanding empirical rank; and the M-3 magnitude deciles bound to the identical rule. §12 adds a HARD **Decile causality** row (`:1049`) making a pooled or full-TRAIN edge a hard failure. Both open choices run 6 named are now closed, and closed the way run 6 recommended |
+| R6-03 | derangements not exit-matched on path-dependent arms | **CLOSED** | §6 carries a new binding block, **EXIT-MATCHING, BINDING ON BOTH DERANGEMENTS** (`:472–480`): the deranged side/timing is applied first, then entry fill, barrier levels and exit are **re-resolved from M1 exactly as §2 specifies**, and `r` is computed from the re-resolved fills; sign negation is PERMITTED ONLY on time-exit arms and asserted per arm; a device whose null cannot be exit-matched is demoted to DISCLOSURE and labelled. §12 adds a HARD **Exit-matched nulls** row (`:1050`). The mechanism run 6 described (side decides which barrier is hit and when) is now the design's own stated reason |
+| R6-04 | live 50–60k prediction contradicted the all-null predeclaration | **CLOSED** | Both live premises are gone. `:662–669` now reads "WHICH band this design's strata land in is **NOT predicted** — no `n` is forecast anywhere (§8.1), so the band is assigned from the realised `n` when it exists", and the `c = 5.4` anchor and the 50–60k figure appear **only** inside the withdrawal sentence, with the artifact-checked reason ("`c = 5.4` appears nowhere in the arm-C artifact (its smallest band median is 5.634)"). I confirmed 5.634 from the JSON: band `0-100`, `c_median = 5.6339`. The crossing point is now read off `required_n_by_band`, not typed. `grep` over the whole design finds no surviving live `n` forecast |
+| R6-05 | block-rule check had no canonical string; JSON string not verbatim | **CLOSED** | §8.1 now declares a **six-clause canonical literal** (`:790–806`) and §12 (`:1048`) checks it "**clause by clause against §8.1's canonical six-clause list** (never by string equality), because a string comparison fails on whitespace and passes on a paraphrase". I diffed the JSON's `source_ci_rule` against `SPDR-018/design.md:245–252` myself: the quoted text is now SPDR-018 §6.2's three bullets **and nothing else** — the appended "emit per-seed bound spreads" sentence run 6 flagged is gone, and §8.1/§12 both state that this design's extra emission requirement is deliberately outside the pinned string. All six clauses map onto SPDR-018 §6.2's content with no addition and no loss |
+| R6-06 | TRIPWIRE-2 equality clause false-fails on coincident prices | **CLOSED** | `:570–574` now defines `both_reachable_bar_ids` as counting **only** M1 bars where target and trail/stop are DISTINCT prices, and adds `price_identical_bars`, "counted separately … never as a failure" — exactly run 6's fix |
+| R6-07 | G6 asked QA to confirm a "material difference" | **CLOSED** | G6 (`:1025–1029`) is now the structural comparison: `shift_is_exact_one_row`, `changed_state_rows > 0`, `changed_selection_episodes > 0`, and that the legal variant entered the emission — with "No magnitude is asserted: the payoff delta is reported and carries no pass rule" |
+| R6-08 | predeclaration grain omitted the band axis | **CLOSED** | §8.1 **BAND AXIS AND THE JOIN KEY** (`:871–876`) states the predeclaration is at the full-TRAIN grain, that DESIGN/CONFIRM carry `band` as a fourth **reporting** column and join on `(clock, delta, variant_id, scope)` alone — and honestly notes the join is exact *only because* every predeclared value is null. The developer no longer invents the schema |
+| R6-09 | module docstring asserted the withdrawn flatness claim | **CLOSED** | `git show 112242c -- python/src/xen/resolution_basis.py`: the docstring now reads "The derivation EXPECTS `c` to be flat … but that is a hypothesis, not a result: on SPDR-018's arm-C cells the 15,000+ band's horizon medians are 11.855 / 8.363 / 11.744, a 1.42× spread … no caller may assume flatness". Matches `horizon_interpretation` in the artifact. This fix is what created R7-02 |
+| R6-10 | modulated sizing constant undefined | **CLOSED** | §4.2 (`:308`) now pins it: `N0 × (ŝ_uncond / ŝ(t,h))`, clipped `[0.25, 4]`, with the constant pinned to `N0 × ŝ_uncond` per symbol — run 6's recommended normalisation. Residue is the prose claim attached to it, R7-04 |
+| R6-11 | predeclaration pinned a different universe file from §10's | **CLOSED** | §8.1 **UNIVERSE PIN** (`:878–882`) states both files, and §12 adds a HARD **Universe file equality** row (`:1052`) asserting set equality before the run, with regeneration-and-re-review rather than hand reconciliation if they differ. I verified independently: the prior's `scope` axis minus `POOLED` is set-identical to both `cf-voldir-001-universe.json` and `SPDR-014/results/universe_recomputed.json` (25 symbols, both `True`) |
+| *(advisory)* | subset assertion covers L1 only | **NOT TAKEN UP** | §12's **L1 fixed-entry subset** row (`:1053`) is still L1-only. Restated as Advisory 1 below; it was advisory in run 6 and stays advisory |
+
+---
+
+### PART B — independent numeric audit
+
+Recomputed from the parent emission with my own code, not the module under review.
+
+| Quantity | Design / artifact | My recomputation | Verdict |
+|---|---|---|---|
+| Basis row accounting | 24,098 → 18,988 (`arm == 'C'`) → 18,479 retained, 509 excluded | **24,098 / 18,988 / 18,479 / 509** | REPRODUCES |
+| Exclusions by reason | 509 `missing_required_value`, 0 / 0 / 0 | **509 / 0 / 0 / 0** | REPRODUCES |
+| §12 accounting identity | `filter_matched − retained == excluded == Σ by_reason` | 18,988 − 18,479 = 509 = 509 | RECONCILES |
+| 15,000+ band | 26 cells, 8 distinct `n`, 3 bases | **26 / 8 / 3** (`pooled_raw`, `pooled_sigma_normalised`, `dose_response`) | REPRODUCES |
+| 15,000+ horizon medians | 11.855 / 8.363 / 11.744 on 6 / 14 / 6 cells | **11.8547 / 8.3628 / 11.7438** on **6 / 14 / 6** | REPRODUCES |
+| Horizon spread "1.42×" | 1.42 | 11.8547 / 8.3628 = **1.4176** | REPRODUCES |
+| Smallest band median (the 5.4 refutation) | 5.634 | JSON band `0-100` `c_median` = **5.6339** | REPRODUCES |
+| Full band table | 5.634 / 6.648 / 7.353 / 7.418 / 11.304 | **5.6339 / 6.6475 / 7.3528 / 7.4177 / 11.3036** over bands `0-100 / 100-1,000 / 1,000-5,000 / 5,000-15,000 / 15,000-inf` | REPRODUCES |
+| Arm-C `n ≥ 10,000` | 0.053–0.107 over 41 cells | **0.05343–0.10680**, **41** cells | REPRODUCES |
+| Three largest `n` | 20,977 / 20,572 / 20,279; 0.0727–0.0945 over 9 cells | **exact**; 9 cells, **0.07271–0.09447** | REPRODUCES |
+| Per-horizon spans of those nine | h=4 0.078–0.094 · h=12 0.076–0.082 · h=24 0.073–0.090 | **0.0781–0.0945 · 0.0756–0.0823 · 0.0727–0.0904** | REPRODUCES |
+| Cells reaching 0.03 | 0, other than three degenerate `n=2, p=0` | **exactly 3**, all `n = 2, p = 0` (0.01015 / 0.01189 / 0.01523) | REPRODUCES |
+| `source_ci_rule` vs parent | "SPDR-018 §6.2's own text and nothing else" | diffed against `SPDR-018/design.md:245–252`: three bullets, verbatim, **no addition** | REPRODUCES |
+| Cell arithmetic | L4 = 3+3+2+2+4+4+1+1 = 20; 1+4+5+3+20 = **33**; 33 × 2 × 3 = **198**; 198 × 26 = **5,148** | all exact; `declared_axes.variant_id` holds **33** ids matching §4.1a **name for name**; axes 2 × 3 × 33 × 26 | REPRODUCES |
+| Predeclaration integrity | 5,148 strata, all UNKNOWN, no placeholder | `row_count` **5,148**, **5,148 distinct** grain tuples, **5,148/5,148** `UNKNOWN_NO_PARENT_MEASURED_POPULATION`, **0** non-null `expected_n`, **0** non-null `expected_mde50`; payload contains none of `computed at run`, `placeholder`, `l5_slot`, `powered`, `unpowered`, `at_target`, `not_resolvable` | REPRODUCES |
+| §12 `input_sha256.basis` assertion | equals sha256 of committed `resolution_basis.json` | pinned `c1c560bb7934…` = actual `c1c560bb7934…` | HOLDS |
+| Generator provenance pin | `source_sha256.generator_code` | pinned `2489bd5b…`, **actual `72c6b1f9…`** | **MISMATCH → R7-02** |
+| Prior pin | `input_sha256.prior` | pinned `961cec28…` = actual `961cec28…` | HOLDS |
+| Parent emission pin | `spdr018_analyst_per_cell_magnitudes` | pinned `c06c58f5…` = actual `c06c58f5…` | HOLDS |
+| Universe set equality | prior scope ≡ family pin ≡ SPDR-014 recompute | 25 symbols, both comparisons `True` | HOLDS |
+| §12 HARD-check count | "EXPECTED HARD-CHECK COUNT: **28**" | I counted the named list: check-count, TRIPWIRE-1, TRIPWIRE-2, TRAIN fence, holdout, causality, fill causality, universe pin, identity reconstruction, log R definition, cost isolation, derangement fixed-point count, golden traces, determinism, block rule, L4 comparator identity, parent-gate provenance, parent-gate parity, decile causality, exit-matched nulls, L1 fixed-entry subset, MOD-hold eligibility, predeclaration present, basis population, universe file equality, L-51 selection check, log R never unaccompanied, predeclared-vs-realised = **28**. Every one has its own row in the §12 table | REPRODUCES |
+| L-23 tally | 4 looser / 8 tighter / 5 neutral (17 rows); active 3 / 7 / 5 | LOOSER {1,2,7,10}=4; TIGHTER {3,4,8,11,13,15,16,17}=8; NEUTRAL {5,6,9,12,14}=5; total **17**; less superseded 7 and 11 → **3 / 7 / 5** | REPRODUCES (but see R7-03) |
+| False-qualifier disclosure | 2.5% → 4.95 of 198; 128.7 of 5,148 | 0.025 × 198 = **4.95**; 0.025 × 5,148 = **128.7** | REPRODUCES |
+| Registry C6 / C7 | pre-declared (b) trigger; ladder `{0.02,0.03,0.05,0.075,0.10,0.15}`; no `NOT_RESOLVABLE` flag anywhere | verified verbatim at `cf-voldir-001.md` rows dated 2026-07-28. §4.3's reconciliation (C7 supersedes the *flag*, not the *obligation*; the six-rung distribution is reported instead) is a disclosed, defensible reading of a genuine conflict between two registered amendments | CORRECT |
+| M1 lane exists | `data/catalog/`, T1 lane | `data/catalog/data/bar` holds **903** `…-1-MINUTE-LAST-EXTERNAL` catalogs | HOLDS |
+| `xen.evaluation.block_bootstrap_ci` | named in the block rule | exists, `src/xen/evaluation.py:59` | HOLDS |
+| `tests/test_resolution_basis.py` | tested and re-runnable | `PYTHONPATH=src python -m pytest -q tests/test_resolution_basis.py` → **9 passed** in 0.39s | PASSES |
+
+**On the R-MARKOV regeneration, executed rather than argued.** Running
+`walk_forward_probs` + `metrics_row` on `regime_states.parquet` for four symbols at k=4 and k=12:
+
+```
+1000BONKUSDT  k=4   emitted -0.02304579816015967   regen -0.02304579816015967   diff 0.0
+1000BONKUSDT  k=12  emitted -0.09525884058640921   regen -0.09525884058640921   diff 0.0
+1000LUNCUSDT  k=4   emitted -0.00739049895070917   regen -0.00739049895070917   diff 0.0
+1000LUNCUSDT  k=12  emitted -0.09855503079154710   regen -0.09855503079154710   diff 0.0
+1000PEPEUSDT  k=4   emitted NaN                    regen NaN     (n_finite_p = 0)
+1000RATSUSDT  k=4   emitted NaN                    regen NaN     (n_finite_p = 0)
+```
+
+The route is sound, deterministic and bit-identical — R6-01's fix is real, not a promise. The last
+two rows are R7-01.
+
+---
+
+### PART C — findings
+
+#### R7-01 — MEDIUM — the HARD parent-gate parity check has no defined outcome for the 8 of 25 symbols where the parent emitted no probability at all
+
+**Fails:** `design.md:252–255` (§4.1a PARENT PARITY, HARD: *"must reproduce SPDR-015's own emitted
+`delta_brier_vs_pers` at k=4 and k=12, per symbol, to `|d| <= 1e-9`"*); `design.md:1051` (§12 HARD
+**Parent-gate parity**).
+
+`transition_metrics.parquet`, filtered to `clock == 'H1'`, `model == 'R-MARKOV'`,
+`method == 'logistic_ridge'`, `horizon_k ∈ {4, 12}`, holds 50 rows — and **only 34 carry a finite
+`delta_brier_vs_pers`**. Eight symbols are NaN at **both** horizons:
+
+`1000PEPEUSDT · 1000RATSUSDT · BIGTIMEUSDT · ORDIUSDT · PYTHUSDT · SEIUSDT · TIAUSDT · WLDUSDT`
+
+I traced the cause: `walk_forward_probs` returns an all-NaN `logistic_ridge` vector when
+`origin_idx.size < 40` (`transitions.py:189–190`), so the parent never produced a probability for
+those symbols and its Brier is undefined. My regeneration reproduces the NaN faithfully. Two
+consequences the design does not state:
+
+1. **The check.** `|NaN − NaN| ≤ 1e-9` evaluates false. A literal implementation of the HARD
+   assertion fails on a **correct** screen, on a third of the universe — the same shape as R6-06,
+   which the design has already fixed once for TRIPWIRE-2.
+2. **The population.** Those eight symbols have no R-MARKOV k=4/k=12 gate at all, so every one of
+   their episodes is ineligible for `L2_LEVEL_RMARKOV_K4`, `L2_LEVEL_RMARKOV_K12`,
+   `L2_JOINT_HMM_HIGH_AND_K12_HIGH` and `L2_INTERACTION_HMM_X_K12` — 4 of the 33 variants run on
+   **17 of 25 symbols**. §4.1a's ALIGNMENT clause already forces the right behaviour ("An event with
+   no available label yet is excluded from that layer's rows with a count and reason"), so the
+   population rule is not missing — but the coverage fact is undisclosed, and a per-symbol L2 read
+   on 17 rather than 25 symbols is exactly the kind of silent narrowing the design elsewhere refuses.
+
+**Why this is not blocking.** The developer is not being asked to invent a rule: §4.1a already says
+what happens to an event with no label, and the parity convention follows from the design's own
+P-23/L-52 principle that a check which cannot be evaluated is recorded, not vacuously passed.
+
+**Required fix (quant-designer), before EXECUTION not before implementation.** In §4.1a and §12,
+state that a symbol whose parent `delta_brier_vs_pers` is null at a horizon is **PARITY-EXEMPT** at
+that horizon, that its count and its symbol list are emitted to `results/parent_gate_parity.json`,
+and that its episodes are INELIGIBLE for the four R-MARKOV variants with the same count-and-reason
+treatment as any other missing label. Add the realised per-variant symbol coverage to
+`metrics_by_cell` so the 17-of-25 fact is disclosed rather than inferred.
+
+#### R7-02 — LOW — the committed predeclaration pins a generator hash that no longer matches the generator
+
+`expected_resolution.json.source_sha256.generator_code = 2489bd5b9600…` and
+`resolution_basis.json.generator_sha256 = 2489bd5b9600…`, but the actual sha256 of
+`python/src/xen/resolution_basis.py` at HEAD 112242c is **`72c6b1f953ca…`**. The R6-09 docstring fix
+landed in the same commit as the artifact regeneration but **after** it, so the provenance pin is
+stale. The same defect is present in `SPDR-020/results/expected_resolution.json` and in the shared
+`resolution_basis.json` (byte-identical file, same sha `c1c560bb…`, pinned by both experiments).
+
+§12's **Predeclaration present** row asserts only that `input_sha256.basis` equals the sha of the
+committed basis — which **does** hold — so no stated check fails. What fails is §15's and §8.1's
+claim that the artifact is "SHA-256-pinned on its inputs": the pinned generator is not the generator
+on disk. I verified the change is numerically inert — I recomputed every band, cell count,
+`distinct_n`, horizon summary and `c_median` independently and they reproduce the committed values
+exactly — so this is a provenance-record defect, not a data defect.
+
+**Required fix (experiment-developer).** Re-run the §8.1 generator command at the pinned
+`generated_at_utc` with the current source hashes and re-commit both experiments' JSONs; confirm the
+payload is unchanged apart from `generator_sha256` / `source_sha256.generator_code`. Do this before
+execution so the audit trail is intact.
+
+#### R7-03 — LOW — the L-23 ledger has no row for the run-6 remediation
+
+`design.md:1127–1257`. Every earlier QA round is booked — AMENDMENT-3/4/5 (run 1), 9/10 (run 2),
+12/13 (run 3), 14/15/16 (run 4), 17 (run 5, "in one row because the items are one repair of the same
+document"). The run-6 repair is not: commit 112242c added §4.1b whole, replaced the R-MARKOV gate
+route, added the binding exit-matching clause, added or edited six §12 rows and stated the HARD count
+as a literal 28 — and the ledger still totals 17 rows reading `4 looser / 8 tighter / 5 neutral`. My
+recount of the 17 booked rows matches those numbers exactly, so the tally is right *for what is
+booked*; the omission is that the run-6 changes are not booked at all. L-23 requires **every**
+pre-measurement amendment to carry a direction and enter the running count.
+
+**Required fix (quant-designer).** Add `AMENDMENT-18: QA run-6 remediation` in the AMENDMENT-17 style
+(one row, items (a)–(k)), `DIRECTION: TIGHTER`, and update the counts to `4 looser / 9 tighter /
+5 neutral`, active `3 / 8 / 5`. The LOOSER streak flag for the operator is unaffected.
+
+#### R7-04 — LOW — the sizing arm's "same average notional by construction" is not true by construction
+
+`design.md:308`: *"the constant `c` is pinned to `N0 × ŝ_uncond` per symbol, so the modulated arm has
+the SAME average notional as its comparator **by construction** and only its dispersion differs."*
+The weight is `ŝ_uncond / ŝ(t,h)`; by Jensen `E[ŝ_uncond/ŝ] ≥ ŝ_uncond/E[ŝ] = 1` whenever `ŝ` varies,
+and the `[0.25, 4]` clip perturbs it further. What is equal by construction is the **scale anchor**,
+not the realised mean notional. Harmless to every estimand — §4.2 and §13 forbid a sizing cell
+carrying a `log R` claim and bind it to dispersion (SoT §4.4) — but a reader will take the sentence
+at face value and it is checkable, so it should be right.
+
+**Required fix (quant-designer).** Replace "the SAME average notional … by construction" with
+"anchored at the same scale; the realised mean weight is emitted", and add the realised mean and sd
+of the weight per symbol to the two `L4_SIZE_*` rows' emission.
+
+#### R7-05 — LOW — three departures from the BINDING reflection are unlabelled, and one §12 row mis-cites it
+
+The reflection at
+`docs/experiments-docs/checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/reflection-mid-volatility-model.md`
+is the binding source. Three departures exist. All three are, in my judgement, **improvements** — but
+L-23 and the design's own practice require them to be booked as departures, and one of them is
+currently justified by a misquotation.
+
+1. **§12's L1 row (`design.md:1053`) asserts "§5.5's ŝ-decile axis is a selection axis, not an entry
+   re-parameterisation".** Reflection §5.5 (`:359`) says the opposite: the ŝ-decile axis is offered
+   as the **calibration axis for `deltaThreshold`** — *"a decile-based threshold is the natural
+   calibration axis, not an absolute number"* — which is precisely an entry re-parameterisation. The
+   design's choice (freeze `δ` at `{0.25, 0.5, 1.0}`, use ŝ deciles to **select** among the signals
+   the frozen δ already produced) is the better one and is compelled by §5.9's single-fixed-entry
+   requirement plus AMENDMENT-3. But the authority for it is §5.9, not §5.5, and the sentence as
+   written tells a reader the reflection says something it does not.
+2. **Reflection §5.9's L1 row (`:429`)** is *"ŝ used **only** to set parameter magnitudes; no state
+   gate, no swing gate"*. The design's L1 sets no magnitudes — it selects — and magnitude-setting has
+   moved into L4. A real reallocation of content between layers, unbooked.
+3. **Reflection §5.9 (`:435`)** specifies the L4 unmodulated arm as *"a fixed multiple of **ATR**"*.
+   The design uses the per-symbol TRAIN-median **ŝ** instead (§4.2, §7, and the HARD §12 L4 comparator
+   identity row). This is right — the ATR-vs-Parkinson pairing is the EXP-025 seam (L-21) and would
+   have put a ~1.5–1.7× level shift inside the one comparison L4 exists to make — but it is a
+   departure from the binding text, currently framed only as "QA run 2".
+
+The design already books the one §5.9 narrowing it noticed (AMENDMENT-13: *"record the reflection
+§5.9 L4 narrowing (modulation by ŝ only, not by each volatility layer)"*), which is why the other
+three read as an oversight rather than concealment.
+
+**Required fix (quant-designer).** Correct the §12 citation to name §5.9's fixed-entry requirement as
+the authority, and book (1)–(3) inside the AMENDMENT-18 row of R7-03 as disclosed, reasoned
+departures from reflection §5.5 / §5.9, each with its own direction label.
+
+#### R7-06 — LOW — §6.1 TRIPWIRE-2 says "ALL THREE" over four conjuncts
+
+`design.md:568–579`. The R6-06 fix added the `price_identical_bars` clause, so the HARD pass rule now
+has four conjuncts under a heading that still reads *"HARD PASS, fixed before the run - ALL THREE"*.
+TRIPWIRE-1's "ALL THREE" (`:545`) is correct. Cosmetic, but §12's check-count reconciliation is a
+by-name discipline and a miscounted conjunction inside a HARD rule is the wrong habit.
+**Fix:** "ALL FOUR".
+
+**Advisory 1 (unchanged from run 6, still advisory).** §12's **L1 fixed-entry subset** row covers L1
+only. L2 and L3 are selection layers on the same frozen entry; extending the identical subset
+assertion to them costs nothing and closes the symmetric failure.
+
+**Advisory 2 (feasibility, not validity).** §6 now requires **≥ 2,000 deranged seeds** whose exit
+paths are **re-resolved on the M1 stream** for every target and trail arm, across 198 fixed cells.
+That is a materially larger compute object than a sign flip, and §10's complexity freeze says nothing
+about it. Worth the developer sizing before starting, and worth the operator knowing; it is not a
+design defect and does not change what must be measured.
+
+---
+
+### Checks independently verified clean
+
+| Check | Result |
+|---|---|
+| Exact mirror, slope 1 | **CLEAN.** `log R = log(W/L) − log((1−p)/p)` consistent across §1, §4.1, §5, §8, §9, §12, G4, G5, §13. `0.9408` appears once and only to refuse it; §12 makes a fitted-slope residual a hard failure |
+| Cost isolation (AMENDMENT-C5) | **CLEAN.** Header NOTE, §5 DISCLOSED REFERENCE ONLY, §7 cost-floor line, §12 HARD row, §13 first bullet, §15 column flag. No band, threshold, estimand or comparison carries a cost term |
+| SPREAD-COST-DISCLOSURE | **CLEAN.** All five fields present verbatim per `design-requirements.md` §10; `UNAVAILABLE_NOT_CHARGED`, `spread_rt_bps: null`, `PARTIAL_FEES_FUNDING_ONLY`, prohibited claims listed. Unchanged across seven runs |
+| Mandatory declaration blocks | **CLEAN.** Mechanism + DERIVED (§1), OBJECT-IDENTITY (§3), four control blocks with all seven required fields each (§6), two tripwires (§6.1), bands (§9), golden traces G1–G7 (§11), HARD/INFORMATIVE split (§12), CONVERSION-PIN (§7), amendment ledger (§14). The `UNPOWERED` band and the POWER block are replaced by the ladder under registered AMENDMENT-C7 — an authorised, registry-backed substitution, not an omission |
+| No adequacy flag / no canonical threshold | **CLEAN.** §12 asserts the absence HARD; the ladder matches registered C7 rung for rung; `mde50/mde80/mde95` are three points of one curve, none privileged; the committed predeclaration contains none of `powered`/`unpowered`/`at_target`/`not_resolvable` (I grepped the payload) |
+| Phase-(b) trigger vs C6 / reflection §5.9.1 / INFR-016 | **CLEAN.** Pre-declared before (a), stated on the (a) reads in the §9 CI-relative vocabulary, no magnitude, nothing machine-dropped, operator authority still required and declinable. Execution blocker 1 stays discharged |
+| C6 `NOT_RESOLVABLE` vs C7 | **CLEAN.** §4.3 discharges C6's obligation without C7's forbidden flag by requiring the whole six-rung distribution, reported and not adjudicated. Both registry rows verified |
+| Block rule vs SPDR-018 §6.2 | **CLEAN.** Six-clause canonical literal, clause-by-clause §12 check, JSON string verbatim with nothing appended. Min block 1 day = 24 h ≥ the longest horizon in scope (20 h, including the clipped `h_mod`) |
+| Basis population | **CLEAN.** One declared population, accounting reconciles, exclusions tallied by reason, generator raises if they do not sum (`resolution_basis.py:412–413`) |
+| Predeclaration integrity | **CLEAN on content** (5,148 distinct strata, dated, no placeholder, no outcome input, generator deterministic, 9/9 tests pass). Provenance-hash residue is R7-02 |
+| Decile causality (new) | **CLEAN.** Per symbol, expanding, strictly-before-`[0]`, 250-bar warm-up, continuous rank and M-3 deciles bound to the same rule, HARD in §12 |
+| Exit-matched nulls (new) | **CLEAN.** Binding on both derangements, negation restricted to time-exit arms and asserted per arm, un-matchable devices demoted to DISCLOSURE |
+| L-28 derangements | **CLEAN.** Both permutation controls declare and count zero fixed points; TRIPWIRE-1 correctly declares N/A (index shift, not a permutation) |
+| L-50 / P-21 | **CLEAN.** Plant rungs stated in σ̂ units and re-derived per universe at run; no absolute bps bar crosses a universe boundary |
+| L-21 / P-15 unit pin | **CLEAN.** Two divisor objects, ATR20 bound to `deltaThreshold` and explicitly barred from every L4 arm, medians computed at run to `unit_pin.json`, effects reported in bps and σ̂ side by side, σ̂ never compared to the cost floor |
+| M-4 effective coverage | **CLEAN.** 229,646 measured pooled H1 bars, not date arithmetic; asserted in §12; the R6-04 prose contradiction is gone |
+| M-2 / M-3 / M-5 | **CLEAN.** Span disclosure in §12 and `metrics_by_cell`; magnitude-matched comparator mandatory for L1 and L3 with its own plant curve; collapse fraction disclosure-only in every control, with the mirror null's explicit `null / POINT_NULL` |
+| L-51 selection check | **CLEAN and defensible.** HARD on presence and form only, re-anchored to every separately reported subset now that the powered/unpowered split is retired |
+| L-52 / P-23 | **CLEAN.** Check-count reconciliation by name with a stated literal (28, which I recounted); every check bound to an emitted artifact; missing/empty is a failure not a vacuous pass; determinism unconditional at `--jobs > 1` |
+| Lane compliance (`spdr-lane.md`) | **CLEAN.** TRAIN-only, causal `t−1`, M1 fill resolution with no intrabar look-ahead, ≥2,000-seed batteries against a lane floor of 25, per-stratum reporting with multiplicity disclosed (5,148 rows named explicitly), pooled reverts to disclosure-only without homogeneity, no local accounting, dependence-matched CI with block ≥ H |
+| Shared-code boundary | **CLEAN.** `python/src/xen/resolution_basis.py` contains no threshold and no admit/exclude/label/rank path; `required_n`, `mde50`, `c_bands` are pure conversions and summaries; tests pass |
+| Holdout / TEST / XENA / family action | **CLEAN.** TRAIN-only; §12 asserts zero queries `≥ 2025-01-08`; §13 refuses family status change, XENA, TEST and holdout contact; header declares execution unauthorised. No XENA route, so INFR-010 R4 does not apply |
+| Golden traces | **CLEAN.** G1–G7 cover entry+fill, expiry, suppression, the identity, the exact mirror, exit precedence, and leak discrimination; all are deterministic selection rules QA can compute from the catalog without running the implementation; G6 is now structural |
+
+---
+
+### Standing execution blockers
+
+1. **DISCHARGED (re-verified this run)** — the AMENDMENT-7 / registered-C6 departure. Checked against
+   `cf-voldir-001.md` and reflection §5.9.1 directly, not against the design's assertion.
+2. **STANDS** — `reflection-inputs.md` §9 is still explicitly unsigned. This blocks **execution**,
+   not implementation.
+3. **STANDS (lane-wide, unchanged)** — the per-symbol spread pin is open; every money read stays
+   blocked. It does not block this measurement under AMENDMENT-C5.
+
+New this run, and to be cleared before execution rather than before implementation: **R7-01** (parity
+NaN convention + L2 coverage disclosure) and **R7-02** (regenerate the artifacts so the generator hash
+matches).
+
+### Golden-trace and boundary verdict
+
+Design-stage: no code and no smoke emission to diff. G1–G7 are hand-derivable from the catalog and
+the design alone, as the lane requires, and G6 is now executable. No golden trace depends on a value
+the implementation would produce.
+
+---
+
+**FAILING_ARTIFACT:** none blocking. Residual defects sit in
+`python/experiments/SPDR-019/design.md` (R7-01, R7-03, R7-04, R7-05, R7-06) and in the committed
+provenance pins of `python/experiments/SPDR-019/results/expected_resolution.json` +
+`python/experiments/SPDR-019/results/resolution_basis.json` (R7-02, which also affects SPDR-020).
+
+**REQUIRED_SKILL:** `quant-designer` for R7-01/03/04/05/06; `experiment-developer` for R7-02.
+
+**Implementation authorisation: YES.** Every clause a developer must build from is now specified:
+the entry and both fill rules, the 33 named variants, each gate's source artifact and column, the
+decile population and window, the L4 comparator identity and the exact modulated-hold equation, both
+tripwires' structural pass rules, the exit-matched null construction, the block rule clause by
+clause, and the full emission schema. The six open findings are a check convention, a stale hash, a
+ledger row, a sentence, three citations and one number-word — none changes the estimand, the
+population, a comparator or an integrity check, and none can silently corrupt a result if fixed
+before the operator's execution gate.
+
+**What I did not reach.** I did not recompute M15 or H1 episode counts from the catalog — no parent
+emission carries them and the design correctly declares them unknown. I did not audit
+`xen.evaluation.block_bootstrap_ci`'s internals beyond confirming it exists and honours the L-20
+contract. I regenerated the R-MARKOV parity on 4 of 25 symbols, not all 25; the two matching symbols
+matched bit-identically and the two NaN symbols reproduced the NaN, which is what R7-01 rests on. I
+did not review SPDR-020, which shares `resolution_basis.py` and the resolution artifacts — **R7-02
+applies there verbatim**, and R7-04/R7-05 may.
