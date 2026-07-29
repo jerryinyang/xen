@@ -6,7 +6,7 @@
   files, still cite the old name.
 - **Family:** `CF-VOLDIR-001` — status remains `REGISTERED`. **No family action is taken or proposed here.**
 - **Authority:** checkpoint-018 `design.md` §5 Step 2; SoT `.ignore/what-next/alts/opportunity.md`; chapter-06 governance
-- **Status:** **SIGNED 2026-07-29 — option B (§9).** SPDR-019/020 execute now; P2 (arm C) and P5 (the spread pin) run in parallel. The decision is **sequencing only**: no end-state, no family action, no thread closed.
+- **Status:** **SIGNED 2026-07-29 — option B (§9).** SPDR-019/020 execute now; P2 (arm C) runs in parallel. The decision is **sequencing only**: no end-state, no family action, no thread closed. *(P5 is not a thread: spread is never charged programme-wide per the 2026-07-23 directive — see §8.)*
 - **Corrections applied:** `corrections-log.md` — independent adversarial audit 2026-07-26,
   **RELIABLE WITH CORRECTIONS**; both verdicts survive. Two critical fixes are already reflected below.
 - **Binding inputs (final, not re-run here):**
@@ -25,7 +25,8 @@ SPREAD-COST-DISCLOSURE
   cost_scope: PARTIAL_FEES_FUNDING_ONLY  (cTrader: BORROWED from Bybit AND RESCALED = DOUBLY SYNTHETIC)
   implication: every money figure understates true cost; reported net is overstated
   prohibited_claims: fully-net, cost-complete, tradable, deployable
-  PER-SYMBOL SPREAD PIN: still OPEN and BLOCKING for any Step 3 money read (design §6 item 5)
+  SPREAD: NEVER CHARGED, PROGRAMME-WIDE (2026-07-23, evaluation-framework.md SSChapter-04) -
+    a standing exclusion with a travelling caveat, not a pending pin
 ```
 
 ---
@@ -266,7 +267,7 @@ an edge.
 | **P2** | Median / trimmed-mean CIs | **partly DONE** | **DONE for the 451 powered arm-B `per_symbol` cells** → `SPDR-018/addendum-p02-p03-ci-recovery.md`. **Changes the wording, not the verdict:** median CI excludes zero on **449/451**, trimmed on **451/451, all negative**; the **mean** CI on only **46/451**. "Sits at gross break-even" is the *only* one of the three statistics that fails to reject zero — the negative read gets **stronger**. Identity conclusions unaffected (it is a mean identity). **Still open: arm C (534) and the `trail`/`stop` populations** |
 | **P3** | CI fragility sweep | **DONE** | **CLOSED 2026-07-26**, same 451 cells. Seed spans **~4.8% of CI width** (p95 0.067); block spans **0.43–0.65 bps** against 2–18 bps effects. **No read in either run rests on a Monte-Carlo or block artifact** — retroactively supports every CI-based conclusion in both reports and closes the INFR-004 / L-20 gap for this stratum. P3 was never a missing method: computed on all 37,791 cells, discarded at `cells.py:127` |
 | **P4** | ~~Is C3's required `n` reachable?~~ | — | **ANSWERED 2026-07-26** → `SPDR-018/addendum-p04-c3-reachability.md`. **C3 is terminally unpowerable in its registered form:** all 1,946 unresolved cells are already pooled+σ-normalised on full TRAIN (no lever remains), median **81× short**, and at the conditioner's own event rate (3 per 10,000 bars) the median cell needs **201 years** of 25-symbol history — 88.3% need >20y. **Unpowerable, NOT refuted.** §3.2 is answered |
-| **P5** | **Per-symbol spread pin** (SoT §3 axis E) | Infra | **Already declared BLOCKING.** The difference between "misses by 0.65 bps" and "nowhere close". No capture design should be parameterised before it exists, and the cTrader deflator cannot be pinned without it |
+| **P5** | ~~Per-symbol spread pin~~ (SoT §3 axis E) | Infra | **NOT A THREAD — retired as an item 2026-07-23.** Spread is never charged programme-wide: the T1 lane holds no quote data and a fixed proxy is refused in code. It would still be the difference between "misses by 0.65 bps" and "nowhere close", so the consequence is carried as a permanent caveat and a claim refusal (AMENDMENT-C2), not as pending work. Nothing waits on it |
 | **P6** | Determinism (one sequential pass) + a Bybit-holdout assertion on 018B's §5 guard reads | **Cheap** | Closes the only residual Phase-0 exposure in the evidence base |
 | **P7** | **The Asia magnitude × shock interaction** — magnitude-matched **no-shock** momentum ≈ **+9.98 bps in Asia vs −1.17 in EU**, on 162–184 rows | Medium | **The only genuinely new substantive object either run produced.** Unregistered — **must be registered before it is screened** (SoT §7 exploration guardrail; L-controlled thesis-shopping is allowed, un-registered screening is not) |
 | **P8** | C9 / D3 / D4 on cTrader; arm-C parent parity on the remaining 2,323 crypto cells; why the 018B power flag is not regenerable (317 vs 315) | Low–Medium | Completeness, not decision-relevant |
@@ -346,7 +347,7 @@ Each is a *sequencing* choice. None closes the checkpoint; none takes a family a
 
 | Option | What it means | Consequence |
 |---|---|---|
-| **A — Resolve the cheap threads first, then design 019/020 as apparatus** ⭐ **RECOMMENDED** | Run **P2, P3, P4, P6** (all cheap, all in-scope, no new experiment) and press on **P5** (the spread pin, already blocking). Then design SPDR-019/020 as **apparatus / characterisation**, carrying the §6.1 constraints, with the "name the mechanism for `R > 1`" requirement written into the design | The evidence base becomes fragility-checked and Phase-0 clean before anything is parameterised off it; P4 may convert C3 from an open lead into a recorded answer; 019/020 proceed with an honest frame and a predeclared acceptable-zero outcome |
+| **A — Resolve the cheap threads first, then design 019/020 as apparatus** ⭐ **RECOMMENDED** | Run **P2, P3, P4, P6** (all cheap, all in-scope, no new experiment) and press on **P5** (the spread pin — *this clause was already stale when written: spread was retired as a chargeable item programme-wide on 2026-07-23*). Then design SPDR-019/020 as **apparatus / characterisation**, carrying the §6.1 constraints, with the "name the mechanism for `R > 1`" requirement written into the design | The evidence base becomes fragility-checked and Phase-0 clean before anything is parameterised off it; P4 may convert C3 from an open lead into a recorded answer; 019/020 proceed with an honest frame and a predeclared acceptable-zero outcome |
 | **B — Design 019/020 immediately, resolve the threads in parallel** | Same designs, but do not wait | Faster, but 019/020 get parameterised off means whose medians disagree by 13 bps and whose CIs have never been fragility-tested (P2/P3), and against a cost floor that is still unpinned (P5) |
 | **C — Press C2 first (P1) before anything else** | Treat the one surviving live thread as the priority: re-run M-3 at `n` in the thousands on the powered grid strata, multiplicity treated, comparator mean disclosed | Settles the single question that most affects whether end-state 1 is takeable at the retrospective. Costs more than A's threads and delays 019/020 |
 | **D — Take end-state 1 now and close** | Declare the terminal capture-geometry package | **Not available on this evidence.** It requires reading C2 and 3,559 `NOT_RESOLVABLE` cells as negatives, which B-5 forbids. Recorded here only so the refusal is explicit |
@@ -369,7 +370,7 @@ before SPDR-019/020 are designed, or in parallel with them?
 | Holdout contact | **none** — Bybit 2025-01-08 and cTrader 2024-12-13 never queried. One recorded gap: no HARD assertion that 018B's §5 cross-universe guard reads stayed inside the Bybit TRAIN fence (P6); no violation is evidenced |
 | Family status | `CF-VOLDIR-001` **REGISTERED**, unchanged. Transitions are retrospective-only |
 | XENA | `XENA-VOLDIR-001` **RESERVED**; not discussable until Step 3 graduates a cost-surviving base under separate authority |
-| Spread pin | **OPEN / BLOCKING** (design §6 item 5) |
+| Spread | **NEVER CHARGED, programme-wide (2026-07-23).** Standing exclusion + travelling caveat; every net figure is overstated by an unquantified amount. Not an open item |
 | New knowledge-base entries | **L-50, L-51, L-52, L-53**; dead ends **P-21…P-25** |
 | Unregistered lead | **P7** — Asia magnitude×shock. **Register before screening** |
 | Outstanding engineering | `SPDR-018B/screen_code/add_missing_controls.py` is still a manual post-step any re-run silently undoes (L-52) |
@@ -389,8 +390,10 @@ DECISION RECORD
     not refuted; may not close the thread): [x]
   Ruling on SPDR-018B's seven un-run
     inherited HARD checks:               [x] accept with them recorded   [ ] require P6 first
-  Thread priority ordering:              P2 (arm C, 534 cells) and P5 (per-symbol spread pin) run
-                                         ALONGSIDE SPDR-019/020, not before them.
+  Thread priority ordering:              P2 (arm C, 534 cells) runs ALONGSIDE SPDR-019/020, not
+                                         before it. P5 is NOT a thread and has not been one since
+                                         2026-07-23: spread is never charged programme-wide, so
+                                         there is nothing to schedule - only a caveat to carry.
                                          P3 CLOSED. P4 ANSWERED (C3 terminally unpowerable in its
                                          registered form). P6 SKIPPED by the 2026-07-28 directive
                                          and recorded as an open gap. P1 remains SKIPPED, so C2
@@ -411,9 +414,10 @@ DECISION RECORD
     This decision is SEQUENCING ONLY. It takes no end-state, closes no thread, and changes no
     family status - those remain retrospective-only, and end-state 1 is still NOT takeable while
     C2 and the NOT_RESOLVABLE population stand (§5).
-    Still blocking independently of this signature: every money read, expectancy claim and Step-3
-    graduation remain blocked by the open spread pin (AMENDMENT-C5), and AMENDMENT-C2 binds every
-    claim.
+    Still binding independently of this signature: spread is never charged programme-wide
+    (2026-07-23), so every reported net figure is overstated by an unquantified amount and the
+    caveat travels with it; AMENDMENT-C2 refuses every fully-net, cost-complete, tradable or
+    deployable claim - permanently, not pending any measurement.
 
   Operator signature:                    Jerry Inyang, operator directive of 2026-07-29,
                                          recorded in-session; superseding nothing.

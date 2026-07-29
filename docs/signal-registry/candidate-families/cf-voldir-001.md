@@ -54,7 +54,7 @@ Exact by the definition of conditional expectation.
 
 Axis A (`p`) and axis B (`W`, `L`, `W/L`) are `SPDR-018`. Axis C (`E[|move|]`) is proven and
 supplies **selection + parameter scale, never edge**. Axis D (capture) is `SPDR-019`/`SPDR-020`.
-Axis E (cost) is blocked on a per-symbol spread pin.
+Axis E (cost): spread is never charged programme-wide (2026-07-23) — a standing exclusion with a travelling caveat, not a blocked prerequisite.
 
 **Refused by construction:** any expectancy claim from exits, holds, or sizing on a joint
 `(p, W, L)` that does not clear `p_be_net` at power (the analytic `E[gross]=0` kill —
@@ -470,8 +470,8 @@ spread not charged; reported net **overstated** relative to true cost.
   slots; no family action; status remains REGISTERED.** |
 | 2026-07-29 | **MID-CHECKPOINT REFLECTION SIGNED (option B) + SPDR-019/020 QA-APPROVED — evidence
   and disposition row, no status transition.** (1) `reflection-mid.md` §9 is **signed**: option
-  **B** — 019/020 execute now, with P2 (arm C) and P5 (the per-symbol spread pin) resolved in
-  parallel. Sequencing only: **no end-state is taken, no thread is closed, and end-state 1 remains
+  **B** — 019/020 execute now, with P2 (arm C) resolved in parallel. *(P5 is not a thread: spread
+  was retired as a chargeable item programme-wide on 2026-07-23.)* Sequencing only: **no end-state is taken, no thread is closed, and end-state 1 remains
   NOT takeable while C2 and the `NOT_RESOLVABLE` population stand.** P1 stays skipped, so **C2
   books at the retrospective as terminal `NOT_RESOLVABLE`, never as a refutation**; P6 stays
   skipped and recorded as an open gap; P7 remains unregistered and may not be screened.
@@ -484,6 +484,8 @@ spread not charged; reported net **overstated** relative to true cost.
   (3) **AMENDMENT-C5 needs no follow-up row:** it already executes the gross narrowing and both
   `HYP-D6`/`HYP-D7` rows above read as the gross condition and cite it. The reflection companion's
   “amendment owed” line was stale and is corrected there.
-  **Still binding and unchanged:** AMENDMENT-C2 on every claim; the spread pin blocks every money
-  read, expectancy claim and Step-3 graduation; XENA remains RESERVED and undiscussable.
+  **Still binding and unchanged:** AMENDMENT-C2 on every claim; spread is never charged
+  programme-wide (2026-07-23), so reported net is overstated and no money read, expectancy claim or
+  Step-3 graduation is licensed — by standing rule, not by pending work; XENA remains RESERVED and
+  undiscussable.
   **0 counted TEST reads; 0 multiplicity slots; no family action; status remains REGISTERED.** |

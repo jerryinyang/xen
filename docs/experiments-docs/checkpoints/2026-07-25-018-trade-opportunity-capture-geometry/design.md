@@ -3,7 +3,7 @@
 - **Opened:** 2026-07-25
 - **Status:** `OPEN — SoT SIGNED; SPDR-018 + SPDR-018B COMPLETE AND CLOSED 2026-07-26; MID-CHECKPOINT REFLECTION SIGNED 2026-07-29 (option B); SPDR-019 + SPDR-020 DESIGNS COMPLETE AND QA-APPROVED 2026-07-29 (run 7) — IMPLEMENTATION AUTHORISED, EXECUTION AT THE OPERATOR'S GATE`
 - **Reflection:** `reflection-mid.md` (assembled 2026-07-26 as `reflection-inputs.md`; **SIGNED
-  2026-07-29, option B** — 019/020 run now, P2 arm-C and the spread pin in parallel; sequencing
+  2026-07-29, option B** — 019/020 run now, P2 arm-C in parallel; sequencing
   only, no end-state), renamed on signature per §5 Step 2.
 - **Reflection companion:** `reflection-mid-volatility-model.md` (2026-07-28, revised same day after
   independent audit) — the volatility evidence inventory (V1–V28, each with an evidence class) and the
@@ -109,7 +109,7 @@ magnitude that is already realised (SoT §2.1).
 | **B. `W`, `L`, `W/L`** | win size, loss size, payoff asymmetry | **NEVER MEASURED** | `SPDR-018` |
 | **C. `E[\|move\|]`** | the scale that sets `W` and `L`: vol level (IC 0.34); T-GT-CUR (+0.21, 21/21); R-MARKOV k=4/12 | **PROVEN** | fold in by amendment |
 | **D. capture** | exits, targets, holds, trailing, sizing — the levers that move `W/L` against `p` | measured, not optimised | `SPDR-019`, `SPDR-020` |
-| **E. `cost`** | per-symbol spread pin | **blocking, unresolved** | infra |
+| **E. `cost`** | spread never charged (2026-07-23) | **standing exclusion + caveat; not an open item** | infra |
 
 κ is a **diagnostic**, never a multiplicative term: "what fraction of the best available point the
 policy retained", labelled non-tradable.
@@ -240,7 +240,7 @@ Unchanged from checkpoint-017; still **RESERVED**.
 | 3 | `SPDR-018` run + analysis | Resolve the complete 017 residue | design + execution authority | **COMPLETE / CLOSED 2026-07-26** — `HYP-D5` **SUPPORTED**; 1,413 powered signed cells vs SPDR-014's 0/927; 18 HARD checks; **0 of 1,413 clear `p_be_net`**; `W/L` 96.7% mirror-determined. No gating verdict (§2). `python/experiments/SPDR-018/report.md` |
 | 3b | `SPDR-018B` run + analysis *(added; the cTrader leg SPDR-018 narrowed by defect)* | Replicate the residue on an independent asset class | design + execution authority | **COMPLETE / CLOSED 2026-07-26** — `HYP-D5` **PARTIALLY SUPPORTED**; structure replicates more tightly (mirror R² **0.9746**), **0 of 315 clear `p_be_net`**; **C2 neither replicated nor refuted**. `python/experiments/SPDR-018B/report.md` |
 | 4 | Mid-checkpoint reflection | Book each 017 question resolved / NOT_RESOLVABLE; decide Step 3 from the `(p,W,L)` picture | SPDR-018 analysis | **INPUTS ASSEMBLED 2026-07-26 — awaiting operator decision.** `reflection-mid.md` |
-| 5 | Spread pin (infra) | Per-symbol spread — prerequisite for Step 3 **money reads** | operator | **OPEN.** No longer blocks the SPDR-019/020 measurement (AMENDMENT-C5, gross-only); still blocks every money read, expectancy claim and graduation |
+| 5 | ~~Spread pin~~ (infra) | Spread cost | operator | **RETIRED AS AN ITEM 2026-07-23** — spread is never charged programme-wide (`evaluation-framework.md` §Chapter-04): no quote data on the T1 lane, fixed proxies refused in code. Nothing is scheduled or awaited. The consequence is permanent, not pending: reported net is overstated, the caveat travels on every record, and AMENDMENT-C2 refuses every money, expectancy, tradability and graduation claim |
 | 6 | `SPDR-019` design | Baseline breakout + opportunity-modulated capture | reflection gate | **COMPLETE 2026-07-28** — `python/experiments/SPDR-019/design.md`; execution unauthorised |
 | 7 | `SPDR-019` run + analysis | κ conversion on a fixed signed entry | design + authority | unauthorised |
 | 8 | `SPDR-020` design | Event-grammar direction-aware capture | reflection gate | **COMPLETE; QA run-5 fixes applied 2026-07-29, fresh QA pending** — `python/experiments/SPDR-020/design.md`; execution unauthorised |

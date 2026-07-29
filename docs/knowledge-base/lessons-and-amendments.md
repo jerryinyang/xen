@@ -1384,7 +1384,8 @@ ambiguity would have decided the result.
   invariant to it and which are not. A single point value is an under-specification.
 - Any **cross-universe comparison of net magnitudes** is void while the deflator is unidentified.
   Gross remains primary. (Compounding disclosure for SPDR-018B: the cost is also **doubly
-  synthetic** — borrowed from Bybit and rescaled — and the per-symbol spread pin is still blocking.)
+  synthetic** — borrowed from Bybit and rescaled — and spread is never charged at all, programme-wide
+  since 2026-07-23, so both universes' net figures are overstated by unquantified amounts.)
 
 **Meta-lesson.** Cost and normalisation constants are usually treated as inputs fixed before the
 analysis, so nobody re-audits them once results exist. When such a constant is *estimated from the

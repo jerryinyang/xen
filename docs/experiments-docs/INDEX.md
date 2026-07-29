@@ -5,13 +5,14 @@
 **CHECKPOINT-018 OPEN (2026-07-25) — Trade Opportunity Modelling / Capture Geometry.
 SoT signed. `SPDR-018` + `SPDR-018B` COMPLETE AND CLOSED 2026-07-26 (`HYP-D5` SUPPORTED /
 PARTIALLY SUPPORTED; no gating verdict from either). NEXT = the mid-checkpoint reflection
-(**SIGNED 2026-07-29, option B** — 019/020 run now, P2 arm-C and the spread pin in parallel).
+(**SIGNED 2026-07-29, option B** — 019/020 run now, P2 arm-C in parallel).
 `SPDR-019` / `SPDR-020` designs are complete;
 both passed fresh QA on 2026-07-29 (run 7, APPROVE) and **implementation of `screen_code/` is
 authorised**. **Both prior execution blockers are now cleared** — the
 reflection is signed and the gross narrowing is executed as AMENDMENT-C5 — so execution awaits
-only the operator's own gate. The spread pin stays open and blocks money reads, not the
-measurement. TRAIN only; holdouts sealed.**
+only the operator's own gate. **Spread is never charged programme-wide (2026-07-23)** — a standing
+exclusion with a travelling caveat, not an open item: reported net is overstated and every money,
+expectancy and tradability claim stays refused by AMENDMENT-C2. TRAIN only; holdouts sealed.**
 
 **Closed threads since:** **P4** — C3 is *terminally unpowerable* in its registered form (median cell
 needs ~201 years of 25-symbol history); **P3** — CI fragility swept, seed spans ~4.8% of CI width, so
@@ -37,7 +38,7 @@ Governance: [Chapter 06 governance](../references/chapter-06-governance.md)
 Checkpoint:
 [018 trade-opportunity capture geometry](checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/design.md)
 
-**Blocking:** per-symbol spread pin is a prerequisite for any checkpoint-018 money read.  
+**Standing caveat:** spread is never charged programme-wide (2026-07-23); no checkpoint-018 money read is licensed, by rule rather than by pending work.  
 **Deferred (operator):** pure direction-agnostic strategies (both-side / straddle / grid) — parked,
 not refuted.
 
@@ -92,7 +93,7 @@ EXP-099 not authorised. Family retrospective still pending (independent of Ch.06
   **OPEN** 2026-07-25; SoT signed. **SPDR-018 and SPDR-018B both COMPLETE AND CLOSED 2026-07-26**
   (`HYP-D5` SUPPORTED / PARTIALLY SUPPORTED; **no gating verdict from either**). **Next item = the
   mid-checkpoint reflection**, which sets how SPDR-019/020 are parameterised, not whether they run.
-  SPDR-019/020 registered; designs complete, execution unauthorised. Spread pin still **BLOCKING**
+  SPDR-019/020 registered; designs complete, execution unauthorised. Spread **never charged**
   for any money read.
 - [Checkpoint 018 corrections log](checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/corrections-log.md)
   — 2026-07-26; independent adversarial audit of the 018/018B documentation. **RELIABLE WITH

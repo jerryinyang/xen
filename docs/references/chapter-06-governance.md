@@ -112,8 +112,14 @@ SoT: `.ignore/what-next/alts/opportunity.md`
 (EURUSD / XAUUSD / USTEC, INFR-021 fence) = **independent replication read only**, never pooled into
 the powered estimate. cTrader holdout from **2024-12-13** must never be queried.
 
-**Blocking:** per-symbol spread pin is a prerequisite for any checkpoint-018 money read (a
-capture-geometry branch is more spread-sensitive than a forecasting branch).
+**Standing caveat (not a blocker with a to-do behind it):** spread is **never charged,
+programme-wide** (operator directive 2026-07-23, `evaluation-framework.md` §Chapter-04 cost
+interpretation). No quote or effective spread exists on the T1 lane, a fixed proxy is refused in
+code, and no per-symbol pin is scheduled. Consequence: reported cost understates total cost,
+reported net is overstated, the caveat travels on every record, and **no checkpoint-018 money read,
+expectancy claim, tradability claim or graduation is licensed** — by rule, permanently. This bites
+harder on a capture-geometry branch than on a forecasting branch, which is a reason to state it on
+every report, not a reason to await a measurement.
 
 **Deferred (operator, 2026-07-25):** pure direction-agnostic strategies — both-side, straddle-class,
 grid-class. Parked, not refuted. Direction-aware capture is required.

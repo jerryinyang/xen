@@ -22,9 +22,13 @@ SPREAD-COST-DISCLOSURE
   cost_scope: PARTIAL_FEES_FUNDING_ONLY  (cTrader: BORROWED from Bybit AND RESCALED = DOUBLY SYNTHETIC)
   implication: every money figure understates true cost; reported net is overstated
   prohibited_claims: fully-net, cost-complete, tradable, deployable
-  PER-SYMBOL SPREAD PIN: still OPEN. It no longer blocks the SPDR-019/020 MEASUREMENT
-    (operator directive 2026-07-28: cost excluded from every exploration test; the target is
-    GROSS - see §5.4a). It still blocks every money read, expectancy claim and Step-3 graduation.
+  SPREAD: NEVER CHARGED, PROGRAMME-WIDE (operator directive 2026-07-23, evaluation-framework.md
+    SSChapter-04). No quote or effective spread exists on the T1 lane and a fixed pin is not a
+    substitute, so this is a STANDING EXCLUSION, not an open item awaiting a measurement. The
+    caveat above travels on every record and is repeated in every report; AMENDMENT-C2 refuses
+    every fully-net / cost-complete / tradable / deployable claim. Cost as a whole is additionally
+    excluded from every SPDR-019/020 test by the 2026-07-28 directive (SS5.4a); the target is
+    GROSS.
 ```
 
 ---
@@ -45,7 +49,8 @@ document, not inherited.
 
 **Two further audit items are dispositions, not corrections:** P6 (018B determinism + the Bybit-guard
 holdout assertion) is **skipped by operator directive 2026-07-28** and recorded as an open gap, not a
-blocker; the spread pin is reclassified per the disclosure block above.
+blocker; spread is reclassified per the disclosure block above - a standing programme-wide
+exclusion with a travelling caveat, not a pending pin.
 
 ---
 
@@ -179,7 +184,7 @@ and **V25's 67× span is [U]** with a [P] span of 5.3×.
 |---|---|
 | Charged cost (crypto) | **13.1–16.1 bps**, pooled figure 13.540 — fees + discrete funding + allowance |
 | Charged cost (cTrader) | ~2.43–2.54 bps — **doubly synthetic** (borrowed from Bybit and rescaled) |
-| Spread | **NOT CHARGED. Per-symbol pin OPEN and BLOCKING** |
+| Spread | **NEVER CHARGED, programme-wide (2026-07-23).** Not a pending pin: no quote spread exists on the T1 lane and a fixed proxy is refused in code. Every net figure here is overstated by an unquantified amount, and that caveat travels with it |
 | Deflator sensitivity (cTrader) | defensible range **0.185–0.703** (factor 3.8, ±2× on every net figure); the 0/315 conclusion clears the defensible floor by **4%** (P-25 / L-53) |
 
 Against this floor: the largest measured volatility effect that is *usable for selection* — the
@@ -344,7 +349,7 @@ that narrowing needs an amendment row on the family contract before either desig
 | No expectancy, tradability, deployability or cost-complete claim | SoT §7 / §8, chapter-06 governance — unchanged |
 | No graduation, no XENA, no family status change | Retrospective-only authority |
 | `p_be_net` still **reported** alongside `p_be` on every cell, as a disclosed reference | So Step 3 has a landing place and no one has to re-run to learn the distance |
-| The spread pin is still **OPEN** and still blocks every money read | It no longer blocks the measurement |
+| Spread is **never charged** and every reported net figure is overstated | The standing caveat and AMENDMENT-C2 carry that, permanently - it is not a measurement anyone is waiting for |
 
 **One risk the designs must pre-empt.** Gross-only reads look far more positive than net ones —
 **32.5% of powered cells already clear gross break-even.** That is why the mirror is the pre-registered
@@ -382,9 +387,11 @@ wrong, which is the point.
 
 ### 5.7 What would change this model
 
-- **The spread pin (P5).** It is the difference between "misses the floor by 0.65 bps" and "nowhere
-  close", and the cTrader deflator cannot be pinned without it. **No longer blocks the SPDR-019/020
-  measurement** (§5.4a); still blocks every money read and every Step-3 graduation claim.
+- **An audited external spread source, if one ever exists.** It would be the difference between
+  "misses the floor by 0.65 bps" and "nowhere close", and the cTrader deflator cannot be pinned
+  without it. It is NOT a scheduled thread: spread is never charged programme-wide (2026-07-23),
+  the T1 lane carries no quote data, and a fixed proxy is refused in code. Until such a source is
+  acquired, the caveat stands and no money read is licensed - by rule, not by pending work.
 - **Median / trimmed-mean CIs on the remaining powered cells (P2).** Already done for 451 arm-B cells:
   median CI excludes zero on **449/451**, trimmed on **451/451, all negative**, while the **mean** CI
   does so on only **46/451**. The near-break-even framing is the *only* one of the three statistics
@@ -486,7 +493,7 @@ Two distinct reasons, both of which a winners-only combination would violate:
 | Counted TEST reads | **0** — nothing in this document reads TEST or holdout |
 | Family status | `CF-VOLDIR-001` **REGISTERED**, unchanged. Transitions are retrospective-only |
 | XENA | `XENA-VOLDIR-001` **RESERVED** |
-| Spread pin | **OPEN.** Does not block the SPDR-019/020 measurement (§5.4a); still blocks every money read, expectancy claim and Step-3 graduation |
+| Spread | **NEVER CHARGED, programme-wide (2026-07-23).** A standing exclusion with a travelling caveat, not an open pin. Cost as a whole is excluded from the SPDR-019/020 measurement (§5.4a). Money reads, expectancy claims and Step-3 graduation stay refused by AMENDMENT-C2 and the caveat |
 | Relationship to `reflection-mid.md` | Companion. That document holds the `(p, W, L)` picture, the 017-residue booking, the four decision options and the operator decision record, **signed 2026-07-29 as option B** (sequencing only: 019/020 run now, P2 arm-C and P5 in parallel; no end-state, no family action). **This document adds no options and takes no end-state decision**; it does carry two operator directives dated 2026-07-28 (§5.4a cost exclusion, §5.9 layer protocol) |
 | **P6** | **SKIPPED by operator directive 2026-07-28.** 018B's determinism check and the Bybit-guard holdout assertion remain **un-run and recorded as an open gap**. No violation is evidenced; the exposure is that absence of evidence, not evidence of absence. Any future citation of 018B's §5 guard reads must carry this caveat |
 | Estimand amendment | **DISCHARGED.** `HYP-D6` / `HYP-D7` were registered against partial-net expectancy above the cost floor; §5.4a narrows both to the **gross** residual `log R`. The family-contract row that executes this is **AMENDMENT-C5 (NARROWING, 2026-07-28)** in `docs/signal-registry/candidate-families/cf-voldir-001.md`, and both hypothesis rows there now read as the gross condition and cite it. *(This line previously said the amendment was named but not executed; it was executed the same day and this row was stale — corrected 2026-07-29.)* |
