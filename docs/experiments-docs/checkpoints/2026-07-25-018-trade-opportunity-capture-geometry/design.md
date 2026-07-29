@@ -1,7 +1,7 @@
 # Checkpoint 018 — Trade Opportunity Modelling / Capture Geometry
 
 - **Opened:** 2026-07-25
-- **Status:** `OPEN — SoT SIGNED; SPDR-018 + SPDR-018B COMPLETE AND CLOSED 2026-07-26; MID-CHECKPOINT REFLECTION DELIVERED 2026-07-28 (volatility model + AMENDMENT-C5/C6); SPDR-019 + SPDR-020 DESIGNS COMPLETE 2026-07-28 — EXECUTION UNAUTHORISED`
+- **Status:** `OPEN — SoT SIGNED; SPDR-018 + SPDR-018B COMPLETE AND CLOSED 2026-07-26; MID-CHECKPOINT REFLECTION DELIVERED 2026-07-28 (volatility model + AMENDMENT-C5/C6); SPDR-019 + SPDR-020 DESIGNS COMPLETE; SPDR-020 QA RUN-5 FIXES APPLIED 2026-07-29, FRESH QA PENDING — EXECUTION UNAUTHORISED`
 - **Reflection input package:** `reflection-inputs.md` (assembled 2026-07-26; **operator decision
   unsigned**). Becomes `reflection-mid.md` on signature, per §5 Step 2.
 - **Reflection companion:** `reflection-mid-volatility-model.md` (2026-07-28, revised same day after
@@ -219,8 +219,9 @@ Period → the `κ` window. Full signal / execution spec in SoT §6.1.
 
 **`SPDR-020` — strategy #2, the E-TOUCH / E-CLOSE MOMO–MR SPDR-014 models.** SPDR-014 grammar,
 directionally aware by design. Gross **and** net availability both reported. Two binding
-carry-forward fixes: the band must actually **select** (SPDR-014's `p_event` was 0.938–0.998 — the
-event was nearly every zone), and the DESIGN→CONFIRM sign flip must be shown to be a power artifact.
+carry-forward fixes: band selectivity must be **measured and visible on every cell** (`p_event`
+was 0.938–0.998 in SPDR-014 and is a covariate, never an eligibility filter), and the
+DESIGN→CONFIRM sign flip must be shown to be a power artifact.
 
 ### Step 4 — XENA (conditional)
 
@@ -241,7 +242,7 @@ Unchanged from checkpoint-017; still **RESERVED**.
 | 5 | Spread pin (infra) | Per-symbol spread — prerequisite for Step 3 **money reads** | operator | **OPEN.** No longer blocks the SPDR-019/020 measurement (AMENDMENT-C5, gross-only); still blocks every money read, expectancy claim and graduation |
 | 6 | `SPDR-019` design | Baseline breakout + opportunity-modulated capture | reflection gate | **COMPLETE 2026-07-28** — `python/experiments/SPDR-019/design.md`; execution unauthorised |
 | 7 | `SPDR-019` run + analysis | κ conversion on a fixed signed entry | design + authority | unauthorised |
-| 8 | `SPDR-020` design | Event-grammar direction-aware capture | reflection gate | **COMPLETE 2026-07-28** — `python/experiments/SPDR-020/design.md`; execution unauthorised |
+| 8 | `SPDR-020` design | Event-grammar direction-aware capture | reflection gate | **COMPLETE; QA run-5 fixes applied 2026-07-29, fresh QA pending** — `python/experiments/SPDR-020/design.md`; execution unauthorised |
 | 9 | `SPDR-020` run + analysis | κ conversion on the 014 event object | design + authority | unauthorised |
 | 10 | Operator gate D | Graduate base / terminal diagnosis | 019 and/or 020 | unauthorised |
 | 11 | `XENA-VOLDIR-001` | Portfolio/search on graduated bases | D graduates + separate design/QA/approval | **RESERVED** |

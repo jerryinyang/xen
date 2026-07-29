@@ -89,8 +89,9 @@ is refused.
 4. `SPDR-020` — E-TOUCH / E-CLOSE MOMO–MR under direction-aware capture (same sequencing).
    **Carry-forward fix discharged by SPDR-018:** the DESIGN→CONFIRM sign flip **is** a
    power/weighting artifact (flip rate *below* chance on both universes; `n`-weighted bands agree to
-   0.33 bps crypto / 0.65 bps cTrader) and need not be re-litigated in the 020 design. The band-must-
-   actually-select fix (`p_event` 0.938–0.998) still stands.
+   0.33 bps crypto / 0.65 bps cTrader) and need not be re-litigated in the 020 design. The
+   selectivity-visibility fix still stands: `p_event` is measured and reported on every cell
+   (never an eligibility filter), including the previously hidden 0.938–0.998 range.
 5. `XENA-VOLDIR-001` — unchanged; conditional on a graduated cost-surviving base.
 
 **New, binding on any 019/020 design (from the 018/018B evidence):** any proposal must **name the

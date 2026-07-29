@@ -5,8 +5,9 @@
 **CHECKPOINT-018 OPEN (2026-07-25) — Trade Opportunity Modelling / Capture Geometry.
 SoT signed. `SPDR-018` + `SPDR-018B` COMPLETE AND CLOSED 2026-07-26 (`HYP-D5` SUPPORTED /
 PARTIALLY SUPPORTED; no gating verdict from either). NEXT = the mid-checkpoint reflection
-(inputs assembled, operator decision unsigned). `SPDR-019` / `SPDR-020` REGISTERED with
-designs pending. TRAIN only; holdouts sealed.**
+(inputs assembled, operator decision unsigned). `SPDR-019` / `SPDR-020` designs are complete;
+`SPDR-020` QA run-5 fixes were applied 2026-07-29 and await fresh QA approval. Execution remains
+unauthorised. TRAIN only; holdouts sealed.**
 
 **Closed threads since:** **P4** — C3 is *terminally unpowerable* in its registered form (median cell
 needs ~201 years of 25-symbol history); **P3** — CI fragility swept, seed spans ~4.8% of CI width, so
@@ -87,7 +88,8 @@ EXP-099 not authorised. Family retrospective still pending (independent of Ch.06
   **OPEN** 2026-07-25; SoT signed. **SPDR-018 and SPDR-018B both COMPLETE AND CLOSED 2026-07-26**
   (`HYP-D5` SUPPORTED / PARTIALLY SUPPORTED; **no gating verdict from either**). **Next item = the
   mid-checkpoint reflection**, which sets how SPDR-019/020 are parameterised, not whether they run.
-  SPDR-019/020 registered, designs pending. Spread pin still **BLOCKING** for any money read.
+  SPDR-019/020 registered; designs complete, execution unauthorised. Spread pin still **BLOCKING**
+  for any money read.
 - [Checkpoint 018 corrections log](checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/corrections-log.md)
   — 2026-07-26; independent adversarial audit of the 018/018B documentation. **RELIABLE WITH
   CORRECTIONS**; both verdicts survive. Two critical fixes: the C2 ruling's third leg was false and

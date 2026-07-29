@@ -132,7 +132,7 @@ re-parameterisation of SPDR-011’s range-break object.
 | `CF-VOLDIR-001/HYP-D4` | SPDR-017 | Independent predicted-price mispricing (proven + error dynamics + weak-dir features) characterised like 014 — residual ≠ ambient? |
 | `CF-VOLDIR-001/HYP-D5` | SPDR-018 | For every question checkpoint-017 left **UNPOWERED or INCONCLUSIVE**, measured in its **original statement**: can it be resolved to its own target precision on this data, and if so what is the answer? Covers the complete residue of SPDR-012/013/014/015 (only authorised drop: SPDR-017), plus a uniform `(p, W, L, W/L, p_be_net, edge)` decomposition on every cell carrying a signed return |
 | `CF-VOLDIR-001/HYP-D6` | SPDR-019 | Given the `(p, W, L)` picture from D5, does opportunity-modulated capture geometry on a **fixed signed breakout entry** (selection, hold, exits, sizing scaled to forecast move) move the payoff residual `log R = log(W/L) − log((1−p)/p)` reliably above zero — i.e. `p` above its own **gross** break-even — versus the unmodulated baseline? *(Narrowed from partial-net-above-cost-floor by **AMENDMENT-C5**, 2026-07-28; tested layer-by-layer per **AMENDMENT-C6**.)* |
-| `CF-VOLDIR-001/HYP-D7` | SPDR-020 | Same question on the SPDR-014 E-TOUCH / E-CLOSE event object under direction-aware capture, with a band that actually selects *(same C5 / C6 amendments)* |
+| `CF-VOLDIR-001/HYP-D7` | SPDR-020 | Same question on the SPDR-014 E-TOUCH / E-CLOSE event object under direction-aware capture, with band selectivity measured and reported on every cell (`p_event` is a covariate, never an eligibility filter) *(same C5 / C6 amendments)* |
 | `CF-VOLDIR-001/HYP-E` | XENA-VOLDIR-001 | Conditional portfolio/search among graduated bases only |
 
 **Checkpoint-018 hypothesis notes.** `HYP-D5` is a **precision experiment**, not a mechanism
@@ -327,7 +327,7 @@ spread not charged; reported net **overstated** relative to true cost.
   direction term, never substitutes for it**) together with the organising identity
   `E[net] = p·W − (1−p)·L − cost` (`p_be_net = (L+cost)/(W+L)`, `edge = p − p_be_net`).
   **Registered `SPDR-018` (`HYP-D5`),
-  `SPDR-019` (`HYP-D6`), `SPDR-020` (`HYP-D7`)** — designs pending, execution unauthorised; 019/020
+  `SPDR-019` (`HYP-D6`), `SPDR-020` (`HYP-D7`)** — designs complete, execution unauthorised; 019/020
   start-gated on the SPDR-018 mid-checkpoint reflection. **AMENDMENT-C1 (NEUTRAL):** cTrader instruments
   (EURUSD/XAUUSD/USTEC, INFR-021 fence) admitted as an **independent replication read only** — never
   pooled into the powered crypto estimate; separate fence (`train_end` 2023-11-22), holdout 2024-12-13+
@@ -459,5 +459,12 @@ spread not charged; reported net **overstated** relative to true cost.
   the mirror** (above / covers / below) rather than by any magnitude. **B-5 is strengthened, not weakened:** a
   boolean label could be dropped in summary, whereas an effect that cannot be quoted without its own precision
   cannot be read as a negative by omission. Both designs carry the change in their amendment ledgers
-  (SPDR-019 AMENDMENT-6, SPDR-020 AMENDMENT-4) and both remain **execution-unauthorised** pending QA run 2.
+  (SPDR-019 AMENDMENT-6, SPDR-020 AMENDMENT-4) and both remain **execution-unauthorised**.
   **0 counted TEST reads; 0 multiplicity slots; no family action; status remains REGISTERED.** |
+| 2026-07-29 | **HYP-D7 WORDING CLARIFICATION (NEUTRAL — operator directive).** “With a band that
+  actually selects” is replaced by the executable requirement that band selectivity is measured
+  and reported on every cell. `p_event` is a covariate and dose-response axis; it may never admit,
+  exclude, weight, label or rank a cell. This records the 2026-07-28 no-gate directive and changes
+  no entry, estimand, population or claim boundary. It is **not** an amendment to C6 and does not
+  resolve SPDR-020's separate phase-(b) trigger blocker. **0 counted TEST reads; 0 multiplicity
+  slots; no family action; status remains REGISTERED.** |

@@ -1,0 +1,112 @@
+{
+  "source": "SPDR-018/results/analyst_per_cell_magnitudes.parquet (all arms)",
+  "source_ci_rule": "SPDR-018: blocks in DAYS, minimum block = 1 day = 24 H1 bars >= every horizon in scope; envelope = min/max over blocks x seeds (conservative); 5-seed battery",
+  "provenance": "COMPUTED from the source emission by xen.resolution_basis; never typed",
+  "definition": "c = (block_mde_bps / ((1-p)*L)) * sqrt(n); dimensionless",
+  "caveat": "c is comparable only across cells whose CIs used the SAME block rule, block sweep and seed battery. Reusing c under a weaker rule understates uncertainty. Bands whose distinct_n or distinct_groups is small do not support a range claim -- the spread there is noise.",
+  "gating": "NONE. No band, rung or value admits, excludes, labels or ranks any cell.",
+  "n_bands": [
+    {
+      "n_band": "0-100",
+      "cells": 10289,
+      "distinct_n": 99,
+      "distinct_groups": 4,
+      "c_median": 5.863274107055377,
+      "c_p25": 4.248662995650155,
+      "c_p75": 8.014582703421139,
+      "n_median": 22.0
+    },
+    {
+      "n_band": "100-1,000",
+      "cells": 8782,
+      "distinct_n": 691,
+      "distinct_groups": 5,
+      "c_median": 6.652292711599149,
+      "c_p25": 5.921247156944888,
+      "c_p75": 7.71925353335042,
+      "n_median": 218.0
+    },
+    {
+      "n_band": "1,000-5,000",
+      "cells": 3763,
+      "distinct_n": 1003,
+      "distinct_groups": 5,
+      "c_median": 7.316489080424582,
+      "c_p25": 6.680226703569527,
+      "c_p75": 8.052283038059775,
+      "n_median": 2064.0
+    },
+    {
+      "n_band": "5,000-15,000",
+      "cells": 555,
+      "distinct_n": 152,
+      "distinct_groups": 5,
+      "c_median": 7.463971553097409,
+      "c_p25": 6.971274751475482,
+      "c_p75": 8.053787226364697,
+      "n_median": 6482.0
+    },
+    {
+      "n_band": "15,000-inf",
+      "cells": 138,
+      "distinct_n": 36,
+      "distinct_groups": 3,
+      "c_median": 13.140042169651398,
+      "c_p25": 12.039608564508043,
+      "c_p75": 14.666565797275181,
+      "n_median": 32034.0
+    }
+  ],
+  "required_n_by_band": {
+    "0.02": {
+      "0-100": 85945,
+      "100-1,000": 110632,
+      "1,000-5,000": 133828,
+      "5,000-15,000": 139277,
+      "15,000-inf": 431652
+    },
+    "0.03": {
+      "0-100": 38198,
+      "100-1,000": 49170,
+      "1,000-5,000": 59479,
+      "5,000-15,000": 61901,
+      "15,000-inf": 191845
+    },
+    "0.05": {
+      "0-100": 13751,
+      "100-1,000": 17701,
+      "1,000-5,000": 21412,
+      "5,000-15,000": 22284,
+      "15,000-inf": 69064
+    },
+    "0.075": {
+      "0-100": 6112,
+      "100-1,000": 7867,
+      "1,000-5,000": 9517,
+      "5,000-15,000": 9904,
+      "15,000-inf": 30695
+    },
+    "0.1": {
+      "0-100": 3438,
+      "100-1,000": 4425,
+      "1,000-5,000": 5353,
+      "5,000-15,000": 5571,
+      "15,000-inf": 17266
+    },
+    "0.15": {
+      "0-100": 1528,
+      "100-1,000": 1967,
+      "1,000-5,000": 2379,
+      "5,000-15,000": 2476,
+      "15,000-inf": 7674
+    }
+  },
+  "ladder": [
+    0.02,
+    0.03,
+    0.05,
+    0.075,
+    0.1,
+    0.15
+  ]
+}
