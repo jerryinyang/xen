@@ -562,7 +562,11 @@ def write_symbol_shard(shard_dir: Path, result: dict) -> None:
 
 
 def load_symbol_shard(shard_dir: Path, symbol: str) -> dict:
-    """Reconstruct a process-symbol result from an on-disk shard."""
+    """Reconstruct a process-symbol result from an on-disk shard.
+
+    Prefer :func:`assemble_tables_from_shards` for full-universe wrap-up — this
+    path materialises list-of-dicts and is only safe for small probes/tests.
+    """
     meta_path = shard_meta_path(shard_dir, symbol)
     if not meta_path.is_file():
         raise FileNotFoundError(f"missing shard meta for {symbol}")
@@ -588,6 +592,80 @@ def load_symbol_shard(shard_dir: Path, symbol: str) -> dict:
         "tripwire": meta.get("tripwire") or {},
         "g8_evidence": meta.get("g8_evidence"),
         "gate_info": meta.get("gate_info") or {},
+    }
+
+
+def assemble_tables_from_shards(
+    shard_dir: Path,
+    symbols: list[str],
+) -> dict:
+    """Concat shard parquets as DataFrames — never expand 10M+ rows to dicts.
+
+    Loading every episode as a Python dict OOMs on the full universe (~30M rows).
+    Parquet concat keeps peak memory near the on-disk table footprint.
+    """
+    print(f"  assembling tables from {len(symbols)} shards…", flush=True)
+
+    def concat_kind(prefix: str) -> pd.DataFrame:
+        frames: list[pd.DataFrame] = []
+        for index, symbol in enumerate(symbols, 1):
+            path = shard_dir / f"{prefix}_{symbol}.parquet"
+            if path.is_file():
+                frames.append(pd.read_parquet(path))
+            if index % 5 == 0 or index == len(symbols):
+                rows = sum(len(frame) for frame in frames)
+                print(
+                    f"    {prefix}: {index}/{len(symbols)} files, {rows} rows",
+                    flush=True,
+                )
+        if not frames:
+            return pd.DataFrame()
+        out = pd.concat(frames, ignore_index=True)
+        del frames
+        return out
+
+    episodes = concat_kind("ep")
+    zones = concat_kind("zn")
+    events = concat_kind("ev")
+    cell_cov = concat_kind("cv")
+
+    units: list[dict] = []
+    tw_mats: list[dict] = []
+    g8_evidence_rows: list = []
+    parity_map: dict[str, list] = {}
+    for symbol in symbols:
+        meta_path = shard_meta_path(shard_dir, symbol)
+        if not meta_path.is_file():
+            continue
+        meta = json.loads(meta_path.read_text())
+        if meta.get("error"):
+            print(
+                f"  ERROR {symbol}: {meta.get('error')}\n"
+                f"{str(meta.get('traceback') or '')[:500]}",
+                flush=True,
+            )
+        if meta.get("unit"):
+            units.append(meta["unit"])
+        if meta.get("tripwire"):
+            tw_mats.append(meta["tripwire"])
+        if meta.get("g8_evidence"):
+            g8_evidence_rows.append(meta["g8_evidence"])
+        parity_map[symbol] = meta.get("parity_posts") or []
+
+    print(
+        f"  episodes={len(episodes)}  zones={len(zones)}  events={len(events)}  "
+        f"cell_cov={len(cell_cov)}",
+        flush=True,
+    )
+    return {
+        "episodes": episodes,
+        "zones": zones,
+        "events": events,
+        "cell_cov": cell_cov,
+        "units": units,
+        "tw_mats": tw_mats,
+        "g8_evidence_rows": g8_evidence_rows,
+        "parity_map": parity_map,
     }
 
 
@@ -1189,18 +1267,14 @@ def main(argv: list[str] | None = None) -> int:
         total_symbols=len(syms),
     )
 
-    # Full symbol set = prior complete shards + this batch (shards written on finish).
+    # Assemble ONLY from shard parquets (DataFrame concat). Never reload full
+    # symbol results as list-of-dicts — that OOMs at ~30M episode rows.
     complete_now = list_complete_shard_symbols(shard_dir)
-    results_by_symbol: dict[str, dict] = {}
-    for symbol in sorted(complete_now):
-        results_by_symbol[symbol] = load_symbol_shard(shard_dir, symbol)
-    for result in new_results:
-        results_by_symbol[str(result["symbol"])] = result
-    results = [results_by_symbol[s] for s in syms if s in results_by_symbol]
-    missing_symbols = [s for s in syms if s not in results_by_symbol]
+    assemble_symbols = [s for s in syms if s in complete_now]
+    missing_symbols = [s for s in syms if s not in complete_now]
     if missing_symbols:
         print(
-            f"  WARNING missing symbol results: {missing_symbols}",
+            f"  WARNING missing symbol shards: {missing_symbols}",
             flush=True,
         )
 
@@ -1220,52 +1294,51 @@ def main(argv: list[str] | None = None) -> int:
             "event_types": list(event_types),
             "variants": list(VARIANT_IDS),
         })
-        par = next(r for r in new_results if r["symbol"] == seq["symbol"])
+        # Compare against the just-written shard parquet row count / sample hash.
+        shard_eps = pd.read_parquet(shard_dir / f"ep_{probe_symbol}.parquet")
+        par_n = int(len(shard_eps))
+        seq_n = len(seq.get("episodes") or [])
         h1 = hashlib.sha256(
             json.dumps(seq.get("episodes", [])[:100], sort_keys=True, default=_json).encode()
         ).hexdigest()
         h2 = hashlib.sha256(
-            json.dumps(par.get("episodes", [])[:100], sort_keys=True, default=_json).encode()
+            shard_eps.head(100).to_json(orient="records").encode()
         ).hexdigest()
-        # compare counts as stronger check
-        determinism_ok = len(seq.get("episodes", [])) == len(par.get("episodes", []))
+        determinism_ok = seq_n == par_n
         print(
             f"  determinism {'OK' if determinism_ok else 'FAIL'} "
-            f"n={len(seq.get('episodes',[]))} vs {len(par.get('episodes',[]))} "
+            f"n={seq_n} vs {par_n} "
             f"hash {h1[:12]} vs {h2[:12]}",
             flush=True,
         )
+        # Free probe payload before universe assemble.
+        del seq, shard_eps
+        new_results = []
 
-    # assemble
-    ep_rows, zone_rows, event_rows = [], [], []
-    parity_map: dict[str, list] = {}
-    units, tw_mats, cell_cov, g8_evidence_rows = [], [], [], []
-    for r in results:
-        if r.get("error"):
-            print(f"  ERROR {r['symbol']}: {r['error']}\n{r.get('traceback','')[:500]}", flush=True)
-        ep_rows.extend(r.get("episodes") or [])
-        zone_rows.extend(r.get("zones") or [])
-        event_rows.extend(r.get("events") or [])
-        if r.get("parity_posts") is not None:
-            parity_map[r["symbol"]] = r.get("parity_posts") or []
-        if r.get("unit"):
-            units.append(r["unit"])
-        if r.get("tripwire"):
-            tw_mats.append(r["tripwire"])
-        if r.get("g8_evidence"):
-            g8_evidence_rows.append(r["g8_evidence"])
-        cell_cov.extend(r.get("cell_cov") or [])
+    assembled = assemble_tables_from_shards(shard_dir, assemble_symbols)
+    episodes = assembled["episodes"]
+    zones_df = assembled["zones"]
+    events_df = assembled["events"]
+    cell_cov_df = assembled["cell_cov"]
+    units = assembled["units"]
+    tw_mats = assembled["tw_mats"]
+    g8_evidence_rows = assembled["g8_evidence_rows"]
+    parity_map = assembled["parity_map"]
 
-    episodes = pd.DataFrame(ep_rows) if ep_rows else pd.DataFrame()
-    print(f"  episodes={len(episodes)}  zones={len(zone_rows)}  events={len(event_rows)}", flush=True)
     if not episodes.empty:
+        print("  writing episodes.parquet…", flush=True)
         write_parquet("episodes.parquet", episodes)
-    if zone_rows:
-        write_parquet("zones.parquet", pd.DataFrame(zone_rows))
-    if event_rows:
-        write_parquet("events.parquet", pd.DataFrame(event_rows))
-    if cell_cov:
-        write_parquet("cell_coverage.parquet", pd.DataFrame(cell_cov))
+    if not zones_df.empty:
+        print("  writing zones.parquet…", flush=True)
+        write_parquet("zones.parquet", zones_df)
+    if not events_df.empty:
+        print("  writing events.parquet…", flush=True)
+        write_parquet("events.parquet", events_df)
+    if not cell_cov_df.empty:
+        print("  writing cell_coverage.parquet…", flush=True)
+        write_parquet("cell_coverage.parquet", cell_cov_df)
+    # zones only needed for write
+    del zones_df
 
     # metrics
     print("  scoring cells…", flush=True)
@@ -1368,7 +1441,6 @@ def main(argv: list[str] | None = None) -> int:
     # controls
     print("  controls…", flush=True)
     control_bundle_cache: dict[str, dict] = {}
-    events_df = pd.DataFrame(event_rows)
     ambient_candidates = _ambient_control_candidates(
         episodes,
         events_df,
@@ -1581,8 +1653,8 @@ def main(argv: list[str] | None = None) -> int:
     eth_posts = parity_map.get("ETHUSDT", [])
     gold = golden.run_golden(
         episodes=episodes,
-        events=pd.DataFrame(event_rows),
-        cell_coverage=pd.DataFrame(cell_cov),
+        events=events_df,
+        cell_coverage=cell_cov_df,
         parity_posts_eth=eth_posts,
         metrics_df=metrics_df,
         integrity_extra=integrity_extra,
