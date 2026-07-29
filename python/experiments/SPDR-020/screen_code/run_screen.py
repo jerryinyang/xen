@@ -490,6 +490,107 @@ def write_parquet(name: str, df: pd.DataFrame) -> Path:
     return p
 
 
+def _frame_to_parquet(path: Path, rows: list | None) -> None:
+    """Write a list-of-dicts table; empty list removes any prior file."""
+    if path.exists():
+        path.unlink()
+    if not rows:
+        return
+    frame = pd.DataFrame(rows)
+    for column in frame.columns:
+        if frame[column].dtype == object:
+            frame[column] = frame[column].map(
+                lambda value: (
+                    json.dumps(value, default=_json)
+                    if isinstance(value, (list, dict))
+                    else value
+                )
+            )
+    frame.to_parquet(path, index=False)
+
+
+def shard_meta_path(shard_dir: Path, symbol: str) -> Path:
+    return shard_dir / f"meta_{symbol}.json"
+
+
+def shard_is_complete(shard_dir: Path, symbol: str) -> bool:
+    return shard_meta_path(shard_dir, symbol).is_file()
+
+
+def list_complete_shard_symbols(shard_dir: Path) -> set[str]:
+    if not shard_dir.exists():
+        return set()
+    return {
+        path.name[len("meta_"):-len(".json")]
+        for path in shard_dir.glob("meta_*.json")
+    }
+
+
+def write_symbol_shard(shard_dir: Path, result: dict) -> None:
+    """Persist one symbol as soon as it finishes (resume-safe).
+
+    Completion marker is ``meta_<symbol>.json``, written last so a kill mid-write
+    leaves the symbol incomplete and re-runnable.
+    """
+    symbol = str(result.get("symbol") or "")
+    if not symbol:
+        raise ValueError("symbol shard requires a symbol")
+    shard_dir.mkdir(parents=True, exist_ok=True)
+    _frame_to_parquet(shard_dir / f"ep_{symbol}.parquet", result.get("episodes") or [])
+    _frame_to_parquet(shard_dir / f"zn_{symbol}.parquet", result.get("zones") or [])
+    _frame_to_parquet(shard_dir / f"ev_{symbol}.parquet", result.get("events") or [])
+    _frame_to_parquet(shard_dir / f"cv_{symbol}.parquet", result.get("cell_cov") or [])
+    meta = {
+        "symbol": symbol,
+        "empty": bool(result.get("empty")),
+        "error": result.get("error"),
+        "traceback": result.get("traceback"),
+        "unit": result.get("unit"),
+        "tripwire": result.get("tripwire") or {},
+        "g8_evidence": result.get("g8_evidence"),
+        "parity_posts": result.get("parity_posts") or [],
+        "gate_info": result.get("gate_info") or {},
+        "n_episodes": len(result.get("episodes") or []),
+        "n_zones": len(result.get("zones") or []),
+        "n_events": len(result.get("events") or []),
+        "n_cell_cov": len(result.get("cell_cov") or []),
+    }
+    tmp = shard_dir / f"meta_{symbol}.json.tmp"
+    final = shard_meta_path(shard_dir, symbol)
+    tmp.write_text(json.dumps(meta, indent=2, sort_keys=True, default=_json))
+    tmp.replace(final)
+
+
+def load_symbol_shard(shard_dir: Path, symbol: str) -> dict:
+    """Reconstruct a process-symbol result from an on-disk shard."""
+    meta_path = shard_meta_path(shard_dir, symbol)
+    if not meta_path.is_file():
+        raise FileNotFoundError(f"missing shard meta for {symbol}")
+    meta = json.loads(meta_path.read_text())
+
+    def _rows(name: str) -> list[dict]:
+        path = shard_dir / f"{name}_{symbol}.parquet"
+        if not path.is_file():
+            return []
+        return pd.read_parquet(path).to_dict(orient="records")
+
+    return {
+        "symbol": symbol,
+        "empty": bool(meta.get("empty")),
+        "error": meta.get("error"),
+        "traceback": meta.get("traceback"),
+        "episodes": _rows("ep"),
+        "zones": _rows("zn"),
+        "events": _rows("ev"),
+        "cell_cov": _rows("cv"),
+        "parity_posts": meta.get("parity_posts") or [],
+        "unit": meta.get("unit"),
+        "tripwire": meta.get("tripwire") or {},
+        "g8_evidence": meta.get("g8_evidence"),
+        "gate_info": meta.get("gate_info") or {},
+    }
+
+
 def universe() -> list[str]:
     pin = json.loads(Path(UNIVERSE_PIN_FAMILY).read_text())
     return list(pin["symbols"])
@@ -588,23 +689,43 @@ def _process_symbol(task: dict) -> dict:
         }
 
 
-def run_tasks(tasks: list[dict], jobs: int, *, label: str) -> list[dict]:
+def run_tasks(
+    tasks: list[dict],
+    jobs: int,
+    *,
+    label: str,
+    shard_dir: Path | None = None,
+    already_done: int = 0,
+    total_symbols: int | None = None,
+) -> list[dict]:
+    """Run symbol tasks; optionally write a complete shard as each finishes."""
     t0 = time.time()
+    planned = total_symbols if total_symbols is not None else (already_done + len(tasks))
+
+    def _record(res: dict, finished_in_batch: int) -> None:
+        if shard_dir is not None:
+            write_symbol_shard(shard_dir, res)
+        print(
+            f"  [{label}] {already_done + finished_in_batch}/{planned} "
+            f"{res.get('symbol', '?')} ({time.time() - t0:.0f}s)",
+            flush=True,
+        )
+
+    if not tasks:
+        return []
     if jobs <= 1:
         out = []
-        for i, t in enumerate(tasks, 1):
-            out.append(_process_symbol(t))
-            print(f"  [{label}] {i}/{len(tasks)} {t['symbol']} ({time.time()-t0:.0f}s)", flush=True)
+        for i, task in enumerate(tasks, 1):
+            res = _process_symbol(task)
+            out.append(res)
+            _record(res, i)
         return out
     ctx = mp.get_context("spawn")
     with ctx.Pool(jobs) as pool:
         out = []
         for i, res in enumerate(pool.imap_unordered(_process_symbol, tasks), 1):
             out.append(res)
-            print(
-                f"  [{label}] {i}/{len(tasks)} {res.get('symbol','?')} ({time.time()-t0:.0f}s)",
-                flush=True,
-            )
+            _record(res, i)
     return sorted(out, key=lambda r: r.get("symbol", ""))
 
 
@@ -1047,21 +1168,59 @@ def main(argv: list[str] | None = None) -> int:
         "variants": list(VARIANT_IDS),
     } for s in syms]
 
-    # resume: skip symbols with shard present
+    # resume: skip symbols with a complete per-symbol shard (meta_*.json)
     shard_dir = RESULTS_DIR / "shards"
-    if args.resume and shard_dir.exists():
-        done = {p.stem.replace("ep_", "") for p in shard_dir.glob("ep_*.parquet")}
-        tasks = [t for t in tasks if t["symbol"] not in done]
-        print(f"  resume: {len(done)} done, {len(tasks)} remaining", flush=True)
+    shard_dir.mkdir(parents=True, exist_ok=True)
+    done_symbols = list_complete_shard_symbols(shard_dir) if args.resume else set()
+    if args.resume:
+        tasks = [t for t in tasks if t["symbol"] not in done_symbols]
+        print(
+            f"  resume: {len(done_symbols)} complete shards, "
+            f"{len(tasks)} remaining",
+            flush=True,
+        )
 
-    results = run_tasks(tasks, args.jobs, label="symbols")
+    new_results = run_tasks(
+        tasks,
+        args.jobs,
+        label="symbols",
+        shard_dir=shard_dir,
+        already_done=len(done_symbols),
+        total_symbols=len(syms),
+    )
 
-    # determinism when jobs>1
+    # Full symbol set = prior complete shards + this batch (shards written on finish).
+    complete_now = list_complete_shard_symbols(shard_dir)
+    results_by_symbol: dict[str, dict] = {}
+    for symbol in sorted(complete_now):
+        results_by_symbol[symbol] = load_symbol_shard(shard_dir, symbol)
+    for result in new_results:
+        results_by_symbol[str(result["symbol"])] = result
+    results = [results_by_symbol[s] for s in syms if s in results_by_symbol]
+    missing_symbols = [s for s in syms if s not in results_by_symbol]
+    if missing_symbols:
+        print(
+            f"  WARNING missing symbol results: {missing_symbols}",
+            flush=True,
+        )
+
+    # determinism when jobs>1 (only if this batch produced at least one symbol)
     determinism_ok = True
-    if args.jobs > 1 and results and not args.smoke:
+    if args.jobs > 1 and new_results and not args.smoke:
         print("  determinism: re-running 1 symbol sequential…", flush=True)
-        seq = _process_symbol(tasks[0] if tasks else {"symbol": results[0]["symbol"], "s_pin": s_pin})
-        par = next(r for r in results if r["symbol"] == seq["symbol"])
+        probe_symbol = new_results[0]["symbol"]
+        seq = _process_symbol({
+            "symbol": probe_symbol,
+            "s_pin": s_pin,
+            "sources": list(sources),
+            "clocks": list(clocks),
+            "H_values": list(H_values),
+            "z_values": list(z_values),
+            "h_values": list(h_values),
+            "event_types": list(event_types),
+            "variants": list(VARIANT_IDS),
+        })
+        par = next(r for r in new_results if r["symbol"] == seq["symbol"])
         h1 = hashlib.sha256(
             json.dumps(seq.get("episodes", [])[:100], sort_keys=True, default=_json).encode()
         ).hexdigest()
@@ -1096,18 +1255,6 @@ def main(argv: list[str] | None = None) -> int:
         if r.get("g8_evidence"):
             g8_evidence_rows.append(r["g8_evidence"])
         cell_cov.extend(r.get("cell_cov") or [])
-
-    # also load any resumed shards
-    if args.resume and shard_dir.exists():
-        for p in shard_dir.glob("ep_*.parquet"):
-            df = pd.read_parquet(p)
-            ep_rows.extend(df.to_dict(orient="records"))
-
-    # write shards for resume
-    shard_dir.mkdir(parents=True, exist_ok=True)
-    for r in results:
-        if r.get("episodes") and not r.get("empty"):
-            pd.DataFrame(r["episodes"]).to_parquet(shard_dir / f"ep_{r['symbol']}.parquet", index=False)
 
     episodes = pd.DataFrame(ep_rows) if ep_rows else pd.DataFrame()
     print(f"  episodes={len(episodes)}  zones={len(zone_rows)}  events={len(event_rows)}", flush=True)

@@ -926,6 +926,40 @@ def test_required_control_cells_label_missing_l4_devices() -> None:
     assert result["missing_labelled_cells"]
 
 
+def test_symbol_shard_writes_complete_marker_and_reloads() -> None:
+    import importlib
+
+    run_screen = importlib.import_module("run_screen")
+    tmp = Path("/tmp/spdr020_shard_test")
+    if tmp.exists():
+        import shutil
+        shutil.rmtree(tmp)
+    tmp.mkdir()
+    result = {
+        "symbol": "BTCUSDT",
+        "empty": False,
+        "episodes": [{"event_key": "a", "r_bps": 1.0}],
+        "zones": [{"z": 1.5}],
+        "events": [{"event_idx": 1}],
+        "cell_cov": [{"n_origins": 2}],
+        "parity_posts": [{"entry_ts": 1}],
+        "unit": {"symbol": "BTCUSDT", "s_symbol": 1.0},
+        "tripwire": {"hard_pass": True},
+        "g8_evidence": {"dual_exit_probe": True},
+        "gate_info": {},
+    }
+    assert run_screen.shard_is_complete(tmp, "BTCUSDT") is False
+    run_screen.write_symbol_shard(tmp, result)
+    assert run_screen.shard_is_complete(tmp, "BTCUSDT") is True
+    assert run_screen.list_complete_shard_symbols(tmp) == {"BTCUSDT"}
+    loaded = run_screen.load_symbol_shard(tmp, "BTCUSDT")
+    assert loaded["symbol"] == "BTCUSDT"
+    assert loaded["episodes"][0]["event_key"] == "a"
+    assert loaded["zones"][0]["z"] == 1.5
+    assert loaded["unit"]["s_symbol"] == 1.0
+    assert loaded["tripwire"]["hard_pass"] is True
+
+
 def test_hold_control_requirements_use_device_horizon_not_primary_h() -> None:
     start = config.DESIGN_START_NS
     episodes = pd.DataFrame({
