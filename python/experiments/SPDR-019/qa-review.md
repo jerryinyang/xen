@@ -3714,3 +3714,640 @@ Stated honestly, because a coverage claim is worth less than a coverage map.
   makes R8-17's ordering defect materially more frequent — none of that is measured here.
 - **I did not attempt to quantify the direction or size of any defect's effect on the result.** That
   is the data-analyst's object post-run, and there is no run.
+
+---
+
+## QA run 9 — 2026-07-29T17:30:40Z — mode: subagent — HEAD d3c9a79 (SPDR-019 unchanged since `0d08f48`)
+
+**Reviewed git state:** `HEAD d3c9a795da7e3b508767c814729ae774bc310415`. `git diff 0d08f48 HEAD --
+python/experiments/SPDR-019/` is **empty** — the two commits on top (`a4cdaa4`, `d3c9a79`) are
+SPDR-020 only. Working tree carries two untracked SPDR-020 paths (`results/run_plan.json`,
+`results/shards/`), both out of scope and untouched by me.
+**Stage:** IMPLEMENTATION QA, re-review after remediation. 17 modules, 5,401 lines, two of them new
+(`integrity.py`, `tripwires.py`).
+**Independence:** fresh subagent context. I authored none of the design and none of the
+implementation. `design.md` (1,396 lines) read in full including the new AMENDMENT-19; run 8 read in
+full; runs 5–7 read for settled findings; `spdr-lane.md`, `lessons-and-amendments.md` (L-28 in full),
+`pitfalls-ledger.md`, KB index and `_pipeline-config.md` read.
+
+**Verdict: REVISE.**
+
+**Execution authorisation: NO.**
+
+The picture has changed materially. Run 8 rejected on an integrity layer that could not fail: two
+tripwires that reconstructed their own evidence, nine HARD checks that were `True` literals, a dead
+exit-matched control whose check attested it ran, a 2,000-seed battery with one distinct value, and a
+one-token bug that emptied four predeclared variants. **All 29 run-8 findings are closed, 24 of them
+confirmed by execution.** I ran the sanctioned smoke (2 symbols, `n_boot=200`, TRAIN-only) and then
+attacked the emitted artifacts with injected faults: the checks that were literals now genuinely flip
+to `False` when I corrupt the thing they check.
+
+What blocks execution is narrower and is the same *class*, not the same *size*: **three of the 28
+HARD checks still cannot fail on what they claim to verify.** One HARD check passes on garbage input
+(`PARENT-GATE PROVENANCE`), and both tripwires now run against the live pipeline but each has a limb
+that is structurally incapable of failing — TRIPWIRE-1 never reaches the L1 layer or any L4 arm, and
+TRIPWIRE-2's favourable-precedence twin never calls the exit resolver it exists to test. Under
+P-23/L-52 a check that cannot fail is indistinguishable from one that was skipped, and §12 makes all
+three HARD. None of them corrupts a number in the emission — they are verification-coverage gaps, not
+estimand defects — which is why this is REVISE and not a second REJECT.
+
+Findings: **0 CRITICAL · 3 HIGH · 7 MEDIUM · 7 LOW.**
+
+Every claim below is marked **CONFIRMED** (I executed it or hand-derived it) or **READ** (read-only).
+No number appears that I did not produce.
+
+**Smoke run, and its cleanup.** `run_screen.py --smoke --jobs 2 --n-boot 200`: 617,197 episodes,
+1,260,603 signals, 1,758 metric rows (1,710 cells + 48 interaction), determinism bit-identical
+(`96537d97a448` sequential vs parallel), 5.6 min, **28/28 HARD checks pass**. This reproduces the
+developer's claim exactly on episodes, determinism and hard-pass; my cell count is 1,710 scored cells
+against the claimed 1,758, which is the same number counted with the interaction rows included.
+`results/` was restored afterwards to the three predeclaration files, hashes unchanged:
+`resolution_basis.json 23d5f5bf1eb16d00…`, `expected_resolution.json e3247798edc9ab90…`,
+`expected_resolution_prior.json 961cec28e28f6ff3…`. `git status` on SPDR-019 is clean.
+
+---
+
+### PART A — run-8 close-out, R8-01 … R8-29
+
+| ID | Status | How I verified |
+|---|---|---|
+| **R8-01** TRIPWIRE-1 rebuilt its own input | **CLOSED — CONFIRMED** | The reconstruction branch is gone (`grep _tripwire_material` → 0 hits). `tripwires.tripwire_1:63-124` materialises both streams over the nine `GATE_ARRAYS`, re-runs `build_l0_episodes` + `select_layer_from_l0` on each, and compares episode key sets. Smoke emitted `changed_state_rows 45,117`, `changed_selection_episodes 122`, `legal 3,325 / leaky 3,329`, per-variant symmetric differences (L2_SHOCK 23, L3_TGTCUR 24, …). Real re-selection. **Residual coverage gap → R9-01** |
+| **R8-02** TRIPWIRE-2 on synthetic prices + dummy fallbacks | **CLOSED — CONFIRMED** | All default arguments gone; `tripwires.tripwire_2:127-243` walks the real `L4_TARGET_A1_UNMOD` episode set. Twin (a) is a genuine second resolution: `fills.resolve_entry_stop_on_clock:86-120` re-resolves the same stop rule on decision-clock OHLC — smoke emitted `count_clock_vs_m1 = 851` differing ids with both fill prices per id. `price_identical_bars` counted separately (0). **Residual: twin (b) → R9-02** |
+| **R8-03** nine HARD checks hardcoded `True` | **CLOSED — CONFIRMED by fault injection** | Every literal is replaced by a computation in `integrity.py`. I loaded the smoke's `episodes.parquet` (617,197 rows) and injected faults: one row with `fill_ts ≤ decision_end_ns` → `causality` **False**, `fill_causality` **False**; an ATR-proportional target width on `L4_TARGET_A1_UNMOD` → `l4_comparator` **False**; a pooled full-TRAIN decile → `decile_causality` **False**; `r_bps_side_flipped = −r_bps` on a target arm → `exit_matched` **False**; one altered L1 stop price → `l1_subset` **False**; `L4_HOLD_4H_MOD` holds set constant → `mod_hold` **False**. Empty frames fail every one. **Exception: `parent_prov` → R9-03** |
+| **R8-04** exit-matched derangement dead code | **CLOSED — CONFIRMED** | The function is gone; the material is now built in the engine. `engine._build_variant:460-472` re-resolves the exit from M1 on the flipped side for target/trail arms (`TARGET_TRAIL_RERESOLVE`) and negates only on time-exit arms. `run_screen._run_controls:546-563` runs the side derangement on **11 arms** (L0 + 6 target + 4 trail), not one. Smoke `EXIT-MATCHED NULLS` detail: all 22 time-exit arms `max\|r_flip + r\| = 0` exactly; all 10 target/trail arms 631.0–1,098.4 bps |
+| **R8-05** ≥2,000-seed battery = one value | **CLOSED — CONFIRMED** | `controls.derange_indices:35-49` draws a permutation with zero fixed points by rejection (≤50 tries, deterministic repair fallback); `side_derangement:107-113` flips only episodes whose deranged label differs. On 3,000 synthetic episodes at `n_seeds=2000`: **2,000 draws, 2,000 distinct values, null sd 0.0451, percentile 0.83, fixed points 0**. In the smoke every one of the 11 arms emitted `n_distinct = n_draws` with null sd 0.059–0.073. **Seed-count coupling → R9-05; residual alignment disclosure → R9-14** |
+| **R8-06** `p_stay ≡ 1.0`, four MOD arms empty | **CLOSED — CONFIRMED** | `parent_gates._p_stay_series:236` now uses `stayed`, and the O(n²) scan is replaced by a per-origin-state `searchsorted`. On a synthetic two-state chain with true stay 0.642: **1,951 finite values, 1,293 distinct, mean 0.6565**. In the smoke all four MOD-hold arms are populated — 27,061 / 16,346 / 8,381 / 5,866 episodes — with holds spanning 1.000–1.933, 1.600–7.733, 4.800–20.0, 8.000–20.0 h. (My distinct-value count differs from the claimed 10,313, which was measured on real regime states, not my synthetic chain) |
+| **R8-07** entry-timing derangement re-labelled realised P&L | **CLOSED — hand-derived + CONFIRMED** | `controls.entry_timing_derangement:185` now computes `r_d[i] = sign(side[i])·sign(side[donor])·r[donor]`. For a constant-hold time exit, `r = side·ambient(t,h)`, so this is exactly the donor window's ambient return scored under the receiver's side — the algebra is exact, not an approximation. The dead double-assignment and the unused `ambient_r_by_key` are gone (grep → 0). The function now **refuses** rather than approximating when holds vary (`NOT_APPLICABLE_VARIABLE_HOLD`, `:155-167`). Smoke: 200 draws, 200 distinct, null mean 0.00085, sd 0.0798, q05/q50/q95 −0.1256/0.0017/0.1469 |
+| **R8-08** two plant operators algebraically identical | **CLOSED — CONFIRMED** | `metrics.resolution_ladder:280-302` applies both operators to the **resampled** totals, not the point estimate. On a 2,791-episode / 400-day cell at `n_boot=400`: `detect_wl {0.02:0.0125, 0.03:0.015, 0.05:0.0425, 0.075:0.11, 0.1:0.2125, 0.15:0.595}` vs `detect_p {…, 0.03:0.0125, …, 0.075:0.1025, …, 0.15:0.60}` — **IDENTICAL operators: False**. They are genuinely different objects. Note the separation is small (≤0.005 at most rungs), so the design's "the pair shows how operator-dependent the cell's resolution is" will read as "barely" |
+| **R8-09** ladder emitted 0/1 indicators; mde50/80/95 not from the ladder | **CLOSED — CONFIRMED** | Rates are now `mean(planted > crit)` over finite replicates — **all values in [0,1], several strictly interior** (0.0125 … 0.595 above). `mde50/80/95 = crit − quantile(v0, 1−q)` (`:308-309`) is the exact analytic inversion of the primary operator's own curve, so summaries and rungs are one computation. Consistency check: rate(0.15) = 0.595 with mde50 = 0.1393 < 0.15 — coherent |
+| **R8-10** Δ`log R` CI was fabricated arithmetic | **CLOSED — CONFIRMED** | `metrics.paired_combo_ci:513-591` draws **one** block index set per `(block, seed)` replicate and reuses it across all arms on a common day index. I instrumented `_resample_day_blocks`: a paired call makes **15 draws, seeds `[101,211,307,401,503]`** — one per replicate set, shared. Over 30 trials with a true zero (a 60% subset against its parent, 250 days, `n_boot=300`) the CI covered zero **29/30** with mean width 0.2225 against a true sampling spread of `2×1.96×sd = 0.1899` — i.e. ~17% conservative, which is what a min/max envelope over 15 CIs should be. (I did not reproduce the claimed "within 4%"; different construction, not a finding.) The same function carries the `L2_INTERACTION` row (`run_screen.py:439-443`) |
+| **R8-11** §9 band computed then overwritten | **CLOSED — CONFIRMED** | Renamed to `mirror_band` (`metrics.py:422-427`); the reporting band keeps `band`. Both survive in `metrics_by_cell.parquet`: `band ∈ {TRAIN, DESIGN, CONFIRM}`, `mirror_band` = 1,489 COVERS / 104 ABOVE / 9 BELOW / 156 null. `golden.py:136` G4 correctly keys on the reporting `band == "CONFIRM"`; the ladder projection (`run_screen.py:873-881`) does not carry `mirror_band` and does not need it. No reader of the old key remains. **156 nulls → R9-16** |
+| **R8-12** G5/G6 hardcoded, G7 unevaluated and excluded | **CLOSED — CONFIRMED** | G5 is a real scan of emitted column names **and** the screen's own source for six forbidden tokens (`golden.scan_for_fitted_slope:174-203`) — smoke scanned 84 columns, 0 offending. G6 reads the real TRIPWIRE-1 payload. G7 reads the real TRIPWIRE-2 payload and emitted a real episode: `m1_ts 1658337060…`, SHORT, adverse 23601.328 / favourable 23493.672, `r` −22.859 / +22.859. `selfcheck.py:231` now iterates all seven. **Residual: two hardcoded sub-clauses → R9-12** |
+| **R8-13** block rule never checked clause by clause | **CLOSED — CONFIRMED** | `integrity.check_block_rule:325-441` evaluates all six clauses and reads `source_ci_rule` from the basis artifact, matching each clause by keyword rather than string equality. Smoke: all six `held: True`, `source_ci_rule_covers_clause` all `True`, `min_observed == max_observed == 15` per-seed CIs on 1,649 cells, `effective block < n` checked on 5,127 block records, `max_active_hold_hours 20.0 ≤ min_block_hours 24`. It **fails** when I set holds to 48 h, when a cell has 5 per-seed CIs, and on an empty metrics list. **Exemption gap → R9-04** |
+| **R8-14** M-3 comparator matched on the selection variable | **CLOSED — CONFIRMED** | `panel.py:172-178` computes `abs_r_decile` per symbol, expanding, causal, 250-bar warm-up; `run_screen._run_controls:588-613` matches the complement on it and runs the comparator for **L1 and L3** (six arms). Smoke: every arm returned 200 draws / 200 distinct with per-decile matching, e.g. `L1_SHAT_DECILE_GE9` live 0.6141 vs null mean 0.0943 (pct 0.98); unmatched deciles disclosed by name (`['2','3']` on two L3 arms). The complement is the layer's excluded L0 set — disjoint by construction |
+| **R8-15** parity passed vacuously on NaN / missing | **CLOSED — READ + CONFIRMED** | `parent_gates.run_all_parity:289-321`: `hard_pass = no failures AND n_ok == 2×n_non_exempt AND n_non_exempt > 0`; `NO_PARENT_ROW`, `PARENT_NAN`, `NO_REGIME_ROWS` and a missing cell all append to `failures`. The silent-exception fallback is gone — `run_screen.py:821-831` records a raised parity as `hard_pass: False` with the traceback. Smoke: `n_ok 4/4`, `failures []` |
+| **R8-16** three checks passed vacuously on an empty emission | **CLOSED — READ** | `selfcheck.py:142-150` requires `have_ts = n_eps > 0 and max_ts > 0`; the `else True` branch is gone. `derangement fixed-point count` (`:217-227`) now requires at least one control that reported `fixed_point_count_measured` and defaults to `None`, not `0`. `identity reconstruction` requires `n_checked > 0`; `log R definition` requires `n > 0` |
+| **R8-17** exclusivity in decision order | **CLOSED — CONFIRMED** | `engine._apply_exclusivity_in_fill_order:319-338` sorts candidates by `(fill_ts, decision_end_ns, −side)` and tests occupancy on `fill_ts < open_until`. The dead `entry.apply_exclusivity` is gone (grep → the fill-order function only). Smoke signal accounting: 617,197 EPISODE / 307,222 SUPPRESSED / 183,143 INELIGIBLE / 152,754 UNFILLED / 287 NO_EXIT — nothing dropped |
+| **R8-18** exit scan dropped the last M1 bar | **CLOSED — READ** | `fills.py:211` uses `side="right"`, with the reasoning inline. The entry-bar exclusion is now declared in the design (AMENDMENT-19b, `design.md:135`) |
+| **R8-19** `effective_n` was `n` renamed | **CLOSED — CONFIRMED** | `metrics.py:404-418` builds an iid half-width at the **same alpha** via the delta method and reports `effective_n = n·(iid_half/block_mde)²`, with `n_nominal` alongside. On 2,400 episodes over 300 days: **independent → ratio 0.802; day-clustered (day-level mean shocks) → ratio 0.187**. The column now moves with dependence. Smoke median `effective_n/n = 0.724`. (I did not reproduce the claimed 0.96 / 0.08; my clustering strength differs. Direction and magnitude order confirmed) |
+| **R8-20** declared 5-seed battery not the one that ran | **CLOSED — CONFIRMED** | `metrics.envelope_ci_logR:146` and `paired_combo_ci:559` both iterate `for seed in BOOT_SEEDS`. My instrumented paired call recorded seeds `[101, 211, 307, 401, 503]` — the declared constants |
+| **R8-21** `zz_ordinal` unsorted before hold-forward | **CLOSED — READ** | `parent_gates.load_zz_ordinal:88-90` sorts on `confirm_slot_end`, and `panel._hold_forward:78-79` **raises** on a non-ascending source rather than walking it silently. Both limbs of the fix are present |
+| **R8-22** plant curve a point boolean ignoring side | **CLOSED in letter — CONFIRMED** | `controls.plant_curve:294-304` emits `detection_rate_vs_null` per rung against the control's own ≥2,000 draws, plus σ̂ units re-derived from the run-measured pooled σ̂ (smoke: 25.577 bps). It is a rate, not a boolean. **But the curve saturates → R9-06** |
+| **R8-23** fill rate, κ, homogeneity, collapse never computed | **CLOSED — CONFIRMED** | All four exist. Smoke: `fill_rate` finite on 97.3% of rows (`run_screen._signal_counts:273-301` joins the signal frame); `kappa` finite on 97.3% (`metrics.py:438-445` from `fills.mfe_bps`); `i_squared` on 533 of 594 pooled rows with `pooled_status`/`per_symbol_spread_log_R` (`metrics.homogeneity:454-479`, `_attach_homogeneity:617-657`); `collapse_fraction` attached to the 11 cells the controls actually refereed and `NOT_REFEREED` elsewhere |
+| **R8-24** `check_no_local_accounting` FAILED | **CLOSED — CONFIRMED by execution** | `build_episodes_for_variant` → `assemble_episodes_for_variant` (`engine.py:511`). `check_no_local_accounting("experiments/SPDR-019/screen_code")` → `{"ok": true, "banned_defs_found": []}` |
+| **R8-25** sizing arm carried a `log R` | **CLOSED — CONFIRMED** | `run_screen._score_one_cell:259-269` nulls `log_R`, `ci_*`, `block_mde`, `mirror_band`, `mde50/80/95`, `realised_c`, `ladder` on both sizing variants and emits `sizing_dispersion_sd_bps` / `_iqr_bps` plus `log_R_suppressed_reason`. Smoke: 108 sizing rows, `log_R` null on all, dispersion present on all, `n_episodes` present on all, and all 108 still appear in `resolution_ladder.parquet`. `_layer_deltas` skips them per §4.2. **One silent drop found → R9-04** |
+| **R8-26** abandoned scratch code in the hashed tree | **CLOSED — CONFIRMED** | `sensitivity_ladder`, `if False`, `# mess` → 0 hits. **A smaller instance remains → R9-15** |
+| **R8-27** determinism skipped under `--smoke`; `--resume` inert | **CLOSED — CONFIRMED** | `run_screen.py:765` is `if args.jobs > 1:` with no smoke exception, and `determinism_ok` initialises to `None` so a check that did not run cannot record as held. `--resume` removed (grep → 0). My `--smoke --jobs 2` run **did** execute it: `determinism OK 96537d97a448 vs 96537d97a448` |
+| **R8-28** two paths would not complete at full scale | **CLOSED — CONFIRMED** | `_p_stay_series` is now `searchsorted`-based, not O(n²). `metrics._boot_totals:94-108` chunks at 250 replicates, bounding peak memory to one chunk. `main()` replaces the hardcoded `est_met = 300` with a real cell-scoring probe (`:720-756`). Measured: 2 symbols × 2 clocks × 3 δ in 5.6 min at `n_boot=200`, ~95 s per symbol for the episode stage. Extrapolation to 25 symbols at `n_boot=2000` is the operator's call on the emitted `run_estimate.json`, not mine |
+| **R8-29** import surgery deleted this screen's `config` | **CLOSED — READ** | `parent_gates._load_by_path:31-64` loads each parent module from an explicit path under a `_SPDR_015__` key, aliases bare names only for the duration of the load inside `try/finally`, and **never** mutates `sys.path` or deletes an existing entry. Ran clean under `mp.Pool` spawn with 2 workers |
+
+**Run-8 standing blockers.** Blockers 1 and 2 remain DISCHARGED (re-verified, not re-flagged).
+Blocker 3 (lane-wide spread pin) **STANDS** and is respected: `SPREAD_COST_DISCLOSURE` carried
+verbatim with `spread_rt_bps: null`, `SPREAD_BPS_PROHIBITED = True`, and the only cost objects in
+`metrics_by_cell` are `cost_bps_DISCLOSURE_ONLY`, `p_be_net`, `p_be_net_flag` and
+`spread_cost_status` — CONFIRMED on the emitted frame. Blockers 4, 5 and 6 are **DISCHARGED** by the
+close-outs above.
+
+---
+
+### PART B — new findings
+
+#### R9-01 — HIGH — TRIPWIRE-1 never reaches the L1 layer or any L4 arm
+
+**Fails:** `design.md:556-558` (§6.1 TRIPWIRE-1: *"rebuild **every layer's** conditioning state from
+bar `[+1]`"*), `design.md:1063` (§12 HARD Causality), P-23/L-52.
+**Code:** `tripwires.py:39-45` and `tripwires.py:92-100`; `engine.py:124-139`; `entry.py:75-85`.
+
+The tripwire shifts nine panel arrays and re-runs the build. But L1's conditioning state is not read
+from the panel: `engine._select_mask:124-139` reads `sig.s_hat_decile` and `sig.s_hat_rank` off the
+`Signal` object, which `entry.detect_signals:75-85` froze from the **original** panel — and
+`tripwires.tripwire_1:92-93` hands the **same** `base_sigs` list to both builds. Shifting
+`panel.s_hat_decile` therefore cannot change an L1 selection.
+
+**CONFIRMED on the emission.** `per_state_array` records `s_hat_decile: 2,164` and `s_hat_rank:
+12,126` changed rows, while `per_variant` records:
+
+```
+L1_SHAT_DECILE_GE5 0 · L1_SHAT_DECILE_GE7 0 · L1_SHAT_DECILE_GE9 0 · L1_SHAT_RANK_CONTINUOUS 0
+L2_SHOCK_HMM 23 · L2_LEVEL_RMARKOV_K12 20 · L2_LEVEL_RMARKOV_K4 11 · L2_JOINT 13
+L3_TGTCUR_FIRES 24 · L3_TGTCUR_DOES_NOT_FIRE 24 · L3_TGTMED5_CO_REPORT 7
+```
+
+All 122 of the `changed_selection_episodes` come from L2 and L3. Separately, `LAYER_VARIANTS`
+(`tripwires.py:39-45`) contains no `L4_*` id at all, so `p_stay` (11,855 changed rows) and
+`n_prior_trans` (11,911) — the MOD-hold arm's entire conditioning state — reach no episode
+comparison either. The HARD pass is carried by the layers that happen to read the panel.
+
+**Required fix (experiment-developer).** Rebuild the `Signal` stream from the leaky panel (or shift
+the ŝ fields on the Signal objects) so L1 is exercised, and add the four `L4_HOLD_*_MOD` arms to the
+variant list. Emit `changed_selection_episodes` per variant as a **required non-zero** for every
+variant whose gate array the shift actually changed, not as a pooled sum.
+
+#### R9-02 — HIGH — TRIPWIRE-2's favourable-precedence twin never calls the exit resolver; clauses 3 and 4 cannot fail
+
+**Fails:** `design.md:583-599` (§6.1 TRIPWIRE-2 clauses 3 and 4, and *"The third clause is what
+proves the adverse rule is actually implemented"*), `design.md:1088`, P-23/L-52.
+**Code:** `tripwires.py:196-224`; `fills.py:159, 238-242` (the branch under test).
+
+`resolve_target_trail_time` accepts `favourable_precedence` and inverts the both-reachable branch at
+`fills.py:238`. **CONFIRMED: it is never passed `True` anywhere** — `grep favourable_precedence
+screen_code/*.py` returns only the definition (`fills.py:159`), the branch (`:238`), the pass-through
+(`engine.py:262, 273`) and an unrelated key name (`tripwires.py:234`). The adverse-precedence branch
+the tripwire exists to prove is dead code in every run.
+
+What the twin does instead is arithmetic on a constructed pair, and both remaining clauses are
+tautologies:
+
+- **Clause 3** (`count_favourable_diff == count_both_reachable`): `both_ids.append` and
+  `fav_ids.append` are the same two lines of the same block (`tripwires.py:205-208`). Equality holds
+  by construction. **CONFIRMED** by source and by the emission (`4 == 4`).
+- **Clause 4** (*"the favourable twin's fill price is mechanically no worse"*): `favourable_px =
+  ep.target_price` and `adverse_px = trail_level` sit on opposite sides of `ep.fill_price` by
+  construction (`:189, 206-207`), so the LONG/SHORT inequality at `:221-224` cannot fail. The
+  emitted G7 row shows the signature: `adverse_r_bps −22.859`, `favourable_r_bps +22.859` — exact
+  negatives, because at `a = 1, b = 1` the constructed trail mirrors the target.
+
+A third point of substance: `emitted_exit_price` is labelled as the emitted arm's fill but is the
+**constructed** trail level; the real episode exited at its target or at time. §6.1 asks for a
+comparison against the emitted arm's price.
+
+**Required fix (experiment-developer).** For each constructed both-reachable episode, call
+`resolve_target_trail_time` twice with the same target and trail — `favourable_precedence=False` and
+`True` — and derive both counts and both prices from the returned `ExitFill`s. Clause 3 then measures
+something (the two id sets can differ) and clause 4 compares two resolver outputs.
+
+#### R9-03 — HIGH — PARENT-GATE PROVENANCE passes on garbage
+
+**Fails:** `design.md:1079` (§12 HARD **Parent-gate provenance**: *"each layer's gate reads exactly
+the model/field/rule pinned in §4.1a … and the outcome label `y` and realised swing magnitude appear
+in **no** gate input — a **hard failure** if they do"*), `design.md:273-276`, P-23/L-52.
+**Code:** `integrity.py:139-157`.
+
+```python
+rows = (parent_parity or {}).get("rows") or []
+if not rows:
+    return _fail("parent parity emitted no rows")
+...
+return True, {"pinned_fields": fields, "n_symbols_with_parent_rows": n_with_gate, ...}
+```
+
+The verdict is `True` whenever the parity payload has at least one row. The `fields` dict is a
+**string literal**, not a read of what the code actually consumed. Nothing checks the firing rules,
+nothing checks the hold-forward direction, and — the clause §12 states as a hard failure — **nothing
+looks for `y`, `mag_k1`, `next_abs_oo` or `run_len_*` in any gate input.**
+
+**CONFIRMED by execution:** `integrity.check_parent_provenance(episodes, {"rows": [{"junk": 1}]})`
+→ `True`. This is the R8-03 shape, relocated into the new file.
+
+**Required fix (experiment-developer).** Assert the columns actually read in `parent_gates.attach_gates`
+(`s_hmm_rv`; `walk_forward_probs(...)["logistic_ridge"]`; `logit_ridge` with `p >= 0.5`; `ridge_cont`
+with `pred_cont > threshold` on the same row), assert the forbidden names against every array bound
+onto the panel, and assert that each gate came through `_hold_forward` (whose ascending guard already
+raises).
+
+#### R9-04 — MEDIUM — the block-rule degenerate exemption is uncapped, unvalidated, and silently drops every sizing row
+
+**Fails:** `design.md:1070` (§12 BLOCK RULE: *"a missing seed battery … is a **hard failure**"*),
+`design.md:1116-1117` (*"missing or empty is a **failure**, never a vacuous pass"*).
+**Code:** `integrity.py:354-380`.
+
+`held = bool(per_seed_counts) and min(per_seed_counts) == 15`. **One** compliant cell satisfies the
+clause regardless of how many cells were exempted. **CONFIRMED:** 1 compliant row + 5,000 fabricated
+degenerate rows → `held: True`, `n_cells_with_a_ci: 1`, `n_degenerate_cells_no_ci: 5000`. Nothing
+asserts that a degenerate cell is actually too thin to bootstrap — `n_dates` is recorded and never
+tested — so any future bug that empties `per_seed_ci` while nulling `ci_low` widens the exemption
+silently. The artifact also truncates `degenerate_cells` to 50 (`:379`) while the design's own
+exemption model (§4.1a PARITY-EXEMPT) is by **name and count**.
+
+Second limb, and this is the sizing question directly: a row with a **non-empty** `per_seed_ci` and a
+**null** `ci_low` falls into neither branch and is silently dropped. That is exactly the sizing-row
+shape after the R8-25 suppression. **CONFIRMED on the emission:** `n_cells_with_a_ci 1,649` +
+`n_degenerate 1` = 1,650 against 1,758 metric rows — the 108 missing rows are precisely the 108
+sizing cells. Their per-seed batteries are real and compliant; they are simply not counted anywhere,
+and nothing records that they were skipped.
+
+**Required fix (experiment-developer).** Require a stated reason per exempted cell (e.g. `n_dates <
+2`) and fail otherwise; emit the full degenerate list, not the first 50; classify suppressed-`log R`
+rows as an explicit third bucket, counted and named.
+
+#### R9-05 — MEDIUM — the ≥2,000-seed control battery is coupled to `--n-boot` and asserted nowhere
+
+**Fails:** `design.md:506` and `design.md:525` (§6: *">= 2000 seeds"* on both derangements),
+`spdr-lane.md` integrity boundary (seed-battery rule, L-19).
+**Code:** `run_screen.py:837`.
+
+```python
+n_ctrl = min(2000, max(50, n_boot))
+```
+
+The control seed count is an operator CLI flag in disguise. **CONFIRMED:** at `--n-boot 200` every
+arm emitted `n_seeds: 200`, `n_null_draws: 200`, including the entry-timing control. A default run
+(`n_boot = 2000`) satisfies §6, but no HARD check reads `n_seeds`, so a run at a reduced `--n-boot`
+would emit a 50-seed derangement under a passing `derangement fixed-point count` check.
+
+**Required fix (experiment-developer).** Pin the control battery to 2,000 independent of `n_boot`, or
+add `n_seeds >= 2000` to the derangement HARD check.
+
+#### R9-06 — MEDIUM — the plant curve saturates at every rung, so §6's UNUSABLE clause is inoperable
+
+**Fails:** `design.md:506-510` (§6: *"Report the detection rate at each rung. The control is reported
+**UNUSABLE** for any effect below its own plant-curve resolution"*), P-24.
+**Code:** `controls.py:294-304`.
+
+The plant is added to the **live** series (`lp = _logR(r + bps)`) and scored against the control's own
+null. The live value already sits near percentile 1.0 against that null, so every rung clears it.
+**CONFIRMED on the emitted `L0_BASELINE` curve:**
+
+```
+5 bps (0.195 σ̂) → 1.0   10 bps (0.391 σ̂) → 1.0
+20 bps (0.782 σ̂) → 1.0   40 bps (1.564 σ̂) → 1.0
+```
+
+A curve that reads 1.0 at its finest rung states no resolution. Nothing below 5 bps can be declared
+UNUSABLE, and nothing above it is informative either. The σ̂ re-derivation is correct (run-measured
+pooled σ̂ = 25.577 bps, L-50/P-21 satisfied) — the defect is the base the plant is applied to.
+
+**Required fix (experiment-developer).** Plant into a null-equivalent series (one deranged draw), so
+the curve rises from ≈ α at the finest rung and the UNUSABLE threshold becomes readable.
+
+#### R9-07 — MEDIUM — the L-51 selection check covers 5 of the subsets §12 names and is verified only by count
+
+**Fails:** `design.md:1081` (§12 L-51: *"runs on **every** selected subset the design or analysis
+reports separately — L1's `d≥5/d≥7/d≥9` cuts, L2's state cells, L3's gate, L5's combination, and
+cells above vs below median `mde50`"*), `design.md:1390` (§15).
+**Code:** `run_screen.py:884-897`; `selfcheck.py:279-281`.
+
+Five subsets are built — `L1_SHAT_DECILE_GE{5,7,9}`, `L2_SHOCK_HMM`, `L3_TGTCUR_FIRES` — H1 only,
+with the three δ levels pooled together. **CONFIRMED** in `selection_check.json`: `n_checks: 5`.
+Missing: `L2_LEVEL_RMARKOV_K4`, `L2_LEVEL_RMARKOV_K12`, `L2_JOINT_HMM_HIGH_AND_K12_HIGH`,
+`L3_TGTCUR_DOES_NOT_FIRE`, `L3_TGTMED5_CO_REPORT`, the M15 clock, and the **cells above vs below
+median `mde50`** split the design names explicitly. The HARD check asserts only `n_checks > 0`, so it
+cannot notice.
+
+#### R9-08 — MEDIUM — DECILE CAUSALITY separates only the worst case, and `warm_up_ok` is a literal
+
+**Fails:** `design.md:1071` (§12 DECILE CAUSALITY: *"computed **per symbol** on an **expanding**
+window using only bars strictly before the decision close, after the declared warm-up; a pooled or
+full-TRAIN decile edge anywhere is a **hard failure**"*), `design.md:288-301`.
+**Code:** `integrity.py:160-207`, specifically `:186-192` and `:188`.
+
+The verdict is `overlap > 0`, where overlap counts decile pairs whose raw ŝ ranges intersect across
+the pool. A **full-TRAIN pooled** edge gives zero overlap and is caught — **CONFIRMED:** injecting a
+global percentile-rank decile flipped the check to `False`. But a **pooled-yet-expanding** edge also
+produces overlap, because the edges drift with time, so the §4.1b *population* clause (per symbol) is
+not what is tested. Smoke emitted `cross_symbol_decile_value_overlaps: 45` on two symbols.
+
+`warm_up_ok` is assigned `True` at `:188` and never computed, then emitted as evidence.
+
+**Required fix (experiment-developer).** Recompute a sample of edges per symbol from that symbol's own
+history strictly before `[0]` and diff against the emitted decile; compute `warm_up_ok` from the
+minimum history length behind each emitted edge, or drop the field.
+
+#### R9-09 — MEDIUM — L4 COMPARATOR IDENTITY tests only the ATR half of the clause
+
+**Fails:** `design.md:1076` (§12: the two arms *"share estimator, unit, clock, horizon scaling and
+multiplier, differing **only** in constant-per-symbol-TRAIN-median ŝ vs conditional ŝ(t,h)"*).
+**Code:** `integrity.py:107-121`, specifically `:111`.
+
+`arm_ok = not atr_const`. `width_over_shat_is_constant` and `expected_shat_tracking` are computed
+(`:107-117`), emitted, and never read into the verdict — so nothing asserts that the MOD arm tracks
+ŝ(t) or that the UNMOD arm is constant per symbol. The ATR half is real and does fail: injecting an
+ATR-proportional target width flipped the check to `False` (**CONFIRMED**). Smoke emitted
+`atr_matches 0`, `shat_matches 5` (the five MOD arms), which is the correct pattern — it just is not
+asserted. `_is_constant` also returns `False` for any arm with fewer than 2 finite widths (`:134`),
+so a one-episode arm passes.
+
+#### R9-10 — MEDIUM — TRIPWIRE-2 runs on one symbol, chosen by whether its HARD condition holds
+
+**Fails:** `design.md:551-553` (§6.1: the tripwires *"pass or fail on counts and identities that are
+decided by the construction"*), P-23.
+**Code:** `run_screen.py:906-912`.
+
+```python
+for tm in sorted(tw_mats, key=lambda t: t.get("symbol", "")):
+    if tm.get("tripwire_2", {}).get("count_both_reachable", 0) > 0:
+        tw1, tw2, tw_symbol = ...
+        break
+```
+
+The reported tripwire is the **first symbol whose clause-2 count is non-zero**. With 25 symbols that
+makes `count(both_reachable_bar_ids) > 0` near-unfailable by selection rather than by construction —
+a milder relative of R8-01. It is deterministic and `tripwire_symbol` is emitted, so it is disclosed
+rather than hidden. Note also how thin the passing evidence is: **CONFIRMED** `count_both_reachable
+= 4` on BTCUSDT against roughly 30k `L4_TARGET_A1_UNMOD` episodes. TRIPWIRE-1 rides on the same
+selection.
+
+**Required fix (experiment-developer).** Pre-declare the tripwire symbol (BTCUSDT, the golden-trace
+anchor), or run both tripwires on every symbol and pool the counts and the id lists.
+
+#### R9-11 — LOW — MOD-HOLD ELIGIBILITY tests a different predicate from §12
+
+**Fails (soft):** `design.md:1080` (§12: *"A MOD row whose holds are **identical to its UNMOD twin on
+every episode** is a hard failure"*).
+**Code:** `integrity.py:298-301`.
+
+The code tests `ptp(mod holds) > 1e-9` — that the MOD arm **varies** — and never compares the two
+vectors. The two predicates differ: a MOD arm constant at some value ≠ `h` fails the code and passes
+the design. Currently moot: **CONFIRMED** all four pairs vary on the smoke (h=1: 1.000–1.933; h=4:
+1.600–7.733; h=12: 4.800–20.0; h=20: 8.000–20.0), with 361 events excluded per arm for
+`MOD_HOLD_WARMUP`. Worth noting for the operator: `h_mod = clip(h·E_run/20, 1, 20)` pins the h=1 arm
+at exactly 1.0 — the UNMOD hold — for every episode with `E_run ≤ 20`, i.e. across most of the
+design's own measured 19–23 h E[run] scale, so that pair is close to the condition §12 calls a hard
+failure even though the check as written passes.
+
+#### R9-12 — LOW — G7 and G6 still carry hardcoded sub-clauses
+
+**Fails:** `design.md:1040-1045` (§11 G7: *"separately confirms (a) the trail ratcheted on M1 CLOSES
+only … and (b) a time-exit episode fills at the OPEN of the first decision-clock bar"*).
+**Code:** `golden.py:248-249`, `golden.py:221`.
+
+`trail_ratchets_on_m1_closes_only: True` and `time_exit_fills_at_decision_bar_open: True` are
+literals, as is G6's `legal_variant_is_the_emitted_one: True`. The **primary** clause of each trace is
+now genuinely computed, which is why this is LOW and not a repeat of R8-12. The implementations are in
+fact correct (`fills.py:249-257` ratchets on `c[i]` after the trigger test; `resolve_time_exit:136-143`
+fills at `clock_open[i]` where `slot_start[i] >= deadline`) — they are just not asserted.
+
+#### R9-13 — LOW — the entry M1 bar is excluded from exit scanning but included in κ's MFE
+
+**Code:** `fills.py:184` (`start = max(fill_m1_idx + 1, …)`) vs `fills.py:284`
+(`m1["high"][fill_m1_idx:end_i]`).
+
+AMENDMENT-19b declares the entry bar unscanned for exits; the MFE that forms κ's denominator still
+begins at the entry bar. κ is `DISCLOSURE_ONLY` and multiplies nothing (§5), so this is a consistency
+note, not a validity defect.
+
+#### R9-14 — LOW — the side derangement emits the permutation fixed-point count, not the alignment L-28 is about
+
+**Code:** `controls.py:110-112, 119`.
+
+`fixed_point_count` is 0 by construction of `derange_indices`, so it is uninformative. The quantity
+that determines how much of the true side survives a seed is `mean(side[perm] != side)` — computed at
+`:111` and never reported. With roughly balanced sides about half the episodes retain their own side
+on every seed. Under AMENDMENT-19(a) that fraction **is** the control's destruction strength, and it
+is the direct analogue of VAL-008's 11.1% alignment that L-28 was written after.
+
+**Required fix.** Emit the per-seed flipped fraction (mean, sd, min, max) alongside the fixed-point
+count.
+
+#### R9-15 — LOW — dead code inside the hashed tree
+
+**Code:** `indicators.py:87-104` (`expanding_rank`) — defined, never called (grep: 1 hit, the `def`).
+`selfcheck._sha256_tree:45-50` hashes every `.py`, so it is part of the run's pinned code identity.
+Same shape as the now-closed R8-26, one function instead of a hundred lines.
+
+#### R9-16 — LOW — the L2 interaction rows carry no §9 band label
+
+**Fails:** `design.md:1387` (§15 `metrics_by_cell` must carry *"band label (CI-relative)"*).
+**Code:** `run_screen.py:444-463`.
+
+The 48 interaction rows carry `log_R`, `ci_low`, `ci_high`, `ci_width`, `block_mde` and pass the
+`log R never unaccompanied` check, but no `mirror_band`. **CONFIRMED:** of 156 null `mirror_band`
+values, 108 are the deliberately suppressed sizing rows and 48 are the interaction rows.
+
+#### R9-17 — LOW — two stale statements in `design.md`
+
+`design.md:1092` (§12 determinism) still says *"independent of `--resume`"*; the flag was removed per
+R8-27 (grep: 0 hits). `design.md:1335-1336` says *"AMENDMENTS 12-18 are seven consecutive TIGHTER
+rows"*, but 12 and 14 are labelled `NEUTRAL` in the same ledger — the L-23 streak is five tighter
+rows within that span, not seven. Neither affects a check. (The ledger's arithmetic itself is
+correct: I recounted 4 looser / 9 tighter / 6 neutral across all rows and 3 / 8 / 6 active after the
+two supersessions, matching `design.md:1332-1334`.)
+
+---
+
+### PART C — the adversarial pass: can each HARD check fail?
+
+Method: for each check I constructed or reasoned a case that ought to fail it. Rows marked
+**CONFIRMED** were executed against the smoke's own `episodes.parquet` (617,197 rows) or against
+fabricated metrics rows.
+
+| # | HARD check | Can it fail? | Evidence / construction |
+|---|---|---|---|
+| 1 | check-count reconciliation | **YES** | `selfcheck.py:353-364`: fails if the final list is not 28 names or any name carries `missing: True`. Names are asserted at import (`config.py:282`) |
+| 2 | TRIPWIRE-1 | **PARTLY** | Fails if `changed_state_rows == 0` or `changed_selection_episodes == 0` (real quantities, 45,117 / 122). Also fails if any gate array is all-NaN (`both.any()` false). But `shift_is_exact_one_row` is true by construction — the leaky stream *is* the shifted legal stream — and the episode limb is blind to L1 and all L4 arms → **R9-01** |
+| 3 | TRIPWIRE-2 | **PARTLY** | Clause 1 (`clock_vs_m1 > 0`, emitted 851) and clause 2 (`both_reachable > 0`, emitted 4) are real, though clause 2's symbol is selected for passing (**R9-10**). Clauses 3 and 4 are tautologies → **R9-02** |
+| 4 | TRAIN fence | **YES — CONFIRMED** | Requires `n_episodes > 0 and max_ts > 0` then `max_ts < TRAIN_END_NS`. Empty frame → `have_ts` False → fails. Emitted `max exit_ts 2023-12-17 23:52 UTC` < `2023-12-18` |
+| 5 | holdout | **YES** | Same guard, `< 2025-01-08` |
+| 6 | causality | **YES — CONFIRMED** | One row with `fill_ts ≤ decision_end_ns` → `False`. Empty frame → `False`. Missing columns → `False` |
+| 7 | fill causality | **YES — CONFIRMED** | Same injection → `False`; also fails on `exit_ts < fill_ts` |
+| 8 | universe pin | **YES** | `len(symbols) == 25` on the family pin file |
+| 9 | identity reconstruction | **YES** | Requires `n_checked > 0` and zero residuals above 0.01 bps. Empty → `False`. (Residual is zero by construction of `_agg`, so it will not fail on correct code — the check guards against a future change to `p`, `W`, `L`) |
+| 10 | log R definition | **YES** | Recomputes `log(W/L) − log((1−p)/p)` per row and requires `n > 0`. A fitted-slope column would also trip G5 |
+| 11 | cost isolation | **WEAKLY** | `selfcheck.py:201-214` bans exactly three literal column names (`mean_net`, `edge_net`, `log_r_net`) and requires `p_be_net` present. A cost column under any other name passes. Not new this run; noted, not raised as a finding |
+| 12 | derangement fixed-point count | **YES** | Requires at least one control reporting `fixed_point_count_measured` and `max == 0`; absent controls → `False` (R8-16 fix). See **R9-14** for what it does *not* measure |
+| 13 | golden traces | **YES** | All seven statuses must be `FOUND`/`PASS`; G5 and G6 are real; G7 is `MISSING` if TRIPWIRE-2 found no both-reachable row |
+| 14 | determinism | **YES — CONFIRMED** | At `--jobs > 1` requires `determinism_ok is True`; `None` (comparison did not run) fails. My smoke ran it. At `--jobs 1` it is marked True as "identity trivial" — vacuous but explicitly scoped by §12 to `--jobs > 1` |
+| 15 | BLOCK RULE | **YES — CONFIRMED** | Fails on: holds > 24 h; a cell with 5 per-seed CIs instead of 15; an empty metrics list; a non-`block` `mde_source_for_bands`; an unlabelled iid column; a `source_ci_rule` missing a clause keyword. **Weakness: the degenerate exemption → R9-04** |
+| 16 | L4 COMPARATOR IDENTITY | **PARTLY — CONFIRMED** | ATR-proportional width → `False`; no L4 episodes → `False`. The ŝ half is computed and unused → **R9-09** |
+| 17 | PARENT-GATE PROVENANCE | **NO** | `check_parent_provenance(ep, {"rows":[{"junk":1}]})` → `True`. Fails only on an empty row list → **R9-03** |
+| 18 | PARENT-GATE PARITY | **YES** | `n_ok == 2 × n_non_exempt` and zero failures and `n_non_exempt > 0`; `NO_PARENT_ROW` / `PARENT_NAN` / `NO_REGIME_ROWS` / missing cell all count as failures; a raised computation is recorded `hard_pass: False` |
+| 19 | DECILE CAUSALITY | **PARTLY — CONFIRMED** | Pooled full-TRAIN edge → `False`; empty or missing columns → `False`. Pooled-expanding edge would pass → **R9-08** |
+| 20 | EXIT-MATCHED NULLS | **YES — CONFIRMED** | Setting a target arm's `r_bps_side_flipped = −r_bps` → `False`. Also fails if a time-exit arm's negation is inexact, or if an arm carries the wrong `exit_matched_method`. Per-arm, not aggregate |
+| 21 | L1 FIXED-ENTRY SUBSET | **YES — CONFIRMED** | Altering one L1 episode's stop price → `False`. Empty L0 or empty L1 → `False` |
+| 22 | MOD-HOLD ELIGIBILITY | **YES — CONFIRMED** | Setting `L4_HOLD_4H_MOD` holds to a constant → `False`; empty frame → `False`. Predicate differs from §12's → **R9-11** |
+| 23 | PREDECLARATION PRESENT | **YES** | Two sha256 comparisons against `config.py` pins, `row_count == 5148`, `input_sha256.basis` match, and a `"COMPUTED AT RUN"` substring scan. `verify_predeclaration()` also asserts before any data is read |
+| 24 | BASIS POPULATION | **YES** | `input_filter.value == "C"` and `matched − retained == excluded == Σ excluded_by_reason` |
+| 25 | UNIVERSE FILE EQUALITY | **YES** | Set equality between the family pin and SPDR-014's `universe_recomputed.json` |
+| 26 | L-51 SELECTION CHECK | **PRESENCE ONLY** | `n_checks > 0`. §12 makes it HARD on presence, so this is per spec — but it cannot notice the missing subsets → **R9-07** |
+| 27 | log R never unaccompanied | **YES — CONFIRMED** | Requires the five columns present and non-null on every row carrying a finite `log_R`, and `len > 0`. I re-derived it independently on the emitted frame: 1,649 rows with `log_R`, zero missing companions |
+| 28 | PREDECLARED vs REALISED resolution | **PRESENCE ONLY** | Column presence in `metrics_by_cell` or `resolution_ladder`. Per §12, which makes the last four HARD on presence and form only |
+
+**Summary: 20 of 28 can fail on substance and were shown to (12 by execution). 4 are partial
+(TRIPWIRE-1, TRIPWIRE-2, L4 comparator, decile causality). 2 are presence-only by design (L-51,
+predeclared-vs-realised). 1 is weak but not new (cost isolation). 1 cannot fail: PARENT-GATE
+PROVENANCE.** Run 8's count was eleven that could not fail.
+
+**On the degenerate exemption specifically (the brief's question).** It is sound in intent — a cell
+too thin to bootstrap emits no per-seed bounds, and requiring 15 of them would fail a correct screen.
+It is **not sound in form**: it is uncapped (one compliant cell carries the clause), unvalidated (no
+assertion that an exempted cell is actually thin), truncated in the artifact (first 50), and it has a
+silent third class that swallowed all 108 sizing rows. It *can* widen silently. See R9-04.
+
+---
+
+### PART D — integrity boundary, re-verified
+
+| Boundary rule | Result |
+|---|---|
+| **TRAIN-only** | **CLEAN — CONFIRMED.** `catalog_io` raises before any read on `end > TRAIN_END_NS` or `> HOLDOUT_START_NS`. On the emission: `max signal_ts = max decision_end_ns = 2023-12-17 23:15 UTC`, `max fill_ts = 23:17`, `max exit_ts = 23:52` — all inside `2023-12-18T00:00Z`. `TEST_START` and `HOLDOUT_START` are defined and never read |
+| **Causal `t−1`** | **CLEAN — CONFIRMED.** `signal_ts == decision_end_ns` on **all** 617,197 episodes; `fill_ts > decision_end_ns` on all; `exit_ts >= fill_ts` on all. `_first_m1_after` uses `side="right"`. Parent labels held forward with `src_end <= dst_end` and an ascending-order guard that raises. Deciles rank against history strictly before `[0]` |
+| **Block ≥ H** | **CLEAN — CONFIRMED.** Blocks are `{1,3,7}` **calendar** days; emitted `min_block_hours 24 ≥ max_active_hold_hours 20.0`. Effective block `< n_days` verified on 5,127 block records. The fast path is bit-equivalent to `xen.evaluation.block_bootstrap_ci`. The Δ`log R` read now uses the same rule (R8-10) |
+| **No money read** | **CLEAN — CONFIRMED.** Cost-touching columns in `metrics_by_cell`: `cost_bps_DISCLOSURE_ONLY`, `p_be_net`, `p_be_net_flag`, `spread_cost_status` — nothing else. `spread_cost_status` is `UNAVAILABLE_NOT_CHARGED` on every row; `spread_rt_bps: null`. No net figure enters an estimand, threshold, band or comparison. AMENDMENT-C5 satisfied; the lane-wide spread blocker is respected |
+| **No holdout / TEST / XENA** | **CLEAN — CONFIRMED.** No `xena` import, no TEST band, no registry write anywhere in the tree |
+| **No family action** | **CLEAN.** No disposition, no registry file touched, `main()` returns an exit code and nothing else |
+| **No local accounting** | **CLEAN — CONFIRMED by execution.** `check_no_local_accounting` → `{"ok": true, "banned_defs_found": []}` |
+| **No adequacy flag (C7)** | **CLEAN — CONFIRMED.** No column in the emitted frame matches `powered\|unpowered\|at_target\|not_resolvable` |
+| **Per-stratum / multiplicity disclosed** | **CLEAN.** 1,758 rows across 33 variants × clocks × δ × 3 bands × (POOLED + symbols); pooled rows carry `i_squared`, `homogeneity_q/df/k_symbols`, `per_symbol_spread_log_R` and a `pooled_status` the operator judges; nothing machine-dropped |
+| **Predeclaration untouched** | **CLEAN — CONFIRMED.** Three files, hashes `23d5f5bf…`, `e3247798…`, `961cec28…` before and after my smoke |
+
+---
+
+### PART E — verdict on AMENDMENT-19
+
+**Overall: all three clauses are legitimate specification fixes, not scope changes. The `NEUTRAL`
+direction label is defensible for (b) and (c); for (a) it is defensible only with a disclosure the
+design does not currently carry.**
+
+**19(a) — zero fixed points on the PERMUTATION, not on the side VALUE. LEGITIMATE.** This is the
+clause the brief asks me to scrutinise hardest, and it survives.
+
+1. **The literal reading is arithmetically self-contradicting, and run 8 measured it.** A binary side
+   with every value differing from its own is a full flip — one arrangement, identical on every seed.
+   Run 8's own execution produced `null_sd = 1.39e-17`, `null_q05 == null_q95`, `percentile = 1.0`.
+   The **same §6 clause** demands `>= 2000 seeds` and *"the null's own mean, sd and quantiles"*. Both
+   cannot hold. One of them had to be re-read.
+2. **The programme's own L-28 defines the derangement on the permutation, not on the value.** I read
+   `lessons-and-amendments.md` L-28 in full: it is stated entirely in terms of permutation fixed
+   points — *"a uniform random permutation of n items has E[fixed points] = 1 for any n"*, *"those
+   fixed points keep the original timing/signal at those indices"*. AMENDMENT-19(a) applies L-28 as
+   L-28 is written. This is the decisive point: it is not a new reading invented to make a control
+   pass.
+3. **The cited comparator was measured under this reading.** SPDR-013's 0.20–0.28 / 0.48–0.57
+   percentiles are values only a spread null can produce. Under the literal reading the design would
+   be comparing against a number its own control could never emit.
+4. **The control still bites.** In my smoke the L0 null sits at mean ≈ 0 (collapse −0.0085 against
+   live `log R` 0.183) with sd 0.073, and the live value reads percentile 1.0. This is a control that
+   discriminates, not one loosened until it stopped objecting.
+
+**What is genuinely lost, and what the design should say.** Under a random derangement of a balanced
+binary label, roughly **half the episodes retain their own side on every seed**. Against a full flip
+that is a real reduction in destruction strength, and it is exactly the quantity VAL-008 measured as
+"11.1% alignment". The design acknowledges the mechanism in prose (*"the mix of flipped and unflipped
+episodes is what varies across seeds and is what gives the null its spread"*) but requires only the
+**fixed-point count** to be measured — which is 0 by construction and therefore says nothing. The
+amendment should additionally require the **flipped fraction per seed** to be emitted (→ R9-14). With
+that disclosure, `NEUTRAL` is right. Without it, the ledger records a control as unchanged when its
+destruction strength halved and the emission carries no number that shows it.
+
+**19(b) — the entry bar is not scanned for an exit. LEGITIMATE, and correctly labelled NEUTRAL.** §2's
+exit table genuinely did not say. The stated reasoning — intrabar ordering is unknowable at M1
+resolution, the same premise as the adverse-precedence rule — is the design's existing principle
+applied consistently, and it removes both favourable and adverse intrabar paths, so it does not bias
+in the design's favour. Implemented at `fills.py:184`. One consistency residue: κ's MFE still includes
+the entry bar (R9-13), which the amendment does not address.
+
+**19(c) — the both-reachable population is constructed. LEGITIMATE AS A SPECIFICATION; NOT
+DISCHARGED BY THE CODE.** The premise is correct and checkable: none of the 33 variants places both a
+target and a trail, so §6.1's TRIPWIRE-2(b) and §11's G7 had no population to observe. Pairing each
+target episode with the trail its own ŝ device would set at `b = 1` is deterministic, re-derivable by
+QA from the catalog, and enters no emitted arm — all as the amendment claims. **But** the amendment
+does not notice what its own construction does to §6.1's clause 3: a symmetric constructed twin makes
+`count_favourable == count_both` and "favourable never worse" true by geometry, so the clause the
+design calls *"what proves the adverse rule is actually implemented"* proves nothing. That is a code
+finding (R9-02), and the fix is available without changing the amendment — resolve the constructed
+pair through `resolve_target_trail_time` under both precedence settings.
+
+**Direction-ledger note (L-23).** AMENDMENT-19 is booked `NEUTRAL`, giving 4 looser / 9 tighter /
+6 neutral across all rows and 3 / 8 / 6 active — I recounted both and they reconcile. The L-23
+tighter-streak note (`design.md:1335`) miscounts its own span (R9-17). The standing L-23 flags for the
+operator at the execution gate are unchanged: 3 active loosenings (AMENDMENT-1 full TRAIN,
+AMENDMENT-2 M15, AMENDMENT-10 hold grid), none touching an integrity check, fence, causality rule or
+claim boundary.
+
+---
+
+### Checks independently verified clean
+
+| Check | Result |
+|---|---|
+| Entry rule, fill rule, stop price | **CLEAN — READ + smoke.** `entry.detect_signals:57-67` implements §2 verbatim; `fills.resolve_entry_stop:46-83` fills at the stop, at the open on a gap, expires otherwise. Run 8 confirmed G1 numerically against the catalog and the code is unchanged there |
+| Identity `\|p·W − (1−p)·L − mean\| < 0.01` | **CLEAN — hand-derived + CONFIRMED.** Zero by construction of `_agg`; smoke `identity reconstruction` held over every scored cell |
+| `log R` slope 1, no fitted-slope object | **CLEAN — CONFIRMED.** G5 scanned 84 emitted columns and all screen source for six tokens; 0 offending |
+| Bootstrap == `xen.evaluation.block_bootstrap_ci` | **CLEAN — CONFIRMED** in the smoke's own block-rule clause 5 |
+| 33 named variants, 28 HARD names | **CLEAN — CONFIRMED.** Both asserted at import; 33 variants present in the emitted frame; 28 checks in `integrity_selfcheck.json` |
+| Unit pin, ATR barred from L4 | **CLEAN — CONFIRMED.** `atr_matches: 0` across all ten L4 barrier arms; ATR reaches only `entry.py:57`; medians computed at run into `unit_pin.json` |
+| Suppression / unfilled / ineligible accounting | **CLEAN — CONFIRMED.** 617,197 / 307,222 / 183,143 / 152,754 / 287, with ineligibility reasons broken out by gate (`L1_DECILE 64,157`, `HMM_LOW 20,742`, `RMARKOV_K4_NA 5,028`, …). Nothing dropped |
+| Span disclosure (M-2), M-4 effective coverage | **CLEAN — CONFIRMED.** `span_exact_frac`, `span_p50`, `span_p90`, `effective_frac_of_nominal`, `n_symbols_in_cell` all present |
+| `_strip_internal` | **CLEAN — CONFIRMED.** I recursively scanned the written `controls.json` for `_`-prefixed keys and for oversized raw lists: **zero hits**. `_null_draws` is consumed by `plant_curve` before the strip and never reaches disk. The unstripped payload is also passed to `selfcheck`, which reads only `fixed_point_count*` from it and embeds nothing — so no draw array reaches `integrity_selfcheck.json` either |
+| Sizing suppression side effects | **CLEAN except one.** Sizing rows keep `n_episodes`, `n`, `fill_rate`, dispersion stats, and all 108 appear in `resolution_ladder.parquet`; `_attach_homogeneity` skips them without corrupting any pooled figure; `_layer_deltas` excludes them per §4.2. The one silent drop is the block-rule clause-4 population (R9-04) |
+| Spawn safety under `mp.Pool` | **CLEAN — CONFIRMED.** Ran two spawn workers with the new path-based parent import; no `sys.path` mutation, no module deletion, determinism bit-identical |
+
+---
+
+### Golden-trace verdict
+
+| Trace | Design expectation | Implementation | Verdict |
+|---|---|---|---|
+| **G1** entry + fill | first BTCUSDT H1 DESIGN LONG at δ=0.5, with OHLCs, ATR20, momentum, stop, fill | `golden.py:30-80`, unchanged since run 8, which verified it numerically against the catalog. Emitted `FOUND` in my smoke | **PASS** |
+| **G2** expiry path | first ETHUSDT H1 DESIGN SHORT unfilled in 2 h, entering the fill-rate denominator only | `golden.py:84-100` selects it; the fill-rate denominator it feeds is now **real** (97.3% of cells carry a finite `fill_rate`), closing run 8's PARTIAL | **PASS** |
+| **G3** suppression | first signal arriving while an episode is open → SUPPRESSED, counted, no second episode | `golden.py:103-126`; suppression is now decided in **fill** order (R8-17), so the row it finds is the design's row. 307,222 suppressed signals counted | **PASS** |
+| **G4** identity + primary read | recompute `p, W, L`, residual < 0.01 bps, recompute `log R` | `golden.py:129-156`, keying on the reporting `band == "CONFIRM"` — no longer fragile now that the CI-relative label owns `mirror_band` | **PASS** |
+| **G5** mirror null is the exact one | null reference 0 at slope 1; **no fitted-slope residual anywhere** | Real scan of 84 emitted columns **and** every screen source file for six tokens; `offending_columns: []`, `offending_source: []`. Was a literal in run 8 | **PASS — CONFIRMED** |
+| **G6** leak discrimination | §6.1's three structural conditions on the G1 rows | Reads the real TRIPWIRE-1 payload: `exact True`, `changed_state_rows 45,117`, `changed_selection_episodes 122`. Inherits R9-01's coverage gap; `legal_variant_is_the_emitted_one` is a literal | **PASS, with R9-01 attached** |
+| **G7** exit fill precedence | first both-reachable target+trail bar: which fills under adverse precedence, at what price, `r`; **plus** trail ratchets on M1 closes only; **plus** time exit at the decision-bar open | Reads the real TRIPWIRE-2 payload and emits a real episode (`m1_ts 1658337060…`, SHORT, adverse 23601.328 / favourable 23493.672, `r` −22.859 / +22.859). But the fill it reports was **computed arithmetically, not returned by `resolve_target_trail_time`** (R9-02), and the two supplementary clauses are literals (R9-12) | **PARTIAL** |
+
+**Verdict: 6 PASS (2 newly confirmed by execution), 1 PARTIAL.** Run 8 had 1 PASS confirmed, 1 PASS
+fragile, 2 PARTIAL, 3 FAIL.
+
+---
+
+### Standing execution blockers
+
+1. **DISCHARGED** (re-verified, not re-flagged) — AMENDMENT-7 / registered-C6 departure.
+2. **DISCHARGED** (re-verified) — `reflection-inputs.md` §9, signed option B at `9d8832e`.
+3. **STANDS (lane-wide, unchanged)** — the per-symbol spread pin. It does not block this measurement
+   under AMENDMENT-C5, and the code makes no money read (verified above).
+4. **NEW — BLOCKING** — **R9-01, R9-02, R9-03.** Three HARD checks (TRIPWIRE-1, TRIPWIRE-2,
+   PARENT-GATE PROVENANCE) cannot fail on what §12 says they verify. Under P-23/L-52 a check that
+   cannot fail is indistinguishable from one that was skipped. None of them corrupts a number in the
+   emission, which is why the verdict is REVISE, but a run in this state would again write
+   `all_hard_pass: true` over three unverified clauses.
+5. **NEW — should clear before execution** — **R9-04 … R9-10** (seven MEDIUM). Each either widens an
+   exemption silently, leaves a design-mandated parameter unasserted, emits a control curve that
+   carries no resolution, or covers less than the design names.
+6. **Run-8 blockers 4, 5 and 6 are DISCHARGED** — all 29 findings closed, `check_no_local_accounting`
+   green.
+
+---
+
+**FAILING_ARTIFACT:** `python/experiments/SPDR-019/screen_code/` — specifically `tripwires.py`
+(R9-01, R9-02), `integrity.py` (R9-03, R9-04, R9-08, R9-09, R9-11), `run_screen.py` (R9-05, R9-07,
+R9-10, R9-16), `controls.py` (R9-06, R9-14), `golden.py` (R9-12), `fills.py` (R9-13),
+`indicators.py` (R9-15). `design.md` carries only R9-17 (two stale sentences, no check affected).
+
+**REQUIRED_SKILL:** `experiment-developer` for R9-01 … R9-16. `quant-designer` jointly for R9-14 (the
+AMENDMENT-19(a) disclosure clause — the flipped-fraction emission belongs in §6, not only in code).
+
+**Execution authorisation: NO.**
+
+Not because the screen is wrong — it is now, on everything I could execute, right. Because three of
+the twenty-eight HARD checks still cannot fail on their own subject, and the design's own P-23 rule
+does not admit a check that cannot fail. The three fixes are small and local: shift the ŝ fields into
+the leaky Signal stream and add the L4 arms to the tripwire's variant list; route the constructed
+both-reachable pair through `resolve_target_trail_time` under both precedence settings; and make
+`check_parent_provenance` assert the columns and the forbidden names instead of returning a literal.
+A re-read of that diff plus a re-run of the smoke would be enough — unlike run 8, these corrections
+change what is *checked*, not what is *computed*, so the estimand does not move and a full re-QA of
+the measurement path is not required.
+
+---
+
+### What I did not reach
+
+- **I did not run the full 25-symbol screen.** Operator-gated and unauthorised. Everything above
+  comes from the sanctioned 2-symbol smoke at `n_boot = 200`, from isolated function calls, or from
+  hand derivation. At `n_boot = 2000` the control battery, the ladder and the paired bootstrap all
+  scale up; I verified their *behaviour*, not their full-scale cost.
+- **Every real-data claim rests on BTCUSDT and ETHUSDT.** The 23 other symbols are unexercised. In
+  particular `PARENT-GATE PARITY` passed at `n_ok 4/4` — the 8 PARITY-EXEMPT symbols and the 15
+  remaining non-exempt symbols were never in the run, so the exempt-list mechanism itself is
+  untested against real parent NaNs this round (run 7 tested the regeneration).
+- **I did not verify the M15 clock beyond the fact that it ran.** Both clocks were in the smoke and
+  the cell grid contains M15 rows, but I checked no M15 fill, no M15 hold conversion and no M15
+  block behaviour individually. M15 carries the primary read.
+- **I did not test TRIPWIRE-1's ability to detect a real leak.** I showed it re-selects episodes and
+  that its L1/L4 limbs are blind; I did not construct a genuinely non-causal pipeline and confirm the
+  tripwire's payoff delta moves in the expected direction. §6.1 makes that direction reported, never
+  a pass condition, so this is a coverage gap in my review, not in the check.
+- **I did not audit `xen.evaluation.block_bootstrap_ci` or `xen.resolution_basis` internals**, only
+  that the screen's fast path reproduces the former and that the predeclaration hashes match.
+- **I did not re-derive the parent gates end to end.** `walk_forward_probs`, the feature matrix and
+  the parity arithmetic were read, not independently recomputed; run 7 executed that path.
+- **I did not quantify the effect of any finding on any result.** There is no authorised run, and
+  that is the data-analyst's object in any case.
+- **I did not review `python/experiments/SPDR-020/screen_code/`.** It shares `resolution_basis.py`
+  and the resolution artifacts and was actively changing in the same working tree during this review
+  (two commits and an untracked `results/shards/` appeared while I worked). Several shapes here —
+  the degenerate-exemption pattern, the plant-curve base, the tripwire twin construction — are the
+  kind a sibling implementation repeats. **That directory needs its own QA run; do not infer its
+  state from this one.**
