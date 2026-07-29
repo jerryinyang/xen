@@ -127,6 +127,7 @@ A result contrary to any of these is a finding; a result matching them is the ex
 | **Event types** | **E-TOUCH** (intrabar pierce, earliest) · **E-CLOSE** (bar closes outside, sustained) · **E-HORIZON** (outside only at the last bar) |
 | **Entry** | breach bar `j` → fill at `open[j+1]` |
 | **Exit (parent)** | `open[entry + h]`, `h ∈ {4, 12, 24}` — **this is what the L4 devices replace** |
+| **The parent's own stop, and why it is absent here** | SPDR-014's signed policies exit at `min(h, stop)` with a stop at adverse excursion ≥ **1.5 × ATR(14) Wilder H1** at entry−1 (its `design.md:246`). **This design's P&L object is the UNSTOPPED `r_h`**, the parent's own residual column, so no ATR stop is inherited and §7's ban on Wilder ATR as an exit boundary stands. Parity (§2.2) is asserted only on `mean_r_h`, `p_momo`, `p_mr` and `n_decided`, which are computed from `r_h` and are therefore stop-independent — the parent emits the same `r_h` for an event under every policy arm. Stated because the parent's stop governs a large share of its signed episodes, and silence would read as an oversight |
 | **Side** | **MOMO** (with the breach) and **MR** (against it) both emitted; neither assumed |
 | **UNDECIDED side** | SPDR-014's rule inherited verbatim: an event whose side cannot be resolved is marked **UNDECIDED**, excluded from the signed cells, and **counted and reported** — never silently dropped |
 
@@ -186,7 +187,8 @@ parents disagree — SPDR-014 fills at the next bar open after a touch, SPDR-019
 stream at the level. A design that leaves this open makes the developer choose the exit price,
 which is the most consequential single number in a payoff-geometry experiment.
 
-**This design inherits SPDR-019 §2's rule verbatim**, so the two experiments' capture devices are
+**This design inherits SPDR-019 §2's rule, with the time exit re-expressed on this object's own
+inherited `h`** (bars from entry, not hours from fill), so the two experiments' capture devices are
 the same object and their `log R` values are comparable:
 
 | Exit | Fill |
@@ -931,7 +933,8 @@ G7 (leak discrimination):
 ```
 HARD (block execution / invalidate emission):
   EVERY SS12 ROW IS CLASSIFIED - a row with no class is a row nobody has to run (QA run 6).
-  HARD, EXPECTED COUNT = 29, reconciled BY NAME by the check-count assertion (P-23 / L-52):
+  HARD, EXPECTED COUNT = 29, reconciled BY NAME by the check-count assertion (P-23 / L-52),
+  against THIS TABLE AND SS6.2 - the two tripwires are specified in SS6.2 and are HARD there:
     1  check-count reconciliation     2  TRIPWIRE-1                3  TRIPWIRE-2
     4  TRAIN fence                    5  holdout                   6  causality
     7  breach detection               8  EXIT FILL CAUSALITY       9  parent parity
