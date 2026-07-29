@@ -84,24 +84,6 @@ def wilder_atr(
     return atr
 
 
-def expanding_rank(x: np.ndarray, *, min_hist: int = 1) -> np.ndarray:
-    """Causal expanding empirical rank of x_i among x[:i] (strictly before i), in [0,1].
-
-    At decision bar [0] the rank uses history STRICTLY BEFORE [0] (§4.1b).
-    """
-    n = x.size
-    out = np.full(n, np.nan)
-    hist: list[float] = []
-    for i in range(n):
-        if len(hist) >= min_hist and np.isfinite(x[i]):
-            # rank of x[i] among history before i; for decile edges we need edges from hist only
-            arr = np.asarray(hist, dtype=float)
-            out[i] = float(np.mean(arr <= x[i]))
-        if np.isfinite(x[i]):
-            hist.append(float(x[i]))
-    return out
-
-
 def expanding_decile_edges(x: np.ndarray, *, min_hist: int) -> tuple[np.ndarray, np.ndarray]:
     """Per-bar decile (1..10) of x_i vs history strictly before i; NaN if hist < min_hist.
 

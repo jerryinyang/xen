@@ -103,21 +103,31 @@ def side_derangement(
     n = r.size
     nulls = []
     fixed_max = 0
+    flipped_fracs = []
     seeds = DERANGE_SEEDS[:n_seeds]
     for sd in seeds:
         rng = np.random.default_rng(sd)
         perm = derange_indices(n, rng)
         fixed_max = max(fixed_max, int(np.sum(perm == np.arange(n))))
         flipped = side[perm] != side
+        flipped_fracs.append(float(np.mean(flipped)) if n else float("nan"))
         r_d = np.where(flipped, r_flip, r)
         nulls.append(_logR(r_d))
     out = _null_summary(np.asarray(nulls, dtype=float), live)
     methods = (
         sorted({str(m) for m in exit_matched_method}) if exit_matched_method is not None else []
     )
+    ff = np.asarray(flipped_fracs, dtype=float)
+    ff = ff[np.isfinite(ff)]
     out.update({
         "fixed_point_count": fixed_max,
         "fixed_point_count_measured": True,
+        # AMENDMENT-19(a) / R9-14: destruction strength is the flipped fraction, not the
+        # permutation fixed-point count (which is 0 by construction)
+        "flipped_fraction_mean": float(ff.mean()) if ff.size else float("nan"),
+        "flipped_fraction_sd": float(ff.std(ddof=1)) if ff.size > 1 else float("nan"),
+        "flipped_fraction_min": float(ff.min()) if ff.size else float("nan"),
+        "flipped_fraction_max": float(ff.max()) if ff.size else float("nan"),
         "n_seeds": int(len(seeds)),
         "method": "side_label_derangement_exit_matched",
         "exit_matched_methods_present": methods,
@@ -269,14 +279,23 @@ def magnitude_matched_comparator(
     return out
 
 
-def plant_curve(r: np.ndarray, nulls: np.ndarray, *, sigma_hat: float) -> dict:
+def plant_curve(
+    r: np.ndarray,
+    nulls: np.ndarray,
+    *,
+    sigma_hat: float,
+    r_flip: np.ndarray | None = None,
+    side: np.ndarray | None = None,
+) -> dict:
     """§6 plant curve: detection RATE against the control's OWN null, per rung.
 
-    ``r`` is already signed by the position's side, so adding ``bps`` to every episode injects
-    exactly ``bps`` of true side information into the position's payoff. What was missing is
-    the RATE: a point boolean against zero cannot support §6's clause that "the control is
-    reported UNUSABLE for any effect below its own plant-curve resolution" (QA run 8, R8-22).
-    The rate is the fraction of the control's ≥2,000 null draws the planted live value clears.
+    The plant is added to a NULL-EQUIVALENT series, not the live series (R9-06). Planting onto
+    the live series saturates every rung at 1.0 whenever the live value already sits near
+    percentile 1.0, which makes the UNUSABLE clause inoperable.
+
+    Preferred base (when ``r_flip`` and ``side`` are supplied): one deterministic exit-matched
+    side-derangement draw — the same null the control draws from. Fallback: a half-flip of
+    ``r``. Either way the curve should rise from near α at the finest rung.
 
     Rungs are also stated in σ̂ units, re-derived from the run-measured pooled σ̂ (L-50/P-21).
     """
@@ -284,15 +303,30 @@ def plant_curve(r: np.ndarray, nulls: np.ndarray, *, sigma_hat: float) -> dict:
     nulls = np.asarray(nulls, dtype=float)
     nulls = nulls[np.isfinite(nulls)]
     live = _logR(r)
+    rng = np.random.default_rng(0xA19C0DE)
+    if r_flip is not None and side is not None and r.size >= 2:
+        rf = np.asarray(r_flip, dtype=float)
+        sd = np.asarray(side, dtype=float)
+        perm = derange_indices(r.size, rng)
+        flipped = sd[perm] != sd
+        r_base = np.where(flipped, rf, r)
+        base_name = "null_equivalent_one_derange_draw"
+    else:
+        flip = rng.random(r.size) < 0.5
+        r_base = np.where(flip, -r, r)
+        base_name = "null_equivalent_half_flip"
+    base_log_R = _logR(r_base)
     out = {
         "sigma_hat_bps": float(sigma_hat),
         "rungs_bps": list(PLANT_CURVE_BPS),
         "n_null_draws": int(nulls.size),
         "detection": {},
         "live_log_R": live,
+        "plant_base": base_name,
+        "plant_base_log_R": base_log_R,
     }
     for bps in PLANT_CURVE_BPS:
-        lp = _logR(r + bps)
+        lp = _logR(r_base + bps)
         rate = (
             float(np.mean(nulls < lp))
             if nulls.size and np.isfinite(lp) else float("nan")

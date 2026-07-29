@@ -278,12 +278,15 @@ def mfe_bps(
     if fill_m1_idx < 0 or ts.size == 0 or not (entry_price > 0):
         return float("nan")
     end_i = int(np.searchsorted(ts, exit_ts, side="right"))
-    if end_i <= fill_m1_idx:
+    # AMENDMENT-19b / R9-13: the entry M1 bar is unscanned for exits; κ's MFE uses the same
+    # window so the diagnostic does not invent favourable excursion on an unscanned bar
+    start_i = fill_m1_idx + 1
+    if end_i <= start_i:
         return float("nan")
     if side > 0:
-        best = float(np.max(m1["high"][fill_m1_idx:end_i]))
+        best = float(np.max(m1["high"][start_i:end_i]))
     else:
-        best = float(np.min(m1["low"][fill_m1_idx:end_i]))
+        best = float(np.min(m1["low"][start_i:end_i]))
     if not np.isfinite(best):
         return float("nan")
     return float(side * (best / entry_price - 1.0) * 1e4)

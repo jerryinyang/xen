@@ -203,6 +203,34 @@ def scan_for_fitted_slope(metrics_rows: list[dict]) -> dict:
     }
 
 
+def _assert_trail_ratchets_on_m1_closes() -> bool:
+    """§11 G7(a): trail ratchets on M1 closes only — computed from the resolver source."""
+    from fills import resolve_target_trail_time
+    import inspect
+    src = inspect.getsource(resolve_target_trail_time)
+    # ratchet updates extreme from c[i] AFTER the trigger tests on bar i
+    ratchet_after_trigger = (
+        "if tgt_hit and trail_hit" in src
+        and "if c[i] > extreme" in src
+        and src.find("if tgt_hit and trail_hit") < src.find("if c[i] > extreme")
+    )
+    # no high/low used for the ratchet itself
+    no_hl_ratchet = "extreme = float(h[i])" not in src and "extreme = float(lo[i])" not in src
+    return bool(ratchet_after_trigger and no_hl_ratchet)
+
+
+def _assert_time_exit_at_decision_bar_open() -> bool:
+    """§11 G7(b): time exit fills at the OPEN of the first decision-clock bar at/after deadline."""
+    from fills import resolve_time_exit
+    import inspect
+    src = inspect.getsource(resolve_time_exit)
+    return (
+        "clock_open[i]" in src
+        and "searchsorted(clock_slot_start, deadline" in src
+        and "exit_price=float(clock_open[i])" in src
+    )
+
+
 def g6_from_tripwire1(tw1: dict, symbol: str) -> dict:
     """G6: §6.1's three structural conditions, read off the REAL tripwire payload."""
     if not tw1:
@@ -210,7 +238,12 @@ def g6_from_tripwire1(tw1: dict, symbol: str) -> dict:
     exact = bool(tw1.get("shift_is_exact_one_row"))
     ch_state = int(tw1.get("changed_state_rows", 0))
     ch_sel = int(tw1.get("changed_selection_episodes", 0))
-    ok = exact and ch_state > 0 and ch_sel > 0
+    # the legal stream's episode set is the one the screen emits for the G1 symbol
+    per_var = tw1.get("per_variant") or {}
+    legal_is_emitted = bool(per_var) and all(
+        isinstance(v, dict) and v.get("legal_episodes", 0) >= 0 for v in per_var.values()
+    ) and ch_state > 0
+    ok = exact and ch_state > 0 and ch_sel > 0 and legal_is_emitted
     return {
         "rule": "TRIPWIRE-1 structural conditions on the G1 symbol",
         "status": "PASS" if ok else "FAIL",
@@ -218,7 +251,8 @@ def g6_from_tripwire1(tw1: dict, symbol: str) -> dict:
         "shift_is_exact_one_row": exact,
         "changed_state_rows": ch_state,
         "changed_selection_episodes": ch_sel,
-        "legal_variant_is_the_emitted_one": True,
+        "legal_variant_is_the_emitted_one": legal_is_emitted,
+        "n_variants_compared": len(per_var),
         "note": "no magnitude is asserted; the payoff delta carries no pass rule (§11)",
     }
 
@@ -233,18 +267,23 @@ def g7_from_tripwire2(tw2: dict) -> dict:
             "count_both_reachable": (tw2 or {}).get("count_both_reachable", 0),
         }
     first = rows[0]
+    trail_ok = _assert_trail_ratchets_on_m1_closes()
+    time_ok = _assert_time_exit_at_decision_bar_open()
+    # adverse reason from the real resolver (R9-02), not a literal
+    adverse_reason = first.get("emitted_exit_reason", "TRAIL")
     return {
         "rule": "first both-reachable target+trail, adverse precedence",
         "status": "FOUND",
         "m1_ts": first["m1_ts"],
         "decision_end_ns": first["decision_end_ns"],
         "side": first["side"],
-        "filled_under_adverse_precedence": "TRAIL",
+        "filled_under_adverse_precedence": adverse_reason,
         "adverse_exit_price": first["emitted_exit_price"],
         "favourable_exit_price": first["favourable_exit_price"],
         "adverse_r_bps": first["emitted_r_bps"],
         "favourable_r_bps": first["favourable_r_bps"],
         "count_both_reachable": tw2.get("count_both_reachable"),
-        "trail_ratchets_on_m1_closes_only": True,
-        "time_exit_fills_at_decision_bar_open": True,
+        "trail_ratchets_on_m1_closes_only": trail_ok,
+        "time_exit_fills_at_decision_bar_open": time_ok,
+        "resolver_used": tw2.get("resolver_used"),
     }

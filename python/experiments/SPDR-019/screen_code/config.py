@@ -221,6 +221,13 @@ LADDER_PLANT_N = 200  # detection rate samples per rung (descriptive)
 DERANGE_SEEDS = tuple(range(31000, 33000))  # 2000 side-derangement
 TIMING_SEEDS = tuple(range(41000, 43000))   # 2000 entry-timing
 MAGMATCH_SEEDS = tuple(range(71000, 73000))  # 2000 magnitude-matched
+# control battery is PINNED at 2000, independent of --n-boot (R9-05 / design §6)
+CONTROL_N_SEEDS = 2000
+assert len(DERANGE_SEEDS) >= CONTROL_N_SEEDS
+assert len(TIMING_SEEDS) >= CONTROL_N_SEEDS
+assert len(MAGMATCH_SEEDS) >= CONTROL_N_SEEDS
+# golden-trace / tripwire anchor — never selected by whether a HARD clause already holds (R9-10)
+TRIPWIRE_SYMBOL = "BTCUSDT"
 PLANT_CURVE_BPS = (5.0, 10.0, 20.0, 40.0)
 PLANT_CURVE_SIGMA = (0.068, 0.137, 0.274, 0.548)  # at pooled sigma-hat=73 bps; re-derived at run
 MAGMATCH_DECILES = 10

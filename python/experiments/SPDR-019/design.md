@@ -498,10 +498,13 @@ CONTROL SIDE-DERANGEMENT (within_sample_attribution - REPORT LAYER):
     with ZERO FIXED POINTS (`pi(i) != i`, redrawn and rejected per seed; L-28), so every episode
     is refereed under a DIFFERENT episode's side. The mix of flipped and unflipped episodes is
     what varies across seeds and is what gives the null its spread; the fixed-point count is
-    MEASURED per seed and emitted, never asserted. (AMENDMENT-19a: an earlier wording required
-    every episode's side VALUE to differ from its own, which on a binary side is a full flip -
-    the same arrangement on every seed, a point-mass null, and a percentile that can only be 0.0
-    or 1.0. That contradicts this control's own ">= 2000 seeds" and "null mean, sd and quantiles"
+    MEASURED per seed and emitted, never asserted. ALSO emit the per-seed flipped fraction
+    (mean/sd/min/max of `mean(side[perm] != side)`) — that fraction IS the control's destruction
+    strength under a balanced binary side (≈0.5 retained), the direct analogue of VAL-008's
+    alignment disclosure (R9-14). (AMENDMENT-19a: an earlier wording required every episode's
+    side VALUE to differ from its own, which on a binary side is a full flip - the same
+    arrangement on every seed, a point-mass null, and a percentile that can only be 0.0 or 1.0.
+    That contradicts this control's own ">= 2000 seeds" and "null mean, sd and quantiles"
     requirements and could not produce SPDR-013's cited 0.20-0.28 / 0.48-0.57 percentiles.)
   bite/MDE: >= 2000 seeds; plant curve co-designed - inject +5/+10/+20/+40 bps of true side
     information, stated ALSO in sigma-hat units (0.068 / 0.137 / 0.274 / 0.548 sigma at the
@@ -1089,7 +1092,7 @@ G6 (leak discrimination):
 | Episode exclusivity | at most one open episode per symbol; suppression count emitted |
 | Fill rate | emitted per cell; unfilled and suppressed signals counted, never dropped |
 | Derangements | fixed-point count == 0, measured and reported (L-28) |
-| Determinism | runs **unconditionally** whenever `--jobs > 1`, independent of `--resume`; parallel bit-identical to sequential (P-23) |
+| Determinism | runs **unconditionally** whenever `--jobs > 1`; parallel bit-identical to sequential (P-23). `--resume` is not a flag of this screen. |
 | Golden traces | G1–G7 pass |
 | No local accounting | screen metrics are availability/residual bps, not booked P&L; no `xen.adjudication` mimicry |
 | Code hash | sha256 of `screen_code/` pinned into `results/integrity_selfcheck.json` |
@@ -1313,9 +1316,12 @@ AMENDMENT-19: QA run-8 remediation. The run-8 findings are implementation defect
       therefore read where the programme has always applied it: on the PERMUTATION,
       `pi(i) != i`, redrawn and REJECTED per seed. Each episode then takes the side of a
       DIFFERENT episode, the mix of flipped and unflipped episodes is what varies across seeds,
-      and the fixed-point count is MEASURED rather than asserted. SPDR-013's own side-derangement
-      percentiles (0.20-0.28 on M15, 0.48-0.57 on H1) are values only a non-degenerate null can
-      produce, so this is also the reading the cited comparator was measured under.
+      and the fixed-point count is MEASURED rather than asserted. The flipped fraction per seed
+      (mean/sd/min/max) is ALSO emitted — that is the destruction-strength disclosure (≈ half the
+      episodes retain their own side under a balanced binary derangement; cf. VAL-008 alignment).
+      SPDR-013's own side-derangement percentiles (0.20-0.28 on M15, 0.48-0.57 on H1) are values
+      only a non-degenerate null can produce, so this is also the reading the cited comparator was
+      measured under.
   (b) SS2's exit table did not say whether the ENTRY BAR itself is scanned for an exit. It is
       NOT: scanning it would manufacture an entry-and-exit inside one M1 bar at an ordering that
       is unknowable at M1 resolution, which is the same reasoning as the adverse-precedence rule.
@@ -1332,10 +1338,10 @@ AMENDMENT-19: QA run-8 remediation. The run-8 findings are implementation defect
 running count (all rows as labelled, including superseded): 4 looser / 9 tighter / 6 neutral
 ACTIVE rows after supersessions (AMENDMENT-7 by -17, AMENDMENT-11 by -15): 3 looser / 8 tighter /
 6 neutral.
-L-23 STREAK NOTE (clause 3 applies to the conservative direction too): AMENDMENTS 12-18 are seven
-consecutive TIGHTER rows. Flagged for the operator at the execution gate: a design that only ever
-tightens after review is one whose first draft was systematically under-specified, which is what
-this ledger records.
+L-23 STREAK NOTE (clause 3 applies to the conservative direction too): within AMENDMENTS 12-18
+the TIGHTER streak is five rows (12 and 14 are NEUTRAL in this ledger). Flagged for the operator
+at the execution gate: a design that only ever tightens after review is one whose first draft was
+systematically under-specified, which is what this ledger records.
 NOTE per L-23: LOOSER now stands at 3 (AMENDMENT-1 full TRAIN, -2 M15, -10 hold grid) and is
 FLAGGED for the operator at the execution gate, as L-23 requires.
 EXPECTED FALSE-QUALIFIER COUNT UNDER THE FINAL SET (L-23, mandatory): **N/A - ZERO machine

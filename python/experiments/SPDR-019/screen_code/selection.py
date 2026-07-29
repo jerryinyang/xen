@@ -46,6 +46,14 @@ def run_selection_checks(cells: dict[str, dict]) -> dict:
         "subsets": rows,
         "note": (
             "L-51 on every selected subset the design reports separately: "
-            "L1 d>=5/7/9, L2 state cells, L3 gates, cells above vs below median mde50"
+            "L1 d>=5/7/9, L2 state cells (shock/k4/k12/joint), L3 gates "
+            "(fires/does-not-fire/med5), both clocks, cells above vs below median mde50"
         ),
+        "required_subsets": [
+            "L1_SHAT_DECILE_GE5", "L1_SHAT_DECILE_GE7", "L1_SHAT_DECILE_GE9",
+            "L2_SHOCK_HMM", "L2_LEVEL_RMARKOV_K4", "L2_LEVEL_RMARKOV_K12",
+            "L2_JOINT_HMM_HIGH_AND_K12_HIGH",
+            "L3_TGTCUR_FIRES", "L3_TGTCUR_DOES_NOT_FIRE", "L3_TGTMED5_CO_REPORT",
+            "MDE50_ABOVE_MEDIAN", "MDE50_BELOW_MEDIAN",
+        ],
     }

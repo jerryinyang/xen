@@ -26,6 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "src"))
 from config import (  # noqa: E402
     BOOT_RESAMPLES,
     CLOCKS_RUN,
+    CONTROL_N_SEEDS,
     CONTROL_PRIMARY,
     COST_FLOOR_BPS,
     DELTA_THRESHOLDS,
@@ -36,6 +37,7 @@ from config import (  # noqa: E402
     RESOLUTION_BASIS_SHA256,
     SIZING_VARIANTS,
     SPREAD_COST_DISCLOSURE,
+    TRIPWIRE_SYMBOL,
     UNIVERSE_PIN_FAMILY,
     VARIANT_IDS,
 )
@@ -441,6 +443,14 @@ def _add_interaction_rows(
                         lambda v: v["joint"] - v["shock"] - v["k12"] + v["l0"],
                         n_boot=n_boot,
                     )
+                    # §9 CI-relative band on the interaction row (R9-16)
+                    ci_lo, ci_hi = d["ci_low"], d["ci_high"]
+                    if np.isfinite(ci_lo) and ci_lo > 0:
+                        mirror = "ABOVE_THE_MIRROR"
+                    elif np.isfinite(ci_hi) and ci_hi < 0:
+                        mirror = "BELOW_THE_MIRROR"
+                    else:
+                        mirror = "COVERS_THE_MIRROR"
                     extra.append({
                         "variant_id": "L2_INTERACTION_HMM_X_K12",
                         "clock": clock, "delta": float(delta), "scope": scope, "band": band,
@@ -449,6 +459,7 @@ def _add_interaction_rows(
                         "ci_high": d["ci_high"],
                         "ci_width": d["ci_width"],
                         "block_mde": d["block_mde"],
+                        "mirror_band": mirror,
                         "n": by[(clock, float(delta), scope, band,
                                  "L2_JOINT_HMM_HIGH_AND_K12_HIGH")].get("n"),
                         "n_dates": d.get("n_days"),
@@ -548,17 +559,20 @@ def _run_controls(episodes: pd.DataFrame, *, n_ctrl: int, sigma: float) -> dict:
         if arm.empty:
             out["side_derangement_by_arm"][vid] = {"status": "NO_EPISODES"}
             continue
+        r_arm = arm["r_bps"].to_numpy(dtype=float)
+        r_flip = arm["r_bps_side_flipped"].to_numpy(dtype=float)
+        side_arm = arm["side"].to_numpy(dtype=float)
         payload = controls_mod.side_derangement(
-            arm["r_bps"].to_numpy(dtype=float),
-            arm["r_bps_side_flipped"].to_numpy(dtype=float),
-            arm["side"].to_numpy(dtype=float),
+            r_arm, r_flip, side_arm,
             exit_matched_method=arm["exit_matched_method"].to_numpy(),
             n_seeds=n_ctrl,
         )
         payload["plant_curve"] = controls_mod.plant_curve(
-            arm["r_bps"].to_numpy(dtype=float),
+            r_arm,
             payload.get("_null_draws", np.empty(0)),
             sigma_hat=sigma,
+            r_flip=r_flip,
+            side=side_arm,
         )
         out["side_derangement_by_arm"][vid] = payload
         out["refereed_cells"][f"{vid}|{clock}|{delta}|POOLED|TRAIN"] = {
@@ -607,7 +621,7 @@ def _run_controls(episodes: pd.DataFrame, *, n_ctrl: int, sigma: float) -> dict:
             comp["r_bps"].to_numpy(dtype=float),
             comp["abs_r_decile"].to_numpy(dtype=float),
             sigma_hat=sigma,
-            n_seeds=min(n_ctrl, 500),
+            n_seeds=n_ctrl,
         )
     out["magnitude_matched_by_arm"] = mm
     out["magnitude_matched"] = mm.get("L1_SHAT_DECILE_GE7", {})
@@ -831,13 +845,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  parent parity ERROR (hard fail): {e}", flush=True)
     write_json("parent_gate_parity.json", parent_parity)
 
-    # controls (§6). Every arm gets a side derangement, and it is exit-matched on every arm
-    # because the engine emitted each episode's re-resolved flipped payoff.
+    # controls (§6). Battery is PINNED at CONTROL_N_SEEDS, independent of --n-boot (R9-05).
     controls_payload = {"spread_cost_disclosure": SPREAD_COST_DISCLOSURE}
-    n_ctrl = min(2000, max(50, n_boot))
+    n_ctrl = CONTROL_N_SEEDS
     sigma = unit_pin.get("pooled_s_hat_median") or float("nan")
     if not episodes.empty:
         controls_payload.update(_run_controls(episodes, n_ctrl=n_ctrl, sigma=sigma))
+    controls_payload["n_ctrl_seeds_pinned"] = n_ctrl
     write_json("controls.json", _strip_internal(controls_payload))
 
     # metrics
@@ -880,36 +894,103 @@ def main(argv: list[str] | None = None) -> int:
         ]
         write_parquet("resolution_ladder.parquet", metrics_df[ladder_cols])
 
-    # selection L-51
+    # selection L-51 — every subset §12 names (R9-07)
     sel_cells = {}
+    l51_layer_vids = (
+        "L1_SHAT_DECILE_GE5", "L1_SHAT_DECILE_GE7", "L1_SHAT_DECILE_GE9",
+        "L2_SHOCK_HMM", "L2_LEVEL_RMARKOV_K4", "L2_LEVEL_RMARKOV_K12",
+        "L2_JOINT_HMM_HIGH_AND_K12_HIGH",
+        "L3_TGTCUR_FIRES", "L3_TGTCUR_DOES_NOT_FIRE", "L3_TGTMED5_CO_REPORT",
+    )
     if not episodes.empty:
-        l0 = episodes[(episodes.variant_id == "L0_BASELINE") & (episodes.clock == "H1")]
-        for vid in ("L1_SHAT_DECILE_GE5", "L1_SHAT_DECILE_GE7", "L1_SHAT_DECILE_GE9",
-                    "L2_SHOCK_HMM", "L3_TGTCUR_FIRES"):
-            sub = episodes[(episodes.variant_id == vid) & (episodes.clock == "H1")]
-            if len(sub) and len(l0):
-                keys = set(zip(sub.symbol, sub.decision_end_ns, sub.side))
-                exc = l0[[(s, t, d) not in keys for s, t, d in zip(l0.symbol, l0.decision_end_ns, l0.side)]]
-                sel_cells[vid] = {
-                    "selected_r": sub["r_bps"].to_numpy(),
-                    "excluded_r": exc["r_bps"].to_numpy() if len(exc) else np.array([]),
-                }
+        for clock in CLOCKS_RUN:
+            l0 = episodes[(episodes.variant_id == "L0_BASELINE") & (episodes.clock == clock)]
+            for vid in l51_layer_vids:
+                sub = episodes[(episodes.variant_id == vid) & (episodes.clock == clock)]
+                if len(sub) and len(l0):
+                    keys = set(zip(sub.symbol, sub.decision_end_ns, sub.side))
+                    exc = l0[[
+                        (s, t, d) not in keys
+                        for s, t, d in zip(l0.symbol, l0.decision_end_ns, l0.side)
+                    ]]
+                    sel_cells[f"{vid}|{clock}"] = {
+                        "selected_r": sub["r_bps"].to_numpy(),
+                        "excluded_r": exc["r_bps"].to_numpy() if len(exc) else np.array([]),
+                    }
+        # cells above vs below median mde50 on the scored TRAIN POOLED rows
+        if mrows:
+            cell_mde = {
+                (r.get("variant_id"), r.get("clock"), r.get("delta")): r.get("mde50")
+                for r in mrows
+                if r.get("band") == "TRAIN" and r.get("scope") == "POOLED"
+                and isinstance(r.get("mde50"), (int, float)) and np.isfinite(r.get("mde50"))
+            }
+            if cell_mde:
+                med = float(np.median(list(cell_mde.values())))
+                above_r, below_r = [], []
+                for (vid, clock, delta), mde in cell_mde.items():
+                    g = episodes[
+                        (episodes.variant_id == vid) & (episodes.clock == clock)
+                        & np.isclose(episodes.delta, float(delta))
+                    ]
+                    if g.empty:
+                        continue
+                    if mde >= med:
+                        above_r.append(g["r_bps"].to_numpy())
+                    else:
+                        below_r.append(g["r_bps"].to_numpy())
+                if above_r and below_r:
+                    sel_cells["MDE50_ABOVE_MEDIAN"] = {
+                        "selected_r": np.concatenate(above_r),
+                        "excluded_r": np.concatenate(below_r),
+                    }
+                    sel_cells["MDE50_BELOW_MEDIAN"] = {
+                        "selected_r": np.concatenate(below_r),
+                        "excluded_r": np.concatenate(above_r),
+                    }
     selection_payload = selection.run_selection_checks(sel_cells)
     write_json("selection_check.json", selection_payload)
 
-    # tripwires — the payloads the workers computed against the live pipeline. The tripwire
-    # symbol is chosen deterministically (first by name that produced both payloads) so QA can
-    # re-derive it; nothing is reconstructed to make a condition hold.
+    # tripwires — pre-declared anchor BTCUSDT (golden G1), never selected by a passing count (R9-10).
+    # Counts and id lists are also POOLED across every symbol that ran a tripwire.
     tw1 = {"hard_pass": False, "missing": True}
     tw2 = {"hard_pass": False, "missing": True}
-    tw_symbol = None
-    for tm in sorted(tw_mats, key=lambda t: t.get("symbol", "")):
-        if tm.get("tripwire_2", {}).get("count_both_reachable", 0) > 0:
-            tw1, tw2, tw_symbol = tm["tripwire_1"], tm["tripwire_2"], tm["symbol"]
-            break
-    if tw_symbol is None and tw_mats:
+    tw_symbol = TRIPWIRE_SYMBOL
+    by_sym = {tm.get("symbol"): tm for tm in tw_mats if tm.get("symbol")}
+    if TRIPWIRE_SYMBOL in by_sym:
+        tm = by_sym[TRIPWIRE_SYMBOL]
+        tw1 = tm.get("tripwire_1", tw1)
+        tw2 = tm.get("tripwire_2", tw2)
+    elif tw_mats:
+        # anchor absent from this run (e.g. a non-BTC smoke) — fall back to first symbol, labelled
         tm = sorted(tw_mats, key=lambda t: t.get("symbol", ""))[0]
-        tw1, tw2, tw_symbol = tm.get("tripwire_1", tw1), tm.get("tripwire_2", tw2), tm["symbol"]
+        tw1 = tm.get("tripwire_1", tw1)
+        tw2 = tm.get("tripwire_2", tw2)
+        tw_symbol = tm.get("symbol")
+        tw1 = dict(tw1)
+        tw1["anchor_fallback"] = True
+        tw1["declared_anchor"] = TRIPWIRE_SYMBOL
+    # pool structural counts across all symbols so clause-2 is not carried by selection
+    if tw_mats:
+        pool = {
+            "count_clock_vs_m1": sum(
+                int(tm.get("tripwire_2", {}).get("count_clock_vs_m1", 0)) for tm in tw_mats
+            ),
+            "count_both_reachable": sum(
+                int(tm.get("tripwire_2", {}).get("count_both_reachable", 0)) for tm in tw_mats
+            ),
+            "count_favourable_diff": sum(
+                int(tm.get("tripwire_2", {}).get("count_favourable_diff", 0)) for tm in tw_mats
+            ),
+            "n_symbols_pooled": len(tw_mats),
+            "symbols": sorted(tm.get("symbol", "") for tm in tw_mats),
+        }
+        tw2 = dict(tw2)
+        tw2["pooled"] = pool
+        # hard_pass requires the anchor payload AND a non-zero pooled both-reachable count
+        tw2["hard_pass"] = bool(
+            tw2.get("hard_pass") and pool["count_both_reachable"] > 0
+        )
 
     integrity_extra = integrity.build_integrity_extra(
         episodes=episodes,

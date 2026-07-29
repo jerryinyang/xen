@@ -213,17 +213,30 @@ def run_selfcheck(
         "banned_cols": banned, "has_p_be_net": "p_be_net" in (metrics_df.columns if len(metrics_df) else []),
     })
 
-    # derangement fixed points — MEASURED per seed, never a default (L-28)
+    # derangement fixed points — MEASURED per seed, never a default (L-28);
+    # battery size pinned at CONTROL_N_SEEDS independent of --n-boot (R9-05)
+    from config import CONTROL_N_SEEDS
     arms = (controls or {}).get("side_derangement_by_arm", {})
     measured = [
         v for v in list(arms.values()) + [(controls or {}).get("entry_timing", {})]
         if isinstance(v, dict) and v.get("fixed_point_count_measured")
     ]
     fp_max = max((int(v.get("fixed_point_count", 0)) for v in measured), default=None)
-    mark("derangement fixed-point count", bool(measured) and fp_max == 0, {
+    n_seeds_min = min(
+        (int(v.get("n_seeds", 0)) for v in measured if isinstance(v, dict)),
+        default=0,
+    )
+    seeds_ok = n_seeds_min >= CONTROL_N_SEEDS
+    mark("derangement fixed-point count", bool(measured) and fp_max == 0 and seeds_ok, {
         "fixed_point_count_max": fp_max,
         "n_controls_measured": len(measured),
-        "reason": None if measured else "no control reported a MEASURED fixed-point count",
+        "n_seeds_min": n_seeds_min,
+        "n_seeds_required": CONTROL_N_SEEDS,
+        "reason": (
+            None if measured and seeds_ok else
+            ("no control reported a MEASURED fixed-point count" if not measured
+             else f"n_seeds_min {n_seeds_min} < {CONTROL_N_SEEDS}")
+        ),
     })
 
     # golden — all SEVEN traces, G7 included (§12 "G1–G7 pass"); it was excluded from the
@@ -275,9 +288,22 @@ def run_selfcheck(
     mark("MOD-HOLD ELIGIBILITY", bool(integrity_extra.get("mod_hold_ok", False)),
          integrity_extra.get("mod_hold_detail", {}))
 
-    # L-51
-    mark("L-51 SELECTION CHECK", bool(selection) and selection.get("n_checks", 0) > 0, {
-        "n_checks": selection.get("n_checks"),
+    # L-51 — presence plus the design-named subset coverage floor (R9-07)
+    # 10 layer subsets × 2 clocks + 2 mde50 splits = 22 when both clocks ran
+    n_l51 = int((selection or {}).get("n_checks", 0))
+    l51_names = set((selection or {}).get("subsets", {}) or {})
+    required_tokens = (
+        "L1_SHAT_DECILE_GE5", "L1_SHAT_DECILE_GE7", "L1_SHAT_DECILE_GE9",
+        "L2_SHOCK_HMM", "L2_LEVEL_RMARKOV_K4", "L2_LEVEL_RMARKOV_K12",
+        "L2_JOINT", "L3_TGTCUR_FIRES", "L3_TGTCUR_DOES_NOT_FIRE", "L3_TGTMED5",
+        "MDE50_ABOVE", "MDE50_BELOW",
+    )
+    covered = sum(1 for tok in required_tokens if any(tok in n for n in l51_names))
+    mark("L-51 SELECTION CHECK", n_l51 > 0 and covered >= 10, {
+        "n_checks": n_l51,
+        "n_required_tokens_covered": covered,
+        "required_tokens": list(required_tokens),
+        "subset_names": sorted(l51_names),
     })
 
     # log R never unaccompanied
