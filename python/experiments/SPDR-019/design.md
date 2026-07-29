@@ -132,6 +132,7 @@ exits are resolved on the same **M1 stream**, causally:
 | **Time exit** | at the **open of the first decision-clock bar at or after `activeHold`** — an open-to-open exit, matching the entry convention |
 | **Precedence within one M1 bar** | if target and trail/stop are both reachable in the same M1 bar, the **adverse one fills** (trail/stop). Never assume the favourable ordering |
 | **Precedence with the time exit** | a target or trail triggering **at or before** the time-exit bar's open takes precedence |
+| **The entry bar itself** | **not scanned for an exit** (AMENDMENT-19b). Exit scanning starts at the M1 bar after the fill bar: resolving an exit inside the entry bar would manufacture an entry-and-exit at an intrabar ordering that is unknowable at M1 resolution — the same reasoning as adverse precedence |
 
 The adverse-precedence rule is deliberate: intrabar ordering is unknowable at M1 resolution, so the
 screen takes the pessimistic branch every time rather than manufacturing a favourable path.
@@ -493,8 +494,15 @@ EXIT-MATCHING, BINDING ON BOTH DERANGEMENTS (L-24.2 / F04, QA run 6): every dera
 CONTROL SIDE-DERANGEMENT (within_sample_attribution - REPORT LAYER):
   question answered: does the entry's SIDE carry information, or would random sides produce the
     same payoff geometry?
-  population: the same episodes with sides deranged; DISJOINT in labelling from the live series -
-    every episode's side differs from its own (zero fixed points).
+  population: the same episodes with their side LABELS deranged across episodes by a permutation
+    with ZERO FIXED POINTS (`pi(i) != i`, redrawn and rejected per seed; L-28), so every episode
+    is refereed under a DIFFERENT episode's side. The mix of flipped and unflipped episodes is
+    what varies across seeds and is what gives the null its spread; the fixed-point count is
+    MEASURED per seed and emitted, never asserted. (AMENDMENT-19a: an earlier wording required
+    every episode's side VALUE to differ from its own, which on a binary side is a full flip -
+    the same arrangement on every seed, a point-mass null, and a percentile that can only be 0.0
+    or 1.0. That contradicts this control's own ">= 2000 seeds" and "null mean, sd and quantiles"
+    requirements and could not produce SPDR-013's cited 0.20-0.28 / 0.48-0.57 percentiles.)
   bite/MDE: >= 2000 seeds; plant curve co-designed - inject +5/+10/+20/+40 bps of true side
     information, stated ALSO in sigma-hat units (0.068 / 0.137 / 0.274 / 0.548 sigma at the
     measured pooled sigma-hat = 73.00 bps) and RE-DERIVED per universe at run, never carried as an
@@ -573,6 +581,9 @@ TRIPWIRE-2 (fill-rule look-ahead) - COVERS ENTRIES AND EXITS (QA run 1 required 
           stream;
       (b) FAVOURABLE-PRECEDENCE twin: keep M1 resolution but let the TARGET win inside an M1 bar
           where both target and trail/stop are reachable (SS2 mandates the ADVERSE branch).
+    No emitted variant places a target AND a trail, so the both-reachable population is
+    CONSTRUCTED: each target episode is paired with the trail level its own s_hat device would
+    set at `b = 1` (AMENDMENT-19c). Deterministic, re-derivable by QA, and it enters no arm.
   emitted statistics: `clock_vs_m1_differing_fill_ids` and its count;
     `both_reachable_bar_ids` and its count; `favourable_precedence_differing_fill_ids` and its
     count; per differing id, the two fill prices; plus paired payoff deltas with CIs.
@@ -1291,9 +1302,36 @@ AMENDMENT-18: QA run-6 remediation, booked as one row because it is one repair p
     Each keeps the reflection's INTENT - one fixed entry, layers characterised alone, a comparator
     that isolates the information - and none widens scope.
 
-running count (all rows as labelled, including superseded): 4 looser / 9 tighter / 5 neutral
+AMENDMENT-19: QA run-8 remediation. The run-8 findings are implementation defects and are fixed
+  in `screen_code/`, not here; three of them turned on a design clause that could not be
+  implemented as literally written, and those are booked:
+  (a) SS6's side-derangement clause reads "every episode's side differs from its own (zero fixed
+      points)". For a BINARY side that is not a derangement of a permutation but a FULL FLIP, and
+      a full flip is the SAME arrangement on every seed - so the ">= 2000 seeds" and the "null's
+      own mean, sd and quantiles" the same clause requires cannot exist (the null is a point mass
+      and the percentile can only be 0.0 or 1.0). L-28's zero-fixed-point requirement is
+      therefore read where the programme has always applied it: on the PERMUTATION,
+      `pi(i) != i`, redrawn and REJECTED per seed. Each episode then takes the side of a
+      DIFFERENT episode, the mix of flipped and unflipped episodes is what varies across seeds,
+      and the fixed-point count is MEASURED rather than asserted. SPDR-013's own side-derangement
+      percentiles (0.20-0.28 on M15, 0.48-0.57 on H1) are values only a non-degenerate null can
+      produce, so this is also the reading the cited comparator was measured under.
+  (b) SS2's exit table did not say whether the ENTRY BAR itself is scanned for an exit. It is
+      NOT: scanning it would manufacture an entry-and-exit inside one M1 bar at an ordering that
+      is unknowable at M1 resolution, which is the same reasoning as the adverse-precedence rule.
+      Declared rather than left implicit.
+  (c) SS6.1's TRIPWIRE-2(b) and SS11's G7 both require a bar where a target AND a trail are
+      reachable, but none of the 33 variants places both. The both-reachable population is
+      therefore CONSTRUCTED deterministically: each target episode is paired with the trail level
+      its own s_hat device would have set at `b = 1`. The pairing is a diagnostic twin, enters no
+      emitted arm, and is re-derivable by QA from the catalog.
+  - DIRECTION: NEUTRAL (three specification gaps closed; no estimand, population, comparator or
+    check changes, and no cell is admitted or excluded by any of them)
+  - QA run 8.
+
+running count (all rows as labelled, including superseded): 4 looser / 9 tighter / 6 neutral
 ACTIVE rows after supersessions (AMENDMENT-7 by -17, AMENDMENT-11 by -15): 3 looser / 8 tighter /
-5 neutral.
+6 neutral.
 L-23 STREAK NOTE (clause 3 applies to the conservative direction too): AMENDMENTS 12-18 are seven
 consecutive TIGHTER rows. Flagged for the operator at the execution gate: a design that only ever
 tightens after review is one whose first draft was systematically under-specified, which is what
