@@ -1096,8 +1096,8 @@ AMENDMENT-15: record the phase-(b) trigger as operator judgement on the full pha
     registered family amendment by recording that it disagrees with it. The pre-declared
     condition is restored in SS4.1 and this row's EXECUTION BLOCKER is DISCHARGED.
   - QA runs 4 and 5. SS4.1's scope protection (phase (a) may not shrink phase (b)) is intact.
-  - SEPARATE STANDING EXECUTION BLOCKER: `reflection-inputs.md` §9 remains unsigned. It does not
-    block implementation and is not altered by this remediation.
+  - SEPARATE STANDING EXECUTION BLOCKER: `reflection-mid.md` §9 was unsigned when this row was
+    written. **It was SIGNED 2026-07-29 (option B), so that blocker is DISCHARGED.**
 
 AMENDMENT-16: restore L1 to AMENDMENT-C6's single-entry protocol; remove the ŝ-conditioned entry
   and its private L0. L1 is now the three central fixed-entry modulated/unmodulated capture pairs

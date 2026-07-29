@@ -82,7 +82,7 @@ is refused.
    Step 3 from the full `(p, W, L)` picture, including the possibility that the handle is `W/L`
    rather than `p`. **It does not close the checkpoint on a null rate.**
    **INPUTS ASSEMBLED 2026-07-26 — operator decision unsigned:**
-   `checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/reflection-inputs.md`.
+   `checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/reflection-mid.md`.
 3. `SPDR-019` — strategy #1 (naive candlestick-breakout baseline) + the opportunity score + the
    capture test set (dynamic profit targets, trailing stops, holding periods, position sizing);
    sequenced after the reflection, which sets its **parameterisation** — not whether it runs.

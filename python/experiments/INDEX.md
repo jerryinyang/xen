@@ -22,7 +22,7 @@ SoT: `.ignore/what-next/alts/opportunity.md`
 **Status 2026-07-26: SPDR-018 and SPDR-018B are both COMPLETE AND CLOSED.** The mid-checkpoint
 reflection is the next item and is **not** gated by their outcome — SPDR-019/020 are registered and
 would run regardless; what 018/018B changed is how they are *parameterised*. Reflection input
-package: `docs/experiments-docs/checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/reflection-inputs.md`.
+package: `docs/experiments-docs/checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/reflection-mid.md`.
 
 **Headline, both universes:** the joint `(p, W, L)` sits **at break-even**, and **nothing clears
 `p_be_net`** — 0 of 1,413 powered crypto cells and 0 of 315 powered cTrader cells. `W/L` is **not a

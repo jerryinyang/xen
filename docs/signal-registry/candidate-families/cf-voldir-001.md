@@ -401,7 +401,7 @@ spread not charged; reported net **overstated** relative to true cost.
   remains REGISTERED.** |
 | 2026-07-28 | **MID-CHECKPOINT REFLECTION — VOLATILITY EVIDENCE + CAPTURE-GEOMETRY MODEL (evidence + amendment row; NOT a status transition).**
   Artifact: `docs/experiments-docs/checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/reflection-mid-volatility-model.md`
-  (companion to `reflection-inputs.md`, whose §9 operator decision remains unsigned). Consolidates every
+  (companion to `reflection-mid.md`, whose §9 operator decision was **SIGNED 2026-07-29 as option B**). Consolidates every
   confirmed volatility observation from SPDR-012/013/015 and SPDR-018/018B into a 28-row inventory (V1–V28),
   **each carrying an explicit evidence class** — powered-at-target `[P]`, scored-without-a-bps-target `[S]`,
   disclosure `[D]`, unpowered `[U]` — and states the capture-geometry model they support: a five-layer stack
@@ -468,3 +468,22 @@ spread not charged; reported net **overstated** relative to true cost.
   no entry, estimand, population or claim boundary. It is **not** an amendment to C6 and does not
   resolve SPDR-020's separate phase-(b) trigger blocker. **0 counted TEST reads; 0 multiplicity
   slots; no family action; status remains REGISTERED.** |
+| 2026-07-29 | **MID-CHECKPOINT REFLECTION SIGNED (option B) + SPDR-019/020 QA-APPROVED — evidence
+  and disposition row, no status transition.** (1) `reflection-mid.md` §9 is **signed**: option
+  **B** — 019/020 execute now, with P2 (arm C) and P5 (the per-symbol spread pin) resolved in
+  parallel. Sequencing only: **no end-state is taken, no thread is closed, and end-state 1 remains
+  NOT takeable while C2 and the `NOT_RESOLVABLE` population stand.** P1 stays skipped, so **C2
+  books at the retrospective as terminal `NOT_RESOLVABLE`, never as a refutation**; P6 stays
+  skipped and recorded as an open gap; P7 remains unregistered and may not be screened.
+  (2) Both designs passed independent QA on their **seventh** run (APPROVE): implementation of
+  `screen_code/` is authorised. The phase-(b) trigger departure that both carried is **withdrawn**
+  — each design restores the pre-declared condition **AMENDMENT-C6** requires, stated on the
+  phase-(a) CIs, so **no design now departs from C6** and neither needs a C8. Each design commits
+  a dated, hash-pinned expected-resolution artifact expanding every declared stratum, with strata
+  the parents never measured marked explicitly unknown rather than forecast.
+  (3) **AMENDMENT-C5 needs no follow-up row:** it already executes the gross narrowing and both
+  `HYP-D6`/`HYP-D7` rows above read as the gross condition and cite it. The reflection companion's
+  “amendment owed” line was stale and is corrected there.
+  **Still binding and unchanged:** AMENDMENT-C2 on every claim; the spread pin blocks every money
+  read, expectancy claim and Step-3 graduation; XENA remains RESERVED and undiscussable.
+  **0 counted TEST reads; 0 multiplicity slots; no family action; status remains REGISTERED.** |

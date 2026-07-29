@@ -1,9 +1,12 @@
-# Checkpoint 018 — Mid-checkpoint Reflection: INPUT PACKAGE
+# Checkpoint 018 — Mid-checkpoint Reflection (signed)
 
-- **Date assembled:** 2026-07-26
+- **Date assembled:** 2026-07-26 · **SIGNED 2026-07-29** (§9, option **B**)
+- **Filename:** this file was assembled as `reflection-inputs.md` and became **`reflection-mid.md`**
+  on signature, per design §5 Step 2. Pre-2026-07-29 documents, and the append-only `qa-review.md`
+  files, still cite the old name.
 - **Family:** `CF-VOLDIR-001` — status remains `REGISTERED`. **No family action is taken or proposed here.**
 - **Authority:** checkpoint-018 `design.md` §5 Step 2; SoT `.ignore/what-next/alts/opportunity.md`; chapter-06 governance
-- **Status:** **INPUTS ASSEMBLED — OPERATOR DECISION NOT TAKEN.** The decision record is §9, deliberately unsigned. When signed it becomes `reflection-mid.md` in this directory.
+- **Status:** **SIGNED 2026-07-29 — option B (§9).** SPDR-019/020 execute now; P2 (arm C) and P5 (the spread pin) run in parallel. The decision is **sequencing only**: no end-state, no family action, no thread closed.
 - **Corrections applied:** `corrections-log.md` — independent adversarial audit 2026-07-26,
   **RELIABLE WITH CORRECTIONS**; both verdicts survive. Two critical fixes are already reflected below.
 - **Binding inputs (final, not re-run here):**
@@ -373,27 +376,52 @@ before SPDR-019/020 are designed, or in parallel with them?
 
 ---
 
-## 9. OPERATOR DECISION — *unsigned*
+## 9. OPERATOR DECISION — **SIGNED 2026-07-29**
 
 ```
-DECISION RECORD (to be completed by the operator; this section is deliberately blank)
+DECISION RECORD
 
-  Date:
-  Option taken (A / B / C / D / other):
-  Booking of the 017 residue:            [ ] accepted as recorded in SPDR-018/report.md §3
+  Date:                                  2026-07-29
+  Option taken (A / B / C / D / other):  B - design and RUN SPDR-019/020 now; resolve the
+                                         remaining cheap threads in parallel.
+  Booking of the 017 residue:            [x] accepted as recorded in SPDR-018/report.md §3
   C2 ruling accepted (not replicated,
-    not refuted; may not close the thread): [ ]
+    not refuted; may not close the thread): [x]
   Ruling on SPDR-018B's seven un-run
-    inherited HARD checks:               [ ] accept with them recorded  [ ] require P6 first
-  Thread priority ordering:
-  SPDR-019 / SPDR-020 framing:           [ ] apparatus / characterisation  [ ] other (state)
+    inherited HARD checks:               [x] accept with them recorded   [ ] require P6 first
+  Thread priority ordering:              P2 (arm C, 534 cells) and P5 (per-symbol spread pin) run
+                                         ALONGSIDE SPDR-019/020, not before them.
+                                         P3 CLOSED. P4 ANSWERED (C3 terminally unpowerable in its
+                                         registered form). P6 SKIPPED by the 2026-07-28 directive
+                                         and recorded as an open gap. P1 remains SKIPPED, so C2
+                                         books at the retrospective as terminal NOT_RESOLVABLE and
+                                         may not be read as a refutation. P7 stays unregistered
+                                         and may not be screened until it is registered.
+  SPDR-019 / SPDR-020 framing:           [x] apparatus / characterisation
   Notes:
+    Why B and not the document's own recommendation A: A was written before the designs existed
+    and its premise was that 019/020 would otherwise be PARAMETERISED off un-fragility-tested
+    means. That premise no longer holds. Both designs are gross-only under AMENDMENT-C5, so the
+    unpinned spread (P5) enters no estimand, threshold or comparison in either of them; and P2
+    sharpens a conclusion ABOUT SPDR-018 that neither design depends on - the reflection's own
+    §5.7 records that completing it would make the negative read STRONGER, not weaker, and would
+    change wording rather than any identity conclusion. Two of A's four threads are already
+    discharged (P3, P4) and a third is skipped by directive (P6). What A would buy is therefore
+    a delay, not a protection.
+    This decision is SEQUENCING ONLY. It takes no end-state, closes no thread, and changes no
+    family status - those remain retrospective-only, and end-state 1 is still NOT takeable while
+    C2 and the NOT_RESOLVABLE population stand (§5).
+    Still blocking independently of this signature: every money read, expectancy claim and Step-3
+    graduation remain blocked by the open spread pin (AMENDMENT-C5), and AMENDMENT-C2 binds every
+    claim.
 
-  Operator signature:
+  Operator signature:                    Jerry Inyang, operator directive of 2026-07-29,
+                                         recorded in-session; superseding nothing.
 ```
 
-**On signature this document is renamed / superseded by `reflection-mid.md` in this directory, per
-design §5 Step 2.**
+**Signed 2026-07-29 and renamed to `reflection-mid.md` in this directory, per design §5 Step 2.**
+Documents written before that date cite it as `reflection-inputs.md`; the two `qa-review.md` files
+are append-only and deliberately keep the old path.
 
 ---
 

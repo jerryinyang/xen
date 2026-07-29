@@ -5,11 +5,13 @@
 **CHECKPOINT-018 OPEN (2026-07-25) — Trade Opportunity Modelling / Capture Geometry.
 SoT signed. `SPDR-018` + `SPDR-018B` COMPLETE AND CLOSED 2026-07-26 (`HYP-D5` SUPPORTED /
 PARTIALLY SUPPORTED; no gating verdict from either). NEXT = the mid-checkpoint reflection
-(inputs assembled, operator decision unsigned). `SPDR-019` / `SPDR-020` designs are complete;
+(**SIGNED 2026-07-29, option B** — 019/020 run now, P2 arm-C and the spread pin in parallel).
+`SPDR-019` / `SPDR-020` designs are complete;
 both passed fresh QA on 2026-07-29 (run 7, APPROVE) and **implementation of `screen_code/` is
-authorised**. **Execution remains unauthorised**: `reflection-inputs.md` §9 is unsigned and the
-family contract still needs the amendment row narrowing HYP-D6/D7 to the gross residual. TRAIN
-only; holdouts sealed.**
+authorised**. **Both prior execution blockers are now cleared** — the
+reflection is signed and the gross narrowing is executed as AMENDMENT-C5 — so execution awaits
+only the operator's own gate. The spread pin stays open and blocks money reads, not the
+measurement. TRAIN only; holdouts sealed.**
 
 **Closed threads since:** **P4** — C3 is *terminally unpowerable* in its registered form (median cell
 needs ~201 years of 25-symbol history); **P3** — CI fragility swept, seed spans ~4.8% of CI width, so
@@ -96,9 +98,9 @@ EXP-099 not authorised. Family retrospective still pending (independent of Ch.06
   — 2026-07-26; independent adversarial audit of the 018/018B documentation. **RELIABLE WITH
   CORRECTIONS**; both verdicts survive. Two critical fixes: the C2 ruling's third leg was false and
   now supports *not replicated*; `log R` is negative at the centre, not uniformly.
-- [Checkpoint 018 reflection inputs](checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/reflection-inputs.md)
+- [Checkpoint 018 reflection inputs](checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/reflection-mid.md)
   — 2026-07-26; the consolidated two-universe `(p, W, L, W/L, edge)` picture, the per-item 017 residue
-  ledger, surviving open threads, and the written end-state options. **Operator decision unsigned.**
+  ledger, surviving open threads, and the written end-state options. **SIGNED 2026-07-29 (option B): sequencing only — 019/020 run now, P2 arm-C and P5 in parallel; no end-state taken, no thread closed.**
 
 ## Prior checkpoints
 

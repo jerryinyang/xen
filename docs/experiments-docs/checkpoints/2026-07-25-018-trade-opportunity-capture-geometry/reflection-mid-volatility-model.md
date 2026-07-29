@@ -1,7 +1,7 @@
 # Checkpoint 018 — Mid-checkpoint Reflection: THE VOLATILITY EVIDENCE BASE AND THE CAPTURE-GEOMETRY MODEL
 
 - **Date assembled:** 2026-07-28 · **Revised 2026-07-28** after independent audit (§A)
-- **Role:** companion to `reflection-inputs.md` (assembled 2026-07-26, operator decision unsigned).
+- **Role:** companion to `reflection-mid.md` (assembled 2026-07-26; **SIGNED 2026-07-29, option B**).
   That document books the 017 residue and the `(p, W, L)` picture. **This one does the other half of
   design §5 Step 2: it inventories the confirmed volatility observations the programme owns, each with
   its own evidence class, and states plainly what capture-geometry model those observations support.**
@@ -487,9 +487,9 @@ Two distinct reasons, both of which a winners-only combination would violate:
 | Family status | `CF-VOLDIR-001` **REGISTERED**, unchanged. Transitions are retrospective-only |
 | XENA | `XENA-VOLDIR-001` **RESERVED** |
 | Spread pin | **OPEN.** Does not block the SPDR-019/020 measurement (§5.4a); still blocks every money read, expectancy claim and Step-3 graduation |
-| Relationship to `reflection-inputs.md` | Companion. That document holds the `(p, W, L)` picture, the 017-residue booking, the four decision options and the unsigned operator decision record. **This document adds no options and takes no end-state decision**; it does carry two operator directives dated 2026-07-28 (§5.4a cost exclusion, §5.9 layer protocol) |
+| Relationship to `reflection-mid.md` | Companion. That document holds the `(p, W, L)` picture, the 017-residue booking, the four decision options and the operator decision record, **signed 2026-07-29 as option B** (sequencing only: 019/020 run now, P2 arm-C and P5 in parallel; no end-state, no family action). **This document adds no options and takes no end-state decision**; it does carry two operator directives dated 2026-07-28 (§5.4a cost exclusion, §5.9 layer protocol) |
 | **P6** | **SKIPPED by operator directive 2026-07-28.** 018B's determinism check and the Bybit-guard holdout assertion remain **un-run and recorded as an open gap**. No violation is evidenced; the exposure is that absence of evidence, not evidence of absence. Any future citation of 018B's §5 guard reads must carry this caveat |
-| Estimand amendment owed | **`HYP-D6` / `HYP-D7` are registered against partial-net expectancy above the cost floor.** §5.4a narrows both to the **gross** residual `log R`. **A family-contract amendment row is required before either design is signed** — the amendment is named here, not executed |
+| Estimand amendment | **DISCHARGED.** `HYP-D6` / `HYP-D7` were registered against partial-net expectancy above the cost floor; §5.4a narrows both to the **gross** residual `log R`. The family-contract row that executes this is **AMENDMENT-C5 (NARROWING, 2026-07-28)** in `docs/signal-registry/candidate-families/cf-voldir-001.md`, and both hypothesis rows there now read as the gross condition and cite it. *(This line previously said the amendment was named but not executed; it was executed the same day and this row was stale — corrected 2026-07-29.)* |
 | Unregistered lead | **P7** — register before screening |
 
 **No family action, end-state decision, gating verdict, tradability, deployability, cost-complete,
