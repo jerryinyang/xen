@@ -255,12 +255,30 @@ never pooled. It is **not** an edge and carries no expectancy claim.
 
 > **Phase (a) determines WHETHER phase (b) runs. It does NOT determine WHAT is in it.**
 
-**Trigger: the operator decides, on the full phase-(a) report.** No numeric cutoff is written here
-(same reasoning as §2.2 — invented thresholds are the wrong shape; INFR-016).
+**TRIGGER — pre-declared here, before phase (a) runs (registered AMENDMENT-C6; reflection
+§5.9.1).** The condition is stated on the phase-(a) reads themselves:
 
-**What IS pre-declared, and what actually prevents the overfitting, is the SCOPE — not the
-trigger.** Phase (a) may inform *whether* the operator authorises phase (b); it may never shrink
-what phase (b) contains.
+```
+Phase (b) MAY run only if, in the phase-(a) emission on the primary read, AT LEAST ONE of:
+  (i)  some layer/device cell has  Delta log R vs L0  with ci_low > 0, or
+  (ii) some layer/device cell has  absolute log R     with ci_low > 0.
+Otherwise phase (b) DOES NOT RUN, and that is the pre-declared outcome.
+```
+
+It uses the §9 CI-relative band vocabulary and introduces **no magnitude**: nothing is admitted,
+excluded, labelled or ranked by it, no cell is dropped, and every phase-(a) cell is reported in
+full either way (INFR-016 intact). It is a stopping rule on a phase, not a value gate on a cell.
+
+The condition is **necessary, not sufficient**: phase (b) additionally requires its own operator
+execution authority and its own design amendment, and the operator may decline a fired trigger.
+What the operator may not do is decide after seeing (a) what "promising" meant — the
+optional-stopping hole C6 exists to close.
+
+*(AMENDMENT-15, now superseded, replaced this with post-(a) operator judgement and carried a
+standing execution blocker. The condition is restored, so the blocker is discharged.)*
+
+**The SCOPE is pre-declared too, and is what prevents the overfitting.** Phase (a) may inform
+*whether* phase (b) runs; it may never shrink what phase (b) contains.
 
 **Scope, fixed and independent of the (a) outcome:** the complete {L1, L2, L3} × {target, trail,
 hold, sizing} cross on the same episode population, with **individually-flat layers retained on equal
@@ -647,7 +665,7 @@ EXPECTED RESOLUTION, PER STRATUM - PREDECLARED BY GENERATION, NOT BY TYPING.
         prior_path, basis_path, output_path,
         generated_at_utc="2026-07-29T00:00:00Z",
         source_hashes=<the six SHA-256 pins embedded in the output>)
-  Expected output SHA-256: 257968a00f4c6ef1382d8957c164526e6c98c162066159381c7ca08c6eb0a7cd.
+  Expected output SHA-256: 39db9012791d37bd210e1272e0635d5690cf54a121a3a8a7cdfb7acb1b8ac077.
 
   The generated artifact already exists, is dated, and pins the SHA-256 of both JSON inputs, the
   shared module, and every parent artifact used. Implementation must verify those hashes before
@@ -1014,11 +1032,10 @@ AMENDMENT-14: record the L1 re-specification as a departure from AMENDMENT-C6's 
 AMENDMENT-15: record the phase-(b) trigger as operator judgement on the full phase-(a) report,
   departing from registered AMENDMENT-C6 ("the (b) trigger is pre-declared before (a) runs").
   - DIRECTION: LOOSER (an optional-stopping guard is given up)
-  - EXECUTION BLOCKER: disclosure is not authority. `cf-voldir-001.md` still carries C6 verbatim
-    and there is no C8. This design may not EXECUTE until the operator either signs an amendment
-    to C6 or directs that a pre-declared condition be restored. It does not block implementation:
-    phase (b) is not authorised by this document.
-  - QA run 4. SS4.1's scope protection (phase (a) may not shrink phase (b)) is retained intact.
+  - **SUPERSEDED BY AMENDMENT-17.** Disclosure was not authority: a design cannot amend a
+    registered family amendment by recording that it disagrees with it. The pre-declared
+    condition is restored in SS4.1 and this row's EXECUTION BLOCKER is DISCHARGED.
+  - QA runs 4 and 5. SS4.1's scope protection (phase (a) may not shrink phase (b)) is intact.
   - SEPARATE STANDING EXECUTION BLOCKER: `reflection-inputs.md` §9 remains unsigned. It does not
     block implementation and is not altered by this remediation.
 
@@ -1032,10 +1049,19 @@ AMENDMENT-16: restore L1 to AMENDMENT-C6's single-entry protocol; remove the ŝ-
   - QA run 5 remediation. Supersedes AMENDMENT-10 and AMENDMENT-14; AMENDMENT-13 already
     superseded AMENDMENT-8.
 
-historical row count: 3 looser / 9 tighter / 4 neutral
-NOTE per L-23: LOOSER now stands at 3 (AMENDMENT-1 gate removal, -2 full TRAIN, -15 phase-(b)
-trigger) and is FLAGGED for the operator at the execution gate. AMENDMENT-15 is the one carrying
-real risk and it carries an EXECUTION BLOCKER above; the other two act only on population size. Neither
+AMENDMENT-17: restore the pre-declared phase-(b) trigger of registered AMENDMENT-C6 and
+  reflection SS5.9.1 (SS4.1), superseding AMENDMENT-15 and discharging its execution blocker; and
+  re-pin the resolution artifacts after the shared basis was regenerated with its arm-C filter,
+  row accounting and per-horizon summaries made explicit (SS8, SS15).
+  - DIRECTION: TIGHTER (a loosening is withdrawn; the basis population and its exclusions become
+    checkable; nothing is admitted or excluded)
+  - QA run 5.
+
+historical row count: 3 looser / 10 tighter / 4 neutral
+ACTIVE rows after supersessions (AMENDMENT-8 by -13, -10 and -14 by -16, -15 by -17):
+2 looser / 8 tighter / 3 neutral.
+NOTE per L-23: LOOSER now stands at 2 (AMENDMENT-1 gate removal, -2 full TRAIN) and is FLAGGED for
+the operator at the execution gate. Both act only on population size. Neither
 loosening touches an integrity check, a fence, a causality rule or a claim boundary; both act ONLY
 on population size, and the second is a power lever SPDR-018 already used. No band label, control
 or refusal is relaxed. Superseded rows remain in the historical tally and are named above. Under

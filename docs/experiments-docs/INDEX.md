@@ -6,7 +6,7 @@
 SoT signed. `SPDR-018` + `SPDR-018B` COMPLETE AND CLOSED 2026-07-26 (`HYP-D5` SUPPORTED /
 PARTIALLY SUPPORTED; no gating verdict from either). NEXT = the mid-checkpoint reflection
 (inputs assembled, operator decision unsigned). `SPDR-019` / `SPDR-020` designs are complete;
-`SPDR-020` QA run-5 fixes were applied 2026-07-29 and await fresh QA approval. Execution remains
+QA run-5 fixes were applied to BOTH on 2026-07-29 and await fresh QA approval. Execution remains
 unauthorised. TRAIN only; holdouts sealed.**
 
 **Closed threads since:** **P4** — C3 is *terminally unpowerable* in its registered form (median cell
