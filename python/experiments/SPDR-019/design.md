@@ -1084,7 +1084,8 @@ G6 (leak discrimination):
 | **L-51 selection check** | the three-number check (payoff-scale ratio, sign-share differential, mean-vs-median gap in the excluded set) runs on **every selected subset the design or analysis reports separately** — L1's `d≥5/d≥7/d≥9` cuts, L2's state cells, L3's gate, L5's combination, and cells above vs below median `mde50` — each against its own complement, and is emitted to `results/selection_check.json`. Binding per `chapter-06-governance.md` §1b |
 | **M-4 effective coverage** | any pooled bar or episode count used in a resolution statement is the **measured** `unit_pin.json` / emitted value, never a date-range product; effective-vs-nominal multi-symbol coverage emitted |
 | **Predeclared vs realised resolution** | each stratum's **predeclared** expected `n` and expected `mde50` (§8.1) ship on the **same row** as its **realised** `n` and `mde50` in `resolution_ladder.parquet`. Nothing is admitted, excluded, labelled or ranked by the comparison (B-5 enforcement clause 4, QA run 3) |
-| **`log R` never unaccompanied** | HARD schema check: no `log R` ships in **any** artifact without `ci_low`, `ci_high`, `ci_width` and `block_mde` on the **same row** — asserted over `metrics_by_cell`, `layer_deltas` and the resolution ladder alike (B-5 enforcement, QA run 2) |
+| **`log R` never unaccompanied** | HARD schema check: no `log R` ships in **any** artifact without `ci_low`, `ci_high`, `ci_width` and `block_mde` on the **same row** — asserted over `metrics_by_cell`, `layer_deltas` and the resolution ladder alike (B-5 enforcement, QA run 2). The requirement attaches to **each artifact's OWN primary read**: `log_R` on `metrics_by_cell`, `delta_log_R` on `layer_deltas`, `log_R` on the ladder where present. `log_R_layer` and `log_R_L0` on `layer_deltas` are **carried context** — copies of another row's value, whose interval lives on that row — and are explicitly NOT the read the companions describe; requiring companions for them would forbid 7 rows whose own `delta_log_R` is undefined and whose companions are correctly absent. A row whose own primary read is finite and lacks any companion is a hard failure (AMENDMENT-20, QA run 12 R11-04) |
+| **Row accounting for cells without a CI** | every metric row lands in exactly **one** of four named buckets and the four reconcile to the row count: **carries a CI**; **exempt — cannot carry one**; **`log R` suppressed** (sizing variants, which may not carry a `log R` claim); **unclassified**, which is a **hard failure**. An exempt cell must name which of the two exempting conditions applies — (i) `log R` **undefined** for the cell (token `LOG_R_UNDEFINED`) — a one-sided outcome set (`p = 1` ⇒ `L` undefined, `p = 0` ⇒ `W` undefined) leaves a zero in `log(W/L) − log((1−p)/p)`, and a cell with **no signed outcome at all** leaves `p` itself undefined; either way every bootstrap replicate is non-finite; or (ii) **fewer than 2 calendar days** (token `N_DATES_LT_2_NO_DAY_BLOCK`), so no day-block exists to resample — and the named condition is **validated against that cell's own emitted `p`, `W`, `L`, `n`, `n_dates`** — never against the emitted `log R`, which the exemption itself blanks. `log R` counts as defined iff `p`, `W`, `L` are finite with `0 < p < 1`, `W > 0`, `L > 0`. A reason that does not describe the cell is a hard failure. `n_dates < 7` is **not** an exempting condition: §8.1 clause 5 caps the effective block at `n_dates − 1`, so a 3-day cell bootstraps. **DERIVED rows (interaction terms) are ineligible** — their `p`/`W`/`L` are NaN by construction, so they are **not built** unless every input arm carries a defined `log R`, and one appearing without a CI is unclassified (AMENDMENT-20) |
 | **Ladder plant operator** | both plant operators (via `W/L` at fixed `p`; via `p` at fixed `W/L`) computed and emitted per rung; neither omitted |
 | **No adequacy flag** | asserted that **no** `powered` / `unpowered` / `at_target` / `NOT_RESOLVABLE` column is emitted anywhere, and that no single canonical MDE threshold appears in code (operator mandate 2026-07-28) |
 | **Ladder emitted** | the sensitivity ladder is present on **every** cell, with its detection rates and required-`n` values |
@@ -1335,15 +1336,76 @@ AMENDMENT-19: QA run-8 remediation. The run-8 findings are implementation defect
     check changes, and no cell is admitted or excluded by any of them)
   - QA run 8.
 
-running count (all rows as labelled, including superseded): 4 looser / 9 tighter / 6 neutral
-ACTIVE rows after supersessions (AMENDMENT-7 by -17, AMENDMENT-11 by -15): 3 looser / 8 tighter /
+AMENDMENT-20: cells that cannot carry a CI - the exemption is booked, and keyed to the binding
+  constraint. The first full-scale run (25 symbols, n_boot 2000) hard-failed BLOCK RULE with three
+  `unclassified` cells and hard-failed "`log R` never unaccompanied" with five rows. Diagnosis: this
+  design authorised NO exemption path at all, while `screen_code/` had been running an
+  implementation-invented one - `n_dates < 7`, four buckets, `unclassified` fatal - since the run-9
+  remediation of R9-04. Two defects follow and only the first is a design change.
+  (a) THE EXEMPTION IS NOW DECLARED, ON THE CORRECT AXIS. A cell cannot carry a block-bootstrap CI
+      in exactly two conditions, and neither of them is "few calendar days":
+        i.  `log R` is UNDEFINED for the cell (token `LOG_R_UNDEFINED`). A ONE-SIDED outcome set
+            puts a zero in `log(W/L) - log((1-p)/p)` (`p = 1` => `L` undefined; `p = 0` => `W`
+            undefined), and a cell with NO SIGNED OUTCOME leaves `p` itself undefined; either way
+            every bootstrap replicate is non-finite and the seed battery returns EMPTY. All three
+            unclassified cells are this, and none is thin on days:
+            `1000RATSUSDT / L4_TARGET_A1_MOD / H1 / d=1.0` in TRAIN and in CONFIRM carries
+            `n = 11`, `n_dates = 8`, `p = 1.0`, `L` undefined - eleven episodes, every one a winner;
+            `1000BONKUSDT / L2_INTERACTION_HMM_X_K12 / M15 / d=1.0` in DESIGN carries `n = 1`
+            over `n_dates = 47`.
+        ii. FEWER THAN 2 CALENDAR DAYS. With one day there is no day-block to resample and
+            `envelope_ci_logR` returns before the sweep runs.
+      The exempting reason must NAME which condition applies and be VALIDATED against the cell's own
+      emitted `p`, `W`, `L`, `n`, `n_dates`; a reason that does not describe the cell is a hard
+      failure. `n_dates < 7` is WITHDRAWN as a reason - §8.1 clause 5 caps the effective block at
+      `n_dates - 1`, so a 3-day cell bootstraps and needs no exemption. `unclassified` stays fatal.
+  (b) THE FIVE UNACCOMPANIED ROWS ARE A CODE DEFECT, NOT A DESIGN GAP. §12's rule - no `log R`
+      ships without `ci_low`, `ci_high`, `ci_width` and `block_mde` on the same row - is CONFIRMED
+      UNCHANGED. `cell_metrics` assigns `log R` from `(p, W, L)` BEFORE calling `envelope_ci_logR`,
+      so a cell that early-returns at `n_days < 2` keeps a computed `log R` and loses its interval.
+      All five rows are `n_dates = 1`. Suppression is already this design's answer for a cell whose
+      `log R` may not be claimed; that path simply was not reached. Fixed in `screen_code/`; no
+      clause moves.
+  (c) DERIVED ROWS ARE NOT ELIGIBLE FOR THE EXEMPTION - THEY ARE NOT BUILT. An interaction term
+      carries `p`, `W`, `L` = NaN BY CONSTRUCTION on all 312 of its rows, healthy ones included, so
+      condition (i) is VACUOUS on it and would excuse every interaction row ever emitted (QA run 11,
+      R11-03). The interaction of an arm whose own `log R` is undefined is itself undefined, so the
+      term is NOT BUILT rather than built and then exempted: `L2_INTERACTION_HMM_X_K12` requires all
+      four input arms (`L0`, shock, k12, joint) to carry a DEFINED `log R`, tested on each arm's own
+      `p`, `W`, `L`. On the failing run this drops EXACTLY ONE row of 312 - the
+      `1000BONKUSDT / M15 / d=1.0 / DESIGN` cell, whose joint arm has `n = 1`, `p = 1.0` - and keeps
+      all 311 that carry a CI. A derived row appearing without a CI is UNCLASSIFIED and fails.
+  (d) UNDEFINEDNESS IS DERIVED FROM `p`, `W`, `L` - NEVER FROM THE EMITTED `log R`. The remedy in
+      (b) blanks `log R`, so a check that reads `log R` to decide whether `log R` was undefined
+      agrees with itself on every row and can no longer reject a bad excuse (QA run 11, R11-02 - the
+      exact P-23 defect this run's earlier remediation existed to remove). `log R` is defined iff
+      `p`, `W`, `L` are all finite with `0 < p < 1`, `W > 0`, `L > 0`; both the emitter and the
+      checker use that one predicate.
+  - DIRECTION: LOOSER, with a TIGHTENING COMPONENT THAT MUST NOT BE NETTED AWAY. LOOSER because the
+    design previously admitted no exemption at all: read literally, every cell without a CI was a
+    hard failure, and this row creates the path. TIGHTER on the **13** non-sizing exempt cells whose
+    `n_dates` is 2-4 - the withdrawn reason had been exempting them for a condition they do not have,
+    and they now need the correct narrower justification or they fail. TIGHTER a SECOND time via
+    clause (c), which removes a row from the population outright (13,377 -> 13,376). Of the 33 exempt
+    cells AFTER the fix, 18 have `n_dates = 1` and TWO have `n_dates = 8` - the `1000RATSUSDT /
+    L4_TARGET_A1_MOD` TRAIN and CONFIRM cells named in (a)(i), exempt because their `log R` is
+    undefined and not because they are thin. (The pre-fix 31-cell set contained none at
+    `n_dates >= 7`; that was a property of the OLD set and does not survive the fix.) No SURVIVING
+    cell's estimand, comparator or band changes, the one removed row carried no CI and fed nothing,
+    and the arithmetic of all 12,503 cells that carry a CI is untouched.
+  - QA run 10 / first full-scale run.
+
+running count (all rows as labelled, including superseded): 5 looser / 9 tighter / 6 neutral
+ACTIVE rows after supersessions (AMENDMENT-7 by -17, AMENDMENT-11 by -15): 4 looser / 8 tighter /
 6 neutral.
 L-23 STREAK NOTE (clause 3 applies to the conservative direction too): within AMENDMENTS 12-18
 the TIGHTER streak is five rows (12 and 14 are NEUTRAL in this ledger). Flagged for the operator
 at the execution gate: a design that only ever tightens after review is one whose first draft was
 systematically under-specified, which is what this ledger records.
-NOTE per L-23: LOOSER now stands at 3 (AMENDMENT-1 full TRAIN, -2 M15, -10 hold grid) and is
-FLAGGED for the operator at the execution gate, as L-23 requires.
+NOTE per L-23: LOOSER now stands at 4 (AMENDMENT-1 full TRAIN, -2 M15, -10 hold grid, -20 the
+no-CI exemption path) and is FLAGGED for the operator at the execution gate, as L-23 requires.
+AMENDMENT-20 also BREAKS the tightening streak recorded above: the streak note stands as history,
+but the ledger's direction is no longer monotone after review.
 EXPECTED FALSE-QUALIFIER COUNT UNDER THE FINAL SET (L-23, mandatory): **N/A - ZERO machine
 qualifiers.** Under AMENDMENT-C7 this design emits no `powered` / `unpowered` / `at_target` /
 `NOT_RESOLVABLE` field and applies no canonical adequacy threshold, so there is no qualification
@@ -1366,8 +1428,18 @@ Assessment, item by item:
     counts as a live loosening and its execution blocker is discharged.
   - AMENDMENT-10 (hold horizon): defensible. Reflection SS5.5's measured E[run] bound authorises
     the scale; the alternative was a hold axis that did not reach the scale it claimed.
-No loosening touches an integrity check, fence, causality rule or claim boundary - verified against
-SS10, SS12 and SS13. The eight active tightenings close real specification gaps.
+  - AMENDMENT-20 (no-CI exemption path): defensible, and the ONLY loosening that touches an
+    integrity check - it is an exemption inside BLOCK RULE, so it is stated narrowly and audited on
+    the cell's own numbers rather than on a proxy. Two points against it, both disclosed: an
+    exemption path is a place where a future thin-cell defect can hide, and it is booked AFTER a
+    failing run rather than before it, which is the weakest moment to widen a rule. Two points for
+    it: the alternative is a design whose literal reading hard-fails 34 near-empty cells with no
+    stated remedy, and the amendment is strictly narrower than the code it replaces - it withdraws
+    the `n_dates < 7` reason that had been absorbing 13 cells it does not describe. No cell that
+    carries a CI is affected, and no exempt cell contributes a `log R`, a band or a comparator.
+No loosening except AMENDMENT-20 touches an integrity check, fence, causality rule or claim
+boundary - verified against SS10, SS12 and SS13; AMENDMENT-20's contact with BLOCK RULE is stated
+and assessed immediately above. The eight active tightenings close real specification gaps.
 ```
 
 Checkpoint/family amendments in force: **U1** (top-25 universe, NEUTRAL), **S1** (per-symbol

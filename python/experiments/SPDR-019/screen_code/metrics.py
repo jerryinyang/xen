@@ -108,6 +108,20 @@ def _boot_totals(suff: np.ndarray, block: int, n_boot: int, seed: int) -> np.nda
     return out
 
 
+def log_R_is_defined(p, W, L) -> bool:
+    """Is `log R = log(W/L) - log((1-p)/p)` defined from THESE primitives? (AMENDMENT-20)
+
+    Derived from `p`, `W`, `L` and nothing else — deliberately NOT from an emitted `log_R`
+    field, because the exemption path blanks that field, and a check that reads the value its
+    own remedy just deleted can only ever agree with itself (QA run 11, R11-02).
+    """
+    vals = (p, W, L)
+    ok_types = (int, float, np.floating, np.integer)  # np.integer per QA run 12, R12-04
+    if not all(isinstance(v, ok_types) and np.isfinite(v) for v in vals):
+        return False
+    return bool(0.0 < float(p) < 1.0 and float(W) > 0.0 and float(L) > 0.0)
+
+
 def _logR_from_totals(tot: np.ndarray) -> np.ndarray:
     n_pos, sum_pos = tot[:, 2], tot[:, 3]
     n_neg, sum_neg = tot[:, 4], tot[:, 5]
@@ -389,6 +403,24 @@ def cell_metrics(
     out["effective_block_cap"] = True
     out["per_block_ci"] = ci.get("per_block", [])
     out["per_seed_ci"] = ci.get("per_seed", [])
+
+    # AMENDMENT-20: a cell that cannot carry a block-bootstrap CI must NAME which condition
+    # applies, and may not ship a log R (§12 "log R never unaccompanied" — log R was assigned
+    # from (p, W, L) above, before the CI was attempted, so a cell that early-returns at
+    # n_days < 2 would otherwise keep a number and lose its interval).
+    # Order is fixed so the token is deterministic; integrity re-derives BOTH conditions and
+    # validates whichever is claimed.
+    if np.isfinite(out["ci_low"]) and np.isfinite(out["ci_high"]):
+        out["ci_absent_reason"] = None
+    else:
+        if not log_R_is_defined(p, W, L):
+            out["ci_absent_reason"] = "LOG_R_UNDEFINED"
+        elif n_days < 2:
+            out["ci_absent_reason"] = "N_DATES_LT_2_NO_DAY_BLOCK"
+        else:
+            # no admissible condition → integrity classes it unclassified → HARD failure
+            out["ci_absent_reason"] = None
+        out["log_R"] = float("nan")
 
     # realised c = mde_log * sqrt(n)
     mde = out["block_mde"]

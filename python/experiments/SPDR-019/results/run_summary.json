@@ -1,0 +1,27 @@
+{
+  "all_hard_pass": true,
+  "elapsed_s": 2631.2462871074677,
+  "experiment": "SPDR-019",
+  "hard_fail_names": [],
+  "jobs": 6,
+  "n_boot": 2000,
+  "n_episodes": 5753583,
+  "n_metric_rows": 13376,
+  "n_symbols": 25,
+  "n_variants": 33,
+  "phase": "a",
+  "smoke": false,
+  "spread_cost_disclosure": {
+    "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
+    "implication": "reported cost understates total cost; reported net performance is overstated",
+    "note_amendment_c5": "cost enters NO estimand, threshold or comparison; p_be_net is DISCLOSED REFERENCE only",
+    "prohibited_claims": [
+      "fully-net",
+      "cost-complete",
+      "tradable",
+      "deployable"
+    ],
+    "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+    "spread_rt_bps": null
+  }
+}

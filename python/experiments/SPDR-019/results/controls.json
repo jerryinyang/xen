@@ -1,0 +1,1681 @@
+{
+  "entry_timing": {
+    "collapse_fraction": 0.022000775651725375,
+    "collapse_fraction_status": "DISCLOSURE_ONLY",
+    "exit_matched": true,
+    "exit_matched_reason": "constant-hold time-exit arm; asserted above",
+    "fixed_point_count": 0,
+    "fixed_point_count_measured": true,
+    "hold_hours": 1.0,
+    "live_log_R": 0.05502431984687445,
+    "method": "within_symbol_timing_derange",
+    "n_distinct_null_values": 2000,
+    "n_episodes_dropped_singleton_symbol": 0,
+    "n_null_draws": 2000,
+    "n_seeds": 2000,
+    "n_symbols_used": 25,
+    "null_mean": 0.0009988498335443373,
+    "null_q05": -0.040312524960417415,
+    "null_q50": 0.0012105777163398646,
+    "null_q95": 0.04187179137972105,
+    "null_sd": 0.024931022450641466,
+    "percentile": 0.985
+  },
+  "fixed_point_count": 0,
+  "magnitude_matched": {
+    "collapse_fraction": 0.596813877500079,
+    "collapse_fraction_status": "DISCLOSURE_ONLY",
+    "deciles_with_demand_unmatched": [],
+    "disjoint": true,
+    "disjointness_note": "complement is the layer's excluded set; disjoint by construction",
+    "live_log_R": 0.078435829956601,
+    "matched_on": "abs_r_decision_bps decile (per-symbol expanding causal, \u00a74.1b)",
+    "method": "magnitude_matched_decile",
+    "n_complement": 13660,
+    "n_distinct_null_values": 2000,
+    "n_null_draws": 2000,
+    "n_seeds": 2000,
+    "n_selected": 5310,
+    "null_mean": 0.047282307158717785,
+    "null_q05": -0.010264592002828695,
+    "null_q50": 0.0468115918113359,
+    "null_q95": 0.10684356861658707,
+    "null_sd": 0.035123464972196,
+    "per_decile": {
+      "1": {
+        "matched": false,
+        "n_complement_available": 0,
+        "n_selected": 0,
+        "with_replacement": false
+      },
+      "10": {
+        "matched": true,
+        "n_complement_available": 1126,
+        "n_selected": 2490,
+        "with_replacement": true
+      },
+      "2": {
+        "matched": false,
+        "n_complement_available": 2,
+        "n_selected": 0,
+        "with_replacement": false
+      },
+      "3": {
+        "matched": false,
+        "n_complement_available": 41,
+        "n_selected": 0,
+        "with_replacement": false
+      },
+      "4": {
+        "matched": false,
+        "n_complement_available": 298,
+        "n_selected": 0,
+        "with_replacement": false
+      },
+      "5": {
+        "matched": false,
+        "n_complement_available": 1029,
+        "n_selected": 0,
+        "with_replacement": false
+      },
+      "6": {
+        "matched": false,
+        "n_complement_available": 2136,
+        "n_selected": 0,
+        "with_replacement": false
+      },
+      "7": {
+        "matched": true,
+        "n_complement_available": 3210,
+        "n_selected": 86,
+        "with_replacement": false
+      },
+      "8": {
+        "matched": true,
+        "n_complement_available": 3133,
+        "n_selected": 878,
+        "with_replacement": false
+      },
+      "9": {
+        "matched": true,
+        "n_complement_available": 2202,
+        "n_selected": 1856,
+        "with_replacement": false
+      }
+    },
+    "percentile": 0.816,
+    "plant_curve": {
+      "detection": {
+        "10.0": {
+          "detection_rate_vs_null": 0.935,
+          "planted_log_R": 0.10170332082536951,
+          "sigma_units": 0.19638250163139642
+        },
+        "20.0": {
+          "detection_rate_vs_null": 1.0,
+          "planted_log_R": 0.22469603317655962,
+          "sigma_units": 0.39276500326279284
+        },
+        "40.0": {
+          "detection_rate_vs_null": 1.0,
+          "planted_log_R": 0.46702175623031983,
+          "sigma_units": 0.7855300065255857
+        },
+        "5.0": {
+          "detection_rate_vs_null": 0.4215,
+          "planted_log_R": 0.03994726841193612,
+          "sigma_units": 0.09819125081569821
+        }
+      },
+      "live_log_R": 0.078435829956601,
+      "n_null_draws": 2000,
+      "plant_base": "null_equivalent_half_flip",
+      "plant_base_log_R": -0.021916985363402933,
+      "rungs_bps": [
+        5.0,
+        10.0,
+        20.0,
+        40.0
+      ],
+      "sigma_hat_bps": 50.92103378319152
+    }
+  },
+  "magnitude_matched_by_arm": {
+    "L1_SHAT_DECILE_GE5": {
+      "collapse_fraction": 0.596160799738941,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "deciles_with_demand_unmatched": [],
+      "disjoint": true,
+      "disjointness_note": "complement is the layer's excluded set; disjoint by construction",
+      "live_log_R": 0.06333312634907146,
+      "matched_on": "abs_r_decision_bps decile (per-symbol expanding causal, \u00a74.1b)",
+      "method": "magnitude_matched_decile",
+      "n_complement": 10722,
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_seeds": 2000,
+      "n_selected": 8248,
+      "null_mean": 0.038122017933941404,
+      "null_q05": -0.019235764133766563,
+      "null_q50": 0.037756727254229835,
+      "null_q95": 0.09600884041260745,
+      "null_sd": 0.035674282587134884,
+      "per_decile": {
+        "1": {
+          "matched": false,
+          "n_complement_available": 0,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "10": {
+          "matched": true,
+          "n_complement_available": 586,
+          "n_selected": 3030,
+          "with_replacement": true
+        },
+        "2": {
+          "matched": false,
+          "n_complement_available": 2,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "3": {
+          "matched": false,
+          "n_complement_available": 41,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "4": {
+          "matched": false,
+          "n_complement_available": 298,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "5": {
+          "matched": false,
+          "n_complement_available": 1029,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "6": {
+          "matched": true,
+          "n_complement_available": 2119,
+          "n_selected": 17,
+          "with_replacement": false
+        },
+        "7": {
+          "matched": true,
+          "n_complement_available": 2671,
+          "n_selected": 625,
+          "with_replacement": false
+        },
+        "8": {
+          "matched": true,
+          "n_complement_available": 2160,
+          "n_selected": 1851,
+          "with_replacement": false
+        },
+        "9": {
+          "matched": true,
+          "n_complement_available": 1333,
+          "n_selected": 2725,
+          "with_replacement": true
+        }
+      },
+      "percentile": 0.7675,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 0.9885,
+            "planted_log_R": 0.122406281667358,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.2653091665095947,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.5463276937224439,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 0.6445,
+            "planted_log_R": 0.05064031830452258,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.06333312634907146,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_half_flip",
+        "plant_base_log_R": -0.02122254770291282,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L1_SHAT_DECILE_GE7": {
+      "collapse_fraction": 0.596813877500079,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "deciles_with_demand_unmatched": [],
+      "disjoint": true,
+      "disjointness_note": "complement is the layer's excluded set; disjoint by construction",
+      "live_log_R": 0.078435829956601,
+      "matched_on": "abs_r_decision_bps decile (per-symbol expanding causal, \u00a74.1b)",
+      "method": "magnitude_matched_decile",
+      "n_complement": 13660,
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_seeds": 2000,
+      "n_selected": 5310,
+      "null_mean": 0.047282307158717785,
+      "null_q05": -0.010264592002828695,
+      "null_q50": 0.0468115918113359,
+      "null_q95": 0.10684356861658707,
+      "null_sd": 0.035123464972196,
+      "per_decile": {
+        "1": {
+          "matched": false,
+          "n_complement_available": 0,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "10": {
+          "matched": true,
+          "n_complement_available": 1126,
+          "n_selected": 2490,
+          "with_replacement": true
+        },
+        "2": {
+          "matched": false,
+          "n_complement_available": 2,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "3": {
+          "matched": false,
+          "n_complement_available": 41,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "4": {
+          "matched": false,
+          "n_complement_available": 298,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "5": {
+          "matched": false,
+          "n_complement_available": 1029,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "6": {
+          "matched": false,
+          "n_complement_available": 2136,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "7": {
+          "matched": true,
+          "n_complement_available": 3210,
+          "n_selected": 86,
+          "with_replacement": false
+        },
+        "8": {
+          "matched": true,
+          "n_complement_available": 3133,
+          "n_selected": 878,
+          "with_replacement": false
+        },
+        "9": {
+          "matched": true,
+          "n_complement_available": 2202,
+          "n_selected": 1856,
+          "with_replacement": false
+        }
+      },
+      "percentile": 0.816,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 0.935,
+            "planted_log_R": 0.10170332082536951,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.22469603317655962,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.46702175623031983,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 0.4215,
+            "planted_log_R": 0.03994726841193612,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.078435829956601,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_half_flip",
+        "plant_base_log_R": -0.021916985363402933,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L1_SHAT_DECILE_GE9": {
+      "collapse_fraction": 0.9767748723650203,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "deciles_with_demand_unmatched": [],
+      "disjoint": true,
+      "disjointness_note": "complement is the layer's excluded set; disjoint by construction",
+      "live_log_R": 0.06715726663240001,
+      "matched_on": "abs_r_decision_bps decile (per-symbol expanding causal, \u00a74.1b)",
+      "method": "magnitude_matched_decile",
+      "n_complement": 16319,
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_seeds": 2000,
+      "n_selected": 2651,
+      "null_mean": 0.06629001053473198,
+      "null_q05": 0.012910433728409339,
+      "null_q50": 0.06559753054324616,
+      "null_q95": 0.1212782535282304,
+      "null_sd": 0.03300118319192088,
+      "per_decile": {
+        "1": {
+          "matched": false,
+          "n_complement_available": 0,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "10": {
+          "matched": true,
+          "n_complement_available": 1897,
+          "n_selected": 1719,
+          "with_replacement": false
+        },
+        "2": {
+          "matched": false,
+          "n_complement_available": 2,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "3": {
+          "matched": false,
+          "n_complement_available": 41,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "4": {
+          "matched": false,
+          "n_complement_available": 298,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "5": {
+          "matched": false,
+          "n_complement_available": 1029,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "6": {
+          "matched": false,
+          "n_complement_available": 2136,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "7": {
+          "matched": true,
+          "n_complement_available": 3291,
+          "n_selected": 5,
+          "with_replacement": false
+        },
+        "8": {
+          "matched": true,
+          "n_complement_available": 3868,
+          "n_selected": 143,
+          "with_replacement": false
+        },
+        "9": {
+          "matched": true,
+          "n_complement_available": 3274,
+          "n_selected": 784,
+          "with_replacement": false
+        }
+      },
+      "percentile": 0.516,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 0.3165,
+            "planted_log_R": 0.0503967770513187,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 0.999,
+            "planted_log_R": 0.1549625401101384,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.36300793188769365,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 0.019,
+            "planted_log_R": -0.0018955875617792453,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.06715726663240001,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_half_flip",
+        "plant_base_log_R": -0.05412755350999594,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L3_TGTCUR_DOES_NOT_FIRE": {
+      "collapse_fraction": 1.5645786974116687,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "deciles_with_demand_unmatched": [],
+      "disjoint": true,
+      "disjointness_note": "complement is the layer's excluded set; disjoint by construction",
+      "live_log_R": 0.04669677464890329,
+      "matched_on": "abs_r_decision_bps decile (per-symbol expanding causal, \u00a74.1b)",
+      "method": "magnitude_matched_decile",
+      "n_complement": 11361,
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_seeds": 2000,
+      "n_selected": 7609,
+      "null_mean": 0.07329617742788225,
+      "null_q05": 0.023177304724962374,
+      "null_q50": 0.07306077885350734,
+      "null_q95": 0.12308033351338986,
+      "null_sd": 0.030706957560675728,
+      "per_decile": {
+        "1": {
+          "matched": false,
+          "n_complement_available": 0,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "10": {
+          "matched": true,
+          "n_complement_available": 1776,
+          "n_selected": 1840,
+          "with_replacement": true
+        },
+        "2": {
+          "matched": false,
+          "n_complement_available": 2,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "3": {
+          "matched": true,
+          "n_complement_available": 29,
+          "n_selected": 12,
+          "with_replacement": false
+        },
+        "4": {
+          "matched": true,
+          "n_complement_available": 220,
+          "n_selected": 78,
+          "with_replacement": false
+        },
+        "5": {
+          "matched": true,
+          "n_complement_available": 757,
+          "n_selected": 272,
+          "with_replacement": false
+        },
+        "6": {
+          "matched": true,
+          "n_complement_available": 1419,
+          "n_selected": 717,
+          "with_replacement": false
+        },
+        "7": {
+          "matched": true,
+          "n_complement_available": 2039,
+          "n_selected": 1257,
+          "with_replacement": false
+        },
+        "8": {
+          "matched": true,
+          "n_complement_available": 2377,
+          "n_selected": 1634,
+          "with_replacement": false
+        },
+        "9": {
+          "matched": true,
+          "n_complement_available": 2259,
+          "n_selected": 1799,
+          "with_replacement": false
+        }
+      },
+      "percentile": 0.194,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 0.991,
+            "planted_log_R": 0.14623051187968336,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.3261916073317268,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.6760619368134239,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 0.2765,
+            "planted_log_R": 0.055587793444279096,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.04669677464890329,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_half_flip",
+        "plant_base_log_R": -0.03522108105096101,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L3_TGTCUR_FIRES": {
+      "collapse_fraction": 0.7047598296635394,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "deciles_with_demand_unmatched": [
+        "2"
+      ],
+      "disjoint": true,
+      "disjointness_note": "complement is the layer's excluded set; disjoint by construction",
+      "live_log_R": 0.07149747340874643,
+      "matched_on": "abs_r_decision_bps decile (per-symbol expanding causal, \u00a74.1b)",
+      "method": "magnitude_matched_decile",
+      "n_complement": 8650,
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_seeds": 2000,
+      "n_selected": 10320,
+      "null_mean": 0.049548234231265614,
+      "null_q05": 0.006298119375630022,
+      "null_q50": 0.050388547180921575,
+      "null_q95": 0.09128089120204214,
+      "null_sd": 0.025936093017279643,
+      "per_decile": {
+        "1": {
+          "matched": false,
+          "n_complement_available": 0,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "10": {
+          "matched": true,
+          "n_complement_available": 1943,
+          "n_selected": 1673,
+          "with_replacement": false
+        },
+        "2": {
+          "matched": false,
+          "n_complement_available": 0,
+          "n_selected": 2,
+          "with_replacement": false
+        },
+        "3": {
+          "matched": true,
+          "n_complement_available": 12,
+          "n_selected": 29,
+          "with_replacement": true
+        },
+        "4": {
+          "matched": true,
+          "n_complement_available": 78,
+          "n_selected": 220,
+          "with_replacement": true
+        },
+        "5": {
+          "matched": true,
+          "n_complement_available": 293,
+          "n_selected": 736,
+          "with_replacement": true
+        },
+        "6": {
+          "matched": true,
+          "n_complement_available": 769,
+          "n_selected": 1367,
+          "with_replacement": true
+        },
+        "7": {
+          "matched": true,
+          "n_complement_available": 1372,
+          "n_selected": 1924,
+          "with_replacement": true
+        },
+        "8": {
+          "matched": true,
+          "n_complement_available": 1773,
+          "n_selected": 2238,
+          "with_replacement": true
+        },
+        "9": {
+          "matched": true,
+          "n_complement_available": 1927,
+          "n_selected": 2131,
+          "with_replacement": true
+        }
+      },
+      "percentile": 0.8025,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.19600044735138206,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.403582354769558,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.8027004071755863,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 0.9485,
+            "planted_log_R": 0.09094974743567841,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.07149747340874643,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_half_flip",
+        "plant_base_log_R": -0.014463783471368076,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L3_TGTMED5_CO_REPORT": {
+      "collapse_fraction": 0.619558687701639,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "deciles_with_demand_unmatched": [
+        "2"
+      ],
+      "disjoint": true,
+      "disjointness_note": "complement is the layer's excluded set; disjoint by construction",
+      "live_log_R": 0.07338836284609751,
+      "matched_on": "abs_r_decision_bps decile (per-symbol expanding causal, \u00a74.1b)",
+      "method": "magnitude_matched_decile",
+      "n_complement": 5037,
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_seeds": 2000,
+      "n_selected": 13933,
+      "null_mean": 0.04516085647578325,
+      "null_q05": 0.0005906108692581432,
+      "null_q50": 0.0454683977774999,
+      "null_q95": 0.0917147015497257,
+      "null_sd": 0.02779388094952332,
+      "per_decile": {
+        "1": {
+          "matched": false,
+          "n_complement_available": 0,
+          "n_selected": 0,
+          "with_replacement": false
+        },
+        "10": {
+          "matched": true,
+          "n_complement_available": 1221,
+          "n_selected": 2395,
+          "with_replacement": true
+        },
+        "2": {
+          "matched": false,
+          "n_complement_available": 0,
+          "n_selected": 2,
+          "with_replacement": false
+        },
+        "3": {
+          "matched": true,
+          "n_complement_available": 6,
+          "n_selected": 35,
+          "with_replacement": true
+        },
+        "4": {
+          "matched": true,
+          "n_complement_available": 31,
+          "n_selected": 267,
+          "with_replacement": true
+        },
+        "5": {
+          "matched": true,
+          "n_complement_available": 106,
+          "n_selected": 923,
+          "with_replacement": true
+        },
+        "6": {
+          "matched": true,
+          "n_complement_available": 344,
+          "n_selected": 1792,
+          "with_replacement": true
+        },
+        "7": {
+          "matched": true,
+          "n_complement_available": 667,
+          "n_selected": 2629,
+          "with_replacement": true
+        },
+        "8": {
+          "matched": true,
+          "n_complement_available": 1006,
+          "n_selected": 3005,
+          "with_replacement": true
+        },
+        "9": {
+          "matched": true,
+          "n_complement_available": 1173,
+          "n_selected": 2885,
+          "with_replacement": true
+        }
+      },
+      "percentile": 0.8495,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.1877529373412439,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.3929417850389999,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.787817887127892,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 0.919,
+            "planted_log_R": 0.08402906966620628,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.07338836284609751,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_half_flip",
+        "plant_base_log_R": -0.019995002847106855,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    }
+  },
+  "n_ctrl_seeds_pinned": 2000,
+  "plant_curve": {
+    "detection": {
+      "10.0": {
+        "detection_rate_vs_null": 1.0,
+        "planted_log_R": 0.21238647606383726,
+        "sigma_units": 0.19638250163139642
+      },
+      "20.0": {
+        "detection_rate_vs_null": 1.0,
+        "planted_log_R": 0.4003081325568736,
+        "sigma_units": 0.39276500326279284
+      },
+      "40.0": {
+        "detection_rate_vs_null": 1.0,
+        "planted_log_R": 0.7635144895491317,
+        "sigma_units": 0.7855300065255857
+      },
+      "5.0": {
+        "detection_rate_vs_null": 1.0,
+        "planted_log_R": 0.11741196342708905,
+        "sigma_units": 0.09819125081569821
+      }
+    },
+    "live_log_R": 0.05502431984687445,
+    "n_null_draws": 2000,
+    "plant_base": "null_equivalent_one_derange_draw",
+    "plant_base_log_R": 0.02213933069013513,
+    "rungs_bps": [
+      5.0,
+      10.0,
+      20.0,
+      40.0
+    ],
+    "sigma_hat_bps": 50.92103378319152
+  },
+  "primary_cell": {
+    "band": "TRAIN",
+    "clock": "H1",
+    "delta": 0.5,
+    "scope": "POOLED",
+    "variant_id": "L0_BASELINE"
+  },
+  "refereed_cells": {
+    "L0_BASELINE|H1|0.5|POOLED|TRAIN": {
+      "collapse_fraction": 0.05784321109705401,
+      "control": "side_derangement"
+    },
+    "L4_TARGET_A1_MOD|H1|0.5|POOLED|TRAIN": {
+      "collapse_fraction": 0.8712343573917154,
+      "control": "side_derangement"
+    },
+    "L4_TARGET_A1_UNMOD|H1|0.5|POOLED|TRAIN": {
+      "collapse_fraction": 0.6593000431071622,
+      "control": "side_derangement"
+    },
+    "L4_TARGET_A2_MOD|H1|0.5|POOLED|TRAIN": {
+      "collapse_fraction": 0.6047069937078271,
+      "control": "side_derangement"
+    },
+    "L4_TARGET_A2_UNMOD|H1|0.5|POOLED|TRAIN": {
+      "collapse_fraction": 0.665687871074954,
+      "control": "side_derangement"
+    },
+    "L4_TARGET_A3_MOD|H1|0.5|POOLED|TRAIN": {
+      "collapse_fraction": 0.3738939907327356,
+      "control": "side_derangement"
+    },
+    "L4_TARGET_A3_UNMOD|H1|0.5|POOLED|TRAIN": {
+      "collapse_fraction": 0.362624958464217,
+      "control": "side_derangement"
+    },
+    "L4_TRAIL_B1_MOD|H1|0.5|POOLED|TRAIN": {
+      "collapse_fraction": 6.268994399940173,
+      "control": "side_derangement"
+    },
+    "L4_TRAIL_B1_UNMOD|H1|0.5|POOLED|TRAIN": {
+      "collapse_fraction": 1.425036339753357,
+      "control": "side_derangement"
+    },
+    "L4_TRAIL_B2_MOD|H1|0.5|POOLED|TRAIN": {
+      "collapse_fraction": -0.5745298172098576,
+      "control": "side_derangement"
+    },
+    "L4_TRAIL_B2_UNMOD|H1|0.5|POOLED|TRAIN": {
+      "collapse_fraction": 1.3795310078473302,
+      "control": "side_derangement"
+    }
+  },
+  "side_derangement": {
+    "collapse_fraction": 0.05784321109705401,
+    "collapse_fraction_status": "DISCLOSURE_ONLY",
+    "exit_matched_methods_present": [
+      "TIME_EXIT_NEGATION"
+    ],
+    "fixed_point_count": 0,
+    "fixed_point_count_measured": true,
+    "flipped_fraction_max": 0.5124934106483922,
+    "flipped_fraction_mean": 0.4995356879283079,
+    "flipped_fraction_min": 0.486768581971534,
+    "flipped_fraction_sd": 0.0037705314842180625,
+    "live_log_R": 0.05502431984687445,
+    "method": "side_label_derangement_exit_matched",
+    "n_distinct_null_values": 2000,
+    "n_null_draws": 2000,
+    "n_reresolved_flips_available": 18970,
+    "n_seeds": 2000,
+    "null_mean": 0.003480669934898501,
+    "null_q05": -0.036202146291670935,
+    "null_q50": 0.0031827833483745772,
+    "null_q95": 0.045815042640274035,
+    "null_sd": 0.024896605508145996,
+    "percentile": 0.9755,
+    "plant_curve": {
+      "detection": {
+        "10.0": {
+          "detection_rate_vs_null": 1.0,
+          "planted_log_R": 0.21238647606383726,
+          "sigma_units": 0.19638250163139642
+        },
+        "20.0": {
+          "detection_rate_vs_null": 1.0,
+          "planted_log_R": 0.4003081325568736,
+          "sigma_units": 0.39276500326279284
+        },
+        "40.0": {
+          "detection_rate_vs_null": 1.0,
+          "planted_log_R": 0.7635144895491317,
+          "sigma_units": 0.7855300065255857
+        },
+        "5.0": {
+          "detection_rate_vs_null": 1.0,
+          "planted_log_R": 0.11741196342708905,
+          "sigma_units": 0.09819125081569821
+        }
+      },
+      "live_log_R": 0.05502431984687445,
+      "n_null_draws": 2000,
+      "plant_base": "null_equivalent_one_derange_draw",
+      "plant_base_log_R": 0.02213933069013513,
+      "rungs_bps": [
+        5.0,
+        10.0,
+        20.0,
+        40.0
+      ],
+      "sigma_hat_bps": 50.92103378319152
+    }
+  },
+  "side_derangement_by_arm": {
+    "L0_BASELINE": {
+      "collapse_fraction": 0.05784321109705401,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "exit_matched_methods_present": [
+        "TIME_EXIT_NEGATION"
+      ],
+      "fixed_point_count": 0,
+      "fixed_point_count_measured": true,
+      "flipped_fraction_max": 0.5124934106483922,
+      "flipped_fraction_mean": 0.4995356879283079,
+      "flipped_fraction_min": 0.486768581971534,
+      "flipped_fraction_sd": 0.0037705314842180625,
+      "live_log_R": 0.05502431984687445,
+      "method": "side_label_derangement_exit_matched",
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_reresolved_flips_available": 18970,
+      "n_seeds": 2000,
+      "null_mean": 0.003480669934898501,
+      "null_q05": -0.036202146291670935,
+      "null_q50": 0.0031827833483745772,
+      "null_q95": 0.045815042640274035,
+      "null_sd": 0.024896605508145996,
+      "percentile": 0.9755,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.21238647606383726,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.4003081325568736,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.7635144895491317,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.11741196342708905,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.05502431984687445,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_one_derange_draw",
+        "plant_base_log_R": 0.02213933069013513,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L4_TARGET_A1_MOD": {
+      "collapse_fraction": 0.8712343573917154,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "exit_matched_methods_present": [
+        "TARGET_TRAIL_RERESOLVE"
+      ],
+      "fixed_point_count": 0,
+      "fixed_point_count_measured": true,
+      "flipped_fraction_max": 0.5113876001687052,
+      "flipped_fraction_mean": 0.4995871467735133,
+      "flipped_fraction_min": 0.48766343315056937,
+      "flipped_fraction_sd": 0.0036191456603080303,
+      "live_log_R": 0.06202897572735533,
+      "method": "side_label_derangement_exit_matched",
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_reresolved_flips_available": 18963,
+      "n_seeds": 2000,
+      "null_mean": 0.05402495579420085,
+      "null_q05": 0.020961143601827492,
+      "null_q50": 0.05404177480748873,
+      "null_q95": 0.085607481803509,
+      "null_sd": 0.019719495586060447,
+      "percentile": 0.665,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.27893296769540554,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.5178038977324024,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.9488864429617831,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.15234812456788027,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.06202897572735533,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_one_derange_draw",
+        "plant_base_log_R": 0.02021466596448529,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L4_TARGET_A1_UNMOD": {
+      "collapse_fraction": 0.6593000431071622,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "exit_matched_methods_present": [
+        "TARGET_TRAIL_RERESOLVE"
+      ],
+      "fixed_point_count": 0,
+      "fixed_point_count_measured": true,
+      "flipped_fraction_max": 0.5103969754253308,
+      "flipped_fraction_mean": 0.4995825981936568,
+      "flipped_fraction_min": 0.4882377651753833,
+      "flipped_fraction_sd": 0.00349990425717242,
+      "live_log_R": 0.07310822758296076,
+      "method": "side_label_derangement_exit_matched",
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_reresolved_flips_available": 19039,
+      "n_seeds": 2000,
+      "null_mean": 0.04836225919257234,
+      "null_q05": 0.017613844635731457,
+      "null_q50": 0.04820025759693425,
+      "null_q95": 0.08069508777642775,
+      "null_sd": 0.01945364967231309,
+      "percentile": 0.8895,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.34770320479371575,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.6098809086697536,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 1.076010901579409,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.20745270273643235,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.07310822758296076,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_one_derange_draw",
+        "plant_base_log_R": 0.05995731540512095,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L4_TARGET_A2_MOD": {
+      "collapse_fraction": 0.6047069937078271,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "exit_matched_methods_present": [
+        "TARGET_TRAIL_RERESOLVE"
+      ],
+      "fixed_point_count": 0,
+      "fixed_point_count_measured": true,
+      "flipped_fraction_max": 0.5111932418162619,
+      "flipped_fraction_mean": 0.4995977296726505,
+      "flipped_fraction_min": 0.4877507919746568,
+      "flipped_fraction_sd": 0.003563527889342815,
+      "live_log_R": 0.054009516237207025,
+      "method": "side_label_derangement_exit_matched",
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_reresolved_flips_available": 18936,
+      "n_seeds": 2000,
+      "null_mean": 0.03271488296070939,
+      "null_q05": 0.000804890166017197,
+      "null_q50": 0.032659932195415534,
+      "null_q95": 0.06595268412925441,
+      "null_sd": 0.02023521483647119,
+      "percentile": 0.8515,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.27455688962616676,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.47690423079443245,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.8621125134289619,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.17121150120960707,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.054009516237207025,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_one_derange_draw",
+        "plant_base_log_R": 0.06659106872219436,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L4_TARGET_A2_UNMOD": {
+      "collapse_fraction": 0.665687871074954,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "exit_matched_methods_present": [
+        "TARGET_TRAIL_RERESOLVE"
+      ],
+      "fixed_point_count": 0,
+      "fixed_point_count_measured": true,
+      "flipped_fraction_max": 0.5126775381378222,
+      "flipped_fraction_mean": 0.49975155181483427,
+      "flipped_fraction_min": 0.48690163072067333,
+      "flipped_fraction_sd": 0.003616882781819255,
+      "live_log_R": 0.053284624573741474,
+      "method": "side_label_derangement_exit_matched",
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_reresolved_flips_available": 19006,
+      "n_seeds": 2000,
+      "null_mean": 0.03566360512399238,
+      "null_q05": 0.00505747299104799,
+      "null_q50": 0.035470928293522136,
+      "null_q95": 0.06652860203807026,
+      "null_sd": 0.01891946966913147,
+      "percentile": 0.8295,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.2776220218812103,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.4931834018451181,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.8990095648187781,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.16677990328019146,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.053284624573741474,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_one_derange_draw",
+        "plant_base_log_R": 0.054037695677518316,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L4_TARGET_A3_MOD": {
+      "collapse_fraction": 0.3738939907327356,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "exit_matched_methods_present": [
+        "TARGET_TRAIL_RERESOLVE"
+      ],
+      "fixed_point_count": 0,
+      "fixed_point_count_measured": true,
+      "flipped_fraction_max": 0.5124953769746923,
+      "flipped_fraction_mean": 0.4996480160617108,
+      "flipped_fraction_min": 0.4869234427009035,
+      "flipped_fraction_sd": 0.0036278618279075294,
+      "live_log_R": 0.05837497376758617,
+      "method": "side_label_derangement_exit_matched",
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_reresolved_flips_available": 18923,
+      "n_seeds": 2000,
+      "null_mean": 0.021709228636003438,
+      "null_q05": -0.013502863722770042,
+      "null_q50": 0.02182605190088155,
+      "null_q95": 0.057457329130958475,
+      "null_sd": 0.021909101556745258,
+      "percentile": 0.953,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.2303193460332027,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.4218760707519898,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.7905327870248746,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.13324719560729953,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.05837497376758617,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_one_derange_draw",
+        "plant_base_log_R": 0.035605919962886784,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L4_TARGET_A3_UNMOD": {
+      "collapse_fraction": 0.362624958464217,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "exit_matched_methods_present": [
+        "TARGET_TRAIL_RERESOLVE"
+      ],
+      "fixed_point_count": 0,
+      "fixed_point_count_measured": true,
+      "flipped_fraction_max": 0.512553292278541,
+      "flipped_fraction_mean": 0.49964519185220274,
+      "flipped_fraction_min": 0.4882362229591031,
+      "flipped_fraction_sd": 0.003716493013294511,
+      "live_log_R": 0.042525957631914156,
+      "method": "side_label_derangement_exit_matched",
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_reresolved_flips_available": 18995,
+      "n_seeds": 2000,
+      "null_mean": 0.015491386650919885,
+      "null_q05": -0.01561950316095081,
+      "null_q50": 0.015420973619923922,
+      "null_q95": 0.04723383003700047,
+      "null_sd": 0.019332156082717843,
+      "percentile": 0.9165,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.21624103402078027,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.4183189697620331,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.8055936495177104,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.1135183037540491,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.042525957631914156,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_one_derange_draw",
+        "plant_base_log_R": 0.009967154218500196,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L4_TRAIL_B1_MOD": {
+      "collapse_fraction": 6.268994399940173,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "exit_matched_methods_present": [
+        "TARGET_TRAIL_RERESOLVE"
+      ],
+      "fixed_point_count": 0,
+      "fixed_point_count_measured": true,
+      "flipped_fraction_max": 0.5115546218487395,
+      "flipped_fraction_mean": 0.499595955882353,
+      "flipped_fraction_min": 0.48834033613445377,
+      "flipped_fraction_sd": 0.003663339500745568,
+      "live_log_R": 0.004597395092871048,
+      "method": "side_label_derangement_exit_matched",
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_reresolved_flips_available": 19040,
+      "n_seeds": 2000,
+      "null_mean": 0.029190792607794024,
+      "null_q05": -0.0052510873561119826,
+      "null_q50": 0.02882104409152103,
+      "null_q95": 0.06340176151076037,
+      "null_sd": 0.02084685668268055,
+      "percentile": 0.1145,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.40925408702096944,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.8642782594606102,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 1.8197174367228333,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.19477764623253202,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.004597395092871048,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_one_derange_draw",
+        "plant_base_log_R": -0.009622671886626022,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L4_TRAIL_B1_UNMOD": {
+      "collapse_fraction": 1.425036339753357,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "exit_matched_methods_present": [
+        "TARGET_TRAIL_RERESOLVE"
+      ],
+      "fixed_point_count": 0,
+      "fixed_point_count_measured": true,
+      "flipped_fraction_max": 0.5119832548403978,
+      "flipped_fraction_mean": 0.4996618001046572,
+      "flipped_fraction_min": 0.4867608581894296,
+      "flipped_fraction_sd": 0.0036585656369132547,
+      "live_log_R": 0.01716204288497991,
+      "method": "side_label_derangement_exit_matched",
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_reresolved_flips_available": 19110,
+      "n_seeds": 2000,
+      "null_mean": 0.02407708366687647,
+      "null_q05": -0.007072149981055253,
+      "null_q50": 0.024456534775501915,
+      "null_q95": 0.05533316916159725,
+      "null_sd": 0.018859844040226722,
+      "percentile": 0.3635,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.47209912317747427,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.9998392893997481,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 2.2494312645323253,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.23040867259396314,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.01716204288497991,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_one_derange_draw",
+        "plant_base_log_R": 0.0015290978914831999,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L4_TRAIL_B2_MOD": {
+      "collapse_fraction": -0.5745298172098576,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "exit_matched_methods_present": [
+        "TARGET_TRAIL_RERESOLVE"
+      ],
+      "fixed_point_count": 0,
+      "fixed_point_count_measured": true,
+      "flipped_fraction_max": 0.5120193572142444,
+      "flipped_fraction_mean": 0.49960785860817425,
+      "flipped_fraction_min": 0.4871916259007943,
+      "flipped_fraction_sd": 0.003634779435749905,
+      "live_log_R": 0.009605855364792415,
+      "method": "side_label_derangement_exit_matched",
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_reresolved_flips_available": 19011,
+      "n_seeds": 2000,
+      "null_mean": -0.0059491054015427735,
+      "null_q05": -0.03920659549306779,
+      "null_q50": -0.005518850326878516,
+      "null_q95": 0.02811178233122056,
+      "null_sd": 0.020402057717905174,
+      "percentile": 0.7795,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.25639949218393626,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.5150301605177632,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 1.0503164998258034,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.13021167980734144,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": 0.009605855364792415,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_one_derange_draw",
+        "plant_base_log_R": 0.006252536468850434,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    },
+    "L4_TRAIL_B2_UNMOD": {
+      "collapse_fraction": 1.3795310078473302,
+      "collapse_fraction_status": "DISCLOSURE_ONLY",
+      "exit_matched_methods_present": [
+        "TARGET_TRAIL_RERESOLVE"
+      ],
+      "fixed_point_count": 0,
+      "fixed_point_count_measured": true,
+      "flipped_fraction_max": 0.512449546574409,
+      "flipped_fraction_mean": 0.49960088064161035,
+      "flipped_fraction_min": 0.48623997483881115,
+      "flipped_fraction_sd": 0.003544520758093912,
+      "live_log_R": -0.0027645550353657122,
+      "method": "side_label_derangement_exit_matched",
+      "n_distinct_null_values": 2000,
+      "n_null_draws": 2000,
+      "n_reresolved_flips_available": 19077,
+      "n_seeds": 2000,
+      "null_mean": -0.004209994657362595,
+      "null_q05": -0.03533322666779373,
+      "null_q50": -0.0038137893941874723,
+      "null_q95": 0.026128405275866115,
+      "null_sd": 0.018596785278397802,
+      "percentile": 0.5215,
+      "plant_curve": {
+        "detection": {
+          "10.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.3023751944443931,
+            "sigma_units": 0.19638250163139642
+          },
+          "20.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.6028107366922244,
+            "sigma_units": 0.39276500326279284
+          },
+          "40.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 1.24455415567086,
+            "sigma_units": 0.7855300065255857
+          },
+          "5.0": {
+            "detection_rate_vs_null": 1.0,
+            "planted_log_R": 0.15683739113474432,
+            "sigma_units": 0.09819125081569821
+          }
+        },
+        "live_log_R": -0.0027645550353657122,
+        "n_null_draws": 2000,
+        "plant_base": "null_equivalent_one_derange_draw",
+        "plant_base_log_R": 0.014411144846489865,
+        "rungs_bps": [
+          5.0,
+          10.0,
+          20.0,
+          40.0
+        ],
+        "sigma_hat_bps": 50.92103378319152
+      }
+    }
+  },
+  "spread_cost_disclosure": {
+    "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
+    "implication": "reported cost understates total cost; reported net performance is overstated",
+    "note_amendment_c5": "cost enters NO estimand, threshold or comparison; p_be_net is DISCLOSED REFERENCE only",
+    "prohibited_claims": [
+      "fully-net",
+      "cost-complete",
+      "tradable",
+      "deployable"
+    ],
+    "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+    "spread_rt_bps": null
+  }
+}

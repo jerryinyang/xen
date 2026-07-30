@@ -19,6 +19,7 @@ from config import (
     BOOT_SEEDS,
     BLOCK_RULE_CLAUSES,
     DECILE_WARMUP_SHAT,
+    DERIVED_VARIANTS,
     L4_HOLD_HOURS,
     MOD_HOLD_MIN_PRIOR_TRANS,
     RESULTS_DIR,
@@ -544,17 +545,37 @@ def check_block_rule(episodes: pd.DataFrame, metrics_rows: list, n_boot: int) ->
                 "reason": row.get("log_R_suppressed_reason") or "SIZING_VARIANT",
             })
         elif not ps:
+            # AMENDMENT-20: exactly two conditions exempt a cell from carrying a CI, and
+            # "few calendar days" is neither. The claimed token is re-derived here from the
+            # cell's OWN p / W / L / log_R / n_dates and must match; the withdrawn
+            # `n_dates < 7` reason had been absorbing 13 cells it does not describe.
             n_dates = row.get("n_dates")
-            # the {1,3,7}-day sweep cannot form a 7-day block on fewer than 7 calendar days;
-            # n_dates < 2 was too tight and left real thin cells unclassified (R9-04 smoke)
-            min_dates = max(BOOT_BLOCKS_DAYS)
-            if isinstance(n_dates, (int, float)) and n_dates < min_dates:
-                reason = f"n_dates < {min_dates} (min day-block in {{1,3,7}} sweep)"
-            elif not isinstance(n_dates, (int, float)):
-                reason = None  # unvalidated — must fail
+            claimed = row.get("ci_absent_reason")
+
+            # Undefinedness is re-derived from the cell's OWN p / W / L — NOT from its `log_R`
+            # field, which the remedy blanks, and which would therefore make this check agree
+            # with itself on every row (QA run 11, R11-02).
+            log_r_undefined = not metrics.log_R_is_defined(
+                row.get("p"), row.get("W"), row.get("L")
+            )
+            too_few_days = isinstance(n_dates, (int, float)) and n_dates < 2
+            # A DERIVED row (an interaction term) carries p/W/L = NaN by construction, so the
+            # undefinedness test is vacuous on it and cannot be an exemption. Such a row must
+            # not be emitted without a CI at all (§12 eligibility, AMENDMENT-20) — if one
+            # appears here it stays unclassified and fails.
+            if vid in DERIVED_VARIANTS:
+                admissible = {}
             else:
-                reason = None  # enough dates but empty battery → real defect
-            entry = {**meta, "reason": reason}
+                admissible = {
+                    "LOG_R_UNDEFINED": log_r_undefined,
+                    "N_DATES_LT_2_NO_DAY_BLOCK": too_few_days,
+                }
+            reason = claimed if admissible.get(claimed) else None
+            entry = {
+                **meta, "reason": reason, "claimed_reason": claimed,
+                "log_R_undefined": log_r_undefined, "n_dates_lt_2": too_few_days,
+                "p": row.get("p"), "W": row.get("W"), "L": row.get("L"), "n": row.get("n"),
+            }
             if reason is None:
                 unclassified.append(entry)
             else:
@@ -582,7 +603,10 @@ def check_block_rule(episodes: pd.DataFrame, metrics_rows: list, n_boot: int) ->
         "suppressed_log_R_cells": suppressed_log_r,
         "n_unclassified_cells": len(unclassified),
         "unclassified_cells": unclassified,
-        "degenerate_reason_required": f"n_dates < {max(BOOT_BLOCKS_DAYS)}",
+        "degenerate_reason_required": (
+            "one of LOG_R_UNDEFINED | N_DATES_LT_2_NO_DAY_BLOCK, validated against the "
+            "cell's own p/W/L/log_R/n_dates (AMENDMENT-20; n_dates < 7 withdrawn)"
+        ),
     }
     # 5 the canonical library call, and the effective block capped < n
     boot_eq = {"equivalent": False, "reason": "not run"}

@@ -427,7 +427,17 @@ def _add_interaction_rows(
                         ("k12", "L2_LEVEL_RMARKOV_K12"),
                         ("joint", "L2_JOINT_HMM_HIGH_AND_K12_HIGH"),
                     ):
-                        if by.get((clock, float(delta), scope, band, vid)) is None:
+                        src = by.get((clock, float(delta), scope, band, vid))
+                        if src is None:
+                            arms = {}
+                            break
+                        # AMENDMENT-20 eligibility: the interaction of an arm whose own log R is
+                        # undefined is undefined. Such a term is NOT BUILT rather than emitted
+                        # and then exempted — there is nothing to measure when an input arm has
+                        # a one-sided outcome set (QA run 11, R11-03).
+                        if not metrics.log_R_is_defined(
+                            src.get("p"), src.get("W"), src.get("L")
+                        ):
                             arms = {}
                             break
                         a = _arm_arrays(arm_idx, vid, clock, delta, scope, band)

@@ -1,0 +1,174 @@
+{
+  "n_checks": 22,
+  "note": "L-51 on every selected subset the design reports separately: L1 d>=5/7/9, L2 state cells (shock/k4/k12/joint), L3 gates (fires/does-not-fire/med5), both clocks, cells above vs below median mde50",
+  "required_subsets": [
+    "L1_SHAT_DECILE_GE5",
+    "L1_SHAT_DECILE_GE7",
+    "L1_SHAT_DECILE_GE9",
+    "L2_SHOCK_HMM",
+    "L2_LEVEL_RMARKOV_K4",
+    "L2_LEVEL_RMARKOV_K12",
+    "L2_JOINT_HMM_HIGH_AND_K12_HIGH",
+    "L3_TGTCUR_FIRES",
+    "L3_TGTCUR_DOES_NOT_FIRE",
+    "L3_TGTMED5_CO_REPORT",
+    "MDE50_ABOVE_MEDIAN",
+    "MDE50_BELOW_MEDIAN"
+  ],
+  "subsets": {
+    "L1_SHAT_DECILE_GE5|H1": {
+      "excluded_mean_vs_median_gap": 6.673562376624013,
+      "n_excluded": 32495,
+      "n_selected": 24789,
+      "payoff_scale_ratio": 1.791309488619598,
+      "sign_share_differential": 0.014709406000282532
+    },
+    "L1_SHAT_DECILE_GE5|M15": {
+      "excluded_mean_vs_median_gap": 2.559155211480573,
+      "n_excluded": 111569,
+      "n_selected": 78053,
+      "payoff_scale_ratio": 1.7590445269017088,
+      "sign_share_differential": 0.011664096445216654
+    },
+    "L1_SHAT_DECILE_GE7|H1": {
+      "excluded_mean_vs_median_gap": 6.59667767355645,
+      "n_excluded": 41397,
+      "n_selected": 15887,
+      "payoff_scale_ratio": 1.9642857142857246,
+      "sign_share_differential": 0.013065136308518965
+    },
+    "L1_SHAT_DECILE_GE7|M15": {
+      "excluded_mean_vs_median_gap": 2.3882520837790686,
+      "n_excluded": 141273,
+      "n_selected": 48349,
+      "payoff_scale_ratio": 1.9238419462189638,
+      "sign_share_differential": 0.008433058633868062
+    },
+    "L1_SHAT_DECILE_GE9|H1": {
+      "excluded_mean_vs_median_gap": 7.1710526882339884,
+      "n_excluded": 49291,
+      "n_selected": 7993,
+      "payoff_scale_ratio": 2.172570103310118,
+      "sign_share_differential": 0.006043465642255885
+    },
+    "L1_SHAT_DECILE_GE9|M15": {
+      "excluded_mean_vs_median_gap": 2.4373654783736445,
+      "n_excluded": 165690,
+      "n_selected": 23932,
+      "payoff_scale_ratio": 2.1885680854594463,
+      "sign_share_differential": 0.00868733074403677
+    },
+    "L2_JOINT_HMM_HIGH_AND_K12_HIGH|H1": {
+      "excluded_mean_vs_median_gap": 8.082822517366022,
+      "n_excluded": 47782,
+      "n_selected": 9502,
+      "payoff_scale_ratio": 1.648986521610475,
+      "sign_share_differential": 0.009263659501759225
+    },
+    "L2_JOINT_HMM_HIGH_AND_K12_HIGH|M15": {
+      "excluded_mean_vs_median_gap": 2.4162342882384946,
+      "n_excluded": 160737,
+      "n_selected": 28885,
+      "payoff_scale_ratio": 1.582951791004587,
+      "sign_share_differential": 0.008132845869310346
+    },
+    "L2_LEVEL_RMARKOV_K12|H1": {
+      "excluded_mean_vs_median_gap": 11.305801687643514,
+      "n_excluded": 22275,
+      "n_selected": 35009,
+      "payoff_scale_ratio": 0.8316955083648903,
+      "sign_share_differential": 0.010648977793305037
+    },
+    "L2_LEVEL_RMARKOV_K12|M15": {
+      "excluded_mean_vs_median_gap": 2.84625341673857,
+      "n_excluded": 78781,
+      "n_selected": 110841,
+      "payoff_scale_ratio": 0.8365223170706826,
+      "sign_share_differential": -0.003503789910926647
+    },
+    "L2_LEVEL_RMARKOV_K4|H1": {
+      "excluded_mean_vs_median_gap": 11.197063943918717,
+      "n_excluded": 22052,
+      "n_selected": 35232,
+      "payoff_scale_ratio": 0.8357975928206823,
+      "sign_share_differential": 0.010688050826038076
+    },
+    "L2_LEVEL_RMARKOV_K4|M15": {
+      "excluded_mean_vs_median_gap": 2.6775270835714227,
+      "n_excluded": 77590,
+      "n_selected": 112032,
+      "payoff_scale_ratio": 0.8417588807676959,
+      "sign_share_differential": -0.003735366558746067
+    },
+    "L2_SHOCK_HMM|H1": {
+      "excluded_mean_vs_median_gap": 6.754786907732911,
+      "n_excluded": 42725,
+      "n_selected": 14559,
+      "payoff_scale_ratio": 1.8264085664365697,
+      "sign_share_differential": 0.010359534405859183
+    },
+    "L2_SHOCK_HMM|M15": {
+      "excluded_mean_vs_median_gap": 2.4395550256405234,
+      "n_excluded": 143565,
+      "n_selected": 46057,
+      "payoff_scale_ratio": 1.7448198977434468,
+      "sign_share_differential": 0.009769737924154975
+    },
+    "L3_TGTCUR_DOES_NOT_FIRE|H1": {
+      "excluded_mean_vs_median_gap": 8.07580552051131,
+      "n_excluded": 33923,
+      "n_selected": 23361,
+      "payoff_scale_ratio": 1.0658730158730279,
+      "sign_share_differential": 0.00425317695382027
+    },
+    "L3_TGTCUR_DOES_NOT_FIRE|M15": {
+      "excluded_mean_vs_median_gap": 2.4588393376583086,
+      "n_excluded": 110788,
+      "n_selected": 78834,
+      "payoff_scale_ratio": 1.0829412905219096,
+      "sign_share_differential": -0.000988959247996024
+    },
+    "L3_TGTCUR_FIRES|H1": {
+      "excluded_mean_vs_median_gap": 9.10300296830167,
+      "n_excluded": 26539,
+      "n_selected": 30745,
+      "payoff_scale_ratio": 0.8343994739044428,
+      "sign_share_differential": -0.004052661058333185
+    },
+    "L3_TGTCUR_FIRES|M15": {
+      "excluded_mean_vs_median_gap": 3.9224260904662382,
+      "n_excluded": 89584,
+      "n_selected": 100038,
+      "payoff_scale_ratio": 0.8155232311626841,
+      "sign_share_differential": -0.0005180281367274109
+    },
+    "L3_TGTMED5_CO_REPORT|H1": {
+      "excluded_mean_vs_median_gap": 9.626045704448348,
+      "n_excluded": 15317,
+      "n_selected": 41967,
+      "payoff_scale_ratio": 0.728735208468075,
+      "sign_share_differential": -0.0034719841289568287
+    },
+    "L3_TGTMED5_CO_REPORT|M15": {
+      "excluded_mean_vs_median_gap": 3.8623689185642003,
+      "n_excluded": 51239,
+      "n_selected": 138383,
+      "payoff_scale_ratio": 0.723179097941925,
+      "sign_share_differential": -0.002312518965134014
+    },
+    "MDE50_ABOVE_MEDIAN": {
+      "excluded_mean_vs_median_gap": 1.5345335062777543,
+      "n_excluded": 3998790,
+      "n_selected": 1262399,
+      "payoff_scale_ratio": 1.3687393264088747,
+      "sign_share_differential": -0.031823141718763714
+    },
+    "MDE50_BELOW_MEDIAN": {
+      "excluded_mean_vs_median_gap": 7.883958453086036,
+      "n_excluded": 1262399,
+      "n_selected": 3998790,
+      "payoff_scale_ratio": 0.7305993045612809,
+      "sign_share_differential": 0.031823141718763714
+    }
+  }
+}

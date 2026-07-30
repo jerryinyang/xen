@@ -4351,3 +4351,1167 @@ the measurement path is not required.
   the degenerate-exemption pattern, the plant-curve base, the tripwire twin construction — are the
   kind a sibling implementation repeats. **That directory needs its own QA run; do not infer its
   state from this one.**
+
+---
+
+## QA run 10 — 2026-07-29T22:21:14Z — mode: subagent — HEAD 1979b93 (SPDR-019 unchanged since `bb92447`)
+
+**Reviewed git state:** `HEAD 1979b93648c41fad74458b86a3bb96bff2244012`.
+`git diff bb92447 HEAD -- python/experiments/SPDR-019/` is **empty** — the one commit on top
+(`1979b93`) is SPDR-020 only. `git status -- python/experiments/SPDR-019/` shows only the seven
+untracked `results/*.json` smoke artifacts. `git diff HEAD -- screen_code/ design.md` is empty at
+the end of this review: every fault injection below was an **in-memory monkeypatch**, no file in
+the experiment tree was edited, and the pre-existing smoke artifacts were copied to scratch before
+I re-ran the smoke over them.
+**Stage:** IMPLEMENTATION QA, narrow re-review of one remediation commit.
+**Scope (as authorised):** verify closure of the 17 run-9 findings **R9-01 … R9-17** against
+commit `bb92447`; confirm nothing in that diff moved a computed estimand, threshold or comparison;
+re-run the sanctioned 2-symbol smoke. Run 9 pre-declared this scoping and its reason: the
+corrections change what is *checked*, not what is *computed*. I honoured it — no run-8 finding is
+re-litigated and the measurement path is re-audited only where the diff touched it (`fills.mfe_bps`
+only, see R9-13).
+**Independence:** fresh subagent context. I authored none of the design, none of the
+implementation, and none of the earlier QA runs. Read in full: `git show bb92447` (683 insertions /
+143 deletions across 11 files), run 9 in full, the current `tripwires.py`, `integrity.py`,
+`controls.py`, `golden.py`, `selfcheck.py`, `selection.py`, `config.py`, the changed hunks of
+`run_screen.py` and `fills.py`, and `design.md` §6/§6.1/§9/§11/§12/§15 plus the AMENDMENT ledger.
+
+**Verdict: APPROVE.**
+
+**Execution authorisation: YES.**
+
+All 17 run-9 findings are closed. **The three HIGH ones are closed by execution, not by reading:**
+I reverted each fix in memory and watched the HARD check flip to `False` on its own subject.
+`check_parent_provenance` now rejects the exact garbage payload run 9 used to break it. Nothing in
+the diff moved a number: `episodes.parquet` is bit-identical in size and content to run 9's
+(617,197 rows), `metrics_by_cell.parquet` is 1,758 rows as before, `metrics.py`, `engine.py`,
+`entry.py`, `panel.py`, `parent_gates.py` and `catalog_io.py` are untouched by the commit, and the
+three predeclaration hashes are unchanged. My independent smoke reproduces `all_hard_pass: true`
+with `hard_fail_names: []` at 28/28.
+
+Six residual observations are recorded below as **R10-01 … R10-06**. None is a blocker: five are
+disclosure or check-strength notes on already-closed findings, and one (**R10-01**) is a ledger-
+hygiene gap in `design.md` that changes no number, gate, band or population. They are listed so the
+operator and the data-analyst can see them, not to withhold authorisation.
+
+---
+
+### PART A — run-9 close-out
+
+| Finding | Status | Evidence I produced |
+|---|---|---|
+| **R9-01** — HIGH — TRIPWIRE-1 never reaches L1 or any L4 arm | **CLOSED — CONFIRMED by fault injection (both limbs)** | `tripwires._rebind_signal_shat:94-124` re-freezes `s_hat_bps` / `s_hat_decile` / `s_hat_rank` from each panel onto its own Signal stream (`:159-160`), and `tripwire_1:134-136` now shifts those three ŝ source arrays as well; `LAYER_VARIANTS:42-47` adds the four `L4_HOLD_*H_MOD` ids and L4 goes through `engine._build_variant` (`:168-174`) rather than `select_layer_from_l0`, so a shifted `p_stay` can move `exit_ts`. **Clean run on BTCUSDT H1 δ=0.5:** 15 variants compared, `changed_selection_episodes` 372 (was 122), L1 d≥5/7/9 symmetric differences **25 / 21 / 16** (were 0/0/0), L4 4H/12H/20H **38 / 71 / 79** (were absent). **Injection A** — `_rebind_signal_shat` replaced by the identity, i.e. exactly the pre-fix state: L1 differences collapse to **0 / 0 / 0**, `per_variant_required_nonzero_held` **False**, `hard_pass` **False**. **Injection B** — `engine._build_variant` forced onto the legal panel for L4 ids only: L4 differences **0 / 0 / 0**, `hard_pass` **False**. The pooled-sum blindfold is gone: `per_variant_ok` (`:201-205`) requires a non-zero difference from *every* threshold variant whose own gate array the shift actually changed. |
+| **R9-02** — HIGH — TRIPWIRE-2's favourable twin never calls the exit resolver | **CLOSED — CONFIRMED by fault injection (clauses 3 and 4 separately)** | `tripwire_2:316-331` now makes **two** real calls to `resolve_target_trail_time` on the same target+trail pair, `favourable_precedence=False` and `True`, both anchored identically at `hit-1` so the both-reachable bar is the first bar scanned; every price, reason and `r` in the payload comes from the returned `ExitFill` (`:334-355`). Clean: all four both-reachable bars resolve **adverse → `TRAIL`, favourable → `TARGET`** — the branch is alive. **Injection C** — the resolver wrapped to force `favourable_precedence=False` (the pre-fix dead branch): `count_favourable_diff` **0** against `count_both_reachable` **4**, `hard_pass` **False**. Clause 3 therefore measures something. **Injection D** — precedence inverted so the favourable twin is *worse*: `favourable_price_never_worse` **False**, `hard_pass` **False**. Clause 4 therefore measures something. The G7 row changed accordingly — adverse 23606.5 / `TRAIL`, favourable 23493.672 / `TARGET`, `r` −25.056 / +22.859 — no longer the exact-negative signature run 9 flagged as the tautology's fingerprint. The arm's own exit is disclosed separately as `arm_exit_price` / `arm_exit_reason` (see **R10-02** for the residual naming point). |
+| **R9-03** — HIGH — PARENT-GATE PROVENANCE passes on garbage | **CLOSED — CONFIRMED by execution on five payloads** | `integrity.check_parent_provenance:179-253` now (a) requires real gate structure per row, (b) asserts the pinned model/field tokens are present in `parent_gates.py` (`_PINNED_GATE_TOKENS`, `:165-171`), (c) asserts `attach_gates` calls `_hold_forward` and that the no-backfill rule text is present, and (d) scans both the panel-bound arrays and every episode column for the forbidden outcome labels `y`, `mag_k1`, `next_abs_oo`, `run_len_` (`:172`). **Executed against the smoke's 617,197-row `episodes.parquet`:** real payload → `True`; run 9's exact breaker `{"rows":[{"junk":1}]}` → **False** ("parent parity rows carry no gate structure"); a `y` column added to episodes → **False**; a `mag_k1_realised` column added → **False**; `{"rows":[]}` → **False**. The §12 clause that names `y` and the swing magnitude a hard failure is now the clause the code enforces. |
+| **R9-04** — MEDIUM — block-rule exemption uncapped, unvalidated, sizing rows silently dropped | **CLOSED — CONFIRMED by execution** | `integrity.check_block_rule:491-565` splits every row with a `per_seed_ci` into four named buckets and requires each degenerate cell to carry a validated thinness reason; `unclassified` is fatal. **Reconciliation is now exact:** 1,649 with a CI + 1 degenerate + 108 suppressed-`log R` + 0 unclassified = **1,758 = every metric row**. The 108 sizing rows are the named third bucket, each with `per_seed_ci_len 15` and `reason SIZING_VARIANT_MAY_NOT_CARRY_A_LOG_R_CLAIM`; the single degenerate cell carries `reason "n_dates < 7 (min day-block in {1,3,7} sweep)"`; `degenerate_cells` is emitted in full, no 50-row truncation. **Fails on:** a degenerate cell with 500 dates and an empty battery → `held False`, `unclassified 1`; a non-sizing row with a 3-entry battery and null `ci_low` → `held False`; a sizing row with a 7-entry battery → `held False`; a degenerate cell with non-numeric `n_dates` → `held False`; a cell with 5 per-seed CIs → `held False`, `min_observed 5`. See **R10-03** for what the fix does *not* do. |
+| **R9-05** — MEDIUM — control battery coupled to `--n-boot` | **CLOSED — CONFIRMED by execution** | `config.py:225-228` pins `CONTROL_N_SEEDS = 2000` with three `assert len(...) >= CONTROL_N_SEEDS` guards; `run_screen.py:850` reads it instead of `min(2000, max(50, n_boot))`; `_run_controls:624` passes `n_ctrl` to the magnitude-matched comparator too (was `min(n_ctrl, 500)`). My smoke at `--n-boot 200` emitted `n_ctrl_seeds_pinned 2000` and `n_seeds 2000` on **all eleven** side-derangement arms, on `entry_timing` and on `magnitude_matched`. `selfcheck.py:224-241` now makes the seed count part of the HARD verdict: emulating the predicate, `n_seeds 200` → **False**, `fixed_point_count 3` → **False**, the real payload → **True**. |
+| **R9-06** — MEDIUM — plant curve saturates, §6's UNUSABLE clause inoperable | **CLOSED in mechanism — residual is a design rung-grid limit, not a code defect** | `controls.plant_curve:282-334` plants onto a **null-equivalent base** — one deterministic exit-matched side-derangement draw (`plant_base: null_equivalent_one_derange_draw`) — not onto the live series. Verified across all eleven arms: the base sits at or near the null median on most arms (e.g. `L4_TARGET_A2_MOD` base −0.0480 vs `null_q50` −0.0419; `A3_MOD` −0.0123 vs −0.0294), and two arms now emit a rate of **0.9995, not 1.0**, which proves the rate is a measured quantity rather than a construction. **The curve is nonetheless still 1.0 at every rung, and I checked why:** on `L0_BASELINE` a 5 bps plant moves `log R` by 0.1869 = **2.43 null sd**, so even a perfectly median base would detect at ≈0.99. The design's finest declared rung is simply coarser than the control's own resolution. Two consequences: no control is UNUSABLE for any effect the design declares, which is the favourable direction; and run 9's stated expectation ("rises from ≈ α at the finest rung") was **analytically unreachable** — a null-equivalent base scored against its own null gives ≈0.5 at zero plant by construction, never α. The mechanism defect is fixed; locating the resolution numerically needs finer rungs, which is `quant-designer`'s object. See **R10-04**. |
+| **R9-07** — MEDIUM — L-51 covers 5 of the named subsets, verified only by count | **CLOSED — CONFIRMED by execution** | `run_screen.py:899-1028` builds ten layer subsets across **both clocks** plus the `MDE50_ABOVE_MEDIAN` / `MDE50_BELOW_MEDIAN` split; `selection.py:52-61` emits `required_subsets`. Smoke: `n_checks` **22** (was 5), subsets = the ten layer ids × {H1, M15} + the two mde50 cells, **12 of 12 required tokens covered**. `selfcheck.py:295-307` now scores token coverage, not just presence: run-9's five-subset payload → **False** (covered 5); nine tokens → **False**; the real payload → **True**. See **R10-05** on the floor. |
+| **R9-08** — MEDIUM — DECILE CAUSALITY separates only the worst case; `warm_up_ok` a literal | **CLOSED — CONFIRMED by execution on three limbs** | `integrity.check_decile_causality:256-352` adds a per-symbol decile-median fingerprint limb and computes `warm_up_ok` from `decision_idx` against `DECILE_WARMUP_SHAT`. Clean: overlap 45, 1 symbol pair compared, 0 identical fingerprints, `warm_up_ok True`, `n_episodes_below_warmup 0`, `warmup_threshold_decision_idx 250`. **Fails on:** a pooled quantile edge applied identically to both symbols → `False`, overlap collapses to **0**; five episodes forced to `decision_idx 0` → `False`, `warm_up_ok False`, `n_below 5`; the `decision_idx` column removed → `False`. The literal is gone. |
+| **R9-09** — MEDIUM — L4 COMPARATOR tests only the ATR half | **CLOSED — CONFIRMED by execution on both halves** | `integrity.check_l4_comparator:72-131` now asserts `arm_ok = (not atr_prop) and shat_prop` for MOD and `(not atr_prop) and (not shat_prop)` for UNMOD, via a new `_is_proportional:146-161` that requires the denominator to actually vary (so two flat series are not read as proportionality) and requires ≥2 finite widths — closing the one-episode-arm hole run 9 noted. Clean: all ten arms `ok True` with the correct pattern (five MOD `width_over_shat_is_constant True`, five UNMOD `False`, all ten `width_over_atr_is_constant False`). **Fails on:** a MOD arm forced to a constant 1% width → `L4_TARGET_A1_MOD ok False`, `shat_half_held False`; an UNMOD arm forced ŝ-proportional → `L4_TARGET_A1_UNMOD ok False`. |
+| **R9-10** — MEDIUM — TRIPWIRE-2 symbol chosen by whether its HARD condition holds | **CLOSED — CONFIRMED** | `config.py:229-230` pre-declares `TRIPWIRE_SYMBOL = "BTCUSDT"` with the comment stating it is never selected by a passing clause; `run_screen.py:959-982` reads the anchor by name, labels any fallback (`anchor_fallback`, `declared_anchor`), and **pools** the structural counts across every symbol that ran a tripwire. Smoke: `symbol BTCUSDT`, `pooled {count_clock_vs_m1 1785, count_both_reachable 12, count_favourable_diff 12, n_symbols_pooled 2, symbols [BTCUSDT, ETHUSDT]}`, and `tw2["hard_pass"]` is **conjoined** with `pooled count_both_reachable > 0` (`:991-993`) — the pooling can only tighten, never rescue. The selection-by-passing loop is deleted. |
+| **R9-11** — LOW — MOD-HOLD tests a different predicate from §12 | **CLOSED — CONFIRMED by execution** | `integrity.check_mod_hold:426-489` joins each MOD arm to its UNMOD twin on `(symbol, clock, delta, decision_end_ns, side)` and requires at least one shared episode to differ — §12's predicate, not `ptp > 0`. Clean: h=1 27,036 compared / 26,502 identical; h=4 11,543 / 11; h=12 4,234 / 3; h=20 2,527 / 66; all four `differs_from_unmod True`. **Fails on:** the 4H MOD holds overwritten with their UNMOD twin's value on every shared key → `False`. Run 9's warning about the h=1 arm is now **quantified rather than argued**: 98.0% of its compared episodes carry a hold identical to UNMOD, so that pair is close to §12's hard-failure condition and separates on 534 episodes only. Carried forward as **R10-06**, not as a blocker — §12's predicate is "identical on every episode", and it is not. |
+| **R9-12** — LOW — G6/G7 hardcoded sub-clauses | **CLOSED — CONFIRMED by execution** | `golden._assert_trail_ratchets_on_m1_closes:206-219` and `_assert_time_exit_at_decision_bar_open:222-232` compute both G7 sub-clauses from the resolver source, including the ordering constraint (ratchet update must appear *after* the trigger test). Both return `True` on the real source and **`False`** when I swap the resolver for a token-free stub. G6's `legal_variant_is_the_emitted_one` is no longer a literal: `g6_from_tripwire1` returns `FAIL` on an empty `per_variant`, on `changed_state_rows 0`, on `changed_selection_episodes 0` and on `shift_is_exact_one_row False`. The G7 `filled_under_adverse_precedence` field now reads the resolver's own reason (`TRAIL`) instead of the string literal. See **R10-02** for the residual on the G6 field's *name*. |
+| **R9-13** — LOW — entry M1 bar excluded from exits but included in κ's MFE | **CLOSED — CONFIRMED** | `fills.mfe_bps:264-299`: `start_i = fill_m1_idx + 1`, with the `end_i <= start_i` guard moved onto the same window. The MFE scan now matches AMENDMENT-19(b)'s exit window. I confirmed the containment claim: κ appears only at `metrics.py:440-445` where it is emitted with `kappa_status "DISCLOSURE_ONLY"`, and `design.md:455` states it multiplies nothing — so this is the **only** estimand-adjacent line in the diff and it touches a disclosure diagnostic, not an estimand. |
+| **R9-14** — LOW — derangement emits the permutation fixed-point count, not the alignment | **CLOSED — CONFIRMED, and booked in the design** | `controls.side_derangement:113, 127-131` emits `flipped_fraction_mean/sd/min/max` alongside the fixed-point count. Smoke `L0_BASELINE`: **mean 0.4991, sd 0.0120, min 0.4550, max 0.5411** — the ≈half-retained figure the finding predicted, and the direct analogue of VAL-008's alignment disclosure. Booked in the design too: the CONTROL SIDE-DERANGEMENT block and AMENDMENT-19(a) both now require the emission, which is what run 9 routed jointly to `quant-designer`. (The manner of that design edit is **R10-01**.) |
+| **R9-15** — LOW — dead `expanding_rank` in the hashed tree | **CLOSED — CONFIRMED** | `grep -rn expanding_rank screen_code/` → **0 hits** (excluding `__pycache__`). `expanding_decile_edges` remains and is live. |
+| **R9-16** — LOW — interaction rows carry no §9 band label | **CLOSED — CONFIRMED** | `run_screen.py:444-463` derives `mirror_band` from the interaction row's own `ci_low`/`ci_high`. Smoke: all **48** interaction rows carry `COVERS_THE_MIRROR`; null `mirror_band` is now **exactly 108 rows**, all of them the deliberately suppressed sizing cells (`L4_SIZE_MOD` 54, `L4_SIZE_UNMOD` 54). The 48 unexplained nulls run 9 counted are gone. |
+| **R9-17** — LOW — two stale design statements | **CLOSED — CONFIRMED, and the ledger arithmetic re-derived** | `design.md:1095` now reads "`--resume` is not a flag of this screen"; `design.md:1341-1342` now reads "within AMENDMENTS 12-18 the TIGHTER streak is five rows (12 and 14 are NEUTRAL)". I recounted from the DIRECTION lines rather than trusting either text: amendments in file order 12(NEUTRAL, `:1225`), 14(NEUTRAL, `:1233`), 15(TIGHTER, `:1239`), 16(TIGHTER, `:1244`), 13(TIGHTER, `:1252`), 17(TIGHTER, `:1271`), 18(TIGHTER, `:1290`) — **five consecutive TIGHTER**, correct as amended, and still ≥3 so the L-23 clause-3 flag stands. Whole-ledger recount: 4 LOOSER / 9 TIGHTER / 6 NEUTRAL across 19 rows, and 3 / 8 / 6 active after the two supersessions — both match `design.md:1338-1340` exactly. |
+
+**Close-out count: 17 of 17.** Three closed by injection on the HIGH subject itself, eleven more closed by execution, three (R9-15, R9-16, R9-17) closed by direct inspection of the artifact or the file.
+
+---
+
+### PART B — did the diff move a number?
+
+This is the question run 9's scoping rests on, so I tested it rather than assumed it.
+
+| Surface | Finding |
+|---|---|
+| **Estimand modules** | `metrics.py`, `engine.py`, `entry.py`, `panel.py`, `parent_gates.py`, `catalog_io.py` appear in **no hunk** of `bb92447` (11 files changed; these are not among them). Episode generation, gate attachment and the `(p, W, L, log R)` computation are byte-identical to the code run 9 reviewed. |
+| **`fills.py`** | One hunk, nine lines, entirely inside `mfe_bps`. κ is `DISCLOSURE_ONLY` (`metrics.py:445`) and multiplies nothing (`design.md:455`). No estimand, threshold or comparison reads it. |
+| **Episode and cell counts** | 617,197 episodes and 1,758 metric rows in my run — identical to the counts run 9 reported from the pre-fix code, and identical to the developer's post-fix smoke. |
+| **Predeclaration** | `resolution_basis.json 23d5f5bf1eb16d00…`, `expected_resolution.json e3247798edc9ab90…`, `expected_resolution_prior.json 961cec28e28f6ff3…` — all three match the values recorded in runs 7, 8 and 9. The files are untouched by the commit and by my run. |
+| **Thresholds and comparisons** | The only numeric constants the diff introduces are `CONTROL_N_SEEDS = 2000` (raising a battery size the design already mandated at ≥2000), `TRIPWIRE_SYMBOL = "BTCUSDT"` (an anchor label), and `n_dates < max(BOOT_BLOCKS_DAYS)` as the degenerate-exemption predicate. None enters an estimand, a band, a gate or a §9 comparison. `mirror_band` on interaction rows is **derived** from a `ci_low`/`ci_high` pair that was already computed and emitted. |
+| **Reproducibility of my run vs the developer's** | `controls.json`, `selection_check.json`, `parent_gate_parity.json`, `golden_traces.json`, `unit_pin.json` are **byte-identical**. `integrity_selfcheck.json` differs in exactly one place: the order of a five-element column-name list inside the `log R never unaccompanied` detail (Python set iteration order). Same `code_sha256 4fcea2d049c0745d…`. |
+
+**Answer: no.** The diff changes what is checked, what is emitted as disclosure, and what a control's plant curve is scored against. It does not change what is measured.
+
+---
+
+### PART C — the sanctioned smoke, re-run by me
+
+Command, exactly as authorised: `python run_screen.py --smoke --n-boot 200 --jobs 2` (2 symbols,
+TRAIN only, phase (a), 33 variants). I copied the seven pre-existing `results/*.json` to scratch
+first, so the developer's 20:44 emission is preserved and was diffed against mine.
+
+```
+predeclaration OK  basis=23d5f5bf1eb16d00…  expected=e3247798edc9ab90…
+symbols=2  jobs=2  n_boot=200
+determinism: re-running 1 symbol sequential… determinism OK 830aeed4747f vs 830aeed4747f
+episodes=617197  signals=1260603   scoring 1710 cells
+done in 3.6 min  hard_pass=True  fails=[]
+```
+
+`run_summary.json`: `all_hard_pass true`, `hard_fail_names []`, `n_hard_checks 28`,
+`expected_hard_checks 28`, 617,197 episodes, 1,758 metric rows, 33 variants, 214 s.
+Every one of the 28 checks reads `held: true`, `severity: HARD`. The determinism check ran
+unconditionally at `--jobs 2` and matched the sequential hash.
+
+**I verified the pre-existing 20:44 emission as well** rather than only my own: it carries the same
+28/28, the same counts and the same `code_sha256`, and — apart from the one set-ordering artifact
+above — the same payloads. The two runs are the same run.
+
+---
+
+### PART D — can the three restored HARD checks fail? (P-23 / L-52)
+
+Every row below is an executed result, not a reading of the source. All patches were in-memory;
+`git diff HEAD -- screen_code/` is empty.
+
+| Check | Clean | Injection | Result |
+|---|---|---|---|
+| **TRIPWIRE-1** L1 limb | `hard_pass True`, L1 d≥5/7/9 = 25/21/16 | `_rebind_signal_shat` → identity (pre-fix state) | L1 = **0/0/0**, `per_variant_required_nonzero_held` **False**, `hard_pass` **False** |
+| **TRIPWIRE-1** L4 limb | L4 4H/12H/20H = 38/71/79 | `engine._build_variant` pinned to the legal panel for L4 ids | L4 = **0/0/0**, `hard_pass` **False** |
+| **TRIPWIRE-2** clause 3 | `count_both_reachable 4`, `count_favourable_diff 4`, reasons TRAIL vs TARGET on all 4 | resolver forced to `favourable_precedence=False` | `count_favourable_diff` **0**, `hard_pass` **False** |
+| **TRIPWIRE-2** clause 4 | `favourable_price_never_worse True` | precedence inverted (favourable twin made worse) | `favourable_price_never_worse` **False**, `hard_pass` **False** |
+| **PARENT-GATE PROVENANCE** | `True` on the real 4-row payload | `{"rows":[{"junk":1}]}` | **False** |
+| " | " | episode column `y` added | **False** |
+| " | " | episode column `mag_k1_realised` added | **False** |
+| " | " | `{"rows":[]}` | **False** |
+
+Also re-confirmed failable, on the same standard, for the MEDIUM/LOW fixes: BLOCK RULE (five
+distinct injections), DECILE CAUSALITY (three), L4 COMPARATOR IDENTITY (two, one per half),
+MOD-HOLD ELIGIBILITY (one), derangement fixed-point/seed-count (two), L-51 coverage (two), and both
+G7 sub-clauses (one each). **The two exemptions in TRIPWIRE-1 are principled and disclosed, not
+convenient:** `L1_SHAT_RANK_CONTINUOUS` is eligibility-only (its selection is finiteness, not a
+threshold) and `L4_HOLD_1H_MOD` is clip-insensitive because `h_mod = clip(h·E_run/20, 1, 20)` pins
+h=1 at 1.0 for any `E_run ≤ 20`. Both still **run** and both report their zero in `per_variant`
+with `required_nonzero: false` and a named reason; neither is skipped.
+
+---
+
+### PART E — governance, on the surfaces the diff touched
+
+| Item | Evidence |
+|---|---|
+| `check_no_local_accounting("SPDR-019/screen_code")` | `{'ok': True, 'banned_defs_found': []}` — executed against the current tree. |
+| Derangement form (L-28) | `destroy form: DERANGEMENT`; `fixed_point_count 0`, `fixed_point_count_measured true` on all eleven arms plus entry-timing; and the destruction strength is now **disclosed as a number** (`flipped_fraction_mean 0.4991`, sd 0.0120) rather than implied by a count that is 0 by construction. |
+| Spread-cost disclosure (chapter 05) | Unchanged by the diff and re-read in the emission: `spread_cost_status UNAVAILABLE_NOT_CHARGED`, `spread_rt_bps null`, `cost_scope PARTIAL_FEES_FUNDING_ONLY`, prohibited claims `fully-net / cost-complete / tradable / deployable`, and the AMENDMENT-C5 note that cost enters no estimand, threshold or comparison. |
+| Holdout | Smoke is TRAIN-only, phase (a); the `holdout` and `TRAIN fence` HARD checks both `held`. No hunk in the diff touches a band boundary. |
+| Amendment-direction ledger (L-23) | Arithmetic independently recounted and correct (see R9-17 above); the LOOSER=3 flag and the five-row TIGHTER-streak flag both stand for the operator at the gate. **One gap → R10-01.** |
+| One BacktestNode per process (L-31) | Not applicable — this is a screen over the OHLCV catalog, no `BacktestNode` is constructed anywhere in `screen_code/`. Unchanged by the diff. |
+| XENA VOID (INFR-010 R4) | Not applicable — no XENA routing in this design. Unchanged by the diff. |
+| Predeclaration integrity | Three hashes unchanged across the remediation and across my run; `generator_sha256` and `resolution_basis_sha256` reproduce the run-7 values. |
+
+---
+
+### PART F — residual observations (R10-01 … R10-06)
+
+None of these blocks execution. They are recorded so the operator sees them before the gate and the
+data-analyst sees them after the run.
+
+#### R10-01 — LOW — the run-9 design edits were folded into AMENDMENT-19 without their own ledger row
+**Governance:** L-23 (every pre-measurement amendment carries a direction declaration and enters the
+running count). **File:** `design.md:498-507`, `1308-1310`, `1336`.
+
+`bb92447` added a **new required emission** to the design — the per-seed flipped fraction — in both
+the CONTROL SIDE-DERANGEMENT block and AMENDMENT-19(a). AMENDMENT-19's header still reads "QA run-8
+remediation" and its provenance line still reads "QA run 8", and no AMENDMENT-20 row was opened, so
+the ledger does not record that a run-9 review changed a design requirement. Direction is
+unambiguous if it were booked (NEUTRAL-or-tighter: more must be disclosed, nothing is admitted or
+excluded, no estimand, population, comparator, gate or band moves), and the requirement is already
+implemented and emitted, which is why this is LOW. **Suggested, not required before the run:** open
+an AMENDMENT-20 row, or extend AMENDMENT-19's header and provenance line to "QA run-8 and run-9
+remediation", with a NEUTRAL direction. Routes to `quant-designer`.
+
+#### R10-02 — LOW — two field names in the tripwire and G6 payloads still overstate what they carry
+`tripwires.py:346` emits the adverse-precedence twin's price under the key `emitted_exit_price`,
+while the arm's actual exit is the separate `arm_exit_price` (23606.5 vs 23493.672 on the G7 row).
+The comparison itself is now correct — adverse twin vs favourable twin, same anchor, both from the
+resolver — and the arm's own price is disclosed, so the substance of run 9's third point is
+addressed; the **key name** is not. Separately, `golden.py:243-246`'s `legal_variant_is_the_emitted_one`
+reduces to "`per_variant` is non-empty and `changed_state_rows > 0`" (`v.get("legal_episodes", 0) >= 0`
+is true for any count), so it is computed and does fail on an empty payload, but it does not verify
+the proposition its name states. Both are labelling, not logic. Analyst note: read
+`arm_exit_price`/`arm_exit_reason` when you want the emitted arm's fill.
+
+#### R10-03 — LOW — the block-rule exemption is now validated per cell but still uncapped in aggregate
+Run 9's required fix (reason per cell, full list, sizing as a named bucket) is fully implemented and
+executes. What remains: **5,000 fabricated degenerate cells each carrying a valid `n_dates < 7`
+reason still leave `held: True`**, carried by the 1,649 compliant cells. Also note the exemption
+predicate is `n_dates < 7`, looser than the `n_dates < 2` run 9 used as its example — the code
+comment explains that `< 2` left real thin cells unclassified, and the threshold is disclosed in the
+artifact as `degenerate_reason_required`. Analyst note for the 25-symbol run: read
+`n_degenerate_cells_no_ci` as a number, not as a pass/fail — a large count with valid reasons is a
+thinness disclosure the HARD check will not raise.
+
+#### R10-04 — LOW — the plant-curve rung grid does not bracket the control's resolution
+See R9-06. All four rungs read 1.0 (two arms 0.9995) because 5 bps is already ≈2.4 null sd. Two
+things would make §6's UNUSABLE threshold numerically locatable, neither of them a code fix:
+finer rungs (e.g. 0.5 / 1 / 2 bps), and averaging the rate over several base draws rather than one —
+the single deranged base is a random draw and on `L0_BASELINE` it landed **1.3 null sd above the
+null median**, which pre-loads the curve even though the construction is correct. Routes to
+`quant-designer` if the operator wants a located resolution; otherwise the correct reading of the
+present curve is "the control resolves every effect size this design declares".
+
+#### R10-05 — LOW — the L-51 HARD check's coverage floor is 10, not the 12 subsets the design names
+`selfcheck.py:302` marks the check on `covered >= 10`. The emission covers 12 of 12, so the clause
+is satisfied in fact; but the check would still pass if both `MDE50_*` cells were absent — the
+exact subset run 9 singled out as the one the design names explicitly. It fails at 9 tokens and at
+run-9's 5, so it is a real check, just two tokens loose. `n_required_tokens_covered` is emitted, so
+the operator can read the true coverage directly.
+
+#### R10-06 — INFORMATIVE — the h=1 MOD-hold pair separates on 2.0% of its episodes
+Now measured rather than argued: `L4_HOLD_1H_MOD` is identical to its UNMOD twin on **26,502 of
+27,036** compared episodes (98.0%), separating on 534. §12's hard failure is "identical on **every**
+episode", and it is not, so the check correctly passes. But that pair carries very little
+independent information, for the structural reason `clip(h·E_run/20, 1, 20)` pins h=1 at 1.0
+whenever `E_run ≤ 20` — and the design's own measured E[run] scale is 19–23 h. The h=4/12/20 pairs
+separate on 99.9%, 99.9% and 97.4% of their compared episodes respectively. Analyst note: do not
+read the h=1 MOD/UNMOD contrast as a powered comparison.
+
+---
+
+### Standing execution blockers
+
+1. **DISCHARGED** (re-verified) — AMENDMENT-7 / registered-C6 departure.
+2. **DISCHARGED** (re-verified) — `reflection-inputs.md` §9, signed option B at `9d8832e`.
+3. **STANDS (lane-wide, unchanged)** — the per-symbol spread pin. It does not block this measurement
+   under AMENDMENT-C5; the disclosure block is intact and the code makes no money read.
+4. **DISCHARGED** — run-9 blocker 4 (**R9-01, R9-02, R9-03**). All three HARD checks now fail on
+   their own subject under injection; evidence in PART D.
+5. **DISCHARGED** — run-9 blocker 5 (**R9-04 … R9-10**, seven MEDIUM). All seven closed; the two
+   that retain a soft edge are recorded as R10-03 and R10-04/R10-05 with the residual stated.
+6. **DISCHARGED** — run-8 blockers 4, 5, 6 (all 29 findings, closed at run 9;
+   `check_no_local_accounting` re-run green here).
+7. **OPERATOR FLAGS AT THE GATE, unchanged and not blockers** — L-23 requires two: LOOSER stands at
+   3 active rows (AMENDMENT-1 full TRAIN, -2 M15, -10 hold grid), and the TIGHTER streak within
+   AMENDMENTS 12-18 is five rows. Both are declared in `design.md:1341-1347`.
+
+---
+
+**FAILING_ARTIFACT:** none. No artifact fails.
+
+**REQUIRED_SKILL:** none required before execution. Optional and post-gate: `quant-designer` for
+R10-01 (book the run-9 design edits in the amendment ledger) and R10-04 (finer plant-curve rungs if
+a located control resolution is wanted); `experiment-developer` for R10-02 (two field names) and
+R10-05 (raise the L-51 floor from 10 to 12). None of the four changes a measured quantity, so none
+needs to precede the run.
+
+**Execution authorisation: YES.**
+
+The full 25-symbol phase-(a) screen is authorised from QA's side. The three checks that blocked run
+9 now fail when I break the thing they check; the other fourteen findings are closed on evidence;
+the emission reproduces 28/28 with an empty failure list on an independent re-run of the sanctioned
+smoke; and nothing in the remediation moved an estimand, a threshold or a comparison — the episode
+count, the cell count and all three predeclaration hashes are unchanged. Execution remains the
+operator's gate, and the two L-23 flags in blocker 7 are the operator's to read at it.
+
+---
+
+### What I did not reach
+
+- **I did not run the full 25-symbol screen.** Operator-gated and unauthorised. Everything above
+  comes from the sanctioned 2-symbol smoke at `n_boot = 200, jobs = 2`, from isolated function calls
+  on that emission, or from hand derivation. At `n_boot = 2000` the ladder and the paired bootstrap
+  scale up; the control battery does **not** (that is R9-05's fix), but I verified its behaviour at
+  2,000 seeds, not the full run's wall-clock or memory cost.
+- **Every real-data claim still rests on BTCUSDT and ETHUSDT** — carried forward from run 9,
+  unchanged and unaddressable inside the authorised smoke. The 23 other symbols are unexercised.
+  `PARENT-GATE PARITY` again passed at `n_ok 4/4`, so the 8 PARITY-EXEMPT symbols and the 15
+  remaining non-exempt symbols were never in the run and the exempt-list mechanism is still untested
+  against real parent NaNs this round. **R9-10's fix is anchored on BTCUSDT, which was present in
+  the smoke**, so the `anchor_fallback` branch (`run_screen.py:964-972`) is the one path in the
+  remediation I could not exercise — it will not be taken on a 25-symbol run that includes BTCUSDT.
+- **I did not verify the M15 clock beyond the fact that it ran** — carried forward from run 9,
+  unchanged. Both clocks were in the smoke and M15 rows are present in the cell grid and now in the
+  L-51 subsets (R9-07 added them), but I checked no M15 fill, no M15 hold conversion and no M15
+  block behaviour individually. **M15 carries the primary read** (AMENDMENT-2). This is the largest
+  coverage gap in the review series and it is not closable by a 2-symbol smoke.
+- **I did not review `python/experiments/SPDR-020/screen_code/`** — carried forward from run 9,
+  unchanged. It shares `resolution_basis.py` and the resolution artifacts, and it moved again during
+  this review (`1979b93`, plus untracked `results/run_plan.json` and `results/shards/`). Several
+  shapes corrected here — the plant-curve base, the degenerate-exemption bucketing, the tripwire twin
+  construction, the source-token assertions — are exactly what a sibling implementation repeats.
+  **That directory needs its own QA run; do not infer its state from this one.**
+- **I did not re-audit the measurement path**, by design: run 9 scoped this run to the diff plus the
+  smoke on the ground that the corrections change what is checked, not what is computed. I tested
+  that premise (PART B) and it held, but "the modules are untouched and the counts are identical" is
+  a weaker statement than "I re-derived the estimand", and only the former is on the record here.
+- **I did not construct a genuinely non-causal pipeline** to confirm TRIPWIRE-1's payoff delta moves
+  in the expected direction — same gap run 9 recorded. I showed the tripwire re-selects episodes
+  across all fifteen variants and that each limb dies when I disable it; §6.1 makes the delta's
+  direction reported, never a pass condition.
+- **I did not audit `xen.evaluation.block_bootstrap_ci` or `xen.resolution_basis` internals**, only
+  that the predeclaration hashes match and that the screen's fast path is unchanged by this diff.
+- **I did not re-derive the parent gates end to end.** `parent_gates.py` is untouched by the commit;
+  R9-03's fix asserts tokens *in* that file rather than recomputing what it produces, so a rewrite
+  that kept the tokens and changed the arithmetic would pass. Run 7 executed that path.
+- **I did not quantify the effect of any finding on any result.** There is no authorised run, and
+  that is the data-analyst's object in any case.
+
+---
+
+## QA run 11 — 2026-07-29T23:47:56Z — mode: subagent — HEAD 1979b93 (dirty: SPDR-019/design.md, SPDR-019/qa-review.md, SPDR-019/screen_code/integrity.py, SPDR-019/screen_code/metrics.py; SPDR-019/results/* and SPDR-020/results/* untracked)
+
+Verdict: **REVISE**
+
+Subject: the two HARD failures of the first full-scale run (25 symbols, `n_boot` 2000, 5,753,583
+episodes, 13,377 metric rows, 44 min) — `BLOCK RULE` and `log R never unaccompanied` — and the
+remediation carried by AMENDMENT-20 + the `screen_code/` diff.
+
+Evidence base. Failing full-run artifacts read unmodified from
+`…/scratchpad/spdr019_fullrun_FAILING/` (`code_sha256 4fcea2d049c0745d…`). The repo `results/`
+directory holds a **2-symbol smoke at `n_boot` 200** whose `code_sha256` I recomputed with
+`selfcheck._sha256_tree(SCREEN_CODE_DIR)` → `9e46e90caa51db30fb548a0e635a542376975d69ea78d33925ef66537364c6da`,
+**byte-identical to the reported value**, so the smoke provably ran the code now on disk. Both
+runs share `generator_sha256 72c6b1f953cae24c…`, `expected_resolution_sha256` and
+`resolution_basis_sha256`.
+
+### PART A — the diagnosis, reproduced independently
+
+I re-derived both failures from the preserved parquet and integrity JSON without using the
+developer's account.
+
+| Claim under test | What I found | Verdict |
+|---|---|---|
+| 2 of 28 HARD checks failed | `all_hard_pass false`, `hard_fail_names = ['BLOCK RULE', 'log R never unaccompanied']`, `integrity_violation true`, `n_hard_checks 28 == expected 28` | REPRODUCES |
+| 5 rows carried a `log R` with no CI/MDE | 13,377 rows; 12,503 carry a CI; 12,508 carry a finite `log_R`; **exactly 5** rows have finite `log_R` with `ci_low`/`ci_high`/`ci_width`/`block_mde` all null | REPRODUCES |
+| all 5 have `n_dates = 1` | `BLURUSDT/L1_SHAT_RANK_CONTINUOUS/M15/{0.25,0.50}/DESIGN` and `1000BONKUSDT/L2_JOINT_HMM_HIGH_AND_K12_HIGH/H1/{0.25,0.50,1.00}/DESIGN` — **all five `n_dates = 1`**, `p` ∈ {0.4, 0.667, 0.5}, `W` and `L` finite | REPRODUCES |
+| cause is assignment order in `cell_metrics` | `metrics.py:363` `out["log_R"] = log_R_from_pWL(p, W, L)`; `metrics.py:376` `ci = envelope_ci_logR(suff, …)`; `metrics.py:136` early-returns `ci_low/ci_high = nan` at `n_days < 2`. A one-day cell therefore keeps a computed `log R` and loses its interval. Confirmed a **code defect**, not a §12 defect | REPRODUCES |
+| 3 cells `unclassified`, which is fatal | `n_unclassified_cells 3`, all with `reason: null`; `deg_ok = all(...) and not unclassified` (`integrity.py:580`) drives `battery_ok` → `held false` | REPRODUCES |
+| the 3 are the named cells | `1000RATSUSDT/L4_TARGET_A1_MOD/H1/1.0` in **TRAIN and CONFIRM** (`n = 11`, `n_dates = 8`, `p = 1.0`, `L` undefined — eleven episodes, every one a winner) and `1000BONKUSDT/L2_INTERACTION_HMM_X_K12/M15/1.0/DESIGN` (`n = 1`, `n_dates = 47`, `p`/`W`/`L` all undefined) | REPRODUCES |
+| the pre-existing reason described none of them | all 31 exempt cells carried the single string `n_dates < 7 (min day-block in {1,3,7} sweep)`; the 3 unclassified have `n_dates` 8, 8, 47 | REPRODUCES |
+| 13 exempt cells had `n_dates` 2–4 | exempt-cell `n_dates` histogram `{1: 18, 2: 4, 3: 2, 4: 7}` = 31; **4 + 2 + 7 = 13**; none ≥ 7 | REPRODUCES |
+| the design authorised no exemption path at all | I read §12 in the pre-diff design: the `log R never unaccompanied` row and the block-rule rows exist; **no row mentions a cell without a CI**, four buckets, a reason token, or `unclassified`. The four-bucket accounting, the `n_dates < 7` reason and `unclassified`-is-fatal are all in `integrity.py` only, added at the run-9 R9-04 remediation | REPRODUCES |
+
+Bucket reconciliation, recomputed from the parquet: 12,503 with a CI + 840 sizing-suppressed
+(`sizing_no_logR_claim`, reason `SIZING_VARIANT_MAY_NOT_CARRY_A_LOG_R_CLAIM`) + 31 exempt + 3
+unclassified = **13,377** = the row count. The four buckets do reconcile.
+
+### PART B — design-to-code fidelity trace on the amended clauses
+
+Expected behaviour derived from the amended design text first, then read against the code.
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §12 new row: every metric row lands in exactly **one** of four named buckets and the four reconcile to the row count | `integrity.py:526-582` (`has_ci` / sizing / `not ps` / else) + `:588-597` counts | MATCHES | reconciliation verified numerically above on the failing run and on the smoke (1,649 + 108 + 1 + 0 = 1,758 = `n_metric_rows`) |
+| §12 new row: `unclassified` is a **hard failure** | `integrity.py:580` `deg_ok = all(d.get("reason") …) and not unclassified` | MATCHES | fault-injected below; `held` goes False |
+| §12 new row: an exempt cell must **name** which condition applies | `metrics.py:398-408` emits `ci_absent_reason`; `integrity.py:552` reads it | MATCHES **for `cell_metrics` rows only** | see R11-01 — interaction rows never receive the key |
+| AMENDMENT-20(a)(i): token `LOG_R_UNDEFINED` = one-sided outcome set (`p = 1` ⇒ `L` undefined; `p = 0` ⇒ `W` undefined) **or** no signed outcome leaving `p` undefined | `metrics.py:402` `if not np.isfinite(out["log_R"])`; `integrity.py:558` `log_r_undefined = not _fin("log_R")` | **DEVIATES** | the design defines the condition on `p`/`W`/`L`; both code sites test the `log_R` **field**. Producer-side this is exact (`log_R_from_pWL`, `metrics.py:74-78`, returns NaN on precisely that predicate). Checker-side it is **vacuous** — see R11-02 |
+| AMENDMENT-20(a)(ii): token `N_DATES_LT_2_NO_DAY_BLOCK` = fewer than 2 calendar days, no day-block to resample | `metrics.py:404` `elif n_days < 2`; `integrity.py:559` `too_few_days = … n_dates < 2` | MATCHES | matches `envelope_ci_logR`'s own guard `if n_days < 2` (`metrics.py:136`) exactly |
+| §12 new row: the named condition is **validated against that cell's own emitted `p`, `W`, `L`, `n`, `n_dates`** | `integrity.py:556-562` | **DEVIATES** | `p`, `W`, `L`, `n` are **emitted for audit** (`:566`) but only `log_R` and `n_dates` are **used**. `log_R` is not in the design's list, and it is the one field the same commit overwrites |
+| AMENDMENT-20(a): "a reason that does not describe the cell is a hard failure" | `integrity.py:562` `reason = claimed if admissible.get(claimed) else None` | MATCHES for `N_DATES_LT_2`; **unenforceable for `LOG_R_UNDEFINED`** | R11-02 |
+| AMENDMENT-20(a): `n_dates < 7` is **WITHDRAWN** | old `min_dates = max(BOOT_BLOCKS_DAYS)` branch deleted; `degenerate_reason_required` restated (`integrity.py:597-600`) | MATCHES | no residual reference to `n_dates < 7` anywhere in `screen_code/` (grepped) |
+| AMENDMENT-20(a): the exempting conditions are **exactly two** | `admissible` dict, `integrity.py:560-563` | MATCHES as written | but see R11-03: one of the three cells the amendment was written for fits **neither** honestly |
+| AMENDMENT-20(b): §12's unaccompanied rule is **CONFIRMED UNCHANGED**; the fix is suppression | `metrics.py:409` `out["log_R"] = float("nan")` inside the CI-absent branch | MATCHES | §12 row text unchanged in the diff — confirmed by `git diff` (only the new "Row accounting" row is added) |
+| AMENDMENT-20(b): suppression is "already this design's answer" | `log_R_suppressed_reason` / `sizing_no_logR_claim` path, `integrity.py:534-540` | MATCHES | the sizing bucket is a genuine precedent; the new suppression reuses the same mechanism |
+| §12 (pre-existing): the unaccompanied rule is asserted over `metrics_by_cell`, `layer_deltas` **and** the resolution ladder "alike" | `selfcheck.py:309-316` | **DEVIATES (pre-existing)** | asserts on `metrics_df` only, and keys on a column literally named `log_R`. See R11-04 — informative, no violation in data |
+| Ledger: 5 looser / 9 tighter / 6 neutral; active 4 / 8 / 6 | design.md ledger block | MATCHES | 5+9+6 = 20 = AMENDMENTS 1…20; two supersessions (-7 by -17, -11 by -15) → 18 = 4+8+6. Arithmetic correct |
+| L-23: LOOSER note lists 4 and is flagged at the execution gate | design.md L-23 note | MATCHES | -1, -2, -10, -20 named; flag present |
+| L-23 clause 3: streak flagged | design.md streak note | MATCHES | streak note retained as history + explicit statement that AMENDMENT-20 breaks monotonicity. Honest |
+
+### PART C — did any estimand move? (item 3)
+
+Two independent lines, both clean.
+
+**C1 — structural.** `git diff` on `metrics.py` is a **pure insertion**: 18 added lines, 0 removed,
+entirely inside `cell_metrics`, guarded on `not (isfinite(ci_low) and isfinite(ci_high))`. For a
+row that carries a CI the branch adds `ci_absent_reason = None` and nothing else. I then grepped
+every `log_R` site and confirmed **no code reads `out["log_R"]` after line 409**: `W_L`, `p_be`,
+`p_be_net`, `identity_residual_bps` are computed at `:356-373` from `p`/`W`/`L`; `mirror_band`
+(`:440-445`) reads `ci_low`/`ci_high`; `ladder`/`mde50/80/95` (`:448-450`) rebuild from `suff`;
+`realised_c` and `effective_n` read `block_mde` and `iid_half`.
+
+Two candidate propagation paths, both checked and both closed:
+- `_attach_homogeneity` (`run_screen.py:646-653`) feeds per-symbol `log_R` into `i_squared`,
+  `homogeneity_q`, `per_symbol_spread_log_R` on POOLED cells. `metrics.homogeneity` (`:482`) filters
+  `np.isfinite(v) & np.isfinite(s) & (s > 0)` and `s = block_mde/1.96`. For all 5 suppressed rows
+  `block_mde` is NaN, so they were **already dropped before the change**. No pooled statistic moves.
+- `_layer_deltas` (`run_screen.py:488-490`) skips any row with `band != "TRAIN"`. All 5 suppressed
+  rows are `band = DESIGN`. No contact.
+
+**C2 — empirical, cross-version, on real data.** `p`, `W`, `L`, `n`, `n_dates`, `mean` and
+`log_R` do not depend on `n_boot`, so the pre-fix full run and the post-fix smoke are directly
+comparable on their shared per-symbol cells. Joining on
+`(variant_id, clock, delta, scope, band)` for `scope ∈ {BTCUSDT, ETHUSDT}` gives **1,164 cells in
+both**, and across `n, mean, p, W, L, n_pos, n_neg, p_flat, n_dates, W_L, p_be, p_be_net,
+identity_residual_bps, mean_signed_rows, kappa, kappa_n, n_nominal, log_R` every column returns
+**max |Δ| = 0.0** with zero finite/non-finite flips. Schema delta is exactly one added column,
+`ci_absent_reason`; nothing removed.
+
+I also re-derived `log_R` from `(p, W, L)` on all 13,377 failing-run rows: exact match
+(`max |Δ| = 0.0`) wherever both are finite; 840 rows where the recompute is finite and the emitted
+value is null (**exactly** the sizing-suppressed bucket); 311 rows where the emitted value is finite
+and the recompute is null (**exactly** the `L2_INTERACTION_HMM_X_K12` rows, whose `log_R` is a paired
+Δ and whose `p`/`W`/`L` are hardcoded NaN at `run_screen.py:466`).
+
+**Conclusion:** the 12,503 CI-carrying cells are arithmetically untouched, and the only `log_R`
+values that change are the 5 suppressed ones. Item 3 **verified**.
+
+### PART D — can `BLOCK RULE` still fail on its own subject? (P-23 / L-52, item 4)
+
+Fault injection through `integrity.check_block_rule` directly. Overall `held` is False in every row
+below because my synthetic 200-episode frame cannot satisfy clause 5 (`boot_eq`), so the
+discriminating field is the **envelope clause** — the clause AMENDMENT-20 actually amends. Three
+valid-claim rows are included as negative controls.
+
+| # | Injected row | envelope `held` | exempt | unclassified |
+|---|---|---|---|---|
+| 0 | all cells carry a CI (control) | True | 0 | 0 |
+| A | `n_dates = 1`, claims `N_DATES_LT_2_NO_DAY_BLOCK` (true) | True | 1 | 0 |
+| B | `p = 1`, `L` undefined, claims `LOG_R_UNDEFINED` (true) | True | 1 | 0 |
+| C | **wrong token** — `n_dates = 8` claims `N_DATES_LT_2_NO_DAY_BLOCK` | **False** | 0 | **1** |
+| D | **missing token** — `ci_absent_reason = None` | **False** | 0 | **1** |
+| E | **bogus token** — `"BANANA"` | **False** | 0 | **1** |
+| F | **key absent entirely** | **False** | 0 | **1** |
+| G | **neither condition** — `n_dates = 47`, `log_R` **finite**, claims `LOG_R_UNDEFINED` | **False** | 0 | **1** |
+| H | **neither condition** — `n_dates = 47`, `p`/`W`/`L` finite, `log_R` **nulled**, claims `LOG_R_UNDEFINED` | **True** ⚠ | 1 | 0 |
+| I | both conditions true, claims `LOG_R_UNDEFINED` | True | 1 | 0 |
+| J | both conditions true, claims `N_DATES_LT_2_NO_DAY_BLOCK` (swapped) | True | 1 | 0 |
+
+The check **can** still fail: C–G all drive `held` False. That part of P-23 is satisfied.
+
+**Row H is the defect** and it is not hypothetical: `metrics.py:409` nulls `log_R` on **every** row
+that enters the exemption branch, so the shape the artifact can actually present is H, never G. Full
+finding at R11-02.
+
+**On the swapped-token question (I vs J).** When both conditions genuinely hold, a swapped token is
+admissible. I judge this **acceptable**: the cell is exempt on either ground, no downstream number
+depends on which token is recorded, and `integrity.py:566-568` emits **both** derived booleans plus
+`p`/`W`/`L`/`n`, so the audit record is complete regardless of which token was claimed. This is only
+harmless *because* both booleans ship — and R11-02 must be fixed for `log_R_undefined` to carry any
+information at all.
+
+### PART E — findings
+
+**R11-01 — BLOCKING (HARD). The fix does not close the `BLOCK RULE` failure. One of the three
+unclassified cells survives it, so the full 25-symbol re-run will HARD-fail again.**
+
+The third unclassified cell, `1000BONKUSDT / L2_INTERACTION_HMM_X_K12 / M15 / δ=1.0 / DESIGN`
+(`n = 1`, `n_dates = 47`), is **not** a `cell_metrics` row. It is an interaction row appended by
+`run_screen._extra` at `run_screen.py:453-474`, which writes its dict literally and **never sets
+`ci_absent_reason`**. `grep -rn 'ci_absent_reason' screen_code/*.py` returns 4 sites in `metrics.py`
+and 1 read in `integrity.py` — nothing in `run_screen.py`.
+
+I reproduced the cell exactly as `_extra` builds it and ran it through the fixed
+`check_block_rule`:
+
+```
+INTERACTION ROW as actually built by run_screen._extra:
+  envelope held = False   degenerate = 0   UNCLASSIFIED = 1
+  entry: {..., 'reason': None, 'claimed_reason': None, 'log_R_undefined': True,
+          'n_dates_lt_2': False, 'p': nan, 'W': nan, 'L': nan, 'n': 1.0}
+SAME ROW WITH the token the design mandates:
+  envelope held = True    UNCLASSIFIED = 0
+```
+
+Predicted post-fix full-run outcome: 33 of 34 exempt cells classified (28 `LOG_R_UNDEFINED` via
+`cell_metrics` + 5 `N_DATES_LT_2_NO_DAY_BLOCK`), **1 unclassified**, `BLOCK RULE` **still FAILS**.
+The `log R never unaccompanied` failure *is* closed by the suppression, so the re-run would fail
+1 of 28 rather than 2 of 28 — an unauthorised-run-shaped outcome, not a clean run.
+
+AMENDMENT-20(a)(i) names this exact cell as an instance of `LOG_R_UNDEFINED`, so the clause is
+**booked in design and MISSING in code**. Route: `experiment-developer`.
+
+**R11-02 — BLOCKING (fidelity + P-23). Integrity's re-derivation of `LOG_R_UNDEFINED` is vacuous:
+it reads a field the producer overwrites in the same commit.**
+
+`integrity.py:558` computes `log_r_undefined = not _fin("log_R")`. But `metrics.py:409` sets
+`out["log_R"] = float("nan")` for **every** row whose CI is absent — i.e. for every row that can
+reach `integrity.py:552`. So `log_r_undefined` is **unconditionally True inside the exemption
+branch**, `admissible["LOG_R_UNDEFINED"]` is unconditionally True, and the `LOG_R_UNDEFINED` token
+can never be rejected. Consequences:
+
+1. The emitted audit field `log_R_undefined` is constant-True and carries no information. The smoke
+   confirms it: its single exempt cell reports `log_R_undefined: true` — correct there, but
+   uninformative by construction.
+2. Fault case H passes: a cell with 47 calendar days, finite `p`/`W`/`L` and an **empty bootstrap
+   battery** — a genuine defect, and precisely the case the pre-diff code caught with
+   `reason = None  # enough dates but empty battery → real defect` — is now silently exempted if it
+   claims `LOG_R_UNDEFINED`.
+3. The check loses its independence. End-to-end the pipeline still catches case H, but only because
+   the **producer** (`metrics.py:406-408`) declines to emit a token — `integrity.py` is supposed to
+   be the check that does not trust the producer. That is the whole reason this apparatus exists.
+4. It contradicts the design text: §12's new row requires validation "against that cell's own
+   emitted `p`, `W`, `L`, `n`, `n_dates`". `log_R` is not in that list, and it is the one field the
+   commit mutates.
+
+**Required change** (two lines, `integrity.py:558`): derive the condition from `p`/`W`/`L` as the
+design states, e.g. `log_r_undefined = not np.isfinite(log_R_from_pWL(row.get("p"), row.get("W"),
+row.get("L")))`, or the explicit predicate `not all finite(p, W, L) or p <= 0 or p >= 1 or W <= 0
+or L <= 0`. `metrics.log_R_from_pWL:74-78` is exactly that predicate, so the two agree by
+construction.
+
+I verified this fix is **behaviour-preserving on the real run and discriminating**: across the 34
+non-sizing no-CI cells the `p`/`W`/`L` derivation gives **29 undefined / 5 defined**, `n_dates < 2`
+gives **18**, cells satisfying **neither = 0**, cells satisfying **both = 13**. The 5 defined ones
+are exactly the 5 suppressed rows, all `n_dates = 1`, so they remain admissible on their own token.
+Nothing reclassifies; case H starts failing. Route: `experiment-developer`.
+
+**R11-03 — BLOCKING (design). `LOG_R_UNDEFINED` is the wrong condition for the interaction cell,
+and asserting it there widens the exemption to all 311 interaction rows.**
+
+AMENDMENT-20(a)(i) justifies the interaction cell as "a cell with NO SIGNED OUTCOME leaves `p`
+itself undefined". That is not what the artifact says. `run_screen.py:466` hardcodes
+`"p": nan, "W": nan, "L": nan` on **every** interaction row — I confirmed all 311 in the failing run
+carry `p = W = L = NaN`, including 310 with healthy CIs, `per_seed_ci` lengths up to 945 and `n` up
+to 1,090. `p` is undefined on that row **by construction of the row type**, not by its outcome set.
+So under either derivation — the current `log_R`-field one or the corrected `p`/`W`/`L` one —
+`LOG_R_UNDEFINED` becomes admissible for every interaction row regardless of whether it has 1
+episode or 1,027. The exemption stops being narrow.
+
+The cell's actual property is different and more specific: the paired combination
+`joint − shock − k12 + l0` could not be formed because an arm had `n = 1`, so
+`metrics.paired_combo_ci` returned an empty battery. That is a **third condition the design has not
+booked**, and it is the honest one.
+
+**My recommendation, and it is the operator's question from item 5:** for this cell the right answer
+is **exclude before scoring, not exempt after**. An interaction row whose constituent arm cannot
+support the combination should not be constructed at all — there is nothing to interact — and
+`_extra` already has the machinery: `run_screen.py:430-437` breaks out of arm assembly when an arm
+is missing. Extending that guard to "an arm cannot support the paired bootstrap" removes the cell
+from the frame, keeps the four-bucket accounting genuinely exhaustive over rows that exist, and
+needs no new exemption token. Exclusion is self-documenting (`n_metric_rows` drops, visibly);
+exemption is a place a future thin-cell defect can hide, which the amendment's own assessment
+paragraph concedes. Route: `quant-designer`.
+
+**R11-04 — INFORMATIVE (pre-existing). The unaccompanied rule is asserted on one artifact, not
+three.** §12 requires it "asserted over `metrics_by_cell`, `layer_deltas` and the resolution ladder
+alike". `selfcheck.py:309-316` builds `need = {log_R, ci_low, ci_high, ci_width, block_mde}` and
+tests `metrics_df` only, keyed on a column named literally `log_R`; `layer_deltas` ships
+`log_R_layer` / `log_R_L0` / `delta_log_R` and would not be matched even if it were passed in. I
+checked the data directly and found **no violation**: `resolution_ladder` 1,649 finite-`log_R` rows,
+0 with any companion missing; `layer_deltas` 522 rows, 0 with any companion missing on any of the
+three `log_R`-family columns. Non-blocking, but it is the assertion that failed, so the scope gap
+should be closed rather than left implicit. This surface was touched at run 9 (line 3128) without
+the multi-artifact scope being resolved.
+
+**R11-05 — INFORMATIVE. The sanctioned smoke exercises almost none of what it was run to verify;
+its 28/28 is not evidence the two failures are closed (item 6).**
+
+The smoke is `BTCUSDT` + `ETHUSDT` only. **None** of `BLURUSDT`, `1000BONKUSDT`, `PYTHUSDT`,
+`1000RATSUSDT` — the four symbols that produced every one of the 5 unaccompanied rows and all 3
+unclassified cells — is present. Concretely, in the smoke:
+- **0** `log_R` suppressions fired. My cross-version join shows `log_R` `oldOnlyFinite = 0`, i.e.
+  `metrics.py:409` never changed a value. The suppression path is **entirely unexercised**.
+- **0** `N_DATES_LT_2_NO_DAY_BLOCK` tokens issued.
+- **0** interaction-row exemptions, so R11-01 could not surface.
+- Its **1** exempt cell is `ETHUSDT/L1_SHAT_DECILE_GE9/H1/1.0/CONFIRM`, `n = 2`, `n_dates = 2`,
+  `p = 0.0`, `W` undefined, `claimed_reason` and `reason` both `LOG_R_UNDEFINED`,
+  `log_R_undefined: true`, `n_dates_lt_2: false`.
+
+That last item **does** verify the reported reclassification, and I confirm it: at `n_dates = 2`
+this cell was previously exempted as `n_dates < 7` — a condition it does not have — and is now
+exempted as `LOG_R_UNDEFINED`, which it does have (`p = 0` ⇒ `W` undefined). The withdrawal of
+`n_dates < 7` is demonstrated on real data. Everything else about the two failures is untested at
+runtime.
+
+I did **not** re-run the smoke: QA is read-only and a re-run would overwrite `results/`. Instead I
+verified its provenance by recomputing the code-tree hash (exact match) and reproduced the two
+failure modes against `check_block_rule` directly, including a field-exact replay of the surviving
+unclassified cell — stronger evidence for the modes the smoke cannot reach. **No full-scale run has
+been done since the fix**, and per R11-01 one should not be launched until it is.
+
+### PART F — judgement on AMENDMENT-20 (item 5)
+
+*Is the DIRECTION honestly labelled?* **Yes.** LOOSER is correct and is the harder of the two labels
+to volunteer: read literally, the pre-diff design contained no exemption path, so every one of 34
+near-empty cells was a hard failure and this row creates the relief. The tightening component is
+real and quantified — 13 cells were being exempted for a condition they do not have, and I verified
+the count (`n_dates` histogram 2:4, 3:2, 4:7). The ledger arithmetic checks out (5/9/6 total,
+4/8/6 active, 20 rows, 18 after two supersessions), the L-23 LOOSER note correctly lists four, both
+required operator flags are present, and the amendment volunteers that it breaks its own tightening
+streak. The assessment paragraph states two points against itself, including the one that matters
+most — that this is booked *after* a failing run. I found nothing overstated and nothing netted away.
+
+*Is booking an exemption inside a HARD integrity check after a failing run acceptable?* **For the
+`cell_metrics` cells, yes — narrowly, and on these specific grounds.** This is a genuine
+specification gap, not an inconvenient result: a cell with eleven episodes all of which are winners
+has an undefined `log(W/L) − log((1−p)/p)` as a matter of arithmetic, not of data quality, and no
+rule the design could have written would make it bootstrappable. The remedy moves no estimand
+(PART C: bit-exact on 1,164 cells), no band, no comparator and no cost figure; no exempt cell
+contributes a `log R` to anything; and the amendment is **strictly narrower** than the undeclared
+code it replaces. Booking it is better governance than the status quo, which was an
+implementation-invented exemption running unbooked since the run-9 R9-04 remediation. The right
+criticism to make of this episode is not the amendment — it is that `n_dates < 7`, four buckets and
+`unclassified`-is-fatal reached a full-scale run without ever appearing in design.md.
+
+*Is the exemption too wide?* **As drafted, for one of its three cells, yes** — and that is R11-03,
+which is why this run is a REVISE rather than an APPROVE-with-notes. Applied to the interaction row
+the exemption rests on a `NaN` that `run_screen.py:466` writes unconditionally, so it would exempt
+all 311 interaction rows on identical evidence. There the operator's alternative framing is the
+correct one: **exclude such a cell before scoring rather than exempt it after.** I would keep
+exemption-after for the one-sided `cell_metrics` cells — those are real, reportable cells that
+happen not to admit an interval, and suppressing the interval while keeping the row is honest — and
+switch to exclusion-before-scoring for interaction rows that cannot form their combination.
+
+### Checks independently verified clean
+
+- Both HARD failures reproduced from the preserved artifacts without relying on the developer's
+  account; every numeric claim in AMENDMENT-20 recomputed and reproducing (5 rows all `n_dates = 1`;
+  13 at `n_dates` 2–4; 18 at `n_dates = 1`; none ≥ 7; 31 + 3 = 34; 12,503; `n = 11`/`n_dates = 8`/
+  `p = 1.0` for `1000RATSUSDT`; `n = 1`/`n_dates = 47` for `1000BONKUSDT`).
+- Estimand invariance: bit-exact across 18 columns on all 1,164 shared per-symbol cells; single
+  additive schema column; no downstream reader of the suppressed `log_R` (homogeneity and
+  `_layer_deltas` both verified closed).
+- §12's `log R never unaccompanied` row is **textually unchanged** by the diff — the design did not
+  weaken the rule that failed.
+- `n_hard_checks = 28 = expected_hard_checks`, all 28 present by name in both runs; no check added,
+  removed or renamed by the diff.
+- No residual reference to `n_dates < 7` anywhere in `screen_code/`.
+- `BLOCK RULE` can still fail: 5 of 6 injected faults drive the envelope clause False.
+- Amendment-direction ledger arithmetic and both L-23 flags.
+- Code provenance: smoke `code_sha256` recomputes exactly to the code now on disk; `generator_sha256`,
+  `expected_resolution_sha256`, `resolution_basis_sha256` identical across both runs.
+- Spread disclosure intact (`UNAVAILABLE_NOT_CHARGED`, `PARTIAL_FEES_FUNDING_ONLY`,
+  `spread_rt_bps: null`, prohibited-claims list present); the diff does not touch cost.
+- Diff scope: 3 files (`design.md`, `integrity.py`, `metrics.py`) plus `qa-review.md`. No holdout
+  surface, no fence, no causality rule, no `BacktestNode`, no accounting primitive, no registry.
+
+### FAILING_ARTIFACT / REQUIRED_SKILL
+
+```
+FAILING_ARTIFACT: python/experiments/SPDR-019/screen_code/run_screen.py:453-474
+                  (interaction rows never emit `ci_absent_reason`; the surviving
+                   unclassified cell → BLOCK RULE still HARD-fails)   [R11-01]
+FAILING_ARTIFACT: python/experiments/SPDR-019/screen_code/integrity.py:558
+                  (`log_r_undefined` re-derived from a field metrics.py:409
+                   overwrites → the LOG_R_UNDEFINED token cannot be rejected) [R11-02]
+FAILING_ARTIFACT: python/experiments/SPDR-019/design.md AMENDMENT-20(a)(i)
+                  (interaction cell mislabelled LOG_R_UNDEFINED on a structural
+                   NaN; exempts all 311 interaction rows on the same evidence) [R11-03]
+REQUIRED_SKILL:   quant-designer      → R11-03 (choose exclusion-before-scoring for
+                                        interaction rows, or book the third condition
+                                        explicitly and bound it)
+REQUIRED_SKILL:   experiment-developer → R11-01, R11-02 (after R11-03 settles the
+                                        design question, since R11-01's remedy depends
+                                        on it), R11-04 (optional, non-blocking)
+```
+
+### Standing execution blockers
+
+1. **R11-01** — the full 25-symbol re-run will HARD-fail `BLOCK RULE` again on one unclassified
+   cell. Field-exact replay, not inference.
+2. **R11-02** — the amended HARD check cannot reject its own primary token; the design's stated
+   validation basis is not the one implemented.
+3. **R11-03** — the design question underneath R11-01 is unsettled: exempt the interaction cell, or
+   exclude it before scoring. R11-01's remedy differs depending on the answer, so this is decided
+   first.
+4. **No full-scale run since the fix**, and the 2-symbol smoke exercises none of the three failure
+   modes above (R11-05). A smoke that includes at least one of `BLURUSDT`, `1000BONKUSDT`,
+   `PYTHUSDT`, `1000RATSUSDT` is the minimum runtime evidence for a re-authorisation.
+
+**Execution authorisation: NO** — for the full 25-symbol re-run. Re-authorise after R11-03 is
+decided, R11-01/R11-02 are implemented, and a smoke covering the four affected symbols returns
+28/28 with 0 unclassified.
+
+### What I did not reach
+
+- **I did not re-run the screen at any scale.** QA is read-only and a run would overwrite
+  `results/`. My runtime evidence is `check_block_rule` invoked directly on synthetic rows and on a
+  field-exact replay of the real surviving cell, plus static reads of the two preserved artifact
+  sets. The prediction that the re-run fails 1 of 28 is a prediction, not an observation.
+- **I did not verify the 26 passing HARD checks.** They passed in both the failing full run and the
+  smoke and lie outside the diff; runs 8–10 traced them. If R11-01/R11-02 are fixed by a change that
+  reaches beyond the exemption branch, that reliance lapses.
+- **I did not re-derive the parent gates, the unit pin, the selection check or the controls.**
+  Untouched by the diff; `controls.json`, `parent_gate_parity.json`, `selection_check.json`,
+  `unit_pin.json`, `golden_traces.json` were read only for hash/provenance comparison.
+- **I did not audit the 840 sizing-suppressed cells.** Booked at run 9 (R9-04) and unchanged here; I
+  verified only that the bucket reconciles and that my recompute of `log_R` from `(p, W, L)` picks
+  out exactly that set.
+- **I did not check whether the exempt cells are the same set at 25 symbols post-fix.** Cell
+  membership is data-determined and nothing upstream changed, so I expect the same 34; I verified
+  the classification logic, not the regeneration.
+- **I did not quantify any finding's effect on any result.** There is no authorised run, and that is
+  the data-analyst's object.
+
+---
+
+## QA run 12 — 2026-07-30T00:01Z — mode: subagent — HEAD 1979b93 (dirty: SPDR-019/design.md, SPDR-019/qa-review.md, SPDR-019/screen_code/{integrity,metrics,run_screen}.py; SPDR-019/results/* and SPDR-020/results/* untracked)
+
+Verdict: **APPROVE**
+
+**Execution authorisation: YES** — for the full 25-symbol phase-(a) re-run.
+
+Subject: closure of the three run-11 blocking findings (**R11-01** the fix missed the
+derived/interaction construction path; **R11-02** the checker derived undefinedness from the very
+`log_R` field the remedy blanks; **R11-03** condition (i) was vacuous on interaction rows), and the
+remediation carried by the three-file `screen_code/` diff plus AMENDMENT-20 clauses (c) and (d).
+
+**Reviewed state.** `HEAD 1979b93648c41fad74458b86a3bb96bff2244012`, nothing committed.
+`git diff` scope is exactly four files: `design.md` (+79/−17 across the §12 row and the amendment
+ledger), `screen_code/integrity.py` (one hunk in `check_block_rule` plus one import plus the
+`degenerate_reason_required` string), `screen_code/metrics.py` (**pure insertion**, +31/−0: the new
+`log_R_is_defined` and the `ci_absent_reason` block), `screen_code/run_screen.py` (+12/−2 inside
+`_add_interaction_rows`), and `qa-review.md`. `qa-review.md`'s diff is a **single append hunk**
+(`@@ -4353,0 +4354,676 @@`), so runs 1–11 are byte-identical; this section is appended below run 11
+and nothing above it is touched.
+
+**Independence.** Fresh subagent context. I authored none of the design, none of the
+implementation, and none of runs 1–11. Read in full before touching code: runs 10 and 11, the whole
+`git diff`, `metrics.py:52-120` and `:340-425`, `integrity.py:492-610`, `run_screen.py:320-486` and
+`:750-775`, `golden.py`, `config.py:129-200`, `design.md` §4.3, §12's row set and the AMENDMENT
+ledger. **Read-only:** every injection below is an in-memory patch or a synthetic frame;
+`git diff HEAD -- python/experiments/SPDR-019/screen_code/` is unchanged by this review and I did
+not re-run the screen at any scale.
+
+---
+
+### PART A — the three run-11 findings, closed by injection
+
+Every row is an executed result. `held` is the `min/max envelope over blocks x seeds` clause of
+`BLOCK RULE` — the clause AMENDMENT-20 amends — driven by `integrity.check_block_rule` called
+directly, with one healthy CI-carrying control row present so the 15-entry battery clause is
+satisfied and the exemption logic is the only discriminator.
+
+| Finding | Status | Evidence I produced |
+|---|---|---|
+| **R11-01** — the fix missed the derived/interaction construction path; one unclassified cell survived it and `BLOCK RULE` would HARD-fail again | **CLOSED — CONFIRMED on live data and by injection** | Remedied on the **other** axis from the one run 11 predicted: instead of teaching `_extra` to emit a token, `run_screen.py:434-442` refuses to **build** the term. Verified three ways. (1) **Live:** the 6-symbol smoke in `results/` (provenance below) emits **77** interaction rows, **all 77 carrying a CI**, and the offending `1000BONKUSDT / M15 / δ=1.0 / DESIGN` cell is **absent**; I independently enumerated every `(clock, δ, scope, band)` key with all four arms present and an arm whose own `log R` is undefined — there is exactly **one**, that key, and it is exactly the one with no interaction row. No key with an undefined arm produced a row. (2) **Full-scale replay:** over the preserved failing frame the rule drops **1 of 312** interaction rows, the one with no CI, and keeps all **311** that carry one. (3) **Injection:** a derived row reaching `check_block_rule` without a CI is unclassified and fails in **all four** shapes I could construct — token `LOG_R_UNDEFINED` with NaN `p`/`W`/`L`; token `N_DATES_LT_2_NO_DAY_BLOCK` with a genuinely true `n_dates = 1`; token `LOG_R_UNDEFINED` with finite one-sided `p`/`W`/`L`; and with a non-empty battery so it falls to the final `else`. `integrity.py:566-567` sets `admissible = {}` for `DERIVED_VARIANTS`, so **no** token can rescue a derived row. |
+| **R11-02** — integrity's re-derivation of `LOG_R_UNDEFINED` was vacuous: it read the field `metrics.py:409` blanks, so the token could never be rejected | **CLOSED — CONFIRMED by injection in both directions** | `metrics.log_R_is_defined:111-121` is now the single predicate and `integrity.py:558-560` calls it on the row's **own `p`/`W`/`L`**. **Run-11 case H — the exact defect — now FAILS:** a cell with `n_dates = 47`, finite `p`/`W`/`L`, an empty battery and `log_R` blanked, claiming `LOG_R_UNDEFINED`, gives `held False`, `unclassified 1` (run 11: `held True`, exempt 1). **I reverted the fix in memory** — recompiled `integrity.py` with `log_r_undefined` read back off the `log_R` field — and the same row returns `held True`, exempt 1: the defect is reproducible and the fix is what removes it. The emitted audit field is no longer constant-True: in the live smoke's 31 exempt cells `log_R_undefined` reads **26 True / 5 False** and `n_dates_lt_2` reads **17 True / 14 False**, so both booleans now carry information. On the real 13,376-row post-fix frame, forcing every exemption to claim `LOG_R_UNDEFINED` leaves **5 unclassified** — precisely the 5 cells whose `p`/`W`/`L` are defined — so a false claim of that token is now detected on real data. |
+| **R11-03** — `LOG_R_UNDEFINED` was the wrong condition for the interaction cell, and asserting it there would widen the exemption to all 311 interaction rows | **CLOSED — the design took QA's recommended option, and the widening is structurally impossible** | AMENDMENT-20(c) adopts **exclusion-before-scoring**, which is what run 11 recommended, rather than booking a third exemption token. Two independent barriers now exist and I tested both: the term is not built (PART A row 1), and even if one appeared, `DERIVED_VARIANTS` is barred from the exemption path entirely, so the 311-row widening cannot occur by construction — no token is admissible for a derived row regardless of what its `p`/`W`/`L` say. I confirmed the premise the amendment rests on: **all 312** interaction rows in the failing run carry `p = W = L = NaN`, including 310 with healthy CIs and `n` up to 1,090, so definedness genuinely is vacuous on that row type. |
+
+**Fault matrix, in full** (one injected no-CI row + one healthy control; `held` is the envelope clause):
+
+| # | Injected row | held | exempt | unclassified |
+|---|---|---|---|---|
+| 0 | control — every cell carries a CI | True | 0 | 0 |
+| A | `n_dates = 1`, `p`/`W`/`L` finite, claims `N_DATES_LT_2` (true) | True | 1 | 0 |
+| B | `p = 1` ⇒ `L` undefined, claims `LOG_R_UNDEFINED` (true) | True | 1 | 0 |
+| C | **wrong token** — `n_dates = 8`, `p`/`W`/`L` finite, claims `N_DATES_LT_2` | **False** | 0 | **1** |
+| D | **missing token** — `ci_absent_reason = None` | **False** | 0 | **1** |
+| E | **bogus token** — `"BANANA"` | **False** | 0 | **1** |
+| F | **key absent entirely** | **False** | 0 | **1** |
+| G | run-11 case G — `n_dates = 47`, `log_R` **finite**, claims `LOG_R_UNDEFINED` | **False** | 0 | **1** |
+| H | **run-11 case H** — `n_dates = 47`, `p`/`W`/`L` finite, `log_R` **blanked**, empty battery, claims `LOG_R_UNDEFINED` | **False** ✅ | 0 | **1** |
+| H′ | case H against a **reverted** checker (reads the blanked `log_R`) | True ⚠ | 1 | 0 |
+| I | both conditions true, claims `LOG_R_UNDEFINED` | True | 1 | 0 |
+| J | both conditions true, claims `N_DATES_LT_2` (**swapped**) | True | 1 | 0 |
+| K | **derived** row, no CI, NaN `p`/`W`/`L`, claims `LOG_R_UNDEFINED` | **False** | 0 | **1** |
+| L | **derived** row, no CI, claims `N_DATES_LT_2` with a genuinely true `n_dates = 1` | **False** | 0 | **1** |
+| M | **derived** row, no CI, finite one-sided `p`/`W`/`L`, claims `LOG_R_UNDEFINED` | **False** | 0 | **1** |
+| N | **derived** row, no CI, **non-empty** battery (falls to the final `else`) | **False** | 0 | **1** |
+| O | `p = 0` ⇒ `W` undefined, `n_dates = 30`, claims `LOG_R_UNDEFINED` (true) | True | 1 | 0 |
+| P | `W = 0` exactly, claims `LOG_R_UNDEFINED` (true — `log(0/L)` is `−inf`) | True | 1 | 0 |
+| Q | `n_dates` non-numeric `"many"`, `p`/`W`/`L` finite, claims `N_DATES_LT_2` | **False** | 0 | **1** |
+
+**On the real 13,376-row post-fix frame** (buckets recomputed each time):
+
+| Injection | held | exempt | unclassified | reconciles |
+|---|---|---|---|---|
+| clean | **True** | 33 | 0 | 13,376 = row count |
+| swap every exemption token | **False** | 13 | **20** | yes |
+| drop every exemption token | **False** | 0 | **33** | yes |
+| forge `"BANANA"` on every exemption | **False** | 0 | **33** | yes |
+| force every exemption to claim `LOG_R_UNDEFINED` | **False** | 28 | **5** | yes |
+
+The developer's fail-ability numbers (20 on a swap, 33 on a drop) **reproduce exactly**. So does the
+bucket reconciliation: **12,503 carrying a CI + 840 sizing-suppressed + 33 exempt (28
+`LOG_R_UNDEFINED` + 5 `N_DATES_LT_2_NO_DAY_BLOCK`) + 0 unclassified = 13,376**, and the envelope
+clause `held True` with `min_observed = max_observed = expected_per_cell = 15`.
+
+*Replay fidelity note.* The preserved artifact is a parquet, so three columns must be restored to
+their live in-process shape before `check_block_rule` sees them: `per_seed_ci` is stored as a JSON
+**string** (`list("[]")` yields a 2-element list and silently mis-routes every exempt cell to the
+final `else`), and `log_R_suppressed_reason` materialises as **NaN** rather than absent (NaN is
+truthy, which mis-routes all 33 exempt cells into the sizing bucket). I verified against
+`run_screen.py:271` and `integrity.py:712` that the live call receives in-process dicts in which
+that key is genuinely absent on non-sizing rows, so neither is a code defect — but both are traps
+for anyone auditing from the parquet, and both silently produce a *wrong* bucket split rather than
+an error. Recorded for the data-analyst.
+
+---
+
+### PART B — did any measured quantity move? (item 2)
+
+Verified against the preserved failing artifacts at
+`…/scratchpad/spdr019_fullrun_FAILING/metrics_by_cell.parquet` (13,377 rows).
+
+| Claim under test | What I found | Verdict |
+|---|---|---|
+| the 12,503 CI-carrying cells are arithmetically identical | joined pre- and post-fix on `(variant_id, clock, delta, scope, band)`: **12,503 pre, 12,503 post, 12,503 joined**, and across `n, mean, p, W, L, n_pos, n_neg, n_dates, W_L, p_be, p_be_net, identity_residual_bps, mean_signed_rows, log_R, ci_low, ci_high, ci_width, block_mde` every column returns **max \|Δ\| = 0.0 with 0 finiteness flips** | CONFIRMED |
+| exactly 5 `log_R` values are blanked | 12,508 finite `log_R` pre-fix, 12,503 carrying a CI, **5** rows finite-`log_R`-with-no-CI: `BLURUSDT / L1_SHAT_RANK_CONTINUOUS / M15 / {0.25, 0.50} / DESIGN` and `1000BONKUSDT / L2_JOINT_HMM_HIGH_AND_K12_HIGH / H1 / {0.25, 0.50, 1.00} / DESIGN`, **all five `n_dates = 1`** with `p`/`W`/`L` finite. The emitter-exact simulation blanks **5** and no others | CONFIRMED |
+| exactly 1 ineligible derived row is dropped | 13,377 → **13,376**; the dropped row is `1000BONKUSDT / M15 / δ=1.0 / DESIGN`, `had_ci = False`, offending arm `L2_JOINT_HMM_HIGH_AND_K12_HIGH` with `n = 1, p = 1.0, L = NaN` | CONFIRMED |
+| the new predicate agrees with the estimand's own | `log_R_is_defined(p, W, L)` vs `isfinite(log_R_from_pWL(p, W, L))` on all **13,377** rows: **0 mismatches**. So the shared predicate is not a second, subtly different rule | CONFIRMED |
+| the blanking cannot reach `layer_deltas` | all 5 blanked rows are `band = DESIGN`; `_layer_deltas` (`run_screen.py:489`) is TRAIN-only, and the smoke's `layer_deltas.parquet` carries `bands = ['TRAIN']` only. **Zero contact**, confirming run 11's PART C by a different route | CONFIRMED |
+| nothing asserts an expected interaction-row count that a drop would break | `DERIVED_VARIANTS` is excluded from the cell-count estimate (`run_screen.py:762`) and appears in no HARD check other than the new `integrity.py:566` bar; no `selfcheck`/`selection` clause references the interaction variant; §12 and §9 impose no interaction-coverage requirement | CONFIRMED |
+| the dropped row could not have armed anything | its `ci_low` is NaN, so it entered no `ci_low > 0` read, no `mirror_band` other than the CI-relative default, and no homogeneity pool | CONFIRMED |
+
+**Answer: nothing measured moved.** The only value changes in the entire remediation are 5 `log_R`
+fields set to null on cells that ship no interval, and one derived row that ships no interval being
+removed from the frame.
+
+---
+
+### PART C — the live 6-symbol smoke, verified rather than accepted
+
+`results/` holds a 6-symbol run at `n_boot 200, jobs 4`, and I checked its provenance before using
+it: `selfcheck._sha256_tree(screen_code)` recomputes to
+`fd56d6ce079002f6f4ebcdecba03f6c4ffa732107a34176c915db2c961c53de6`, **byte-identical to the
+`code_sha256` in `integrity_selfcheck.json`**, so the smoke provably ran the code now on disk.
+
+| Reported | Verified |
+|---|---|
+| 28/28 HARD checks pass | `all_hard_pass true`, `hard_fail_names []`, `n_hard_checks 28 = expected_hard_checks 28`; I listed all 28 by name and every one reads `held true`, including `BLOCK RULE`, `log R never unaccompanied` and `golden traces` |
+| symbols cover the four that caused the failures, plus BTC/ETH | scopes = `1000BONKUSDT, 1000RATSUSDT, BLURUSDT, BTCUSDT, ETHUSDT, PYTHUSDT` (+ POOLED). All four affected symbols present — the coverage gap run 11 recorded as R11-05 is **closed** |
+| buckets reconcile to the row count, 0 unclassified | 3,307 with a CI + 31 exempt + 228 sizing + **0** unclassified = **3,566 = `n_metric_rows`** |
+| both exemption tokens exercised, 26 undefined / 5 single-day | `Counter({'LOG_R_UNDEFINED': 26, 'N_DATES_LT_2_NO_DAY_BLOCK': 5})`, and `ci_absent_reason` in the parquet reads `{NaN: 3535, LOG_R_UNDEFINED: 26, N_DATES_LT_2_NO_DAY_BLOCK: 5}` |
+| 0 unaccompanied `log R` | finite `log_R` with no CI: **0** of 3,566. The suppression path **fired** this time (unlike the 2-symbol smoke run 11 criticised) |
+| the previously-failing interaction cell absent | 77 interaction rows, all with a CI; the `1000BONKUSDT / M15 / δ=1.0 / DESIGN` cell is not present; and it is the **only** key in the whole emission with all four arms present and an undefined arm |
+
+**On the 4-symbol run that failed only `golden traces`:** the reading is **correct in substance, with
+a correction to the detail.** G1 is pinned to `BTCUSDT H1 DESIGN` (`golden.py:29-30`), G2 to
+`ETHUSDT H1 DESIGN` (`:83`), and G6 to "the G1 symbol" (`:164`) — those three go `MISSING` when
+neither symbol is in the run, which fails the check. **G3 is not pinned** — it is "first SUPPRESSED
+signal **any symbol** H1 DESIGN" (`:102-103`) — so the stated reason "G1–G3 are pinned to
+BTCUSDT/ETHUSDT" over-attributes by one trace and under-attributes G6. The conclusion stands: that
+failure is an absent anchor, not a defect, and it cannot occur on a 25-symbol run that contains both
+symbols. Incidentally that run also exercised the `anchor_fallback` branch
+(`run_screen.py:964-972`) which run 10 recorded as the one unexercised path in the R9-10 fix.
+
+---
+
+### PART D — design-to-code fidelity on the amended clauses
+
+Expected behaviour derived from the amended design text first, then read against the code.
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| AMENDMENT-20(d) / §12: "`log R` counts as defined iff `p`, `W`, `L` are finite with `0 < p < 1`, `W > 0`, `L > 0`" | `metrics.log_R_is_defined:111-121` | MATCHES | literal transcription; and it agrees with `log_R_from_pWL:74-78` on all 13,377 real rows |
+| AMENDMENT-20(d): "both the emitter and the checker use that one predicate" | emitter `metrics.py:412`; checker `integrity.py:558-560`; eligibility `run_screen.py:438-440` | MATCHES | one function, three call sites, no duplicated inline predicate anywhere (grepped) |
+| AMENDMENT-20(d): undefinedness "NEVER FROM THE EMITTED `log R`" | `integrity.py:558-560` | MATCHES | no read of `row["log_R"]` remains anywhere in the exemption branch; case H fails, case H′ (reverted) passes |
+| AMENDMENT-20(c): "requires all four input arms (`L0`, shock, k12, joint) to carry a DEFINED `log R`, tested on each arm's own `p`, `W`, `L`" | `run_screen.py:424-442` | MATCHES | all four arm ids enumerated; the test reads `src["p"]/["W"]/["L"]` from the arm's own `cell_metrics` row at the same `(clock, δ, scope, band)` key |
+| AMENDMENT-20(c): the term is "NOT BUILT rather than built and then exempted" | `run_screen.py:441-442` `arms = {}; break` before `_arm_arrays` and before `paired_combo_ci` | MATCHES | the break precedes both the array fetch and the bootstrap, so no work and no row |
+| AMENDMENT-20(c): "on the failing run this drops EXACTLY ONE row of 312 … and keeps all 311 that carry a CI" | — | MATCHES, **recomputed** | 312 interaction rows; dropped 1; kept 311; the dropped one is the only one without a CI |
+| AMENDMENT-20(c): "A derived row appearing without a CI is UNCLASSIFIED and fails" | `integrity.py:566-567` (`admissible = {}`) and the final `else` at `:583-585` | MATCHES | both routes verified by injection (K/L/M via the empty-battery branch, N via the final `else`) |
+| §12 row: four buckets reconcile to the row count; `unclassified` is a hard failure | `integrity.py:526-587`, `deg_ok` at `:587` | MATCHES | reconciles exactly at both scales (13,376 and 3,566); `unclassified` drives `held False` in 11 injected shapes |
+| §12 row: the condition is "validated against that cell's own emitted `p`, `W`, `L`, `n`, `n_dates`" | `integrity.py:558-561`, audit fields at `:574-578` | MATCHES | `p`/`W`/`L` now **used**, not merely emitted; `n` is still emitted-only, which is what the clause says (`n` is not part of either condition) |
+| §12 row: "`n_dates < 7` is **not** an exempting condition" | old branch deleted; `degenerate_reason_required` restated at `:606-609` | MATCHES | no residual `n_dates < 7` in `screen_code/` (grepped); `BOOT_BLOCKS_DAYS` now used only by clauses 2 and 3 |
+| §12 row text ↔ AMENDMENT-20 body | `design.md:1088` vs `:1339-1394` | MATCHES | the §12 row carries clauses (c) and (d) verbatim in substance; the definedness predicate is stated identically in both places |
+| Ledger: 5 looser / 9 tighter / 6 neutral; active 4 / 8 / 6 | `design.md:1397-1399` | MATCHES, **recounted from the DIRECTION lines** | LOOSER = 1, 2, 7, 10, 20 (5); TIGHTER = 3, 4, 8, 11, 13, 15, 16, 17, 18 (9); NEUTRAL = 5, 6, 9, 12, 14, 19 (6); total 20. Supersessions −7 by −17 and −11 by −15 → 18 = 4 / 8 / 6 |
+| L-23: LOOSER note lists four and is flagged at the gate | `design.md:1405-1406` | MATCHES | AMENDMENT-1, -2, -10, -20 named; flag present |
+| L-23 clause 3: streak flagged, and the break disclosed | `design.md:1400-1404` | MATCHES | the five-row TIGHTER streak in 12–18 stands as history and AMENDMENT-20 is stated to break monotonicity. Honest — the easy move would have been to delete the streak note |
+| `check_no_local_accounting("SPDR-019/screen_code")` | executed | PASSES | `{'ok': True, 'banned_defs_found': []}` |
+| Spread disclosure (chapter 05) | `config.py:192-194` | INTACT | `UNAVAILABLE_NOT_CHARGED`, `spread_rt_bps: None`, `PARTIAL_FEES_FUNDING_ONLY`; the diff does not touch cost |
+| Hard-check count | `config.py:288-289` | UNCHANGED | `EXPECTED_HARD_CHECK_COUNT = 28` with an assert against `HARD_CHECK_NAMES`; `config.py` is not in the diff. No check added, removed or renamed |
+| Holdout / fence / causality / `BacktestNode` / XENA / registry | — | NO CONTACT | the diff touches none of these surfaces |
+
+---
+
+### PART E — the "not built" eligibility rule, judged on its merits (item 3)
+
+**Is excluding a derived term whose input arm has an undefined `log R` the right call? Yes.** The
+interaction estimand is `Δ log R(joint) − Δ log R(shock) − Δ log R(k12)` and
+`paired_combo_ci:577-581` forms its point estimate as `combo({name: log_R_from_pWL(...)})` per arm.
+If any arm's `log R` is non-finite the combination is non-finite as a matter of arithmetic, so
+`paired_combo_ci` returns an empty battery and there is nothing to measure. Excluding is strictly
+more honest than emitting a row and then excusing it: an exempted row still occupies the frame, is
+still counted, and is a place a future thin-cell defect can hide — which is the criticism run 11
+made and which the design's own assessment paragraph concedes.
+
+**Is it correctly scoped to derived variants only? Yes, and I checked it two ways.** The rule lives
+entirely inside `_add_interaction_rows` (`run_screen.py:434-442`), which is reached only for
+`L2_INTERACTION_HMM_X_K12`; the 13,065 non-derived rows cannot be dropped by it. In the failing
+frame **28 non-derived rows have an undefined `log R` and 0 of them carry a CI** — all 28 keep their
+row, their `p`/`W`/`L` and their exemption, exactly as §12 requires. Separately, `integrity.py:566`
+bars only `DERIVED_VARIANTS` from the exemption path, so no ordinary cell loses its exemption.
+
+**Can it silently drop anything beyond the one known row at full scale? No — I enumerated rather
+than inferred.** Across the 25-symbol frame, five arm-cells have an undefined `log R`: four
+`L2_SHOCK_HMM` cells (`PYTHUSDT / H1 / {0.5, 1.0} / {TRAIN, CONFIRM}`) and one
+`L2_JOINT_HMM_HIGH_AND_K12_HIGH` cell. At each of the four `PYTHUSDT` keys only **2 of 4** arm rows
+exist, so the pre-existing `src is None` guard (`run_screen.py:431`) already excluded them and the
+new rule changes nothing there. Only the `1000BONKUSDT` key has all four arms plus an undefined one,
+and that is the single drop. The drop set is also **`n_boot`-invariant** — `p`, `W`, `L` are day-sum
+aggregates independent of the bootstrap — so on a deterministic re-run over the same episode set the
+expectation is exactly **311 interaction rows and 13,376 metric rows**. That is a hard, predeclared
+number the operator and the data-analyst can check the re-run against.
+
+**One residual the rule does not cover, and it needs an analyst note — R12-01.** The bar is drawn at
+*definedness*, not at *intervallability*. Three interaction rows survive it while an input arm
+carries **no CI at all**: `1000BONKUSDT / H1 / {0.25, 0.50, 1.00} / DESIGN`, whose `joint` arm has
+`n = 2` over **1 calendar day** and is itself exempt under `N_DATES_LT_2_NO_DAY_BLOCK` with its
+`log R` blanked by AMENDMENT-20(b). Because that arm's `p`/`W`/`L` are finite and two-sided
+(`p = 0.5, W = 682.8, L = 433.1`), `log_R_is_defined` is True, the term is built, and
+`paired_combo_ci` recomputes the arm's `log R` internally on the union day index — so a value the
+design forbids shipping on its own row reappears, unlabelled, inside a derived point estimate. At
+`n_boot 2000` one of the three reads **`ci_low = 0.0930 > 0`**, i.e. `ABOVE_THE_MIRROR`.
+**Why this is not blocking, checked and not assumed:** §4.3's phase-(b) trigger reads
+`Δ log R vs L0` or absolute `log R` **"in the phase-(a) emission on the primary read"**, and the
+primary read is full TRAIN (AMENDMENT-1) — all three rows are `band = DESIGN`, and `layer_deltas`,
+which carries the `Δ log R` read, is TRAIN-only by construction. The four TRAIN-band interaction
+rows that do read `ci_low > 0` (ADAUSDT ×2, BNBUSDT, POOLED — all M15) are healthy: `n` 293–3,046
+over 491–893 days, no arm without a CI. The three thin rows also **disclose their own thinness**:
+`run_screen.py:473-474` copies the joint arm's `n`, so each ships `n = 2.0` on the row. So the
+consequence is confined to a verification-band row that a reader can see is built on two episodes.
+**Analyst note:** do not read `1000BONKUSDT / H1 / DESIGN` interaction rows as measured
+interactions. **For `quant-designer`, post-gate:** the natural bar is "every input arm carries a
+CI", which would also make the eligibility rule symmetric with §12's suppression rule; it drops
+these 3 rows and nothing else at full scale (311 → 308).
+
+---
+
+### PART F — AMENDMENT-20's DIRECTION label, re-examined (item 4)
+
+The amendment now contains a loosening (the exemption path) **and** two tightenings (the withdrawn
+`n_dates < 7` reason; clause (c)'s not-built rule). Judgement: **the label is still honest, and the
+ledger arithmetic and both L-23 flags are still correct.**
+
+*Direction.* **LOOSER is right and remains the harder label to volunteer.** Read literally, the
+pre-diff design authorised no exemption at all, so all 34 near-empty cells were hard failures and
+this row creates the relief; that is a loosening whatever else is bundled with it. The DIRECTION
+line refuses to net the tightening away — it says so in capitals — and quantifies it: **13**
+non-sizing exempt cells at `n_dates` 2–4 were being exempted for a condition they do not have. I
+recomputed that: the post-fix exempt histogram is `LOG_R_UNDEFINED` {1: 13, 2: 4, 3: 2, 4: 7, 8: 2}
+and `N_DATES_LT_2` {1: 5}, so the 13 at `n_dates` 2–4 are exactly `4 + 2 + 7` and they now all carry
+the correct narrower `LOG_R_UNDEFINED` justification rather than failing. The design's claim is
+accurate.
+
+*Ledger arithmetic.* Recounted from the DIRECTION lines, not from the summary text: 5 / 9 / 6 over
+20 rows, and 4 / 8 / 6 over the 18 active after the two supersessions. Both match `design.md`
+exactly. The L-23 LOOSER note correctly lists four (−1, −2, −10, −20). The streak note is retained
+as history with an explicit statement that AMENDMENT-20 breaks monotonicity — the honest handling.
+The `EXPECTED FALSE-QUALIFIER COUNT` line is `N/A — ZERO machine qualifiers`, consistent with
+AMENDMENT-C7, and the §12 "No adequacy flag" row still asserts it.
+
+*Two wording residuals, neither a direction error.*
+- **R12-02 (LOW).** The DIRECTION line books only the first tightening. Clause (c) is the second and
+  it changes the **row population** (13,377 → 13,376), while the DIRECTION line says "No cell's
+  estimand, comparator or band changes" — true of every surviving cell, but silent on the removed
+  one. Clause (c)'s body does disclose the drop and its exact size, so this is a ledger-line
+  completeness gap, not a concealment; and the omitted component pushes the row *away* from LOOSER,
+  so the label is if anything conservative.
+- **R12-03 (LOW).** The parenthetical "(Of the 31 exempt cells, 18 genuinely have `n_dates = 1`;
+  none has `n_dates >= 7`.)" describes the **pre-fix** 31-cell set. Post-fix the exempt set is 33
+  and **2 of them have `n_dates = 8`** — the `1000RATSUSDT / L4_TARGET_A1_MOD` TRAIN and CONFIRM
+  cells, which clause (a)(i) names explicitly as `LOG_R_UNDEFINED`. Internally consistent, but a
+  reader could take "none has `n_dates >= 7`" as a property of the post-fix exempt set, which is
+  false. Wording only.
+
+---
+
+### PART G — the known residual: a swapped token when both conditions hold (item 5)
+
+**Acceptable. It does not need to be fixed before the run.** Stated plainly: for the 13 cells where
+both exempting conditions are genuinely true, the checker will accept either token, so a cell could
+record `N_DATES_LT_2_NO_DAY_BLOCK` where `LOG_R_UNDEFINED` is the more fundamental reason (or vice
+versa). I judge this harmless on four grounds, each checked rather than argued:
+
+1. **Both conditions are true**, so neither token is a false statement about the cell. The failure
+   mode a false reason exists to catch — a cell exempted for something it does not have — is closed:
+   swapping tokens on the real frame turns **20 of 33** exempt cells into unclassified failures, and
+   the 13 that survive are exactly the both-true set.
+2. **Both derived booleans ship on every exempt row** (`log_R_undefined`, `n_dates_lt_2`, plus
+   `p`, `W`, `L`, `n`, `n_dates`, `claimed_reason` and the validated `reason`), and they are now
+   informative rather than constant — the live smoke shows 26/5 and 17/14. Any reader can recover
+   the true condition set regardless of which token was claimed.
+3. **The emitter's order is deterministic and disclosed** (`metrics.py:412-416`: `LOG_R_UNDEFINED`
+   first, then `N_DATES_LT_2`), so in practice a both-true cell always records `LOG_R_UNDEFINED`.
+   The ambiguity is admissible in the checker but not produced by the emitter.
+4. **No number depends on which token is recorded.** The token enters no estimand, band, comparator,
+   gate or count other than the exempt/unclassified split, and both tokens land in the same bucket.
+
+Tightening this — requiring the emitter's precedence order — would be a checker that tests the
+emitter's implementation choice rather than the cell's property, which is the wrong direction for an
+integrity check. I recommend leaving it, with the two booleans as the audit record.
+
+---
+
+### PART H — carried forward, not closed (item 6)
+
+- **Evidence is still not from a full 25-symbol run since the fix.** The strongest live evidence is a
+  **6-symbol** smoke at `n_boot 200` — a real improvement on run 11's 2-symbol/`n_boot 200` smoke,
+  because it now contains all four symbols that produced the failures and it fires both exemption
+  tokens and the suppression path. But scale-dependent behaviour is untested: the 25-symbol run
+  scores ~13,376 cells at `n_boot 2000` (44 min previously), and my full-scale statements are
+  **replays of the fixed logic over the preserved pre-fix frame**, not observations of a new run. The
+  predeclared expectations to check the re-run against are: **13,376 metric rows, 311 interaction
+  rows, 12,503 cells with a CI, 33 exempt (28 + 5), 840 sizing, 0 unclassified, 0 unaccompanied
+  `log R`, 28/28 HARD**.
+- **M15 detail-level verification.** Unchanged since run 9. Both clocks ran, M15 rows are present and
+  in the L-51 subsets, and the eligibility rule fired on an M15 cell — but I checked no M15 fill, no
+  M15 hold conversion and no M15 block behaviour individually. **M15 carries the primary read**
+  (AMENDMENT-2). This remains the largest standing coverage gap in the review series and no smoke
+  closes it.
+- **SPDR-020's `screen_code/` has never been reviewed.** Unchanged and now more pressing: it shares
+  `resolution_basis.py` and the resolution artifacts, it moved again during this review window
+  (untracked `results/run_plan.json` and `results/shards/`), and `log_R_is_defined` is exactly the
+  kind of shared-predicate correction a sibling implementation will *not* have received. **It needs
+  its own QA run; do not infer its state from this one.**
+
+---
+
+### PART I — other findings (all non-blocking)
+
+**R12-01 — INFORMATIVE / `quant-designer` (post-gate).** Eligibility is keyed to definedness, not to
+intervallability; 3 DESIGN-band interaction rows are built on a joint arm of 2 episodes over 1
+calendar day, one of them reading `ci_low > 0`. Cannot reach the phase-(b) trigger (DESIGN band;
+`layer_deltas` is TRAIN-only) and the thinness is disclosed as `n = 2.0` on the row. Full analysis in
+PART E. **Analyst note: do not read those three rows as measured interactions.**
+
+**R12-02 — LOW / `quant-designer`.** AMENDMENT-20's DIRECTION line books one tightening component and
+omits clause (c)'s, which changes the row population by one. PART F.
+
+**R12-03 — LOW / `quant-designer`.** "none has `n_dates >= 7`" describes the pre-fix exempt set; two
+post-fix exempt cells have `n_dates = 8`. PART F.
+
+**R12-04 — LOW / `experiment-developer`.** `metrics.log_R_is_defined:119` accepts
+`(int, float, np.floating)` but **not `np.integer`**, so it and `log_R_from_pWL` — which
+AMENDMENT-20(d) says are one predicate — disagree on an integer-typed `W` or `L`
+(`log_R_is_defined(0.5, np.int64(5), 6.0)` is `False` while `log_R_from_pWL` is finite). Consequence
+if it ever fired: an interaction term silently not built, and an admissible `LOG_R_UNDEFINED` on a
+defined cell. **Currently unreachable** — `metrics._agg:52-71` returns float64 throughout, and the
+two predicates agree on all 13,377 real rows — so this is a robustness note on a newly-shared
+predicate, not a live defect. Adding `np.integer` closes it.
+
+**R12-05 — INFORMATIVE (pre-existing).** `cell_metrics:352-359` early-returns on `r.size == 0`
+**before** `per_seed_ci` is set, so such a row is skipped by `check_block_rule`'s bucket loop
+(`integrity.py:528`) and would break the four-bucket reconciliation **silently** rather than raising.
+Not realised — reconciliation is exact at both scales — because `run_screen.py:336/340` skips empty
+cells before scoring, so no empty row reaches the frame. Recorded because the reconciliation is now a
+load-bearing HARD clause and its exhaustiveness rests on that upstream filter.
+
+**R11-04 — upgraded from INFORMATIVE to MEDIUM, still non-blocking, routes to `quant-designer`.**
+§12 requires the unaccompanied rule "asserted over `metrics_by_cell`, `layer_deltas` and the
+resolution ladder alike"; `selfcheck.py:309-316` tests `metrics_df` only, keyed on a column literally
+named `log_R`. Run 11 found no instances. **I found instances.** In the live smoke,
+`layer_deltas.parquet` has **7 rows** with a non-finite `delta_log_R` and therefore no CI, on which
+`log_R_L0` is **finite** — six `PYTHUSDT` and one `1000RATSUSDT / L4_TARGET_A1_MOD` (one of run 11's
+three unclassified cells). Read literally, that is 7 violations of a HARD rule, currently invisible
+because the check does not cover that artifact. Three things make this a **wording** defect rather
+than a data defect, and none of them is the code: the 7 rows arise from layer arms whose `log R` is
+undefined, a pre-existing shape untouched by this diff (all 5 blanked rows are DESIGN and
+`_layer_deltas` is TRAIN-only, so the remedy has **zero** contact with this artifact); `log_R_L0` is
+a **copy of another row's** value, and that row carries its own interval; and on the 1,168 healthy
+rows the companions present describe the **delta**, not `log_R_L0`, so the literal rule is satisfied
+there only by coincidence. **Required change is in `design.md`, not `screen_code/`:** state that the
+companion requirement attaches to each artifact's own primary read (`delta_log_R` on `layer_deltas`),
+and that `log_R_layer` / `log_R_L0` are carried context whose intervals live on their own rows —
+then extend the check to that stated scope. **Why I am not blocking on it:** no emitted number is
+wrong, the primary read and its interval are correctly paired on all 1,168 rows that have one, the
+check that exists passes honestly on the artifact it names, and the 7 rows are visible in the
+emission. **What the operator accepts by running first:** the §12 wording correction then happens
+after measurement, which is the pattern run 11 rightly criticised in AMENDMENT-20 itself. It is a
+one-paragraph clarification with no effect on any result, so booking it before the run is cheap and
+strictly cleaner. My recommendation: book it now, run immediately after; do not hold the run for it
+if the operator prefers.
+
+---
+
+### Checks independently verified clean
+
+- All three run-11 blocking findings closed, each by fault injection on its own subject, including a
+  reverted-code control (case H′) that reproduces the R11-02 defect.
+- A derived row without a CI fails in all four constructible shapes; no token can rescue it.
+- Wrong, missing, bogus and inapplicable exemption reasons are all rejected — 11 of 18 synthetic
+  shapes and 4 of 4 real-frame injections drive `held False`.
+- 12,503 CI-carrying cells bit-exact across 18 columns with zero finiteness flips; exactly 5 `log_R`
+  blanked; exactly 1 derived row dropped; buckets reconcile at 13,376 and at 3,566.
+- The eligibility rule enumerated at full scale: 1 drop, 0 measured cells lost, 0 non-derived rows
+  reachable, drop set `n_boot`-invariant.
+- Smoke provenance: `code_sha256` recomputes exactly to the code on disk; 28/28 HARD; all four
+  affected symbols present; suppression path fired; both tokens issued; 0 unaccompanied `log R`; the
+  offending interaction cell absent and it is the only such key.
+- Amendment ledger recounted from the DIRECTION lines (5/9/6 total, 4/8/6 active); both L-23 flags
+  present; the streak break volunteered.
+- `check_no_local_accounting` green; spread disclosure intact; `EXPECTED_HARD_CHECK_COUNT = 28`
+  unchanged with its assert; no check added, removed or renamed; no holdout, fence, causality,
+  `BacktestNode`, XENA or registry surface touched.
+- `qa-review.md` diff is a single append hunk — runs 1–11 byte-identical.
+- Shared-code boundary: the only new shared symbol is `metrics.log_R_is_defined`, used at three sites
+  inside `SPDR-019/screen_code/`; nothing was added to or changed in `python/src/xen`.
+
+---
+
+### FAILING_ARTIFACT / REQUIRED_SKILL
+
+```
+FAILING_ARTIFACT: none — no artifact fails, and no finding blocks execution.
+
+REQUIRED_SKILL (before the run — RECOMMENDED, not required):
+  quant-designer  -> R11-04 (correct §12's wording so the unaccompanied rule attaches to
+                    each artifact's own primary read; 7 live instances on layer_deltas are
+                    currently masked by the check's narrower scope). One paragraph, no
+                    effect on any number. Cheaper to book now than after measurement.
+
+REQUIRED_SKILL (post-gate, optional):
+  quant-designer  -> R12-01 (consider raising the eligibility bar to "every input arm
+                    carries a CI"; drops 3 DESIGN-band rows, nothing else)
+                    R12-02, R12-03 (two ledger/wording corrections in AMENDMENT-20)
+  experiment-developer -> R12-04 (add np.integer to log_R_is_defined's type test)
+                    R11-04's second half (extend the check to the stated scope once the
+                    design states it)
+```
+
+### Standing execution blockers
+
+1. **DISCHARGED** — AMENDMENT-7 / registered-C6 departure (re-verified: AMENDMENT-17 restored the
+   pre-declared trigger; `design.md:377-401`).
+2. **DISCHARGED** — `reflection-inputs.md` §9, signed option B at `9d8832e`.
+3. **STANDS (lane-wide, unchanged)** — the per-symbol spread pin. Does not block this measurement
+   under AMENDMENT-C5; the disclosure block is intact and the code makes no money read.
+4. **DISCHARGED** — run-9 blockers 4 and 5, run-8 blockers 4–6 (re-verified green where the diff
+   touches them; `check_no_local_accounting` re-run).
+5. **DISCHARGED — R11-01.** The surviving unclassified cell is gone, by exclusion at build time.
+   Verified on live data, by full-scale replay, and by four injections.
+6. **DISCHARGED — R11-02.** The checker rejects its own primary token when the token is false;
+   reverting the fix reproduces the defect.
+7. **DISCHARGED — R11-03.** The design chose exclusion-before-scoring, the option QA recommended, and
+   the 311-row widening is structurally impossible.
+8. **DISCHARGED — run-11 blocker 4.** A smoke covering all four affected symbols returns 28/28 with
+   0 unclassified and 0 unaccompanied `log R`. Run 11's three re-authorisation conditions are all
+   met.
+9. **OPERATOR FLAGS AT THE GATE, not blockers** — L-23 requires two: LOOSER now stands at **4**
+   active rows (AMENDMENT-1 full TRAIN, -2 M15, -10 hold grid, **-20 the no-CI exemption path**),
+   and the five-row TIGHTER streak within AMENDMENTS 12–18 is now broken by -20. Both are declared
+   at `design.md:1400-1406`. Plus, as this run's own contribution to what the operator should see
+   before authorising: **R11-04's §12 wording correction is cheaper to book before the run than
+   after**, and the re-run's numbers are predeclared above so a surprise is detectable.
+
+---
+
+**Execution authorisation: YES.**
+
+The full 25-symbol phase-(a) screen is authorised from QA's side. All three findings that blocked run
+11 are closed on executed evidence rather than on reading, including a reverted-code control that
+reproduces the defect the fix removes. Nothing measured moved: the 12,503 cells that carry an
+interval are bit-exact across 18 columns, exactly the 5 intended `log_R` values are blanked, and
+exactly the 1 intended derived row is dropped — a row that carried no interval and could arm nothing.
+The new eligibility rule is enumerated at full scale rather than assumed: it drops one row, it cannot
+reach a non-derived cell, and its drop set does not depend on the bootstrap. And for the first time
+in this series the runtime evidence covers the symbols that actually failed. Execution remains the
+operator's gate; blocker 9 lists what to read at it.
+
+---
+
+### What I did not reach
+
+- **I did not run the screen at any scale.** QA is read-only and a run would overwrite `results/`.
+  My runtime evidence is `integrity.check_block_rule` invoked directly on synthetic frames and on the
+  preserved 13,377-row frame, an in-memory revert of the fix, and static reads of the emitted
+  6-symbol smoke whose code hash I recomputed. The 13,376 / 311 / 33 / 0 figures for the re-run are
+  **predictions from a replay**, not observations.
+- **I did not verify the 26 HARD checks outside the diff.** They passed in the live 6-symbol smoke
+  and lie outside the three changed files; runs 8–10 traced them. That reliance lapses if a later
+  change reaches beyond the exemption branch and the interaction builder.
+- **I did not re-derive the estimand, the parent gates, the unit pin, the selection check or the
+  controls.** All untouched by the diff. I read `controls.json`, `parent_gate_parity.json`,
+  `selection_check.json`, `unit_pin.json` and `golden_traces.json` only for the 28-check roll-up and
+  provenance.
+- **I did not audit the 840 sizing-suppressed cells**, only that the bucket reconciles and that the
+  emitter-exact replay leaves them untouched.
+- **I did not exercise the `n_days < 2` failure mode of `paired_combo_ci`.** In principle a derived
+  term with all four arms defined could still return an empty battery if the union day index has
+  fewer than 2 days, which would land it unclassified and HARD-fail the run. I bounded rather than
+  tested it: `L0_BASELINE`'s minimum `n_dates` across all 420 cells is **4**, and the union index is
+  at least L0's own, so the path is unreachable on this data. It is data-determined, not guaranteed.
+- **I did not confirm the 4-symbol run's reported outcome by executing it.** I confirmed the
+  *mechanism* — G1/G2/G6's anchors are `BTCUSDT`/`ETHUSDT`/the-G1-symbol, G3 is symbol-agnostic — so
+  the claim that only `golden traces` fails, and only for want of its anchors, is structurally sound
+  but not independently observed.
+- **I did not re-verify the M15 detail level or review SPDR-020's `screen_code/`.** Both carried
+  forward in PART H, both still open.
+- **I did not quantify any finding's effect on any result.** There is no authorised run yet, and that
+  is the data-analyst's object.

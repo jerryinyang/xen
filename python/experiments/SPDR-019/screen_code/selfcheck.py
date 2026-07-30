@@ -306,14 +306,47 @@ def run_selfcheck(
         "subset_names": sorted(l51_names),
     })
 
-    # log R never unaccompanied
-    need = {"log_R", "ci_low", "ci_high", "ci_width", "block_mde"}
-    unacc_ok = need.issubset(set(metrics_df.columns)) if len(metrics_df) else False
-    if unacc_ok:
-        # every finite log_R row has the others
-        m = metrics_df[list(need)].dropna(subset=["log_R"])
-        unacc_ok = m[list(need)].notna().all().all() if len(m) else False
-    mark("log R never unaccompanied", unacc_ok, {"columns": list(need)})
+    # log R never unaccompanied. §12 asserts this over metrics_by_cell, layer_deltas AND the
+    # resolution ladder alike; it used to be tested on metrics_df only (QA run 12, R11-04).
+    # The companion requirement attaches to each artifact's OWN primary read: `log_R` on the
+    # cell table, `delta_log_R` on the layer deltas. `log_R_layer` / `log_R_L0` there are
+    # CARRIED CONTEXT copied from another row, and their intervals live on that row.
+    companions = ["ci_low", "ci_high", "ci_width", "block_mde"]
+
+    def _unaccompanied(df, stat):
+        """Rows whose own primary read is finite but is missing a companion."""
+        cols = [stat, *companions]
+        if df is None or not len(df) or not set(cols).issubset(df.columns):
+            return None  # cannot verify → caller treats as a failure, never a vacuous pass
+        m = df[cols].dropna(subset=[stat])
+        return int((~m[cols].notna().all(axis=1)).sum())
+
+    unacc_detail = {"metrics_by_cell": _unaccompanied(metrics_df, "log_R")}
+    ld_path = RESULTS_DIR / "layer_deltas.parquet"
+    lad_path = RESULTS_DIR / "resolution_ladder.parquet"
+    if ld_path.exists():
+        unacc_detail["layer_deltas"] = _unaccompanied(
+            pd.read_parquet(ld_path), "delta_log_R"
+        )
+    if lad_path.exists():
+        lad = pd.read_parquet(lad_path)
+        # the ladder carries a log R only if it names one; absent → nothing to accompany
+        unacc_detail["resolution_ladder"] = (
+            _unaccompanied(lad, "log_R") if "log_R" in lad.columns else 0
+        )
+    unacc_ok = bool(unacc_detail) and all(
+        v == 0 for v in unacc_detail.values()
+    ) and None not in unacc_detail.values()
+    mark("log R never unaccompanied", unacc_ok, {
+        "primary_read_per_artifact": {
+            "metrics_by_cell": "log_R",
+            "layer_deltas": "delta_log_R",
+            "resolution_ladder": "log_R (if present)",
+        },
+        "companions": companions,
+        "n_unaccompanied_rows": unacc_detail,
+        "carried_context_excluded": ["log_R_layer", "log_R_L0"],
+    })
 
     # predeclared vs realised
     has_pre = "expected_n" in metrics_df.columns or "expected_mde50" in metrics_df.columns
