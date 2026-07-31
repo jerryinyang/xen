@@ -219,7 +219,7 @@ These binding constraints apply to all Xen research.
 | **Deterministic generation** | Derived views and feature tables produce identical output from identical input. Randomness is allowed only when the scope requires it and fixes the seed. |
 | **Streaming compatibility** | All generators must work as sequential stateful functions (no look-ahead). |
 | **Human-in-the-loop** | All plans, designs, implementations, and conclusions require explicit approval (standard mode) or clear governance verdicts (executor mode). |
-| **Single hypothesis per experiment** | Each experiment answers exactly one question. Scope creep is a governance violation. |
+| **Single hypothesis per experiment** | Each experiment answers exactly one question. Scope creep is a governance violation. **Carve-out — exploratory SPDR characterisation:** an SPDR may traverse a predeclared grid of components, devices and combinations, under the SPDR characterisation contract in `docs/references/spdr-lane.md`. The carve-out buys breadth, not looseness: every stratum still names its exact comparison and emits its own direct estimate and uncertainty. |
 | **Complexity budget enforced** | Every experiment has defined limits on statistical tests, visualisations, and new code modules. |
 | **No premature optimisation** | Characterisation phases must not tune strategy parameters, windows, filters, stops, or targets against analysis-set performance. Optimisation requires an explicit phase and scope. |
 | **Causal-by-construction execution** | Price-primary experiments run in the **Nautilus event-driven engine** only (`BacktestNode`); Python is analysis-only on emitted runs. A vectorised Python backtest of a price strategy is rejected. (Principle = event sequencing, not C#.) |
@@ -350,6 +350,7 @@ When QA issues REVISE, the verdict identifies:
 - If no index exists, start with `EXP-001`.
 - VAL-series experiments (validation reruns) use `VAL-001`, `VAL-002`, etc. — same structure, different prefix.
 - SPDR-series speed-runs (TRAIN-only availability screens) use `SPDR-001`, etc. — lean screen lane (design.md + screen.md + analysis.md, no QA subagent), no cTrader/estimand gate, disposition-only. Spec: `docs/references/spdr-lane.md`.
+- **SPDR allocation floor (2026-07-30): the next SPDR identifier to issue is `SPDR-021`.** Identifiers below that floor are spent — some by experiments that ran, some by registrations that were withdrawn — and **none is reused**, so the index is not a reliable high-water mark on its own. Raise this floor when an ID is issued; never lower it.
 
 ---
 

@@ -367,7 +367,7 @@ CTRADER (EURUSD, XAUUSD, USTEC) - 315 powered signed cells, TRAIN only, GROSS PR
 > **not**, and must not be made. Crypto's gap is −0.0138 on medians and −0.0078 on means: negative on
 > both.
 
-**Three constraints this places on any SPDR-019/020 design:**
+**Three constraints this places on any capture-geometry design:**
 
 1. **The joint sits at break-even on two independent universes.** SoT §1.1's gate — *a capture design
    cannot manufacture expectancy out of a joint `(p, W, L)` that sits at break-even* — now binds on

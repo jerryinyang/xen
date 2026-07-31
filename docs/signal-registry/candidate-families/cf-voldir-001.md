@@ -50,10 +50,12 @@ Exact by the definition of conditional expectation.
   capture branch.
 - **κ is a diagnostic, never a multiplicative term.**
 - **Direction is measured, not targeted** — no work in this checkpoint tries to improve `p`,
-  select a better entry, or build a direction model. Entries stay simple and fixed.
+  select a better direction rule, or build a direction model. Direction/event logic stays simple
+  and fixed; only predeclared direct/reverse native geometry may vary threshold, expiry, `z` or `H`.
 
 Axis A (`p`) and axis B (`W`, `L`, `W/L`) are `SPDR-018`. Axis C (`E[|move|]`) is proven and
-supplies **selection + parameter scale, never edge**. Axis D (capture) is `SPDR-019`/`SPDR-020`.
+supplies **selection + parameter scale, never edge**. Axis D (capture) is registered as
+`SPDR-021/022/023` under `HYP-D8/D9/D10`.
 Axis E (cost): spread is never charged programme-wide (2026-07-23) — a standing exclusion with a travelling caveat, not a blocked prerequisite.
 
 **Refused by construction:** any expectancy claim from exits, holds, or sizing on a joint
@@ -105,9 +107,8 @@ re-parameterisation of SPDR-011’s range-break object.
 | **D2** | SPDR-015 conditioner science | **SCREEN COMPLETE (2026-07-24)** — **WORTH_EXPLORING** (operator-signed): ordinal swing-size gate + vol level-state labels + R-MARKOV multi-bar gate (k=4/12) route on; k=1 next-bar NOT_WORTH. Improves gates/labels for 014/016 by amendment only |
 | **D3a** | SPDR-016 refine 014 residual | **CLOSED — SUPERSEDED, NEVER RUN** (2026-07-25). DERIVED feature layer measured inert by SPDR-017; target carried into `SPDR-018` arm C, in the original event-nested form. 0 reads |
 | **D3b** | SPDR-017 independent mispricing (#3) | **CLOSED — NOT_WORTH** (2026-07-24) — model IC ≈ 0; DERIVED layer inert; destroys indistinguishable; M-ZONE ≤ Z-VOL |
-| **D5** | SPDR-018 power the complete 017 residue | **DESIGN COMPLETE** 2026-07-25 (checkpoint-018); execution unauthorised |
-| **D6** | SPDR-019 strategy #1 (naive baseline) + opportunity score + capture test set | **REGISTERED** 2026-07-25 — start-gated on the SPDR-018 reflection |
-| **D7** | SPDR-020 event-grammar direction-aware capture | **REGISTERED** 2026-07-25 — start-gated on the SPDR-018 reflection |
+| **D5** | SPDR-018 power the complete 017 residue | **COMPLETE AND CLOSED** 2026-07-26; evidence inventory approved 2026-07-30 |
+| **D8–D10 (capture)** | Adaptive opportunity management | **DESIGN APPROVED 2026-07-30** — SPDR-021 breakout, SPDR-022 MOMO and SPDR-023 MR; independent Nautilus characterisations; implementation unauthorised |
 | **E** | XENA-VOLDIR-001 (conditional) | Only if a base graduates; not for A–C. **RESERVED, never opened** |
 
 **Stop rules:**
@@ -131,29 +132,27 @@ re-parameterisation of SPDR-011’s range-break object.
 | `CF-VOLDIR-001/HYP-D3` | SPDR-016 | Do error-dynamics features refine the **014 residual** without open ML zoo? (014-gated) |
 | `CF-VOLDIR-001/HYP-D4` | SPDR-017 | Independent predicted-price mispricing (proven + error dynamics + weak-dir features) characterised like 014 — residual ≠ ambient? |
 | `CF-VOLDIR-001/HYP-D5` | SPDR-018 | For every question checkpoint-017 left **UNPOWERED or INCONCLUSIVE**, measured in its **original statement**: can it be resolved to its own target precision on this data, and if so what is the answer? Covers the complete residue of SPDR-012/013/014/015 (only authorised drop: SPDR-017), plus a uniform `(p, W, L, W/L, p_be_net, edge)` decomposition on every cell carrying a signed return |
-| `CF-VOLDIR-001/HYP-D6` | SPDR-019 | Given the `(p, W, L)` picture from D5, does opportunity-modulated capture geometry on a **fixed signed breakout entry** (selection, hold, exits, sizing scaled to forecast move) move the payoff residual `log R = log(W/L) − log((1−p)/p)` reliably above zero — i.e. `p` above its own **gross** break-even — versus the unmodulated baseline? *(Narrowed from partial-net-above-cost-floor by **AMENDMENT-C5**, 2026-07-28; tested layer-by-layer per **AMENDMENT-C6**.)* |
-| `CF-VOLDIR-001/HYP-D7` | SPDR-020 | Same question on the SPDR-014 E-TOUCH / E-CLOSE event object under direction-aware capture, with band selectivity measured and reported on every cell (`p_event` is a covariate, never an eligibility filter) *(same C5 / C6 amendments)* |
+| `CF-VOLDIR-001/HYP-D8` | SPDR-021 | On a candlestick breakout, how does each confirmed volatility component change native threshold/expiry geometry in both directions and each applicable external management device relative to fixed forms? |
+| `CF-VOLDIR-001/HYP-D9` | SPDR-022 | On MOMO `E-TOUCH/E-CLOSE`, how does each confirmed volatility component change native `z/H` geometry in both directions and each applicable external management device relative to fixed forms? |
+| `CF-VOLDIR-001/HYP-D10` | SPDR-023 | On MR `E-TOUCH/E-CLOSE`, how does each confirmed volatility component change native `z/H` geometry in both directions and each applicable external management device relative to fixed forms? |
 | `CF-VOLDIR-001/HYP-E` | XENA-VOLDIR-001 | Conditional portfolio/search among graduated bases only |
 
 **Checkpoint-018 hypothesis notes.** `HYP-D5` is a **precision experiment**, not a mechanism
 experiment: each arm inherits its parent screen's mechanism, object and estimand verbatim, and only
 the data behind each estimate changes (parent parity asserted in code). `NOT_RESOLVABLE` — a cell
 that cannot reach its target precision in its original form — is a **first-class result**, not a
-failure. `HYP-D6`/`HYP-D7` are start-gated on the D5 reflection: no capture rule can produce
-expectancy from a joint `(p, W, L)` sitting at `p_be_net`. `HYP-D3` (SPDR-016) is closed superseded;
-its intent survives inside D5's arm C.
+failure. The former capture registrations remain permanently void. Their replacements,
+`HYP-D8/D9/D10`, are exploratory map questions rather than binary hypotheses: all rows are reported,
+none gates another, and interpretation waits for all three analyses. No capture rule can in any
+case be claimed to produce expectancy from a joint `(p, W, L)` sitting at `p_be_net`. `HYP-D3`
+(SPDR-016) is closed superseded; its intent survives inside D5's arm C.
 
-**`HYP-D6`/`HYP-D7` measurement contract (AMENDMENT-C5 / C6, 2026-07-28).** Both are **gross**
-experiments: cost is excluded from every estimand, threshold and comparison, with `p_be_net` and the
-cost floor reported per cell as a **disclosed reference only**. The null is the driftless mirror
-(`log R = 0`), never zero P&L — 32.5% of SPDR-018's powered cells already clear gross break-even, so a
-gross screen scored against zero would re-discover that and call it an effect. Both run the
-**layer-by-layer protocol**: phase (a) sequential characterisation (L0 baseline → L1 scale → L2 state →
-L3 swing gate → L4 devices individually, each unmodulated *and* modulated → L5 evidence-selected
-combination), then phase (b), a full layer × device cross whose **trigger** depends on (a) but whose
-**scope does not** — individually-flat layers stay in the grid, and (b)'s estimand is the interaction
-term. Full statement: the mid-checkpoint reflection companion, §5.4a and §5.9. **AMENDMENT-C2 still
-binds every claim**; C5 governs measurement only.
+**Capture-axis measurement contract — VOID 2026-07-30.** The gross-narrowing, mirror-null and
+layer-protocol contract written for the two withdrawn capture registrations is void along with them.
+The replacement design at checkpoint `adaptive-management-design.md` uses **device-native outcome
+measures**, common-origin fixed-native comparators, fixed-device comparators and individual reads
+before bounded combinations. It tests direct and reverse native applications and does not cross the
+native and external-management grids. **AMENDMENT-C2 still binds every claim.**
 
 ## 5. Frozen scope (programme defaults; per-SPDR designs may narrow, not expand silently)
 
@@ -326,9 +325,9 @@ spread not charged; reported net **overstated** relative to true cost.
   (**unconditional direction dead; conditional direction unpowered-not-refuted; volatility multiplies a
   direction term, never substitutes for it**) together with the organising identity
   `E[net] = p·W − (1−p)·L − cost` (`p_be_net = (L+cost)/(W+L)`, `edge = p − p_be_net`).
-  **Registered `SPDR-018` (`HYP-D5`),
-  `SPDR-019` (`HYP-D6`), `SPDR-020` (`HYP-D7`)** — designs complete, execution unauthorised; 019/020
-  start-gated on the SPDR-018 mid-checkpoint reflection. **AMENDMENT-C1 (NEUTRAL):** cTrader instruments
+  **Registered `SPDR-018` (`HYP-D5`)** — design complete, execution unauthorised. *(Two capture-axis
+  registrations opened on this date were withdrawn and voided 2026-07-30; see the entry of that date.)*
+  **AMENDMENT-C1 (NEUTRAL):** cTrader instruments
   (EURUSD/XAUUSD/USTEC, INFR-021 fence) admitted as an **independent replication read only** — never
   pooled into the powered crypto estimate; separate fence (`train_end` 2023-11-22), holdout 2024-12-13+
   sealed. **AMENDMENT-C2 (TIGHTER):** expectancy claims from exits/holds/sizing are refused unless the joint
@@ -399,13 +398,14 @@ spread not charged; reported net **overstated** relative to true cost.
   (317 vs 315). New unregistered lead **P6**: Asia magnitude×shock ≈ +10 bps vs ≈ 0 in EU on 162–184 rows —
   **must be registered before it is screened**. **0 counted TEST reads; 0 multiplicity slots; no XENA; status
   remains REGISTERED.** |
-| 2026-07-28 | **MID-CHECKPOINT REFLECTION — VOLATILITY EVIDENCE + CAPTURE-GEOMETRY MODEL (evidence + amendment row; NOT a status transition).**
-  Artifact: `docs/experiments-docs/checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/reflection-mid-volatility-model.md`
-  (companion to `reflection-mid.md`, whose §9 operator decision was **SIGNED 2026-07-29 as option B**). Consolidates every
+| 2026-07-28 | **MID-CHECKPOINT REFLECTION — VOLATILITY EVIDENCE (evidence + amendment row; NOT a status transition).**
+  Artifact consolidated 2026-07-30 into
+  `docs/experiments-docs/checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/reflection-mid.md`.
+  Consolidates every
   confirmed volatility observation from SPDR-012/013/015 and SPDR-018/018B into a 28-row inventory (V1–V28),
   **each carrying an explicit evidence class** — powered-at-target `[P]`, scored-without-a-bps-target `[S]`,
-  disclosure `[D]`, unpowered `[U]` — and states the capture-geometry model they support: a five-layer stack
-  (units → scale ŝ → shock/level state → swing gate → capture parameters) constrained by the identity.
+  disclosure `[D]`, unpowered `[U]` — and maps every observation to the management decision it can
+  inform without prescribing a common model or score.
   **Three corrections booked against the first draft of that document** (independent audit; no source
   experiment affected): (i) the free residual is the **exact** `log R = log(W/L) − log((1−p)/p)` — slope 1,
   intercept 0, forced by `E[gross]=0` — **not** the fitted-slope form; the exact residual reproduces
@@ -417,75 +417,38 @@ spread not charged; reported net **overstated** relative to true cost.
   **not** an opportunity budget. D2 (run-length) and the ambient-base reads reclassified `[D]`; D7 confirmed
   `[S]` (60/75 SUPPORTED, no bps target); A-IC's 165-cell figure **verified exactly** (CONFIRM × H1 ×
   per-symbol × 11 models, 100% CI-excluding-zero, median 0.3262 — of which 68.9% also meet target precision).
-  **AMENDMENT-C5 (NARROWING — operator directive 2026-07-28): cost is excluded from every SPDR-019/020
-  exploration test.** `HYP-D6` and `HYP-D7` as registered ask for *partial-net expectancy above the cost
-  floor*; both are narrowed to the **gross** condition `log R > 0 ⟺ p > p_be`. Rationale: failure on cost and
-  failure of the capture mechanism are different failures, and charging an unpinned floor conflates them. The
-  narrowing costs nothing in rigour — the residual target contains no cost term. **`p_be_net` and the cost
-  floor remain reported per cell as a disclosed reference**; the per-symbol spread pin **no longer blocks the
-  measurement** but still blocks every money read, expectancy claim and Step-3 graduation. **AMENDMENT-C2 is
-  unchanged and still binds every *claim*** — this amendment governs measurement only. Pre-empted risk
-  recorded: 32.5% of powered cells already clear gross break-even, so **the driftless mirror is the
-  pre-registered null and no capture variant may be scored against zero P&L.**
-  **AMENDMENT-C6 (TIGHTER — operator directive 2026-07-28): layer-by-layer test protocol, binding on both
-  `SPDR-019` and `SPDR-020`.** Phase **(a)**, sequential and run in full on both strategies: L0 unmodulated
-  baseline (its own `p_dir`, `W`, `L`, κ measured first) → L1 scale alone → L2 state alone (shock, level, then
-  joint) → L3 swing gate alone → L4 capture devices **one at a time**, each run **twice — unmodulated and
-  modulated** → L5 a small evidence-selected combination. Phase **(b)**, the full layer × device cross:
-  **phase (a) determines WHETHER (b) runs; it does NOT determine WHAT is in it.** Winners-only combination is
-  refused on two recorded grounds — selecting (a)'s winners and combining only those fits the combination to
-  the sample that chose its components, and **a layer can be flat alone yet productive in combination**, which
-  pruning makes permanently undiscoverable. Consequences: the (b) trigger is **pre-declared before (a) runs**
-  (deciding afterwards what counted as promising is optional stopping); (b)'s scope is **fixed and complete**
-  regardless of (a)'s outcome, with individually-flat layers retained on equal footing; (b)'s estimand is the
-  **interaction** `Δlog R(combined) − Σ Δlog R(individual)`, not the combined main effect; multiplicity
-  disclosed across the declared grid; per-cell MDE stated in log units up front, and a grid that cannot
-  resolve the interaction is booked `NOT_RESOLVABLE` rather than run and explained. A layer that reads flat is
-  a result and is reported as one. **P6 (018B determinism + the Bybit-guard holdout assertion) SKIPPED by
+  **AMENDMENTS C5, C6 and C7 — VOID 2026-07-30.** These three amendments existed solely to govern the
+  two capture-axis registrations that were withdrawn on that date. They are void with them: no gross
+  narrowing, no layer-by-layer phase-(a)/(b) protocol, and no sensitivity-ladder resolution rule
+  survives as a family obligation. **AMENDMENT-C2 is unchanged and still binds every claim.**
+  **P6 (018B determinism + the Bybit-guard holdout assertion) SKIPPED by
   operator directive** — recorded as an open gap, not a blocker; any future citation of 018B's §5 guard reads
   must carry the caveat. **0 counted TEST reads; 0 multiplicity slots; no XENA; no family action; status
   remains REGISTERED.** Family transitions remain retrospective-only. |
-| 2026-07-28 | **AMENDMENT-C7 (NEUTRAL — operator mandate): retire the single canonical power threshold across `SPDR-019` and `SPDR-020`.**
-  The mid-checkpoint reflection originally named **+0.03 to +0.07 log units** as the effect a capture policy must
-  reach on the payoff residual `log R`, and the two designs turned 0.07 into a `powered` / `unpowered` adequacy
-  label. **Both are withdrawn.** The numbers were anchored on `sd(log R) = 0.0729` and `median log R = −0.0301` —
-  the **dispersion** and **location** of the observed residual — neither of which is a statement about what effect
-  size matters to the research. Two replacements, both operator-approved: **(1) sensitivity analysis** — every cell
-  emits a **ladder** `{0.02, 0.03, 0.05, 0.075, 0.10, 0.15}` log units carrying the detection rate and the required
-  `n` at each rung, as a presentation grid that admits, excludes, labels and ranks nothing; **(2) precision-first** —
-  **no `powered` / `unpowered` / `at_target` / `NOT_RESOLVABLE` flag is emitted anywhere**, each cell reports its
-  effect with its **block MDE and CI width bound to the same row**, and adequacy is the reader's judgement, with
-  powering left to later verification. Interpretation bands are correspondingly redefined by the **CI's relation to
-  the mirror** (above / covers / below) rather than by any magnitude. **B-5 is strengthened, not weakened:** a
-  boolean label could be dropped in summary, whereas an effect that cannot be quoted without its own precision
-  cannot be read as a negative by omission. Both designs carry the change in their amendment ledgers
-  (SPDR-019 AMENDMENT-6, SPDR-020 AMENDMENT-4) and both remain **execution-unauthorised**.
-  **0 counted TEST reads; 0 multiplicity slots; no family action; status remains REGISTERED.** |
-| 2026-07-29 | **HYP-D7 WORDING CLARIFICATION (NEUTRAL — operator directive).** “With a band that
-  actually selects” is replaced by the executable requirement that band selectivity is measured
-  and reported on every cell. `p_event` is a covariate and dose-response axis; it may never admit,
-  exclude, weight, label or rank a cell. This records the 2026-07-28 no-gate directive and changes
-  no entry, estimand, population or claim boundary. It is **not** an amendment to C6 and does not
-  resolve SPDR-020's separate phase-(b) trigger blocker. **0 counted TEST reads; 0 multiplicity
-  slots; no family action; status remains REGISTERED.** |
-| 2026-07-29 | **MID-CHECKPOINT REFLECTION SIGNED (option B) + SPDR-019/020 QA-APPROVED — evidence
-  and disposition row, no status transition.** (1) `reflection-mid.md` §9 is **signed**: option
-  **B** — 019/020 execute now, with P2 (arm C) resolved in parallel. *(P5 is not a thread: spread
-  was retired as a chargeable item programme-wide on 2026-07-23.)* Sequencing only: **no end-state is taken, no thread is closed, and end-state 1 remains
-  NOT takeable while C2 and the `NOT_RESOLVABLE` population stand.** P1 stays skipped, so **C2
-  books at the retrospective as terminal `NOT_RESOLVABLE`, never as a refutation**; P6 stays
-  skipped and recorded as an open gap; P7 remains unregistered and may not be screened.
-  (2) Both designs passed independent QA on their **seventh** run (APPROVE): implementation of
-  `screen_code/` is authorised. The phase-(b) trigger departure that both carried is **withdrawn**
-  — each design restores the pre-declared condition **AMENDMENT-C6** requires, stated on the
-  phase-(a) CIs, so **no design now departs from C6** and neither needs a C8. Each design commits
-  a dated, hash-pinned expected-resolution artifact expanding every declared stratum, with strata
-  the parents never measured marked explicitly unknown rather than forecast.
-  (3) **AMENDMENT-C5 needs no follow-up row:** it already executes the gross narrowing and both
-  `HYP-D6`/`HYP-D7` rows above read as the gross condition and cite it. The reflection companion's
-  “amendment owed” line was stale and is corrected there.
-  **Still binding and unchanged:** AMENDMENT-C2 on every claim; spread is never charged
-  programme-wide (2026-07-23), so reported net is overstated and no money read, expectancy claim or
-  Step-3 graduation is licensed — by standing rule, not by pending work; XENA remains RESERVED and
-  undiscussable.
-  **0 counted TEST reads; 0 multiplicity slots; no family action; status remains REGISTERED.** |
+| 2026-07-30 | **CAPTURE-AXIS REGISTRATIONS WITHDRAWN AND VOIDED — governance row, no status transition.**
+  The two axis-D capture registrations and their two vehicles are **removed from
+  the active programme and permanently void**. Their identifiers are not reused. Grounds, all design
+  defects rather than results: (1) they used a **scale-free payoff residual as a single common target**
+  for a mechanism whose strongest confirmed information is **move scale**; (2) they **bundled
+  device-specific questions** behind one large shared protocol; (3) they **did not directly estimate
+  the incremental effect** of applying each volatility component to each management device. The
+  first vehicle completed a run and analysis; the second began a run but did not reach analysis.
+  Those results are removed from the active evidence base because their designs did not answer the
+  intended questions; **no SPDR-018/018B measured result or verdict changes.**
+  Amendments **C5, C6 and C7** are void with them (see the 2026-07-28 entry). Axis D is now
+  **unregistered**; a replacement must be registered afresh, may not begin until the checkpoint-018
+  evidence inventory is operator-approved, and must carry **device-native outcome measures**, a
+  **direct comparator per stratum**, and **per-component × per-device incremental estimates before any
+  combination is interpreted**. Recovery of the withdrawn material is via Git history only.
+  **0 counted TEST reads; 0 multiplicity slots; no XENA; no family action; status remains REGISTERED.** |
+| 2026-07-30 | **REPLACEMENT CAPTURE DESIGN APPROVED AND REGISTERED — no execution authority.**
+  The operator approved the evidence inventory and the three-experiment Nautilus design:
+  `SPDR-021/HYP-D8` fixed breakout, `SPDR-022/HYP-D9` MOMO with `E-TOUCH/E-CLOSE`, and
+  `SPDR-023/HYP-D10` MR with `E-TOUCH/E-CLOSE`. All three run independently; none gates another.
+  Each shows its fixed strategy, direct and reverse volatility-adaptive native parameters, every
+  applicable volatility-component × external-management read, all states and only the predeclared
+  bounded combinations. Native parameters are not crossed with external management. Outcomes are
+  origin-/device-native; event count, uncertainty and MDE are informative; no per-experiment
+  supported/refuted verdict is produced. Selective strong patterns remain reportable for later
+  XENA robustness work. **Implementation and execution are not authorised; 0 TEST reads; 0
+  multiplicity slots; no family action; status remains REGISTERED.** |

@@ -739,7 +739,7 @@ The three pieces of evidence that most drive this:
 
 ### 13.2 The `(p, W, L, W/L, edge)` picture the mid-checkpoint reflection needs
 
-**For parameterising SPDR-019/020. cTrader is credibility, never power, and never pooled into crypto `n`.**
+**For parameterising any later capture-geometry work. cTrader is credibility, never power, and never pooled into crypto `n`.**
 
 ```
 CTRADER (EURUSD, XAUUSD, USTEC) — 315 powered signed cells, TRAIN only, GROSS PRIMARY
@@ -776,7 +776,7 @@ CTRADER (EURUSD, XAUUSD, USTEC) — 315 powered signed cells, TRAIN only, GROSS 
 - **But the checkpoint still should not be closed as end-state 1, and 018B does not change the two reasons it could not be** on crypto: (a) the **C2 thread remains open** — 018B neither replicated nor refuted it, and its own C2 evidence is too weak to close anything; and (b) **`NOT_RESOLVABLE` remains large on the conditional-direction objects** — 179 of 5,526 arm-C cells powered here, 3,559 unresolved on crypto with 55% in C3. **Closing over those would read UNPOWERED as a negative, which B-5 forbids and which is precisely the error checkpoint-017 was closed to avoid.**
 - **End-state 3 (a powered counter-outcome that routes) is checked and not satisfied** — 12 negative CI-excluding-zero cells, best flipped gross +1.754 bps against its own 2.544 bps charge, 0 of 12 clearing when flipped. And unlike crypto, the tail counts (12 negative / 2 positive of 315) are near the nominal-95% expectation, so there is no enriched tail to route.
 - **End-state 2 requires something to clear `p_be_net`.** Nothing does, on either universe.
-- **The shape I would suggest** (entirely the operator's call): resolve **P4** (cheap, closes Phase 0), **P2/P3** (cheap, and they decide whether "at gross break-even" survives contact with the median), and **P5** — the spread pin, already a declared blocking prerequisite — before taking the end-state decision. **P1** is the only probe that can settle C2, and **P6** is the one new lead worth a look. `SPDR-019`/`020` re-framed as **apparatus or characterisation** is consistent with everything measured on both universes; as a tradability test it is not.
+- **The shape I would suggest** (entirely the operator's call): resolve **P4** (cheap, closes Phase 0), **P2/P3** (cheap, and they decide whether "at gross break-even" survives contact with the median), and **P5** — the spread pin, already a declared blocking prerequisite — before taking the end-state decision. **P1** is the only probe that can settle C2, and **P6** is the one new lead worth a look. A capture experiment framed as **apparatus or characterisation** is consistent with everything measured on both universes; as a tradability test it is not.
 
 ---
 

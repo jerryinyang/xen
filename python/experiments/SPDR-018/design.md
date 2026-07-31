@@ -89,7 +89,7 @@ uniform: the `(p, W, L)` decomposition, the dependence-matched MDE, and the SoT 
 | B5 | **M15 arms** | all D-SMA and D-ZZ arms on the M15 clock | carried but under-read |
 
 **Arm B is where `W` and `L` are measured on real episodes** — the axis-B gap that SoT §2
-exposed. It is the highest-value arm for parameterising SPDR-019/020.
+exposed. It is the highest-value arm for parameterising any later capture-geometry work.
 
 ### Arm C — SPDR-014 residue (zone / event / post-event residual)
 
@@ -506,7 +506,7 @@ SPDR-014's own band, the object was re-specified — which this design forbids.
 - Reading UNPOWERED or NOT_RESOLVABLE as a negative; reading SUGGESTIVE as SUPPORTED (B-5).
 - Framing `DA-STRADDLE` as anything but characterisation (SoT §0).
 - Any expectancy framing of the form `p > 0.5` — the break-even is `p_be_net`, not 0.5 (SoT §2.2).
-- Any capture-geometry, exit, or sizing claim — that is SPDR-019/020.
+- Any capture-geometry, exit, or sizing claim — that belongs to the (currently unregistered) capture axis.
 - Any tradability, deployability or cost-complete claim; any family status change; any XENA.
 
 ---

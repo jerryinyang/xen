@@ -299,7 +299,7 @@ Verified: **2,714 pairs**, **44.14% flip sign** (screen 44.1% ✓), of those fli
 
 ## 5. Question 3 (decisive) — is `W/L` a real handle, or the arithmetic mirror of `p`?
 
-This determines whether the capture branch (`SPDR-019/020`) has anything to pull on. Tested three ways rather than asserted.
+This determines whether the capture branch has anything to pull on. Tested three ways rather than asserted.
 
 **The test.** From the identity, `mean = (1−p)·L·(R − 1)` where `R = p·W / ((1−p)·L)`. So `R = 1` exactly when `mean = 0`, and on a driftless path with a fixed-horizon exit `W/L` is **fully determined** by `p`: `W/L = (1−p)/p`. If `W/L` is a free degree of freedom, it must deviate from that mirror by more than the measurement error.
 
@@ -723,9 +723,9 @@ The three pieces of evidence that most drive this:
 
 I am not authorised to take a family disposition and I do not. What the evidence supports as an **input** to the mid-checkpoint reflection:
 
-- **`SPDR-019`/`SPDR-020` should not open as an edge search on this evidence.** SoT §1.1 makes the gate explicit — "a capture design cannot manufacture expectancy out of a joint `(p, W, L)` that sits at break-even". The joint sits at break-even: 0 of 1,413 clear `p_be_net`, arm C's rate is 0.0007 from its own gross break-even, and §5 shows the `W/L` lever moves 67× without lifting the mean off the zero line in any of five exit geometries, replicated on a second asset class.
+- **No capture experiment should open as an edge search on this evidence.** SoT §1.1 makes the gate explicit — "a capture design cannot manufacture expectancy out of a joint `(p, W, L)` that sits at break-even". The joint sits at break-even: 0 of 1,413 clear `p_be_net`, arm C's rate is 0.0007 from its own gross break-even, and §5 shows the `W/L` lever moves 67× without lifting the mean off the zero line in any of five exit geometries, replicated on a second asset class.
 - **But the checkpoint should not be closed as end-state 1 either.** Two things forbid it: the `shock_flag` M-3 survivor (§7.2), and 3,559 `NOT_RESOLVABLE` cells — 55% of them C3, the ordered vol-flip that the SoT premise names as "unpowered, not refuted". Closing over those would read UNPOWERED as a negative, which B-5 forbids and which is precisely the error checkpoint-017 was closed to avoid.
-- **The shape I would suggest** (operator's call entirely): resolve P1, P2, P3 and P5 first — they are cheap, in-scope, and P5 (the spread pin) is already a declared blocking prerequisite — then take the end-state decision. `SPDR-019`/`020` re-framed as **apparatus or characterisation** rather than as an edge search would be consistent with everything measured here; as a tradability test it would not be.
+- **The shape I would suggest** (operator's call entirely): resolve P1, P2, P3 and P5 first — they are cheap, in-scope, and P5 (the spread pin) is already a declared blocking prerequisite — then take the end-state decision. A capture experiment framed as **apparatus or characterisation** rather than as an edge search would be consistent with everything measured here; as a tradability test it would not be.
 
 ---
 

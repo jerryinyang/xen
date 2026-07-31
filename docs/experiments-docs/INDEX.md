@@ -4,13 +4,12 @@
 
 **CHECKPOINT-018 OPEN (2026-07-25) — Trade Opportunity Modelling / Capture Geometry.
 SoT signed. `SPDR-018` + `SPDR-018B` COMPLETE AND CLOSED 2026-07-26 (`HYP-D5` SUPPORTED /
-PARTIALLY SUPPORTED; no gating verdict from either). NEXT = the mid-checkpoint reflection
-(**SIGNED 2026-07-29, option B** — 019/020 run now, P2 arm-C in parallel).
-`SPDR-019` / `SPDR-020` designs are complete;
-both passed fresh QA on 2026-07-29 (run 7, APPROVE) and **implementation of `screen_code/` is
-authorised**. **Both prior execution blockers are now cleared** — the
-reflection is signed and the gross narrowing is executed as AMENDMENT-C5 — so execution awaits
-only the operator's own gate. **Spread is never charged programme-wide (2026-07-23)** — a standing
+PARTIALLY SUPPORTED; no gating verdict from either). **The evidence inventory and three-experiment
+replacement design were approved 2026-07-30.** `SPDR-021` breakout, `SPDR-022` MOMO and
+`SPDR-023` MR are independent Nautilus characterisations. Their approved native arms adapt
+breakout threshold/expiry and breach `z/H` in both directions before bounded native combinations;
+implementation and execution are not yet authorised.
+**Spread is never charged programme-wide (2026-07-23)** — a standing
 exclusion with a travelling caveat, not an open item: reported net is overstated and every money,
 expectancy and tradability claim stays refused by AMENDMENT-C2. TRAIN only; holdouts sealed.**
 
@@ -29,9 +28,9 @@ satisfiable at `p < 0.5` when `W > L`. `W/L` is the natural handle for the captu
 κ is a diagnostic only. Direction is **measured, not targeted**.
 
 Route: `SPDR-018` (**powering sweep over the complete 017 residue** — four arms, original statement,
-no omissions, only authorised drop SPDR-017) → mid-checkpoint reflection →
-`SPDR-019` (breakout baseline + opportunity-modulated capture) / `SPDR-020` (E-TOUCH/E-CLOSE
-direction-aware capture) → conditional `XENA-VOLDIR-001`.
+no omissions, only authorised drop SPDR-017) → mid-checkpoint reflection (evidence inventory) →
+`SPDR-021/022/023` adaptive-management characterisation → operator interpretation → conditional
+`XENA-VOLDIR-001`.
 
 Checkpoint-018 SoT: `.ignore/what-next/alts/opportunity.md`  
 Governance: [Chapter 06 governance](../references/chapter-06-governance.md)  
@@ -78,7 +77,10 @@ EXP-099 not authorised. Family retrospective still pending (independent of Ch.06
   checkpoint-017 **CLOSED**, checkpoint-018 **OPEN**. 017 banked: reliable H1/H4 range vol level,
   forecastable next-swing magnitude, ordinal swing-size gate, multi-bar vol-state gate; measured
   dead: unconditional direction, error-dynamics features, predicted-price mispricing zones.
-  018 registers `SPDR-018/019/020` (`HYP-D5/D6/D7`). **SPDR-018 + SPDR-018B closed 2026-07-26:**
+  018 registered `SPDR-018` (`HYP-D5`). Two later capture-axis registrations were withdrawn and
+  permanently voided on 2026-07-30 for design defects. Their replacements are
+  `SPDR-021/HYP-D8`, `SPDR-022/HYP-D9` and `SPDR-023/HYP-D10`. **SPDR-018 + SPDR-018B closed
+  2026-07-26:**
   the 017 residue is now largely **powered** (1,413 signed cells against SPDR-014's 0 of 927) and the
   `(p, W, L)` layer is measured for the first time — the joint sits **at break-even**, **nothing clears
   `p_be_net`** on either universe, and `W/L` is ~97% the arithmetic **mirror of `p`** rather than a free
@@ -91,17 +93,18 @@ EXP-099 not authorised. Family retrospective still pending (independent of Ch.06
 
 - [Checkpoint 018 design](checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/design.md) —
   **OPEN** 2026-07-25; SoT signed. **SPDR-018 and SPDR-018B both COMPLETE AND CLOSED 2026-07-26**
-  (`HYP-D5` SUPPORTED / PARTIALLY SUPPORTED; **no gating verdict from either**). **Next item = the
-  mid-checkpoint reflection**, which sets how SPDR-019/020 are parameterised, not whether they run.
-  SPDR-019/020 registered; designs complete, execution unauthorised. Spread **never charged**
-  for any money read.
+  (`HYP-D5` SUPPORTED / PARTIALLY SUPPORTED; **no gating verdict from either**). The evidence
+  inventory and [replacement design](checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/adaptive-management-design.md)
+  are **approved**; implementation and execution remain unauthorised. Spread **never charged** for
+  any money read.
 - [Checkpoint 018 corrections log](checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/corrections-log.md)
   — 2026-07-26; independent adversarial audit of the 018/018B documentation. **RELIABLE WITH
   CORRECTIONS**; both verdicts survive. Two critical fixes: the C2 ruling's third leg was false and
   now supports *not replicated*; `log R` is negative at the centre, not uniformly.
 - [Checkpoint 018 reflection inputs](checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/reflection-mid.md)
   — 2026-07-26; the consolidated two-universe `(p, W, L, W/L, edge)` picture, the per-item 017 residue
-  ledger, surviving open threads, and the written end-state options. **SIGNED 2026-07-29 (option B): sequencing only — 019/020 run now, P2 arm-C and P5 in parallel; no end-state taken, no thread closed.**
+  ledger and surviving open threads. **Approved as an evidence inventory 2026-07-30; it remains
+  evidence-only and takes no end-state.**
 
 ## Prior checkpoints
 

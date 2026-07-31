@@ -1,6 +1,6 @@
 # Chapter 06 Governance — Structural Volatility + Direction Programme
 
-**State:** `CHECKPOINT-017 CLOSED 2026-07-25 (structural package delivered / extraction unresolved-at-power) / CHECKPOINT-018 OPEN — SPDR-018 + SPDR-018B COMPLETE AND CLOSED 2026-07-26; MID-CHECKPOINT REFLECTION NEXT (inputs assembled, decision unsigned); SPDR-019+020 REGISTERED, DESIGNS PENDING`
+**State:** `CHECKPOINT-017 CLOSED / CHECKPOINT-018 OPEN — SPDR-018 + SPDR-018B CLOSED; EVIDENCE INVENTORY AND SPDR-021/022/023 DESIGNS APPROVED 2026-07-30; IMPLEMENTATION NOT YET AUTHORISED`
 
 **Governing RAW brief (checkpoint-017):** `.ignore/what-next/alts/vol-direction-structural-programme-raw.md`
 
@@ -78,25 +78,29 @@ is refused.
    rate**; and **`W/L` is NOT a free degree of freedom** — R² 0.9667 (crypto) / 0.9746 (cTrader)
    against the driftless mirror `(1−p)/p`, 36–67× movable by exit geometry with `p` moving inversely
    and the mean not improving. **Still `UNPOWERED`-not-refuted: C2 shock-MOMO and C3.**
-2. Mid-checkpoint reflection — books each 017 question resolved or `NOT_RESOLVABLE`, and decides
-   Step 3 from the full `(p, W, L)` picture, including the possibility that the handle is `W/L`
-   rather than `p`. **It does not close the checkpoint on a null rate.**
-   **INPUTS ASSEMBLED 2026-07-26 — operator decision unsigned:**
+2. Mid-checkpoint reflection — the evidence inventory was **approved 2026-07-30**. It remains an
+   evidence artifact and selects no experiment itself:
    `checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/reflection-mid.md`.
-3. `SPDR-019` — strategy #1 (naive candlestick-breakout baseline) + the opportunity score + the
-   capture test set (dynamic profit targets, trailing stops, holding periods, position sizing);
-   sequenced after the reflection, which sets its **parameterisation** — not whether it runs.
-4. `SPDR-020` — E-TOUCH / E-CLOSE MOMO–MR under direction-aware capture (same sequencing).
-   **Carry-forward fix discharged by SPDR-018:** the DESIGN→CONFIRM sign flip **is** a
+3. **Adaptive opportunity management — DESIGN APPROVED 2026-07-30.** Three independent Nautilus
+   characterisations are registered: `SPDR-021` fixed breakout, `SPDR-022` MOMO
+   (`E-TOUCH/E-CLOSE`) and `SPDR-023` MR (`E-TOUCH/E-CLOSE`). None gates another. Each compares its
+   fixed strategy with direct and reverse volatility-adaptive native parameters (breakout
+   threshold/expiry; breach `z/H`) and individual volatility-component × external-management arms.
+   Native-native combinations are bounded; native parameters are not crossed with external
+   management. All origins and strata are reported with origin-/device-native measures and
+   informative uncertainty, without per-experiment verdict labels. Common contract:
+   `checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/adaptive-management-design.md`.
+   Implementation and execution remain unauthorised.
+   **Carry-forward fix still discharged by SPDR-018:** the DESIGN→CONFIRM sign flip **is** a
    power/weighting artifact (flip rate *below* chance on both universes; `n`-weighted bands agree to
-   0.33 bps crypto / 0.65 bps cTrader) and need not be re-litigated in the 020 design. The
-   selectivity-visibility fix still stands: `p_event` is measured and reported on every cell
-   (never an eligibility filter), including the previously hidden 0.938–0.998 range.
-5. `XENA-VOLDIR-001` — unchanged; conditional on a graduated cost-surviving base.
+   0.33 bps crypto / 0.65 bps cTrader). The selectivity-visibility fix still stands: `p_event` is
+   measured and reported on every cell (never an eligibility filter), including the previously
+   hidden 0.938–0.998 range.
+4. `XENA-VOLDIR-001` — unchanged; conditional on a graduated cost-surviving base.
 
-**New, binding on any 019/020 design (from the 018/018B evidence):** any proposal must **name the
-mechanism** that puts `R = p·W/((1−p)·L)` above 1 — five distinct exit devices spanning a 36–67×
-range of `W/L` did not, on either universe. Demand the mechanism, not a search. Thresholds must be
+**New, binding on any capture-geometry design (from the 018/018B evidence):** any proposal must
+**name the mechanism** that puts `R = p·W/((1−p)·L)` above 1 — five distinct exit devices spanning a
+36–67× range of `W/L` did not, on either universe. Demand the mechanism, not a search. Thresholds must be
 stated in σ̂ units or re-derived per universe (**L-50**), and no powered subset's magnitudes may be
 read without the three-number selection check (**L-51**).
 
@@ -163,7 +167,8 @@ Added by checkpoint-018:
 - **Any rule, band, or gate phrased against `p > 0.5`** — the break-even is `p_be_net` (§1b).
 - A blended opportunity score reported without its term-level decomposition.
 - Researching direction prediction — new entry models, trend filters, SMA/ZigZag sign variants, or
-  tuning any entry parameter to improve `p`. Entries stay simple and fixed.
+  tuning any entry parameter to improve `p`. Direction/event rules stay simple and fixed; only the
+  predeclared direct/reverse native-geometry arms may vary threshold, expiry, `z` or `H`.
 - Pure direction-agnostic **strategy branches** while the checkpoint-018 scope constraint stands.
   *Exception:* SPDR-014's `DA-STRADDLE` is powered in `SPDR-018` as **characterisation only**.
 - Sizing reported as improving expectancy — sizing changes variance, not mean.
@@ -173,11 +178,12 @@ Added by checkpoint-018:
 ## 4. Enforcement
 
 - `docs/experiments-docs/INDEX.md` is the live status record.  
-- Design registration for SPDR-018/019/020 does **not** authorise execution.  
+- Design registration does **not** authorise implementation or execution. The former capture
+  registrations remain permanently void; the live replacements are SPDR-021/022/023.
 - Each SPDR requires its own `design.md` before run; SPDR lane self-check replaces full QA subagent
   unless operator demands more.  
-- Operator gates: execution per SPDR; mid-checkpoint reflection owns the `p_dir` gate call;
-  019/020 start-gated on that reflection; XENA separate.
+- Operator gates: implementation plan approval, then execution authority per SPDR; all three
+  analyses precede the checkpoint-level interpretation; XENA remains separate.
 - Every declared lead carries a predeclared target MDE. B-5 is symmetric: unpowered ≠ negative, and
   suggestive ≠ supported.
 

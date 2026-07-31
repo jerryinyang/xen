@@ -51,6 +51,34 @@ SPDR leg never opens a checkpoint; a multi-leg series' disposition lives in its 
 container** checkpoint (e.g. checkpoint-010 for the SPDR-001/002/003 series). A
 `WORTH_EXPLORING` is a *routing signal*, not a verdict.
 
+## SPDR characterisation contract (BINDING — added 2026-07-30)
+
+The pipeline's general **single-hypothesis-per-experiment** rule does **not** apply literally to
+exploratory SPDR characterisation. It is replaced here by this contract, which permits breadth and
+forbids the vagueness that usually comes with it:
+
+- an SPDR **may** traverse a **predeclared** full grid of components, devices and combinations;
+- **every stratum must name the exact comparison** it makes and emit **its own direct estimate and
+  uncertainty** — not a share of a pooled effect, and not an inference from a neighbouring stratum;
+- **all strata are reported.** No winner-only pruning, and no experiment-wide
+  supported / refuted verdict over the grid;
+- **individual component × device strata must remain visible before any combined stratum is
+  interpreted.** A combination read never substitutes for the individual contribution reads;
+- **measures are device-native.** Choose each outcome for what that device actually does; do not
+  impose one universal score across every device in the grid;
+- **every adaptive or conditioned arm carries a direct comparator** — the same device unconditioned,
+  on the same eligible population;
+- for an operator-declared characterisation series, event count, uncertainty and MDE may be
+  **informative metadata only**: they remain visible but do not create positive/negative labels,
+  prune rows or gate companion experiments;
+- the **operator** interprets the resulting map and decides the next research action. The SPDR
+  produces the map, not the decision.
+
+**Why this exists.** A grid whose strata share one scale-free summary score, or whose device
+questions are bundled behind a single shared protocol, cannot say which component helped which
+device — it produces a verdict nobody can attribute. Two designs were withdrawn from the programme
+on 2026-07-30 for exactly that defect.
+
 ## Stages (lean)
 
 ```

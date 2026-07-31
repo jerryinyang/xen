@@ -1,22 +1,17 @@
 # Checkpoint 018 — Trade Opportunity Modelling / Capture Geometry
 
 - **Opened:** 2026-07-25
-- **Status:** `OPEN — SoT SIGNED; SPDR-018 + SPDR-018B COMPLETE AND CLOSED 2026-07-26; MID-CHECKPOINT REFLECTION SIGNED 2026-07-29 (option B); SPDR-019 + SPDR-020 DESIGNS COMPLETE AND QA-APPROVED 2026-07-29 (run 7) — IMPLEMENTATION AUTHORISED, EXECUTION AT THE OPERATOR'S GATE`
-- **Reflection:** `reflection-mid.md` (assembled 2026-07-26 as `reflection-inputs.md`; **SIGNED
-  2026-07-29, option B** — 019/020 run now, P2 arm-C in parallel; sequencing
-  only, no end-state), renamed on signature per §5 Step 2.
-- **Reflection companion:** `reflection-mid-volatility-model.md` (2026-07-28, revised same day after
-  independent audit) — the volatility evidence inventory (V1–V28, each with an evidence class) and the
-  capture-geometry model it supports. Carries two operator directives binding on `SPDR-019`/`SPDR-020`:
-  **§5.4a cost excluded from every exploration test (gross target)** and **§5.9 layer-by-layer test
-  protocol**. Takes no end-state decision.
+- **Status:** `OPEN — SPDR-018 + SPDR-018B CLOSED; EVIDENCE INVENTORY AND THREE-EXPERIMENT STEP-3 DESIGN APPROVED 2026-07-30; IMPLEMENTATION NOT YET AUTHORISED`
+- **Reflection:** `reflection-mid.md` — the confirmed evidence through SPDR-018B, each observation
+  with its evidence class and the adaptive-management decision it may inform. It selects **no** next
+  experiment and **no** universal outcome measure.
 - **Family:** `CF-VOLDIR-001` (`REGISTERED`) — **extension** of checkpoint-017, not a new family
 - **Governing SoT (substance precedence):** `.ignore/what-next/alts/opportunity.md`
   This design **translates** that brief 1-to-1; it does not replace or thin it.
 - **Predecessor:** `checkpoints/2026-07-23-017-structural-vol-direction-programme/` —
   **CLOSED 2026-07-25** (`retrospective.md`)
-- **Container:** `SPDR-018` → mid-checkpoint reflection → `SPDR-019` / `SPDR-020` →
-  conditional `XENA-VOLDIR-001`
+- **Container:** `SPDR-018` → approved evidence inventory → `SPDR-021/022/023`
+  characterisation → operator interpretation → conditional `XENA-VOLDIR-001`
 - **Authority:** family REGISTERED; SoT operator-signed 2026-07-25. Registration does **not**
   authorise execution. No XENA / TEST / holdout without operator gates.
 
@@ -73,10 +68,10 @@ equality; it only trades `p` against `W/L` along the zero line. Xen booked this 
 
 **What this gates — and what it does not** (SoT §1.1):
 
-- **Gates:** opening `SPDR-019`/`SPDR-020` as an **edge search**.
+- **Gates:** opening any capture experiment as an **edge search**.
 - **Does NOT gate:** the checkpoint, the exploration, or the magnitude work. A powered result
   below break-even **routes** (end-state 3), it does not terminate. `SPDR-018` is a **powering
-  experiment**; being an input to the 019/020 decision is a consequence of that job, not its
+  experiment**; being an input to the capture-axis decision is a consequence of that job, not its
   definition.
 
 ---
@@ -108,7 +103,7 @@ magnitude that is already realised (SoT §2.1).
 | **A. `p`** | conditional rate, per state | **UNPOWERED** across the 017 residue | `SPDR-018` |
 | **B. `W`, `L`, `W/L`** | win size, loss size, payoff asymmetry | **NEVER MEASURED** | `SPDR-018` |
 | **C. `E[\|move\|]`** | the scale that sets `W` and `L`: vol level (IC 0.34); T-GT-CUR (+0.21, 21/21); R-MARKOV k=4/12 | **PROVEN** | fold in by amendment |
-| **D. capture** | exits, targets, holds, trailing, sizing — the levers that move `W/L` against `p` | measured, not optimised | `SPDR-019`, `SPDR-020` |
+| **D. capture** | exits, targets, holds, trailing, sizing — the levers that move `W/L` against `p` | measured, not optimised | **unregistered — no vehicle** |
 | **E. `cost`** | spread never charged (2026-07-23) | **standing exclusion + caveat; not an open item** | infra |
 
 κ is a **diagnostic**, never a multiplicative term: "what fraction of the best available point the
@@ -128,7 +123,8 @@ MECHANISM:
   Two stages. Stage 1 is a PRECISION experiment, not a mechanism experiment: the 017 residue is
   sample-limited rather than effect-limited, and each arm inherits its parent screen's mechanism,
   object and estimand verbatim - only the data behind each estimate changes. Stage 2 is
-  extraction: capture geometry moves W/L against p on a fixed signed entry.
+  extraction: the signed direction rule stays fixed; predeclared volatility adaptation may change
+  the strategy's intrinsic event/order geometry and its post-entry capture without tuning direction.
 DERIVED:
   estimands = each parent's estimand verbatim, PLUS a uniform (p, W, L, W_L, p_be_net, edge)
               decomposition on every cell carrying a signed return
@@ -140,7 +136,7 @@ DERIVED:
 OBJECT-IDENTITY:
   SPDR-018 measurement object == each parent's object, unchanged. No estimand substitution,
     no un-nesting a conditioner out of its event. Parent parity is asserted in code.
-  SPDR-019/020 measurement object == the extraction object frozen at the mid reflection;
+  Any Step-3 measurement object == the extraction object frozen at the mid reflection;
     no silent object switch between screen and strategy
 ```
 
@@ -201,28 +197,22 @@ each 017 open question as resolved, or as `NOT_RESOLVABLE` on this data.
 + recorded decision. Artifact: `reflection-mid.md` in this checkpoint directory (created when the
 reflection runs, not at open).
 
-### Step 3 — strategies + capture geometry (start-gated on Step 2)
+### Step 3 — adaptive opportunity management
 
-Both strategies are **direction-aware** (signed entries) with **fixed** entries; the research
-variable is the capture geometry wrapped around them. The axis-D test set is all four devices:
-dynamic profit targets, trailing stops, holding periods, position sizing (SoT §6.3).
+**DESIGN APPROVED 2026-07-30; implementation and execution not yet authorised.** The binding
+programme design is `adaptive-management-design.md`:
 
-**`SPDR-019` — strategy #1, naive baseline / benchmark + opportunity-modulated capture.** A fixed,
-signed, non-predictive entry whose three hyperparameters map one-to-one onto the identity terms:
-Delta Threshold → selection on `E[|move|]`; Inactive Hold Period → event definition; Active Hold
-Period → the `κ` window. Full signal / execution spec in SoT §6.1.
+- `SPDR-021`: fixed candlestick-breakout benchmark;
+- `SPDR-022`: MOMO after `E-TOUCH` / `E-CLOSE`;
+- `SPDR-023`: MR after `E-TOUCH` / `E-CLOSE`.
 
-- **It is not direction-neutral** — it carries a momentum prior, so its own `p_dir` and `κ` must be
-  measured **first**, or later improvements are misattributed.
-- **A zero baseline edge is a predeclared, acceptable outcome.**
-- Stop-order fills and pending-order expiry are **execution semantics**: the screen may approximate
-  them under a declared fill rule; booked P&L requires a native execution vehicle.
-
-**`SPDR-020` — strategy #2, the E-TOUCH / E-CLOSE MOMO–MR SPDR-014 models.** SPDR-014 grammar,
-directionally aware by design. Gross **and** net availability both reported. Two binding
-carry-forward fixes: band selectivity must be **measured and visible on every cell** (`p_event`
-was 0.938–0.998 in SPDR-014 and is a covariate, never an eligibility filter), and the
-DESIGN→CONFIRM sign flip must be shown to be a power artifact.
+All three run independently. Each reports its fixed strategy, every applicable volatility component
+against the strategy's native parameters in both direct and reverse orientations, and every
+applicable external management device individually. Only predeclared native-native and
+management-device combinations are allowed; the two grids are not crossed. Outcomes are
+origin-/device-native; all strata are visible; power is informative; no per-experiment verdict is
+issued. NautilusTrader is required for native order and competing-exit semantics. The family-level
+interpretation occurs only after all three analyses.
 
 ### Step 4 — XENA (conditional)
 
@@ -239,14 +229,12 @@ Unchanged from checkpoint-017; still **RESERVED**.
 | 2 | `SPDR-018` design | Freeze the four arms, the residue inventory, the uniform `(p,W,L)` layer, power targets, controls | Checkpoint open | **COMPLETE 2026-07-25** — `python/experiments/SPDR-018/design.md` |
 | 3 | `SPDR-018` run + analysis | Resolve the complete 017 residue | design + execution authority | **COMPLETE / CLOSED 2026-07-26** — `HYP-D5` **SUPPORTED**; 1,413 powered signed cells vs SPDR-014's 0/927; 18 HARD checks; **0 of 1,413 clear `p_be_net`**; `W/L` 96.7% mirror-determined. No gating verdict (§2). `python/experiments/SPDR-018/report.md` |
 | 3b | `SPDR-018B` run + analysis *(added; the cTrader leg SPDR-018 narrowed by defect)* | Replicate the residue on an independent asset class | design + execution authority | **COMPLETE / CLOSED 2026-07-26** — `HYP-D5` **PARTIALLY SUPPORTED**; structure replicates more tightly (mirror R² **0.9746**), **0 of 315 clear `p_be_net`**; **C2 neither replicated nor refuted**. `python/experiments/SPDR-018B/report.md` |
-| 4 | Mid-checkpoint reflection | Book each 017 question resolved / NOT_RESOLVABLE; decide Step 3 from the `(p,W,L)` picture | SPDR-018 analysis | **INPUTS ASSEMBLED 2026-07-26 — awaiting operator decision.** `reflection-mid.md` |
+| 4 | Mid-checkpoint reflection | Book each 017 question resolved / NOT_RESOLVABLE; inventory the confirmed evidence and what it licenses | SPDR-018 analysis | **APPROVED 2026-07-30.** Evidence only. `reflection-mid.md` |
 | 5 | ~~Spread pin~~ (infra) | Spread cost | operator | **RETIRED AS AN ITEM 2026-07-23** — spread is never charged programme-wide (`evaluation-framework.md` §Chapter-04): no quote data on the T1 lane, fixed proxies refused in code. Nothing is scheduled or awaited. The consequence is permanent, not pending: reported net is overstated, the caveat travels on every record, and AMENDMENT-C2 refuses every money, expectancy, tradability and graduation claim |
-| 6 | `SPDR-019` design | Baseline breakout + opportunity-modulated capture | reflection gate | **COMPLETE 2026-07-28** — `python/experiments/SPDR-019/design.md`; execution unauthorised |
-| 7 | `SPDR-019` run + analysis | κ conversion on a fixed signed entry | design + authority | unauthorised |
-| 8 | `SPDR-020` design | Event-grammar direction-aware capture | reflection gate | **COMPLETE; QA run-5 fixes applied 2026-07-29, fresh QA pending** — `python/experiments/SPDR-020/design.md`; execution unauthorised |
-| 9 | `SPDR-020` run + analysis | κ conversion on the 014 event object | design + authority | unauthorised |
-| 10 | Operator gate D | Graduate base / terminal diagnosis | 019 and/or 020 | unauthorised |
-| 11 | `XENA-VOLDIR-001` | Portfolio/search on graduated bases | D graduates + separate design/QA/approval | **RESERVED** |
+| 6 | Step-3 design (adaptive opportunity management) | Incremental effect of volatility-adaptive vs fixed native parameters and external management, per component | operator approval of item 4 | **APPROVED 2026-07-30; NATIVE-ARM AMENDMENT APPROVED.** `adaptive-management-design.md`; `SPDR-021/022/023` |
+| 7 | Step-3 implementation + run + analysis | Three independent Nautilus SPDR characterisations | approved implementation plan + execution authority | **NOT YET AUTHORISED** |
+| 8 | Operator gate D | Graduate base / terminal diagnosis | Step 3 | unauthorised |
+| 9 | `XENA-VOLDIR-001` | Portfolio/search on graduated bases | D graduates + separate design/QA/approval | **RESERVED** |
 
 No historical TEST. No holdout. No automatic family verdict.
 
@@ -271,8 +259,9 @@ New for this checkpoint:
   edge can exist at `p < 0.5` whenever `W > L`.
 - **A blended opportunity score reported without its term-level decomposition.**
 - **Researching direction prediction** — new entry models, trend filters, SMA/ZigZag sign
-  variants, or tuning any entry parameter to improve `p`. Entries stay simple and fixed; direction
-  is **measured, not targeted**.
+  variants, or tuning any entry parameter to improve `p`. Direction/event logic stays fixed; only
+  the approved direct/reverse native-geometry arms may vary threshold, expiry, `z` or `H`.
+  Direction is **measured, not targeted**.
 - **Pure direction-agnostic *strategy* branches** (both-side, straddle-class, grid-class) while the
   SoT §0 scope constraint stands. SPDR-013's ambient-harvest line is **parked, not pursued**.
   *Exception (operator, 2026-07-25):* SPDR-014's `DA-STRADDLE` is powered in `SPDR-018` as
@@ -316,20 +305,23 @@ New for this checkpoint:
 
 ---
 
-## 10. Registration and ID assignment (executed 2026-07-25)
+## 10. Registration and ID assignment
 
 | Object | ID | Hypothesis |
 |---|---|---|
 | Checkpoint | `2026-07-25-018-trade-opportunity-capture-geometry` | — |
 | Powering sweep over the full 017 residue | `SPDR-018` | `CF-VOLDIR-001/HYP-D5` |
-| Baseline breakout + opportunity-modulated capture | `SPDR-019` | `CF-VOLDIR-001/HYP-D6` |
-| Event-grammar direction-aware capture | `SPDR-020` | `CF-VOLDIR-001/HYP-D7` |
+| Breakout adaptive-management characterisation | `SPDR-021` | `CF-VOLDIR-001/HYP-D8` |
+| MOMO adaptive-management characterisation | `SPDR-022` | `CF-VOLDIR-001/HYP-D9` |
+| MR adaptive-management characterisation | `SPDR-023` | `CF-VOLDIR-001/HYP-D10` |
 | Conditional XENA | `XENA-VOLDIR-001` | `CF-VOLDIR-001/HYP-E` (unchanged) |
 
 `SPDR-016` was closed **SUPERSEDED / NEVER RUN** at the checkpoint-017 retrospective; its intent is
-preserved verbatim as `SPDR-018`'s declared lead list. **IDs are registered; designs are pending;
-runs require operator execution authority.** `SPDR-019` and `SPDR-020` are start-gated on the
-mid-checkpoint reflection.
+preserved verbatim as `SPDR-018`'s declared lead list. **Runs require operator execution authority.**
+The two capture-axis IDs registered on 2026-07-25 were **withdrawn and permanently voided on
+2026-07-30** and are not reused. Their replacements were registered only after the evidence
+inventory and replacement design were approved. Registration does not authorise implementation or
+execution.
 
 ---
 
@@ -338,6 +330,7 @@ mid-checkpoint reflection.
 | Resource | Role |
 |---|---|
 | `.ignore/what-next/alts/opportunity.md` | **SoT — substance precedence** |
+| `adaptive-management-design.md` | Approved common contract for SPDR-021/022/023 |
 | `checkpoints/2026-07-23-017-structural-vol-direction-programme/retrospective.md` | Closure of the evidence base |
 | `docs/references/chapter-06-governance.md` | Live gate |
 | `docs/signal-registry/candidate-families/cf-voldir-001.md` | Family contract |

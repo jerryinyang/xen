@@ -39,10 +39,9 @@ where the parent permits, score CONFIRM explicitly, report effective rather than
 No estimand was substituted and no conditioner was un-nested from its event.
 
 > **It carries no gating verdict.** Checkpoint design §2 is explicit: SPDR-018 being an input to the
-> SPDR-019/020 decision is a *consequence* of its job, not its definition. It does not gate the
-> checkpoint, the exploration, or the magnitude work. `SPDR-019`/`SPDR-020` are registered and would
-> run regardless of what this experiment found; what SPDR-018 changes is how they are *parameterised*,
-> not whether they happen.
+> capture-axis decision is a *consequence* of its job, not its definition. It does not gate the
+> checkpoint, the exploration, or the magnitude work. What SPDR-018 changes is how a capture
+> experiment would be *parameterised*, not whether one happens.
 
 **The proof that this was a powering experiment and not a re-scoping one is parent parity**, asserted
 in code: each arm reproduces its parent's published cells on the parent's own band to
@@ -106,7 +105,7 @@ three classes. **Per B-5, class C is a statement about sample size and is never 
 |---|---|---|
 | **The counter-outcome** | **130 of 1,413** powered cells have a gross-mean CI excluding zero — **129 negative, 1 positive**. Median **−4.12 bps**, max \|effect\| **12.93 bps**. On signed direction cells a powered negative mean **is** a powered directional statement: the registered side reliably loses | **NO.** Flipping the side: **0 of 129** clear even the *partial* cost floor; best flipped gross **+12.93 bps** against 13.1–16.0 bps; best flipped net **−0.65 bps**. SoT §10 end-state 3 is checked and **not satisfied at this cost floor** |
 | **Tail asymmetry** | Under a pure null with nominal 95% CIs on 1,413 cells you would expect ~35 per tail. Observed **1 positive, 129 negative** — the positive tail is **depleted well below chance** while the negative tail is **enriched ~3.7×** | Reported as a positive quantification, not a null. Corroborated independently by C8's mean-reversion lean (`p_momo` ≈ 0.468–0.470) and by arm C's side-derangement (live −12.22 bps, percentile **0.0065**) |
-| **`W/L` as a free lever** | **REFUTED as a free degree of freedom, confirmed as a real and large one.** `log(W/L) = −0.0048 + 0.9408·log((1−p)/p)`, **R² 0.9667** — 96.7% of payoff-asymmetry variance is the arithmetic mirror of the rate. Exit geometry moves `W/L` **0.150 → 10.05 (67×)** while `p` moves inversely by almost exactly the offsetting amount; the gross mean does **not** improve (−0.99 bps at `W/L` 2.06; **−37.9 bps at `W/L` 10.05**). Free residual `log R` has sd 0.073 and is negative **at the centre** — median **−0.0301**, mean **−0.0356**, and negative in all five per-exit-mode medians — but **not in every cell**: `log R > 0` in **459 of 1,413 (32.5%)**, which is the *identical* set to the 32.5% clearing gross break-even, since `R > 1 ⟺ p > p_be`. (An earlier draft of this row said "uniformly negative"; that was false and contradicted the 32.5% figure four lines above it. `analysis.md` §5.3 was precise — it said this of the per-mode medians.) **82.8%** of powered cells cannot have their `W/L` distinguished from the driftless mirror at all | This is the decisive finding for SPDR-019/020. The capture branch has a lever; on this evidence the lever **does not have a positive direction** |
+| **`W/L` as a free lever** | **REFUTED as a free degree of freedom, confirmed as a real and large one.** `log(W/L) = −0.0048 + 0.9408·log((1−p)/p)`, **R² 0.9667** — 96.7% of payoff-asymmetry variance is the arithmetic mirror of the rate. Exit geometry moves `W/L` **0.150 → 10.05 (67×)** while `p` moves inversely by almost exactly the offsetting amount; the gross mean does **not** improve (−0.99 bps at `W/L` 2.06; **−37.9 bps at `W/L` 10.05**). Free residual `log R` has sd 0.073 and is negative **at the centre** — median **−0.0301**, mean **−0.0356**, and negative in all five per-exit-mode medians — but **not in every cell**: `log R > 0` in **459 of 1,413 (32.5%)**, which is the *identical* set to the 32.5% clearing gross break-even, since `R > 1 ⟺ p > p_be`. (An earlier draft of this row said "uniformly negative"; that was false and contradicted the 32.5% figure four lines above it. `analysis.md` §5.3 was precise — it said this of the per-mode medians.) **82.8%** of powered cells cannot have their `W/L` distinguished from the driftless mirror at all | This is the decisive finding for the capture branch. The branch has a lever; on this evidence the lever **does not have a positive direction** |
 
 ### Class C — STILL NOT RESOLVABLE (a power statement, never a negative), with new information
 
@@ -267,7 +266,7 @@ are delivered as quantified first-class `NOT_RESOLVABLE` answers rather than as 
 
 ### What this experiment explicitly does NOT decide
 
-- **No gating verdict.** SPDR-018 does not gate the checkpoint, SPDR-019, SPDR-020, or the
+- **No gating verdict.** SPDR-018 does not gate the checkpoint, the capture axis, or the
   exploration. Checkpoint design §2 is explicit and this report changes nothing about it.
 - **No family action.** `CF-VOLDIR-001` status is unchanged and remains `REGISTERED`. Family status
   transitions happen only at a checkpoint retrospective, operator-signed.

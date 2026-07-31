@@ -9,7 +9,7 @@ Residue inventory (design §2, complete — nothing narrowed):
   B5  M15 arms                                        all D-SMA and D-ZZ arms on the M15 clock
 
 **This is where ``W`` and ``L`` are measured on real episodes** — the axis-B gap SoT §2 exposed,
-and the highest-value arm for parameterising SPDR-019/020.
+and the highest-value arm for parameterising any later capture-geometry work.
 
 The object is SPDR-013's episode under its declared capture geometry, inherited verbatim: this
 module re-scores the parent's own emitted episodes, it does not rebuild them. Powering comes from
