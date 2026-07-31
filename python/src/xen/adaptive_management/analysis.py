@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 import json
+import multiprocessing
 from pathlib import Path
 import shutil
 from typing import Any
@@ -50,6 +51,18 @@ _IDENTITY_COLUMNS = (
     "setting",
     "comparator_id",
     "state",
+)
+_DEVICES = ("TARGET", "STOP", "TRAIL", "HOLD", "SIZE")
+# validate_full_reporting is a whole-run check; these are the only columns it reads.
+_VALIDATION_ORIGIN_COLUMNS = ("origin_id", "symbol", "entry_variant")
+_VALIDATION_NATIVE_COLUMNS = ("origin_id", "entry_variant", "arm_id")
+_VALIDATION_POLICY_COLUMNS = (
+    "origin_id",
+    "entry_variant",
+    "arm_id",
+    "comparator_id",
+    "policy_id",
+    "native_arm_id",
 )
 _NON_EVENT_STATES = {
     "NO_EVENT",
@@ -384,6 +397,7 @@ def analyse_run(
     *,
     block_bars: int = 24,
     n_boot: int = 2_000,
+    jobs: int = 1,
 ) -> None:
     """Analyse one completed TRAIN run and atomically publish descriptive tables."""
     run_dir = Path(run_dir)
@@ -395,57 +409,59 @@ def analyse_run(
         raise ValueError("adaptive-management analysis accepts TRAIN runs only")
     experiment_id = str(config["experiment_id"])
     universe = str(config["universe"])
-    origins = pl.read_parquet(run_dir / "origins.parquet")
-    native = pl.read_parquet(run_dir / "native_parameter_schedule.parquet")
-    policies = pl.read_parquet(run_dir / "policy_schedule.parquet")
-    # The ledger is the largest artifact (tens of millions of rows on the breach crypto
-    # cells) and is only ever consumed as the two aggregates _attach_results builds, so
-    # it is read column-projected and released before the estimate stages allocate.
-    ledger = pl.read_parquet(
-        run_dir / "episode_results.parquet",
-        columns=[
-            "episode_id",
-            "arm_id",
-            "policy_id",
-            "state",
-            "ts_ns",
-            "price",
-            "exit_reason",
-        ],
+    # Whole-run reporting completeness is a global property (an arm's origin set is
+    # compared against the ledger's, across every symbol), so it is checked once on
+    # narrow reads before any symbol is analysed.
+    validate_full_reporting(
+        experiment_id,
+        pl.read_parquet(run_dir / "origins.parquet", columns=_VALIDATION_ORIGIN_COLUMNS),
+        pl.read_parquet(
+            run_dir / "native_parameter_schedule.parquet",
+            columns=_VALIDATION_NATIVE_COLUMNS,
+        ),
+        pl.read_parquet(
+            run_dir / "policy_schedule.parquet", columns=_VALIDATION_POLICY_COLUMNS
+        ),
     )
-    validate_full_reporting(experiment_id, origins, native, policies)
 
-    native = _attach_native_contract(experiment_id, native)
-    native_results = _attach_path_diagnostics(
-        _attach_results(native, ledger, universe), run_dir
-    )
-    policy_results = _attach_path_diagnostics(
-        _attach_results(policies, ledger, universe), run_dir
-    )
-    del ledger
-    native_table = origin_estimates(
-        origins,
-        native_results,
-        block_bars,
-        n_boot=n_boot,
-    )
-    paired = paired_estimates(
-        policy_results,
-        block_bars,
-        n_boot=n_boot,
-    )
-    device_tables = {
-        device: _device_table(
-            policy_results,
-            device,
-            block_bars=block_bars,
-            n_boot=n_boot,
+    # Every estimate is keyed by symbol and every comparator is matched within symbol, so
+    # each symbol is analysed independently and its small result tables are concatenated.
+    # Peak memory becomes one symbol's working set rather than the whole run's, which is
+    # what lets a breach crypto cell run at all, and lets several symbols run at once.
+    symbols = list(
+        dict.fromkeys(
+            pl.read_parquet(run_dir / "origins.parquet", columns=["symbol"])["symbol"]
+            .cast(pl.Utf8)
+            .to_list()
         )
-        for device in ("TARGET", "STOP", "TRAIL", "HOLD", "SIZE")
-    }
-    selected_excluded = _selected_excluded(native_results)
-    selection_checks = _selection_checks(selected_excluded)
-    state_sections = _state_sections(native_results, policy_results)
+    )
+    work = [(run_dir, symbol, experiment_id, universe, block_bars, n_boot) for symbol in symbols]
+    if jobs and jobs > 1 and len(work) > 1:
+        context = multiprocessing.get_context("spawn")
+        with context.Pool(min(jobs, len(work))) as pool:
+            parts = pool.map(_analyse_symbol_payload, work, chunksize=1)
+    else:
+        parts = [_analyse_symbol_payload(item) for item in work]
+
+    def _stack(name: str) -> pl.DataFrame:
+        # Keep typed-but-empty contributions so an all-empty table still publishes its
+        # schema, exactly as a whole-run pass does; only schemaless frames are dropped.
+        frames = [part[name] for part in parts if part[name].width]
+        return pl.concat(frames, how="diagonal_relaxed") if frames else pl.DataFrame()
+
+    native_table = _stack("native_table")
+    paired = _stack("paired")
+    device_tables = {device: _stack(f"device_{device}") for device in _DEVICES}
+    selected_excluded = _stack("selected_excluded")
+    selection_checks = _stack("selection_checks")
+    shared_trades = _stack("shared_trades")
+    # _state_sections sorts globally, so the per-symbol pieces are re-sorted on the same
+    # keys rather than left in symbol-file order.
+    state_sections = _stack("state_sections")
+    if state_sections.height:
+        state_sections = state_sections.sort(
+            ["symbol", "entry_variant", "arm_id", "state"]
+        )
     controls = _control_inventory(experiment_id, universe)
     per_stratum = pl.concat(
         [
@@ -454,11 +470,7 @@ def analyse_run(
         ],
         how="diagonal_relaxed",
     )
-    per_stratum = _attach_common_context(
-        per_stratum,
-        pl.concat([native_results, policy_results], how="diagonal_relaxed"),
-        config,
-    )
+    per_stratum = _attach_context(per_stratum, _stack("contexts"), config)
 
     output_dir.parent.mkdir(parents=True, exist_ok=True)
     workspace = output_dir.parent / f".{output_dir.name}.tmp-{uuid.uuid4().hex}"
@@ -467,7 +479,7 @@ def analyse_run(
         tables = {
             "per_stratum_estimates": per_stratum,
             "native_parameter_origins": native_table,
-            "native_parameter_shared_trades": _shared_trade_diagnostics(native_results),
+            "native_parameter_shared_trades": shared_trades,
             "native_parameter_selected_excluded": selected_excluded,
             "device_target": device_tables["TARGET"],
             "device_stop": device_tables["STOP"],
@@ -497,6 +509,112 @@ def analyse_run(
     except BaseException:
         shutil.rmtree(workspace, ignore_errors=True)
         raise
+
+
+def _analyse_symbol_payload(
+    item: tuple[Path, str, str, str, int, int],
+) -> dict[str, pl.DataFrame]:
+    """Pool entry point: one positional argument so `Pool.map` can carry it."""
+    run_dir, symbol, experiment_id, universe, block_bars, n_boot = item
+    return _analyse_symbol(
+        run_dir,
+        symbol,
+        experiment_id,
+        universe,
+        block_bars=block_bars,
+        n_boot=n_boot,
+    )
+
+
+def _analyse_symbol(
+    run_dir: Path,
+    symbol: str,
+    experiment_id: str,
+    universe: str,
+    *,
+    block_bars: int,
+    n_boot: int,
+) -> dict[str, pl.DataFrame]:
+    """Produce one symbol's contribution to every analysis table.
+
+    Reads only this symbol's rows. The run's schedules are written symbol-major, so
+    concatenating these contributions in symbol order reproduces the row order a
+    whole-run pass produces.
+    """
+    origins = (
+        pl.scan_parquet(run_dir / "origins.parquet")
+        .filter(pl.col("symbol") == symbol)
+        .collect()
+    )
+    native = (
+        pl.scan_parquet(run_dir / "native_parameter_schedule.parquet")
+        .filter(pl.col("symbol") == symbol)
+        .collect()
+    )
+    policies = (
+        pl.scan_parquet(run_dir / "policy_schedule.parquet")
+        .filter(pl.col("symbol") == symbol)
+        .collect()
+    )
+    # episode_results carries no symbol column, so it is restricted by this symbol's
+    # origins. Projection keeps only the columns _attach_results consumes.
+    origin_ids = origins["origin_id"].cast(pl.Utf8).unique()
+    ledger = (
+        pl.scan_parquet(run_dir / "episode_results.parquet")
+        .select(
+            "episode_id",
+            "origin_id",
+            "arm_id",
+            "policy_id",
+            "state",
+            "ts_ns",
+            "price",
+            "exit_reason",
+        )
+        .filter(pl.col("origin_id").cast(pl.Utf8).is_in(origin_ids.implode()))
+        .drop("origin_id")
+        .collect()
+    )
+
+    native = _attach_native_contract(experiment_id, native)
+    native_results = _attach_path_diagnostics(
+        _attach_results(native, ledger, universe), run_dir
+    )
+    del native
+    native_table = origin_estimates(origins, native_results, block_bars, n_boot=n_boot)
+    selected_excluded = _selected_excluded(native_results)
+    selection_checks = _selection_checks(selected_excluded)
+    shared_trades = _shared_trade_diagnostics(native_results)
+    native_slim = _slim(native_results)
+    del native_results
+
+    policy_results = _attach_path_diagnostics(
+        _attach_results(policies, ledger, universe), run_dir
+    )
+    del ledger, policies
+    paired = paired_estimates(policy_results, block_bars, n_boot=n_boot)
+    device_tables = {
+        device: _device_table(
+            policy_results, device, block_bars=block_bars, n_boot=n_boot
+        )
+        for device in _DEVICES
+    }
+    policy_slim = _slim(policy_results)
+    del policy_results
+
+    payload = {
+        "native_table": native_table,
+        "paired": paired,
+        "selected_excluded": selected_excluded,
+        "selection_checks": selection_checks,
+        "shared_trades": shared_trades,
+        "state_sections": _state_sections(native_slim, policy_slim),
+        "contexts": _common_context(
+            pl.concat([native_slim, policy_slim], how="diagonal_relaxed")
+        ),
+    }
+    payload.update({f"device_{device}": device_tables[device] for device in _DEVICES})
+    return payload
 
 
 def _origin_row(
@@ -874,7 +992,14 @@ def _attach_common_context(
     results: pl.DataFrame,
     config: dict[str, Any],
 ) -> pl.DataFrame:
-    contexts = _common_context(results)
+    return _attach_context(estimates, _common_context(results), config)
+
+
+def _attach_context(
+    estimates: pl.DataFrame,
+    contexts: pl.DataFrame,
+    config: dict[str, Any],
+) -> pl.DataFrame:
     keys = [
         "experiment_id",
         "universe",
@@ -1035,16 +1160,17 @@ def _device_table(
             )
         observed_metrics = metric_function(paired_left)
         comparator_metrics = metric_function(paired_right)
+        intervals = _paired_metric_intervals(
+            paired_left,
+            paired_right,
+            observed_metrics,
+            comparator_metrics,
+            device=device,
+            block_bars=block_bars,
+            n_boot=n_boot,
+        )
         for metric_name, observed in observed_metrics.items():
-            stats = _paired_metric_interval(
-                paired_left,
-                paired_right,
-                metric_function,
-                metric_name,
-                device=device,
-                block_bars=block_bars,
-                n_boot=n_boot,
-            )
+            stats = intervals[metric_name]
             arm_rows.append(
                 {
                     **identity,
@@ -1233,27 +1359,44 @@ def _pair_episode_rows(
     return left, right
 
 
-def _paired_metric_interval(
+def _paired_metric_intervals(
     adaptive: pl.DataFrame,
     comparator: pl.DataFrame,
-    metric_function: Callable[[pl.DataFrame], dict[str, float]],
-    metric_name: str,
+    observed_metrics: dict[str, float],
+    comparator_metrics: dict[str, float],
     *,
     device: str,
     block_bars: int,
     n_boot: int,
-) -> dict[str, float | int]:
-    observed = metric_function(adaptive)[metric_name]
-    fixed = metric_function(comparator)[metric_name]
-    estimate = float(observed - fixed)
-    if adaptive.height < 2:
+) -> dict[str, dict[str, float | int]]:
+    """Interval every metric of one device from a single pass over shared draws.
+
+    Each metric previously ran its own bootstrap. Every one of those runs seeded
+    `default_rng(240730)` and drew `len(partitions)` blocks from the same paired
+    population, so all metrics of a group resampled the *identical* 2 000 block sets and
+    then discarded the other metrics the kernel had already computed. Drawing once and
+    reading every metric off the same draw is therefore arithmetically identical, and
+    costs one pass instead of one per metric.
+    """
+    estimates = {
+        name: float(observed - comparator_metrics[name])
+        for name, observed in observed_metrics.items()
+    }
+
+    def _degenerate(effective_n: int) -> dict[str, dict[str, float | int]]:
         return {
-            "estimate": estimate,
-            "ci_low": estimate,
-            "ci_high": estimate,
-            "mde": np.nan,
-            "effective_n": adaptive.height,
+            name: {
+                "estimate": estimate,
+                "ci_low": estimate,
+                "ci_high": estimate,
+                "mde": np.nan,
+                "effective_n": effective_n,
+            }
+            for name, estimate in estimates.items()
         }
+
+    if adaptive.height < 2:
+        return _degenerate(adaptive.height)
     block_bars = max(24, int(block_bars))
     indexed = adaptive.with_row_index("_row")
     if "decision_ts" in indexed.columns:
@@ -1270,38 +1413,38 @@ def _paired_metric_interval(
     else:
         partitions = [[index] for index in range(adaptive.height)]
     if len(partitions) < 2:
-        return {
-            "estimate": estimate,
-            "ci_low": estimate,
-            "ci_high": estimate,
-            "mde": np.nan,
-            "effective_n": len(partitions),
-        }
+        return _degenerate(len(partitions))
     blocks = [np.asarray(block, dtype=np.int64) for block in partitions]
     columns = _DEVICE_METRIC_COLUMNS[device]
     kernel = _METRIC_KERNELS[device]
     left_arrays = _metric_arrays(adaptive, columns)
     right_arrays = _metric_arrays(comparator, columns)
     rng = np.random.default_rng(240730)
-    draws = []
+    draws: dict[str, list[float]] = {name: [] for name in estimates}
     for _ in range(max(1, int(n_boot))):
         chosen = rng.integers(0, len(partitions), size=len(partitions))
         rows = np.concatenate([blocks[block] for block in chosen])
-        left_metric = kernel(left_arrays, rows)[metric_name]
-        right_metric = kernel(right_arrays, rows)[metric_name]
-        if np.isfinite(left_metric) and np.isfinite(right_metric):
-            draws.append(left_metric - right_metric)
-    if not draws:
-        low = high = np.nan
-    else:
-        low, high = np.quantile(np.asarray(draws), [0.025, 0.975])
-    return {
-        "estimate": estimate,
-        "ci_low": float(low),
-        "ci_high": float(high),
-        "mde": float(estimate - low) if np.isfinite(low) else np.nan,
-        "effective_n": len(partitions),
-    }
+        left_metrics = kernel(left_arrays, rows)
+        right_metrics = kernel(right_arrays, rows)
+        for name in estimates:
+            left_metric = left_metrics[name]
+            right_metric = right_metrics[name]
+            if np.isfinite(left_metric) and np.isfinite(right_metric):
+                draws[name].append(left_metric - right_metric)
+    intervals: dict[str, dict[str, float | int]] = {}
+    for name, estimate in estimates.items():
+        if not draws[name]:
+            low = high = np.nan
+        else:
+            low, high = np.quantile(np.asarray(draws[name]), [0.025, 0.975])
+        intervals[name] = {
+            "estimate": estimate,
+            "ci_low": float(low),
+            "ci_high": float(high),
+            "mde": float(estimate - low) if np.isfinite(low) else np.nan,
+            "effective_n": len(partitions),
+        }
+    return intervals
 
 
 def _shared_trade_diagnostics(results: pl.DataFrame) -> pl.DataFrame:
@@ -1396,6 +1539,42 @@ def _selection_checks(frame: pl.DataFrame) -> pl.DataFrame:
             }
         )
     return pl.from_dicts(rows, infer_schema_length=None)
+
+
+# Columns _state_sections and _common_context read. analyse_run keeps only these two
+# narrow views alive so each wide working frame can be released as soon as its own
+# stages finish; a column missing here fails loudly rather than filling nulls.
+_STATE_SECTION_COLUMNS = (
+    "experiment_id",
+    "universe",
+    "symbol",
+    "entry_variant",
+    "arm_id",
+    "component",
+    "state",
+    "outcome_bps",
+)
+_COMMON_CONTEXT_COLUMNS = (
+    "experiment_id",
+    "universe",
+    "symbol",
+    "entry_variant",
+    "arm_id",
+    "state",
+    "outcome_bps",
+    "mfe_bps",
+    "mae_bps",
+    "partial_cost_bps",
+    "exit_reason",
+    "_exit_reason",
+    "_exit_price",
+)
+
+
+def _slim(frame: pl.DataFrame) -> pl.DataFrame:
+    """Project a working frame to the columns the two cross-frame stages read."""
+    wanted = dict.fromkeys(_STATE_SECTION_COLUMNS + _COMMON_CONTEXT_COLUMNS)
+    return frame.select([column for column in wanted if column in frame.columns])
 
 
 def _state_sections(native: pl.DataFrame, policies: pl.DataFrame) -> pl.DataFrame:

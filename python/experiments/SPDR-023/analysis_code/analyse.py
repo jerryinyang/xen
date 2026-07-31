@@ -15,11 +15,12 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--run", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--jobs", type=int, default=1)
     args = parser.parse_args(argv)
     config = json.loads((args.run / "config.json").read_text(encoding="utf-8"))
     if config.get("experiment_id") != EXPERIMENT_ID:
         raise ValueError(f"{EXPERIMENT_ID} wrapper received a different experiment run")
-    analyse_run(args.run, args.output)
+    analyse_run(args.run, args.output, jobs=args.jobs)
 
 
 if __name__ == "__main__":

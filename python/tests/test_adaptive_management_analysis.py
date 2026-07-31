@@ -733,7 +733,9 @@ def test_each_analysis_wrapper_invokes_only_its_own_run(monkeypatch, tmp_path):
     monkeypatch.setattr(
         analysis,
         "analyse_run",
-        lambda run_dir, output_dir: seen.append((Path(run_dir), Path(output_dir))),
+        lambda run_dir, output_dir, **kwargs: seen.append(
+            (Path(run_dir), Path(output_dir))
+        ),
     )
     for experiment_id in ("SPDR-021", "SPDR-022", "SPDR-023"):
         path = (
