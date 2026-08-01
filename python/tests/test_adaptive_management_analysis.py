@@ -596,6 +596,24 @@ def _write_complete_run(run_dir: Path) -> None:
     )
 
 
+def test_analyse_run_accepts_a_breach_origin_ledger_without_entry_variant(tmp_path):
+    """SPDR-022/023 zone origins are common to both entry variants and carry no
+    `entry_variant` column; the schedule supplies it. Analysis must not require it."""
+    from xen.adaptive_management.analysis import ANALYSIS_ARTIFACTS, analyse_run
+
+    run_dir = tmp_path / "run"
+    _write_complete_run(run_dir)
+    breach_origins = pl.read_parquet(run_dir / "origins.parquet").drop("entry_variant")
+    assert "entry_variant" not in breach_origins.columns
+    breach_origins.write_parquet(run_dir / "origins.parquet")
+
+    output_dir = tmp_path / "analysis"
+    analyse_run(run_dir, output_dir, n_boot=20)
+    assert set(ANALYSIS_ARTIFACTS).issubset(
+        {path.name for path in output_dir.iterdir()}
+    )
+
+
 def test_analyse_run_writes_every_declared_table_without_verdicts(tmp_path):
     from xen.adaptive_management.analysis import ANALYSIS_ARTIFACTS, analyse_run
 

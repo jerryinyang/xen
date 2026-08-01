@@ -1,0 +1,286 @@
+{
+  "universe": "ctrader",
+  "origins": 44700,
+  "features": 44703,
+  "symbols": 3,
+  "feature_minus_origin": 3,
+  "origin_id_unique": 44700,
+  "component_ready_false": 3,
+  "feature_rows_without_origin": 3,
+  "feature_rows_without_origin_ts": [
+    "2023-11-22 00:00:00+00:00"
+  ],
+  "origin_rows_without_feature": 0,
+  "native_rows": 5811000,
+  "native_arms": 130,
+  "native_arms_per_variant": [
+    {
+      "entry_variant": "E_CLOSE",
+      "len": 65
+    },
+    {
+      "entry_variant": "E_TOUCH",
+      "len": 65
+    }
+  ],
+  "native_distinct_keys": 5811000,
+  "native_duplicate_keys": 0,
+  "native_origins_covered": 44700,
+  "native_origins_missing": 0,
+  "native_expected_rows_arms_x_origins": 5811000,
+  "native_row_key_audit_pass": true,
+  "management_rows": 7152000,
+  "management_arms": 80,
+  "management_arms_per_variant": [
+    {
+      "entry_variant": "E_TOUCH",
+      "len": 80
+    },
+    {
+      "entry_variant": "E_CLOSE",
+      "len": 80
+    }
+  ],
+  "management_distinct_keys": 7152000,
+  "management_duplicate_keys": 0,
+  "management_origins_covered": 44700,
+  "management_origins_missing": 0,
+  "management_expected_rows_arms_x_origins": 7152000,
+  "management_row_key_audit_pass": true,
+  "native_states_by_variant": [
+    {
+      "entry_variant": "E_CLOSE",
+      "state": "ORDER_CREATED",
+      "len": 2382365
+    },
+    {
+      "entry_variant": "E_CLOSE",
+      "state": "NO_FEATURE",
+      "len": 308819
+    },
+    {
+      "entry_variant": "E_CLOSE",
+      "state": "NO_EVENT",
+      "len": 212286
+    },
+    {
+      "entry_variant": "E_CLOSE",
+      "state": "INCOMPLETE",
+      "len": 2022
+    },
+    {
+      "entry_variant": "E_CLOSE",
+      "state": "CENSORED",
+      "len": 8
+    },
+    {
+      "entry_variant": "E_TOUCH",
+      "state": "ORDER_CREATED",
+      "len": 2517999
+    },
+    {
+      "entry_variant": "E_TOUCH",
+      "state": "NO_FEATURE",
+      "len": 308819
+    },
+    {
+      "entry_variant": "E_TOUCH",
+      "state": "NO_EVENT",
+      "len": 75121
+    },
+    {
+      "entry_variant": "E_TOUCH",
+      "state": "INCOMPLETE",
+      "len": 2022
+    },
+    {
+      "entry_variant": "E_TOUCH",
+      "state": "EVENT_UNDECIDED",
+      "len": 1539
+    }
+  ],
+  "native_arm_class": [
+    {
+      "arm_class": "NATIVE_COMBINATION",
+      "len": 2860800,
+      "arms": 64
+    },
+    {
+      "arm_class": "FIXED_NATIVE",
+      "len": 89400,
+      "arms": 2
+    },
+    {
+      "arm_class": "NATIVE",
+      "len": 2860800,
+      "arms": 64
+    }
+  ],
+  "management_states_by_variant": [
+    {
+      "entry_variant": "E_CLOSE",
+      "state": "ORDER_CREATED",
+      "len": 3530080
+    },
+    {
+      "entry_variant": "E_CLOSE",
+      "state": "NO_EVENT",
+      "len": 43280
+    },
+    {
+      "entry_variant": "E_CLOSE",
+      "state": "INCOMPLETE",
+      "len": 2400
+    },
+    {
+      "entry_variant": "E_CLOSE",
+      "state": "NO_FEATURE",
+      "len": 240
+    },
+    {
+      "entry_variant": "E_TOUCH",
+      "state": "ORDER_CREATED",
+      "len": 3569200
+    },
+    {
+      "entry_variant": "E_TOUCH",
+      "state": "INCOMPLETE",
+      "len": 2400
+    },
+    {
+      "entry_variant": "E_TOUCH",
+      "state": "NO_EVENT",
+      "len": 2400
+    },
+    {
+      "entry_variant": "E_TOUCH",
+      "state": "EVENT_UNDECIDED",
+      "len": 1760
+    },
+    {
+      "entry_variant": "E_TOUCH",
+      "state": "NO_FEATURE",
+      "len": 240
+    }
+  ],
+  "management_arm_class": [
+    {
+      "arm_class": "MANAGEMENT",
+      "len": 3665400,
+      "arms": 41
+    },
+    {
+      "arm_class": "FIXED_MANAGEMENT",
+      "len": 1251600,
+      "arms": 14
+    },
+    {
+      "arm_class": "MANAGEMENT_DEVICE_COMBINATION",
+      "len": 268200,
+      "arms": 3
+    },
+    {
+      "arm_class": "MANAGEMENT_COMPONENT_COMBINATION",
+      "len": 1966800,
+      "arms": 22
+    }
+  ],
+  "ledger_rows": 15263724,
+  "ledger_states": [
+    {
+      "state": "BLOCKED_ACTIVE",
+      "len": 11207995
+    },
+    {
+      "state": "ORDER_CREATED",
+      "len": 791649
+    },
+    {
+      "state": "FILLED",
+      "len": 791630
+    },
+    {
+      "state": "CLOSED",
+      "len": 791013
+    },
+    {
+      "state": "HOLD_DUE",
+      "len": 717614
+    },
+    {
+      "state": "NO_FEATURE",
+      "len": 618118
+    },
+    {
+      "state": "NO_EVENT",
+      "len": 333087
+    },
+    {
+      "state": "INCOMPLETE",
+      "len": 8844
+    },
+    {
+      "state": "EVENT_UNDECIDED",
+      "len": 3299
+    },
+    {
+      "state": "EXIT_DENIED",
+      "len": 423
+    },
+    {
+      "state": "OPEN_AT_FENCE_END",
+      "len": 25
+    },
+    {
+      "state": "DENIED",
+      "len": 19
+    },
+    {
+      "state": "CENSORED",
+      "len": 8
+    }
+  ],
+  "run_controls_json": {
+    "effect_quality_is_blocking": false,
+    "experiment_id": "SPDR-022",
+    "ledger_rows": 15263724,
+    "magnitude_match": {
+      "excluded_rows": 21760,
+      "rows": 43523,
+      "selected_rows": 21763
+    },
+    "run_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/SPDR-022-ctrader-train-20260731T004708Z",
+    "time_derangement": {
+      "rows": 44703,
+      "seed": 240730,
+      "zero_fixed_points": true
+    },
+    "universe": "ctrader"
+  },
+  "integrity_hard_checks": {
+    "causality": true,
+    "deterministic_replay": true,
+    "entry_parity": true,
+    "fence": true,
+    "future_shift_changed_mapping": true,
+    "golden_traces": true,
+    "management_lattice": true,
+    "native_lattice": true,
+    "no_native_management_cross": true,
+    "order_fill_position_reconciliation": true,
+    "provenance": true,
+    "row_accounting": true,
+    "unique_result_keys": true
+  },
+  "integrity_blocking_pass": true,
+  "run_summary_hard_integrity_field": "NOT_YET_RUN_TASK_8",
+  "run_environment": {
+    "dry_run": false,
+    "jobs": 1,
+    "nautilus_version": "1.230.0",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O"
+  },
+  "sha_episodes": "1fb9851ba2b388214e17557144b16ebcfc8710de630cc5b11ffdd0fd1a8fc491",
+  "sha_native_parameter_schedule": "1fb9851ba2b388214e17557144b16ebcfc8710de630cc5b11ffdd0fd1a8fc491",
+  "episodes_equals_native_schedule_sha": true
+}

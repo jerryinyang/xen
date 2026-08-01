@@ -391,6 +391,19 @@ def validate_full_reporting(
         raise ValueError("origin ledger is empty")
 
 
+def _read_available(path: Path, columns: tuple[str, ...]) -> pl.DataFrame:
+    """Read only the requested columns that the artifact actually carries.
+
+    Breach origin ledgers (SPDR-022/023) hold zone origins common to both entry
+    variants and so carry no `entry_variant` column; `_origins_for_episodes` supplies it
+    from the schedule instead. A fixed projection would refuse those runs.
+    """
+    available = set(pl.scan_parquet(path).collect_schema().names())
+    return pl.read_parquet(
+        path, columns=[column for column in columns if column in available]
+    )
+
+
 def analyse_run(
     run_dir: Path,
     output_dir: Path,
@@ -414,13 +427,12 @@ def analyse_run(
     # narrow reads before any symbol is analysed.
     validate_full_reporting(
         experiment_id,
-        pl.read_parquet(run_dir / "origins.parquet", columns=_VALIDATION_ORIGIN_COLUMNS),
-        pl.read_parquet(
-            run_dir / "native_parameter_schedule.parquet",
-            columns=_VALIDATION_NATIVE_COLUMNS,
+        _read_available(run_dir / "origins.parquet", _VALIDATION_ORIGIN_COLUMNS),
+        _read_available(
+            run_dir / "native_parameter_schedule.parquet", _VALIDATION_NATIVE_COLUMNS
         ),
-        pl.read_parquet(
-            run_dir / "policy_schedule.parquet", columns=_VALIDATION_POLICY_COLUMNS
+        _read_available(
+            run_dir / "policy_schedule.parquet", _VALIDATION_POLICY_COLUMNS
         ),
     )
 
