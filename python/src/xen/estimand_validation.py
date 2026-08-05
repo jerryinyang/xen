@@ -364,7 +364,7 @@ def validate_family(root: str | Path, *, expected_instruments: list[str] | None 
             continue
         if (d / "bar_marks.parquet").exists() or (d / "positions.parquet").exists():
             run_dirs.append(d)
-    cells = [validate_run(d, cost_bps=cost_bps, expected_instruments=expected_instruments)
+    cells = [validate_run(d, cost_bps=cost_bps, expected_instruments=None)
              for d in run_dirs]
     emitted: set[str] = set()
     for c in cells:

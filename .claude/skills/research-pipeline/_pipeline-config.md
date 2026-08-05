@@ -350,7 +350,7 @@ When QA issues REVISE, the verdict identifies:
 - If no index exists, start with `EXP-001`.
 - VAL-series experiments (validation reruns) use `VAL-001`, `VAL-002`, etc. — same structure, different prefix.
 - SPDR-series speed-runs (TRAIN-only availability screens) use `SPDR-001`, etc. — lean screen lane (design.md + screen.md + analysis.md, no QA subagent), no cTrader/estimand gate, disposition-only. Spec: `docs/references/spdr-lane.md`.
-- **SPDR allocation floor (2026-07-30): the next SPDR identifier to issue is `SPDR-021`.** Identifiers below that floor are spent — some by experiments that ran, some by registrations that were withdrawn — and **none is reused**, so the index is not a reliable high-water mark on its own. Raise this floor when an ID is issued; never lower it.
+- **SPDR allocation floor (raised 2026-08-05 on issuing `SPDR-024`): the next SPDR identifier to issue is `SPDR-025`.** Identifiers below that floor are spent — some by experiments that ran, some by registrations that were withdrawn — and **none is reused**, so the index is not a reliable high-water mark on its own. Raise this floor when an ID is issued; never lower it.
 
 ---
 

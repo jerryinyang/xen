@@ -1,0 +1,47 @@
+{
+  "experiment_id": "SPDR-022",
+  "artifact_count_per_universe": 13,
+  "all_equal": true,
+  "universes": [
+    {
+      "universe": "ctrader",
+      "run_id": "SPDR-022-ctrader-train-20260803T140238Z",
+      "all_equal": true,
+      "artifacts": [
+        {"artifact": "analysis_summary.json", "first_pass_sha256": "a495e6e1c09997d5bc132c9f18b88a738dbd4f1dfd4ae64a3ac04a314495fcdd", "second_pass_sha256": "a495e6e1c09997d5bc132c9f18b88a738dbd4f1dfd4ae64a3ac04a314495fcdd", "equal": true},
+        {"artifact": "controls.parquet", "first_pass_sha256": "4fbe3aa919fdab1a4e81785ca8da69a4e7bfbf7b470fbb3698f1ace7fcb04845", "second_pass_sha256": "4fbe3aa919fdab1a4e81785ca8da69a4e7bfbf7b470fbb3698f1ace7fcb04845", "equal": true},
+        {"artifact": "device_hold.parquet", "first_pass_sha256": "4a11be53736f817dc03ea48f87302faf4e684fc7c1b334aade59cdbeb16d350f", "second_pass_sha256": "4a11be53736f817dc03ea48f87302faf4e684fc7c1b334aade59cdbeb16d350f", "equal": true},
+        {"artifact": "device_size.parquet", "first_pass_sha256": "fbc7b0cb77fd205c2c904e598aa375b6a559d44aaf12d68e6009e783b092a1d5", "second_pass_sha256": "fbc7b0cb77fd205c2c904e598aa375b6a559d44aaf12d68e6009e783b092a1d5", "equal": true},
+        {"artifact": "device_stop.parquet", "first_pass_sha256": "6e960831e1ae2a35fe540af5ca4d0decd77ee86693827e1058077223997123ed", "second_pass_sha256": "6e960831e1ae2a35fe540af5ca4d0decd77ee86693827e1058077223997123ed", "equal": true},
+        {"artifact": "device_target.parquet", "first_pass_sha256": "5867a82c2d9e1afe546c1d0c24f11bf6eaaf359524fb282f5d1bd4ed0cd5aaaa", "second_pass_sha256": "5867a82c2d9e1afe546c1d0c24f11bf6eaaf359524fb282f5d1bd4ed0cd5aaaa", "equal": true},
+        {"artifact": "device_trail.parquet", "first_pass_sha256": "1c496e1e77f0e9133b4280e472ec3684bf5f22fa96b943520b666a618f8f1fdb", "second_pass_sha256": "1c496e1e77f0e9133b4280e472ec3684bf5f22fa96b943520b666a618f8f1fdb", "equal": true},
+        {"artifact": "native_parameter_origins.parquet", "first_pass_sha256": "bd58a2ddf9ca1cf28882807b0cf204f7a06e38815bd9b74af9352c76975f5df9", "second_pass_sha256": "bd58a2ddf9ca1cf28882807b0cf204f7a06e38815bd9b74af9352c76975f5df9", "equal": true},
+        {"artifact": "native_parameter_selected_excluded.parquet", "first_pass_sha256": "831d527229c7844a700c2d4b248983e6ddb8ecb5c7db835670d9d4e6439e5d40", "second_pass_sha256": "831d527229c7844a700c2d4b248983e6ddb8ecb5c7db835670d9d4e6439e5d40", "equal": true},
+        {"artifact": "native_parameter_shared_trades.parquet", "first_pass_sha256": "5df7b6dcc12d99d91cbdefac1849535b6713762049922aa541cf863a11e2fa7c", "second_pass_sha256": "5df7b6dcc12d99d91cbdefac1849535b6713762049922aa541cf863a11e2fa7c", "equal": true},
+        {"artifact": "per_stratum_estimates.parquet", "first_pass_sha256": "3659b6fabe3a097f36158ed89b1a271b9195000c9abbd28c0a828cc57f5eec36", "second_pass_sha256": "3659b6fabe3a097f36158ed89b1a271b9195000c9abbd28c0a828cc57f5eec36", "equal": true},
+        {"artifact": "selection_checks.parquet", "first_pass_sha256": "34922d60e48abb82e35da035b66ba55b373fe36ac18e8abccb3b31492b3cf57e", "second_pass_sha256": "34922d60e48abb82e35da035b66ba55b373fe36ac18e8abccb3b31492b3cf57e", "equal": true},
+        {"artifact": "state_sections.parquet", "first_pass_sha256": "7dc033b3d36c734f95b40cba33b1bc69d4a12c4a7c4212a934a8e7a6adc58e2d", "second_pass_sha256": "7dc033b3d36c734f95b40cba33b1bc69d4a12c4a7c4212a934a8e7a6adc58e2d", "equal": true}
+      ]
+    },
+    {
+      "universe": "crypto",
+      "run_id": "SPDR-022-crypto-train-20260803T140238Z",
+      "all_equal": true,
+      "artifacts": [
+        {"artifact": "analysis_summary.json", "first_pass_sha256": "83426150f0a97f2e0a21eb07aad32318ae92fa6b62226c9b949de2dd16fb50b8", "second_pass_sha256": "83426150f0a97f2e0a21eb07aad32318ae92fa6b62226c9b949de2dd16fb50b8", "equal": true},
+        {"artifact": "controls.parquet", "first_pass_sha256": "3cf6ae3fcca9bfe9f569760b26396b15720944ce4fd33288ba5e6dee700635b1", "second_pass_sha256": "3cf6ae3fcca9bfe9f569760b26396b15720944ce4fd33288ba5e6dee700635b1", "equal": true},
+        {"artifact": "device_hold.parquet", "first_pass_sha256": "80baa1dd8c936dd4b93084d9b9cf6d8d6784464709ec57d54b791a9328fc1291", "second_pass_sha256": "80baa1dd8c936dd4b93084d9b9cf6d8d6784464709ec57d54b791a9328fc1291", "equal": true},
+        {"artifact": "device_size.parquet", "first_pass_sha256": "c7ebeecd2f241374fa45864a07e1774070ba2aa9eb84e1ee075ee50577f72145", "second_pass_sha256": "c7ebeecd2f241374fa45864a07e1774070ba2aa9eb84e1ee075ee50577f72145", "equal": true},
+        {"artifact": "device_stop.parquet", "first_pass_sha256": "8e25b217b96f8fb4d4bb601a933444cd19f2e43075d3c6c9d604e2c36eeeff0e", "second_pass_sha256": "8e25b217b96f8fb4d4bb601a933444cd19f2e43075d3c6c9d604e2c36eeeff0e", "equal": true},
+        {"artifact": "device_target.parquet", "first_pass_sha256": "896d081f3a4958d24047c6b8ffcfa948c76f99e49605e37a7f9f3efa966594c3", "second_pass_sha256": "896d081f3a4958d24047c6b8ffcfa948c76f99e49605e37a7f9f3efa966594c3", "equal": true},
+        {"artifact": "device_trail.parquet", "first_pass_sha256": "b6b13494746b30e43e2aa67a1f94551f3a3dc34c9d8ad8b2b244e3810725e95a", "second_pass_sha256": "b6b13494746b30e43e2aa67a1f94551f3a3dc34c9d8ad8b2b244e3810725e95a", "equal": true},
+        {"artifact": "native_parameter_origins.parquet", "first_pass_sha256": "3b9b10d90d44b5555e215a2611b22f329d69075f554bb92f8cdbd6fc7dde633b", "second_pass_sha256": "3b9b10d90d44b5555e215a2611b22f329d69075f554bb92f8cdbd6fc7dde633b", "equal": true},
+        {"artifact": "native_parameter_selected_excluded.parquet", "first_pass_sha256": "69f21408bbf711d69aa3d136e0091989a0a8229dd4e1e8e377a383240cd0c2c5", "second_pass_sha256": "69f21408bbf711d69aa3d136e0091989a0a8229dd4e1e8e377a383240cd0c2c5", "equal": true},
+        {"artifact": "native_parameter_shared_trades.parquet", "first_pass_sha256": "e5ed4fd0740650029413459692d48909c56b5ee8a7f255682827ac822d7a7350", "second_pass_sha256": "e5ed4fd0740650029413459692d48909c56b5ee8a7f255682827ac822d7a7350", "equal": true},
+        {"artifact": "per_stratum_estimates.parquet", "first_pass_sha256": "9314016953cbbacadc34b1426a16cfc1a8f160029f225731337161cf7730bbd6", "second_pass_sha256": "9314016953cbbacadc34b1426a16cfc1a8f160029f225731337161cf7730bbd6", "equal": true},
+        {"artifact": "selection_checks.parquet", "first_pass_sha256": "30d80158f23ddf9792f7e0169c90cc5969953d38bdff50d5089e66812a487aba", "second_pass_sha256": "30d80158f23ddf9792f7e0169c90cc5969953d38bdff50d5089e66812a487aba", "equal": true},
+        {"artifact": "state_sections.parquet", "first_pass_sha256": "20f369a64132e60f2a104d930c67ccc4ee49fc72020347889b9139eaed11b9ac", "second_pass_sha256": "20f369a64132e60f2a104d930c67ccc4ee49fc72020347889b9139eaed11b9ac", "equal": true}
+      ]
+    }
+  ]
+}

@@ -108,7 +108,7 @@ re-parameterisation of SPDR-011’s range-break object.
 | **D3a** | SPDR-016 refine 014 residual | **CLOSED — SUPERSEDED, NEVER RUN** (2026-07-25). DERIVED feature layer measured inert by SPDR-017; target carried into `SPDR-018` arm C, in the original event-nested form. 0 reads |
 | **D3b** | SPDR-017 independent mispricing (#3) | **CLOSED — NOT_WORTH** (2026-07-24) — model IC ≈ 0; DERIVED layer inert; destroys indistinguishable; M-ZONE ≤ Z-VOL |
 | **D5** | SPDR-018 power the complete 017 residue | **COMPLETE AND CLOSED** 2026-07-26; evidence inventory approved 2026-07-30 |
-| **D8–D10 (capture)** | Adaptive opportunity management | **DESIGN APPROVED 2026-07-30** — SPDR-021 breakout, SPDR-022 MOMO and SPDR-023 MR; independent Nautilus characterisations; implementation unauthorised |
+| **D8–D10 (capture)** | Adaptive opportunity management | **DESIGN APPROVED 2026-07-30; AMENDED RERUN COMPLETE; ANALYSIS COMPLETE; AWAITING OPERATOR INTERPRETATION** (2026-08-04) — SPDR-021 breakout, SPDR-022 MOMO and SPDR-023 MR; six TRAIN cells at run stamp `20260803T140238Z`, all integrity-clean with 13/13 reproduction hashes; evidence only, family status unchanged |
 | **E** | XENA-VOLDIR-001 (conditional) | Only if a base graduates; not for A–C. **RESERVED, never opened** |
 
 **Stop rules:**

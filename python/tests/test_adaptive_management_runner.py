@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import gc
 import hashlib
 import importlib.util
 import json
 import time
+import tracemalloc
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -226,6 +228,15 @@ def test_real_scheduler_materialises_complete_native_grid(
     management = tables["policy_schedule"]
     assert management.filter(pl.col("native_arm_id").is_not_null()).is_empty()
     assert management["policy_id"].n_unique() > 1
+    ineligible = management.filter(~pl.col("eligible"))
+    assert ineligible.height > 0
+    assert set(ineligible["state"]) == {"NO_FEATURE"}
+    execution_ineligible = schedule.join(
+        ineligible.select("episode_id", "arm_id", "policy_id"),
+        on=["episode_id", "arm_id", "policy_id"],
+        how="inner",
+    )
+    assert set(execution_ineligible["state"]) == {"NO_FEATURE"}
 
 
 class _StubInstrument:
@@ -323,6 +334,40 @@ def test_resume_refuses_changed_config(monkeypatch, tmp_path):
         runner.run_experiment(
             experiment_spec("SPDR-022"), "ctrader", output, resume=True
         )
+
+
+def test_complete_unit_hash_validation_has_bounded_python_memory(tmp_path):
+    """A large Parquet artifact must be hashed as a stream, not one Python bytes object."""
+    from xen.adaptive_management import runner
+
+    unit = tmp_path / "unit"
+    unit.mkdir()
+    config_hash = "config"
+    large_payload = b"x" * 20_000_000
+    digest = hashlib.sha256()
+    for index, name in enumerate(runner.UNIT_FRAMES):
+        payload = large_payload if index == 0 else b"small"
+        (unit / f"{name}.parquet").write_bytes(payload)
+        digest.update(name.encode("utf-8"))
+        digest.update(hashlib.sha256(payload).digest())
+    (unit / runner.UNIT_COMPLETION_FILE).write_text(
+        json.dumps(
+            {
+                "config_hash": config_hash,
+                "content_hash": digest.hexdigest(),
+                "rows": {},
+            }
+        )
+    )
+    del large_payload
+    gc.collect()
+
+    tracemalloc.start()
+    assert runner._unit_is_complete(unit, config_hash)
+    _, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    assert peak < 4_000_000
 
 
 def test_default_mode_refuses_existing_in_progress_directory(monkeypatch, tmp_path):

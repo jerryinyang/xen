@@ -184,7 +184,8 @@ def run_integrity_checks(
     )
     policies = _read_parquet(
         run_dir / "policy_schedule.parquet",
-        columns=accounting_columns + ["native_arm_id", "policy_id", "comparator_id"],
+        columns=accounting_columns
+        + ["native_arm_id", "policy_id", "comparator_id", "device"],
     )
     row_accounting = _check_row_accounting(origins, native, policies)
     native_lattice = _check_native_lattice(experiment_id, origins, native)
@@ -192,19 +193,26 @@ def run_integrity_checks(
     no_cross = _check_no_cross(policies)
     fixed_comparators = _check_fixed_comparators(policies)
     parity = _check_entry_parity(experiment_id, origins, native)
-    del native, policies
+    del native
 
     ledger = _read_parquet(
         run_dir / "episode_results.parquet",
         columns=[
             "episode_id", "arm_id", "policy_id", "state", "ts_ns", "exit_reason",
-            "experiment_id", "entry_variant", "price",
+            "experiment_id", "entry_variant", "device", "price",
             # reconciliation reads these when the emission carries them
             "position_id", "outcome_bps", "side",
         ],
     )
     unique_results = _check_unique_results(ledger)
     golden = _golden_trace_checks(ledger)
+    attestation = _read_json(run_dir / "fence_attestation.json")
+    train_end = _parse_timestamp(attestation.get("train_end_utc"))
+    train_end_ns = int(train_end.timestamp() * 1e9) if train_end is not None else None
+    management_lifecycle = _check_management_lifecycle(
+        ledger, policies, train_end_ns
+    )
+    del policies
     ledger_rows = ledger.height
 
     orders = _read_parquet(run_dir / "orders.parquet", columns=["client_order_id", "status"])
@@ -235,6 +243,7 @@ def run_integrity_checks(
         "unique_result_keys": unique_results,
         "future_shift_changed_mapping": bool(future["changed_mapping"]),
         "deterministic_replay": deterministic["pass"],
+        "management_lifecycle": management_lifecycle,
     }
     controls = _informative_controls(features, origins, ledger_rows)
     result = {
@@ -448,6 +457,73 @@ def _check_unique_results(ledger: pl.DataFrame) -> bool:
         if column in ledger.columns
     ]
     return bool(keys) and not ledger.select(keys).is_duplicated().any()
+
+
+def _check_management_lifecycle(
+    ledger: pl.DataFrame,
+    policies: pl.DataFrame,
+    train_end_ns: int | None,
+) -> bool:
+    """Require every filled management execution to close or carry an explicit fence label."""
+    required = {"episode_id", "arm_id", "state", "ts_ns"}
+    if ledger.is_empty() or not required.issubset(ledger.columns):
+        return False
+    identities = ["episode_id", "arm_id"]
+    if "entry_variant" in ledger.columns:
+        identities.append("entry_variant")
+    summary = ledger.group_by(identities).agg(
+        (pl.col("state") == "FILLED").any().alias("_filled"),
+        (pl.col("state") == "CLOSED").any().alias("_closed"),
+        pl.col("state")
+        .is_in(["EXIT_DENIED", "EXIT_REJECTED"])
+        .any()
+        .alias("_exit_failed"),
+        ((pl.col("state") == "CLOSED") & (pl.col("exit_reason") == "FAILSAFE"))
+        .any()
+        .alias("_failsafe_closed"),
+        pl.col("state")
+        .is_in(["OPEN_AT_FENCE_END", "CENSORED"])
+        .any()
+        .alias("_censored"),
+        pl.when(pl.col("state").is_in(["OPEN_AT_FENCE_END", "CENSORED"]))
+        .then(pl.col("ts_ns"))
+        .max()
+        .alias("_censor_ns"),
+        pl.col("device").drop_nulls().first().alias("_ledger_device")
+        if "device" in ledger.columns
+        else pl.lit(None, dtype=pl.Utf8).alias("_ledger_device"),
+    ).filter(pl.col("_filled"))
+    if summary.is_empty():
+        return True
+    if {"arm_id", "device"}.issubset(policies.columns):
+        policy_devices = policies.select(
+            "arm_id", pl.col("device").alias("_policy_device")
+        ).unique()
+        summary = summary.join(policy_devices, on="arm_id", how="left")
+    else:
+        summary = summary.with_columns(
+            pl.lit(None, dtype=pl.Utf8).alias("_policy_device")
+        )
+    summary = summary.with_columns(
+        pl.coalesce("_policy_device", "_ledger_device").alias("_device")
+    )
+    timed = pl.col("_device").fill_null("").str.contains(
+        r"(^|\+)(SIZE|HOLD)(\+|$)"
+    )
+    censor_after_fence = (
+        pl.lit(False)
+        if train_end_ns is None
+        else pl.col("_censor_ns") > train_end_ns
+    )
+    valid = (
+        pl.when(pl.col("_exit_failed"))
+        .then(pl.col("_failsafe_closed"))
+        .otherwise(
+            pl.col("_closed")
+            | (pl.col("_censored") & (~timed | censor_after_fence))
+        )
+    )
+    return bool(summary.select(valid.all()).item())
 
 
 def _check_reconciliation(

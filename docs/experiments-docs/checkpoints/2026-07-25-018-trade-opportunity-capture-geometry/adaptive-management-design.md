@@ -1,6 +1,6 @@
 # Checkpoint 018 — Step 3 Adaptive-Management Characterisation
 
-- **Status:** `DESIGN APPROVED 2026-07-30 — IMPLEMENTATION AND EXECUTION NOT YET AUTHORISED`
+- **Status:** `FIRST PASS INVALIDATED — AMENDED RERUN AUTHORISED 2026-08-03; ANALYSIS PENDING`
 - **Evidence basis:** `reflection-mid.md`, approved by the operator 2026-07-30
 - **Vehicles:** `SPDR-021`, `SPDR-022`, `SPDR-023`
 - **Engine:** NautilusTrader, because stops, targets, trails, pending orders and competing exits
@@ -357,3 +357,42 @@ family status, open XENA, or suppress contrary rows.
 After all three analyses, the operator makes the checkpoint-level interpretation. Any robustness
 or deployment candidate then receives a new locked XENA design, separate data authority and normal
 governance.
+
+## 12. Amendment — execution lifecycle and reporting populations
+
+```text
+AMENDMENT DATE: 2026-08-03
+CAUSE: execution lifecycle and reporting-population defects
+GRID: unchanged
+DATES / UNIVERSES / FEATURES / ORIENTATIONS: unchanged
+FIRST PASS: invalid for interpretation; full six-cell rerun required
+
+ENTRY-FILL IDENTITY:
+  actual fill := state_ledger state == FILLED with non-null _entry_ns
+  common fill := adaptive and fixed both have actual fills on the same declared origin key
+
+SIZE HORIZON:
+  SPDR-021 SIZE closing horizon := fixed strategy hold of 1 H1 bar after actual entry
+  SPDR-022/023 SIZE closing horizon := fixed strategy hold of 4 H1 bars after actual entry
+  adaptive HOLD uses its declared value
+  pure TARGET / STOP / TRAIL arms keep price-only semantics; no hidden time cap
+
+EXIT FAILURE:
+  protective exits are submitted only after the engine exposes the position
+  a rejected/denied exit triggers one deterministic reduce-only market fail-safe
+  the arm is released only after confirmed close
+  failure of the fail-safe aborts the work unit; no incomplete unit is published
+
+REPORT POPULATIONS:
+  eligible_origin_n, entry_fill_n, close_n, common_fill_n, common_close_n
+  per-origin uncertainty uses origins; per-trade uncertainty uses actual paired trades
+
+CONTROLS:
+  time derangement and magnitude matching are computed against outcomes per stratum
+  they remain informative and cannot gate another arm or experiment
+```
+
+The approved arm lattice, seven component families/eight executable IDs, component and device
+combinations, dates, universes, direction rules, `E-TOUCH`/`E-CLOSE` split, native orientations and
+two estimands are unchanged. The dated invalidation record is
+`docs/superpowers/plans/2026-08-03-spdr-021-023-first-pass-invalidation.md`.

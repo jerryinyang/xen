@@ -31,6 +31,7 @@ from xen.adaptive_management.contracts import (
     Device,
     ExperimentSpec,
     NativeArmSpec,
+    OriginState,
     PolicySpec,
     build_management_lattice,
     build_native_lattice,
@@ -392,6 +393,8 @@ def _execute_plan(
                 schedule_path=str(schedule_path),
                 output_dir=str(symbol_root / "engine"),
                 base_trade_size=_base_trade_size(instrument),
+                fence_start_ns=int(plan.manifest.analysis_start_utc.timestamp() * 1e9),
+                fence_end_ns=int(plan.manifest.train_end_utc.timestamp() * 1e9),
             )
             return symbol, unit, tables, _bar_marks(symbol, instrument_id, minute)
 
@@ -466,7 +469,7 @@ def _publish_unit(
         path = staging / f"{name}.parquet"
         _atomic_parquet(frames[name], path)
         digest.update(name.encode("utf-8"))
-        digest.update(hashlib.sha256(path.read_bytes()).digest())
+        digest.update(_file_sha256(path))
     _atomic_json(
         {
             "config_hash": config_hash,
@@ -494,8 +497,14 @@ def _unit_is_complete(unit_dir: Path, config_hash: str) -> bool:
         if not path.exists():
             return False
         digest.update(name.encode("utf-8"))
-        digest.update(hashlib.sha256(path.read_bytes()).digest())
+        digest.update(_file_sha256(path))
     return digest.hexdigest() == payload.get("content_hash")
+
+
+def _file_sha256(path: Path) -> bytes:
+    """Hash an artifact without allocating one Python bytes object for the whole file."""
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").digest()
 
 
 def _unit_row_count(unit_dir: Path) -> int:
@@ -709,7 +718,17 @@ def _policy_schedule(
         if policy.combination_id
         else "MANAGEMENT"
     )
-    return _schedule_defaults(frame).with_columns(
+    scheduled = _schedule_defaults(frame)
+    prior_state = (
+        pl.col("state")
+        if "state" in scheduled.columns
+        else pl.lit(str(OriginState.ORDER_CREATED))
+    )
+    return scheduled.with_columns(
+        pl.when(pl.col("eligible").fill_null(False))
+        .then(prior_state)
+        .otherwise(pl.lit(str(OriginState.NO_FEATURE)))
+        .alias("state"),
         pl.lit(policy.policy_id).alias("arm_id"),
         pl.lit(arm_class).alias("arm_class"),
         pl.lit(None, dtype=pl.Utf8).alias("native_arm_id"),
@@ -730,9 +749,16 @@ def _device_combination_schedule(
     experiment_id: str,
 ) -> pl.DataFrame:
     base = _schedule_defaults(group[0][1])
+    prior_state = (
+        pl.col("state")
+        if "state" in base.columns
+        else pl.lit(str(OriginState.ORDER_CREATED))
+    )
+    eligible = pl.Series("eligible", [True] * base.height)
     devices: list[str] = []
     for policy, frame in group:
         devices.append(str(policy.device))
+        eligible = eligible & frame["eligible"].fill_null(False)
         for column in (
             "target_distance_bps",
             "stop_distance_bps",
@@ -742,7 +768,11 @@ def _device_combination_schedule(
         ):
             if column in frame.columns:
                 base = base.with_columns(frame[column].alias(column))
-    return base.with_columns(
+    return base.with_columns(eligible).with_columns(
+        pl.when(pl.col("eligible"))
+        .then(prior_state)
+        .otherwise(pl.lit(str(OriginState.NO_FEATURE)))
+        .alias("state"),
         pl.lit(combination_id).alias("arm_id"),
         pl.lit("MANAGEMENT_DEVICE_COMBINATION").alias("arm_class"),
         pl.lit(None, dtype=pl.Utf8).alias("native_arm_id"),

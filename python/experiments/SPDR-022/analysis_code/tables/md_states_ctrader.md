@@ -1,0 +1,12 @@
+| entry_variant | state | rows | row_n | mean_outcome_bps |
+|---|---|---|---|---|
+| E_CLOSE | CENSORED | 8 | 8 | 0.0000 |
+| E_CLOSE | INCOMPLETE | 405 | 4242 | 0.0000 |
+| E_CLOSE | NO_EVENT | 435 | 253686 | 0.0000 |
+| E_CLOSE | NO_FEATURE | 435 | 501203 | 0.0000 |
+| E_CLOSE | ORDER_CREATED | 435 | 5722361 | -0.0466 |
+| E_TOUCH | EVENT_UNDECIDED | 435 | 3181 | 0.0000 |
+| E_TOUCH | INCOMPLETE | 405 | 4242 | 0.0000 |
+| E_TOUCH | NO_EVENT | 433 | 77421 | 0.0000 |
+| E_TOUCH | NO_FEATURE | 435 | 501203 | 0.0000 |
+| E_TOUCH | ORDER_CREATED | 435 | 5895453 | 0.0108 |

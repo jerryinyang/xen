@@ -2,7 +2,7 @@
 
 - **Family / registration:** `CF-VOLDIR-001/HYP-D8`
 - **Checkpoint:** `2026-07-25-018-trade-opportunity-capture-geometry`
-- **Status:** `DESIGN APPROVED 2026-07-30 — IMPLEMENTATION AND EXECUTION NOT YET AUTHORISED`
+- **Status:** `FIRST PASS INVALIDATED — AMENDED RERUN AUTHORISED 2026-08-03; ANALYSIS PENDING`
 - **Vehicle:** NautilusTrader; SPDR TRAIN-only characterisation
 - **Programme contract:** checkpoint
   `adaptive-management-design.md` is binding in full
@@ -54,6 +54,12 @@ programme contract adds separate direct and reverse threshold arms, direct and r
 and the four threshold+expiry orientation pairs for every volatility component. Values are frozen;
 none is selected from outcomes. The plain management baseline is unit size with no target, stop or
 trail.
+
+The 2026-08-03 common amendment in `adaptive-management-design.md` is binding: actual fills use
+engine `_entry_ns`; common fills require both sides to fill; SIZE closes after the fixed one-H1-bar
+strategy hold; and eligible, filled, closed, common-filled and common-closed populations are
+reported separately. This experiment's native keys remain breakout threshold and pending expiry.
+No grid element changes.
 
 ## Arms and outputs
 

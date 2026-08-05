@@ -18,7 +18,7 @@ records it so no origin is ever dropped.
 
 from __future__ import annotations
 
-from collections import defaultdict, deque
+from collections import defaultdict
 from decimal import Decimal
 import hashlib
 from pathlib import Path
@@ -145,10 +145,11 @@ class AdaptiveManagementStrategy(Strategy):
         overlap_keys = ["arm_id", "entry_variant", "origin_id"]
         if schedule.select(overlap_keys).is_duplicated().any():
             raise ValueError("overlapping schedule rows for one arm and entry variant")
-        self._rows_by_ts: dict[int, list[dict]] = defaultdict(list)
-        for row in schedule.iter_rows(named=True):
-            self._rows_by_ts[int(row["_ts"])].append(row)
-        self._pending_ts = deque(sorted(self._rows_by_ts))
+        # Keep the frozen schedule columnar and materialise only the next actionable row.
+        # Expanding a full breach schedule into Python dictionaries retained several million
+        # objects (8.41 GB on BTCUSDT) before the engine processed its first bar.
+        self._schedule_rows = schedule.iter_rows(named=True)
+        self._next_schedule_row = next(self._schedule_rows, None)
         self._last_bar_ts: int | None = None
 
         # arm_id -> episode currently holding the arm's single slot
@@ -161,6 +162,10 @@ class AdaptiveManagementStrategy(Strategy):
         self._hold_timer: dict[tuple[str, str], str] = {}
         self._execution_rows: dict[tuple[str, str], dict] = {}
         self._orders_by_execution: dict[tuple[str, str], list[str]] = defaultdict(list)
+        self._pending_exits: dict[tuple[str, str], list[tuple]] = defaultdict(list)
+        self._position_to_execution: dict[str, tuple[str, str]] = {}
+        self._failsafe_attempted: set[tuple[str, str]] = set()
+        self._failsafe_orders: set[str] = set()
         self._entry_terminal: set[tuple[str, str]] = set()
         self._closed: set[tuple[str, str]] = set()
         self.state_ledger: list[dict] = []
@@ -195,32 +200,51 @@ class AdaptiveManagementStrategy(Strategy):
         # holiday, a weekend). Such a row acts on the first minute at or after it, never
         # before it, so no row is stranded and nothing is pulled earlier in time.
         self._last_bar_ts = int(bar.ts_event)
-        while self._pending_ts and self._pending_ts[0] <= int(bar.ts_event):
-            for row in self._rows_by_ts.pop(self._pending_ts.popleft(), []):
-                self._act_on_origin(row, bar)
+        while (
+            self._next_schedule_row is not None
+            and int(self._next_schedule_row["_ts"]) <= int(bar.ts_event)
+        ):
+            row = self._take_schedule_row()
+            self._act_on_origin(row, bar)
 
     def on_stop(self) -> None:
-        if self._rows_by_ts:
+        if self._next_schedule_row is not None:
             # Rows after the final traded minute never became actionable inside the fence and
             # are censored, with their origin still recorded. Anything left at or before the
             # final bar means the run dropped a row, which stays a hard failure.
-            stranded = sum(
-                len(rows)
-                for ts, rows in self._rows_by_ts.items()
-                if self._last_bar_ts is None or ts <= self._last_bar_ts
-            )
-            if stranded:
+            if (
+                self._last_bar_ts is None
+                or int(self._next_schedule_row["_ts"]) <= self._last_bar_ts
+            ):
+                stranded = 0
+                while (
+                    self._next_schedule_row is not None
+                    and (
+                        self._last_bar_ts is None
+                        or int(self._next_schedule_row["_ts"]) <= self._last_bar_ts
+                    )
+                ):
+                    self._take_schedule_row()
+                    stranded += 1
                 raise RuntimeError(f"{stranded} unconsumed schedule rows at stop")
-            for ts in sorted(self._rows_by_ts):
-                for row in self._rows_by_ts[ts]:
-                    self._execution_rows[_execution_key(row)] = row
-                    self._terminal_entry(row, OriginState.CENSORED, ts)
-            self._rows_by_ts.clear()
-            self._pending_ts.clear()
-        for key, deadline in list(self._hold_deadline.items()):
+            while self._next_schedule_row is not None:
+                row = self._take_schedule_row()
+                self._execution_rows[_execution_key(row)] = row
+                self._terminal_entry(row, OriginState.CENSORED, int(row["_ts"]))
+        for key, position_id in list(self._episode_position.items()):
+            if key in self._closed:
+                continue
             row = self._execution_rows[key]
+            deadline = self._hold_deadline.get(key, self.config.fence_end_ns)
             self._record(key[0], "OPEN_AT_FENCE_END", deadline, row)
         self.flush_ledger()
+
+    def _take_schedule_row(self) -> dict:
+        row = self._next_schedule_row
+        if row is None:
+            raise RuntimeError("schedule iterator exhausted")
+        self._next_schedule_row = next(self._schedule_rows, None)
+        return row
 
     # ------------------------------------------------------------------ #
     # origin handling
@@ -315,17 +339,37 @@ class AdaptiveManagementStrategy(Strategy):
     def on_order_denied(self, event) -> None:
         self._handle_order_failure(event, OriginState.DENIED)
 
+    def on_position_opened(self, event) -> None:
+        self._position_became_visible(event.position_id)
+
+    def on_position_changed(self, event) -> None:
+        self._position_became_visible(event.position_id)
+
+    def _position_became_visible(self, position_id) -> None:
+        key = self._position_to_execution.get(str(position_id))
+        if key is not None:
+            self._flush_pending_exits(key)
+
     def _handle_order_failure(self, event, state: OriginState) -> None:
-        row = self._by_client_order.get(str(event.client_order_id))
+        typed_client_order_id = event.client_order_id
+        client_order_id = str(typed_client_order_id)
+        row = self._by_client_order.get(client_order_id)
         if row is None:
             return
-        if str(event.client_order_id) in self._entry_orders:
+        if client_order_id in self._failsafe_orders:
+            raise RuntimeError(
+                f"fail-safe exit {client_order_id} was {state}; work unit is incomplete"
+            )
+        if client_order_id in self._entry_orders:
             self._terminal_entry(row, state, event.ts_event)
             self._release(row, None, event.ts_event)
         else:
+            key = _execution_key(row)
+            if key in self._closed or key in self._failsafe_attempted:
+                return
             # A combination arm submits several exit legs, and each leg can fail on its own.
             # Name the failing leg so its ledger row is distinguishable from its siblings.
-            order = self.cache.order(event.client_order_id)
+            order = self._order_for_client(typed_client_order_id, key)
             leg = _tag_value(order, "device") if order is not None else None
             self._record(
                 str(row["episode_id"]),
@@ -334,44 +378,47 @@ class AdaptiveManagementStrategy(Strategy):
                 row,
                 exit_reason=leg,
             )
+            self._cancel_siblings(key, exclude=client_order_id)
+            self._failsafe_attempted.add(key)
+            self._submit_failsafe(key, event.ts_event)
+
+    def _order_for_client(self, client_order_id, key: tuple[str, str]):
+        order = self.cache.order(client_order_id) if self.cache is not None else None
+        if order is not None:
+            return order
+        return next(
+            (
+                candidate
+                for candidate in self._open_exits.get(key, ())
+                if str(candidate.client_order_id) == str(client_order_id)
+            ),
+            None,
+        )
 
     def _on_entry_filled(self, row: dict, event) -> None:
         key = _execution_key(row)
+        if key in self._closed:
+            return
         entry_price = float(event.last_px)
         side = int(row["side"])
-        if key in self._episode_position:
-            # A venue may fill one entry order in several slices. The episode already has its
-            # terminal FILLED row, its position and its hold timer; only the incremental
-            # quantity still needs exits, so the exit legs stay matched to the exposure.
-            exit_side = OrderSide.SELL if side > 0 else OrderSide.BUY
-            for device, distance in (
-                ("TARGET", row["target_distance_bps"]),
-                ("STOP", row["stop_distance_bps"]),
-                ("TRAIL", row["trail_distance_bps"]),
-            ):
-                if distance is None:
-                    continue
-                self._submit_exit(
-                    row, device, float(distance), entry_price, exit_side, event.last_qty
+        if key not in self._episode_position:
+            self._terminal_entry(row, OriginState.FILLED, event.ts_event, price=entry_price)
+            position_id = _position_id(row)
+            self._episode_position[key] = position_id
+            self._position_to_execution[str(position_id)] = key
+            if row["hold_bars"] is not None:
+                deadline = int(event.ts_event) + int(
+                    row["hold_bars"]
+                ) * NS_PER_HOUR
+                self._hold_deadline[key] = deadline
+                timer_name = f"hold-{position_id}"
+                self._hold_timer[key] = timer_name
+                self.clock.set_time_alert(
+                    timer_name,
+                    pd.Timestamp(deadline, tz="UTC"),
+                    callback=self._on_hold_timer,
                 )
-            return
-        self._terminal_entry(row, OriginState.FILLED, event.ts_event, price=entry_price)
-        self._episode_position[key] = _position_id(row)
-        if row["hold_bars"] is not None:
-            deadline = int(event.ts_event) + int(
-                row["hold_bars"]
-            ) * NS_PER_HOUR
-            self._hold_deadline[key] = deadline
-            timer_name = f"hold-{_position_id(row)}"
-            self._hold_timer[key] = timer_name
-            self.clock.set_time_alert(
-                timer_name,
-                pd.Timestamp(deadline, tz="UTC"),
-                callback=self._on_hold_timer,
-            )
         exit_side = OrderSide.SELL if side > 0 else OrderSide.BUY
-        quantity = event.last_qty
-
         for device, distance in (
             ("TARGET", row["target_distance_bps"]),
             ("STOP", row["stop_distance_bps"]),
@@ -379,7 +426,22 @@ class AdaptiveManagementStrategy(Strategy):
         ):
             if distance is None:
                 continue
-            self._submit_exit(row, device, float(distance), entry_price, exit_side, quantity)
+            self._pending_exits[key].append(
+                (row, device, float(distance), entry_price, exit_side, event.last_qty)
+            )
+        self._flush_pending_exits(key)
+
+    def _confirmed_position(self, key: tuple[str, str]):
+        position_id = self._episode_position.get(key)
+        return self.cache.position(position_id) if position_id and self.cache is not None else None
+
+    def _flush_pending_exits(self, key: tuple[str, str]) -> None:
+        position = self._confirmed_position(key)
+        if position is None or position.is_closed:
+            return
+        pending = self._pending_exits.pop(key, [])
+        for specification in pending:
+            self._submit_exit(*specification)
 
     def _submit_exit(
         self,
@@ -437,6 +499,32 @@ class AdaptiveManagementStrategy(Strategy):
         self._open_exits[key].append(order)
         self.submit_order(order, position_id=self._episode_position[key])
 
+    def _submit_failsafe(self, key: tuple[str, str], ts_event: int) -> None:
+        row = self._execution_rows[key]
+        position = self._confirmed_position(key)
+        if position is None or position.is_closed:
+            raise RuntimeError(
+                f"cannot submit fail-safe for {key}: no confirmed open position"
+            )
+        order = self.order_factory.market(
+            instrument_id=self.config.instrument_id,
+            order_side=OrderSide.SELL if position.is_long else OrderSide.BUY,
+            quantity=position.quantity,
+            reduce_only=True,
+            tags=[
+                *_identity_tags(row),
+                "device=FAILSAFE",
+                "exit_reason=FAILSAFE",
+                "leg=FAILSAFE",
+            ],
+        )
+        client_order_id = str(order.client_order_id)
+        self._by_client_order[client_order_id] = row
+        self._orders_by_execution[key].append(client_order_id)
+        self._failsafe_orders.add(client_order_id)
+        self._open_exits[key].append(order)
+        self.submit_order(order, position_id=self._episode_position[key])
+
     def _on_exit_filled(self, row: dict, event, order=None) -> None:
         episode_id = str(row["episode_id"])
         key = _execution_key(row)
@@ -457,7 +545,9 @@ class AdaptiveManagementStrategy(Strategy):
         if timer_name is not None and timer_name in self.clock.timer_names:
             self.clock.cancel_timer(timer_name)
         self._release(row, None, event.ts_event)
-        self._episode_position.pop(key, None)
+        position_id = self._episode_position.pop(key, None)
+        if position_id is not None:
+            self._position_to_execution.pop(str(position_id), None)
         self._open_exits.pop(key, None)
         self._forget(key)
 
@@ -488,6 +578,7 @@ class AdaptiveManagementStrategy(Strategy):
         )
         self._by_client_order[str(order.client_order_id)] = row
         self._orders_by_execution[_execution_key(row)].append(str(order.client_order_id))
+        self._open_exits[key].append(order)
         self.submit_order(order, position_id=position_id)
 
     def _cancel_siblings(self, key: tuple[str, str], exclude: str) -> None:
@@ -529,8 +620,15 @@ class AdaptiveManagementStrategy(Strategy):
         if key in self._hold_deadline:
             return
         self._execution_rows.pop(key, None)
+        position_id = self._episode_position.get(key)
+        if position_id is not None:
+            self._position_to_execution.pop(str(position_id), None)
+        self._pending_exits.pop(key, None)
+        self._failsafe_attempted.discard(key)
         for client_order_id in self._orders_by_execution.pop(key, ()):  # noqa: B007
             self._by_client_order.pop(client_order_id, None)
+            self._entry_orders.discard(client_order_id)
+            self._failsafe_orders.discard(client_order_id)
 
     def _record(
         self,

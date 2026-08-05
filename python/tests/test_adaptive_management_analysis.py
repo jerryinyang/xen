@@ -112,6 +112,7 @@ def _native_episodes() -> pl.DataFrame:
 def _paired_results() -> pl.DataFrame:
     rows = []
     for episode_id, fixed, adaptive in (("E1", 2.0, 5.0), ("E2", -3.0, -1.0)):
+        timestamp = 1 if episode_id == "E1" else 2
         common = {
             "experiment_id": "SPDR-021",
             "universe": "crypto",
@@ -122,6 +123,8 @@ def _paired_results() -> pl.DataFrame:
             "device": "TARGET",
             "setting": "M1.00",
             "state": "ALL",
+            "_entry_ns": timestamp,
+            "_exit_ns": timestamp + 10,
         }
         rows.extend(
             [
@@ -251,6 +254,123 @@ def test_metric_kernels_reproduce_the_polars_metric_functions(device, rows):
             assert other == value, name
 
 
+def test_block_summary_kernel_matches_the_row_reference_exactly():
+    import numpy as np
+
+    from xen.adaptive_management.analysis import _block_interval, _clustered_interval
+
+    start = datetime(2023, 1, 1, tzinfo=timezone.utc)
+    frame = pl.DataFrame(
+        {
+            "decision_ts": [
+                start,
+                start + timedelta(hours=1),
+                start + timedelta(days=1),
+                start + timedelta(days=2),
+                start + timedelta(days=2, hours=1),
+            ],
+            "value": [1.0, 2.0, None, 4.0, 5.0],
+        }
+    )
+    expected = _clustered_interval(frame, "value", block_bars=24, n_boot=100)
+    observed = _block_interval(frame, "value", block_bars=24, n_boot=100)
+    assert set(observed) == set(expected)
+    for key, value in expected.items():
+        if isinstance(value, float) and np.isnan(value):
+            assert np.isnan(observed[key])
+        else:
+            assert observed[key] == value
+
+
+def test_batched_clustered_intervals_match_independent_draws_exactly():
+    import numpy as np
+
+    from xen.adaptive_management.analysis import (
+        _clustered_interval,
+        _clustered_intervals,
+    )
+
+    start = datetime(2023, 1, 1, tzinfo=timezone.utc)
+    frame = pl.DataFrame(
+        {
+            "decision_ts": [
+                start,
+                start + timedelta(hours=1),
+                start + timedelta(days=1),
+                start + timedelta(days=2),
+                start + timedelta(days=2, hours=1),
+            ],
+            "all_delta": [1.0, -2.0, float("nan"), 4.0, 5.0],
+            "selected_delta": [1.0, 0.0, 0.0, 4.0, 0.0],
+            "excluded_delta": [0.0, -2.0, float("nan"), 0.0, 5.0],
+        }
+    )
+    columns = ("all_delta", "selected_delta", "excluded_delta")
+    expected = {
+        column: _clustered_interval(
+            frame,
+            column,
+            block_bars=24,
+            n_boot=100,
+        )
+        for column in columns
+    }
+    observed = _clustered_intervals(
+        frame,
+        columns,
+        block_bars=24,
+        n_boot=100,
+    )
+
+    assert observed.keys() == expected.keys()
+    for column in columns:
+        for key, value in expected[column].items():
+            other = observed[column][key]
+            if isinstance(value, float) and np.isnan(value):
+                assert np.isnan(other), (column, key)
+            else:
+                assert other == value, (column, key)
+
+
+def test_native_states_share_one_bootstrap_pass_per_arm(monkeypatch):
+    from xen.adaptive_management import analysis as module
+
+    calls: list[tuple[str, ...]] = []
+    original = module._clustered_intervals
+
+    def tracked(frame, value_columns, *, block_bars, n_boot):
+        calls.append(tuple(value_columns))
+        return original(
+            frame,
+            value_columns,
+            block_bars=block_bars,
+            n_boot=n_boot,
+        )
+
+    monkeypatch.setattr(module, "_clustered_intervals", tracked)
+    module.origin_estimates(_origins(), _native_episodes(), block_bars=24, n_boot=20)
+
+    assert len(calls) == _native_episodes()["arm_id"].n_unique()
+    assert all(len(columns) >= 2 for columns in calls)
+
+
+def test_ledger_origin_filter_preserves_exact_membership_and_order():
+    from xen.adaptive_management.analysis import _ledger_origin_filter
+
+    origin_ids = pl.Series("origin_id", ["BTC-01", "BTC-ff"])
+    frame = pl.DataFrame(
+        {
+            "origin_id": ["AAA-ff", "BTC-01", "BTC-80", "BTC-ff", "ZZZ-00", None],
+            "row": [0, 1, 2, 3, 4, 5],
+        }
+    )
+    expected = frame.filter(pl.col("origin_id").is_in(origin_ids.implode()))
+    observed = frame.filter(_ledger_origin_filter(origin_ids))
+
+    assert observed.equals(expected)
+    assert observed["row"].to_list() == [1, 3]
+
+
 def test_every_adaptive_row_has_a_paired_fixed_device_delta():
     from xen.adaptive_management.analysis import paired_estimates
 
@@ -259,6 +379,54 @@ def test_every_adaptive_row_has_a_paired_fixed_device_delta():
     assert table["comparator_id"].str.starts_with("FIXED_").all()
     assert table["estimate"].to_list() == [2.5]
     assert {"ci_low", "ci_high", "effective_n", "mde"}.issubset(table.columns)
+    assert table["common_fill_n"].to_list() == [2]
+    assert table["common_close_n"].to_list() == [2]
+    assert table["effective_trade_blocks"].to_list() == table["effective_n"].to_list()
+    assert table["eligible_origin_n"].null_count() == table.height
+
+
+def test_scheduled_nonfills_do_not_inflate_trade_level_counts():
+    from xen.adaptive_management.analysis import paired_estimates
+
+    rows = _paired_results()
+    unfilled = rows.filter(pl.col("episode_id") == "E1").with_columns(
+        pl.lit("E3").alias("episode_id"),
+        pl.lit(None, dtype=pl.Int64).alias("_entry_ns"),
+        pl.lit(None, dtype=pl.Int64).alias("_exit_ns"),
+    )
+    table = paired_estimates(
+        pl.concat([rows, unfilled]), block_bars=24, n_boot=20
+    )
+    assert table["entry_fill_n"].to_list() == [2]
+    assert table["close_n"].to_list() == [2]
+    assert table["common_fill_n"].to_list() == [2]
+    assert table["common_close_n"].to_list() == [2]
+
+
+def test_device_tables_exclude_ineligible_policy_rows():
+    from xen.adaptive_management.analysis import _device_table
+
+    paired = _paired_results().with_columns(
+        pl.lit(True).alias("eligible"),
+        pl.lit(False).alias("target_reached"),
+        pl.col("outcome_bps").alias("realised_capture_bps"),
+        pl.lit(None, dtype=pl.Float64).alias("missed_excess_bps"),
+        pl.lit(None, dtype=pl.Float64).alias("time_to_target"),
+    )
+    ineligible = paired.filter(pl.col("arm_id") != pl.col("comparator_id")).head(1).with_columns(
+        pl.lit("E3").alias("episode_id"),
+        pl.lit("NO_FEATURE").alias("state"),
+        pl.lit(False).alias("eligible"),
+        pl.lit(None, dtype=pl.Int64).alias("_entry_ns"),
+        pl.lit(None, dtype=pl.Int64).alias("_exit_ns"),
+    )
+
+    table = _device_table(
+        pl.concat([paired, ineligible]), "TARGET", block_bars=24, n_boot=20
+    )
+
+    assert set(table["state"]) == {"ALL"}
+    assert table["common_close_n"].unique().to_list() == [2]
 
 
 def test_native_analysis_retains_no_event_and_unfilled_origins():
@@ -267,6 +435,15 @@ def test_native_analysis_retains_no_event_and_unfilled_origins():
     table = origin_estimates(_origins(), _native_episodes(), block_bars=24, n_boot=100)
     all_rows = table.filter(pl.col("state") == "ALL")
     assert all_rows["eligible_origins"].unique().to_list() == [3]
+    assert all_rows["eligible_origin_n"].unique().to_list() == [3]
+    assert all_rows["event_count"].unique().to_list() == [3]
+    assert all_rows["estimate_source"].unique().to_list() == [
+        "COMMON_ORIGIN_OCCUPANCY_INCLUSIVE"
+    ]
+    assert all_rows["common_fill_n"].null_count() == all_rows.height
+    assert all_rows["effective_origin_blocks"].to_list() == all_rows[
+        "effective_n"
+    ].to_list()
     assert {
         "signal_rate",
         "event_rate",
@@ -291,6 +468,114 @@ def test_native_analysis_emits_both_orientations_and_all_four_pairs():
         "REVERSE_DIRECT",
         "REVERSE_REVERSE",
     }
+
+
+def _shared_fill_fixture(
+    *,
+    entry_variant: str,
+    planned_entry,
+    adaptive_entry_ns: int | None,
+    fixed_entry_ns: int | None,
+    adaptive_exit_ns: int | None = 20,
+    fixed_exit_ns: int | None = 21,
+) -> pl.DataFrame:
+    common = {
+        "experiment_id": "SPDR-021" if entry_variant == "BREAKOUT" else "SPDR-022",
+        "universe": "crypto",
+        "symbol": "SYN",
+        "entry_variant": entry_variant,
+        "origin_id": "O1",
+        "decision_ts": datetime(2023, 1, 1, tzinfo=timezone.utc),
+        "entry_ts": planned_entry,
+        "comparator_id": "FIXED_NATIVE",
+    }
+    return pl.from_dicts(
+        [
+            {
+                **common,
+                "arm_id": "FIXED_NATIVE",
+                "arm_class": "FIXED_NATIVE",
+                "outcome_bps": 2.0,
+                "_entry_ns": fixed_entry_ns,
+                "_exit_ns": fixed_exit_ns,
+            },
+            {
+                **common,
+                "arm_id": "ADAPTIVE_NATIVE",
+                "arm_class": "NATIVE",
+                "outcome_bps": 5.0,
+                "_entry_ns": adaptive_entry_ns,
+                "_exit_ns": adaptive_exit_ns,
+            },
+        ],
+        infer_schema_length=None,
+    )
+
+
+def test_shared_fill_uses_actual_breakout_fills_not_planned_entry_time():
+    from xen.adaptive_management.analysis import _shared_trade_diagnostics
+
+    shared = _shared_trade_diagnostics(
+        _shared_fill_fixture(
+            entry_variant="BREAKOUT",
+            planned_entry=None,
+            adaptive_entry_ns=10,
+            fixed_entry_ns=11,
+        )
+    )
+    assert shared.height == 1
+    assert shared["paired_outcome_delta_bps"].to_list() == [3.0]
+
+
+@pytest.mark.parametrize(
+    ("adaptive_entry_ns", "fixed_entry_ns"),
+    [(None, 11), (10, None), (None, None)],
+)
+def test_shared_fill_excludes_scheduled_breach_nonfills(
+    adaptive_entry_ns, fixed_entry_ns
+):
+    from xen.adaptive_management.analysis import _shared_trade_diagnostics
+
+    shared = _shared_trade_diagnostics(
+        _shared_fill_fixture(
+            entry_variant="E_TOUCH",
+            planned_entry=datetime(2023, 1, 1, 1, tzinfo=timezone.utc),
+            adaptive_entry_ns=adaptive_entry_ns,
+            fixed_entry_ns=fixed_entry_ns,
+        )
+    )
+    assert shared.is_empty()
+
+
+def test_shared_fill_requires_actual_closes_for_the_outcome_lens():
+    from xen.adaptive_management.analysis import _shared_trade_diagnostics
+
+    shared = _shared_trade_diagnostics(
+        _shared_fill_fixture(
+            entry_variant="BREAKOUT",
+            planned_entry=None,
+            adaptive_entry_ns=10,
+            fixed_entry_ns=11,
+            adaptive_exit_ns=None,
+        )
+    )
+    assert shared.is_empty()
+
+
+def test_shared_fill_rejects_duplicate_declared_origin_identity():
+    from xen.adaptive_management.analysis import _shared_trade_diagnostics
+
+    frame = _shared_fill_fixture(
+        entry_variant="BREAKOUT",
+        planned_entry=None,
+        adaptive_entry_ns=10,
+        fixed_entry_ns=11,
+    )
+    duplicate = pl.concat(
+        [frame, frame.filter(pl.col("arm_class") == "FIXED_NATIVE")]
+    )
+    with pytest.raises(ValueError, match="duplicate fixed.*origin identity"):
+        _shared_trade_diagnostics(duplicate)
 
 
 def test_breach_origins_are_retained_for_both_entry_variants():
@@ -510,6 +795,9 @@ def _write_complete_run(run_dir: Path) -> None:
     origins.write_parquet(run_dir / "origins.parquet")
     native.write_parquet(run_dir / "native_parameter_schedule.parquet")
     policies.write_parquet(run_dir / "policy_schedule.parquet")
+    origins.select("symbol", pl.col("decision_ts").alias("ts")).with_columns(
+        pl.Series("magnitude_bps", [10.0, 20.0, 30.0, 40.0])
+    ).write_parquet(run_dir / "features.parquet")
     ledger_rows = []
     for row in pl.concat([native, policies], how="diagonal_relaxed").iter_rows(named=True):
         if row["origin_id"] not in {"O1", "O2"} or row["entry_ts"] is None:
@@ -661,6 +949,16 @@ def test_analyse_run_writes_every_declared_table_without_verdicts(tmp_path):
         "effective_n",
         "mde",
     }.issubset(target.columns)
+    population_columns = {
+        "eligible_origin_n",
+        "entry_fill_n",
+        "close_n",
+        "common_fill_n",
+        "common_close_n",
+        "effective_origin_blocks",
+        "effective_trade_blocks",
+    }
+    assert population_columns.issubset(target.columns)
     device_metrics = {
         name: set(
             pl.read_parquet(output_dir / f"device_{name}.parquet")["metric_name"]
@@ -703,6 +1001,10 @@ def test_analyse_run_writes_every_declared_table_without_verdicts(tmp_path):
             pl.col("observed").is_finite().any().alias("has_measure")
         )["has_measure"].all()
     per_stratum = pl.read_parquet(output_dir / "per_stratum_estimates.parquet")
+    assert population_columns.issubset(per_stratum.columns)
+    assert "COMMON_ORIGIN_OCCUPANCY_INCLUSIVE" in set(
+        per_stratum["estimate_source"]
+    )
     row_key = [
         "experiment_id",
         "universe",
@@ -739,9 +1041,40 @@ def test_analyse_run_writes_every_declared_table_without_verdicts(tmp_path):
         "exit_reason_share",
     }.issubset(per_stratum.columns)
     assert per_stratum["trade_count"].max() > 0
+    controls = pl.read_parquet(output_dir / "controls.parquet")
+    assert set(controls["control"]) >= {"TIME_DERANGEMENT", "MAGNITUDE_MATCH"}
+    assert set(controls["analysis_stage"]) == {"COMPUTED"}
+    assert {
+        "population",
+        "comparator",
+        "estimate",
+        "ci_low",
+        "ci_high",
+        "count",
+        "effective_count",
+        "undefined_reason",
+    }.issubset(controls.columns)
+    informative = controls.filter(
+        pl.col("control").is_in(["TIME_DERANGEMENT", "MAGNITUDE_MATCH"])
+    )
+    assert informative.height > 0
+    assert (
+        informative["estimate"].is_not_null()
+        | informative["undefined_reason"].is_not_null()
+    ).all()
     summary = json.loads((output_dir / "analysis_summary.json").read_text())
     assert summary["experiment_id"] == "SPDR-021"
     assert summary["interpretation"] == "DESCRIPTIVE_ONLY"
+    assert set(summary["count_definitions"]) >= population_columns
+
+    replay_dir = tmp_path / "analysis-replay"
+    analyse_run(run_dir, replay_dir, n_boot=50)
+    for artifact in (
+        "native_parameter_selected_excluded.parquet",
+        "state_sections.parquet",
+        "selection_checks.parquet",
+    ):
+        assert (output_dir / artifact).read_bytes() == (replay_dir / artifact).read_bytes()
 
 
 def test_each_analysis_wrapper_invokes_only_its_own_run(monkeypatch, tmp_path):

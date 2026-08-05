@@ -20,6 +20,7 @@ import shutil
 import polars as pl
 
 FILL_CAPACITY_MULTIPLE = 1_000  # bar volume floor, in units of the work unit trade size
+MAX_ORDER_SUBMIT_RATE = "100000/00:00:01"  # independent research arms may act together
 # Per-event UUIDs are regenerated on every run, so they make otherwise identical emissions
 # differ. `xen.nautilus.emission` already strips them from the event log for the same reason.
 EPHEMERAL_ID_COLUMNS = ("init_id",)
@@ -52,6 +53,8 @@ class WorkUnit:
     output_dir: str
     base_trade_size: str = "1"
     ledger_batch_rows: int = 250_000  # operational only: the emitted ledger cannot depend on it
+    fence_start_ns: int | None = None
+    fence_end_ns: int | None = None
 
 
 def _make_instrument(spec: InstrumentSpec):
@@ -166,7 +169,7 @@ def _assert_portfolio_statistics_disabled(engine) -> None:
 def run_work_unit(unit: WorkUnit) -> dict[str, int]:
     """Replay one instrument's bars against one arm schedule. One engine per process."""
     from nautilus_trader.backtest.engine import BacktestEngine, BacktestEngineConfig
-    from nautilus_trader.config import LoggingConfig
+    from nautilus_trader.config import LoggingConfig, RiskEngineConfig
     from nautilus_trader.model.currencies import USD, USDT
     from nautilus_trader.model.data import Bar, BarType
     from nautilus_trader.model.enums import AccountType, OmsType
@@ -209,7 +212,13 @@ def run_work_unit(unit: WorkUnit) -> dict[str, int]:
     currency = USDT if unit.instrument.quote_currency == "USDT" else USD
     engine = BacktestEngine(
         config=BacktestEngineConfig(
-            logging=LoggingConfig(log_level="ERROR", log_colors=False, print_config=False)
+            logging=LoggingConfig(log_level="ERROR", log_colors=False, print_config=False),
+            risk_engine=RiskEngineConfig(
+                max_order_submit_rate=MAX_ORDER_SUBMIT_RATE
+            ),
+            # Canonical reports come directly from the trader and strategy ledgers below.
+            # Nautilus post-run performance statistics are neither emitted nor consumed.
+            run_analysis=False,
         )
     )
     engine.add_venue(
@@ -218,6 +227,10 @@ def run_work_unit(unit: WorkUnit) -> dict[str, int]:
         account_type=AccountType.MARGIN,
         base_currency=currency,
         starting_balances=[Money(10_000_000, currency)],
+        # Arms are independent research paths, not a shared-capital portfolio. Recalculating
+        # one aggregate account after every fill is therefore unused work; the emitted order,
+        # fill, position and state ledgers remain the engine's native records.
+        frozen_account=True,
     )
     engine.add_instrument(instrument)
     engine.add_data(bars)
@@ -230,8 +243,16 @@ def run_work_unit(unit: WorkUnit) -> dict[str, int]:
             bar_type=str(bar_type),
             schedule_path=unit.schedule_path,
             base_trade_size=Decimal(unit.base_trade_size),
-            fence_start_ns=int(min(ts_ns)),
-            fence_end_ns=int(max(ts_ns)),
+            fence_start_ns=(
+                int(unit.fence_start_ns)
+                if unit.fence_start_ns is not None
+                else int(min(ts_ns))
+            ),
+            fence_end_ns=(
+                int(unit.fence_end_ns)
+                if unit.fence_end_ns is not None
+                else int(max(ts_ns))
+            ),
             ledger_dir=str(ledger_dir),
             ledger_batch_rows=int(unit.ledger_batch_rows),
         )

@@ -199,7 +199,14 @@ def materialise_policy(
                 pl.lit(spec.fixed_hold_bars, dtype=pl.Int64).alias("fixed_hold_bars"),
             ]
         else:
-            columns += [pl.lit(1.0).alias("risk_size"), pl.lit(1.0).alias("fixed_risk_size")]
+            columns += [
+                pl.lit(1.0).alias("risk_size"),
+                pl.lit(1.0).alias("fixed_risk_size"),
+                pl.lit(
+                    1 if experiment_id == "SPDR-021" else 4,
+                    dtype=pl.Int64,
+                ).alias("hold_bars"),
+            ]
     elif spec.device in (Device.TARGET, Device.STOP, Device.TRAIL):
         adaptive, fixed = _distance_columns(spec, medians)
         adjustment = spec.adjustment_component
@@ -293,6 +300,10 @@ def materialise_policy(
         columns += [
             size.alias("risk_size"),
             pl.lit(1.0).alias("fixed_risk_size"),
+            pl.lit(
+                1 if experiment_id == "SPDR-021" else 4,
+                dtype=pl.Int64,
+            ).alias("hold_bars"),
         ]
 
     result = _null_out_nan(frame.with_columns(columns))

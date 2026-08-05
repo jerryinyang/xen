@@ -22,6 +22,10 @@ from xen.adaptive_management.contracts import (
     build_management_lattice,
     build_native_lattice,
 )
+from xen.adaptive_management.integrity import (
+    derange_component_times,
+    magnitude_matched_controls,
+)
 
 ANALYSIS_ARTIFACTS = (
     "per_stratum_estimates.parquet",
@@ -173,6 +177,8 @@ def paired_estimates(
         "episode_id",
         pl.col("arm_id").alias("comparator_id"),
         pl.col("outcome_bps").alias("fixed_outcome_bps"),
+        pl.col("_entry_ns").alias("_fixed_entry_ns"),
+        pl.col("_exit_ns").alias("_fixed_exit_ns"),
     )
     join_keys = [
         "experiment_id",
@@ -182,7 +188,12 @@ def paired_estimates(
         "episode_id",
         "comparator_id",
     ]
-    paired = adaptive.join(fixed, on=join_keys, how="inner").with_columns(
+    paired_fills = adaptive.join(fixed, on=join_keys, how="inner").filter(
+        pl.col("_entry_ns").is_not_null() & pl.col("_fixed_entry_ns").is_not_null()
+    )
+    paired = paired_fills.filter(
+        pl.col("_exit_ns").is_not_null() & pl.col("_fixed_exit_ns").is_not_null()
+    ).with_columns(
         (pl.col("outcome_bps") - pl.col("fixed_outcome_bps")).alias("_delta")
     )
     if paired.is_empty():
@@ -191,6 +202,9 @@ def paired_estimates(
     rows = []
     for key, group in paired.group_by(group_columns, maintain_order=True):
         identity = dict(zip(group_columns, _as_tuple(key), strict=True))
+        common_fills = paired_fills
+        for column, value in identity.items():
+            common_fills = common_fills.filter(pl.col(column).eq_missing(value))
         stats = _clustered_interval(
             group,
             "_delta",
@@ -207,6 +221,13 @@ def paired_estimates(
                 "mde": stats["mde"],
                 "paired_n": group.height,
                 "effective_n": stats["effective_n"],
+                "eligible_origin_n": None,
+                "entry_fill_n": group.height,
+                "close_n": group.height,
+                "common_fill_n": common_fills.height,
+                "common_close_n": group.height,
+                "effective_origin_blocks": None,
+                "effective_trade_blocks": stats["effective_n"],
             }
         )
     return pl.from_dicts(rows, infer_schema_length=None)
@@ -263,16 +284,53 @@ def origin_estimates(
         identity = dict(zip(group_columns, _as_tuple(key), strict=True))
         if identity.get("arm_class") == "FIXED_NATIVE":
             identity["orientation"] = "FIXED"
-        rows.append(_origin_row(identity, arm, "ALL", block_bars, n_boot))
-        for state in arm["state"].drop_nulls().unique(maintain_order=True):
+        states: list[str | None] = [None]
+        states.extend(
+            str(state) for state in arm["state"].drop_nulls().unique(maintain_order=True)
+        )
+        value_columns = tuple(
+            f"_origin_delta_{index}" for index in range(len(states))
+        )
+        delta = pl.col("outcome_bps") - pl.col("_fixed_outcome_bps")
+        interval_frame = arm.with_columns(
+            [
+                (
+                    delta
+                    if state is None
+                    else pl.when(pl.col("state") == state)
+                    .then(delta)
+                    .otherwise(0.0)
+                ).alias(column)
+                for state, column in zip(states, value_columns, strict=True)
+            ]
+        )
+        intervals = _clustered_intervals(
+            interval_frame,
+            value_columns,
+            block_bars=block_bars,
+            n_boot=n_boot,
+        )
+        rows.append(
+            _origin_row(
+                identity,
+                arm,
+                "ALL",
+                block_bars,
+                n_boot,
+                stats=intervals[value_columns[0]],
+            )
+        )
+        for state, column in zip(states[1:], value_columns[1:], strict=True):
             rows.append(
                 _origin_row(
                     identity,
-                    arm.filter(pl.col("state") == state),
+                    arm,
                     str(state),
                     block_bars,
                     n_boot,
                     eligible_origins=arm.height,
+                    selected_state=str(state),
+                    stats=intervals[column],
                 )
             )
     return pl.from_dicts(rows, infer_schema_length=None)
@@ -474,11 +532,16 @@ def analyse_run(
         state_sections = state_sections.sort(
             ["symbol", "entry_variant", "arm_id", "state"]
         )
-    controls = _control_inventory(experiment_id, universe)
+    controls = pl.concat(
+        [_control_inventory(experiment_id, universe), _stack("controls")],
+        how="diagonal_relaxed",
+    )
     per_stratum = pl.concat(
         [
-            _tag_estimate_source(native_table, "COMMON_ORIGIN"),
-            _tag_estimate_source(paired, "PAIRED_EPISODE"),
+            _tag_estimate_source(
+                native_table, "COMMON_ORIGIN_OCCUPANCY_INCLUSIVE"
+            ),
+            _tag_estimate_source(paired, "COMMON_CLOSE_TRADE"),
         ],
         how="diagonal_relaxed",
     )
@@ -513,6 +576,22 @@ def analyse_run(
                 "block_bars": max(24, int(block_bars)),
                 "native_rows": native_table.height,
                 "paired_rows": paired.height,
+                "count_definitions": {
+                    "eligible_origins": "legacy alias of eligible_origin_n",
+                    "fill_count": "legacy alias of entry_fill_n",
+                    "paired_n": "legacy alias of common_close_n",
+                    "effective_n": (
+                        "legacy alias of effective_origin_blocks for origin estimates "
+                        "and effective_trade_blocks for trade estimates"
+                    ),
+                    "eligible_origin_n": "eligible scheduled origins",
+                    "entry_fill_n": "actual filled entries",
+                    "close_n": "actual confirmed closes",
+                    "common_fill_n": "origins filled on both comparison sides",
+                    "common_close_n": "origins closed on both comparison sides",
+                    "effective_origin_blocks": "resampled origin/date blocks",
+                    "effective_trade_blocks": "resampled paired-trade/date blocks",
+                },
                 "artifacts": list(ANALYSIS_ARTIFACTS),
             },
             workspace / "analysis_summary.json",
@@ -535,6 +614,21 @@ def _analyse_symbol_payload(
         universe,
         block_bars=block_bars,
         n_boot=n_boot,
+    )
+
+
+def _ledger_origin_filter(origin_ids: pl.Series) -> pl.Expr:
+    """Keep exact origin membership while exposing bounds for Parquet pruning."""
+    ids = origin_ids.cast(pl.Utf8)
+    if ids.is_empty():
+        return pl.lit(False)
+    lower = ids.min()
+    upper = ids.max()
+    origin = pl.col("origin_id")
+    return (
+        (origin >= pl.lit(lower))
+        & (origin <= pl.lit(upper))
+        & origin.is_in(ids.implode())
     )
 
 
@@ -568,6 +662,14 @@ def _analyse_symbol(
         .filter(pl.col("symbol") == symbol)
         .collect()
     )
+    features_path = run_dir / "features.parquet"
+    features = (
+        pl.scan_parquet(features_path)
+        .filter(pl.col("symbol") == symbol)
+        .collect()
+        if features_path.exists()
+        else pl.DataFrame()
+    )
     # episode_results carries no symbol column, so it is restricted by this symbol's
     # origins. Projection keeps only the columns _attach_results consumes.
     origin_ids = origins["origin_id"].cast(pl.Utf8).unique()
@@ -583,7 +685,7 @@ def _analyse_symbol(
             "price",
             "exit_reason",
         )
-        .filter(pl.col("origin_id").cast(pl.Utf8).is_in(origin_ids.implode()))
+        .filter(_ledger_origin_filter(origin_ids))
         .drop("origin_id")
         .collect()
     )
@@ -597,6 +699,12 @@ def _analyse_symbol(
     selected_excluded = _selected_excluded(native_results)
     selection_checks = _selection_checks(selected_excluded)
     shared_trades = _shared_trade_diagnostics(native_results)
+    controls = _informative_controls(
+        native_results,
+        features,
+        block_bars=block_bars,
+        n_boot=n_boot,
+    )
     native_slim = _slim(native_results)
     del native_results
 
@@ -620,6 +728,7 @@ def _analyse_symbol(
         "selected_excluded": selected_excluded,
         "selection_checks": selection_checks,
         "shared_trades": shared_trades,
+        "controls": controls,
         "state_sections": _state_sections(native_slim, policy_slim),
         "contexts": _common_context(
             pl.concat([native_slim, policy_slim], how="diagonal_relaxed")
@@ -637,39 +746,68 @@ def _origin_row(
     n_boot: int,
     *,
     eligible_origins: int | None = None,
+    selected_state: str | None = None,
+    stats: dict[str, float | int] | None = None,
 ) -> dict[str, Any]:
-    event = (
-        frame["event_ts"].is_not_null().sum()
-        if "event_ts" in frame.columns
-        else (~frame["state"].is_in(_NON_EVENT_STATES)).sum()
+    selected = (
+        frame.filter(pl.col("state") == selected_state)
+        if selected_state is not None
+        else frame
+    )
+    observed_event = (
+        selected["event_ts"].is_not_null().sum()
+        if "event_ts" in selected.columns
+        else (~selected["state"].is_in(_NON_EVENT_STATES)).sum()
     )
     filled = (
-        frame["entry_ts"].is_not_null().sum()
-        if "entry_ts" in frame.columns
-        else (frame["state"] == "FILLED").sum()
+        selected["_entry_ns"].is_not_null().sum()
+        if "_entry_ns" in selected.columns
+        else selected["entry_ts"].is_not_null().sum()
+        if "entry_ts" in selected.columns
+        else (selected["state"] == "FILLED").sum()
     )
-    signal = (~frame["state"].is_in(_NON_EVENT_STATES)).sum()
-    stats_frame = frame.with_columns(
-        (pl.col("outcome_bps") - pl.col("_fixed_outcome_bps")).alias("_delta")
+    closed = (
+        selected["_exit_ns"].is_not_null().sum()
+        if "_exit_ns" in selected.columns
+        else 0
     )
-    stats = _clustered_interval(
-        stats_frame,
-        "_delta",
-        block_bars=block_bars,
-        n_boot=n_boot,
-    )
+    signal = (~selected["state"].is_in(_NON_EVENT_STATES)).sum()
+    if stats is None:
+        stats_frame = frame.with_columns(
+            pl.when(
+                pl.lit(True)
+                if selected_state is None
+                else pl.col("state") == selected_state
+            )
+            .then(pl.col("outcome_bps") - pl.col("_fixed_outcome_bps"))
+            .otherwise(0.0)
+            .alias("_delta")
+        )
+        stats = _clustered_interval(
+            stats_frame,
+            "_delta",
+            block_bars=block_bars,
+            n_boot=n_boot,
+        )
     denominator = eligible_origins if eligible_origins is not None else frame.height
     return {
         **identity,
         "state": state,
+        "estimate_source": "COMMON_ORIGIN_OCCUPANCY_INCLUSIVE",
         "eligible_origins": denominator,
+        "eligible_origin_n": denominator,
         "signal_count": int(signal),
-        "event_count": int(event),
+        "observed_event_count": int(observed_event),
+        "event_count": denominator,
         "fill_count": int(filled),
+        "entry_fill_n": int(filled),
+        "close_n": int(closed),
+        "common_fill_n": None,
+        "common_close_n": None,
         "signal_rate": float(signal / denominator) if denominator else np.nan,
-        "event_rate": float(event / denominator) if denominator else np.nan,
+        "event_rate": float(observed_event / denominator) if denominator else np.nan,
         "fill_rate": float(filled / denominator) if denominator else np.nan,
-        "exposure_per_origin": float(frame["outcome_bps"].sum() / denominator)
+        "exposure_per_origin": float(selected["outcome_bps"].sum() / denominator)
         if denominator
         else np.nan,
         "estimate": stats["estimate"],
@@ -677,6 +815,8 @@ def _origin_row(
         "ci_high": stats["ci_high"],
         "mde": stats["mde"],
         "effective_n": stats["effective_n"],
+        "effective_origin_blocks": stats["effective_n"],
+        "effective_trade_blocks": None,
     }
 
 
@@ -795,6 +935,105 @@ def _clustered_interval(
         "mde": float(estimate - low),
         "effective_n": len(samples),
     }
+
+
+def _clustered_intervals(
+    frame: pl.DataFrame,
+    value_columns: tuple[str, ...],
+    *,
+    block_bars: int,
+    n_boot: int,
+) -> dict[str, dict[str, float | int]]:
+    """Bootstrap complete sibling columns with one identical block-draw stream.
+
+    Native ALL/state estimates previously rebuilt the same block partition and reset the
+    same RNG once per state. Their delta columns are complete by construction, so every
+    call sampled identical row positions. Sharing those positions preserves the gathered
+    value order and the per-column NumPy mean while avoiding repeated partitioning,
+    random draws, and row-index concatenation. Any nullable input takes the independent
+    reference path rather than widening this equivalence claim.
+    """
+    if not value_columns:
+        return {}
+    if any(frame[column].null_count() for column in value_columns):
+        return {
+            column: _clustered_interval(
+                frame,
+                column,
+                block_bars=block_bars,
+                n_boot=n_boot,
+            )
+            for column in value_columns
+        }
+    if frame.is_empty():
+        return {
+            column: _clustered_interval(
+                frame,
+                column,
+                block_bars=block_bars,
+                n_boot=n_boot,
+            )
+            for column in value_columns
+        }
+
+    block_bars = max(24, int(block_bars))
+    if "decision_ts" in frame.columns and frame["decision_ts"].null_count() < frame.height:
+        partitions = (
+            frame.with_row_index("_row")
+            .with_columns(
+                pl.col("decision_ts")
+                .cast(pl.Datetime("ns", "UTC"))
+                .dt.truncate(f"{block_bars}h")
+                .alias("_block")
+            )
+            .group_by("_block", maintain_order=True)
+            .agg(pl.col("_row"))
+        )["_row"].to_list()
+    else:
+        partitions = [[index] for index in range(frame.height)]
+
+    blocks = [np.asarray(block, dtype=np.int64) for block in partitions]
+    values = {
+        column: frame[column]
+        .cast(pl.Float64, strict=False)
+        .to_numpy()
+        .astype(float)
+        for column in value_columns
+    }
+    estimates = {column: float(np.mean(values[column])) for column in value_columns}
+    if len(blocks) < 2:
+        return {
+            column: {
+                "estimate": estimate,
+                "ci_low": estimate,
+                "ci_high": estimate,
+                "mde": np.nan,
+                "effective_n": len(blocks),
+            }
+            for column, estimate in estimates.items()
+        }
+
+    draw_count = max(1, int(n_boot))
+    draws = {column: np.empty(draw_count) for column in value_columns}
+    rng = np.random.default_rng(240730)
+    for index in range(draw_count):
+        chosen = rng.integers(0, len(blocks), size=len(blocks))
+        rows = np.concatenate([blocks[item] for item in chosen])
+        for column in value_columns:
+            draws[column][index] = np.mean(values[column][rows])
+
+    intervals: dict[str, dict[str, float | int]] = {}
+    for column in value_columns:
+        low, high = np.quantile(draws[column], [0.025, 0.975])
+        estimate = estimates[column]
+        intervals[column] = {
+            "estimate": estimate,
+            "ci_low": float(low),
+            "ci_high": float(high),
+            "mde": float(estimate - low),
+            "effective_n": len(blocks),
+        }
+    return intervals
 
 
 def _attach_results(
@@ -1132,7 +1371,12 @@ def _device_table(
     block_bars: int,
     n_boot: int,
 ) -> pl.DataFrame:
-    frame = results.filter(pl.col("device").cast(pl.Utf8).str.contains(device))
+    eligible_results = _with_columns(results, {"eligible": True}).filter(
+        pl.col("eligible").fill_null(False)
+    )
+    frame = eligible_results.filter(
+        pl.col("device").cast(pl.Utf8).str.contains(device)
+    )
     if frame.is_empty():
         return pl.DataFrame()
     metric_function: Callable[[pl.DataFrame], dict[str, float]] = {
@@ -1144,7 +1388,7 @@ def _device_table(
     }[device]
     group_columns = [column for column in _IDENTITY_COLUMNS if column in frame.columns]
     comparator_keys = ["arm_id", "symbol", "entry_variant", "state"]
-    comparators = results.filter(
+    comparators = eligible_results.filter(
         pl.col("arm_id").is_in(frame["comparator_id"].unique().implode())
     ).partition_by(comparator_keys, as_dict=True, maintain_order=True)
     arm_rows: list[dict[str, Any]] = []
@@ -1165,11 +1409,6 @@ def _device_table(
                 f"for {identity['arm_id']}"
             )
         paired_left, paired_right = _pair_episode_rows(group, comparator)
-        if paired_left.is_empty():
-            raise ValueError(
-                f"no shared episodes for {identity['arm_id']} "
-                f"and {identity['comparator_id']}"
-            )
         observed_metrics = metric_function(paired_left)
         comparator_metrics = metric_function(paired_right)
         intervals = _paired_metric_intervals(
@@ -1180,6 +1419,10 @@ def _device_table(
             device=device,
             block_bars=block_bars,
             n_boot=n_boot,
+        )
+        common_fill_n = _shared_episode_count(
+            group.filter(pl.col("_entry_ns").is_not_null()),
+            comparator.filter(pl.col("_entry_ns").is_not_null()),
         )
         for metric_name, observed in observed_metrics.items():
             stats = intervals[metric_name]
@@ -1195,6 +1438,13 @@ def _device_table(
                     "mde": stats["mde"],
                     "episode_n": paired_left.height,
                     "effective_n": stats["effective_n"],
+                    "eligible_origin_n": None,
+                    "entry_fill_n": int(group["_entry_ns"].is_not_null().sum()),
+                    "close_n": int(group["_exit_ns"].is_not_null().sum()),
+                    "common_fill_n": common_fill_n,
+                    "common_close_n": paired_left.height,
+                    "effective_origin_blocks": None,
+                    "effective_trade_blocks": stats["effective_n"],
                 }
             )
     return pl.from_dicts(arm_rows, infer_schema_length=None)
@@ -1357,18 +1607,28 @@ def _pair_episode_rows(
     adaptive: pl.DataFrame,
     comparator: pl.DataFrame,
 ) -> tuple[pl.DataFrame, pl.DataFrame]:
-    common = (
-        adaptive.select("episode_id")
-        .unique()
-        .join(comparator.select("episode_id").unique(), on="episode_id", how="inner")
+    if adaptive.select("episode_id").is_duplicated().any():
+        raise ValueError("duplicate adaptive episode in device comparison")
+    if comparator.select("episode_id").is_duplicated().any():
+        raise ValueError("duplicate comparator episode in device comparison")
+    adaptive = adaptive.filter(
+        pl.col("_entry_ns").is_not_null() & pl.col("_exit_ns").is_not_null()
+    )
+    comparator = comparator.filter(
+        pl.col("_entry_ns").is_not_null() & pl.col("_exit_ns").is_not_null()
+    )
+    common = adaptive.select("episode_id").join(
+        comparator.select("episode_id"), on="episode_id", how="inner"
     )
     left = adaptive.join(common, on="episode_id", how="inner").sort("episode_id")
     right = comparator.join(common, on="episode_id", how="inner").sort("episode_id")
-    if left.select("episode_id").is_duplicated().any():
-        raise ValueError("duplicate adaptive episode in device comparison")
-    if right.select("episode_id").is_duplicated().any():
-        raise ValueError("duplicate comparator episode in device comparison")
     return left, right
+
+
+def _shared_episode_count(left: pl.DataFrame, right: pl.DataFrame) -> int:
+    return left.select("episode_id").unique().join(
+        right.select("episode_id").unique(), on="episode_id", how="inner"
+    ).height
 
 
 def _paired_metric_intervals(
@@ -1462,27 +1722,70 @@ def _paired_metric_intervals(
 def _shared_trade_diagnostics(results: pl.DataFrame) -> pl.DataFrame:
     if results.is_empty():
         return pl.DataFrame()
-    fixed = results.filter(pl.col("arm_class") == "FIXED_NATIVE").select(
-        "origin_id",
-        "symbol",
-        "entry_variant",
-        pl.col("outcome_bps").alias("fixed_outcome_bps"),
-        pl.col("entry_ts").alias("fixed_entry_ts")
-        if "entry_ts" in results.columns
-        else pl.lit(None).alias("fixed_entry_ts"),
-    )
+    origin_identity = [
+        column
+        for column in (
+            "experiment_id",
+            "universe",
+            "symbol",
+            "entry_variant",
+            "origin_id",
+            "decision_ts",
+        )
+        if column in results.columns
+    ]
+    required = {"_entry_ns", "_exit_ns"}
+    if not required.issubset(results.columns):
+        raise ValueError("shared-fill analysis requires actual entry and exit timestamps")
+    fixed_rows = results.filter(pl.col("arm_class") == "FIXED_NATIVE")
     adaptive = results.filter(pl.col("arm_class") != "FIXED_NATIVE")
+    if fixed_rows.select(origin_identity).is_duplicated().any():
+        raise ValueError("duplicate fixed row for declared origin identity")
+    if adaptive.select([*origin_identity, "arm_id"]).is_duplicated().any():
+        raise ValueError("duplicate adaptive arm row for declared origin identity")
+    fixed = fixed_rows.select(
+        *origin_identity,
+        pl.col("outcome_bps").alias("fixed_outcome_bps"),
+        pl.col("_entry_ns").alias("fixed_entry_ns"),
+        pl.col("_exit_ns").alias("fixed_exit_ns"),
+    )
+    arm_identity = [
+        column
+        for column in (
+            "experiment_id",
+            "universe",
+            "symbol",
+            "entry_variant",
+            "arm_id",
+        )
+        if column in adaptive.columns
+    ]
+    adaptive = adaptive.with_columns(
+        pl.col("_entry_ns").is_not_null().sum().over(arm_identity).alias("entry_fill_n"),
+        pl.col("_exit_ns").is_not_null().sum().over(arm_identity).alias("close_n"),
+    )
+    common_fills = adaptive.join(fixed, on=origin_identity, how="inner").filter(
+        pl.col("_entry_ns").is_not_null()
+        & pl.col("fixed_entry_ns").is_not_null()
+    ).with_columns(pl.len().over(arm_identity).alias("common_fill_n"))
     return (
-        adaptive.join(fixed, on=["origin_id", "symbol", "entry_variant"], how="inner")
-        .filter(
-            pl.col("entry_ts").is_not_null() & pl.col("fixed_entry_ts").is_not_null()
-            if "entry_ts" in adaptive.columns
-            else pl.lit(False)
+        common_fills.filter(
+            pl.col("_exit_ns").is_not_null()
+            & pl.col("fixed_exit_ns").is_not_null()
         )
         .with_columns(
             (pl.col("outcome_bps") - pl.col("fixed_outcome_bps")).alias(
                 "paired_outcome_delta_bps"
-            )
+            ),
+            pl.len().over(arm_identity).alias("common_close_n"),
+            pl.lit(None, dtype=pl.Int64).alias("eligible_origin_n"),
+            pl.lit(None, dtype=pl.Int64).alias("effective_origin_blocks"),
+            pl.col("decision_ts")
+            .cast(pl.Datetime("ns", "UTC"))
+            .dt.truncate("24h")
+            .n_unique()
+            .over(arm_identity)
+            .alias("effective_trade_blocks"),
         )
     )
 
@@ -1617,22 +1920,323 @@ def _state_sections(native: pl.DataFrame, policies: pl.DataFrame) -> pl.DataFram
     )
 
 
+def _native_origin_deltas(results: pl.DataFrame) -> pl.DataFrame:
+    identity = [
+        column
+        for column in (
+            "experiment_id",
+            "universe",
+            "symbol",
+            "entry_variant",
+            "origin_id",
+            "decision_ts",
+        )
+        if column in results.columns
+    ]
+    fixed = results.filter(pl.col("arm_class") == "FIXED_NATIVE").select(
+        *identity,
+        pl.col("outcome_bps").alias("_fixed_outcome_bps"),
+    )
+    adaptive = results.filter(pl.col("arm_class") != "FIXED_NATIVE")
+    return adaptive.join(fixed, on=identity, how="inner").with_columns(
+        (pl.col("outcome_bps") - pl.col("_fixed_outcome_bps")).alias("_delta")
+    )
+
+
+def _informative_controls(
+    results: pl.DataFrame,
+    features: pl.DataFrame,
+    *,
+    block_bars: int,
+    n_boot: int,
+) -> pl.DataFrame:
+    deltas = _native_origin_deltas(results)
+    if deltas.is_empty():
+        return pl.DataFrame()
+    group_columns = [
+        column
+        for column in (
+            "experiment_id",
+            "universe",
+            "symbol",
+            "entry_variant",
+            "arm_id",
+            "component",
+            "comparator_id",
+        )
+        if column in deltas.columns
+    ]
+    rows: list[dict[str, Any]] = []
+    for key, group in deltas.group_by(group_columns, maintain_order=True):
+        identity = dict(zip(group_columns, _as_tuple(key), strict=True))
+        rows.append(
+            _time_derangement_control(
+                identity,
+                group,
+                block_bars=block_bars,
+                n_boot=n_boot,
+            )
+        )
+        rows.extend(
+            _magnitude_controls(
+                identity,
+                group,
+                features,
+                block_bars=block_bars,
+                n_boot=n_boot,
+            )
+        )
+    return pl.from_dicts(rows, infer_schema_length=None)
+
+
+def _time_derangement_control(
+    identity: dict[str, Any],
+    group: pl.DataFrame,
+    *,
+    block_bars: int,
+    n_boot: int,
+) -> dict[str, Any]:
+    base = {
+        **identity,
+        "control": "TIME_DERANGEMENT",
+        "analysis_stage": "COMPUTED",
+        "population": "ELIGIBLE_ORIGIN_TIME_DERANGED",
+        "comparator": identity.get("comparator_id"),
+        "magnitude_bin": None,
+        "count": group.height,
+    }
+    if group.height < 2:
+        return {
+            **base,
+            "estimate": None,
+            "ci_low": None,
+            "ci_high": None,
+            "mde": None,
+            "effective_count": 0,
+            "undefined_reason": "FEWER_THAN_TWO_ORIGINS",
+        }
+    ordered = group.sort(["decision_ts", "origin_id"])
+    mapping = derange_component_times(
+        ordered.select(pl.col("decision_ts").alias("ts")), seed=240730
+    )
+    if bool((mapping["source_ts"] == mapping["ts"]).any()):
+        raise RuntimeError("time derangement contains a fixed point")
+    rng = np.random.default_rng(240730)
+    shift = int(rng.integers(1, ordered.height))
+    control = ordered.with_columns(
+        pl.Series("_control_delta", np.roll(ordered["_delta"].to_numpy(), shift))
+    )
+    stats = _block_interval(
+        control,
+        "_control_delta",
+        block_bars=block_bars,
+        n_boot=n_boot,
+    )
+    return {
+        **base,
+        "estimate": stats["estimate"],
+        "ci_low": stats["ci_low"],
+        "ci_high": stats["ci_high"],
+        "mde": stats["mde"],
+        "effective_count": stats["effective_n"],
+        "undefined_reason": None,
+    }
+
+
+def _magnitude_controls(
+    identity: dict[str, Any],
+    group: pl.DataFrame,
+    features: pl.DataFrame,
+    *,
+    block_bars: int,
+    n_boot: int,
+) -> list[dict[str, Any]]:
+    base = {
+        **identity,
+        "control": "MAGNITUDE_MATCH",
+        "analysis_stage": "COMPUTED",
+        "population": "ELIGIBLE_ORIGIN_MAGNITUDE_STRATUM",
+        "comparator": identity.get("comparator_id"),
+    }
+    if features.is_empty():
+        return [
+            {
+                **base,
+                "magnitude_bin": magnitude_bin,
+                "estimate": None,
+                "ci_low": None,
+                "ci_high": None,
+                "mde": None,
+                "count": 0,
+                "effective_count": 0,
+                "undefined_reason": "FEATURES_UNAVAILABLE",
+            }
+            for magnitude_bin in range(4)
+        ]
+    matched = magnitude_matched_controls(
+        group.with_columns(
+            pl.col("decision_ts").cast(pl.Datetime("ns", "UTC"))
+        ),
+        features,
+    )
+    rows = []
+    for magnitude_bin in range(4):
+        stratum = matched.filter(pl.col("magnitude_bin") == magnitude_bin)
+        selected = _array(stratum.filter(pl.col("selected")), "_delta")
+        excluded = _array(stratum.filter(~pl.col("selected")), "_delta")
+        if not len(selected) or not len(excluded):
+            rows.append(
+                {
+                    **base,
+                    "magnitude_bin": magnitude_bin,
+                    "estimate": None,
+                    "ci_low": None,
+                    "ci_high": None,
+                    "mde": None,
+                    "count": stratum.height,
+                    "effective_count": 0,
+                    "undefined_reason": "EMPTY_SELECTED_OR_COMPARATOR_SIDE",
+                }
+            )
+            continue
+        estimate, low, high, effective = _matched_block_interval(
+            stratum, block_bars=block_bars, n_boot=n_boot
+        )
+        rows.append(
+            {
+                **base,
+                "magnitude_bin": magnitude_bin,
+                "estimate": estimate,
+                "ci_low": low,
+                "ci_high": high,
+                "mde": estimate - low,
+                "count": stratum.height,
+                "effective_count": effective,
+                "undefined_reason": None,
+            }
+        )
+    return rows
+
+
+def _block_interval(
+    frame: pl.DataFrame,
+    value_column: str,
+    *,
+    block_bars: int,
+    n_boot: int,
+) -> dict[str, float | int]:
+    values = _array(frame, value_column)
+    if not len(values):
+        return {
+            "estimate": np.nan,
+            "ci_low": np.nan,
+            "ci_high": np.nan,
+            "mde": np.nan,
+            "effective_n": 0,
+        }
+    blocks = (
+        frame.with_columns(
+            pl.col("decision_ts")
+            .cast(pl.Datetime("ns", "UTC"))
+            .dt.truncate(f"{max(24, int(block_bars))}h")
+            .alias("_block")
+        )
+        .group_by("_block", maintain_order=True)
+        .agg(
+            pl.col(value_column).drop_nulls().sum().alias("_sum"),
+            pl.col(value_column).drop_nulls().len().alias("_count"),
+        )
+        .filter(pl.col("_count") > 0)
+    )
+    estimate = float(np.mean(values))
+    if blocks.height < 2:
+        return {
+            "estimate": estimate,
+            "ci_low": estimate,
+            "ci_high": estimate,
+            "mde": np.nan,
+            "effective_n": blocks.height,
+        }
+    sums = blocks["_sum"].to_numpy()
+    counts = blocks["_count"].to_numpy()
+    rng = np.random.default_rng(240730)
+    draws = np.empty(max(1, int(n_boot)))
+    for index in range(len(draws)):
+        chosen = rng.integers(0, blocks.height, size=blocks.height)
+        draws[index] = sums[chosen].sum() / counts[chosen].sum()
+    low, high = np.quantile(draws, [0.025, 0.975])
+    return {
+        "estimate": estimate,
+        "ci_low": float(low),
+        "ci_high": float(high),
+        "mde": float(estimate - low),
+        "effective_n": blocks.height,
+    }
+
+
+def _matched_block_interval(
+    frame: pl.DataFrame,
+    *,
+    block_bars: int,
+    n_boot: int,
+) -> tuple[float, float, float, int]:
+    blocks = (
+        frame.with_columns(
+            pl.col("decision_ts")
+            .cast(pl.Datetime("ns", "UTC"))
+            .dt.truncate(f"{max(24, int(block_bars))}h")
+            .alias("_block")
+        )
+        .group_by("_block", maintain_order=True)
+        .agg(
+            pl.col("_delta").filter(pl.col("selected")).sum().alias("_left_sum"),
+            pl.col("selected").sum().alias("_left_n"),
+            pl.col("_delta").filter(~pl.col("selected")).sum().alias("_right_sum"),
+            (~pl.col("selected")).sum().alias("_right_n"),
+        )
+    )
+    selected = _array(frame.filter(pl.col("selected")), "_delta")
+    excluded = _array(frame.filter(~pl.col("selected")), "_delta")
+    estimate = float(np.mean(selected) - np.mean(excluded))
+    rng = np.random.default_rng(240730)
+    draws = []
+    for _ in range(max(1, int(n_boot))):
+        chosen = rng.integers(0, blocks.height, size=blocks.height)
+        sample = blocks[chosen]
+        left_n = int(sample["_left_n"].sum())
+        right_n = int(sample["_right_n"].sum())
+        if left_n and right_n:
+            draws.append(
+                float(sample["_left_sum"].sum() / left_n)
+                - float(sample["_right_sum"].sum() / right_n)
+            )
+    if not draws:
+        return estimate, np.nan, np.nan, blocks.height
+    low, high = np.quantile(np.asarray(draws), [0.025, 0.975])
+    return estimate, float(low), float(high), blocks.height
+
+
 def _control_inventory(experiment_id: str, universe: str) -> pl.DataFrame:
     return pl.DataFrame(
         {
-            "experiment_id": [experiment_id] * 4,
-            "universe": [universe] * 4,
+            "experiment_id": [experiment_id] * 2,
+            "universe": [universe] * 2,
             "control": [
                 "FIXED_DEVICE",
                 "FIXED_NATIVE_PARAMETER",
-                "TIME_DERANGEMENT",
-                "MAGNITUDE_MATCH",
             ],
-            "analysis_stage": [
-                "COMPUTED",
-                "COMPUTED",
-                "DEFERRED_TO_STAGE_8",
-                "DEFERRED_TO_STAGE_8",
+            "analysis_stage": ["COMPUTED", "COMPUTED"],
+            "population": ["COMMON_CLOSE_TRADE", "ELIGIBLE_ORIGIN"],
+            "comparator": ["DECLARED_FIXED_DEVICE", "DECLARED_FIXED_NATIVE"],
+            "estimate": [None, None],
+            "ci_low": [None, None],
+            "ci_high": [None, None],
+            "mde": [None, None],
+            "count": [None, None],
+            "effective_count": [None, None],
+            "undefined_reason": [
+                "REPORTED_IN_DEVICE_TABLES",
+                "REPORTED_IN_NATIVE_PARAMETER_ORIGINS",
             ],
         }
     )
@@ -1667,6 +2271,13 @@ def _empty_estimates() -> pl.DataFrame:
             "mde": pl.Float64,
             "paired_n": pl.Int64,
             "effective_n": pl.Int64,
+            "eligible_origin_n": pl.Int64,
+            "entry_fill_n": pl.Int64,
+            "close_n": pl.Int64,
+            "common_fill_n": pl.Int64,
+            "common_close_n": pl.Int64,
+            "effective_origin_blocks": pl.Int64,
+            "effective_trade_blocks": pl.Int64,
         }
     )
 

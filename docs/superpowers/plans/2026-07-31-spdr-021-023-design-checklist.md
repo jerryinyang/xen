@@ -61,3 +61,22 @@ venue and recorded as `EXIT_REJECTED`: 35 of 4 502 closed legs (0.8%) in the bou
 episode keeps its other legs and the state is explicit, never silent, but those legs ran without
 that protective exit. Treating a through-market stop as an immediate exit instead would be a
 design change, so it is left as declared behaviour for the analysis to account for.
+
+## 2026-08-03 amended acceptance checklist
+
+The first pass exposed lifecycle and reporting-population defects, so the observation above is
+superseded by the dated common amendment. Prose alone does not accept any amended clause. Tasks 2–4
+must fill the evidence cells below before first-pass deletion or production execution.
+
+| Amended clause | Intended code | Focused test | Smoke evidence | Accepted |
+|---|---|---|---|:---:|
+| Entry-fill identity: actual `_entry_ns` on both adaptive and fixed sides | `analysis.py` shared-fill assembly | `test_shared_fill_uses_actual_breakout_fills_not_planned_entry_time`, breach non-fill and duplicate-identity tests | v9 common-fill rows: 966 / 6,407 / 6,394; every row had both actual fills | [x] |
+| SIZE inherits strategy-fixed close: 1 H1 bar in SPDR-021, 4 H1 bars in SPDR-022/023 | `policies.py`, `strategy.py` | `test_size_inherits_the_strategy_fixed_horizon`; amended five-case synthetic trace | v9 SIZE filled/closed: 319/319, 3,388/3,388, 3,388/3,388 | [x] |
+| Pure TARGET/STOP/TRAIL remain price-only; adaptive HOLD keeps its own duration | `policies.py`, `strategy.py` | `test_only_time_based_devices_materialise_a_horizon`; declared-combination hold tests | v9 device census showed multiple fills and explicit price-only fence censoring | [x] |
+| Exit submission waits for a visible position and uses the intended `position_id` | `strategy.py` lifecycle state | `test_protective_exits_wait_until_the_filled_position_is_visible`; confirmed-position-ID test | v9 repeated breach episodes passed lifecycle integrity | [x] |
+| Rejected/denied protective exit gets exactly one reduce-only market fail-safe | `strategy.py` failure path | denied-leg, successful-fail-safe and denied-fail-safe tests | v9 had one exit failure and zero absorbing failures; later synthetic episode executed | [x] |
+| Filled/closed lifecycle completeness is hard integrity; pure price-only fence censoring remains explicit | `integrity.py` | missing SIZE close, explicit price-only fence and fail-safe-close tests | all three v9 `blocking_pass=true` | [x] |
+| Populations named separately: eligible origins, entry fills, closes, common fills, common closes | `analysis.py`, `integrity.py` | scheduled-nonfill and ineligible-device-population tests | v9 row accounting passed in all three cells | [x] |
+| Per-origin uncertainty uses origin blocks; per-trade uncertainty uses actual common fill/close blocks | `analysis.py` bootstrap routes | exact block-kernel reference and scheduled-nonfill count tests | 21-day clean/resume/two-scratch canonical hash `7834a5cd…5c71` | [x] |
+| Time derangement and magnitude matching carry outcome estimates per declared stratum | `analysis.py` control tables | zero-fixed-point and named-strata integrity tests | v9 computed control rows: 320 / 640 / 640; none deferred | [x] |
+| Research grid remains unchanged | `contracts.py`, experiment wrappers | `test_real_scheduler_materialises_complete_native_grid` | v9 full row accounting passed for 371 / 839 / 839 origins | [x] |

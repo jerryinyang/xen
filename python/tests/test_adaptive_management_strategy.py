@@ -7,8 +7,11 @@ Every engine runs in its own spawned process (L-31: a second BacktestNode in one
 aborts the Rust runtime).
 """
 
+import gc
 import hashlib
+import tracemalloc
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -16,13 +19,13 @@ import polars as pl
 import pytest
 
 from xen.adaptive_management.engine import (
-    InstrumentSpec, WorkUnit, _make_instrument, run_work_unit_subprocess,
+    InstrumentSpec, WorkUnit, _make_instrument, run_work_unit, run_work_unit_subprocess,
 )
 from xen.adaptive_management.contracts import build_native_lattice
 from xen.adaptive_management.entries import breach_origins
 from xen.adaptive_management.native_parameters import materialise_native_arm
 from xen.adaptive_management.strategy import AdaptiveManagementConfig, AdaptiveManagementStrategy
-from nautilus_trader.model.identifiers import InstrumentId
+from nautilus_trader.model.identifiers import ClientOrderId, InstrumentId
 from nautilus_trader.model.data import Bar, BarType
 from nautilus_trader.persistence.catalog import ParquetDataCatalog
 from xen.nautilus.catalog_fence import FenceManifest, fenced_bar_query
@@ -122,6 +125,427 @@ def _row(**overrides) -> dict:
     }
     base.update(overrides)
     return base
+
+
+def _strategy_without_engine(tmp_path, row):
+    strategy = AdaptiveManagementStrategy(
+        AdaptiveManagementConfig(
+            instrument_id=InstrumentId.from_str("XRPUSDT-LINEAR.BYBIT"),
+            bar_type="XRPUSDT-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL",
+            schedule_path=_schedule(tmp_path, [row]),
+            base_trade_size=Decimal("100"),
+            fence_start_ns=int(START.timestamp() * 1e9),
+            fence_end_ns=int((START + timedelta(hours=8)).timestamp() * 1e9),
+        )
+    )
+    scheduled = strategy._next_schedule_row
+    assert scheduled is not None
+    strategy._execution_rows[(str(scheduled["episode_id"]), str(scheduled["policy_id"]))] = scheduled
+    return strategy, scheduled
+
+
+def test_strategy_initialisation_does_not_retain_one_python_object_per_schedule_row(
+    tmp_path,
+):
+    """A larger frozen schedule may grow columnar storage, not Python heap per row."""
+
+    def peak_python_bytes(root: Path, count: int) -> int:
+        root.mkdir()
+        rows = [
+            _row(
+                arm_id=f"ARM-{index}",
+                origin_id=f"O-{index}",
+                episode_id=f"E-{index}",
+                state="NO_EVENT",
+                entry_order_type="NONE",
+                stop_price=None,
+            )
+            for index in range(count)
+        ]
+        schedule_path = _schedule(root, rows)
+        del rows
+        gc.collect()
+        tracemalloc.start()
+        strategy = AdaptiveManagementStrategy(
+            AdaptiveManagementConfig(
+                instrument_id=InstrumentId.from_str("XRPUSDT-LINEAR.BYBIT"),
+                bar_type="XRPUSDT-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL",
+                schedule_path=schedule_path,
+                base_trade_size=Decimal("100"),
+                fence_start_ns=int(START.timestamp() * 1e9),
+                fence_end_ns=int((START + timedelta(hours=8)).timestamp() * 1e9),
+            )
+        )
+        _, peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        del strategy
+        gc.collect()
+        return peak
+
+    small_peak = peak_python_bytes(tmp_path / "small", 100)
+    large_peak = peak_python_bytes(tmp_path / "large", 20_000)
+    assert large_peak < small_peak + 8_000_000
+
+
+def test_forget_releases_client_order_state_but_keeps_idempotency_guards(tmp_path):
+    strategy, row = _strategy_without_engine(tmp_path, _row())
+    key = ("E1", "FIXED_BASELINE_PLAIN")
+    client_order_id = "O-19700101-000000-001-001-1"
+    strategy._execution_rows[key] = row
+    strategy._orders_by_execution[key].append(client_order_id)
+    strategy._by_client_order[client_order_id] = row
+    strategy._entry_orders.add(client_order_id)
+    strategy._entry_terminal.add(key)
+    strategy._closed.add(key)
+
+    strategy._forget(key)
+
+    assert client_order_id not in strategy._by_client_order
+    assert client_order_id not in strategy._entry_orders
+    assert key in strategy._entry_terminal
+    assert key in strategy._closed
+
+
+def test_protective_exits_wait_until_the_filled_position_is_visible(
+    monkeypatch, tmp_path
+):
+    strategy, row = _strategy_without_engine(
+        tmp_path,
+        _row(
+            experiment_id="SPDR-022",
+            entry_order_type="MARKET",
+            stop_price=None,
+            expiry_bars=None,
+            target_distance_bps=100.0,
+            stop_distance_bps=100.0,
+            trail_distance_bps=100.0,
+            trail_activation_bps=50.0,
+        ),
+    )
+    submitted = []
+    visible = {"position": None}
+
+    def capture_exit(self, row, device, distance, entry_price, exit_side, quantity):
+        submitted.append((device, quantity, self._episode_position[("E1", "FIXED_BASELINE_PLAIN")]))
+
+    monkeypatch.setattr(AdaptiveManagementStrategy, "_submit_exit", capture_exit)
+    monkeypatch.setattr(
+        AdaptiveManagementStrategy,
+        "_confirmed_position",
+        lambda self, key: visible["position"],
+        raising=False,
+    )
+    fill = SimpleNamespace(last_px=Decimal("100"), last_qty=Decimal("40"), ts_event=1)
+    strategy._on_entry_filled(row, fill)
+    assert submitted == []
+
+    key = ("E1", "FIXED_BASELINE_PLAIN")
+    visible["position"] = SimpleNamespace(
+        id=strategy._episode_position[key], is_closed=False, quantity=Decimal("40")
+    )
+    strategy.on_position_opened(
+        SimpleNamespace(position_id=strategy._episode_position[key])
+    )
+    assert [device for device, _, _ in submitted] == ["TARGET", "STOP", "TRAIL"]
+    assert all(position_id == strategy._episode_position[key] for _, _, position_id in submitted)
+
+
+@pytest.mark.parametrize(
+    ("device", "distances", "ohlc"),
+    [
+        (
+            "TARGET",
+            {"target_distance_bps": 200.0},
+            [(100.0, 100.1, 99.9, 100.0), (100.0, 103.0, 99.9, 102.5)],
+        ),
+        (
+            "STOP",
+            {"stop_distance_bps": 200.0},
+            [(100.0, 100.1, 99.9, 100.0), (100.0, 100.1, 97.0, 97.5)],
+        ),
+        (
+            "TRAIL",
+            {"trail_distance_bps": 200.0, "trail_activation_bps": 100.0},
+            [
+                (100.0, 100.1, 99.9, 100.0),
+                (100.0, 102.5, 99.9, 102.0),
+                (102.0, 102.1, 99.0, 99.5),
+            ],
+        ),
+    ],
+)
+def test_protective_orders_use_the_confirmed_entry_position_id(
+    tmp_path, device, distances, ohlc
+):
+    reports = _run_reports(
+        tmp_path,
+        ohlc,
+        [
+            _row(
+                experiment_id="SPDR-022",
+                entry_order_type="MARKET",
+                stop_price=None,
+                expiry_bars=None,
+                **distances,
+            )
+        ],
+    )
+    orders = reports["orders"]
+    entry = orders.filter(pl.col("tags").str.contains("leg=ENTRY")).row(0, named=True)
+    protective = orders.filter(
+        pl.col("tags").str.contains(f"device={device}")
+    ).row(0, named=True)
+    assert protective["position_id"] == entry["position_id"]
+    assert protective["position_id"] is not None
+
+
+@pytest.mark.parametrize(
+    ("experiment_id", "entry_variant", "entry_order_type", "size_hold"),
+    [
+        ("SPDR-021", "BREAKOUT", "STOP", 1),
+        ("SPDR-022", "E_TOUCH", "MARKET", 4),
+        ("SPDR-022", "E_CLOSE", "MARKET", 4),
+        ("SPDR-023", "E_TOUCH", "MARKET", 4),
+        ("SPDR-023", "E_CLOSE", "MARKET", 4),
+    ],
+)
+def test_amended_synthetic_trace_covers_each_experiment_and_entry_variant(
+    tmp_path, experiment_id, entry_variant, entry_order_type, size_hold
+):
+    entry_fields = {
+        "experiment_id": experiment_id,
+        "entry_variant": entry_variant,
+        "entry_order_type": entry_order_type,
+        "stop_price": 100.0 if entry_order_type == "STOP" else None,
+        "expiry_bars": 2 if entry_order_type == "STOP" else None,
+    }
+    rows = [
+        _row(
+            **entry_fields,
+            arm_id="PROTECTIVE",
+            policy_id="PROTECTIVE",
+            device="TARGET+STOP+TRAIL",
+            target_distance_bps=500.0,
+            stop_distance_bps=500.0,
+            trail_distance_bps=500.0,
+            trail_activation_bps=500.0,
+        ),
+        _row(
+            **entry_fields,
+            arm_id="ADAPTIVE-HOLD",
+            policy_id="ADAPTIVE-HOLD",
+            device="HOLD",
+            hold_bars=2,
+        ),
+        _row(
+            **entry_fields,
+            arm_id="ADAPTIVE-SIZE",
+            policy_id="ADAPTIVE-SIZE",
+            device="SIZE",
+            hold_bars=size_hold,
+            risk_size=0.5,
+        ),
+    ]
+    opening = (
+        [(99.5, 99.6, 99.4, 99.5), (99.5, 101.0, 99.0, 100.5)]
+        if entry_order_type == "STOP"
+        else [(100.0, 100.1, 99.9, 100.0)]
+    )
+    flat = 100.5 if entry_order_type == "STOP" else 100.0
+    ohlc = opening + [(flat, flat + 0.1, flat - 0.1, flat)] * (
+        max(size_hold, 2) * 60 + 5
+    )
+    reports = _run_reports(tmp_path, ohlc, rows)
+    ledger = reports["state_ledger"]
+    expected = {
+        "PROTECTIVE": ["ORDER_CREATED", "FILLED", "OPEN_AT_FENCE_END"],
+        "ADAPTIVE-HOLD": ["ORDER_CREATED", "FILLED", "HOLD_DUE", "CLOSED"],
+        "ADAPTIVE-SIZE": ["ORDER_CREATED", "FILLED", "HOLD_DUE", "CLOSED"],
+    }
+    for policy_id, states in expected.items():
+        observed = ledger.filter(pl.col("policy_id") == policy_id)["state"].to_list()
+        assert observed == states
+    protective = reports["orders"].filter(
+        pl.col("tags").str.contains("policy_id=PROTECTIVE")
+        & pl.col("tags").str.contains("leg=(TARGET|STOP|TRAIL)")
+    )
+    assert set(protective["status"]) == {"ACCEPTED"}
+    assert set(
+        protective["tags"].str.extract(r"device=(TARGET|STOP|TRAIL)", 1)
+    ) == {"TARGET", "STOP", "TRAIL"}
+    for policy_id, hold_bars in (
+        ("ADAPTIVE-HOLD", 2),
+        ("ADAPTIVE-SIZE", size_hold),
+    ):
+        states = ledger.filter(pl.col("policy_id") == policy_id)
+        filled_ns = states.filter(pl.col("state") == "FILLED")["ts_ns"][0]
+        due_ns = states.filter(pl.col("state") == "HOLD_DUE")["ts_ns"][0]
+        assert due_ns - filled_ns == hold_bars * 3_600_000_000_000
+
+
+def test_denied_protective_leg_submits_one_failsafe(monkeypatch, tmp_path):
+    strategy, row = _strategy_without_engine(tmp_path, _row(stop_distance_bps=100.0))
+    key = ("E1", "FIXED_BASELINE_PLAIN")
+    strategy._episode_position[key] = SimpleNamespace(value="P1")
+    strategy._busy[("ARM", "BREAKOUT")] = "E1"
+    strategy._by_client_order["PROTECT"] = row
+    strategy._open_exits[key].append(
+        SimpleNamespace(client_order_id="PROTECT", tags=["device=STOP"], is_open=True)
+    )
+    created = []
+    submitted = []
+
+    def market(**kwargs):
+        created.append(kwargs)
+        return SimpleNamespace(client_order_id="FAILSAFE", is_open=True)
+
+    monkeypatch.setattr(
+        AdaptiveManagementStrategy,
+        "order_factory",
+        SimpleNamespace(market=market),
+    )
+    monkeypatch.setattr(
+        AdaptiveManagementStrategy,
+        "_confirmed_position",
+        lambda self, execution: SimpleNamespace(
+            is_closed=False, is_long=True, quantity=Decimal("100")
+        ),
+    )
+    monkeypatch.setattr(
+        AdaptiveManagementStrategy,
+        "submit_order",
+        lambda self, order, position_id=None: submitted.append(
+            (str(order.client_order_id), position_id)
+        ),
+    )
+    event = SimpleNamespace(client_order_id="PROTECT", ts_event=10)
+    strategy.on_order_denied(event)
+    strategy.on_order_denied(event)
+    assert len(created) == 1
+    assert created[0]["reduce_only"] is True
+    assert created[0]["quantity"] == Decimal("100")
+    assert submitted == [("FAILSAFE", strategy._episode_position[key])]
+    assert ("ARM", "BREAKOUT") in strategy._busy
+
+
+def test_exit_failure_keeps_the_typed_client_order_id_for_cache_lookup(
+    monkeypatch, tmp_path
+):
+    strategy, row = _strategy_without_engine(tmp_path, _row(stop_distance_bps=100.0))
+    strategy._by_client_order["PROTECT"] = row
+    seen = []
+    monkeypatch.setattr(
+        AdaptiveManagementStrategy,
+        "_order_for_client",
+        lambda self, client_order_id, key: seen.append(client_order_id)
+        or SimpleNamespace(tags=["device=STOP"]),
+    )
+    monkeypatch.setattr(
+        AdaptiveManagementStrategy,
+        "_submit_failsafe",
+        lambda self, key, ts_event: None,
+    )
+    client_order_id = ClientOrderId("PROTECT")
+    strategy.on_order_rejected(
+        SimpleNamespace(client_order_id=client_order_id, ts_event=10)
+    )
+    assert seen == [client_order_id]
+
+
+def test_successful_failsafe_closes_cancels_and_releases(monkeypatch, tmp_path):
+    strategy, row = _strategy_without_engine(tmp_path, _row(stop_distance_bps=100.0))
+    key = ("E1", "FIXED_BASELINE_PLAIN")
+    slot = ("ARM", "BREAKOUT")
+    strategy._busy[slot] = "E1"
+    strategy._episode_position[key] = SimpleNamespace(value="P1")
+    sibling = SimpleNamespace(client_order_id="STOP", is_open=True)
+    failsafe = SimpleNamespace(
+        client_order_id="FAILSAFE", tags=["device=FAILSAFE"], is_open=False
+    )
+    strategy._open_exits[key].extend([sibling, failsafe])
+    canceled = []
+    monkeypatch.setattr(
+        AdaptiveManagementStrategy,
+        "cancel_order",
+        lambda self, order: canceled.append(str(order.client_order_id)),
+    )
+    strategy._on_exit_filled(
+        row,
+        SimpleNamespace(client_order_id="FAILSAFE", ts_event=20, last_px=Decimal("99")),
+        failsafe,
+    )
+    assert strategy.state_ledger[-1]["state"] == "CLOSED"
+    assert strategy.state_ledger[-1]["exit_reason"] == "FAILSAFE"
+    assert canceled == ["STOP"]
+    assert slot not in strategy._busy
+
+    submitted = []
+    later = {
+        **row,
+        "episode_id": "E2",
+        "origin_id": "O2",
+        "entry_order_type": "MARKET",
+    }
+    strategy.instrument = SimpleNamespace(make_qty=lambda quantity: quantity)
+    monkeypatch.setattr(
+        AdaptiveManagementStrategy,
+        "order_factory",
+        SimpleNamespace(
+            market=lambda **kwargs: SimpleNamespace(client_order_id="ENTRY-2")
+        ),
+    )
+    monkeypatch.setattr(
+        AdaptiveManagementStrategy,
+        "submit_order",
+        lambda self, order, position_id=None: submitted.append(str(order.client_order_id)),
+    )
+    strategy._act_on_origin(later, SimpleNamespace(ts_event=30))
+    assert submitted == ["ENTRY-2"]
+    assert strategy._busy[slot] == "E2"
+
+
+def test_denied_failsafe_aborts_the_work_unit(tmp_path):
+    strategy, row = _strategy_without_engine(tmp_path, _row(stop_distance_bps=100.0))
+    strategy._by_client_order["FAILSAFE"] = row
+    strategy._failsafe_orders = {"FAILSAFE"}
+    with pytest.raises(RuntimeError, match="fail-safe"):
+        strategy.on_order_denied(
+            SimpleNamespace(client_order_id="FAILSAFE", ts_event=30)
+        )
+
+
+def test_partial_entry_fills_keep_one_terminal_row_and_exact_exit_quantity(
+    monkeypatch, tmp_path
+):
+    strategy, row = _strategy_without_engine(
+        tmp_path, _row(target_distance_bps=100.0)
+    )
+    visible = {"position": None}
+    quantities = []
+    monkeypatch.setattr(
+        AdaptiveManagementStrategy,
+        "_confirmed_position",
+        lambda self, key: visible["position"],
+        raising=False,
+    )
+    monkeypatch.setattr(
+        AdaptiveManagementStrategy,
+        "_submit_exit",
+        lambda self, row, device, distance, entry_price, exit_side, quantity: quantities.append(quantity),
+    )
+    strategy._on_entry_filled(
+        row, SimpleNamespace(last_px=Decimal("100"), last_qty=Decimal("40"), ts_event=1)
+    )
+    key = ("E1", "FIXED_BASELINE_PLAIN")
+    visible["position"] = SimpleNamespace(
+        id=strategy._episode_position[key], is_closed=False, quantity=Decimal("40")
+    )
+    strategy.on_position_opened(SimpleNamespace(position_id=strategy._episode_position[key]))
+    strategy._on_entry_filled(
+        row, SimpleNamespace(last_px=Decimal("100"), last_qty=Decimal("60"), ts_event=2)
+    )
+    assert [record["state"] for record in strategy.state_ledger].count("FILLED") == 1
+    assert sum(quantities, Decimal("0")) == Decimal("100")
 
 
 @pytest.mark.parametrize("device", ["TARGET"])
@@ -279,6 +703,92 @@ def test_two_runs_of_one_work_unit_are_byte_identical(tmp_path):
     assert not set(EPHEMERAL_ID_COLUMNS) & set(orders.columns)
 
 
+def test_high_turnover_emission_matches_the_pinned_accounting_reference(tmp_path):
+    """Skipping shared-account arithmetic must not change any emitted engine report."""
+    rows = [
+        _row(
+            experiment_id="SPDR-022",
+            entry_variant="E_TOUCH",
+            entry_order_type="MARKET",
+            stop_price=None,
+            expiry_bars=None,
+            arm_id=f"ARM-{index}",
+            policy_id=f"POLICY-{index}",
+            episode_id=f"E-{index}",
+            origin_id=f"O-{index}",
+            hold_bars=1,
+        )
+        for index in range(100)
+    ]
+    reports = _run_reports(
+        tmp_path,
+        [(100.0, 100.1, 99.9, 100.0)] * 63,
+        rows,
+    )
+    assert {name: frame.height for name, frame in reports.items()} == {
+        "fills": 200,
+        "orders": 200,
+        "positions": 100,
+        "state_ledger": 400,
+    }
+    output = tmp_path / "report-out"
+    assert {
+        path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(output.glob("*.parquet"))
+    } == {
+        "fills.parquet": "91b8cc1b084334f9a4f14f36511a11033c07db72f2a50c98a359ce6eab9341d1",
+        "orders.parquet": "bb65debc498d44eaf98e653694e89efb08295e159f48a396a1a341c98f4ba85e",
+        "positions.parquet": "80cb17863a12f587d0e81b52b1ef460b87c0790b0381393012b48b164f55a0d8",
+        "state_ledger.parquet": "9accc3604e61c781b19cf7acdb5bd2d80f36fafe64aa23faedbdcca56fdd0237",
+    }
+
+
+def test_engine_freezes_the_shared_account_for_independent_research_arms(
+    monkeypatch,
+    tmp_path,
+):
+    """Shared-account PnL is not an emitted estimand and must not be recalculated per fill."""
+    captured = {}
+    captured_config = {}
+
+    class VenueConfigured(Exception):
+        pass
+
+    class ProbeEngine:
+        def __init__(self, *, config):
+            captured_config["value"] = config
+
+        def add_venue(self, **kwargs):
+            captured.update(kwargs)
+            raise VenueConfigured
+
+    monkeypatch.setattr(
+        "nautilus_trader.backtest.engine.BacktestEngine",
+        ProbeEngine,
+    )
+    unit = WorkUnit(
+        unit_id="FROZEN-ACCOUNT-PROBE",
+        instrument=SPEC,
+        bars_path=_bars_parquet(tmp_path, [(100.0, 100.1, 99.9, 100.0)]),
+        schedule_path=_schedule(
+            tmp_path,
+            [
+                _row(
+                    state="NO_EVENT",
+                    entry_order_type="NONE",
+                    stop_price=None,
+                )
+            ],
+        ),
+        output_dir=str(tmp_path / "unused-output"),
+        base_trade_size="100",
+    )
+    with pytest.raises(VenueConfigured):
+        run_work_unit(unit)
+    assert captured.get("frozen_account") is True
+    assert captured_config["value"].run_analysis is False
+
+
 def test_portfolio_statistics_stay_disabled_during_a_run(tmp_path):
     # The analyzer's per-trade pandas concat is quadratic and nothing we emit reads it. If a
     # future Nautilus version accumulates anyway, the run must fail rather than crawl.
@@ -337,6 +847,37 @@ def test_actionable_time_without_a_traded_minute_acts_on_the_next_bar(tmp_path):
     assert ledger.height >= 1
     assert set(ledger["episode_id"]) == {"E1"}
     assert "FILLED" in set(ledger["state"])
+
+
+def test_schedule_after_the_last_traded_minute_is_censored_inside_declared_fence(
+    tmp_path,
+):
+    bars_path = _bars_parquet(tmp_path, [(99.5, 99.6, 99.4, 99.5)])
+    schedule_path = _schedule(
+        tmp_path,
+        [
+            _row(
+                actionable_ts=START + timedelta(minutes=10),
+                state="NO_EVENT",
+                entry_order_type="NONE",
+                stop_price=None,
+            )
+        ],
+    )
+    reports = run_work_unit_subprocess(
+        WorkUnit(
+            unit_id="FENCE-CENSOR",
+            instrument=SPEC,
+            bars_path=bars_path,
+            schedule_path=schedule_path,
+            output_dir=str(tmp_path / "fence-censor-out"),
+            base_trade_size="100",
+            fence_start_ns=int(START.timestamp() * 1e9),
+            fence_end_ns=int((START + timedelta(hours=1)).timestamp() * 1e9),
+        ),
+        timeout=300,
+    )
+    assert reports["state_ledger"]["state"].to_list() == ["CENSORED"]
 
 
 def test_thin_bar_volume_does_not_slice_one_entry_into_several_episodes(tmp_path):
@@ -458,6 +999,31 @@ def test_touch_and_close_variants_do_not_block_each_other(tmp_path):
     assert ledger.filter(pl.col("state") == "FILLED").height == 2
     assert "BLOCKED_ACTIVE" not in set(ledger["state"])
     assert len(positions) == 2
+
+
+def test_engine_rate_limit_keeps_all_declared_parallel_arms(tmp_path):
+    rows = [
+        _row(
+            experiment_id="SPDR-022",
+            entry_variant="E_TOUCH",
+            entry_order_type="MARKET",
+            stop_price=None,
+            expiry_bars=None,
+            arm_id=f"ARM-{index}",
+            policy_id=f"POLICY-{index}",
+            episode_id=f"E-{index}",
+            origin_id=f"O-{index}",
+        )
+        for index in range(150)
+    ]
+    reports = _run_reports(
+        tmp_path,
+        [(100.0, 100.1, 99.9, 100.0)] * 2,
+        rows,
+    )
+    ledger = reports["state_ledger"]
+    assert ledger.filter(pl.col("state") == "FILLED").height == 150
+    assert not set(ledger["state"]) & {"DENIED", "REJECTED"}
 
 
 def test_two_policies_on_one_episode_keep_two_terminal_rows_and_positions(tmp_path):

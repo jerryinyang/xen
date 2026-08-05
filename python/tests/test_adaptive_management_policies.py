@@ -27,6 +27,7 @@ from xen.adaptive_management.policies import (
     state_hold_bars,
     state_size,
 )
+from xen.adaptive_management.runner import _device_combination_schedule
 from tests.test_adaptive_management_entries import _breach_fixture, golden_long_frame
 from xen.adaptive_management.entries import breach_origins
 
@@ -237,6 +238,87 @@ def test_range_size_does_not_import_shock_or_tail_restraint():
         episodes, features, _calibration_medians(), spec, experiment_id="SPDR-021"
     ).row(0, named=True)
     assert row["risk_size"] == pytest.approx(40.0 / 60.0)
+
+
+@pytest.mark.parametrize(
+    ("experiment_id", "expected_hold"),
+    [("SPDR-021", 1), ("SPDR-022", 4), ("SPDR-023", 4)],
+)
+def test_size_inherits_the_strategy_fixed_horizon(experiment_id, expected_hold):
+    features = _features()
+    episodes = breakout_origins(features).with_columns(
+        pl.col("origin_id").alias("episode_id")
+    )
+    spec = next(
+        arm
+        for arm in build_management_lattice(experiment_id)
+        if arm.device == Device.SIZE and arm.component == Component.RANGE_SCALE
+        and arm.combination_id is None
+    )
+    row = materialise_policy(
+        episodes, features, _calibration_medians(), spec,
+        experiment_id=experiment_id,
+    ).row(0, named=True)
+    assert row["hold_bars"] == expected_hold
+
+
+def test_only_time_based_devices_materialise_a_horizon():
+    features = _features()
+    episodes = breakout_origins(features).with_columns(
+        pl.col("origin_id").alias("episode_id")
+    )
+    arms = build_management_lattice("SPDR-021")
+    adaptive_hold = next(
+        arm for arm in arms
+        if arm.device == Device.HOLD and arm.component == Component.LEVEL_NOW
+        and arm.combination_id is None
+    )
+    hold_row = materialise_policy(
+        episodes, features, _calibration_medians(), adaptive_hold,
+        experiment_id="SPDR-021",
+    ).row(0, named=True)
+    assert hold_row["hold_bars"] == 12
+
+    for device in (Device.TARGET, Device.STOP, Device.TRAIL):
+        spec = next(
+            arm for arm in arms
+            if arm.device == device and arm.component is None
+        )
+        row = materialise_policy(
+            episodes, features, _calibration_medians(), spec,
+            experiment_id="SPDR-021",
+        ).row(0, named=True)
+        assert row.get("hold_bars") is None
+
+
+@pytest.mark.parametrize(
+    ("combination_id", "expected_hold"),
+    [
+        ("DC_TARGET_STOP", None),
+        ("DC_TRAIL_HOLD", 4),
+        ("DC_TARGET_STOP_HOLD", 4),
+    ],
+)
+def test_device_combinations_use_only_their_declared_hold(
+    combination_id, expected_hold
+):
+    features = _features()
+    episodes = breakout_origins(features).with_columns(
+        pl.col("origin_id").alias("episode_id")
+    )
+    group = []
+    for spec in build_management_lattice("SPDR-021"):
+        if spec.combination_id != combination_id:
+            continue
+        frame = materialise_policy(
+            episodes, features, _calibration_medians(), spec,
+            experiment_id="SPDR-021",
+        )
+        group.append((spec, frame))
+    row = _device_combination_schedule(
+        combination_id, group, "BREAKOUT", "SPDR-021"
+    ).row(0, named=True)
+    assert row["hold_bars"] == expected_hold
 
 
 def test_component_combination_executes_primary_then_adjustment_and_keeps_roles():

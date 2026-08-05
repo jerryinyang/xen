@@ -151,6 +151,8 @@ def _valid_run(root: Path, experiment_id: str = "SPDR-021") -> Path:
                 "native_arm_id": None,
                 "policy_id": policy_id,
                 "comparator_id": policy.comparator_id,
+                "device": str(policy.device),
+                "hold_bars": policy.fixed_hold_bars,
             }
             for policy_id, policy in logical_policies.items()
             for variant in variants
@@ -191,6 +193,7 @@ def _valid_run(root: Path, experiment_id: str = "SPDR-021") -> Path:
                 "arm_id": "FIXED_TARGET_M1.00",
                 "position_id": "P1",
                 "state": "ORDER_CREATED",
+                "device": "TARGET",
                 "ts_ns": 1,
                 "price": None,
                 "side": 1,
@@ -202,6 +205,7 @@ def _valid_run(root: Path, experiment_id: str = "SPDR-021") -> Path:
                 "arm_id": "FIXED_TARGET_M1.00",
                 "position_id": "P1",
                 "state": "FILLED",
+                "device": "TARGET",
                 "ts_ns": 2,
                 "price": 100.0,
                 "side": 1,
@@ -213,6 +217,7 @@ def _valid_run(root: Path, experiment_id: str = "SPDR-021") -> Path:
                 "arm_id": "FIXED_TARGET_M1.00",
                 "position_id": "P1",
                 "state": "CLOSED",
+                "device": "TARGET",
                 "ts_ns": 3,
                 "price": 102.0,
                 "side": 1,
@@ -270,6 +275,7 @@ def test_valid_run_passes_and_writes_complete_integrity_package(tmp_path):
         "unique_result_keys",
         "future_shift_changed_mapping",
         "deterministic_replay",
+        "management_lifecycle",
     }
     assert set(INTEGRITY_ARTIFACTS).issubset(
         {path.name for path in run.iterdir()}
@@ -386,6 +392,95 @@ def test_each_hard_integrity_failure_is_named(tmp_path, target, mutation):
     result = run_integrity_checks(run)
     assert result["hard_checks"][target] is False
     assert result["blocking_pass"] is False
+
+
+def test_filled_size_without_its_scheduled_close_is_blocking(tmp_path):
+    run = _valid_run(tmp_path)
+    policy_path = run / "policy_schedule.parquet"
+    pl.read_parquet(policy_path).with_columns(
+        pl.when(pl.col("arm_id") == "FIXED_TARGET_M1.00")
+        .then(pl.lit("SIZE"))
+        .otherwise(pl.col("device"))
+        .alias("device"),
+        pl.when(pl.col("arm_id") == "FIXED_TARGET_M1.00")
+        .then(pl.lit(1, dtype=pl.Int64))
+        .otherwise(pl.col("hold_bars"))
+        .alias("hold_bars"),
+    ).write_parquet(policy_path)
+    ledger_path = run / "episode_results.parquet"
+    ledger = pl.read_parquet(ledger_path).filter(pl.col("state") != "CLOSED")
+    open_row = ledger.filter(pl.col("state") == "FILLED").with_columns(
+        pl.lit("OPEN_AT_FENCE_END").alias("state"),
+        pl.lit(3_600_000_000_002, dtype=pl.Int64).alias("ts_ns"),
+    )
+    pl.concat([ledger, open_row]).write_parquet(ledger_path)
+    result = run_integrity_checks(run)
+    assert result["hard_checks"]["management_lifecycle"] is False
+    assert result["blocking_pass"] is False
+
+
+def test_time_exit_after_the_train_fence_is_explicitly_censored(tmp_path):
+    run = _valid_run(tmp_path)
+    start = datetime(2023, 1, 1, tzinfo=timezone.utc)
+    train_end_ns = int((start + timedelta(days=1)).timestamp() * 1e9)
+    policy_path = run / "policy_schedule.parquet"
+    pl.read_parquet(policy_path).with_columns(
+        pl.when(pl.col("arm_id") == "FIXED_TARGET_M1.00")
+        .then(pl.lit("SIZE"))
+        .otherwise(pl.col("device"))
+        .alias("device"),
+        pl.when(pl.col("arm_id") == "FIXED_TARGET_M1.00")
+        .then(pl.lit(1, dtype=pl.Int64))
+        .otherwise(pl.col("hold_bars"))
+        .alias("hold_bars"),
+    ).write_parquet(policy_path)
+    ledger_path = run / "episode_results.parquet"
+    ledger = pl.read_parquet(ledger_path).filter(pl.col("state") != "CLOSED")
+    filled_ns = train_end_ns - 30 * 60 * 1_000_000_000
+    ledger = ledger.with_columns(
+        pl.when(pl.col("state") == "FILLED")
+        .then(pl.lit(filled_ns, dtype=pl.Int64))
+        .otherwise(pl.col("ts_ns"))
+        .alias("ts_ns")
+    )
+    censored = ledger.filter(pl.col("state") == "FILLED").with_columns(
+        pl.lit("OPEN_AT_FENCE_END").alias("state"),
+        pl.lit(filled_ns + 3_600_000_000_000, dtype=pl.Int64).alias("ts_ns"),
+    )
+    pl.concat([ledger, censored]).write_parquet(ledger_path)
+    result = run_integrity_checks(run)
+    assert result["hard_checks"]["management_lifecycle"] is True
+
+
+def test_price_only_open_episode_requires_an_explicit_fence_label(tmp_path):
+    run = _valid_run(tmp_path)
+    ledger_path = run / "episode_results.parquet"
+    ledger = pl.read_parquet(ledger_path).filter(pl.col("state") != "CLOSED")
+    ledger.write_parquet(ledger_path)
+    result = run_integrity_checks(run)
+    assert result["hard_checks"]["management_lifecycle"] is False
+
+    censored = ledger.filter(pl.col("state") == "FILLED").with_columns(
+        pl.lit("OPEN_AT_FENCE_END").alias("state"),
+        pl.lit(4, dtype=pl.Int64).alias("ts_ns"),
+    )
+    pl.concat([ledger, censored]).write_parquet(ledger_path)
+    result = run_integrity_checks(run)
+    assert result["hard_checks"]["management_lifecycle"] is True
+
+
+def test_exit_failure_requires_a_confirmed_failsafe_close(tmp_path):
+    run = _valid_run(tmp_path)
+    ledger_path = run / "episode_results.parquet"
+    ledger = pl.read_parquet(ledger_path)
+    failed = ledger.filter(pl.col("state") == "CLOSED").with_columns(
+        pl.lit("EXIT_DENIED").alias("state"),
+        pl.lit(4, dtype=pl.Int64).alias("ts_ns"),
+        pl.lit("STOP").alias("exit_reason"),
+    )
+    pl.concat([ledger, failed]).write_parquet(ledger_path)
+    result = run_integrity_checks(run)
+    assert result["hard_checks"]["management_lifecycle"] is False
 
 
 def test_breach_fixed_entry_parity_drift_is_blocking(tmp_path):

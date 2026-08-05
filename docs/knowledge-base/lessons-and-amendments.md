@@ -1395,3 +1395,87 @@ estimate.
 
 **Enforced at.** `python/experiments/SPDR-018B/analysis.md` §2.3;
 `python/experiments/SPDR-018B/report.md` §6; `python/experiments/SPDR-018B/results/deflators.json`.
+
+---
+
+## L-54 — Profile Python retention and Nautilus defaults as one critical path; compiled work can still be irrelevant work (SPDR-021/022/023 amended rerun)
+
+**What.** A corrected SPDR-022 crypto unit projected nearly ten hours at one worker. The main
+causes were neither the research grid nor an inherently slow Python interpreter:
+
+- 3,625,870 future schedule rows were expanded into retained Python dictionaries before replay
+  (9.327 s, 8.410 GB RSS);
+- Nautilus's compiled portfolio/accounting path recalculated one shared margin account after every
+  fill even though the experiment measures independent arms and emits no shared-account estimand;
+- completed entry IDs and terminal episode keys remained in Python sets for the full run;
+- publication/resume hashing allocated each entire Parquet file as one Python `bytes` object.
+
+Columnar ordered consumption reduced schedule initialisation to 0.509 s and 3.474 GB. Freezing the
+irrelevant shared account reduced a 2,000-arm replay from 27.016 s to 5.945 s with all four Parquet
+hashes equal. A full BTCUSDT replay finished in 428.245 s at 5.749 GB RSS and reproduced the prior
+orders, fills, positions and state ledger byte-for-byte (827,105 / 796,647 / 398,388 / 4,767,815
+rows). Terminal guards are now released, unused Nautilus post-run analysis is disabled, and hashes
+stream through `hashlib.file_digest`.
+
+**Mechanism.** “Python is slow” and “the engine is compiled” are both too coarse to guide work.
+Performance is the combined live path: columnar inputs → Python objects → Nautilus subsystems →
+Pandas/Polars reports → artifact hashing. An operation can be fast in isolation or implemented in
+Cython/Rust and still dominate because the experiment never consumes its result. Conversely, a
+single eager Python conversion can make safe parallelism impossible even when CPU is idle.
+
+**Fix / new rule.** Before every large Nautilus run:
+
+1. time and measure RSS for preparation, child replay, report extraction and publication separately;
+2. audit `to_dicts`, retained `iter_rows(named=True)`, large `to_list`, `read_bytes`, repeated joins,
+   prefix recomputation, and lifecycle sets/maps without release;
+3. inventory Nautilus defaults (`frozen_account`, `run_analysis`, risk, message queues, cache/report
+   behavior) and disable only work proven outside the estimand;
+4. size workers from parent + child + publication live sets, not child RSS alone;
+5. require test-first edge fixtures, exact artifact/key/value parity, one representative full-unit
+   replay, wall/RSS before-after, and clean/resume/parallel hashes;
+6. port to Rust only after profiling isolates a stable pure-Python kernel and vectorised/columnar
+   routes are exhausted; use a pinned bit-parity corpus as in INFR-007.
+
+Never trade away fences, dates, symbols, origins, arms, event order, draws, precision, rows or
+schemas for speed. The deferred cache-purge/report-streaming rewrite remains a separate governed
+change, not an excuse to bypass this proof.
+
+**Enforced at.** `python/src/xen/adaptive_management/{strategy,engine,runner}.py`;
+`python/tests/test_adaptive_management_{strategy,runner}.py`;
+`docs/superpowers/plans/2026-08-03-spdr-critical-path-performance-review.md`;
+`docs/knowledge-base/pitfalls-ledger.md` **P-26**.
+
+---
+
+## L-55 — Repeated deterministic analysis is a shared-work problem before it is a faster-language problem (SPDR-023 amended rerun)
+
+**What.** SPDR-023 crypto analysis was stopped after its live stack landed in the native-origin
+bootstrap. For every arm, the analyser recomputed `ALL` and each state separately even though all
+calls used the same origin population, block partition, seed and ordered random draws. It also
+filtered an 88.3-million-row symbol-major episode ledger by exact membership without exposing
+simple bounds to the Parquet reader; 695 of 719 row groups contained only one symbol.
+
+The correction builds the partition and draw positions once per arm, then applies each column's
+unchanged NumPy mean to those positions. Nullable columns retain the independent reference path.
+Ledger scans now add inclusive min/max bounds while retaining the exact membership predicate.
+The bootstrap probe improved 0.543 → 0.202 seconds (2.69×); a warm PYTHUSDT scan improved
+0.0108 → 0.00330 seconds (3.27×), with 237,974 rows on both paths. Full SPDR-023 cTrader analysis
+improved 1,056.134 → 539.170 seconds and reproduced all 13 canonical SHA-256 hashes exactly.
+
+**Mechanism.** Determinism often creates reusable work: reset seeds and identical populations mean
+separate-looking estimates may traverse the same sample positions. Likewise, exact key filters can
+remain exact while carrying redundant bounds that let a columnar reader skip impossible row
+groups. Porting the inner loop to Rust would preserve the duplicated work and add a parity surface;
+removing the duplication attacks the measured cause with less code.
+
+**Fix / new rule.** On long deterministic analyses, inspect repeated groups for identical
+population, partition, seed and draw order. Share only the proven-identical positions, preserve each
+metric's original arithmetic, and retain a reference fallback outside that domain. For sorted or
+symbol-major Parquet, add pruning predicates only as conjunctions with the authoritative exact key.
+Acceptance requires test-first edge cases, exact estimates/intervals, a representative full replay,
+all artifact hashes equal, and an explicit memory measurement.
+
+**Enforced at.** `python/src/xen/adaptive_management/analysis.py`;
+`python/tests/test_adaptive_management_analysis.py`;
+`docs/superpowers/plans/2026-08-03-spdr-critical-path-performance-review.md`;
+`docs/knowledge-base/pitfalls-ledger.md` **P-27**.

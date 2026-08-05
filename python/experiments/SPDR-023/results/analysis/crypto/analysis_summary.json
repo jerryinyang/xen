@@ -16,9 +16,22 @@
   ],
   "band": "TRAIN",
   "block_bars": 24,
+  "count_definitions": {
+    "close_n": "actual confirmed closes",
+    "common_close_n": "origins closed on both comparison sides",
+    "common_fill_n": "origins filled on both comparison sides",
+    "effective_n": "legacy alias of effective_origin_blocks for origin estimates and effective_trade_blocks for trade estimates",
+    "effective_origin_blocks": "resampled origin/date blocks",
+    "effective_trade_blocks": "resampled paired-trade/date blocks",
+    "eligible_origin_n": "eligible scheduled origins",
+    "eligible_origins": "legacy alias of eligible_origin_n",
+    "entry_fill_n": "actual filled entries",
+    "fill_count": "legacy alias of entry_fill_n",
+    "paired_n": "legacy alias of common_close_n"
+  },
   "experiment_id": "SPDR-023",
   "interpretation": "DESCRIPTIVE_ONLY",
   "native_rows": 17176,
-  "paired_rows": 14322,
+  "paired_rows": 2780,
   "universe": "crypto"
 }

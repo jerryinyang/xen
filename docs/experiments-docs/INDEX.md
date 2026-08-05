@@ -7,8 +7,9 @@ SoT signed. `SPDR-018` + `SPDR-018B` COMPLETE AND CLOSED 2026-07-26 (`HYP-D5` SU
 PARTIALLY SUPPORTED; no gating verdict from either). **The evidence inventory and three-experiment
 replacement design were approved 2026-07-30.** `SPDR-021` breakout, `SPDR-022` MOMO and
 `SPDR-023` MR are independent Nautilus characterisations. Their approved native arms adapt
-breakout threshold/expiry and breach `z/H` in both directions before bounded native combinations;
-implementation and execution are not yet authorised.
+breakout threshold/expiry and breach `z/H` in both directions before bounded native combinations.
+**Status 2026-08-04: AMENDED RERUN COMPLETE; ANALYSIS COMPLETE; AWAITING OPERATOR INTERPRETATION** — six TRAIN cells rerun under the 2026-08-03 amendment (run stamp
+`20260803T140238Z`), all integrity-clean and reproducible, three screens and three analyses written.
 **Spread is never charged programme-wide (2026-07-23)** — a standing
 exclusion with a travelling caveat, not an open item: reported net is overstated and every money,
 expectancy and tradability claim stays refused by AMENDMENT-C2. TRAIN only; holdouts sealed.**
@@ -95,8 +96,8 @@ EXP-099 not authorised. Family retrospective still pending (independent of Ch.06
   **OPEN** 2026-07-25; SoT signed. **SPDR-018 and SPDR-018B both COMPLETE AND CLOSED 2026-07-26**
   (`HYP-D5` SUPPORTED / PARTIALLY SUPPORTED; **no gating verdict from either**). The evidence
   inventory and [replacement design](checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/adaptive-management-design.md)
-  are **approved**; implementation and execution remain unauthorised. Spread **never charged** for
-  any money read.
+  are **approved**. SPDR-021/022/023 execution and analysis are **AMENDED RERUN COMPLETE; ANALYSIS COMPLETE; AWAITING OPERATOR INTERPRETATION** (2026-08-04).
+  Spread **never charged** for any money read.
 - [Checkpoint 018 corrections log](checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/corrections-log.md)
   — 2026-07-26; independent adversarial audit of the 018/018B documentation. **RELIABLE WITH
   CORRECTIONS**; both verdicts survive. Two critical fixes: the C2 ruling's third leg was false and

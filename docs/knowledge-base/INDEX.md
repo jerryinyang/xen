@@ -94,8 +94,11 @@ infrastructure correctness must precede family registration and outcome contact.
   **L-50** absolute-bps thresholds are not portable across volatility scales (state them in σ units);
   **L-51** a precision gate is a dispersion gate and is not sign-neutral on skewed P&L;
   **L-52** a check depending on transient state silently does not run — assert the check *count*;
-  **L-53** a deflator derived from a selected subset is circular — report its range.
-  Corresponding dead ends: **P-21…P-25**.
+  **L-53** a deflator derived from a selected subset is circular — report its range;
+  **L-54** profile Python retention and Nautilus defaults as one critical path, with exact parity
+  before optimisation; **L-55** share proven-identical deterministic analysis work and expose safe
+  columnar pruning bounds before considering a faster-language port. Corresponding dead ends:
+  **P-21…P-27**.
 
 ## Project memory
 

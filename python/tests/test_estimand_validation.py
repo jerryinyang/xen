@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from xen.estimand_validation import check_no_local_accounting, validate_run
+from xen.estimand_validation import check_no_local_accounting, validate_family, validate_run
 
 _US2000 = (Path(__file__).resolve().parents[2] / "data" / "strategy_runs" /
            "EXP-014c-4h-s8-e3-extend-z15" /
@@ -30,6 +30,35 @@ def test_clean_experiment_code_passes(tmp_path: Path) -> None:
     code.mkdir()
     (code / "run.py").write_text("from xen.adjudication import reconcile\n")
     assert check_no_local_accounting(code)["ok"]
+
+
+def test_family_expectation_is_checked_across_single_instrument_cells(
+    monkeypatch, tmp_path: Path
+) -> None:
+    from xen import estimand_validation
+
+    for symbol in ("EURUSD", "XAUUSD"):
+        cell = tmp_path / symbol
+        cell.mkdir()
+        (cell / "bar_marks.parquet").touch()
+
+    def fake_validate_run(path, *, cost_bps, expected_instruments):
+        assert expected_instruments is None
+        symbol = Path(path).name
+        return {
+            "blocking_pass": True,
+            "instrument": symbol,
+            "manifest": {"emitted": [symbol]},
+        }
+
+    monkeypatch.setattr(estimand_validation, "validate_run", fake_validate_run)
+
+    report = validate_family(
+        tmp_path, expected_instruments=["EURUSD", "XAUUSD"]
+    )
+
+    assert report["blocking_pass"]
+    assert report["manifest"]["missing"] == []
 
 
 @pytest.mark.skipif(not _US2000.exists(), reason="US2000 emission not present")

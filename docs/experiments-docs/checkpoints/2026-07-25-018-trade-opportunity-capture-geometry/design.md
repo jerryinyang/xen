@@ -1,7 +1,10 @@
 # Checkpoint 018 — Trade Opportunity Modelling / Capture Geometry
 
 - **Opened:** 2026-07-25
-- **Status:** `OPEN — SPDR-018 + SPDR-018B CLOSED; EVIDENCE INVENTORY AND THREE-EXPERIMENT STEP-3 DESIGN APPROVED 2026-07-30; IMPLEMENTATION NOT YET AUTHORISED`
+- **Status:** `OPEN — SPDR-018 + SPDR-018B CLOSED; STEP-3 (SPDR-021/022/023) COMPLETE AND INTERPRETED 2026-08-05; SPDR-024 REGISTERED BY OPERATOR AMENDMENT 2026-08-05 (item 7b), DESIGN NOT YET WRITTEN`
+- **Amendment 2026-08-05 (operator-signed):** adds **item 7b / Step 3b — `SPDR-024`**, and
+  **narrows** the §7 refusal on sizing-and-expectancy (see §7). Basis: the Step-3 confirmation
+  extraction, `confirmation-extraction-021-023.md`; specification: `next-experiment-shape.md`.
 - **Reflection:** `reflection-mid.md` — the confirmed evidence through SPDR-018B, each observation
   with its evidence class and the adaptive-management decision it may inform. It selects **no** next
   experiment and **no** universal outcome measure.
@@ -214,6 +217,32 @@ origin-/device-native; all strata are visible; power is informative; no per-expe
 issued. NautilusTrader is required for native order and competing-exit semantics. The family-level
 interpretation occurs only after all three analyses.
 
+### Step 3b — `SPDR-024` — baseline characterisation on competent estimands
+
+**ADDED 2026-08-05 by operator amendment.** Registered; design not yet written.
+
+Step 3 answered the questions its emission could put and returned four powered refutations
+(vol-gated hold length, stop distance, trail width, recovery-after-stop) plus one surviving
+direction-certain, magnitude-unresolved lever (state-gated sizing on drawdown depth). It also
+established that **three questions were unaskable on that emission**, each for a structural reason:
+
+| Unaskable question | Structural reason |
+|---|---|
+| Does the admission filter select *better* trades? | Rejected origins carry `outcome_bps = 0.0`, not a counterfactual |
+| Is any effect regime-conditional? | Arms are *gated by* volatility state; outcomes are never *labelled* with it |
+| Does sizing change expectancy? | A per-trade **bps** estimand is per-unit-notional and cannot register a size change — paired SIZE delta is exactly `0.000000` on 1,400/1,400 rows in all six cells |
+
+`SPDR-024` exists to make those three askable and to characterise the SPDR-021 breakout baseline in
+its own right — including its **H4** behaviour, never previously run. Binding specification, with
+the full decision record (D1–D11, E1–E6, M1–M7, H1–H3):
+`next-experiment-shape.md` in this checkpoint directory (revised 2026-08-05).
+
+Governing constraints, unchanged: TRAIN only; gross, no cost of any kind charged; NautilusTrader
+full strategy with realistic fills, no vectorisation; H1 and H4 signal domains run **independently**,
+never pooled; both universes reported separately; SPDR characterisation contract applies (breadth
+permitted, every stratum names its comparator and carries its own estimate and uncertainty); no
+family action, no verdict, no TEST or holdout contact.
+
 ### Step 4 — XENA (conditional)
 
 `XENA-VOLDIR-001` only if Step 3 graduates a cost-surviving base under separate authority.
@@ -233,7 +262,8 @@ Unchanged from checkpoint-017; still **RESERVED**.
 | 5 | ~~Spread pin~~ (infra) | Spread cost | operator | **RETIRED AS AN ITEM 2026-07-23** — spread is never charged programme-wide (`evaluation-framework.md` §Chapter-04): no quote data on the T1 lane, fixed proxies refused in code. Nothing is scheduled or awaited. The consequence is permanent, not pending: reported net is overstated, the caveat travels on every record, and AMENDMENT-C2 refuses every money, expectancy, tradability and graduation claim |
 | 6 | Step-3 design (adaptive opportunity management) | Incremental effect of volatility-adaptive vs fixed native parameters and external management, per component | operator approval of item 4 | **APPROVED 2026-07-30; NATIVE-ARM AMENDMENT APPROVED.** `adaptive-management-design.md`; `SPDR-021/022/023` |
 | 7 | Step-3 implementation + run + analysis | Three independent Nautilus SPDR characterisations | approved implementation plan + execution authority | **NOT YET AUTHORISED** |
-| 8 | Operator gate D | Graduate base / terminal diagnosis | Step 3 | unauthorised |
+| 7b | `SPDR-024` design + run + analysis *(added 2026-08-05 by operator amendment)* | Characterise the SPDR-021 breakout baseline on its own, then the volatility components against it, on a **competent** set of estimands. Successor to Step 3; **not** a repeat of it | operator amendment (this row) + approved design + execution authority | **REGISTERED 2026-08-05; design not yet written** |
+| 8 | Operator gate D | Graduate base / terminal diagnosis | Step 3 **+ 7b** | unauthorised |
 | 9 | `XENA-VOLDIR-001` | Portfolio/search on graduated bases | D graduates + separate design/QA/approval | **RESERVED** |
 
 No historical TEST. No holdout. No automatic family verdict.
@@ -266,7 +296,19 @@ New for this checkpoint:
   SoT §0 scope constraint stands. SPDR-013's ambient-harvest line is **parked, not pursued**.
   *Exception (operator, 2026-07-25):* SPDR-014's `DA-STRADDLE` is powered in `SPDR-018` as
   **characterisation only** — a measured payoff cell, never a strategy branch.
-- **Sizing reported as improving expectancy** — sizing changes variance, not mean.
+- ~~**Sizing reported as improving expectancy** — sizing changes variance, not mean.~~
+  **NARROWED 2026-08-05 (operator amendment, same signature as item 7b).** The blanket refusal
+  pre-committed a conclusion, which is not this programme's method. Replaced by two rules:
+  1. **A per-trade bps estimand may never be cited to support OR refute a sizing-expectancy claim.**
+     It is blind by construction — bps is per unit of notional, so scaling the position leaves it
+     unchanged. Measured: paired SIZE outcome delta is exactly `0.000000` on **1,400 of 1,400 rows
+     across all six Step-3 cells**, and `device_size.parquet` emits no outcome metric at all. Those
+     zeros are an instrument limitation, not a finding, and reading them as one is a measurement
+     error in either direction.
+  2. **The question may be measured, and must be, on a size-weighted / capital-normalised estimand**
+     (`SPDR-024` requirement E6). Whatever that returns — effect or powered null — is reported as
+     measured, under unbiased critical analysis. What stays refused is *asserting* the conclusion
+     from an estimand that cannot see it.
 - **Narrowing the `SPDR-018` residue inventory.** Every 017 UNPOWERED / INCONCLUSIVE item is in
   scope in its original statement; the only authorised drop is `SPDR-017`.
 

@@ -2,7 +2,7 @@
 
 - **Family / registration:** `CF-VOLDIR-001/HYP-D9`
 - **Checkpoint:** `2026-07-25-018-trade-opportunity-capture-geometry`
-- **Status:** `DESIGN APPROVED 2026-07-30 — IMPLEMENTATION AND EXECUTION NOT YET AUTHORISED`
+- **Status:** `FIRST PASS INVALIDATED — AMENDED RERUN AUTHORISED 2026-08-03; ANALYSIS PENDING`
 - **Vehicle:** NautilusTrader; SPDR TRAIN-only characterisation
 - **Programme contract:** checkpoint
   `adaptive-management-design.md` is binding in full
@@ -53,6 +53,12 @@ The programme contract adds separate direct and reverse z arms, direct and rever
 four z+H orientation pairs for every volatility component. `E-TOUCH` and `E-CLOSE` remain separate.
 The baseline enters with the breach side, uses unit size, has no target, stop or trail, and exits
 after four H1 bars.
+
+The 2026-08-03 common amendment in `adaptive-management-design.md` is binding: actual fills use
+engine `_entry_ns`; common fills require both sides to fill; SIZE closes after the fixed four-H1-bar
+strategy hold; and eligible, filled, closed, common-filled and common-closed populations are
+reported separately. This experiment's native keys remain `z` and `H`, with `E-TOUCH` and
+`E-CLOSE` separate. No grid element changes.
 
 Band-event rate, decided-side rate and selectivity are emitted for every arm. Neither event variant
 may become the other's fallback.

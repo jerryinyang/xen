@@ -1,28 +1,31 @@
-# SPDR-022 — screen record
+# SPDR-022 — Screen record
 
-- **Experiment id:** SPDR-022
-- **Title:** Volatility-adaptive management after MOMO breach entries
-- **Family / registration:** `CF-VOLDIR-001/HYP-D9`
+- **Experiment:** `SPDR-022` — Volatility-adaptive management on a fixed momentum-breach benchmark
+- **Family / registration:** `CF-VOLDIR-001/HYP-D8`
 - **Checkpoint:** `2026-07-25-018-trade-opportunity-capture-geometry`
 - **Band:** TRAIN
-- **Vehicle:** NautilusTrader
-- **Run stamp:** `20260731T004708Z`
-- **Date of this record:** 2026-07-31
+- **Vehicle:** NautilusTrader 1.230.0
+- **Run stamp:** `20260803T140238Z` (two universes: cTrader, crypto)
+- **Entry substrate:** breach with two separate entry variants kept separate throughout: `E-TOUCH` and `E-CLOSE`.
+- **Date of this record:** 2026-08-04
 
-**Status.** The screen executed in both universes (cTrader and crypto) and the 13 declared analysis
-artifacts exist for each cell. **No disposition is taken here.** This document is a neutral
-bookkeeping record of what ran and what exists. It is subordinate to `analysis.md`, which a
-separate fresh-context analyst will write and which is the binding interpretive read.
+**Status.** This is the amended rerun authorised on 2026-08-03. The earlier first pass was
+invalidated and hard-removed; its identifiers are listed only in the invalidation record, see
+`docs/superpowers/plans/2026-08-03-spdr-021-023-first-pass-invalidation.md`. Both universes of this
+experiment ran to completion, passed every hard integrity check, and produced 13 analysis artifacts
+per universe that reproduce exactly on an independent second pass
+(13/13 SHA-256 equality in both universes: `all_equal = true`).
 
-This experiment describes MOMO only. Its two entry variants, `E_TOUCH` and `E_CLOSE`, are kept
-strictly separate throughout: neither is presented as the other's fallback and no variant-level
-count is aggregated across them.
+**NO disposition is taken here.** This document is a neutral record of what ran and what exists. It
+contains no interpretation, no effect values, no ranking of arms, and no verdict. The interpretive
+read is `analysis.md`; the combined interpretation across the three experiments belongs to the
+operator.
 
 ---
 
 ## Spread limitation
 
-Reproduced verbatim from `design.md`:
+Reproduced from the run's own disclosure block (`config.json`, `run_summary.json`):
 
 ```text
 SPREAD-COST-DISCLOSURE
@@ -33,459 +36,260 @@ SPREAD-COST-DISCLOSURE
   prohibited_claims: fully-net, cost-complete, tradable, deployable
 ```
 
-Plainly: the cost recorded in this run is **partial**. Only fees and funding are charged. Spread is
-not charged at all. Any figure in this run that bears a cost therefore **understates cost**, and any
-cost-bearing performance figure is correspondingly overstated. The same disclosure block is carried
-in each run's `config.json` and `run_summary.json`, and each `per_stratum_estimates.parquet` carries
-`spread_cost_status`, `spread_rt_bps` and `cost_scope` columns per row.
+Plainly: **cost in this run is partial.** Only fees and funding are charged. Spread is not charged
+at all. Every cost-bearing field in every artifact therefore **understates cost**, and any
+net-of-cost figure derived from them is correspondingly overstated.
+
+Recording defect, all six cells: the mirrored `spread_cost_status`, `spread_rt_bps` and
+`cost_scope` columns on `per_stratum_estimates.parquet` are null, because the analysis reads those
+keys at the top level of the run config while the run nests them under `spread_cost_disclosure`.
+The disclosure itself is intact in `config.json` and `run_summary.json`, no estimate is affected,
+and the limitation is stated here and in `analysis.md` instead.
 
 ---
 
-# Universe: cTrader
+## Universe 1 — ctrader
 
-### Spread limitation (repeat)
-
-Cost in the cTrader run is partial — fees and funding only, spread not charged
-(`spread_cost_status: UNAVAILABLE_NOT_CHARGED`, `cost_scope: PARTIAL_FEES_FUNDING_ONLY`). Any
-cost-bearing figure understates cost.
-
-## Run identity — cTrader
+### Run identity
 
 | Field | Value |
-|---|---|
-| Run id | `SPDR-022-ctrader-train-20260731T004708Z` |
-| Absolute path | `/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/SPDR-022-ctrader-train-20260731T004708Z` |
+| --- | --- |
+| Run id | `SPDR-022-ctrader-train-20260803T140238Z` |
+| Absolute path | `/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/SPDR-022-ctrader-train-20260803T140238Z` |
 | Catalog path | `/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/catalog_ctrader` |
-| Catalog version | `INFR-021` |
-| Manifest path | `python/experiments/INFR-021/artifacts/fence-manifest.json` |
+| Manifest path | `/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/INFR-021/artifacts/fence-manifest.json` |
 | Manifest sha256 | `4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0` |
-| Config hash | `620736932e62769ca2eb2c779f6f973264221b520212edf017c5a48386b8e9aa` |
-| Fence status | `PINNED` |
+| Band | TRAIN |
 | `train_start_utc` | `2021-06-02T00:01:00Z` |
 | `train_end_utc` | `2023-11-22T00:00:00Z` |
-| `analysis_end_utc` | `2024-12-13T00:00:00Z` |
-| `holdout_start_utc` | `2024-12-13T00:00:00Z` |
-| Symbols (3) | EURUSD, XAUUSD, USTEC |
-| Instrument ids | `EURUSD.CTrader` (CurrencyPair), `XAUUSD.CTrader` (Cfd), `USTEC.CTrader` (Cfd) |
+| Symbols | EURUSD, XAUUSD, USTEC (3) |
 | Work units | 3 declared, 3 completed |
 | `native_arms` | 130 |
 | `native_adaptive_arms` | 128 |
 | `management_arms` | 84 |
-| `base_size_increments` | 1000 |
+| `base_size_increments` | 1,000 |
+| Execution workers | 2 then 1 |
+| Execution wall time | 5,816 s |
+| Raw output size | 4,277,760 KiB |
 
-Software pins: NautilusTrader `1.230.0`, Python `3.13.1`, polars `1.41.2`.
-Run environment: `dry_run` false, `jobs` 1, platform `macOS-26.5.2-arm64-arm-64bit-Mach-O`.
+**Spread limitation (repeated):** cost here is fees and funding only; spread is not charged, so every cost-bearing figure in this universe's artifacts understates cost.
 
-Per-instrument emissions exist under `cells/<SYMBOL>/` for each of EURUSD, XAUUSD, USTEC — eight
-files per cell: `bar_marks.parquet`, `event_log.jsonl`, `fence_attestation.json`, `fills.parquet`,
-`instrument_id_map.json`, `orders.parquet`, `positions_ledger.parquet`, `run_metadata.json`.
+### Integrity status
 
-## Integrity status — cTrader
-
-`integrity_selfcheck.json`: `blocking_pass = true`. Thirteen hard checks, each recorded individually:
+`integrity_selfcheck.json` — `blocking_pass: true`. **14 hard checks, 14 `true`:**
 
 | Hard check | Result |
-|---|---|
-| `causality` | true |
-| `deterministic_replay` | true |
-| `entry_parity` | true |
-| `fence` | true |
-| `future_shift_changed_mapping` | true |
-| `golden_traces` | true |
-| `management_lattice` | true |
-| `native_lattice` | true |
-| `no_native_management_cross` | true |
-| `order_fill_position_reconciliation` | true |
-| `provenance` | true |
-| `row_accounting` | true |
-| `unique_result_keys` | true |
+| --- | --- |
+| `causality` | `true` |
+| `deterministic_replay` | `true` |
+| `entry_parity` | `true` |
+| `fence` | `true` |
+| `future_shift_changed_mapping` | `true` |
+| `golden_traces` | `true` |
+| `management_lattice` | `true` |
+| `management_lifecycle` | `true` |
+| `native_lattice` | `true` |
+| `no_native_management_cross` | `true` |
+| `order_fill_position_reconciliation` | `true` |
+| `provenance` | `true` |
+| `row_accounting` | `true` |
+| `unique_result_keys` | `true` |
 
-`row_accounting.json`: `pass = true`, `native_complete = true`, `management_complete = true`,
-`native_rows = 5,811,000`, `management_rows = 7,152,000`, `origin_count = 44,700`.
+Canonical estimand gate: `blocking_pass: true` over 3 per-instrument cells. Determinism: `pass: true` (mode `IMMEDIATE_REHASH`). Row accounting: `pass: true` (native 5,811,000 rows, management 7,152,000 rows, 44,700 origins, no missing, extra or duplicate key).
 
-`golden_traces.json`: `pass = true`; traces `expiry_ordering` true, `strict_threshold_boundary`
-true, `target_precedes_later_stop` true.
+### Emission counts
 
-`determinism.json`: `mode = IMMEDIATE_REHASH`, `pass = true`; the 43 replay hashes match the 43
-expected replay hashes exactly.
+| Count | Value |
+| --- | --- |
+| Eligible origins | 44,700 |
+| Orders | 3,004,883 |
+| Fills | 2,897,544 |
+| Positions (opened) | 1,448,950 |
+| Native episode rows | 5,811,000 |
+| Management policy rows | 7,152,000 |
+| State-ledger rows | 17,141,991 |
 
-Controls inventory (`controls.json`): `effect_quality_is_blocking = false`; `ledger_rows =
-15,263,724`; `magnitude_match` rows 43,523 (selected 21,763 / excluded 21,760); `time_derangement`
-rows 44,703, seed 240730, `zero_fixed_points = true`. The analysis-side `controls.parquet` lists
-four controls: `FIXED_DEVICE` (COMPUTED), `FIXED_NATIVE_PARAMETER` (COMPUTED), `TIME_DERANGEMENT`
-(DEFERRED_TO_STAGE_8), `MAGNITUDE_MATCH` (DEFERRED_TO_STAGE_8).
+### Device populations from the canonical analysis
 
-**Known artifact-labelling defect.** `run_summary.json` still carries the stale literal
-`"hard_integrity": "NOT_YET_RUN_TASK_8"`. `integrity_selfcheck.json` is authoritative and reports
-`blocking_pass = true` with all thirteen hard checks true. The stale field is a labelling defect in
-`run_summary.json`, not an integrity failure.
+Counts are population-labelled exactly as emitted. `eligible_origin_n` counts scheduled opportunities, `entry_fill_n` counts actual fills, `close_n` counts confirmed closes.
 
-## Counts — cTrader
+| Device | rows | eligible_origin_n | entry_fill_n | close_n |
+| --- | ---: | ---: | ---: | ---: |
+| TARGET | 2,040 | null | 465,480 | 465,000 |
+| STOP | 1,848 | null | 458,024 | 457,600 |
+| TRAIL | 1,053 | null | 131,898 | 131,652 |
+| HOLD | 1,284 | null | 922,600 | 922,576 |
+| SIZE | 1,188 | null | 705,452 | 705,452 |
 
-Top-level emission counts (verified by row count on each parquet; identical to `run_summary.json`):
+Episode-state sections present in this universe (state as emitted by the state ledger):
 
-| Object | Rows |
-|---|---|
-| origins | 44,700 |
-| episodes (native parameter schedule) | 5,811,000 |
-| policy rows (management schedule) | 7,152,000 |
-| orders | 1,641,007 |
-| fills | 1,582,643 |
-| positions | 791,630 |
-| ledger rows (`episode_results.parquet`) | 15,263,724 |
-| features | 44,703 |
-| calibration | 3 |
+| State | rows |
+| --- | ---: |
+| `CENSORED` | 8 |
+| `EVENT_UNDECIDED` | 3,181 |
+| `INCOMPLETE` | 8,484 |
+| `NO_EVENT` | 331,107 |
+| `NO_FEATURE` | 1,002,406 |
+| `ORDER_CREATED` | 11,617,814 |
 
-`episodes.parquet` and `native_parameter_schedule.parquet` carry the same sha256
-(`1fb9851b…`) — they are the same content under two names.
+### Native lattice and lenses
 
-### Native schedule — complete `arm_class` tabulation (5,811,000 rows)
+- Entry variants present: `E_CLOSE`, `E_TOUCH`
+- Arm classes present: `FIXED_NATIVE`, `NATIVE`, `NATIVE_COMBINATION`
+- Orientation pairs present: `DIRECT_DIRECT`, `DIRECT_REVERSE`, `REVERSE_DIRECT`, `REVERSE_REVERSE`
+- Estimand lenses present: `COMMON_CLOSE_TRADE`, `COMMON_ORIGIN_OCCUPANCY_INCLUSIVE`
+- `native_parameter_origins.parquet` rows: 2,121; paired trade rows: 293; block length: 24 bars; interpretation field: `DESCRIPTIVE_ONLY`
 
-| `arm_class` | rows | E_TOUCH | E_CLOSE |
-|---|---|---|---|
-| FIXED_NATIVE | 89,400 | 44,700 | 44,700 |
-| NATIVE | 2,860,800 | 1,430,400 | 1,430,400 |
-| NATIVE_COMBINATION | 2,860,800 | 1,430,400 | 1,430,400 |
-| **total** | **5,811,000** | **2,905,500** | **2,905,500** |
+### Control availability
 
-### Native schedule — complete `state` tabulation (5,811,000 rows)
+| Control | rows | stage | rows with an estimate | rows null with a reason |
+| --- | ---: | --- | ---: | ---: |
+| `FIXED_DEVICE` | 1 | `COMPUTED` | 0 | 1 |
+| `FIXED_NATIVE_PARAMETER` | 1 | `COMPUTED` | 0 | 1 |
+| `MAGNITUDE_MATCH` | 1,536 | `COMPUTED` | 1,536 | 0 |
+| `TIME_DERANGEMENT` | 384 | `COMPUTED` | 384 | 0 |
 
-| `state` | rows | E_TOUCH | E_CLOSE |
-|---|---|---|---|
-| CENSORED | 8 | 0 | 8 |
-| EVENT_UNDECIDED | 1,539 | 1,539 | 0 |
-| INCOMPLETE | 4,044 | 2,022 | 2,022 |
-| NO_EVENT | 287,407 | 75,121 | 212,286 |
-| NO_FEATURE | 617,638 | 308,819 | 308,819 |
-| ORDER_CREATED | 4,900,364 | 2,517,999 | 2,382,365 |
-| **total** | **5,811,000** | **2,905,500** | **2,905,500** |
+Engine-side control inputs recorded in `controls.json`: time derangement 44,703 rows, seed 240730, `zero_fixed_points: true`; magnitude match 43,523 rows (21,763 selected, 21,760 excluded). Controls are informative and gate nothing.
 
-### Policy schedule — complete `arm_class` tabulation (7,152,000 rows)
+### Analysis artifacts
 
-| `arm_class` | rows | E_TOUCH | E_CLOSE |
-|---|---|---|---|
-| FIXED_MANAGEMENT | 1,251,600 | 625,800 | 625,800 |
-| MANAGEMENT | 3,665,400 | 1,832,700 | 1,832,700 |
-| MANAGEMENT_COMPONENT_COMBINATION | 1,966,800 | 983,400 | 983,400 |
-| MANAGEMENT_DEVICE_COMBINATION | 268,200 | 134,100 | 134,100 |
-| **total** | **7,152,000** | **3,576,000** | **3,576,000** |
-
-### Policy schedule — complete `state` tabulation (7,152,000 rows)
-
-| `state` | rows | E_TOUCH | E_CLOSE |
-|---|---|---|---|
-| EVENT_UNDECIDED | 1,760 | 1,760 | 0 |
-| INCOMPLETE | 4,800 | 2,400 | 2,400 |
-| NO_EVENT | 45,680 | 2,400 | 43,280 |
-| NO_FEATURE | 480 | 240 | 240 |
-| ORDER_CREATED | 7,099,280 | 3,569,200 | 3,530,080 |
-| **total** | **7,152,000** | **3,576,000** | **3,576,000** |
-
-All four tabulations above are complete: every observed level of `arm_class` and `state` is listed,
-nothing is filtered, and nothing is sorted by any outcome.
-
-## Analysis artifacts — cTrader
-
-Directory: `results/analysis/ctrader/` — 13 artifacts.
-
-| Artifact | rows | columns |
-|---|---|---|
-| `per_stratum_estimates.parquet` | 3,903 | 50 |
-| `native_parameter_origins.parquet` | 2,121 | 25 |
-| `native_parameter_shared_trades.parquet` | 4,792,565 | 76 |
-| `native_parameter_selected_excluded.parquet` | 5,811,000 | 11 |
-| `device_target.parquet` | 2,376 | 20 |
-| `device_stop.parquet` | 2,160 | 20 |
-| `device_trail.parquet` | 1,215 | 20 |
-| `device_hold.parquet` | 1,620 | 20 |
-| `device_size.parquet` | 1,188 | 20 |
-| `state_sections.parquet` | 3,891 | 9 |
-| `selection_checks.parquet` | 390 | 11 |
-| `controls.parquet` | 4 | 4 |
-| `analysis_summary.json` | — | — |
-
-`native_parameter_selected_excluded.parquet` has exactly as many rows as the native schedule
-(5,811,000).
-
-`per_stratum_estimates.parquet` carries the fields `estimate`, `ci_low`, `ci_high`, `mde` and
-`effective_n`. All 3,903 rows carry a non-null value in each of those five fields. **No values from
-those fields are quoted in this record.**
-
-`analysis_summary.json` contents:
-
-```json
-{
-  "artifacts": [
-    "per_stratum_estimates.parquet", "native_parameter_origins.parquet",
-    "native_parameter_shared_trades.parquet", "native_parameter_selected_excluded.parquet",
-    "device_target.parquet", "device_stop.parquet", "device_trail.parquet",
-    "device_hold.parquet", "device_size.parquet", "state_sections.parquet",
-    "selection_checks.parquet", "controls.parquet", "analysis_summary.json"
-  ],
-  "band": "TRAIN",
-  "block_bars": 24,
-  "experiment_id": "SPDR-022",
-  "interpretation": "DESCRIPTIVE_ONLY",
-  "native_rows": 2121,
-  "paired_rows": 1782,
-  "universe": "ctrader"
-}
-```
-
-All 13 artifacts for this cell were re-derived in an independent second pass to a temporary
-directory and sha256-hashed; the two passes were identical for all 13.
-
-## Execution record — cTrader
-
-From the analysis execution record: 2 jobs; primary pass 471 s wall clock; reproduction pass 483 s;
-reproduction result "13 artifacts identical".
+- Directory: `python/experiments/SPDR-022/results/analysis/ctrader/`
+- Artifacts: 13 of 13 declared
+- Production pass: 845.466 s / 4.295 GB
+- Independent reproduction pass: 842.795 s / 4.400 GB
+- Reproduction evidence: `python/experiments/SPDR-022/results/analysis/reproduction-hashes.json`
 
 ---
 
-# Universe: crypto
+## Universe 2 — crypto
 
-### Spread limitation (repeat)
-
-Cost in the crypto run is partial — fees and funding only, spread not charged
-(`spread_cost_status: UNAVAILABLE_NOT_CHARGED`, `cost_scope: PARTIAL_FEES_FUNDING_ONLY`). Any
-cost-bearing figure understates cost.
-
-## Run identity — crypto
-
-**The raw emission for this universe lives on an external volume**, not in the repository data
-directory.
+### Run identity
 
 | Field | Value |
-|---|---|
-| Run id | `SPDR-022-crypto-train-20260731T004708Z` |
-| Absolute path (external volume) | `/Volumes/SSID/Xen/data/nautilus_runs/SPDR-022-crypto-train-20260731T004708Z` |
+| --- | --- |
+| Run id | `SPDR-022-crypto-train-20260803T140238Z` |
+| Absolute path | `/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/SPDR-022-crypto-train-20260803T140238Z` |
 | Catalog path | `/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/catalog` |
-| Catalog version | `INFR-011-A6` |
-| Manifest path | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json` |
+| Manifest path | `/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json` |
 | Manifest sha256 | `35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448` |
-| Config hash | `ba92d1ba79f04e16f9525cb73d9fd39debaa92f53cb99f4167274c6aa82cb8ea` |
-| Fence status | `PINNED` |
+| Band | TRAIN |
 | `train_start_utc` | `2021-06-29T06:53:00Z` |
 | `train_end_utc` | `2023-12-18T00:00:00Z` |
-| `analysis_end_utc` | `2025-01-08T00:00:00Z` |
-| `holdout_start_utc` | `2025-01-08T00:00:00Z` |
-| Symbols | 25 (all Bybit linear `CryptoPerpetual`) |
+| Symbols | BTCUSDT, ETHUSDT, SOLUSDT, AVAXUSDT, ORDIUSDT, 1000BONKUSDT, TIAUSDT, DOGEUSDT, XRPUSDT, LINKUSDT, ADAUSDT, BIGTIMEUSDT, BLURUSDT, 1000PEPEUSDT, 1000LUNCUSDT, MATICUSDT, INJUSDT, SEIUSDT, BNBUSDT, WLDUSDT, PYTHUSDT, DYDXUSDT, GALAUSDT, OPUSDT, 1000RATSUSDT (25) |
 | Work units | 25 declared, 25 completed |
 | `native_arms` | 130 |
 | `native_adaptive_arms` | 128 |
 | `management_arms` | 84 |
-| `base_size_increments` | 1000 |
+| `base_size_increments` | 1,000 |
+| Execution workers | 1 |
+| Execution wall time | 8,659 s |
+| Raw output size | 22,222,568 KiB |
 
-The 25 symbols: BTCUSDT, ETHUSDT, SOLUSDT, AVAXUSDT, ORDIUSDT, 1000BONKUSDT, TIAUSDT, DOGEUSDT,
-XRPUSDT, LINKUSDT, ADAUSDT, BIGTIMEUSDT, BLURUSDT, 1000PEPEUSDT, 1000LUNCUSDT, MATICUSDT, INJUSDT,
-SEIUSDT, BNBUSDT, WLDUSDT, PYTHUSDT, DYDXUSDT, GALAUSDT, OPUSDT, 1000RATSUSDT.
+**Spread limitation (repeated):** cost here is fees and funding only; spread is not charged, so every cost-bearing figure in this universe's artifacts understates cost.
 
-Software pins: NautilusTrader `1.230.0`, Python `3.13.1`, polars `1.41.2`.
-Run environment: `dry_run` false, `jobs` 1, platform `macOS-26.5.2-arm64-arm-64bit-Mach-O`.
+### Integrity status
 
-Per-instrument emissions exist under `cells/<SYMBOL>/` for all 25 symbols, eight files per cell, the
-same file set as the cTrader cells.
-
-**AppleDouble sidecars.** Because the run sits on an external (non-APFS-native) volume, macOS has
-written 247 sidecar files named `._*` across the run tree (22 at the run root, the rest inside
-`cells/`). These are filesystem metadata shadows of real files. They are excluded from the replay
-hashes, they are **not** instrument cells and **not** artifacts, and they are not counted anywhere
-in this record as symbols or files.
-
-## Integrity status — crypto
-
-`integrity_selfcheck.json`: `blocking_pass = true`. Thirteen hard checks, each recorded individually:
+`integrity_selfcheck.json` — `blocking_pass: true`. **14 hard checks, 14 `true`:**
 
 | Hard check | Result |
-|---|---|
-| `causality` | true |
-| `deterministic_replay` | true |
-| `entry_parity` | true |
-| `fence` | true |
-| `future_shift_changed_mapping` | true |
-| `golden_traces` | true |
-| `management_lattice` | true |
-| `native_lattice` | true |
-| `no_native_management_cross` | true |
-| `order_fill_position_reconciliation` | true |
-| `provenance` | true |
-| `row_accounting` | true |
-| `unique_result_keys` | true |
+| --- | --- |
+| `causality` | `true` |
+| `deterministic_replay` | `true` |
+| `entry_parity` | `true` |
+| `fence` | `true` |
+| `future_shift_changed_mapping` | `true` |
+| `golden_traces` | `true` |
+| `management_lattice` | `true` |
+| `management_lifecycle` | `true` |
+| `native_lattice` | `true` |
+| `no_native_management_cross` | `true` |
+| `order_fill_position_reconciliation` | `true` |
+| `provenance` | `true` |
+| `row_accounting` | `true` |
+| `unique_result_keys` | `true` |
 
-`row_accounting.json`: `pass = true`, `native_complete = true`, `management_complete = true`,
-`native_rows = 30,045,730`, `management_rows = 36,979,360`, `origin_count = 231,121`.
+Canonical estimand gate: `blocking_pass: true` over 25 per-instrument cells. Determinism: `pass: true` (mode `IMMEDIATE_REHASH`). Row accounting: `pass: true` (native 30,045,730 rows, management 36,979,360 rows, 231,121 origins, no missing, extra or duplicate key).
 
-`golden_traces.json`: `pass = true`; traces `expiry_ordering` true, `strict_threshold_boundary`
-true, `target_precedes_later_stop` true.
+### Emission counts
 
-`determinism.json`: `mode = IMMEDIATE_REHASH`, `pass = true`; the 216 replay hashes match the 216
-expected replay hashes exactly.
+| Count | Value |
+| --- | --- |
+| Eligible origins | 231,121 |
+| Orders | 15,369,583 |
+| Fills | 14,807,929 |
+| Positions (opened) | 7,405,640 |
+| Native episode rows | 30,045,730 |
+| Management policy rows | 36,979,360 |
+| State-ledger rows | 88,261,422 |
 
-Controls inventory (`controls.json`): `effect_quality_is_blocking = false`; `ledger_rows =
-78,691,344`; `magnitude_match` rows 218,337 (selected 109,175 / excluded 109,162);
-`time_derangement` rows 231,146, seed 240730, `zero_fixed_points = true`. The analysis-side
-`controls.parquet` lists the same four controls: `FIXED_DEVICE` (COMPUTED),
-`FIXED_NATIVE_PARAMETER` (COMPUTED), `TIME_DERANGEMENT` (DEFERRED_TO_STAGE_8), `MAGNITUDE_MATCH`
-(DEFERRED_TO_STAGE_8).
+### Device populations from the canonical analysis
 
-**Known artifact-labelling defect.** As in the cTrader run, `run_summary.json` still carries the
-stale literal `"hard_integrity": "NOT_YET_RUN_TASK_8"`. `integrity_selfcheck.json` is authoritative
-and reports `blocking_pass = true` with all thirteen hard checks true. The stale field is a
-labelling defect, not an integrity failure.
+Counts are population-labelled exactly as emitted. `eligible_origin_n` counts scheduled opportunities, `entry_fill_n` counts actual fills, `close_n` counts confirmed closes.
 
-## Counts — crypto
+| Device | rows | eligible_origin_n | entry_fill_n | close_n |
+| --- | ---: | ---: | ---: | ---: |
+| TARGET | 16,232 | null | 2,546,892 | 2,542,940 |
+| STOP | 14,704 | null | 2,612,300 | 2,608,944 |
+| TRAIL | 8,391 | null | 747,279 | 745,230 |
+| HOLD | 10,140 | null | 4,695,624 | 4,695,232 |
+| SIZE | 9,548 | null | 3,576,716 | 3,576,672 |
 
-| Object | Rows |
-|---|---|
-| origins | 231,121 |
-| episodes (native parameter schedule) | 30,045,730 |
-| policy rows (management schedule) | 36,979,360 |
-| orders | 8,369,810 |
-| fills | 8,052,651 |
-| positions | 4,028,998 |
-| ledger rows (`episode_results.parquet`) | 78,691,344 |
-| features | 231,146 |
-| calibration | 25 |
+Episode-state sections present in this universe (state as emitted by the state ledger):
 
-### Native schedule — complete `arm_class` tabulation (30,045,730 rows)
+| State | rows |
+| --- | ---: |
+| `CENSORED` | 27 |
+| `EVENT_UNDECIDED` | 146,299 |
+| `INCOMPLETE` | 69,964 |
+| `NO_EVENT` | 1,649,971 |
+| `NO_FEATURE` | 5,590,882 |
+| `ORDER_CREATED` | 59,567,947 |
 
-| `arm_class` | rows | E_TOUCH | E_CLOSE |
-|---|---|---|---|
-| FIXED_NATIVE | 462,242 | 231,121 | 231,121 |
-| NATIVE | 14,791,744 | 7,395,872 | 7,395,872 |
-| NATIVE_COMBINATION | 14,791,744 | 7,395,872 | 7,395,872 |
-| **total** | **30,045,730** | **15,022,865** | **15,022,865** |
+### Native lattice and lenses
 
-### Native schedule — complete `state` tabulation (30,045,730 rows)
+- Entry variants present: `E_CLOSE`, `E_TOUCH`
+- Arm classes present: `FIXED_NATIVE`, `NATIVE`, `NATIVE_COMBINATION`
+- Orientation pairs present: `DIRECT_DIRECT`, `DIRECT_REVERSE`, `REVERSE_DIRECT`, `REVERSE_REVERSE`
+- Estimand lenses present: `COMMON_CLOSE_TRADE`, `COMMON_ORIGIN_OCCUPANCY_INCLUSIVE`
+- `native_parameter_origins.parquet` rows: 17,176; paired trade rows: 2,785; block length: 24 bars; interpretation field: `DESCRIPTIVE_ONLY`
 
-| `state` | rows | E_TOUCH | E_CLOSE |
-|---|---|---|---|
-| CENSORED | 27 | 0 | 27 |
-| EVENT_UNDECIDED | 73,689 | 73,689 | 0 |
-| INCOMPLETE | 32,964 | 16,482 | 16,482 |
-| NO_EVENT | 1,337,086 | 236,561 | 1,100,525 |
-| NO_FEATURE | 3,461,906 | 1,730,953 | 1,730,953 |
-| ORDER_CREATED | 25,140,058 | 12,965,180 | 12,174,878 |
-| **total** | **30,045,730** | **15,022,865** | **15,022,865** |
+### Control availability
 
-### Policy schedule — complete `arm_class` tabulation (36,979,360 rows)
+| Control | rows | stage | rows with an estimate | rows null with a reason |
+| --- | ---: | --- | ---: | ---: |
+| `FIXED_DEVICE` | 1 | `COMPUTED` | 0 | 1 |
+| `FIXED_NATIVE_PARAMETER` | 1 | `COMPUTED` | 0 | 1 |
+| `MAGNITUDE_MATCH` | 12,800 | `COMPUTED` | 12,800 | 0 |
+| `TIME_DERANGEMENT` | 3,200 | `COMPUTED` | 3,200 | 0 |
 
-| `arm_class` | rows | E_TOUCH | E_CLOSE |
-|---|---|---|---|
-| FIXED_MANAGEMENT | 6,471,388 | 3,235,694 | 3,235,694 |
-| MANAGEMENT | 18,951,922 | 9,475,961 | 9,475,961 |
-| MANAGEMENT_COMPONENT_COMBINATION | 10,169,324 | 5,084,662 | 5,084,662 |
-| MANAGEMENT_DEVICE_COMBINATION | 1,386,726 | 693,363 | 693,363 |
-| **total** | **36,979,360** | **18,489,680** | **18,489,680** |
+Engine-side control inputs recorded in `controls.json`: time derangement 231,146 rows, seed 240730, `zero_fixed_points: true`; magnitude match 218,337 rows (109,175 selected, 109,162 excluded). Controls are informative and gate nothing.
 
-### Policy schedule — complete `state` tabulation (36,979,360 rows)
+### Analysis artifacts
 
-| `state` | rows | E_TOUCH | E_CLOSE |
-|---|---|---|---|
-| EVENT_UNDECIDED | 76,720 | 76,720 | 0 |
-| INCOMPLETE | 40,000 | 20,000 | 20,000 |
-| NO_EVENT | 327,760 | 23,680 | 304,080 |
-| NO_FEATURE | 4,000 | 2,000 | 2,000 |
-| ORDER_CREATED | 36,530,880 | 18,367,280 | 18,163,600 |
-| **total** | **36,979,360** | **18,489,680** | **18,489,680** |
-
-All four tabulations above are complete: every observed level is listed, nothing filtered, nothing
-ordered by outcome.
-
-## Analysis artifacts — crypto
-
-Directory: `results/analysis/crypto/` — 13 artifacts.
-
-| Artifact | rows | columns |
-|---|---|---|
-| `per_stratum_estimates.parquet` | 31,498 | 50 |
-| `native_parameter_origins.parquet` | 17,176 | 25 |
-| `native_parameter_shared_trades.parquet` | 24,543,794 | 76 |
-| `native_parameter_selected_excluded.parquet` | 30,045,730 | 11 |
-| `device_target.parquet` | 19,096 | 20 |
-| `device_stop.parquet` | 17,360 | 20 |
-| `device_trail.parquet` | 9,765 | 20 |
-| `device_hold.parquet` | 13,020 | 20 |
-| `device_size.parquet` | 9,548 | 20 |
-| `state_sections.parquet` | 31,286 | 9 |
-| `selection_checks.parquet` | 3,250 | 11 |
-| `controls.parquet` | 4 | 4 |
-| `analysis_summary.json` | — | — |
-
-`native_parameter_selected_excluded.parquet` has exactly as many rows as the native schedule
-(30,045,730).
-
-`per_stratum_estimates.parquet` carries the fields `estimate`, `ci_low`, `ci_high`, `mde` and
-`effective_n`. All 31,498 rows carry a non-null value in each of those five fields. **No values from
-those fields are quoted in this record.**
-
-`analysis_summary.json` contents:
-
-```json
-{
-  "artifacts": [
-    "per_stratum_estimates.parquet", "native_parameter_origins.parquet",
-    "native_parameter_shared_trades.parquet", "native_parameter_selected_excluded.parquet",
-    "device_target.parquet", "device_stop.parquet", "device_trail.parquet",
-    "device_hold.parquet", "device_size.parquet", "state_sections.parquet",
-    "selection_checks.parquet", "controls.parquet", "analysis_summary.json"
-  ],
-  "band": "TRAIN",
-  "block_bars": 24,
-  "experiment_id": "SPDR-022",
-  "interpretation": "DESCRIPTIVE_ONLY",
-  "native_rows": 17176,
-  "paired_rows": 14322,
-  "universe": "crypto"
-}
-```
-
-All 13 artifacts for this cell were re-derived in an independent second pass to a temporary
-directory and sha256-hashed; the two passes were identical for all 13.
-
-## Execution record — crypto
-
-From the analysis execution record: 3 jobs; primary pass 1,719 s wall clock; reproduction pass
-1,761 s; reproduction result "13 artifacts identical". The same record notes peak memory of 8.03 GB
-across parent process and symbol workers for this cell.
+- Directory: `python/experiments/SPDR-022/results/analysis/crypto/`
+- Artifacts: 13 of 13 declared
+- Production pass: 5,035.342 s / 8.030 GB
+- Independent reproduction pass: 4,952.383 s / 7.653 GB
+- Reproduction evidence: `python/experiments/SPDR-022/results/analysis/reproduction-hashes.json`
 
 ---
 
-## Links
+## Populations to keep separate when reading the artifacts
 
-Raw run directories:
+- `eligible_origin_n` — scheduled opportunities, including origins with no exposure because the arm
+  was occupied. Per-origin intervals and MDEs are built from these.
+- `entry_fill_n` — actual entry fills recorded by the engine.
+- `close_n` — confirmed closes.
+- `common_fill_n` / `common_close_n` — origins filled, or closed, on both comparison sides.
+- `effective_origin_blocks` / `effective_trade_blocks` — resampled blocks behind the matching
+  interval. A scheduled row never inflates a trade-level count.
 
-- cTrader — [`../../../data/nautilus_runs/SPDR-022-ctrader-train-20260731T004708Z/`](../../../data/nautilus_runs/SPDR-022-ctrader-train-20260731T004708Z/)
-- crypto — external volume, absolute path only:
-  `/Volumes/SSID/Xen/data/nautilus_runs/SPDR-022-crypto-train-20260731T004708Z/` (no repository-relative
-  path exists; the volume must be mounted to read it)
-
-Analysis directories:
-
-- [`results/analysis/ctrader/`](results/analysis/ctrader/)
-- [`results/analysis/crypto/`](results/analysis/crypto/)
-
-Design:
-
-- [`design.md`](design.md)
-
-Interpretive read:
-
-- `analysis.md` — **not yet written.** When written by the fresh-context analyst it is the binding
-  interpretive read for SPDR-022. This screen record is subordinate to it.
+The two native lenses (`COMMON_ORIGIN_OCCUPANCY_INCLUSIVE` and `COMMON_CLOSE_TRADE`) answer
+different questions and must never be merged.
 
 ---
 
-## Boundary statement
+## What is not in this record
 
-- TRAIN band only. No TEST data was read.
-- No contact with the global holdout. The fence is `PINNED` in both universes and the holdout starts
-  after the analysis end in each (`2024-12-13T00:00:00Z` cTrader, `2025-01-08T00:00:00Z` crypto).
-- No family status change. `CF-VOLDIR-001` is untouched by this record.
-- No XENA action of any kind.
-- No verdict, disposition or recommendation is taken here.
-- This experiment describes MOMO only. It does **not** gate SPDR-021 and does **not** gate SPDR-023,
-  and it makes no comparison between `E_TOUCH` and `E_CLOSE`.
-- Reported cost is partial (fees and funding only, spread not charged); no cost-complete or
-  tradability reading is available from this run.
-- The operator takes any disposition only after reading `analysis.md`.
+No effect value, no comparison of arms, no power judgement, no `SUPPORTED`/`REFUTED` label, no
+winner, no tradability or deployability statement, and no TEST or holdout contact of any kind.
