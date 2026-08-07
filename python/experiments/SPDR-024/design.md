@@ -132,11 +132,25 @@ OBJECT-IDENTITY:
 PRIMARY: capital_normalised_episode_return
   object   : xen.adjudication episode
   numerator: gross episode P&L (fees/funding only; NO spread — see disclosure)
-  denominator: capital committed to that episode at entry (risk_size x notional at fill)
+  denominator: a FIXED UNIT-CAPITAL REFERENCE BASE (see AMENDMENT-4, unsigned).
+               The original text read "capital committed to that episode at entry (risk_size x
+               notional at fill)". That quantity divides the size change straight back out and
+               is identically the per-notional bps estimand, which is blind to sizing by
+               construction; §14 trace 1 requires a non-zero delta and therefore settles the
+               reading. The implemented form is outcome_bps x risk_size.
   returns  : open-to-open; real prices only
   paired   : adaptive arm minus fixed arm, on COMMON-CLOSED episodes only
   aggregation: un-nest -> sigma-hat-normalise -> pool, with a SYMBOL-CLUSTERED interval (M1)
 ```
+
+**What this estimand cannot do, stated where it is defined.** The paired difference for a SIZE
+arm is exactly `(risk_size - 1) x baseline_outcome`, so its mean decomposes into an EXPOSURE
+term `(E[size] - 1) x E[outcome]` and a SELECTIVITY term `Cov(size, outcome)`. The exposure term
+is arithmetic: on a positive-mean population any size reduction must lower the measure, and on a
+negative-mean population must raise it, whatever the component is doing. **A component-level
+claim therefore rests on the SELECTIVITY term and on the gate-permutation control (§8), never on
+the raw paired difference**, which would otherwise report the same component as helpful wherever
+the baseline loses money and harmful wherever it earns.
 
 **Everything else is a diagnostic**, explicitly including:
 
@@ -308,6 +322,32 @@ CONTROL MAGNITUDE-MATCH:
   expected if H true: effect survives magnitude matching; if H false: effect collapses into the bin
   disclosure: collapse fraction + comparator mean + null quantiles + plant curve, always together
   class: report layer
+  IMPLEMENTED AS (2026-08-06): regime-stratified matching, `_regime_matched_contrast` in
+    `xen.adaptive_management.spdr024_analysis`. Every admission rule in this run IS a volatility
+    gate, so the admitted and declined populations differ by realised regime BY CONSTRUCTION
+    (TAIL_RISK cTrader H1: 3 HIGH / 213 LOW among declined origins). The contrast is recomputed
+    inside each realised state and reported with the collapse fraction against the unmatched
+    figure, each stratum's own comparator mean, its count and its MDE. The regime is the
+    coarsest magnitude this emission carries; a continuous-magnitude binning would need a
+    per-component magnitude column the emission does not have, and is recorded as a successor
+    item rather than approximated here.
+
+CONTROL GATE-PERMUTATION (added 2026-08-06; the SIZE channel's non-vacuity control):
+  question answered: is the gate applied to WORSE trades, or merely applied?
+  population: the arm's own paired episodes, with each symbol's risk_size vector permuted
+    against its own outcomes. DISJOINT: not a disjoint pool — it is a within-arm permutation
+    null, and it is declared as such so it is never mistaken for an attribution control.
+  bite/MDE: the observed effect's percentile within its own permutation null, two-sided;
+    the cell's own MDE still governs the magnitude read
+  non-vacuity: it preserves the gate rate and the exact multiplier distribution — so the
+    EXPOSURE term is identical under the null — while destroying the gate-to-outcome
+    association, which is the SELECTIVITY term. It is NOT mean-preserving on the paired
+    difference, so unlike TIME-DERANGEMENT it can move the statistic it exists to destroy.
+  expected if H true: the observed effect sits in the tail of its own null
+  expected if H false: the observed effect sits mid-distribution — the component gates, but not
+    selectively, and the measured difference is exposure arithmetic
+  disclosure: observed, null mean, component-specific difference, percentile and two-sided p
+  class: report layer
 
 CONTROL TIME-DERANGEMENT: REMOVED (D8).
   Basis: identical to its paired real estimate on 100% of rows in all six Step-3 cells
@@ -456,26 +496,54 @@ is not.
 
 ---
 
-## 11. Interpretation bands (per stratum — labels, never gates)
+## 11. Reporting rule (no result labels — superseded 2026-08-07, AMENDMENT-6)
+
+**This section previously declared `SUPPORTED` / `WASH` / `CONTRADICTED` / `UNPOWERED` bands. They
+are withdrawn.** The binding contract does not permit them, and no operator directive superseded
+the clauses that forbid them:
+
+- `adaptive-management-design.md` §1: *"Event count, uncertainty and MDE are reported as context;
+  **power labels do not decide which rows are shown or how they are described**."*
+- `adaptive-management-design.md` §9: *"Emit event count, effective count, CI and MDE for every
+  row. These are informative diagnostics, **not verdict labels or pruning rules**."*
+- The SPDR-021/022/023 execution standard: *"**Power is context only**"*; report MDE *"without
+  making power a gate"*; *"no verdict, winner, **pass/fail-value** or top-N field exists."*
 
 ```text
-BANDS (per stratum, on the PRIMARY estimand, in sigma-hat units).
-  Every band is evaluated under the MOST CONSERVATIVE of the three variance treatments (§10.1);
-  the other two are printed alongside and never override it.
+REPORTING (every row, both channels, every stratum):
+  estimate            in sigma-hat units
+  uncertainty         ci_low / ci_high under ALL THREE variance treatments (§10.1)
+  population count    the applicable named populations — eligible_origin_n, entry_fill_n,
+                      close_n, common_fill_n, common_close_n — NULL where one does not apply,
+                      NEVER filled in from a different population
+  effective count     effective_origin_blocks for an origin-lens read,
+                      effective_trade_blocks for a paired trade-lens read; the other is NULL
+  MDE                 in the same units as the estimate, on the same row
 
-  SUPPORTED:    |effect| >= MDE_sigma with ci excluding zero on the same side
-  WASH:         |effect| <  MDE_sigma with ci covering zero  -> report as A ~= B, never as refutation
-  CONTRADICTED: effect <= -MDE_sigma with ci_high < 0
-  UNPOWERED:    fewer than 30 distinct baseline trades in the cell, or MDE_sigma > the Step-3
-                observed effect for that family -> excluded from negatives entirely (B-5)
+  and NOTHING else. No band, no class, no verdict, no pass field, no ranking, no top-N.
+
+READING:
+  the reader compares the estimate with its own interval and its own MDE. Tallies are reported
+  as counts of intervals excluding zero on each side, beside the median estimate and the median
+  MDE, in the SPDR-021 form — never as counts of labels.
+  A cell whose MDE exceeds the effect sizes this family has previously observed (0.022–0.150
+  sigma-hat) is described that way in prose, with both numbers shown. It is not given a name,
+  and it is never folded into a negative (B-5).
+
+DIRECTION-vs-MAGNITUDE: still reported as two separate reads, but as two NUMBERS — the interval
+  relative to zero, and the estimate relative to the MDE — not as two labels. Step-3's sizing
+  result was direction-certain (236/236 resolving rows one side, 6/6 cells) and
+  magnitude-unresolved (0.022–0.150 sigma-hat) SIMULTANEOUSLY; both facts are visible in the
+  emitted columns without either being named.
+
 POOLED: disclosure-only unless symbol homogeneity is shown; the per-symbol ladder (§6E) is always
-        printed alongside it.
-DIRECTION-vs-MAGNITUDE: reported as two separate reads. Step-3's sizing result was direction-certain
-  (236/236 resolving rows one side, 6/6 cells) and magnitude-unresolved (0.022-0.150 sigma-hat)
-  SIMULTANEOUSLY. A band that collapses those into one label would have retired the finding.
-```
+  printed alongside it.
 
----
+STRUCTURAL ZEROS: reported as the measured `exact_zero_delta_share`, not as a label. A share of
+  1.0 on the per-notional lens is the metric's blindness to size; a share of 1.0 on the PRIMARY
+  lens is an arm that never gated in that stratum. The lens, the gate rate and the counts are all
+  on the row, so the reader distinguishes them without the emission asserting which it is.
+```
 
 ## 12. Conversion pin (L-21 — this design cites SPDR evidence)
 
@@ -557,6 +625,93 @@ AMENDMENT-3 (2026-08-06, operator): three variance treatments V-A/V-B/V-C, most 
   not detectable in the data (§10). Reporting all three with the conservative one binding is
   strictly stricter than picking one.
   running count: 0 looser / 2 tighter / 1 neutral
+
+AMENDMENT-4 (2026-08-06, DRAFTED BY THE IMPLEMENTER — **UNSIGNED, AWAITING OPERATOR**):
+  the PRIMARY estimand's denominator is a FIXED UNIT-CAPITAL REFERENCE BASE — DIRECTION: NEUTRAL
+  Basis: §3 writes the denominator as "capital committed to that episode at entry (risk_size x
+  notional at fill)". Taken literally that denominator scales with risk_size exactly as the
+  numerator does, the two cancel, and the estimand collapses to per-notional bps — reproducing
+  the structural zero (1,400/1,400 rows, six cells) that this experiment exists to escape.
+  §14 golden trace 1 settles the intended reading: it requires the halved arm to show a
+  NON-ZERO primary delta for the same per-notional move, and states "if the PRIMARY delta is
+  also zero, E6 is not implemented". Implemented as
+  capital_normalised_return_bps = outcome_bps x risk_size, i.e. the episode's contribution
+  measured against a fixed unit-capital base.
+  Not LOOSER: no threshold, admission rule or band is relaxed; it changes which quantity is
+  measured, in the only direction that makes OD-19 answerable at all.
+  WHAT THE OPERATOR IS RATIFYING, stated plainly: under this estimand, reducing exposure can
+  only improve the measure where gross expectancy is negative, and can only worsen it where
+  gross expectancy is positive. That arithmetic is why §10.1 of this ledger's companion
+  analysis reports the EXPOSURE and SELECTIVITY terms separately, and why a component-level
+  claim rests on the gate-permutation control rather than on the raw paired difference.
+  running count: 0 looser / 2 tighter / 2 neutral
+
+AMENDMENT-5 (2026-08-07, POST-REVIEW CORRECTION — **UNSIGNED, AWAITING OPERATOR**):
+  §11 gains an explicit RESOLUTION LADDER, and admission is read at the FILL —
+  DIRECTION: TIGHTER
+  Basis: a review of the first build's artifacts found three defects that all pushed the same
+  way, toward reading unresolvable cells as measured nulls.
+   (a) The band rule compared each cell's floor to the TOP of the family's observed effect
+       range (0.150 sigma-hat) alone. cTrader H1's governing floor is 0.084 sigma-hat, so it is
+       blind to more than half the range, yet every sub-floor result in it was banded `WASH`.
+   (b) The SELECTION channel had no power guard of any kind — only a 30-row minimum. All 64
+       selection contrasts across the four cells sat 3-20x BELOW their own detection floor
+       (crypto H4: contrasts 1.2-23.0 bps against floors of 35.9-51.8 bps) and all 64 were
+       banded `WASH`, i.e. reported as measured nulls.
+   (c) `admitted` was read at ORDER CREATION, not at the stop fill that §2 OBJECT-IDENTITY
+       binds it to. The eight `PENDING_EXPIRY` arms act on a pending order's lifetime, so they
+       create exactly the comparator's order set and were banded
+       `NOT_APPLICABLE_NO_REJECTION_SEMANTICS` — "empty by construction". Measured, they are
+       not empty: `TAIL_RISK PENDING_EXPIRY` fills 1,808 against the comparator's 1,695
+       (+6.7%), and on the fill event all eight carry 35-68 declined origins with real
+       counterfactuals.
+  Also in this amendment, each narrowing what may be called a result rather than widening it:
+  the selection channel's floor now comes from the same governing treatment as its interval
+  (it took the interval from the block bootstrap and the floor from unblocked row counts); the
+  gate-permutation band is computed through the §11 rule on the control's own null envelope
+  instead of a fixed `p >= 0.05` cut; the future-shift tripwire now records whether any arm had
+  a causal edge to collapse at all, and its pass requires every arm that HAD one to collapse
+  into the cell's own noise floor (design §9's "expected collapse fraction ~ 1.0"), rather than
+  only that no shifted edge exceeded its twin.
+  Not LOOSER: every change removes a label that asserted more than the data supports. No
+  threshold is relaxed, no admission rule widened, no arm added.
+  running count: 0 looser / 3 tighter / 2 neutral
+  L-23 CHECK: the last three amendments are TIGHTER, NEUTRAL, TIGHTER — no one-directional
+  streak of 3, so no operator flag is raised by the ledger itself. The amendment is
+  nevertheless UNSIGNED, because it changes what the run may call a null.
+  SUPERSEDED IN PART by AMENDMENT-6: the band taxonomy this amendment introduced
+  (NOT_RESOLVABLE_AT_THIS_FLOOR, MAGNITUDE_RESOLVED_DIRECTION_UNRESOLVED,
+  INERT_ARM_NO_GATE_FIRED_IN_STRATUM, the resolution ladder) is withdrawn with the rest of §11.
+  Its three FINDINGS stand and are retained: the admission-at-fill correction, the selection
+  channel's missing floor comparison, and the tripwire collapse criterion.
+
+AMENDMENT-6 (2026-08-07, POST-REVIEW CORRECTION — **UNSIGNED, AWAITING OPERATOR**):
+  §11 withdraws ALL result labels; every row is estimate + uncertainty + population count +
+  effective count + MDE — DIRECTION: TIGHTER
+  Basis: §11 declared SUPPORTED/WASH/CONTRADICTED bands, and AMENDMENT-5 extended rather than
+  removed them. Both are non-compliant with clauses that no operator directive superseded:
+    `adaptive-management-design.md` §1 — "power labels do not decide which rows are shown or how
+      they are described";
+    `adaptive-management-design.md` §9 — "Emit event count, effective count, CI and MDE for every
+      row. These are informative diagnostics, not verdict labels or pruning rules";
+    the SPDR-021/022/023 execution standard — "Power is context only", report MDE "without making
+      power a gate", "no verdict, winner, pass/fail-value or top-N field exists".
+  The precedent bears this out: SPDR-021/022/023 `analysis.md` contain zero occurrences of
+  UNPOWERED, WASH, CONTRADICTED or NOT_RESOLVABLE; SUPPORTED and REFUTED appear once each, inside
+  SPDR-021's boundary statement declining to use them.
+  `UNPOWERED` was the sharpest violation: it describes a row BY ITS POWER, which is the precise
+  thing §1 forbids, and AMENDMENT-5 made it worse by computing the class from the floor BEFORE
+  the estimate was read.
+  Also in this amendment: the seven separately-named populations (`eligible_origin_n`,
+  `entry_fill_n`, `close_n`, `common_fill_n`, `common_close_n`, `effective_origin_blocks`,
+  `effective_trade_blocks`) are emitted on every row, null where one does not apply and never
+  filled in from another population — the population-conflation defect that invalidated the
+  SPDR-021/022/023 first pass (handoff defects 4 and 5).
+  Not LOOSER: it removes every assertion the emission was making beyond the measurement. No
+  threshold is relaxed, no admission rule widened, no arm added, no row pruned.
+  running count: 0 looser / 4 tighter / 2 neutral
+  L-23 CHECK: the last three amendments are NEUTRAL, TIGHTER, TIGHTER — no one-directional
+  streak of 3. UNSIGNED, because it changes the emitted schema and the reporting contract.
 ```
 
 No one-directional streak of 3 (L-23); no operator flag required at the execution gate.

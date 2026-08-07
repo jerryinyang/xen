@@ -1,0 +1,582 @@
+{
+  "blocking_pass": true,
+  "evaluation_errors": {},
+  "experiment_id": "SPDR-024",
+  "failed_checks": [],
+  "hard_check_count": 17,
+  "hard_checks": {
+    "arm_lattice_matches_design": {
+      "absent": [],
+      "declared_arms": 38,
+      "device_note": "devices read from the emitted column; the safety ceiling is device NONE and is apparatus, not a hold-length arm",
+      "expected_arms": 38,
+      "observed_arms": 38,
+      "pass": true,
+      "refuted_devices_present": [],
+      "reverse_arms_present": [],
+      "unexpected": []
+    },
+    "causal_t_minus_1_provenance": {
+      "pass": true,
+      "source": "integrity_selfcheck.json:hard_checks.causality"
+    },
+    "deterministic_rerun": {
+      "artifacts_compared": 41,
+      "differing_artifacts": [],
+      "jobs": 3,
+      "normalised_before_hashing": {
+        "run_environment.json": [
+          "jobs"
+        ],
+        "run_metadata.json": [
+          "generated_utc"
+        ]
+      },
+      "note": "only wall-clock stamps and the declared worker count are normalised; every research artifact is compared byte for byte",
+      "pass": true,
+      "replay_source": "experiments/SPDR-024/results/runs/ctrader_H1/replay"
+    },
+    "e1_regime_label_present": {
+      "declared_nullable": [],
+      "missing_columns": [],
+      "non_null_rows": {
+        "regime_episode_id": 762318,
+        "regime_state": 762318
+      },
+      "pass": true,
+      "requirement": "E1",
+      "unexpectedly_empty_columns": []
+    },
+    "e2_counterfactual_present_and_non_zero_fill": {
+      "finite_share": 1.0,
+      "max_allowed_zero_share": 0.1,
+      "min_rows_required": 30,
+      "non_zero_counterfactuals": 13427,
+      "note": "a zero-filled counterfactual would void every selection read",
+      "pass": true,
+      "rejected_with_counterfactual": 13487,
+      "zero_fill_share": 0.004448728405130867
+    },
+    "e4_exit_reason_and_entry_ts_populated": {
+      "declared_nullable": [],
+      "missing_columns": [],
+      "non_null_rows": {
+        "entry_ts": 59169,
+        "exit_reason": 59168
+      },
+      "pass": true,
+      "requirement": "E4",
+      "unexpectedly_empty_columns": []
+    },
+    "e5_hold_duration_and_cap_flag_present": {
+      "declared_nullable": [
+        "hold_cap_bars"
+      ],
+      "missing_columns": [],
+      "non_null_rows": {
+        "hold_bars_realised": 59168,
+        "hold_cap_bars": 0,
+        "hold_cap_binds": 762318
+      },
+      "pass": true,
+      "requirement": "E5",
+      "unexpectedly_empty_columns": []
+    },
+    "e6_capital_normalised_estimand_present": {
+      "declared_nullable": [],
+      "missing_columns": [],
+      "non_null_rows": {
+        "capital_normalised_return_bps": 59168
+      },
+      "pass": true,
+      "requirement": "E6",
+      "unexpectedly_empty_columns": []
+    },
+    "estimand_reconciliation": {
+      "artifact": "experiments/SPDR-024/results/estimand_validation_ctrader_H1.json",
+      "checks": null,
+      "pass": true
+    },
+    "future_shift_tripwire_collapse": {
+      "admission_rows_changed": 3156,
+      "arms_compared": 34,
+      "arms_with_a_causal_edge": 1,
+      "arms_with_an_edge_that_did_not_collapse_into_noise": [],
+      "bite_note": "the tripwire had at least one arm with an edge to destroy",
+      "class": "future_destroy HARD VALIDITY",
+      "committed_capital_rows_changed": 51468,
+      "comparisons": [
+        {
+          "arm_id": "ADP_LEVEL_FORECAST_K12_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": false,
+          "causal_effect_sigma": -0.03294725432065962,
+          "channel": "SCALE",
+          "collapse_fraction": 0.2861399113741532,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.06801006345801643,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.02351972988932439
+        },
+        {
+          "arm_id": "ADP_LEVEL_FORECAST_K4_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": false,
+          "causal_effect_sigma": -0.022578868770986846,
+          "channel": "SCALE",
+          "collapse_fraction": 0.6928199038380844,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.06801006345801643,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.006935779080299012
+        },
+        {
+          "arm_id": "ADP_LEVEL_NOW_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": false,
+          "causal_effect_sigma": -0.047932843541968466,
+          "channel": "SCALE",
+          "collapse_fraction": 0.5456685144457003,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.06801006345801643,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.02177740001326435
+        },
+        {
+          "arm_id": "ADP_RANGE_SCALE_SIZE_SCALE_NORMALISED",
+          "causal_edge_present": false,
+          "causal_effect_sigma": -0.058447964064188986,
+          "channel": "SCALE",
+          "collapse_fraction": 0.09519848732259073,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.06801006345801643,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.05288380629819305
+        },
+        {
+          "arm_id": "ADP_RANGE_SCALE_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": false,
+          "causal_effect_sigma": -0.05939380725217287,
+          "channel": "SCALE",
+          "collapse_fraction": 0.17225249263066966,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.06801006345801643,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.04916307590616055
+        },
+        {
+          "arm_id": "ADP_SHOCK_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": true,
+          "causal_effect_sigma": -0.06920610460228792,
+          "channel": "SCALE",
+          "collapse_fraction": 0.16756878332336245,
+          "collapsed_into_noise": true,
+          "mde_sigma": 0.06801006345801643,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.05760932185553318
+        },
+        {
+          "arm_id": "ADP_SWING_GT_CUR_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": false,
+          "causal_effect_sigma": -0.05382235868810695,
+          "channel": "SCALE",
+          "collapse_fraction": 0.06237786066521667,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.06801006345801643,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.050465035097186896
+        },
+        {
+          "arm_id": "ADP_SWING_SCALE_SIZE_SCALE_NORMALISED",
+          "causal_edge_present": false,
+          "causal_effect_sigma": -0.04918081757728379,
+          "channel": "SCALE",
+          "collapse_fraction": 0.08007135867004322,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.06801006345801643,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.04524284269336713
+        },
+        {
+          "arm_id": "ADP_SWING_SCALE_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": false,
+          "causal_effect_sigma": -0.06095193819032314,
+          "channel": "SCALE",
+          "collapse_fraction": 0.11913994617731472,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.06801006345801643,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.053690127554925034
+        },
+        {
+          "arm_id": "ADP_TAIL_RISK_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": false,
+          "causal_effect_sigma": -0.06194845734849249,
+          "channel": "SCALE",
+          "collapse_fraction": 0.14771532443513247,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.06801006345801643,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.05279772087300395
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_LEVEL_FORECAST_K12_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": -2.7271821884350222,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 4.732872186784459,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": -2.543167290909326
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_LEVEL_FORECAST_K4_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": -2.867584255320906,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 4.878478373462424,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": -2.4817273335569667
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_LEVEL_NOW_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": -1.2292288568259933,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 4.186610841812459,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": -0.6621917150019779
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_RANGE_SCALE_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 0.6108411586983984,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 8.7924039424614,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 2.0848274549629644
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_SHOCK_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": -0.9909964684560164,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 3.75481132069291,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": -0.2519054655550861
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_SWING_GT_CUR_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": -1.6314727284619956,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 4.307437517085272,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": -1.0959860442785754
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_SWING_SCALE_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 3.79785804374083,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 14.057132742810806,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 3.6297832831438086
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_TAIL_RISK_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 0.29379490646100803,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 5.576477994256943,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 1.457096079201936
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_LEVEL_FORECAST_K12_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": -2.062469024311363,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 4.646674274757899,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": -1.7022474824780507
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_LEVEL_FORECAST_K12_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_LEVEL_FORECAST_K4_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": -2.5558448959846984,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 4.772703148239201,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": -1.9815282698027428
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_LEVEL_FORECAST_K4_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_LEVEL_NOW_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": -1.0710881746643857,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 4.102240551003861,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": -0.5108012205656487
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_LEVEL_NOW_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_RANGE_SCALE_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 0.6579380416190364,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 8.408139741396637,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 2.1792144089378795
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_RANGE_SCALE_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_SHOCK_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": -0.7704832224578064,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 3.733851951244571,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 0.20198240180651883
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_SHOCK_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_SWING_GT_CUR_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": -1.3536637513505305,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 4.260209249632534,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": -0.8238032411295482
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_SWING_GT_CUR_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_SWING_SCALE_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 4.143161900950565,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 13.435749801420664,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 3.9741822073695383
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_SWING_SCALE_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_TAIL_RISK_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 0.5891848287614038,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 5.323032183304703,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 1.7493637219218399
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_TAIL_RISK_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        }
+      ],
+      "failure_meaning": "an acausal leak: fix the data, never read it as 'no edge'",
+      "informative": true,
+      "known_limit": "the statistic is scale-invariant in the delta series, so a strictly proportional leak would not trip it; it detects a leak that changes WHICH origins are admitted or the RELATIVE size committed, which is the leak this apparatus can produce",
+      "non_collapse_note": "a SIZE arm's paired difference is dominated by the exposure term (E[size] - 1) x E[outcome], and a one-bar availability shift barely changes the GATE RATE, so the exposure term is nearly invariant to the shift. An arm whose effect is mostly exposure arithmetic therefore need not collapse, and requiring it to would fail a valid emission. This is the scale-invariance limit recorded above, seen from the other side.",
+      "non_vacuous": true,
+      "pass": true,
+      "scale_arms_compared": 10,
+      "selection_arms_compared": 24,
+      "surviving_arms": []
+    },
+    "golden_traces_match_design": {
+      "artifact": "experiments/SPDR-024/results/golden_traces.json",
+      "failed": [],
+      "n_traces": 3,
+      "pass": true
+    },
+    "hard_check_count_reconciled_by_name": {
+      "declared_but_absent": [],
+      "declared_design_section_13": [
+        "future_shift_tripwire_collapse",
+        "train_holdout_fence",
+        "causal_t_minus_1_provenance",
+        "nautilus_order_fill_position_reconciliation",
+        "estimand_reconciliation",
+        "deterministic_rerun",
+        "hard_check_count_reconciled_by_name"
+      ],
+      "declared_implementation": [
+        "golden_traces_match_design",
+        "e1_regime_label_present",
+        "e2_counterfactual_present_and_non_zero_fill",
+        "e4_exit_reason_and_entry_ts_populated",
+        "e5_hold_duration_and_cap_flag_present",
+        "e6_capital_normalised_estimand_present",
+        "arm_lattice_matches_design",
+        "no_cost_charged",
+        "train_only_band_and_domain",
+        "time_derangement_absent"
+      ],
+      "executed_but_undeclared": [],
+      "executed_hard_checks": 17,
+      "expected_hard_checks": 17,
+      "lesson": "L-52 / P-23: a declared-but-absent check is a failure, not a silence",
+      "pass": true
+    },
+    "nautilus_order_fill_position_reconciliation": {
+      "pass": true,
+      "source": "integrity_selfcheck.json:hard_checks.order_fill_position_reconciliation"
+    },
+    "no_cost_charged": {
+      "cost_scope_carried_into_analysis_artifact": true,
+      "pass": true,
+      "prohibited_claims_found": [],
+      "spread_cost_status": "UNAVAILABLE_NOT_CHARGED"
+    },
+    "time_derangement_absent": {
+      "note": "OD-17 removed time derangement; the future-destroy tripwire is NOT removed",
+      "pass": true,
+      "status": "REMOVED_OD17"
+    },
+    "train_holdout_fence": {
+      "attestation_status": "PINNED",
+      "manifest_sha256": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0",
+      "pass": true,
+      "source": "integrity_selfcheck.json:hard_checks.fence (manifest hash + bar marks)",
+      "stub_rejected": true,
+      "train_end_utc": "2023-11-22T00:00:00Z"
+    },
+    "train_only_band_and_domain": {
+      "band": "TRAIN",
+      "declared_domains": [
+        "H1",
+        "H4"
+      ],
+      "pass": true,
+      "signal_domain": "H1"
+    }
+  },
+  "inherited_blocking_pass": true,
+  "inherited_integrity_hard_checks": {
+    "causality": true,
+    "deterministic_replay": true,
+    "entry_parity": true,
+    "fence": true,
+    "future_shift_changed_mapping": true,
+    "golden_traces": true,
+    "management_lattice": true,
+    "management_lifecycle": true,
+    "native_lattice": true,
+    "no_native_management_cross": true,
+    "order_fill_position_reconciliation": true,
+    "provenance": true,
+    "row_accounting": true,
+    "unique_result_keys": true
+  },
+  "run_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/runs/ctrader_H1/full",
+  "signal_domain": "H1",
+  "universe": "ctrader"
+}

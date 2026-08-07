@@ -224,7 +224,10 @@ def test_real_scheduler_materialises_complete_native_grid(
     assert native.filter(pl.col("arm_class") == "FIXED_NATIVE")[
         "arm_id"
     ].n_unique() == expected_fixed
-    assert set(SCHEDULE_COLUMNS) == set(schedule.columns)
+    from xen.adaptive_management.strategy import OPTIONAL_SCHEDULE_COLUMNS
+
+    assert set(SCHEDULE_COLUMNS) <= set(schedule.columns)
+    assert set(schedule.columns) - set(SCHEDULE_COLUMNS) <= set(OPTIONAL_SCHEDULE_COLUMNS)
     management = tables["policy_schedule"]
     assert management.filter(pl.col("native_arm_id").is_not_null()).is_empty()
     assert management["policy_id"].n_unique() > 1
@@ -272,7 +275,7 @@ def _stub_execution(monkeypatch, *, fail_on: set[str] | None = None, calls: list
         "_bars_frame",
         lambda symbol, bars: pl.DataFrame({"symbol": [symbol], "ts": [0]}),
     )
-    monkeypatch.setattr(runner, "_hourly_frame", lambda minute: minute)
+    monkeypatch.setattr(runner, "_domain_frame", lambda minute, domain="H1": minute)
     monkeypatch.setattr(
         runner,
         "_bar_marks",
@@ -286,7 +289,7 @@ def _stub_execution(monkeypatch, *, fail_on: set[str] | None = None, calls: list
         lambda symbol, instrument: symbol,
     )
 
-    def fake_materialise(spec, h1):
+    def fake_materialise(spec, h1, **kwargs):
         symbol = h1["symbol"][0]
         tables = {
             name: pl.DataFrame({"symbol": [symbol], "table": [name]})

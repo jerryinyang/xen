@@ -209,7 +209,7 @@ def materialise_native_arm(
         )
     if not spec.experiment_id or spec not in build_native_lattice(spec.experiment_id):
         raise ValueError("native spec is not a member of its experiment's frozen lattice")
-    is_breakout = spec.experiment_id == "SPDR-021"
+    is_breakout = spec.experiment_id in {"SPDR-021", "SPDR-024"}
     if is_breakout and set(origins["entry_variant"].unique()) != {"BREAKOUT"}:
         raise ValueError("native spec experiment does not match origin population")
     if not is_breakout and "entry_variant" in origins.columns:

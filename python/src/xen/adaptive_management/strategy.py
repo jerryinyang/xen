@@ -59,6 +59,9 @@ SCHEDULE_COLUMNS = (
     "trail_activation_bps",
     "risk_size",
 )
+# Carried to the engine when the schedule supplies it; absent schedules keep the plain
+# holding-cap semantics, so no existing experiment's ledger changes.
+OPTIONAL_SCHEDULE_COLUMNS = ("hold_exit_reason",)
 NS_PER_HOUR = 3_600_000_000_000
 
 # The ledger is one row per arm per state transition: millions of rows on a full TRAIN span.
@@ -89,6 +92,9 @@ class AdaptiveManagementConfig(StrategyConfig, frozen=True):
     base_trade_size: Decimal
     fence_start_ns: int
     fence_end_ns: int
+    # Nanoseconds in one signal-domain bar. Pending expiry and holding caps are declared in
+    # domain bars, so H4 arms must not measure them on an H1 clock (OD-2).
+    domain_ns: int = NS_PER_HOUR
     ledger_dir: str = ""
     ledger_batch_rows: int = LEDGER_BATCH_ROWS
 
@@ -279,7 +285,7 @@ class AdaptiveManagementStrategy(Strategy):
         if entry_order_type == "STOP":
             if row["stop_price"] is None or row["expiry_bars"] is None:
                 raise ValueError("STOP entry requires stop_price and expiry_bars")
-            expire_ns = int(bar.ts_event) + int(row["expiry_bars"]) * NS_PER_HOUR
+            expire_ns = int(bar.ts_event) + int(row["expiry_bars"]) * self.config.domain_ns
             order = self.order_factory.stop_market(
                 instrument_id=self.config.instrument_id,
                 order_side=side,
@@ -409,7 +415,7 @@ class AdaptiveManagementStrategy(Strategy):
             if row["hold_bars"] is not None:
                 deadline = int(event.ts_event) + int(
                     row["hold_bars"]
-                ) * NS_PER_HOUR
+                ) * self.config.domain_ns
                 self._hold_deadline[key] = deadline
                 timer_name = f"hold-{position_id}"
                 self._hold_timer[key] = timer_name
@@ -569,12 +575,21 @@ class AdaptiveManagementStrategy(Strategy):
         self._hold_deadline.pop(key, None)
         if position is None or position.is_closed:
             return
+        # An arm may declare what its holding exit means. The SPDR-024 uncapped arm exits only
+        # on its operational safety ceiling, and the ledger must say so rather than record it
+        # as an ordinary holding cap.
+        reason = str(row.get("hold_exit_reason") or "HOLD")
         order = self.order_factory.market(
             instrument_id=self.config.instrument_id,
             order_side=OrderSide.SELL if position.is_long else OrderSide.BUY,
             quantity=position.quantity,
             reduce_only=True,
-            tags=[*_identity_tags(row), "device=HOLD", "exit_reason=HOLD", "leg=HOLD"],
+            tags=[
+                *_identity_tags(row),
+                f"device={reason}",
+                f"exit_reason={reason}",
+                f"leg={reason}",
+            ],
         )
         self._by_client_order[str(order.client_order_id)] = row
         self._orders_by_execution[_execution_key(row)].append(str(order.client_order_id))

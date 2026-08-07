@@ -245,7 +245,7 @@ def run_integrity_checks(
         "deterministic_replay": deterministic["pass"],
         "management_lifecycle": management_lifecycle,
     }
-    controls = _informative_controls(features, origins, ledger_rows)
+    controls = _informative_controls(features, origins, ledger_rows, experiment_id)
     result = {
         "experiment_id": experiment_id,
         "universe": universe,
@@ -714,7 +714,7 @@ def _check_entry_parity(
     origins: pl.DataFrame,
     native: pl.DataFrame,
 ) -> bool:
-    if experiment_id == "SPDR-021":
+    if experiment_id in {"SPDR-021", "SPDR-024"}:
         return set(origins["entry_variant"]) == {"BREAKOUT"}
     expected_variants = {"E_TOUCH", "E_CLOSE"}
     # Breach zone origins are common to both variants and carry no variant column; the parity
@@ -785,15 +785,25 @@ def _informative_controls(
     features: pl.DataFrame,
     origins: pl.DataFrame,
     ledger_rows: int,
+    experiment_id: str = "",
 ) -> dict[str, Any]:
-    derangement = derange_component_times(features, seed=240730)
+    # OD-17 / D8: time derangement is REMOVED for SPDR-024. It was identical to its paired real
+    # estimate on 100% of rows in all six Step-3 cells - a control that was not there, not a
+    # control that passed. Emitting it here would reinstate a retired layer.
+    derangement_removed = experiment_id == "SPDR-024"
+    derangement = (
+        None if derangement_removed else derange_component_times(features, seed=240730)
+    )
     magnitude = magnitude_matched_controls(origins, features)
     return {
         "time_derangement": {
-            "seed": 240730,
-            "rows": derangement.height,
-            "zero_fixed_points": bool(
-                (derangement["source_ts"] == derangement["ts"]).sum() == 0
+            "status": "REMOVED_OD17" if derangement_removed else "EMITTED",
+            "seed": None if derangement_removed else 240730,
+            "rows": None if derangement_removed else derangement.height,
+            "zero_fixed_points": (
+                None
+                if derangement_removed
+                else bool((derangement["source_ts"] == derangement["ts"]).sum() == 0)
             ),
         },
         "magnitude_match": {

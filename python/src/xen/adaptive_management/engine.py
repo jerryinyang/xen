@@ -55,6 +55,7 @@ class WorkUnit:
     ledger_batch_rows: int = 250_000  # operational only: the emitted ledger cannot depend on it
     fence_start_ns: int | None = None
     fence_end_ns: int | None = None
+    domain_ns: int = 3_600_000_000_000
 
 
 def _make_instrument(spec: InstrumentSpec):
@@ -253,6 +254,7 @@ def run_work_unit(unit: WorkUnit) -> dict[str, int]:
                 if unit.fence_end_ns is not None
                 else int(max(ts_ns))
             ),
+            domain_ns=int(unit.domain_ns),
             ledger_dir=str(ledger_dir),
             ledger_batch_rows=int(unit.ledger_batch_rows),
         )

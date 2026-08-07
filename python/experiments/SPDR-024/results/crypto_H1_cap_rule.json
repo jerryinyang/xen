@@ -1,0 +1,85 @@
+{
+  "arm_rows": 102160,
+  "bind_rate_by_candidate": {
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "12": 1.0,
+    "24": 1.0,
+    "48": 1.0
+  },
+  "censored_positions": 18,
+  "closed_positions": 1574,
+  "decay_curve": [
+    {
+      "bars_held": 120,
+      "mean_outcome_bps": 35.21077898413921,
+      "mean_primary_bps": 35.21077898413921,
+      "n": 1574
+    }
+  ],
+  "decay_curve_class": "DESCRIPTIVE_SETS_NO_CAP_IN_THIS_RUN",
+  "duration_basis": "signal-domain bars from engine entry to engine close",
+  "duration_distribution": {
+    "ceiling_bars": 120,
+    "ceiling_bind_rate": 1.0,
+    "closed_positions": 1574,
+    "mean_bars": 120.00000000000001,
+    "percentiles": {
+      "100": 120.00000000000001,
+      "50": 120.00000000000001,
+      "75": 120.00000000000001,
+      "90": 120.00000000000001,
+      "95": 120.00000000000001,
+      "99": 120.00000000000001
+    }
+  },
+  "filled_positions": 1592,
+  "grid": [
+    2,
+    4,
+    8,
+    12,
+    24,
+    48
+  ],
+  "hold_cap_bars": null,
+  "operator_note": "No declared grid value binds at or below the declared fraction. The rule is reported as it fell out; the cap is NOT set, and the comparison arms keep the declared baseline hold. The decay curve remains descriptive (H3).",
+  "operator_note_ceiling": "The safety ceiling binds above its declared 2% tolerance, so it is not acting purely as a valve. Design section 7 requires this be flagged to the operator rather than reinterpreted.",
+  "outcome_never_consulted": true,
+  "per_symbol_closed": {
+    "1000BONKUSDT": 57,
+    "1000LUNCUSDT": 73,
+    "1000PEPEUSDT": 34,
+    "1000RATSUSDT": 4,
+    "ADAUSDT": 85,
+    "AVAXUSDT": 86,
+    "BIGTIMEUSDT": 11,
+    "BLURUSDT": 49,
+    "BNBUSDT": 85,
+    "BTCUSDT": 84,
+    "DOGEUSDT": 88,
+    "DYDXUSDT": 85,
+    "ETHUSDT": 84,
+    "GALAUSDT": 87,
+    "INJUSDT": 81,
+    "LINKUSDT": 87,
+    "MATICUSDT": 150,
+    "OPUSDT": 86,
+    "ORDIUSDT": 32,
+    "PYTHUSDT": 4,
+    "SEIUSDT": 22,
+    "SOLUSDT": 84,
+    "TIAUSDT": 7,
+    "WLDUSDT": 25,
+    "XRPUSDT": 84
+  },
+  "realised_bind_rate": null,
+  "rule": "smallest declared grid value binding <= 5% of arm B closed positions; duration basis only",
+  "run_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/runs/crypto_H1/hold",
+  "safety_ceiling_bars": 120,
+  "safety_ceiling_bind_rate": 1.0,
+  "safety_ceiling_flagged": true,
+  "status": "NOT_APPLICABLE",
+  "uncapped_arm_id": "UNCAPPED_HOLD_SAFETY_CEILING"
+}

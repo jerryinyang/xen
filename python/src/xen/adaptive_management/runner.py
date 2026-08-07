@@ -29,6 +29,7 @@ import polars as pl
 
 from xen.adaptive_management.contracts import (
     Device,
+    SIGNAL_DOMAIN_HOURS,
     ExperimentSpec,
     NativeArmSpec,
     OriginState,
@@ -41,6 +42,11 @@ from xen.adaptive_management.entries import breach_origins, breakout_origins
 from xen.adaptive_management.features import Calibration, build_feature_panel, fit_calibration
 from xen.adaptive_management.native_parameters import materialise_native_arm
 from xen.adaptive_management.policies import materialise_policy
+from xen.adaptive_management.spdr024 import (
+    attach_regime_labels,
+    regime_episode_summary,
+    regime_panel,
+)
 from xen.nautilus.catalog_fence import (
     FenceManifest,
     FenceViolation,
@@ -52,6 +58,7 @@ from xen.nautilus.catalog_fence import (
 from xen.nautilus.emission import write_emission_v1
 
 Universe = Literal["crypto", "ctrader"]
+NS_PER_HOUR = 3_600_000_000_000
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 CRYPTO_CATALOG = REPO_ROOT / "data" / "catalog"
@@ -78,6 +85,8 @@ TABLE_ARTIFACTS = (
     "episodes",
     "policy_schedule",
     "episode_results",
+    # E1: the regime episode inventory the V-C variance treatment resamples over.
+    "regime_episodes",
 )
 RAW_ARTIFACTS = tuple(f"{name}.parquet" for name in TABLE_ARTIFACTS) + (
     "config.json",
@@ -126,6 +135,14 @@ class RunPlan:
     manifest: FenceManifest
     jobs: int
     metadata: dict[str, Any]
+    #: SPDR-024 M4 common maximum hold, in signal-domain bars. Set only from the arm-B
+    #: duration distribution by the design section 7 CAP-RULE; never chosen from outcomes.
+    hold_cap_bars: int | None = None
+    #: Restrict execution to these declared arm ids (SPDR-024 phase 1 runs arms A and B only).
+    arm_filter: tuple[str, ...] | None = None
+    #: Leak tripwire only (design section 9): make every component readable this many
+    #: signal-domain bars earlier than it could have been. 0 is the causal run.
+    future_shift_bars: int = 0
 
 
 @dataclass(frozen=True)
@@ -185,6 +202,9 @@ def _run_plan(
     universe: Universe,
     *,
     jobs: int,
+    hold_cap_bars: int | None = None,
+    arm_filter: tuple[str, ...] | None = None,
+    future_shift_bars: int = 0,
 ) -> RunPlan:
     if jobs < 1:
         raise ValueError("jobs must be at least 1")
@@ -197,7 +217,16 @@ def _run_plan(
         band="TRAIN",
     )
     metadata = _catalog_metadata(config)
-    return RunPlan(spec=spec, universe=config, manifest=manifest, jobs=jobs, metadata=metadata)
+    return RunPlan(
+        spec=spec,
+        universe=config,
+        manifest=manifest,
+        jobs=jobs,
+        metadata=metadata,
+        hold_cap_bars=hold_cap_bars,
+        arm_filter=arm_filter,
+        future_shift_bars=future_shift_bars,
+    )
 
 
 def _plan_payload(plan: RunPlan, *, dry_run: bool) -> dict[str, Any]:
@@ -206,6 +235,11 @@ def _plan_payload(plan: RunPlan, *, dry_run: bool) -> dict[str, Any]:
     return {
         "experiment_id": plan.spec.experiment_id,
         "universe": plan.universe.name,
+        "signal_domain": plan.spec.domain,
+        "signal_domain_hours": SIGNAL_DOMAIN_HOURS[plan.spec.domain],
+        "hold_cap_bars": plan.hold_cap_bars,
+        "arm_filter": list(plan.arm_filter) if plan.arm_filter is not None else None,
+        "future_shift_bars": plan.future_shift_bars,
         "band": "TRAIN",
         "dry_run": dry_run,
         "jobs": plan.jobs,
@@ -235,12 +269,15 @@ def run_experiment(
     jobs: int = 1,
     dry_run: bool = False,
     resume: bool = False,
+    hold_cap_bars: int | None = None,
+    arm_filter: tuple[str, ...] | None = None,
+    future_shift_bars: int = 0,
     progress: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     """Run one experiment/universe independently and publish a complete atomic emission."""
     if band != "TRAIN":
         raise FenceViolation("adaptive-management SPDR runners are TRAIN-only")
-    if spec.experiment_id not in {"SPDR-021", "SPDR-022", "SPDR-023"}:
+    if spec.experiment_id not in {"SPDR-021", "SPDR-022", "SPDR-023", "SPDR-024"}:
         raise ValueError(f"unsupported experiment: {spec.experiment_id}")
     output = Path(output)
     in_progress = output.parent / f".{output.name}.inprogress"
@@ -250,7 +287,14 @@ def run_experiment(
         raise FileExistsError(
             f"refusing to overwrite in-progress directory (use resume): {in_progress}"
         )
-    plan = _run_plan(spec, universe, jobs=jobs)
+    plan = _run_plan(
+        spec,
+        universe,
+        jobs=jobs,
+        hold_cap_bars=hold_cap_bars,
+        arm_filter=arm_filter,
+        future_shift_bars=future_shift_bars,
+    )
     payload = _plan_payload(plan, dry_run=dry_run)
     if dry_run:
         return payload
@@ -377,8 +421,14 @@ def _execute_plan(
             if not bars:
                 raise RuntimeError(f"TRAIN query returned no bars for {instrument_id}")
             minute = _bars_frame(symbol, bars)
-            h1 = _hourly_frame(minute)
-            tables, schedule = _materialise_symbol(plan.spec, h1)
+            domain_bars = _domain_frame(minute, plan.spec.domain)
+            tables, schedule = _materialise_symbol(
+                plan.spec,
+                domain_bars,
+                hold_cap_bars=plan.hold_cap_bars,
+                arm_filter=plan.arm_filter,
+                future_shift_bars=plan.future_shift_bars,
+            )
             symbol_root = workspace / "work" / symbol
             shutil.rmtree(symbol_root, ignore_errors=True)
             symbol_root.mkdir(parents=True)
@@ -395,6 +445,7 @@ def _execute_plan(
                 base_trade_size=_base_trade_size(instrument),
                 fence_start_ns=int(plan.manifest.analysis_start_utc.timestamp() * 1e9),
                 fence_end_ns=int(plan.manifest.train_end_utc.timestamp() * 1e9),
+                domain_ns=SIGNAL_DOMAIN_HOURS[plan.spec.domain] * NS_PER_HOUR,
             )
             return symbol, unit, tables, _bar_marks(symbol, instrument_id, minute)
 
@@ -595,16 +646,22 @@ class _ProgressReporter:
 def _materialise_symbol(
     spec: ExperimentSpec,
     h1: pl.DataFrame,
+    *,
+    hold_cap_bars: int | None = None,
+    arm_filter: tuple[str, ...] | None = None,
+    future_shift_bars: int = 0,
 ) -> tuple[dict[str, pl.DataFrame], pl.DataFrame]:
     train_start = h1["ts"].min()
     train_end = h1["ts"].max()
     calibration = fit_calibration(h1, train_start, train_end)
-    features = build_feature_panel(h1, calibration)
+    features = build_feature_panel(
+        h1, calibration, availability_shift_bars=future_shift_bars
+    )
     medians = {
         "range": calibration.median_range_scale_bps,
         "swing": calibration.median_swing_scale_bps,
     }
-    if spec.experiment_id == "SPDR-021":
+    if spec.experiment_id in {"SPDR-021", "SPDR-024"}:
         origin_work = breakout_origins(
             h1.join(features.select("symbol", "ts", "atr20"), on=["symbol", "ts"])
         )
@@ -617,9 +674,17 @@ def _materialise_symbol(
             column for column in origin_work.columns if not column.startswith("_path_")
         )
 
+    # E1: the realised regime label, from volatility at <= t-1 only, carried on every origin
+    # and therefore on every arm's episode row.
+    regimes = regime_panel(features)
+    public_origins = attach_regime_labels(public_origins, regimes)
+
+    selected = set(arm_filter) if arm_filter is not None else None
     native_parts: list[pl.DataFrame] = []
     fixed_by_variant: dict[str, pl.DataFrame] = {}
     for arm in build_native_lattice(spec.experiment_id):
+        if selected is not None and arm.is_adaptive and arm.native_arm_id not in selected:
+            continue
         episodes = materialise_native_arm(origin_work, features, medians, arm)
         native_parts.append(_native_schedule(episodes, arm, spec.experiment_id))
         if not arm.is_adaptive:
@@ -631,6 +696,8 @@ def _materialise_symbol(
     for variant, fixed_episodes in fixed_by_variant.items():
         materialised: list[tuple[PolicySpec, pl.DataFrame]] = []
         for policy in policies:
+            if selected is not None and policy.policy_id not in selected:
+                continue
             rows = materialise_policy(
                 fixed_episodes,
                 features,
@@ -641,9 +708,14 @@ def _materialise_symbol(
             materialised.append((policy, rows))
         policy_parts.extend(_management_schedules(materialised, variant, spec.experiment_id))
     policy_schedule = _concat(policy_parts)
-    execution_schedule = _concat([native_schedule, policy_schedule]).select(
-        _strategy_columns()
+    native_schedule = _apply_hold_cap(
+        attach_regime_labels(native_schedule, regimes), hold_cap_bars
     )
+    policy_schedule = _apply_hold_cap(
+        attach_regime_labels(policy_schedule, regimes), hold_cap_bars
+    )
+    combined = _concat([native_schedule, policy_schedule])
+    execution_schedule = combined.select(_strategy_columns(combined))
 
     return (
         {
@@ -654,8 +726,35 @@ def _materialise_symbol(
             "episodes": native_schedule,
             "policy_schedule": policy_schedule,
             "episode_results": pl.DataFrame(),
+            "regime_episodes": regime_episode_summary(regimes),
         },
         execution_schedule,
+    )
+
+
+def _apply_hold_cap(schedule: pl.DataFrame, hold_cap_bars: int | None) -> pl.DataFrame:
+    """Give every arm the common maximum hold (M4) and record whether the cap binds.
+
+    The cap is measurement apparatus, not a hold device: it is applied identically to every
+    arm and its per-arm bind rate is emitted (E5). A null hold stays null.
+    """
+    if schedule.is_empty() or "hold_bars" not in schedule.columns:
+        return schedule
+    if hold_cap_bars is None:
+        return schedule.with_columns(
+            pl.lit(None, dtype=pl.Int64).alias("hold_cap_bars"),
+            pl.lit(False).alias("hold_cap_binds"),
+        )
+    cap = int(hold_cap_bars)
+    return schedule.with_columns(
+        pl.lit(cap, dtype=pl.Int64).alias("hold_cap_bars"),
+        (pl.col("hold_bars") > cap).fill_null(False).alias("hold_cap_binds"),
+    ).with_columns(
+        pl.when(pl.col("hold_bars").is_null())
+        .then(None)
+        .otherwise(pl.min_horizontal(pl.col("hold_bars"), pl.lit(cap, dtype=pl.Int64)))
+        .cast(pl.Int64)
+        .alias("hold_bars"),
     )
 
 
@@ -671,7 +770,7 @@ def _native_schedule(
         if arm.combination_id
         else "NATIVE"
     )
-    hold = 1 if experiment_id == "SPDR-021" else 4
+    hold = 1 if experiment_id in {"SPDR-021", "SPDR-024"} else 4
     return _schedule_defaults(episodes).with_columns(
         pl.lit(arm.native_arm_id).alias("arm_id"),
         pl.lit(arm_class).alias("arm_class"),
@@ -793,6 +892,7 @@ def _schedule_defaults(frame: pl.DataFrame) -> pl.DataFrame:
         "hold_bars": (None, pl.Int64),
         "risk_size": (1.0, pl.Float64),
         "exit_reason": (None, pl.Utf8),
+        "hold_exit_reason": (None, pl.Utf8),
     }
     expressions = [
         pl.lit(value, dtype=dtype).alias(name)
@@ -802,10 +902,16 @@ def _schedule_defaults(frame: pl.DataFrame) -> pl.DataFrame:
     return frame.with_columns(expressions) if expressions else frame
 
 
-def _strategy_columns() -> list[str]:
-    from xen.adaptive_management.strategy import SCHEDULE_COLUMNS
+def _strategy_columns(frame: pl.DataFrame | None = None) -> list[str]:
+    from xen.adaptive_management.strategy import (
+        OPTIONAL_SCHEDULE_COLUMNS,
+        SCHEDULE_COLUMNS,
+    )
 
-    return list(SCHEDULE_COLUMNS)
+    columns = list(SCHEDULE_COLUMNS)
+    if frame is not None:
+        columns += [name for name in OPTIONAL_SCHEDULE_COLUMNS if name in frame.columns]
+    return columns
 
 
 def _bars_frame(symbol: str, bars: list[Any]) -> pl.DataFrame:
@@ -825,13 +931,16 @@ def _bars_frame(symbol: str, bars: list[Any]) -> pl.DataFrame:
     ).with_columns(pl.col("ts").cast(pl.Datetime("ns", "UTC")))
 
 
-def _hourly_frame(minutes: pl.DataFrame) -> pl.DataFrame:
+def _domain_frame(minutes: pl.DataFrame, domain: str = "H1") -> pl.DataFrame:
+    """Aggregate native one-minute bars into the run's signal-domain bars (OD-2)."""
+    hours = SIGNAL_DOMAIN_HOURS[domain]
+    every = f"{hours}h"
     return (
         minutes.sort("ts")
         .group_by_dynamic(
             "ts",
-            every="1h",
-            period="1h",
+            every=every,
+            period=every,
             closed="right",
             label="right",
         )

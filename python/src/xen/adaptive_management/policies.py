@@ -11,11 +11,15 @@ from __future__ import annotations
 import polars as pl
 
 from xen.adaptive_management.contracts import (
+    BASELINE_HOLD_BARS,
     Component,
     Device,
     NativeArmSpec,
     PolicySpec,
     OriginState,
+    SCALE_COMPONENTS,
+    STATE_SIZE_SETTING,
+    UNCAPPED_ARM_ID,
     build_management_lattice,
 )
 from xen.adaptive_management.native_parameters import (
@@ -87,6 +91,13 @@ def state_hold_bars(state: str, component: Component) -> int:
 
 def _multiplier_from_setting(setting: str) -> float:
     return float(setting[1:])
+
+
+def _baseline_hold(experiment_id: str) -> int:
+    """Bars the plain baseline holds, in signal-domain bars."""
+    if experiment_id in {"SPDR-021", "SPDR-024"}:
+        return BASELINE_HOLD_BARS
+    return FIXED_HOLD_BARS
 
 
 def _distance_columns(
@@ -175,6 +186,10 @@ def materialise_policy(
             pl.lit(spec.fixed_hold_bars, dtype=pl.Int64).alias("hold_bars"),
             pl.lit(spec.pending_expiry_bars, dtype=pl.Int64).alias("pending_expiry_bars"),
             pl.lit(1.0).alias("risk_size"),
+            pl.lit(
+                "SAFETY_CEILING" if spec.policy_id == UNCAPPED_ARM_ID else None,
+                dtype=pl.Utf8,
+            ).alias("hold_exit_reason"),
         ]
     elif not spec.is_adaptive:
         if spec.device in (Device.TARGET, Device.STOP, Device.TRAIL):
@@ -202,10 +217,7 @@ def materialise_policy(
             columns += [
                 pl.lit(1.0).alias("risk_size"),
                 pl.lit(1.0).alias("fixed_risk_size"),
-                pl.lit(
-                    1 if experiment_id == "SPDR-021" else 4,
-                    dtype=pl.Int64,
-                ).alias("hold_bars"),
+                pl.lit(_baseline_hold(experiment_id), dtype=pl.Int64).alias("hold_bars"),
             ]
     elif spec.device in (Device.TARGET, Device.STOP, Device.TRAIL):
         adaptive, fixed = _distance_columns(spec, medians)
@@ -265,7 +277,25 @@ def materialise_policy(
             pl.lit(FIXED_HOLD_BARS, dtype=pl.Int64).alias("fixed_hold_bars"),
         ]
     else:  # Device.SIZE
-        if component is Component.RANGE_SCALE:
+        if component in SCALE_COLUMN and spec.setting == STATE_SIZE_SETTING:
+            # The discrete gate on a numeric component: its own calibration-median ratio
+            # q >= 1 is the HIGH state, exactly as the native expiry schedule discretises it.
+            median = pl.col("symbol").replace_strict(
+                medians, default=None, return_dtype=pl.Float64
+            )
+            state = (
+                pl.when(pl.col(SCALE_COLUMN[component]) >= median)
+                .then(pl.lit("HIGH"))
+                .when(pl.col(SCALE_COLUMN[component]).is_not_null())
+                .then(pl.lit("LOW"))
+                .otherwise(pl.lit("UNKNOWN"))
+            )
+            size = (
+                pl.when(state == "HIGH").then(pl.lit(SIZE_RESTRAINT))
+                .when(state == "LOW").then(pl.lit(1.0))
+                .otherwise(None)
+            )
+        elif component in SCALE_COMPONENTS:
             median = pl.col("symbol").replace_strict(
                 medians, default=None, return_dtype=pl.Float64
             )
@@ -300,10 +330,7 @@ def materialise_policy(
         columns += [
             size.alias("risk_size"),
             pl.lit(1.0).alias("fixed_risk_size"),
-            pl.lit(
-                1 if experiment_id == "SPDR-021" else 4,
-                dtype=pl.Int64,
-            ).alias("hold_bars"),
+            pl.lit(_baseline_hold(experiment_id), dtype=pl.Int64).alias("hold_bars"),
         ]
 
     result = _null_out_nan(frame.with_columns(columns))

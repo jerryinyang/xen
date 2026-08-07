@@ -1,0 +1,185 @@
+{
+  "P1_per_symbol": [
+    {
+      "blocks": {
+        "V_A_UNCHUNKED": 2057,
+        "V_B_TIME_BLOCK": 641,
+        "V_C_REGIME_EPISODE": 649
+      },
+      "conversion_pin": {
+        "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
+        "rows": 15422,
+        "source": "COMPUTED_FROM_TRAIN_DATA_NEVER_RECALLED",
+        "train_median_bps": 12.825483066547891,
+        "train_p10_bps": 8.530918197535618,
+        "train_p90_bps": 21.40594875495971
+      },
+      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "domain_bars": 15423,
+      "fixed_arm_orders": 2057,
+      "mde_sigma": {
+        "V_A_UNCHUNKED": 0.061736340918339294,
+        "V_B_TIME_BLOCK": 0.11059335077467099,
+        "V_C_REGIME_EPISODE": 0.10990961407704034
+      },
+      "most_conservative_mde_sigma": 0.11059335077467099,
+      "order_rate_per_origin": 0.2988956698634118,
+      "origins": 6882,
+      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "regime_episodes": 748,
+      "symbol": "EURUSD"
+    },
+    {
+      "blocks": {
+        "V_A_UNCHUNKED": 1871,
+        "V_B_TIME_BLOCK": 621,
+        "V_C_REGIME_EPISODE": 639
+      },
+      "conversion_pin": {
+        "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
+        "rows": 14648,
+        "source": "COMPUTED_FROM_TRAIN_DATA_NEVER_RECALLED",
+        "train_median_bps": 22.956260841126518,
+        "train_p10_bps": 17.021690150286403,
+        "train_p90_bps": 31.703292785859016
+      },
+      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "domain_bars": 14649,
+      "fixed_arm_orders": 1871,
+      "mde_sigma": {
+        "V_A_UNCHUNKED": 0.06473231481653668,
+        "V_B_TIME_BLOCK": 0.11236012954671792,
+        "V_C_REGIME_EPISODE": 0.11076628809809297
+      },
+      "most_conservative_mde_sigma": 0.11236012954671792,
+      "order_rate_per_origin": 0.2839150227617602,
+      "origins": 6590,
+      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "regime_episodes": 750,
+      "symbol": "XAUUSD"
+    },
+    {
+      "blocks": {
+        "V_A_UNCHUNKED": 1810,
+        "V_B_TIME_BLOCK": 619,
+        "V_C_REGIME_EPISODE": 593
+      },
+      "conversion_pin": {
+        "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
+        "rows": 14630,
+        "source": "COMPUTED_FROM_TRAIN_DATA_NEVER_RECALLED",
+        "train_median_bps": 34.50174334732536,
+        "train_p10_bps": 19.976218508509096,
+        "train_p90_bps": 62.59202178861558
+      },
+      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "domain_bars": 14631,
+      "fixed_arm_orders": 1810,
+      "mde_sigma": {
+        "V_A_UNCHUNKED": 0.06581406926111757,
+        "V_B_TIME_BLOCK": 0.11254150194813971,
+        "V_C_REGIME_EPISODE": 0.11498221872944545
+      },
+      "most_conservative_mde_sigma": 0.11498221872944545,
+      "order_rate_per_origin": 0.2747002580057672,
+      "origins": 6589,
+      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "regime_episodes": 688,
+      "symbol": "USTEC"
+    }
+  ],
+  "P1_pooled": {
+    "count_basis": "STOP ORDERS CREATED. Fills are a subset, so every MDE below is OPTIMISTIC against the realised sample; the realised MDE is recomputed post-execution from filled trades.",
+    "mde_sigma_V_A_UNCHUNKED": 0.03696389767886772,
+    "mde_sigma_V_B_TIME_BLOCK": 0.0645600166275003,
+    "mde_sigma_V_C_REGIME_EPISODE": 0.0645600166275003,
+    "most_conservative_mde_sigma": 0.0645600166275003,
+    "n_orders_created": 5738,
+    "power_label": "CARRIES_MAGNITUDE_QUESTION",
+    "power_label_basis": "ORDERS_NOT_FILLS_TREAT_AS_UPPER_BOUND"
+  },
+  "P2_origin_counts": {
+    "EURUSD": {
+      "orders": 2057,
+      "origins": 6882
+    },
+    "USTEC": {
+      "orders": 1810,
+      "origins": 6589
+    },
+    "XAUUSD": {
+      "orders": 1871,
+      "origins": 6590
+    }
+  },
+  "P3_conversion_pin": {
+    "EURUSD": {
+      "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
+      "rows": 15422,
+      "source": "COMPUTED_FROM_TRAIN_DATA_NEVER_RECALLED",
+      "train_median_bps": 12.825483066547891,
+      "train_p10_bps": 8.530918197535618,
+      "train_p90_bps": 21.40594875495971
+    },
+    "USTEC": {
+      "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
+      "rows": 14630,
+      "source": "COMPUTED_FROM_TRAIN_DATA_NEVER_RECALLED",
+      "train_median_bps": 34.50174334732536,
+      "train_p10_bps": 19.976218508509096,
+      "train_p90_bps": 62.59202178861558
+    },
+    "XAUUSD": {
+      "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
+      "rows": 14648,
+      "source": "COMPUTED_FROM_TRAIN_DATA_NEVER_RECALLED",
+      "train_median_bps": 22.956260841126518,
+      "train_p10_bps": 17.021690150286403,
+      "train_p90_bps": 31.703292785859016
+    }
+  },
+  "P5_cross_symbol_correlation": {
+    "consequence": "the interval stays symbol-clustered under every variance treatment (M1)",
+    "max_correlation": 0.42093046934667827,
+    "mean_correlation": 0.31230662876391496,
+    "median_correlation": 0.3629561956881463,
+    "min_correlation": 0.15303322125692026,
+    "overlapping_bars": 14618,
+    "pairs": 3,
+    "symbols": [
+      "EURUSD",
+      "XAUUSD",
+      "USTEC"
+    ]
+  },
+  "P5_paired_difference_dependence": {
+    "reason": "the paired arm-difference series is outcome x weight and no outcome exists before the run; the weight half is measured above",
+    "scheduled": "first post-execution diagnostic, before any effect is read",
+    "status": "NOT_COMPUTABLE_BEFORE_EXECUTION"
+  },
+  "P5_weight_series_dependence": {
+    "EURUSD": {
+      "max_abs_autocorrelation_lag_1_20": 0.6988884907936237,
+      "n": 2057,
+      "noise_band_95": 0.04321543864283751
+    },
+    "USTEC": {
+      "max_abs_autocorrelation_lag_1_20": 0.7449426065665178,
+      "n": 1810,
+      "noise_band_95": 0.046069848482782304
+    },
+    "XAUUSD": {
+      "max_abs_autocorrelation_lag_1_20": 0.42745949337262995,
+      "n": 1871,
+      "noise_band_95": 0.045312620371575685
+    }
+  },
+  "band": "TRAIN",
+  "experiment_id": "SPDR-024",
+  "interpretation": "OPERATIONAL_AND_POWER_ONLY_NO_RESEARCH_VALUE",
+  "manifest_sha256": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0",
+  "signal_domain": "H1",
+  "train_end_utc": "2023-11-22T00:00:00+00:00",
+  "train_start_utc": "2021-06-02T00:01:00+00:00",
+  "universe": "ctrader"
+}

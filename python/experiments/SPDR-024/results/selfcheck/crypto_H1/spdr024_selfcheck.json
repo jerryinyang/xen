@@ -1,0 +1,587 @@
+{
+  "blocking_pass": true,
+  "evaluation_errors": {},
+  "experiment_id": "SPDR-024",
+  "failed_checks": [],
+  "hard_check_count": 17,
+  "hard_checks": {
+    "arm_lattice_matches_design": {
+      "absent": [],
+      "declared_arms": 38,
+      "device_note": "devices read from the emitted column; the safety ceiling is device NONE and is apparatus, not a hold-length arm",
+      "expected_arms": 38,
+      "observed_arms": 38,
+      "pass": true,
+      "refuted_devices_present": [],
+      "reverse_arms_present": [],
+      "unexpected": []
+    },
+    "causal_t_minus_1_provenance": {
+      "pass": true,
+      "source": "integrity_selfcheck.json:hard_checks.causality"
+    },
+    "deterministic_rerun": {
+      "artifacts_compared": 217,
+      "differing_artifacts": [],
+      "jobs": 3,
+      "normalised_before_hashing": {
+        "run_environment.json": [
+          "jobs"
+        ],
+        "run_metadata.json": [
+          "generated_utc"
+        ]
+      },
+      "note": "only wall-clock stamps and the declared worker count are normalised; every research artifact is compared byte for byte",
+      "pass": true,
+      "replay_source": "experiments/SPDR-024/results/runs/crypto_H1/replay"
+    },
+    "e1_regime_label_present": {
+      "declared_nullable": [],
+      "missing_columns": [],
+      "non_null_rows": {
+        "regime_episode_id": 3882080,
+        "regime_state": 3882080
+      },
+      "pass": true,
+      "requirement": "E1",
+      "unexpectedly_empty_columns": []
+    },
+    "e2_counterfactual_present_and_non_zero_fill": {
+      "finite_share": 1.0,
+      "max_allowed_zero_share": 0.1,
+      "min_rows_required": 30,
+      "non_zero_counterfactuals": 78472,
+      "note": "a zero-filled counterfactual would void every selection read",
+      "pass": true,
+      "rejected_with_counterfactual": 80390,
+      "zero_fill_share": 0.02385868889165319
+    },
+    "e4_exit_reason_and_entry_ts_populated": {
+      "declared_nullable": [],
+      "missing_columns": [],
+      "non_null_rows": {
+        "entry_ts": 273699,
+        "exit_reason": 273650
+      },
+      "pass": true,
+      "requirement": "E4",
+      "unexpectedly_empty_columns": []
+    },
+    "e5_hold_duration_and_cap_flag_present": {
+      "declared_nullable": [
+        "hold_cap_bars"
+      ],
+      "missing_columns": [],
+      "non_null_rows": {
+        "hold_bars_realised": 273650,
+        "hold_cap_bars": 0,
+        "hold_cap_binds": 3882080
+      },
+      "pass": true,
+      "requirement": "E5",
+      "unexpectedly_empty_columns": []
+    },
+    "e6_capital_normalised_estimand_present": {
+      "declared_nullable": [],
+      "missing_columns": [],
+      "non_null_rows": {
+        "capital_normalised_return_bps": 273650
+      },
+      "pass": true,
+      "requirement": "E6",
+      "unexpectedly_empty_columns": []
+    },
+    "estimand_reconciliation": {
+      "artifact": "experiments/SPDR-024/results/estimand_validation_crypto_H1.json",
+      "checks": null,
+      "pass": true
+    },
+    "future_shift_tripwire_collapse": {
+      "admission_rows_changed": 12664,
+      "arms_compared": 34,
+      "arms_with_a_causal_edge": 5,
+      "arms_with_an_edge_that_did_not_collapse_into_noise": [
+        "ADP_LEVEL_FORECAST_K12_SIZE_STATE_HALVE_HIGH",
+        "ADP_LEVEL_FORECAST_K4_SIZE_STATE_HALVE_HIGH",
+        "ADP_LEVEL_NOW_SIZE_STATE_HALVE_HIGH",
+        "ADP_SWING_GT_CUR_SIZE_STATE_HALVE_HIGH"
+      ],
+      "bite_note": "the tripwire had at least one arm with an edge to destroy",
+      "class": "future_destroy HARD VALIDITY",
+      "committed_capital_rows_changed": 246756,
+      "comparisons": [
+        {
+          "arm_id": "ADP_LEVEL_FORECAST_K12_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": true,
+          "causal_effect_sigma": -0.0458404405313599,
+          "channel": "SCALE",
+          "collapse_fraction": -0.1411323749081146,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.030476218683171626,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.05231001077038491
+        },
+        {
+          "arm_id": "ADP_LEVEL_FORECAST_K4_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": true,
+          "causal_effect_sigma": -0.04904980002794288,
+          "channel": "SCALE",
+          "collapse_fraction": -0.07359405142824893,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.030425797109811054,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.05265957353374464
+        },
+        {
+          "arm_id": "ADP_LEVEL_NOW_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": true,
+          "causal_effect_sigma": -0.03374438961503662,
+          "channel": "SCALE",
+          "collapse_fraction": -0.0836758239687081,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.030425797109811054,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.036567979220395924
+        },
+        {
+          "arm_id": "ADP_RANGE_SCALE_SIZE_SCALE_NORMALISED",
+          "causal_edge_present": false,
+          "causal_effect_sigma": 0.01789832853802166,
+          "channel": "SCALE",
+          "collapse_fraction": 0.28164009785945254,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.030425797109811054,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": 0.012857441537052608
+        },
+        {
+          "arm_id": "ADP_RANGE_SCALE_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": false,
+          "causal_effect_sigma": -0.0015104126105121274,
+          "channel": "SCALE",
+          "collapse_fraction": -2.0329321453065936,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.030425797109811054,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.004580978959098679
+        },
+        {
+          "arm_id": "ADP_SHOCK_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": false,
+          "causal_effect_sigma": -0.013230121320458534,
+          "channel": "SCALE",
+          "collapse_fraction": -0.279155613447041,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.030425797109811054,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.016923383953649913
+        },
+        {
+          "arm_id": "ADP_SWING_GT_CUR_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": true,
+          "causal_effect_sigma": -0.04384205097934367,
+          "channel": "SCALE",
+          "collapse_fraction": 0.01604235290162348,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.030425797109811054,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.04313872132560207
+        },
+        {
+          "arm_id": "ADP_SWING_SCALE_SIZE_SCALE_NORMALISED",
+          "causal_edge_present": true,
+          "causal_effect_sigma": 0.034062773311664775,
+          "channel": "SCALE",
+          "collapse_fraction": 0.1740428406218213,
+          "collapsed_into_noise": true,
+          "mde_sigma": 0.030711799515029975,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": 0.028134391485045474
+        },
+        {
+          "arm_id": "ADP_SWING_SCALE_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": false,
+          "causal_effect_sigma": 0.008335449746129356,
+          "channel": "SCALE",
+          "collapse_fraction": 0.7415161971197809,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.030425797109811054,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": 0.002154578749096473
+        },
+        {
+          "arm_id": "ADP_TAIL_RISK_SIZE_STATE_HALVE_HIGH",
+          "causal_edge_present": false,
+          "causal_effect_sigma": -0.02575086876172241,
+          "channel": "SCALE",
+          "collapse_fraction": -0.11299536844923153,
+          "collapsed_into_noise": false,
+          "mde_sigma": 0.030425797109811054,
+          "shifted_edge_survives": false,
+          "shifted_effect_sigma": -0.02866059766534104
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_LEVEL_FORECAST_K12_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 1.983695718203193,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 12.253077934585983,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 4.755712020533546
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_LEVEL_FORECAST_K4_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 3.3003632285422206,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 12.835763309586042,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 3.287046508826484
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_LEVEL_NOW_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 2.4108155723416322,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 9.995614153730758,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 2.844079859584487
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_RANGE_SCALE_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 1.2422718275092848,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 10.457770593459173,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 2.035964996955318
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_SHOCK_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 3.3245929389562807,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 9.250486847992264,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 6.134311745472217
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_SWING_GT_CUR_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 4.553375649262564,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 10.158120376145686,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 4.546186088145086
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_SWING_SCALE_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": -1.482913284237371,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 10.119483093019861,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": -0.6836974504815627
+        },
+        {
+          "applicable": true,
+          "arm_id": "NATCOMB_BREAKOUT_TAIL_RISK_DIRECT_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 3.8621318743107005,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 9.876018972066666,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 3.9933321414896947
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_LEVEL_FORECAST_K12_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 1.8811024334147328,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 12.346036004635154,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 4.970866822673934
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_LEVEL_FORECAST_K12_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_LEVEL_FORECAST_K4_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 3.6964456634730727,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 12.848712034936312,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 3.506128268623617
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_LEVEL_FORECAST_K4_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_LEVEL_NOW_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 2.7752739185490176,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 9.983609596600461,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 3.1892144117857066
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_LEVEL_NOW_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_RANGE_SCALE_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 1.6687344860033768,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 10.343430493920737,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 2.457203829516444
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_RANGE_SCALE_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_SHOCK_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 4.978418229000224,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 9.1310791581849,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 7.739275684190377
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_SHOCK_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_SWING_GT_CUR_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 4.206419081342267,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 10.250156946296752,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 4.525892982831699
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_SWING_GT_CUR_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_SWING_SCALE_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": -1.4914227660972,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 9.926295421235027,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": -0.8832723448535291
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_SWING_SCALE_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        },
+        {
+          "applicable": true,
+          "arm_id": "NAT_BREAKOUT_TAIL_RISK_BREAKOUT_THRESHOLD_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": 4.199272092157804,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": 10.029928035852347,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": 4.3129801114628545
+        },
+        {
+          "applicable": false,
+          "arm_id": "NAT_BREAKOUT_TAIL_RISK_PENDING_EXPIRY_DIRECT",
+          "causal_edge_present": false,
+          "causal_effect_bps": NaN,
+          "channel": "SELECTION",
+          "collapsed_into_noise": false,
+          "mde_bps": NaN,
+          "shifted_edge_survives": false,
+          "shifted_effect_bps": NaN
+        }
+      ],
+      "failure_meaning": "an acausal leak: fix the data, never read it as 'no edge'",
+      "informative": true,
+      "known_limit": "the statistic is scale-invariant in the delta series, so a strictly proportional leak would not trip it; it detects a leak that changes WHICH origins are admitted or the RELATIVE size committed, which is the leak this apparatus can produce",
+      "non_collapse_note": "a SIZE arm's paired difference is dominated by the exposure term (E[size] - 1) x E[outcome], and a one-bar availability shift barely changes the GATE RATE, so the exposure term is nearly invariant to the shift. An arm whose effect is mostly exposure arithmetic therefore need not collapse, and requiring it to would fail a valid emission. This is the scale-invariance limit recorded above, seen from the other side.",
+      "non_vacuous": true,
+      "pass": true,
+      "scale_arms_compared": 10,
+      "selection_arms_compared": 24,
+      "surviving_arms": []
+    },
+    "golden_traces_match_design": {
+      "artifact": "experiments/SPDR-024/results/golden_traces.json",
+      "failed": [],
+      "n_traces": 3,
+      "pass": true
+    },
+    "hard_check_count_reconciled_by_name": {
+      "declared_but_absent": [],
+      "declared_design_section_13": [
+        "future_shift_tripwire_collapse",
+        "train_holdout_fence",
+        "causal_t_minus_1_provenance",
+        "nautilus_order_fill_position_reconciliation",
+        "estimand_reconciliation",
+        "deterministic_rerun",
+        "hard_check_count_reconciled_by_name"
+      ],
+      "declared_implementation": [
+        "golden_traces_match_design",
+        "e1_regime_label_present",
+        "e2_counterfactual_present_and_non_zero_fill",
+        "e4_exit_reason_and_entry_ts_populated",
+        "e5_hold_duration_and_cap_flag_present",
+        "e6_capital_normalised_estimand_present",
+        "arm_lattice_matches_design",
+        "no_cost_charged",
+        "train_only_band_and_domain",
+        "time_derangement_absent"
+      ],
+      "executed_but_undeclared": [],
+      "executed_hard_checks": 17,
+      "expected_hard_checks": 17,
+      "lesson": "L-52 / P-23: a declared-but-absent check is a failure, not a silence",
+      "pass": true
+    },
+    "nautilus_order_fill_position_reconciliation": {
+      "pass": true,
+      "source": "integrity_selfcheck.json:hard_checks.order_fill_position_reconciliation"
+    },
+    "no_cost_charged": {
+      "cost_scope_carried_into_analysis_artifact": true,
+      "pass": true,
+      "prohibited_claims_found": [],
+      "spread_cost_status": "UNAVAILABLE_NOT_CHARGED"
+    },
+    "time_derangement_absent": {
+      "note": "OD-17 removed time derangement; the future-destroy tripwire is NOT removed",
+      "pass": true,
+      "status": "REMOVED_OD17"
+    },
+    "train_holdout_fence": {
+      "attestation_status": "PINNED",
+      "manifest_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+      "pass": true,
+      "source": "integrity_selfcheck.json:hard_checks.fence (manifest hash + bar marks)",
+      "stub_rejected": true,
+      "train_end_utc": "2023-12-18T00:00:00Z"
+    },
+    "train_only_band_and_domain": {
+      "band": "TRAIN",
+      "declared_domains": [
+        "H1",
+        "H4"
+      ],
+      "pass": true,
+      "signal_domain": "H1"
+    }
+  },
+  "inherited_blocking_pass": true,
+  "inherited_integrity_hard_checks": {
+    "causality": true,
+    "deterministic_replay": true,
+    "entry_parity": true,
+    "fence": true,
+    "future_shift_changed_mapping": true,
+    "golden_traces": true,
+    "management_lattice": true,
+    "management_lifecycle": true,
+    "native_lattice": true,
+    "no_native_management_cross": true,
+    "order_fill_position_reconciliation": true,
+    "provenance": true,
+    "row_accounting": true,
+    "unique_result_keys": true
+  },
+  "run_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/runs/crypto_H1/full",
+  "signal_domain": "H1",
+  "universe": "crypto"
+}

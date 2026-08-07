@@ -1,0 +1,228 @@
+{
+  "gate_version": "v2",
+  "root": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/runs/ctrader_H1/full/cells",
+  "n_cells": 3,
+  "manifest": {
+    "ok": true,
+    "expected": [
+      "EURUSD",
+      "XAUUSD",
+      "USTEC"
+    ],
+    "emitted": [
+      "EURUSD",
+      "USTEC",
+      "XAUUSD"
+    ],
+    "missing": []
+  },
+  "blocking_pass": true,
+  "cells": [
+    {
+      "gate_version": "v2",
+      "emission_type": "nautilus_v1",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/runs/ctrader_H1/full/cells/EURUSD",
+      "instrument": "EURUSD",
+      "domain": null,
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true,
+        "emission_contract_version": "nautilus-emission-v1",
+        "missing_emission_files": [],
+        "contract_version_ok": true
+      },
+      "fence": {
+        "ok": true,
+        "mode": "nautilus_v2",
+        "status": "PINNED",
+        "last_bar": "2023-11-22 00:00:00",
+        "analysis_end_utc": "2024-12-13T00:00:00Z",
+        "within_fence": true,
+        "manifest": {
+          "canonical_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/INFR-021/artifacts/fence-manifest.json",
+          "exists": true,
+          "ok": true,
+          "expected_sha256": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0",
+          "actual_sha256": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0"
+        }
+      },
+      "manifest": {
+        "ok": true,
+        "expected": [],
+        "emitted": [
+          "EURUSD"
+        ],
+        "missing": []
+      },
+      "catalog_attestation": {
+        "ok": true,
+        "note": null,
+        "catalog_version": "INFR-021",
+        "config_hash": "874e25c91ae95a465042773f89c023bb39f0dbd10c0c75c795f0b3647743f966"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 15062.075793477596,
+        "per_leg_realized_total": 15062.075793477588,
+        "abs_diff_bps": 7.275957614183426e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 2.4722773594950187,
+        "n_bars": 916707,
+        "n_legs": 21771,
+        "n_censored_legs": 0,
+        "total_net_bps": 15062.075793477596,
+        "annualised_return": 0.6092389163226467,
+        "per_bar_sharpe_annualised": 0.9470494288335831,
+        "max_drawdown_bps": -5195.005784663506,
+        "occupancy": 0.8039962605281731,
+        "buy_and_hold_annualised_return": -0.04552076546661004,
+        "buy_and_hold_annualised_vol": 0.08855966406492802,
+        "sanity_flags": [
+          "annualised return 60.9% exceeds 3x buy-and-hold vol (8.9%) on the same instrument"
+        ]
+      },
+      "blocking_pass": true
+    },
+    {
+      "gate_version": "v2",
+      "emission_type": "nautilus_v1",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/runs/ctrader_H1/full/cells/USTEC",
+      "instrument": "USTEC",
+      "domain": null,
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true,
+        "emission_contract_version": "nautilus-emission-v1",
+        "missing_emission_files": [],
+        "contract_version_ok": true
+      },
+      "fence": {
+        "ok": true,
+        "mode": "nautilus_v2",
+        "status": "PINNED",
+        "last_bar": "2023-11-22 00:00:00",
+        "analysis_end_utc": "2024-12-13T00:00:00Z",
+        "within_fence": true,
+        "manifest": {
+          "canonical_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/INFR-021/artifacts/fence-manifest.json",
+          "exists": true,
+          "ok": true,
+          "expected_sha256": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0",
+          "actual_sha256": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0"
+        }
+      },
+      "manifest": {
+        "ok": true,
+        "expected": [],
+        "emitted": [
+          "USTEC"
+        ],
+        "missing": []
+      },
+      "catalog_attestation": {
+        "ok": true,
+        "note": null,
+        "catalog_version": "INFR-021",
+        "config_hash": "f222991112c630bc5779f9802facfaa0e8500cb117125a10d8ec8ff44463c3af"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 5999.246480857073,
+        "per_leg_realized_total": 5999.246480857064,
+        "abs_diff_bps": 9.094947017729282e-12,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 2.4722773594950187,
+        "n_bars": 875887,
+        "n_legs": 18389,
+        "n_censored_legs": 0,
+        "total_net_bps": 5999.246480857073,
+        "annualised_return": 0.24266073779369418,
+        "per_bar_sharpe_annualised": 0.1313186868935416,
+        "max_drawdown_bps": -20608.31887204565,
+        "occupancy": 0.7633187842724004,
+        "buy_and_hold_annualised_return": 0.06216307299043136,
+        "buy_and_hold_annualised_vol": 0.24191772016945526,
+        "sanity_flags": []
+      },
+      "blocking_pass": true
+    },
+    {
+      "gate_version": "v2",
+      "emission_type": "nautilus_v1",
+      "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/runs/ctrader_H1/full/cells/XAUUSD",
+      "instrument": "XAUUSD",
+      "domain": null,
+      "schema": {
+        "ok": true,
+        "missing_positions_cols": [],
+        "missing_leg_cols": [],
+        "timestamps_strictly_increasing": true,
+        "emission_contract_version": "nautilus-emission-v1",
+        "missing_emission_files": [],
+        "contract_version_ok": true
+      },
+      "fence": {
+        "ok": true,
+        "mode": "nautilus_v2",
+        "status": "PINNED",
+        "last_bar": "2023-11-22 00:00:00",
+        "analysis_end_utc": "2024-12-13T00:00:00Z",
+        "within_fence": true,
+        "manifest": {
+          "canonical_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/INFR-021/artifacts/fence-manifest.json",
+          "exists": true,
+          "ok": true,
+          "expected_sha256": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0",
+          "actual_sha256": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0"
+        }
+      },
+      "manifest": {
+        "ok": true,
+        "expected": [],
+        "emitted": [
+          "XAUUSD"
+        ],
+        "missing": []
+      },
+      "catalog_attestation": {
+        "ok": true,
+        "note": null,
+        "catalog_version": "INFR-021",
+        "config_hash": "27c41d5c3c83d977f352b8ec5b9c30e4d3b6317435c9296bf815876c33260c5b"
+      },
+      "reconciliation": {
+        "ok": true,
+        "per_bar_gross_total": 45793.1965201413,
+        "per_leg_realized_total": 45793.196520141275,
+        "abs_diff_bps": 2.1827872842550278e-11,
+        "tol_bps": 1.0
+      },
+      "physicality": {
+        "years": 2.4722773594950187,
+        "n_bars": 874650,
+        "n_legs": 19009,
+        "n_censored_legs": 1,
+        "total_net_bps": 45793.1965201413,
+        "annualised_return": 1.85226776212095,
+        "per_bar_sharpe_annualised": 1.7230830028577533,
+        "max_drawdown_bps": -6052.629703615734,
+        "occupancy": 0.8128188418224432,
+        "buy_and_hold_annualised_return": 0.020858564572775986,
+        "buy_and_hold_annualised_vol": 0.1431548820253857,
+        "sanity_flags": [
+          "|annualised return| 185.2% > 100%/yr",
+          "annualised return 185.2% exceeds 3x buy-and-hold vol (14.3%) on the same instrument"
+        ]
+      },
+      "blocking_pass": true
+    }
+  ]
+}

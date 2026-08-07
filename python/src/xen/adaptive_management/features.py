@@ -562,13 +562,24 @@ def fit_calibration(
     )
 
 
-def build_feature_panel(bars: pl.DataFrame, calibration: Calibration) -> pl.DataFrame:
+def build_feature_panel(
+    bars: pl.DataFrame,
+    calibration: Calibration,
+    *,
+    availability_shift_bars: int = 0,
+) -> pl.DataFrame:
     """One row per H1 decision bar; every value uses completed bars at or before that bar.
 
     Reads: ``open/high/low/close`` of bars ``<= t``. Writes no column that depends on bar
     ``t + 1`` or later. ``abs_oo_bps`` is a disclosure column measured over bar ``t`` and must
     never be used as a decision input.
+
+    ``availability_shift_bars`` is the leak tripwire and nothing else: at ``1`` every component
+    becomes readable one signal-domain bar EARLIER than it could have been, so each arm
+    conditions on information it could not have had. The default ``0`` is the causal panel and
+    is byte-identical to the panel this function produced before the parameter existed.
     """
+    lag = 1 - int(availability_shift_bars)
     frames = []
     for symbol, group in bars.group_by("symbol", maintain_order=True):
         name = symbol[0] if isinstance(symbol, tuple) else symbol
@@ -579,7 +590,7 @@ def build_feature_panel(bars: pl.DataFrame, calibration: Calibration) -> pl.Data
                 (pl.col("park_scale_bps") * factor).alias("range_scale_bps"),
                 pl.lit(FORMULA_SOURCES["RANGE_SCALE"]).alias("range_scale_source"),
             ).with_columns(
-                pl.col(column).shift(1).alias(column)
+                pl.col(column).shift(lag).alias(column)
                 for column in (
                     "atr20",
                     "rv20",

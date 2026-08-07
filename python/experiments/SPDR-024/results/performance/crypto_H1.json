@@ -1,0 +1,73 @@
+{
+  "cell": "crypto_H1",
+  "jobs": 3,
+  "peak_child_rss_bytes": 4338024448,
+  "signal_domain": "H1",
+  "steps": [
+    {
+      "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H1/hold.log",
+      "peak_child_rss_bytes": 2060877824,
+      "returncode": 0,
+      "step": "hold_phase",
+      "wall_seconds": 156.75
+    },
+    {
+      "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H1/cap_rule.log",
+      "peak_child_rss_bytes": 2060877824,
+      "returncode": 0,
+      "step": "cap_rule",
+      "wall_seconds": 0.3
+    },
+    {
+      "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H1/full.log",
+      "peak_child_rss_bytes": 2208153600,
+      "returncode": 0,
+      "step": "full_grid",
+      "wall_seconds": 236.8
+    },
+    {
+      "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H1/shift.log",
+      "peak_child_rss_bytes": 2235547648,
+      "returncode": 0,
+      "step": "future_shift_tripwire",
+      "wall_seconds": 236.83
+    },
+    {
+      "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H1/replay.log",
+      "peak_child_rss_bytes": 2680537088,
+      "returncode": 0,
+      "step": "determinism_replay",
+      "wall_seconds": 571.78
+    },
+    {
+      "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H1/estimand.log",
+      "peak_child_rss_bytes": 2680537088,
+      "returncode": 0,
+      "step": "estimand_gate",
+      "wall_seconds": 4.79
+    },
+    {
+      "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H1/selfcheck.log",
+      "peak_child_rss_bytes": 4338024448,
+      "returncode": 0,
+      "step": "selfcheck",
+      "wall_seconds": 54.59
+    },
+    {
+      "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H1/analysis.log",
+      "peak_child_rss_bytes": 4338024448,
+      "returncode": 0,
+      "step": "analysis",
+      "wall_seconds": 300.71
+    },
+    {
+      "removed": [
+        "shift",
+        "replay"
+      ],
+      "step": "prune_reproducible_runs"
+    }
+  ],
+  "total_wall_seconds": 1562.55,
+  "universe": "crypto"
+}

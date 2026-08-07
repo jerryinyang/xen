@@ -8,6 +8,11 @@ Native-arm counts (design section 5): 8 executable component IDs x 2 native para
 orientations = 32 single arms, plus 4 predeclared orientation pairs per component = 32
 combination arms, giving 64 adaptive native configurations per entry variant. SPDR-021 has one
 entry variant (64); SPDR-022 and SPDR-023 have two (E-TOUCH / E-CLOSE) and therefore 128 each.
+
+SPDR-024 is narrower by operator directive and is declared by
+`python/experiments/SPDR-024/design.md`: DIRECT orientation only (OD-16), SIZE the only external
+device (OD-15), the four refuted devices excluded (OD-11), and two signal domains (H1 / H4) run
+as separate cells that are never pooled (OD-2).
 """
 
 from __future__ import annotations
@@ -139,13 +144,37 @@ NATIVE_PARAMETERS: dict[str, tuple[NativeParameter, NativeParameter]] = {
     "SPDR-021": (NativeParameter.BREAKOUT_THRESHOLD, NativeParameter.PENDING_EXPIRY),
     "SPDR-022": (NativeParameter.BAND_Z, NativeParameter.BAND_H),
     "SPDR-023": (NativeParameter.BAND_Z, NativeParameter.BAND_H),
+    "SPDR-024": (NativeParameter.BREAKOUT_THRESHOLD, NativeParameter.PENDING_EXPIRY),
 }
 
 ENTRY_VARIANTS: dict[str, tuple[str, ...]] = {
     "SPDR-021": ("BREAKOUT",),
     "SPDR-022": ("E_TOUCH", "E_CLOSE"),
     "SPDR-023": ("E_TOUCH", "E_CLOSE"),
+    "SPDR-024": ("BREAKOUT",),
 }
+
+# --------------------------------------------------------------------------- #
+# SPDR-024 frozen parameters (design sections 4, 6 and 7)
+# --------------------------------------------------------------------------- #
+
+#: Signal domains run as separate cells (OD-2), and the hours in one of their bars.
+SIGNAL_DOMAIN_HOURS: dict[str, int] = {"H1": 1, "H4": 4}
+DEFAULT_SIGNAL_DOMAIN = "H1"
+
+#: Design section 7 SAFETY-CEILING: 10x the largest declared comparison cap, in domain bars.
+SAFETY_CEILING_BARS = 120
+#: Design section 7 CAP-RULE grid, declared before execution.
+HOLD_CAP_GRID: tuple[int, ...] = (2, 4, 8, 12, 24, 48)
+#: Design section 7 CAP-RULE: the smallest grid value binding at most this share.
+HOLD_CAP_BIND_FRACTION = 0.05
+#: Design section 7: a ceiling bind rate above this is flagged to the operator.
+SAFETY_CEILING_FLAG_FRACTION = 0.02
+#: Design section 6 arm A: the breakout baseline holds one signal-domain bar.
+BASELINE_HOLD_BARS = 1
+
+UNCAPPED_ARM_ID = "UNCAPPED_HOLD_SAFETY_CEILING"
+SPDR024_HOLD_PHASE_ARMS = ("FIXED_BASELINE_PLAIN", UNCAPPED_ARM_ID)
 
 
 @dataclass(frozen=True)
@@ -153,6 +182,7 @@ class ExperimentSpec:
     experiment_id: str
     entry_variants: tuple[str, ...]
     native_parameters: tuple[NativeParameter, NativeParameter]
+    domain: str = DEFAULT_SIGNAL_DOMAIN
 
 
 @dataclass(frozen=True)
@@ -235,27 +265,47 @@ class ResultKey:
 # --------------------------------------------------------------------------- #
 
 
-def experiment_spec(experiment_id: str) -> ExperimentSpec:
-    """Return the frozen spec for a declared experiment ID."""
+def experiment_spec(
+    experiment_id: str,
+    domain: str = DEFAULT_SIGNAL_DOMAIN,
+) -> ExperimentSpec:
+    """Return the frozen spec for a declared experiment ID and signal domain."""
     if experiment_id not in NATIVE_PARAMETERS:
         raise ValueError(f"unknown experiment: {experiment_id}")
+    if domain not in SIGNAL_DOMAIN_HOURS:
+        raise ValueError(f"unknown signal domain: {domain}")
+    if domain != DEFAULT_SIGNAL_DOMAIN and experiment_id != "SPDR-024":
+        raise ValueError(f"{experiment_id} is declared on the H1 domain only")
     return ExperimentSpec(
         experiment_id=experiment_id,
         entry_variants=ENTRY_VARIANTS[experiment_id],
         native_parameters=NATIVE_PARAMETERS[experiment_id],
+        domain=domain,
     )
 
 
 def _fixed_native_arm_id(experiment_id: str, entry_variant: str) -> str:
-    kind = "BREAKOUT" if experiment_id == "SPDR-021" else "BAND"
-    suffix = "" if experiment_id == "SPDR-021" else f"_{entry_variant}"
+    kind = "BAND" if experiment_id in {"SPDR-022", "SPDR-023"} else "BREAKOUT"
+    suffix = f"_{entry_variant}" if kind == "BAND" else ""
     return f"FIXED_NATIVE_{kind}{suffix}"
 
 
 def build_native_lattice(experiment_id: str) -> tuple[NativeArmSpec, ...]:
-    """Fixed comparator, both single-parameter orientations and all four orientation pairs."""
+    """Fixed comparator, both single-parameter orientations and all four orientation pairs.
+
+    SPDR-024 carries the DIRECT orientation only (OD-16 / amendment-1): the REVERSE arms are
+    dropped, which also leaves a single orientation pair.
+    """
     spec = experiment_spec(experiment_id)
     first, second = spec.native_parameters
+    orientations = (
+        (Orientation.DIRECT,) if experiment_id == "SPDR-024" else tuple(Orientation)
+    )
+    orientation_pairs = (
+        ((Orientation.DIRECT, Orientation.DIRECT),)
+        if experiment_id == "SPDR-024"
+        else _ORIENTATION_PAIRS
+    )
     arms: list[NativeArmSpec] = []
     for entry_variant in spec.entry_variants:
         comparator_id = _fixed_native_arm_id(experiment_id, entry_variant)
@@ -274,7 +324,7 @@ def build_native_lattice(experiment_id: str) -> tuple[NativeArmSpec, ...]:
         )
         for component in Component:
             for parameter in (first, second):
-                for orientation in Orientation:
+                for orientation in orientations:
                     arms.append(
                         NativeArmSpec(
                             native_arm_id=(
@@ -289,7 +339,7 @@ def build_native_lattice(experiment_id: str) -> tuple[NativeArmSpec, ...]:
                             experiment_id=experiment_id,
                         )
                     )
-            for pair in _ORIENTATION_PAIRS:
+            for pair in orientation_pairs:
                 arms.append(
                     NativeArmSpec(
                         native_arm_id=(
@@ -404,9 +454,73 @@ def _fixed_management_arms(experiment_id: str) -> list[PolicySpec]:
     return arms
 
 
+def _spdr024_management_lattice() -> tuple[PolicySpec, ...]:
+    """SPDR-024 design section 6: arm A, arm B and the SIZE arms. Nothing else.
+
+    Arm A is the plain breakout baseline (OD-3). Arm B is the same baseline with its holding
+    cap removed, exiting only on the section 7 safety ceiling, and is the source of the
+    non-circular duration distribution the cap rule reads (H1 of the hold procedure). The SIZE
+    arms are the single live device (OD-15): the discrete state gate on all eight components,
+    and the continuous scale-normalised form on the two components that supply a numeric scale
+    (OD-14 — the design declares no continuous schedule for a categorical component, so the
+    continuous-vs-discrete head-to-head is read where both forms exist).
+    """
+    arms: list[PolicySpec] = [
+        PolicySpec(
+            policy_id="FIXED_BASELINE_PLAIN",
+            component=None,
+            device=Device.NONE,
+            setting="UNIT_NO_TARGET_NO_STOP_NO_TRAIL",
+            comparator_id="FIXED_BASELINE_PLAIN",
+            is_adaptive=False,
+            experiment_id="SPDR-024",
+            fixed_hold_bars=BASELINE_HOLD_BARS,
+            pending_expiry_bars=2,
+        ),
+        PolicySpec(
+            policy_id=UNCAPPED_ARM_ID,
+            component=None,
+            device=Device.NONE,
+            setting=f"UNCAPPED_SAFETY_CEILING_B{SAFETY_CEILING_BARS}",
+            comparator_id="FIXED_BASELINE_PLAIN",
+            is_adaptive=False,
+            experiment_id="SPDR-024",
+            fixed_hold_bars=SAFETY_CEILING_BARS,
+            pending_expiry_bars=2,
+        ),
+        PolicySpec(
+            policy_id="FIXED_SIZE_UNIT",
+            component=None,
+            device=Device.SIZE,
+            setting="UNIT",
+            comparator_id="FIXED_SIZE_UNIT",
+            is_adaptive=False,
+            experiment_id="SPDR-024",
+        ),
+    ]
+    for component in Component:
+        settings = [STATE_SIZE_SETTING]
+        if component in SCALE_COMPONENTS:
+            settings.append(SCALE_SIZE_SETTING)
+        for setting in settings:
+            arms.append(
+                PolicySpec(
+                    policy_id=f"ADP_{component}_{Device.SIZE}_{setting}",
+                    component=component,
+                    device=Device.SIZE,
+                    setting=setting,
+                    comparator_id="FIXED_SIZE_UNIT",
+                    experiment_id="SPDR-024",
+                )
+            )
+    return tuple(arms)
+
+
 def build_management_lattice(experiment_id: str) -> tuple[PolicySpec, ...]:
     """Individual component x device arms first, then the declared bounded combinations."""
     experiment_spec(experiment_id)
+    if experiment_id == "SPDR-024":
+        return _spdr024_management_lattice()
     arms: list[PolicySpec] = _fixed_management_arms(experiment_id)
 
     for component in Component:

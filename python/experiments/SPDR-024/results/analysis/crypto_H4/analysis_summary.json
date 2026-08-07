@@ -1,0 +1,126 @@
+{
+  "artifacts": [
+    "episodes.parquet",
+    "paired_difference_dependence.json",
+    "baseline_characterisation.parquet",
+    "scale_channel_estimates.parquet",
+    "selection_channel_estimates.parquet",
+    "pool_filter_ladder.parquet"
+  ],
+  "band": "TRAIN",
+  "dependence_premise_check": {
+    "baseline_series": {
+      "outside_noise_band": [
+        "1000BONKUSDT",
+        "ADAUSDT",
+        "AVAXUSDT",
+        "BNBUSDT",
+        "DOGEUSDT",
+        "INJUSDT",
+        "LINKUSDT",
+        "MATICUSDT",
+        "SOLUSDT",
+        "XRPUSDT"
+      ],
+      "symbols": 25
+    },
+    "consequence_if_not_supported": "V-A's unchunked treatment would overstate resolution; V-B and V-C remain, and the most conservative still governs every band",
+    "paired_difference_symbols_outside_band": [
+      "1000BONKUSDT",
+      "1000LUNCUSDT",
+      "1000PEPEUSDT",
+      "ADAUSDT",
+      "AVAXUSDT",
+      "BLURUSDT",
+      "BNBUSDT",
+      "BTCUSDT",
+      "DOGEUSDT",
+      "DYDXUSDT",
+      "ETHUSDT",
+      "GALAUSDT",
+      "INJUSDT",
+      "LINKUSDT",
+      "MATICUSDT",
+      "OPUSDT",
+      "ORDIUSDT",
+      "SOLUSDT",
+      "XRPUSDT"
+    ],
+    "premise": "design section 10 assumes no detectable serial dependence in the trade series",
+    "verdict": "NOT_SUPPORTED_BY_THIS_RUN_SEE_SYMBOLS"
+  },
+  "diagnostic_estimand": "outcome_bps (per-notional; BARRED from sizing claims)",
+  "estimand_validation_physicality_scope": {
+    "baseline_occupancy_is_reported_separately_in": "analysis.md baseline section",
+    "scope": "WHOLE_38_ARM_LATTICE_NOT_THE_STRATEGY",
+    "warning": "occupancy, annualised return and Sharpe in estimand_validation.json are computed over every arm's positions together. They are an apparatus figure and must never be quoted as the baseline strategy's own"
+  },
+  "experiment_id": "SPDR-024",
+  "future_shift_bars": 0,
+  "governing_rule": "the most conservative of the three governs every band label",
+  "hold_cap_bars": null,
+  "interpretation": "DESCRIPTIVE_ONLY_NO_VERDICT",
+  "labels": {
+    "authority": "adaptive-management-design.md section 1 ('power labels do not decide which rows are shown or how they are described') and section 9 ('Emit event count, effective count, CI and MDE for every row. These are informative diagnostics, not verdict labels or pruning rules')",
+    "result_labels_emitted": "NONE",
+    "rule": "every row is described by estimate, uncertainty, population count, effective count and MDE, and by nothing else"
+  },
+  "od14_coverage": {
+    "continuous_and_discrete_head_to_head": [
+      "RANGE_SCALE",
+      "SWING_SCALE"
+    ],
+    "discrete_only": [
+      "LEVEL_NOW",
+      "LEVEL_FORECAST_K4",
+      "LEVEL_FORECAST_K12",
+      "SHOCK",
+      "SWING_GT_CUR",
+      "TAIL_RISK"
+    ],
+    "reason": "the continuous rule needs a numeric scale and its calibration median; the design declares no continuous schedule for a categorical state component, and inventing one would be a new mechanism"
+  },
+  "primary_estimand": "capital_normalised_episode_return (E6)",
+  "prohibited_claims": [
+    "fully-net",
+    "cost-complete",
+    "tradable",
+    "deployable"
+  ],
+  "reference_effect_range_sigma": {
+    "step3_observed_sizing_effects": [
+      0.022,
+      0.15
+    ],
+    "use": "context for comparing a cell's own MDE against the effect sizes this family has previously observed; it classifies nothing and no artifact column is derived from it"
+  },
+  "regime_label_shared_with_arm": "ADP_LEVEL_NOW_SIZE_STATE_HALVE_HIGH",
+  "row_vs_trade_note": "one row per arm per origin; a sample-size statement uses distinct trades, never row counts",
+  "rows": {
+    "arms": 38,
+    "censored_episodes": 22,
+    "closed_episodes": 63553,
+    "distinct_baseline_trades": 2003,
+    "distinct_origins": 27194,
+    "episodes": 1033372
+  },
+  "signal_domain": "H4",
+  "spread_cost_disclosure": {
+    "cost_scope": "PARTIAL_FEES_FUNDING_ONLY",
+    "implication": "reported cost understates total cost; reported net performance is overstated",
+    "prohibited_claims": [
+      "fully-net",
+      "cost-complete",
+      "tradable",
+      "deployable"
+    ],
+    "spread_cost_status": "UNAVAILABLE_NOT_CHARGED",
+    "spread_rt_bps": null
+  },
+  "universe": "crypto",
+  "variance_treatments": [
+    "V_A_UNCHUNKED",
+    "V_B_TIME_BLOCK",
+    "V_C_REGIME_EPISODE"
+  ]
+}

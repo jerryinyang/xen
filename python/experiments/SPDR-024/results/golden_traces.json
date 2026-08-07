@@ -1,0 +1,63 @@
+{
+  "blocking_pass": true,
+  "experiment_id": "SPDR-024",
+  "n_passed": 3,
+  "n_traces": 3,
+  "source": "design.md section 14 - hand-derived, not generated from the implementation",
+  "traces": [
+    {
+      "design_reference": "design.md section 14 item 1",
+      "expected": {
+        "capital_normalised_delta": -50.0,
+        "outcome_bps_delta": 0.0,
+        "per_notional_both_sides_bps": 100.0
+      },
+      "meaning_if_failed": "E6 is not implemented; the sizing question is unreadable",
+      "observed": {
+        "capital_normalised_delta": -50.0,
+        "fixed_capital_bps": 100.0,
+        "fixed_outcome_bps": 100.0,
+        "halved_capital_bps": 50.0,
+        "halved_outcome_bps": 100.0,
+        "outcome_bps_delta": 0.0
+      },
+      "pass": true,
+      "trace": "1_capital_normalisation_makes_sizing_visible"
+    },
+    {
+      "design_reference": "design.md section 14 item 2",
+      "expected": {
+        "counterfactual_outcome_bps": 25.0,
+        "must_not_be": 0.0
+      },
+      "meaning_if_failed": "E2 is not implemented; every selection read is void",
+      "observed": {
+        "counterfactual_outcome_bps": 25.0,
+        "counterfactual_source": "FIXED_ARM_REALISED_OUTCOME"
+      },
+      "pass": true,
+      "trace": "2_rejected_origin_counterfactual"
+    },
+    {
+      "design_reference": "design.md section 14 item 3",
+      "expected": {
+        "ceiling_exit_reason": "SAFETY_CEILING",
+        "ceiling_hold_bars": 120.0,
+        "fence_position_state": "OPEN_AT_FENCE_END (censored, never closed at fence)"
+      },
+      "meaning_if_failed": "the ceiling is acting as an ordinary hold, or a fenced position was silently closed at the fence price",
+      "observed": {
+        "ceiling_exit_reason": "SAFETY_CEILING",
+        "ceiling_hold_bars": 120.0,
+        "censored_has_close": false,
+        "censored_states": [
+          "ORDER_CREATED",
+          "FILLED",
+          "OPEN_AT_FENCE_END"
+        ]
+      },
+      "pass": true,
+      "trace": "3_safety_ceiling_and_censoring"
+    }
+  ]
+}
