@@ -7,7 +7,10 @@ and Chapter 03 (XENA-001..003 + INFR-006..009, 2026-07-09 → 2026-07-14; first 
 portfolio universes, CF-MTFCTX-001 retired, referee redesigned and route restored), and
 Chapter 04 (INFR-010..020, VAL-008, SPDR-004..009 and three candidate families,
 2026-07-14 → 2026-07-22; Nautilus/Bybit migration, exact taker-side volume, and the first
-full signed-auction investigation).
+full signed-auction investigation), and Chapter 05 (INFR-021, SPDR-011..024, checkpoints
+016/017/018, 2026-07-22 → 2026-08-07; the structural volatility-and-direction programme powered
+on two independent universes and retired — the chapter that established the joint `(p, W, L)`
+sits at break-even and that `W/L` is not a free lever).
 Read this **before** designing any new experiment: it records what is frozen, what is dead,
 what worked, and the lessons that cost a false positive to learn.
 
@@ -15,6 +18,40 @@ This KB is canonical and **append-merged** at every chapter rollover (new chapte
 they do not wipe prior canon). The **signal-registry** (`docs/signal-registry/`) is the *live*
 operational ledger (multiplicity, test-reads, candidate families) and is referenced here, not
 copied — it persists across chapters and must never be reset.
+
+## Programme status (2026-08-07): Chapter 05 closed and archived; no family is open
+
+**Chapter 05 is closed.** Checkpoints 016, 017 and 018 ran one family — `CF-VOLDIR-001`, the
+structural volatility-and-direction programme — from registration to retirement across
+`SPDR-011..024` and `INFR-021`, spending **0 counted TEST reads and 0 multiplicity slots**, with
+`XENA-VOLDIR-001` reserved and never opened. The family is **`RETIRED — CHARACTERISED, NOT
+TRADABLE`** (2026-08-07, operator-signed).
+
+**What the chapter established, and it is structural rather than empirical.** The joint
+`(p, W, L)` was powered on two independent universes — 25 Bybit USDT-perps and 3 cTrader
+instruments sharing no venue, cost model or vendor — and it **sits at net break-even**: `0 of
+1,413` powered crypto cells and `0 of 315` powered cTrader cells clear it, with **91–96% of the
+distance being cost, not rate**. The reason it sits there is that **`W/L` is ~97% the arithmetic
+mirror of `p`** (R² 0.9667 / 0.9746): exit geometry moves the payoff ratio 36–67× while the hit
+rate moves inversely, leaving the mean unchanged. The capture programme's whole premise was that
+this handle was independent. It is not. Every volatility-adaptive device tested on top either does
+nothing measurable (hold), does less than its fixed counterpart (stop distance), gives back more
+(trail), or has a consistent sign with a magnitude below its own detection floor after a
+purpose-built experiment was run to measure it (size). See
+[families-explored.md](families-explored.md).
+
+**The transferable methodological output** is `L-56` and AMENDMENT-7: a detection floor and the
+effect it judges must share a scale, and where the estimand's ceiling is algebraically knowable —
+for a size-only device it is pinned to the baseline's per-trade Sharpe — that ceiling and its
+implied sample requirement are computed **in the design**, not discovered after the run. SPDR-024's
+first emission was purged and re-run over exactly this. See
+[evaluation-framework.md](evaluation-framework.md) § *Detection floors*.
+
+**Nothing is open.** The next chapter starts with no registered family. Two threads are parked as
+terminal `NOT_RESOLVABLE` and must never be re-booked as refutations: **C2 shock-MOMO** and **C3**
+(unpowerable — the median cell needs ~201 years of history). The binding constraint on any
+successor is cost: spread remains uncharged programme-wide, and on this substrate the entire
+measured deficit is cost.
 
 ## Programme status (2026-07-22): Chapter 04 archived; Chapter 05 blocked on preflight
 
@@ -97,8 +134,15 @@ infrastructure correctness must precede family registration and outcome contact.
   **L-53** a deflator derived from a selected subset is circular — report its range;
   **L-54** profile Python retention and Nautilus defaults as one critical path, with exact parity
   before optimisation; **L-55** share proven-identical deterministic analysis work and expose safe
-  columnar pruning bounds before considering a faster-language port. Corresponding dead ends:
-  **P-21…P-27**.
+  columnar pruning bounds before considering a faster-language port. Newest (SPDR-021…024,
+  2026-08-07): **L-56** ⭐ a detection floor and the effect it judges must share a scale, and where
+  the estimand is pinned to a known ratio the ceiling is computable *before* the run;
+  **L-57** a control that reproduces the real estimate has never tested anything — assert it
+  *differs*; **L-58** a device that changes only *which* trades happen cannot change *what* the
+  shared ones are worth; **L-59** gating by a state without *labelling* realised state makes the
+  question unaskable, not underpowered; **L-60** a per-notional estimand is arithmetically blind
+  to sizing and its exact zero is a units alarm, not a null; **L-61** a pooled figure over three
+  instruments is one instrument. Corresponding dead ends: **P-21…P-31**.
 
 ## Project memory
 
@@ -123,3 +167,9 @@ infrastructure correctness must precede family registration and outcome contact.
 - `archive/chapter-04-nautilus-bybit-sigauc/` — Chapter 04 experiments, complete
   experiments-docs, source snapshot and deprecated tests; active neutral source was restored from
   this snapshot.
+- `archive/chapter-05-voldir-capture-geometry/` — Chapter 05 experiments (`INFR-021`,
+  `SPDR-011..024`), complete experiments-docs (checkpoints 016/017/018 with the 018
+  retrospective, the SPDR-024 detection-floor defect record, and the 021/022/023 confirmation
+  extraction), source snapshot, and `ROLLOVER.md`. **Raw Nautilus emissions were purged** at this
+  rollover as regenerable from pinned code; analysis artefacts, self-checks, preflight and
+  performance records are retained.

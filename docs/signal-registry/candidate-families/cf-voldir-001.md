@@ -1,7 +1,8 @@
 # CF-VOLDIR-001 — Structural Volatility + Direction Programme
 
-- **Status:** `REGISTERED` — 2026-07-23, checkpoint-017, operator-authorised (**no status change**)
-- **Chapter:** 06
+- **Status:** **`RETIRED — CHARACTERISED, NOT TRADABLE`** — 2026-08-07, checkpoint-018
+  retrospective, operator-signed. (Previously `REGISTERED` 2026-07-23 at checkpoint-017.)
+- **Chapter:** 06 (registered) → retired at the chapter-05 rollover
 - **Route:** `SPDR-012` → `SPDR-013` → Reflection C (O3 + Decision A) →
   `SPDR-014` (zone/event — screen done, pin NONE) → `SPDR-015` (conditioners) → `SPDR-016` (refine 014 residual — open by override) →
   `SPDR-017` (independent predicted-price mispricing; operator original #3) →
@@ -22,10 +23,12 @@
   — **CLOSED 2026-07-25** (`retrospective.md`): `STRUCTURAL PACKAGE DELIVERED / EXTRACTION
   UNRESOLVED-AT-POWER`. **SPDR-016 CLOSED — SUPERSEDED, NEVER RUN.** 0 TEST reads, 0 slots,
   status unchanged.
-- **Checkpoint-018 (current):**
+- **Checkpoint-018 (final):**
   `docs/experiments-docs/checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/design.md`
-  — **OPEN 2026-07-25**, trade-opportunity modelling / capture geometry; an **extension** of 017,
-  not a new family. SoT: `.ignore/what-next/alts/opportunity.md`
+  — opened 2026-07-25, trade-opportunity modelling / capture geometry; an **extension** of 017,
+  not a new family. **CLOSED 2026-08-07** (`retrospective.md`): `CAPTURE GEOMETRY CHARACTERISED /
+  NO EXTRACTABLE EDGE AT THE MEASURED JOINT` — **family retired**. 0 TEST reads, 0 slots.
+  SoT: `.ignore/what-next/alts/opportunity.md`
 - **Governing RAW brief (017):** `.ignore/what-next/alts/vol-direction-structural-programme-raw.md`
 - **Distinct from:** `CF-VOLCONV-001` (closed L1 path: assumed vol + late range-break direction)
 
@@ -452,3 +455,24 @@ spread not charged; reported net **overstated** relative to true cost.
   supported/refuted verdict is produced. Selective strong patterns remain reportable for later
   XENA robustness work. **Implementation and execution are not authorised; 0 TEST reads; 0
   multiplicity slots; no family action; status remains REGISTERED.** |
+| 2026-08-07 | **FAMILY RETIRED — CHARACTERISED, NOT TRADABLE. Operator-signed at the
+  checkpoint-018 retrospective.** `SPDR-021/022/023` completed (six TRAIN cells, run stamp
+  `20260803T140238Z`, integrity-clean, 13/13 reproduction hashes) and the confirmation extraction
+  was signed 2026-08-05: **four refutes, zero economic support**. `SPDR-024` completed as the
+  successor characterisation (four cells, 17 HARD each, `blocking_pass` true, H4 run for the first
+  time), after its first emission was found defective, **purged**, and fully re-emitted under
+  AMENDMENT-7 R1–R5. **Grounds for retirement:** the joint `(p, W, L)` sits at net break-even on
+  two independent universes with **0 of 1,413** crypto and **0 of 315** cTrader powered cells
+  clearing it, and **91–96% of the distance is cost, not rate**; `W/L` is ~97% the arithmetic
+  mirror of `p` (R² 0.9667 / **0.9746**) and is therefore not a free lever; vol-gated hold, stop
+  distance, trail and post-stop recovery are refuted at power; vol-aware SIZE has a consistent
+  direction (236/236 rows, 6/6 cells) but a magnitude below its own detection floor after the
+  dedicated `SPDR-024` measurement; and vol state never clears zero as a baseline selectivity
+  contrast on mean or Sharpe in any cell. **C2 (shock-MOMO) and C3 are booked as terminal
+  `NOT_RESOLVABLE` — parked, never refuted;** C9/D3/D4 are OPEN and never run; P6 is an
+  unregistered lead. **Re-opening requires a new information source, not a new exit rule,
+  volatility transform, or re-parameterisation of the same lattice.** The binding precondition is
+  cost: spread remains uncharged programme-wide and the entire measured deficit is cost.
+  **0 counted TEST reads; 0 multiplicity slots; no XENA universe ever opened; holdout sealed
+  throughout.** Retrospective:
+  `archive/chapter-05-voldir-capture-geometry/experiments-docs/checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/retrospective.md` |

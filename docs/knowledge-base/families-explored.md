@@ -104,6 +104,32 @@ gross effects remained drift, beta and volatility clustering. If the product per
 directional exposure, test that product honestly with risk and costs rather than defining its
 only durable return source away; this is not evidence that a net edge already exists.
 
+## Chapter 05 family dispositions (2026-07-22 → 2026-08-07)
+
+Checkpoints 016, 017 and 018. One family, three checkpoints, `0` counted TEST reads and `0`
+multiplicity slots across the entire chapter. `XENA-VOLDIR-001` was reserved and never opened.
+
+| Family | What it was | Disposition (mechanism) |
+|---|---|---|
+| **CF-VOLCONV-001** — assumed volatility + late range-break direction | The L1 conversion path opened at the chapter-05 boundary | **CLOSED.** SPDR-011 L1 NOT SUPPORTED. Superseded by the structural decomposition programme, which separates the volatility claim from the direction claim rather than assuming the first and testing the second. |
+| **CF-VOLDIR-001** — structural volatility + direction programme | Separate the claims — (A) is volatility modellable, (B) does fast direction have positive expectancy in bps, (C) capture geometry, (D) cost — so that failure is *diagnosable* rather than vague. Two independent universes: 25 Bybit USDT-perps and 3 cTrader instruments (EURUSD/XAUUSD/USTEC, INFR-021 fence). Vehicles SPDR-012…018B, 021…024 | **RETIRED — CHARACTERISED, NOT TRADABLE (2026-08-07, operator-signed).** Structure measured at power on both universes, not merely rejected. **(1) The joint sits at net break-even and nothing clears it** — `0 of 1,413` powered crypto cells, `0 of 315` powered cTrader cells, with **91% (crypto) to 96% (cTrader) of the distance being COST, not rate**. Crypto `p` 0.3887 vs `p_be_net` 0.4992 (`edge` −0.0728); cTrader `p` 0.4868 vs `p_be` 0.4855, gross mean −0.080 bps = **0.006σ**. The identity reconciles to 1.46e-11 bps and the structure replicates **more tightly on the second universe**, which shares no instrument, venue, cost model or vendor with the first. **(2) `W/L` is not a free lever** — it is ~97% the arithmetic mirror of `p` (R² 0.9667 crypto / **0.9746** cTrader, slope 0.9656); exit geometry moves it 36–67× while `p` moves inversely and the mean does not improve; 82.8%/93% of cells are indistinguishable from the driftless mirror. The whole capture-geometry premise rested on this handle being independent. It is not. **(3) Adaptive capture geometry adds nothing** — the MOMO and MR breach screens are the same trades sign-flipped (r = −0.98, fixed baselines cancel to exactly zero symbol by symbol), so "native geometry effect" was a **direction artifact**; admission rules move shared-trade value by **exactly zero on ~2.3M paired rows**; vol-gated hold is inert (0.03–0.60× its floor, 6/6 cells), vol-gated stop distance is **worse** than a fixed one (shrinks the loss-severity effect 1.3–18×), vol-scaled trails give back more when wider, and nothing recovers after a vol-adapted stop. **(4) The one surviving lever was measured and did not clear** — vol-aware SIZE reduces drawdown depth with a consistent sign (236/236 resolving rows, 6/6 cells) but a magnitude below its own detection floor (est/MDE 0.20–0.97); SPDR-024 rebuilt the estimand specifically to see it (capital-normalised, regime-labelled, counterfactual-bearing) and its scale-channel intervals still cross zero at the governing treatment, with gate-permutation p-values frequently failing to reject exchangeability with a **random** gate. **(5) Vol state is not a selectivity filter** — `HIGH − LOW` never clears zero on mean or Sharpe at any cell's pooled level. **Booked as terminal `NOT_RESOLVABLE`, never refuted: C2 shock-MOMO** (018B's comparator is not a neutral yardstick — its own mean runs +0.97 EU → +12.05 Asia, the Asia null lies entirely above zero and is blind upward, and an independent rebuild flipped `P-MR` 0.067 → 0.826; P1 skipped by operator, no 018C) **and C3** (unpowerable in its registered form — all 1,946 unresolved cells fully levered, median 81× short, median cell needs **201 years** of 25-symbol history). C9/D3/D4 OPEN and never run; P6 (Asia magnitude × shock) an unregistered lead. **Re-opening requires a new information source** — not a new exit rule, volatility transform, or re-parameterisation of the same lattice. The binding precondition is cost: spread is uncharged programme-wide and the entire measured deficit is cost. |
+
+### What Chapter 05 changed about the frame
+
+Chapter 04 left the question "can an intentionally directional, risk-managed volatility exposure
+clear exact intraday costs?" Chapter 05 answered the **capture** half of it and the answer is
+structural rather than empirical: on this substrate the win/loss ratio and the hit rate are very
+nearly the same number, so the two-dimensional search space the capture programme assumed is
+approximately one-dimensional, and moving along it does not move the mean. That is not a statement
+about volatility conditioning being weak — it is a statement about the geometry of the exit
+problem, and it replicated on two unrelated universes.
+
+The practical consequence for the next chapter: **do not open a family whose thesis is that a
+better exit, hold, trail or size rule converts a break-even joint into a positive one.** That
+class is now refuted at power. And because 91–96% of the measured gap is cost, no successor on
+this substrate is evaluable at all while spread remains uncharged — the cost precondition binds
+before any modelling question does.
+
 ## Selection discipline going forward
 
 Open the next family by **screening availability first** (TRAIN-only Δ-over-matched-random,

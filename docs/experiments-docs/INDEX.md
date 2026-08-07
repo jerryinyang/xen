@@ -2,23 +2,40 @@
 
 ## Current checkpoint status
 
-**CHECKPOINT-018 OPEN (2026-07-25) — Trade Opportunity Modelling / Capture Geometry.
-SoT signed. `SPDR-018` + `SPDR-018B` COMPLETE AND CLOSED 2026-07-26 (`HYP-D5` SUPPORTED /
-PARTIALLY SUPPORTED; no gating verdict from either). **The evidence inventory and three-experiment
-replacement design were approved 2026-07-30.** `SPDR-021` breakout, `SPDR-022` MOMO and
-`SPDR-023` MR are independent Nautilus characterisations. Their approved native arms adapt
-breakout threshold/expiry and breach `z/H` in both directions before bounded native combinations.
-**Status 2026-08-04: AMENDED RERUN COMPLETE; ANALYSIS COMPLETE; AWAITING OPERATOR INTERPRETATION** — six TRAIN cells rerun under the 2026-08-03 amendment (run stamp
-`20260803T140238Z`), all integrity-clean and reproducible, three screens and three analyses written.
-**Spread is never charged programme-wide (2026-07-23)** — a standing
-exclusion with a travelling caveat, not an open item: reported net is overstated and every money,
-expectancy and tradability claim stays refused by AMENDMENT-C2. TRAIN only; holdouts sealed.**
+**CHECKPOINT-018 CLOSED 2026-08-07 — `CAPTURE GEOMETRY CHARACTERISED / NO EXTRACTABLE EDGE AT
+THE MEASURED JOINT`. `CF-VOLDIR-001` RETIRED — CHARACTERISED, NOT TRADABLE (operator-signed).**
+Retrospective:
+[checkpoint-018 retrospective](checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/retrospective.md).
 
-**Closed threads since:** **P4** — C3 is *terminally unpowerable* in its registered form (median cell
-needs ~201 years of 25-symbol history); **P3** — CI fragility swept, seed spans ~4.8% of CI width, so
-no read rests on a Monte-Carlo artifact; **P2** — median/trimmed CIs recovered on 451 arm-B cells, and
-they reject zero where the mean does not. **P1 skipped by operator** (no 018C), so **C2 must be booked
-at the retrospective as unresolved-and-parked — terminal `NOT_RESOLVABLE`, never a refutation.**
+The chapter closes with this checkpoint. `SPDR-018` + `SPDR-018B` powered the complete 017
+residue on two independent universes; `SPDR-021/022/023` characterised adaptive capture geometry
+(six TRAIN cells, run stamp `20260803T140238Z`, integrity-clean, 13/13 reproduction hashes);
+`SPDR-024` measured the one surviving lever on estimands that could actually see it (four cells,
+17 HARD each, H4 run for the first time in the programme).
+
+**The finding.** The joint `(p, W, L)` sits **at net break-even** and nothing clears it — 0 of
+1,413 powered crypto cells, 0 of 315 powered cTrader cells — with **91–96% of the distance being
+cost, not rate**. `W/L` is **not a free lever**: it is ~97% the arithmetic mirror of `p`
+(R² 0.9667 crypto / **0.9746** cTrader), movable 36–67× with `p` inverse and the mean unchanged.
+Vol-gated hold, stop distance, trail and post-stop recovery are refuted at power. Vol-aware SIZE
+has a consistent direction (236/236 rows, 6/6 cells) but a magnitude below its own detection floor
+after the dedicated `SPDR-024` measurement. Vol state never clears zero as a baseline selectivity
+contrast, on mean or Sharpe, in any cell.
+
+**Standing exclusion carried forward:** spread is never charged programme-wide (2026-07-23) —
+reported net is overstated and every money, expectancy and tradability claim stays refused by
+AMENDMENT-C2. TRAIN only; **0 counted TEST reads; 0 multiplicity slots; holdouts sealed
+throughout.**
+
+**Booked as terminal `NOT_RESOLVABLE` — parked, never refuted:** **C2 shock-MOMO** (`SPDR-018B`
+neither replicated nor refuted it; the comparator is not a neutral yardstick; P1 skipped by
+operator, no 018C) and **C3** (terminally unpowerable in its registered form — the median cell
+needs ~201 years of 25-symbol history). **C9, D3, D4 are OPEN and never run.** **P6** — Asia
+magnitude × shock, ~+10 bps vs ~0 EU — is an unregistered lead.
+
+**Closed diagnostic threads:** **P3** — CI fragility swept, seed spans ~4.8% of CI width, so no
+read rests on a Monte-Carlo artifact; **P2** — median/trimmed CIs recovered on 451 arm-B cells,
+and they reject zero where the mean does not.
 
 Binding premise: *Unconditional direction is dead. Conditional direction is unpowered, not refuted.
 Volatility is a multiplier on a direction term, never a substitute for it.*
@@ -28,10 +45,12 @@ Organising identity: `E[net] = p·W − (1−p)·L − cost`, `p_be_net = (L+cos
 satisfiable at `p < 0.5` when `W > L`. `W/L` is the natural handle for the capture branch;
 κ is a diagnostic only. Direction is **measured, not targeted**.
 
-Route: `SPDR-018` (**powering sweep over the complete 017 residue** — four arms, original statement,
-no omissions, only authorised drop SPDR-017) → mid-checkpoint reflection (evidence inventory) →
-`SPDR-021/022/023` adaptive-management characterisation → operator interpretation → conditional
-`XENA-VOLDIR-001`.
+Route as executed: `SPDR-018` / `SPDR-018B` (**powering sweep over the complete 017 residue** —
+four arms, original statement, no omissions, only authorised drop SPDR-017) → mid-checkpoint
+reflection (evidence inventory, signed 2026-07-30) → `SPDR-021/022/023` adaptive-management
+characterisation → confirmation extraction (signed 2026-08-05) → `SPDR-024` successor
+characterisation → operator interpretation → **family retired**. `XENA-VOLDIR-001` was reserved
+and **never opened** — no graduated base existed at any point.
 
 Checkpoint-018 SoT: `.ignore/what-next/alts/opportunity.md`  
 Governance: [Chapter 06 governance](../references/chapter-06-governance.md)  

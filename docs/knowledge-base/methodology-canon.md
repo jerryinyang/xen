@@ -148,6 +148,42 @@ and the traps to avoid, on any new experiment.
   a risk-managed trend/volatility exposure is legitimate and must be benchmarked and costed
   honestly rather than automatically residualised away.
 
+## Chapter 05 additions (structural decomposition + the estimand-capability rule)
+
+- **Decompose the claim before testing it.** `CF-VOLDIR-001`'s whole value came from separating
+  (A) is volatility modellable, (B) does direction have positive expectancy in bps, (C) capture
+  geometry, (D) cost — so that failure was **diagnosable** rather than "markets empty". The
+  chapter's answer ("the joint sits at break-even and 91–96% of the gap is cost") is only
+  available because the terms were measured separately.
+- **Write the identity down and let it constrain the search.**
+  `E[net] = p·W − (1−p)·L − cost`, `p_be_net = (L+cost)/(W+L)`, `edge = p − p_be_net`. This is
+  what showed the target is **not** `p > 0.5` (an edge exists at `p < 0.5` when `W > L`) — and it
+  is also what made the mirror relation between `p` and `W/L` a checkable claim rather than an
+  intuition.
+- **Check whether the estimand can express the effect, before power.** The order is: *can this
+  instrument see the thing at all* → *is the floor on the same scale as the effect* → *is n
+  sufficient*. Skipping the first two produced an exact `0.000000` on 1,400/1,400 rows (a units
+  artifact read as a null, **L-60**) and a floor that failed every read in three of four cells
+  (**L-56**). Neither was a power problem, and neither was fixable after the run.
+- **Compute the estimand's algebraic ceiling in the design.** Where the maximum is a function of
+  knowable quantities — a Sharpe ratio, a bounded rate, a fixed multiple — evaluate it per cell
+  along with the implied block requirement, and declare incapable cells **before** they run.
+- **Classify devices as admission or valuation.** An admission rule partitions the origin set and
+  cannot change the value of a trade both arms take — the paired trade-lens difference is exactly
+  zero by construction (**L-58**). Read admission devices on the **origin lens**, carrying declined
+  origins at their counterfactual value.
+- **Gating implies labelling.** If a design gates on a state, emit that state as a decision-time
+  column. Otherwise every question about it is unaskable, not underpowered (**L-59**).
+- **Controls must be shown to differ.** Assert non-degeneracy as a HARD check: a control that
+  reproduces the real estimate has tested nothing and reports green while doing so (**L-57**).
+- **Leave-one-out on small panels.** Below ~10 strata, report leave-one-out sign stability and the
+  mass share of the largest contributor with every pooled figure. A three-instrument pooled sign
+  that flips on one drop is one instrument wearing a panel's credibility (**L-61**).
+- **A second universe is replication, never added `n`.** The cTrader panel's role stays credibility
+  only; it is never pooled into crypto's count (AMENDMENT-C1/S1). Its value in this chapter was
+  exactly that: the break-even structure replicated *more tightly* on a universe sharing no
+  instrument, venue, cost model or vendor.
+
 ## Statistical defaults
 
 Non-parametric / empirical by default (block / stationary / moving-block bootstrap;

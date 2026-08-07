@@ -21,3 +21,9 @@ as work happens. Append a one-line pointer per memory file below. Distinct from 
 - [volatility-amplifies-direction.md](volatility-amplifies-direction.md) — high volatility amplified directional continuation; gross evidence did not survive costs.
 - [signed-volume-provenance.md](signed-volume-provenance.md) — exact Bybit taker-side volume validated 20/20 raw-trade symbol-days.
 - [chapter05-entry-gate.md](chapter05-entry-gate.md) — preflight blocks registration/outcomes; approved route is SPDR → frozen EXP, no XENA or historical TEST.
+- [chapter05-dispositions.md](chapter05-dispositions.md) — CF-VOLDIR-001 retired characterised-not-tradable; chapter closes with no family open; C2/C3 parked as terminal NOT_RESOLVABLE.
+- [joint-sits-at-breakeven-cost-not-rate.md](joint-sits-at-breakeven-cost-not-rate.md) — 0 of 1,413 and 0 of 315 powered cells clear net; 91–96% of the gap is cost, not rate.
+- [wl-is-the-mirror-of-p.md](wl-is-the-mirror-of-p.md) — W/L is ~97% the arithmetic mirror of p; exit geometry cannot move the mean.
+- [detection-floor-must-share-scale.md](detection-floor-must-share-scale.md) — AMENDMENT-7: floors use the row's own bootstrap SE; compute the estimand ceiling at design time.
+- [per-notional-blind-to-size.md](per-notional-blind-to-size.md) — a per-notional estimand divides size out; an exact zero on 100% of rows is a units alarm.
+- [gate-implies-label-and-live-controls.md](gate-implies-label-and-live-controls.md) — emit realised state whenever you gate on it; a control equal to the real estimate is a failed control.

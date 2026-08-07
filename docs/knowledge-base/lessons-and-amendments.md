@@ -1479,3 +1479,182 @@ all artifact hashes equal, and an explicit memory measurement.
 `python/tests/test_adaptive_management_analysis.py`;
 `docs/superpowers/plans/2026-08-03-spdr-critical-path-performance-review.md`;
 `docs/knowledge-base/pitfalls-ledger.md` **P-27**.
+
+---
+
+## L-56 — A detection floor and the effect it judges must share a scale, and where the estimand is pinned to a known ratio the ceiling is computable BEFORE the run (SPDR-024) ⭐
+
+**What.** The first SPDR-024 emission returned "unresolvable" on essentially every read across all
+four cells. The cause was not thin data. The detection floor was `MDE_Z / √n` with `MDE_Z = 2.8`
+(`spdr024_analysis.py:31`, `:392`), while the effect it judged was a σ̂-normalised paired difference
+on a pure SIZE device. For that device the normalised estimand is arithmetically **pinned to the
+baseline's per-trade Sharpe ratio** — 0.032 to 0.059 in these cells. Clearing a floor beneath that
+ceiling needs **2,270–7,501 independent blocks**, and only **one of four cells** had them. Three of
+four cells could not resolve anything **before the run started**, by arithmetic that was computable
+at design time and was not computed.
+
+Four inflations compounded on top: the yardstick was built from estimates themselves declared
+unresolved; `2.8` — a **sample-size target** — was used as a **significance bar** beside a bootstrap
+SE the floor ignored; two channels with different σ̂ denominators (`paired_delta` for scale,
+`outcome_level_bps` for selection) were read on one shared numeric ladder; and the pre-execution
+power gate used a different standard from the post-execution ladder.
+
+**Mechanism (why).** A power constant and a test threshold answer different questions. `MDE_Z = 2.8`
+encodes "how many observations do I need to have an 80% chance of seeing an effect of size δ" — it
+is a *planning* quantity about a hypothetical future sample. A significance bar asks "is *this*
+realised estimate distinguishable from zero given *this* sample's dispersion". Substituting the
+first for the second silently imports the planning constant's conservatism into every realised read,
+and — the load-bearing part — does so **on a different scale from the estimate**, because the
+planning constant divides `√n` while the estimate is normalised by a σ̂ the constant never sees. The
+mismatch is invisible in the code because both quantities are dimensionless floats. It becomes
+visible only when you write down the estimand's algebraic ceiling, which for a size-only device
+reduces to the baseline Sharpe and can therefore be evaluated from the baseline alone.
+
+The failure is **universal rather than selective** — every read fails, not the marginal ones — and
+that universality is the diagnostic signature. A floor calibrated to the data fails *some* reads. A
+floor on the wrong scale fails *all* of them, which is what should have prompted the check.
+
+**Fix / new rule (AMENDMENT-7 R1–R5, now programme-wide).**
+1. **R1/R5** — preflight power counts and any historical observed-effect band are **context only**,
+   never gates and never thresholds on a realised estimate.
+2. **R2** — a detection floor must be built from the **same SE family as the row's own CI**:
+   `mde = MDE_Z × bootstrap_SE` of the same estimator. Never a parametric `k/√n` beside a bootstrap
+   interval.
+3. **R3** — no row is dropped, demoted, or labelled by its floor. `MDE_Z` is context; the words
+   `WASH` and `UNPOWERED` as row verdicts are withdrawn.
+4. **R4** — every channel declares its `sigma_denominator`. Channels with different denominators
+   may **never** be ranked against each other on a shared numeric ladder.
+5. **Design-time ceiling check (the new one):** where the estimand's algebraic maximum is a function
+   of quantities knowable before the run — a Sharpe ratio, a bounded rate, a fixed multiple —
+   compute the ceiling and the implied block requirement **in the design**, per cell, and record
+   whether each cell can resolve anything at all. A cell that cannot must be declared incapable
+   before it runs, or dropped.
+
+**Enforced at.** `python/src/xen/adaptive_management/spdr024_analysis.py` (floor construction and
+`sigma_denominator` declaration); `python/experiments/SPDR-024/design.md` §10/§11;
+`.claude/skills/data-analyst/SKILL.md` (floor/ladder rules at analysis time);
+`.claude/skills/quant-designer/design-requirements.md` (design-time ceiling block);
+`docs/knowledge-base/pitfalls-ledger.md` **P-28**.
+
+---
+
+## L-57 — A control that reproduces the real estimate exactly has never tested anything; assert that the control DIFFERS (SPDR-021/022/023, X-09)
+
+**What.** `TIME_DERANGEMENT` returned **the identical number to the real estimate on 100% of rows in
+all six cells**. It had been carried as a live control across multiple experiments and reported as
+held. It tested nothing at any point.
+
+**Mechanism (why).** A control earns its status by being a *different computation on deliberately
+broken input*. When the derangement is applied to a quantity that is invariant to the thing being
+deranged — here, a per-trade value that does not depend on the time ordering the derangement
+permutes — the "control" is the identity function with extra steps. Nothing in a pass/fail harness
+notices, because a control that equals the real estimate does not fail: it agrees. The check reports
+green precisely because it is vacuous. This is the same family as the chapter-02 finding that
+permuting realised P&L cannot collapse a mean-stat referee.
+
+**Fix / new rule.** Every control must carry a **non-degeneracy assertion**: the control statistic
+must differ from the real statistic on a stated minimum share of rows, and that share is itself a
+HARD check. A control whose output equals the real estimate is a **failed control**, not a passed
+one. `TIME_DERANGEMENT` is **removed** (`REMOVED_OD17`), not fixed.
+
+**Enforced at.** SPDR-024 HARD set (`time_derangement_absent` — its removal is asserted, so it
+cannot silently return); `docs/knowledge-base/pitfalls-ledger.md` **P-29**; companion to **L-52**
+(assert the check *count*) — this one asserts the check has *content*.
+
+---
+
+## L-58 — A device that changes only WHICH trades happen cannot change WHAT the shared trades are worth (SPDR-021/022/023, X-02)
+
+**What.** Native admission rules — entry threshold, order expiry, breach band `H` — moved the value
+of shared trades by **exactly zero on ~2.3 million paired trade rows**. Not "within noise": zero.
+The one apparent exception, `BAND_Z`, is a **price offset**, not an admission rule, and does move
+outcomes.
+
+**Mechanism (why).** An admission rule is a predicate over origins. It partitions the origin
+population into taken and not-taken; it does not touch the price path, the entry price, or the exit
+of any trade that both arms take. So for the intersection of two arms' trade sets, every outcome is
+identical by construction, and a paired difference over that intersection is exactly zero as an
+algebraic fact, not a measurement. Reading such a device on a **trade lens** therefore measures
+nothing and consumes the whole budget doing it. The effect, if any, lives entirely in the
+composition of the taken set — which is an **origin-lens** quantity.
+
+**Fix / new rule.** Classify every device before it is emitted as **admission** (changes the origin
+set) or **valuation** (changes what a trade is worth). Admission devices are read on the **origin
+lens only**, with non-fills carried at their counterfactual value, never dropped. A paired trade-lens
+read on an admission device must be declared void in the design, not discovered empty in the
+analysis. Where a parameter does both — a price offset that also gates — say so explicitly.
+
+**Enforced at.** SPDR-024 emission contract `E2` (counterfactual outcome for excluded origins);
+`.claude/skills/quant-designer/design-requirements.md` (device classification block);
+`docs/knowledge-base/pitfalls-ledger.md` **P-30**.
+
+---
+
+## L-59 — A screen that GATES BY a state but never LABELS realised state cannot answer any question about that state (SPDR-021/022/023)
+
+**What.** All six cells of SPDR-021/022/023 gated their arms by volatility state. None of them
+recorded the **realised** regime on the origin or the trade. Every regime-conditional question was
+therefore unanswerable — not underpowered, **unaskable** — and this was only discovered at the
+confirmation-extraction stage, after the runs.
+
+**Mechanism (why).** Gating writes state into the *control flow* and then discards it. The emitted
+row records what the arm did, not what the world was doing when it did it. Downstream, a regime
+question needs the state as a **column**, and no amount of analysis recovers a column that was never
+written — the decision-time state is not reconstructible from the outcome, and reconstructing it
+post hoc from features would use a different clock than the one the gate used, silently introducing
+look-ahead.
+
+**Fix / new rule.** If a design gates on a state, it must **emit that state as a labelled column**
+at decision time (`E1`), on the origin and inherited by every resulting fill. Gating without
+labelling is a design defect caught at QA, not a limitation disclosed in analysis.
+
+**Enforced at.** SPDR-024 emission contract `E1` + HARD check `e1_regime_label_present`;
+`.claude/skills/qa-compliance/SKILL.md` (gate-implies-label check).
+
+---
+
+## L-60 — A per-notional estimand is arithmetically blind to sizing, and the exact zero it returns is not a null (SPDR-021/022/023)
+
+**What.** The paired SIZE delta was exactly `0.000000` on **1,400 of 1,400 rows in all six cells**.
+The primary estimand — per-trade bps — is per-unit-notional. The one device that survived every
+other refutation was measured by an instrument that cannot see it.
+
+**Mechanism (why).** Normalising a return by the position's own notional divides out the size term
+by construction. Halving size halves both numerator and denominator. The result is not a small
+effect or a noisy one; it is an algebraic identity, and it reports as a clean, confident,
+tightly-CI'd zero — the most convincing-looking null in the study, and entirely an artifact of the
+unit. A reader who does not check the estimand's units reads it as evidence that sizing does not
+matter.
+
+**Fix / new rule.** Any claim about **sizing, exposure, or capital efficiency** requires a
+**capital-normalised** estimand (`E6`), never a per-unit-notional one. More generally: before
+accepting a null, verify the estimand is capable of expressing the effect — an exact zero across
+100% of rows is a **units alarm**, not a result. This is the sizing-specific instance of the
+programme rule that no expectancy claim may come from exits or sizing on an estimand that cannot
+represent them.
+
+**Enforced at.** SPDR-024 emission contract `E6` + HARD check
+`e6_capital_normalised_estimand_present`; `docs/knowledge-base/pitfalls-ledger.md` **P-31**.
+
+---
+
+## L-61 — A pooled figure over three instruments is one instrument (SPDR-021/022/023, X-10)
+
+**What.** The pooled cTrader native-geometry number is XAUUSD. Dropping that single instrument
+**flips the pooled sign**.
+
+**Mechanism (why).** Pooling weights by event mass, and on a three-instrument panel one high-
+volatility, high-event-count instrument can carry a majority of the mass. The pooled statistic is
+then a disguised single-instrument statistic wearing the credibility of a panel. The failure is
+invisible in the pooled number itself — it looks like a three-instrument result — and is exposed
+only by leave-one-out. This is the small-panel case of the standing per-stratum rule: pooled figures
+are disclosure-only.
+
+**Fix / new rule.** On any panel with fewer than ~10 strata, report **leave-one-out sign stability**
+alongside every pooled figure, and state the mass share of the largest contributor. A pooled sign
+that does not survive leave-one-out is not reported as a panel result. Three instruments remain a
+**replication instrument, not a substrate** — the cTrader universe's role (credibility, never
+pooled `n`) is unchanged from **AMENDMENT-C1/S1**.
+
+**Enforced at.** `.claude/skills/data-analyst/SKILL.md` (leave-one-out disclosure on small panels);
+`docs/knowledge-base/methodology-canon.md` (per-stratum non-pooling).
