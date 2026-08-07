@@ -1,10 +1,12 @@
 {
   "P1_per_symbol": [
     {
+      "baseline_gross_mean_bps": 19.761727561023253,
+      "baseline_gross_sigma_bps": 94.84844986541347,
       "blocks": {
-        "V_A_UNCHUNKED": 1234,
-        "V_B_TIME_BLOCK": 476,
-        "V_C_REGIME_EPISODE": 391
+        "V_A_UNCHUNKED": 752,
+        "V_B_TIME_BLOCK": 416,
+        "V_C_REGIME_EPISODE": 339
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -14,26 +16,34 @@
         "train_p10_bps": 31.978739595713446,
         "train_p90_bps": 101.90623891311631
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 12504,
+      "fill_rate": 0.6094003241491086,
+      "fixed_arm_fills": 752,
       "fixed_arm_orders": 1234,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.07970773192334007,
-        "V_B_TIME_BLOCK": 0.1283377895839496,
-        "V_C_REGIME_EPISODE": 0.1416020864787686
-      },
-      "most_conservative_mde_sigma": 0.1416020864787686,
+      "most_conservative_planning_mde_sigma": 0.15207512504619916,
       "order_rate_per_origin": 0.2053586287235813,
       "origins": 6009,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.10210549404852619,
+        "V_B_TIME_BLOCK": 0.13728129459672883,
+        "V_C_REGIME_EPISODE": 0.15207512504619916
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 451,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.1473260932170082,
       "symbol": "BTCUSDT"
     },
     {
+      "baseline_gross_mean_bps": 26.084484547865067,
+      "baseline_gross_sigma_bps": 118.29019753289309,
       "blocks": {
-        "V_A_UNCHUNKED": 1314,
-        "V_B_TIME_BLOCK": 488,
-        "V_C_REGIME_EPISODE": 434
+        "V_A_UNCHUNKED": 827,
+        "V_B_TIME_BLOCK": 435,
+        "V_C_REGIME_EPISODE": 374
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -43,26 +53,34 @@
         "train_p10_bps": 38.948239977109694,
         "train_p90_bps": 138.8767825065973
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 12504,
+      "fill_rate": 0.6293759512937596,
+      "fixed_arm_fills": 827,
       "fixed_arm_orders": 1314,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.07724321626955434,
-        "V_B_TIME_BLOCK": 0.12675004445952592,
-        "V_C_REGIME_EPISODE": 0.1344043010064494
-      },
-      "most_conservative_mde_sigma": 0.1344043010064494,
+      "most_conservative_planning_mde_sigma": 0.14478455319860536,
       "order_rate_per_origin": 0.21693907875185736,
       "origins": 6057,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.09736553993890092,
+        "V_B_TIME_BLOCK": 0.13424972441590755,
+        "V_C_REGIME_EPISODE": 0.14478455319860536
+      },
+      "power_label": "CONTEXT_FLOOR_AT_OR_BELOW_MECHANISM_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 510,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.15592598788603948,
       "symbol": "ETHUSDT"
     },
     {
+      "baseline_gross_mean_bps": 45.8005963597576,
+      "baseline_gross_sigma_bps": 178.20164509466997,
       "blocks": {
-        "V_A_UNCHUNKED": 1402,
-        "V_B_TIME_BLOCK": 497,
-        "V_C_REGIME_EPISODE": 430
+        "V_A_UNCHUNKED": 926,
+        "V_B_TIME_BLOCK": 442,
+        "V_C_REGIME_EPISODE": 383
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -72,26 +90,34 @@
         "train_p10_bps": 80.03084153940338,
         "train_p90_bps": 222.77911253601735
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 12528,
+      "fill_rate": 0.6604850213980028,
+      "fixed_arm_fills": 926,
       "fixed_arm_orders": 1402,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.07477975268926869,
-        "V_B_TIME_BLOCK": 0.12559716512455182,
-        "V_C_REGIME_EPISODE": 0.1350279902077154
-      },
-      "most_conservative_mde_sigma": 0.1350279902077154,
+      "most_conservative_planning_mde_sigma": 0.1430733164861269,
       "order_rate_per_origin": 0.25407756433490397,
       "origins": 5518,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.09201370918610849,
+        "V_B_TIME_BLOCK": 0.13318241836325834,
+        "V_C_REGIME_EPISODE": 0.1430733164861269
+      },
+      "power_label": "CONTEXT_FLOOR_AT_OR_BELOW_MECHANISM_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 504,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.18173744833369762,
       "symbol": "SOLUSDT"
     },
     {
+      "baseline_gross_mean_bps": 30.43144431340856,
+      "baseline_gross_sigma_bps": 145.1719797725028,
       "blocks": {
-        "V_A_UNCHUNKED": 1460,
-        "V_B_TIME_BLOCK": 498,
-        "V_C_REGIME_EPISODE": 447
+        "V_A_UNCHUNKED": 1003,
+        "V_B_TIME_BLOCK": 458,
+        "V_C_REGIME_EPISODE": 399
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -101,26 +127,34 @@
         "train_p10_bps": 62.647370708005155,
         "train_p90_bps": 194.8831403643544
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 12504,
+      "fill_rate": 0.686986301369863,
+      "fixed_arm_fills": 1003,
       "fixed_arm_orders": 1460,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.07327934916262992,
-        "V_B_TIME_BLOCK": 0.12547100018550184,
-        "V_C_REGIME_EPISODE": 0.13243545555531258
-      },
-      "most_conservative_mde_sigma": 0.13243545555531258,
+      "most_conservative_planning_mde_sigma": 0.14017532881009248,
       "order_rate_per_origin": 0.27087198515769945,
       "origins": 5390,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.08841125691309415,
+        "V_B_TIME_BLOCK": 0.13083540778447936,
+        "V_C_REGIME_EPISODE": 0.14017532881009248
+      },
+      "power_label": "CONTEXT_FLOOR_AT_OR_BELOW_MECHANISM_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 514,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.14822612923673717,
       "symbol": "AVAXUSDT"
     },
     {
+      "baseline_gross_mean_bps": 91.76447000935059,
+      "baseline_gross_sigma_bps": 338.06979888368573,
       "blocks": {
-        "V_A_UNCHUNKED": 590,
-        "V_B_TIME_BLOCK": 200,
-        "V_C_REGIME_EPISODE": 168
+        "V_A_UNCHUNKED": 367,
+        "V_B_TIME_BLOCK": 185,
+        "V_C_REGIME_EPISODE": 150
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -130,26 +164,34 @@
         "train_p10_bps": 112.58730965380518,
         "train_p90_bps": 408.376210684922
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 5032,
+      "fill_rate": 0.6220338983050847,
+      "fixed_arm_fills": 367,
       "fixed_arm_orders": 590,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.11527417574296656,
-        "V_B_TIME_BLOCK": 0.1979898987322333,
-        "V_C_REGIME_EPISODE": 0.21602468994692867
-      },
-      "most_conservative_mde_sigma": 0.21602468994692867,
+      "most_conservative_planning_mde_sigma": 0.22861904265976327,
       "order_rate_per_origin": 0.25010597710894444,
       "origins": 2359,
-      "power_label": "DESCRIPTIVE_CANNOT_RESOLVE_STEP3_EFFECT",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.14615881027212654,
+        "V_B_TIME_BLOCK": 0.20586009418626613,
+        "V_C_REGIME_EPISODE": 0.22861904265976327
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 198,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.19193456271415152,
       "symbol": "ORDIUSDT"
     },
     {
+      "baseline_gross_mean_bps": 83.62806413062194,
+      "baseline_gross_sigma_bps": 396.1355754475319,
       "blocks": {
-        "V_A_UNCHUNKED": 763,
-        "V_B_TIME_BLOCK": 297,
-        "V_C_REGIME_EPISODE": 258
+        "V_A_UNCHUNKED": 494,
+        "V_B_TIME_BLOCK": 256,
+        "V_C_REGIME_EPISODE": 221
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -159,26 +201,34 @@
         "train_p10_bps": 124.406315491946,
         "train_p90_bps": 583.5954264245627
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 8295,
+      "fill_rate": 0.6474442988204456,
+      "fixed_arm_fills": 494,
       "fixed_arm_orders": 763,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.10136680599583951,
-        "V_B_TIME_BLOCK": 0.16247247889198463,
-        "V_C_REGIME_EPISODE": 0.17432038578211329
-      },
-      "most_conservative_mde_sigma": 0.17432038578211329,
+      "most_conservative_planning_mde_sigma": 0.18834838231896747,
       "order_rate_per_origin": 0.24668606530876172,
       "origins": 3093,
-      "power_label": "DESCRIPTIVE_CANNOT_RESOLVE_STEP3_EFFECT",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.1259779557864373,
+        "V_B_TIME_BLOCK": 0.175,
+        "V_C_REGIME_EPISODE": 0.18834838231896747
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 328,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.14927710336911798,
       "symbol": "1000BONKUSDT"
     },
     {
+      "baseline_gross_mean_bps": 87.12134496749916,
+      "baseline_gross_sigma_bps": 366.66980691634086,
       "blocks": {
-        "V_A_UNCHUNKED": 144,
-        "V_B_TIME_BLOCK": 44,
-        "V_C_REGIME_EPISODE": 35
+        "V_A_UNCHUNKED": 99,
+        "V_B_TIME_BLOCK": 41,
+        "V_C_REGIME_EPISODE": 32
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -188,26 +238,34 @@
         "train_p10_bps": 206.90296318541337,
         "train_p90_bps": 552.067863405521
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 1063,
+      "fill_rate": 0.6875,
+      "fixed_arm_fills": 99,
       "fixed_arm_orders": 144,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.2333333333333333,
-        "V_B_TIME_BLOCK": 0.42211588240886905,
-        "V_C_REGIME_EPISODE": 0.47328638264796924
-      },
-      "most_conservative_mde_sigma": 0.47328638264796924,
+      "most_conservative_planning_mde_sigma": 0.4949747468305832,
       "order_rate_per_origin": 0.29568788501026694,
       "origins": 487,
-      "power_label": "DESCRIPTIVE_CANNOT_RESOLVE_STEP3_EFFECT",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.28141058827257937,
+        "V_B_TIME_BLOCK": 0.43728653328809697,
+        "V_C_REGIME_EPISODE": 0.4949747468305832
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 44,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.16800972605488268,
       "symbol": "TIAUSDT"
     },
     {
+      "baseline_gross_mean_bps": 25.97267136702841,
+      "baseline_gross_sigma_bps": 184.97835276878098,
       "blocks": {
-        "V_A_UNCHUNKED": 1359,
-        "V_B_TIME_BLOCK": 489,
-        "V_C_REGIME_EPISODE": 425
+        "V_A_UNCHUNKED": 882,
+        "V_B_TIME_BLOCK": 449,
+        "V_C_REGIME_EPISODE": 373
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -217,26 +275,34 @@
         "train_p10_bps": 53.90947099638774,
         "train_p90_bps": 189.0610964287966
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 12504,
+      "fill_rate": 0.6490066225165563,
+      "fixed_arm_fills": 882,
       "fixed_arm_orders": 1359,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.0759535894853082,
-        "V_B_TIME_BLOCK": 0.12662037686091768,
-        "V_C_REGIME_EPISODE": 0.13581995002034644
-      },
-      "most_conservative_mde_sigma": 0.13581995002034644,
+      "most_conservative_planning_mde_sigma": 0.14497850446197935,
       "order_rate_per_origin": 0.24931205283434232,
       "origins": 5451,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.09428090415820634,
+        "V_B_TIME_BLOCK": 0.13214016989124241,
+        "V_C_REGIME_EPISODE": 0.14497850446197935
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 504,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.09928433124340713,
       "symbol": "DOGEUSDT"
     },
     {
+      "baseline_gross_mean_bps": 21.7846466325535,
+      "baseline_gross_sigma_bps": 148.08894970916998,
       "blocks": {
-        "V_A_UNCHUNKED": 1402,
-        "V_B_TIME_BLOCK": 486,
-        "V_C_REGIME_EPISODE": 404
+        "V_A_UNCHUNKED": 917,
+        "V_B_TIME_BLOCK": 435,
+        "V_C_REGIME_EPISODE": 368
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -246,26 +312,34 @@
         "train_p10_bps": 56.90026532164768,
         "train_p90_bps": 156.88283019731338
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 12504,
+      "fill_rate": 0.6540656205420827,
+      "fixed_arm_fills": 917,
       "fixed_arm_orders": 1402,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.07477975268926869,
-        "V_B_TIME_BLOCK": 0.12701057925542406,
-        "V_C_REGIME_EPISODE": 0.13930520662939846
-      },
-      "most_conservative_mde_sigma": 0.13930520662939846,
+      "most_conservative_planning_mde_sigma": 0.14596008983995234,
       "order_rate_per_origin": 0.24704845814977974,
       "origins": 5675,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.0924641461357357,
+        "V_B_TIME_BLOCK": 0.13424972441590755,
+        "V_C_REGIME_EPISODE": 0.14596008983995234
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 475,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.10401904659249141,
       "symbol": "XRPUSDT"
     },
     {
+      "baseline_gross_mean_bps": 25.433125457015166,
+      "baseline_gross_sigma_bps": 134.7769817962304,
       "blocks": {
-        "V_A_UNCHUNKED": 1609,
-        "V_B_TIME_BLOCK": 505,
-        "V_C_REGIME_EPISODE": 461
+        "V_A_UNCHUNKED": 1076,
+        "V_B_TIME_BLOCK": 471,
+        "V_C_REGIME_EPISODE": 417
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -275,26 +349,34 @@
         "train_p10_bps": 67.02150400136044,
         "train_p90_bps": 177.07440726339277
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 12504,
+      "fill_rate": 0.6687383467992541,
+      "fixed_arm_fills": 1076,
       "fixed_arm_orders": 1609,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.06980395169219195,
-        "V_B_TIME_BLOCK": 0.12459836465719573,
-        "V_C_REGIME_EPISODE": 0.13040900119313423
-      },
-      "most_conservative_mde_sigma": 0.13040900119313423,
+      "most_conservative_planning_mde_sigma": 0.13711658992482967,
       "order_rate_per_origin": 0.28342434384357934,
       "origins": 5677,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.08535950651895692,
+        "V_B_TIME_BLOCK": 0.1290171897235456,
+        "V_C_REGIME_EPISODE": 0.13711658992482967
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 542,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.13343476933333903,
       "symbol": "LINKUSDT"
     },
     {
+      "baseline_gross_mean_bps": 24.816012023737308,
+      "baseline_gross_sigma_bps": 127.3179158719108,
       "blocks": {
-        "V_A_UNCHUNKED": 1495,
-        "V_B_TIME_BLOCK": 502,
-        "V_C_REGIME_EPISODE": 450
+        "V_A_UNCHUNKED": 1020,
+        "V_B_TIME_BLOCK": 465,
+        "V_C_REGIME_EPISODE": 412
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -304,26 +386,34 @@
         "train_p10_bps": 57.11804493721621,
         "train_p90_bps": 154.16108840978956
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 12528,
+      "fill_rate": 0.6822742474916388,
+      "fixed_arm_fills": 1020,
       "fixed_arm_orders": 1495,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.07241648401566203,
-        "V_B_TIME_BLOCK": 0.12497011594968649,
-        "V_C_REGIME_EPISODE": 0.13199326582148885
-      },
-      "most_conservative_mde_sigma": 0.13199326582148885,
+      "most_conservative_planning_mde_sigma": 0.13794609894300103,
       "order_rate_per_origin": 0.2750689972401104,
       "origins": 5435,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.08767140075192092,
+        "V_B_TIME_BLOCK": 0.12984689081284712,
+        "V_C_REGIME_EPISODE": 0.13794609894300103
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 523,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.13782483214416913,
       "symbol": "ADAUSDT"
     },
     {
+      "baseline_gross_mean_bps": 105.82231262840979,
+      "baseline_gross_sigma_bps": 417.3155475398148,
       "blocks": {
-        "V_A_UNCHUNKED": 195,
-        "V_B_TIME_BLOCK": 64,
-        "V_C_REGIME_EPISODE": 53
+        "V_A_UNCHUNKED": 117,
+        "V_B_TIME_BLOCK": 59,
+        "V_C_REGIME_EPISODE": 47
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -333,26 +423,34 @@
         "train_p10_bps": 205.1037176917668,
         "train_p90_bps": 651.1574525429261
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 1595,
+      "fill_rate": 0.6,
+      "fixed_arm_fills": 117,
       "fixed_arm_orders": 195,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.2005121647310412,
-        "V_B_TIME_BLOCK": 0.35,
-        "V_C_REGIME_EPISODE": 0.38460957905632925
-      },
-      "most_conservative_mde_sigma": 0.38460957905632925,
+      "most_conservative_planning_mde_sigma": 0.40842197619410475,
       "order_rate_per_origin": 0.27045769764216365,
       "origins": 721,
-      "power_label": "DESCRIPTIVE_CANNOT_RESOLVE_STEP3_EFFECT",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.25886009157177353,
+        "V_B_TIME_BLOCK": 0.3645289507463068,
+        "V_C_REGIME_EPISODE": 0.40842197619410475
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 55,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.17930718206287846,
       "symbol": "BIGTIMEUSDT"
     },
     {
+      "baseline_gross_mean_bps": 44.15658276205743,
+      "baseline_gross_sigma_bps": 237.95853315822518,
       "blocks": {
-        "V_A_UNCHUNKED": 936,
-        "V_B_TIME_BLOCK": 298,
-        "V_C_REGIME_EPISODE": 237
+        "V_A_UNCHUNKED": 597,
+        "V_B_TIME_BLOCK": 269,
+        "V_C_REGIME_EPISODE": 209
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -362,26 +460,34 @@
         "train_p10_bps": 87.75123579478418,
         "train_p90_bps": 340.4297345783869
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 7337,
+      "fill_rate": 0.6378205128205128,
+      "fixed_arm_fills": 597,
       "fixed_arm_orders": 936,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.09152086306448587,
-        "V_B_TIME_BLOCK": 0.16219964498177783,
-        "V_C_REGIME_EPISODE": 0.18187954468925666
-      },
-      "most_conservative_mde_sigma": 0.18187954468925666,
+      "most_conservative_planning_mde_sigma": 0.19368004988250087,
       "order_rate_per_origin": 0.27824019024970276,
       "origins": 3364,
-      "power_label": "DESCRIPTIVE_CANNOT_RESOLVE_STEP3_EFFECT",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.11459637126980812,
+        "V_B_TIME_BLOCK": 0.17071901303791384,
+        "V_C_REGIME_EPISODE": 0.19368004988250087
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 271,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.13121369799466073,
       "symbol": "BLURUSDT"
     },
     {
+      "baseline_gross_mean_bps": 58.84782155766526,
+      "baseline_gross_sigma_bps": 334.1567117839572,
       "blocks": {
-        "V_A_UNCHUNKED": 537,
-        "V_B_TIME_BLOCK": 204,
-        "V_C_REGIME_EPISODE": 166
+        "V_A_UNCHUNKED": 348,
+        "V_B_TIME_BLOCK": 175,
+        "V_C_REGIME_EPISODE": 148
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -391,26 +497,34 @@
         "train_p10_bps": 114.91781606324663,
         "train_p90_bps": 382.4098844599002
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 5485,
+      "fill_rate": 0.6480446927374302,
+      "fixed_arm_fills": 348,
       "fixed_arm_orders": 537,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.12082891856058886,
-        "V_B_TIME_BLOCK": 0.19603921176392136,
-        "V_C_REGIME_EPISODE": 0.21732214719777318
-      },
-      "most_conservative_mde_sigma": 0.21732214719777318,
+      "most_conservative_planning_mde_sigma": 0.2301585822275002,
       "order_rate_per_origin": 0.22591501893142615,
       "origins": 2377,
-      "power_label": "DESCRIPTIVE_CANNOT_RESOLVE_STEP3_EFFECT",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.15009575487729127,
+        "V_B_TIME_BLOCK": 0.21166010488516723,
+        "V_C_REGIME_EPISODE": 0.2301585822275002
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 207,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.12452748131057825,
       "symbol": "1000PEPEUSDT"
     },
     {
+      "baseline_gross_mean_bps": 45.47679475249482,
+      "baseline_gross_sigma_bps": 246.47711786719765,
       "blocks": {
-        "V_A_UNCHUNKED": 1170,
-        "V_B_TIME_BLOCK": 432,
-        "V_C_REGIME_EPISODE": 345
+        "V_A_UNCHUNKED": 744,
+        "V_B_TIME_BLOCK": 379,
+        "V_C_REGIME_EPISODE": 307
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -420,26 +534,34 @@
         "train_p10_bps": 72.35120165328817,
         "train_p90_bps": 277.96518256018715
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 11151,
+      "fill_rate": 0.6358974358974359,
+      "fixed_arm_fills": 744,
       "fixed_arm_orders": 1170,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.08185874846865604,
-        "V_B_TIME_BLOCK": 0.13471506281091267,
-        "V_C_REGIME_EPISODE": 0.15074693257628632
-      },
-      "most_conservative_mde_sigma": 0.15074693257628632,
+      "most_conservative_planning_mde_sigma": 0.15980444074989789,
       "order_rate_per_origin": 0.25026737967914436,
       "origins": 4675,
-      "power_label": "DESCRIPTIVE_CANNOT_RESOLVE_STEP3_EFFECT",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.1026529805149473,
+        "V_B_TIME_BLOCK": 0.14382633914250395,
+        "V_C_REGIME_EPISODE": 0.15980444074989789
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 413,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.13046626897610883,
       "symbol": "1000LUNCUSDT"
     },
     {
+      "baseline_gross_mean_bps": 41.592769021534394,
+      "baseline_gross_sigma_bps": 178.634562704343,
       "blocks": {
-        "V_A_UNCHUNKED": 2815,
-        "V_B_TIME_BLOCK": 880,
-        "V_C_REGIME_EPISODE": 725
+        "V_A_UNCHUNKED": 1897,
+        "V_B_TIME_BLOCK": 822,
+        "V_C_REGIME_EPISODE": 664
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -449,26 +571,34 @@
         "train_p10_bps": 73.0473379179292,
         "train_p90_bps": 247.84566275995041
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 21642,
+      "fill_rate": 0.6738898756660746,
+      "fixed_arm_fills": 1897,
       "fixed_arm_orders": 2815,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.05277385649118361,
-        "V_B_TIME_BLOCK": 0.09438798074485388,
-        "V_C_REGIME_EPISODE": 0.10398938937914903
-      },
-      "most_conservative_mde_sigma": 0.10398938937914903,
+      "most_conservative_planning_mde_sigma": 0.10866107359888659,
       "order_rate_per_origin": 0.2868351334827797,
       "origins": 9814,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.06428717856939503,
+        "V_B_TIME_BLOCK": 0.09766121489812181,
+        "V_C_REGIME_EPISODE": 0.10866107359888659
+      },
+      "power_label": "CONTEXT_FLOOR_AT_OR_BELOW_MECHANISM_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 830,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.1646407536044966,
       "symbol": "MATICUSDT"
     },
     {
+      "baseline_gross_mean_bps": 37.436040962297305,
+      "baseline_gross_sigma_bps": 196.52833442304143,
       "blocks": {
-        "V_A_UNCHUNKED": 1582,
-        "V_B_TIME_BLOCK": 471,
-        "V_C_REGIME_EPISODE": 407
+        "V_A_UNCHUNKED": 1069,
+        "V_B_TIME_BLOCK": 452,
+        "V_C_REGIME_EPISODE": 378
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -478,26 +608,34 @@
         "train_p10_bps": 86.93202565718872,
         "train_p90_bps": 284.99989925630587
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 11705,
+      "fill_rate": 0.6757269279393173,
+      "fixed_arm_fills": 1069,
       "fixed_arm_orders": 1582,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.07039710372159766,
-        "V_B_TIME_BLOCK": 0.1290171897235456,
-        "V_C_REGIME_EPISODE": 0.1387908471870507
-      },
-      "most_conservative_mde_sigma": 0.1387908471870507,
+      "most_conservative_planning_mde_sigma": 0.1440164599646191,
       "order_rate_per_origin": 0.3015630956919558,
       "origins": 5246,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.08563852502892624,
+        "V_B_TIME_BLOCK": 0.1317009215737036,
+        "V_C_REGIME_EPISODE": 0.1440164599646191
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 459,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.13469446277520705,
       "symbol": "INJUSDT"
     },
     {
+      "baseline_gross_mean_bps": 55.07150232528033,
+      "baseline_gross_sigma_bps": 259.03087800683846,
       "blocks": {
-        "V_A_UNCHUNKED": 412,
-        "V_B_TIME_BLOCK": 119,
-        "V_C_REGIME_EPISODE": 99
+        "V_A_UNCHUNKED": 262,
+        "V_B_TIME_BLOCK": 112,
+        "V_C_REGIME_EPISODE": 88
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -507,26 +645,34 @@
         "train_p10_bps": 78.84778811871091,
         "train_p90_bps": 327.1393486252923
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 2972,
+      "fill_rate": 0.6359223300970874,
+      "fixed_arm_fills": 262,
       "fixed_arm_orders": 412,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.13794609894300103,
-        "V_B_TIME_BLOCK": 0.2566755791678992,
-        "V_C_REGIME_EPISODE": 0.28141058827257937
-      },
-      "most_conservative_mde_sigma": 0.28141058827257937,
+      "most_conservative_planning_mde_sigma": 0.29848100289785456,
       "order_rate_per_origin": 0.2947067238912732,
       "origins": 1398,
-      "power_label": "DESCRIPTIVE_CANNOT_RESOLVE_STEP3_EFFECT",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.17298457770026032,
+        "V_B_TIME_BLOCK": 0.264575131106459,
+        "V_C_REGIME_EPISODE": 0.29848100289785456
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 113,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.1503350992127988,
       "symbol": "SEIUSDT"
     },
     {
+      "baseline_gross_mean_bps": 17.365531191862715,
+      "baseline_gross_sigma_bps": 102.45674594431956,
       "blocks": {
-        "V_A_UNCHUNKED": 1400,
-        "V_B_TIME_BLOCK": 496,
-        "V_C_REGIME_EPISODE": 424
+        "V_A_UNCHUNKED": 953,
+        "V_B_TIME_BLOCK": 455,
+        "V_C_REGIME_EPISODE": 395
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -536,26 +682,34 @@
         "train_p10_bps": 36.025596790536625,
         "train_p90_bps": 116.90505701192208
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 12504,
+      "fill_rate": 0.6807142857142857,
+      "fixed_arm_fills": 953,
       "fixed_arm_orders": 1400,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.07483314773547882,
-        "V_B_TIME_BLOCK": 0.12572371141874245,
-        "V_C_REGIME_EPISODE": 0.13598002073001697
-      },
-      "most_conservative_mde_sigma": 0.13598002073001697,
+      "most_conservative_planning_mde_sigma": 0.14088328951945572,
       "order_rate_per_origin": 0.2729044834307992,
       "origins": 5130,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.09070089677484316,
+        "V_B_TIME_BLOCK": 0.1312660246627787,
+        "V_C_REGIME_EPISODE": 0.14088328951945572
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 499,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.11984847607151071,
       "symbol": "BNBUSDT"
     },
     {
+      "baseline_gross_mean_bps": 27.849825886740017,
+      "baseline_gross_sigma_bps": 205.6853698881493,
       "blocks": {
-        "V_A_UNCHUNKED": 440,
-        "V_B_TIME_BLOCK": 144,
-        "V_C_REGIME_EPISODE": 120
+        "V_A_UNCHUNKED": 293,
+        "V_B_TIME_BLOCK": 131,
+        "V_C_REGIME_EPISODE": 108
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -565,26 +719,34 @@
         "train_p10_bps": 131.4313426436356,
         "train_p90_bps": 313.3669104031766
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 3517,
+      "fill_rate": 0.6659090909090909,
+      "fixed_arm_fills": 293,
       "fixed_arm_orders": 440,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.1334847624943829,
-        "V_B_TIME_BLOCK": 0.2333333333333333,
-        "V_C_REGIME_EPISODE": 0.2556038601690775
-      },
-      "most_conservative_mde_sigma": 0.2556038601690775,
+      "most_conservative_planning_mde_sigma": 0.26943012562182533,
       "order_rate_per_origin": 0.27936507936507937,
       "origins": 1575,
-      "power_label": "DESCRIPTIVE_CANNOT_RESOLVE_STEP3_EFFECT",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.16357774659435606,
+        "V_B_TIME_BLOCK": 0.2446371358650906,
+        "V_C_REGIME_EPISODE": 0.26943012562182533
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 142,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.0957423503192637,
       "symbol": "WLDUSDT"
     },
     {
+      "baseline_gross_mean_bps": 7.740215525210851,
+      "baseline_gross_sigma_bps": 328.6495457440659,
       "blocks": {
-        "V_A_UNCHUNKED": 96,
-        "V_B_TIME_BLOCK": 27,
-        "V_C_REGIME_EPISODE": 22
+        "V_A_UNCHUNKED": 60,
+        "V_B_TIME_BLOCK": 26,
+        "V_C_REGIME_EPISODE": 20
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -594,26 +756,34 @@
         "train_p10_bps": 221.03781925138338,
         "train_p90_bps": 526.1010235980705
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 641,
+      "fill_rate": 0.625,
+      "fixed_arm_fills": 60,
       "fixed_arm_orders": 96,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.28577380332470415,
-        "V_B_TIME_BLOCK": 0.5388602512436507,
-        "V_C_REGIME_EPISODE": 0.5969620057957091
-      },
-      "most_conservative_mde_sigma": 0.5969620057957091,
+      "most_conservative_planning_mde_sigma": 0.626099033699941,
       "order_rate_per_origin": 0.3137254901960784,
       "origins": 306,
-      "power_label": "DESCRIPTIVE_CANNOT_RESOLVE_STEP3_EFFECT",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.36147844564602555,
+        "V_B_TIME_BLOCK": 0.5491251783869153,
+        "V_C_REGIME_EPISODE": 0.626099033699941
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 24,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.016653480756623897,
       "symbol": "PYTHUSDT"
     },
     {
+      "baseline_gross_mean_bps": 37.30790296900995,
+      "baseline_gross_sigma_bps": 204.3927662246076,
       "blocks": {
-        "V_A_UNCHUNKED": 1362,
-        "V_B_TIME_BLOCK": 480,
-        "V_C_REGIME_EPISODE": 448
+        "V_A_UNCHUNKED": 918,
+        "V_B_TIME_BLOCK": 450,
+        "V_C_REGIME_EPISODE": 401
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -623,26 +793,34 @@
         "train_p10_bps": 88.85921311925821,
         "train_p90_bps": 270.22384845331806
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 12504,
+      "fill_rate": 0.6740088105726872,
+      "fixed_arm_fills": 918,
       "fixed_arm_orders": 1362,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.07586989404447668,
-        "V_B_TIME_BLOCK": 0.12780193008453875,
-        "V_C_REGIME_EPISODE": 0.1322875655532295
-      },
-      "most_conservative_mde_sigma": 0.1322875655532295,
+      "most_conservative_planning_mde_sigma": 0.13982532744289825,
       "order_rate_per_origin": 0.27682926829268295,
       "origins": 4920,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.09241377067782293,
+        "V_B_TIME_BLOCK": 0.13199326582148885,
+        "V_C_REGIME_EPISODE": 0.13982532744289825
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 556,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.12906851679988957,
       "symbol": "DYDXUSDT"
     },
     {
+      "baseline_gross_mean_bps": 50.51606987330426,
+      "baseline_gross_sigma_bps": 195.31410106685868,
       "blocks": {
-        "V_A_UNCHUNKED": 1493,
-        "V_B_TIME_BLOCK": 503,
-        "V_C_REGIME_EPISODE": 425
+        "V_A_UNCHUNKED": 961,
+        "V_B_TIME_BLOCK": 459,
+        "V_C_REGIME_EPISODE": 383
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -652,26 +830,34 @@
         "train_p10_bps": 84.70935175482933,
         "train_p90_bps": 246.8413170546621
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 12504,
+      "fill_rate": 0.6436704621567314,
+      "fixed_arm_fills": 961,
       "fixed_arm_orders": 1493,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.0724649717907738,
-        "V_B_TIME_BLOCK": 0.12484582937895874,
-        "V_C_REGIME_EPISODE": 0.13581995002034644
-      },
-      "most_conservative_mde_sigma": 0.13581995002034644,
+      "most_conservative_planning_mde_sigma": 0.1430733164861269,
       "order_rate_per_origin": 0.2705200217430694,
       "origins": 5519,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.09032258064516129,
+        "V_B_TIME_BLOCK": 0.13069280784261425,
+        "V_C_REGIME_EPISODE": 0.1430733164861269
+      },
+      "power_label": "CONTEXT_FLOOR_AT_OR_BELOW_MECHANISM_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 486,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.18288620929668245,
       "symbol": "GALAUSDT"
     },
     {
+      "baseline_gross_mean_bps": 52.61606517456149,
+      "baseline_gross_sigma_bps": 200.55145055973568,
       "blocks": {
-        "V_A_UNCHUNKED": 1564,
-        "V_B_TIME_BLOCK": 507,
-        "V_C_REGIME_EPISODE": 430
+        "V_A_UNCHUNKED": 1081,
+        "V_B_TIME_BLOCK": 470,
+        "V_C_REGIME_EPISODE": 397
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -681,26 +867,34 @@
         "train_p10_bps": 88.14048456280348,
         "train_p90_bps": 287.82288650632694
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 12504,
+      "fill_rate": 0.6911764705882353,
+      "fixed_arm_fills": 1081,
       "fixed_arm_orders": 1564,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.0708010432393843,
-        "V_B_TIME_BLOCK": 0.1243523656716117,
-        "V_C_REGIME_EPISODE": 0.1350279902077154
-      },
-      "most_conservative_mde_sigma": 0.1350279902077154,
+      "most_conservative_planning_mde_sigma": 0.14052797170397877,
       "order_rate_per_origin": 0.275013187972569,
       "origins": 5687,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.08516186905414629,
+        "V_B_TIME_BLOCK": 0.1291543691240439,
+        "V_C_REGIME_EPISODE": 0.14052797170397877
+      },
+      "power_label": "CONTEXT_FLOOR_AT_OR_BELOW_MECHANISM_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 479,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.18551437239893687,
       "symbol": "OPUSDT"
     },
     {
+      "baseline_gross_mean_bps": 278.5287279528344,
+      "baseline_gross_sigma_bps": 897.3168688003991,
       "blocks": {
-        "V_A_UNCHUNKED": 75,
-        "V_B_TIME_BLOCK": 22,
-        "V_C_REGIME_EPISODE": 17
+        "V_A_UNCHUNKED": 54,
+        "V_B_TIME_BLOCK": 21,
+        "V_C_REGIME_EPISODE": 15
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -710,130 +904,168 @@
         "train_p10_bps": 396.3839736445185,
         "train_p90_bps": 1018.4479748954888
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 615,
+      "fill_rate": 0.72,
+      "fixed_arm_fills": 54,
       "fixed_arm_orders": 75,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.32331615074619036,
-        "V_B_TIME_BLOCK": 0.5969620057957091,
-        "V_C_REGIME_EPISODE": 0.6790997501017323
-      },
-      "most_conservative_mde_sigma": 0.6790997501017323,
+      "most_conservative_planning_mde_sigma": 0.7229568912920511,
       "order_rate_per_origin": 0.27075812274368233,
       "origins": 277,
-      "power_label": "DESCRIPTIVE_CANNOT_RESOLVE_STEP3_EFFECT",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.38103173776627214,
+        "V_B_TIME_BLOCK": 0.6110100926607787,
+        "V_C_REGIME_EPISODE": 0.7229568912920511
+      },
+      "power_label": "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 19,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.21948718355647245,
       "symbol": "1000RATSUSDT"
     }
   ],
   "P1_pooled": {
-    "count_basis": "STOP ORDERS CREATED. Fills are a subset, so every MDE below is OPTIMISTIC against the realised sample; the realised MDE is recomputed post-execution from filled trades.",
-    "mde_sigma_V_A_UNCHUNKED": 0.01708810775278591,
-    "mde_sigma_V_B_TIME_BLOCK": 0.02930531728555659,
-    "mde_sigma_V_C_REGIME_EPISODE": 0.03166116480579539,
-    "most_conservative_mde_sigma": 0.03166116480579539,
+    "baseline_gross_mean_bps": 39.218665649219375,
+    "baseline_gross_sigma_bps": 203.88967552357147,
+    "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
+    "fill_rate": 0.6598756005810272,
+    "most_conservative_planning_mde_sigma": 0.033399668390652885,
+    "n_fills": 17717,
     "n_orders_created": 26849,
-    "power_label": "CARRIES_MAGNITUDE_QUESTION",
-    "power_label_basis": "ORDERS_NOT_FILLS_TREAT_AS_UPPER_BOUND"
+    "planning_gate_rate": 0.5,
+    "planning_mde_sigma_V_A_UNCHUNKED": 0.021035989179841234,
+    "planning_mde_sigma_V_B_TIME_BLOCK": 0.030673076687957795,
+    "planning_mde_sigma_V_C_REGIME_EPISODE": 0.033399668390652885,
+    "power_label": "CONTEXT_FLOOR_AT_OR_BELOW_MECHANISM_CEILING",
+    "power_label_basis": "FILLS_NOT_ORDERS",
+    "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
+    "size_mechanism_ceiling_sigma": 0.13601367680064258
   },
   "P2_origin_counts": {
     "1000BONKUSDT": {
+      "fills": 494,
       "orders": 763,
       "origins": 3093
     },
     "1000LUNCUSDT": {
+      "fills": 744,
       "orders": 1170,
       "origins": 4675
     },
     "1000PEPEUSDT": {
+      "fills": 348,
       "orders": 537,
       "origins": 2377
     },
     "1000RATSUSDT": {
+      "fills": 54,
       "orders": 75,
       "origins": 277
     },
     "ADAUSDT": {
+      "fills": 1020,
       "orders": 1495,
       "origins": 5435
     },
     "AVAXUSDT": {
+      "fills": 1003,
       "orders": 1460,
       "origins": 5390
     },
     "BIGTIMEUSDT": {
+      "fills": 117,
       "orders": 195,
       "origins": 721
     },
     "BLURUSDT": {
+      "fills": 597,
       "orders": 936,
       "origins": 3364
     },
     "BNBUSDT": {
+      "fills": 953,
       "orders": 1400,
       "origins": 5130
     },
     "BTCUSDT": {
+      "fills": 752,
       "orders": 1234,
       "origins": 6009
     },
     "DOGEUSDT": {
+      "fills": 882,
       "orders": 1359,
       "origins": 5451
     },
     "DYDXUSDT": {
+      "fills": 918,
       "orders": 1362,
       "origins": 4920
     },
     "ETHUSDT": {
+      "fills": 827,
       "orders": 1314,
       "origins": 6057
     },
     "GALAUSDT": {
+      "fills": 961,
       "orders": 1493,
       "origins": 5519
     },
     "INJUSDT": {
+      "fills": 1069,
       "orders": 1582,
       "origins": 5246
     },
     "LINKUSDT": {
+      "fills": 1076,
       "orders": 1609,
       "origins": 5677
     },
     "MATICUSDT": {
+      "fills": 1897,
       "orders": 2815,
       "origins": 9814
     },
     "OPUSDT": {
+      "fills": 1081,
       "orders": 1564,
       "origins": 5687
     },
     "ORDIUSDT": {
+      "fills": 367,
       "orders": 590,
       "origins": 2359
     },
     "PYTHUSDT": {
+      "fills": 60,
       "orders": 96,
       "origins": 306
     },
     "SEIUSDT": {
+      "fills": 262,
       "orders": 412,
       "origins": 1398
     },
     "SOLUSDT": {
+      "fills": 926,
       "orders": 1402,
       "origins": 5518
     },
     "TIAUSDT": {
+      "fills": 99,
       "orders": 144,
       "origins": 487
     },
     "WLDUSDT": {
+      "fills": 293,
       "orders": 440,
       "origins": 1575
     },
     "XRPUSDT": {
+      "fills": 917,
       "orders": 1402,
       "origins": 5675
     }
@@ -1208,9 +1440,10 @@
       "noise_band_95": 0.05234582688248808
     }
   },
+  "amendment": "AMENDMENT-7",
   "band": "TRAIN",
   "experiment_id": "SPDR-024",
-  "interpretation": "OPERATIONAL_AND_POWER_ONLY_NO_RESEARCH_VALUE",
+  "interpretation": "OPERATIONAL_AND_POWER_CONTEXT_ONLY_NO_RESEARCH_VALUE",
   "manifest_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
   "signal_domain": "H1",
   "train_end_utc": "2023-12-18T00:00:00+00:00",

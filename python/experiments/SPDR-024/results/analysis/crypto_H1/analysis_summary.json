@@ -66,14 +66,21 @@
     "warning": "occupancy, annualised return and Sharpe in estimand_validation.json are computed over every arm's positions together. They are an apparatus figure and must never be quoted as the baseline strategy's own"
   },
   "experiment_id": "SPDR-024",
+  "floor_contract": {
+    "forbidden_row_floor": "MDE_Z / sqrt(effective_blocks)",
+    "mde_z_role": "sample-size planning only; not a pass mark on realised |estimate|",
+    "row_floor": "mde = MDE_Z * bootstrap_SE of the same estimator as the CI",
+    "scale_sigma_denominator": "paired_delta",
+    "selection_sigma_denominator": "outcome_level_bps"
+  },
   "future_shift_bars": 0,
-  "governing_rule": "the most conservative of the three governs every band label",
+  "governing_rule": "most conservative treatment by fewest blocks / highest coherent R2 floor",
   "hold_cap_bars": null,
   "interpretation": "DESCRIPTIVE_ONLY_NO_VERDICT",
   "labels": {
-    "authority": "adaptive-management-design.md section 1 ('power labels do not decide which rows are shown or how they are described') and section 9 ('Emit event count, effective count, CI and MDE for every row. These are informative diagnostics, not verdict labels or pruning rules')",
+    "authority": "adaptive-management-design.md section 1 ('power labels do not decide which rows are shown or how they are described') and section 9 ('Emit event count, effective count, CI and MDE for every row. These are informative diagnostics, not verdict labels or pruning rules'); SPDR-024 AMENDMENT-7 R1\u2013R5",
     "result_labels_emitted": "NONE",
-    "rule": "every row is described by estimate, uncertainty, population count, effective count and MDE, and by nothing else"
+    "rule": "every row is described by estimate, uncertainty, population count, effective count and optional R2 MDE, and by nothing else"
   },
   "od14_coverage": {
     "continuous_and_discrete_head_to_head": [
@@ -98,11 +105,11 @@
     "deployable"
   ],
   "reference_effect_range_sigma": {
-    "step3_observed_sizing_effects": [
+    "step3_observed_sizing_effects_historical_only": [
       0.022,
       0.15
     ],
-    "use": "context for comparing a cell's own MDE against the effect sizes this family has previously observed; it classifies nothing and no artifact column is derived from it"
+    "use": "HISTORICAL CONTEXT ONLY under AMENDMENT-7 R1. Never a gate, resolve ladder, preflight yardstick, or column-derived classification"
   },
   "regime_label_shared_with_arm": "ADP_LEVEL_NOW_SIZE_STATE_HALVE_HIGH",
   "row_vs_trade_note": "one row per arm per origin; a sample-size statement uses distinct trades, never row counts",

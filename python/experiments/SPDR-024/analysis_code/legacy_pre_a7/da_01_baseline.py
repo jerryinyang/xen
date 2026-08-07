@@ -1,3 +1,9 @@
+"""QUARANTINED pre-AMENDMENT-7. Do not use for emission or analysis.md."""
+raise RuntimeError(
+    "AMENDMENT_7_QUARANTINE: this script is legacy (pre R1-R5 floor fix). "
+    "Use analysis_code/analyse.py emission only; see legacy_pre_a7/README.md."
+)
+
 """Data-analyst (fresh context) — baseline characterisation, OD-3.
 
 Independent of experiments/SPDR-024/analysis_code/analyse.py.

@@ -1,73 +1,66 @@
 {
   "cell": "crypto_H4",
   "jobs": 3,
-  "peak_child_rss_bytes": 3188588544,
+  "peak_child_rss_bytes": 2866479104,
   "signal_domain": "H4",
   "steps": [
     {
       "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H4/hold.log",
-      "peak_child_rss_bytes": 2252177408,
+      "peak_child_rss_bytes": 2088615936,
       "returncode": 0,
       "step": "hold_phase",
-      "wall_seconds": 123.48
+      "wall_seconds": 170.93
     },
     {
       "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H4/cap_rule.log",
-      "peak_child_rss_bytes": 2252177408,
+      "peak_child_rss_bytes": 2088615936,
       "returncode": 0,
       "step": "cap_rule",
-      "wall_seconds": 0.21
+      "wall_seconds": 0.27
     },
     {
       "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H4/full.log",
-      "peak_child_rss_bytes": 2252177408,
+      "peak_child_rss_bytes": 2091008000,
       "returncode": 0,
       "step": "full_grid",
-      "wall_seconds": 148.48
+      "wall_seconds": 198.19
     },
     {
       "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H4/shift.log",
-      "peak_child_rss_bytes": 2252177408,
+      "peak_child_rss_bytes": 2128134144,
       "returncode": 0,
       "step": "future_shift_tripwire",
-      "wall_seconds": 145.02
+      "wall_seconds": 200.7
     },
     {
       "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H4/replay.log",
-      "peak_child_rss_bytes": 2252177408,
+      "peak_child_rss_bytes": 2128134144,
       "returncode": 0,
       "step": "determinism_replay",
-      "wall_seconds": 375.7
+      "wall_seconds": 534.76
     },
     {
       "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H4/estimand.log",
-      "peak_child_rss_bytes": 2252177408,
+      "peak_child_rss_bytes": 2128134144,
       "returncode": 0,
       "step": "estimand_gate",
-      "wall_seconds": 1.82
+      "wall_seconds": 2.42
     },
     {
       "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H4/selfcheck.log",
-      "peak_child_rss_bytes": 3188588544,
+      "peak_child_rss_bytes": 2577694720,
       "returncode": 0,
       "step": "selfcheck",
-      "wall_seconds": 11.39
+      "wall_seconds": 41.03
     },
     {
       "log": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/python/experiments/SPDR-024/results/logs/crypto_H4/analysis.log",
-      "peak_child_rss_bytes": 3188588544,
+      "peak_child_rss_bytes": 2866479104,
       "returncode": 0,
       "step": "analysis",
-      "wall_seconds": 164.35
-    },
-    {
-      "removed": [
-        "shift",
-        "replay"
-      ],
-      "step": "prune_reproducible_runs"
+      "wall_seconds": 459.42
     }
   ],
-  "total_wall_seconds": 970.45,
+  "total_wall_seconds": 1607.72,
   "universe": "crypto"
 }

@@ -1,3 +1,9 @@
+"""QUARANTINED pre-AMENDMENT-7. Do not use for emission or analysis.md."""
+raise RuntimeError(
+    "AMENDMENT_7_QUARANTINE: this script is legacy (pre R1-R5 floor fix). "
+    "Use analysis_code/analyse.py emission only; see legacy_pre_a7/README.md."
+)
+
 """Data-analyst: regime-conditional reads + the identity check on the SIZE arms.
 
 (a) Is the paired SIZE delta exactly (risk_size - 1) x baseline outcome? If so the scale

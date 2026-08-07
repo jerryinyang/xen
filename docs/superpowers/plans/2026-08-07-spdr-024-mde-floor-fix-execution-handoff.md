@@ -870,15 +870,27 @@ experiment.
 
 | Task | Status | Date | Evidence summary |
 | --- | --- | --- | --- |
-| 1 Design AMENDMENT-7 | pending | | |
-| 2 Analyser R2/R3/R4 | pending | | |
-| 3 Preflight R1/R5 | pending | | |
-| 4 Acceptance + smoke | pending | | |
-| 5 Claude review gate | pending | | path → `docs/superpowers/plans/reviews/2026-08-07-spdr-024-mde-floor-claude-review.md` |
-| 6 Purge | pending | | |
-| 7 Engine re-screen | pending | | |
-| 8 Re-analysis + docs | pending | | |
-| 9 Closeout | pending | | |
+| 1 Design AMENDMENT-7 | done | 2026-08-07 | `design.md` §10/§11/§15 AMENDMENT-7 R1–R5; A4–A6 hygiene table; L-23 streak of 3 cleared by defect §13; `implementation-notes.md` §8 |
+| 2 Analyser R2/R3/R4 | done | 2026-08-07 | `clustered_interval` / selection use `MDE_Z * bootstrap_SE`; `sigma_denominator`; label denylist tests green |
+| 3 Preflight R1/R5 | done | 2026-08-07 | imports fixed; domain-bar fills; R1 ceiling endpoint; no STEP3/CARRIES gate; tests green |
+| 4 Acceptance + smoke | done | 2026-08-07 | 282 pytest pass; ruff clean; R1–R5 checklist; synthetic smoke SMOKE_OK; free disk ~31G > 7.2G×1.25 |
+| 5 Claude review gate | done | 2026-08-07 | path → `docs/superpowers/plans/reviews/2026-08-07-spdr-024-mde-floor-claude-review.md`; verdict READY_FOR_PURGE_AND_FULL_RUN; blocking=0; gate **CLEARED** (BR-1/2/3 fixed after delta) |
+| 6 Purge | done | 2026-08-07 | deleted results/ analysis.md screen.md plots/; recovered ~7.2G; decontamination clean (hits only design/notes/code/legacy) |
+
+### Task 5 gate evidence
+
+- Claude CLI exit 0; final verdict **READY_FOR_PURGE_AND_FULL_RUN**; blocking findings **0**.
+- Intermediate delta1 was BLOCKED on BR-1/2/3; all three fixed under TDD; final re-review cleared.
+- Gate status: **CLEARED** — purge and full four-cell re-run authorised.
+| 7 Engine re-screen | done | 2026-08-07 | all four cells COMPLETE; blocking_pass=true; HARD=17; walls 660/367/3026/1608 s |
+| 8 Re-analysis + docs | done | 2026-08-07 | emission R2/R4 coherent; analysis.md + screen.md rewritten; no denylist labels |
+| 9 Closeout | done | 2026-08-07 | boundary search clean (forbid-list prose only); pytest 42 pass; operator handoff below |
+
+### Task 1–4 completion notes
+
+- **R1–R5 map:** design §10/§11 ↔ `size_mechanism_ceiling` / `row_floor_from_se` / `bootstrap_se` / `clustered_interval` / `_contrast_interval` / `preflight.descriptive_power_label` ↔ `test_row_floor_uses_bootstrap_se_not_blocks_sqrt`, `test_scale_and_selection_declare_distinct_denominators`, `test_preflight_module_imports_and_uses_r1_endpoint`, `test_no_artifact_column_carries_a_result_label`, `test_size_mechanism_ceiling_is_baseline_only`.
+- **Smoke:** synthetic scale+selection emission; floors track bootstrap SE; no label columns; R4 denominators present.
+- **Resources (pre-purge):** free ~31 GB; prior `results/` 7.2 GB; margin_ok for re-run after purge.
 
 ---
 
@@ -934,4 +946,26 @@ Core library:
 10. **No verdict / no TEST / no XENA** in this plan.
 11. **Claude review once** after checks/smokes, **before** purge and full four-cell run — do not skip.
 
-**End of handoff (execution not started).**
+---
+
+## Operator interpretation handoff (Task 9)
+
+**Apparatus changed (only):** R1–R5 detection-floor / preflight honesty under AMENDMENT-7. Row
+floors = `MDE_Z × bootstrap SE` (same family as CI). Preflight uses fill-based provisional counts
+and the R1 mechanism ceiling. Scale vs selection denominators declared. No result/power labels.
+
+**Unchanged:** arm lattice, SIZE-only devices, four cells, TRAIN fence, PRIMARY estimand identity,
+cost disclosure (spread not charged), no TEST/holdout, no family-status action.
+
+**Where results live:**
+- Engine + analysis: `python/experiments/SPDR-024/results/`
+- Narrative: `python/experiments/SPDR-024/analysis.md`, `screen.md`
+- Design: AMENDMENT-7 in `design.md` §10/§11/§15
+- Claude pre-run review: `docs/superpowers/plans/reviews/2026-08-07-spdr-024-mde-floor-claude-review.md`
+
+**Integrity:** all four cells `blocking_pass=true`, HARD inventory 17/17 by name.
+
+**Hypothesis interpretation is the operator’s.** This handoff issues no SUPPORTED/REFUTED verdict,
+no arm ranking, no tradability claim, no XENA or family action.
+
+**End of handoff (Tasks 1–9 complete).**

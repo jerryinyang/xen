@@ -1,10 +1,12 @@
 {
   "P1_per_symbol": [
     {
+      "baseline_gross_mean_bps": 4.013446173297074,
+      "baseline_gross_sigma_bps": 18.251351031076734,
       "blocks": {
-        "V_A_UNCHUNKED": 2057,
-        "V_B_TIME_BLOCK": 641,
-        "V_C_REGIME_EPISODE": 649
+        "V_A_UNCHUNKED": 1369,
+        "V_B_TIME_BLOCK": 598,
+        "V_C_REGIME_EPISODE": 583
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -14,26 +16,34 @@
         "train_p10_bps": 8.530918197535618,
         "train_p90_bps": 21.40594875495971
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 15423,
+      "fill_rate": 0.6655323286339329,
+      "fixed_arm_fills": 1369,
       "fixed_arm_orders": 2057,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.061736340918339294,
-        "V_B_TIME_BLOCK": 0.11059335077467099,
-        "V_C_REGIME_EPISODE": 0.10990961407704034
-      },
-      "most_conservative_mde_sigma": 0.11059335077467099,
+      "most_conservative_planning_mde_sigma": 0.11596415131876149,
       "order_rate_per_origin": 0.2988956698634118,
       "origins": 6882,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.07567567567567567,
+        "V_B_TIME_BLOCK": 0.1145005148153343,
+        "V_C_REGIME_EPISODE": 0.11596415131876149
+      },
+      "power_label": "CONTEXT_FLOOR_AT_OR_BELOW_MECHANISM_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 748,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.15549177703247194,
       "symbol": "EURUSD"
     },
     {
+      "baseline_gross_mean_bps": 6.925552305966542,
+      "baseline_gross_sigma_bps": 28.785303733384264,
       "blocks": {
-        "V_A_UNCHUNKED": 1871,
-        "V_B_TIME_BLOCK": 621,
-        "V_C_REGIME_EPISODE": 639
+        "V_A_UNCHUNKED": 1243,
+        "V_B_TIME_BLOCK": 580,
+        "V_C_REGIME_EPISODE": 566
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -43,26 +53,34 @@
         "train_p10_bps": 17.021690150286403,
         "train_p90_bps": 31.703292785859016
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 14649,
+      "fill_rate": 0.6643506146445751,
+      "fixed_arm_fills": 1243,
       "fixed_arm_orders": 1871,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.06473231481653668,
-        "V_B_TIME_BLOCK": 0.11236012954671792,
-        "V_C_REGIME_EPISODE": 0.11076628809809297
-      },
-      "most_conservative_mde_sigma": 0.11236012954671792,
+      "most_conservative_planning_mde_sigma": 0.1176927784785756,
       "order_rate_per_origin": 0.2839150227617602,
       "origins": 6590,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.07941864389163594,
+        "V_B_TIME_BLOCK": 0.11626367179523595,
+        "V_C_REGIME_EPISODE": 0.1176927784785756
+      },
+      "power_label": "CONTEXT_FLOOR_AT_OR_BELOW_MECHANISM_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 750,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.17012518069529936,
       "symbol": "XAUUSD"
     },
     {
+      "baseline_gross_mean_bps": 13.89494861258221,
+      "baseline_gross_sigma_bps": 55.3145761123053,
       "blocks": {
-        "V_A_UNCHUNKED": 1810,
-        "V_B_TIME_BLOCK": 619,
-        "V_C_REGIME_EPISODE": 593
+        "V_A_UNCHUNKED": 1234,
+        "V_B_TIME_BLOCK": 584,
+        "V_C_REGIME_EPISODE": 541
       },
       "conversion_pin": {
         "divisor_object": "ATR(20) on the signal-domain bar, lagged [t-1]",
@@ -72,42 +90,58 @@
         "train_p10_bps": 19.976218508509096,
         "train_p90_bps": 62.59202178861558
       },
-      "count_basis": "STOP_ORDERS_CREATED_UPPER_BOUND_ON_FILLS",
+      "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
       "domain_bars": 14631,
+      "fill_rate": 0.6817679558011049,
+      "fixed_arm_fills": 1234,
       "fixed_arm_orders": 1810,
-      "mde_sigma": {
-        "V_A_UNCHUNKED": 0.06581406926111757,
-        "V_B_TIME_BLOCK": 0.11254150194813971,
-        "V_C_REGIME_EPISODE": 0.11498221872944545
-      },
-      "most_conservative_mde_sigma": 0.11498221872944545,
+      "most_conservative_planning_mde_sigma": 0.12038140250985736,
       "order_rate_per_origin": 0.2747002580057672,
       "origins": 6589,
-      "power_label": "CARRIES_MAGNITUDE_QUESTION",
+      "planning_gate_rate": 0.5,
+      "planning_mde_sigma": {
+        "V_A_UNCHUNKED": 0.07970773192334007,
+        "V_B_TIME_BLOCK": 0.1158648244043315,
+        "V_C_REGIME_EPISODE": 0.12038140250985736
+      },
+      "power_label": "CONTEXT_FLOOR_AT_OR_BELOW_MECHANISM_CEILING",
+      "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
       "regime_episodes": 688,
+      "size_mechanism_ceiling_basis": "PROVISIONAL_DOMAIN_BAR_SIM_ONE_BAR_HOLD_MATCHES_FIXED_NATIVE_HOLD",
+      "size_mechanism_ceiling_sigma": 0.17762429143897518,
       "symbol": "USTEC"
     }
   ],
   "P1_pooled": {
-    "count_basis": "STOP ORDERS CREATED. Fills are a subset, so every MDE below is OPTIMISTIC against the realised sample; the realised MDE is recomputed post-execution from filled trades.",
-    "mde_sigma_V_A_UNCHUNKED": 0.03696389767886772,
-    "mde_sigma_V_B_TIME_BLOCK": 0.0645600166275003,
-    "mde_sigma_V_C_REGIME_EPISODE": 0.0645600166275003,
-    "most_conservative_mde_sigma": 0.0645600166275003,
+    "baseline_gross_mean_bps": 8.125126343080227,
+    "baseline_gross_sigma_bps": 36.9875972965785,
+    "count_basis": "PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS",
+    "fill_rate": 0.6702683861972812,
+    "most_conservative_planning_mde_sigma": 0.06811059575747279,
+    "n_fills": 3846,
     "n_orders_created": 5738,
-    "power_label": "CARRIES_MAGNITUDE_QUESTION",
-    "power_label_basis": "ORDERS_NOT_FILLS_TREAT_AS_UPPER_BOUND"
+    "planning_gate_rate": 0.5,
+    "planning_mde_sigma_V_A_UNCHUNKED": 0.04514954639042978,
+    "planning_mde_sigma_V_B_TIME_BLOCK": 0.06670449172881157,
+    "planning_mde_sigma_V_C_REGIME_EPISODE": 0.06811059575747279,
+    "power_label": "CONTEXT_FLOOR_AT_OR_BELOW_MECHANISM_CEILING",
+    "power_label_basis": "FILLS_NOT_ORDERS",
+    "power_label_endpoint": "R1_SIZE_MECHANISM_CEILING",
+    "size_mechanism_ceiling_sigma": 0.1553313098204665
   },
   "P2_origin_counts": {
     "EURUSD": {
+      "fills": 1369,
       "orders": 2057,
       "origins": 6882
     },
     "USTEC": {
+      "fills": 1234,
       "orders": 1810,
       "origins": 6589
     },
     "XAUUSD": {
+      "fills": 1243,
       "orders": 1871,
       "origins": 6590
     }
@@ -174,9 +208,10 @@
       "noise_band_95": 0.045312620371575685
     }
   },
+  "amendment": "AMENDMENT-7",
   "band": "TRAIN",
   "experiment_id": "SPDR-024",
-  "interpretation": "OPERATIONAL_AND_POWER_ONLY_NO_RESEARCH_VALUE",
+  "interpretation": "OPERATIONAL_AND_POWER_CONTEXT_ONLY_NO_RESEARCH_VALUE",
   "manifest_sha256": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0",
   "signal_domain": "H1",
   "train_end_utc": "2023-11-22T00:00:00+00:00",

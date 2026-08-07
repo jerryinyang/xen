@@ -27,16 +27,22 @@ import polars as pl
 TREATMENTS = ("V_A_UNCHUNKED", "V_B_TIME_BLOCK", "V_C_REGIME_EPISODE")
 #: V-B block width in signal-domain bars, carried from the Step-3 form for comparability.
 TIME_BLOCK_BARS = 24
-#: Design section 10: MDE_sigma = 2.8 / sqrt(n).
+#: Design §10 / AMENDMENT-7 R3: planning constant for sample size only — not a pass mark on |est|.
 MDE_Z = 2.8
-#: The RANGE of sizing effects Step-3 observed, in sigma-hat units. Reported in
-#: `analysis_summary.json` as the reference a reader compares each cell's MDE against. It is
-#: reference context only: nothing in this module compares an MDE with it, because that
-#: comparison produced the power labels the contract forbids.
+#: Historical Step-3 point-estimate range (σ̂). Context only under AMENDMENT-7 R1; never a gate,
+#: resolve ladder, or preflight yardstick. Prefer not to re-export a single "STEP3_OBSERVED"
+#: alias that preflight could gate on.
 STEP3_OBSERVED_EFFECT_SIGMA_MAX = 0.150
 STEP3_OBSERVED_EFFECT_SIGMA_MIN = 0.022
+#: Minimum fill count for preflight descriptive capacity (design §10 PREFLIGHT M2).
+MIN_FILLS_FOR_PREFLIGHT = 30
+#: Default planning gate rate for SIZE mechanism ceiling when a component-specific rate is
+#: not supplied (STATE_HALVE_HIGH on HIGH ≈ half the sample).
+DEFAULT_PLANNING_GATE_RATE = 0.5
 BOOTSTRAP_DRAWS = 2_000
 BOOTSTRAP_SEED = 20260806
+#: Normal z for optional interval-implied SE: (ci_high - ci_low) / (2 * Z_975).
+Z_975 = 1.959963984540054
 #: Rejection classes whose origins carry a real E2 counterfactual. Both are genuine declines at
 #: the fill event: the rule either never created the order, or created one its own expiry rule
 #: killed before it filled.
@@ -340,6 +346,48 @@ def _block_index(blocks: np.ndarray) -> list[np.ndarray]:
     return np.split(order, boundaries) if order.size else []
 
 
+def row_floor_from_se(se: float, *, z: float = MDE_Z) -> float:
+    """AMENDMENT-7 R2: detection floor = MDE_Z × SE of the same estimator as the CI."""
+    if not np.isfinite(se) or se <= 0:
+        return float("nan")
+    return float(z * se)
+
+
+def bootstrap_se(draws: np.ndarray) -> float:
+    """Sample standard deviation of bootstrap replicates (same family as the percentile CI)."""
+    finite = np.asarray(draws, dtype=float)
+    finite = finite[np.isfinite(finite)]
+    if finite.size < 2:
+        return float("nan")
+    return float(np.std(finite, ddof=1))
+
+
+def interval_implied_se(ci_low: float, ci_high: float, *, z: float = Z_975) -> float:
+    """SE implied by a central (1-α) interval: half-width / z. Documented fallback only."""
+    if not (np.isfinite(ci_low) and np.isfinite(ci_high) and z > 0):
+        return float("nan")
+    return float((ci_high - ci_low) / (2.0 * z))
+
+
+def size_mechanism_ceiling(
+    gross_mean_bps: float,
+    gross_sigma_bps: float,
+    *,
+    gate_rate: float = DEFAULT_PLANNING_GATE_RATE,
+) -> float:
+    """AMENDMENT-7 R1: √p × |baseline mean / baseline σ| from baseline-only quantities."""
+    if (
+        not np.isfinite(gross_mean_bps)
+        or not np.isfinite(gross_sigma_bps)
+        or gross_sigma_bps <= 0
+        or not np.isfinite(gate_rate)
+        or gate_rate < 0
+    ):
+        return float("nan")
+    sharpe = abs(float(gross_mean_bps)) / float(gross_sigma_bps)
+    return float(np.sqrt(gate_rate) * sharpe)
+
+
 def clustered_interval(
     series: list[SymbolSeries],
     treatment: str,
@@ -352,6 +400,9 @@ def clustered_interval(
     Symbols are the cluster unit because cross-symbol contemporaneous correlation is not a
     time-series dependence and is never addressed by any time-blocking treatment (design
     section 10). Blocks inside a drawn symbol follow the treatment.
+
+    AMENDMENT-7 R2: `mde_sigma = MDE_Z * bootstrap_se` of the same draws that form the CI.
+    The free-standing `MDE_Z / sqrt(effective_blocks)` form is forbidden as the row floor.
     """
     usable = [item for item in series if item.n > 1 and np.isfinite(item.sigma) and item.sigma > 0]
     if not usable:
@@ -383,13 +434,15 @@ def clustered_interval(
         if finite.size
         else (float("nan"), float("nan"))
     )
+    se = bootstrap_se(finite)
     return {
         "treatment": treatment,
         "estimate_sigma": estimate,
         "ci_low_sigma": ci_low,
         "ci_high_sigma": ci_high,
         "effective_blocks": effective_blocks,
-        "mde_sigma": MDE_Z / np.sqrt(effective_blocks) if effective_blocks else float("nan"),
+        "bootstrap_se_sigma": se,
+        "mde_sigma": row_floor_from_se(se),
         "n_trades": int(sum(item.n for item in usable)),
         "n_symbols": len(usable),
     }
@@ -402,6 +455,7 @@ def _empty_interval(treatment: str, series: list[SymbolSeries]) -> dict[str, Any
         "ci_low_sigma": float("nan"),
         "ci_high_sigma": float("nan"),
         "effective_blocks": 0,
+        "bootstrap_se_sigma": float("nan"),
         "mde_sigma": float("nan"),
         "n_trades": int(sum(item.n for item in series)),
         "n_symbols": len(series),
@@ -427,12 +481,11 @@ def _empty_interval(treatment: str, series: list[SymbolSeries]) -> dict[str, Any
 
 
 def governing_treatment(intervals: list[dict[str, Any]]) -> dict[str, Any]:
-    """The most conservative of the three governs every band label (D12).
+    """Most conservative of the three treatments (D12 / AMENDMENT-7).
 
-    Conservative means the highest detection floor: the treatment that credits the sample with
-    the fewest independent blocks and therefore demands the largest effect. Selecting on
-    interval width alone can import the SMALLEST floor with the widest interval, which is not
-    the conservative choice the directive asks for; width breaks a tie.
+    Conservative = highest coherent R2 floor (`mde_sigma` = MDE_Z × bootstrap SE). Interval
+    width breaks a tie. No treatment may be selected after seeing which estimate flatters a
+    result; this rule is frozen before estimates are read.
     """
     scored = [item for item in intervals if np.isfinite(item["mde_sigma"])]
     if not scored:
@@ -593,10 +646,14 @@ def _estimate_rows(
                 # Emitted as the measured share so the reader distinguishes the two, rather
                 # than as a label asserting which one it is.
                 "exact_zero_delta_share": _zero_delta_share(series),
+                # AMENDMENT-7 R4: scale σ̂ is sd of the paired difference, never outcome level.
+                "sigma_denominator": "paired_delta",
             }
         )
     for item in series:
         raw = float(np.mean(item.values)) if item.n else float("nan")
+        # Per-symbol diagnostic: real block-bootstrap SE (same R2 family as POOLED), not 2.8/√n.
+        per = clustered_interval([item], "V_A_UNCHUNKED", n_boot=n_boot)
         rows.append(
             {
                 **identity,
@@ -604,16 +661,18 @@ def _estimate_rows(
                 "scope": "PER_SYMBOL",
                 "symbol": item.symbol,
                 "treatment": "V_A_UNCHUNKED",
-                "estimate_sigma": raw / item.sigma if item.sigma else float("nan"),
-                "ci_low_sigma": None,
-                "ci_high_sigma": None,
-                "effective_blocks": item.n,
-                "mde_sigma": MDE_Z / np.sqrt(item.n) if item.n else float("nan"),
+                "estimate_sigma": per["estimate_sigma"],
+                "ci_low_sigma": per["ci_low_sigma"],
+                "ci_high_sigma": per["ci_high_sigma"],
+                "effective_blocks": per["effective_blocks"],
+                "bootstrap_se_sigma": per["bootstrap_se_sigma"],
+                "mde_sigma": per["mde_sigma"],
                 "n_trades": item.n,
                 "n_symbols": 1,
+                "sigma_denominator": "paired_delta",
                 **_scale_populations(
                     populations.get("per_symbol", {}).get(item.symbol, {}),
-                    {"effective_blocks": item.n, "n_trades": item.n},
+                    {"effective_blocks": per["effective_blocks"], "n_trades": item.n},
                 ),
                 "governs": False,
                 "mean_delta_raw": raw,
@@ -718,6 +777,8 @@ def _contrast_interval(
             "treatment": treatment,
             "ci_low_bps": float("nan"),
             "ci_high_bps": float("nan"),
+            "bootstrap_se_bps": float("nan"),
+            "mde_bps": float("nan"),
             "effective_blocks_admitted": 0,
             "effective_blocks_rejected": 0,
         }
@@ -729,6 +790,8 @@ def _contrast_interval(
             "treatment": treatment,
             "ci_low_bps": float("nan"),
             "ci_high_bps": float("nan"),
+            "bootstrap_se_bps": float("nan"),
+            "mde_bps": float("nan"),
             "effective_blocks_admitted": 0,
             "effective_blocks_rejected": 0,
         }
@@ -749,6 +812,8 @@ def _contrast_interval(
             "treatment": treatment,
             "ci_low_bps": float("nan"),
             "ci_high_bps": float("nan"),
+            "bootstrap_se_bps": float("nan"),
+            "mde_bps": float("nan"),
             "effective_blocks_admitted": 0,
             "effective_blocks_rejected": 0,
         }
@@ -770,10 +835,13 @@ def _contrast_interval(
         if sample_a.size and sample_b.size:
             draws[index] = float(np.mean(sample_a) - np.mean(sample_b))
     finite = draws[np.isfinite(draws)]
+    se = bootstrap_se(finite)
     return {
         "treatment": treatment,
         "ci_low_bps": float(np.percentile(finite, 2.5)) if finite.size else float("nan"),
         "ci_high_bps": float(np.percentile(finite, 97.5)) if finite.size else float("nan"),
+        "bootstrap_se_bps": se,
+        "mde_bps": row_floor_from_se(se),
         "effective_blocks_admitted": int(
             sum(len(packs[name][1]) for name in names)
         ),
@@ -841,20 +909,20 @@ def selection_channel_estimates(
                 )
                 for treatment in TREATMENTS
             ]
-            # Same conservatism rule as the scale channel: fewest independent blocks wins,
-            # width breaks the tie. A channel-specific rule would let the same run label two
-            # effects by two standards.
+            # Same conservatism as scale: highest R2 floor (MDE_Z × bootstrap SE); width breaks ties.
             scored = [
                 item
                 for item in intervals
-                if np.isfinite(item["ci_high_bps"] - item["ci_low_bps"])
+                if np.isfinite(item.get("mde_bps", float("nan")))
             ]
             governing = (
-                min(
+                max(
                     scored,
                     key=lambda item: (
-                        item["effective_blocks_admitted"] + item["effective_blocks_rejected"],
-                        -(item["ci_high_bps"] - item["ci_low_bps"]),
+                        item["mde_bps"],
+                        (item["ci_high_bps"] - item["ci_low_bps"])
+                        if np.isfinite(item["ci_high_bps"] - item["ci_low_bps"])
+                        else -np.inf,
                     ),
                 )
                 if scored
@@ -866,14 +934,10 @@ def selection_channel_estimates(
             # raw bps is the disclosure.
             sigma = _pooled_sigma(admitted_frame, declined)
             contrast_bps = _mean(admitted) - _mean(rejected)
-            # D12 governs this channel's FLOOR as well as its interval: the block counts come
-            # from the same governing treatment the interval came from.
-            mde_bps = _two_sample_mde(
-                admitted,
-                rejected,
-                n_left=governing.get("effective_blocks_admitted"),
-                n_right=governing.get("effective_blocks_rejected"),
-            )
+            # AMENDMENT-7 R2: floor from the same bootstrap SE family as the governing CI.
+            mde_bps = governing.get("mde_bps")
+            if mde_bps is None or not np.isfinite(mde_bps):
+                mde_bps = row_floor_from_se(governing.get("bootstrap_se_bps", float("nan")))
             # CONTROL MAGNITUDE-MATCH (design section 8): every admission rule here IS a
             # volatility gate, so admitted and declined populations differ by regime BY
             # CONSTRUCTION. The matched contrast asks the question inside each state, where
@@ -921,18 +985,24 @@ def selection_channel_estimates(
                     "admitted_positive_share": _positive_share(admitted),
                     "rejected_positive_share": _positive_share(rejected),
                     "mde_bps": mde_bps,
-                    "mde_bps_unblocked": _two_sample_mde(admitted, rejected),
-                    "contrast_over_mde": (
-                        float(abs(contrast_bps) / mde_bps)
-                        if np.isfinite(mde_bps) and mde_bps > 0 else float("nan")
+                    "bootstrap_se_bps": governing.get("bootstrap_se_bps"),
+                    # Optional context: |contrast| / SE (not / MDE — R3 forbids |est|≥MDE resolve).
+                    "contrast_over_se": (
+                        float(abs(contrast_bps) / governing["bootstrap_se_bps"])
+                        if (
+                            governing.get("bootstrap_se_bps") is not None
+                            and np.isfinite(governing.get("bootstrap_se_bps", float("nan")))
+                            and governing["bootstrap_se_bps"] > 0
+                        )
+                        else float("nan")
                     ),
-                    # The MDE expressed on the same sigma-hat scale as the contrast, so the
-                    # reader can compare the two directly without converting units. Context,
-                    # not a classification.
+                    # Optional sigma-hat form of the floor. Denominator is outcome-level σ,
+                    # not paired-delta σ (AMENDMENT-7 R4) — never a shared silent ladder.
                     "mde_sigma": (
                         mde_bps / sigma
                         if np.isfinite(sigma) and sigma > 0 else float("nan")
                     ),
+                    "sigma_denominator": "outcome_level_bps",
                     # The separately-named populations. This is an origin-lens read, so the
                     # trade-block count does not apply and is null rather than borrowed.
                     "eligible_origin_n": group.height,
@@ -1005,7 +1075,7 @@ def _regime_matched_contrast(
             "admitted_mean_bps": float(np.mean(left_values)),
             "declined_mean_bps": float(np.mean(right_values)),
             "contrast_bps": contrast,
-            "mde_bps": _two_sample_mde(left_values, right_values),
+            # No parametric row-count floor here (R2): stratum is descriptive counts + means.
         }
         weighted_total += contrast * (left.len() + right.len())
         weight_total += left.len() + right.len()
@@ -1028,19 +1098,11 @@ def _regime_matched_contrast(
               / (all_admitted.size + all_declined.size))
         if (all_admitted.size + all_declined.size) else float("nan")
     )
-    # A collapse fraction is only meaningful when there is something to collapse. Dividing one
-    # noise draw by another produces spectacular ratios that mean nothing, so it is emitted
-    # ONLY where the unmatched contrast clears its own detection floor.
-    unmatched_mde = _two_sample_mde(matched_admitted, matched_declined)
-    resolves = bool(
-        np.isfinite(unmatched) and np.isfinite(unmatched_mde) and abs(unmatched) >= unmatched_mde
-    )
-    # Suppressed values are NULL, never NaN. A NaN is non-null on every row and reads as
-    # "populated" to any check that tests null-ness - the exact shape of the defect this
-    # apparatus was corrected for elsewhere.
+    # AMENDMENT-7 R3: do not gate emission on |est| ≥ MDE. Suppress collapse only when the
+    # arithmetic is undefined (unmatched == 0), not when power is low.
     collapse = (
         float(1.0 - matched / unmatched)
-        if resolves and unmatched != 0 and np.isfinite(matched)
+        if unmatched != 0 and np.isfinite(unmatched) and np.isfinite(matched)
         else None
     )
     return {
@@ -1048,12 +1110,10 @@ def _regime_matched_contrast(
         "unmatched_contrast_bps": unmatched,
         "whole_population_contrast_bps": _mean(all_admitted) - _mean(all_declined),
         "matched_coverage_share": coverage,
-        "unmatched_contrast_mde_bps": unmatched_mde,
-        "unmatched_contrast_resolves": resolves,
         "regime_matched_contrast_bps": matched,
         "regime_match_collapse_fraction": collapse,
         "collapse_fraction_suppressed_reason": (
-            None if resolves else "unmatched contrast is inside its own noise floor"
+            None if collapse is not None else "unmatched contrast is exactly zero (undefined ratio)"
         ),
         "regime_strata": json.dumps(strata, sort_keys=True, default=str),
         "regime_imbalance_note": (
@@ -1078,40 +1138,9 @@ def _positive_share(values: np.ndarray) -> float:
     return float(np.mean(values > 0)) if values.size else float("nan")
 
 
-def _two_sample_mde(
-    left: np.ndarray,
-    right: np.ndarray,
-    *,
-    n_left: int | None = None,
-    n_right: int | None = None,
-) -> float:
-    """Two-sample MDE at the realised split, in bps. The bite check the design co-designs.
-
-    `n_left`/`n_right` override the raw row counts with the governing treatment's INDEPENDENT
-    block counts. The interval on this contrast comes from a block bootstrap, so taking the
-    floor from unblocked row counts would band one effect by two standards - a floor that
-    credits every row as independent against an interval that does not.
-    """
-    if left.size < 2 or right.size < 2:
-        return float("nan")
-    size_left = int(n_left) if n_left else int(left.size)
-    size_right = int(n_right) if n_right else int(right.size)
-    if size_left < 1 or size_right < 1:
-        return float("nan")
-    pooled = np.concatenate([left, right])
-    sigma = float(np.std(pooled, ddof=1))
-    return MDE_Z * sigma * np.sqrt(1.0 / size_left + 1.0 / size_right)
-
-
-# `_selection_band` is withdrawn. It classified a contrast by comparing it with its own floor,
-# which is the power label the contract forbids. `contrast_bps`, `mde_bps`, `mde_sigma`,
-# `contrast_over_mde`, both interval bounds, `n_admitted`, `n_rejected` and
-# `effective_origin_blocks` are all on the row; the reader does the comparison.
-#
-# One factual column survives from it, because it is a statement about the POPULATION rather
-# than about the result: `rejected_population_empty` records that a rule declined no origin
-# carrying a counterfactual, which is a property of the arm's semantics and no amount of data
-# changes it.
+# `_selection_band` and parametric `_two_sample_mde` are withdrawn (AMENDMENT-7 R2/R3).
+# Floors use bootstrap SE of the same estimator as the CI. `rejected_population_empty` remains
+# as a population property, not a result label.
 
 
 # --------------------------------------------------------------------------- #
@@ -1291,7 +1320,7 @@ def tripwire_collapse(
         # destroy, and "did not survive" is not evidence of causality - it is the tripwire
         # having no bite on that arm. Recorded per arm so the pass cannot be read as more than
         # it is.
-        edge_present = bool(
+        at_bite = bool(
             np.isfinite(causal_effect) and np.isfinite(mde) and causal_effect >= mde
         )
         comparisons.append(
@@ -1301,16 +1330,19 @@ def tripwire_collapse(
                 "causal_effect_sigma": pair["causal"]["estimate_sigma"],
                 "shifted_effect_sigma": pair["shifted"]["estimate_sigma"],
                 "mde_sigma": mde,
+                "bootstrap_se_sigma": pair["causal"].get("bootstrap_se_sigma"),
+                "integrity_bite_scale_note": (
+                    "MDE_Z × bootstrap SE of scale estimator; integrity noise rule, "
+                    "not a resolution statement"
+                ),
                 "collapse_fraction": (
                     float(1.0 - shifted_effect / causal_effect)
                     if causal_effect > 0 and np.isfinite(shifted_effect)
                     else None
                 ),
-                "causal_edge_present": edge_present,
-                # Where an edge exists the design requires it to collapse INTO the noise floor,
-                # not merely to shrink: collapse fraction ~ 1.0.
+                "causal_effect_at_or_above_integrity_bite_scale": at_bite,
                 "collapsed_into_noise": bool(
-                    edge_present and np.isfinite(shifted_effect) and shifted_effect < mde
+                    at_bite and np.isfinite(shifted_effect) and shifted_effect < mde
                 ),
                 "shifted_edge_survives": survives,
             }
@@ -1329,16 +1361,27 @@ def tripwire_collapse(
         pair = {}
         for label, frame in (("causal", causal), ("shifted", shifted)):
             rows = frame.filter(pl.col("arm_id") == arm_id)
-            left = rows.filter(pl.col("admitted") & pl.col("outcome_bps").is_not_null())[
-                "outcome_bps"
-            ].to_numpy()
-            right = rows.filter(
-                (pl.col("rejection_class") == "EVALUATED_DECLINED")
+            admitted_frame = rows.filter(
+                pl.col("admitted") & pl.col("outcome_bps").is_not_null()
+            )
+            declined = rows.filter(
+                pl.col("rejection_class").is_in(list(DECLINED_CLASSES))
                 & pl.col("counterfactual_outcome_bps").is_not_null()
-            )["counterfactual_outcome_bps"].to_numpy()
+            )
+            left = admitted_frame["outcome_bps"].to_numpy()
+            right = declined["counterfactual_outcome_bps"].to_numpy()
+            # Integrity bite scale = same bootstrap SE family as the selection CI (R2 / Task 2).
+            interval = _contrast_interval(
+                admitted_frame,
+                declined,
+                "V_A_UNCHUNKED",
+                domain_hours=domain_hours,
+                n_boot=n_boot,
+            )
             pair[label] = {
                 "contrast": _mean(left) - _mean(right) if left.size and right.size else np.nan,
-                "mde": _two_sample_mde(left, right),
+                "mde": interval.get("mde_bps", float("nan")),
+                "bootstrap_se_bps": interval.get("bootstrap_se_bps", float("nan")),
                 "n_declined": int(right.size),
             }
         causal_effect = abs(pair["causal"]["contrast"])
@@ -1352,7 +1395,8 @@ def tripwire_collapse(
             and np.isfinite(mde)
             and shifted_effect - causal_effect > mde
         )
-        edge_present = bool(
+        # Integrity bite scale only — not a resolution / result classification (R3).
+        at_bite = bool(
             applicable
             and np.isfinite(causal_effect)
             and np.isfinite(mde)
@@ -1365,10 +1409,15 @@ def tripwire_collapse(
                 "causal_effect_bps": pair["causal"]["contrast"],
                 "shifted_effect_bps": pair["shifted"]["contrast"],
                 "mde_bps": mde,
+                "bootstrap_se_bps": pair["causal"]["bootstrap_se_bps"],
+                "integrity_bite_scale_note": (
+                    "MDE_Z × bootstrap SE of selection contrast; integrity noise rule, "
+                    "not a resolution statement"
+                ),
                 "applicable": applicable,
-                "causal_edge_present": edge_present,
+                "causal_effect_at_or_above_integrity_bite_scale": at_bite,
                 "collapsed_into_noise": bool(
-                    edge_present and np.isfinite(shifted_effect) and shifted_effect < mde
+                    at_bite and np.isfinite(shifted_effect) and shifted_effect < mde
                 ),
                 "shifted_edge_survives": survives,
             }
@@ -1376,7 +1425,14 @@ def tripwire_collapse(
 
     surviving = [item for item in comparisons if item["shifted_edge_survives"]]
     non_vacuous = bool(admission_changed > 0 or capital_changed > 0)
-    with_edge = [item for item in comparisons if item.get("causal_edge_present")]
+    # Support both field names while scale half is updated below.
+    def _at_bite(item: dict[str, Any]) -> bool:
+        return bool(
+            item.get("causal_effect_at_or_above_integrity_bite_scale")
+            or item.get("causal_edge_present")
+        )
+
+    with_edge = [item for item in comparisons if _at_bite(item)]
     failed_to_collapse = [
         item["arm_id"] for item in with_edge if not item.get("collapsed_into_noise")
     ]
@@ -1393,19 +1449,21 @@ def tripwire_collapse(
         "committed_capital_rows_changed": capital_changed,
         "non_vacuous": non_vacuous,
         "surviving_arms": [item["arm_id"] for item in surviving],
-        # How much of the arm set the tripwire could actually bite on. An arm whose causal
-        # effect is already inside the cell's floor has no edge to destroy, so its "did not
-        # survive" carries no causal information.
+        # Integrity bite inventory only — not a resolution count of "real edges".
         "arms_with_a_causal_edge": len(with_edge),
-        # INFORMATIVE, not a gate. See the HARD criterion below for why.
+        "arms_at_or_above_integrity_bite_scale": len(with_edge),
         "arms_with_an_edge_that_did_not_collapse_into_noise": failed_to_collapse,
         "informative": bool(with_edge),
         "bite_note": (
-            "no arm in this cell carries a causal effect above its own detection floor, so the "
-            "tripwire had nothing to collapse; the pass records the absence of a surviving "
-            "shifted edge, NOT a demonstrated collapse"
+            "no arm in this cell sits at or above the integrity bite scale (MDE_Z × SE of the "
+            "same estimator as the CI), so the tripwire had nothing to collapse; the pass "
+            "records the absence of a surviving shifted edge, NOT a demonstrated collapse and "
+            "NOT a research resolution statement"
             if not with_edge
-            else "the tripwire had at least one arm with an edge to destroy"
+            else (
+                "the tripwire had at least one arm at or above the integrity bite scale "
+                "(integrity noise rule, not a resolution statement)"
+            )
         ),
         "non_collapse_note": (
             "a SIZE arm's paired difference is dominated by the exposure term "
@@ -1416,19 +1474,8 @@ def tripwire_collapse(
             "seen from the other side."
         ),
         "comparisons": comparisons,
-        # HARD criterion, taken from design section 9's REJECT clause: the shift must be
-        # non-vacuous, and no shifted arm may outperform its causal twin beyond that cell's own
-        # floor. Section 9 states "expected collapse fraction ~ 1.0" as an EXPECTATION; its
-        # REJECT condition is "a SURVIVING edge under the shift".
-        #
-        # An earlier version of this function ALSO required every arm that had an edge to
-        # collapse INTO the noise floor, and blocked when one did not. That is overreach, and it
-        # produced a false HARD failure on crypto H4 `ADP_SWING_SCALE_SIZE_STATE_HALVE_HIGH`:
-        # causal effect 0.0648 sigma-hat against a floor of 0.0626 - clearing it by 3.5% - with a
-        # shifted twin of 0.0656, which is statistically the same number rather than an
-        # outperforming one. A HARD failure declares the EMISSION INVALID and sends the operator
-        # to fix the data; that verdict would have been wrong. Collapse behaviour is reported per
-        # arm and in the two fields above, and gates nothing.
+        # HARD criterion: non-vacuous shift and no shifted arm outperforms its twin beyond the
+        # integrity bite scale (R2 SE family). Collapse into noise is informative only.
         "pass": bool(non_vacuous and not surviving),
         "class": "future_destroy HARD VALIDITY",
         "failure_meaning": "an acausal leak: fix the data, never read it as 'no edge'",

@@ -1,3 +1,9 @@
+"""QUARANTINED pre-AMENDMENT-7. Do not use for emission or analysis.md."""
+raise RuntimeError(
+    "AMENDMENT_7_QUARANTINE: this script is legacy (pre R1-R5 floor fix). "
+    "Use analysis_code/analyse.py emission only; see legacy_pre_a7/README.md."
+)
+
 """Falsification probes on the two selection reads whose CI clears zero, plus
 concentration ladders, dose-response on the continuous arms, and break-even spread."""
 from __future__ import annotations

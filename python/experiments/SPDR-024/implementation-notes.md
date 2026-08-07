@@ -288,28 +288,35 @@ python/experiments/SPDR-024/
 
 ---
 
-## 8. MDE / floor apparatus — superseded emission (2026-08-07)
+## 8. MDE / floor apparatus — AMENDMENT-7 (2026-08-07)
 
 **Binding decision:**  
 `docs/experiments-docs/checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/mde-floor-defect-spdr024.md`
 §12 (independent validation) and **§13 (OPERATOR DECISION — clean fix, artefact purge, full
 re-emission)**.
 
-Summary for this folder:
+**Design:** AMENDMENT-7 in `design.md` §10 / §11 / §15 — R1–R5 in one package; **SIGNED** by
+§13 / 2026-08-07. Supersedes: `2.8/√blocks` as row floor; Step-3 0.022–0.150 as gate/resolve bar;
+order-only preflight magnitude passes; silent dual-σ̂ ladder. Retains: A4 unit-capital PRIMARY;
+A5 admission-at-fill; A6 no result labels + seven populations.
 
-- Five defects in the detection-floor apparatus were independently verified against the live
-  artefacts and code (ceiling/yardstick mismatch, Step-3 unresolved range as gate, 2.8 used as a
-  pass mark, floor ignoring bootstrap SE, dual σ̂ denominators, preflight on orders at the wrong
-  endpoint).
-- A prose rewalk of the existing emission is **rejected**.
-- Required path: design amendment R1–R5 → implementation + tests → **purge** `results/`,
-  `analysis.md`, `screen.md` (and generated plots) → full four-cell re-run → re-analysis.
-- Until that cycle completes, **do not** use `mde_*` / preflight magnitude labels for resolve-or-null
-  language on either channel. Estimates, CIs, exposure/selectivity, and controls remain usable as
-  descriptive objects only.
+**Code contract (post-A7):**
 
-The emission under `results/` and the current `analysis.md` / `screen.md` are the **pre-fix**
-cycle and are to be deleted under §13.3 of that decision, not patched in place.
+| Remedy | Where | Rule |
+|---|---|---|
+| R1 | `preflight.py` + optional analysis context | mechanism ceiling = √p × \|μ\|/σ from baseline fills |
+| R2 | `spdr024_analysis.clustered_interval` / selection interval | `mde = MDE_Z × bootstrap_SE` |
+| R3 | emission schema + prose | no pass-mark / no power labels |
+| R4 | scale vs selection rows | `sigma_denominator` = `paired_delta` / `outcome_level_bps` |
+| R5 | `preflight.py` | fills or `PROVISIONAL_FILL_RATE_ADJUSTED`; same R1 endpoint |
 
-**Execution handoff (checkbox ledger; not started until operator says go):**  
+**Execution handoff:**  
 `docs/superpowers/plans/2026-08-07-spdr-024-mde-floor-fix-execution-handoff.md`
+
+**Claude pre-run review (Task 5):**  
+`docs/superpowers/plans/reviews/2026-08-07-spdr-024-mde-floor-claude-review.md`  
+Verdict `READY_FOR_PURGE_AND_FULL_RUN`; gate CLEARED 2026-08-07.
+
+**Re-emission (2026-08-07):** pre-fix artefacts purged; all four cells re-ran TRAIN-only with
+`blocking_pass=true` and HARD count 17. Fresh `analysis.md` / `screen.md` use power as context
+only. AMENDMENT-7 in force.

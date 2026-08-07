@@ -456,43 +456,70 @@ V-C RULES:
   pre-declared   : this rule is frozen at design time; it is not tuned after seeing the estimates
 ```
 
-**MDE is declared in sigma-hat units, never absolute bps** (L-50 / P-21 — importing an absolute bar
-across universes silently loosened a threshold 5.6× and produced three wrong headline numbers):
+**MDE / detection-floor apparatus (AMENDMENT-7 — R1–R5).** Power remains **context only**. No
+result or power label classifies a row (`CLEARS_FLOOR`, `WASH`, `UNPOWERED`, `FULLY_RESOLVING`,
+`NOT_RESOLVABLE_*`, `CARRIES_MAGNITUDE_*`, or synonyms). MDE units stay sigma-hat for scale when
+sigma-hat is the estimate's unit (L-50 / P-21); selection uses its own declared units (R4).
 
 ```text
-POWER (V-A, the treatment the dependence test supports; V-B/V-C reported alongside):
-  MDE_sigma = 2.8 / sqrt(n)
+# --- R1: SIZE mechanism ceiling (baseline-only; per cell) ---
+SIZE_MECHANISM_CEILING:
+  sharpe_per_trade := |gross_mean_bps| / gross_sigma_bps
+                      # from FIXED baseline fills only (no adaptive arm)
+  ceiling_sigma(p) := sqrt(p) * sharpe_per_trade
+  # p = design gate rate for planning (e.g. STATE_HALVE_HIGH on HIGH ≈ 0.5);
+  #     report realised gate rates beside estimates post-run
+  # soft ceiling: selectivity / continuous size > 1 may exceed; still the planning scale
+  FORBIDDEN as yardstick: STEP3 0.022 / 0.150 (historical context only, never a gate)
 
-  per-symbol : cTrader n~570 -> 0.117 sigma-hat ;  crypto n~420 -> 0.137 sigma-hat
-  pooled     : cTrader n=1,698 -> 0.068 sigma-hat ; crypto n=8,469 -> 0.030 sigma-hat
+# --- R2: row floor shares the CI's SE family ---
+ROW_FLOOR (if mde_* columns remain):
+  SE := SE of the same estimator as the CI on that row
+       (bootstrap SE of the clustered interval draws preferred;
+        (ci_high - ci_low) / (2 * z_0.975) only if documented as interval-implied SE
+        and used consistently for that row)
+  mde := MDE_Z * SE
+  FORBIDDEN: mde := MDE_Z / sqrt(effective_blocks) as the row floor
+             when the row's CI is bootstrap / clustered
 
-  observed Step-3 sizing effect: 0.022 - 0.150 sigma-hat
+# --- R3: MDE_Z is planning only ---
+MDE_Z := 2.8
+  USE: sample-size planning for future designs / preflight descriptive capacity
+  DO NOT USE: pass mark on realised |estimate| (no |est| ≥ MDE resolve language)
 
-  n required to resolve magnitude (est/MDE > 1):
-    strongest cells (0.150 sigma-hat): n >= ~350    -> cleared PER SYMBOL in both universes
-    median   cells (0.060 sigma-hat): n >= ~2,200   -> cleared POOLED in crypto; MARGINAL pooled
-                                                       in cTrader (1,698)
-    weakest  cells (0.022 sigma-hat): n >= ~16,200  -> NOT REACHABLE on this TRAIN span
-
-  strata predeclared UNPOWERED (can NEVER be read as negatives, B-5):
-    - any cell with fewer than 30 distinct baseline trades. A REAL population here: crypto
-      per-symbol counts run down to 25 (the 8 thinnest symbols sit below 200)
-    - all H4 cells pending preflight (H4 supplies ~1/4 the origins of H1)
-    - LEVEL_FORECAST_K4/K12 in the H1 domain (horizon-mismatched by construction, §7)
-    - the weakest-effect component cells identified above
-  Reported with the shortfall quantified (NOT_RESOLVABLE), never folded into a negative.
+# --- R5: preflight M2 (fills + same endpoint as post-run context) ---
+PREFLIGHT M2:
+  n_basis := FILLS (preferred) or orders * measured_fill_rate with
+             count_basis labelled PROVISIONAL_FILL_RATE_ADJUSTED
+             or PROVISIONAL_DOMAIN_BAR_SIMULATED_FILLS (baseline-only micro-pass
+             stop-touch + one-domain-bar hold; reconcile to engine fills post-run)
+  endpoint := mechanism ceiling / descriptive rule from R1 (same as post-run context)
+  planning_floor (preflight only, no bootstrap yet):
+             MDE_Z / sqrt(n_basis) under each variance treatment's block count;
+             most conservative reported as context
+  descriptive label (frozen vocabulary; not a result band):
+    DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING
+        when planning_floor > ceiling_sigma(p)
+    CONTEXT_FLOOR_AT_OR_BELOW_MECHANISM_CEILING
+        when planning_floor <= ceiling_sigma(p)
+    INSUFFICIENT_FILLS_FOR_PREFLIGHT
+        when n_basis < 30
+  FORBIDDEN: gate on STEP3 0.022 or 0.150
+  FORBIDDEN: CARRIES_MAGNITUDE on pure order counts while noting optimism
+  Cells marked DESCRIPTIVE for SIZE magnitude still RUN (breadth); they do not
+  support magnitude claims. Blind breadth is rejected by the descriptive label,
+  not by skipping the engine.
 ```
 
-**Consequence, stated before results exist:** the sizing magnitude question is expected to resolve
-for the **stronger components** (`TAIL_RISK`, `SHOCK`, `LEVEL_NOW` — §4.5.4 of the specification)
-and to remain **unresolvable for the weakest**. That is a partial answer by design, not a failure,
-and it is declared here so it cannot be re-narrated afterwards.
+**Historical design-time counts (still true for sample size; floors above are superseded):**
+per-symbol cTrader n~570 / crypto n~420; pooled cTrader n~1,698 / crypto n~8,469 under
+order-level baselines. H4 remains thinner (~1/4 of H1 origins) pending measured preflight.
+Step-3's 0.022–0.150 σ̂ range is **historical context only** — never a resolve or preflight bar.
 
-**M2 gate, applied before execution:** compute the predeclared MDE per cell at preflight from
-realised counts under all three variance treatments (§10.1), taking the most conservative. Cells
-that cannot reach `est/MDE > 1` for the Step-3 observed effect are
-marked **DESCRIPTIVE** in this design, before results exist. Breadth is accepted (D4); blind breadth
-is not.
+**M2 before execution:** compute fill-based (or provisional fill-rate-adjusted) planning floors
+under all three variance treatments (§10.1), take the most conservative, compare to the R1
+mechanism ceiling, and emit the frozen descriptive label. No cell is "passed" for magnitude on
+order counts alone.
 
 ---
 
@@ -510,31 +537,45 @@ the clauses that forbid them:
   making power a gate"*; *"no verdict, winner, **pass/fail-value** or top-N field exists."*
 
 ```text
-REPORTING (every row, both channels, every stratum):
-  estimate            in sigma-hat units
-  uncertainty         ci_low / ci_high under ALL THREE variance treatments (§10.1)
-  population count    the applicable named populations — eligible_origin_n, entry_fill_n,
-                      close_n, common_fill_n, common_close_n — NULL where one does not apply,
-                      NEVER filled in from a different population
+REPORTING (every row, both channels, every stratum) — AMENDMENT-6 + AMENDMENT-7:
+  estimate            in the channel's declared units (see CHANNELS)
+  uncertainty         ci_low / ci_high under ALL THREE variance treatments (§10.1);
+                      governing = most conservative by fewest blocks / highest coherent
+                      floor under R2
+  population count    eligible_origin_n, entry_fill_n, close_n, common_fill_n,
+                      common_close_n — NULL where one does not apply, NEVER filled in
+                      from a different population
   effective count     effective_origin_blocks for an origin-lens read,
                       effective_trade_blocks for a paired trade-lens read; the other is NULL
-  MDE                 in the same units as the estimate, on the same row
+  optional context    mde from R2 (same SE family as that row's CI), est/SE, exposure /
+                      selectivity terms, control fields
 
-  and NOTHING else. No band, no class, no verdict, no pass field, no ranking, no top-N.
+  and NOTHING else that classifies the row. No band, no class, no verdict, no pass field,
+  no ranking, no top-N.
+
+NEVER emit or narrate as resolve/unresolve:
+  band, resolution_class, WASH, UNPOWERED, NOT_RESOLVABLE_*, DIRECTION_RESOLVED_*,
+  SUPPORTED, CONTRADICTED, CLEARS_FLOOR, FULLY_RESOLVING, CARRIES_MAGNITUDE_*,
+  or prose that means the same (including |est| ≥ MDE as a resolve rule)
+
+CHANNELS (R4 — denominators declared; no silent dual-σ̂ ladder):
+  SCALE: estimate is sigma-hat of the paired difference
+         (values / sd(paired Δ)); sigma_denominator = "paired_delta"
+         optional mde_sigma = MDE_Z × bootstrap_SE of that same paired estimator
+  SELECTION: contrasts are in bps (raw) with their own interval in bps;
+             sigma_denominator = "outcome_level_bps" when a sigma-hat form is also shown
+             (sd of pooled outcome levels, NOT sd of paired Δ). Do not claim the same
+             numeric 0.022–0.150 ladder as scale. Optional mde_bps = MDE_Z × bootstrap_SE
+             of the contrast in bps.
+  If both channels report a sigma-hat number, each row names its denominator object in a
+  column — never one silent shared ladder.
 
 READING:
-  the reader compares the estimate with its own interval and its own MDE. Tallies are reported
-  as counts of intervals excluding zero on each side, beside the median estimate and the median
-  MDE, in the SPDR-021 form — never as counts of labels.
-  A cell whose MDE exceeds the effect sizes this family has previously observed (0.022–0.150
-  sigma-hat) is described that way in prose, with both numbers shown. It is not given a name,
-  and it is never folded into a negative (B-5).
-
-DIRECTION-vs-MAGNITUDE: still reported as two separate reads, but as two NUMBERS — the interval
-  relative to zero, and the estimate relative to the MDE — not as two labels. Step-3's sizing
-  result was direction-certain (236/236 resolving rows one side, 6/6 cells) and
-  magnitude-unresolved (0.022–0.150 sigma-hat) SIMULTANEOUSLY; both facts are visible in the
-  emitted columns without either being named.
+  the reader compares the estimate with its own interval (and optional est/SE). Tallies are
+  counts of intervals excluding zero on each side, beside median estimate and optional
+  median floor — never counts of labels. Power / MDE is context only; it does not demote
+  a row. Step-3's 0.022–0.150 range may appear only as historical family context, never as
+  a resolve bar (B-5: thin cells are not negatives).
 
 POOLED: disclosure-only unless symbol homogeneity is shown; the per-symbol ladder (§6E) is always
   printed alongside it.
@@ -712,9 +753,49 @@ AMENDMENT-6 (2026-08-07, POST-REVIEW CORRECTION — **UNSIGNED, AWAITING OPERATO
   running count: 0 looser / 4 tighter / 2 neutral
   L-23 CHECK: the last three amendments are NEUTRAL, TIGHTER, TIGHTER — no one-directional
   streak of 3. UNSIGNED, because it changes the emitted schema and the reporting contract.
+
+AMENDMENT-7 (2026-08-07, **SIGNED by operator decision §13** in
+  docs/experiments-docs/checkpoints/2026-07-25-018-trade-opportunity-capture-geometry/
+  mde-floor-defect-spdr024.md — independent validation §12; operator decision 2026-08-07):
+  detection-floor / MDE apparatus R1–R5 in one coherent package — DIRECTION: TIGHTER
+  on honesty of power and preflight; NEUTRAL on strategy admission, arm grid, cost, TRAIN fence.
+  Basis (defect doc §2–§6; all five defects graded PROVEN in §12.2):
+    D1 floor often above SIZE mechanism ceiling (σ̂ ≈ √gate × baseline Sharpe);
+    D2 Step-3 unresolved 0.022–0.150 used as yardstick;
+    D3.1 MDE_Z=2.8 used as pass mark on realised |est|;
+    D3.2 row floor = 2.8/√blocks ignoring bootstrap SE;
+    D4 scale vs selection silent dual-σ̂ ladder;
+    D5 preflight on orders + 0.150 gate, post-run fills.
+  Remedies (exact formulae in §10 / §11 above):
+    R1 mechanism ceiling baseline-only; retire 0.022/0.150 as gate;
+    R2 mde = MDE_Z × SE_CI (bootstrap / clustered), forbid 2.8/√blocks as row floor;
+    R3 MDE_Z planning only; no clears-floor / |est|≥MDE resolve;
+    R4 scale sigma_denominator=paired_delta; selection outcome_level_bps or raw bps;
+    R5 preflight fills or PROVISIONAL_FILL_RATE_ADJUSTED; same R1 endpoint; no order-only
+       magnitude-carrying pass.
+  Pre-fix emission under results/ + analysis.md + screen.md is **invalid for MDE-based
+  resolution claims**; prose rewalk of that emission is **refused** (§13.1). Required path:
+  implement R1–R5 → Claude review gate → purge generated artefacts → four-cell re-emission.
+  Arms, components, domains, universes, PRIMARY estimand, cost disclosure, TRAIN fence:
+  **unchanged**.
+
+  Prior unsigned findings — still in force / superseded:
+
+  | Prior | In force | Superseded |
+  |---|---|---|
+  | A4 unit-capital PRIMARY | yes | — |
+  | A5 admission-at-fill; selection floor vs block treatment alignment intent | yes (fill identity; coherent SE under R2) | resolution ladder / band names |
+  | A6 no result labels; seven populations | yes | any residual Step-3 0.022–0.150 as resolve/preflight bar; 2.8/√n as row floor |
+
+  running count: 0 looser / 5 tighter / 2 neutral
+  L-23 CHECK: last three amendments A5/A6/A7 are TIGHTER, TIGHTER, TIGHTER — one-directional
+  streak of 3. **Operator flag raised by the ledger rule; cleared for execution by defect-doc
+  §13** (2026-08-07), which explicitly authorises this R1–R5 package + purge + re-run.
+  Status: **SIGNED by operator decision §13 / 2026-08-07** (content authorisation for R1–R5
+  and the purge/re-emission path). No arm/grid/cost/TEST change.
 ```
 
-No one-directional streak of 3 (L-23); no operator flag required at the execution gate.
+L-23 streak of 3 on TIGHTER is flagged above and **cleared by defect-doc §13** for this package only.
 
 Every pre-measurement amendment appends here with its direction (L-23). A one-directional streak of
 3 is an explicit operator flag at the execution gate.

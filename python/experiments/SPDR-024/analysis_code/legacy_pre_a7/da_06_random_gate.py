@@ -1,3 +1,9 @@
+"""QUARANTINED pre-AMENDMENT-7. Do not use for emission or analysis.md."""
+raise RuntimeError(
+    "AMENDMENT_7_QUARANTINE: this script is legacy (pre R1-R5 floor fix). "
+    "Use analysis_code/analyse.py emission only; see legacy_pre_a7/README.md."
+)
+
 """Random-gate control: is a component's sizing effect distinguishable from halving a
 RANDOM subset of the same size? The paired delta is exactly (risk_size-1) x outcome, so any
 gate on a positive-mean population produces a negative delta. This battery quantifies how

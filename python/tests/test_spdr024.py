@@ -31,6 +31,7 @@ from xen.adaptive_management.spdr024 import (
     regime_panel,
 )
 from xen.adaptive_management.spdr024_analysis import (
+    MDE_Z,
     SymbolSeries,
     _estimate_rows,
     breakeven_spread,
@@ -39,6 +40,7 @@ from xen.adaptive_management.spdr024_analysis import (
     gate_permutation_control,
     governing_treatment,
     pool_filter_ladder,
+    size_mechanism_ceiling,
 )
 
 UTC = timezone.utc
@@ -192,6 +194,18 @@ def test_cap_rule_on_no_closed_positions_selects_nothing():
 # --------------------------------------------------------------------------- #
 
 
+_LABEL_DENYLIST = {
+    "band",
+    "governing_band",
+    "component_specific_band",
+    "resolution_class",
+    "WASH",
+    "step3_band",
+    "floor_over_step3",
+    "step3_resolving",
+}
+
+
 def test_no_artifact_column_carries_a_result_label():
     """The contract's central reporting rule, enforced on the emitted schema.
 
@@ -220,9 +234,256 @@ def test_no_artifact_column_carries_a_result_label():
     rows = _estimate_rows(
         [series], identity={"channel": "SCALE"}, populations={}, n_boot=20
     )
-    forbidden = {"band", "governing_band", "component_specific_band", "resolution_class"}
     for row in rows:
-        assert not forbidden & set(row), f"result label emitted: {forbidden & set(row)}"
+        bad = _LABEL_DENYLIST & set(row)
+        assert not bad, f"result label emitted: {bad}"
+        # Broader column-name denylist (step3_*, floor_over_*, *_band).
+        for key in row:
+            assert not key.startswith("step3_"), key
+            assert not key.startswith("floor_over_"), key
+            assert not key.endswith("_band"), key
+
+
+def test_row_floor_uses_bootstrap_se_not_blocks_sqrt(monkeypatch):
+    """AMENDMENT-7 R2 / D3.2: mde = MDE_Z × SE_bootstrap, not MDE_Z/√blocks."""
+    rng = np.random.default_rng(11)
+    n = 240
+    # Strong within-block dependence so bootstrap SE ≠ 1/√blocks.
+    values = np.repeat(rng.normal(size=n // 12), 12) + rng.normal(scale=0.05, size=n)
+    series = [
+        SymbolSeries(
+            symbol="A",
+            values=values,
+            blocks={
+                "V_A_UNCHUNKED": np.arange(n),
+                "V_B_TIME_BLOCK": np.arange(n) // 12,
+                "V_C_REGIME_EPISODE": np.arange(n) // 24,
+            },
+        )
+    ]
+    result = clustered_interval(series, "V_B_TIME_BLOCK", n_boot=400, seed=99)
+    se = result["bootstrap_se_sigma"]
+    assert np.isfinite(se) and se > 0
+    assert result["mde_sigma"] == pytest.approx(MDE_Z * se, rel=1e-9)
+    block_floor = MDE_Z / np.sqrt(result["effective_blocks"])
+    # When bootstrap SE differs from 1/√blocks, the row floor must follow SE.
+    assert abs(se - 1.0 / np.sqrt(result["effective_blocks"])) > 1e-4
+    assert result["mde_sigma"] != pytest.approx(block_floor, rel=1e-3)
+
+
+def test_scale_and_selection_declare_distinct_denominators():
+    """AMENDMENT-7 R4: no silent dual-σ̂ ladder across channels."""
+    series = SymbolSeries(
+        symbol="A",
+        values=np.linspace(-1.0, 1.0, 80),
+        blocks={name: np.arange(80) for name in
+                ("V_A_UNCHUNKED", "V_B_TIME_BLOCK", "V_C_REGIME_EPISODE")},
+    )
+    scale_rows = _estimate_rows(
+        [series], identity={"channel": "SCALE"}, populations={}, n_boot=20
+    )
+    for row in scale_rows:
+        assert row["sigma_denominator"] == "paired_delta"
+
+    # Selection channel: synthetic admitted/rejected on two symbols.
+    from xen.adaptive_management.spdr024_analysis import selection_channel_estimates
+
+    rows = []
+    start = datetime(2023, 1, 1, tzinfo=UTC)
+    for symbol in ("A", "B"):
+        for index in range(40):
+            ts = start + timedelta(hours=index)
+            exit_ts = ts + timedelta(hours=1)
+            rows.append(
+                {
+                    "arm_id": "ADP_X",
+                    "arm_class": "NATIVE",
+                    "component": "TAIL_RISK",
+                    "symbol": symbol,
+                    "origin_id": f"{symbol}-{index}",
+                    "decision_ts": ts,
+                    "entry_ts": ts,
+                    "exit_ts": exit_ts,
+                    "regime_episode_id": f"R{index // 5}",
+                    "regime_state": "HIGH" if index % 2 == 0 else "LOW",
+                    "admitted": index % 3 != 0,
+                    "rejection_class": (
+                        "ADMITTED" if index % 3 != 0 else "EVALUATED_DECLINED"
+                    ),
+                    "outcome_bps": float(index % 7 - 3),
+                    "counterfactual_outcome_bps": float((index % 5) - 2),
+                }
+            )
+            rows.append(
+                {
+                    "arm_id": "FIXED_NATIVE_BREAKOUT",
+                    "arm_class": "NATIVE",
+                    "component": None,
+                    "symbol": symbol,
+                    "origin_id": f"{symbol}-{index}",
+                    "decision_ts": ts,
+                    "entry_ts": ts,
+                    "exit_ts": exit_ts,
+                    "regime_episode_id": f"R{index // 5}",
+                    "regime_state": "HIGH" if index % 2 == 0 else "LOW",
+                    "admitted": True,
+                    "rejection_class": "ADMITTED",
+                    "outcome_bps": float(index % 7 - 3),
+                    "counterfactual_outcome_bps": None,
+                }
+            )
+    table = selection_channel_estimates(pl.DataFrame(rows), domain_hours=1, n_boot=30)
+    assert not table.is_empty()
+    assert "sigma_denominator" in table.columns
+    assert set(table["sigma_denominator"].drop_nulls().unique().to_list()) == {
+        "outcome_level_bps"
+    }
+    # Selection floor (when finite) tracks bootstrap SE, not 2.8/√(n_a+n_b) alone.
+    pooled = table.filter(pl.col("scope") == "POOLED")
+    if pooled.height:
+        row = pooled.row(0, named=True)
+        if row.get("bootstrap_se_bps") is not None and np.isfinite(row["bootstrap_se_bps"]):
+            assert row["mde_bps"] == pytest.approx(
+                MDE_Z * row["bootstrap_se_bps"], rel=1e-6
+            )
+
+
+def test_size_mechanism_ceiling_is_baseline_only():
+    """AMENDMENT-7 R1: ceiling = √p × |μ|/σ from baseline moments."""
+    ceiling = size_mechanism_ceiling(2.0, 40.0, gate_rate=0.25)
+    assert ceiling == pytest.approx(0.5 * (2.0 / 40.0), rel=1e-9)
+    assert np.isnan(size_mechanism_ceiling(1.0, 0.0))
+
+
+def test_preflight_module_imports_and_uses_r1_endpoint():
+    """AMENDMENT-7 R5: preflight imports cleanly; labels use R1, not Step-3 0.150."""
+    import importlib.util
+    from pathlib import Path
+
+    path = (
+        Path(__file__).resolve().parents[1]
+        / "experiments"
+        / "SPDR-024"
+        / "screen_code"
+        / "preflight.py"
+    )
+    spec = importlib.util.spec_from_file_location("spdr024_preflight", path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+
+    assert not hasattr(module, "STEP3_OBSERVED_EFFECT_SIGMA")
+    assert module.LABEL_DESCRIPTIVE == "DESCRIPTIVE_SIZE_MAGNITUDE_FLOOR_ABOVE_CEILING"
+    # Floor above ceiling → descriptive; never CARRIES_MAGNITUDE on order counts.
+    assert (
+        module.descriptive_power_label(100, planning_floor=0.20, mechanism_ceiling=0.05)
+        == module.LABEL_DESCRIPTIVE
+    )
+    assert (
+        module.descriptive_power_label(100, planning_floor=0.02, mechanism_ceiling=0.05)
+        == module.LABEL_CONTEXT
+    )
+    assert (
+        module.descriptive_power_label(5, planning_floor=0.02, mechanism_ceiling=0.05)
+        == module.LABEL_INSUFFICIENT
+    )
+    # Explicit ban: Step-3 range must not gate the label (code path, not ban prose).
+    source = path.read_text(encoding="utf-8")
+    assert "STEP3_OBSERVED" not in source
+    assert "CARRIES_MAGNITUDE_QUESTION" not in source
+    assert "mde > " not in source
+    # Label function has no Step-3 constant comparison.
+    import inspect
+    label_src = inspect.getsource(module.descriptive_power_label)
+    assert "0.150" not in label_src
+    assert "0.022" not in label_src
+
+
+def test_legacy_da_scripts_are_quarantined():
+    """B1: exploratory da_*.py must not live on the emission path with band floors."""
+    from pathlib import Path
+
+    analysis_code = (
+        Path(__file__).resolve().parents[1] / "experiments" / "SPDR-024" / "analysis_code"
+    )
+    live = list(analysis_code.glob("da_*.py"))
+    assert live == [], f"live da scripts still on emission path: {live}"
+    legacy = analysis_code / "legacy_pre_a7"
+    assert legacy.is_dir()
+    assert (legacy / "README.md").exists()
+    # Each quarantined script refuses to run.
+    for path in legacy.glob("da_*.py"):
+        text = path.read_text(encoding="utf-8")
+        assert "AMENDMENT_7_QUARANTINE" in text
+        assert "raise RuntimeError" in text
+
+
+def test_selection_tripwire_uses_all_declined_classes():
+    """BR-1: PENDING_EXPIRY declines (ORDER_EXPIRED) must enter the leak test."""
+    import inspect
+    from xen.adaptive_management.spdr024_analysis import tripwire_collapse
+
+    src = inspect.getsource(tripwire_collapse)
+    assert "DECLINED_CLASSES" in src
+    assert 'rejection_class") == "EVALUATED_DECLINED"' not in src
+
+
+def test_regime_strata_do_not_emit_parametric_mde():
+    """BR-2: no unblocked parametric floor inside regime_strata JSON."""
+    from xen.adaptive_management.spdr024_analysis import _regime_matched_contrast
+    import json
+
+    rng = np.random.default_rng(3)
+    admitted = pl.DataFrame(
+        {
+            "outcome_bps": rng.normal(size=80),
+            "regime_state": ["HIGH"] * 40 + ["LOW"] * 40,
+        }
+    )
+    declined = pl.DataFrame(
+        {
+            "counterfactual_outcome_bps": rng.normal(size=80),
+            "regime_state": ["HIGH"] * 40 + ["LOW"] * 40,
+        }
+    )
+    result = _regime_matched_contrast(admitted, declined)
+    strata = json.loads(result["regime_strata"])
+    for state, payload in strata.items():
+        assert "mde_bps" not in payload, state
+
+
+def test_emission_frames_have_no_banned_label_values_or_columns():
+    """Widen label ban beyond scale _estimate_rows (Claude B5)."""
+    series = SymbolSeries(
+        symbol="A",
+        values=np.linspace(-1.0, 1.0, 100),
+        blocks={name: np.arange(100) for name in
+                ("V_A_UNCHUNKED", "V_B_TIME_BLOCK", "V_C_REGIME_EPISODE")},
+    )
+    scale_rows = _estimate_rows(
+        [series], identity={"channel": "SCALE"}, populations={}, n_boot=15
+    )
+    banned_names = _LABEL_DENYLIST | {
+        "unmatched_contrast_resolves",
+        "contrast_over_mde",
+        "mde_bps_parametric_blocks",
+    }
+    banned_values = {
+        "WASH", "UNPOWERED", "NOT_RESOLVABLE", "CARRIES_MAGNITUDE",
+        "FULLY_RESOLVING", "CLEARS_FLOOR",
+    }
+    for row in scale_rows:
+        assert not (banned_names & set(row)), banned_names & set(row)
+        for key in row:
+            assert not key.startswith("step3_"), key
+            assert not key.endswith("_band"), key
+        for value in row.values():
+            if isinstance(value, str):
+                assert value not in banned_values, value
+    # Per-symbol floors use bootstrap SE, not free-standing 2.8/√n under a bootstrap name.
+    per = next(r for r in scale_rows if r["scope"] == "PER_SYMBOL")
+    assert np.isfinite(per["bootstrap_se_sigma"])
+    assert per["mde_sigma"] == pytest.approx(MDE_Z * per["bootstrap_se_sigma"], rel=1e-6)
 
 
 def test_every_row_carries_the_five_reporting_quantities():
@@ -303,12 +564,11 @@ def test_blocking_never_increases_the_block_count_above_the_trade_count():
     assert intervals["V_A_UNCHUNKED"]["effective_blocks"] == 400
     assert intervals["V_B_TIME_BLOCK"]["effective_blocks"] == 40
     assert intervals["V_C_REGIME_EPISODE"]["effective_blocks"] == 16
-    # Fewer blocks is a larger detection floor: coarser blocking is the conservative direction.
-    assert (
-        intervals["V_C_REGIME_EPISODE"]["mde_sigma"]
-        > intervals["V_B_TIME_BLOCK"]["mde_sigma"]
-        > intervals["V_A_UNCHUNKED"]["mde_sigma"]
-    )
+    # AMENDMENT-7 R2: floor tracks bootstrap SE, not free-standing 2.8/√blocks.
+    for item in intervals.values():
+        assert item["mde_sigma"] == pytest.approx(
+            MDE_Z * item["bootstrap_se_sigma"], rel=1e-9
+        )
 
 
 def test_interval_is_deterministic_for_a_fixed_seed():
@@ -522,12 +782,10 @@ def test_selection_rows_report_an_empty_rejected_population_as_a_fact():
         assert field in table.columns
 
 
-def test_suppressed_collapse_fraction_is_null_not_nan():
-    """A suppressed value must be NULL. A NaN is non-null on every row and reads as populated
-    to any check that tests null-ness — the defect class this apparatus was corrected for."""
+def test_collapse_fraction_not_gated_on_mde_resolve():
+    """AMENDMENT-7 R3: collapse is not suppressed by |est| ≥ MDE power rule."""
     from xen.adaptive_management.spdr024_analysis import _regime_matched_contrast
 
-    # Two populations whose contrast is well inside its own noise floor.
     rng = np.random.default_rng(21)
     admitted = pl.DataFrame(
         {
@@ -542,10 +800,32 @@ def test_suppressed_collapse_fraction_is_null_not_nan():
         }
     )
     result = _regime_matched_contrast(admitted, declined)
-    assert result["unmatched_contrast_resolves"] is False
+    assert "unmatched_contrast_resolves" not in result
+    # Collapse is arithmetic; only undefined when unmatched == 0.
+    if result["unmatched_contrast_bps"] != 0:
+        assert result["regime_match_collapse_fraction"] is not None
+        assert np.isfinite(result["regime_match_collapse_fraction"])
+
+
+def test_zero_unmatched_collapse_is_null_not_nan():
+    """Undefined ratio (unmatched==0) is NULL, never NaN."""
+    from xen.adaptive_management.spdr024_analysis import _regime_matched_contrast
+
+    admitted = pl.DataFrame(
+        {
+            "outcome_bps": [1.0, 1.0, 1.0, 1.0] * 10,
+            "regime_state": ["HIGH"] * 20 + ["LOW"] * 20,
+        }
+    )
+    declined = pl.DataFrame(
+        {
+            "counterfactual_outcome_bps": [1.0, 1.0, 1.0, 1.0] * 10,
+            "regime_state": ["HIGH"] * 20 + ["LOW"] * 20,
+        }
+    )
+    result = _regime_matched_contrast(admitted, declined)
+    assert result["unmatched_contrast_bps"] == pytest.approx(0.0)
     assert result["regime_match_collapse_fraction"] is None
-    assert result["collapse_fraction_suppressed_reason"]
-    # And it must survive the round trip through polars as a null, not a NaN.
     frame = pl.DataFrame([{"collapse": result["regime_match_collapse_fraction"]}])
     assert frame["collapse"].null_count() == 1
 

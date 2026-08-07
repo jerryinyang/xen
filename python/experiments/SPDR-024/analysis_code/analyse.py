@@ -221,29 +221,38 @@ def main(argv: list[str] | None = None) -> int:
             "primary_estimand": "capital_normalised_episode_return (E6)",
             "diagnostic_estimand": "outcome_bps (per-notional; BARRED from sizing claims)",
             "variance_treatments": list(TREATMENTS),
-            "governing_rule": "the most conservative of the three governs every band label",
+            "governing_rule": (
+                "most conservative treatment by fewest blocks / highest coherent R2 floor"
+            ),
             "labels": {
                 "result_labels_emitted": "NONE",
                 "rule": (
                     "every row is described by estimate, uncertainty, population count, "
-                    "effective count and MDE, and by nothing else"
+                    "effective count and optional R2 MDE, and by nothing else"
                 ),
                 "authority": (
                     "adaptive-management-design.md section 1 ('power labels do not decide "
                     "which rows are shown or how they are described') and section 9 ('Emit "
                     "event count, effective count, CI and MDE for every row. These are "
-                    "informative diagnostics, not verdict labels or pruning rules')"
+                    "informative diagnostics, not verdict labels or pruning rules'); "
+                    "SPDR-024 AMENDMENT-7 R1–R5"
                 ),
             },
+            "floor_contract": {
+                "row_floor": "mde = MDE_Z * bootstrap_SE of the same estimator as the CI",
+                "forbidden_row_floor": "MDE_Z / sqrt(effective_blocks)",
+                "mde_z_role": "sample-size planning only; not a pass mark on realised |estimate|",
+                "scale_sigma_denominator": "paired_delta",
+                "selection_sigma_denominator": "outcome_level_bps",
+            },
             "reference_effect_range_sigma": {
-                "step3_observed_sizing_effects": [
+                "step3_observed_sizing_effects_historical_only": [
                     STEP3_OBSERVED_EFFECT_SIGMA_MIN,
                     STEP3_OBSERVED_EFFECT_SIGMA_MAX,
                 ],
                 "use": (
-                    "context for comparing a cell's own MDE against the effect sizes this "
-                    "family has previously observed; it classifies nothing and no artifact "
-                    "column is derived from it"
+                    "HISTORICAL CONTEXT ONLY under AMENDMENT-7 R1. Never a gate, resolve "
+                    "ladder, preflight yardstick, or column-derived classification"
                 ),
             },
             "dependence_premise_check": _dependence_premise(dependence),
