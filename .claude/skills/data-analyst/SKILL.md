@@ -100,8 +100,32 @@ UNANSWERED with a reason. Add follow-up questions as answers raise them.
   `trimmed_mean`/median CI alongside. Report a CI that clears zero as
   "**bootstrap 95% CI excludes zero**" — never "<5% if the true effect were 0" (a percentile CI
   is not a hypothesis test; `CI_EXCLUDES_ZERO_PHRASE`).
-- Distinguish "no effect" from "unpowered": state the minimum detectable effect where a
-  negative matters.
+- **Detection floors (AMENDMENT-7 / L-56 / P-28) — binding apparatus, not style notes:**
+  1. **R1/R5 — power is context, never a second test.** Preflight power counts, planning
+     constants (`MDE_Z`, sample-size targets), and any historical observed-effect band are
+     descriptive context only. They never gate a row, never demote a CI, and never act as a
+     pass mark on a realised estimate.
+  2. **R2 — same SE family as the row CI.** If a detection floor is reported, it must be
+     `mde = MDE_Z × bootstrap_SE` of the **same estimator** that produced that row's CI.
+     Forbidden: parametric `k/√n` (or `MDE_Z/√blocks`) beside a bootstrap interval; dual SE
+     scales on one row; a power constant used as a significance bar.
+  3. **R3 — no floor-derived row labels.** Do not drop, demote, or label a row by its floor.
+     Words like `WASH`, `UNPOWERED`, `CLEARS_FLOOR`, `FULLY_RESOLVING` (and synonyms) as
+     *row* verdicts from power are withdrawn. Report estimate, CI, n, and optional context
+     floor; the operator judges. (Hypothesis-level "A≈B within noise" in §6 of the template
+     is a separate recommendation language — not a per-row power label.)
+  4. **R4 — declare `sigma_denominator` per channel.** Channels with different denominators
+     (e.g. paired-Δ vs outcome-level) must never be ranked on one shared numeric ladder.
+     State the denominator next to every channel read.
+  5. **Universal-failure diagnostic.** If *every* read fails a floor while CIs are not
+     universally uninformative, stop and check scale mismatch before writing a null story
+     (wrong-scale floors fail all reads; data-thin floors fail some).
+  6. **Design-time ceiling is not analysis-time invention.** If the design omitted the
+     algebraic estimand ceiling / implied block requirement, note that gap; do not invent a
+     post-hoc "could never clear" verdict from a floor the design never justified.
+- Distinguish "no effect" from "cannot see": when a negative matters, report the row's own
+  CI width / same-SE-family floor as **context**, never as a silent veto of a CI that
+  excludes zero.
 - Physicality numbers (from the estimand validation report) are interpreted, not just pasted:
   what does the occupancy/drawdown/Sharpe say about what the strategy IS?
 

@@ -42,8 +42,14 @@ Answer all of these for every experiment (add mechanism-specific questions on to
     the dominant mechanism at all (B-3 shape)?
 13. For every headline number: one "what would make this wrong?" probe, executed (e.g. recompute
     under alternative attribution, drop censored legs, split halves).
-14. Power: for any negative, the minimum detectable effect — is "no effect" distinguishable from
-    "cannot see"?
+14. Power (AMENDMENT-7): for any negative, report the row's own CI and — if a floor is shown —
+    a same-SE-family floor only (`MDE_Z × bootstrap_SE` of that estimator). Is "no effect"
+    distinguishable from "cannot see"? Preflight counts and planning constants are context,
+    never a second test on the realised estimate.
+15. Channel scales (AMENDMENT-7 R4): does every channel declare its `sigma_denominator`?
+    Are two channels with different denominators being ranked on one ladder?
+16. Universal floor failure (L-56 diagnostic): did *every* read fail a floor? If so, check
+    scale mismatch before writing a null — wrong-scale floors fail all reads.
 
 ---
 
@@ -63,6 +69,8 @@ Answer all of these for every experiment (add mechanism-specific questions on to
 | Acausal favourable-index (L-01) | Own-bar close used as that bar's intrabar limit |
 | Synthetic prices | Any P&L touching HA/Renko constructed prices |
 | Multi-leg accounting (L-18) | Any per-bar series not built by `xen.adjudication` |
+| **Wrong-scale detection floor (L-56 / AMENDMENT-7 / P-28)** | Floor = `k/√n` or planning `MDE_Z` used as pass mark beside bootstrap CI; dual SE per row; channels with different `sigma_denominator` ranked on one ladder; every read "unresolvable" while CIs still speak — check scale before null story |
+| **Floor-derived row labels (AMENDMENT-7 R3)** | Any `WASH`/`UNPOWERED`/`CLEARS_FLOOR`/synonym as a *row* verdict from power — report estimate+CI+context only |
 
 ---
 

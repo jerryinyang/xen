@@ -79,13 +79,48 @@ BANDS (per stratum):
 POOLED: disclosure-only unless homogeneity shown.
 ```
 
-## 6. Power statement
+## 6. Power statement (AMENDMENT-7 / L-56 — binding)
 
 ```
 POWER: expected events per stratum: <table>
-  MDE at n=<...>: <...> bps
-  strata predeclared UNPOWERED: <list>   # these can never be read as negatives (B-5)
+  # Planning context only — never a realised-row pass mark (R1/R5)
+  planning_MDE_Z: <e.g. 2.8>   # sample-size target, NOT a significance bar
+  preflight_basis: <orders | fills | blocks — must match post-run denominator story or disclose the gap (R5)>
+  historical_effect_band: <optional context; NEVER a resolve ladder (R1)>
+
+  # Same-SE-family floor contract (R2) — how floors will be *reported* if at all
+  floor_definition: mde = MDE_Z × bootstrap_SE(same estimator as row CI)
+  forbidden: k/√n parametric floor beside bootstrap CI; dual SE scales on one row
+
+  # Per-channel scale declaration (R4)
+  channels:
+    - name: <...>
+      sigma_denominator: <paired_delta | outcome_level | ...>
+      # channels with different denominators MUST NOT share one numeric ladder
+
+  # Design-time estimand ceiling (L-56) — required when the algebraic max is knowable
+  estimand_ceiling_per_cell:
+    - cell: <...>
+      algebraic_ceiling: <formula + numeric from baseline/knowables>
+      implied_blocks_to_clear_floor: <n>
+      capable: YES | NO   # NO ⇒ declare incapable before run, or drop the cell
+  strata predeclared incapable / thin: <list>   # never read as negatives (B-5)
 ```
+
+Rules:
+1. **R1/R5** — preflight power and historical effect bands are **context only**, never gates
+   and never thresholds on a realised estimate.
+2. **R2** — any detection floor uses the **same SE family as the row CI**
+   (`MDE_Z × bootstrap_SE`), never a parametric `k/√n` beside a bootstrap interval.
+3. **R3** — the design must not invent row labels from floors (`WASH`/`UNPOWERED`/
+   `CLEARS_FLOOR` as power verdicts). Interpretation bands in §5 that use UNPOWERED mean
+   *insufficient n for a negative claim*, not a floor-vs-estimate row demotion.
+4. **R4** — every channel declares `sigma_denominator`; different denominators are never
+   ranked on one ladder.
+5. **Design-time ceiling** — where the estimand's algebraic maximum is a function of
+   quantities knowable before the run (Sharpe, bounded rate, fixed multiple), compute the
+   ceiling and implied block requirement **per cell in this design**, and declare incapable
+   cells before they run. Skipping this is the SPDR-024 defect class (P-28).
 
 ## 7. Golden trace (for QA)
 

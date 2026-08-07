@@ -1530,11 +1530,19 @@ floor on the wrong scale fails *all* of them, which is what should have prompted
    whether each cell can resolve anything at all. A cell that cannot must be declared incapable
    before it runs, or dropped.
 
-**Enforced at.** `python/src/xen/adaptive_management/spdr024_analysis.py` (floor construction and
-`sigma_denominator` declaration); `python/experiments/SPDR-024/design.md` §10/§11;
-`.claude/skills/data-analyst/SKILL.md` (floor/ladder rules at analysis time);
-`.claude/skills/quant-designer/design-requirements.md` (design-time ceiling block);
-`docs/knowledge-base/pitfalls-ledger.md` **P-28**.
+**Enforced at (live, post chapter-05 archive).**
+`.claude/skills/data-analyst/SKILL.md` Phase 2 +
+`.claude/skills/data-analyst/references/interrogation-protocol.md` (analysis-time floor/ladder
+rules R1–R5);
+`.claude/skills/quant-designer/references/design-requirements.md` §6 (design-time ceiling +
+same-SE floor contract);
+`docs/knowledge-base/pitfalls-ledger.md` **P-28**;
+`docs/knowledge-base/methodology-canon.md` (Chapter 05 additions).
+
+**Historical (chapter-05 archive only — not live imports).**
+`archive/chapter-05-voldir-capture-geometry/python-src/adaptive_management/spdr024_analysis.py`
+(floor construction and `sigma_denominator` declaration);
+`archive/chapter-05-voldir-capture-geometry/experiments/SPDR-024/design.md` §10/§11.
 
 ---
 
