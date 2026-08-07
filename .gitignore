@@ -68,13 +68,10 @@ docs/planning/*
 # Rust kernel build artifacts (INFR-007)
 python/rust/xena_fold/target/
 
-# Skill mirrors — single-source from .claude/skills via scripts/sync_skills.sh (INFR-016 follow-up).
-# Edit .claude/skills ONLY; these are regenerated copies, not tracked (stops the 9x diff churn).
-.agents/skills/
-.cline/skills/
-.codex/skills/
-.cursor/skills/
-.grok/skills/
-.kilocode/skills/
-.opencode/skills/
-.windsurf/skills/
+# Skills single-source of truth: .agents/skills (tracked).
+# IDE/tool skill paths are symlinks to ../.agents/skills — track the symlink only.
+# Do not re-introduce full skill-tree copies under tool dirs.
+.kilocode/node_modules/
+.opencode/node_modules/
+**/.DS_Store
+**/__pycache__/
