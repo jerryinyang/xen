@@ -12,5 +12,4 @@ and 93% (cTrader) of cells are statistically indistinguishable from the driftles
 Consequence: the capture branch's two-dimensional search space is approximately
 one-dimensional. **Do not open a family whose thesis is that a better exit, hold, trail or size
 rule converts a break-even joint into a positive one** — that class is refuted at power
-(`P-02` generalised). See [[joint-sits-at-breakeven-cost-not-rate]] and
-[[chapter05-dispositions]].
+(`P-02` generalised). See [[chapter05-dispositions]].

@@ -12,5 +12,5 @@ it.
 
 Rules: any **sizing, exposure or capital-efficiency** claim requires a **capital-normalised**
 estimand (`E6`). Before accepting any null, verify the estimand can express the effect — an exact
-zero across 100% of rows is a **units alarm**. Related: [[unit-pin-money-floor]] (L-21/L-22 pin
-the unit at seams; this pins the estimand's *capability*), [[detection-floor-must-share-scale]].
+zero across 100% of rows is a **units alarm**. Related: [[unit-pin-money-floor]] (L-21 unit pin
+at seams; this pins the estimand's *capability*).
