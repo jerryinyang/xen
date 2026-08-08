@@ -299,18 +299,13 @@ stack** (INFR-010 R4) — fresh CAL cycle required before any crypto universe. E
 operator-invoked only. Fills contract from Nautilus emissions (`positions_ledger` +
 `bar_marks` via shim; `SlPrice` field on legs). Full spec: `docs/references/xena-lane.md` v2.
 
-### Chapter 05 bounded route override (operator-approved, 2026-07-22; **cost policy superseded by INFR-022**)
+### Chapter 06 standing route (live)
 
-For proposed `CF-VOLCONV-001`, read `docs/references/chapter-05-governance.md` before any
-registration, design, census, or execution. While `docs/experiments-docs/INDEX.md` says the
-cost/data preflight is blocked, stop before outcome contact. After a separately evidenced and
-fresh-QA-approved preflight, the permitted exception is one TRAIN-only SPDR characterisation followed
-by one frozen Nautilus EXP if authorised; no XENA and no historical TEST. Infrastructure clearance
-does not itself authorise family registration or either run. **INFR-022:** the chapter-05 cost
-policy (``PARTIAL_FEES_FUNDING_ONLY``, spread omitted with understatement caveat) is **HISTORICAL
-(superseded-for-live-use)** — the live programme is zero-cost (§ Zero-cost model); the chapter-05
-cost-data preflight docs carry a HISTORICAL banner (`docs/references/chapter-05-cost-data-preflight*.md`).
-
+Standing enforcement: `docs/references/chapter-06-governance.md` +
+`docs/experiments-docs/INDEX.md`. Programme frame: INFR-022 (§ Zero-cost model, Neutrality,
+Powering strip above). Chapter-05 governance/preflight packs were removed from live
+`docs/references/`; historical material is under `archive/chapter-05-voldir-capture-geometry/`
+only.
 ### Every Experiment Is Price-Primary (binding, INFR-001)
 
 - All strategy logic runs in **NautilusTrader** (`BacktestNode`), emitting

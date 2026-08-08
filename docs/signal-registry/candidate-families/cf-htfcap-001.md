@@ -6,7 +6,8 @@
 **Chapter:** 04 (NautilusTrader + Bybit USDT-perp primary, INFR-010+)  
 **Route:** **SPDR → full XENA** if `WORTH_EXPLORING` (**EXP lane not used**)  
 **Companions:**  
-- SPDR pack: `docs/references/spdr-pack-htfcap-001.md`  
+- SPDR pack: removed from live `docs/references/` (family closed; pack was SPDR-004 era)  
+
 - Open-Q log: `docs/signal-registry/candidate-families/proposal-ref-ab-open-questions.md`  
 - Sibling family: CF-EPSOSC-001  
 

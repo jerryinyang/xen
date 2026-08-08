@@ -4,7 +4,7 @@
 **Applies to D0 cards:**  
 - `cf-htfcap-001.md` (REF-A)  
 - `cf-epsosc-001.md` (REF-B)  
-- SPDR packs: `docs/references/spdr-pack-htfcap-001.md`, `spdr-pack-epsosc-001.md`  
+- SPDR packs: *(removed from live refs — family closed)*, `spdr-pack-epsosc-001.md`  
 
 ## Locked before this sheet (discussion)
 

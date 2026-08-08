@@ -5,7 +5,7 @@
 **Chapter context:** post–INFR-010 (NautilusTrader + Bybit USDT-perp primary)  
 **Supersedes / re-opens:** spirit of CF-VOLHARV-001 (P-12 structure re-open) — **new family, new harvest object, new stack**. Does **not** re-parameterise the retired banded/hard-cap grid.
 
-**Companion:** SPDR pack → `docs/references/spdr-pack-epsosc-001.md`  
+**Companion:** SPDR pack → *(removed from live refs — family closed)*  
 **Shared open questions:** `docs/signal-registry/candidate-families/proposal-ref-ab-open-questions.md`
 
 ---

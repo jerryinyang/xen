@@ -5,7 +5,7 @@
 **Chapter context:** post–INFR-010 (NautilusTrader + Bybit USDT-perp primary)  
 **Supersedes / re-opens:** spirit of CF-HTFDI-001 (P-14) and the capture-scale intent of CF-MTFCTX-001 — **new family, new D0, new stack**. Does **not** revive retired cards or import their verdicts as true on Bybit.
 
-**Companion:** SPDR pack → `docs/references/spdr-pack-htfcap-001.md`  
+**Companion:** SPDR pack → *(removed from live refs — family closed)*  
 **Shared open questions:** `docs/signal-registry/candidate-families/proposal-ref-ab-open-questions.md`
 
 ---

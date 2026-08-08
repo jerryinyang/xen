@@ -6,8 +6,8 @@
 |---|---|
 | [cf-htfcap-001.md](cf-htfcap-001.md) | **CF-HTFCAP-001** D0 complete (REF-A) |
 | [cf-epsosc-001.md](cf-epsosc-001.md) | **CF-EPSOSC-001** D0 complete (REF-B) |
-| [spdr-pack-htfcap-001.md](../../references/spdr-pack-htfcap-001.md) | SPDR pack HTFCAP (D0-frozen) |
-| [spdr-pack-epsosc-001.md](../../references/spdr-pack-epsosc-001.md) | SPDR pack EPSOSC (D0-frozen) |
+| ~~spdr-pack-htfcap-001~~ | Removed from live refs (family closed) |
+| ~~spdr-pack-epsosc-001~~ | Removed from live refs (family closed) |
 | [proposal-ref-ab-open-questions.md](proposal-ref-ab-open-questions.md) | Decision log (frozen) |
 
 ## Superseded drafts (historical)

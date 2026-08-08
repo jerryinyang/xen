@@ -50,18 +50,15 @@ nothing measurable (hold), does less than its fixed counterpart (stop distance),
 purpose-built experiment was run to measure it (size). See
 [families-explored.md](families-explored.md).
 
-**The transferable methodological output** is `L-56` and AMENDMENT-7: a detection floor and the
-effect it judges must share a scale, and where the estimand's ceiling is algebraically knowable —
-for a size-only device it is pinned to the baseline's per-trade Sharpe — that ceiling and its
-implied sample requirement are computed **in the design**, not discovered after the run. SPDR-024's
-first emission was purged and re-run over exactly this. See
-[evaluation-framework.md](evaluation-framework.md) § *Detection floors*.
+**The transferable methodological output** is codified under **INFR-022**: sample-size context +
+direct baseline comparison (L-63, retiring AMENDMENT-7 floors as live apparatus), neutrality N1–N11,
+PSR pairing, and zero-cost. Historical detail: [evaluation-framework.md](evaluation-framework.md)
+*Live evaluation frame* and [lessons-and-amendments.md](lessons-and-amendments.md) L-56 / L-62..65.
 
-**Nothing is open.** The next chapter starts with no registered family. Two threads are parked as
+**Nothing is open.** Chapter 06 starts with no registered family. Two threads are parked as
 terminal `NOT_RESOLVABLE` and must never be re-booked as refutations: **C2 shock-MOMO** and **C3**
-(unpowerable — the median cell needs ~201 years of history). The binding constraint on any
-successor is cost: spread remains uncharged programme-wide, and on this substrate the entire
-measured deficit is cost.
+(sample too thin in registered form). Live money reads are **gross under zero-cost** (L-62); do not
+re-open cost-floor clearance as a disposition rule.
 
 ## Programme status (2026-07-22): Chapter 04 archived; Chapter 05 blocked on preflight
 
@@ -84,14 +81,10 @@ high volatility; no Chapter-04 implementation established deployable net edge. S
 [data-architecture.md](data-architecture.md), [evaluation-framework.md](evaluation-framework.md),
 and [families-explored.md](families-explored.md).
 
-Chapter 05 may test one bounded volatility-to-direction conversion object, but no family may be
-registered and no outcome-bearing work may begin until the cost/data preflight passes focused tests
-and fresh-context QA. The approved route is one TRAIN-only SPDR characterisation followed, only if
-authorised, by one frozen Nautilus EXP; XENA and historical TEST are excluded. Enforcement lives in
-[`chapter-05-governance.md`](../references/chapter-05-governance.md) and the active
-[`experiments-docs/INDEX.md`](../experiments-docs/INDEX.md). The mechanism is sequencing: invalid
-cost composition or an unusable spread field would make the economic front gate meaningless, so
-infrastructure correctness must precede family registration and outcome contact.
+Chapter 05 is **closed and archived**. Live enforcement is
+[`chapter-06-governance.md`](../references/chapter-06-governance.md) and
+[`experiments-docs/INDEX.md`](../experiments-docs/INDEX.md). The programme frame is **INFR-022**
+(zero-cost, powering strip, PSR, neutrality).
 
 ## What's FROZEN (do not re-derive)
 
