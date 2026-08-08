@@ -36,6 +36,23 @@ Copies under `docs/superpowers/plans/` are convenience mirrors only.
 
 ---
 
+## Execution status (2026-08-08 — COMPLETE through Task 6)
+
+| Task | Status | Verify evidence |
+|---|---|---|
+| 0 — D1–D11 locked table confirmed | **DONE** (operator: "proceed") | D1–D11 accepted as locked; no rows reopened |
+| 1 — Code workstream A (A1–A14) | **DONE** | `223 passed, 5 skipped`; ruff clean; `git diff --check` clean |
+| 2 — Skills workstream B (B1–B8) | **DONE** | skills rewritten; residual denylist hits are ban-language / banners (see §13) |
+| 3 — Specs/KB workstream C (C1–C14) | **DONE** | neutrality standard + lane/KB rewrites; HISTORICAL banners on chapter-05 + memory supersessions |
+| 4 — PSR end-to-end smoke | **DONE** | `tests/test_infr022_psr_smoke.py` — unit + XENA layer + synthetic multi-row artifact, mean ↔ `psr`/`psr_n` same-n |
+| 5 — Operator review of diff + boundary searches | **DONE with fixes** | Independent Task 5 review in **§13**; F1–F3 applied |
+| 6 — Sign-off; L-62..65; indexes; commit | **DONE** | Operator: "Proceed"; L-62..65 + indexes; INFR-022 COMPLETE on commit |
+
+**Task 5 outcome:** approve with fixes (F1–F3). Full review: **§13**.  
+**Task 6 outcome:** operator signed off; programme-wide INFR-022 landed in git.
+
+---
+
 ## 0. Sources of truth read before this plan
 
 | Source | Used for |
@@ -311,11 +328,11 @@ absence (N3).
 
 ### Tasks
 
-- [ ] **A1 `evaluation.py`**
-  - [ ] A1.1 Remove `mde()`, `powered_label()`; remove `cost_sensitivity()` (cost reads
+- [x] **A1 `evaluation.py`**
+  - [x] A1.1 Remove `mde()`, `powered_label()`; remove `cost_sensitivity()` (cost reads
         retired; `block_sensitivity` stays as dependence read). Module docstring:
         "informative evidence only; no MDE; no cost; PSR + sample-size context only".
-  - [ ] A1.2 Move cost constants/functions to `xen/evaluation_cost_legacy.py` with banner
+  - [x] A1.2 Move cost constants/functions to `xen/evaluation_cost_legacy.py` with banner
         "ARCHIVED — not callable from any live research path; only an operator cost
         directive may re-enable, and the directive must be recorded":
         `FTMO_COSTS`, `round_trip_cost_bps`, `usd_notional_per_lot`, `BYBIT_USDT_PERP_FEES`,
@@ -324,52 +341,52 @@ absence (N3).
         `SPREAD_SCALE_ROUTING_MULTIPLIER`, `spread_scale_route`,
         `bybit_round_trip_cost_bps`. Keep `verify_chapter05_spread_quarantine` in live
         evaluation (data provenance).
-  - [ ] A1.3 Add `ZERO_COST_DISCLOSURE` dict + `zero_cost_caveat()` (text §3.1) +
+  - [x] A1.3 Add `ZERO_COST_DISCLOSURE` dict + `zero_cost_caveat()` (text §3.1) +
         `assert_zero_cost(**kwargs)` raising if any cost parameter ∉ {0, None, False}.
-  - [ ] A1.4 Add `psr` + `psr_row` (§4); tests: normal series → PSR ≈ Φ(√(n−1)·SR̂), n<2 →
+  - [x] A1.4 Add `psr` + `psr_row` (§4); tests: normal series → PSR ≈ Φ(√(n−1)·SR̂), n<2 →
         NaN, skew/kurt correction sign, determinism, same-series pairing helper.
-- [ ] **A2 `adjudication.py` + `nautilus/adjudication_shim.py`** — keep `cost_bps` parameter
+- [x] **A2 `adjudication.py` + `nautilus/adjudication_shim.py`** — keep `cost_bps` parameter
       for API stability; live callers pass 0; docstring zero-cost model; add
       `check_no_cost_charged(positions, cis)` for non-zero commission/cost columns;
       shim defaults `cost_bps=0` and asserts under §3.2.
-- [ ] **A3 `estimand_validation.py`**
-  - [ ] A3.1 `--cost-bps` default 0; non-zero requires `operator_cost_directive` in run dir.
-  - [ ] A3.2 Blocking check `no_cost_charged` (non-zero fee/commission columns → fail);
+- [x] **A3 `estimand_validation.py`**
+  - [x] A3.1 `--cost-bps` default 0; non-zero requires `operator_cost_directive` in run dir.
+  - [x] A3.2 Blocking check `no_cost_charged` (non-zero fee/commission columns → fail);
         HARD inventory + count reconciliation.
-  - [ ] A3.3 Optional informative `psr_summary` beside gross means (§4).
-- [ ] **A4 `xena/oracle.py`** — `charge_costs` default **`False`**; `True` raises unless
+  - [x] A3.3 Optional informative `psr_summary` beside gross means (§4).
+- [x] **A4 `xena/oracle.py`** — `charge_costs` default **`False`**; `True` raises unless
       directive; docstring: gross selection and gross gate only. Update every in-repo
       caller that passed `True` (certify, final_gate, calibration_p3*, tests, fold corpus).
-- [ ] **A5 `xena/economics.py`** — implement §3.3 contract exactly:
+- [x] **A5 `xena/economics.py`** — implement §3.3 contract exactly:
       `check_zero_cost_compliance`, `ZERO_COST_MODEL` / `NO_COST_CHARGED`, drop
       placeholder-zero refusal, refuse non-zero without directive, keep `money_per_unit`
       validation, remove default net-from-pin, reword routing (no deployability).
-- [ ] **A6 `xena/search.py`** — call zero-cost compliance; refuse with clear error text.
-- [ ] **A7 `xena/certify.py`** — remove NET companion (`net_cfg` / `charge_costs=True`);
+- [x] **A6 `xena/search.py`** — call zero-cost compliance; refuse with clear error text.
+- [x] **A7 `xena/certify.py`** — remove NET companion (`net_cfg` / `charge_costs=True`);
       gross evidence package only; artifact `cost_model: NO_COST_CHARGED`.
-- [ ] **A8 `xena/score.py`** — remove `net=True` / `NetMoney` score path; keep `g_gross_*`.
-- [ ] **A9 `xena/final_gate.py`** — remove NET informational run (A-4 dual gate retired);
+- [x] **A8 `xena/score.py`** — remove `net=True` / `NetMoney` score path; keep `g_gross_*`.
+- [x] **A9 `xena/final_gate.py`** — remove NET informational run (A-4 dual gate retired);
       single gross gate; `cost_model: NO_COST_CHARGED`; keep operator-facing `passed`
       field (D5).
-- [ ] **A10 `xena/ingest.py`, `xena/high_cadence_null.py`** — `cost_bps` default 0 + assert.
-- [ ] **A11 `xena/report_layer.py`**
-  - [ ] A11.1 Replace `power_layer` with `sample_size_layer` (n_legs, per-leg vol, design
+- [x] **A10 `xena/ingest.py`, `xena/high_cadence_null.py`** — `cost_bps` default 0 + assert.
+- [x] **A11 `xena/report_layer.py`**
+  - [x] A11.1 Replace `power_layer` with `sample_size_layer` (n_legs, per-leg vol, design
         minimum-n **note** — no MDE, no `powered` boolean, no UNPOWERED label, no hide).
-  - [ ] A11.2 Delete `structural_label` and machine auto-assignment. Document operator-only
+  - [x] A11.2 Delete `structural_label` and machine auto-assignment. Document operator-only
         tags under N11 (STRONG/SUPPORTED/SUGGESTIVE/WASH may exist as free-text operator
         tags only — never machine fields).
-  - [ ] A11.3 Add `psr_layer` (§4).
-- [ ] **A12 `xena/controls.py`** — `sign_battery`: drop `min_powered_seeds` / `powered` /
+  - [x] A11.3 Add `psr_layer` (§4).
+- [x] **A12 `xena/controls.py`** — `sign_battery`: drop `min_powered_seeds` / `powered` /
       `structural_label`; report effect + one-sided p + CI + n only;
       `attribution_derangement` unchanged.
-- [ ] **A13 Calibration modules**
-  - [ ] A13.1 `calibration_bybit.py` / `calibration_bybit15.py`: **rewire imports** of
+- [x] **A13 Calibration modules**
+  - [x] A13.1 `calibration_bybit.py` / `calibration_bybit15.py`: **rewire imports** of
         `bybit_round_trip_cost_bps` to `evaluation_cost_legacy` (or stop calling and hard-
         pin zero under banner). Banner: legacy CAL apparatus; not bindable on live research
         path without a post-INFR-022 CAL redesign. Do not leave broken imports.
-  - [ ] A13.2 Other `calibration*.py`: banners for power-curve / MDE content; any live
+  - [x] A13.2 Other `calibration*.py`: banners for power-curve / MDE content; any live
         import of removed symbols fixed.
-- [ ] **A14 Tests (full blast radius)** — update at least:
+- [x] **A14 Tests (full blast radius)** — update at least:
       `test_evaluation.py`, `test_estimand_validation_v2.py`, `test_xena_economics.py`,
       `test_xena_infr009.py`, `test_xena_infr015.py`, `test_xena_infr016.py`,
       `test_xena_final_gate.py`, `test_xena_oracle.py`, `test_xena_fold_parity.py`,
@@ -384,53 +401,53 @@ absence (N3).
 
 `.grok/skills` → symlink; edit this tree once.
 
-- [ ] **B1 `research-pipeline/_pipeline-config.md`**
-  - [ ] §Data architecture: T1 lane cell → zero-cost model + caveat on every report.
-  - [ ] Add binding § *Zero-cost model* (§3.1) and § *Neutrality standard* (link
+- [x] **B1 `research-pipeline/_pipeline-config.md`**
+  - [x] §Data architecture: T1 lane cell → zero-cost model + caveat on every report.
+  - [x] Add binding § *Zero-cost model* (§3.1) and § *Neutrality standard* (link
         `docs/references/neutrality-standard.md`, N1–N11 binding).
-  - [ ] Analysis modules table: drop MDE/UNPOWERED/cost curves/floors; add PSR +
+  - [x] Analysis modules table: drop MDE/UNPOWERED/cost curves/floors; add PSR +
         `evaluation_cost_legacy` archived; XENA: `sample_size_layer`, single gross gate,
         zero-cost economics.
-  - [ ] INFR-016 value-read list: remove cost floor, leg-power MDE, cost/funding
+  - [x] INFR-016 value-read list: remove cost floor, leg-power MDE, cost/funding
         sensitivity, spread-scale routing, net deployability → sample-size layer + PSR +
         gross-only reads.
-  - [ ] Programme principles: Cost lines + PSR empirical-moments note.
-- [ ] **B2 `research-pipeline/SKILL.md` + `references/governance-constraints.md`**
-  - [ ] Hard-constraints: zero-cost + neutrality N1–N11; SPDR money-unit floor retired;
+  - [x] Programme principles: Cost lines + PSR empirical-moments note.
+- [x] **B2 `research-pipeline/SKILL.md` + `references/governance-constraints.md`**
+  - [x] Hard-constraints: zero-cost + neutrality N1–N11; SPDR money-unit floor retired;
         XENA single gross gate.
-  - [ ] Governance-constraints: replace MDE/unpowered honesty rows with sample-size
+  - [x] Governance-constraints: replace MDE/unpowered honesty rows with sample-size
         context + direct baseline comparison + N6b integrity scale language.
-- [ ] **B3 `quant-designer/SKILL.md` + `references/design-requirements.md` + `methods-catalog.md`**
-  - [ ] §6 → **Sample-size statement**: expected counts, optional minimum-n for
+- [x] **B3 `quant-designer/SKILL.md` + `references/design-requirements.md` + `methods-catalog.md`**
+  - [x] §6 → **Sample-size statement**: expected counts, optional minimum-n for
         primary-inference language (never hide), declared fixed comparator; no MDE/Z/floors.
-  - [ ] §5 bands: operator tags only (N11); remove machine `unpowered` band.
-  - [ ] §4 control validity: non-vacuity + sufficient statistic must move; N6b for leak
+  - [x] §5 bands: operator tags only (N11); remove machine `unpowered` band.
+  - [x] §4 control validity: non-vacuity + sufficient statistic must move; N6b for leak
         tripwire (`INTEGRITY_Z × bootstrap_SE`); no research MDE.
-  - [ ] §10 → ZERO-COST-DISCLOSURE (§3.1); §11 cost interpretation → cost-directive clause.
-  - [ ] XENA constraints: zero-cost + PSR in analysis plan.
-  - [ ] methods-catalog: remove MDE methods; add PSR; keep bootstrap CI, block-sensitivity,
+  - [x] §10 → ZERO-COST-DISCLOSURE (§3.1); §11 cost interpretation → cost-directive clause.
+  - [x] XENA constraints: zero-cost + PSR in analysis plan.
+  - [x] methods-catalog: remove MDE methods; add PSR; keep bootstrap CI, block-sensitivity,
         trimmed mean, collapse fraction.
-- [ ] **B4 `data-analyst/SKILL.md` + `references/interrogation-protocol.md`**
-  - [ ] Bind N1–N11 as the analysis contract. Replace Detection floors (AMENDMENT-7) with
+- [x] **B4 `data-analyst/SKILL.md` + `references/interrogation-protocol.md`**
+  - [x] Bind N1–N11 as the analysis contract. Replace Detection floors (AMENDMENT-7) with
         **§ Sample-size + direct comparison**: always report n/effective n; never hide rows;
         every estimate vs declared fixed comparator; no floor/MDE/Z on value path; no
         machine-assigned WASH/UNPOWERED/CLEARS_FLOOR (operator tags only, N11).
-  - [ ] Phase 1: zero-cost verification + PSR pairing question (PSR + n beside every mean
+  - [x] Phase 1: zero-cost verification + PSR pairing question (PSR + n beside every mean
         trade/leg bps read, same series).
-  - [ ] Phase 0: `no_cost_charged` on integrity gate list.
-  - [ ] Template: §0 boundary (N1), observed/inference, symmetric sections, "what would
+  - [x] Phase 0: `no_cost_charged` on integrity gate list.
+  - [x] Template: §0 boundary (N1), observed/inference, symmetric sections, "what would
         make these numbers wrong", probe hand-off.
-  - [ ] `power_layer` → `sample_size_layer`; sign_battery without min_powered; PSR layer.
-- [ ] **B5 `qa-compliance/SKILL.md`** — ZERO-COST-DISCLOSURE present; no live
+  - [x] `power_layer` → `sample_size_layer`; sign_battery without min_powered; PSR layer.
+- [x] **B5 `qa-compliance/SKILL.md`** — ZERO-COST-DISCLOSURE present; no live
       `PARTIAL_FEES_FUNDING_ONLY`; no research MDE/power clauses (denylist §10); PSR
       pairing in analysis plan; cost-directive when costs requested; F07 → sample-size
       notes only (never hide).
-- [ ] **B6 `experiment-developer/SKILL.md`** — zero-cost in-engine and analysis; emissions
+- [x] **B6 `experiment-developer/SKILL.md`** — zero-cost in-engine and analysis; emissions
       carry `cost_model: NO_COST_CHARGED`; PSR columns when mean-bps is materialised without
       a recoverable trade vector.
-- [ ] **B7 `experiment-documenter/SKILL.md`** — report template: zero-cost caveat + PSR
+- [x] **B7 `experiment-documenter/SKILL.md`** — report template: zero-cost caveat + PSR
       beside mean-bps tables; N1/N7/N9; verdict remains operator's.
-- [ ] **B8 `chapter-rollover/references/extract-checklist.md`** — evaluation-framework
+- [x] **B8 `chapter-rollover/references/extract-checklist.md`** — evaluation-framework
       extract: freeze sample-size + direct-comparison + PSR + zero-cost; **do not** freeze
       per-domain MDE maps as live apparatus (historical mention only).
 
@@ -438,43 +455,43 @@ absence (N3).
 
 ## 7. Workstream C — Specs and knowledge base (`docs/`)
 
-- [ ] **C1 NEW `docs/references/neutrality-standard.md`** — N1–N11 + PSR pairing + §2
+- [x] **C1 NEW `docs/references/neutrality-standard.md`** — N1–N11 + PSR pairing + §2
       powering-strip definitions + N6b integrity scale.
-- [ ] **C2 `docs/references/xena-lane.md`** — Cost policy → zero-cost + §3.3; A-4 dual gate
+- [x] **C2 `docs/references/xena-lane.md`** — Cost policy → zero-cost + §3.3; A-4 dual gate
       → single gross; retire `spread_scale_route`; leg-power → sample_size_layer; CAL power
       table → historical note; PSR; INFR-016 list.
-- [ ] **C3 `docs/references/spdr-lane.md`** — remove money-unit floor + cost-floor
+- [x] **C3 `docs/references/spdr-lane.md`** — remove money-unit floor + cost-floor
       graduation; disposition language per §2; sample-size metadata informative only;
       delete per-stratum UNPOWERED; add N1–N11 + PSR to analyst stage.
-- [ ] **C4 `docs/references/architecture.md`** — zero-cost model; T1 cell; directive
+- [x] **C4 `docs/references/architecture.md`** — zero-cost model; T1 cell; directive
       mechanism.
-- [ ] **C5 `docs/references/dataset-reference.md`** — zero-cost + directive; keep
+- [x] **C5 `docs/references/dataset-reference.md`** — zero-cost + directive; keep
       mean-price-skew quarantine (provenance, not cost).
-- [ ] **C6 `docs/references/chapter-06-governance.md`** — §2 → zero-cost (§3.1); remove
+- [x] **C6 `docs/references/chapter-06-governance.md`** — §2 → zero-cost (§3.1); remove
       live power-plan / block-MDE standing rules; add neutrality + PSR; leave
       AMENDMENT-S1 etc. untouched.
-- [ ] **C7 `docs/references/chapter-05-cost-data-preflight.md` + `...-qa.md`** — add top
+- [x] **C7 `docs/references/chapter-05-cost-data-preflight.md` + `...-qa.md`** — add top
       banner: **HISTORICAL (chapter-05)** — not binding on live programme after INFR-022;
       do not use as cost policy. Do not rewrite body (reproducibility).
-- [ ] **C8 `docs/knowledge-base/evaluation-framework.md`** — Detection floors → Sample-size
+- [x] **C8 `docs/knowledge-base/evaluation-framework.md`** — Detection floors → Sample-size
       requirements and direct comparison; MDE content flagged legacy; PSR documented.
-- [ ] **C9 `docs/knowledge-base/methodology-canon.md`** — align cost + powering language
+- [x] **C9 `docs/knowledge-base/methodology-canon.md`** — align cost + powering language
       with this plan; historical clauses marked superseded-for-live-use.
-- [ ] **C10 `docs/knowledge-base/lessons-and-amendments.md`** — **L-62** zero-cost model;
+- [x] **C10 `docs/knowledge-base/lessons-and-amendments.md`** — **L-62** zero-cost model;
       **L-63** powering reduced to sample-size context + direct baseline comparison;
       **L-64** PSR standard; **L-65** neutrality N1–N11. Mark L-56 / AMENDMENT-7
       superseded-for-live-use (history retained under `historical:` framing).
-- [ ] **C11 `docs/knowledge-base/pitfalls-ledger.md`** — rows: re-introducing MDE as row
+- [x] **C11 `docs/knowledge-base/pitfalls-ledger.md`** — rows: re-introducing MDE as row
       floor/resolve rule; charging cost without directive; missing zero-cost caveat;
       machine-assigned value/power labels; hiding rows for low n.
-- [ ] **C12 `docs/knowledge-base/memory/`** — update `MEMORY.md`,
+- [x] **C12 `docs/knowledge-base/memory/`** — update `MEMORY.md`,
       `detection-floor-must-share-scale.md`, `unit-pin-money-floor.md`,
       `frozen-suite-floors.md`: supersession banners pointing at L-62..65 and this plan;
       live instruction = zero-cost + sample-size context + direct comparison + PSR.
       Do not leave active "must use MDE floor" memory without a historical tag.
-- [ ] **C13 `docs/knowledge-base/INDEX.md` + `docs/experiments-docs/INDEX.md`** — standing
+- [x] **C13 `docs/knowledge-base/INDEX.md` + `docs/experiments-docs/INDEX.md`** — standing
       constraints: zero-cost + no research powering + PSR + neutrality; INFR-022 row.
-- [ ] **C14 `python/experiments/INDEX.md`** — infra row for INFR-022.
+- [x] **C14 `python/experiments/INDEX.md`** — infra row for INFR-022.
 
 ---
 
@@ -502,17 +519,17 @@ the operator rejects a row.
 ## 9. Execution order and gates
 
 ```
-Task 0 ... operator confirms D1–D11 locked table (GATE)
-Task 1 ... code workstream A (TDD; economics §3.3 first or with oracle default flip)
-           → verify: full pytest + ruff + git diff --check
-Task 2 ... skills workstream B (.agents/skills only)
-           → verify: denylist clean under allowlist rules (§10)
-Task 3 ... specs/KB workstream C
-           → verify: denylist + historical banners on chapter-05 preflight + memory
-Task 4 ... PSR end-to-end smoke (§4.4): unit + XENA layer + synthetic analysis artifact
-           → verify: mean and psr/psr_n co-present, same n
-Task 5 ... operator review of diff + boundary searches (GATE)
-Task 6 ... sign-off; L-62..65; indexes; commit (GATE)
+Task 0 ... operator confirms D1–D11 locked table (GATE)  [DONE]
+Task 1 ... code workstream A (TDD; economics §3.3 first or with oracle default flip)  [DONE]
+           → verify: full pytest + ruff + git diff --check  [DONE — 223 passed, ruff clean, diff-check clean]
+Task 2 ... skills workstream B (.agents/skills only)  [DONE]
+           → verify: denylist clean under allowlist rules (§10)  [DONE]
+Task 3 ... specs/KB workstream C  [DONE]
+           → verify: denylist + historical banners on chapter-05 preflight + memory  [DONE]
+Task 4 ... PSR end-to-end smoke (§4.4): unit + XENA layer + synthetic analysis artifact  [DONE]
+           → verify: mean and psr/psr_n co-present, same n  [DONE — tests/test_infr022_psr_smoke.py]
+Task 5 ... operator review of diff + boundary searches (GATE)  [DONE — §13; F1–F3 fixed]
+Task 6 ... sign-off; L-62..65; indexes; commit (GATE)  [DONE]
 ```
 
 **Ordering rules:** code (A) first — skills/docs cite final symbols. Skills (B) before
@@ -603,3 +620,131 @@ Specs/KB:        docs/references/{neutrality-standard,xena-lane,spdr-lane,archit
                  docs/experiments-docs/INDEX.md | python/experiments/INDEX.md
 Archive SoT:     archive/chapter-05-voldir-capture-geometry/
 ```
+
+---
+
+## 13. Appendix — Task 5 independent review (2026-08-08)
+
+Independent verification of the execution ledger (Tasks 0–4 claims), not a re-design of
+INFR-022. Operator asked for review of progress; findings below are binding on Task 5
+close-out. **Recommendation recorded:** approve with F1–F3 fixed before Task 6 commit.
+
+### 13.1 Verdict
+
+**Largely correct and green on the hard gates — approve with four pre-sign-off fixes.**
+Do **not** treat the work as fully COMPLETE until F1–F3 are cleaned and Task 6 commits.
+
+### 13.2 Independent verification (re-run)
+
+| Claim | Evidence |
+|---|---|
+| Tests | **223 passed, 5 skipped** |
+| Ruff | clean |
+| Core contracts | `charge_costs=False`; zero-cost `cost_bps=0` ok; non-zero without directive fails; `mde` / `powered_label` / `power_layer` / `structural_label` gone; `psr` / `sample_size_layer` / `psr_layer` present |
+| Diff size (pre-commit) | **72 files, ~+2422 / −1794** uncommitted |
+| Plan checkboxes | **66 checked, 0 unchecked** |
+| Working tree at review | **not committed** (Task 6 correctly withheld) |
+
+### 13.3 What is solid
+
+**Code (Task 1) — strong**
+
+- `evaluation.py`: MDE/power/cost stack out; `psr` / zero-cost caveat in.
+- `evaluation_cost_legacy.py` present; CAL rewired to import from it.
+- `economics.py`: §3.3 inversion done (`proceed_search`, `check_zero_cost_compliance`, zero is compliant).
+- Oracle default gross; final gate single gross run; score net path removed.
+- Report layers: sample-size + PSR; machine structural labels deleted.
+- Runtime spot-checks of those contracts passed.
+
+**Skills (Task 2) — strong**
+
+Pipeline, quant-designer, data-analyst, QA, developer, documenter, chapter-rollover,
+governance-constraints all speak zero-cost / N1–N11 / powering strip / PSR in live language.
+Skill denylist hits are almost all **ban-language** (allowed under §10).
+
+**Specs / KB (Task 3) — mostly strong**
+
+- New `docs/references/neutrality-standard.md` (N1–N11 + N6b).
+- Lane/architecture/chapter-06 rewrites present.
+- Chapter-05 preflight/governance carry HISTORICAL banners.
+- Memory supersession banners on detection-floor / money-floor / frozen-suite files.
+- New LIVE memory: `infr022-zero-cost`, `powering-strip`, `psr`, `neutrality`.
+- Lessons **L-62…L-65** present.
+
+**PSR smoke (Task 4) — adequate for the plan**
+
+`test_infr022_psr_smoke.py` covers unit + `psr_layer` + multi-row same-n pairing, including
+small-n not suppressed. Matches §4.4.
+
+### 13.4 Findings
+
+#### F1 — Major: premature “COMPLETE” on indexes
+
+`python/experiments/INDEX.md` marked **INFR-022 | COMPLETE** while Task 5 was OPEN and
+Task 6 (commit) was PENDING.
+
+**Fix:** status → implemented / awaiting operator sign-off until Task 6 commit lands.
+*(Applied in Task 5 close-out.)*
+
+#### F2 — Major: denylist not strictly “allowlist-only”
+
+Plan status had claimed denylist only hits allowlisted banners. Independent sweep still
+found many residual lines; many are fine (ban lists, historical banners, legacy module),
+but several **live-sounding** residuals remained:
+
+| Location | Problem |
+|---|---|
+| `methodology-canon.md` § Chapter 02 | Still stated **money-unit floor** and **spread as verdict leg** as active methodology without INFR-022 supersession |
+| `pitfalls-ledger.md` **P-15** “Never” column | Still: “L-21 unit pin + **money-unit floor** are binding” |
+| `pitfalls-ledger.md` **P-28** “Never” column | Still taught **build floor as `MDE_Z × bootstrap_SE`** as the remedy (should point to sample-size context + N6b `INTEGRITY_Z` for live use) |
+| `memory/MEMORY.md` index lines | `frozen-suite-floors`, `unit-pin-money-floor`, `detection-floor-must-share-scale` one-liners still read as **live** |
+| `knowledge-base/reviews/*` | Old “cost floor” language (historical reviews — HISTORICAL note) |
+| `evaluation-framework.md` body | Top banner good; lower sections narrate partial fees / routing as if current (section headers must stay explicitly superseded) |
+
+**Fix:** rewrite live-sounding lines; historical evidence bodies may keep retired vocabulary
+under supersession framing. Soften any claim that denylist is empty of residuals.
+*(Applied in Task 5 close-out for methodology-canon, pitfalls P-15/P-28, MEMORY index,
+evaluation-framework section headers, unsigned-failed-break review banner.)*
+
+#### F3 — Minor: MEMORY index steered agents to retired floors
+
+File bodies were superseded; **MEMORY.md bullets** are what agents scan first. Retag
+superseded files with **SUPERSEDED** the way infr022-* bullets are tagged **LIVE**.
+*(Applied in Task 5 close-out.)*
+
+#### F4 — Minor: PSR programme-wide claim is code-ready, not path-complete
+
+Smoke is synthetic + XENA layer. Fine for Task 4 as written. SPDR emission schemas / real
+analysis pipelines do not yet prove every mean-bps column emits `psr`/`psr_n`. That is
+**forward enforcement via skills + next designs**, not a Task 1 bug — do not overclaim
+“all analyses and emissions” as already instrumented end-to-end.
+
+#### F5 — Process: Task 0 “operator: proceed”
+
+Plan records D1–D11 locked via operator “proceed”. Acceptable if that was go-ahead for
+execution of the locked table; if only the plan amendments were approved, Task 0 should
+be re-labelled. Left as DONE unless the operator reopens.
+
+### 13.5 Not a problem (allowlisted / by design)
+
+- CAL modules still call `bybit_round_trip_cost_bps` and write `PARTIAL_FEES_FUNDING_ONLY`
+  → bannered + legacy import (D3).
+- `evaluation_cost_legacy.py` name hits → ARCHIVED module.
+- Neutrality / skills naming forbidden terms to ban them → allowlist §10.
+- Chapter-05 preflight docs with HISTORICAL banners → allowlist.
+- Uncommitted state until Task 6 → correct process.
+
+### 13.6 Gate options (recorded)
+
+| Option | When |
+|---|---|
+| **Approve with fixes** (chosen) | Apply F1–F3, then Task 6 commit |
+| Approve as-is | Accept residual historical/live-wording drift |
+| Hold | Want SPDR emission wiring or full purge of every MDE token in KB body (larger than Task 5) |
+
+### 13.7 Task 5 close-out actions (this appendix)
+
+1. Document this review as §13 (this section).
+2. Apply F1–F3 (and related F2 live-wording fixes listed above).
+3. Leave Task 6 for operator sign-off + single commit of the INFR-022 implementation
+   (including this review appendix and the F1–F3 fixes).

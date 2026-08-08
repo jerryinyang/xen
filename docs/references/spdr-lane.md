@@ -42,9 +42,9 @@ Per-stratum disposition, one of:
 
 | Disposition | Meaning |
 |-------------|---------|
-| `WORTH_EXPLORING` | Signal-conditional lift over the matched baseline is present; route to a full cTrader-primary EXP + family registration. |
+| `WORTH_EXPLORING` | Signal-conditional lift over the matched baseline is present; route to a full price-primary EXP + family registration. |
 | `NOT_WORTH` | No lift over the matched baseline. |
-| `INCONCLUSIVE` | Underpowered / vehicle-limited; not a negative (B-5, UNPOWERED ≠ evidence-against). |
+| `INCONCLUSIVE` | Event count and/or interval width leave the estimate unresolved for the operator — **descriptive**, not a negative finding and not a hide rule (INFR-022 §2 SPDR disposition language). |
 
 SPDR **never** registers a family, spends a read, or makes a tradability claim. A single
 SPDR leg never opens a checkpoint; a multi-leg series' disposition lives in its **phase
@@ -68,9 +68,10 @@ forbids the vagueness that usually comes with it:
   impose one universal score across every device in the grid;
 - **every adaptive or conditioned arm carries a direct comparator** — the same device unconditioned,
   on the same eligible population;
-- for an operator-declared characterisation series, event count, uncertainty and MDE may be
-  **informative metadata only**: they remain visible but do not create positive/negative labels,
-  prune rows or gate companion experiments;
+- for an operator-declared characterisation series, event count and effective count are
+  **sample-size metadata, informative only** (INFR-022): they remain visible next to every row,
+  never create positive/negative labels, never prune rows, never gate companion experiments
+  (N3/N10);
 - the **operator** interprets the resulting map and decides the next research action. The SPDR
   produces the map, not the decision.
 
@@ -119,8 +120,15 @@ faults are prohibited: (1) **qualifier/verdict framing** ("wash", "not supported
 rate", "no systematic effect") — report the measured Δ and its CI, not an adjudication; (2)
 **detrimental pooling** — grid-wide summary counts ("X% of cells cross zero", "N+/M− of 872",
 "median percentile") must never be the headline; a pooled line is disclosure-only (L-03). Emit the
-full per-stratum magnitude table to `results/` (nothing hidden behind a pooled count). Per-stratum
-UNPOWERED is a power statement, never folded into a negative (B-5).
+full per-stratum magnitude table to `results/` (nothing hidden behind a pooled count). Small-count
+strata are reported next to their counts — never labelled, never folded into a negative (N3/N10,
+INFR-022 L-63).
+
+**Neutrality + PSR (INFR-022, binding).** The stage-5 analyst binds N1–N11
+(`docs/references/neutrality-standard.md`): no-verdict boundary, observed vs inference labels,
+counts as context, direct comparator reads, populations named and separated, symmetric evidence,
+zero-cost caveat on every money-bearing table, completeness, operator-only labels. Every
+mean-trade/leg bps read carries `psr` + `psr_n` on the same series (`xen.evaluation.psr`).
 
 **Series verdict.** When an idea is split across a multi-leg SPDR series (e.g. CTRL-01/02/03 →
 SPDR-001/002/003), the candidate disposition is taken **once, after the last leg** — individual
@@ -157,7 +165,8 @@ registration → checkpoint design → mechanism-first `design.md` → fresh-con
 execution → estimand gate → data-analyst → operator verdict. The SPDR result is prior evidence
 for that experiment; it is never itself promoted to a family verdict.
 
-### Unit convention + money-unit floor (BINDING — amended 2026-07-09, EXP-025 lesson L-21)
+### Unit convention + zero-cost note (BINDING — amended 2026-07-09 EXP-025 lesson L-21;
+INFR-022 supersedes the money-unit floor)
 
 The screen→graduation handoff is where a dimensionless screen number becomes a money claim.
 EXP-025 inflated its target 4× by asserting the wrong ATR divisor from memory (design declared
@@ -172,9 +181,8 @@ EXP-025 inflated its target 4× by asserting the wrong ATR divisor from memory (
    (b) its measured TRAIN-median value in bps on the target instrument(s), (c) the resulting
    bps/trade effect — each verifiable against data, none asserted from memory. QA traces this
    as a clause.
-3. **Money-unit floor (disposition gate, informative).** Before a `WORTH_EXPLORING` routes to
-   graduation, convert the best-cell screen effect to bps/trade with the actual normaliser
-   value and compare against a cost floor: spread estimate + commission + one-sided-capture
-   dilution (≈ gap/2). If the best cell sits at or below the floor, the disposition must say
-   so explicitly; the operator may still graduate it — but only re-framed as an apparatus or
-   characterisation test, never a tradability test.
+3. **Zero-cost note (INFR-022 — the former money-unit floor is retired).** The programme is
+   ZERO-COST: no cost floor gates a disposition; every money-bearing table carries the
+   ZERO-COST-DISCLOSURE caveat verbatim. A `WORTH_EXPLORING` routes to graduation as an
+   apparatus/characterisation test by default; a tradability-framed test remains refused by
+   rule unless the operator sanctions it separately.

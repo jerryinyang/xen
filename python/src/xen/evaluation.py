@@ -1,4 +1,6 @@
-"""Signal-quality evaluation toolbox (INFR-001 WS-7) — informative, never gating.
+"""Signal-quality evaluation toolbox (INFR-001 WS-7; INFR-022 zero-cost + powering strip).
+
+Informative evidence only: no MDE, no cost, no power floors; PSR + sample-size context only.
 
 Replaces the frozen monolithic referee stack (`referee_adaptive` / `referee_pstar` /
 `referee_calibration` / `incremental_referee`) for NEW adjudication. Those modules stay
@@ -6,11 +8,25 @@ byte-frozen for historical reproducibility but are retired from service: their m
 conjunctions, readiness floors, and materiality thresholds selected fragile gate-threaders
 and vetoed robust candidates (L-17, B-5/B-7; operator decision 2026-07-04).
 
+INFR-022 (operator directive 2026-08-08) — binding frame:
+* **Zero cost model.** No spread, commission, or swap enters any calculation programme-wide
+  unless an explicit operator cost directive (recorded in the experiment's design.md)
+  requests costs. Every money-bearing report carries the zero-cost caveat
+  (`zero_cost_caveat`, `ZERO_COST_DISCLOSURE`). The retired cost stack lives in
+  `xen.evaluation_cost_legacy` (ARCHIVED banner; not callable from any live path).
+* **No MDE / no powering.** `mde`, `powered_label`, `cost_sensitivity` and all detection
+  floors were removed (L-63). Retained: sample-size *context* (never a hide/drop rule) and
+  DIRECT comparisons against a pre-specified baseline. No arbitrary threshold or gate on
+  realised estimates.
+* **PSR.** Probabilistic Sharpe Ratio (Bailey & López de Prado 2012, skew/kurt-adjusted)
+  is reported beside every mean per-trade/leg bps read, on the same trade series (`psr`,
+  `psr_row`). PSR is evidence, never a gate.
+
 Design frame:
 * **Validity is gated elsewhere** — leak tripwire, holdout, causality, and the per-bar↔per-leg
   reconciliation live in `xen.estimand_validation` and the analyst's integrity phase.
 * **Everything here is evidence** — effect sizes with CIs, exposure-honest economics,
-  robustness curves, power. No function returns a verdict; the operator judges value.
+  robustness curves. No function returns a verdict; the operator judges value.
 * **Candidate-aware composition** — the Quant Designer picks which pieces apply and on which
   estimand (per-leg, episode, per-active-bar), derived from the candidate's own mechanism.
   There is no fixed stack to "pass".
@@ -22,9 +38,9 @@ exposure profile — both normalizations, judgment left to the reader.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
 import hashlib
 import json
+import math
 from pathlib import Path
 from typing import Callable
 
@@ -102,9 +118,9 @@ def block_sensitivity(x: np.ndarray, blocks: list[int], *,
                       stat: Callable[[np.ndarray], float] = np.mean, n_boot: int = DEFAULT_N_BOOT,
                       alpha: float = DEFAULT_ALPHA, seed: int = 0,
                       n_seeds: int = DEFAULT_N_SEEDS) -> list[dict]:
-    """CI at each requested block length (INFR-004 F3). Mirrors ``cost_sensitivity``: if the
-    sign of ``ci[0]`` changes across a sensible block range the inference is block-fragile —
-    evidence, never a verdict. Each row carries the effective ``block`` actually used."""
+    """CI at each requested block length (INFR-004 F3). If the sign of ``ci[0]`` changes
+    across a sensible block range the inference is block-fragile — evidence, never a verdict.
+    Each row carries the effective ``block`` actually used."""
     out = []
     for bl in blocks:
         r = block_bootstrap_ci(x, stat, block=bl, n_boot=n_boot, alpha=alpha, seed=seed,
@@ -113,25 +129,109 @@ def block_sensitivity(x: np.ndarray, blocks: list[int], *,
     return out
 
 
-def mde(x: np.ndarray, *, block: int = DEFAULT_BLOCK, n_boot: int = DEFAULT_N_BOOT,
-        alpha: float = DEFAULT_ALPHA, seed: int = 0) -> float:
-    """Minimum detectable mean shift: the smallest planted constant that lifts CI_low above 0.
+# --------------------------------------------------------------------------- #
+# Zero-cost model (INFR-022 directive 1)
+# --------------------------------------------------------------------------- #
+ZERO_COST_DISCLOSURE: dict[str, object] = {
+    "cost_model": "NO_COST_CHARGED",
+    "spread": "not modeled",
+    "commissions": "not modeled",
+    "swaps/funding": "not modeled",
+    "implication": (
+        "every figure in this document is gross and cost-free; no spread, commission, or "
+        "swap enters any calculation. Realised results would differ (likely worse) under "
+        "any real cost schedule."
+    ),
+    "prohibited_claims": ["fully-net", "cost-complete", "tradable", "deployable"],
+    "lifting": (
+        "only an explicit operator directive may introduce a cost model for a scoped "
+        "experiment; the directive is recorded in that experiment's design.md."
+    ),
+}
 
-    Computed as the half-width of the bootstrap CI of the mean around its point value —
-    the shift needed for the observed sampling noise to clear zero. Cells whose plausible
-    effect < MDE are UNPOWERED and must never be read as negatives.
+
+def zero_cost_caveat() -> str:
+    """Canonical zero-cost disclosure text (INFR-022 §3.1) — must appear VERBATIM on every
+    report, analysis and results document."""
+    return (
+        "ZERO-COST-DISCLOSURE\n"
+        "  cost_model: NO_COST_CHARGED\n"
+        "  spread: not modeled\n"
+        "  commissions: not modeled\n"
+        "  swaps/funding: not modeled\n"
+        "  implication: every figure in this document is gross and cost-free; no spread,\n"
+        "    commission, or swap enters any calculation. Realised results would differ\n"
+        "    (likely worse) under any real cost schedule.\n"
+        "  prohibited_claims: fully-net, cost-complete, tradable, deployable\n"
+        "  lifting: only an explicit operator directive may introduce a cost model for a\n"
+        "    scoped experiment; the directive is recorded in that experiment's design.md."
+    )
+
+
+def assert_zero_cost(**kwargs) -> None:
+    """Raise unless every cost-related parameter is inert (0 / None / False).
+
+    INFR-022 §3.2: no cost function is called in any live path; cost parameters are
+    pinned to their zero value and enforced by asserts where they exist. A non-zero cost
+    parameter without an operator directive is a governance violation.
     """
-    r = block_bootstrap_ci(x, np.mean, block=block, n_boot=n_boot, alpha=alpha, seed=seed)
-    if r["n"] < 2:
-        return float("nan")
-    return float(r["stat"] - r["ci"][0])
+    offending = {k: v for k, v in kwargs.items() if v not in (0, 0.0, None, False)}
+    if offending:
+        raise ValueError(
+            "zero-cost model violated (INFR-022): non-inert cost parameter(s) "
+            f"{offending} — no spread, commission, or swap may enter any live calculation "
+            "unless an explicit operator cost directive is recorded in the design"
+        )
 
 
-def powered_label(x: np.ndarray, plausible_effect: float, **kw) -> dict:
-    """{'mde', 'plausible_effect', 'powered'} — a negative is reportable only when powered."""
-    m = mde(x, **kw)
-    return {"mde": m, "plausible_effect": plausible_effect,
-            "powered": bool(np.isfinite(m) and m <= plausible_effect)}
+# --------------------------------------------------------------------------- #
+# PSR — Probabilistic Sharpe Ratio (INFR-022 directive 4)
+# --------------------------------------------------------------------------- #
+def _normal_cdf(z: float) -> float:
+    """Standard normal CDF via erf (pure; no scipy dependency)."""
+    return 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
+
+
+def psr(per_trade_bps: np.ndarray, *, sr_star: float = 0.0) -> dict:
+    """Probabilistic Sharpe Ratio (Bailey & López de Prado, 2012), skew/kurtosis-adjusted.
+
+    Computed from the SAME per-trade series as the mean-trade (bps) figure it accompanies:
+    ``SR_hat`` is the **per-trade** Sharpe (mean/std of that series — not annualised),
+    ``n`` the number of trades in that population, ``gamma3``/``gamma4`` the empirical
+    skewness/kurtosis of the same vector. Empirical moments only — no normality assumption.
+    Default ``sr_star = 0`` (design may override).
+
+    PSR is **evidence, never a gate**. ``n < 2`` or non-finite moments → ``psr = NaN`` with
+    ``n`` stated; the row is still reported (N3).
+    """
+    x = np.asarray(per_trade_bps, dtype=float)
+    n = int(len(x))
+    if n < 2 or not np.all(np.isfinite(x)):
+        return {"psr": float("nan"), "n": n,
+                "sr_hat": float("nan"), "skew": float("nan"), "kurt": float("nan")}
+    mean = float(x.mean())
+    sd = float(x.std())
+    if sd <= 0.0:
+        # degenerate constant series: SR_hat undefined → NaN (moments undefined)
+        return {"psr": float("nan"), "n": n,
+                "sr_hat": float("nan"), "skew": float("nan"), "kurt": float("nan")}
+    sr_hat = mean / sd
+    dev = x - mean
+    g3 = float((dev ** 3).mean() / sd ** 3)      # empirical skewness (population form)
+    g4 = float((dev ** 4).mean() / sd ** 4)      # empirical kurtosis (population form)
+    denom2 = 1.0 - g3 * sr_hat + (g4 - 1.0) / 4.0 * sr_hat ** 2
+    if denom2 <= 0.0:
+        # variance term non-positive → PSR undefined on this series
+        return {"psr": float("nan"), "n": n, "sr_hat": sr_hat, "skew": g3, "kurt": g4}
+    z = (sr_hat - float(sr_star)) * math.sqrt(n - 1) / math.sqrt(denom2)
+    return {"psr": float(_normal_cdf(z)), "n": n, "sr_hat": sr_hat, "skew": g3, "kurt": g4}
+
+
+def psr_row(per_trade_bps: np.ndarray, *, sr_star: float = 0.0) -> dict:
+    """PSR row fragment for analysis tables / dict rows: ``psr`` + ``psr_n`` beside the
+    mean-trade bps column, on the SAME series (INFR-022 §4.2 pairing rule)."""
+    out = psr(per_trade_bps, sr_star=sr_star)
+    return {"psr": out["psr"], "psr_n": int(out["n"])}
 
 
 # --------------------------------------------------------------------------- #
@@ -176,228 +276,14 @@ def exposure_metrics(series: MultiLegSeries, *, real_open: np.ndarray) -> dict:
     }
 
 
-# --------------------------------------------------------------------------- #
-# Robustness disclosures
-# --------------------------------------------------------------------------- #
-def cost_sensitivity(gross_per_leg: np.ndarray, costs: list[float], *,
-                     block: int = DEFAULT_BLOCK, n_boot: int = DEFAULT_N_BOOT,
-                     alpha: float = DEFAULT_ALPHA, seed: int = 0) -> list[dict]:
-    """Net per-leg mean + CI at each candidate round-trip cost. Where the CI dies is evidence."""
-    out = []
-    for c in costs:
-        r = block_bootstrap_ci(gross_per_leg - c, np.mean, block=block, n_boot=n_boot,
-                               alpha=alpha, seed=seed)
-        out.append({"cost_bps": float(c), **r})
-    return out
-
-
 def collapse_fraction(raw_effect: float, control_effect: float) -> float:
     """Continuous control disclosure (L-15): control/raw. Never reduced to survive/die."""
     return float(control_effect / raw_effect) if abs(raw_effect) > 1e-12 else float("nan")
 
 
 # --------------------------------------------------------------------------- #
-# Declared trading-cost table (EXP-019, CF-VOLHARV-001)
+# Frozen spread-quarantine provenance (kept live — data provenance, not a cost read)
 # --------------------------------------------------------------------------- #
-# Source: FTMO published symbol specifications, https://ftmo.com/wp-json/ftmo/symbols
-# (the data feed behind https://ftmo.com/en/symbols/), snapshot 2026-07-04. Values verbatim.
-# Operator directive 2026-07-04 (EXP-019 deviation D5): cost basis = FTMO commissions +
-# spread; swap DISREGARDED (design §6 swap table superseded).
-#   * commission / commission_type: FTMO's published per-lot commission.
-#     "flat_USD"  = fixed USD per 1 standard lot, ROUND TRIP (operator-confirmed 2026-07-07):
-#                   the $5 figure is the full round-turn charge, so it is applied ONCE and is
-#                   NOT scaled by ``commission_events``. As bps of notional it depends on the
-#                   USD notional of one lot, which is currency-convention-specific — computed by
-#                   ``usd_notional_per_lot`` (XXXUSD = contract_size·price; USDXXX = contract_size;
-#                   cross = contract_size·base_usd_rate, which must be pinned explicitly).
-#                   The ``pip_commission_per_lot`` field (FTMO's ~$3/lot ≈ 0.3 pips on EURUSD)
-#                   is recorded verbatim for disclosure only and is NO LONGER used in the cost
-#                   conversion (it disagrees with the authoritative $5 flat).
-#     "percent"   = percent of notional per event; price-free (charged on the traded amount,
-#                   not entry price). ``commission_basis`` ∈ {"per_side","round_turn"} pins the
-#                   convention: "per_side" scales by ``commission_events`` (x2 for a round trip),
-#                   "round_turn" is charged once. Default "per_side"; verify vs FTMO per symbol —
-#                   a wrong per-side assumption on a round-turn % overstates the fee 2x.
-#     Informative, never gating.
-#   * spread_pips: NOT statically published (live-ticker only). Must be read off the live
-#     FTMO page at analysis time and pinned here before the binding cost read; the design's
-#     1x/2x stress read (§6) then applies to commission + spread jointly.
-#   * pip_conversion: price units per pip; contract_size: units per 1.0 lot.
-FTMO_COST_SNAPSHOT = "2026-07-06 https://ftmo.com/wp-json/ftmo/symbols"
-FTMO_COSTS: dict[str, dict] = {
-    # symbol: contract_size, digits, pip_conversion, commission, commission_type,
-    #         usd_commission_per_lot, pip_commission_per_lot (FTMO-published pips), spread_pips
-    # --------------------------------------------------------------------------- #
-    # Forex — majors (all flat $5/lot USD commission)
-    # --------------------------------------------------------------------------- #
-    "EURUSD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.30, "spread_pips": None},
-    "GBPUSD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.30, "spread_pips": None},
-    "USDJPY": {"contract_size": 100000, "digits": 3, "pip_conversion": 0.01,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.48, "spread_pips": None},
-    "USDCHF": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.27, "spread_pips": None},
-    "USDCAD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.41, "spread_pips": None},
-    "AUDUSD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.30, "spread_pips": None},
-    "NZDUSD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.30, "spread_pips": None},
-    # Forex — crosses
-    "EURJPY": {"contract_size": 100000, "digits": 3, "pip_conversion": 0.01,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.48, "spread_pips": None},
-    "GBPJPY": {"contract_size": 100000, "digits": 3, "pip_conversion": 0.01,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.48, "spread_pips": None},
-    "AUDJPY": {"contract_size": 100000, "digits": 3, "pip_conversion": 0.01,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.48, "spread_pips": None},
-    "EURCHF": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.27, "spread_pips": None},
-    "EURGBP": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.23, "spread_pips": None},
-    "EURAUD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.44, "spread_pips": None},
-    "EURCAD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.41, "spread_pips": None},
-    "EURNZD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.49, "spread_pips": None},
-    "GBPAUD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.44, "spread_pips": None},
-    "GBPCAD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.41, "spread_pips": None},
-    "GBPCHF": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.27, "spread_pips": None},
-    "GBPNZD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.49, "spread_pips": None},
-    "AUDCAD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.41, "spread_pips": None},
-    "AUDCHF": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.27, "spread_pips": None},
-    "AUDNZD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.49, "spread_pips": None},
-    "NZDCAD": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.41, "spread_pips": None},
-    "NZDCHF": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.27, "spread_pips": None},
-    "NZDJPY": {"contract_size": 100000, "digits": 3, "pip_conversion": 0.01,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.48, "spread_pips": None},
-    "CADJPY": {"contract_size": 100000, "digits": 3, "pip_conversion": 0.01,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.48, "spread_pips": None},
-    "CADCHF": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.27, "spread_pips": None},
-    "CHFJPY": {"contract_size": 100000, "digits": 3, "pip_conversion": 0.01,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 0.48, "spread_pips": None},
-
-
-
-    # --------------------------------------------------------------------------- #
-    # Metals CFD — percent commission
-    # --------------------------------------------------------------------------- #
-    # FTMO code XAU/USD (Metals CFD). Published percent (0.0014) and usd_commission (11.69)
-    # are mutually inconsistent at the snapshot gold price — both recorded verbatim, disclosed.
-    # percent-type ⇒ the usd_commission_per_lot field is disclosure-only (not used in the bps conv).
-    "XAUUSD": {"contract_size": 100, "digits": 2, "pip_conversion": 1.0,
-               "commission": 0.0014, "commission_type": "percent", "commission_basis": "per_side",
-               "usd_commission_per_lot": 11.69, "pip_commission_per_lot": 0.24,
-               "spread_pips": None},
-    # FTMO code XAG/USD (Metals CFD). Same %-commission inconsistency noted for gold.
-    "XAGUSD": {"contract_size": 5000, "digits": 3, "pip_conversion": 1.0,
-               "commission": 0.0014, "commission_type": "percent", "commission_basis": "per_side",
-               "usd_commission_per_lot": 8.85, "pip_commission_per_lot": 0.03,
-               "spread_pips": None},
-    # --------------------------------------------------------------------------- #
-    # Crypto CFD — percent commission
-    # --------------------------------------------------------------------------- #
-    # FTMO code BTCUSD (Crypto CFD): 0.065% of notional per trade.
-    "BTCUSD": {"contract_size": 1, "digits": 2, "pip_conversion": 1.0,
-               "commission": 0.065, "commission_type": "percent", "commission_basis": "per_side",
-               "usd_commission_per_lot": 81.407, "pip_commission_per_lot": 0.0,
-               "spread_pips": None},
-    # --------------------------------------------------------------------------- #
-    # Cash-CFD indices: zero commission (spread-only pricing).
-    # --------------------------------------------------------------------------- #
-    "USTEC": {"contract_size": 1, "digits": 2, "pip_conversion": 1.0,
-              "commission": 0.0, "commission_type": "percent", "usd_commission_per_lot": 0.0,
-              "pip_commission_per_lot": 0.0, "spread_pips": None},
-    "US500": {"contract_size": 1, "digits": 2, "pip_conversion": 1.0,
-              "commission": 0.0, "commission_type": "percent", "usd_commission_per_lot": 0.0,
-              "pip_commission_per_lot": 0.0, "spread_pips": None},
-    "US2000": {"contract_size": 1, "digits": 2, "pip_conversion": 1.0,
-               "commission": 0.0, "commission_type": "percent", "usd_commission_per_lot": 0.0,
-               "pip_commission_per_lot": 0.0, "spread_pips": None},
-    "JP225": {"contract_size": 10, "digits": 2, "pip_conversion": 1.0,
-              "commission": 0.0, "commission_type": "percent", "usd_commission_per_lot": 0.0,
-              "pip_commission_per_lot": 0.0, "spread_pips": None},
-    "AUS200": {"contract_size": 1, "digits": 2, "pip_conversion": 1.0,
-               "commission": 0.0, "commission_type": "percent", "usd_commission_per_lot": 0.0,
-               "pip_commission_per_lot": 0.0, "spread_pips": None},
-    "US30": {"contract_size": 1, "digits": 2, "pip_conversion": 1.0,
-             "commission": 0.0, "commission_type": "percent", "usd_commission_per_lot": 0.0,
-             "pip_commission_per_lot": 0.0, "spread_pips": None},
-    "EU50": {"contract_size": 1, "digits": 2, "pip_conversion": 1.0,
-             "commission": 0.0, "commission_type": "percent", "usd_commission_per_lot": 0.0,
-             "pip_commission_per_lot": 0.0, "spread_pips": None},
-    "GER40": {"contract_size": 1, "digits": 2, "pip_conversion": 1.0,
-              "commission": 0.0, "commission_type": "percent", "usd_commission_per_lot": 0.0,
-              "pip_commission_per_lot": 0.0, "spread_pips": None},
-    "HK50": {"contract_size": 1, "digits": 2, "pip_conversion": 1.0,
-             "commission": 0.0, "commission_type": "percent", "usd_commission_per_lot": 0.0,
-             "pip_commission_per_lot": 0.0, "spread_pips": None},
-    "UK100": {"contract_size": 1, "digits": 2, "pip_conversion": 1.0,
-              "commission": 0.0, "commission_type": "percent", "usd_commission_per_lot": 0.0,
-              "pip_commission_per_lot": 0.0, "spread_pips": None},
-    # Exotics (informative — not in Xen universe)
-    "USDZAR": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 5.0, "spread_pips": None},
-    "USDSEK": {"contract_size": 100000, "digits": 5, "pip_conversion": 0.0001,
-               "commission": 5.0, "commission_type": "flat_USD", "usd_commission_per_lot": 5.0,
-               "pip_commission_per_lot": 3.33, "spread_pips": None},
-}
-
-# --------------------------------------------------------------------------- #
-# Bybit USDT linear perpetual cost table (INFR-012, replaces FTMO for new stack)
-# --------------------------------------------------------------------------- #
-# Source: Bybit derivatives fee schedule (USDT perpetuals), snapshot 2026-07-15.
-# T1 lane: engine costless-honest; Chapter 05 charges fees + funding only.
-# Spread cost unavailable: it is not charged, so reported cost understates total cost.
-# Netted-turnover rule carries (commission charged on net position change per event).
-BYBIT_COST_SNAPSHOT = "2026-07-15 Bybit USDT linear perpetual fee schedule"
-BYBIT_USDT_PERP_FEES: dict[str, float] = {
-    "maker_bps_per_side": 2.0,    # 0.02% maker
-    "taker_bps_per_side": 5.5,    # 0.055% taker
-}
-# Conservative funding assumption when history missing (R7) — 8h rate, bps of notional
-BYBIT_FUNDING_CONSERVATIVE_BPS_PER_8H = 1.0
-SPREAD_SCALE_ROUTING_MULTIPLIER = 3.0  # gross < 3× RT spread => undecidable on T1 (INFR-010 §4)
 CHAPTER05_INFR017_PIN_SHA256 = (
     "e3b9fd9b9b5851b8a9a11f9ce34cd1e0fa8e10ea1fe1b210bd0090da379e6225"
 )
@@ -405,8 +291,6 @@ CHAPTER05_INFR017_COLUMN_PINS = (
     Path(__file__).resolve().parents[3]
     / "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-017/results/column_pins.json"
 )
-_NS_PER_HOUR = 3_600_000_000_000
-_BYBIT_FUNDING_INTERVAL_NS = 8 * _NS_PER_HOUR
 
 
 def verify_chapter05_spread_quarantine(path: str | Path | None = None) -> dict:
@@ -436,228 +320,6 @@ def verify_chapter05_spread_quarantine(path: str | Path | None = None) -> dict:
         "pin_sha256": actual_sha,
         "stored_column_status": status,
     }
-
-
-def _utc_timestamp_ns(value: str | datetime | np.datetime64) -> int:
-    """Convert one UTC timestamp to integer nanoseconds."""
-    if isinstance(value, datetime):
-        if value.tzinfo is None:
-            raise ValueError("datetime funding timestamps must be timezone-aware")
-        value = value.astimezone(timezone.utc).replace(tzinfo=None)
-    elif isinstance(value, str):
-        value = value.removesuffix("Z")
-    timestamp = np.datetime64(value, "ns")
-    if np.isnat(timestamp):
-        raise ValueError(f"invalid funding timestamp {value!r}")
-    return int(timestamp.astype(np.int64))
-
-
-def count_bybit_funding_stamps(
-    entry_time: str | datetime | np.datetime64,
-    exit_time: str | datetime | np.datetime64,
-) -> int:
-    """Count scheduled 00:00/08:00/16:00 UTC settlements in ``(entry, exit]``."""
-    entry_ns = _utc_timestamp_ns(entry_time)
-    exit_ns = _utc_timestamp_ns(exit_time)
-    if exit_ns < entry_ns:
-        raise ValueError("exit_time must be at or after entry_time")
-    return exit_ns // _BYBIT_FUNDING_INTERVAL_NS - entry_ns // _BYBIT_FUNDING_INTERVAL_NS
-
-
-def t1_round_trip_spread_bps(
-    symbol: str,
-    spread_bps: float,
-    *,
-    stress: float = 1.0,
-) -> float:
-    """Validate and stress one non-negative round-trip spread pin in bps."""
-    del symbol  # per-symbol series already resolved by caller
-    spread = float(spread_bps)
-    multiplier = float(stress)
-    if not np.isfinite(spread) or spread < 0.0:
-        raise ValueError(f"spread_bps must be finite and non-negative, got {spread_bps!r}")
-    if not np.isfinite(multiplier) or multiplier < 0.0:
-        raise ValueError(f"stress must be finite and non-negative, got {stress!r}")
-    return float(multiplier * spread)
-
-
-def bybit_fee_bps_per_side(*, liquidity: str = "taker") -> float:
-    """Published maker/taker fee in bps per side."""
-    liq = liquidity.lower()
-    if liq == "maker":
-        return BYBIT_USDT_PERP_FEES["maker_bps_per_side"]
-    if liq == "taker":
-        return BYBIT_USDT_PERP_FEES["taker_bps_per_side"]
-    raise ValueError(f"liquidity must be maker|taker, got {liquidity!r}")
-
-
-def bybit_round_trip_cost_bps(
-    symbol: str,
-    entry_price: float,
-    *,
-    liquidity: str = "taker",
-    spread_bps: float | None = None,
-    funding_bps_per_8h: float | None = None,
-    hold_hours: float = 8.0,
-    funding_stamps: int | None = None,
-    funding_coverage: str = "OK",
-    stress: float = 1.0,
-) -> dict:
-    """Declared T1 round-trip cost in bps (informative for analysis, never gating).
-
-    **Spread is never charged, programme-wide.** No quote, effective or proxy spread is
-    available for the Bybit T1 lane, so the cost stack is fees plus discrete funding only:
-    every result carries ``cost_scope=PARTIAL_FEES_FUNDING_ONLY``. Reported cost therefore
-    understates total cost and reported net performance is overstated — that caveat travels on
-    every returned record and must be repeated in any report derived from it.
-
-    ``spread_bps`` is retained only to reject callers that still try to charge one; passing a
-    value raises. Spread remains legitimate as a *routing* input (``spread_scale_route``,
-    ``t1_round_trip_spread_bps``), which decides whether T1 can resolve a candidate at all —
-    that is a decidability read, not a cost charge.
-
-    Provide ``funding_stamps`` for timestamp-counted settlement charges; otherwise the
-    legacy continuous ``hold_hours / 8`` accrual is retained for historical callers.
-    ``funding_coverage`` ∈ {OK, GAP} — GAP triggers conservative assumption flag (R7).
-    Returns component breakdown for disclosure.
-    """
-    del symbol, entry_price  # USDT-margined perps: bps of notional is price-free
-    if spread_bps is not None:
-        raise ValueError(
-            "spread cost is not charged programme-wide: no quote or effective spread exists "
-            "for the Bybit T1 lane, and a fixed proxy is not a substitute. Omit spread_bps. "
-            "For decidability routing use spread_scale_route / t1_round_trip_spread_bps."
-        )
-    fee_side = bybit_fee_bps_per_side(liquidity=liquidity)
-    multiplier = float(stress)
-    if not np.isfinite(multiplier) or multiplier < 0.0:
-        raise ValueError(f"stress must be finite and non-negative, got {stress!r}")
-    fee_rt = multiplier * 2.0 * fee_side
-    spread_rt = None
-    spread_cost_status = "UNAVAILABLE_NOT_CHARGED"
-    cost_scope = "PARTIAL_FEES_FUNDING_ONLY"
-    if funding_bps_per_8h is None:
-        funding_bps_per_8h = BYBIT_FUNDING_CONSERVATIVE_BPS_PER_8H
-        if funding_coverage == "OK":
-            funding_coverage = "GAP"
-    if funding_stamps is None:
-        funding_units = hold_hours / 8.0
-        funding_method = "CONTINUOUS_LEGACY"
-    else:
-        if isinstance(funding_stamps, bool) or int(funding_stamps) != funding_stamps:
-            raise ValueError("funding_stamps must be a non-negative integer")
-        if funding_stamps < 0:
-            raise ValueError("funding_stamps must be a non-negative integer")
-        funding_units = float(funding_stamps)
-        funding_method = "DISCRETE_STAMPS"
-    funding_rt = multiplier * funding_bps_per_8h * funding_units
-    total = fee_rt + funding_rt + (spread_rt if spread_rt is not None else 0.0)
-    return {
-        "total_bps": float(total),
-        "fee_rt_bps": float(fee_rt),
-        "spread_rt_bps": spread_rt,
-        "spread_cost_status": spread_cost_status,
-        "spread_cost_caveat": (
-            "Spread cost unavailable and not charged; reported cost understates total cost "
-            "and reported net performance is overstated."
-        ),
-        "cost_scope": cost_scope,
-        "funding_rt_bps": float(funding_rt),
-        "funding_method": funding_method,
-        "funding_coverage": funding_coverage,
-        "liquidity": liquidity,
-        "stress": stress,
-    }
-
-
-def spread_scale_route(
-    gross_edge_bps: float,
-    rt_spread_bps: float,
-    *,
-    secondary_available: bool = True,
-) -> dict:
-    """§4 spread-scale routing — undecidable on T1 when gross < 3× RT spread."""
-    threshold = SPREAD_SCALE_ROUTING_MULTIPLIER * rt_spread_bps
-    undecidable = abs(gross_edge_bps) < threshold
-    if undecidable and secondary_available:
-        route = "AWAITING_MBP"
-        note = "verdict-bearing confirmation requires T2 or park AWAITING_MBP"
-    elif undecidable:
-        route = "PARKED_T1_UNRESOLVED"
-        note = "secondary data unavailable; unresolved on this catalog"
-    else:
-        route = "T1_DECIDABLE"
-        note = "T1 may carry verdict-bearing reads (subject to power/cost)"
-    return {
-        "gross_edge_bps": float(gross_edge_bps),
-        "rt_spread_bps": float(rt_spread_bps),
-        "threshold_bps": float(threshold),
-        "t1_undecidable": undecidable,
-        "route": route,
-        "note": note,
-    }
-
-
-def usd_notional_per_lot(symbol: str, price: float, *, base_usd_rate: float | None = None) -> float:
-    """USD notional of one standard lot (the denominator for a fixed-USD commission → bps).
-
-    Currency-convention aware — ``price`` alone only yields USD notional for XXXUSD pairs:
-      * XXXUSD forex  → contract_size · price   (quote = USD; price is USD per base unit)
-      * USDXXX forex  → contract_size           (base = USD; price is irrelevant)
-      * cross forex   → contract_size · base_usd_rate  (base ≠ USD, quote ≠ USD; rate must be
-                        pinned explicitly — same discipline as ``spread_pips``)
-      * USD-priced non-forex (metals/crypto/indices) → contract_size · price
-        (these are all percent-commission, so this branch is not reached via the cost path).
-    """
-    spec = FTMO_COSTS[symbol.upper()]
-    cs = float(spec["contract_size"])
-    sym = symbol.upper()
-    if len(sym) == 6 and sym[3:] == "USD":            # XXXUSD: quote is USD
-        return cs * price
-    if len(sym) == 6 and sym[:3] == "USD":            # USDXXX: base is USD
-        return cs
-    if len(sym) == 6:                                  # cross: base ≠ USD, quote ≠ USD
-        if base_usd_rate is None:
-            raise ValueError(
-                f"{symbol}: cross pair — base_usd_rate not pinned. A fixed-USD commission needs "
-                "the base→USD rate to form USD notional; pin it explicitly before the cost read.")
-        return cs * base_usd_rate
-    return cs * price                                  # USD-priced non-forex (percent-comm anyway)
-
-
-def round_trip_cost_bps(symbol: str, entry_price: float, *, spread_pips: float | None = None,
-                        commission_events: float = 2.0, base_usd_rate: float | None = None,
-                        stress: float = 1.0) -> float:
-    """Declared round-trip cost in bps of notional for one leg (informative, never gating).
-
-    commission:
-      * percent-type  → commission% of notional per event, scaled by ``commission_events``
-        (2 = per-side reading of a round trip). Charged on the traded amount, not entry price.
-      * flat_USD-type → the published ``usd_commission_per_lot`` is a ROUND-TRIP fixed-USD charge
-        (operator-confirmed 2026-07-07), so it is applied ONCE and is independent of
-        ``commission_events``. Converted to bps via the USD notional of one lot
-        (``usd_notional_per_lot`` — currency-convention aware; crosses need ``base_usd_rate``).
-        The pip-commission field is disclosure-only and no longer used here.
-    spread: one full published spread per round trip (cross once at entry; exit symmetric
-    half-spreads sum to one). ``stress`` scales the whole cost (design §6: report 1x and 2x).
-    """
-    spec = FTMO_COSTS[symbol.upper()]
-    if spec["commission_type"] == "percent":
-        # commission_basis pins whether the published % is per-side (×events for a round trip)
-        # or already round-turn (charged once). Declared per symbol; verify vs FTMO before a
-        # binding cost read. Prevents the silent ×2 overstatement when the % is round-turn.
-        basis = spec.get("commission_basis", "per_side")
-        events = commission_events if basis == "per_side" else 1.0
-        comm_bps = events * spec["commission"] * 100.0             # percent of notional → bps
-    else:                                                            # flat_USD: fixed $/lot, round trip
-        usd_notional = usd_notional_per_lot(symbol, entry_price, base_usd_rate=base_usd_rate)
-        comm_bps = spec["usd_commission_per_lot"] / usd_notional * 1e4
-    sp = spread_pips if spread_pips is not None else spec["spread_pips"]
-    if sp is None:
-        raise ValueError(f"{symbol}: spread_pips not pinned — read it off the live FTMO page "
-                         "and pass/pin it before the binding cost read (EXP-019 D5).")
-    spread_bps = sp * spec["pip_conversion"] / entry_price * 1e4
-    return float(stress * (comm_bps + spread_bps))
 
 
 def split_by(values: np.ndarray, labels: np.ndarray, *, block: int = DEFAULT_BLOCK,

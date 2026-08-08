@@ -1,4 +1,4 @@
-"""XENA intensive turnover-edge score (INFR-009 / consolidated-03 §3).
+"""XENA intensive turnover-edge score (INFR-009 / consolidated-03 §3; INFR-022 gross-only).
 
 Binding search / rank / fold statistic:
 
@@ -10,11 +10,15 @@ window W, and notional_entry = Units · EntryPrice · money_per_unit.
 This is an *intensive* ratio: adding more equal-quality trades does not raise the
 score by itself (unlike log-wealth F, which scales with trade count × leverage ×
 compounding — audit A1/A2/B1). Used identically in search, folds, and (post-CAL)
-TEST. Net companion uses NetMoney in the numerator with the same denominator.
+TEST.
+
+INFR-022 (zero-cost model): the NET score path (``NetMoney`` numerator) is **removed** —
+no cost enters any calculation programme-wide. ``g_gross`` is the only score; legacy CAL
+``g_net`` reads are retired (bannered CAL apparatus must run gross).
 
 Bootstrap: common-block resampling of the universe bar grid, summing per-bar
-gross P&L and |notional| then forming the ratio — same common-index machinery as
-the retired extensive bootstrap, different scalar.
+gross P&L and |notional| then forming the ratio — same common-index machinery as the
+retired extensive bootstrap, different scalar.
 """
 from __future__ import annotations
 
@@ -42,24 +46,21 @@ def entry_notional(units: np.ndarray, entry_price: np.ndarray,
 
 
 def g_gross_from_ledger(ledger: pl.DataFrame,
-                        mpu_by_cid: Mapping[str, float],
-                        *, net: bool = False) -> float:
+                        mpu_by_cid: Mapping[str, float]) -> float:
     """Point intensive edge (bps of entry notional) from an oracle ledger.
 
     Parameters
     ----------
-    ledger : polars DataFrame with GrossMoney/NetMoney, Units, EntryPrice, CandidateId.
+    ledger : polars DataFrame with GrossMoney, Units, EntryPrice, CandidateId.
     mpu_by_cid : per-candidate money_per_unit.
-    net : if True, use NetMoney (cost-charged) in the numerator.
 
     Returns
     -------
     float
-        Intensive bps; ``-inf`` when no admitted notional.
+        Intensive bps; ``-inf`` when no admitted notional. Gross only (INFR-022).
     """
     if ledger is None or ledger.height == 0:
         return float("-inf")
-    col = "NetMoney" if net else "GrossMoney"
     units = ledger.get_column("Units").to_numpy().astype(float)
     ep = ledger.get_column("EntryPrice").to_numpy().astype(float)
     cids = ledger.get_column("CandidateId").to_list()
@@ -68,25 +69,23 @@ def g_gross_from_ledger(ledger: pl.DataFrame,
     denom = float(notional.sum())
     if denom <= _NOTIONAL_EPS:
         return float("-inf")
-    numer = float(ledger.get_column(col).sum())
+    numer = float(ledger.get_column("GrossMoney").sum())
     return 1e4 * numer / denom
 
 
-def g_gross_point(result: OracleResult, streams: list[CandidateStream],
-                  *, net: bool = False) -> float:
-    """Point g_gross / g_net from an ``OracleResult``."""
-    return g_gross_from_ledger(result.ledger, money_per_unit_map(streams), net=net)
+def g_gross_point(result: OracleResult, streams: list[CandidateStream]) -> float:
+    """Point g_gross from an ``OracleResult`` (gross only, INFR-022)."""
+    return g_gross_from_ledger(result.ledger, money_per_unit_map(streams))
 
 
-def mean_per_leg_bps(result: OracleResult, streams: list[CandidateStream],
-                     *, net: bool = False) -> float:
+def mean_per_leg_bps(result: OracleResult, streams: list[CandidateStream]) -> float:
     """Mean per-admitted-leg intensive bps (INFR-009 P-BF frozen TEST functional).
 
     For each admitted leg ℓ: ``bps_ℓ = 1e4 · PnL_ℓ / |notional_entry_ℓ|``.
     Returns the unweighted mean over legs (light form (a)). Undefined (-inf) if no
     finite-notional legs. Ratio g_gross remains a companion disclosure only under P-BF.
     """
-    pnl, notional, _et = ledger_leg_arrays(result, streams, net=net)
+    pnl, notional, _et = ledger_leg_arrays(result, streams)
     if len(pnl) == 0:
         return float("-inf")
     ok = notional > _NOTIONAL_EPS
@@ -96,14 +95,13 @@ def mean_per_leg_bps(result: OracleResult, streams: list[CandidateStream],
 
 
 def grid_gross_notional(result: OracleResult, streams: list[CandidateStream],
-                        grid: np.ndarray, *, net: bool = False
-                        ) -> tuple[np.ndarray, np.ndarray]:
-    """Bin admitted-trade GrossMoney (or NetMoney) and |notional| onto the bar grid.
+                        grid: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Bin admitted-trade GrossMoney and |notional| onto the bar grid.
 
     Returns
     -------
     pnl_per_bar, notional_per_bar : ndarray shape (len(grid),)
-        Zero-filled; used by the common-block bootstrap of g_gross / g_net.
+        Zero-filled; used by the common-block bootstrap of g_gross.
     """
     n = len(grid)
     pnl = np.zeros(n, dtype=float)
@@ -113,8 +111,7 @@ def grid_gross_notional(result: OracleResult, streams: list[CandidateStream],
         return pnl, notional
     mpu_map = money_per_unit_map(streams)
     et = led.get_column("EntryTime").to_numpy().astype(np.int64)
-    col = "NetMoney" if net else "GrossMoney"
-    g = led.get_column(col).to_numpy().astype(float)
+    g = led.get_column("GrossMoney").to_numpy().astype(float)
     units = led.get_column("Units").to_numpy().astype(float)
     ep = led.get_column("EntryPrice").to_numpy().astype(float)
     cids = led.get_column("CandidateId").to_list()
@@ -170,33 +167,32 @@ def bootstrap_g_gross(gross_per_bar: np.ndarray, notional_per_bar: np.ndarray,
 
 
 def robust_g_hat(result: OracleResult, streams: list[CandidateStream], grid: np.ndarray,
-                 starts: np.ndarray, *, block: int, quantile: float = 0.25,
-                 net: bool = False) -> tuple[float, float, np.ndarray]:
-    """Quantile of block-bootstrapped g_gross (or g_net) + point intensive edge.
+                 starts: np.ndarray, *, block: int, quantile: float = 0.25
+                 ) -> tuple[float, float, np.ndarray]:
+    """Quantile of block-bootstrapped g_gross + point intensive edge.
 
     Returns
     -------
     g_hat, g_point, boot
         Robust score, point intensive edge, full bootstrap vector.
     """
-    g_bar, n_bar = grid_gross_notional(result, streams, grid, net=net)
+    g_bar, n_bar = grid_gross_notional(result, streams, grid)
     boot = bootstrap_g_gross(g_bar, n_bar, starts, block=block)
     finite = boot[np.isfinite(boot)]
     if len(finite) == 0:
         g_hat = float("-inf")
     else:
         g_hat = float(np.quantile(finite, quantile))
-    g_point = g_gross_point(result, streams, net=net)
+    g_point = g_gross_point(result, streams)
     return g_hat, g_point, boot
 
 
 def effective_n_diagnostics(result: OracleResult, streams: list[CandidateStream],
-                            grid: np.ndarray, *, block: int,
-                            net: bool = False) -> dict:
+                            grid: np.ndarray, *, block: int) -> dict:
     """n_legs, nonempty-block count, empty-bar fraction (P3b A1 diagnostics)."""
     led = result.ledger
     n_legs = int(led.height) if led is not None else 0
-    pnl, notional = grid_gross_notional(result, streams, grid, net=net)
+    pnl, notional = grid_gross_notional(result, streams, grid)
     n_bars = len(notional)
     nonempty_bars = int(np.sum(notional > _NOTIONAL_EPS))
     empty_bar_fraction = (1.0 - nonempty_bars / n_bars) if n_bars else 1.0
@@ -218,38 +214,36 @@ def effective_n_diagnostics(result: OracleResult, streams: list[CandidateStream]
 
 
 def lcb_g(result: OracleResult, streams: list[CandidateStream], grid: np.ndarray,
-          starts: np.ndarray, *, block: int, confidence: float = 0.95,
-          net: bool = False) -> dict:
+          starts: np.ndarray, *, block: int, confidence: float = 0.95) -> dict:
     """One-sided LCB via **raw Efron percentile** (P3 baseline — undercovers at low n).
 
-    Prefer :func:`lcb_g_studentized` for P3b+ binders.
+    Prefer :func:`lcb_g_studentized` for P3b+ binders. Gross only (INFR-022).
     """
     if not (0.0 < confidence < 1.0):
         raise ValueError("confidence must be in (0, 1)")
     q = 1.0 - confidence
     g_hat, g_point, boot = robust_g_hat(
-        result, streams, grid, starts, block=block, quantile=q, net=net)
+        result, streams, grid, starts, block=block, quantile=q)
     finite = boot[np.isfinite(boot)]
-    diag = effective_n_diagnostics(result, streams, grid, block=block, net=net)
+    diag = effective_n_diagnostics(result, streams, grid, block=block)
     return {
         "lcb": g_hat,
         "point": g_point,
         "boot_median": float(np.median(finite)) if len(finite) else float("nan"),
         "n_boot_finite": int(len(finite)),
         "pass_positive": bool(np.isfinite(g_hat) and g_hat > 0.0),
-        "net": bool(net),
         "confidence": float(confidence),
         "block": int(block),
-        "score_kind": "g_net" if net else "g_gross",
+        "score_kind": "g_gross",
         "method": "percentile",
         "binder_form": "LCB>0 percentile (P3 baseline); prefer studentized for P3b",
         **diag,
     }
 
 
-def ledger_leg_arrays(result: OracleResult, streams: list[CandidateStream],
-                      *, net: bool = False) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Per-leg (pnl, |notional|, entry_time) for leg/event bootstrap (P3d).
+def ledger_leg_arrays(result: OracleResult, streams: list[CandidateStream]
+                      ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Per-leg (pnl, |notional|, entry_time) for leg/event bootstrap (P3d). Gross only.
 
     Returns
     -------
@@ -260,9 +254,8 @@ def ledger_leg_arrays(result: OracleResult, streams: list[CandidateStream],
     if led is None or led.height == 0:
         return (np.zeros(0), np.zeros(0), np.zeros(0, dtype=np.int64))
     mpu_map = money_per_unit_map(streams)
-    col = "NetMoney" if net else "GrossMoney"
     et = led.get_column("EntryTime").to_numpy().astype(np.int64)
-    pnl = led.get_column(col).to_numpy().astype(float)
+    pnl = led.get_column("GrossMoney").to_numpy().astype(float)
     units = led.get_column("Units").to_numpy().astype(float)
     ep = led.get_column("EntryPrice").to_numpy().astype(float)
     cids = led.get_column("CandidateId").to_list()
@@ -305,26 +298,19 @@ def bootstrap_g_legs(pnl: np.ndarray, notional: np.ndarray, *, n_boot: int,
 
 def lcb_g_leg_studentized(result: OracleResult, streams: list[CandidateStream], *,
                           n_boot: int = 400, seed: int = 0, block_legs: int = 1,
-                          confidence: float = 0.95, net: bool = False,
-                          n_legs_floor: int | None = None) -> dict:
-    """Studentized LCB on g_gross/g_net via **leg** bootstrap (P3d mechanistic fix).
+                          confidence: float = 0.95) -> dict:
+    """Studentized LCB on g_gross via **leg** bootstrap (P3d mechanistic fix). Gross only.
 
     Resamples admitted legs (IID or leg-blocks), not sparse calendar bars — addresses
     ~94% empty-bar geometry at high cadence.
     """
     if not (0.0 < confidence < 1.0):
         raise ValueError("confidence must be in (0, 1)")
-    pnl, notional, _et = ledger_leg_arrays(result, streams, net=net)
+    pnl, notional, _et = ledger_leg_arrays(result, streams)
     n_legs = int(len(pnl))
-    g_point = g_gross_point(result, streams, net=net)
+    g_point = g_gross_point(result, streams)
     boot = bootstrap_g_legs(pnl, notional, n_boot=n_boot, seed=seed, block_legs=block_legs)
     finite = boot[np.isfinite(boot)]
-
-    in_domain = True
-    domain_reason = "ok"
-    if n_legs_floor is not None and n_legs < int(n_legs_floor):
-        in_domain = False
-        domain_reason = f"n_legs {n_legs} < floor {n_legs_floor}"
 
     if len(finite) < 8 or not np.isfinite(g_point):
         lcb, se, t_crit = float("-inf"), float("nan"), float("nan")
@@ -344,18 +330,14 @@ def lcb_g_leg_studentized(result: OracleResult, streams: list[CandidateStream], 
         "t_crit": t_crit if len(finite) >= 8 else float("nan"),
         "boot_median": float(np.median(finite)) if len(finite) else float("nan"),
         "n_boot_finite": int(len(finite)),
-        "pass_positive": bool(in_domain and np.isfinite(lcb) and lcb > 0.0),
-        "in_domain": in_domain,
-        "domain_reason": domain_reason,
-        "out_of_calibration_domain": not in_domain,
-        "net": bool(net),
+        "pass_positive": bool(np.isfinite(lcb) and lcb > 0.0),
         "confidence": float(confidence),
         "n_legs": n_legs,
         "n_nonempty_blocks": n_legs,  # each leg is a unit
         "empty_bar_fraction": float("nan"),  # N/A for leg bootstrap
         "block_legs": int(block_legs),
         "n_boot": int(n_boot),
-        "score_kind": "g_net" if net else "g_gross",
+        "score_kind": "g_gross",
         "method": "leg_studentized_bootstrap_t",
         "resample_unit": "legs",
         "binder_form": "LCB>0 leg-bootstrap studentized (INFR-009 P3d)",
@@ -364,36 +346,21 @@ def lcb_g_leg_studentized(result: OracleResult, streams: list[CandidateStream], 
 
 def lcb_g_studentized(result: OracleResult, streams: list[CandidateStream],
                       grid: np.ndarray, starts: np.ndarray, *, block: int,
-                      confidence: float = 0.95, net: bool = False,
-                      n_legs_floor: int | None = None,
-                      n_blocks_floor: int | None = None) -> dict:
-    """One-sided **bootstrap-t (studentized)** LCB on intensive g_gross / g_net (P3b A1).
+                      confidence: float = 0.95) -> dict:
+    """One-sided **bootstrap-t (studentized)** LCB on intensive g_gross (P3b A1). Gross only.
 
     ``LCB = ĝ − t*_{1-α} · sê`` with ``t*_b = (g*_b − ĝ) / sê`` and
     ``sê = sample sd of finite bootstrap replicates``. Same common-bar bootstrap path
-    as search; interval math only changes.
-
-    If effective-n floors are set and violated → ``OUT_OF_CALIBRATION_DOMAIN`` (A3):
-    ``pass_positive`` is False and ``in_domain`` is False (no LCB claim).
+    as search; interval math only changes. Sample size is reported as context (n_legs,
+    nonempty blocks, empty-bar fraction); it never vetoes a read (INFR-022 L-63).
     """
     if not (0.0 < confidence < 1.0):
         raise ValueError("confidence must be in (0, 1)")
-    g_bar, n_bar = grid_gross_notional(result, streams, grid, net=net)
+    g_bar, n_bar = grid_gross_notional(result, streams, grid)
     boot = bootstrap_g_gross(g_bar, n_bar, starts, block=block)
     finite = boot[np.isfinite(boot)]
-    g_point = g_gross_point(result, streams, net=net)
-    diag = effective_n_diagnostics(result, streams, grid, block=block, net=net)
-
-    in_domain = True
-    domain_reason = "ok"
-    if n_legs_floor is not None and diag["n_legs"] < int(n_legs_floor):
-        in_domain = False
-        domain_reason = f"n_legs {diag['n_legs']} < floor {n_legs_floor}"
-    if n_blocks_floor is not None and diag["n_nonempty_blocks"] < int(n_blocks_floor):
-        in_domain = False
-        domain_reason = (
-            f"n_nonempty_blocks {diag['n_nonempty_blocks']} < floor {n_blocks_floor}"
-        )
+    g_point = g_gross_point(result, streams)
+    diag = effective_n_diagnostics(result, streams, grid, block=block)
 
     if len(finite) < 8 or not np.isfinite(g_point):
         lcb = float("-inf")
@@ -417,14 +384,10 @@ def lcb_g_studentized(result: OracleResult, streams: list[CandidateStream],
         "t_crit": t_crit if len(finite) >= 8 else float("nan"),
         "boot_median": float(np.median(finite)) if len(finite) else float("nan"),
         "n_boot_finite": int(len(finite)),
-        "pass_positive": bool(in_domain and np.isfinite(lcb) and lcb > 0.0),
-        "in_domain": in_domain,
-        "domain_reason": domain_reason,
-        "out_of_calibration_domain": not in_domain,
-        "net": bool(net),
+        "pass_positive": bool(np.isfinite(lcb) and lcb > 0.0),
         "confidence": float(confidence),
         "block": int(block),
-        "score_kind": "g_net" if net else "g_gross",
+        "score_kind": "g_gross",
         "method": "studentized_bootstrap_t",
         "binder_form": "LCB>0 studentized (INFR-009 P3b A1); not extensive-F",
         **diag,

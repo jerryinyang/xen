@@ -31,7 +31,11 @@ def main() -> None:
     print(f"{len(streams)} streams, {len(cases)} corpus cases", flush=True)
     out = []
     for i, case in enumerate(cases):
-        cfg = OracleConfig(charge_costs=case["charge_costs"], backend="python")
+        cfg = OracleConfig(charge_costs=case["charge_costs"], backend="python",
+                           operator_cost_directive={
+                               "reason": "INFR-007 parity corpus (pinned costed cases)",
+                               "scope": "parity-corpus"}
+                           if case["charge_costs"] else None)
         res = evaluate(set(case["subset"]), streams, cfg, segment=tuple(case["segment"]))
         out.append({"case": case["case"], "digest": result_digest(res)})
         if i % 25 == 0:

@@ -1,5 +1,35 @@
 # Evaluation / Referee Framework (Frozen)
 
+> **INFR-022 (2026-08-08) — live-programme frame.** Everything below marked *frozen*,
+> *historical*, or *archived* (chapter-01/02/03 referee suites, MDE maps, detection floors,
+> cost models) is **superseded-for-live-use**: retained verbatim for reproducibility, never
+> binding on new experiments. The live frame is:
+> **sample-size requirements + direct comparison against a pre-specified baseline + PSR +
+> zero-cost** (see the *Live evaluation frame (INFR-022)* section below and
+> `docs/references/neutrality-standard.md` N1–N11). No MDE, no detection floor, no power
+> curve, no machine power label is a live apparatus.
+
+## Live evaluation frame (INFR-022 — binding)
+
+* **Sample-size requirements.** Designs state expected per-stratum event counts and optional
+  minimum-n notes for *primary-inference language*; rows are **never** hidden or dropped for
+  low `n` (N3/N10) — every row is reported with its count and interval.
+* **Direct comparison.** Every conditioned arm is read against its pre-specified declared
+  comparator: estimate + uncertainty + counts; no threshold on the realised estimate (N4).
+* **PSR.** Probabilistic Sharpe Ratio (`xen.evaluation.psr` / `psr_row`; Bailey & López de
+  Prado 2012, skew/kurt-adjusted, same per-trade series as the mean it accompanies) sits
+  beside every mean-trade/leg bps read — `psr` + `psr_n`, evidence never a gate (directive 4).
+* **Zero-cost.** `NO_COST_CHARGED` default; the retired cost stack is archived in
+  `xen/evaluation_cost_legacy.py`; ZERO-COST-DISCLOSURE caveat on every money-bearing
+  artifact; a costed experiment requires a recorded operator cost directive.
+* **Neutrality.** N1–N11 bind every report; the leak tripwire's integrity bite is
+  `INTEGRITY_Z × bootstrap_SE` (N6b), never an MDE.
+* The **block-bootstrap toolbox** (`block_bootstrap_ci` with capped circular blocks, seed
+  battery, `block_sensitivity`, `trimmed_mean`) remains live evidence machinery (INFR-004
+  hardening, L-20).
+
+---
+
 > **Chapter-02 renewal (binding since 2026-06-29):** the operative referee is the **renewed
 > §10.3a gate at q\*=0.75** with the **E6 P\*-capable variant** and the **E7 15m domain** — see
 > the "Chapter-02 renewed referee" section below. The Chapter-01 suite described next remains
@@ -186,18 +216,21 @@ from 17.0 to 12.0 bps. Stage-1 is net-binding (`charge_costs=True`, `score_kind=
 measured false-positive rate α̂ was calibrated against a cost that no longer exists. The pin
 must be re-measured before it authorises another XENA search or gate. CLS-EPISODE requires at least 16 gate-band legs, and a fourth CAL cycle needs
 family-wise correction or a doubled CONFIRM bank. These are class-specific apparatus limits,
-not candidate-value thresholds.
+not candidate-value thresholds. [**INFR-022 (2026-08-08): the CAL apparatus is bannered
+legacy — not bindable on the live research path without a post-INFR-022 CAL redesign; the
+pin is historical record.**]
 
-## Chapter-04 cost interpretation
+## Chapter-04 cost interpretation [**superseded-for-live-use (INFR-022 L-62); historical record only**]
+
+> **Not live policy.** Live programme: `NO_COST_CHARGED` + ZERO-COST-DISCLOSURE (see *Live
+> evaluation frame* above). The paragraphs below describe the retired partial-fees apparatus.
 
 - Bybit taker/taker fees are 11.0 bps round trip before spread, funding or slippage.
-- **Spread is never charged, programme-wide (2026-07-23).** No quote or effective spread exists
-  on the T1 lane and a fixed pin is not a substitute, so every cost read is
-  `cost_scope=PARTIAL_FEES_FUNDING_ONLY` with `spread_rt_bps=None`. Reported cost understates
-  total cost and reported net performance is overstated — the caveat travels on every record
-  and must be repeated in every report. `bybit_round_trip_cost_bps` raises if a caller passes
-  `spread_bps`; `check_cost_map_integrity` refuses a universe declaring any other scope. Spread
-  remains legitimate for *decidability routing* (`spread_scale_route`), which is not a charge.
+- **Historical (2026-07-23 partial-fees regime):** spread was never charged on the T1 lane;
+  cost reads used `cost_scope=PARTIAL_FEES_FUNDING_ONLY` with `spread_rt_bps=None`. Reported
+  cost understated total cost. That stack, including `bybit_round_trip_cost_bps` and
+  `spread_scale_route`, is **retired for live use** — functions live only in
+  `xen/evaluation_cost_legacy.py` (ARCHIVED).
 - Stored `SpreadBps` is `UNUSABLE`; it is a mean-print differential and can be negative.
   Any result that previously called it a measured spread keeps its gross/fee/funding evidence
   but loses the spread-based floor claim.
@@ -213,22 +246,23 @@ not candidate-value thresholds.
   has not been quantified. Do not inherit their exact spread-based net conclusions without a
   corrected replay; gross, fee and separately computed funding evidence remain usable.
 
-## Trading-cost model (net-of-cost / tradability tier)
+## Trading-cost model (net-of-cost / tradability tier) [**superseded-for-live-use (INFR-022 L-62); historical record only**]
 
-> **MIGRATION (INFR-010, 2026-07-14):** the FTMO table below binds only for the archived
-> FX/indices data. Chapter 05 uses **Bybit USDT-perp maker/taker fees + a declared discrete
-> funding method**, implemented by
-> INFR-012 in `xen.evaluation`. The **discipline carries unchanged**: engine
-> costless-honest, costs analyst-injected from a single source-of-truth table, netted-turnover
-> rule, no per-signal double-charging.
+> **Not live policy.** Live programme does not inject costs on any research path unless an
+> operator cost directive is recorded. Historical FTMO / Bybit fee tables and
+> `round_trip_cost_bps` live in `xen/evaluation_cost_legacy.py` (ARCHIVED). Engine remains
+> costless-honest (gross emissions); that discipline is unchanged.
 
-Costs are **analyst-injected in Python only** — the cTrader engine is costless (emits real-OHLC
-mid/last fills, gross `MtmBps`, no commission/spread applied; bid/ask appear only as disclosure
-flags). The single source of truth is `xen.evaluation.FTMO_COSTS` + `round_trip_cost_bps`, so a
-table update propagates to every future analysis automatically. Availability-screen tiers
-(EXP-021/022/024) apply **no** cost; cost first gates at the tradability tier (EXP-023 / HYP-003).
+> **MIGRATION (INFR-010, 2026-07-14 — historical):** the FTMO table below bound only for the
+> archived FX/indices data. Chapter 05 used Bybit USDT-perp maker/taker fees + discrete funding
+> (INFR-012) under the retired partial-fees scope.
 
-`round_trip_cost_bps` (corrected 2026-07-07, operator-directed):
+**Historical apparatus (pre-INFR-022):** costs were analyst-injected in Python only; the engine
+emitted gross fills. Single source of truth was `FTMO_COSTS` + `round_trip_cost_bps` (now in
+`evaluation_cost_legacy`). Availability-screen tiers applied no cost; cost first gated at a
+tradability tier (EXP-023 / HYP-003) — that gate class is retired under L-62.
+
+`round_trip_cost_bps` (corrected 2026-07-07, operator-directed) — **archived signature:**
 - **flat_USD** commissions are the published `usd_commission_per_lot` (e.g. $5), a **round-turn**
   fixed-USD charge → applied **once** (NOT ×`commission_events`), converted to bps via the USD
   notional of one lot. Notional is **currency-convention aware** (`usd_notional_per_lot`):

@@ -31,7 +31,40 @@ They MUST NOT bind any crypto/Bybit universe until a fresh CAL cycle produces a 
 Design record (redesign): `python/experiments/INFR-009/design.md`. Historical INFR-006 plan:
 `python/experiments/INFR-006/design.md`. Spec source: `.ignore/temp/new-referee/xena-model.md`.
 
-## INFR-016 — value chain is report layers, not gates (2026-07-18, operator-ratified)
+## INFR-022 — zero-cost model, single gross gate, powering strip (binding, 2026-08-08)
+
+Operator directive INFR-022 supersedes, within the live programme: the A-4 dual gate
+(gross binding + net informational), `PARTIAL_FEES_FUNDING_ONLY` cost scope,
+`spread_scale_route` T1 decidability routing, the leg-power MDE layer, and all net
+reads.
+
+* **Zero-cost model.** All lanes default to `NO_COST_CHARGED` — no spread, commission, or
+  swap enters any calculation (`cost_bps == 0` is a compliant pin; the old
+  placeholder-zero refusal is gone). Non-zero costs require an operator cost directive
+  (`operator_cost_directive.json` + design clause); `charge_costs=True` raises without
+  it. Every report/artifact carries the ZERO-COST-DISCLOSURE caveat verbatim (§3.1).
+  `money_per_unit` is a sizing/capital-unit factor, not a cost.
+* **Single gross gate.** `run_final_gate` runs GROSS once (selection also runs gross, so
+  the search-gap diagnostic compares like scales); the `net_informational` block is
+  retired and the artifact carries `cost_model: NO_COST_CHARGED`. `passed` remains an
+  operator-facing selection-machinery field (D5); deployability/tradability claims stay
+  refused by rule. `final_report_layer` is a gross walk-forward layer
+  (`final_walk_forward`).
+* **Powering strip (L-63).** `power_layer` → `sample_size_layer` (n_legs + per-leg vol +
+  design minimum-n NOTE; no MDE, no `powered`, no UNPOWERED); `structural_label` and
+  machine label assignment deleted (N11 — operator-only tags); `sign_battery` drops
+  `min_powered_seeds`/`powered` (effect + one-sided p + CI + n). Search/certify are
+  gross-only (`score_kind='g_gross'`; the `g_net`/L-26 path raises).
+* **PSR pairing.** Every mean-trade/leg bps read (economics disclosure, report layers,
+  analysis) carries `psr` + `psr_n` on the same series (`xen.evaluation.psr`;
+  `report_layer.psr_layer`). PSR is evidence, never a gate.
+* **Neutrality.** N1–N11 (`docs/references/neutrality-standard.md`) bind every read;
+  the leak tripwire's integrity bite is `INTEGRITY_Z × bootstrap_SE` (N6b), never an MDE.
+* **Retired CAL apparatus** (`calibration*.py`) is bannered legacy — not bindable on the
+  live path without a post-INFR-022 CAL redesign (the WS-6 v3 power table below is
+  **historical record**).
+
+## INFR-016/INFR-022 — value chain is report layers, not gates
 
 Every value / quality / significance / selection read is a **report layer**
 (`xen.xena.report_layer.LayerReport`): per candidate, `observed / ideal / interpretation`, **no
@@ -42,20 +75,22 @@ disjoint layers (design §4):
   non-STUB fence, no-local-accounting, structural computability, oracle determinism, and
   **future-destroy leak survival** (edge survives destroying FUTURE info ⇒ acausal L-01 leak).
   A failure = *emission invalid → fix the data*, never *no edge*.
-- **VALUE reads (REPORT LAYERS)** — cost floor & breakeven, cadence coverage, **leg-power**
-  (`power_layer`, retires `n_legs_floor` veto), search score, fold stability, **stage-2 bounds
-  for ALL subsets AND per-cell** (`stage2_bounds_layer`, retires `one_subset` top-1),
-  **within-sample attribution** collapse (`controls.attribution_derangement` — reported
-  fraction, retires `hard_fail_leak` collapse<0.5), **sign battery** (`controls.sign_battery`,
-  ≥2000 seeds → effect size + one-sided p + CI, retires the 25-seed `at_or_above_p95` boolean),
-  cost/funding sensitivity, spread-scale routing, **net deployability**
-  (`final_gate.final_report_layer`, retires the final gate's `passed`).
+- **VALUE reads (REPORT LAYERS)** — sample-size layer (`sample_size_layer`, retires
+  `power_layer`/`n_legs_floor`/MDE), cadence coverage, search score, fold stability,
+  **stage-2 bounds for ALL subsets AND per-cell** (`stage2_bounds_layer`, retires
+  `one_subset` top-1), **within-sample attribution** collapse
+  (`controls.attribution_derangement` — reported fraction, retires `hard_fail_leak`
+  collapse<0.5), **sign battery** (`controls.sign_battery`, ≥2000 seeds → effect size +
+  one-sided p + CI + n, retires the 25-seed `at_or_above_p95` boolean and power labels),
+  **PSR** (`psr_layer` — PSR + n beside mean-trade bps), gross walk-forward
+  (`final_gate.final_report_layer` = `final_walk_forward`, retires net deployability and
+  the final gate's `passed`).
 
 Interpretation bands `SUPPORTED / WASH / CONTRADICTED / UNPOWERED / SUGGESTIVE / STRONG` are
-**labels on a layer, never gates**. The counted-read ledger + holdout-safety stay as read-budget
-/ validity controls. Grounding failures (HTFCAP): a 25-seed P95 boolean auto-"failed" SOL 24.9
-bps (p≈0.22, ~P78 at 2000 seeds — SUGGESTIVE, not refuted); `one_subset` hid it and certified a
-~1 bps leak-class cell. `python/experiments/INFR-016/design.md`.
+**operator-only tags on a layer** (N11) — never machine-assigned, never gates. The counted-read
+ledger + holdout-safety stay as read-budget / validity controls. Grounding failures (HTFCAP): a
+25-seed P95 boolean auto-"failed" SOL 24.9 bps (p≈0.22, ~P78 at 2000 seeds — SUGGESTIVE, not
+refuted); `one_subset` hid it and certified a ~1 bps leak-class cell. `python/experiments/INFR-016/design.md`.
 
 ## Principle
 
@@ -74,7 +109,8 @@ operator authorises progression.
 3 Search .............. xen.xena.search.run_restart ×10–15 (LAHC, TRAIN search band only)
 4 Certification ....... xen.xena.certify.certify_and_rank (plateau screen + fold ranking)
     [OPERATOR — reviews evidence package; approves gate spend]
-5 Final gate .......... xen.xena.final_gate.run_final_gate (TEST band, counted, cap 2)
+5 Final gate .......... xen.xena.final_gate.run_final_gate (TEST band, counted, cap 2;
+                        single GROSS run — INFR-022)
     [OPERATOR — final verdict on the artifact]
 ```
 
@@ -90,9 +126,9 @@ operator authorises progression.
   sizes, never sees account state.
 - **Python oracle (`xen.xena.oracle`, per subset):** chronological composition ONLY —
   FM(t), `R_i = r·FM·w_i` sizing, global `R_max` admission (rejected signals logged as
-  first-class events — the sole interaction channel), cost charging (Bybit fees + T1 spread +
-  funding via `xen.evaluation`, L-22 binding), segment-end censoring, reconciliation
-  invariant (raises). Deterministic:
+  first-class events — the sole interaction channel), zero-cost gross accounting
+  (`charge_costs` defaults False; charging requires an operator cost directive — INFR-022),
+  segment-end censoring, reconciliation invariant (raises). Deterministic:
   (bitmask, segment, seed) → bit-identical. It may never alter an entry/exit decision.
   **INFR-007 (NEUTRAL, 2026-07-12):** the sequential event fold is dispatched to the
   `xena_fold` Rust kernel (`OracleConfig.backend`, ~15×/eval) — proven bit-identical to
@@ -122,12 +158,11 @@ operator authorises progression.
 
 **Calibration credentials (WS-6 v3, 550 realistic-null universes — shared regime-GBM
 path, correlated coin-flip nulls, vol-clustered entries — real code paths incl. the A-4
-dual gate):** null certification 2/300, **end-to-end false passes 0/300 → FPR ≤ 1% at
-95%** (rule of three; the gross gate threshold killed both certifiers — layered defense
-observed). End-to-end power: 18 bps gross 16% · 30 bps 70% · 40 bps 94% · 60 bps 100%
-(at 60 trades/candidate + regime-GBM noise; restate per live trade density). All
-end-to-end passers were also net-P25-positive (deployability preview 1.0). §11
-insensitivity verified. Raw + summary: `python/experiments/INFR-006/results/`.
+dual gate):** [**HISTORICAL record** — CAL apparatus is bannered legacy after INFR-022;
+these power figures must NOT be re-derived or treated as live credentials. End-to-end
+power: 18 bps gross 16% · 30 bps 70% · 40 bps 94% · 60 bps 100% (at 60 trades/candidate +
+regime-GBM noise; restate per live trade density).] Raw + summary:
+`python/experiments/INFR-006/results/`.
 
 **Enforced in code (review F01, archived universes only):** for chapter-03 live universes,
 `certify_and_rank` and `run_final_gate` MUST receive `registry_path`; they hash-verify the pin and refuse
@@ -140,36 +175,31 @@ ledger carry `registry_sha256`.
 violation.** A change = new predeclared calibration (new battery, new hash-pin), with a
 LOOSER/TIGHTER-tagged amendment (L-23).
 
-## Cost policy (amendments A-1 + A-4, operator 2026-07-10)
+## Cost policy (INFR-022 — supersedes amendments A-1 + A-4)
 
-- **Selection stages (search + certification) run cost-free** (`OracleConfig
-  .charge_costs=False`): commissions/spread are excluded from the portfolio-selection
-  process. Nautilus T1 emissions are gross as always (engine costless-honest).
-- **T1 spread-scale routing (INFR-010 §4):** call `spread_scale_route` with secondary-data
-  availability declared. Chapter 05 passes `secondary_available=False`; a gross edge within
-  ~3× round-trip spread is parked `PARKED_T1_UNRESOLVED`. Archived XENA replays retain their
-  historical `AWAITING_MBP` disposition only for reproducibility.
-- **Rationale (operator, 2026-07-10, review F02):** the dual gate separates the
-  characterisation of model performance / signal quality (gross) from failure-by-cost
-  scenarios (net). A portfolio that dies only under costs is a cost problem, not a
-  selection-machinery problem; one blended binding number would hide which failed. Net
-  stays strictly informational but important; the final verdict is always the operator's.
-- **The final gate runs the §A.4 protocol TWICE (A-4):**
-  - **GROSS run — BINDING.** `passed` = gross bootstrap P25 ≥ threshold AND gross-path
-    DD feasible. Validates the pure optimizer + walk-forward selection machinery on the
-    same scale the selection ran on. Gate threshold is derived from GROSS null gate P25s.
-  - **NET run — INFORMATIONAL.** Full costs charged + its own DD read; recorded in the
-    artifact as `net_informational`.
-- **L-22 retained clause (binding):** a gross gate pass is a **selection-machinery
-  verdict, never a tradability/deployability claim**. Any deployability claim MUST cite
-  the `net_informational` block (net P25, net DD) — and deployability remains
-  operator-gated as always.
+- **Zero-cost model (binding).** Selection, certification, and the final gate all run
+  **GROSS and cost-free**: `OracleConfig.charge_costs` defaults `False`; `cost_bps` on
+  streams is inert (ledger `CostMoney` = 0.0); non-zero `--cost-bps` / `charge_costs=True`
+  raise unless an operator cost directive (`operator_cost_directive.json`, recorded in the
+  design before execution) is supplied. Nautilus T1 emissions are gross as always (engine
+  costless-honest). `docs/references/neutrality-standard.md` § N9 requires the
+  ZERO-COST-DISCLOSURE caveat on every money-bearing artifact.
+- **Retired routing.** `spread_scale_route` / `t1_round_trip_spread_bps` and the
+  `PARKED_T1_UNRESOLVED` / `AWAITING_MBP` dispositions are retired (moved to
+  `xen.evaluation_cost_legacy`, ARCHIVED banner) — no decidability routing on the live
+  path.
+- **Single gross gate (INFR-022, supersedes A-4).** The final gate runs the §A.4 protocol
+  ONCE, gross and binding: `passed` = gross bootstrap P25 ≥ pre-registered threshold AND
+  gross-path DD feasible. The `net_informational` run is retired; artifacts carry
+  `cost_model: NO_COST_CHARGED`.
+- **L-22 retained clause (binding):** a gate pass is a **selection-machinery verdict,
+  never a tradability/deployability claim**; deployability/tradability claims remain
+  refused by rule (the zero-cost model does not loosen them).
 - **DD feasibility**: FTMO-style limits (daily 5% vs day-start equity, total 10% vs
-  initial) — binding on the gross path; disclosed on the net path.
-- Chapter-05 callers use `bybit_round_trip_cost_bps` without spread. Spread cost is unavailable
-  and not charged; reported cost understates total cost and reported net performance is overstated.
-  Stored `SpreadBps`/`MeanPriceSkewBps` and former proxy pins are never cost inputs. Archived XENA
-  cost policy remains historical only.
+  initial) — binding on the gross path.
+- The retired cost stack (`bybit_round_trip_cost_bps`, FTMO tables, funding stamps) lives
+  in `xen/evaluation_cost_legacy.py` — archive-only; the chapter-05 cost-data preflight
+  docs carry HISTORICAL banners.
 
 ## Temporal mapping (Q1, tightened)
 

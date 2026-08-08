@@ -1,5 +1,9 @@
 """INFR-009 P-C — binder-form exit (c): two-stage sample-split.
 
+> **LEGACY CAL APPARATUS (INFR-022).** Not bindable on the live research path without a
+> post-INFR-022 CAL redesign. Retired names used here for historical replay only: the NET
+> LCB path (zero-cost model). INFR-022: gross-only LCBs; sample size as context.
+
 Predeclaration: design.md §P-C (committed 2026-07-14). Parent: §P-BF DESIGN STOP.
 
 Select on a stage-1 band only, then test ONCE on a distant/embargoed stage-2 band with the
@@ -122,9 +126,9 @@ def _search_params(cadence: CadenceSpec) -> SearchParams:
 
 def run_two_stage(streams: list[CandidateStream], cadence: CadenceSpec,
                   layout: SegmentLayout, *, scale: ScaleSpec, seed: int,
-                  n_boot: int = N_BOOT, block_legs: int = BLOCK_LEGS,
-                  net: bool = False) -> dict[str, Any]:
-    """One full stage-1 search→select(top-1) → stage-2 leg-studentized LCB(g_gross)."""
+                  n_boot: int = N_BOOT, block_legs: int = BLOCK_LEGS) -> dict[str, Any]:
+    """One full stage-1 search→select(top-1) → stage-2 leg-studentized LCB(g_gross).
+    Gross-only (INFR-022 zero-cost model)."""
     config = OracleConfig(charge_costs=False)
     params = _search_params(cadence)
     finalists = [
@@ -143,7 +147,7 @@ def run_two_stage(streams: list[CandidateStream], cadence: CadenceSpec,
         return {"empty": True, "gross_pass": False, "top": []}
     top = pkg["ranked"][0].subset
     lcb = eval_lcb_legs(top, streams, config, layout.gate, n_boot=n_boot, seed=seed,
-                        block_legs=block_legs, net=net)
+                        block_legs=block_legs)
     top_ids = sorted(str(x) for x in top)
     return {
         "empty": False,

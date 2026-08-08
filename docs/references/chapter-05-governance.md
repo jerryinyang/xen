@@ -1,5 +1,12 @@
 # Chapter 05 Governance — Volatility-to-Direction Conversion
 
+> **HISTORICAL (chapter-05) — not binding on the live programme after INFR-022 (2026-08-08).**
+> The chapter-05 cost/data route below is superseded-for-live-use: the live programme is
+> zero-cost (`NO_COST_CHARGED`), and the chapter-05 cost instructions (fee/funding injection,
+> `PARTIAL_FEES_FUNDING_ONLY`) are historical record. Body retained verbatim for
+> reproducibility.
+
+
 **State:** `CHECKPOINT-016 OPEN / RUN-1 A13 IMPLEMENTED + FRESH QA PENDING`
 
 **Governing brief:** `.ignore/what-next/alts/intraday-way-forward-plan.md`

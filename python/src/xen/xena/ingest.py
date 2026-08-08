@@ -12,7 +12,7 @@ Universe manifest (`universe_manifest.json`, one per universe root):
   "universe_id": "XENA-001",
   "candidates": [
     {"candidate_id": "donch20_USTEC_m15", "run_dir": "donchian_USTEC_m15",
-     "symbol": "USTEC", "cost_bps": 2.1, "money_per_unit": 1.0}
+     "symbol": "USTEC", "cost_bps": 0.0, "money_per_unit": 1.0}
   ]
 }
 ```
@@ -21,6 +21,11 @@ Universe manifest (`universe_manifest.json`, one per universe root):
 dir must contain the standard emission: `run_metadata.json` (with `AnalysisEndUtc`),
 `positions.parquet` (per-bar real OHLC → the mark grid), `cis_trades.parquet` (per-leg fills
 → the trade-intent ledger).
+
+Zero-cost model (INFR-022 §3.2/§3.4): ``cost_bps`` defaults to 0 and non-zero pins are
+refused at load unless an ``operator_cost_directive.json`` exists next to the manifest
+(only an explicit operator cost directive may introduce costs; recorded in the design
+before execution). `money_per_unit` is a sizing/capital-unit factor, not a cost.
 
 XENA emission contract additions over the base contract:
 * every non-censored leg carries finite `EntryFillPrice`, `ExitFillPrice`, `RealizedBps`;
@@ -100,13 +105,21 @@ def _to_ns(col: pl.Expr) -> pl.Expr:
     return col.dt.cast_time_unit("ns").cast(pl.Int64)
 
 
-def load_candidate(run_dir: str | Path, *, candidate_id: str, symbol: str, cost_bps: float,
-                   money_per_unit: float = 1.0) -> CandidateStream:
+def load_candidate(run_dir: str | Path, *, candidate_id: str, symbol: str,
+                   cost_bps: float = 0.0, money_per_unit: float = 1.0,
+                   operator_cost_directive: Any = None) -> CandidateStream:
     """Adapt one emitted run directory into an oracle ``CandidateStream``.
 
     Loading is permissive only about extra columns; every required column and the stop
     contract are enforced here (and again, with artifacts, in :func:`gate_candidate`).
+    Zero-cost model (INFR-022): non-zero ``cost_bps`` raises unless an operator cost
+    directive is supplied.
     """
+    if cost_bps not in (0, 0.0, None):
+        from xen.evaluation import assert_zero_cost
+        directive_ok = _directive_payload(operator_cost_directive) is not None
+        if not directive_ok:
+            assert_zero_cost(cost_bps=cost_bps)
     run_path = Path(run_dir)
     pos = pl.read_parquet(run_path / "positions.parquet")
     cis = pl.read_parquet(run_path / "cis_trades.parquet")
@@ -149,8 +162,9 @@ def _analysis_end_ns(metadata: dict[str, Any]) -> int | None:
 # --------------------------------------------------------------------------- #
 # The blocking gate
 # --------------------------------------------------------------------------- #
-def gate_candidate(run_dir: str | Path, *, candidate_id: str, symbol: str, cost_bps: float,
-                   money_per_unit: float = 1.0) -> dict[str, Any]:
+def gate_candidate(run_dir: str | Path, *, candidate_id: str, symbol: str,
+                   cost_bps: float = 0.0, money_per_unit: float = 1.0,
+                   operator_cost_directive: Any = None) -> dict[str, Any]:
     """Blocking per-candidate validation. Returns a report dict with ``blocking_pass``.
 
     Never raises for a *failing* candidate — failures are reported so a universe gate can
@@ -174,7 +188,8 @@ def gate_candidate(run_dir: str | Path, *, candidate_id: str, symbol: str, cost_
         return report
     try:
         stream = load_candidate(run_path, candidate_id=candidate_id, symbol=symbol,
-                                cost_bps=cost_bps, money_per_unit=money_per_unit)
+                                cost_bps=cost_bps, money_per_unit=money_per_unit,
+                                operator_cost_directive=operator_cost_directive)
         check("schema", True)
     except ValueError as e:
         check("schema", False, str(e))
@@ -258,6 +273,25 @@ class Universe:
     manifest_path: Path
 
 
+def _directive_payload(operator_cost_directive: Any) -> dict | None:
+    """Load an operator cost directive (dict or JSON file) or None when absent/malformed."""
+    if operator_cost_directive is None:
+        return None
+    if isinstance(operator_cost_directive, (str, Path)):
+        path = Path(operator_cost_directive)
+        if not path.exists():
+            return None
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            return None
+    else:
+        payload = dict(operator_cost_directive)
+    if payload.get("reason") and payload.get("scope"):
+        return payload
+    return None
+
+
 def gate_universe(manifest_path: str | Path, *, write_artifact: bool = True) -> dict[str, Any]:
     """Gate every manifest candidate; write ``xena_candidate_gate.json`` next to the manifest.
 
@@ -268,13 +302,16 @@ def gate_universe(manifest_path: str | Path, *, write_artifact: bool = True) -> 
     mpath = Path(manifest_path)
     manifest = json.loads(mpath.read_text(encoding="utf-8"))
     root = mpath.parent
+    directive = (root / "operator_cost_directive.json"
+                 if (root / "operator_cost_directive.json").exists() else None)
     reports = []
     for c in manifest["candidates"]:
         rd = Path(c["run_dir"])
         reports.append(gate_candidate(rd if rd.is_absolute() else root / rd,
                                       candidate_id=c["candidate_id"], symbol=c["symbol"],
-                                      cost_bps=c["cost_bps"],
-                                      money_per_unit=c.get("money_per_unit", 1.0)))
+                                      cost_bps=c.get("cost_bps", 0.0),
+                                      money_per_unit=c.get("money_per_unit", 1.0),
+                                      operator_cost_directive=directive))
     ids = [c["candidate_id"] for c in manifest["candidates"]]
     artifact = {"universe_id": manifest.get("universe_id", mpath.parent.name),
                 "n_candidates": len(reports),
@@ -309,11 +346,14 @@ def load_universe(manifest_path: str | Path) -> Universe:
     if gated_ids != manifest_ids:
         raise RuntimeError("gate artifact is stale (candidate set changed) — rerun gate_universe")
     root = mpath.parent
+    directive = (root / "operator_cost_directive.json"
+                 if (root / "operator_cost_directive.json").exists() else None)
     streams = []
     for c in manifest["candidates"]:
         rd = Path(c["run_dir"])
         streams.append(load_candidate(rd if rd.is_absolute() else root / rd,
                                       candidate_id=c["candidate_id"], symbol=c["symbol"],
-                                      cost_bps=c["cost_bps"],
-                                      money_per_unit=c.get("money_per_unit", 1.0)))
+                                      cost_bps=c.get("cost_bps", 0.0),
+                                      money_per_unit=c.get("money_per_unit", 1.0),
+                                      operator_cost_directive=directive))
     return Universe(manifest.get("universe_id", root.name), streams, mpath)

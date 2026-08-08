@@ -10,17 +10,15 @@ import polars as pl
 import pytest
 
 from xen.xena.economics import (SearchRefusedIntegrity, check_cost_map_integrity,
-                                economics_disclosure, is_placeholder_cost,
+                                check_zero_cost_compliance, economics_disclosure,
                                 require_economics_before_search)
 # SearchRefusedIntegrity also raised from run_restart (P0 hard entry)
 from xen.xena.fill_basis import (decompose_stream, summarize_decomposition)
 from xen.xena.high_cadence_null import (HighCadenceNullSpec, build_high_cadence_null,
                                         null_diagnostics)
 from xen.xena.oracle import CandidateStream, OracleConfig, evaluate
-from xen.xena.score import (bootstrap_g_gross, g_gross_from_ledger, g_gross_point,
-                            grid_gross_notional, robust_g_hat)
-from xen.xena.search import (SearchParams, bootstrap_block_starts, clip_grid_covering,
-                             run_restart, universe_grid)
+from xen.xena.score import (bootstrap_g_gross, g_gross_point)
+from xen.xena.search import (SearchParams, bootstrap_block_starts, run_restart)
 from xen.xena.certify import (certify_and_rank, contiguous_purged_folds,
                               random_subset_reference)
 
@@ -52,16 +50,14 @@ def _stream(cid: str, edge_bps: float, *, n_trades: int = 40, seed: int = 0,
 
 
 # --------------------------------------------------------------------------- #
-# P0 — cost integrity + economics disclosure
+# P0 — zero-cost compliance + economics disclosure (INFR-022 §3.3)
 # --------------------------------------------------------------------------- #
-def test_placeholder_cost_detected():
-    assert is_placeholder_cost(0.0)
-    assert is_placeholder_cost(None)
-    assert is_placeholder_cost(float("nan"))
-    assert not is_placeholder_cost(1.5)
-
-
-def test_cost_map_integrity_blocks_zero_pins():
+def test_zero_pin_is_compliant_and_nonzero_blocks():
+    # INFR-022: 0.0 is a compliant zero-cost pin (placeholder refusal retired)
+    assert check_zero_cost_compliance(
+        [{"candidate_id": "a", "symbol": "USTEC", "cost_bps": 0.0,
+          "money_per_unit": 1.0}]).complete
+    # non-zero without an operator cost directive blocks
     cands = [
         {"candidate_id": "a", "symbol": "USTEC", "cost_bps": 0.0, "money_per_unit": 1.0},
         {"candidate_id": "b", "symbol": "EURUSD", "cost_bps": 2.0, "money_per_unit": 1.0},
@@ -70,17 +66,18 @@ def test_cost_map_integrity_blocks_zero_pins():
     assert not st.complete
     assert st.n_incomplete == 1
     assert st.reason == "INTEGRITY_INCOMPLETE"
+    assert "non_zero_cost_bps_without_directive" in st.incomplete[0]["reasons"]
 
 
-def test_cost_map_complete_with_real_pins():
+def test_cost_map_complete_with_zero_pins():
     cands = [
-        {"candidate_id": "a", "symbol": "USTEC", "cost_bps": 1.2, "money_per_unit": 1.0},
-        {"candidate_id": "b", "symbol": "EURUSD", "cost_bps": 0.8, "money_per_unit": 1.0},
+        {"candidate_id": "a", "symbol": "USTEC", "cost_bps": 0.0, "money_per_unit": 1.0},
+        {"candidate_id": "b", "symbol": "EURUSD", "cost_bps": 0.0, "money_per_unit": 1.0},
     ]
     assert check_cost_map_integrity(cands).complete
 
 
-def test_economics_disclosure_writes_and_refuses_search(tmp_path: Path):
+def test_economics_disclosure_writes_zero_cost_artifact(tmp_path: Path):
     # minimal fake emission
     run = tmp_path / "c1"
     run.mkdir()
@@ -92,7 +89,7 @@ def test_economics_disclosure_writes_and_refuses_search(tmp_path: Path):
         "Direction": [1.0] * n,
         "EntryFillPrice": [100.0] * n,
         "ExitFillPrice": [100.02] * n,  # +2 bps
-        "RealizedBps": [2.0] * n,
+        "RealizedBps": [2.0 + 0.3 * (i % 3) for i in range(n)],  # slight variation → PSR finite
         "Censored": [False] * n,
         "SlPrice": [99.0] * n,
     })
@@ -113,9 +110,55 @@ def test_economics_disclosure_writes_and_refuses_search(tmp_path: Path):
     mpath = tmp_path / "universe_manifest.json"
     mpath.write_text(json.dumps(man))
     art = economics_disclosure(mpath, max_workers=1)
-    assert art["cost_map_integrity"]["complete"] is False
+    assert art["zero_cost"]["compliance_complete"] is True
+    assert art["zero_cost"]["cost_model"] == "NO_COST_CHARGED"
+    assert "ZERO-COST-DISCLOSURE" in art["zero_cost"]["caveat"]
+    assert art["search_allowed"] is True
+    assert art["operator_routing"]["decision"] == "proceed_search"
+    assert art["gross_economics"]["p50"] == pytest.approx(2.3, abs=0.01)
+    # PSR pairing: psr + psr_n beside the mean on the same per-trade series
+    row = art["_per_candidate_rows"][0]
+    assert row["gross_mean_bps"] == pytest.approx(2.3, abs=0.01)
+    assert row["psr_n"] == n
+    assert 0.0 <= row["psr"] <= 1.0
+    require_economics_before_search(tmp_path)  # no refusal: zero-cost compliant
+
+
+def test_economics_refuses_noncompliant_universe(tmp_path: Path):
+    run = tmp_path / "c1"
+    run.mkdir()
+    n = 10
+    t0 = 1_000_000_000_000
+    cis = pl.DataFrame({
+        "EntryTime": pl.Series([t0 + i * 60_000_000_000 for i in range(n)]).cast(pl.Datetime("ns")),
+        "ExitTime": pl.Series([t0 + (i + 5) * 60_000_000_000 for i in range(n)]).cast(pl.Datetime("ns")),
+        "Direction": [1.0] * n,
+        "EntryFillPrice": [100.0] * n,
+        "ExitFillPrice": [100.02] * n,
+        "RealizedBps": [2.0] * n,
+        "Censored": [False] * n,
+        "SlPrice": [99.0] * n,
+    })
+    pos = pl.DataFrame({
+        "SourceCloseTime": pl.Series([t0 + i * 60_000_000_000 for i in range(n + 5)]).cast(pl.Datetime("ns")),
+        "RealOpen": [100.0] * (n + 5),
+    })
+    cis.write_parquet(run / "cis_trades.parquet")
+    pos.write_parquet(run / "positions.parquet")
+    man = {
+        "universe_id": "TOY2",
+        "candidates": [{
+            "candidate_id": "C1-USTEC-1H5M-H05X-V00",
+            "run_dir": "c1", "symbol": "USTEC",
+            "cost_bps": 2.0, "money_per_unit": 1.0,  # no directive
+        }],
+    }
+    mpath = tmp_path / "universe_manifest.json"
+    mpath.write_text(json.dumps(man))
+    art = economics_disclosure(mpath, max_workers=1)
+    assert art["zero_cost"]["compliance_complete"] is False
     assert art["search_allowed"] is False
-    assert art["gross_economics"]["p50"] == pytest.approx(2.0, abs=0.01)
+    assert art["operator_routing"]["decision"] == "do_not_search"
     with pytest.raises(SearchRefusedIntegrity):
         require_economics_before_search(tmp_path)
 
@@ -154,26 +197,34 @@ def test_search_uses_g_gross_score_kind():
     streams = [_stream(f"w{i}", +30.0, seed=i) for i in range(3)] + [
         _stream(f"l{i}", -30.0, seed=100 + i) for i in range(4)]
     res = run_restart(streams, CFG, budget=80, restart_id=1,
-                      params=SearchParams(L=20, n_boot=40, init_size=3))
+                      params=SearchParams(L=20, n_boot=40, init_size=3),
+                      skip_economics_precondition=True)
     rec = res.cache.get(res.best_subset)
     assert rec is not None
     assert rec.score_kind == "g_gross"
     assert {"w0", "w1", "w2"} & res.best_subset
 
 
-def test_search_refuses_placeholder_costs():
-    streams = [_stream("a", +10.0, cost_bps=0.0, seed=1),
-               _stream("b", -10.0, cost_bps=0.0, seed=2)]
-    with pytest.raises(SearchRefusedIntegrity):
+def test_search_refuses_nonzero_cost_streams():
+    """INFR-022: non-zero cost pins without a directive refuse search on the guard path."""
+    streams = [_stream("a", +10.0, cost_bps=2.0, seed=1),
+               _stream("b", -10.0, cost_bps=2.0, seed=2)]
+    with pytest.raises(SearchRefusedIntegrity, match="ZERO-COST-COMPLIANCE"):
         run_restart(streams, CFG, budget=10, restart_id=1,
                     params=SearchParams(L=5, n_boot=8, init_size=1))
+    # zero-cost pins pass the guard
+    streams0 = [_stream("a", +10.0, cost_bps=0.0, seed=1),
+                _stream("b", -10.0, cost_bps=0.0, seed=2)]
+    res = run_restart(streams0, CFG, budget=10, restart_id=1,
+                      params=SearchParams(L=5, n_boot=8, init_size=1), skip_economics_precondition=True)
+    assert res.cache.evaluation_count > 0
 
 
 def test_evidence_package_retires_binders():
     streams = [_stream(f"w{i}", +25.0, seed=i) for i in range(3)] + [
         _stream(f"l{i}", -25.0, seed=50 + i) for i in range(3)]
     params = SearchParams(L=20, n_boot=40, init_size=3)
-    finals = [run_restart(streams, CFG, budget=60, restart_id=i, params=params)
+    finals = [run_restart(streams, CFG, budget=60, restart_id=i, params=params, skip_economics_precondition=True)
               for i in (1, 2)]
     folds = contiguous_purged_folds(0, 2000 * 60 * NS, n_folds=2, purge_ns=60 * 60 * NS)
     out = certify_and_rank(finals, streams, CFG, folds=folds, params=params,
@@ -186,7 +237,9 @@ def test_evidence_package_retires_binders():
     assert out["jaccard_core_spread"]["binding"] is False
     assert out["fill_basis"] is not None
     assert out["fill_basis"].get("binding") is False
+    # INFR-022: NET companion retired (zero-cost model) — gross-only package
     assert out["net_companion"] is not None
+    assert out["net_companion"].get("retired") is True
     assert out["net_companion"].get("binding") is False
 
 

@@ -14,6 +14,16 @@ sits at break-even and that `W/L` is not a free lever).
 Read this **before** designing any new experiment: it records what is frozen, what is dead,
 what worked, and the lessons that cost a false positive to learn.
 
+> **INFR-022 (2026-08-08) — standing programme constraints (binding).** (1) **Zero-cost
+> model**: no spread/commission/swap enters any calculation (`NO_COST_CHARGED`); ZERO-COST-
+> DISCLOSURE caveat on every money-bearing artifact; a costed experiment requires a recorded
+> operator cost directive. (2) **No research powering**: MDE/floors/power curves/UNPOWERED
+> machine labels are stripped — sample-size context + direct baseline comparison only (L-63).
+> (3) **PSR** beside every mean-trade/leg bps read, same series (L-64). (4) **Neutrality
+> N1–N11** binds every analysis/screen/report (`docs/references/neutrality-standard.md`; L-65).
+> Retired apparatus (CAL pins, AMENDMENT-7 floors, cost stack) is bannered historical record.
+> Full authority: `docs/superpowers/plans/2026-08-08-infr-022-zero-cost-neutrality-psr-pipeline-update.md`.
+
 This KB is canonical and **append-merged** at every chapter rollover (new chapters add/update;
 they do not wipe prior canon). The **signal-registry** (`docs/signal-registry/`) is the *live*
 operational ledger (multiplicity, test-reads, candidate families) and is referenced here, not
@@ -85,6 +95,11 @@ infrastructure correctness must precede family registration and outcome contact.
 
 ## What's FROZEN (do not re-derive)
 
+- **INFR-022 programme frame** — zero-cost model; sample-size context + direct baseline
+  comparison; PSR pairing; neutrality N1–N11
+  ([neutrality-standard.md](../references/neutrality-standard.md)). The leak tripwire's
+  integrity bite is `INTEGRITY_Z × bootstrap_SE` (N6b) — never an MDE. Historical
+  detection-floor/CAL apparatus is superseded-for-live-use.
 - **Evaluation governance** — validity failures remain hard stops; value, significance,
   power and selection are reported as complete frozen-arm distributions for operator judgement,
   never automatic winner gates. Historical frozen referees remain calibration evidence, not a
@@ -114,11 +129,13 @@ infrastructure correctness must precede family registration and outcome contact.
   diagnosis + design recommendations: proven cores, proven ineffective, genuine gaps, C0–C3
   capture stack and four-layer D0 contract.
 - [reviews/unsigned-failed-break-bounce-review.md](reviews/unsigned-failed-break-bounce-review.md)
-  — standalone viability of the one CF-SIGAUC-001 object that clears its cost floor, stripped of
-  the dead signed claim. Reproduces on PVA/PRIOR only (IB is a day-weighting artifact), but the
-  lift is **+5–11% relative** over matched-random on an **MFE ceiling with no realized return ever
-  computed**, MFE:MAE ≈ 1.35:1, and 81% STOP under the only exit tested. **Characterisation, not a
-  candidate** — re-opening needs a new information source (P-01).
+  — **HISTORICAL (pre-INFR-022):** standalone viability of the one CF-SIGAUC-001 object that
+  historically cleared a cost floor, stripped of the dead signed claim. Reproduces on PVA/PRIOR
+  only (IB is a day-weighting artifact), but the lift is **+5–11% relative** over matched-random
+  on an **MFE ceiling with no realized return ever computed**, MFE:MAE ≈ 1.35:1, and 81% STOP under
+  the only exit tested. **Characterisation, not a candidate** — re-opening needs a new information
+  source (P-01). Live programme is zero-cost (L-62); do not treat cost-floor clearance as current
+  disposition.
 
 ## How to work
 
@@ -127,22 +144,10 @@ infrastructure correctness must precede family registration and outcome contact.
   per-stratum non-pooling, inverted-inference predeclaration) and the ones that wasted effort.
 - [lessons-and-amendments.md](lessons-and-amendments.md) — **the most important file.** Every
   observation that forced an amendment, each with its **mechanism (why)**. The look-ahead that
-  shipped a false `DEPLOYABLE_CONFIRMED` is lesson L-01. Newest (SPDR-018/018B, 2026-07-26):
-  **L-50** absolute-bps thresholds are not portable across volatility scales (state them in σ units);
-  **L-51** a precision gate is a dispersion gate and is not sign-neutral on skewed P&L;
-  **L-52** a check depending on transient state silently does not run — assert the check *count*;
-  **L-53** a deflator derived from a selected subset is circular — report its range;
-  **L-54** profile Python retention and Nautilus defaults as one critical path, with exact parity
-  before optimisation; **L-55** share proven-identical deterministic analysis work and expose safe
-  columnar pruning bounds before considering a faster-language port. Newest (SPDR-021…024,
-  2026-08-07): **L-56** ⭐ a detection floor and the effect it judges must share a scale, and where
-  the estimand is pinned to a known ratio the ceiling is computable *before* the run;
-  **L-57** a control that reproduces the real estimate has never tested anything — assert it
-  *differs*; **L-58** a device that changes only *which* trades happen cannot change *what* the
-  shared ones are worth; **L-59** gating by a state without *labelling* realised state makes the
-  question unaskable, not underpowered; **L-60** a per-notional estimand is arithmetically blind
-  to sizing and its exact zero is a units alarm, not a null; **L-61** a pooled figure over three
-  instruments is one instrument. Corresponding dead ends: **P-21…P-31**.
+  shipped a false `DEPLOYABLE_CONFIRMED` is lesson L-01. Newest (INFR-022, 2026-08-08):
+  **L-62** zero-cost model; **L-63** powering stripped to sample-size context + direct
+  baseline comparison; **L-64** PSR pairing standard; **L-65** neutrality N1–N11. L-56 /
+  AMENDMENT-7 are superseded-for-live-use (historical).
 
 ## Project memory
 

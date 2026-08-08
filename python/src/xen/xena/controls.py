@@ -1,4 +1,4 @@
-"""Reusable XENA attribution/leak controls as REPORT LAYERS (INFR-016).
+"""Reusable XENA attribution/leak controls as REPORT LAYERS (INFR-016; INFR-022 L-63/N11).
 
 Promotes the per-experiment controls (XENA-HTFCAP-001 `analysis_code/controls.py`) into
 `xen`, and **retires their auto-verdict fields**:
@@ -6,7 +6,10 @@ Promotes the per-experiment controls (XENA-HTFCAP-001 `analysis_code/controls.py
 * ``rand_sign_battery`` no longer emits an ``at_or_above_p95`` boolean at 25 seeds (that bar
   is ~the top order statistic of 25 draws = pure noise; HTFCAP SOL 24.9 bps read P80/FALSE
   and was auto-labelled a "fail"). It now runs a **≥2000-seed** battery and reports **effect
-  size + one-sided p + CI** — a description, never a pass/fail.
+  size + one-sided p + CI** — a description, never a pass/fail. INFR-022: the
+  ``min_powered_seeds`` / ``powered`` / ``structural_label`` (UNPOWERED/CONTRADICTED)
+  machinery is **deleted** — the battery reports effect + one-sided p + CI + n only; value
+  labels are operator-only tags (N11).
 * ``attribution_derangement`` no longer emits ``hard_fail_leak`` / a collapse<0.5 auto-REJECT.
   It reports the **collapse fraction** (how much edge is timing/construction-attributable)
   with battery percentiles — the operator judges (INFR-016 §4c, operator-ratified 2026-07-18).
@@ -16,7 +19,9 @@ Promotes the per-experiment controls (XENA-HTFCAP-001 `analysis_code/controls.py
 * ``future_destroy`` — destroys information from AFTER the decision (time-reversal /
   future-shuffle / label-permutation). Edge survival ⇒ acausal L-01 leak. **This class stays a
   HARD VALIDITY attestation** and is NOT rendered as a report layer here (it belongs to the
-  data-validity block; see :func:`assert_future_destroy_class`).
+  data-validity block; see :func:`assert_future_destroy_class`). Its integrity bite scale is
+  the SE-family ``INTEGRITY_Z × bootstrap_SE`` of the control's own estimator (INFR-022 N6b),
+  never an MDE/detection floor.
 * ``within_sample_attribution`` — scrambles within-sample alignment/timing while entries stay
   causal (≤ t-1), e.g. the HTFCAP gate-schedule derangement. A partly-surviving edge is an
   **attribution** finding, not a leak → **report layer**.
@@ -26,11 +31,10 @@ Every battery is data-independent (regenerable from seed + entry schedule).
 """
 from __future__ import annotations
 
-from typing import Any
 
 import numpy as np
 
-from xen.xena.report_layer import LayerReport, structural_label
+from xen.xena.report_layer import LayerReport
 
 DEFAULT_SIGN_BATTERY_SEEDS = 2000     # INFR-016 §7 (operator-ratified 2026-07-18)
 DEFAULT_DERANGE_SEEDS = 25            # ≥15 (L-19); default 25 for a stable percentile read
@@ -67,8 +71,7 @@ def make_derangement(n: int, rng: np.random.Generator) -> np.ndarray:
 # --------------------------------------------------------------------------- #
 def sign_battery(direction: np.ndarray, entry_price: np.ndarray, exit_price: np.ndarray,
                  *, candidate_id: str, n_seeds: int = DEFAULT_SIGN_BATTERY_SEEDS,
-                 seed0: int = SIGN_BATTERY_SEED0,
-                 min_powered_seeds: int = 1000) -> LayerReport:
+                 seed0: int = SIGN_BATTERY_SEED0) -> LayerReport:
     """Rademacher sign-scramble battery on a fixed entry schedule → a report layer.
 
     Destroys directional content (Rademacher signs on |path magnitude|); keeps the entry
@@ -76,8 +79,8 @@ def sign_battery(direction: np.ndarray, entry_price: np.ndarray, exit_price: np.
     live effect vs the battery mean, a **one-sided p** (fraction of null medians ≥ raw), and a
     percentile-bootstrap CI on the null median — NEVER a P95 boolean.
 
-    ``min_powered_seeds``: below this the read is labelled UNPOWERED (a 25-seed battery cannot
-    resolve a tail quantile — the HTFCAP defect).
+    INFR-022 (L-63/N11): ``min_powered_seeds`` / ``powered`` / machine labels are deleted —
+    the read is effect + one-sided p + CI + n; labels are operator-only tags.
     """
     d = np.asarray(direction, dtype=float)
     ep = np.asarray(entry_price, dtype=float)
@@ -101,17 +104,11 @@ def sign_battery(direction: np.ndarray, entry_price: np.ndarray, exit_price: np.
     ci_hi = float(np.quantile(arr, 0.975)) if len(arr) else float("nan")
     percentile = float(np.mean(arr <= raw_med))
 
-    powered = n_seeds >= min_powered_seeds
-    # Structural label only (UNPOWERED / CONTRADICTED / None) — the plain read below carries
-    # the p-strength; no p-cutpoint label (INFR-016 follow-up, retires the L-32-in-miniature).
-    label = structural_label(powered=powered, directional_positive=raw_med > 0)
     interp = (
         f"raw {raw_med:.1f} bps vs sign-null mean {null_mean:.1f} bps "
         f"(effect {effect:+.1f}); one-sided p={one_sided_p:.3f}, "
         f"percentile {percentile:.2f}; "
-        + ("underpowered — too few seeds to resolve the tail"
-           if not powered else
-           "suggestive but not decisive" if 0.15 < one_sided_p <= 0.35 else
+        + ("suggestive but not decisive" if 0.15 < one_sided_p <= 0.35 else
            "directional signal above the null" if one_sided_p <= 0.15 else
            "within noise of the sign null"))
     return LayerReport(
@@ -120,7 +117,7 @@ def sign_battery(direction: np.ndarray, entry_price: np.ndarray, exit_price: np.
         observed=f"raw {raw_med:.1f} bps, p={one_sided_p:.3f}",
         ideal_range="raw median above the sign null with one-sided p ≤ ~0.05 (real edge)",
         interpretation=interp,
-        interpretation_label=label,
+        interpretation_label=None,
         supporting={
             "n_legs": int(len(raw)),
             "n_seeds": int(n_seeds),
@@ -131,8 +128,8 @@ def sign_battery(direction: np.ndarray, entry_price: np.ndarray, exit_price: np.
             "one_sided_p": one_sided_p,
             "percentile_vs_battery": percentile,
             "null_ci95": [ci_lo, ci_hi],
-            "powered": bool(powered),
-            "form": "Rademacher sign scramble; schedule fixed (B-1); effect+p+CI, no P95 boolean",
+            "form": "Rademacher sign scramble; schedule fixed (B-1); effect+p+CI+n, "
+                     "no P95 boolean, no power labels (INFR-022 L-63)",
         },
     )
 

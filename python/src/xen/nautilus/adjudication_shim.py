@@ -170,7 +170,15 @@ def adjudicate_emission(
     *,
     cost_bps: float = 0.0,
 ) -> AdjudicationBundle:
-    """Parse emission and run the canonical multi-leg series + reconcile."""
+    """Parse emission and run the canonical multi-leg series + reconcile.
+
+    Zero-cost model (INFR-022 §3.2): ``cost_bps`` defaults to 0 and any non-zero pin is
+    refused (``assert_zero_cost``) — no cost enters a live adjudication unless an operator
+    cost directive is recorded in the design. Returns ``None`` series when the emission
+    has < 2 bars or an empty leg book."""
+    from xen.evaluation import assert_zero_cost
+
+    assert_zero_cost(cost_bps=cost_bps)
     positions, cis, metadata = emission_to_adjudication_frames(emission)
     if positions.height < 2:
         return AdjudicationBundle(positions, cis, metadata, None, None)

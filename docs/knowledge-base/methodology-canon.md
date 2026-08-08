@@ -67,12 +67,17 @@ and the traps to avoid, on any new experiment.
   screened TRAIN-only in Python (0 engine runs, 0 counted reads, 0 slots): blind multi-leg
   analyst passes, ref-arm replication, control battery. Cheap WORTH_EXPLORING/KILL routing —
   CF-HTFDI-001 was registered and retired for ~0 budget. Lane spec: `docs/references/spdr-lane.md`.
-- **Unit pin at every screen→graduation seam (L-21).** A dimensionless screen effect becomes a
-  money claim only through an explicit unit derivation (which ATR, which timeframe, which lag),
-  re-computed — not asserted — at graduation, plus a **money-unit floor** (bps/trade vs the cost
-  stack). The 4.1× EXP-025 inflation is the canonical failure.
-- **Spread is a verdict leg on 0-commission instruments (L-22).** A commission-only cost band
-  never binds where commission is 0; the SUPPORTED tier must price spread.
+- **Unit pin at every screen→graduation seam (L-21; live core retained under INFR-022).** A
+  dimensionless screen effect becomes a money claim only through an explicit unit derivation
+  (which ATR, which timeframe, which lag), re-computed — not asserted — at graduation. The
+  historical **money-unit floor** (bps/trade vs a cost stack) is **superseded-for-live-use by
+  L-62** (zero-cost model): live money claims are gross, carry ZERO-COST-DISCLOSURE, and are
+  never gated on a cost floor. The 4.1× EXP-025 inflation remains the canonical unit-pin failure.
+- **Spread as a verdict leg on 0-commission instruments (L-22) — superseded-for-live-use
+  (INFR-022 L-62).** Under the zero-cost model, spread/commission/swap are not charged and do
+  not form a binding tradability tier; the historical L-22 lesson (commission-only bands never
+  bind where commission is 0) remains true as *why* partial cost scopes were unsafe, not as a
+  live requirement to price spread into every SUPPORTED read.
 - **Amendment-direction ledger (L-23).** Every pre-measurement amendment declares looser/tighter
   and increments a running count; re-derive the joint false-qualification rate at the final gate.
 - **Seed batteries, never single-draw controls (L-19/L-20).** One random twin is one draw; kill
@@ -103,6 +108,9 @@ and the traps to avoid, on any new experiment.
 - **Check gross bps/trade against breakeven spread BEFORE search** (XENA-003). A universe
   whose gross edge sits within ~3× the round-trip spread is undecidable on costless/coarse
   data — the search will maximize a print artifact. Route to finer data or park.
+  [**superseded-for-live-use (INFR-022): the spread-scale routing and breakeven-spread
+  pre-search check are retired (zero-cost model); the underlying lesson — a search can
+  maximize a print artifact — survives via the fill-basis (print vs path) evidence read.**]
 - **Calibrate α with sized nulls.** e2e α̂ SE ≈ 0.218/√n_null: scale n_null (not candidates or
   budget) to the resolution the gate needs; predeclare n; no optional stopping; gate on the
   point α̂.
@@ -114,7 +122,9 @@ and the traps to avoid, on any new experiment.
   calendar destroy the leg structure the statistic lives on.
 - **Objectives must carry the binding cost** (L-26). A costless cadence-maximizing objective
   structurally penalizes any filter/conditioning thesis; net cost is a verdict leg inside the
-  frozen procedure, never informational-only.
+  frozen procedure, never informational-only. [**superseded-for-live-use (INFR-022): the
+  net-cost-binding selection path is retired — selection is gross-only (`g_gross`); the CAL
+  apparatus that measured it is bannered legacy.**]
 
 ## Chapter 04 additions (Nautilus/Bybit + signed-volume arc)
 

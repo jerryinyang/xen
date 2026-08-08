@@ -1,5 +1,9 @@
 # The Unsigned Failed-Break Bounce — Standalone Viability Review
 
+> **HISTORICAL (pre-INFR-022).** Cost-floor / net-clearing language in this review is
+> chapter-04 apparatus. Live programme is **zero-cost** (L-62); do not treat “clears cost floor”
+> as a current disposition rule. Body retained for reproducibility.
+
 **Purpose.** SPDR-008 killed the *signed* trap-load warrant (CF-SIGAUC-001, powered null on three
 boundaries). It left behind one object that **clears its cost floor**: the unsigned failed-break
 reversal at prior value-area and prior-session-extreme levels. This brief asks the question the

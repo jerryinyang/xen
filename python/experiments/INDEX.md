@@ -11,6 +11,7 @@ re-run these).
 
 | ID | Status | Purpose |
 |---|---|---|
+| INFR-022 | COMPLETE (2026-08-08) | Programme-wide update: zero-cost model, neutrality standard (N1–N11), powering strip (no MDE/floors), PSR pairing — all lanes. Plan: `docs/superpowers/plans/2026-08-08-infr-022-zero-cost-neutrality-psr-pipeline-update.md` (Task 5 review §13; Task 6 sign-off) |
 
 ## Chapter 06 — active
 
@@ -25,8 +26,14 @@ re-run these).
 - **Do not open a family whose thesis is that a better exit, hold, trail or size rule converts a
   break-even joint into a positive one.** That class is refuted at power (chapter-05 §"What
   Chapter 05 changed about the frame"). `W/L` is ~97% the arithmetic mirror of `p`.
-- **Spread is uncharged programme-wide.** Reported net is overstated; every money, expectancy and
-  tradability claim stays refused by rule, not by pending work.
+- **Zero-cost model (INFR-022).** No spread, commission, or swap enters any calculation in
+  any experiment type unless an explicit operator cost directive requests costs (recorded in
+  the design + `operator_cost_directive.json`). The ZERO-COST-DISCLOSURE caveat appears on
+  every money-bearing artifact. Deployability/tradability claims stay refused by rule.
+- **No research powering (INFR-022).** Sample-size context + direct baseline comparison only;
+  MDE/floors/power curves/UNPOWERED labels are retired. PSR (`psr` + `psr_n`, same series)
+  pairs every mean-trade/leg bps read. Neutrality N1–N11 binds every analysis/screen/report
+  (`docs/references/neutrality-standard.md`).
 - **Both sanctioned legacy holdout shots are spent**; the Bybit global-calendar holdout is sealed.
 - **Ledgers persist and are never reset:** `docs/signal-registry/multiplicity-registry.md`,
   `test-read-ledger.md`, `candidate-families/`.

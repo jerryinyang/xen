@@ -25,19 +25,15 @@ Protocol (§A.4):
 Pass/fail: ``pass_threshold`` on the bootstrap P25 is PRE-REGISTERED before the run (L-23);
 this module refuses to run without it and records it verbatim.
 
-Gate cost regime (operator amendment A-4, 2026-07-10): the gate runs the §A.4 protocol
-TWICE — a **GROSS run (binding)** validating the pure optimizer + walk-forward selection
-machinery (selection also runs gross, so the search-gap diagnostic compares like scales),
-and a **NET run (informational)** with full costs + its own DD read. `passed` comes from
-the gross block only. Rationale (operator, 2026-07-10): the dual gate separates the
-characterisation of model performance and signal quality (gross) from failure-by-cost
-scenarios (net) — a portfolio that dies only under costs is a cost problem, not a
-selection-machinery problem, and conflating the two in one binding number would hide
-which failed. The net block stays strictly informational but important; the final
-verdict is always the operator's. L-22 retained clause: **any deployability claim must cite the
-`net_informational` block** — a gross gate pass is a selection-machinery verdict, never
-a tradability claim. The pre-registered `pass_threshold` must be derived from GROSS null
-gate P25s (v3 re-derivation).
+Gate cost regime (INFR-022, supersedes operator amendment A-4): the gate runs the §A.4
+protocol ONCE — a **GROSS run (binding)** validating the pure optimizer + walk-forward
+selection machinery (selection also runs gross, so the search-gap diagnostic compares like
+scales). The A-4 dual gate (gross binding + net informational) is **retired**: the
+programme is zero-cost, so there is no net leg to run. `passed` comes from the gross
+block; the pre-registered `pass_threshold` derives from GROSS null gate P25s. L-22
+retained clause: a gate pass is a selection-machinery verdict, never a tradability claim;
+deployability/tradability claims remain refused by rule (the zero-cost model does not
+loosen them). Every artifact carries ``cost_model: NO_COST_CHARGED`` (INFR-022 §3.1).
 
 Second-slot semantics (operator amendment 2026-07-10, resolving the Q2-vs-§A.5 tension —
 the cap-2 ledger is a **LOOSER** amendment of spec invariant 10 and is tagged as such in
@@ -185,13 +181,10 @@ def run_final_gate(subset: frozenset[str] | set[str], streams: list[CandidateStr
                                       threshold_override_attestation=
                                       threshold_override_attestation))
 
-    # Gate cost policy (operator amendment A-4, 2026-07-10): the BINDING gate run is
-    # GROSS (charge_costs=False) — it validates the pure optimizer + walk-forward
-    # selection machinery. A COSTED run executes alongside as an INFORMATIONAL block.
-    # L-22 retained clause: any DEPLOYABILITY claim must cite the costed block; a gross
-    # gate pass is a selection-machinery verdict, never a deployability claim.
-    config_gross = replace(config, charge_costs=False)
-    config_net = replace(config, charge_costs=True)
+    # INFR-022 (zero-cost model, supersedes A-4 dual gate): the gate runs GROSS once.
+    # Costs never enter the gate; a pass is a selection-machinery verdict, never a
+    # deployability claim (L-22 retained clause).
+    config_gross = replace(config, charge_costs=False, operator_cost_directive=None)
 
     subset = frozenset(subset)
     failed_same = [r for r in spent
@@ -264,9 +257,8 @@ def run_final_gate(subset: frozenset[str] | set[str], streams: list[CandidateStr
             "n_admitted": res.n_admitted, "n_rejected": res.n_rejected,
         }
 
-    # A-4 dual gate run: GROSS = binding (pure selection machinery); NET = informational.
+    # Single GROSS gate run (INFR-022): the A-4 NET informational run is retired.
     gross = walk_forward_block(config_gross)
-    net = walk_forward_block(config_net)
 
     passed = (gross["F_boot"]["p25"] >= pass_threshold
               and gross["dd_feasibility"]["feasible"])
@@ -277,11 +269,9 @@ def run_final_gate(subset: frozenset[str] | set[str], streams: list[CandidateStr
         "gate_segment_ns": list(gate_segment),
         "pass_threshold_preregistered": pass_threshold,
         "passed": bool(passed),                      # binding verdict = GROSS block
-        "binding_block": "gross",                    # A-4: pure optimizer+walk-forward
+        "binding_block": "gross",
+        "cost_model": "NO_COST_CHARGED",            # INFR-022 §3.1 (zero-cost)
         "gross": gross,
-        # INFORMATIONAL ONLY — but any DEPLOYABILITY claim MUST cite this block (L-22
-        # retained clause): a gross pass is a selection-machinery verdict, not tradability.
-        "net_informational": net,
         # §A.4.5 selection-bias calibration. NOT like-for-like: the claim is the SEARCH
         # segment's bootstrap-P25; it is compared against the GATE segment's bootstrap
         # MEDIAN. Both gross (selection ran gross → comparable scales).
@@ -317,43 +307,46 @@ def final_report_layer(subset: frozenset[str] | set[str], streams: list[Candidat
                        config: OracleConfig, *, gate_segment: tuple[int, int],
                        candidate_id: str, params: SearchParams = SearchParams(),
                        oracle_seed: int = 0, boot_seed: int = 424243,
-                       n_decay_windows: int = 4, ideal_range: str = "net P25 > 0 with DD feasible"):
-    """Net-deployability read on the reserved segment as a :class:`LayerReport` — INFR-016.
+                       n_decay_windows: int = 4, ideal_range: str = "gross P25 > 0 with DD feasible"):
+    """Gross walk-forward read on the reserved segment as a :class:`LayerReport` — INFR-016.
 
     Same walk-forward mechanics as :func:`run_final_gate` (deterministic; no emission change),
-    but emits **no `passed`** and **no threshold**: it reports net P25/median/P75, DD, and
-    decay for the operator to judge. The counted-ledger + holdout-safety mechanics stay in
-    :func:`run_final_gate` as data-validity/read-budget controls (INFR-016 §4a); the value
-    read is this layer.
+    but emits **no `passed`** and **no threshold**: it reports gross P25/median/P75, DD, and
+    decay for the operator to judge. INFR-022: gross-only (zero-cost model) — the former
+    net-deployability layer name is retired; deployability claims remain refused by rule.
+    The counted-ledger + holdout-safety mechanics stay in :func:`run_final_gate` as
+    data-validity/read-budget controls (INFR-016 §4a); the value read is this layer.
     """
     from xen.xena.report_layer import LayerReport  # lazy: avoid import cycle at module load
 
     subset = frozenset(subset)
     grid = clip_grid_covering(universe_grid(streams), gate_segment, streams)
-    cfg_net = replace(config, charge_costs=True)
-    res = evaluate(subset, streams, cfg_net, segment=gate_segment, seed=oracle_seed)
+    cfg = replace(config, charge_costs=False, operator_cost_directive=None)
+    res = evaluate(subset, streams, cfg, segment=gate_segment, seed=oracle_seed)
     inc = grid_increments(res, grid)
     starts = bootstrap_block_starts(len(grid), block=params.block_bars,
                                     n_boot=max(params.n_boot, 200), seed=boot_seed)
     boot = bootstrap_F(inc, starts, block=params.block_bars,
-                       initial_equity=cfg_net.initial_equity)
+                       initial_equity=cfg.initial_equity)
     p25, p50, p75 = (float(np.quantile(boot, q)) for q in (0.25, 0.5, 0.75))
-    dd = dd_feasibility(res.equity_times, res.equity, initial_equity=cfg_net.initial_equity)
-    interp = (f"net P25 {p25:.4g}, median {p50:.4g}; DD "
+    dd = dd_feasibility(res.equity_times, res.equity, initial_equity=cfg.initial_equity)
+    interp = (f"gross P25 {p25:.4g}, median {p50:.4g}; DD "
               + ("within FTMO limits" if dd["feasible"] else "breaches FTMO limits")
-              + ("; net-positive lower band" if p25 > 0 else
-                 "; net edge not resolved above zero at the lower band"))
+              + ("; gross-positive lower band" if p25 > 0 else
+                 "; gross edge not resolved above zero at the lower band"))
     return LayerReport(
-        layer="net_deployability",
+        layer="final_walk_forward",
         candidate_id=candidate_id,
-        observed=f"net P25 {p25:.4g}, median {p50:.4g}",
+        observed=f"gross P25 {p25:.4g}, median {p50:.4g}",
         ideal_range=ideal_range,
         interpretation=interp,
         interpretation_label=None,
         supporting={
-            "net_F_boot": {"p25": p25, "median": p50, "p75": p75},
+            "gross_F_boot": {"p25": p25, "median": p50, "p75": p75},
             "dd_feasibility": dd,
             "n_admitted": res.n_admitted, "n_rejected": res.n_rejected,
-            "note": "former final gate as a report layer — operator judges deployability (INFR-016)",
+            "cost_model": "NO_COST_CHARGED",
+            "note": "former final gate as a report layer — operator judges (INFR-016; "
+                     "gross-only under INFR-022 zero-cost)",
         },
     )

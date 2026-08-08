@@ -1,4 +1,4 @@
-"""Reusable report-layer schema + renderer (INFR-016).
+"""Reusable report-layer schema + renderer (INFR-016; INFR-022 powering strip).
 
 Every value / quality / significance / selection read in the XENA value chain is a
 **report layer**, never a gate. A layer runs for **all authorised candidates**, drops
@@ -14,18 +14,26 @@ value chain returns a value auto-verdict: a :class:`LayerReport` carries **no** 
 provenance, estimand reconciliation, future-destroy leak survival — are a different layer and
 keep their blocking semantics; see INFR-016 design §4a/§4c.)
 
+INFR-022 (powering strip, L-63/N11): ``power_layer`` (MDE-based) is replaced by
+``sample_size_layer`` — n_legs, per-leg vol and a design minimum-n **note** only; no MDE,
+no ``powered`` boolean, no UNPOWERED label, no hide. ``structural_label`` and every machine
+auto-assignment of interpretation labels are **deleted**: STRONG/SUPPORTED/SUGGESTIVE/WASH
+(and UNPOWERED/CONTRADICTED) exist only as **operator-supplied tags** (N11) — never machine
+fields, never gates. ``psr_layer`` pairs PSR + n beside a mean-trade (bps) read (directive 4).
+
 ``interpretation_label`` is a scanning aid ONLY (INFR-016 §8): the design §9-style bands
 survive as descriptive labels on a layer, never as gates or drops.
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
-# Descriptive labels only — never a gate (INFR-016 §8). Auto-derivation is limited to the two
-# STRUCTURAL labels (UNPOWERED / CONTRADICTED via structural_label); STRONG/SUPPORTED/SUGGESTIVE/
-# WASH remain valid **operator-supplied** tags but are no longer machine-assigned from a
-# p-cutpoint (that re-imported the L-32 trap — see structural_label).
+# Operator-supplied tags only (INFR-022 N11) — NEVER machine-assigned, NEVER gating.
+# Machine auto-derivation of structural labels (UNPOWERED / CONTRADICTED) is deleted;
+# the operator may optionally tag a layer with plain-language interpretation after reading
+# numbers (STRONG/SUPPORTED/SUGGESTIVE/WASH/UNPOWERED/CONTRADICTED).
 InterpretationLabel = Literal[
     "STRONG", "SUPPORTED", "SUGGESTIVE", "WASH", "UNPOWERED", "CONTRADICTED",
 ]
@@ -83,52 +91,48 @@ class LayerReport:
         }
 
 
-def structural_label(*, powered: bool, directional_positive: bool) -> str | None:
-    """Return ONLY the two labels that are facts about the estimator, not a p-cutpoint.
+def sample_size_layer(candidate_id: str, *, n_legs: int, per_leg_vol_bps: float,
+                      design_min_n: int | None = None) -> LayerReport:
+    """Sample-size CONTEXT as a REPORT layer (INFR-022 L-63 — replaces ``power_layer``).
 
-    ``UNPOWERED`` encodes too-few-seeds (a fact about resolving power); ``CONTRADICTED``
-    encodes the wrong sign (a fact about direction). Otherwise **None** — the operator reads
-    the observed number + one-sided p + CI directly.
-
-    INFR-016 originally also auto-mapped a one-sided p to STRONG/SUPPORTED/SUGGESTIVE/WASH via
-    hardcoded cutpoints (0.05/0.15/0.35). That re-imported the exact L-32 defect in miniature:
-    a hardcoded-threshold label reads as a verdict (SOL at p=0.224 → "SUGGESTIVE" would flip to
-    "WASH" at p=0.36 on a cutpoint no more justified than the retired P95). The honest read is
-    already the number + p + CI; the p-band labels are dropped (INFR-016 follow-up, 2026-07-19).
+    Reports n_legs, per-leg vol, and (optionally) the design's pre-declared minimum-n
+    for *primary-inference language* — descriptive only: the row, estimate, interval and
+    n all still appear; a small-n row is never hidden, dropped, or labelled UNPOWERED
+    (N3/N10). No MDE, no ``powered`` boolean, no detection floor.
     """
-    if not powered:
-        return "UNPOWERED"
-    if not directional_positive:
-        return "CONTRADICTED"
-    return None
-
-
-def power_layer(candidate_id: str, *, n_legs: int, per_leg_vol_bps: float,
-                mde_bps: float, observed_edge_bps: float | None = None) -> LayerReport:
-    """Leg-count / power as a REPORT layer — retires the ``n_legs_floor`` in-domain veto.
-
-    Reports n_legs, per-leg vol, and the MDE (minimum detectable edge) so the operator sees
-    the resolving power. **Never a floor veto**: a thin-leg candidate is labelled UNPOWERED,
-    not dropped (INFR-016 §4b). ``powered`` iff a supplied observed edge exceeds the MDE.
-    """
-    powered = observed_edge_bps is not None and abs(observed_edge_bps) >= mde_bps
-    interp = (f"{n_legs} legs, per-leg vol {per_leg_vol_bps:.1f} bps, MDE {mde_bps:.1f} bps — "
-              + ("enough legs to resolve the observed edge" if powered else
-                 "too few legs / too much per-leg vol to resolve an edge this size — underpowered"))
+    note = (f"design minimum-n {design_min_n} for primary-inference language — descriptive "
+            "only, never a hide/drop rule (N3)" if design_min_n is not None else
+            "no design minimum-n declared — all rows reported with their counts; "
+            "sample-size notes are descriptive only, never a hide/drop rule (N3)")
+    interp = (f"{n_legs} legs, per-leg vol {per_leg_vol_bps:.1f} bps — sample-size context; "
+              "report alongside the estimate and its uncertainty (operator reads the numbers)")
     return LayerReport(
-        layer="leg_power", candidate_id=candidate_id,
-        observed=f"n_legs={n_legs}, MDE={mde_bps:.1f} bps",
-        ideal_range="MDE ≤ the observed edge (enough legs to resolve it)",
+        layer="sample_size", candidate_id=candidate_id,
+        observed=f"n_legs={n_legs}, per-leg vol={per_leg_vol_bps:.1f} bps",
+        ideal_range="sufficient event count for the operator's own reading of the estimate",
         interpretation=interp,
-        interpretation_label=None if powered else "UNPOWERED",
+        interpretation_label=None,
         supporting={"n_legs": int(n_legs), "per_leg_vol_bps": float(per_leg_vol_bps),
-                    "mde_bps": float(mde_bps),
-                    "observed_edge_bps": (None if observed_edge_bps is None
-                                          else float(observed_edge_bps)),
-                    "powered": bool(powered),
-                    "note": "power reported, never a floor veto (retires n_legs_floor)"},
+                    "design_min_n": (None if design_min_n is None else int(design_min_n)),
+                    "note": note},
     )
 
+
+def psr_layer(candidate_id: str, *, avg_trade_bps: float, psr: float, n: int) -> LayerReport:
+    """PSR pairing layer (INFR-022 §4.2): Probabilistic Sharpe Ratio + n beside the mean
+    per-trade (bps) figure, on the SAME trade series and population. Evidence, never a gate;
+    NaN psr with n stated when n < 2 or moments non-finite (N3 — the row still appears)."""
+    interp = (f"PSR {psr:.3f} over n={n} trades beside avg-trade {avg_trade_bps:.2f} bps "
+              "(skew/kurt-adjusted; same series as the mean)" if math.isfinite(psr) else
+              f"PSR undefined (n={n}) — reported with its count, not suppressed")
+    return LayerReport(
+        layer="psr", candidate_id=candidate_id,
+        observed=f"avg_trade_bps={avg_trade_bps:.2f}, PSR={psr:.3f}, n={n}",
+        ideal_range="PSR beside every mean-trade bps read (same series)",
+        interpretation=interp,
+        interpretation_label=None,
+        supporting={"avg_trade_bps": float(avg_trade_bps), "psr": float(psr), "psr_n": int(n)},
+    )
 
 def stage2_bounds_layer(candidate_id: str, *, lcb: float, ucb: float, n_legs: int,
                         net: bool = False) -> LayerReport:

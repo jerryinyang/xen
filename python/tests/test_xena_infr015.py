@@ -2,10 +2,8 @@
 from __future__ import annotations
 
 import numpy as np
-import polars as pl
 import pytest
 
-import xen.xena.calibration_p3b as p3b
 from xen.xena.calibration_bybit import IntegrityError
 from xen.xena.calibration_bybit15 import (
     BLOCK_RULE_ID,
@@ -71,7 +69,7 @@ def test_g2_b1_routes_to_legacy_bitwise():
     layout = c_layout(cadence.n_bars, cadence.hold_bars, embargo_frac=0.2)
     # sparse universe => wide gaps, short holds forced via few candidates + null
     streams = make_episode_null_universe(95_000, cadence, n_candidates=8)
-    config = OracleConfig(charge_costs=True)
+    config = OracleConfig(charge_costs=False)  # INFR-022: gross-only
     ids = [s.candidate_id for s in streams]
     pick = frozenset(ids[:3])
     out_ep = eval_lcb_legs_ep(pick, streams, config, layout.gate, n_boot=50, seed=7)
@@ -141,16 +139,20 @@ def test_g4a_floor_filter_arithmetic():
     assert e0["per_cadence"]["low"]["alpha_hat"] == 0.75
 
 
-def test_g4b_confirm_a4_requires_floor():
+def test_g4b_confirm_a4_refuses_legacy_net_stage1():
+    """INFR-022: the AMENDMENT-4 confirm path is gross-only — an L-26 procedure
+    (stage1 g_net + charge_costs) is refused before any I/O."""
     proc = {"design_bite_ok": True, "embargo_frac": 0.2, "n_boot": 200,
             "block_legs": "episode_overlap_rule_v1", "alpha": 0.05,
             "stage1_score_kind": "g_net", "stage1_charge_costs": True,
             "e2e_pass_event": "stage2_gross_lcb_positive"}
-    with pytest.raises(IntegrityError):
-        confirm_gate_a4(proc, scale=CONFIRM_SCALE_15)  # missing n_legs_floor
+    with pytest.raises(IntegrityError, match="zero-cost"):
+        confirm_gate_a4(proc, scale=CONFIRM_SCALE_15)  # net-cost-binding stage-1 retired
 
 
-def test_g4c_floor_out_of_domain_not_certifiable():
+def test_g4c_floor_veto_retired_rows_still_evaluated():
+    """INFR-022 L-63: the n_legs_floor domain guard is deleted — a tiny-n row is still
+    evaluated and reported (never vetoed as out-of-domain)."""
     from xen.xena.calibration_bybit15 import eval_lcb_legs_ep_floor, _set_seeds
     from xen.xena.calibration_pc import c_layout
     from xen.xena.oracle import OracleConfig
@@ -158,13 +160,15 @@ def test_g4c_floor_out_of_domain_not_certifiable():
     cadence = LOW
     layout = c_layout(cadence.n_bars, cadence.hold_bars, embargo_frac=0.2)
     streams = make_episode_null_universe(99_000, cadence, n_candidates=8)
-    config = OracleConfig(charge_costs=True)
+    config = OracleConfig(charge_costs=False)
     pick = frozenset([s.candidate_id for s in streams][:3])
-    out = eval_lcb_legs_ep_floor(pick, streams, config, layout.gate, n_boot=50,
-                                 seed=7, n_legs_floor=10**6)
-    assert out["in_domain"] is False
-    assert out["pass_positive"] is False
-    assert out["out_of_calibration_domain"] is True
+    out = eval_lcb_legs_ep_floor(pick, streams, config, layout.gate, n_boot=50, seed=7)
+    # no floor machinery: no out_of_calibration_domain / in_domain fields at all
+    assert "out_of_calibration_domain" not in out
+    assert "in_domain" not in out
+    assert "n_legs" in out
+    assert isinstance(out.get("pass_positive"), bool)
+    assert out["block_rule"] == BLOCK_RULE_ID
 
 
 def test_a4_seed_disjointness():

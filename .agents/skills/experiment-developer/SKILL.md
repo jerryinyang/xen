@@ -54,11 +54,19 @@ Three consecutive experiments shipped verdict-material design-to-code drift sile
 1. Map every design clause to a code location; keep the mapping — QA will trace it
    clause-by-clause in a fresh context.
 2. Implement the Nautilus strategy: event handlers use only confirmed data `≤ t-1`; decisions
-   at bar open; T1 lane is costless-honest in-engine (spread/fees injected at analysis).
+   at bar open. **Zero-cost model (INFR-022):** the engine runs costless-honest in-engine
+   AND analysis stays cost-free — no spread/commission/swap function is called on any live
+   path; `cost_bps`/`charge_costs` parameters stay inert (pinned 0 / False) unless the
+   design carries an operator cost directive (then the directive's exact functions/scope are
+   implemented and the run dir carries `operator_cost_directive.json`).
 3. Emit contract v1: `bar_marks.parquet`, `positions_ledger.parquet`, fills, orders,
    `event_log.jsonl`, `fence_attestation.json` (must NOT be STUB for real runs — reference
-   INFR-011 A6 manifest sha256). Run `xen.estimand_validation` v2 on a smoke cell before
-   handoff.
+   INFR-011 A6 manifest sha256). Emission metadata/artifacts carry
+   `cost_model: NO_COST_CHARGED` (or the directive reference). Where an emission
+   materialises a mean-bps column without a recoverable trade vector downstream,
+   also materialise `psr` + `psr_n` on the same series (INFR-022 §4.4). Run
+   `xen.estimand_validation` v2 on a smoke cell before handoff (its `no_cost_charged`
+   check must pass: no non-zero commission/fee column in the emission).
 4. Add run config under `python/experiments/<ID>/code/` (+ engine-side control variants).
 5. Implement the design's leak tripwire variant(s).
 6. **Do not generate the golden trace.** The design's golden-trace events are QA's diff
@@ -70,6 +78,10 @@ Three consecutive experiments shipped verdict-material design-to-code drift sile
 - No Python backtest, replication, or analysis of the strategy — REJECT-class.
 - No accounting primitives in experiment dirs: `assemble_realized_bps` and successors live
   only in `xen.adjudication` (`check_no_local_accounting` gates this).
+- No cost function on any live path (INFR-022): no `bybit_round_trip_cost_bps`,
+  `round_trip_cost_bps`, `spread_scale_route`, FTMO tables, or net-of-cost figures without a
+  recorded operator cost directive; the retired stack lives in `evaluation_cost_legacy`
+  (ARCHIVED banner).
 - No scope extension, no extra emissions/analyses beyond the design.
 - No holdout contact; emissions end at catalog `analysis_end_utc` (fence attestation).
 - No synthetic prices in any emitted outcome column.
@@ -83,7 +95,7 @@ what was built, whether it is ready to run, any decision needed — not a jargon
 - files created/modified; conf names; how to run each cell;
 - design-clause → code-location map (QA input);
 - deviations raised and their resolutions (or "none");
-- smoke-cell integrity check result (`xen.estimand_validation`).
+- smoke-cell integrity check result (`xen.estimand_validation`, incl. `no_cost_charged`).
 
 Execution itself is operator-gated: report ready-to-run; do not launch credentialed/
 cost-bearing runs yourself.

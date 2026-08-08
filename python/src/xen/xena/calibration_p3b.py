@@ -1,11 +1,16 @@
 """INFR-009 P3b re-calibration — studentized LCB + purged rank→TEST seam.
 
+> **LEGACY CAL APPARATUS (INFR-022).** Not bindable on the live research path without a
+> post-INFR-022 CAL redesign. Retired names used here for historical replay only: the
+> ``n_legs_floor`` / ``n_blocks_floor`` domain guards (AMENDMENT-7 / L-56 detection floors)
+> and the NET LCB path (zero-cost model). INFR-022: gross-only, sample-size as context.
+
 Disjoint bank seeds from P3. Does not call run_final_gate. No fixture contact.
 Predeclaration: design.md §P3b.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
@@ -14,7 +19,7 @@ from xen.xena.calibration import SegmentLayout, path_universe
 from xen.xena.certify import certify_and_rank, contiguous_purged_folds
 from xen.xena.high_cadence_null import HighCadenceNullSpec, build_high_cadence_null
 from xen.xena.oracle import CandidateStream, OracleConfig, evaluate
-from xen.xena.score import g_gross_point, lcb_g_studentized
+from xen.xena.score import lcb_g_studentized
 from xen.xena.search import (SearchParams, bootstrap_block_starts, clip_grid_covering,
                              run_restart, universe_grid)
 
@@ -118,22 +123,18 @@ def block_candidates(H: int) -> list[int]:
 
 def evaluate_lcb_st(subset: frozenset[str] | set[str], streams: list[CandidateStream],
                     config: OracleConfig, segment: tuple[int, int], *,
-                    block: int, n_boot: int = 200, seed: int = 0,
-                    net: bool = False,
-                    n_legs_floor: int | None = None,
-                    n_blocks_floor: int | None = None) -> dict:
-    cfg = replace(config, charge_costs=bool(net))
-    res = evaluate(subset, streams, cfg, segment=segment, seed=seed)
+                    block: int, n_boot: int = 200, seed: int = 0) -> dict:
+    """Studentized LCB on g_gross (gross-only, INFR-022). Sample size reported as context."""
+    res = evaluate(subset, streams, config, segment=segment, seed=seed)
     grid = universe_grid(streams)
     grid = clip_grid_covering(grid, segment, streams)
     if len(grid) < 2:
         return {"lcb": float("-inf"), "pass_positive": False, "point": float("nan"),
-                "empty_grid": True, "in_domain": False, "method": "studentized_bootstrap_t"}
+                "empty_grid": True, "method": "studentized_bootstrap_t"}
     starts = bootstrap_block_starts(len(grid), block=block, n_boot=n_boot,
                                     seed=17_001 + seed)
     out = lcb_g_studentized(
-        res, streams, grid, starts, block=block, confidence=LCB_CONFIDENCE,
-        net=net, n_legs_floor=n_legs_floor, n_blocks_floor=n_blocks_floor)
+        res, streams, grid, starts, block=block, confidence=LCB_CONFIDENCE)
     out["n_admitted"] = res.n_admitted
     out["empty_grid"] = False
     return out
@@ -141,14 +142,12 @@ def evaluate_lcb_st(subset: frozenset[str] | set[str], streams: list[CandidateSt
 
 def coverage_no_search(cadence: CadenceSpec, *, block: int, n_universes: int,
                        n_cand: int, subset_size: int = 5,
-                       n_legs_floor: int | None = None,
-                       n_blocks_floor: int | None = None,
                        purge_mult: int = 1) -> dict[str, Any]:
     config = OracleConfig(charge_costs=False)
     layout = _layout(cadence.n_bars, cadence.hold_bars, purge_mult=purge_mult)
     H = cadence.hold_bars
     block = max(block, H)
-    hits = domain_skips = 0
+    hits = 0
     rows = []
     seeds = bank_seeds(cadence, n_universes)
     for seed, cspec in seeds:
@@ -157,34 +156,27 @@ def coverage_no_search(cadence: CadenceSpec, *, block: int, n_universes: int,
         ids = [s.candidate_id for s in streams]
         k = min(subset_size, len(ids))
         pick = frozenset(str(x) for x in rng.choice(ids, size=k, replace=False))
-        lcb = evaluate_lcb_st(pick, streams, config, layout.gate, block=block, seed=seed,
-                              n_legs_floor=n_legs_floor, n_blocks_floor=n_blocks_floor)
-        if lcb.get("out_of_calibration_domain"):
-            domain_skips += 1
-            rows.append({"seed": seed, "pass": False, "ood": True, **{
-                k: lcb.get(k) for k in ("lcb", "n_legs", "n_nonempty_blocks",
-                                         "empty_bar_fraction")}})
-            continue
+        lcb = evaluate_lcb_st(pick, streams, config, layout.gate, block=block, seed=seed)
         pos = bool(lcb.get("pass_positive"))
         hits += int(pos)
-        rows.append({"seed": seed, "pass": pos, "ood": False,
+        rows.append({"seed": seed, "pass": pos,
                      "lcb": lcb.get("lcb"), "n_legs": lcb.get("n_legs"),
                      "n_nonempty_blocks": lcb.get("n_nonempty_blocks"),
                      "empty_bar_fraction": lcb.get("empty_bar_fraction")})
-    n_in = len(seeds) - domain_skips
-    rate = hits / max(n_in, 1)
+    n = len(seeds)
+    rate = hits / max(n, 1)
     return {
         "cadence": cadence.name, "block": block, "H": H,
-        "n": len(seeds), "n_in_domain": n_in, "n_ood": domain_skips,
-        "n_lcb_positive": hits, "rate_lcb_positive": rate,
-        "coverage_ok": (n_in > 0 and rate <= ALPHA),
+        "n": n, "n_lcb_positive": hits, "rate_lcb_positive": rate,
+        "coverage_ok": (n > 0 and rate <= ALPHA),
         "alpha": ALPHA, "method": "studentized_bootstrap_t",
         "rows": rows,
     }
 
 
 def select_block_and_floors(scale: ScaleSpec, *, purge_mult: int = 1) -> dict[str, Any]:
-    """A1 block sweep + A3 floor selection on no-search coverage.
+    """A1 block sweep on no-search coverage (the A3 n_legs_floor selection is RETIRED,
+    INFR-022 L-63 — sample-size is context, never a gate).
 
     Shared L grid: union of per-cadence candidates with L ≥ max(H_low, H_high) so both
     cadences are evaluated at the same L (P3b joint rule).
@@ -195,7 +187,6 @@ def select_block_and_floors(scale: ScaleSpec, *, purge_mult: int = 1) -> dict[st
     if not shared_L:
         shared_L = block_candidates(H_joint)
     sweeps: dict[str, list] = {}
-    # First pass: no floors — pure A1 coverage vs block (same L on both cadences)
     for c in (LOW, HIGH):
         sweeps[c.name] = []
         for L in shared_L:
@@ -211,36 +202,6 @@ def select_block_and_floors(scale: ScaleSpec, *, purge_mult: int = 1) -> dict[st
     selected_block = ok_Ls[0] if ok_Ls else None
     block_use = selected_block if selected_block is not None else max(64, H_joint)
 
-    # A3: smallest n_legs floor such that among in-domain nulls coverage holds
-    # Collect n_legs from rows at selected/fallback block
-    all_legs = []
-    for cname in ("low", "high"):
-        for r in sweeps[cname]:
-            if r["block"] != block_use:
-                continue
-            for row in r["rows"]:
-                if row.get("n_legs") is not None:
-                    all_legs.append(int(row["n_legs"]))
-    floors_tried = sorted(set([0, 5, 10, 15, 20, 30, 40, 50] + (
-        [int(np.percentile(all_legs, p)) for p in (10, 25, 50)] if all_legs else [])))
-    floor_choice = None
-    floor_curve = []
-    for fl in floors_tried:
-        ok_both = True
-        rates = {}
-        for c in (LOW, HIGH):
-            cov = coverage_no_search(
-                c, block=block_use, n_universes=min(scale.n_coverage, 40),
-                n_cand=scale.n_cand, n_legs_floor=fl if fl > 0 else None,
-                purge_mult=purge_mult)
-            rates[c.name] = cov["rate_lcb_positive"]
-            # coverage among in-domain only
-            if cov["n_in_domain"] < 5 or not cov["coverage_ok"]:
-                ok_both = False
-        floor_curve.append({"n_legs_floor": fl, "rates": rates, "ok": ok_both})
-        if ok_both and floor_choice is None:
-            floor_choice = fl
-
     return {
         "rule_block": "smallest L≥H with studentized no-search P(LCB>0)≤α both cadences",
         "selected_block": selected_block,
@@ -249,10 +210,11 @@ def select_block_and_floors(scale: ScaleSpec, *, purge_mult: int = 1) -> dict[st
         "coverage_stop_fail": selected_block is None,
         "sweeps": {k: [{kk: vv for kk, vv in r.items() if kk != "rows"} for r in v]
                    for k, v in sweeps.items()},
-        "rule_A3": "smallest n_legs_floor where in-domain coverage ≤α both cadences",
-        "selected_n_legs_floor": floor_choice,
-        "A3_curve": floor_curve,
-        "A3_fail": floor_choice is None and selected_block is None,
+        "rule_A3": "RETIRED (INFR-022 L-63): n_legs_floor vetoes removed — sample-size is "
+                   "context, never a gate",
+        "selected_n_legs_floor": None,
+        "A3_curve": [],
+        "A3_fail": False,
         "method": "studentized_bootstrap_t",
         "purge_mult": purge_mult,
     }
@@ -260,8 +222,8 @@ def select_block_and_floors(scale: ScaleSpec, *, purge_mult: int = 1) -> dict[st
 
 def run_e2e_one(seed: int, cadence: CadenceSpec, *, block_lcb: int,
                 scale: ScaleSpec, edge_bps: float = 0.0,
-                n_legs_floor: int | None = None,
                 purge_mult: int = 1) -> dict[str, Any]:
+    """One e2e row (gross-only, INFR-022)."""
     config = OracleConfig(charge_costs=False)
     params = SearchParams(L=40, n_boot=80, block_bars=max(64, cadence.hold_bars),
                           init_size=4)
@@ -285,21 +247,17 @@ def run_e2e_one(seed: int, cadence: CadenceSpec, *, block_lcb: int,
         search_segment=layout.search, include_random_ref=False, include_fill_basis=False)
     if not pkg["ranked"]:
         return {"seed": seed, "cadence": cadence.name, "empty_shortlist": True,
-                "gross_pass": False, "net_pass": False, "ood": False}
+                "gross_pass": False}
     top = pkg["ranked"][0].subset
     gross = evaluate_lcb_st(top, streams, config, layout.gate, block=block_lcb,
-                            seed=seed, net=False, n_legs_floor=n_legs_floor)
-    net = evaluate_lcb_st(top, streams, config, layout.gate, block=block_lcb,
-                          seed=seed, net=True, n_legs_floor=n_legs_floor)
-    ood = bool(gross.get("out_of_calibration_domain"))
+                            seed=seed)
     return {
         "seed": seed, "cadence": cadence.name, "symbol": cadence.symbol,
         "empty_shortlist": False, "subset_size": len(top),
         "g_search_hat": pkg["ranked"][0].search_F_hat,
         "gross_lcb": gross.get("lcb"), "gross_point": gross.get("point"),
-        "gross_pass": bool(gross.get("pass_positive")) and not ood,
-        "net_lcb": net.get("lcb"), "net_pass": bool(net.get("pass_positive")),
-        "ood": ood, "n_legs": gross.get("n_legs"),
+        "gross_pass": bool(gross.get("pass_positive")),
+        "n_legs": gross.get("n_legs"),
         "n_nonempty_blocks": gross.get("n_nonempty_blocks"),
         "empty_bar_fraction": gross.get("empty_bar_fraction"),
         "n_admitted_test": gross.get("n_admitted"),
@@ -312,19 +270,17 @@ def run_e2e_one(seed: int, cadence: CadenceSpec, *, block_lcb: int,
 
 
 def end_to_end_alpha(cadence: CadenceSpec, *, block_lcb: int, scale: ScaleSpec,
-                     n_legs_floor: int | None = None,
                      purge_mult: int = 1) -> dict[str, Any]:
     seeds = bank_seeds(cadence, scale.n_null)
     rows = [run_e2e_one(seed, cspec, block_lcb=block_lcb, scale=scale,
-                        n_legs_floor=n_legs_floor, purge_mult=purge_mult)
+                        purge_mult=purge_mult)
             for seed, cspec in seeds]
-    in_dom = [r for r in rows if not r.get("ood") and not r.get("empty_shortlist")]
+    in_dom = [r for r in rows if not r.get("empty_shortlist")]
     n_pass = sum(1 for r in in_dom if r.get("gross_pass"))
     n_in = len(in_dom)
     rate = n_pass / max(n_in, 1)
     return {
         "cadence": cadence.name, "n": len(rows), "n_in_domain": n_in,
-        "n_ood": sum(1 for r in rows if r.get("ood")),
         "n_gross_lcb_positive": n_pass, "alpha_hat": rate,
         "alpha_target": ALPHA, "pass_stop": n_in > 0 and rate <= ALPHA,
         "method": "studentized_bootstrap_t",
@@ -335,33 +291,25 @@ def end_to_end_alpha(cadence: CadenceSpec, *, block_lcb: int, scale: ScaleSpec,
 
 def power_curve(cadence: CadenceSpec, *, block_lcb: int, scale: ScaleSpec,
                 edges: tuple[float, ...] = (5.0, 10.0, 20.0, 30.0, 40.0),
-                n_legs_floor: int | None = None,
                 purge_mult: int = 1) -> dict[str, Any]:
+    """Power curve (gross-only; the NET power read is retired, INFR-022)."""
     base = 15_000 if cadence.name == "low" else 16_000
     curve = []
     for e in edges:
-        hits_g = hits_n = 0
+        hits_g = 0
         for i in range(scale.n_power):
             r = run_e2e_one(base + int(e * 10) + i, cadence, block_lcb=block_lcb,
-                            scale=scale, edge_bps=e, n_legs_floor=n_legs_floor,
-                            purge_mult=purge_mult)
+                            scale=scale, edge_bps=e, purge_mult=purge_mult)
             hits_g += int(r.get("gross_pass", False))
-            hits_n += int(r.get("net_pass", False))
         curve.append({"edge_bps": e, "n": scale.n_power,
                       "gross_lcb_power": hits_g / scale.n_power,
-                      "net_lcb_power": hits_n / scale.n_power,
                       "cadence": cadence.name})
     return {"cadence": cadence.name, "curve": curve, "binding": False,
             "method": "studentized_bootstrap_t"}
 
 
-def select_k(*, block_lcb: int, scale: ScaleSpec,
-             n_legs_floor: int | None = None, purge_mult: int = 1) -> dict[str, Any]:
-    """Policy cushion: smallest k with net power ≥0.5 at edge near power knee (10+ bps).
-
-    Predeclared shift from P3: evaluate at edge = max(k·RT, 10) so RT-scale plants
-    are not the only recovery test (P3 k-rule failed because 2–4 bps ≈ cost).
-    """
+def select_k(*, block_lcb: int, scale: ScaleSpec, purge_mult: int = 1) -> dict[str, Any]:
+    """Policy cushion (gross-only; the NET power read is retired, INFR-022)."""
     ks = (1.0, 1.25, 1.5, 2.0)
     curve = []
     selected = None
@@ -370,48 +318,39 @@ def select_k(*, block_lcb: int, scale: ScaleSpec,
         hits = 0
         for i in range(scale.n_power):
             r = run_e2e_one(17_000 + int(k * 100) + i, LOW, block_lcb=block_lcb,
-                            scale=scale, edge_bps=edge, n_legs_floor=n_legs_floor,
-                            purge_mult=purge_mult)
-            hits += int(r.get("net_pass", False))
+                            scale=scale, edge_bps=edge, purge_mult=purge_mult)
+            hits += int(r.get("gross_pass", False))
         rate = hits / scale.n_power
-        curve.append({"k": k, "edge_bps": edge, "net_lcb_power": rate,
+        curve.append({"k": k, "edge_bps": edge, "gross_lcb_power": rate,
                       "meets": rate >= 0.5})
         if selected is None and rate >= 0.5:
             selected = k
-    return {"rule": "smallest k with net-LCB power≥0.5 at edge=max(k·RT,10)",
+    return {"rule": "smallest k with gross-LCB power≥0.5 at edge=max(k·RT,10)",
             "selected_k": selected, "curve": curve,
-            "k_rule_fail": selected is None,
-            "floor_formula": "floor_bps = RT_cost_bps × k"}
+            "k_rule_fail": selected is None}
 
 
 def run_scale(scale: ScaleSpec, *, purge_mult: int = 1) -> dict[str, Any]:
-    """One scale loop: block/A3 → e2e α both cadences → power/k."""
-    print(f"  [{scale.name}] block+A3 sweep...", flush=True)
+    """One scale loop: block → e2e α both cadences → power/k (gross-only, INFR-022)."""
+    print(f"  [{scale.name}] block sweep...", flush=True)
     sel = select_block_and_floors(scale, purge_mult=purge_mult)
     block = sel["selected_block"] or sel.get("block_fallback") or 64
-    n_legs_floor = sel.get("selected_n_legs_floor")
-    if n_legs_floor == 0:
-        n_legs_floor = None
 
-    print(f"  [{scale.name}] e2e α low (block={block}, floor={n_legs_floor})...",
+    print(f"  [{scale.name}] e2e α low (block={block})...",
           flush=True)
     a_low = end_to_end_alpha(LOW, block_lcb=block, scale=scale,
-                             n_legs_floor=n_legs_floor, purge_mult=purge_mult)
+                             purge_mult=purge_mult)
     print(f"  [{scale.name}] e2e α high...", flush=True)
     a_high = end_to_end_alpha(HIGH, block_lcb=block, scale=scale,
-                              n_legs_floor=n_legs_floor, purge_mult=purge_mult)
+                              purge_mult=purge_mult)
 
     print(f"  [{scale.name}] power curves...", flush=True)
-    pow_low = power_curve(LOW, block_lcb=block, scale=scale,
-                          n_legs_floor=n_legs_floor, purge_mult=purge_mult)
-    pow_high = power_curve(HIGH, block_lcb=block, scale=scale,
-                           n_legs_floor=n_legs_floor, purge_mult=purge_mult)
+    pow_low = power_curve(LOW, block_lcb=block, scale=scale, purge_mult=purge_mult)
+    pow_high = power_curve(HIGH, block_lcb=block, scale=scale, purge_mult=purge_mult)
     print(f"  [{scale.name}] k selection...", flush=True)
-    k_sel = select_k(block_lcb=block, scale=scale, n_legs_floor=n_legs_floor,
-                     purge_mult=purge_mult)
+    k_sel = select_k(block_lcb=block, scale=scale, purge_mult=purge_mult)
 
     cov_fail = bool(sel.get("coverage_stop_fail"))
-    # Also check in-domain coverage rates at selected block after A3
     alpha_fail = (not a_low["pass_stop"]) or (not a_high["pass_stop"])
     stop = cov_fail or alpha_fail
 
@@ -423,7 +362,6 @@ def run_scale(scale: ScaleSpec, *, purge_mult: int = 1) -> dict[str, Any]:
         },
         "block_A3_selection": sel,
         "selected_block": sel.get("selected_block"),
-        "selected_n_legs_floor": n_legs_floor,
         "purge_mult": purge_mult,
         "alpha_low": {k: v for k, v in a_low.items() if k != "rows"},
         "alpha_high": {k: v for k, v in a_high.items() if k != "rows"},
@@ -440,7 +378,6 @@ def run_scale(scale: ScaleSpec, *, purge_mult: int = 1) -> dict[str, Any]:
             "STOP": stop,
             "verdict": "STOP" if stop else "PASS",
             "selected_block": sel.get("selected_block"),
-            "selected_n_legs_floor": n_legs_floor,
             "selected_k": k_sel.get("selected_k"),
             "method": "studentized_bootstrap_t",
             "purge_mult": purge_mult,
@@ -462,7 +399,8 @@ def run_p3b_calibration(*, purge_mult: int = 1,
             "disjoint_from_p3": True,
             "fixtures_forbidden": ["XENA-001", "XENA-002", "XENA-003"],
             "A1": "bootstrap-t LCB",
-            "A3": "n_legs_floor from bank coverage rule",
+            "A3": "RETIRED (INFR-022 L-63): n_legs_floor vetoes removed — sample-size is "
+                 "context, never a gate",
             "B1": "purge ≥ H between ranking and gate",
         },
     }

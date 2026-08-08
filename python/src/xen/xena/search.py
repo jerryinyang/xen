@@ -10,6 +10,11 @@ Climbing with a stagnation kick, paired comparison on common data paths + common
 bootstrap indices, a soft sign-stability gate on marginal deltas, and an append-only
 evaluation cache.
 
+INFR-022 (zero-cost model): the walk is **gross-only** — ``score_kind`` is fixed to
+``g_gross`` (the retired ``g_net`` / L-26 net-cost-binding selection path raises), and the
+zero-cost compliance guard refuses search on non-compliant cost pins unless an operator
+cost directive is recorded. See :func:`run_restart`.
+
 Load-bearing noise machinery:
 * Every subset in one restart is evaluated on the SAME segment and oracle seed, and every
   bootstrap uses the SAME block-start indices (common random numbers) — so the paired
@@ -28,7 +33,6 @@ from dataclasses import dataclass, field
 from typing import Iterable
 
 import numpy as np
-import polars as pl
 
 from xen.xena.oracle import CandidateStream, OracleConfig, OracleResult, evaluate
 from xen.xena.score import robust_g_hat
@@ -329,12 +333,11 @@ def run_restart(streams: list[CandidateStream], config: OracleConfig, *, budget:
     restarts explore differently, while WITHIN a restart every evaluation shares one
     block-start matrix (common indices) and one oracle seed (common data path).
 
-    INFR-009 P0 cost guard:
-    * Live: pass ``universe_root`` after Q1, or leave streams with finite non-placeholder
-      ``cost_bps`` (0.0 is the unpinned sentinel).
+    INFR-022 zero-cost guard:
+    * Live: pass ``universe_root`` after Q1, or leave streams zero-cost-compliant
+      (``cost_bps == 0``; non-zero pins without an operator cost directive are refused).
     * Synthetic / calibration: pass ``skip_economics_precondition=True`` **explicitly**
-      (``calibration.run_pipeline_once`` does this). Do not rely on DEFAULT_COST_BPS alone
-      — a 0-cost synthetic without the skip gets a clear INTEGRITY_INCOMPLETE error.
+      (``calibration.run_pipeline_once`` does this).
     """
     if skip_economics_precondition:
         pass
@@ -343,20 +346,23 @@ def run_restart(streams: list[CandidateStream], config: OracleConfig, *, budget:
         require_economics_before_search(universe_root)
     else:
         # Stream-level guard when no universe root (live ad-hoc or mistaken synthetic).
-        from xen.xena.economics import SearchRefusedIntegrity, check_cost_map_integrity
-        st = check_cost_map_integrity(streams)
+        from xen.xena.economics import SearchRefusedIntegrity, check_zero_cost_compliance
+        st = check_zero_cost_compliance(streams)
         if not st.complete:
             raise SearchRefusedIntegrity(
-                f"INTEGRITY_INCOMPLETE: cost-map incomplete "
-                f"({st.n_incomplete}/{st.n_candidates}). "
-                "Live: run economics_disclosure (Q1) + pin finite non-placeholder "
-                "cost_bps, then pass universe_root=.... "
+                f"ZERO-COST-COMPLIANCE: {st.n_incomplete}/{st.n_candidates} candidates "
+                f"non-compliant ({st.reason}). "
+                "Live: run economics_disclosure (Q1) with cost_bps=0 pins (or a recorded "
+                "operator cost directive), then pass universe_root=.... "
                 "Synthetic/calibration: pass skip_economics_precondition=True "
                 "(see xen.xena.calibration.run_pipeline_once)."
             )
-    if score_kind not in ("g_gross", "g_net"):
-        raise ValueError(f"score_kind must be g_gross|g_net, got {score_kind!r}")
-    use_net = score_kind == "g_net"
+    if score_kind != "g_gross":
+        raise ValueError(
+            f"score_kind must be 'g_gross', got {score_kind!r} — the net selection path "
+            "(g_net / L-26) is retired under the INFR-022 zero-cost model; selection is "
+            "gross-only"
+        )
     universe = sorted(s.candidate_id for s in streams)
     grid = universe_grid(streams)
     if segment is not None:
@@ -377,11 +383,9 @@ def run_restart(streams: list[CandidateStream], config: OracleConfig, *, budget:
         if rec is not None:
             return rec
         res = evaluate(subset, streams, config, segment=segment, seed=oracle_seed)
-        # INFR-009 P1 default: intensive g_gross P25. INFR-014 CAL: g_net + charge_costs
-        # (L-26 net-cost-binding selection).
         g_hat, g_point, boot = robust_g_hat(
             res, streams, grid, starts,
-            block=params.block_bars, quantile=params.quantile, net=use_net)
+            block=params.block_bars, quantile=params.quantile)
         rec = EvalRecord(g_hat, g_point, boot,
                          res.n_admitted, res.n_rejected, it_counter[0], restart_id,
                          score_kind=score_kind)

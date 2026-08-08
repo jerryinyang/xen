@@ -11,7 +11,7 @@ import numpy as np
 import polars as pl
 import pytest
 
-from xen.xena.oracle import CandidateStream, OracleConfig, OracleResult, evaluate
+from xen.xena.oracle import CandidateStream, OracleConfig, evaluate
 
 NS = 1_000_000_000  # 1s in ns; times are plain int64 "ns"
 
@@ -58,14 +58,31 @@ def test_single_trade_pnl_telescopes_to_fills():
     assert res.equity[-1] - CFG.initial_equity == pytest.approx(row["NetMoney"])
 
 
-def test_reconciliation_many_trades_with_costs():
+def test_reconciliation_many_trades_zero_cost_default():
+    """INFR-022: default oracle config is zero-cost — CostMoney is 0 everywhere."""
+    marks = make_marks(500, price0=100.0, drift=0.05)
+    trades = [trade(60 * i, 60 * i + 300, 1.0 if i % 2 else -1.0, 100.0 + 0.05 * i,
+                    100.0 + 0.05 * i + (0.7 if i % 2 else -0.3)) for i in range(1, 40)]
+    s = make_stream("a", trades, marks, cost_bps=2.0)  # pin inert under zero-cost
+    res = evaluate({"a"}, [s], CFG)
+    ledger_net = res.ledger.get_column("NetMoney").sum()
+    assert res.equity[-1] - CFG.initial_equity == pytest.approx(ledger_net, abs=1e-6)
+    assert (res.ledger.get_column("CostMoney") == 0.0).all()
+    assert res.ledger.get_column("NetMoney").to_numpy() == pytest.approx(
+        res.ledger.get_column("GrossMoney").to_numpy())
+
+
+def test_reconciliation_many_trades_directive_charged():
+    """Directive-backed costed run still reconciles (the only sanctioned cost path)."""
     marks = make_marks(500, price0=100.0, drift=0.05)
     trades = [trade(60 * i, 60 * i + 300, 1.0 if i % 2 else -1.0, 100.0 + 0.05 * i,
                     100.0 + 0.05 * i + (0.7 if i % 2 else -0.3)) for i in range(1, 40)]
     s = make_stream("a", trades, marks, cost_bps=2.0)
-    res = evaluate({"a"}, [s], CFG)
+    cfg = OracleConfig(charge_costs=True, operator_cost_directive={
+        "reason": "test directive", "scope": "unit-test"})
+    res = evaluate({"a"}, [s], cfg)
     ledger_net = res.ledger.get_column("NetMoney").sum()
-    assert res.equity[-1] - CFG.initial_equity == pytest.approx(ledger_net, abs=1e-6)
+    assert res.equity[-1] - cfg.initial_equity == pytest.approx(ledger_net, abs=1e-6)
     assert (res.ledger.get_column("CostMoney") > 0).all()
 
 
@@ -213,18 +230,33 @@ def test_empty_subset_is_flat():
     assert res.equity[-1] == CFG.initial_equity
 
 
+def test_charge_costs_requires_directive():
+    """INFR-022 §3.4: charge_costs=True raises without an operator cost directive."""
+    marks = make_marks(100, price0=100.0)
+    s = make_stream("a", [trade(120, 600, 1.0, 100.0, 101.0)], marks)
+    with pytest.raises(ValueError, match="operator cost directive"):
+        evaluate({"a"}, [s], OracleConfig(charge_costs=True))
+    # malformed directive also refused
+    with pytest.raises(ValueError, match="reason"):
+        evaluate({"a"}, [s], OracleConfig(
+            charge_costs=True, operator_cost_directive={"scope": "x"}))
+    # valid dict directive runs the costed path on a cost-pinned stream
+    costed = CandidateStream("a", "TEST", s.trades, s.marks, cost_bps=5.0)
+    cfg = OracleConfig(charge_costs=True, operator_cost_directive={
+        "reason": "operator JI: scoped cost experiment", "scope": "EXP-X"})
+    r = evaluate({"a"}, [costed], cfg)
+    assert r.ledger.row(0, named=True)["CostMoney"] > 0
+
+
 def test_charge_costs_false_zeroes_costs():
-    """Gross-selection amendment: selection configs run cost-free; ledger discloses 0."""
+    """Default (charge_costs=False) is the zero-cost model: ledger discloses 0 cost."""
     marks = make_marks(100, price0=100.0)
     s = make_stream("a", [trade(120, 600, 1.0, 100.0, 101.0)], marks)
     s = CandidateStream("a", "TEST", s.trades, s.marks, cost_bps=5.0)
-    net_cfg = CFG
-    gross_cfg = OracleConfig(charge_costs=False)
-    r_net = evaluate({"a"}, [s], net_cfg)
-    r_gross = evaluate({"a"}, [s], gross_cfg)
-    assert r_net.ledger.row(0, named=True)["CostMoney"] > 0
+    r_gross = evaluate({"a"}, [s], OracleConfig(charge_costs=False))
     assert r_gross.ledger.row(0, named=True)["CostMoney"] == 0.0
-    assert r_gross.equity[-1] > r_net.equity[-1]
+    assert r_gross.equity[-1] == pytest.approx(
+        CFG.initial_equity + r_gross.ledger.row(0, named=True)["NetMoney"])
 
 
 def test_nonpositive_stop_raises():

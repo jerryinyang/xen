@@ -28,6 +28,7 @@ Preferred statistical methods organised by analysis type. Use this catalog when 
 | Method | Use When | Output | Notes |
 |--------|----------|--------|-------|
 | Bootstrap confidence interval | Estimating uncertainty of any statistic | CI (lower, upper) + seed range | `xen.evaluation.block_bootstrap_ci`: circular block bootstrap, ≥10,000 resamples × 5-seed battery. Effective block capped < n (no zero-width CI on sparse strata, INFR-004/L-20). For verdict-bearing reads, co-declare a `block_sensitivity` sweep (½×/1×/2×) and, where the mean may be outlier-driven, a `trimmed_mean`/median CI. Report "CI excludes zero", not a p-value. |
+| Probabilistic Sharpe Ratio (PSR) | Reporting a mean per-trade/leg bps read with its sampling confidence | `psr` + `psr_n` beside the mean | `xen.evaluation.psr`/`psr_row` (INFR-022 directive 4): Bailey & López de Prado 2012, skew/kurtosis-adjusted variance term, empirical moments only (no normality), per-trade series matching the reported mean (not annualised by default; `SR* = 0` default, design may override). PSR is **evidence, never a gate**; `n < 2` or non-finite moments → NaN with `psr_n` stated, row still reported (N3). Always pair PSR + n beside the mean column on the SAME series. |
 | Bootstrap hypothesis test | When analytical p-values are unreliable | Empirical p-value | Resample under null hypothesis |
 | Cross-validation | Assessing model stability | Mean score, std across folds | Use chronological CV for time-series |
 
@@ -93,4 +94,5 @@ Preferred statistical methods organised by analysis type. Use this catalog when 
 | ANOVA without cross-validation | Assumes normality, equal variance | Kruskal-Wallis + permutation test |
 | GARCH / ARCH models | Assumes stationarity, specific functional form | Empirical volatility clustering test |
 | ADF unit root test | Assumes specific data-generating process | Visual inspection of time-series + rolling statistics |
-| Sharpe ratio | Assumes normal returns, penalises upside volatility | Sortino ratio or custom metric |
+| Sharpe ratio (as a standalone verdict) | Assumes normal returns, penalises upside volatility | PSR (skew/kurt-adjusted, same per-trade series) beside the mean-trade bps read — evidence, never a gate (INFR-022) |
+| MDE / detection floors / power curves as row gates | Powering as a pass mark on realised estimates is retired (INFR-022 L-63) | Sample-size context beside every row + direct comparison against the pre-specified baseline |

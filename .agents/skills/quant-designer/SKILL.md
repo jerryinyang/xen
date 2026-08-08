@@ -50,27 +50,36 @@ One artifact, dense (tables/bullets), ~300-line budget. All items below are REQU
 4. **Scope**: instruments/domains/parameters/time range/exclusions; mandatory final-30%
    holdout exclusion; complexity budget; Nautilus strategy + run config + catalog fence
    attestation (all edge-generating experiments run in Nautilus `BacktestNode` — no vectorised
-   Python backtests). Chapter-05 designs declare **SPREAD-COST-DISCLOSURE** (§10
-   design-requirements); historical lanes retain their archived routing rules.
+   Python backtests). Every design carries **ZERO-COST-DISCLOSURE** (§10 design-requirements) —
+   the programme is zero-cost unless an operator cost directive (recorded in the design) says
+   otherwise.
 5. **Controls, each with a validity proof** (see `design-requirements.md`):
    - non-degeneracy: the control population is disjoint from the signal population and could
      produce a different answer (B-1);
-   - bite/MDE: demonstrate, at design time, the control can detect an effect of the expected
-     size (an MDE curve or synthetic plant co-designed with the band — not a fixed plant);
    - non-vacuity: the destroy control moves the metric's sufficient statistic (a permutation
      that preserves the mean cannot referee a mean — B-6/EXP-012);
-   - ≥1 future-destroying leak tripwire that MUST collapse the edge.
+   - bite: demonstrate, at design time, the control can detect an effect of the expected
+     size (a synthetic plant co-designed with the band — not a fixed plant);
+   - ≥1 future-destroying leak tripwire that MUST collapse the edge, with its integrity bite
+     declared as `INTEGRITY_Z × bootstrap_SE` of the same estimator (default `INTEGRITY_Z =
+     2.8`; N6b) — a validity threshold on a planted leak contrast, never an MDE / detection
+     floor for research estimands.
 6. **Test selection, candidate-aware**: pick significance/robustness tests matched to the
    trading style and effect shape (mean-reversion vs outlier-fade vs trend-following get
    different noise models; tail/asymmetric effects get shape-aware reads, not location-only
    gates). Fixed pre-designed referee stacks are prohibited; compose from the toolbox and
    justify each piece against the mechanism.
-7. **Interpretation bands, not binaries**: predeclared effect-size bands per stratum
-   (supported / wash-within-noise / contradicted / unpowered), collapse-fraction disclosure
-   for every control, pooled figures labelled disclosure-only.
-8. **Power statement**: expected event counts per stratum, minimum detectable effect, and the
-   explicit list of strata that will be UNPOWERED (an unpowered cell can never be reported as
-   a negative).
+7. **Interpretation bands, operator-only tags**: predeclared effect-size bands per stratum
+   (supported / wash-within-noise / contradicted) that the OPERATOR may use to tag a report
+   layer after reading numbers — never machine-assigned, never gating, never dropping rows
+   (N11); collapse-fraction disclosure for every control; pooled figures labelled
+disclosure-only.
+8. **Sample-size statement**: expected event counts per stratum, optional minimum-n notes
+   for *primary-inference language* (descriptive tags only — rows below them are still
+   reported with counts and intervals, N3/N10), and the **declared fixed comparator** every
+   conditioned arm is read against. No MDE, no detection floors, no power curves (L-63);
+   thin strata are reported with their counts, never read as negatives (B-5). PSR (same
+   per-trade series, `psr` + `psr_n`) is planned beside every mean-trade/leg bps read.
 9. **Golden-trace spec**: 2-3 hand-computable events (timestamps + expected entry/exit/fill
    behaviour derived from this design) that QA will diff against the emission.
 
@@ -84,12 +93,16 @@ One artifact, dense (tables/bullets), ~300-line budget. All items below are REQU
   `observed / ideal / interpretation`, **no `pass` field**, nothing machine-dropped. The
   design states what each layer measures and the bands for reading it; the operator authorises
   which candidates advance. Interpretation bands (SUPPORTED/WASH/CONTRADICTED/UNPOWERED/
-  SUGGESTIVE/STRONG) are **labels, never gates**.
-- **Control class (INFR-016 §4c):** every control declares `future_destroy` (HARD validity —
-  edge survives destroying FUTURE info ⇒ acausal leak) vs `within_sample_attribution` (report
+  SUGGESTIVE/STRONG) are **operator-supplied tags only** — never machine-assigned, never gates
+  (INFR-022 N11).
+- **Control class (INFR-016 §4c; INFR-022 N6b):** every control declares `future_destroy`
+  (HARD validity — edge survives destroying FUTURE info ⇒ acausal leak; integrity bite =
+  pre-declared `INTEGRITY_Z × bootstrap_SE` of the same estimator, default `INTEGRITY_Z =
+  2.8` — never called MDE, never a detection floor) vs `within_sample_attribution` (report
   layer — timing scrambled, entries still causal; report the collapse fraction, operator
-  judges). Sign/attribution batteries: **≥2000 seeds**, report effect size + one-sided p + CI
-  — never an `at_or_above_pXX` boolean, never a collapse-fraction auto-kill.
+  judges). Sign/attribution batteries: **≥2000 seeds**, report effect size + one-sided p +
+  CI + n — never an `at_or_above_pXX` boolean, never a collapse-fraction auto-kill, never a
+  power label.
 
 ## Constraints
 
@@ -99,12 +112,13 @@ One artifact, dense (tables/bullets), ~300-line budget. All items below are REQU
   conditioning throughout.
 - Experiment-level only: no family dispositions in a design.
 - **XENA runs**: the design declares the universe manifest (candidate grid — models ×
-  params × instruments × domains), per-candidate cost from `bybit_round_trip_cost_bps`
-  (chapter 04) or archived FTMO table (chapter-03 VAL only), the
-  pre-registered band boundaries (search/ranking/gate, 50/30/20 shape), and cites the
-  frozen registry hash — it never re-derives or proposes threshold values (X, F_floor,
-  gate threshold are pinned; L-12 clause). Per-candidate quality gates are forbidden:
-  every grid cell enters the universe. Spec: `docs/references/xena-lane.md`.
+  params × instruments × domains), **zero-cost pins** (`cost_bps = 0`, `cost_model:
+  NO_COST_CHARGED`; a costed universe requires a recorded operator cost directive), the
+  pre-registered band boundaries (search/ranking/gate, 50/30/20 shape), the **PSR pairing
+  plan** (every mean-trade/leg bps read carries `psr` + `psr_n` on the same series), and
+  cites the frozen registry hash — it never re-derives or proposes threshold values (X,
+  F_floor, gate threshold are pinned; L-12 clause). Per-candidate quality gates are
+  forbidden: every grid cell enters the universe. Spec: `docs/references/xena-lane.md`.
 - **Operator-facing communication (binding):** every question, status, or summary to the
   human is concise and de-jargonified. Full rules: `research-pipeline/_pipeline-config.md`
   § *Operator-facing communication*. Short form: plain meaning first; status ≤8 lines;

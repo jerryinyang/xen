@@ -42,7 +42,11 @@ Include:
 - method summary;
 - **key quantitative evidence** from `analysis.md`: effect sizes with uncertainty, sample
   sizes, per-stratum (non-pooled) results, collapse fractions, evidence for AND against;
-- integrity-gate results (estimand validation, tripwire, provenance) and analysis caveats;
+  every mean-trade/leg bps table carries `psr` + `psr_n` on the same series (INFR-022
+  directive 4); every money-bearing section carries the ZERO-COST-DISCLOSURE caveat
+  verbatim (INFR-022 §3.1);
+- integrity-gate results (estimand validation incl. zero-cost compliance, tripwire,
+  provenance) and analysis caveats;
 - **the operator's final verdict**, recorded verbatim, with the analyst's recommendation
   noted separately if they differ;
 - links to `design.md`, `qa-review.md`, `analysis.md`, code, results, plots;
@@ -87,7 +91,9 @@ checkpoint retrospective, operator-signed; append the experiment's evidence to
 
 - Prefer plain English and concrete values.
 - Treat negative, refuted, and inconclusive results as useful findings.
-- Separate factual observations from interpretation.
+- Separate factual observations from interpretation (observed vs inference, N2).
+- The report records the operator's verdict; it never substitutes one (N1) — no machine
+  verdict language; "pass" appears only as the literal name of an integrity field.
 - Link artifacts with relative paths.
 - Keep the report concise enough to support future review.
 - Do not introduce new claims that are absent from `analysis.md` or raw outputs.

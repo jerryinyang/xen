@@ -58,7 +58,8 @@ running the implementation to produce its own expectations.
 
 - design.md contains all mandatory declaration blocks (`quant-designer/references/
   design-requirements.md`): mechanism, object-identity, control validity proofs, tripwire,
-  bands, power, golden trace, hard/informative split.
+  bands, sample-size statement, golden trace, hard/informative split, **ZERO-COST-DISCLOSURE**
+  (§10).
 - `check_no_local_accounting("python/experiments/<ID>/code")` passes; no accounting
   primitives outside `xen.adjudication`.
 - No Python strategy backtest anywhere in the experiment.
@@ -66,24 +67,35 @@ running the implementation to produce its own expectations.
 - Screen-effect conversion pin (L-21): if the design cites SPDR/screen evidence in money
   units, the `CONVERSION-PIN` block exists and each line is verified against data — divisor
   object matches the screen code verbatim, the measured TRAIN-median value is recomputed (not
-  recalled), the resulting bps/trade effect and cost-floor comparison follow arithmetically;
-  §5 bands and §6 power use the pinned effect (`docs/references/spdr-lane.md`).
-- Missing-spread disclosure (chapter 05): verify `SPREAD-COST-DISCLOSURE` declares
-  `UNAVAILABLE_NOT_CHARGED`, `spread_rt_bps: null`, and `PARTIAL_FEES_FUNDING_ONLY`.
-  Spread cost unavailable and not charged, so reported cost understates total cost and reported
-  net performance is overstated. Any fully-net, cost-complete, tradable, or deployable claim is a
-  REVISE. Verify raw `SpreadBps`, `MeanPriceSkewBps`, flip-pair values, and former proxy pins never
-  enter costs; absence must not be represented as zero.
+  recalled), the resulting bps/trade effect follows arithmetically; §5 bands and §6
+  sample-size/comparator statements use the pinned effect (`docs/references/spdr-lane.md`).
+- **Zero-cost model (INFR-022 — replaces the chapter-05 missing-spread disclosure):** verify
+  the design's `ZERO-COST-DISCLOSURE` (§10) matches the canonical text verbatim
+  (`cost_model: NO_COST_CHARGED`; spread/commissions/swaps not modeled; prohibited_claims
+  fully-net/cost-complete/tradable/deployable). Verify the implementation calls NO cost
+  function on any live path: no live `PARTIAL_FEES_FUNDING_ONLY` scope, no `spread_scale_route`,
+  no `bybit_round_trip_cost_bps` import from live modules (the retired stack is
+  `xen.evaluation_cost_legacy`, ARCHIVED banner). If the design requests costs, trace the
+  operator `COST-DIRECTIVE` clause (§11) AND the `operator_cost_directive.json` file before
+  execution. Any fully-net, cost-complete, tradable, or deployable claim is a REVISE.
+- **No research powering (INFR-022 L-63 — denylist §10):** the design and code carry no
+  MDE / `MDE_Z` / detection floors (`2.8/√n`, `MDE_Z × SE` on research estimands) / power
+  curves / `UNPOWERED`-as-machine-label / `min_powered_seeds` / `n_legs_floor` vetoes. The
+  only scale constant is the tripwire's `INTEGRITY_Z` (N6b, validity only). Small-n rows are
+  reported with counts, never hidden (F07 → sample-size notes only).
+- **PSR pairing (INFR-022 directive 4):** the analysis plan pairs `psr` + `psr_n` beside
+  every mean-trade/leg bps read (same series and population).
 - Amendment-direction ledger (L-23): every pre-measurement amendment carries a
   LOOSER/TIGHTER/NEUTRAL declaration + running directional count; the final gate set carries
   a re-derived false-qualifier expectation; a one-directional streak ≥3 is flagged to the
   operator at the execution gate.
 - XENA VOID on new stack (INFR-010 R4): any design routing to XENA on Bybit/crypto data
-  without a post-CAL hash-pinned registry is a REJECT (chapter-03 pins are archive-only).
+  without a post-CAL hash-pinned registry is a REJECT (chapter-03 pins are archive-only; CAL
+  apparatus is bannered legacy pending a post-INFR-022 CAL redesign).
 - Battery/eligibility/null rules (L-24): for any battery-gated, multi-cell, or capped-read
-  design, trace the four clauses of `quant-designer/references/design-requirements.md` §12 —
-  time-stability eligibility, exit-matched nulls, derived tripwire thresholds,
-  MDE-consistent read floors.
+  design, trace the four clauses of `quant-designer/references/design-requirements.md` §13 —
+  time-stability eligibility, exit-matched nulls, derived tripwire thresholds, sample-size
+  notes (never hide rules).
 - Derangement destroy (L-28): any permutation-based leak tripwire, attribution control, or
   null battery arm must be a **derangement** (zero fixed points) — plain permutations leak
   signal (VAL-008: 11.1% alignment → collapse 0.87). Design CONTROL/TRIPWIRE block states

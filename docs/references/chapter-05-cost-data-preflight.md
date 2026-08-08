@@ -1,5 +1,11 @@
 # Chapter 05 Cost/Data Preflight
 
+> **HISTORICAL (chapter-05) — not binding on the live programme after INFR-022 (2026-08-08).**
+> INFR-022 retired the cost model programme-wide (zero-cost, `NO_COST_CHARGED`): the
+> no-spread amendment, `PARTIAL_FEES_FUNDING_ONLY` scope, and fee/funding injection below are
+> superseded-for-live-use. Do not use this document as cost policy. Body retained verbatim
+> for reproducibility.
+
 **State:** `COMPLETE / NO-SPREAD AMENDMENT QA APPROVED`
 
 **Scope:** bounded infrastructure correction required by

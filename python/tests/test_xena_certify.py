@@ -7,7 +7,6 @@ import pytest
 
 from xen.xena.certify import (certify_and_rank, contiguous_purged_folds,
                               dispersion_report, plateau_screen, rank_on_folds)
-from xen.xena.oracle import OracleConfig
 from xen.xena.search import SearchParams, run_restart
 
 from tests.test_xena_search import CFG, make_stream, toy_universe
@@ -87,7 +86,7 @@ def test_plateau_base_matches_walk_cache_under_segment():
     and its fresh neighbor evals must be on the same segment-grid scale."""
     streams = toy_universe()
     seg = (0, 2000 * 60 * NS)
-    res = run_restart(streams, CFG, budget=80, restart_id=1, params=FAST, segment=seg)
+    res = run_restart(streams, CFG, budget=80, restart_id=1, params=FAST, segment=seg, skip_economics_precondition=True)
     rep = plateau_screen(res.best_subset, streams, CFG, threshold=0.0, f_floor=-1e9,
                          restart_seed=1, params=FAST, segment=seg, cache=res.cache)
     assert rep.F_hat == pytest.approx(res.best_F_hat)
@@ -98,7 +97,7 @@ def test_plateau_base_matches_walk_cache_under_segment():
 # --------------------------------------------------------------------------- #
 def test_dispersion_report_shapes():
     streams = toy_universe()
-    finalists = [run_restart(streams, CFG, budget=60, restart_id=i, params=FAST)
+    finalists = [run_restart(streams, CFG, budget=60, restart_id=i, params=FAST, skip_economics_precondition=True)
                  for i in (1, 2, 3)]
     d = dispersion_report(finalists)
     assert d["n_restarts"] == 3
@@ -124,7 +123,7 @@ def test_rank_on_folds_prefers_real_edge():
 # --------------------------------------------------------------------------- #
 def test_certify_and_rank_toy_universe():
     streams = toy_universe()
-    finalists = [run_restart(streams, CFG, budget=200, restart_id=i, params=FAST)
+    finalists = [run_restart(streams, CFG, budget=200, restart_id=i, params=FAST, skip_economics_precondition=True)
                  for i in (1, 2)]
     n_bars_ns = 4000 * 60 * NS
     folds = contiguous_purged_folds(0, n_bars_ns, n_folds=3, purge_ns=60 * 60 * NS)
@@ -147,7 +146,7 @@ def test_noise_only_universe_still_builds_evidence_package():
     random-subset reference, not by emptying the shortlist.
     """
     streams = [make_stream(f"n{i}", 0.0, seed=50 + i) for i in range(6)]
-    finalists = [run_restart(streams, CFG, budget=120, restart_id=i, params=FAST)
+    finalists = [run_restart(streams, CFG, budget=120, restart_id=i, params=FAST, skip_economics_precondition=True)
                  for i in (1, 2)]
     n_bars_ns = 4000 * 60 * NS
     folds = contiguous_purged_folds(0, n_bars_ns, n_folds=3, purge_ns=60 * 60 * NS)
@@ -167,7 +166,7 @@ def test_certify_registry_binding_and_resim_divergence(tmp_path):
     streams = toy_universe()
     layout = SegmentLayout.from_span(0, 4000 * 60 * NS)
     finalists = [run_restart(streams, CFG, budget=200, restart_id=r + 1, params=FAST,
-                             segment=layout.search) for r in range(2)]
+                             segment=layout.search, skip_economics_precondition=True) for r in range(2)]
     folds = contiguous_purged_folds(*layout.ranking, n_folds=2, purge_ns=60 * 60 * NS)
     reg = tmp_path / "frozen.json"
     freeze_registry(params=FAST, plateau_threshold=0.3, f_floor=0.0,

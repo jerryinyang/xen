@@ -1,5 +1,9 @@
 # Chapter 05 Cost/Data Preflight — Fresh-Context QA
 
+> **HISTORICAL (chapter-05) — not binding on the live programme after INFR-022 (2026-08-08).**
+> This QA record backs the superseded chapter-05 cost policy; the live programme is
+> zero-cost (`NO_COST_CHARGED`). Body retained verbatim for reproducibility.
+
 ## QA run 1 — 2026-07-22T20:11:51Z — mode: subagent — HEAD `839b4438da6a6ec524d4fd0e8805fba0af58bcd1`
 
 **Reviewed dirty files:**

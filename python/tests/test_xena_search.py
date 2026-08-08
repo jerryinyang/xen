@@ -94,7 +94,7 @@ def test_search_recovers_planted_optimum():
     planted winner (adding another +30 bps clone does not raise g_gross).
     """
     streams = toy_universe()
-    res = run_restart(streams, CFG, budget=250, restart_id=1, params=FAST)
+    res = run_restart(streams, CFG, budget=250, restart_id=1, params=FAST, skip_economics_precondition=True)
     best = res.best_subset
     winners = {f"win{i}" for i in range(3)}
     losers = {f"lose{i}" for i in range(5)}
@@ -105,8 +105,8 @@ def test_search_recovers_planted_optimum():
 
 def test_restart_is_deterministic():
     streams = toy_universe()
-    r1 = run_restart(streams, CFG, budget=120, restart_id=3, params=FAST)
-    r2 = run_restart(streams, CFG, budget=120, restart_id=3, params=FAST)
+    r1 = run_restart(streams, CFG, budget=120, restart_id=3, params=FAST, skip_economics_precondition=True)
+    r2 = run_restart(streams, CFG, budget=120, restart_id=3, params=FAST, skip_economics_precondition=True)
     assert r1.best_subset == r2.best_subset
     assert r1.best_F_hat == r2.best_F_hat
     assert r1.cache.evaluation_count == r2.cache.evaluation_count
@@ -114,15 +114,15 @@ def test_restart_is_deterministic():
 
 def test_restarts_differ_by_id():
     streams = toy_universe()
-    r1 = run_restart(streams, CFG, budget=60, restart_id=1, params=FAST)
-    r2 = run_restart(streams, CFG, budget=60, restart_id=2, params=FAST)
+    r1 = run_restart(streams, CFG, budget=60, restart_id=1, params=FAST, skip_economics_precondition=True)
+    r2 = run_restart(streams, CFG, budget=60, restart_id=2, params=FAST, skip_economics_precondition=True)
     # different walks (almost surely different eval sets); both must still be valid
     assert r1.cache.evaluation_count > 0 and r2.cache.evaluation_count > 0
 
 
 def test_cache_dedups_and_counts():
     streams = toy_universe()
-    res = run_restart(streams, CFG, budget=200, restart_id=1, params=FAST)
+    res = run_restart(streams, CFG, budget=200, restart_id=1, params=FAST, skip_economics_precondition=True)
     stats = res.cache.revisit_stats()
     # unique evals <= budget+1 (dedup working); revisits actually happened
     assert res.cache.evaluation_count <= 201
@@ -137,7 +137,7 @@ def test_search_F_hat_is_segment_grid_scale():
     from xen.xena.score import robust_g_hat
     streams = toy_universe()
     seg = (0, 2000 * 60 * NS)
-    res = run_restart(streams, CFG, budget=50, restart_id=1, params=FAST, segment=seg)
+    res = run_restart(streams, CFG, budget=50, restart_id=1, params=FAST, segment=seg, skip_economics_precondition=True)
     grid = universe_grid(streams)
     grid = clip_grid_covering(grid, seg, streams)
     starts = bootstrap_block_starts(len(grid), block=FAST.block_bars,

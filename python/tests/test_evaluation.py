@@ -1,4 +1,4 @@
-"""Tests for the xen.evaluation toolbox (INFR-001 WS-7)."""
+"""Tests for the xen.evaluation toolbox (INFR-001 WS-7; INFR-022 zero-cost + PSR)."""
 from __future__ import annotations
 
 import numpy as np
@@ -7,17 +7,22 @@ import pytest
 import xen.evaluation as evaluation
 from xen.adjudication import MultiLegSeries
 from xen.evaluation import (
-    bybit_round_trip_cost_bps,
+    ZERO_COST_DISCLOSURE,
+    assert_zero_cost,
     block_bootstrap_ci,
     block_sensitivity,
     collapse_fraction,
-    cost_sensitivity,
     exposure_metrics,
-    mde,
-    powered_label,
+    psr,
+    psr_row,
     split_by,
-    t1_round_trip_spread_bps,
     trimmed_mean,
+    zero_cost_caveat,
+)
+from xen.evaluation_cost_legacy import (
+    bybit_round_trip_cost_bps,
+    count_bybit_funding_stamps,
+    t1_round_trip_spread_bps,
 )
 
 
@@ -68,24 +73,109 @@ def test_trimmed_mean_robust_to_outlier() -> None:
     assert r["stat"] == pytest.approx(trimmed_mean(x))
 
 
-def test_mde_and_powered_label() -> None:
-    rng = np.random.default_rng(2)
-    x = rng.normal(0.0, 10.0, size=50)
-    m = mde(x, seed=2)
-    assert m > 0
-    assert powered_label(x, plausible_effect=m * 2, seed=2)["powered"]
-    assert not powered_label(x, plausible_effect=m / 10, seed=2)["powered"]
+def test_mde_and_cost_sensitivity_retired() -> None:
+    """INFR-022 L-63: MDE / powered_label / cost_sensitivity removed from live evaluation."""
+    assert not hasattr(evaluation, "mde")
+    assert not hasattr(evaluation, "powered_label")
+    assert not hasattr(evaluation, "cost_sensitivity")
+    # moved to the archived legacy module (never callable from a live path)
+    import xen.evaluation_cost_legacy as legacy
+    assert hasattr(legacy, "round_trip_cost_bps")
+    assert hasattr(legacy, "FTMO_COSTS")
 
 
-def test_cost_sensitivity_monotone() -> None:
-    rng = np.random.default_rng(3)
-    gross = rng.normal(10.0, 5.0, size=300)
-    curve = cost_sensitivity(gross, [0.0, 5.0, 10.0], seed=3)
-    stats = [row["stat"] for row in curve]
-    assert stats[0] > stats[1] > stats[2]
-    assert stats[0] - stats[2] == pytest.approx(10.0)
+# --------------------------------------------------------------------------- #
+# Zero-cost model (INFR-022 directive 1)
+# --------------------------------------------------------------------------- #
+def test_zero_cost_disclosure_dict_and_caveat() -> None:
+    assert ZERO_COST_DISCLOSURE["cost_model"] == "NO_COST_CHARGED"
+    assert ZERO_COST_DISCLOSURE["spread"] == "not modeled"
+    assert "prohibited_claims" in ZERO_COST_DISCLOSURE
+    caveat = zero_cost_caveat()
+    assert "ZERO-COST-DISCLOSURE" in caveat
+    assert "cost_model: NO_COST_CHARGED" in caveat
+    assert "tradable" in caveat and "deployable" in caveat
 
 
+def test_assert_zero_cost_accepts_inert_pins() -> None:
+    assert_zero_cost(cost_bps=0.0)
+    assert_zero_cost(cost_bps=None, charge_costs=False, spread_bps=0)
+    assert_zero_cost()  # no cost params at all
+
+
+def test_assert_zero_cost_refuses_nonzero() -> None:
+    for bad in (1.0, 2.5, True):
+        with pytest.raises(ValueError, match="zero-cost model violated"):
+            assert_zero_cost(cost_bps=bad)
+    with pytest.raises(ValueError, match="zero-cost"):
+        assert_zero_cost(charge_costs=True)
+
+
+# --------------------------------------------------------------------------- #
+# PSR (INFR-022 directive 4)
+# --------------------------------------------------------------------------- #
+def test_psr_normal_series_matches_analytic() -> None:
+    """skew≈0, kurt≈3 → denom≈1 → PSR ≈ Φ(√(n−1)·SR̂)."""
+    import math
+    rng = np.random.default_rng(11)
+    x = rng.normal(0.5, 1.0, size=250)  # SR̂ = 0.5
+    out = psr(x)
+    sr_hat = float(np.mean(x) / np.std(x))
+    expected = 0.5 * (1 + math.erf(np.sqrt(249) * sr_hat / np.sqrt(2)))
+    assert out["psr"] == pytest.approx(expected, abs=0.01)
+    assert out["n"] == 250
+    assert out["sr_hat"] == pytest.approx(sr_hat, abs=1e-12)
+
+
+def test_psr_n_lt_2_is_nan_with_n_stated() -> None:
+    for x in (np.array([]), np.array([3.0]), np.array([np.nan, 1.0])):
+        out = psr(x)
+        assert np.isnan(out["psr"])
+        assert out["n"] == len(x)
+
+
+def test_psr_skew_kurt_correction_sign() -> None:
+    """Negative skew lowers PSR; excess kurtosis lowers PSR (same SR̂)."""
+    rng = np.random.default_rng(13)
+    n = 120
+    base = rng.normal(0.25, 1.0, n)  # modest SR̂ so PSR is not saturated at 1
+    # left-skewed variant: mirror the negative tail
+    left_skew = base.copy()
+    left_skew[base < 0] *= 4.0
+    # heavy-tailed variant
+    heavy = rng.normal(0.25, 1.0, n)
+    heavy[::7] *= 5.0
+    p_base = psr(base)
+    p_left = psr(left_skew)
+    p_heavy = psr(heavy)
+    assert p_base["psr"] < 1.0
+    assert p_left["skew"] < 0.0
+    assert p_heavy["kurt"] > 3.0
+    # both corrections reduce PSR below the near-normal base
+    assert p_left["psr"] < p_base["psr"]
+    assert p_heavy["psr"] < p_base["psr"]
+
+
+def test_psr_deterministic_and_same_series() -> None:
+    rng = np.random.default_rng(17)
+    x = rng.normal(0.3, 1.0, size=100)
+    assert psr(x) == psr(x)
+    # psr_row emits the pairing columns psr + psr_n on the same series
+    row = psr_row(x)
+    assert set(row) == {"psr", "psr_n"}
+    assert row["psr_n"] == 100
+    assert row["psr"] == psr(x)["psr"]
+
+
+def test_psr_sr_star_override() -> None:
+    rng = np.random.default_rng(19)
+    x = rng.normal(0.4, 1.0, size=200)
+    assert psr(x, sr_star=0.0)["psr"] > psr(x, sr_star=0.5)["psr"]
+
+
+# --------------------------------------------------------------------------- #
+# Legacy cost functions retained in the archived module (historical replay only)
+# --------------------------------------------------------------------------- #
 @pytest.mark.parametrize("stress", [0.5, 1.0, 2.0])
 def test_bybit_cost_components_reconcile_with_stress_applied_once(stress: float) -> None:
     result = bybit_round_trip_cost_bps(
@@ -129,8 +219,8 @@ def test_count_bybit_funding_stamps_for_fixed_four_hour_episode(
     exit_time: str,
     expected: int,
 ) -> None:
-    assert hasattr(evaluation, "count_bybit_funding_stamps")
-    counter = getattr(evaluation, "count_bybit_funding_stamps")
+    assert hasattr(evaluation, "count_bybit_funding_stamps") is False
+    counter = count_bybit_funding_stamps
     assert counter(entry_time, exit_time) == expected
 
 
@@ -146,7 +236,7 @@ def test_bybit_cost_uses_discrete_funding_stamps_for_four_hour_episode(
     exit_time: str,
     expected_funding: float,
 ) -> None:
-    stamps = evaluation.count_bybit_funding_stamps(entry_time, exit_time)
+    stamps = count_bybit_funding_stamps(entry_time, exit_time)
     result = bybit_round_trip_cost_bps(
         "BTCUSDT",
         50_000.0,

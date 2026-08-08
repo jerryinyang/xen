@@ -15,7 +15,7 @@ Answer all of these for every experiment (add mechanism-specific questions on to
 1. Do per-bar and per-leg totals reconcile per cell? (from `estimand_validation.json`; restate.)
 2. What is the P&L-bearing object (leg / episode / per-bar)? Does the design's estimand match
    the object the strategy actually trades? (L-16)
-3. Per-leg net distribution: mean, median, std, q01/q05/q95/q99, per cell. Where does the money
+3. Per-leg gross distribution: mean, median, std, q01/q05/q95/q99, per cell. Where does the money
    actually come from?
 
 ### Structure & concentration
@@ -36,20 +36,23 @@ Answer all of these for every experiment (add mechanism-specific questions on to
     underwater durations.
 
 ### Robustness & falsification
-11. Cost sensitivity: at what round-trip cost does the net edge die? How far is that from the
-    frozen cost map?
-12. For each control read: collapse fraction, not just survive/die. Is the control sensitive to
+11. Zero-cost verification (INFR-022): confirm the emission and all reads are gross and
+    cost-free — no non-zero commission/fee/funding/spread column (estimand gate
+    `no_cost_charged`), no cost function called, no net-of-cost figures; the
+    ZERO-COST-DISCLOSURE caveat sits on every money-bearing table. Any costed read must trace
+    to the recorded operator cost directive (design clause + `operator_cost_directive.json`).
+12. PSR pairing (INFR-022 directive 4): every mean trade/leg bps read carries `psr` + `psr_n`
+    computed on the SAME per-trade series and population (never another population's n).
+    NaN + n stated when n < 2; the row still appears (N3).
+13. For each control read: collapse fraction, not just survive/die. Is the control sensitive to
     the dominant mechanism at all (B-3 shape)?
-13. For every headline number: one "what would make this wrong?" probe, executed (e.g. recompute
+14. For every headline number: one "what would make this wrong?" probe, executed (e.g. recompute
     under alternative attribution, drop censored legs, split halves).
-14. Power (AMENDMENT-7): for any negative, report the row's own CI and — if a floor is shown —
-    a same-SE-family floor only (`MDE_Z × bootstrap_SE` of that estimator). Is "no effect"
-    distinguishable from "cannot see"? Preflight counts and planning constants are context,
-    never a second test on the realised estimate.
-15. Channel scales (AMENDMENT-7 R4): does every channel declare its `sigma_denominator`?
-    Are two channels with different denominators being ranked on one ladder?
-16. Universal floor failure (L-56 diagnostic): did *every* read fail a floor? If so, check
-    scale mismatch before writing a null — wrong-scale floors fail all reads.
+15. Sample-size context (INFR-022 L-63): every row reports its n / effective n; a negative is
+    accompanied by the row's own CI width ("no effect" vs "cannot see"). No MDE / floor /
+    power label is used as a row verdict — small-n rows are reported with their counts (N3).
+16. Direct comparison (N4): is every conditioned arm read against its pre-specified declared
+    comparator, never against another adaptive arm and never against a threshold?
 
 ---
 
@@ -69,8 +72,9 @@ Answer all of these for every experiment (add mechanism-specific questions on to
 | Acausal favourable-index (L-01) | Own-bar close used as that bar's intrabar limit |
 | Synthetic prices | Any P&L touching HA/Renko constructed prices |
 | Multi-leg accounting (L-18) | Any per-bar series not built by `xen.adjudication` |
-| **Wrong-scale detection floor (L-56 / AMENDMENT-7 / P-28)** | Floor = `k/√n` or planning `MDE_Z` used as pass mark beside bootstrap CI; dual SE per row; channels with different `sigma_denominator` ranked on one ladder; every read "unresolvable" while CIs still speak — check scale before null story |
-| **Floor-derived row labels (AMENDMENT-7 R3)** | Any `WASH`/`UNPOWERED`/`CLEARS_FLOOR`/synonym as a *row* verdict from power — report estimate+CI+context only |
+| **Costs entering a live calculation (INFR-022)** | Any non-zero commission/fee/funding/spread column, `--cost-bps ≠ 0` without a recorded directive, net-of-cost figures, missing zero-cost caveat |
+| **Power machinery as row verdicts (INFR-022 L-63)** | MDE / `MDE_Z × SE` / `k/√n` floors, power curves, `UNPOWERED`/`WASH`/`CLEARS_FLOOR` machine labels, rows hidden or demoted for low n — report estimate + CI + count, operator judges |
+| **PSR missing beside a mean (INFR-022 directive 4)** | Any mean trade/leg bps read without `psr` + `psr_n` on the same series |
 
 ---
 
@@ -79,16 +83,24 @@ Answer all of these for every experiment (add mechanism-specific questions on to
 ```markdown
 # Data Analysis: <EXP-ID>
 
+## 0. Boundary statement (N1 — binding)
+
+This record issues NO verdict, names NO winner, ranks NO arm, claims NO tradability/
+deployability, and gates NO companion experiment or family action. Every observation below
+is labelled observed (read directly from an emitted artifact) or inference (a mechanism
+reading of observed numbers that is not itself measured). Zero-cost model: every figure is
+gross and cost-free (ZERO-COST-DISCLOSURE).
+
 ## 1. Integrity gate (blocking)
 
 | Check | Result | Evidence |
 |---|---|---|
 | Estimand validation (all cells blocking_pass) | PASS/FAIL | results/estimand_validation.json |
+| Zero-cost compliance (`no_cost_charged`, no directive-gap costs) | PASS/FAIL | estimand gate + design §10/§11 |
 | Provenance trace (verdict-bearing columns ≤ t-1) | PASS/FAIL | <file:line rows below> |
-| Leak tripwire collapsed + non-vacuous | PASS/FAIL | <control, raw vs destroyed, collapse fraction> |
+| Leak tripwire collapsed + non-vacuous (bite = INTEGRITY_Z × bootstrap_SE, N6b) | PASS/FAIL | <control, raw vs destroyed, collapse fraction> |
 | Holdout untouched | PASS/FAIL | <evidence> |
-| Price-primary (Nautilus emission under fence; STUB attestation = FAIL) | PASS/FAIL | data/nautilus_runs/… |
-| T1 spread-scale routing declared + respected | PASS/FAIL | design SPREAD-SCALE-ROUTING block |
+| Price-primary (engine emission under fence; STUB attestation = FAIL) | PASS/FAIL | data/nautilus_runs/… |
 | No experiment-local accounting defs | PASS/FAIL | check_no_local_accounting |
 
 <Provenance table: column | inputs & timestamps | ≤ t-1? | file:line>
@@ -97,19 +109,24 @@ Answer all of these for every experiment (add mechanism-specific questions on to
 <numbered; every question ANSWERED (§ ref) or UNANSWERED (reason)>
 
 ## 3. Evidence FOR the hypothesis
-<each item: observation, effect size, CI, n, stratum coverage>
+<each item: observation, effect size, CI, n, stratum coverage; PSR + n beside each
+mean-trade/leg bps read, same series>
 
 ## 4. Evidence AGAINST the hypothesis
-<same rigor; includes unpowered-vs-absent distinctions>
+<same rigor; small-n rows reported next to their counts — never hidden, never labelled>
 
-## 5. Anomalies & open questions
+## 5. What would make the headline numbers wrong (N7)
+<for each headline: the probe that would falsify it, and whether it was run>
+
+## 6. Anomalies & open questions
 <unexplained observations; suggested probes; anything the operator should push on>
 
-## 6. Recommended verdict (experiment hypothesis only — NOT final, NOT family)
+## 7. Recommended verdict (experiment hypothesis only — NOT final, NOT family)
 - Recommendation: SUPPORTED / NOT SUPPORTED / INCONCLUSIVE / WASH (A≈B within noise)
 - Driven by: <the 2-3 decisive pieces of evidence>
 - Would change if: <what probe/result would flip this>
-- Final verdict is the operator's.
+- Hand-off: final verdict is the operator's; named probes runnable against the existing
+  emission.
 ```
 
 ## Report discipline

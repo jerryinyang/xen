@@ -3,6 +3,11 @@ name: detection-floor-must-share-scale
 description: A detection floor must be built from the same SE family as the row's own CI, and an algebraically knowable estimand ceiling is computed in the design.
 metadata: { type: lesson, chapter: 5 }
 ---
+> **SUPERSEDED-FOR-LIVE-USE (INFR-022, 2026-08-08).** The AMENDMENT-7 detection-floor apparatus (R1–R5, `MDE_Z × bootstrap_SE` floors, design-time ceilings as resolve machinery) is retired by L-63. Its surviving core is codified as N3/N4/N6b/N11 (sample-size context, direct comparison, `INTEGRITY_Z` tripwire bite, operator-only labels). Historical record for SPDR-024 reproducibility. Live instruction:
+> zero-cost model (`NO_COST_CHARGED`) + sample-size context + direct baseline comparison +
+> PSR (`docs/references/neutrality-standard.md`; lessons L-62..L-65; plan
+> `docs/superpowers/plans/2026-08-08-infr-022-zero-cost-neutrality-psr-pipeline-update.md`).
+
 SPDR-024's first emission returned "unresolvable" on essentially every read — the signature of a
 floor on the **wrong scale**, not thin data. `MDE_Z = 2.8` (a sample-size target) was used as a
 significance bar beside a bootstrap SE the floor ignored, while for a pure SIZE device the

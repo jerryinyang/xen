@@ -3,6 +3,11 @@ name: joint-sits-at-breakeven-cost-not-rate
 description: The powered joint (p, W, L) sits at net break-even on both universes and 91-96% of the gap is cost, not rate.
 metadata: { type: project, chapter: 5 }
 ---
+> **HISTORICAL (chapter-05; pre-INFR-022 net accounting).** Net break-even / cost-gap language
+> below is chapter-05 under partial-fees accounting. Live programme is **zero-cost** (L-62);
+> do not re-open cost-clearance as a live disposition. The gross joint characterisation remains
+> useful context.
+
 `0 of 1,413` powered crypto cells and `0 of 315` powered cTrader cells clear net break-even.
 Crypto: `p` 0.3887 vs `p_be_net` 0.4992 (`edge` −0.0728), gross mean −1.18 bps, 32.5% clear
 *gross*. cTrader: `p` 0.4868 vs `p_be` 0.4855 (gap +0.0013), gross mean −0.080 bps = **0.006σ**.

@@ -1,5 +1,8 @@
 # Capture Geometry — Cross-Chapter Analytic Extraction
 
+> **HISTORICAL (pre-INFR-022).** Cost-floor language below is prior-chapter apparatus. Live
+> programme is **zero-cost** (L-62); do not re-introduce cost floors as disposition rules.
+
 **Purpose.** Independent-review brief on every modality and mechanism the programme has used to
 attack **"availability exists, but cannot be captured properly"** — the highest-frequency
 disqualifier of strategies across Chapters 01–03.

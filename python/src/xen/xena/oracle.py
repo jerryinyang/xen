@@ -11,8 +11,12 @@ Accounting contract (extends `xen.adjudication`, L-18):
 * Position P&L accrues per bar via open-to-open marks anchored at the position's own fills —
   the same telescoping construction as ``assemble_multileg_bps``: per position,
   ``sum(increments) == direction * (exit_fill - entry_fill) * size * money_per_unit`` exactly.
-* Round-trip cost is charged once, on the entry event (L-02); spread + commission both binding
-  (L-22), injected via ``cost_bps`` per candidate (from the FTMO table upstream).
+* Zero-cost model (INFR-022): selection and gate are GROSS — ``charge_costs`` defaults to
+  ``False`` and ``cost_bps`` on streams is inert (ledger ``CostMoney`` is 0.0). Charging
+  costs (``charge_costs=True``) raises unless an ``operator_cost_directive`` (dict or path
+  to ``operator_cost_directive.json`` with an operator-signed reason + scope) is supplied;
+  the directive mechanism exists only for operator-scoped cost experiments recorded in
+  design.md before execution.
 * Reconciliation invariant: ``final_equity - initial_equity == sum(ledger NetMoney)`` (marked
   to last mark for censored positions) — checked on every evaluation; failure raises.
 
@@ -41,8 +45,10 @@ XXXUSD); non-USD-quote symbols must pass an explicit factor.
 from __future__ import annotations
 
 import heapq
+import json
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable
 
 import numpy as np
@@ -69,7 +75,9 @@ class CandidateStream:
     (price units, >0), Censored (bool; ExitPrice ignored, marked to last mark).
     ``marks``: CloseTime (bar close), Open (the bar's real open) — the candidate symbol's
     price grid used for intra-position mark-to-market (L-09).
-    ``cost_bps``: round-trip cost in bps of entry notional (spread + commission, L-22).
+    ``cost_bps``: round-trip cost in bps of entry notional. Zero-cost model (INFR-022):
+    inert on the live path (``charge_costs=False`` default → never charged); non-zero pins
+    are refused at ingestion unless an operator cost directive exists.
     ``money_per_unit``: account-currency value of a 1.0 price move on 1 unit.
     """
     candidate_id: str
@@ -95,12 +103,13 @@ class OracleConfig:
     risk_per_position: float = 0.005     # r: fraction of FM(t) per new trade
     r_max: float = 0.05                  # global open-risk cap, fraction of FM(t)
     weights: dict[str, float] | None = None   # w_i per candidate_id; None = equal 1.0
-    # Operator amendment 2026-07-10 (gross-selection): SELECTION stages (search +
-    # certification) run cost-free (charge_costs=False) — commissions/spread are excluded
-    # from the portfolio-selection process. The FINAL GATE forces charge_costs=True
-    # regardless of what it is handed (L-22: costs are a binding verdict leg). Ledger
-    # CostMoney is 0.0 when uncharged.
-    charge_costs: bool = True
+    # INFR-022 (zero-cost model): SELECTION and GATE run GROSS — charge_costs defaults
+    # False and cost_bps on streams is inert (ledger CostMoney = 0.0). charge_costs=True
+    # raises unless operator_cost_directive (dict, or path to operator_cost_directive.json
+    # carrying an operator-signed reason + scope) is supplied — the only sanctioned route
+    # for an operator-scoped cost experiment (recorded in design.md before execution).
+    charge_costs: bool = False
+    operator_cost_directive: "str | Path | dict | None" = None
     # INFR-007 (NEUTRAL amendment): fold-kernel backend. "rust" dispatches the sequential
     # event loop to the `xena_fold` PyO3 kernel — proven bit-identical to "python" by the
     # pinned parity corpus (tests/test_xena_fold_parity.py) and the XENA-001 rid-0 replay.
@@ -171,6 +180,37 @@ def _trade_mark_schedule(times: np.ndarray, opens: np.ndarray, entry_t: int, exi
     return kept_t, inc
 
 
+def _validate_cost_directive(directive: "str | Path | dict | None") -> dict:
+    """Load + validate an operator cost directive (INFR-022 §3.4).
+
+    Accepts a dict with ``reason`` + ``scope``, or a path to ``operator_cost_directive.json``
+    carrying those fields (operator-signed reason string). Raises when absent or malformed —
+    charging a cost without a recorded directive is a governance violation.
+    """
+    if directive is None:
+        raise ValueError(
+            "charge_costs=True requires an operator cost directive (INFR-022 §3.4): pass "
+            "operator_cost_directive as a dict {'reason': ..., 'scope': ...} or a path to "
+            "operator_cost_directive.json in the run dir. Only an explicit operator directive "
+            "may introduce costs, and it must be recorded in the design before execution."
+        )
+    if isinstance(directive, (str, Path)):
+        path = Path(directive)
+        if not path.exists():
+            raise ValueError(f"operator_cost_directive file not found: {path}")
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    else:
+        payload = dict(directive)
+    reason = payload.get("reason")
+    scope = payload.get("scope")
+    if not reason or not scope:
+        raise ValueError(
+            "operator cost directive must carry an operator-signed 'reason' string and a "
+            "'scope' (INFR-022 §3.4); got " + repr(payload)
+        )
+    return {"reason": str(reason), "scope": str(scope)}
+
+
 # --------------------------------------------------------------------------- #
 # The oracle
 # --------------------------------------------------------------------------- #
@@ -189,8 +229,14 @@ def evaluate(bitmask: dict[str, bool] | set[str], streams: list[CandidateStream]
     lands outside the segment, so folds built from disjoint segments are disjoint in P&L
     regardless of holding horizon (review finding 1).
     ``seed``: threaded for future stochastic elements; unused in v1.
+
+    Zero-cost model (INFR-022): ``charge_costs=True`` raises unless an operator cost
+    directive is supplied (see :func:`_validate_cost_directive`). Gross selection and
+    gross gate only on the live path.
     """
     del seed  # v1: no stochastic elements; parameter kept for interface stability
+    if config.charge_costs:
+        _validate_cost_directive(config.operator_cost_directive)
     if config.backend == "rust":
         return _evaluate_rust(bitmask, streams, config, segment=segment,
                               objective=objective)

@@ -10,11 +10,16 @@ Coordinate the experiment workflow; route work to specialists; enforce the split
 (**future-destroy** leak survival, holdout, causality/provenance, estimand reconciliation).
 Every quality or materiality read is informative — presented as evidence, decided by the operator.
 
-**INFR-016 (2026-07-18):** value/quality/significance reads are **report layers**
-(`observed / ideal / interpretation` per candidate — `xen.xena.report_layer`), never gates.
-Nothing is machine-dropped between layers; the operator authorises which candidates advance.
-The only hard checks are **data-validity attestations** (holdout, causal ≤t-1, estimand
-reconciliation, non-STUB fence, no-local-accounting, future-destroy leak survival).
+**INFR-016 (2026-07-18) + INFR-022 (2026-08-08):** value/quality/significance reads are
+**report layers** (`observed / ideal / interpretation` per candidate — `xen.xena.report_layer`),
+never gates. Nothing is machine-dropped between layers; the operator authorises which candidates
+advance. The only hard checks are **data-validity attestations** (holdout, causal ≤t-1, estimand
+reconciliation, non-STUB fence, no-local-accounting, zero-cost compliance, future-destroy leak
+survival — its integrity bite is the SE-family `INTEGRITY_Z × bootstrap_SE`, never an MDE).
+INFR-022 binds the **zero-cost model** (no spread/commission/swap in any calculation; caveat on
+every report), the **neutrality standard** (N1–N11, `docs/references/neutrality-standard.md`),
+the **powering strip** (sample-size context + direct baseline comparison only — no MDE, no
+floors, no UNPOWERED), and **PSR** beside every mean-trade bps read (same series).
 
 ## Start
 
@@ -58,14 +63,17 @@ A vectorised Python backtest of a price strategy is REJECT-class. **VAL carve-ou
 re-analysis of already-emitted, still-valid data skips stages 1-3 and enters at the estimand
 gate → `data-analyst` (archived cTrader emissions under chapter-03 archive only).
 
-**XENA lane (DEFAULT route, INFR-006).** An incoming idea becomes candidates in a XENA
-universe: Nautilus emission per candidate (shim → adjudication; `SlPrice` on legs) →
-blocking candidate gate (`xen.xena.ingest.gate_universe`) → LAHC search on the TRAIN
-search band → plateau + disjoint-fold certification (evidence package, operator reviews) →
-operator-approved counted final gate on TEST (`run_final_gate`; ledger cap 2/universe;
-`new_data_attestation` operator-only). **VOID on new stack (INFR-010 R4):** chapter-03
-frozen registry pins are invalid for Bybit/crypto until a fresh CAL INFR produces a new
-hash-pinned registry. Spec: `docs/references/xena-lane.md` v2.
+**XENA lane (DEFAULT route, INFR-006; INFR-022 zero-cost + single gross gate).** An incoming
+idea becomes candidates in a XENA universe: Nautilus emission per candidate (shim →
+adjudication; `SlPrice` on legs; zero-cost pins) → blocking candidate gate
+(`xen.xena.ingest.gate_universe`, zero-cost compliance) → LAHC search on the TRAIN search band
+(gross-only, zero-cost compliance guard) → plateau + disjoint-fold certification (evidence
+package, operator reviews) → operator-approved counted final gate on TEST (`run_final_gate`;
+**single GROSS gate** — the A-4 net-informational run is retired; ledger cap 2/universe;
+`new_data_attestation` operator-only; artifact carries `cost_model: NO_COST_CHARGED`).
+**VOID on new stack (INFR-010 R4):** chapter-03 frozen registry pins are invalid for
+Bybit/crypto until a fresh CAL INFR produces a new hash-pinned registry (CAL apparatus is
+bannered legacy pending a post-INFR-022 CAL redesign). Spec: `docs/references/xena-lane.md` v2.
 
 **SPDR carve-out (speed-run screens).** The `SPDR-###` lane is a TRAIN-only availability
 screen that runs vectorised in Python to gate a `WORTH_EXPLORING` disposition **before** a
@@ -99,7 +107,8 @@ decides which advance.
 2. **Final experiment verdict** (after `analysis.md`).
 3. Spending a counted TEST read — additionally requires a passing
    `estimand_validation.json` for the emission being read (pre-read gate).
-4. Anything holdout-adjacent; any deployability claim.
+4. Anything holdout-adjacent; any deployability/tradability claim (refused by rule — the
+   zero-cost model does not loosen this).
 5. **Layer progression** — after each report layer, the operator authorises which candidates
    advance to the next layer. No value read auto-drops a candidate.
 
@@ -144,7 +153,17 @@ If a question cannot be stated plainly, investigate first — do not dump proces
   open-to-open returns; catalog fence + emission attestation (STUB fails v2 gate).
 - Estimands come from `xen.adjudication`; no accounting primitives in experiment dirs
   (`check_no_local_accounting`).
-- No verdict, control read, or TEST read on an emission without a passing estimand gate.
+- No verdict, control read, or TEST read on an emission without a passing estimand gate
+  (includes the zero-cost compliance check).
+- **Zero-cost model (INFR-022):** no spread/commission/swap in any calculation; caveat
+  (§3.1 text) on every report/analysis/results artifact; non-zero cost parameters require
+  a recorded operator cost directive (`operator_cost_directive.json` + design clause).
+- **Neutrality (N1–N11):** no-verdict boundary; observed vs inference labelled; counts are
+  context, never hide/drop rules; direct comparisons only; populations named and separated;
+  controls informative; symmetric evidence; operator-only value labels.
+- **Powering strip:** no MDE, no detection floors, no power curves, no "unpowered" labels
+  on the value path — sample-size context + direct baseline comparison only. PSR beside
+  every mean-trade bps read, same series (columns `psr` + `psr_n`).
 - Per-stratum reads; pooled figures are disclosure-only.
 - Register candidates before screening; counted TEST reads recorded (cap 2 lifetime/stratum).
 - No scope expansion after QA APPROVE — new questions are new experiments.
@@ -152,7 +171,8 @@ If a question cannot be stated plainly, investigate first — do not dump proces
   significance reads are **report layers** (`observed/ideal/interpretation`), never gates
   (INFR-016). Retired auto-verdicts: `at_or_above_p95` sign-battery boolean, `n_legs_floor`
   veto, `one_subset` top-1 hiding, derangement `hard_fail_leak` collapse<0.5, final-gate
-  `passed`. Only **future-destroy** leak survival + holdout + causal + estimand stay hard.
+  `passed`, MDE/`powered_label`/`power_layer`/`structural_label`, cost floors, net reads.
+  Only **future-destroy** leak survival + holdout + causal + estimand + zero-cost stay hard.
 
 ## References
 

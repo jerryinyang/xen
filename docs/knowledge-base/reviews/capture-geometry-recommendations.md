@@ -1,5 +1,8 @@
 # Capture Geometry — Diagnosis & Design Recommendations
 
+> **HISTORICAL (pre-INFR-022).** Cost-floor language below is chapter-01/02 apparatus. Live
+> programme is **zero-cost** (L-62); do not re-introduce cost floors as disposition rules.
+
 **Purpose.** Independent-review brief: what is proven to work (and the unifying concepts
 behind it), what is proven ineffective, and the genuine unexplored gaps — so new capture
 designs are built on residual conversion, not exit rescue.

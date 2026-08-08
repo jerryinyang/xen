@@ -59,7 +59,7 @@ def write_universe(root: Path, n: int = 3) -> Path:
     for i in range(n):
         write_run(root / f"c{i}", drift=0.01 * (i + 1))
         cands.append({"candidate_id": f"c{i}", "run_dir": f"c{i}", "symbol": "TEST",
-                      "cost_bps": 1.0})
+                      "cost_bps": 0.0})
     mpath = root / "universe_manifest.json"
     mpath.write_text(json.dumps({"universe_id": "XENA-TOY", "candidates": cands}),
                      encoding="utf-8")
@@ -69,15 +69,34 @@ def write_universe(root: Path, n: int = 3) -> Path:
 # --------------------------------------------------------------------------- #
 def test_load_candidate_maps_contract(tmp_path):
     write_run(tmp_path / "r")
-    s = load_candidate(tmp_path / "r", candidate_id="a", symbol="TEST", cost_bps=1.0)
+    s = load_candidate(tmp_path / "r", candidate_id="a", symbol="TEST", cost_bps=0.0)
     assert s.trades.height == 5
     assert (s.trades.get_column("StopDistance") == 1.0).all()
     assert s.marks.height == 200
 
 
+def test_nonzero_cost_pin_refused_without_directive(tmp_path):
+    """INFR-022 §3.2/§3.4: non-zero cost_bps raises at load unless a directive exists."""
+    write_run(tmp_path / "r")
+    with pytest.raises(ValueError, match="zero-cost model violated"):
+        load_candidate(tmp_path / "r", candidate_id="a", symbol="TEST", cost_bps=1.0)
+    # gate surfaces it as a schema failure
+    rep = gate_candidate(tmp_path / "r", candidate_id="a", symbol="TEST", cost_bps=1.0)
+    assert not rep["blocking_pass"]
+    assert not rep["checks"]["schema"]["pass"]
+    # a valid directive legitimizes the pin
+    directive = {"reason": "operator JI: scoped cost experiment", "scope": "EXP-X"}
+    s = load_candidate(tmp_path / "r", candidate_id="a", symbol="TEST", cost_bps=1.0,
+                       operator_cost_directive=directive)
+    assert s.cost_bps == 1.0
+    rep2 = gate_candidate(tmp_path / "r", candidate_id="a", symbol="TEST", cost_bps=1.0,
+                          operator_cost_directive=directive)
+    assert rep2["blocking_pass"]
+
+
 def test_gate_passes_clean_run(tmp_path):
     write_run(tmp_path / "r")
-    rep = gate_candidate(tmp_path / "r", candidate_id="a", symbol="TEST", cost_bps=1.0)
+    rep = gate_candidate(tmp_path / "r", candidate_id="a", symbol="TEST", cost_bps=0.0)
     assert rep["blocking_pass"], rep["checks"]
     assert all(c["pass"] for c in rep["checks"].values())
 
@@ -90,7 +109,7 @@ def test_gate_passes_clean_run(tmp_path):
 ])
 def test_gate_failure_modes(tmp_path, kw, failing_check):
     write_run(tmp_path / "r", **kw)
-    rep = gate_candidate(tmp_path / "r", candidate_id="a", symbol="TEST", cost_bps=1.0)
+    rep = gate_candidate(tmp_path / "r", candidate_id="a", symbol="TEST", cost_bps=0.0)
     assert not rep["blocking_pass"]
     assert not rep["checks"][failing_check]["pass"]
 
@@ -99,7 +118,7 @@ def test_gate_missing_slprice_is_schema_fail(tmp_path):
     write_run(tmp_path / "r")
     cis = pl.read_parquet(tmp_path / "r" / "cis_trades.parquet").drop("SlPrice")
     cis.write_parquet(tmp_path / "r" / "cis_trades.parquet")
-    rep = gate_candidate(tmp_path / "r", candidate_id="a", symbol="TEST", cost_bps=1.0)
+    rep = gate_candidate(tmp_path / "r", candidate_id="a", symbol="TEST", cost_bps=0.0)
     assert not rep["blocking_pass"]
     assert not rep["checks"]["schema"]["pass"]
 
@@ -152,7 +171,7 @@ def test_load_refuses_stale_gate(tmp_path):
     manifest = json.loads(mpath.read_text())
     write_run(tmp_path / "c9")
     manifest["candidates"].append({"candidate_id": "c9", "run_dir": "c9",
-                                   "symbol": "TEST", "cost_bps": 1.0})
+                                   "symbol": "TEST", "cost_bps": 0.0})
     mpath.write_text(json.dumps(manifest))
     with pytest.raises(RuntimeError, match="stale"):
         load_universe(mpath)

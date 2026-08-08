@@ -41,7 +41,7 @@ class HighCadenceNullSpec:
     target_legs_per_candidate: int = 5_000
     hold_bars: int = 12
     stop_price_units: float = 1.0
-    cost_bps: float = 2.0           # finite non-placeholder (integrity-complete for tests)
+    cost_bps: float = 0.0           # zero-cost model (INFR-022): inert pin; default 0
     money_per_unit: float = 1.0
     edge_bps: float = 0.0           # zero entry-level predictive content
     noise_bps: float = 8.0

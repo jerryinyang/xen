@@ -17,7 +17,10 @@ Accounting contract
   ``M_end(i) = RealOpen[i+1]`` for interior bars and ``ExitFillPrice`` on the exit bar.
   The increments telescope, so per leg: ``sum(inc) == RealizedBps`` exactly, and per cell:
   ``sum(per-bar gross) == sum(leg RealizedBps)`` — the mandatory reconciliation invariant.
-* Round-trip cost is charged once per leg on its entry bar (L-02).
+* Zero-cost model (INFR-022): the ``cost_bps`` parameter is kept for API stability and is
+  pinned to 0 by every live caller; ``net_bps == gross_bps`` on live paths. Non-zero cost
+  pins are refused by callers under the zero-cost compliance contract (``assert_zero_cost``),
+  unless an explicit operator cost directive is recorded in the design.
 * A censored leg (open at the emission fence) is marked to the last bar's ``RealOpen`` and
   flagged; its marked-to-open P&L is reported separately from realized.
 
@@ -97,8 +100,48 @@ def _leg_bar_spans(times: np.ndarray, legs: pl.DataFrame) -> tuple[np.ndarray, n
     return entry_i, exit_i
 
 
+# Columns that would carry an engine-charged cost. Zero-cost model (INFR-022): any
+# non-zero value in these columns means costs entered the emission — a blocking failure.
+_COST_COLUMN_FRAGMENTS = ("commission", "fee", "funding", "swap", "spread")
+
+
+def check_no_cost_charged(*frames: pl.DataFrame) -> dict:
+    """Blocking zero-cost check: no non-zero commission/cost column in the emission frames.
+
+    Scans every column whose lowercased name contains a cost fragment
+    (commission/fee/funding/swap/spread). A non-zero value in any such column means the
+    emission carried an engine-side cost — the zero-cost model (INFR-022 §3.2) forbids it
+    on the live path. Pass the RAW emission frames (the Nautilus ``positions_ledger`` /
+    ``fills`` carry a ``commissions`` column that the adjudication shim drops during
+    normalisation) plus the normalised positions/cis frames. Returns
+    ``{"ok": bool, "non_zero_columns": [...], "n_non_zero_rows": n}``; ``ok`` is True
+    when no such column exists or all values are zero.
+    """
+    hits: dict[str, int] = {}
+    for df in frames:
+        for col in df.columns:
+            low = col.lower()
+            if not any(frag in low for frag in _COST_COLUMN_FRAGMENTS):
+                continue
+            try:
+                s = df.get_column(col)
+                if s.dtype == pl.Utf8:
+                    continue
+                arr = s.to_numpy()
+                num = np.asarray(arr, dtype=float)
+                nz = int(np.count_nonzero(num[np.isfinite(num)] != 0.0))
+            except (TypeError, ValueError):
+                continue
+            if nz:
+                hits[col] = hits.get(col, 0) + nz
+    return {"ok": not hits, "non_zero_columns": sorted(hits), "n_non_zero_rows": sum(hits.values())}
+
+
 def per_leg_net(cis_trades: pl.DataFrame, *, cost_bps: float) -> pl.DataFrame:
-    """Per-leg ledger with ``NetBps = RealizedBps - cost_bps`` (round-trip cost once per leg)."""
+    """Per-leg ledger with ``NetBps = RealizedBps - cost_bps`` (cost once per leg).
+
+    Zero-cost model (INFR-022): live callers pass ``cost_bps=0`` so ``NetBps == RealizedBps``.
+    """
     _require(cis_trades, REQUIRED_LEG_COLS, "cis_trades")
     return cis_trades.with_columns((pl.col("RealizedBps") - cost_bps).alias("NetBps"))
 

@@ -21,12 +21,13 @@ operator verdicts) are unchanged; implementations rebind per INFR-010 §6 Phase 
 
 | Lane | Tier | Data | Fill/cost | Default |
 |------|------|------|-----------|---------|
-| **Primary** | T1 | 1m OHLCV from Bybit trades | Engine costless-honest; fees + discrete funding injected at analysis; spread omitted with mandatory caveat | **All experiments** |
+| **Primary** | T1 | 1m OHLCV from Bybit trades | **Zero-cost model** (`NO_COST_CHARGED`): engine costless-honest; no fees/funding/spread injected at analysis; ZERO-COST-DISCLOSURE caveat on every report | **All experiments** |
 | **Signed bar** | T1 diagnostic | Exact taker buy/sell volume; stored mean-price skew | Skew quarantined as `MeanPriceSkewBps / UNUSABLE_AS_SPREAD`; never cost input | Approved flow diagnostics only |
 | **Secondary** | T2 | MBP/L2 contracts only; no collected dataset | Unavailable | **Not a programme direction** |
 
-**Spread boundary:** no valid spread observation or secondary-data rescue exists. Chapter 05 does
-not manufacture a proxy or a spread-scale gate; reports label cost accounting partial.
+**Spread boundary (INFR-022):** no valid spread observation or secondary-data rescue exists; the
+retired cost stack (fees/funding injection, spread-scale routing) is archived in
+`xen/evaluation_cost_legacy.py` and not callable from any live path.
 
 **Current signed-data materialisation:** the raw signed source is currently readable through the
 mounted archived staging symlink. The full TRAIN signed catalog is verified at
@@ -50,7 +51,7 @@ mounted archived staging symlink. The full TRAIN signed catalog is verified at
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  STAGE 3: ANALYSIS (Python only — no price-strategy vectorised backtest)    │
 │  • xen.estimand_validation v2 (blocking)                                    │
-│  • T1 cost injection: Bybit fees + discrete funding; spread unavailable   │
+│  • T1 cost model: ZERO-COST (NO_COST_CHARGED) — no fees/funding/spread injected   │
 │  • xen.evaluation evidence → operator verdict                               │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -123,26 +124,36 @@ Spec: `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-010/code/emissi
 - **Phase B smokes** may carry `fence_attestation.status: STUB` — estimand gate v2 **rejects** these for real experiments.
 - **Production emissions** must attest the INFR-011 A6 `fence-manifest.json` sha256.
 
-## Cost model (T1 analysis injection)
+## Cost model (ZERO-COST — INFR-022, supersedes the T1 analysis injection)
 
-Engine runs costless-honest (INFR-009 P5 discipline). Analysis layer applies:
+**All lanes default to `NO_COST_CHARGED` (binding, INFR-022 directive 1):** no spread,
+commission, or swap enters any calculation in any experiment type unless an explicit operator
+cost directive requests costs (recorded in the experiment's design.md before execution; QA
+traces it). "Zero" is a model, not a measurement — every money-bearing report/analysis/results
+artifact carries the ZERO-COST-DISCLOSURE caveat verbatim (`docs/references/neutrality-standard.md`
+§ N9). Non-zero `--cost-bps` / `charge_costs=True` raise unless `operator_cost_directive.json`
+(operator-signed reason + scope) is present. `money_per_unit` is a sizing/capital-unit factor,
+not a cost.
 
-- Bybit USDT-perp maker/taker schedule (`xen.evaluation.BYBIT_USDT_PERP_FEES`)
-- Funding: timestamp-counted settlements for the fixed four-hour Chapter-05 episode
-- Netted-turnover rule carries from legacy programme
-
-**Spread cost unavailable and not charged.** `bybit_round_trip_cost_bps` reports
-`spread_rt_bps=None` and `PARTIAL_FEES_FUNDING_ONLY`; reported cost understates total cost and
-reported net performance is overstated. Strategy reports must disclose this and cannot use the
-partial figure as a deployability claim.
+**Retired cost stack (historical record — chapter-04/05).** The former T1 analysis injection —
+Bybit maker/taker schedule (`BYBIT_USDT_PERP_FEES`), timestamp-counted funding,
+`bybit_round_trip_cost_bps` with `spread_rt_bps=None` / `PARTIAL_FEES_FUNDING_ONLY` and the
+understatement caveat, `t1_round_trip_spread_bps`, `spread_scale_route` — moved to
+`xen/evaluation_cost_legacy.py` (ARCHIVED banner; not callable from any live path; only an
+operator cost directive may re-enable it, recorded in the design).
 
 The stored `SpreadBps` bytes have no tick floor and are not spread. Live access goes through
 `xen.sigbar.quarantine_mean_price_skew`, which exposes `MeanPriceSkewBps` with status
-`UNUSABLE_AS_SPREAD`. `xen.evaluation.t1_round_trip_spread_bps` rejects negative/non-finite
-inputs. Historical explicit-spread callers remain reproducible, but Chapter 05 supplies no spread.
+`UNUSABLE_AS_SPREAD` — a data-provenance quarantine, kept live (not a cost read). FTMO cost
+table is **archived** in the legacy module for chapter-03 VAL re-analysis only.
 
-FTMO cost table is **archived** — retained in `xen.evaluation.FTMO_COSTS` for chapter-03
-VAL re-analysis only.
+## Cost directive mechanism (INFR-022 §3.4)
+
+* Design clause in `design.md` naming the directive, functions, and scope.
+* Run-dir / universe-root file `operator_cost_directive.json` (operator-signed reason
+  string + scope).
+* QA traces both. Estimand `--cost-bps != 0` fails without the file; oracle
+  `charge_costs=True` raises without the directive object/path.
 
 ## Confirmed decisions (INFR-010 D1–D8)
 

@@ -1,13 +1,12 @@
 """INFR-009 P3b unit tests — studentized LCB, purged layout, no fixtures."""
 from __future__ import annotations
 
-import numpy as np
 
 from xen.xena.calibration import SegmentLayout
 from xen.xena.calibration_p3b import (LOW, SEED_BASE_LOW, coverage_no_search,
                                       evaluate_lcb_st, make_null_universe)
 from xen.xena.oracle import OracleConfig
-from xen.xena.score import lcb_g, lcb_g_studentized
+from xen.xena.score import lcb_g_studentized
 from xen.xena.search import bootstrap_block_starts, clip_grid_covering, universe_grid
 from xen.xena.oracle import evaluate
 
@@ -38,15 +37,16 @@ def test_studentized_lcb_emits_diagnostics():
     assert "n_nonempty_blocks" in out
 
 
-def test_ood_floor_blocks_pass():
+def test_floor_veto_retired_small_n_still_read():
+    """INFR-022 L-63: the n_legs_floor out-of-domain veto is deleted; a tiny-n subset is
+    still evaluated with its sample-size context reported."""
     streams = make_null_universe(SEED_BASE_LOW + 2, LOW, n_candidates=12)
     layout = SegmentLayout.from_span(0, LOW.n_bars * 60 * NS,
                                      purge_ns=LOW.hold_bars * 60 * NS)
     subset = frozenset(s.candidate_id for s in streams[:3])
-    out = evaluate_lcb_st(subset, streams, CFG, layout.gate, block=64, seed=2,
-                          n_legs_floor=10_000_000)
-    assert out.get("out_of_calibration_domain") is True
-    assert out.get("pass_positive") is False
+    out = evaluate_lcb_st(subset, streams, CFG, layout.gate, block=64, seed=2)
+    assert "out_of_calibration_domain" not in out
+    assert "n_legs" in out  # sample size reported as context, never a veto
 
 
 def test_coverage_shape_studentized():

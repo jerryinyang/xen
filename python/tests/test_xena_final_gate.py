@@ -44,10 +44,10 @@ def test_final_gate_pass_and_artifact(tmp_path):
     assert len(g["decay_windows"]) == 4
     assert "decay_rank_corr" in g
     assert art["binding_block"] == "gross"
-    # informational net block present, costed, and its own full protocol
-    n = art["net_informational"]
-    assert n["costs_charged"] is True and g["costs_charged"] is False
-    assert "dd_feasibility" in n and "F_boot" in n
+    # INFR-022: single GROSS gate; the A-4 NET informational run is retired
+    assert art["cost_model"] == "NO_COST_CHARGED"
+    assert g["costs_charged"] is False
+    assert "net_informational" not in art
     assert art["evaluation_count"] == 123
     assert (tmp_path / GATE_LEDGER_NAME).exists()
     assert (tmp_path / "xena_final_gate_1.json").exists()
@@ -102,9 +102,9 @@ def test_passed_subset_may_regate_without_attestation(tmp_path):
     assert art2["passed"]
 
 
-def test_gate_dual_blocks_gross_binding_net_informational(tmp_path):
-    """A-4: binding verdict from the gross block; net block informational, costed,
-    strictly below gross on a costed stream."""
+def test_gate_is_single_gross_run(tmp_path):
+    """INFR-022: the A-4 dual gate (gross binding + net informational) is retired — the
+    gate runs GROSS once and costs are never charged, even on a cost-pinned stream."""
     from xen.xena.oracle import CandidateStream
     base = make_stream("a", +40.0, seed=1)
     costed = CandidateStream("a", "TEST", base.trades, base.marks, cost_bps=8.0)
@@ -112,11 +112,16 @@ def test_gate_dual_blocks_gross_binding_net_informational(tmp_path):
                          **gate_kwargs(tmp_path))
     assert art["binding_block"] == "gross"
     assert art["gross"]["costs_charged"] is False
-    assert art["net_informational"]["costs_charged"] is True
-    assert art["net_informational"]["F_point"] < art["gross"]["F_point"]
-    # passed reflects the GROSS block regardless of net
+    assert art["cost_model"] == "NO_COST_CHARGED"
+    assert "net_informational" not in art
     assert art["passed"] == (art["gross"]["F_boot"]["p25"] >= 0.0
-                             and art["gross"]["dd_feasibility"]["feasible"])
+                              and art["gross"]["dd_feasibility"]["feasible"])
+    # even a directive-gated config cannot smuggle costs into the gate
+    art2 = run_final_gate({"a"}, [costed],
+                          OracleConfig(charge_costs=True, operator_cost_directive={
+                              "reason": "x", "scope": "y"}),
+                          **gate_kwargs(tmp_path))
+    assert art2["gross"]["costs_charged"] is False
 
 
 def test_dd_feasibility_binding_leg(tmp_path):
@@ -137,7 +142,6 @@ def test_gate_artifact_carries_dd(tmp_path):
     streams = [make_stream("a", +40.0, seed=1)]
     art = run_final_gate({"a"}, streams, CFG, **gate_kwargs(tmp_path))
     assert art["gross"]["dd_feasibility"]["feasible"] is True
-    assert art["net_informational"]["dd_feasibility"] is not None
     assert art["passed"]
 
 
@@ -232,7 +236,7 @@ def test_path_null_is_zero_expectation():
 
 def test_path_planted_edge_is_exact_shift():
     import numpy as np
-    from xen.xena.calibration import path_universe, regime_gbm_path
+    from xen.xena.calibration import path_universe
     u = path_universe(n_planted=1, n_null=0, edge_bps=25.0, seed=9)
     tr = u[0].trades
     opens = u[0].marks.get_column("Open").to_numpy()

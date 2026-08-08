@@ -104,11 +104,13 @@ is refused.
 stated in σ̂ units or re-derived per universe (**L-50**), and no powered subset's magnitudes may be
 read without the three-number selection check (**L-51**).
 
-**Standing design rules (SoT §9), binding on every 018 design:** report the dependence-matched
-**block** MDE, never an iid `2.8σ/√n` form; `h` is an index offset, so co-report the exact-span
-subset; magnitude-defined conditioners need a magnitude-matched comparator; power plans use
-effective, not nominal, multi-symbol coverage; collapse fraction is disclosure-only near a zero
-mean.
+**Standing design rules (SoT §9), binding on every 018 design:** report the
+**dependence-matched block length** for every bootstrap CI (`block ≥ H`; a library default is
+not a substitute); `h` is an index offset, so co-report the exact-span
+subset; magnitude-defined conditioners need a magnitude-matched comparator; **sample-size context**
+uses effective, not nominal, multi-symbol coverage (INFR-022 L-63: expected counts are
+context — never a hide rule, never a resolve rule; no block-MDE, no `2.8σ/√n` floor);
+collapse fraction is disclosure-only near a zero mean.
 
 SoT: `.ignore/what-next/alts/opportunity.md`
 
@@ -116,14 +118,15 @@ SoT: `.ignore/what-next/alts/opportunity.md`
 (EURUSD / XAUUSD / USTEC, INFR-021 fence) = **independent replication read only**, never pooled into
 the powered estimate. cTrader holdout from **2024-12-13** must never be queried.
 
-**Standing caveat (not a blocker with a to-do behind it):** spread is **never charged,
-programme-wide** (operator directive 2026-07-23, `evaluation-framework.md` §Chapter-04 cost
-interpretation). No quote or effective spread exists on the T1 lane, a fixed proxy is refused in
-code, and no per-symbol pin is scheduled. Consequence: reported cost understates total cost,
-reported net is overstated, the caveat travels on every record, and **no checkpoint-018 money read,
-expectancy claim, tradability claim or graduation is licensed** — by rule, permanently. This bites
-harder on a capture-geometry branch than on a forecasting branch, which is a reason to state it on
-every report, not a reason to await a measurement.
+**Standing caveat (binding, INFR-022 — supersedes the chapter-04/05 cost interpretation):**
+the programme is **ZERO-COST** (`NO_COST_CHARGED`): no spread, commission, or swap enters any
+calculation in any experiment type unless an explicit operator cost directive requests costs
+(recorded in the design before execution). Every money-bearing report carries the
+ZERO-COST-DISCLOSURE caveat verbatim (§3.1 / `neutrality-standard.md` § N9). "Zero" is a
+model, not a measurement. **No checkpoint-018 money read, expectancy claim, tradability
+claim or graduation is licensed** — by rule, permanently (the zero-cost model does not loosen
+deployability refusals). This bites harder on a capture-geometry branch than on a forecasting
+branch, which is a reason to state it on every report, not a reason to await a measurement.
 
 **Deferred (operator, 2026-07-25):** pure direction-agnostic strategies — both-side, straddle-class,
 grid-class. Parked, not refuted. Direction-aware capture is required.
@@ -140,13 +143,18 @@ on SPDR-014/015/016; multi-symbol agreement is credibility only. DIRECTION: NEUT
 `docs/signal-registry/candidate-families/cf-voldir-001-universe.json`. Applies to SPDR-012/013/014
 and any later XENA universe definition unless the operator freezes a subset at reflection C.
 
-## 2. Cost boundary (inherits Chapter-05 no-spread amendment)
+## 2. Cost boundary (INFR-022 zero-cost — supersedes the Chapter-05 no-spread amendment)
 
-- Spread cost unavailable and not charged (`spread_rt_bps=null`,
-  `PARTIAL_FEES_FUNDING_ONLY`).
-- Reported cost understates total cost; reported net is overstated.
-- Every money-bearing report must disclose that caveat.
-- No deployability claim from SPDR outputs.
+- **Zero-cost model (§3.1):** `cost_model: NO_COST_CHARGED` — spread, commissions, and
+  swaps/funding are **not modeled**; no cost function is called on any live path. The retired
+  chapter-05 cost scope (`PARTIAL_FEES_FUNDING_ONLY`) is **superseded-for-live-use**
+  (historical record only).
+- Every money-bearing report carries the ZERO-COST-DISCLOSURE caveat verbatim.
+- No deployability claim from SPDR outputs — by rule.
+- **Neutrality + PSR (INFR-022, binding):** every analysis/screen/report binds N1–N11
+  (`docs/references/neutrality-standard.md`); every mean-trade/leg bps read carries
+  `psr` + `psr_n` on the same series; the leak tripwire's integrity bite is
+  `INTEGRITY_Z × bootstrap_SE` (N6b), never an MDE.
 
 ## 3. Hard refusals
 
@@ -184,8 +192,10 @@ Added by checkpoint-018:
   unless operator demands more.  
 - Operator gates: implementation plan approval, then execution authority per SPDR; all three
   analyses precede the checkpoint-level interpretation; XENA remains separate.
-- Every declared lead carries a predeclared target MDE. B-5 is symmetric: unpowered ≠ negative, and
-  suggestive ≠ supported.
+- Every declared lead states its expected per-stratum event counts and its declared fixed
+  comparator (INFR-022 L-63: sample-size is context, never a gate). B-5 is symmetric:
+  small-n ≠ negative, and suggestive ≠ supported. No predeclared target MDE — the MDE
+  apparatus is retired.
 
 ## 5. Relation to checkpoint-016
 

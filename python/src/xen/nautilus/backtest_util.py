@@ -60,14 +60,14 @@ def synthetic_bars(
     for i in range(n):
         px = float(prices[i])
         ts = dt_to_unix_nanos(times[i].to_pydatetime())
-        o, h, l, c = px, px * 1.001, px * 0.999, px
+        o, h, lo, c = px, px * 1.001, px * 0.999, px
         vol = float(volumes[i])
         bars.append(
             Bar(
                 bar_type=bar_type,
                 open=instrument.make_price(o),
                 high=instrument.make_price(h),
-                low=instrument.make_price(l),
+                low=instrument.make_price(lo),
                 close=instrument.make_price(c),
                 volume=instrument.make_qty(vol),
                 ts_event=ts,
@@ -79,7 +79,7 @@ def synthetic_bars(
                 "SourceCloseTime": times[i].to_pydatetime().replace(tzinfo=None),
                 "RealOpen": o,
                 "RealHigh": h,
-                "RealLow": l,
+                "RealLow": lo,
                 "RealClose": c,
                 "Volume": vol,
             }

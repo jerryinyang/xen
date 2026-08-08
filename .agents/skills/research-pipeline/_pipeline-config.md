@@ -136,11 +136,14 @@ Two-lane model (INFR-010 §4):
 
 | Lane | Tier | Data | Path |
 |------|------|------|------|
-| **Primary** | T1 | 1m OHLCV from Bybit trades; fees/funding accounting only | `data/catalog/` |
+| **Primary** | T1 | 1m OHLCV from Bybit trades; **zero-cost model** (no fees/funding/spread charged) | `data/catalog/` |
 | **Signed-volume** | T1 | Exact taker buy/sell volume plus quarantined mean-price skew | `data/catalog/` |
 
-Secondary MBP/L2 data is unavailable and is not an active Chapter-05 branch. Spread cost unavailable
-and not charged; reported cost understates total cost and strategy reports must disclose this.
+Secondary MBP/L2 data is unavailable and is not an active branch. **Zero-cost model
+(INFR-022, binding):** no spread, commission, or swap enters any calculation in any
+experiment type unless an explicit operator cost directive requests costs (recorded in the
+experiment's design.md before execution). Every report, analysis, screen and results
+artifact carries the zero-cost caveat verbatim (§ Zero-cost model below).
 
 - **Universe:** 910 USDT linear perpetuals (listed + delisted), census at INFR-011 A1.
 - **InstrumentId:** `{SYMBOL}-LINEAR.BYBIT` via `xen.nautilus.instrument_ids`.
@@ -157,6 +160,59 @@ Spec: `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-010/code/emissi
 
 **STUB fence attestations (Phase B smokes) fail estimand gate v2** — production runs require
 INFR-011 A6 hash-pinned manifest.
+
+## Zero-cost model (binding — INFR-022 directive 1)
+
+Programme-wide (all lanes — XENA, SPDR, EXP): **no spread, commission, or swap enters any
+calculation in any experiment type**, unless an explicit operator directive requests costs.
+
+* "Zero" is a *model*, not a measurement: absence of cost is never reported as "measured
+  zero cost"; the caveat text below is mandatory instead.
+* A cost directive is experiment-scoped: it may not be inferred from any other experiment's
+  directive, and it is recorded in the design before execution (QA traces it).
+* Deployability/tradability claims remain refused by rule — the zero-cost model does not
+  loosen them.
+* The retired cost stack lives in `xen/evaluation_cost_legacy.py` (ARCHIVED banner; not
+  callable from any live research path).
+* Live mechanics: `cost_bps`/`charge_costs`/`spread_*` parameters are inert (pinned 0 /
+  False) and enforced by code asserts; non-zero `--cost-bps` / `charge_costs=True` require
+  `operator_cost_directive.json` (operator-signed reason + scope).
+
+**Canonical caveat text (must appear VERBATIM on every report/analysis/results document):**
+
+```text
+ZERO-COST-DISCLOSURE
+  cost_model: NO_COST_CHARGED
+  spread: not modeled
+  commissions: not modeled
+  swaps/funding: not modeled
+  implication: every figure in this document is gross and cost-free; no spread,
+    commission, or swap enters any calculation. Realised results would differ
+    (likely worse) under any real cost schedule.
+  prohibited_claims: fully-net, cost-complete, tradable, deployable
+  lifting: only an explicit operator directive may introduce a cost model for a
+    scoped experiment; the directive is recorded in that experiment's design.md.
+```
+
+## Neutrality standard (binding — INFR-022 directive 2)
+
+The extracted chapter-05 neutrality canon is codified in **`docs/references/neutrality-standard.md`**
+(N1–N11). It is **binding** on every analysis, screen, report and results artifact: no-verdict
+boundary statements, observed-vs-inference labelling, counts as context (never hide/drop
+rules), direct comparisons against a pre-specified comparator only, populations named and
+separated, controls informative (the leak tripwire is the only blocking control, on the
+SE-family `INTEGRITY_Z × bootstrap_SE` scale — never an MDE), symmetric evidence, analyst
+independence, the zero-cost caveat on every document, completeness, and operator-only value
+labels. Skill files bind N1–N11 in their own contracts; this file binds them globally.
+
+## Powering strip (binding — INFR-022 directive 3)
+
+**Retained (the only powering-adjacent methods):** sample-size *context* (expected counts,
+optional minimum-n notes for primary-inference language — never a hide/drop rule, never a
+resolve rule) and DIRECT comparisons against a pre-specified baseline model. **Stripped:**
+MDE, detection floors (`2.8/√n`, `MDE_Z × SE`), mechanism ceilings, power curves, "at
+power"/"unpowered" language, and every machine-assigned power/resolution label. PSR is
+evidence, never a gate.
 
 ---
 
@@ -227,8 +283,9 @@ These binding constraints apply to all Xen research.
 | **Open-to-open returns only** | Strategy / signal / P&L returns are measured **open-to-open**, never open-to-close — an `OnClose` execution is impossible in real time (the close is unknown until the bar completes). Close-referenced returns are a non-tradable diagnostic and must be labelled as such. |
 | **Leak resistance is audited independently of the numbers** | Numeric reproduction reproduces a leak. Every price-primary experiment ships a future-destroying control that must collapse the edge; the audit traces verdict-bearing columns' input timestamps. A surviving edge under that control is a leak → REJECT. |
 | **Knowledge-base-first** | Read `docs/knowledge-base/` before designing. Never re-run a `pitfalls-ledger.md` dead end; never re-learn a `lessons-and-amendments.md` mechanism. |
-| **Integrity gates hard, value reads informative** | Only integrity checks block (**future-destroy** leak survival, holdout, causality/provenance, estimand reconciliation). Quality/materiality/significance reads are evidence for the operator — no auto-verdicts, no threshold stacks, no auto-RETIRE. |
-| **Validity attests; value reports (INFR-016)** | The value chain has **two disjoint layers**. (a) **VALIDITY attestations** — holdout fence, causal ≤t-1, estimand reconciliation, non-STUB fence, no-local-accounting, **future-destroy** leak survival — stay HARD; a failure means *emission invalid → fix the data*, never *no edge*. (b) **VALUE reads** — cost floor, cadence, leg-power, search score, fold stability, stage-2 bounds (ALL subsets + per-cell), **within-sample attribution** collapse, sign battery, cost/funding, spread routing, net deployability — are **report layers** (`observed/ideal/interpretation` per candidate, nothing machine-dropped); the operator authorises progression. Interpretation bands (SUPPORTED/WASH/CONTRADICTED/UNPOWERED/SUGGESTIVE/STRONG) are **labels, never gates**. `docs/references/xena-lane.md`. |
+| **Integrity gates hard, value reads informative** | Only integrity checks block (**future-destroy** leak survival, holdout, causality/provenance, estimand reconciliation, zero-cost compliance). Quality/materiality/significance reads are evidence for the operator — no auto-verdicts, no threshold stacks, no auto-RETIRE, no power floors, no MDE. |
+| **Validity attests; value reports (INFR-016/INFR-022)** | The value chain has **two disjoint layers**. (a) **VALIDITY attestations** — holdout fence, causal ≤t-1, estimand reconciliation, non-STUB fence, no-local-accounting, zero-cost compliance, **future-destroy** leak survival (integrity bite = pre-declared `INTEGRITY_Z × bootstrap_SE` of the same estimator — never an MDE) — stay HARD; a failure means *emission invalid → fix the data*, never *no edge*. (b) **VALUE reads** — sample-size layer, cadence, search score, fold stability, stage-2 bounds (ALL subsets + per-cell), **within-sample attribution** collapse, sign battery, PSR — are **report layers** (`observed/ideal/interpretation` per candidate, nothing machine-dropped); the operator authorises progression. Interpretation bands (STRONG/SUPPORTED/SUGGESTIVE/WASH and similar) are **operator-only tags, never machine-assigned, never gates** (N11). No cost floors, no leg-power MDE, no cost/funding sensitivity, no spread-scale routing, no net deployability reads on the live path — the retired cost stack is `evaluation_cost_legacy` (ARCHIVED). `docs/references/xena-lane.md`. |
+| **PSR pairing (INFR-022 directive 4)** | Probabilistic Sharpe Ratio (Bailey & López de Prado 2012, skew/kurt-adjusted) is reported beside every mean per-trade/leg bps read, on the SAME trade series and population: columns `psr` + `psr_n` beside the mean column. Empirical moments only (no normality); `n < 2` or non-finite moments → `psr = NaN` with `psr_n` stated, row still reported (N3). PSR is evidence, never a gate. Default `SR* = 0` (design may override). |
 | **Estimand before hypothesis** | No verdict, control read, or TEST read on an emission without a passing `xen.estimand_validation` gate. Controls that validate a hypothesis on an unvalidated estimand certify artifacts (critical-017). |
 | **Experiment ≠ family** | Experiments produce evidence and experiment-level verdicts. Family open/retire/promote decisions happen only at checkpoint retrospectives, operator-signed. Checkpoints group multiple experiments. |
 | **Protocols, not directives** | Every lesson is codified as a checkable protocol, script, or structural separation — directives ("interrogate raw data") recur; protocols do not. |
@@ -242,16 +299,17 @@ stack** (INFR-010 R4) — fresh CAL cycle required before any crypto universe. E
 operator-invoked only. Fills contract from Nautilus emissions (`positions_ledger` +
 `bar_marks` via shim; `SlPrice` field on legs). Full spec: `docs/references/xena-lane.md` v2.
 
-### Chapter 05 bounded route override (operator-approved, 2026-07-22)
+### Chapter 05 bounded route override (operator-approved, 2026-07-22; **cost policy superseded by INFR-022**)
 
 For proposed `CF-VOLCONV-001`, read `docs/references/chapter-05-governance.md` before any
 registration, design, census, or execution. While `docs/experiments-docs/INDEX.md` says the
 cost/data preflight is blocked, stop before outcome contact. After a separately evidenced and
 fresh-QA-approved preflight, the permitted exception is one TRAIN-only SPDR characterisation followed
 by one frozen Nautilus EXP if authorised; no XENA and no historical TEST. Infrastructure clearance
-does not itself authorise family registration or either run. Chapter-05 costs omit spread rather
-than substitute a proxy: `spread_rt_bps=None`, `PARTIAL_FEES_FUNDING_ONLY`, with the mandatory
-understatement/overstatement caveat in every strategy report.
+does not itself authorise family registration or either run. **INFR-022:** the chapter-05 cost
+policy (``PARTIAL_FEES_FUNDING_ONLY``, spread omitted with understatement caveat) is **HISTORICAL
+(superseded-for-live-use)** — the live programme is zero-cost (§ Zero-cost model); the chapter-05
+cost-data preflight docs carry a HISTORICAL banner (`docs/references/chapter-05-cost-data-preflight*.md`).
 
 ### Every Experiment Is Price-Primary (binding, INFR-001)
 
@@ -263,7 +321,9 @@ understatement/overstatement caveat in every strategy report.
   invalidated by an identified defect, a rerun through the full pipeline is required first.
 - **Estimand gate** — no analysis, verdict, control read, or counted TEST read on any emission
   without a passing `results/estimand_validation.json`
-  (`python -m xen.estimand_validation ...`, blocking: reconciliation/schema/fence/manifest).
+  (`python -m xen.estimand_validation ...`, blocking: reconciliation/schema/fence/manifest/
+  zero-cost compliance — non-zero commission/fee columns or non-zero `--cost-bps` without an
+  `operator_cost_directive.json` fail the gate).
 - Accounting primitives live only in `xen.adjudication`; defining them in experiment dirs
   fails `check_no_local_accounting` (L-18 / critical-017).
 
@@ -379,15 +439,15 @@ Before creating new modules, check these existing reusable functions:
 | Chart-type generator | `xen.renko_generator` | Renko brick generation |
 | Chart-type generator | `xen.heiken_ashi_generator` | Heiken Ashi candle generation |
 | OHLC resampling | `xen.bar_aggregator` | N-minute clock-aligned OHLC aggregation |
-| **Canonical P&L estimands** | `xen.adjudication` | Multi-leg-correct per-bar/per-leg/episode P&L; reconciliation invariant (L-18) — the ONLY permitted accounting path |
-| **Estimand validation gate** | `xen.estimand_validation` | Blocking pre-analysis gate: reconciliation, schema, fence, manifest + physicality report; `check_no_local_accounting` |
-| **Signal-quality toolbox** | `xen.evaluation` | Informative-only evidence: block-bootstrap CIs (INFR-004: circular block capped < n → no zero-width CI on sparse strata; 5-seed battery with `ci_low_seed_range`; `block_sensitivity` sweep; `trimmed_mean` robust stat; report "CI excludes zero", not a p-value — L-20), MDE/UNPOWERED labels, exposure-honest economics (avg+peak normalizations, B&H exposure-matched), cost curves, collapse fractions, splits. Composed per candidate by the Quant Designer — no fixed stack. |
+| **Canonical P&L estimands** | `xen.adjudication` | Multi-leg-correct per-bar/per-leg/episode P&L; reconciliation invariant (L-18) — the ONLY permitted accounting path; `check_no_cost_charged` (zero-cost compliance) |
+| **Estimand validation gate** | `xen.estimand_validation` | Blocking pre-analysis gate: reconciliation, schema, fence, manifest, zero-cost compliance + physicality report (with `psr_summary`); `check_no_local_accounting` |
+| **Signal-quality toolbox** | `xen.evaluation` | Informative-only evidence: block-bootstrap CIs (INFR-004: circular block capped < n → no zero-width CI on sparse strata; 5-seed battery with `ci_low_seed_range`; `block_sensitivity` sweep; `trimmed_mean` robust stat; report "CI excludes zero", not a p-value — L-20), `psr`/`psr_row` (INFR-022 directive 4), zero-cost caveat + `assert_zero_cost`, exposure-honest economics (avg+peak normalizations, B&H exposure-matched), collapse fractions, splits. **No MDE, no UNPOWERED labels, no cost curves** (retired — L-63). Composed per candidate by the Quant Designer — no fixed stack. |
 | ~~Frozen referee stack~~ | `xen.referee_*`, `xen.incremental_referee` | **RETIRED FROM SERVICE (INFR-001 WS-7, 2026-07-04)** — byte-frozen for Chapter-01/02 reproducibility only. Never used for new adjudication: its gate conjunctions/readiness floors select fragile gate-threaders (L-17, B-5/B-7). New evaluation = `xen.evaluation` + operator judgment. |
 | **Nautilus foundation** | `xen.nautilus.{emission,adjudication_shim,instrument_ids,backtest_util}` | Emission v1, shim → adjudication, InstrumentId convention, BacktestNode helpers |
 | Run ingestion (legacy) | `xen.signals.ingestion` | Archived cTrader emissions only |
-| **Bybit T1 cost + routing** | `xen.evaluation` | `bybit_round_trip_cost_bps`, `spread_scale_route`, `t1_round_trip_spread_bps` |
-| **XENA portfolio framework** | `xen.xena.{oracle,ingest,search,certify,final_gate,calibration}` | The DEFAULT adjudication route (INFR-006): shared-capital oracle, blocking candidate gate, LAHC search, plateau+fold certification, counted final gate, frozen-registry verification. Spec: `docs/references/xena-lane.md` |
-| **XENA report layers (INFR-016)** | `xen.xena.report_layer`, `xen.xena.controls` | Value/quality/significance reads as **report layers** (`observed / ideal / interpretation` per candidate, no `pass` field), not gates: `LayerReport` schema + renderer, `power_layer`/`stage2_bounds_layer` (retire `n_legs_floor`/`one_subset`), `sign_battery` (≥2000 seeds, effect+p+CI — no `at_or_above_p95`), `attribution_derangement` (reported collapse fraction — no `hard_fail_leak`), `final_gate.final_report_layer` (net deployability, no `passed`). |
+| ~~Bybit T1 cost + routing~~ | `xen.evaluation_cost_legacy` | **ARCHIVED (INFR-022)** — `bybit_round_trip_cost_bps`, `spread_scale_route`, `t1_round_trip_spread_bps`, `FTMO_COSTS`, `round_trip_cost_bps` and friends moved here with an ARCHIVED banner; not callable from any live research path (only an operator cost directive may re-enable, recorded in the design) |
+| **XENA portfolio framework** | `xen.xena.{oracle,ingest,search,certify,final_gate,calibration}` | The DEFAULT adjudication route (INFR-006/INFR-022): shared-capital oracle (gross-only; `charge_costs=True` requires an operator cost directive), blocking candidate gate, LAHC search (zero-cost compliance guard), plateau+fold certification, single **gross** final gate, frozen-registry verification. Spec: `docs/references/xena-lane.md` |
+| **XENA report layers (INFR-016/INFR-022)** | `xen.xena.report_layer`, `xen.xena.controls` | Value/quality/significance reads as **report layers** (`observed / ideal / interpretation` per candidate, no `pass` field), not gates: `LayerReport` schema + renderer, `sample_size_layer` (n_legs + per-leg vol + design minimum-n NOTE — replaces `power_layer`; no MDE/powered/UNPOWERED), `psr_layer` (PSR + n beside mean-trade bps), `stage2_bounds_layer` (all subsets), `sign_battery` (≥2000 seeds, effect+p+CI+n — no `at_or_above_p95`, no power labels), `attribution_derangement` (reported collapse fraction — no `hard_fail_leak`), `final_gate.final_report_layer` (gross walk-forward, no `passed`). Value labels (STRONG/SUPPORTED/…) are operator-only tags (N11). |
 | *(More to be added as analysis modules are developed)* | `python/src/xen/` | Reusable analysis code |
 
 ---

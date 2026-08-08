@@ -1514,7 +1514,11 @@ The failure is **universal rather than selective** — every read fails, not the
 that universality is the diagnostic signature. A floor calibrated to the data fails *some* reads. A
 floor on the wrong scale fails *all* of them, which is what should have prompted the check.
 
-**Fix / new rule (AMENDMENT-7 R1–R5, now programme-wide).**
+**Fix / new rule (AMENDMENT-7 R1–R5 — [superseded-for-live-use (INFR-022 L-63): the MDE
+floor apparatus is retired programme-wide; the surviving core — sample-size is context,
+never a gate (N3), direct comparisons only (N4), no machine value labels (N11), and the
+leak tripwire on `INTEGRITY_Z × bootstrap_SE` (N6b) — is codified in
+`docs/references/neutrality-standard.md`].)**
 1. **R1/R5** — preflight power counts and any historical observed-effect band are **context only**,
    never gates and never thresholds on a realised estimate.
 2. **R2** — a detection floor must be built from the **same SE family as the row's own CI**:
@@ -1666,3 +1670,101 @@ pooled `n`) is unchanged from **AMENDMENT-C1/S1**.
 
 **Enforced at.** `.claude/skills/data-analyst/SKILL.md` (leave-one-out disclosure on small panels);
 `docs/knowledge-base/methodology-canon.md` (per-stratum non-pooling).
+
+---
+
+## L-62 — The programme runs a ZERO-COST model; cost parameters are inert and every report carries the caveat (INFR-022)
+
+**What.** INFR-022 (2026-08-08) retired the cost model programme-wide: no spread, commission,
+or swap enters any calculation in any experiment type unless an explicit operator cost
+directive requests costs (recorded in the design before execution). The retired stack
+(`bybit_round_trip_cost_bps`, FTMO table, funding stamps, `spread_scale_route`, the
+`PARTIAL_FEES_FUNDING_ONLY` scope, the A-4 net-informational gate run, the NET selection
+path) moved to `xen/evaluation_cost_legacy.py` under an ARCHIVED banner.
+
+**Mechanism (why).** Cost assumptions were the largest unmeasured overlay in every
+money-bearing read: partial scopes understated cost, net reads implied a measurement that
+did not exist, and every report needed a bespoke caveat that drifted. A single programme-wide
+zero-cost model with a canonical verbatim caveat removes the drift and the implied claims
+while keeping deployability refused by rule.
+
+**Fix / new rule.** Default `NO_COST_CHARGED` everywhere; `cost_bps == 0` is a compliant pin;
+non-zero `--cost-bps` / `charge_costs=True` raise without an operator cost directive
+(`operator_cost_directive.json` + design clause; QA traces both). Every money-bearing report,
+analysis, screen and results artifact carries the ZERO-COST-DISCLOSURE caveat verbatim (§3.1).
+"Zero" is a model, never a measured zero.
+
+**Enforced at.** `xen.evaluation.assert_zero_cost`/`zero_cost_caveat`;
+`xen.estimand_validation` `no_cost_charged` blocking check;
+`xen.xena.economics.check_zero_cost_compliance`; oracle directive gate;
+`xen.xena.ingest` zero-cost asserts; `docs/references/neutrality-standard.md` § N9.
+
+## L-63 — Powering is stripped to sample-size context + direct baseline comparison; MDE and floors are not live apparatus (INFR-022)
+
+**What.** All MDE-type and every other powering method are retired from live designs, code,
+artifacts and reports: `mde`, `powered_label`, `power_layer`, `structural_label`, detection
+floors (`2.8/√n`, `MDE_Z × SE` on research estimands), mechanism ceilings, power curves,
+`min_powered_seeds` / `n_legs_floor` vetoes, `at_or_above_p95`, and machine labels
+(`UNPOWERED`/`WASH`/`CLEARS_FLOOR`/…). Retained: sample-size **context** (never a hide/drop
+rule) and DIRECT comparisons against a pre-specified baseline model.
+
+**Mechanism (why).** Power constants answer a planning question about a hypothetical sample;
+using them as row gates on realised estimates silently imported planning conservatism on a
+different scale (the L-56/SPDR-024 defect class). The AMENDMENT-7 apparatus fixed the
+scale-mismatch but kept the concept; INFR-022 removes the concept from the value path
+altogether and keeps only the two honest uses: context counts and a fixed comparator.
+
+**Fix / new rule.** Designs state expected counts and optional minimum-n for
+*primary-inference language* (descriptive only — rows still appear with counts, N3/N10);
+every arm is read against its declared fixed comparator (estimate + uncertainty + counts,
+no threshold, N4). The leak tripwire's validity bite is `INTEGRITY_Z × bootstrap_SE` of the
+same estimator (N6b) — never called MDE.
+
+**Enforced at.** `xen.evaluation` (symbols removed); `xen.xena.report_layer.sample_size_layer`;
+`xen.xena.controls.sign_battery` (no power labels); `xen.xena.score` (no floor vetoes);
+`docs/references/neutrality-standard.md` (powering-strip definitions); skills denylist (§10).
+
+## L-64 — PSR is the paired companion of every mean-trade/leg bps read (INFR-022)
+
+**What.** Probabilistic Sharpe Ratio (Bailey & López de Prado 2012, skew/kurt-adjusted,
+empirical moments, per-trade series) is reported beside every mean trade/leg return in bps,
+on the same series and population: `psr` + `psr_n` (NaN + n when n < 2 or moments
+non-finite — the row still appears, N3). PSR is evidence, never a gate.
+
+**Mechanism (why).** A mean bps alone says nothing about sampling confidence; a raw Sharpe
+assumes normality. PSR gives the sampling probability that the true per-trade Sharpe exceeds
+SR* using the same series the mean came from — no annualisation ambiguity by default.
+
+**Fix / new rule.** Wherever a mean trade / mean leg return in bps is reported, PSR + n sit
+beside it (same vector that produced the mean; never another population's n). Code:
+`xen.evaluation.psr` / `psr_row`; XENA report layer `psr_layer`; economics disclosure rows;
+estimand `psr_summary`.
+
+**Enforced at.** `xen.evaluation.psr` + unit tests; `xen.xena.report_layer.psr_layer`;
+`xen.xena.economics._leg_gross_stats` (PSR beside `gross_mean_bps`);
+`xen.estimand_validation` `psr_summary`; data-analyst protocol (pairing question).
+
+## L-65 — Neutrality N1–N11 is the binding analysis contract (INFR-022)
+
+**What.** The chapter-05 SPDR-021/022/023/024 analysis records' common discipline —
+no-verdict boundary, observed-vs-inference labels, counts as context, direct comparisons,
+populations named and separated, informative controls, symmetric evidence, analyst
+independence, the cost caveat on every document, completeness, operator-only value labels —
+is codified verbatim as N1–N11 in `docs/references/neutrality-standard.md` and bound into
+every analysis/screen/report skill contract.
+
+**Mechanism (why).** Neutrality was achieved by repeated hard-won convention; each new
+analyst had to re-derive it, and each new artifact risked a label, a gate, or a hidden row
+that the convention would have forbidden. Codifying it as binding text with a single source
+of truth makes the convention checkable (QA, denylists) rather than aspirational.
+
+**Fix / new rule.** `analysis.md` / `screen.md` / reports open with the N1 boundary statement,
+label observed vs inference (N2), report every row with its count (N3), compare against the
+declared comparator (N4), name populations (N5), keep controls informative (N6) with the
+N6b tripwire exception, end with "what would make these numbers wrong" + probe hand-off
+(N7), stay analyst-independent (N8), carry the zero-cost caveat (N9), hide nothing (N10),
+and leave value labels to the operator (N11).
+
+**Enforced at.** `docs/references/neutrality-standard.md`; `data-analyst` SKILL.md +
+interrogation-protocol template; `quant-designer` bands; `experiment-documenter` rules;
+`research-pipeline/_pipeline-config.md` (binding sections).

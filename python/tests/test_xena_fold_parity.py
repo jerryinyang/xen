@@ -126,11 +126,24 @@ def synth_streams() -> list[CandidateStream]:
 
 
 BASE = OracleConfig()
+DIRECTIVE = {"reason": "INFR-007 parity corpus (pinned costed cases)",
+             "scope": "parity-corpus"}
 
 
-def test_full_subset_costed(synth_streams):
+def test_full_subset_zero_cost_default(synth_streams):
+    """INFR-022: default oracle config is zero-cost — the costed pin is inert."""
     rp, rr = both({"A", "B", "C"}, synth_streams, BASE)
     assert rp.n_admitted > 0
+    assert (rp.ledger.get_column("CostMoney") == 0.0).all()
+    assert_bitwise_equal(rp, rr)
+
+
+def test_full_subset_directive_costed(synth_streams):
+    """Directive-backed costed configs still exercise the cost branch bit-identically."""
+    cfg = replace(BASE, charge_costs=True, operator_cost_directive=DIRECTIVE)
+    rp, rr = both({"A", "B", "C"}, synth_streams, cfg)
+    assert rp.n_admitted > 0
+    assert (rp.ledger.get_column("CostMoney") > 0).any()
     assert_bitwise_equal(rp, rr)
 
 
@@ -220,7 +233,9 @@ def test_pinned_corpus_rust_backend():
     mismatches = []
     for case, exp in zip(cases, pinned["cases"]):
         assert case["case"] == exp["case"]
-        cfg = OracleConfig(charge_costs=case["charge_costs"], backend="rust")
+        cfg = OracleConfig(charge_costs=case["charge_costs"], backend="rust",
+                           operator_cost_directive=DIRECTIVE
+                           if case["charge_costs"] else None)
         res = evaluate(set(case["subset"]), streams, cfg,
                        segment=tuple(case["segment"]))
         if result_digest(res) != exp["digest"]:

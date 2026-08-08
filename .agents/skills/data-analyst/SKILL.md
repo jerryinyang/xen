@@ -41,16 +41,21 @@ Run before any interpretation. Each item is a table with evidence (file:line, va
    `blocking_pass: true` for every cell in scope
    (`python -m xen.estimand_validation <family_root> --expect <instruments> --out ...`).
    Missing or failing → STOP; the emission may not be analysed, no exceptions.
-2. **Provenance trace.** For every verdict-bearing column (signal, entry, outcome, cost, fill):
+2. **Zero-cost compliance (INFR-022).** The estimand gate's `no_cost_charged` check is on
+the integrity list: no non-zero commission/fee/funding/spread column in the emission, and no
+non-zero `--cost-bps` without an `operator_cost_directive.json` (recorded in the design).
+Failure → STOP.
+3. **Provenance trace.** For every verdict-bearing column (signal, entry, outcome, fill):
    input timestamps, confirm each decision-time value derives only from data `≤ t-1` for
    next-bar action. Name exact lines. The `rct[di]` own-close-as-limit pattern is REJECT-class.
-3. **Leak tripwire.** Confirm the shipped future-destroying control collapsed the edge, and
+4. **Leak tripwire.** Confirm the shipped future-destroying control collapsed the edge, and
    confirm the control is non-vacuous for the metric (a mean-invariant permutation against a
    mean statistic proves nothing — EXP-012/L-15 shape). Surviving edge ⇒ leak ⇒ REJECT-class.
-4. **Holdout.** No code path touches the final-30% global holdout.
-5. **Price-primary.** Edge-generating results come from the cTrader engine emission under the
+   Its integrity bite is the pre-declared `INTEGRITY_Z × bootstrap_SE` (N6b) — never an MDE.
+5. **Holdout.** No code path touches the final-30% global holdout.
+6. **Price-primary.** Edge-generating results come from the engine emission under the
    `AnalysisEndUtc` fence, never from a Python backtest.
-6. **Shared-code boundary.** `check_no_local_accounting("python/experiments/<ID>/code")` passes.
+7. **Shared-code boundary.** `check_no_local_accounting("python/experiments/<ID>/code")` passes.
 
 Integrity failures are the ONLY findings with blocking authority. Everything after this point
 is evidence for the operator, not a gate.
@@ -63,7 +68,7 @@ Build the interrogation list BEFORE computing anything. Sources:
   what would it look like if it is an artifact?);
 - the mandatory minimum question set in `references/interrogation-protocol.md`
   (per-leg distributions, episode anatomy, occupancy, physicality interpretation,
-  concentration/tail dependence, per-stratum structure, cost sensitivity);
+  concentration/tail dependence, per-stratum structure, zero-cost verification, PSR pairing);
 - falsification queries: for each headline number, at least one "what would make this number
   wrong?" probe;
 - anything anomalous noticed while loading the data.
@@ -81,16 +86,19 @@ UNANSWERED with a reason. Add follow-up questions as answers raise them.
 - Report effect sizes with uncertainty (bootstrap CIs), sample sizes, and — for any
   survives/dies control read — the **collapse fraction** (control effect / raw effect), not
   just the binary.
-- **Report layers, not verdicts (INFR-016).** Present every value/quality/significance read as
-  a `xen.xena.report_layer.LayerReport` — per candidate, `observed / ideal / interpretation`,
-  **no `pass` field**, nothing dropped; the operator authorises progression. Never emit an
-  auto-verdict: retired are the `at_or_above_p95` sign-battery boolean (use
-  `xen.xena.controls.sign_battery`, **≥2000 seeds** → effect size + one-sided p + CI), the
-  `n_legs_floor` power veto (use `report_layer.power_layer` — report power, never a floor), the
-  `one_subset` top-1 (use `stage2_bounds_layer` for **ALL** subsets + per-cell), the derangement
-  `hard_fail_leak` collapse<0.5 (use `controls.attribution_derangement` — report the fraction),
-  and the final-gate `passed` (use `final_gate.final_report_layer`). Only **future-destroy**
-  leak survival stays a hard data-validity attestation.
+- **Report layers, not verdicts (INFR-016/INFR-022).** Present every value/quality/significance
+  read as a `xen.xena.report_layer.LayerReport` — per candidate, `observed / ideal /
+  interpretation`, **no `pass` field**, nothing dropped; the operator authorises progression.
+  Never emit an auto-verdict: retired are the `at_or_above_p95` sign-battery boolean (use
+  `xen.xena.controls.sign_battery`, **≥2000 seeds** → effect size + one-sided p + CI + n), the
+  `n_legs_floor` power veto and `power_layer` MDE (use `report_layer.sample_size_layer` —
+  n_legs + per-leg vol + design minimum-n NOTE; no powered boolean, no UNPOWERED label), the
+  `one_subset` top-1 (use `stage2_bounds_layer` for **ALL** subsets + per-cell), the
+  derangement `hard_fail_leak` collapse<0.5 (use `controls.attribution_derangement` — report
+  the fraction), and the final-gate `passed` (use `final_gate.final_report_layer`, gross
+  walk-forward). PSR pairs every mean-trade/leg bps read (`psr` + `psr_n`, same series —
+  `report_layer.psr_layer`). Only **future-destroy** leak survival stays a hard data-validity
+  attestation.
 - CI hygiene (INFR-004 / L-20): use `xen.evaluation.block_bootstrap_ci` — it already caps the
   block below n (no zero-width CI on sparse strata) and aggregates a 5-seed battery. For any
   read where `ci` sits near zero, quote the **`ci_low_seed_range`** — if that seed band
@@ -100,32 +108,26 @@ UNANSWERED with a reason. Add follow-up questions as answers raise them.
   `trimmed_mean`/median CI alongside. Report a CI that clears zero as
   "**bootstrap 95% CI excludes zero**" — never "<5% if the true effect were 0" (a percentile CI
   is not a hypothesis test; `CI_EXCLUDES_ZERO_PHRASE`).
-- **Detection floors (AMENDMENT-7 / L-56 / P-28) — binding apparatus, not style notes:**
-  1. **R1/R5 — power is context, never a second test.** Preflight power counts, planning
-     constants (`MDE_Z`, sample-size targets), and any historical observed-effect band are
-     descriptive context only. They never gate a row, never demote a CI, and never act as a
-     pass mark on a realised estimate.
-  2. **R2 — same SE family as the row CI.** If a detection floor is reported, it must be
-     `mde = MDE_Z × bootstrap_SE` of the **same estimator** that produced that row's CI.
-     Forbidden: parametric `k/√n` (or `MDE_Z/√blocks`) beside a bootstrap interval; dual SE
-     scales on one row; a power constant used as a significance bar.
-  3. **R3 — no floor-derived row labels.** Do not drop, demote, or label a row by its floor.
-     Words like `WASH`, `UNPOWERED`, `CLEARS_FLOOR`, `FULLY_RESOLVING` (and synonyms) as
-     *row* verdicts from power are withdrawn. Report estimate, CI, n, and optional context
-     floor; the operator judges. (Hypothesis-level "A≈B within noise" in §6 of the template
-     is a separate recommendation language — not a per-row power label.)
-  4. **R4 — declare `sigma_denominator` per channel.** Channels with different denominators
-     (e.g. paired-Δ vs outcome-level) must never be ranked on one shared numeric ladder.
-     State the denominator next to every channel read.
-  5. **Universal-failure diagnostic.** If *every* read fails a floor while CIs are not
-     universally uninformative, stop and check scale mismatch before writing a null story
-     (wrong-scale floors fail all reads; data-thin floors fail some).
-  6. **Design-time ceiling is not analysis-time invention.** If the design omitted the
-     algebraic estimand ceiling / implied block requirement, note that gap; do not invent a
-     post-hoc "could never clear" verdict from a floor the design never justified.
-- Distinguish "no effect" from "cannot see": when a negative matters, report the row's own
-  CI width / same-SE-family floor as **context**, never as a silent veto of a CI that
-  excludes zero.
+- **Sample-size + direct comparison (INFR-022 L-63 — replaces the AMENDMENT-7 detection
+  floors as the binding frame):**
+  1. **N3/N10 — report, never hide.** Every row carries its n / effective n; no row is
+     dropped, trimmed, top-N pruned, relabelled, or omitted for its count, interval width, or
+     any sample-size quantity. A wide interval is reported as a wide interval, not as an
+     absence. A design minimum-n for primary-inference language is a descriptive tag only.
+  2. **N4 — direct comparisons only.** Every adaptive/conditioned arm is read against its
+     pre-specified declared comparator (the fixed baseline): estimate + uncertainty + counts,
+     no threshold applied to the estimate.
+  3. **No floors on the value path.** No MDE, no `MDE_Z`, no `2.8/√n`, no `MDE_Z × SE` on
+     research estimands, no power curves, no "at power"/"unresolved at this power" language.
+     The only scale constant is the tripwire's `INTEGRITY_Z` (N6b, validity only).
+  4. **N11 — no machine-assigned labels.** `WASH`, `UNPOWERED`, `CLEARS_FLOOR`,
+     `FULLY_RESOLVING`, `SUPPORTED`/`REFUTED`/`CONTRADICTED` as *row verdicts* are withdrawn
+     from machine layers; they exist only as operator-supplied tags after reading numbers.
+     (Hypothesis-level "A≈B within noise" in §6 of the template is recommendation language,
+     not a per-row label.)
+  5. **Distinguish "no effect" from "cannot see".** When a negative matters, report the
+     row's own CI width and count as **context**, never as a silent veto of a CI that
+     excludes zero.
 - Physicality numbers (from the estimand validation report) are interpreted, not just pasted:
   what does the occupancy/drawdown/Sharpe say about what the strategy IS?
 

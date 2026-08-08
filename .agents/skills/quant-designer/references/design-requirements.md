@@ -37,7 +37,8 @@ vs band-touch cost CF-MR-004 its entire availability leg).
 CONTROL <name>:
   question answered: <what attribution/robustness question>
   population: <control pool>; DISJOINT from signal population: <why>            # B-1
-  bite/MDE: <MDE curve or co-designed plant showing detectable effect size>     # B-5 shape
+  bite: <co-designed synthetic plant showing the control can detect an effect of
+        the expected size — no MDE curve, no detection floor (INFR-022 L-63)>    # B-5 shape
   non-vacuity: <which sufficient statistic of the metric it moves>              # B-6
   expected outcome if H true: <...>; if H false: <...>
   disclosure: collapse fraction reported (control effect / raw effect)          # B-2
@@ -66,61 +67,65 @@ TRIPWIRE: <future-shuffle | time-reversal | causal misalignment | ...>
   must collapse the edge; expected collapse fraction ≈ <...>
   vacuity check: <why this destroy can collapse THIS metric>
   if permutation-based: derangement=YES (zero fixed points; L-28)
+  integrity_bite: INTEGRITY_Z × bootstrap_SE (same SE family as the control's own
+                  estimator; default INTEGRITY_Z = 2.8 unless this design names another
+                  constant — documented in the integrity section)  # N6b
 ```
 
-## 5. Interpretation bands (per stratum — no binaries)
+The tripwire is the ONLY control class with blocking authority (validity of the emission,
+not value of the edge). Its integrity bite scale is a **validity threshold on a planted
+leak contrast — not a powering method for research estimands** (INFR-022 N6b): it must never
+be called MDE, never a detection floor, and must not use MDE/MDE_Z/UNPOWERED vocabulary.
+
+## 5. Interpretation bands (per stratum — OPERATOR-ONLY tags, never machine fields)
 
 ```
 BANDS (per stratum):
   SUPPORTED:      effect ≥ <size> with ci_low > <bound>
   WASH:           |effect| < <noise scale> (report as A≈B, not as refutation)
   CONTRADICTED:   effect ≤ <size> with ci_high < <bound>
-  UNPOWERED:      n < <floor> or MDE > <plausible effect> — excluded from negatives
 POOLED: disclosure-only unless homogeneity shown.
 ```
 
-## 6. Power statement (AMENDMENT-7 / L-56 — binding)
+INFR-022 N11: bands are **operator-supplied tags only** — the design may predeclare the
+plain-language bands the operator MAY use to tag a report layer after reading numbers; they
+are never machine-assigned, never gate, never drop rows, and never appear as machine fields
+on emission rows. `UNPOWERED` as a machine row label is deleted; small-count rows are always
+reported next to their counts (N3).
+
+## 6. Sample-size statement (INFR-022 L-63 — replaces the AMENDMENT-7 power statement)
 
 ```
-POWER: expected events per stratum: <table>
-  # Planning context only — never a realised-row pass mark (R1/R5)
-  planning_MDE_Z: <e.g. 2.8>   # sample-size target, NOT a significance bar
-  preflight_basis: <orders | fills | blocks — must match post-run denominator story or disclose the gap (R5)>
-  historical_effect_band: <optional context; NEVER a resolve ladder (R1)>
-
-  # Same-SE-family floor contract (R2) — how floors will be *reported* if at all
-  floor_definition: mde = MDE_Z × bootstrap_SE(same estimator as row CI)
-  forbidden: k/√n parametric floor beside bootstrap CI; dual SE scales on one row
-
-  # Per-channel scale declaration (R4)
-  channels:
+SAMPLE-SIZE:
+  expected events per stratum: <table>            # planning context only
+  minimum_n_for_primary_inference: <optional per stratum>   # DESCRIPTIVE tag only —
+        # rows below it are still reported with their counts and intervals (N3/N10);
+        # the tag limits only the *language* of primary inference, never the row
+  declared_fixed_comparator: <the pre-specified baseline model every conditioned arm is
+        read against — estimate + uncertainty + counts; no threshold applied>
+  channels:                                      # per-channel scale declaration (R4)
     - name: <...>
       sigma_denominator: <paired_delta | outcome_level | ...>
       # channels with different denominators MUST NOT share one numeric ladder
-
-  # Design-time estimand ceiling (L-56) — required when the algebraic max is knowable
-  estimand_ceiling_per_cell:
-    - cell: <...>
-      algebraic_ceiling: <formula + numeric from baseline/knowables>
-      implied_blocks_to_clear_floor: <n>
-      capable: YES | NO   # NO ⇒ declare incapable before run, or drop the cell
-  strata predeclared incapable / thin: <list>   # never read as negatives (B-5)
+  strata predeclared thin: <list>                # reported with counts — never hidden,
+        # never read as negatives (B-5), never labelled UNPOWERED
 ```
 
 Rules:
-1. **R1/R5** — preflight power and historical effect bands are **context only**, never gates
-   and never thresholds on a realised estimate.
-2. **R2** — any detection floor uses the **same SE family as the row CI**
-   (`MDE_Z × bootstrap_SE`), never a parametric `k/√n` beside a bootstrap interval.
-3. **R3** — the design must not invent row labels from floors (`WASH`/`UNPOWERED`/
-   `CLEARS_FLOOR` as power verdicts). Interpretation bands in §5 that use UNPOWERED mean
-   *insufficient n for a negative claim*, not a floor-vs-estimate row demotion.
-4. **R4** — every channel declares `sigma_denominator`; different denominators are never
+1. **R1/R5** — expected counts and historical context are **context only**, never gates and
+   never thresholds on a realised estimate.
+2. **R4** — every channel declares `sigma_denominator`; different denominators are never
    ranked on one ladder.
-5. **Design-time ceiling** — where the estimand's algebraic maximum is a function of
-   quantities knowable before the run (Sharpe, bounded rate, fixed multiple), compute the
-   ceiling and implied block requirement **per cell in this design**, and declare incapable
-   cells before they run. Skipping this is the SPDR-024 defect class (P-28).
+3. **N3/N10** — no row is dropped, trimmed, top-N pruned, relabelled, promoted, demoted, or
+   omitted because of its count, interval width, or any sample-size quantity. A wide interval
+   is reported as a wide interval, not as an absence.
+4. **N4** — every adaptive/conditioned arm is read against the declared fixed comparator,
+   never against another adaptive arm, never against a threshold.
+5. **Stripped (prohibited in designs):** MDE, `mde_bps`/`mde_sigma`, `MDE_Z` (except the
+   renamed validity constant in §4, which must be called `INTEGRITY_Z`), detection floors
+   (`2.8/√n`, `MDE_Z × SE` on research estimands), mechanism ceilings (`√p × Sharpe`), power
+   curves / end-to-end power calibration, "at power", "resolved/unresolved at this power",
+   "below/above detection floor", machine `UNPOWERED`/`WASH`/`CLEARS_FLOOR` row labels.
 
 ## 7. Golden trace (for QA)
 
@@ -133,9 +138,10 @@ execution sign-off; the developer must not generate them.>
 ## 8. Integrity vs informative split
 
 ```
-HARD (block): tripwire collapse, holdout, causal provenance, estimand reconciliation.
+HARD (block): tripwire collapse, holdout, causal provenance, estimand reconciliation,
+  zero-cost compliance (no non-zero cost without a recorded operator cost directive).
 INFORMATIVE (operator judges): all effect sizes, significance reads, robustness reads,
-  cost sensitivity, collapse fractions. No auto-verdict thresholds anywhere.
+  PSR, collapse fractions. No auto-verdict thresholds anywhere.
 ```
 
 ## 9. Screen-effect conversion pin (mandatory when the design cites SPDR/screen evidence — L-21)
@@ -151,37 +157,53 @@ CONVERSION-PIN:
   measured value: <TRAIN-median of that exact object on the target instrument(s), in bps —
                    computed from data, never recalled>
   resulting effect: <screen effect × measured value = <X> bps/trade>
-  cost floor:     <spread estimate + commission + capture dilution (≈ gap/2)>; state whether
-                   the resulting effect clears it — if not, the experiment must be framed as
-                   apparatus/characterisation, not tradability.
+  zero-cost note: the programme is ZERO-COST (INFR-022) — no cost floor applies; the
+                   experiment must still be framed as apparatus/characterisation unless the
+                   operator separately sanctions deployment claims (which remain refused by
+                   rule).
 ```
 
-Each line is verifiable against data; QA traces this block as a clause. Power statements (§6)
-and interpretation bands (§5) must use the pinned effect, never the raw screen units.
-Full convention: `docs/references/spdr-lane.md` §Unit convention + money-unit floor.
+Each line is verifiable against data; QA traces this block as a clause. Sample-size
+statements (§6) and interpretation bands (§5) must use the pinned effect. Full convention:
+`docs/references/spdr-lane.md` §Unit convention.
 
-## 10. Missing-spread disclosure (mandatory on Chapter-05 Bybit lane)
-
-Before any verdict-bearing T1 read, declare:
+## 10. Zero-cost disclosure (mandatory on every design — INFR-022 directive 1)
 
 ```
-SPREAD-COST-DISCLOSURE:
-  spread_cost_status: UNAVAILABLE_NOT_CHARGED
-  spread_rt_bps: null
-  cost_scope: PARTIAL_FEES_FUNDING_ONLY
-  implication: reported cost understates total cost; reported net performance is overstated
+ZERO-COST-DISCLOSURE:
+  cost_model: NO_COST_CHARGED
+  spread: not modeled
+  commissions: not modeled
+  swaps/funding: not modeled
+  implication: every figure in this document is gross and cost-free; no spread, commission,
+    or swap enters any calculation. Realised results would differ (likely worse) under any
+    real cost schedule.
   prohibited_claims: fully-net, cost-complete, tradable, deployable
+  lifting: only an explicit operator directive may introduce a cost model for a scoped
+    experiment; the directive is recorded in that experiment's design.md.
 ```
 
-Spread cost unavailable and not charged. Do not manufacture a proxy, set spread to zero, or open
-a secondary-data route. Every candidate remains reportable with the caveat above.
+All three lanes (XENA, SPDR, EXP) default to zero cost. "Zero" is a model, not a
+measurement. The retired cost stack (`bybit_round_trip_cost_bps`, FTMO tables,
+`spread_scale_route`) is archive-only (`xen/evaluation_cost_legacy.py`, ARCHIVED banner).
 
-## 11. Cost interpretation (mandatory for Chapter 05)
+## 11. Cost directive clause (only when an operator directive requests costs)
 
-Apply `xen.evaluation.bybit_round_trip_cost_bps` with fees plus discrete funding and no
-`spread_bps`. Raw `SpreadBps`, quarantined `MeanPriceSkewBps`, flip-pair values, and the former
-five proxy pins are prohibited as cost inputs. The returned total is partial accounting, not a
-tradability verdict. FTMO tables and historical explicit-spread routes are archive-only.
+A design that charges costs MUST carry the operator's directive:
+
+```
+COST-DIRECTIVE:
+  directive_id: <operator directive reference>
+  reason: <operator-signed reason string — recorded verbatim>
+  scope: <experiment-scoped: this design only>
+  functions: <the exact cost functions/parameters re-enabled>
+  run_dir_file: operator_cost_directive.json (written next to the manifest / run dir before
+                execution; QA traces design clause + file)
+```
+
+Without this clause (and the file), non-zero `--cost-bps`, `charge_costs=True`, and any cost
+function call are refused by code asserts. Deployability/tradability claims remain refused
+by rule — the zero-cost model does not loosen them.
 
 ## 12. Amendment-direction ledger (mandatory once any pre-measurement amendment lands — L-23)
 
@@ -207,6 +229,7 @@ an explicit operator flag at the execution gate.
    registered in the multiplicity ledger; if infeasible, exit* is demoted to disclosure.
 3. **Derived tripwire thresholds (F06):** phase-shift retention REJECT thresholds are computed
    from the real TRAIN autocorrelation of the shifted stream (with CI), never asserted.
-4. **MDE-consistent read floors (F07):** the TEST-read n floor = the n at which the cell's MDE
-   ≤ its **shrunk** TRAIN effect (shrinkage from fold attenuation), applied prospectively —
-   never a bare n ≥ 50 against an unshrunk selected maximum.
+4. **Sample-size notes, never hide rules (F07, INFR-022):** a design may pre-declare a
+   minimum n for *primary-inference language* — a descriptive tag only: the row, estimate,
+   interval and n still appear below it (N3/N10). No MDE-consistent read floor, no n-veto,
+   no row demotion from counts.

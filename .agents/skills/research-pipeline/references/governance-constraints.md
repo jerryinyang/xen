@@ -4,18 +4,25 @@ The constraint framework enforced by **`qa-compliance`** (fresh-context pre-exec
 and at the estimand/TEST-read gates. These constraints are non-negotiable and apply to all
 artifacts in the Xen research pipeline.
 
-**Blocking frame (INFR-001; INFR-016 split).** Only **data-validity / integrity** violations
-block: **future-destroy** leak survival / causality, holdout contact, estimand reconciliation
-failure, silent design deviation, missing tripwire. A block here means *emission invalid → fix
-the data*, never *no edge*. All quality/materiality/significance reads are **report layers**
-(`observed / ideal / interpretation` per candidate — `xen.xena.report_layer`), never gates:
-nothing is machine-dropped; the operator authorises progression. There are no binding quality
-thresholds, readiness floors, or gate stacks. **Control class (INFR-016 §4c, operator-ratified
-2026-07-18):** a `future_destroy` control (edge survives destroying FUTURE info ⇒ acausal leak)
-stays a HARD validity attestation; a `within_sample_attribution` control (timing scrambled,
-entries still causal — e.g. gate-schedule derangement) is a **report layer** (collapse fraction
-reported, operator judges leak-vs-edge). Retired auto-verdicts: `at_or_above_p95`,
-`n_legs_floor` veto, `one_subset` top-1, derangement `hard_fail_leak`, final-gate `passed`.
+**Blocking frame (INFR-001; INFR-016 split; INFR-022).** Only **data-validity / integrity**
+violations block: **future-destroy** leak survival / causality, holdout contact, estimand
+reconciliation failure, silent design deviation, missing tripwire, **zero-cost compliance
+failure** (non-zero cost entering a live calculation without a recorded operator cost
+directive). A block here means *emission invalid → fix the data*, never *no edge*. All
+quality/materiality/significance reads are **report layers** (`observed / ideal /
+interpretation` per candidate — `xen.xena.report_layer`), never gates: nothing is
+machine-dropped; the operator authorises progression. There are no binding quality
+thresholds, readiness floors, or gate stacks — and **no MDE / power floors / power curves / UNPOWERED
+labels on the value path** (INFR-022 powering strip: sample-size context + direct baseline
+comparison only). **Control class (INFR-016 §4c, operator-ratified 2026-07-18; INFR-022
+N6b):** a `future_destroy` control (edge survives destroying FUTURE info ⇒ acausal leak)
+stays a HARD validity attestation — its integrity bite scale is a pre-declared SE-family
+`INTEGRITY_Z × bootstrap_SE` of the same estimator (default `INTEGRITY_Z = 2.8`), never an
+MDE / detection floor; a `within_sample_attribution` control (timing scrambled, entries still
+causal — e.g. gate-schedule derangement) is a **report layer** (collapse fraction reported,
+operator judges leak-vs-edge). Retired auto-verdicts: `at_or_above_p95`, `n_legs_floor` veto,
+`one_subset` top-1, derangement `hard_fail_leak`, final-gate `passed`, MDE/`powered_label`/
+`power_layer`/`structural_label`, cost floors, net reads.
 
 **Artifact mapping.** *Scope Document* + *Analysis Plan* checks → **`design.md`** (plus the
 mandatory declaration blocks in `quant-designer/references/design-requirements.md`);
@@ -181,13 +188,16 @@ research question or temporal semantics.
 
 | Check | Questions |
 |-------|-----------|
-| Integrity gate first | Estimand validation (blocking_pass all cells), provenance trace, tripwire collapse + non-vacuity, holdout, price-primary, `check_no_local_accounting` — all present with evidence before any interpretation? |
+| Integrity gate first | Estimand validation (blocking_pass all cells), provenance trace, tripwire collapse + non-vacuity, holdout, price-primary, `check_no_local_accounting`, zero-cost compliance — all present with evidence before any interpretation? |
 | Independent code path | Every verdict-bearing number computed by the analyst's own `analysis_code/` on canonical `xen` estimands — zero imports from the experiment's `code/`? |
 | Question list | Was the interrogation list written before computation, covering the mandatory minimum set, with every question answered or explicitly UNANSWERED? |
 | Evidence symmetry | Are the FOR and AGAINST sections both present, with equal rigor — effect sizes, CIs, n, per stratum? |
 | Per-stratum before pooled | Every headline re-derived per instrument/cell; pooled figures labelled disclosure-only? |
 | Collapse fractions | Every control read discloses control/raw fraction, not just survive/die? |
-| Power honesty | Negatives distinguished from unpowered (MDE stated); wash (A≈B) reported as wash? |
+| Sample-size context | Small-n rows always reported next to their counts (never hidden/dropped); a design minimum-n for primary-inference language is a descriptive tag only (N3/N10)? |
+| No power machinery | No MDE / detection floor / UNPOWERED label / power curve on the value path (L-63); every estimate read against its pre-specified comparator directly? |
+| PSR pairing | PSR + n beside every mean trade/leg bps read, on the SAME series and population (`psr`, `psr_n`; NaN + n when n<2)? |
+| Zero-cost caveat | Every money-bearing report/table carries the ZERO-COST-DISCLOSURE caveat verbatim (INFR-022 §3.1)? |
 | Mechanism statement | Does the analysis explain *why* the numbers came out this way — the concrete driver, not just that a bar was cleared or missed? |
 | Physicality interpreted | Occupancy/Sharpe/maxDD read against what the strategy IS, not just pasted? |
 | Recommendation scope | Verdict recommended on the experiment's hypothesis only — no family calls, explicitly non-final? |
@@ -237,8 +247,10 @@ a control without a non-degeneracy/bite/non-vacuity proof; an analysis lacking t
 gate, the per-stratum re-derivation, or either evidence section (for/against); a pooled figure
 presented as a finding without homogeneity; an unpowered stratum reported as a negative; a
 design-fidelity trace with an unresolved DEVIATES/MISSING row; experiment-local accounting
-definitions (`check_no_local_accounting` failure); **any auto-verdict machinery** — a quality
-threshold, readiness floor, or gate conjunction wired to decide instead of inform.
+definitions (`check_no_local_accounting` failure); a missing zero-cost caveat; research MDE /
+power-floor / power-curve clauses; machine-assigned value/power labels; rows hidden for low n;
+charging costs without a recorded operator cost directive; **any auto-verdict machinery** — a
+quality threshold, readiness floor, or gate conjunction wired to decide instead of inform.
 
 ### REJECT
 
@@ -252,7 +264,8 @@ Fundamental, unfixable issues. Examples:
 - A **vectorized Python backtest of a price strategy** (price-primary edges must run in the
   cTrader engine; Python is analysis-only on emitted runs)
 - A deployability/tradability claim with **no causal-provenance trace** in the audit, or an audit
-  missing the causal-provenance & leak section
+  missing the causal-provenance & leak section (deployability/tradability claims remain refused
+  by rule under the zero-cost model — INFR-022)
 - Synthetic price violation (computing strategy P&L from Heiken Ashi prices or
   Renko brick prices instead of real prices; `HAClose` diagnostic returns are
   allowed only for explicitly scoped HA distortion experiments that label them

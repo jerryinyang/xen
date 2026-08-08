@@ -1,4 +1,5 @@
-"""INFR-016 — report layers replace value gates; no auto-verdicts in the value chain."""
+"""INFR-016 — report layers replace value gates; no auto-verdicts in the value chain.
+(INFR-022: power_layer → sample_size_layer; structural labels deleted; operator-only tags.)"""
 from __future__ import annotations
 
 import numpy as np
@@ -6,8 +7,9 @@ import pytest
 
 from xen.xena.controls import (assert_future_destroy_class, attribution_derangement,
                                make_derangement, sign_battery)
-from xen.xena.report_layer import (LayerReport, power_layer, render_all_layers,
-                                   render_layer_table, stage2_bounds_layer, structural_label)
+from xen.xena.report_layer import (LayerReport, psr_layer, render_all_layers,
+                                   render_layer_table, sample_size_layer,
+                                   stage2_bounds_layer)
 
 
 # --------------------------------------------------------------------------- #
@@ -32,14 +34,16 @@ def test_bad_label_rejected():
         LayerReport("l", "c", 1.0, "0-2", "fine", interpretation_label="FAIL")
 
 
-def test_only_structural_labels_auto_assigned():
-    # UNPOWERED (too few seeds) and CONTRADICTED (wrong sign) are facts about the estimator;
-    # everything else is None — no p-cutpoint label (retires the L-32-in-miniature).
-    assert structural_label(powered=False, directional_positive=True) == "UNPOWERED"
-    assert structural_label(powered=True, directional_positive=False) == "CONTRADICTED"
-    assert structural_label(powered=True, directional_positive=True) is None
-    # not powered dominates sign
-    assert structural_label(powered=False, directional_positive=False) == "UNPOWERED"
+def test_structural_label_deleted_machine_labels_removed():
+    # INFR-022 N11: structural_label and every machine auto-assignment are deleted;
+    # interpretation labels are operator-supplied tags only.
+    import xen.xena.report_layer as rl
+    assert not hasattr(rl, "structural_label")
+    assert not hasattr(rl, "power_layer")
+    # operator-supplied tags remain valid on a layer (N11)
+    d = LayerReport("l", "c", 1.0, "0-2", "fine", interpretation_label="UNPOWERED").to_dict()
+    assert d["interpretation_label"] == "UNPOWERED"
+    assert d["is_gate"] is False
 
 
 def test_render_runs_for_all_candidates_drops_nothing():
@@ -60,26 +64,28 @@ def test_sign_battery_reports_effect_p_ci_no_boolean():
     ep = 100.0 + rng.normal(0, 1, n)
     # a modest positive directional edge: exit slightly favourable in the traded direction
     d = np.ones(n)
-    xp = ep * (1 + rng.normal(0.0012, 0.01, n))  # ~12 bps mean edge, noisy → underpowered-ish
+    xp = ep * (1 + rng.normal(0.0012, 0.01, n))  # ~12 bps mean edge, noisy
     rep = sign_battery(d, ep, xp, candidate_id="SOL_v15", n_seeds=2000)
     s = rep.supporting
     assert "at_or_above_p95" not in s
-    assert set(("one_sided_p", "effect_bps", "null_ci95", "powered")) <= set(s)
-    assert s["n_seeds"] == 2000 and s["powered"] is True
+    assert set(("one_sided_p", "effect_bps", "null_ci95", "n_seeds", "n_legs")) <= set(s)
+    # INFR-022 L-63/N11: no powered field, no machine labels
+    assert "powered" not in s
+    assert rep.interpretation_label is None
     assert 0.0 <= s["one_sided_p"] <= 1.0
-    # powered + positive ⇒ no auto p-cutpoint label; only structural labels are assigned
-    assert rep.interpretation_label in {None, "CONTRADICTED"}
 
 
-def test_sign_battery_underpowered_flag_at_25_seeds():
+def test_sign_battery_no_power_label_at_any_seed_count():
     rng = np.random.default_rng(1)
     n = 40
     ep = 100.0 + rng.normal(0, 1, n)
     d = np.ones(n)
     xp = ep * (1 + rng.normal(0.001, 0.01, n))
-    rep = sign_battery(d, ep, xp, candidate_id="c", n_seeds=25)  # HTFCAP's broken count
-    assert rep.supporting["powered"] is False
-    assert rep.interpretation_label == "UNPOWERED"
+    # HTFCAP's broken 25-seed count: reported with its n — never labelled UNPOWERED
+    rep = sign_battery(d, ep, xp, candidate_id="c", n_seeds=25)
+    assert "powered" not in rep.supporting
+    assert rep.interpretation_label is None
+    assert rep.supporting["n_seeds"] == 25
 
 
 # --------------------------------------------------------------------------- #
@@ -122,14 +128,32 @@ def test_attribution_derangement_reports_fraction_no_kill():
 
 
 # --------------------------------------------------------------------------- #
-# power_layer / stage2_bounds_layer: retire n_legs_floor + one_subset
+# sample_size_layer / psr_layer / stage2_bounds_layer (INFR-022)
 # --------------------------------------------------------------------------- #
-def test_power_layer_reports_not_vetoes():
-    thin = power_layer("c", n_legs=8, per_leg_vol_bps=40.0, mde_bps=25.0, observed_edge_bps=10.0)
-    assert thin.interpretation_label == "UNPOWERED"          # labelled, not dropped
+def test_sample_size_layer_reports_context_not_veto():
+    thin = sample_size_layer("c", n_legs=8, per_leg_vol_bps=40.0, design_min_n=50)
+    assert thin.layer == "sample_size"
+    assert thin.interpretation_label is None
+    assert thin.supporting["n_legs"] == 8
+    assert thin.supporting["design_min_n"] == 50
     assert "pass" not in thin.to_dict() and thin.to_dict()["is_gate"] is False
-    ok = power_layer("c", n_legs=200, per_leg_vol_bps=40.0, mde_bps=5.0, observed_edge_bps=12.0)
-    assert ok.supporting["powered"] is True and ok.interpretation_label is None
+    assert "mde" not in str(thin.supporting).lower()
+    assert "powered" not in thin.supporting
+    # no design minimum declared → note says all rows reported with counts
+    ok = sample_size_layer("c", n_legs=200, per_leg_vol_bps=40.0)
+    assert ok.supporting["design_min_n"] is None
+    assert "never a hide/drop rule" in ok.supporting["note"]
+
+
+def test_psr_layer_pairs_beside_mean():
+    rep = psr_layer("c", avg_trade_bps=3.2, psr=0.91, n=120)
+    assert rep.layer == "psr"
+    assert rep.supporting == {"avg_trade_bps": 3.2, "psr": 0.91, "psr_n": 120}
+    assert rep.to_dict()["is_gate"] is False
+    # NaN psr still reported with its count (N3 — never suppressed)
+    rep2 = psr_layer("c", avg_trade_bps=float("nan"), psr=float("nan"), n=1)
+    assert np.isnan(rep2.supporting["psr"]) and rep2.supporting["psr_n"] == 1
+    assert "not suppressed" in rep2.interpretation
 
 
 def test_stage2_bounds_layer_reports_all_subsets():

@@ -74,7 +74,6 @@ def decompose_candidate_fills(
     pos = pl.read_parquet(run / "positions.parquet").sort("SourceCloseTime")
 
     et = _entry_times_ns(cis)
-    xt = _exit_times_ns(cis)
     sel = np.ones(len(et), dtype=bool)
     if segment is not None:
         sel &= (et >= segment[0]) & (et < segment[1])

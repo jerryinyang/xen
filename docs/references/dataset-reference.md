@@ -205,32 +205,30 @@ bundle = adjudicate_emission("data/nautilus_runs/<run_id>")
 
 ---
 
-## Cost reads (T1 analysis)
+## Cost reads (ZERO-COST — INFR-022)
 
-Use the Bybit fee schedule and discrete funding in `xen.evaluation`—never the stored mean-price
-skew and no substitute spread proxy:
+**The programme is zero-cost (`NO_COST_CHARGED`):** no spread, commission, or swap enters any
+calculation in any experiment type unless an explicit operator cost directive requests costs
+(recorded in the experiment's design.md before execution). There are no live cost reads; the
+retired Bybit fee/funding functions (`bybit_round_trip_cost_bps`, `count_bybit_funding_stamps`,
+`spread_scale_route`, FTMO table) live in `xen/evaluation_cost_legacy.py` under an ARCHIVED
+banner — not callable from any live path.
 
 ```python
-from xen.evaluation import (
-    bybit_round_trip_cost_bps,
-    count_bybit_funding_stamps,
-    verify_chapter05_spread_quarantine,
-)
+# Zero-cost disclosure (canonical caveat for every money-bearing artifact)
+from xen.evaluation import zero_cost_caveat
+print(zero_cost_caveat())
 
-verify_chapter05_spread_quarantine()  # verifies only that the legacy field remains unusable
-stamps = count_bybit_funding_stamps(entry_time, exit_time)
-rt = bybit_round_trip_cost_bps(
-    "BTCUSDT",
-    entry_price=50_000.0,
-    liquidity="taker",
-    funding_bps_per_8h=1.0,
-    funding_stamps=stamps,
-)
+# Legacy data-provenance check — KEPT LIVE (verifies only that the legacy field
+# remains unusable; not a cost read)
+from xen.evaluation import verify_chapter05_spread_quarantine
+verify_chapter05_spread_quarantine()
 ```
 
-**Spread cost unavailable and not charged.** The result carries `spread_rt_bps=None` and
-`cost_scope=PARTIAL_FEES_FUNDING_ONLY`; reported cost understates total cost and reported net
-performance is overstated. Every Chapter-05 strategy report must repeat this implication.
+The stored mean-price skew is never a cost input and no substitute spread proxy exists. A
+costed read without a recorded operator cost directive (design clause +
+`operator_cost_directive.json`) is a governance violation; deployability/tradability claims
+remain refused by rule.
 
 For the fixed Chapter-05 four-hour episode, settlement timestamps are counted in `(entry, exit]`;
 continuous `hold_hours / 8` prorating is forbidden. The adverse missing-history charge is 1.0 bps

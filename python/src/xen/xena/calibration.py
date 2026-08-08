@@ -1,5 +1,12 @@
 """XENA calibration & self-falsification machinery (INFR-006 WS-6; L-12 governance clause).
 
+> **LEGACY CAL APPARATUS (INFR-022).** Not bindable on the live research path without a
+> post-INFR-022 CAL redesign. Historical text below (e.g. "the default here charges
+> costs", the MDE curve) describes the pre-INFR-022 regime: the programme is now
+> zero-cost and gross-only (L-62/L-63); the retired cost stack lives in
+> ``evaluation_cost_legacy`` and power curves/MDE are stripped. This module is retained
+> for historical CAL replay and WS-6 continuity only.
+
 Before XENA may adjudicate any live universe, the whole pipeline (search → certification →
 final gate) must be characterised on universes with KNOWN truth:
 
@@ -8,10 +15,12 @@ final gate) must be characterised on universes with KNOWN truth:
   round-trip costs). Requirement: certification certifies ~nothing AND the measured
   null final-gate pass rate ≈ the pre-registered α. Zero-cost nulls are friendlier than
   live (they center on zero instead of below it), so any zero-cost FPR figure is an
-  upper bound under a friendlier null — the default here charges costs.
+  upper bound under a friendlier null — the default here charges costs [historical:
+  costs are inert under INFR-022].
 * **Synthetic-positive battery** — planted-edge candidates (known bps/trade, reported
   NET of the charged cost) mixed into zero-edge noise. Sweeping the planted edge size
-  yields the framework's end-to-end MDE curve.
+  yields the framework's end-to-end MDE curve [historical: MDE/power curves are
+  retired — L-63].
 
 **Segment layout (review finding 2).** Calibration mirrors the live Q1 partition — the
 data span is partitioned into a SEARCH band, a disjoint RANKING band (selection folds),

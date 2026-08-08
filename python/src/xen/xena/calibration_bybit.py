@@ -1,11 +1,20 @@
 """INFR-014 Bybit/Nautilus XENA CAL harness — INFR-009 P-C form, re-measured.
 
+> **LEGACY CAL APPARATUS (INFR-022).** This module and its siblings
+> (``calibration_p3b`` / ``calibration_p3d`` / ``calibration_pc`` / ``calibration_bybit15`` /
+> ``calibration``) are the pre-INFR-022 calibration stack. They are **not bindable on the
+> live research path** without a post-INFR-022 CAL redesign. Retired names used here for
+> historical replay only: ``bybit_round_trip_cost_bps`` (now in ``evaluation_cost_legacy``),
+> ``PARTIAL_FEES_FUNDING_ONLY`` cost scope, ``g_net`` stage-1 selection (L-26
+> net-cost-binding), the ``n_legs_floor`` / AMENDMENT-7 domain guards, and the
+> ``stage2_net_lcb_positive`` deployability binding. Under INFR-022 the programme is
+> zero-cost and gross-only; none of the above may bind on a live experiment.
+
 Binder form constants §5.4 verbatim; α̂ re-measured under net-cost-binding stage-1
-(L-26). Chapter-03 pin db87dc1a… is VOID — never loaded as binding.
+(L-26) — historical record; the live selection path is gross-only after INFR-022.
+Chapter-03 pin db87dc1a… is VOID — never loaded as binding.
 
 Class-shaped nulls: CLS-FILTER (BASE+FILT thinning) and CLS-EPISODE (episode objects).
-Both classes: stage-1 score_kind=g_net, charge_costs=True — HARD REFUSE costless stage-1.
-α̂ event = stage-2 GROSS leg-studentized LCB > 0 on single top-1 (deployability = net field).
 """
 from __future__ import annotations
 
@@ -18,7 +27,7 @@ import numpy as np
 import polars as pl
 
 import xen.xena.calibration_p3b as p3b
-from xen.evaluation import bybit_round_trip_cost_bps
+from xen.evaluation_cost_legacy import bybit_round_trip_cost_bps  # ARCHIVED (INFR-022)
 from xen.xena.calibration import SegmentLayout, path_universe, regime_gbm_path
 from xen.xena.calibration_p3b import HIGH, LOW, CadenceSpec, ScaleSpec, bank_seeds
 from xen.xena.calibration_p3d import binomial_se, eval_lcb_legs, wilson
@@ -83,11 +92,26 @@ def _set_seeds(low: int, high: int) -> None:
 
 
 def assert_stage1_net_binding(*, charge_costs: bool, score_kind: str) -> None:
-    """HARD REFUSE costless stage-1 (design §5.4 / §6.1 L-26)."""
+    """LEGACY L-26 guard (historical CAL semantics — retained verbatim for tests/replay).
+
+    INFR-022 supersedes net-cost-binding selection programme-wide; live callers must use
+    :func:`assert_stage1_zero_cost` instead. This function keeps its historical behavior
+    only inside the bannered legacy CAL apparatus.
+    """
     if not charge_costs or score_kind != "g_net":
         raise IntegrityError(
             "CLS-* forbids costless stage-1 — L-26 "
             f"(charge_costs={charge_costs}, score_kind={score_kind!r})"
+        )
+
+
+def assert_stage1_zero_cost(*, charge_costs: bool, score_kind: str) -> None:
+    """INFR-022 zero-cost stage-1 guard: live CAL selection is gross-only."""
+    if charge_costs or score_kind != "g_gross":
+        raise IntegrityError(
+            "INFR-022 zero-cost model: stage-1 must be gross-only "
+            f"(charge_costs={charge_costs}, score_kind={score_kind!r}) — "
+            "the net-cost-binding selection path (L-26) is retired"
         )
 
 
@@ -200,7 +224,6 @@ def make_filter_null_universe(
         edge = float(edge_bps) if plant else 0.0
         # thin from a dense entry pool
         eligible = np.arange(10, cadence.n_bars - cadence.hold_bars - 2)
-        w = np.where(hv[eligible], 3.0, 1.0)
         # synthetic HTF gate independent of future PnL: keep every k-th after RNG mask
         keep = rng.random(len(eligible)) < tau
         pool = eligible[keep]
@@ -344,18 +367,20 @@ def run_two_stage(
     seed: int,
     n_boot: int = N_BOOT,
     block_legs: int = BLOCK_LEGS,
-    charge_costs: bool = True,
-    score_kind: str = "g_net",
 ) -> dict[str, Any]:
-    """Stage-1 search→select(top-1) on g_net; stage-2 leg-studentized LCB(g_gross) for α̂."""
-    assert_stage1_net_binding(charge_costs=charge_costs, score_kind=score_kind)
-    config = OracleConfig(charge_costs=True)
+    """Stage-1 search→select(top-1) on g_gross; stage-2 leg-studentized LCB(g_gross).
+
+    INFR-022: gross-only (zero-cost model) — the retired L-26 net-cost-binding stage-1
+    and the stage-2 net (deployability) read are removed.
+    """
+    assert_stage1_zero_cost(charge_costs=False, score_kind="g_gross")
+    config = OracleConfig(charge_costs=False)
     params = _search_params(cadence)
     finalists = [
         run_restart(
             streams, config, budget=scale.budget, restart_id=r + 1,
             params=params, segment=layout.search,
-            skip_economics_precondition=True, score_kind="g_net",
+            skip_economics_precondition=True,
         )
         for r in range(scale.n_restarts)
     ]
@@ -366,23 +391,18 @@ def run_two_stage(
     pkg = certify_and_rank(
         finalists, streams, config, folds=folds, params=params,
         search_segment=layout.search, include_random_ref=False,
-        include_fill_basis=False, score_kind="g_net",
+        include_fill_basis=False,
     )
     if not pkg["ranked"]:
         return {
-            "empty": True, "gross_pass": False, "net_pass": False, "top": [],
+            "empty": True, "gross_pass": False, "top": [],
             "g_search_hat": None,
         }
     top = pkg["ranked"][0].subset
-    # α̂ event: GROSS LCB on stage-2 (design §5.1)
+    # stage-2: GROSS LCB only (the NET/deployability read is retired, INFR-022)
     lcb_g = eval_lcb_legs(
         top, streams, config, layout.gate, n_boot=n_boot, seed=seed,
-        block_legs=block_legs, net=False,
-    )
-    # deployability field: NET LCB (not inside α̂)
-    lcb_n = eval_lcb_legs(
-        top, streams, config, layout.gate, n_boot=n_boot, seed=seed + 17,
-        block_legs=block_legs, net=True,
+        block_legs=block_legs,
     )
     top_ids = sorted(str(x) for x in top)
     return {
@@ -392,13 +412,11 @@ def run_two_stage(
         "gross_pass": bool(lcb_g.get("pass_positive")),
         "gross_lcb": lcb_g.get("lcb"),
         "gross_point": lcb_g.get("point"),
-        "net_pass": bool(lcb_n.get("pass_positive")),
-        "net_lcb": lcb_n.get("lcb"),
-        "net_point": lcb_n.get("point"),
         "n_legs": lcb_g.get("n_legs"),
         "g_search_hat": pkg["ranked"][0].search_F_hat,
-        "stage1_score_kind": "g_net",
-        "stage1_charge_costs": True,
+        "stage1_score_kind": "g_gross",
+        "stage1_charge_costs": False,
+        "cost_model": "NO_COST_CHARGED",
     }
 
 
@@ -504,14 +522,9 @@ def no_search_coverage(
     n_boot: int = N_BOOT,
     alpha: float = ALPHA,
 ) -> dict[str, Any]:
-    """No-search LCB pass rate on stage-2.
-
-    Uses **current** ``p3b.SEED_BASE_*`` (caller must ``_set_seeds`` for design or
-    confirm). Does **not** re-pin design seeds — confirm coverage must use confirm bases
-    (INFR-014 QA Issue 9).
-    """
+    """No-search LCB pass rate on stage-2. Gross-only (INFR-022)."""
     fac = universe_factory(class_id)
-    config = OracleConfig(charge_costs=True)
+    config = OracleConfig(charge_costs=False)
     layout = c_layout(cadence.n_bars, cadence.hold_bars, embargo_frac=embargo_frac)
     hits = 0
     rows = []
@@ -526,7 +539,7 @@ def no_search_coverage(
         pick = frozenset(str(x) for x in rng.choice(ids, size=k, replace=False))
         lcb = eval_lcb_legs(
             pick, streams, config, layout.gate, n_boot=n_boot, seed=seed,
-            block_legs=block_legs, net=False,
+            block_legs=block_legs,
         )
         pos = bool(lcb.get("pass_positive"))
         hits += int(pos)
@@ -577,9 +590,7 @@ def e2e_alpha(
         rows.append({
             "seed": seed, "symbol": cspec.symbol,
             "gross_pass": bool(out.get("gross_pass")),
-            "net_pass": bool(out.get("net_pass")),
             "gross_lcb": out.get("gross_lcb"), "gross_point": out.get("gross_point"),
-            "net_lcb": out.get("net_lcb"), "net_point": out.get("net_point"),
             "g_search_hat": out.get("g_search_hat"), "n_legs": out.get("n_legs"),
             "empty": out.get("empty", False),
         })
@@ -587,15 +598,12 @@ def e2e_alpha(
     k = sum(1 for r in rows if r["gross_pass"])
     ph = k / max(n, 1)
     lo, hi = wilson(k, n)
-    n_net = sum(1 for r in rows if r["net_pass"])
     return {
         "class_id": class_id, "cadence": cadence.name, "n": n,
         "n_gross_lcb_positive": k, "alpha_hat": ph,
         "alpha_se": binomial_se(ph, n),
         "alpha_wilson_95": {"low": lo, "high": hi},
         "pass_stop": bool(ph <= float(alpha)),
-        "n_net_lcb_positive": n_net,
-        "deployability_rate": n_net / max(n, 1),
         "seed_bases": {"low": seed_base_low, "high": seed_base_high},
         "alpha_target": float(alpha),
         "rows": rows,
@@ -716,11 +724,11 @@ def run_design(
     frozen = {
         "binder": "two_stage_sample_split",
         "stage1": "search+certify top-1 on stage-1 bands",
-        "stage1_score_kind": "g_net",
-        "stage1_charge_costs": True,
+        "stage1_score_kind": "g_gross",
+        "stage1_charge_costs": False,
         "stage2": "lcb_g_leg_studentized(g_gross) > 0 on distant embargoed band",
         "e2e_pass_event": "stage2_gross_lcb_positive",
-        "deployability_binding": "stage2_net_lcb_positive",
+        "deployability_binding": "RETIRED (INFR-022 zero-cost; historical: stage2_net_lcb_positive)",
         "functional": "g_gross_ratio",
         "estimator": "leg_studentized_bootstrap_t",
         "embargo_frac": EMBARGO_FRAC,
@@ -831,15 +839,9 @@ def confirm_gate(
         band = "CERTIFIED" if certified else (
             "FAIL_ALPHA" if not a["pass_stop"] else "FAIL_COV"
         )
-        if certified and a["deployability_rate"] < 0.5:
-            # disclosure only — not α fail
-            deploy = "DEPLOY_WEAK"
-        else:
-            deploy = "DEPLOY_OK" if certified else "N/A"
         per[c.name] = {
             "cadence": c.name,
             "band": band,
-            "deployability": deploy,
             "no_search_cov": cov["rate"],
             "e2e_alpha": a["alpha_hat"],
             "selection_inflation": a["alpha_hat"] - cov["rate"],
@@ -850,7 +852,6 @@ def confirm_gate(
             "alpha_wilson_95": a["alpha_wilson_95"],
             "n": a["n"],
             "n_gross_lcb_positive": a["n_gross_lcb_positive"],
-            "deployability_rate": a["deployability_rate"],
             "seed_bases": a.get("seed_bases"),
             "alpha_target": alpha,
             "failure_label": (

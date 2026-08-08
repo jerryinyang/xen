@@ -9,7 +9,9 @@ Blocking checks (any failure => emission must not be adjudicated):
 * schema — required columns; ``SourceCloseTime`` strictly increasing;
 * fence — last bar within ``analysis_end_utc``; v2 rejects ``STUB`` attestations;
 * reconciliation — |sum(per-bar gross) - sum(leg RealizedBps)| <= tolerance;
-* manifest — expected instruments present when an expectation is given.
+* manifest — expected instruments present when an expectation is given;
+* no-cost (INFR-022) — no non-zero commission/fee/funding/spread column in the emission;
+  a non-zero ``--cost-bps`` requires an ``operator_cost_directive.json`` in the run dir.
 
 CLI::
 
@@ -31,6 +33,7 @@ from xen.adjudication import (
     REQUIRED_LEG_COLS,
     REQUIRED_POSITION_COLS,
     assemble_multileg_bps,
+    check_no_cost_charged,
     reconcile,
 )
 
@@ -40,6 +43,8 @@ PHASE_B_STUB_STATUS = "STUB"
 FENCE_MANIFEST_CANONICAL = Path(
     "archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json"
 )
+
+COST_DIRECTIVE_FILE = "operator_cost_directive.json"
 
 SHARPE_SANITY = 3.0
 ANN_RETURN_SANITY = 1.0
@@ -208,6 +213,50 @@ def _manifest_check(
     }
 
 
+def _no_cost_check(pos: pl.DataFrame, cis: pl.DataFrame, cost_bps: float,
+                   run_dir: Path) -> dict:
+    """Zero-cost compliance (INFR-022 §3.2/§3.4): blocking.
+
+    * Any non-zero commission/fee/funding/spread column in the RAW emission frames or the
+      normalised adjudication frames → fail (the emission itself carried a cost).
+    * A non-zero ``cost_bps`` pin requires ``operator_cost_directive.json`` in the run dir
+      (an operator-signed reason string + scope); absent → fail.
+    """
+    raw_frames = []
+    for name in ("positions_ledger.parquet", "fills.parquet", "orders.parquet",
+                 "bar_marks.parquet", "cis_trades.parquet", "positions.parquet"):
+        p = run_dir / name
+        if p.exists():
+            try:
+                raw_frames.append(pl.read_parquet(p))
+            except Exception:  # noqa: BLE001 — malformed side file must not mask the gate
+                pass
+    charged = check_no_cost_charged(*raw_frames, pos, cis)
+    directive_ok = True
+    directive = None
+    if cost_bps not in (0, 0.0, None):
+        dpath = run_dir / COST_DIRECTIVE_FILE
+        if not dpath.exists():
+            directive_ok = False
+            directive = {"ok": False, "reason": "missing operator_cost_directive.json"}
+        else:
+            directive = json.loads(dpath.read_text(encoding="utf-8"))
+            directive_ok = bool(directive.get("reason") and directive.get("scope"))
+            if not directive_ok:
+                directive = {"ok": False, "reason": "directive missing reason/scope"}
+    return {
+        "ok": bool(charged["ok"] and directive_ok),
+        "cost_model": "NO_COST_CHARGED" if cost_bps in (0, 0.0, None) else "DIRECTIVE_BACKED",
+        "emission_cost_columns": {
+            "ok": charged["ok"],
+            "non_zero_columns": charged["non_zero_columns"],
+            "n_non_zero_rows": charged["n_non_zero_rows"],
+        },
+        "cost_directive": directive,
+        "cost_bps": float(cost_bps) if cost_bps is not None else 0.0,
+    }
+
+
 def _physicality(pos: pl.DataFrame, cis: pl.DataFrame, cost_bps: float) -> dict:
     series = assemble_multileg_bps(pos, cis, cost_bps=cost_bps)
     t = series.times.astype("datetime64[s]").astype("int64")
@@ -236,6 +285,16 @@ def _physicality(pos: pl.DataFrame, cis: pl.DataFrame, cost_bps: float) -> dict:
     if bh_ann_vol > 0 and abs(ann_return) > 3.0 * bh_ann_vol:
         flags.append(f"annualised return {ann_return:.1%} exceeds 3x buy-and-hold vol "
                      f"({bh_ann_vol:.1%}) on the same instrument")
+
+    # PSR (INFR-022 §4): informative, beside the gross per-trade mean — same series and
+    # population (completed legs' RealizedBps), never a gate. NaN + n when n < 2.
+    from xen.evaluation import psr_row
+    per_trade = cis.filter(pl.col("Censored").cast(pl.Boolean).not_()
+                           & pl.col("RealizedBps").is_finite())
+    psr_block = psr_row(
+        per_trade.get_column("RealizedBps").to_numpy().astype(float)
+        if per_trade.height else np.array([], dtype=float)
+    )
     return {
         "years": years, "n_bars": len(t), "n_legs": series.n_legs,
         "n_censored_legs": series.n_censored,
@@ -244,6 +303,8 @@ def _physicality(pos: pl.DataFrame, cis: pl.DataFrame, cost_bps: float) -> dict:
         "occupancy": occupancy,
         "buy_and_hold_annualised_return": bh_ann_return,
         "buy_and_hold_annualised_vol": bh_ann_vol,
+        "gross_mean_bps": float(net.mean()) if len(net) else float("nan"),
+        "psr_summary": psr_block,
         "sanity_flags": flags,
     }
 
@@ -266,6 +327,7 @@ def validate_nautilus_run_v2(
     schema = _nautilus_schema_check(run_dir, pos, cis)
     fence = _fence_check_v2(pos, metadata, fence_attestation, repo_root=repo_root)
     manifest = _manifest_check(metadata, instrument_map, expected_instruments)
+    no_cost = _no_cost_check(pos, cis, cost_bps, run_dir)
 
     catalog_ok = True
     catalog_note = None
@@ -284,6 +346,7 @@ def validate_nautilus_run_v2(
         "schema": schema,
         "fence": fence,
         "manifest": manifest,
+        "no_cost_charged": no_cost,
         "catalog_attestation": {"ok": catalog_ok, "note": catalog_note,
                                 "catalog_version": metadata.get("catalog_version"),
                                 "config_hash": metadata.get("config_hash")},
@@ -306,7 +369,8 @@ def validate_nautilus_run_v2(
         reconcile_ok = cis.height == 0 and schema["ok"]
 
     result["blocking_pass"] = bool(
-        schema["ok"] and fence["ok"] and reconcile_ok and manifest["ok"] and catalog_ok
+        schema["ok"] and fence["ok"] and reconcile_ok and manifest["ok"]
+        and catalog_ok and no_cost["ok"]
     )
     return result
 
@@ -328,12 +392,14 @@ def validate_run(run_dir: str | Path, *, cost_bps: float = 0.0,
     schema = _schema_check(pos, cis)
     fence = _fence_check_ctrader(pos, metadata)
     manifest = _manifest_check(metadata, None, expected_instruments)
+    no_cost = _no_cost_check(pos, cis, cost_bps, run_dir)
     result: dict[str, Any] = {
         "gate_version": "v1",
         "emission_type": "ctrader",
         "run_dir": str(run_dir),
         "instrument": metadata.get("symbol"), "domain": metadata.get("domain"),
         "schema": schema, "fence": fence, "manifest": manifest,
+        "no_cost_charged": no_cost,
     }
     if schema["ok"] and cis.height:
         series = assemble_multileg_bps(pos, cis, cost_bps=cost_bps)
@@ -350,7 +416,8 @@ def validate_run(run_dir: str | Path, *, cost_bps: float = 0.0,
                                     "note": "no leg ledger" if cis.height == 0
                                     else "schema failure — not attempted"}
         reconcile_ok = cis.height == 0 and schema["ok"]
-    result["blocking_pass"] = bool(schema["ok"] and fence["ok"] and reconcile_ok and manifest["ok"])
+    result["blocking_pass"] = bool(schema["ok"] and fence["ok"] and reconcile_ok
+                                    and manifest["ok"] and no_cost["ok"])
     return result
 
 

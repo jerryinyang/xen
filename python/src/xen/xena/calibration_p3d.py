@@ -1,13 +1,15 @@
 """INFR-009 P3d — design/confirm split; leg bootstrap + per-cadence L.
 
+> **LEGACY CAL APPARATUS (INFR-022).** Not bindable on the live research path without a
+> post-INFR-022 CAL redesign. Retired names used here for historical replay only: the NET
+> LCB path (zero-cost model). INFR-022: gross-only LCBs; sample size as context.
+
 Last estimator-calibration round. Confirm fail → binder-form fork (not implemented).
 """
 from __future__ import annotations
 
-from dataclasses import replace
-from typing import Any
-
 import numpy as np
+from typing import Any
 
 import xen.xena.calibration_p3b as p3b
 from xen.xena.calibration_p3b import (HIGH, LOW, CadenceSpec, ScaleSpec, _layout,
@@ -56,27 +58,27 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
 # LCB evaluators
 # --------------------------------------------------------------------------- #
 def eval_lcb_calendar(subset, streams, config, segment, *, block: int, n_boot: int,
-                      seed: int, net: bool = False) -> dict:
-    cfg = replace(config, charge_costs=bool(net))
-    res = evaluate(subset, streams, cfg, segment=segment, seed=seed)
+                      seed: int) -> dict:
+    """Calendar studentized LCB on g_gross (gross-only, INFR-022)."""
+    res = evaluate(subset, streams, config, segment=segment, seed=seed)
     grid = clip_grid_covering(universe_grid(streams), segment, streams)
     if len(grid) < 2:
         return {"pass_positive": False, "lcb": float("-inf"), "method": "calendar_st",
                 "empty_grid": True}
     starts = bootstrap_block_starts(len(grid), block=block, n_boot=n_boot, seed=17_001 + seed)
     out = lcb_g_studentized(res, streams, grid, starts, block=block,
-                            confidence=LCB_CONF, net=net)
+                            confidence=LCB_CONF)
     out["n_admitted"] = res.n_admitted
     out["empty_grid"] = False
     return out
 
 
 def eval_lcb_legs(subset, streams, config, segment, *, n_boot: int, seed: int,
-                  block_legs: int = 1, net: bool = False) -> dict:
-    cfg = replace(config, charge_costs=bool(net))
-    res = evaluate(subset, streams, cfg, segment=segment, seed=seed)
+                  block_legs: int = 1) -> dict:
+    """Leg-studentized LCB on g_gross (gross-only, INFR-022)."""
+    res = evaluate(subset, streams, config, segment=segment, seed=seed)
     out = lcb_g_leg_studentized(res, streams, n_boot=n_boot, seed=seed + 99,
-                                block_legs=block_legs, confidence=LCB_CONF, net=net)
+                                block_legs=block_legs, confidence=LCB_CONF)
     out["n_admitted"] = res.n_admitted
     return out
 
@@ -238,16 +240,16 @@ def design_fit_l_rule_and_interval(*, scale: ScaleSpec = DESIGN_SCALE,
 
 
 def _lcb_for_procedure(subset, streams, config, segment, *, cadence_name: str,
-                       procedure: dict, seed: int, net: bool = False) -> dict:
+                       procedure: dict, seed: int) -> dict:
     cfg = procedure.get(cadence_name) or procedure.get("high")
     method = cfg["method"]
     if method == "leg_studentized":
         return eval_lcb_legs(subset, streams, config, segment,
                              n_boot=cfg.get("n_boot", 400), seed=seed,
-                             block_legs=cfg.get("block_legs", 1), net=net)
+                             block_legs=cfg.get("block_legs", 1))
     return eval_lcb_calendar(subset, streams, config, segment,
                              block=cfg.get("block", 32), n_boot=cfg.get("n_boot", 400),
-                             seed=seed, net=net)
+                             seed=seed)
 
 
 def e2e_alpha(cadence: CadenceSpec, *, procedure: dict, scale: ScaleSpec,

@@ -24,7 +24,7 @@ from xen.xena.calibration_bybit import (
     write_bybit_registry,
 )
 from xen.xena.calibration_p3b import LOW
-from xen.xena.fill_basis import next_open_discriminating_control, reprice_entries_to_next_open
+from xen.xena.fill_basis import reprice_entries_to_next_open
 from xen.xena.calibration_pc import c_layout
 
 
