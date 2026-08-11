@@ -17,8 +17,17 @@ from xen.nautilus.instrument_ids import (
 from xen.nautilus.emission import (
     EMISSION_CONTRACT_VERSION,
     EmissionPaths,
+    StreamingEmissionSource,
     write_emission_v1,
+    write_emission_v1_from_paths,
     load_emission_v1,
+)
+from xen.nautilus.streaming import (
+    BoundedJsonlWriter,
+    BoundedParquetWriter,
+    MemoryBudgetExceeded,
+    MemoryGuard,
+    MemorySample,
 )
 from xen.nautilus.adjudication_shim import (
     emission_to_adjudication_frames,
@@ -42,8 +51,15 @@ __all__ = [
     "parse_instrument_id_str",
     "EMISSION_CONTRACT_VERSION",
     "EmissionPaths",
+    "StreamingEmissionSource",
     "write_emission_v1",
+    "write_emission_v1_from_paths",
     "load_emission_v1",
+    "BoundedJsonlWriter",
+    "BoundedParquetWriter",
+    "MemoryBudgetExceeded",
+    "MemoryGuard",
+    "MemorySample",
     "emission_to_adjudication_frames",
     "adjudicate_emission",
     "SelectionRule",

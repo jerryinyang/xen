@@ -104,6 +104,121 @@ class EmissionPaths:
         return self.root / "fence_attestation.json"
 
 
+@dataclass(frozen=True)
+class StreamingEmissionSource:
+    """Finalized source files produced by bounded cell writers."""
+
+    fills: Path | None
+    orders: Path | None
+    positions_ledger: Path | None
+    bar_marks: Path
+    event_log: Path
+    row_counts: dict[str, int]
+
+
+_EMPTY_TABLE_SCHEMAS = {
+    "fills": {column: pl.Utf8 for column in _FILL_LOG_COLS},
+    "orders": {column: pl.Utf8 for column in _ORDER_LOG_COLS},
+    "positions_ledger": {column: pl.Utf8 for column in _POS_LOG_COLS},
+}
+
+
+def _copy_file(source: Path, destination: Path) -> str:
+    """Copy a finalized file in bounded chunks and return its SHA-256."""
+    with source.open("rb") as src, destination.open("wb") as dst:
+        import shutil
+
+        shutil.copyfileobj(src, dst, length=1024 * 1024)
+    return _sha256_file(destination)
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        while chunk := handle.read(1024 * 1024):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _count(source: StreamingEmissionSource, name: str) -> int:
+    if name in source.row_counts:
+        return int(source.row_counts[name])
+    return int(source.row_counts.get(f"n_{name}", 0))
+
+
+def write_emission_v1_from_paths(
+    run_dir: str | Path,
+    *,
+    source: StreamingEmissionSource,
+    instrument_id_map: dict[str, str],
+    run_config: dict[str, Any],
+    catalog_version: str | None,
+    catalog_path: str | None,
+    fence: dict[str, Any],
+    nautilus_version: str,
+    platform: str,
+    extra_metadata: dict[str, Any] | None = None,
+) -> EmissionPaths:
+    """Finalize bounded writer outputs without loading any table into memory."""
+    root = Path(run_dir)
+    root.mkdir(parents=True, exist_ok=True)
+    paths = EmissionPaths(root)
+    table_sources: dict[str, Path | None] = {
+        "fills": source.fills,
+        "orders": source.orders,
+        "positions_ledger": source.positions_ledger,
+        "bar_marks": source.bar_marks,
+    }
+    table_destinations = {
+        "fills": paths.fills,
+        "orders": paths.orders,
+        "positions_ledger": paths.positions_ledger,
+        "bar_marks": paths.bar_marks,
+    }
+    for name, destination in table_destinations.items():
+        origin = table_sources[name]
+        if origin is not None:
+            if Path(origin).resolve() != destination.resolve():
+                _copy_file(Path(origin), destination)
+        else:
+            if name == "bar_marks":
+                raise FileNotFoundError("bar_marks source is required")
+            empty = pl.DataFrame(schema=_EMPTY_TABLE_SCHEMAS[name])
+            empty.write_parquet(destination)
+
+    _copy_file(Path(source.event_log), paths.event_log)
+    event_log_sha256 = _sha256_file(paths.event_log)
+    paths.instrument_id_map.write_text(
+        json.dumps(instrument_id_map, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    paths.fence_attestation.write_text(
+        json.dumps(fence, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8"
+    )
+    meta = {
+        "emission_contract_version": EMISSION_CONTRACT_VERSION,
+        "generated_utc": datetime.now(UTC).isoformat(),
+        "config_hash": config_hash(run_config),
+        "run_config": run_config,
+        "catalog_version": catalog_version,
+        "catalog_path": catalog_path,
+        "nautilus_version": nautilus_version,
+        "platform": platform,
+        "instrument_id_map": instrument_id_map,
+        "fence_attestation_path": paths.fence_attestation.name,
+        "event_log_sha256": event_log_sha256,
+        "n_fills": _count(source, "fills"),
+        "n_orders": _count(source, "orders"),
+        "n_positions": _count(source, "positions_ledger"),
+        "n_bar_marks": _count(source, "bar_marks"),
+    }
+    if extra_metadata:
+        meta.update(extra_metadata)
+    paths.run_metadata.write_text(
+        json.dumps(meta, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8"
+    )
+    return paths
+
+
 def _df_or_empty(df: pl.DataFrame | None, columns: list[str] | None = None) -> pl.DataFrame:
     if df is None or df.height == 0:
         return pl.DataFrame(schema={c: pl.Utf8 for c in (columns or [])}) if columns else pl.DataFrame()
