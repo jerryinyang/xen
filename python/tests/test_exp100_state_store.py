@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sqlite3
 from pathlib import Path
 
 import pytest
@@ -73,5 +74,40 @@ def test_state_store_rejects_textual_active_flag(tmp_path: Path) -> None:
     try:
         with pytest.raises(ValueError, match="active"):
             store.insert_level({"level_id": "L0", "active": "0"})
+    finally:
+        store.close()
+
+
+def test_profile_generation_reset_rolls_back_to_old_state_on_failure(
+    tmp_path: Path,
+) -> None:
+    """A failed reset leaves the old generation and bins usable."""
+    store = Exp100StateStore(tmp_path / "state.sqlite")
+    try:
+        first = store.start_profile_generation("R1", 1, 0.1)
+        store.increment_profile_bin_range("R1", first, 0, 0)
+        store._connection.execute(
+            """
+            CREATE TRIGGER fail_new_profile_state
+            BEFORE INSERT ON profile_state
+            WHEN NEW.generation = 2
+            BEGIN
+                SELECT RAISE(ABORT, 'injected profile reset failure');
+            END;
+            """
+        )
+        store._connection.commit()
+
+        with pytest.raises(sqlite3.IntegrityError, match="injected"):
+            store.reset_profile_generation("R1", 2, 0.1)
+
+        assert store.current_profile_generation("R1") == first
+        assert list(store.iter_profile_bins("R1", first)) == [(0, 1)]
+        assert store.get_profile_state("R1", first) == {
+            "profile_start_ts_ns": 1,
+            "bin_width": 0.1,
+            "bracket_count": 1,
+            "expected_tpo_total": 1,
+        }
     finally:
         store.close()

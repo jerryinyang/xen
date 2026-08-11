@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from decimal import Decimal, ROUND_FLOOR
 from typing import Any
 
 from .state_store import Exp100StateStore
@@ -52,10 +53,9 @@ class TPOProfileStore:
     ) -> int:
         """Start generation one with a bin width frozen from the causal ATR."""
         self._finite("excursion_price", excursion_price)
-        bin_width = 0.10 * self._positive_finite("atr_unit", atr_unit)
-        generation = self.store.new_profile_generation(raid_id)
-        self.store.set_profile_state(raid_id, generation, start_ts_ns, bin_width)
-        return generation
+        atr_decimal = Decimal(str(self._positive_finite("atr_unit", atr_unit)))
+        bin_width = float(Decimal("0.10") * atr_decimal)
+        return self.store.start_profile_generation(raid_id, start_ts_ns, bin_width)
 
     def add_bar(self, raid_id: str, generation: int, bar: BarRecord) -> None:
         """Apply one closed one-minute bar to each directly intersected bin."""
@@ -67,8 +67,8 @@ class TPOProfileStore:
         if low > high:
             raise ValueError("bar low cannot exceed high")
         bin_width = float(state["bin_width"])
-        low_bin_index = math.floor(low / bin_width)
-        high_bin_index = math.floor(high / bin_width)
+        low_bin_index = self._bin_index(low, bin_width)
+        high_bin_index = self._bin_index(high, bin_width)
         self.store.increment_profile_bin_range(
             raid_id, generation, low_bin_index, high_bin_index
         )
@@ -77,11 +77,9 @@ class TPOProfileStore:
         """Replace the active profile without reconstructing historical bars."""
         self._finite("new_max_price", new_max_price)
         state = self._current_profile_state(raid_id)
-        generation = self.store.new_profile_generation(raid_id)
-        self.store.set_profile_state(
-            raid_id, generation, ts_ns, float(state["bin_width"])
+        return self.store.reset_profile_generation(
+            raid_id, ts_ns, float(state["bin_width"])
         )
-        return generation
 
     def finalize(self, raid_id: str, generation: int, end_ts_ns: int) -> dict[str, Any]:
         """Derive the profile using cursor passes and bounded point queries only."""
@@ -125,12 +123,33 @@ class TPOProfileStore:
             poc_count,
             total,
         )
+        if va_low == va_high:
+            return self._undefined(
+                raid_id,
+                generation,
+                end_ts_ns,
+                state,
+                "GAP_UNDEFINED",
+                tpo_total=total,
+                conservation_ok=total == expected_total,
+            )
         val = va_low * bin_width
         vah = (va_high + 1) * bin_width
         va_width = vah - val
         gap_span = self._gap_span(
-            raid_id, generation, va_low, va_high, total, bin_width
+            raid_id, generation, va_low, va_high, va_count, bin_width
         )
+        if gap_span is None or va_width <= 0.0:
+            return self._undefined(
+                raid_id,
+                generation,
+                end_ts_ns,
+                state,
+                "GAP_UNDEFINED",
+                tpo_total=total,
+                conservation_ok=total == expected_total,
+            )
+        gap_span_value, gap_mask = gap_span
         conservation_ok = total == expected_total
         return {
             "raid_id": raid_id,
@@ -145,14 +164,21 @@ class TPOProfileStore:
             "va_count": va_count,
             "va_mass": va_count / total,
             "va_mask": {"low_bin_index": va_low, "high_bin_index": va_high},
-            "gap_span": gap_span,
+            "gap_mask": gap_mask,
+            "gap_span": gap_span_value,
             "va_width": va_width,
-            "tight_gap": gap_span < self.tight_ratio * va_width,
+            "tight_gap": gap_span_value < self.tight_ratio * va_width,
             "tpo_total": total,
             "tpo_conservation_ok": conservation_ok,
             "profile_status": "DEFINED",
             "undefined_reason": None,
         }
+
+    @staticmethod
+    def _bin_index(price: float, bin_width: float) -> int:
+        price_decimal = Decimal(str(price))
+        width_decimal = Decimal(str(bin_width))
+        return int((price_decimal / width_decimal).to_integral_value(rounding=ROUND_FLOOR))
 
     def _current_profile_state(self, raid_id: str) -> dict[str, int | float]:
         generation = self.store.current_profile_generation(raid_id)
@@ -223,24 +249,26 @@ class TPOProfileStore:
         generation: int,
         va_low: int,
         va_high: int,
-        total: int,
+        va_count: int,
         bin_width: float,
-    ) -> float:
-        target = self.gap_mass * total
+    ) -> tuple[float, str] | None:
+        target = self.gap_mass * va_count
         selected_count = 0
         gap_low: int | None = None
         gap_high: int | None = None
+        gap_mask = ""
         for bin_index, count in self.store.iter_profile_bins_by_density(
             raid_id, generation, va_low, va_high
         ):
             selected_count += count
             gap_low = bin_index if gap_low is None else min(gap_low, bin_index)
             gap_high = bin_index if gap_high is None else max(gap_high, bin_index)
+            gap_mask = f"{gap_mask}|{bin_index}" if gap_mask else str(bin_index)
             if selected_count >= target:
                 break
         if gap_low is None or gap_high is None:
-            return math.nan
-        return (gap_high - gap_low + 1) * bin_width
+            return None
+        return (gap_high - gap_low + 1) * bin_width, gap_mask
 
     def _undefined(
         self,
@@ -268,6 +296,7 @@ class TPOProfileStore:
             "va_count": 0,
             "va_mass": None,
             "va_mask": None,
+            "gap_mask": None,
             "gap_span": None,
             "va_width": None,
             "tight_gap": False,

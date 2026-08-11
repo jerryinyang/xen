@@ -82,3 +82,59 @@ def test_tpo_empty_profile_emits_explicit_reason(tmp_path: Path) -> None:
 
     assert result["profile_status"] == "UNDEFINED"
     assert result["undefined_reason"] == "EMPTY_PROFILE"
+
+
+def test_tpo_gap_uses_va_mass_and_emits_separated_mask(tmp_path: Path) -> None:
+    """VA-mass and total-mass thresholds select different low-density bins."""
+    with Exp100StateStore(tmp_path / "state.sqlite") as store:
+        profile = TPOProfileStore(store)
+        generation = profile.start("R1", 1, excursion_price=0.1, atr_unit=1.0)
+        for index, count in ((0, 4), (1, 10), (2, 3), (3, 4), (4, 9)):
+            for offset in range(count):
+                price = index / 10
+                profile.add_bar(
+                    "R1",
+                    generation,
+                    BarRecord(index * 100 + offset, price, price, price, price, 1.0, 1),
+                )
+        result = profile.finalize("R1", generation, 1000)
+
+    assert result["tpo_total"] == 30
+    assert result["va_count"] == 21
+    assert result["gap_mask"] == "2|0"
+    assert result["gap_span"] == pytest.approx(0.3)
+
+
+def test_tpo_duplicate_start_is_rejected(tmp_path: Path) -> None:
+    """A repeated causal start cannot replace an existing profile generation."""
+    with Exp100StateStore(tmp_path / "state.sqlite") as store:
+        profile = TPOProfileStore(store)
+        first = profile.start("R1", 1, excursion_price=100.0, atr_unit=1.0)
+        with pytest.raises(ValueError, match="already exists"):
+            profile.start("R1", 2, excursion_price=101.0, atr_unit=1.0)
+
+        assert store.current_profile_generation("R1") == first
+
+
+def test_tpo_uses_exact_decimal_boundaries_for_negative_prices(tmp_path: Path) -> None:
+    """Exact positive and negative boundaries map to their mathematical bins."""
+    with Exp100StateStore(tmp_path / "state.sqlite") as store:
+        profile = TPOProfileStore(store)
+        generation = profile.start("R1", 1, excursion_price=0.0, atr_unit=1.0)
+        profile.add_bar("R1", generation, BarRecord(2, 0.3, 0.3, 0.3, 0.3, 1.0, 1))
+        profile.add_bar("R1", generation, BarRecord(3, -0.1, -0.1, -0.1, -0.1, 1.0, 1))
+
+        assert list(store.iter_profile_bins("R1", generation)) == [(-1, 1), (3, 1)]
+
+
+def test_tpo_one_bin_gap_is_explicitly_undefined(tmp_path: Path) -> None:
+    """A one-bin value area cannot produce a meaningful gap/tightness label."""
+    with Exp100StateStore(tmp_path / "state.sqlite") as store:
+        profile = TPOProfileStore(store)
+        generation = profile.start("R1", 1, excursion_price=100.0, atr_unit=1.0)
+        profile.add_bar("R1", generation, BarRecord(2, 100.0, 100.0, 100.0, 100.0, 1.0, 1))
+        result = profile.finalize("R1", generation, 3)
+
+    assert result["profile_status"] == "UNDEFINED"
+    assert result["undefined_reason"] == "GAP_UNDEFINED"
+    assert result["tight_gap"] is False
