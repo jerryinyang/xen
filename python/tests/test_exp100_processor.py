@@ -57,6 +57,7 @@ def make_processor(
     tmp_path: Path,
     *,
     observation_minutes: int = OBSERVATION_MINUTES,
+    confirmation_method: str = "BREAKOUT_BAR",
     memory_guard: MemoryGuard | None = None,
     sinks: Exp100Sinks | None = None,
 ) -> tuple[Exp100Processor, Exp100Sinks]:
@@ -65,7 +66,7 @@ def make_processor(
         archive_symbol="BTCUSDT",
         instrument_id="BTCUSDT-LINEAR.BYBIT",
         observation_minutes=observation_minutes,
-        confirmation_method="BREAKOUT_BAR",
+        confirmation_method=confirmation_method,
         confirmation_reference="1H" if observation_minutes in {15, 30} else "1D",
         level_config="PREVIOUS_1H",
     )
@@ -316,6 +317,137 @@ def test_processor_retains_repeated_raids_after_a_return(tmp_path: Path) -> None
         high=101.0,
         low=100.5,
         close=100.8,
+    )
+    processor.finish(last_ts)
+
+    assert [row["prior_raid_count"] for row in sinks.raids.rows] == [0, 1]
+
+
+def test_reference_selects_older_expected_raid_when_newer_price_is_unresolvable(
+    tmp_path: Path,
+) -> None:
+    """Selecting before event predicates lets an unresolvable newer raid block confirmation."""
+    processor, _ = make_processor(tmp_path, confirmation_method="LEVEL_CLOSE")
+    for raid_id, price, sweep_ts_ns in (("R1", 100.0, 10), ("R2", 90.0, 20)):
+        processor.state.insert_raid(
+            {
+                "raid_id": raid_id,
+                "level_id": raid_id,
+                "event_identity": raid_id,
+                "side": "HIGH",
+                "level_price": price,
+                "sweep_ts_ns": sweep_ts_ns,
+                "return_ts_ns": sweep_ts_ns + 1,
+                "confirmation_ts_ns": None,
+                "max_price": price + 1.0,
+                "profile_generation": None,
+                "profile_finalized": False,
+                "active": 1,
+            }
+        )
+    processor._previous_reference = BarRecord(60, 100.0, 101.0, 99.0, 100.0, 1.0, 1)
+    processor._on_reference_bar(BarRecord(120, 95.0, 95.0, 90.0, 90.0, 1.0, 1))
+
+    rows = {row["raid_id"]: row for row in processor.state.iter_active_raids()}
+    assert rows["R1"]["confirmation_ts_ns"] == 120
+    assert rows["R2"]["confirmation_ts_ns"] is None
+
+
+def test_reference_selects_older_endpoint_when_newer_price_is_unresolvable(
+    tmp_path: Path,
+) -> None:
+    """Endpoint selection must also filter by the current opposing event first."""
+    processor, sinks = make_processor(tmp_path, confirmation_method="LEVEL_CLOSE")
+    for raid_id, price, sweep_ts_ns in (("R1", 100.0, 10), ("R2", 110.0, 20)):
+        processor.state.insert_raid(
+            {
+                "raid_id": raid_id,
+                "level_id": raid_id,
+                "event_identity": raid_id,
+                "side": "HIGH",
+                "level_price": price,
+                "sweep_ts_ns": sweep_ts_ns,
+                "return_ts_ns": sweep_ts_ns + 1,
+                "confirmation_ts_ns": 50,
+                "primary_attribution": True,
+                "max_price": price + 1.0,
+                "profile_generation": None,
+                "profile_finalized": True,
+                "active": 1,
+            }
+        )
+    processor._previous_reference = BarRecord(120, 99.0, 100.0, 98.0, 99.0, 1.0, 1)
+    processor._on_reference_bar(BarRecord(180, 105.0, 106.0, 104.0, 105.0, 1.0, 1))
+
+    assert sinks.raids.rows[0]["raid_id"] == "R1"
+    assert sinks.raids.rows[0]["status"] == "COMPLETED"
+    assert next(processor.state.iter_active_raids())["raid_id"] == "R2"
+
+
+def test_mixed_side_reference_processes_expected_and_opposing_candidates_independently(
+    tmp_path: Path,
+) -> None:
+    """A newer opposite-side failure must not prevent the older expected confirmation."""
+    processor, sinks = make_processor(tmp_path)
+    for raid_id, side, sweep_ts_ns in (("R1", "HIGH", 10), ("R2", "LOW", 20)):
+        processor.state.insert_raid(
+            {
+                "raid_id": raid_id,
+                "level_id": raid_id,
+                "event_identity": raid_id,
+                "side": side,
+                "level_price": 100.0,
+                "sweep_ts_ns": sweep_ts_ns,
+                "return_ts_ns": sweep_ts_ns + 1,
+                "confirmation_ts_ns": None,
+                "max_price": 101.0 if side == "HIGH" else 99.0,
+                "profile_generation": None,
+                "profile_finalized": False,
+                "active": 1,
+            }
+        )
+    processor._previous_reference = BarRecord(60, 100.0, 101.0, 100.0, 100.5, 1.0, 1)
+    processor._on_reference_bar(BarRecord(120, 100.0, 100.0, 99.0, 99.5, 1.0, 1))
+
+    assert next(processor.state.iter_active_raids())["raid_id"] == "R1"
+    assert next(processor.state.iter_active_raids())["confirmation_ts_ns"] == 120
+    assert sinks.raids.rows[0]["raid_id"] == "R2"
+    assert sinks.raids.rows[0]["status"] == "FAILED_BREAKOUT"
+
+
+@pytest.mark.parametrize(
+    ("side", "first", "returned", "recross"),
+    [
+        (
+            "HIGH",
+            {"open": 100.8, "high": 101.0, "low": 100.5, "close": 100.8},
+            {"open": 100.8, "high": 101.0, "low": 100.0, "close": 100.2},
+            {"open": 100.8, "high": 101.0, "low": 100.5, "close": 100.8},
+        ),
+        (
+            "LOW",
+            {"open": 99.2, "high": 99.5, "low": 99.0, "close": 99.2},
+            {"open": 99.2, "high": 100.0, "low": 99.0, "close": 99.8},
+            {"open": 99.2, "high": 99.5, "low": 99.0, "close": 99.2},
+        ),
+    ],
+)
+def test_returning_while_still_beyond_rearms_level_for_next_crossing(
+    tmp_path: Path,
+    side: str,
+    first: dict[str, float],
+    returned: dict[str, float],
+    recross: dict[str, float],
+) -> None:
+    """A return bar may still be beyond; the following crossing must become a new raid."""
+    processor, sinks = make_processor(tmp_path)
+    processor.seed_level("L1", price=100.0, side=side)
+    feed_complete_observation_window(processor, start_ts_ns=0, **first)
+    feed_complete_observation_window(
+        processor, start_ts_ns=OBSERVATION_MINUTES * MINUTE_NS, **returned
+    )
+    last_ts = feed_complete_observation_window(
+        processor, start_ts_ns=2 * OBSERVATION_MINUTES * MINUTE_NS, **recross
     )
     processor.finish(last_ts)
 

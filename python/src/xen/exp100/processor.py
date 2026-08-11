@@ -199,14 +199,15 @@ class Exp100Processor:
             level_id = str(level["level_id"])
             price = float(level["price"])
             side = str(level["side"])
-            beyond = bar.high > price if side == "HIGH" else bar.low < price
+            current_beyond = bar.high > price if side == "HIGH" else bar.low < price
+            returned = bar.low <= price if side == "HIGH" else bar.high >= price
+            beyond = current_beyond and not returned
             previous_beyond = bool(level.get("beyond", False))
             self.state.update_level(
                 level_id, {"beyond": beyond, "last_observation_ts_ns": bar.ts_event_ns}
             )
-            if not beyond or previous_beyond:
+            if not current_beyond or previous_beyond:
                 continue
-            returned = bar.low <= price if side == "HIGH" else bar.high >= price
             if returned:
                 raid = self._new_raid(level, bar, source_window, atr_before, regime_before, True)
                 self._terminal_raid(raid, "AMBIGUOUS_INTRABAR", bar.ts_event_ns)
@@ -312,38 +313,45 @@ class Exp100Processor:
         self._previous_reference = bar
         if previous is None:
             return
-        unconfirmed = self._latest_active_raid(
+        expected = self._latest_active_raid(
             lambda raid: raid["confirmation_ts_ns"] is None
             and raid["return_ts_ns"] is not None
             and bar.ts_event_ns > int(raid["sweep_ts_ns"])
+            and self._is_expected_reference_event(
+                str(raid["side"]), float(raid["level_price"]), previous, bar
+            )
         )
-        if unconfirmed is not None:
-            side = str(unconfirmed["side"])
-            price = float(unconfirmed["level_price"])
-            if self._is_expected_reference_event(side, price, previous, bar):
-                updates = {
-                    "confirmation_ts_ns": bar.ts_event_ns,
-                    "confirmation_method": self.config.confirmation_method,
-                    "confirmation_reference": self.config.confirmation_reference,
-                    "confirmation_atr": self._atr.value,
-                    "confirmation_regime": self._last_regime,
-                    "primary_attribution": True,
-                }
-                self.state.update_raid(str(unconfirmed["raid_id"]), updates)
-                self._finalize_profile({**unconfirmed, **updates}, bar.ts_event_ns, "CONFIRMED")
-                return
-            if self._is_opposing_reference_event(side, price, previous, bar):
-                self._terminal_raid(unconfirmed, "FAILED_BREAKOUT", bar.ts_event_ns)
-                return
-        confirmed = self._latest_active_raid(
+        opposing_unconfirmed = self._latest_active_raid(
+            lambda raid: raid["confirmation_ts_ns"] is None
+            and raid["return_ts_ns"] is not None
+            and bar.ts_event_ns > int(raid["sweep_ts_ns"])
+            and self._is_opposing_reference_event(
+                str(raid["side"]), float(raid["level_price"]), previous, bar
+            )
+        )
+        endpoint = self._latest_active_raid(
             lambda raid: raid["confirmation_ts_ns"] is not None
             and bool(raid.get("primary_attribution", False))
             and bar.ts_event_ns > int(raid["confirmation_ts_ns"])
+            and self._is_opposing_reference_event(
+                str(raid["side"]), float(raid["level_price"]), previous, bar
+            )
         )
-        if confirmed is not None and self._is_opposing_reference_event(
-            str(confirmed["side"]), float(confirmed["level_price"]), previous, bar
-        ):
-            self._terminal_raid(confirmed, "COMPLETED", bar.ts_event_ns)
+        if expected is not None:
+            updates = {
+                "confirmation_ts_ns": bar.ts_event_ns,
+                "confirmation_method": self.config.confirmation_method,
+                "confirmation_reference": self.config.confirmation_reference,
+                "confirmation_atr": self._atr.value,
+                "confirmation_regime": self._last_regime,
+                "primary_attribution": True,
+            }
+            self.state.update_raid(str(expected["raid_id"]), updates)
+            self._finalize_profile({**expected, **updates}, bar.ts_event_ns, "CONFIRMED")
+        if opposing_unconfirmed is not None:
+            self._terminal_raid(opposing_unconfirmed, "FAILED_BREAKOUT", bar.ts_event_ns)
+        if endpoint is not None:
+            self._terminal_raid(endpoint, "COMPLETED", bar.ts_event_ns)
 
     def _latest_active_raid(
         self, eligible: Callable[[dict[str, Any]], bool]
