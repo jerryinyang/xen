@@ -2,8 +2,13 @@
 
 ## Current checkpoint status
 
-**No checkpoint is open. No family is registered.** Chapter 06 begins on a clean slate after the
-chapter-05 rollover (2026-08-07).
+**Checkpoint 019 is open.** `CF-LIQSWP-001` is registered with five TRAIN-only
+experiment designs. No experiment has run; fresh-context QA and operator execution
+approval are still required.
+
+| Checkpoint | Family | Status | Design |
+|---|---|---|---|
+| `2026-08-11-019-liquidity-sweeps` | `CF-LIQSWP-001` | OPEN — design complete, QA pending | [`design.md`](checkpoints/2026-08-11-019-liquidity-sweeps/design.md) |
 
 Read `docs/knowledge-base/INDEX.md` before designing anything.
 

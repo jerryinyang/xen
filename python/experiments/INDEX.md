@@ -1,7 +1,7 @@
 # Chapter 06 Experiment Index
 
-No experiments yet. Chapter 06 opens on a clean slate: **no family is registered** and no
-checkpoint is open.
+Chapter 06 currently has one registered family and one open checkpoint. The five
+liquidity-sweep experiments below have designs only; none has run.
 
 Before designing anything, read `docs/knowledge-base/INDEX.md` — in particular
 `lessons-and-amendments.md` (mechanisms, not just symptoms) and `pitfalls-ledger.md` (do not
@@ -17,12 +17,17 @@ re-run these).
 
 | ID | Family | Status | Purpose |
 |---|---|---|---|
+| EXP-100 | CF-LIQSWP-001 | DESIGN COMPLETE — QA pending | Streaming level/raid/confirmation apparatus and coverage validity |
+| EXP-101 | CF-LIQSWP-001 | DESIGN COMPLETE — QA pending | Level significance versus later swing outcomes |
+| EXP-102 | CF-LIQSWP-001 | DESIGN COMPLETE — QA pending | Repeated raids and prior-raid count |
+| EXP-103 | CF-LIQSWP-001 | DESIGN COMPLETE — QA pending | TPO value gap and tight-gap conditioning |
+| EXP-104 | CF-LIQSWP-001 | DESIGN COMPLETE — QA pending | Volatility-regime conditioning |
 
 ## Carried in from Chapter 05
 
-- **No open family.** `CF-VOLDIR-001` was retired 2026-08-07 as *characterised, not tradable*;
-  `CF-VOLCONV-001` is closed. Prior chapters' families are all closed or retired — see
-  `docs/knowledge-base/families-explored.md`.
+- **No additional family carried in from Chapter 05.** `CF-VOLDIR-001` was retired 2026-08-07
+  as *characterised, not tradable*; `CF-VOLCONV-001` is closed. Prior chapters' families are
+  all closed or retired — see `docs/knowledge-base/families-explored.md`.
 - **Do not open a family whose thesis is that a better exit, hold, trail or size rule converts a
   break-even joint into a positive one.** That class is refuted at power (chapter-05 §"What
   Chapter 05 changed about the frame"). `W/L` is ~97% the arithmetic mirror of `p`.

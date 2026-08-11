@@ -1706,3 +1706,39 @@ An amendment is required before measurement if any of these change:
   characterization experiment is complete.
 
 Amendments must state whether the changed item consumes a new multiplicity slot.
+
+## Chapter 06 — CF-LIQSWP-001 (registered 2026-08-11)
+
+**Checkpoint:** `2026-08-11-019-liquidity-sweeps`
+**Source of truth:** `docs/experiments-docs/checkpoints/2026-08-11-019-liquidity-sweeps/liquidity.md`
+**Route:** `EXP-100` apparatus → `EXP-101` significance → `EXP-102` repeated raids →
+`EXP-103` value gap → `EXP-104` volatility regime. TRAIN only; 0 counted TEST reads;
+holdouts sealed; Bybit and cTrader reported separately.
+
+| ID | Experiment | Registered question | Candidate slot | Status |
+|---|---|---|---:|---|
+| `CF-LIQSWP-001/HYP-000` | EXP-100 | Does the streaming state machine preserve causal level, raid, confirmation, breakout, TPO, and later-outcome identity? | 0 | DESIGN COMPLETE; QA pending |
+| `CF-LIQSWP-001/HYP-001` | EXP-101 | Do level-family/configuration significance strata differ in later swing outcomes? | 0 | DESIGN COMPLETE; QA pending |
+| `CF-LIQSWP-001/HYP-002` | EXP-102 | Does previous completed raid count change later swing outcomes? | 0 | DESIGN COMPLETE; QA pending |
+| `CF-LIQSWP-001/HYP-003` | EXP-103 | Are defined tight value gaps associated with different later outcomes? | 0 | DESIGN COMPLETE; QA pending |
+| `CF-LIQSWP-001/HYP-004` | EXP-104 | Does causal volatility regime describe raid frequency and outcome quality? | 0 | DESIGN COMPLETE; QA pending |
+| `CF-LIQSWP-001/HYP-005` | deferred | Are breakout-causing levels uniquely significant? | 0 | DEFERRED; operator-gated |
+
+**AMENDMENT-L1 (withdrawn during revision):** the proposed exclusion of 1W levels was not
+operator-approved. Family A retains the full SoT level catalogue; no scope slot is consumed.
+
+**AMENDMENT-L2:** use 1H confirmation references for 15m/30m and 1D references for 1h —
+**DIRECTION: TIGHTER**. Running count: **0L / 1T / 0N**.
+
+**AMENDMENT-L3:** retain 1-minute Nautilus input for granular fill simulation and reuse the
+established aggregation convention — **DIRECTION: NEUTRAL**. Running count: **0L / 1T / 1N**.
+
+**AMENDMENT-L4:** normalise distances and profile widths with causal same-asset,
+same-observation-timeframe Wilder ATR(14) — **DIRECTION: NEUTRAL**. Running count: **0L / 1T / 2N**.
+
+**AMENDMENT-L5:** add the SoT tight-gap condition `gap_span < 0.30*(VAH-VAL)` to HYP-003 —
+**DIRECTION: NEUTRAL**. Running count: **0L / 1T / 3N**.
+
+No result-producing code or run has occurred. The value-gap arm must pass TPO conservation,
+70% VA, 30% VA-mass, strict tightness-boundary, reset, causality, and deterministic replay
+checks before an execution gate can open.

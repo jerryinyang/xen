@@ -1,0 +1,49 @@
+{
+  "schema": "xen-universe-pin/v1",
+  "family": "CF-LIQSWP-001",
+  "checkpoint": "2026-08-11-019-liquidity-sweeps",
+  "ranking_metric": "sum(close*volume) over 1m bars",
+  "pool": "894 admitted Bybit USDT linear perpetual symbols",
+  "band": "TRAIN",
+  "window_start_inclusive": "2023-11-18T00:00:00+00:00",
+  "asof_exclusive": "2023-12-18T00:00:00+00:00",
+  "top_n": 10,
+  "source_pin": "docs/signal-registry/candidate-families/cf-voldir-001-universe.json",
+  "source_pin_note": "The source pin is the existing full-catalog 30-day recomputation; all source top-25 symbols, including this top-10 slice, are in the admitted ledger.",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "AVAXUSDT",
+    "ORDIUSDT",
+    "1000BONKUSDT",
+    "TIAUSDT",
+    "DOGEUSDT",
+    "XRPUSDT",
+    "LINKUSDT"
+  ],
+  "dollar_volume": {
+    "BTCUSDT": 156502751495.2917,
+    "ETHUSDT": 49204246503.4652,
+    "SOLUSDT": 25350861979.499,
+    "AVAXUSDT": 8764004241.8415,
+    "ORDIUSDT": 8037342400.12723,
+    "1000BONKUSDT": 7927673349.0767,
+    "TIAUSDT": 7067070596.87876,
+    "DOGEUSDT": 5849197825.41456,
+    "XRPUSDT": 5839633099.2994,
+    "LINKUSDT": 4491482525.0686
+  },
+  "window_bar_count": {
+    "BTCUSDT": 43201,
+    "ETHUSDT": 43201,
+    "SOLUSDT": 43201,
+    "AVAXUSDT": 43199,
+    "ORDIUSDT": 43201,
+    "1000BONKUSDT": 43201,
+    "TIAUSDT": 41760,
+    "DOGEUSDT": 43193,
+    "XRPUSDT": 43200,
+    "LINKUSDT": 43198
+  }
+}
