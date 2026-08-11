@@ -38,6 +38,7 @@ from xen.nautilus.emission import (
 from xen.nautilus.streaming import MemoryBudgetExceeded
 
 from xen.exp100 import Exp100CellConfig
+from xen.exp100.control import destroy_post_confirmation
 from xen.exp100.strategy import (
     DEFAULT_MEMORY_SAMPLE_EVERY,
     DEFAULT_WRITER_MAX_BYTES,
@@ -46,6 +47,7 @@ from xen.exp100.strategy import (
 
 DEFAULT_CHUNK_SIZE = 50_000
 DEFAULT_RSS_LIMIT_BYTES = 1_610_612_736
+DEFAULT_DESTROY_SEED = 17
 _PARQUET_STREAMS = ("bar_marks", "levels", "raids", "tpo_profiles")
 _CELL_NODE_CREATED = False
 
@@ -242,6 +244,8 @@ def run_cell(
     end_time: datetime,
     chunk_size: int = DEFAULT_CHUNK_SIZE,
     rss_limit_bytes: int = DEFAULT_RSS_LIMIT_BYTES,
+    destroy_control: bool = False,
+    destroy_seed: int = DEFAULT_DESTROY_SEED,
 ) -> Path:
     """Run and atomically publish exactly one EXP-100 TRAIN cell.
 
@@ -354,6 +358,27 @@ def run_cell(
         )
         for name in ("levels", "raids", "tpo_profiles"):
             _copy_file(work_dir / f"{name}.parquet", publish_stage / f"{name}.parquet")
+        if destroy_control:
+            control_report = destroy_post_confirmation(
+                publish_stage / "raids.parquet",
+                publish_stage / "raids_destroyed.parquet",
+                group_columns=("archive_symbol", "timeframe", "config"),
+                value_columns=("swing_atr", "duration_ns"),
+                seed=destroy_seed,
+            )
+            metadata_path = publish_stage / "run_metadata.json"
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            metadata["destroy_control"] = {
+                "path": "raids_destroyed.parquet",
+                "seed": int(destroy_seed),
+                "group_columns": ["archive_symbol", "timeframe", "config"],
+                "value_columns": ["swing_atr", "duration_ns"],
+                **control_report,
+            }
+            metadata_path.write_text(
+                json.dumps(metadata, indent=2, sort_keys=True, default=str) + "\n",
+                encoding="utf-8",
+            )
         os.replace(publish_stage, run_dir)
         shutil.rmtree(work_dir, ignore_errors=True)
         return run_dir
@@ -394,7 +419,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--destroy-control",
         action="store_true",
-        help="reserved for Task 5; no control is run by the Task 4 apparatus",
+        help="emit the isolated deterministic future-destroy control",
     )
     return parser
 
@@ -402,8 +427,6 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     """Parse one-cell CLI arguments and return a process exit code."""
     args = _parser().parse_args(argv)
-    if args.destroy_control:
-        raise SystemExit("--destroy-control is reserved for Task 5")
     cell = Exp100CellConfig(
         venue=args.venue,
         archive_symbol=args.archive_symbol,
@@ -421,6 +444,7 @@ def main(argv: list[str] | None = None) -> int:
         end_time=_parse_datetime(args.end),
         chunk_size=args.chunk_size,
         rss_limit_bytes=args.rss_limit_bytes,
+        destroy_control=args.destroy_control,
     )
     print(published)
     return 0

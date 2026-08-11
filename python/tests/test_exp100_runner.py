@@ -70,7 +70,11 @@ def output_hashes(run_dir: Path) -> dict[str, str]:
 
 
 def run_synthetic_cell(
-    root: Path, *, chunk_size: int, rss_limit_bytes: int = 10_000_000_000
+    root: Path,
+    *,
+    chunk_size: int,
+    rss_limit_bytes: int = 10_000_000_000,
+    destroy_control: bool = False,
 ) -> Path:
     catalog_path = root / "catalog"
     run_dir = root / "run"
@@ -106,6 +110,8 @@ def run_synthetic_cell(
         "--rss-limit-bytes",
         str(rss_limit_bytes),
     ]
+    if destroy_control:
+        command.append("--destroy-control")
     result = subprocess.run(command, capture_output=True, text=True, check=False)
     assert result.returncode == 0, f"stdout={result.stdout}\nstderr={result.stderr}"
     return run_dir
@@ -196,3 +202,13 @@ def test_memory_abort_leaves_marker_and_does_not_publish(tmp_path: Path) -> None
     marker = json.loads(markers[0].read_text(encoding="utf-8"))
     assert marker["limit_bytes"] == 1
     assert marker["last_timestamp"] == dt_to_unix_nanos(START)
+
+
+def test_destroy_control_is_separate_and_recorded(tmp_path: Path) -> None:
+    run_dir = run_synthetic_cell(tmp_path / "destroy", chunk_size=128, destroy_control=True)
+
+    assert (run_dir / "raids.parquet").exists()
+    assert (run_dir / "raids_destroyed.parquet").exists()
+    metadata = json.loads((run_dir / "run_metadata.json").read_text(encoding="utf-8"))
+    assert metadata["destroy_control"]["path"] == "raids_destroyed.parquet"
+    assert metadata["destroy_control"]["fixed_points"] == 0

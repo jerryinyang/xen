@@ -372,6 +372,14 @@ class Exp100Processor:
         if not current.get("profile_finalized", False):
             self._finalize_profile(current, endpoint_ts_ns, status)
             current["profile_finalized"] = True
+        confirmation_ts_ns = current.get("confirmation_ts_ns")
+        raid_atr = current.get("raid_atr")
+        swing_atr = None
+        if isinstance(raid_atr, (int, float)) and math.isfinite(float(raid_atr)) and float(raid_atr) > 0.0:
+            swing_atr = float(current["max_excursion"]) / float(raid_atr)
+        duration_ns = None
+        if confirmation_ts_ns is not None:
+            duration_ns = endpoint_ts_ns - int(confirmation_ts_ns)
         current.update(
             {
                 "active": False,
@@ -381,6 +389,11 @@ class Exp100Processor:
                 "censor_ts_ns": endpoint_ts_ns if status.startswith("RIGHT_CENSORED_") else None,
                 "endpoint_atr": self._atr.value,
                 "endpoint_regime": self._last_regime,
+                "archive_symbol": self.config.archive_symbol,
+                "timeframe": f"{self.config.observation_minutes}m",
+                "config": self.config.level_config,
+                "swing_atr": swing_atr,
+                "duration_ns": duration_ns,
             }
         )
         self.sinks.raids.append(current)

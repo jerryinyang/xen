@@ -167,6 +167,9 @@ def _raid_schema() -> pa.Schema:
             ("level_id", pa.string()),
             ("event_identity", pa.string()),
             ("source_configuration", pa.string()),
+            ("archive_symbol", pa.string()),
+            ("timeframe", pa.string()),
+            ("config", pa.string()),
             ("side", pa.string()),
             ("level_price", pa.float64()),
             ("level_creation_ts_ns", pa.int64()),
@@ -197,6 +200,8 @@ def _raid_schema() -> pa.Schema:
             ("active", pa.bool_()),
             ("status", pa.string()),
             ("primary_completed", pa.bool_()),
+            ("swing_atr", pa.float64()),
+            ("duration_ns", pa.int64()),
         ]
     )
 

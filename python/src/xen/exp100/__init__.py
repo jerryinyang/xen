@@ -1,6 +1,7 @@
 """Causal, bounded-memory state primitives for EXP-100."""
 
 from .config import Exp100CellConfig
+from .control import destroy_post_confirmation
 from .features import CausalVolatilityRegime, CausalWilderATR, StreamingOHLC
 from .processor import Exp100Processor, Exp100Sinks
 from .state_store import Exp100StateStore
@@ -12,6 +13,7 @@ __all__ = [
     "CausalVolatilityRegime",
     "CausalWilderATR",
     "Exp100CellConfig",
+    "destroy_post_confirmation",
     "Exp100Processor",
     "Exp100Sinks",
     "Exp100StateStore",
