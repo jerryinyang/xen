@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from xen.exp100.state_store import Exp100StateStore
 
 
@@ -37,5 +39,39 @@ def test_profile_generation_replaces_active_bins_without_python_history(tmp_path
 
         assert list(store.iter_profile_bins("R1", first)) == []
         assert list(store.iter_profile_bins("R1", second)) == [(3, 4)]
+    finally:
+        store.close()
+
+
+def test_state_store_rejects_level_identity_changes(tmp_path: Path) -> None:
+    store = Exp100StateStore(tmp_path / "state.sqlite")
+    try:
+        store.insert_level({"level_id": "L1", "price": 100.0, "active": 1})
+        with pytest.raises(ValueError, match="immutable"):
+            store.update_level("L1", {"level_id": "L2"})
+        assert next(store.iter_active_levels())["level_id"] == "L1"
+    finally:
+        store.close()
+
+
+def test_state_store_rejects_raid_and_level_identity_changes(tmp_path: Path) -> None:
+    store = Exp100StateStore(tmp_path / "state.sqlite")
+    try:
+        store.insert_raid({"raid_id": "R1", "level_id": "L1", "active": 1})
+        with pytest.raises(ValueError, match="immutable"):
+            store.update_raid("R1", {"raid_id": "R2"})
+        with pytest.raises(ValueError, match="immutable"):
+            store.update_raid("R1", {"level_id": "L2"})
+        assert next(store.iter_active_raids())["raid_id"] == "R1"
+        assert next(store.iter_active_raids())["level_id"] == "L1"
+    finally:
+        store.close()
+
+
+def test_state_store_rejects_textual_active_flag(tmp_path: Path) -> None:
+    store = Exp100StateStore(tmp_path / "state.sqlite")
+    try:
+        with pytest.raises(ValueError, match="active"):
+            store.insert_level({"level_id": "L0", "active": "0"})
     finally:
         store.close()

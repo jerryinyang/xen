@@ -94,7 +94,12 @@ class Exp100StateStore:
         if not isinstance(identifier, str) or not identifier:
             raise ValueError("state rows require a non-empty level_id or raid_id")
         active_value = data.get("active", 1)
-        active = int(bool(active_value))
+        if isinstance(active_value, bool):
+            active = int(active_value)
+        elif isinstance(active_value, int) and active_value in {0, 1}:
+            active = active_value
+        else:
+            raise ValueError("active must be a bool or integer 0/1")
         event_identity = data.get("event_identity")
         if event_identity is not None and not isinstance(event_identity, str):
             event_identity = str(event_identity)
@@ -136,6 +141,8 @@ class Exp100StateStore:
         self._connection.commit()
 
     def update_level(self, level_id: str, fields: Mapping[str, Any]) -> None:
+        if "level_id" in fields:
+            raise ValueError("level_id is immutable")
         self._update_state("levels", "level_id", level_id, fields)
 
     def delete_level(self, level_id: str) -> None:
@@ -180,6 +187,10 @@ class Exp100StateStore:
         self._connection.commit()
 
     def update_raid(self, raid_id: str, fields: Mapping[str, Any]) -> None:
+        if "raid_id" in fields:
+            raise ValueError("raid_id is immutable")
+        if "level_id" in fields:
+            raise ValueError("raid level_id is immutable")
         self._update_state("raids", "raid_id", raid_id, fields)
 
     def delete_raid(self, raid_id: str) -> None:

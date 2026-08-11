@@ -19,55 +19,44 @@ class StreamingOHLC:
         self.period_minutes = period_minutes
         self._bucket_key: int | None = None
         self._last_minute: int | None = None
+        self._bar_count = 0
         self._source_bars = 0
         self._open = 0.0
         self._high = 0.0
         self._low = 0.0
         self._close = 0.0
         self._volume = 0.0
-        self._synthetic_clock = False
 
     def update(self, one_minute_bar: BarRecord) -> BarRecord | None:
         minute = self._minute_index(one_minute_bar.ts_event_ns)
         bucket = minute // self.period_minutes
         if self._bucket_key is None:
-            self._synthetic_clock = abs(one_minute_bar.ts_event_ns) < MINUTE_NS
             self._bucket_key = bucket
             self._last_minute = minute
             self._start(one_minute_bar)
-            return None
+            return self._finish(one_minute_bar.ts_event_ns) if self.period_minutes == 1 else None
 
         expected_minute = (self._last_minute or 0) + 1
-        if minute != expected_minute or (not self._synthetic_clock and bucket != self._bucket_key):
+        if minute != expected_minute or bucket != self._bucket_key:
             self._reset()
             self._bucket_key = bucket
             self._last_minute = minute
             self._start(one_minute_bar)
-            return None
+            return self._finish(one_minute_bar.ts_event_ns) if self.period_minutes == 1 else None
 
         self._last_minute = minute
-        if self._synthetic_clock:
-            bucket = self._bucket_key
-        elif bucket != self._bucket_key:
-            completed = self._finish(one_minute_bar.ts_event_ns)
-            self._bucket_key = bucket
-            self._start(one_minute_bar)
-            self._last_minute = minute
-            return completed
-
         self._high = max(self._high, one_minute_bar.high)
         self._low = min(self._low, one_minute_bar.low)
         self._close = one_minute_bar.close
         self._volume += one_minute_bar.volume
+        self._bar_count += 1
         self._source_bars += one_minute_bar.source_bars
-        if self._source_bars == self.period_minutes:
+        if self._bar_count == self.period_minutes:
             return self._finish(one_minute_bar.ts_event_ns)
         return None
 
     @staticmethod
     def _minute_index(ts_event_ns: int) -> int:
-        if abs(ts_event_ns) < MINUTE_NS:
-            return ts_event_ns
         return ts_event_ns // MINUTE_NS
 
     def _start(self, bar: BarRecord) -> None:
@@ -76,6 +65,7 @@ class StreamingOHLC:
         self._low = bar.low
         self._close = bar.close
         self._volume = bar.volume
+        self._bar_count = 1
         self._source_bars = bar.source_bars
 
     def _finish(self, ts_event_ns: int) -> BarRecord:
@@ -94,6 +84,7 @@ class StreamingOHLC:
     def _reset(self) -> None:
         self._bucket_key = None
         self._last_minute = None
+        self._bar_count = 0
         self._source_bars = 0
 
 
@@ -148,8 +139,8 @@ class CausalVolatilityRegime:
     HIGH = "HIGH"
 
     def __init__(self, window: int = 252) -> None:
-        if window <= 0:
-            raise ValueError("window must be positive")
+        if not 1 <= window <= 252:
+            raise ValueError("window must be in 1..252")
         self.window = window
         self._values: deque[float] = deque(maxlen=window)
 
