@@ -28,6 +28,7 @@ from xen.nautilus.streaming import (
     MemoryBudgetExceeded,
     MemoryGuard,
     MemorySample,
+    OversizedRowError,
 )
 from xen.nautilus.adjudication_shim import (
     emission_to_adjudication_frames,
@@ -60,6 +61,7 @@ __all__ = [
     "MemoryBudgetExceeded",
     "MemoryGuard",
     "MemorySample",
+    "OversizedRowError",
     "emission_to_adjudication_frames",
     "adjudicate_emission",
     "SelectionRule",

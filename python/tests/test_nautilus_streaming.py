@@ -19,6 +19,7 @@ from xen.nautilus.streaming import (
     BoundedParquetWriter,
     MemoryBudgetExceeded,
     MemoryGuard,
+    OversizedRowError,
 )
 
 
@@ -43,6 +44,58 @@ def test_memory_guard_raises_before_partial_publication(monkeypatch: pytest.Monk
     guard = MemoryGuard(limit_bytes=100, sample_every=1)
     with pytest.raises(MemoryBudgetExceeded, match="RSS limit"):
         guard.observe(10, pending_rows=0, open_levels=1, open_raids=0, state_bytes=20)
+
+
+def test_parquet_writer_rejects_oversized_row_before_retaining_it(tmp_path: Path) -> None:
+    writer = BoundedParquetWriter(
+        tmp_path / "rows.parquet", pa.schema([("value", pa.string())]), max_bytes=32
+    )
+    with pytest.raises(OversizedRowError):
+        writer.append({"value": "x" * 1_000})
+    assert writer.pending_rows == 0
+    assert writer.rows_written == 0
+    writer.close()
+    assert (tmp_path / "rows.parquet").exists()
+
+
+def test_parquet_write_error_keeps_only_temp_and_incomplete_marker(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    writer = BoundedParquetWriter(
+        tmp_path / "rows.parquet", pa.schema([("i", pa.int64())]), max_rows=1
+    )
+    writer.append({"i": 1})
+    writer.flush()
+    assert writer._writer is not None
+    monkeypatch.setattr(writer._writer, "close", lambda: (_ for _ in ()).throw(OSError("close boom")))
+    with pytest.raises(OSError, match="close boom"):
+        writer.close()
+    assert not (tmp_path / "rows.parquet").exists()
+    assert writer.temp_path.exists()
+    marker = tmp_path / "rows.parquet.incomplete.json"
+    assert marker.exists()
+    assert json.loads(marker.read_text())["error"]
+
+
+def test_memory_guard_writes_required_abort_marker(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("xen.nautilus.streaming.rss_bytes", lambda: 101)
+    marker_base = tmp_path / "cell-output.parquet"
+    guard = MemoryGuard(
+        limit_bytes=100,
+        sample_every=1,
+        incomplete_path=marker_base,
+        cell_identity={"cell": "synthetic"},
+        last_timestamp="2024-01-01T00:00:00Z",
+    )
+    with pytest.raises(MemoryBudgetExceeded):
+        guard.observe(10, pending_rows=0, open_levels=1, open_raids=0, state_bytes=20)
+    marker = json.loads((tmp_path / "cell-output.parquet.incomplete.json").read_text())
+    assert marker["cell_identity"] == {"cell": "synthetic"}
+    assert marker["last_timestamp"] == "2024-01-01T00:00:00Z"
+    assert marker["limit_bytes"] == 100
+    assert marker["peak_rss_bytes"] == 101
 
 
 def test_jsonl_writer_is_compact_and_sorted(tmp_path: Path) -> None:
@@ -76,7 +129,7 @@ def test_path_finalizer_copies_tables_and_uses_supplied_counts(tmp_path: Path) -
         positions_ledger=source_dir / "positions.parquet",
         bar_marks=source_dir / "bars.parquet",
         event_log=source_dir / "events.jsonl",
-        row_counts={"fills": 0, "orders": 0, "positions": 0, "bar_marks": 2},
+        row_counts={"fills": 0, "orders": 0, "positions": 3, "bar_marks": 2},
     )
     paths = write_emission_v1_from_paths(
         tmp_path / "run",
@@ -90,5 +143,7 @@ def test_path_finalizer_copies_tables_and_uses_supplied_counts(tmp_path: Path) -
         platform="test",
     )
     assert pl.read_parquet(paths.bar_marks)["value"].to_list() == [7, 8]
-    assert json.loads(paths.run_metadata.read_text())["n_bar_marks"] == 2
+    metadata = json.loads(paths.run_metadata.read_text())
+    assert metadata["n_bar_marks"] == 2
+    assert metadata["n_positions"] == 3
     assert load_emission_v1(paths.root).event_log_text == '{"kind":"bar","n":1}\n'

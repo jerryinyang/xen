@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import resource
 import sys
 from dataclasses import dataclass
@@ -30,6 +31,15 @@ class MemoryBudgetExceeded(RuntimeError):
         )
 
 
+class OversizedRowError(ValueError):
+    """Raised when one row cannot fit within a writer's working-byte budget."""
+
+    def __init__(self, estimated_bytes: int, limit_bytes: int) -> None:
+        self.estimated_bytes = estimated_bytes
+        self.limit_bytes = limit_bytes
+        super().__init__(f"row requires {estimated_bytes} bytes; limit is {limit_bytes} bytes")
+
+
 @dataclass(frozen=True)
 class MemorySample:
     processed_bars: int
@@ -42,7 +52,15 @@ class MemorySample:
 
 
 class MemoryGuard:
-    def __init__(self, limit_bytes: int | None, sample_every: int = 10_000) -> None:
+    def __init__(
+        self,
+        limit_bytes: int | None,
+        sample_every: int = 10_000,
+        *,
+        incomplete_path: Path | None = None,
+        cell_identity: Mapping[str, Any] | str | None = None,
+        last_timestamp: Any = None,
+    ) -> None:
         if sample_every <= 0:
             raise ValueError("sample_every must be positive")
         if limit_bytes is not None and limit_bytes <= 0:
@@ -53,6 +71,9 @@ class MemoryGuard:
         self._next_sample = 0
         self._has_sample = False
         self._last_sample = MemorySample(0, 0, 0, 0, 0, 0, 0)
+        self.incomplete_path = Path(incomplete_path) if incomplete_path is not None else None
+        self.cell_identity = cell_identity
+        self.last_timestamp = last_timestamp
 
     @property
     def peak_rss_bytes(self) -> int:
@@ -87,15 +108,39 @@ class MemoryGuard:
         self._has_sample = True
         self._next_sample = processed_bars + self.sample_every
         if self.limit_bytes is not None and self._peak_rss_bytes > self.limit_bytes:
+            if self.incomplete_path is not None:
+                write_incomplete_marker(
+                    self.incomplete_path,
+                    cell_identity=self.cell_identity,
+                    last_timestamp=self.last_timestamp,
+                    limit_bytes=self.limit_bytes,
+                    peak_rss_bytes=self._peak_rss_bytes,
+                    processed_bars=processed_bars,
+                )
             raise MemoryBudgetExceeded(processed_bars, self._peak_rss_bytes, self.limit_bytes)
         return sample
 
 
-def write_incomplete_marker(path: str | Path, **payload: Any) -> Path:
+def write_incomplete_marker(
+    path: str | Path,
+    *,
+    cell_identity: Mapping[str, Any] | str | None = None,
+    last_timestamp: Any = None,
+    limit_bytes: int | None = None,
+    peak_rss_bytes: int | None = None,
+    **payload: Any,
+) -> Path:
     """Write an invalid-cell marker beside a temporary output path."""
     marker = Path(path).with_suffix(Path(path).suffix + ".incomplete.json")
+    body = {
+        "cell_identity": cell_identity,
+        "last_timestamp": last_timestamp,
+        "limit_bytes": limit_bytes,
+        "peak_rss_bytes": peak_rss_bytes,
+        **payload,
+    }
     marker.write_text(
-        json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str) + "\n",
+        json.dumps(body, sort_keys=True, separators=(",", ":"), default=str) + "\n",
         encoding="utf-8",
     )
     return marker
@@ -118,10 +163,15 @@ class BoundedParquetWriter:
         self.max_bytes = max_bytes
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._rows: list[Mapping[str, Any]] = []
-        self._estimated_bytes = 0
+        self._working_bytes = 0
         self._rows_written = 0
         self._writer: pq.ParquetWriter | None = None
         self._closed = False
+        self._temp_path = self.path.with_name(f".{self.path.name}.tmp")
+
+    @property
+    def temp_path(self) -> Path:
+        return self._temp_path
 
     @property
     def rows_written(self) -> int:
@@ -136,10 +186,17 @@ class BoundedParquetWriter:
             raise RuntimeError("writer is closed")
         if set(row) - set(self.schema.names):
             raise ValueError(f"row contains columns outside schema: {sorted(set(row) - set(self.schema.names))}")
-        estimated = len(json.dumps(dict(row), sort_keys=True, default=str, separators=(",", ":")))
+        encoded = json.dumps(dict(row), sort_keys=True, default=str, separators=(",", ":")).encode()
+        # The budget includes the encoded mapping, Python container allowance,
+        # and a conservative Arrow conversion allowance for the pending batch.
+        estimated = len(encoded) * 2 + 64
+        if estimated > self.max_bytes:
+            raise OversizedRowError(estimated, self.max_bytes)
+        if self._working_bytes + estimated > self.max_bytes:
+            self.flush()
         self._rows.append(row)
-        self._estimated_bytes += estimated
-        if len(self._rows) >= self.max_rows or self._estimated_bytes >= self.max_bytes:
+        self._working_bytes += estimated
+        if len(self._rows) >= self.max_rows or self._working_bytes >= self.max_bytes:
             self.flush()
 
     def flush(self) -> None:
@@ -147,11 +204,15 @@ class BoundedParquetWriter:
             return
         table = pa.Table.from_pylist([dict(row) for row in self._rows], schema=self.schema)
         if self._writer is None:
-            self._writer = pq.ParquetWriter(self.path, self.schema)
-        self._writer.write_table(table, row_group_size=table.num_rows)
+            self._writer = pq.ParquetWriter(self._temp_path, self.schema)
+        try:
+            self._writer.write_table(table, row_group_size=table.num_rows)
+        except Exception as exc:
+            write_incomplete_marker(self.path, error=repr(exc), rows_written=self._rows_written)
+            raise
         self._rows_written += table.num_rows
         self._rows.clear()
-        self._estimated_bytes = 0
+        self._working_bytes = 0
 
     def close(self) -> None:
         if self._closed:
@@ -159,11 +220,17 @@ class BoundedParquetWriter:
         try:
             self.flush()
             if self._writer is None:
-                pq.write_table(pa.Table.from_pylist([], schema=self.schema), self.path)
+                pq.write_table(pa.Table.from_pylist([], schema=self.schema), self._temp_path)
             else:
                 self._writer.close()
+            os.replace(self._temp_path, self.path)
         except Exception as exc:
-            write_incomplete_marker(self.path, error=repr(exc), rows_written=self._rows_written)
+            write_incomplete_marker(
+                self.path,
+                error=repr(exc),
+                rows_written=self._rows_written,
+                temp_path=str(self._temp_path),
+            )
             raise
         finally:
             self._closed = True

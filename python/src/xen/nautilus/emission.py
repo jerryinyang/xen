@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -125,25 +126,28 @@ _EMPTY_TABLE_SCHEMAS = {
 
 def _copy_file(source: Path, destination: Path) -> str:
     """Copy a finalized file in bounded chunks and return its SHA-256."""
-    with source.open("rb") as src, destination.open("wb") as dst:
-        import shutil
-
-        shutil.copyfileobj(src, dst, length=1024 * 1024)
-    return _sha256_file(destination)
-
-
-def _sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        while chunk := handle.read(1024 * 1024):
+    class DigestWriter:
+        def __init__(self, handle: Any) -> None:
+            self.handle = handle
+
+        def write(self, chunk: bytes) -> int:
             digest.update(chunk)
+            return self.handle.write(chunk)
+
+    with source.open("rb") as src, destination.open("wb") as dst:
+        shutil.copyfileobj(src, DigestWriter(dst), length=1024 * 1024)
     return digest.hexdigest()
 
 
 def _count(source: StreamingEmissionSource, name: str) -> int:
     if name in source.row_counts:
         return int(source.row_counts[name])
-    return int(source.row_counts.get(f"n_{name}", 0))
+    if f"n_{name}" in source.row_counts:
+        return int(source.row_counts[f"n_{name}"])
+    if name == "positions_ledger":
+        return int(source.row_counts.get("positions", source.row_counts.get("n_positions", 0)))
+    return 0
 
 
 def write_emission_v1_from_paths(
@@ -186,8 +190,7 @@ def write_emission_v1_from_paths(
             empty = pl.DataFrame(schema=_EMPTY_TABLE_SCHEMAS[name])
             empty.write_parquet(destination)
 
-    _copy_file(Path(source.event_log), paths.event_log)
-    event_log_sha256 = _sha256_file(paths.event_log)
+    event_log_sha256 = _copy_file(Path(source.event_log), paths.event_log)
     paths.instrument_id_map.write_text(
         json.dumps(instrument_id_map, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
