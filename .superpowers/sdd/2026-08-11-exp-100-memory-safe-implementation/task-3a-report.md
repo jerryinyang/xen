@@ -116,3 +116,32 @@ cd python
 Results: `15 passed`; compile and Ruff passed. `git diff --check` and the
 cursor/no-list scan also passed. The fix-round commit hash is recorded after
 commit.
+
+## Fix round 2
+
+Addressed both Important findings from `task-3a-rereview.md`:
+
+- `new_profile_generation()` no longer mutates profile metadata or bins. It
+  raises a clear `ValueError` directing callers to the atomic
+  `start_profile_generation()` and `reset_profile_generation()` APIs. The
+  existing direct state test now uses those lifecycle APIs, and a regression
+  test protects the rejection.
+- Exact selected gap indexes are persisted incrementally in the new
+  `profile_gap_bins(raid_id, generation, bin_index)` SQLite table. A cursor
+  iterator exposes the exact ascending indexes, while `finalize()` returns a
+  fixed-field reference containing the store path, profile key, selected count,
+  SHA-256 digest, and conservative outer bin indexes. No Python mask string or
+  selected-index list is materialized during finalization.
+
+Verification for this fix round:
+
+```text
+cd python
+.venv/bin/python -m pytest -q tests/test_exp100_tpo.py tests/test_exp100_state_store.py tests/test_exp100_features.py
+.venv/bin/python -m compileall -q src/xen/exp100/tpo.py
+.venv/bin/ruff check src/xen/exp100/tpo.py src/xen/exp100/state_store.py tests/test_exp100_tpo.py tests/test_exp100_state_store.py tests/test_exp100_features.py
+```
+
+Results: `21 passed`; compile and Ruff passed. `git diff --check` and the
+cursor/no-list scan passed. The gap regression verifies separated indexes via
+the SQLite cursor and validates the fixed-size digest reference.

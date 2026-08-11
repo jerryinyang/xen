@@ -8,9 +8,10 @@ active state or profile history in Python.
 from __future__ import annotations
 
 import json
+import hashlib
 import sqlite3
 from pathlib import Path
-from typing import Any, Iterator, Mapping
+from typing import Any, Iterable, Iterator, Mapping
 
 
 SCHEMA_VERSION = 1
@@ -68,6 +69,12 @@ class Exp100StateStore:
                 bin_width REAL NOT NULL,
                 bracket_count INTEGER NOT NULL,
                 expected_tpo_total INTEGER NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS profile_gap_bins (
+                raid_id TEXT NOT NULL,
+                generation INTEGER NOT NULL,
+                bin_index INTEGER NOT NULL,
+                PRIMARY KEY (raid_id, generation, bin_index)
             );
             CREATE INDEX IF NOT EXISTS levels_active_idx ON levels(active, level_id);
             CREATE INDEX IF NOT EXISTS levels_event_idx ON levels(event_identity);
@@ -274,6 +281,79 @@ class Exp100StateStore:
         finally:
             cursor.close()
 
+    def iter_profile_gap_bins(self, raid_id: str, generation: int) -> Iterator[int]:
+        """Yield the exact persisted gap-bin indexes in ascending order."""
+        cursor = self._connection.execute(
+            """
+            SELECT bin_index FROM profile_gap_bins
+            WHERE raid_id = ? AND generation = ?
+            ORDER BY bin_index
+            """,
+            (raid_id, generation),
+        )
+        try:
+            for row in cursor:
+                yield int(row[0])
+        finally:
+            cursor.close()
+
+    def replace_profile_gap_mask(
+        self, raid_id: str, generation: int, bin_indexes: Iterable[int]
+    ) -> tuple[int, int | None, int | None, str]:
+        """Persist selected bins and return fixed-size count, bounds, and digest."""
+        self._connection.execute("BEGIN IMMEDIATE")
+        try:
+            self._connection.execute(
+                "DELETE FROM profile_gap_bins WHERE raid_id = ? AND generation = ?",
+                (raid_id, generation),
+            )
+            selected_count = 0
+            outer_low: int | None = None
+            outer_high: int | None = None
+            for raw_bin_index in bin_indexes:
+                bin_index = int(raw_bin_index)
+                self._connection.execute(
+                    """
+                    INSERT INTO profile_gap_bins(raid_id, generation, bin_index)
+                    VALUES(?, ?, ?)
+                    """,
+                    (raid_id, generation, bin_index),
+                )
+                selected_count += 1
+                outer_low = (
+                    bin_index
+                    if outer_low is None
+                    else min(outer_low, bin_index)
+                )
+                outer_high = (
+                    bin_index
+                    if outer_high is None
+                    else max(outer_high, bin_index)
+                )
+            digest = self._profile_gap_digest(raid_id, generation)
+            self._connection.commit()
+        except Exception:
+            self._connection.rollback()
+            raise
+        return selected_count, outer_low, outer_high, digest
+
+    def _profile_gap_digest(self, raid_id: str, generation: int) -> str:
+        digest = hashlib.sha256()
+        cursor = self._connection.execute(
+            """
+            SELECT bin_index FROM profile_gap_bins
+            WHERE raid_id = ? AND generation = ?
+            ORDER BY bin_index
+            """,
+            (raid_id, generation),
+        )
+        try:
+            for row in cursor:
+                digest.update(f"{int(row[0])}\n".encode("ascii"))
+        finally:
+            cursor.close()
+        return digest.hexdigest()
+
     def get_profile_state(self, raid_id: str, generation: int) -> dict[str, int | float] | None:
         """Return one current-generation profile row without scanning bins."""
         cursor = self._connection.execute(
@@ -371,6 +451,9 @@ class Exp100StateStore:
                 "DELETE FROM profile_bins WHERE raid_id = ?", (raid_id,)
             )
             self._connection.execute(
+                "DELETE FROM profile_gap_bins WHERE raid_id = ?", (raid_id,)
+            )
+            self._connection.execute(
                 """
                 INSERT OR REPLACE INTO profile_state(
                     raid_id, generation, profile_start_ts_ns, bin_width,
@@ -417,6 +500,9 @@ class Exp100StateStore:
                 "DELETE FROM profile_bins WHERE raid_id = ?", (raid_id,)
             )
             self._connection.execute(
+                "DELETE FROM profile_gap_bins WHERE raid_id = ?", (raid_id,)
+            )
+            self._connection.execute(
                 "UPDATE profile_meta SET generation = ? WHERE raid_id = ?",
                 (generation, raid_id),
             )
@@ -427,27 +513,10 @@ class Exp100StateStore:
         return generation
 
     def new_profile_generation(self, raid_id: str) -> int:
-        cursor = self._connection.execute(
-            "SELECT generation FROM profile_meta WHERE raid_id = ?", (raid_id,)
+        raise ValueError(
+            "new_profile_generation() is unsafe; use "
+            "start_profile_generation() or reset_profile_generation()"
         )
-        row = cursor.fetchone()
-        cursor.close()
-        generation = (int(row[0]) if row is not None else 0) + 1
-        self._connection.execute("BEGIN")
-        try:
-            self._connection.execute("DELETE FROM profile_bins WHERE raid_id = ?", (raid_id,))
-            self._connection.execute(
-                """
-                INSERT INTO profile_meta(raid_id, generation) VALUES(?, ?)
-                ON CONFLICT(raid_id) DO UPDATE SET generation = excluded.generation
-                """,
-                (raid_id, generation),
-            )
-            self._connection.commit()
-        except Exception:
-            self._connection.rollback()
-            raise
-        return generation
 
     def _update_state(
         self, table: str, id_column: str, identifier: str, fields: Mapping[str, Any]

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from decimal import Decimal, ROUND_FLOOR
-from typing import Any
+from typing import Any, Iterator
 
 from .state_store import Exp100StateStore
 from .types import BarRecord
@@ -251,24 +251,32 @@ class TPOProfileStore:
         va_high: int,
         va_count: int,
         bin_width: float,
-    ) -> tuple[float, str] | None:
+    ) -> tuple[float, dict[str, Any]] | None:
         target = self.gap_mass * va_count
-        selected_count = 0
-        gap_low: int | None = None
-        gap_high: int | None = None
-        gap_mask = ""
-        for bin_index, count in self.store.iter_profile_bins_by_density(
-            raid_id, generation, va_low, va_high
-        ):
-            selected_count += count
-            gap_low = bin_index if gap_low is None else min(gap_low, bin_index)
-            gap_high = bin_index if gap_high is None else max(gap_high, bin_index)
-            gap_mask = f"{gap_mask}|{bin_index}" if gap_mask else str(bin_index)
-            if selected_count >= target:
-                break
+        def selected_indexes() -> Iterator[int]:
+            selected_mass = 0
+            for bin_index, count in self.store.iter_profile_bins_by_density(
+                raid_id, generation, va_low, va_high
+            ):
+                selected_mass += count
+                yield bin_index
+                if selected_mass >= target:
+                    return
+
+        selected_count, gap_low, gap_high, digest = self.store.replace_profile_gap_mask(
+            raid_id, generation, selected_indexes()
+        )
         if gap_low is None or gap_high is None:
             return None
-        return (gap_high - gap_low + 1) * bin_width, gap_mask
+        return (gap_high - gap_low + 1) * bin_width, {
+            "store_path": str(self.store.path),
+            "raid_id": raid_id,
+            "profile_generation": generation,
+            "selected_count": selected_count,
+            "sha256": digest,
+            "outer_low_bin_index": gap_low,
+            "outer_high_bin_index": gap_high,
+        }
 
     def _undefined(
         self,

@@ -33,13 +33,24 @@ def test_profile_generation_replaces_active_bins_without_python_history(tmp_path
     store = Exp100StateStore(tmp_path / "state.sqlite")
     try:
         store.insert_raid({"raid_id": "R1", "level_id": "L1", "active": 1})
-        first = store.new_profile_generation("R1")
+        first = store.start_profile_generation("R1", 1, 0.1)
         store.upsert_profile_bins("R1", first, {0: 2, 1: 1})
-        second = store.new_profile_generation("R1")
+        second = store.reset_profile_generation("R1", 2, 0.1)
         store.upsert_profile_bins("R1", second, {3: 4})
 
         assert list(store.iter_profile_bins("R1", first)) == []
         assert list(store.iter_profile_bins("R1", second)) == [(3, 4)]
+    finally:
+        store.close()
+
+
+def test_legacy_profile_generation_entry_point_rejects_unsafe_use(
+    tmp_path: Path,
+) -> None:
+    store = Exp100StateStore(tmp_path / "state.sqlite")
+    try:
+        with pytest.raises(ValueError, match="start_profile_generation.*reset_profile_generation"):
+            store.new_profile_generation("R1")
     finally:
         store.close()
 

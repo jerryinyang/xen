@@ -98,10 +98,19 @@ def test_tpo_gap_uses_va_mass_and_emits_separated_mask(tmp_path: Path) -> None:
                     BarRecord(index * 100 + offset, price, price, price, price, 1.0, 1),
                 )
         result = profile.finalize("R1", generation, 1000)
+        selected_bins = list(store.iter_profile_gap_bins("R1", generation))
 
     assert result["tpo_total"] == 30
     assert result["va_count"] == 21
-    assert result["gap_mask"] == "2|0"
+    assert selected_bins == [0, 2]
+    assert isinstance(result["gap_mask"], dict)
+    assert result["gap_mask"]["selected_count"] == 2
+    assert result["gap_mask"]["outer_low_bin_index"] == 0
+    assert result["gap_mask"]["outer_high_bin_index"] == 2
+    assert result["gap_mask"]["sha256"] == (
+        "409f9891ad678ea20e4b20e862d56f23c9b29ed02f40cbdd3a9257821638a85d"
+    )
+    assert "indexes" not in result["gap_mask"]
     assert result["gap_span"] == pytest.approx(0.3)
 
 
