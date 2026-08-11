@@ -32,15 +32,19 @@ programme's only false `DEPLOYABLE_CONFIRMED` (L-01).
 
 ## 1. Programme context: how the map is organised
 
-- **The availability 2×2.** The programme's frame for what is open. Single-instrument ×
-  directional price-geometry entries are **dead twice over** (availability ≈ random, matched
-  controls EXP-047/EXP-081). The open frontier is cross-sectional / magnitude / flow, or
-  **non-price data acquisition** if those also null out.
+- **The availability 2×2.** The programme's frame for what has been tested. Unconditioned
+  single-instrument × directional price-geometry entries have repeatedly failed to establish a
+  robust transferable edge against matched controls, but that is not a blanket closure of every
+  conditional directional baseline. A new claim that a decision-time conditioner changes the
+  baseline must be tested directly, with the conditioner treated as entry information rather than
+  as a downstream rescue. The open frontier remains cross-sectional / magnitude / flow, alongside
+  this explicitly bounded conditional-baseline question.
 
   ```
                  DIRECTIONAL target            MAGNITUDE / range target
-  single-series │  TESTED → DEAD               │  screened (CF-VOLEXP-001): typical range
-                │  (EXP-047/081/084)           │  flat, only a tail-only hint
+  single-series │  TESTED → weak/unresolved     │  screened (CF-VOLEXP-001): typical range
+                │  unconditioned; conditional  │  flat, only a tail-only hint
+                │  baseline remains open       │
   cross-section │  screened (CF-XSECT-001):    │  UNTESTED
                 │  NOT_ADMITTED (below band)   │
   ```
@@ -692,7 +696,7 @@ re-parameterisation of the same lattice.
 
 | # | Disqualifier | Mechanism | Canonical evidence |
 |---|---|---|---|
-| 1 | **Cost geometry (Mode B)** | The capturable move at the tradable horizon is smaller than round-trip cost; faster domains multiply trades but shrink move vs fixed cost | AVWAP net-negative; MR-003 0/24 powered; XENA-003 breakeven 0.705 bps; HTFCAP 0/72 vs ~18 bps; VOLDIR 91–96% of the gap is cost |
+| 1 | **Cost geometry (historical Mode B)** | In the historical costed reads, the capturable move at the tested horizon was smaller than the applied round-trip cost; faster domains multiplied trades but shrank the move against that cost | AVWAP net-negative; MR-003 0/24 powered; XENA-003 breakeven 0.705 bps; HTFCAP 0/72 vs ~18 bps; VOLDIR 91–96% of the gap was cost |
 | 2 | **Availability ≈ random (Mode A)** | Event MFE/path equals a matched random control's — no signal-conditional move | EXP-047, EXP-081, SPDR-007 (race 0.333 vs 0.343), SPDR-008 T4 (random timing gets 90–95% of the excursion) |
 | 3 | **`W/L` mirror — capture can't move the mean** | `E[net] = p·W − (1−p)·L − cost`; near break-even, exits trade p against W/L along the zero line | VOLDIR: R² 0.9667/0.9746; 36–67× W/L movability with no mean improvement |
 | 4 | **Entry-seam mismatch** | The traded fill event (limit touch) is a different, adversely-selected conditioning event than the measured one (confirmed breach) | MR-004 (TP-share 0.52 vs 0.696); P-10 |
@@ -705,9 +709,10 @@ re-parameterisation of the same lattice.
 
 **The unifying error the programme identified:** building or retuning **capture** (exits, stops,
 trails, holds, size) before proving (a) the entry has signal-conditional availability, (b) the
-traded fill event matches the measured object, (c) the residual is cost-relative at the chosen
+traded fill event matches the measured object, (c) the residual is measurable at the chosen
 horizon, and (d) causality holds. Capture is a **second-order operator** — a converter of a
-conditional, cost-relative, causally-fillable residual; it cannot manufacture one.
+conditional, causally-fillable residual; it cannot manufacture one. Under INFR-022, cost is a
+separate, explicitly authorised economic scenario rather than a hidden live discovery gate.
 
 ---
 
@@ -718,8 +723,8 @@ remain live science:
 
 1. **Short-horizon mean reversion / oscillation is a genuine property** (VR<1 on FX and baskets;
    naive-reversion gross +1.958 bps/leg; anchor-reversion availability; the RSI-2 fade relative
-   edge) — the veto is always capture/cost, never substrate absence (MR-002..005, VOLHARV, CSRR,
-   MTFCTX).
+   edge) — historical vetoes were vehicle, capture, or cost findings, not a universal proof of
+   substrate absence (MR-002..005, VOLHARV, CSRR, MTFCTX).
 2. **HTF conditioning and volatility-amplified drift are real but sub-cost at tested granularity**
    (HTFDI ≈1–4 bps; HTFCAP gross +8..+18 bps; SPDR-015 conditioner gates with OOS Brier gains) —
    they amplify a direction term, never substitute for one (VOLDIR).
@@ -751,17 +756,28 @@ remain live science:
 - **No candidate strategy family from Chapters 01–05 is tradable or deployable.** Dispositions
   range over CLOSED, RETIRED, REFUTED, CHARACTERISED-NOT-TRADABLE; the single historical
   `DEPLOYABLE_CONFIRMED` (CF-MR-001) was retracted on a look-ahead defect.
-- The **reasons** are structural, not empirical noise: (a) on this substrate the `(p, W, L)` joint
-  sits at break-even and `W/L` is not an independent lever; (b) 91–96% of the measured deficit is
-  cost — and spread is currently uncharged programme-wide, so **no successor is evaluable at all
-  while that precondition is unmet**; (c) single-instrument directional price geometry is dead
-  twice over; (d) the one genuinely new information source (exact signed volume) has not yet
-  produced a signal that separates from matched timing.
-- **Preconditions for a future viable candidate** (all binding): a genuinely new information source
-  or untested cell (non-price data, order book, cross-asset, cross-sectional × magnitude) screened
-  availability-first at 0 reads; object-matched causal execution; a cost-relative residual at the
-  chosen horizon; no exit/size/trail re-parameterisation of the same lattice; and — before any
-  net claim — the cost precondition (operator cost directive under INFR-022).
+- The **historical reasons** are mechanism-specific, not a programme-wide proof of no gross effect:
+  (a) on the VOLDIR capture substrate the `(p, W, L)` joint sat at break-even and `W/L` was not an
+  independent lever; (b) 91–96% of that measured VOLDIR gap was cost; (c) many unconditioned
+  single-instrument entries failed matched-control availability; and (d) the tested signed-volume
+  transforms did not separate from matched timing. The VOLDIR cost share must not be reported as a
+  count of all programme failures.
+- Under **INFR-022**, a successor or evidence-recovery rerun is evaluable on the default
+  `NO_COST_CHARGED` gross path. This is a model, not a measured zero-cost claim. A costed result
+  requires an operator cost directive and must remain a scenario disclosure, not an arbitrary
+  discovery threshold.
+- A renewed-engine rerun for the next chapter's technique-impact ledger is **evidence recovery**,
+  not an automatic family reopening and not a change to any historical disposition. It must use
+  the Nautilus execution path, the live INFR-022 evaluation frame, direct fixed-baseline
+  comparisons, complete rows, PSR pairing, and no MDE, power, or machine value labels.
+- **Preconditions for a future viable candidate** remain: an explicitly stated information source
+  or conditional mechanism; availability-first screening; object-matched causal execution; a
+  direct baseline comparator; and no downstream exit/size/trail re-parameterisation presented as
+  new entry information. Cost may be added only through the recorded INFR-022 directive.
+
+The provisional candidate extraction for the next INFR chapter is maintained separately in
+[`infr-next-chapter-candidate-extraction.md`](infr-next-chapter-candidate-extraction.md). It is a
+planning record, not a family registration or disposition change.
 
 ---
 
@@ -785,7 +801,7 @@ remain live science:
   `archive/chapter-04-nautilus-bybit-sigauc/`,
   `archive/chapter-05-voldir-capture-geometry/` (incl. `python-src/adaptive_management/` — the
   Nautilus strategy/engine/policy source for SPDR-021..024).
-- **Live frame:** `docs/references/neutrality-standard.md`, `docs/references/chapter-06-governance.md`,
+- **Live frame:** `docs/references/neutrality-standard.md`, `docs/references/governance.md`,
   `docs/superpowers/plans/2026-08-08-infr-022-zero-cost-neutrality-psr-pipeline-update.md`.
 
 *This document is a consolidation, not a new claim. It adds no experiments, changes no

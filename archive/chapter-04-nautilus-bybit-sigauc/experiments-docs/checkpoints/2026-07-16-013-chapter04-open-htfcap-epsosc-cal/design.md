@@ -17,7 +17,7 @@ index `proposal-ref-ab-INDEX.md`. Pre-D0 `proposal-cf-*.md` are SUPERSEDED.
 |---|---|
 | INFR-010 | Phases 0/A/B/C/D/E ALL COMPLETE 2026-07-16 |
 | Phase D | VAL-008 operator verdict SUPPORTED / PASS (`python/experiments/VAL-008/report.md`) |
-| Phase E | INFR-013 verify PASS — `xen.orderflow` contracts + skeleton only; no bulk collection, detectors stubbed (`docs/references/orderflow-feature-store.md`) |
+| Phase E | INFR-013 verify PASS — `xen.orderflow` contracts + skeleton only; no bulk collection, detectors stubbed (`archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-013/orderflow-feature-store.md`) |
 | Engine | nautilus_trader==1.230.0 pinned (`python/pyproject.toml`) |
 | Data | catalog `data/catalog/` — 894 ADMITTED instruments, 672M bars; fence PINNED sha `35d3375e…` via `xen.nautilus.catalog_fence` |
 | Governance | INFR-012 rebind verified 10/10 (estimand gate v2, STUB-fails) |

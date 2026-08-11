@@ -1,243 +1,168 @@
-# Xen Dataset Reference v2
+# Dataset reference
 
-**Version:** v2 (INFR-012, 2026-07-15)
-**Generator:** INFR-011 streaming pipeline → Nautilus `ParquetDataCatalog`
-**Base data unit:** 1-minute OHLCV bars derived from Bybit trades archives
-**Universe:** Bybit USDT linear perpetuals (listed + delisted), census-based anti-survivorship
+**Status:** Binding live dataset facts
 
-**Supersedes:** v1 cTrader/FX-indices dataset reference. Archived data obligations:
-`archive/chapter-03-xena-mtfctx/data/timebars/` — holdout rules on that data remain binding.
+This document describes the data materialized in the repository and the rules for using it. It is a snapshot of the pinned research inputs, not a promise that a future download will have the same universe or date range.
 
----
+## 1. Primary Bybit catalog
 
-## Universe (census-based, binding)
+The primary catalog is one-minute Bybit linear-perpetual data derived from public trades. Raw trade files are not retained in the repository; the derivation preserves the aggregate volume identity used by the catalog.
 
-| Field | Value |
-|-------|-------|
-| Source listing | `https://public.bybit.com/trading/` (Apache directory) |
-| Filter | Folders ending `USDT/` only — excludes `*PERP/` (USDC), inverse `*USD`, dated futures |
-| Census artifact | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/universe-census.md` |
-| Symbol count | **910** (2026-07-14 census) |
-| History cap | Trailing **4 years** per symbol (operator amendment 2026-07-14) |
-| Delisted | Included when present in archive listing; `listed`/`delisted` flags from announcement reconciliation |
-| Spec gaps | `SPEC_INCOMPLETE` — excluded from fill-sensitive reads, included in return-level reads |
+The admission snapshot is:
 
-**InstrumentId convention:** `{SYMBOL}-LINEAR.BYBIT` (e.g. `BTCUSDT-LINEAR.BYBIT`).
-Module: `xen.nautilus.instrument_ids`.
+| Item | Count or fact |
+|---|---:|
+| Initial census | 910 symbols |
+| Admitted | 894 |
+| Specification-incomplete | 9 |
+| Structurally readable | 903 (`894 + 9`) |
+| Corrupt and not admitted | 1 |
+| No bars | 1 |
+| Operator-omitted | 5 |
+| Total bars for admitted plus specification-incomplete | 672,138,742 |
+| API instrument specifications | 612 |
+| Inferred specifications | 282 |
 
-### Sample symbols (illustrative)
+The 903 readable symbols passed structural re-verification. The nine specification-incomplete symbols have readable bars but do not have complete return-level specifications; they are not silently interchangeable with the 894 admitted symbols. The five operator-omitted symbols, the no-bar placeholder, and the corrupt symbol are outside the admitted research universe.
 
-| Symbol | Role | Notes |
-|--------|------|-------|
-| BTCUSDT | liquid anchor | ~4y capped from 2022-07-14 |
-| ETHUSDT | liquid anchor | idem |
-| SOLUSDT | liquid anchor | idem |
-| LUNA2USDT | delist tail test | archive present through 2026-07-13 |
-| USTCUSDT | younger listing | shorter capped range |
+The materialized primary catalog occupies approximately 23 GB. Its layout is:
 
-Full candidate list: `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/candidate_symbols.txt`.
-
----
-
-## Data locations
-
-| Dataset | Path | Status |
-|---------|------|--------|
-| Primary catalog (bars) | `data/catalog/` | INGESTED (A4, 2026-07-16; 894 ADMITTED + 9 SPEC_INCOMPLETE) |
-| Signed staging fields | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/data/staging/bars/` | The raw signed source is currently readable through the mounted `/Volumes/SSID/Xen/data/bars`; provenance/admission is recorded for all five Chapter-05 symbols |
-| Signed custom catalog | `data/catalog_sigbar/train/` | The full TRAIN signed catalog is verified: 3,731,908 rows, five symbols, 90 files; tree sha `d4b7bbed7e0c…f7d2b9`; SPDR-011 attestation records zero TEST/holdout rows and zero mapping violations |
-| Mean-price skew fields | same external signed staging files (`SpreadAbs`/`SpreadBps`/`MeanBuy`/`MeanSell`) | **UNUSABLE AS SPREAD** — analytical access renames the bps field to `MeanPriceSkewBps` and stamps `UNUSABLE_AS_SPREAD` |
-| Strategy emissions | `data/nautilus_runs/<run_id>/` | emission contract v1 |
-| Fence manifest (A6) | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json` | **PINNED** 2026-07-16 |
-| Admission ledger (A5) | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/admission-ledger.jsonl` | 910 census rows, explicit exclusions |
-| Instrument specs | `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/instrument-specs.json` | API (612) + INFERRED (282) |
-
-**Archived cTrader paths (VAL carve-out on old emissions only):**
-`archive/chapter-03-xena-mtfctx/data/timebars/`,
-`archive/chapter-03-xena-mtfctx/data/strategy_runs/`.
-
-**cTrader Nautilus catalog (INFR-021, 2026-07-25):** `data/catalog_ctrader/` — EURUSD, XAUUSD, USTEC as `{SYMBOL}.CTrader` 1m bars from chapter-03 timebars. Fence pin (independent of Bybit): `python/experiments/INFR-021/artifacts/fence-manifest.json`. Volume = TickVolume (no signed buy/sell). Same standard Nautilus `Bar` contract as Bybit `data/catalog/` for plain-OHLCV strategies (swap catalog path + InstrumentId + fence); not interchangeable with `data/catalog_sigbar/` (SignedBar). Not the Chapter 05–06 primary universe.
-
----
-
-## Primary lane: 1-minute OHLCV (T1)
-
-Derived from trades archives (not klines — klines lack aggressor side and drop delisted symbols).
-
-### Bar invariants (admission-blocking)
-
-- Bar volume ≡ Σ trade sizes for the minute
-- `ts_event` strictly monotonic per instrument file
-- OHLC bounds: `High >= max(Open, Close)`, `Low <= min(Open, Close)`
-- Gap ledger: all outages/delistings logged (24/7 market)
-
-### Nautilus `Bar` schema (catalog)
-
-Timestamps in **nanoseconds** (`ts_event`, `ts_init`). Access via `ParquetDataCatalog` or
-approved query wrapper that enforces the global fence.
-
-| Field | Description |
-|-------|-------------|
-| `open`, `high`, `low`, `close` | OHLC from first/last trade prints |
-| `volume` | Real traded volume (contracts/coin per instrument spec) |
-| `bar_type` | 1-MINUTE-LAST |
-
-### Mean-price skew quarantine (not a cost input)
-
-The stored `SpreadBps` field is
-`1e4 × (MeanBuy − MeanSell) / ((MeanBuy + MeanSell) / 2)`. The producing code applies no
-tick floor. Because the two means cover different trades at different times, the value is an
-intraminute mean-price skew and may be negative; it is not a quote or effective spread.
-
-Stored bytes and fence pins remain unchanged. `xen.sigbar.quarantine_mean_price_skew` is the
-only live analytical access seam: it verifies the INFR-017 pin, removes the misleading storage
-name, exposes the value as `MeanPriceSkewBps`, and attaches `MeanPriceSkewStatus =
-UNUSABLE_AS_SPREAD`. Passing this field to any cost function is prohibited.
-
----
-
-## Secondary lane: MBP/L2 contracts (inactive)
-
-Historical contracts describe BTCUSDT, ETHUSDT and SOLUSDT depth data, but no bulk collection
-exists and secondary data is an established programme limitation. Chapter 05 cannot route an
-unresolved T1 result into a T2 rescue branch.
-
-Spec: `docs/references/orderflow-feature-store.md`.
-
----
-
-## Emission contract v1 (strategy runs)
-
-Root: `data/nautilus_runs/<run_id>/`
-
-| File | Required | Role |
-|------|----------|------|
-| `run_metadata.json` | yes | config hash, catalog version, nautilus pin, platform |
-| `bar_marks.parquet` | yes | bar OHLC marks → adjudication `positions` |
-| `positions_ledger.parquet` | yes | closed legs → `cis_trades` via shim |
-| `fills.parquet` | yes | economic fills |
-| `orders.parquet` | yes | order lifecycle |
-| `event_log.jsonl` | yes | UUID-stripped deterministic log |
-| `instrument_id_map.json` | yes | archive symbol ↔ InstrumentId |
-| `fence_attestation.json` | yes | analysis fence; **STUB invalid for real experiments** |
-
-Shim: `xen.nautilus.adjudication_shim.adjudicate_emission(run_dir)`.
-
-### `bar_marks` columns (minimum for gate)
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `SourceCloseTime` | datetime[ns] | Bar close known at decision time |
-| `RealOpen` | float | Execution mark (open-to-open discipline) |
-| `RealHigh`, `RealLow`, `RealClose` | float | optional OHLC |
-| `Position`, `OpenLegs` | int | optional position state |
-
-### `positions_ledger` → `cis_trades`
-
-| Nautilus | Adjudication |
-|----------|--------------|
-| `ts_opened` | `EntryTime` |
-| `ts_closed` | `ExitTime` |
-| `avg_px_open` | `EntryFillPrice` |
-| `avg_px_close` | `ExitFillPrice` |
-| `entry` (BUY/SELL) | `Direction` (+1/-1) |
-
-`RealizedBps = Direction * (Exit - Entry) / Entry * 1e4`
-
----
-
-## Global calendar fence
-
-Single date set for all symbols (INFR-011 A6, **pinned 2026-07-16**,
-manifest sha256 `35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448`):
-
-| Key | Value |
-|-----|-------|
-| `analysis_start_utc` | 2021-06-29T06:53:00Z |
-| `train_end_utc` | 2023-12-18T00:00:00Z (end of TRAIN band; TEST starts here) |
-| `holdout_start_utc` | 2025-01-08T00:00:00Z (global holdout — never queried) |
-| `data_end_utc` | 2026-07-14T23:59:00Z |
-
-Manifest is hash-pinned (`manifest_sha256` in each emission's `fence_attestation.json`).
-Computed from admitted catalog range end — not calendar today (R9).
-Wrapper: `xen.nautilus.catalog_fence` (`load_fence_manifest`, `fenced_bar_query`,
-`fence_attestation_payload`). Note: symbols listed after `holdout_start_utc` have
-zero readable bars until a future fence renewal — accepted consequence of the
-global-fence design.
-
----
-
-## Holdout rules (non-negotiable)
-
-1. Never load, inspect, or use the final 30% of the admitted range.
-2. Catalog queries must pass through the fence wrapper.
-3. Emissions must not contain bar marks after `analysis_end_utc`.
-4. Phase B `STUB` attestations fail estimand gate v2.
-
----
-
-## Loading patterns (T1)
-
-```python
-from pathlib import Path
-from nautilus_trader.persistence.catalog import ParquetDataCatalog
-
-from xen.nautilus.catalog_fence import fenced_bar_query, load_fence_manifest
-
-catalog = ParquetDataCatalog(Path("data/catalog"))
-fence = load_fence_manifest()
-bars = fenced_bar_query(
-    catalog,
-    ["BTCUSDT-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL"],
-    start=fence.analysis_start_utc,
-    end=fence.train_end_utc,
-    band="TRAIN",  # "TEST" only under operator-approved counted reads
-)
+```text
+data/catalog/
+└── data/
+    ├── bar/
+    │   └── <SYMBOL>-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL/
+    │       └── <start>_<end>.parquet
+    └── crypto_perpetual/
+        └── <SYMBOL>-LINEAR.BYBIT/
+            └── <instrument-metadata>.parquet
 ```
 
-For emissions:
+The current instrument identifier is `{SYMBOL}-LINEAR.BYBIT`. The bar type is `<SYMBOL>-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL`.
 
-```python
-from xen.nautilus.adjudication_shim import adjudicate_emission
+## 2. Bar semantics
 
-bundle = adjudicate_emission("data/nautilus_runs/<run_id>")
+- Bars are one-minute aggregates of Bybit public trades.
+- The bar timestamp is the close time: a field is usable only after the bar has closed.
+- `open`, `high`, `low`, `close`, and aggregate `volume` describe the traded bar; they are not a quote stream.
+- `volume` is the sum of the retained aggregate trade sizes. Derivation and re-verification enforce the volume identity.
+- Missing minutes and no-trade minutes are data facts. They must be reported or handled by the registered estimator; they must not be silently filled with future information.
+- There is no live L2, quote, detector, or orderflow feature-store layer in this dataset contract.
+
+All feature reads obey the registered causal rule. For a decision at bar `t`, the default usable feature boundary is the close of `t-1`.
+
+## 3. Signed-bar diagnostic catalog
+
+The signed catalog is a separate, diagnostic TRAIN input. It is not the primary full-universe catalog.
+
+```text
+data/catalog_sigbar/train/
+└── data/custom_signed_bar/
+    └── <SYMBOL>-LINEAR.BYBIT/
+        └── <start>_<end>.parquet
 ```
 
----
+The materialized signed catalog contains five instruments, 3,731,908 rows, and 90 parquet files:
 
-## Cost reads (ZERO-COST — INFR-022)
+- `BTCUSDT-LINEAR.BYBIT`
+- `DOGEUSDT-LINEAR.BYBIT`
+- `ETHUSDT-LINEAR.BYBIT`
+- `SOLUSDT-LINEAR.BYBIT`
+- `XRPUSDT-LINEAR.BYBIT`
 
-**The programme is zero-cost (`NO_COST_CHARGED`):** no spread, commission, or swap enters any
-calculation in any experiment type unless an explicit operator cost directive requests costs
-(recorded in the experiment's design.md before execution). There are no live cost reads; the
-retired Bybit fee/funding functions (`bybit_round_trip_cost_bps`, `count_bybit_funding_stamps`,
-`spread_scale_route`, FTMO table) live in `xen/evaluation_cost_legacy.py` under an ARCHIVED
-banner — not callable from any live path.
+The signed-catalog tree attestation is:
 
-```python
-# Zero-cost disclosure (canonical caveat for every money-bearing artifact)
-from xen.evaluation import zero_cost_caveat
-print(zero_cost_caveat())
-
-# Legacy data-provenance check — KEPT LIVE (verifies only that the legacy field
-# remains unusable; not a cost read)
-from xen.evaluation import verify_chapter05_spread_quarantine
-verify_chapter05_spread_quarantine()
+```text
+rows: 3,731,908
+symbols: 5
+parquet_files: 90
+tree_sha256: d4b7bbed7e0c039cc8c74a05e0f8747796c75016957d1e7c5f7c2feb20f7d2b9
 ```
 
-The stored mean-price skew is never a cost input and no substitute spread proxy exists. A
-costed read without a recorded operator cost directive (design clause +
-`operator_cost_directive.json`) is a governance violation; deployability/tradability claims
-remain refused by rule.
+The signed schema records:
 
-For the fixed Chapter-05 four-hour episode, settlement timestamps are counted in `(entry, exit]`;
-continuous `hold_hours / 8` prorating is forbidden. The adverse missing-history charge is 1.0 bps
-per crossed 00:00/08:00/16:00 UTC timestamp.
+- `buy_volume`: taker-buy volume, where the aggressor lifted the ask;
+- `sell_volume`: taker-sell volume, where the aggressor hit the bid;
+- `delta = buy_volume - sell_volume`;
+- `n_trades`: participation count;
+- `spread_feature`: legacy storage for mean buy-print price minus mean sell-print price, in basis points;
+- `spread_status` and `pipeline_version`.
 
----
+`buy_volume + sell_volume == volume` is exact for the bar aggregate. `delta` is an exact bar aggregate, not an estimate of per-level or intrabar orderflow. The signed catalog contains no valid per-level attribution.
 
-## Legacy reference (archived FX/indices)
+The stored mean-price-skew value is `1e4 × (MeanBuy − MeanSell) / ((MeanBuy + MeanSell) / 2)`. It is not quote spread, executable spread, or a liquidity estimate. Analytical access must rename it to `MeanPriceSkewBps` and attach status `UNUSABLE_AS_SPREAD`. No consumer may apply a tick-size floor or interpret it as a tradable cost.
 
-Chapter-03 instruments (EURUSD, USTEC, etc.) and `data/timebars/` schemas remain documented in
-`archive/chapter-03-xena-mtfctx/docs/references/` for reproducibility. New experiments use
-the Bybit universe only.
+The signed materialization contains TRAIN rows only. It contains no TEST or lifetime-HOLDOUT rows.
+
+## 4. cTrader compatibility catalog
+
+The cTrader catalog is retained only for compatibility with explicitly scoped legacy comparisons. It is not the primary data source for current Bybit research and does not change the programme's event-driven execution or cost boundary.
+
+```text
+data/catalog_ctrader/
+└── data/
+    ├── bar/
+    │   ├── EURUSD.CTrader-1-MINUTE-LAST-EXTERNAL/<start>_<end>.parquet
+    │   ├── XAUUSD.CTrader-1-MINUTE-LAST-EXTERNAL/<start>_<end>.parquet
+    │   └── USTEC.CTrader-1-MINUTE-LAST-EXTERNAL/<start>_<end>.parquet
+    ├── currency_pair/EURUSD.CTrader/<instrument-metadata>.parquet
+    └── cfd/{XAUUSD,USTEC}.CTrader/<instrument-metadata>.parquet
+```
+
+The materialization is approximately 203 MB and contains three instruments. Its bar files begin on 2021-06-02 and end on 2026-06-19, with the exact per-file range encoded in each filename. Its volume field is source-specific and must not be treated as Bybit taker-side volume.
+
+## 5. Chronological fence
+
+All current price-primary reads use these pinned UTC boundaries:
+
+| Boundary | UTC value |
+|---|---|
+| Analysis start | `2021-06-29T06:53:00Z` |
+| TRAIN end / TEST start | `2023-12-18T00:00:00Z` |
+| TEST end / lifetime HOLDOUT start | `2025-01-08T00:00:00Z` |
+| Catalog data end | `2026-07-14T23:59:00Z` |
+| Engine pin | Nautilus `1.230.0` |
+| Fence manifest SHA-256 | `35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448` |
+
+The nested analysis split uses a 70% analysis fraction and a 70% TRAIN fraction within analysis. A design may create narrower chronological windows inside these bounds, but it may not move the global boundaries after seeing outcomes.
+
+Use `fenced_bar_query` and `assert_within_fence` from `python/src/xen/nautilus/catalog_fence.py` for catalog access. The sanctioned bands are `TRAIN` and `TEST`; `HOLDOUT` is refused unconditionally. A TEST read is a counted operator-authorized event, not an ordinary exploratory query.
+
+## 6. Emission inputs and outputs
+
+The current clean slate contains no materialized strategy-run output directory. An authorized run creates its own destination and writes the emission contract there. The destination is passed to `write_emission_v1`; it is not inferred from a historical experiment path.
+
+An emission-contract-v1 directory contains:
+
+```text
+<run_dir>/
+├── run_metadata.json
+├── fills.parquet
+├── orders.parquet
+├── positions_ledger.parquet
+├── bar_marks.parquet
+├── event_log.jsonl
+├── instrument_id_map.json
+└── fence_attestation.json
+```
+
+The metadata records the run configuration hash, catalog identity, engine version, platform, instrument map, output counts, fence attestation, and deterministic event-log hash. Missing or stubbed required artifacts invalidate the run.
+
+## 7. Cost and claim boundary
+
+The datasets do not contain spread, commission, swap, funding, or other execution-cost observations suitable for a net-performance claim. Unless a scoped exception is authorized and recorded before execution, every result is gross and cost-free. Therefore dataset presence, coverage, and clean engine reconciliation do not establish tradability, deployability, or cost-complete performance. The disclosure is:
+
+```text
+ZERO-COST-DISCLOSURE
+  cost_model: NO_COST_CHARGED
+  spread: not modeled
+  commissions: not modeled
+  swaps/funding: not modeled
+  implication: every figure in this document is gross and cost-free; no spread,
+    commission, or swap enters any calculation. Realised results would differ
+    (likely worse) under any real cost schedule.
+  prohibited_claims: fully-net, cost-complete, tradable, deployable
+  lifting: only an explicit operator authorization may introduce a cost model
+    for a scoped experiment; that authorization and its schedule are recorded
+    in the experiment design before execution.
+```

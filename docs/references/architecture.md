@@ -1,175 +1,167 @@
-# Xen Data-Layer Architecture v2
+# Research architecture
 
-**Version:** v2 (INFR-012, 2026-07-15) — NautilusTrader + Bybit USDT-perp catalog
-**Supersedes:** v1 cTrader/FX-indices architecture (archived at `archive/chapter-03-xena-mtfctx/`)
+**Status:** Binding live architecture
 
-## Purpose
+The current Xen architecture is an event-driven, price-primary research system. The engine produces the execution record; Python validates, composes, and analyses that record. No vectorized price backtest, hidden local accounting, or quote-spread claim is part of the live architecture.
 
-Thesis-agnostic research infrastructure for **24/7 crypto perpetual futures**:
+## 1. System boundary
 
-1. **Primary lane (T1 — OHLCV):** 1-minute bars derived from Bybit trades archives, full USDT
-   linear perpetual universe (listed + delisted), ingested to a Nautilus `ParquetDataCatalog`.
-2. **Signed-bar lane:** exact taker buy/sell volume plus a quarantined legacy mean-price-skew
-   storage field. The skew is not an execution-cost input.
-3. **Engine:** NautilusTrader event-driven `BacktestNode` — strategies run in-engine; Python
-   ingests emissions and adjudicates only.
-
-Programme principles (holdout fence, bar-open decisions, open-to-open returns, estimand gate,
-operator verdicts) are unchanged; implementations rebind per INFR-010 §6 Phase C.
-
-## Two-lane data model (binding)
-
-| Lane | Tier | Data | Fill/cost | Default |
-|------|------|------|-----------|---------|
-| **Primary** | T1 | 1m OHLCV from Bybit trades | **Zero-cost model** (`NO_COST_CHARGED`): engine costless-honest; no fees/funding/spread injected at analysis; ZERO-COST-DISCLOSURE caveat on every report | **All experiments** |
-| **Signed bar** | T1 diagnostic | Exact taker buy/sell volume; stored mean-price skew | Skew quarantined as `MeanPriceSkewBps / UNUSABLE_AS_SPREAD`; never cost input | Approved flow diagnostics only |
-| **Secondary** | T2 | MBP/L2 contracts only; no collected dataset | Unavailable | **Not a programme direction** |
-
-**Spread boundary (INFR-022):** no valid spread observation or secondary-data rescue exists; the
-retired cost stack (fees/funding injection, spread-scale routing) is archived in
-`xen/evaluation_cost_legacy.py` and not callable from any live path.
-
-**Current signed-data materialisation:** the raw signed source is currently readable through the
-mounted archived staging symlink. The full TRAIN signed catalog is verified at
-`data/catalog_sigbar/train/`: 3,731,908 rows across five symbols, with tree sha
-`d4b7bbed7e0c…f7d2b9` and a zero-TEST/holdout SPDR-011 attestation. The OHLCV catalog is unaffected.
-
-## High-level architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  STAGE 1: DATA INGEST (INFR-011, streaming raw-less)                        │
-│  • Census: public.bybit.com/trading/ → 910 USDT linear perps (anti-survivorship) │
-│  • Trades → 1m OHLCV + signed volume + quarantined mean-price skew          │
-│  • ParquetDataCatalog at data/catalog/ (instrument_id/data_type/date)       │
-│  • Global calendar fence manifest (A6, hash-pinned)                       │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  STAGE 2: STRATEGY EXECUTION (NautilusTrader, INFR-010)                     │
-│  • BacktestNode on catalog bars; event-sequenced deterministic replay       │
-│  • Emission contract v1 → data/nautilus_runs/<run_id>/                    │
-│  • Shim: xen.nautilus.adjudication_shim → xen.adjudication                 │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  STAGE 3: ANALYSIS (Python only — no price-strategy vectorised backtest)    │
-│  • xen.estimand_validation v2 (blocking)                                    │
-│  • T1 cost model: ZERO-COST (NO_COST_CHARGED) — no fees/funding/spread injected   │
-│  • xen.evaluation evidence → operator verdict                               │
-└─────────────────────────────────────────────────────────────────────────────┘
+```text
+materialized catalog
+        │
+        ▼
+fenced catalog read ──► Nautilus event-driven run ──► emission contract
+        │                                            │
+        └────────────────────────────────────────────┘
+                             ▼
+                 Python validation and referee analysis
+                             ▼
+                     operator evidence handoff
 ```
 
-Chart-type generators (Line Break, Renko, Heiken Ashi) remain **dormant** on the new stack
-until explicitly ported.
+The stages have distinct responsibilities:
 
-## Catalog layout
+1. The catalog supplies the registered price or diagnostic data.
+2. The fence wrapper enforces the authorized chronological band.
+3. Nautilus processes events, strategy state, orders, fills, positions, and marks.
+4. The emission writer records the run identity and deterministic artifacts.
+5. Python checks validity, computes the registered estimand, composes portfolios where required, and produces neutral evidence.
+6. The operator assigns the final disposition.
+
+## 2. Engine and execution contract
+
+- The engine pin for the current catalog fence is Nautilus `1.230.0`.
+- A strategy receives engine events and uses engine-native order and position state.
+- A fill, order, position, or return may enter analysis only through the emitted record or a value explicitly derived from it.
+- Python may perform chronological composition and adjudication after emission. It may not invent fills, replace engine account state, or replay prices with a vectorized shortcut.
+- `python/src/xen/nautilus/emission.py` provides `EmissionPaths`, `write_emission_v1`, and `load_emission_v1` for the run contract.
+- A platform pin, configuration hash, catalog identity, instrument map, output counts, fence attestation, and deterministic event-log hash are part of run identity.
+
+The current clean slate has no materialized run-output directory. An authorized runner supplies a destination to `write_emission_v1`; the writer creates that per-run directory.
+
+## 3. Data layers
+
+The materialized data tree is:
 
 ```text
 data/
-├── catalog/                          # Nautilus ParquetDataCatalog (primary)
-│   └── <instrument_id>/bars/...      # Partitioned by date; ns timestamps
-├── nautilus_runs/                    # Emission contract v1 outputs
-│   └── <run_id>/
-│       ├── run_metadata.json
-│       ├── bar_marks.parquet
-│       ├── positions_ledger.parquet
-│       ├── fills.parquet
-│       ├── orders.parquet
-│       ├── event_log.jsonl
-│       ├── instrument_id_map.json
-│       └── fence_attestation.json
-└── staging/                          # active transient space; Chapter-04 bars archived
+├── catalog/
+│   └── data/
+│       ├── bar/
+│       │   └── <SYMBOL>-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL/
+│       │       └── <start>_<end>.parquet
+│       └── crypto_perpetual/
+│           └── <SYMBOL>-LINEAR.BYBIT/
+│               └── <instrument-metadata>.parquet
+├── catalog_sigbar/
+│   └── train/data/custom_signed_bar/
+│       └── <SYMBOL>-LINEAR.BYBIT/<start>_<end>.parquet
+└── catalog_ctrader/
+    └── data/{bar,currency_pair,cfd}/...
 ```
 
-**Archived (chapter-03, obligations persist on that data):**
-`archive/chapter-03-xena-mtfctx/data/timebars/`, `data/strategy_runs/` (cTrader emissions).
+### Primary price layer
 
-## Instrument identity
+`data/catalog/` contains 903 structurally readable Bybit linear-perpetual instruments: 894 admitted instruments plus nine specification-incomplete instruments. The admitted-plus-incomplete materialization contains 672,138,742 bars. The data is one-minute public-trade OHLCV; raw trades are not retained.
 
-Archive symbol `BTCUSDT` → Nautilus `InstrumentId` `BTCUSDT-LINEAR.BYBIT`.
-Convention: `xen.nautilus.instrument_ids` (`{sym}-LINEAR.BYBIT`).
+The standard bar type is `<SYMBOL>-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL`. The bar becomes known at close. A feature used for a decision at `t` must obey the registered lag, normally `t-1` for bar research.
 
-## Temporal discipline (principle rebind)
+### Signed diagnostic layer
 
-| Legacy (cTrader) | v2 (Nautilus) |
-|----------------|---------------|
-| `AnalysisEndUtc` fence in run metadata | Catalog fence wrapper + `fence_attestation.json` hash-pinned to INFR-011 A6 manifest |
-| `CloseTime` / `SourceCloseTime` alignment | `ts_event` ns monotonicity; decisions on confirmed data ≤ t−1 only |
-| Open-to-open returns | **Unchanged** for bar-domain strategies |
-| cTrader engine only | **Nautilus event-driven engine only** — no vectorised Python backtest of a price strategy |
+`data/catalog_sigbar/train/` contains five instruments, 3,731,908 rows, and 90 parquet files. It records taker-buy volume, taker-sell volume, exact aggregate delta, participation count, and a quarantined mean-price-skew storage field.
 
-No-lookahead is structural: single-threaded event sequencing in `BacktestNode`; analysis
-uses `[t-1]` lag on bar marks. Phase D leak battery proves this on the new stack.
+`buy_volume + sell_volume == volume` is exact for each signed bar. `delta` is an exact bar aggregate only; it does not attribute volume to price levels or claim intrabar orderflow knowledge. `python/src/xen/sigbar/access.py` exposes the legacy mean-price-skew field as `MeanPriceSkewBps` with status `UNUSABLE_AS_SPREAD`; it is not quote spread, executable spread, or a cost estimate.
 
-## Global calendar fence (D6)
+The signed layer is TRAIN-only. It contains no TEST or lifetime-HOLDOUT rows and cannot be used to claim full-universe signed evidence.
 
-One TRAIN/TEST/HOLDOUT date pair shared by every symbol (cross-sectional leak-safety).
-Late-listed symbols have shorter TRAIN; fence computed from admitted catalog range end
-(INFR-011 A6). Final 30% never queried. Catalog query wrapper refuses post-fence reads.
+### Compatibility layer
 
-## Holdout split (unchanged semantics)
+`data/catalog_ctrader/` contains three compatibility instruments: `EURUSD.CTrader`, `XAUUSD.CTrader`, and `USTEC.CTrader`. It is compatibility-only and is not the active source for current Bybit research. Its source-specific volume must not be interpreted as Bybit taker-side volume.
 
+### Absent layers
+
+There is no live L2 snapshot store, quote store, orderflow detector store, or feature-store contract. A future implementation of such a layer would require a new registered design; it cannot be inferred from the signed diagnostic catalog.
+
+## 4. Chronological fence
+
+The pinned global boundaries are:
+
+| Boundary | UTC value |
+|---|---|
+| Analysis start | `2021-06-29T06:53:00Z` |
+| TRAIN end / TEST start | `2023-12-18T00:00:00Z` |
+| TEST end / lifetime HOLDOUT start | `2025-01-08T00:00:00Z` |
+| Catalog data end | `2026-07-14T23:59:00Z` |
+| Fence manifest SHA-256 | `35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448` |
+
+The nested split uses 70% of the analysis range and then 70% of that analysis range for TRAIN. A run may use narrower predeclared windows inside the bounds. It may not move a boundary or tune a window after seeing the outcome.
+
+`python/src/xen/nautilus/catalog_fence.py` is the sanctioned access boundary. Use `fenced_bar_query` or `assert_within_fence`. The only valid bands are `TRAIN` and `TEST`; a HOLDOUT query raises a fence violation. TEST access requires operator authorization and is counted in the gate ledger.
+
+## 5. Emission-contract-v1
+
+Each authorized Nautilus run writes a directory with this contract:
+
+```text
+<run_dir>/
+├── run_metadata.json
+├── fills.parquet
+├── orders.parquet
+├── positions_ledger.parquet
+├── bar_marks.parquet
+├── event_log.jsonl
+├── instrument_id_map.json
+└── fence_attestation.json
 ```
-Admitted catalog range (per symbol, capped 4y)
-├── First 70% chronologically = ANALYSIS
-│   ├── First 70% of analysis = TRAIN
-│   └── Last 30% of analysis = TEST
-└── Final 30% = GLOBAL HOLDOUT (never loaded)
+
+`run_metadata.json` records:
+
+- `emission_contract_version`;
+- a stable hash of the run configuration;
+- catalog version and path as supplied to the runner;
+- Nautilus version and platform;
+- instrument map and output counts;
+- fence-attestation identity;
+- deterministic event-log SHA-256.
+
+The event log strips process-ephemeral identifiers so the same pinned inputs and configuration can be compared across restarts. Differences caused by platform or floating-point behaviour must be declared by the run pin.
+
+The emission is complete only when all required tables and JSON records exist and are non-stub where the design requires them. Reconciliation failures, missing files, empty required observations, or a non-pinned fence invalidate the run.
+
+## 6. Analysis boundary
+
+The referee layer consumes the emission and registered design. It may:
+
+- validate fence, causality, reconciliation, determinism, non-degeneracy, and future-destroy integrity;
+- calculate the predeclared effect, uncertainty, counts, sign distribution, and PSR context;
+- compose XENA candidates in chronological order using the registered portfolio rule;
+- produce neutral tables, diagnostics, and operator-routing metadata.
+
+It may not:
+
+- create local fills or account state that the engine did not emit;
+- tune the strategy or comparator using TEST/HOLDOUT outcomes;
+- turn a count, PSR, threshold, or score into a machine economic verdict;
+- add a spread, commission, swap, funding, or slippage model without a scoped pre-run authorization;
+- present gross, cost-free evidence as net performance, tradability, or deployability.
+
+## 7. Cost boundary
+
+The current architecture charges no execution costs:
+
+```text
+ZERO-COST-DISCLOSURE
+  cost_model: NO_COST_CHARGED
+  spread: not modeled
+  commissions: not modeled
+  swaps/funding: not modeled
+  implication: every figure in this document is gross and cost-free; no spread,
+    commission, or swap enters any calculation. Realised results would differ
+    (likely worse) under any real cost schedule.
+  prohibited_claims: fully-net, cost-complete, tradable, deployable
+  lifting: only an explicit operator authorization may introduce a cost model
+    for a scoped experiment; that authorization and its schedule are recorded
+    in the experiment design before execution.
 ```
 
-Fence dates are **absolute calendar dates** in the pinned manifest, not row fractions on
-the live catalog.
-
-## Emission contract v1
-
-Spec: `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-010/code/emission_contract_v1.md`.
-
-- **Phase B smokes** may carry `fence_attestation.status: STUB` — estimand gate v2 **rejects** these for real experiments.
-- **Production emissions** must attest the INFR-011 A6 `fence-manifest.json` sha256.
-
-## Cost model (ZERO-COST — INFR-022, supersedes the T1 analysis injection)
-
-**All lanes default to `NO_COST_CHARGED` (binding, INFR-022 directive 1):** no spread,
-commission, or swap enters any calculation in any experiment type unless an explicit operator
-cost directive requests costs (recorded in the experiment's design.md before execution; QA
-traces it). "Zero" is a model, not a measurement — every money-bearing report/analysis/results
-artifact carries the ZERO-COST-DISCLOSURE caveat verbatim (`docs/references/neutrality-standard.md`
-§ N9). Non-zero `--cost-bps` / `charge_costs=True` raise unless `operator_cost_directive.json`
-(operator-signed reason + scope) is present. `money_per_unit` is a sizing/capital-unit factor,
-not a cost.
-
-**Retired cost stack (historical record — chapter-04/05).** The former T1 analysis injection —
-Bybit maker/taker schedule (`BYBIT_USDT_PERP_FEES`), timestamp-counted funding,
-`bybit_round_trip_cost_bps` with `spread_rt_bps=None` / `PARTIAL_FEES_FUNDING_ONLY` and the
-understatement caveat, `t1_round_trip_spread_bps`, `spread_scale_route` — moved to
-`xen/evaluation_cost_legacy.py` (ARCHIVED banner; not callable from any live path; only an
-operator cost directive may re-enable it, recorded in the design).
-
-The stored `SpreadBps` bytes have no tick floor and are not spread. Live access goes through
-`xen.sigbar.quarantine_mean_price_skew`, which exposes `MeanPriceSkewBps` with status
-`UNUSABLE_AS_SPREAD` — a data-provenance quarantine, kept live (not a cost read). FTMO cost
-table is **archived** in the legacy module for chapter-03 VAL re-analysis only.
-
-## Cost directive mechanism (INFR-022 §3.4)
-
-* Design clause in `design.md` naming the directive, functions, and scope.
-* Run-dir / universe-root file `operator_cost_directive.json` (operator-signed reason
-  string + scope).
-* QA traces both. Estimand `--cost-bps != 0` fails without the file; oracle
-  `charge_costs=True` raises without the directive object/path.
-
-## Confirmed decisions (INFR-010 D1–D8)
-
-| # | Decision |
-|---|----------|
-| D1 | Bybit official archives only (Binance fallback noted, no MBP fallback) |
-| D2 | OHLCV from trades archives (not klines) |
-| D3 | USDT linear perps only (910 census) |
-| D4 | **Superseded for Chapter 05:** MBP/L2 is unavailable; no secondary confirmation branch |
-| D5 | Chapter rollover — cTrader archived |
-| D6 | Global calendar fence |
-| D7 | **Superseded by INFR-017:** stored mean-price skew is unusable; Chapter-05 T1 uses five audited conservative pins |
-| D8 | MBP/L2 terminology; no MBO/L3 claims |
-
-## What this document is not
-
-- Not a strategy thesis — experiments live under `python/experiments/`.
-- Not an MBP collection plan; secondary data is unavailable for the active programme.
-- Not the XENA adjudication spec — see `xena-lane.md` v2 (registry VOID on new data).
+If a scoped experiment introduces a nonzero model, its schedule, scope, and effect on the estimand are recorded in the design before execution. The default architecture remains gross and cost-free.

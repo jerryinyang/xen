@@ -1174,7 +1174,7 @@ construction** over one that is merely intuitive. An identity that is only *usua
 premise defect, and premise defects propagate into every downstream budget.
 
 **Enforced at.** `.ignore/what-next/alts/opportunity.md` §2;
-`docs/references/chapter-06-governance.md` §1b + §3;
+`docs/references/governance.md` §1b + §3;
 `docs/signal-registry/candidate-families/cf-voldir-001.md` §0;
 `docs/signal-registry/multiplicity-registry.md` AMENDMENT-C2;
 `python/experiments/SPDR-018/design.md` §4.1 + §12 (identity-reconstruction integrity check).

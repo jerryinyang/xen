@@ -1,254 +1,152 @@
-# XENA Lane v2 — Portfolio-Construction Workflow (INFR-006 → INFR-009 → INFR-012 rebind)
+# XENA lane — portfolio construction
 
-**Version:** v2 (INFR-012, 2026-07-15) — Nautilus emissions + Bybit universe
-**The DEFAULT route for incoming ideas** (operator decision Q3, 2026-07-10; route RESTORED
-2026-07-14 under INFR-009 P5): operator presents an idea → it enters a XENA universe.
-EXP/SPDR lanes remain **operator-invoked only**.
+**Status:** Binding live lane rules
 
-## VOID on new stack (binding, INFR-010 R4)
+XENA is the portfolio-construction lane. It generates candidate strategies once in the event-driven engine, composes candidate subsets chronologically in Python, and reports search, certification, and gate evidence for operator review. It is not a licence to search indefinitely, qualify candidates on their own outcomes, or treat a portfolio score as an economic verdict.
 
-All frozen registry pins from chapter 03 (INFR-006/009) are **VOID for new Bybit/crypto data**.
-No XENA universe may run on the new stack until a fresh calibration cycle (CAL discipline:
-n_null sizing, design/confirm bank split, predeclared n) completes and a new hash-pinned
-registry is operator-signed. Chapter-03 registry artifacts remain for archived reproducibility
-only.
+## 1. Responsibilities and boundary
 
-## Archived binder (chapter 03 only — VOID on Bybit/crypto)
+- Every structurally complete registered model × parameter × instrument × domain combination is a candidate. Candidate-level performance gates are prohibited.
+- Nautilus executes each candidate once under the catalog fence and emits the engine record.
+- Python performs chronological portfolio composition, sizing under the registered rule, reconciliation, and analysis. It does not alter entry/exit decisions or invent account state.
+- A candidate that depends on account state for its own signal logic cannot use the price-primary carve-out below.
+- The operator authorizes the universe, search spend, TEST read, cost exception, and final disposition.
 
-The following INFR-009 P5 mechanics are **archived reference** for chapter-03 reproducibility.
-They MUST NOT bind any crypto/Bybit universe until a fresh CAL cycle produces a new pin.
+The registered object is the XENA run: universe manifest, code/config identity, catalog and fence, predeclared bands, search settings, candidate accounting, and any calibration or threshold pin. A later threshold change is a new registered run or a documented pre-execution amendment.
 
-**Archived binder (INFR-009 exit (c), P5 pin):** two-stage sample-split — stage-1 costless intensive
-`g_gross` search → fix top-1 → stage-2 leg-studentized LCB on a distant/embargoed band.
-- **Gross structure:** `lcb_g_leg_studentized(g_gross) > 0` (costless).
-- **Deployability:** `lcb_g_leg_studentized(g_net) > 0` after **flat injected RT = 1.0 bps**
-  (not stream `cost_bps` on engine-costless emissions).
-- **Registry:** `python/experiments/INFR-009/results/pc_frozen_registry.json` (schema v2,
-  sha256 `db87dc1a…`; parent P4 `44e1aa3c…`). α̂=5.0% boundary accepted (Wilson upper 9.0% disclosed).
-- **INFR-006 v3** absolute extensive-F binders (X / F_floor / gate 0.0558) remain **superseded** —
-  artifacts retained; do not re-enable on the binding path.
+## 2. Pipeline
 
-Design record (redesign): `python/experiments/INFR-009/design.md`. Historical INFR-006 plan:
-`python/experiments/INFR-006/design.md`. Spec source: `.ignore/temp/new-referee/xena-model.md`.
-
-## INFR-022 — zero-cost model, single gross gate, powering strip (binding, 2026-08-08)
-
-Operator directive INFR-022 supersedes, within the live programme: the A-4 dual gate
-(gross binding + net informational), `PARTIAL_FEES_FUNDING_ONLY` cost scope,
-`spread_scale_route` T1 decidability routing, the leg-power MDE layer, and all net
-reads.
-
-* **Zero-cost model.** All lanes default to `NO_COST_CHARGED` — no spread, commission, or
-  swap enters any calculation (`cost_bps == 0` is a compliant pin; the old
-  placeholder-zero refusal is gone). Non-zero costs require an operator cost directive
-  (`operator_cost_directive.json` + design clause); `charge_costs=True` raises without
-  it. Every report/artifact carries the ZERO-COST-DISCLOSURE caveat verbatim (§3.1).
-  `money_per_unit` is a sizing/capital-unit factor, not a cost.
-* **Single gross gate.** `run_final_gate` runs GROSS once (selection also runs gross, so
-  the search-gap diagnostic compares like scales); the `net_informational` block is
-  retired and the artifact carries `cost_model: NO_COST_CHARGED`. `passed` remains an
-  operator-facing selection-machinery field (D5); deployability/tradability claims stay
-  refused by rule. `final_report_layer` is a gross walk-forward layer
-  (`final_walk_forward`).
-* **Powering strip (L-63).** `power_layer` → `sample_size_layer` (n_legs + per-leg vol +
-  design minimum-n NOTE; no MDE, no `powered`, no UNPOWERED); `structural_label` and
-  machine label assignment deleted (N11 — operator-only tags); `sign_battery` drops
-  `min_powered_seeds`/`powered` (effect + one-sided p + CI + n). Search/certify are
-  gross-only (`score_kind='g_gross'`; the `g_net`/L-26 path raises).
-* **PSR pairing.** Every mean-trade/leg bps read (economics disclosure, report layers,
-  analysis) carries `psr` + `psr_n` on the same series (`xen.evaluation.psr`;
-  `report_layer.psr_layer`). PSR is evidence, never a gate.
-* **Neutrality.** N1–N11 (`docs/references/neutrality-standard.md`) bind every read;
-  the leak tripwire's integrity bite is `INTEGRITY_Z × bootstrap_SE` (N6b), never an MDE.
-* **Retired CAL apparatus** (`calibration*.py`) is bannered legacy — not bindable on the
-  live path without a post-INFR-022 CAL redesign (the WS-6 v3 power table below is
-  **historical record**).
-
-## INFR-016/INFR-022 — value chain is report layers, not gates
-
-Every value / quality / significance / selection read is a **report layer**
-(`xen.xena.report_layer.LayerReport`): per candidate, `observed / ideal / interpretation`, **no
-`pass` field**, nothing machine-dropped. The operator authorises which candidates advance. Two
-disjoint layers (design §4):
-
-- **VALIDITY attestations (HARD)** — holdout fence, causal ≤t-1, estimand reconciliation,
-  non-STUB fence, no-local-accounting, structural computability, oracle determinism, and
-  **future-destroy leak survival** (edge survives destroying FUTURE info ⇒ acausal L-01 leak).
-  A failure = *emission invalid → fix the data*, never *no edge*.
-- **VALUE reads (REPORT LAYERS)** — sample-size layer (`sample_size_layer`, retires
-  `power_layer`/`n_legs_floor`/MDE), cadence coverage, search score, fold stability,
-  **stage-2 bounds for ALL subsets AND per-cell** (`stage2_bounds_layer`, retires
-  `one_subset` top-1), **within-sample attribution** collapse
-  (`controls.attribution_derangement` — reported fraction, retires `hard_fail_leak`
-  collapse<0.5), **sign battery** (`controls.sign_battery`, ≥2000 seeds → effect size +
-  one-sided p + CI + n, retires the 25-seed `at_or_above_p95` boolean and power labels),
-  **PSR** (`psr_layer` — PSR + n beside mean-trade bps), gross walk-forward
-  (`final_gate.final_report_layer` = `final_walk_forward`, retires net deployability and
-  the final gate's `passed`).
-
-Interpretation bands `SUPPORTED / WASH / CONTRADICTED / UNPOWERED / SUGGESTIVE / STRONG` are
-**operator-only tags on a layer** (N11) — never machine-assigned, never gates. The counted-read
-ledger + holdout-safety stay as read-budget / validity controls. Grounding failures (HTFCAP): a
-25-seed P95 boolean auto-"failed" SOL 24.9 bps (p≈0.22, ~P78 at 2000 seeds — SUGGESTIVE, not
-refuted); `one_subset` hid it and certified a ~1 bps leak-class cell. `python/experiments/INFR-016/design.md`.
-
-## Principle
-
-**No per-candidate evaluation.** Every (model × parameters × instrument × domain) is a
-valid candidate — no qualification gates at candidate level. Candidates run once in
-**Nautilus**; the portfolio framework selects the subset. The optimizer is a candidate
-*generator*, never a *certifier*: certification is machinery the search cannot influence.
-**INFR-016:** even the post-search chain never *certifies* — it **reports layers**; the
-operator authorises progression.
-
-## Pipeline
-
-```
-1 Universe assembly ... manifest + Nautilus emissions → data/nautilus_runs/XENA-<univ>/
-2 Candidate gate ...... xen.xena.ingest.gate_universe → xena_candidate_gate.json (BLOCKING)
-3 Search .............. xen.xena.search.run_restart ×10–15 (LAHC, TRAIN search band only)
-4 Certification ....... xen.xena.certify.certify_and_rank (plateau screen + fold ranking)
-    [OPERATOR — reviews evidence package; approves gate spend]
-5 Final gate .......... xen.xena.final_gate.run_final_gate (TEST band, counted, cap 2;
-                        single GROSS run — INFR-022)
-    [OPERATOR — final verdict on the artifact]
+```text
+1. Universe assembly ... manifest and one-time Nautilus candidate emissions
+2. Candidate gate ...... structural contract and candidate inventory
+3. Search .............. predeclared chronological TRAIN search and restarts
+4. Certification ....... plateau, fold, attribution, sign, and stability reports
+    [OPERATOR — reviews the evidence package and approves gate spend]
+5. Final gate ........... one counted gross TEST walk-forward per authorized slot
+    [OPERATOR — assigns the final disposition]
 ```
 
-## Price-primary carve-out (binding)
+The candidate gate checks completeness and structural identity; it does not select a candidate on performance. Search and certification are TRAIN activities. The final gate is a TEST activity, is counted in the universe ledger, and is not used for post-outcome re-search.
 
-- **Nautilus (per candidate, once):** all signal logic; emission contract v1 under catalog
-  fence — `bar_marks.parquet` (bar grid + `RealOpen` marks) + `positions_ledger.parquet`
-  per-leg ledger (shim → `cis_trades`) with **finite `SlPrice` on every leg** (stop distance
-  `|EntryFill − SlPrice|` is the sizing denominator; missing/non-finite `SlPrice` ⇒ gate
-  REJECT). **Clarified (operator, 2026-07-10, CF-MTFCTX-001 reconciliation):** the gate
-  requirement is the finite per-leg `SlPrice` FIELD; a live engine stop order is not
-  required — a synthetic sizing-only stop price satisfies the contract. Candidate never
-  sizes, never sees account state.
-- **Python oracle (`xen.xena.oracle`, per subset):** chronological composition ONLY —
-  FM(t), `R_i = r·FM·w_i` sizing, global `R_max` admission (rejected signals logged as
-  first-class events — the sole interaction channel), zero-cost gross accounting
-  (`charge_costs` defaults False; charging requires an operator cost directive — INFR-022),
-  segment-end censoring, reconciliation invariant (raises). Deterministic:
-  (bitmask, segment, seed) → bit-identical. It may never alter an entry/exit decision.
-  **INFR-007 (NEUTRAL, 2026-07-12):** the sequential event fold is dispatched to the
-  `xena_fold` Rust kernel (`OracleConfig.backend`, ~15×/eval) — proven bit-identical to
-  the Python loop by the pinned parity corpus (`python/tests/test_xena_fold_parity.py`)
-  and the XENA-001 rid-0 replay credential; sorting, mark schedules, bootstrap RNG, and
-  all search/certify/gate layers stay in Python unchanged.
-- A candidate whose logic depends on account state cannot use this carve-out.
+## 3. Validity attestations
 
-## Frozen registry (chapter 03 archive — VOID on new stack)
+These are hard checks. A failure makes the affected emission or layer invalid (`VOID`); it is not evidence that the strategy has no value:
 
-`python/experiments/INFR-006/results/xena_frozen_registry.json` — verify with
-`xen.xena.calibration.verify_frozen_registry` **on archived FX/indices universes only**.
-**Archived pin: v3 (2026-07-10), sha256
-`537d691aaf59c19220ac65b922d780e970167e8b71972ea8d864402b36e672a6`** — operator-signed
-(v2 X/F_floor sign-off + A-4 dual-gate directive). Superseded: v1 costed-selection
-(`results/v1-costed-selection/`), v2 net-binding-gate (`results/v2-net-binding-gate/`).
+- **Fence:** all reads and emitted timestamps are inside the registered band and carry the pinned attestation.
+- **Causality:** the signal uses only information available by the registered boundary, normally `t-1` for bar decisions.
+- **Estimand reconciliation:** orders, fills, positions, marks, and derived returns reconcile to the registered estimand.
+- **Non-stub output:** required files contain finite, non-degenerate observations.
+- **No local accounting:** Python does not create an unrecorded account or P&L ledger.
+- **Structural computability:** every candidate and subset has the required fields, finite sizing inputs, and declared exclusions.
+- **Oracle determinism:** the same bitmask, segment, seed, and pinned inputs produce the same decision-relevant composition.
+- **Future-destroy integrity:** deliberately destroying future-only information invalidates or materially destroys the affected edge. An edge that survives only because leakage was not tested is not cleared.
 
-| Quantity | Frozen value |
-|---|---|
-| Search params | `SearchParams()` registry defaults (L=150, c=5, kick 2–4 swap-paired, probs .25/.25/.45/.05, B=150, block 64, P25, q=0.6, clear-win 2.0 SD, init size 5) |
-| Gate mechanics | decay windows 4, gate boot seed 424243, gate B = max(B, 200) — fixed in code, listed for §11 registry completeness |
-| Plateau X | 0.70 (min single-drop F̂ ratio) |
-| F_floor | 0.4302 (minimum robust objective, gross scale; conjunction with X) |
-| Gate pass threshold | 0.0558 on the GROSS gate bootstrap P25 (rule: max(0, GROSS null-P95); A-4) |
-| Segment layout shape | 50/30/20 search/ranking/gate (`SegmentLayout.from_span`) |
-| Base objective F | log-wealth; DD limits are gate feasibility checks, never inside F |
+## 4. Value report layers
 
-**Calibration credentials (WS-6 v3, 550 realistic-null universes — shared regime-GBM
-path, correlated coin-flip nulls, vol-clustered entries — real code paths incl. the A-4
-dual gate):** [**HISTORICAL record** — CAL apparatus is bannered legacy after INFR-022;
-these power figures must NOT be re-derived or treated as live credentials. End-to-end
-power: 18 bps gross 16% · 30 bps 70% · 40 bps 94% · 60 bps 100% (at 60 trades/candidate +
-regime-GBM noise; restate per live trade density).] Raw + summary:
-`python/experiments/INFR-006/results/`.
+Value and quality reads are report layers, not automatic gates. Every layer contains `observed`, `ideal`, and `interpretation` fields or their equivalent and does not machine-drop a candidate because a value is inconvenient.
 
-**Enforced in code (review F01, archived universes only):** for chapter-03 live universes,
-`certify_and_rank` and `run_final_gate` MUST receive `registry_path`; they hash-verify the pin and refuse
-thresholds/params that differ (`threshold_override_attestation` is the operator-only
-escape hatch, recorded verbatim like `new_data_attestation`). Only calibration runs —
-where thresholds are being derived, not consumed — pass None. Artifacts and the gate
-ledger carry `registry_sha256`.
+The evidence package may include:
 
-**Tuning any frozen value after seeing a live universe's outcome is a governance
-violation.** A change = new predeclared calibration (new battery, new hash-pin), with a
-LOOSER/TIGHTER-tagged amendment (L-23).
+- sample-size context: counts, per-leg volatility, and any design minimum noted as context only;
+- cadence coverage and missingness;
+- search score and restart dispersion;
+- purged fold stability and worst/median ranking;
+- stage-2 bounds for every declared subset and per-cell result;
+- within-sample attribution and derangement diagnostics;
+- sign battery with effect, one-sided probability, confidence interval, and count;
+- PSR beside every mean-trade or leg-bps read on the same series;
+- gross walk-forward results, decay windows, rank correlation, and seed spread;
+- evaluation counts and distinct-subset counts.
 
-## Cost policy (INFR-022 — supersedes amendments A-1 + A-4)
+Interpretation bands such as `SUPPORTED`, `WASH`, `CONTRADICTED`, `SUGGESTIVE`, or `STRONG` are operator-only labels. They are never machine-assigned and never gate a run. No layer may use MDE, power, detection floors, powered/unpowered labels, or an outcome-derived threshold.
 
-- **Zero-cost model (binding).** Selection, certification, and the final gate all run
-  **GROSS and cost-free**: `OracleConfig.charge_costs` defaults `False`; `cost_bps` on
-  streams is inert (ledger `CostMoney` = 0.0); non-zero `--cost-bps` / `charge_costs=True`
-  raise unless an operator cost directive (`operator_cost_directive.json`, recorded in the
-  design before execution) is supplied. Nautilus T1 emissions are gross as always (engine
-  costless-honest). `docs/references/neutrality-standard.md` § N9 requires the
-  ZERO-COST-DISCLOSURE caveat on every money-bearing artifact.
-- **Retired routing.** `spread_scale_route` / `t1_round_trip_spread_bps` and the
-  `PARKED_T1_UNRESOLVED` / `AWAITING_MBP` dispositions are retired (moved to
-  `xen.evaluation_cost_legacy`, ARCHIVED banner) — no decidability routing on the live
-  path.
-- **Single gross gate (INFR-022, supersedes A-4).** The final gate runs the §A.4 protocol
-  ONCE, gross and binding: `passed` = gross bootstrap P25 ≥ pre-registered threshold AND
-  gross-path DD feasible. The `net_informational` run is retired; artifacts carry
-  `cost_model: NO_COST_CHARGED`.
-- **L-22 retained clause (binding):** a gate pass is a **selection-machinery verdict,
-  never a tradability/deployability claim**; deployability/tradability claims remain
-  refused by rule (the zero-cost model does not loosen them).
-- **DD feasibility**: FTMO-style limits (daily 5% vs day-start equity, total 10% vs
-  initial) — binding on the gross path.
-- The retired cost stack (`bybit_round_trip_cost_bps`, FTMO tables, funding stamps) lives
-  in `xen/evaluation_cost_legacy.py` — archive-only; the chapter-05 cost-data preflight
-  docs carry HISTORICAL banners.
+The sign battery is a robustness read, not a pass/fail test. Its seed count, effect, probability, interval, and interpretation are reported together. A small or wide result is not hidden, and a large count is not proof of adequacy.
 
-## Temporal mapping (Q1, tightened)
+## 5. Price-primary carve-out
 
-TRAIN is **partitioned**: search band ∪ disjoint contiguous purged selection folds
-(ranking band). Folds never overlap the search band. Final gate = TEST, continuous
-walk-forward, fresh account state. Band boundaries are pre-registered per universe.
-Global 30% holdout untouched, as always. CPCV/stitched paths excluded (account-state
-path dependency).
+### Engine-side candidate emission
 
-## Gate ledger (Q2 — LOOSER amendment vs spec §A.5, tagged)
+All signal logic runs in Nautilus once per candidate. The emission includes the bar grid and marks plus the per-leg position ledger. Every leg must carry a finite `SlPrice` field. The price may be a synthetic sizing-only stop; a live stop order is not required. The sizing denominator is `|EntryFill - SlPrice|`. Missing or non-finite `SlPrice` invalidates the candidate emission.
 
-- Portfolio-level ledger `xena_gate_ledger.json` at the universe root; **cap 2 final
-  gates per universe**; a slot is spent on pass OR fail.
-- The second slot = a **materially different certified subset** or **new TEST data** —
-  never a free retry. `run_final_gate` refuses a subset identical to a FAILED row unless
-  `new_data_attestation` is supplied. **The attestation is an OPERATOR-ONLY field**: an
-  agent must never fabricate or supply it; it is the operator's signed reason, recorded
-  verbatim in the ledger.
-- A failed gate = negative result; no post-hoc threshold revision; no re-search on the
-  gate segment.
-- **Similarity to prior failed subsets is reported, never gating** (operator decision
-  2026-07-10, review F03): the artifact carries `max_jaccard_vs_prior_failed`; only exact
-  identity is refused. Candidate-removal responsibility belongs to the whole portfolio
-  referee system — per-candidate qualifying rules are against XENA principles.
+The candidate does not size itself and does not see portfolio account state. A signal may not change because another candidate was selected, because cash was consumed, or because a portfolio-level stop fired.
 
-## Registry semantics
+### Python oracle
 
-- The registered object is a **XENA run**: universe manifest + frozen registry hash +
-  pre-registered band boundaries. Multiplicity ledger logs `evaluation_count` (total
-  oracle calls) AND `distinct_subsets` per run — both travel with every reported number
-  (§10.4). No result without its evaluation counts.
-- Universe status changes (certify/retire) happen at operator-signed checkpoints, mirroring
-  the experiment≠family separation.
+`xen.xena.oracle` performs chronological composition only. For each time step it applies the registered portfolio multiplier and weights, for example `R_i = r · FM · w_i`, applies the global `R_max` admission rule, logs rejected signals as first-class events, censors at segment ends, and raises on reconciliation failure. It must be deterministic for the registered bitmask, segment, and seed.
 
-## Analyst reads (certification evidence package)
+The oracle uses gross accounting by default. It may not alter an entry or exit decision, introduce a hidden cost, or transform a portfolio composition result into a tradability claim.
 
-`certify_and_rank` output is **evidence, not a verdict**: plateau reports (min drop ratio,
-keystone attributions — a keystone is routed to individual scrutiny, not just discarded),
-restart F-dispersion + Hamming proximity (wild dispersion = noise-dominated landscape:
-distrust the winner), fold ranking (median/worst + PBO-like stat), collapse fractions,
-resim-divergence rows (spec §14 ledger-resampling detector: search-band bootstrap claim vs
-full re-sim fold scores per certified finalist; watch `frac_folds_below_search_p25` → 1).
-Gate artifact adds: bootstrap P25/median/P75 (never one number), decay windows +
-rank-corr, search-stage gap (labelled: search-P25 claim vs gate median — deliberately not
-like-for-like), seed spread. Operator judges value on this package.
+## 6. Search, certification, and TEST gate
 
-## v1 limitations (logged, revisable per spec §12)
+- Search uses only the registered TRAIN search band and predeclared restart/perturbation settings.
+- Ranking uses disjoint chronological, purged TRAIN folds. The search band and ranking folds do not overlap.
+- Certification examines every declared subset and cell, not only the top candidate.
+- The final gate uses a fresh TEST walk-forward and gross accounting once per authorized slot.
+- The global HOLDOUT remains sealed and is refused by the access layer.
+- Gate thresholds, objective definitions, segment layouts, and seed budgets are pinned before the corresponding read.
+- A gate read is a selection-machinery event. A gate result is not an economic, tradability, or deployability verdict.
 
-FM(t) = marked equity (no leverage-margin model); `money_per_unit` default 1.0 is
-USD-quote-only (non-USD-quote symbols must pin the factor); deep validation subsumed by
-fold ranking while the oracle is deterministic (multi-seed leg activates with stochastic
-elements); Nautilus batch manifest runner pending first live crypto universe (post-CAL).
+No historical frozen registry is binding for the live lane. If a calibrated threshold or other calibrated value is needed, the run design must name its calibration population, method, result, and hash before execution. It must not re-derive the value after looking at the live universe or gate outcome.
+
+## 7. Gate ledger
+
+The universe gate ledger is append-only and records every final-gate attempt, pass or fail, with the run identity, subset identity, TEST band, threshold pin, and evidence hashes.
+
+- There are at most two final-gate slots per universe unless the operator records a new scope with a new data attestation.
+- A slot is spent on both a pass and a fail.
+- An exact repeat of a failed subset is refused unless the operator supplies a signed new-data attestation.
+- Similarity to prior failed subsets is reported for operator review; only exact identity is an automatic refusal.
+- No threshold revision, baseline change, or re-search is permitted after a gate outcome.
+- `evaluation_count` (all oracle calls) and `distinct_subsets` travel with every reported number.
+
+A failed gate is a failed selection attempt, not a machine economic verdict. The operator records what the failure means for the registered question.
+
+## 8. Temporal mapping
+
+The default global fence is:
+
+```text
+analysis_start  = 2021-06-29T06:53:00Z
+train_end       = 2023-12-18T00:00:00Z
+holdout_start   = 2025-01-08T00:00:00Z
+data_end        = 2026-07-14T23:59:00Z
+```
+
+TRAIN is partitioned into a search band and disjoint chronological ranking folds. TEST is reserved for the counted final gate. The lifetime HOLDOUT is sealed. A universe design may choose narrower boundaries inside these values, but it must pin them before search and preserve them through the gate.
+
+## 9. Cost and claim boundary
+
+Every XENA selection, certification, and final gate is gross and cost-free by default:
+
+```text
+ZERO-COST-DISCLOSURE
+  cost_model: NO_COST_CHARGED
+  spread: not modeled
+  commissions: not modeled
+  swaps/funding: not modeled
+  implication: every figure in this document is gross and cost-free; no spread,
+    commission, or swap enters any calculation. Realised results would differ
+    (likely worse) under any real cost schedule.
+  prohibited_claims: fully-net, cost-complete, tradable, deployable
+  lifting: only an explicit operator authorization may introduce a cost model
+    for a scoped experiment; that authorization and its schedule are recorded
+    in the experiment design before execution.
+```
+
+`money_per_unit` is a sizing or capital-unit factor, not a cost. A nonzero cost model requires a pre-execution operator authorization that names the schedule, scope, and changed estimand. It cannot be introduced as a post-hoc interpretation.
+
+## 10. Neutral analysis and operator handoff
+
+The analyst reports observed values separately from inference, shows supportive and adverse evidence symmetrically, names every population and exclusion, and reports counts as context. Each mean-trade or leg-bps value carries `psr` and `psr_n` from the same predeclared per-trade series; PSR is never a gate.
+
+For observed Sharpe `SR_hat`, reference `SR*`, sample size `n`, empirical skewness `gamma_3`, empirical kurtosis `gamma_4`, and standard-normal CDF `Phi`, the paired PSR is:
+
+```text
+PSR(SR*) = Phi((SR_hat - SR*) * sqrt(n - 1)
+               / sqrt(1 - gamma_3 * SR_hat
+                       + ((gamma_4 - 1) / 4) * SR_hat^2))
+```
+
+It uses the same predeclared per-trade series and population as the reported Sharpe, defaults to `SR* = 0`, and emits `NaN` with an explicit reason when `n < 2` or the required moments/denominator are invalid. `psr` and `psr_n` sit beside every mean-trade or leg-bps read.
+
+The handoff includes the registered question, actual run identity, fence, engine, causal rule, candidate/subset accounting, effect and uncertainty, validity findings, cost disclosure, unresolved limitations, and the requested operator disposition. No machine field, including `passed`, can substitute for that handoff.

@@ -291,25 +291,24 @@ These binding constraints apply to all Xen research.
 | **Protocols, not directives** | Every lesson is codified as a checkable protocol, script, or structural separation — directives ("interrogate raw data") recur; protocols do not. |
 | **Operator-facing chat is plain** | Every question, status, summary, or gate prompt to the human is concise and de-jargonified (see § Operator-facing communication). Technical artifacts stay precise; operator messages translate. |
 
-### XENA Lane — the DEFAULT route (binding, INFR-006, 2026-07-10)
+### XENA Lane — portfolio-construction route
 
-**Incoming ideas route to XENA by default** (operator decision Q3): candidates run once in
-**Nautilus**, selected at portfolio level by `xen.xena.*`. **Frozen registry VOID on new
-stack** (INFR-010 R4) — fresh CAL cycle required before any crypto universe. EXP/SPDR
-operator-invoked only. Fills contract from Nautilus emissions (`positions_ledger` +
-`bar_marks` via shim; `SlPrice` field on legs). Full spec: `docs/references/xena-lane.md` v2.
+XENA is the portfolio-construction route: candidates run once in **Nautilus**, then Python
+composes and reports portfolio evidence through `xen.xena.*`. EXP and SPDR remain distinct
+operator-authorized routes. The fills contract comes from Nautilus emissions
+(`positions_ledger` + `bar_marks` via shim; finite `SlPrice` field on legs). The governing
+lane rules are in `docs/references/xena-lane.md`.
 
-### Chapter 06 standing route (live)
+### Programme standing route (live)
 
-Standing enforcement: `docs/references/chapter-06-governance.md` +
-`docs/experiments-docs/INDEX.md`. Programme frame: INFR-022 (§ Zero-cost model, Neutrality,
-Powering strip above). Chapter-05 governance/preflight packs were removed from live
-`docs/references/`; historical material is under `archive/chapter-05-voldir-capture-geometry/`
-only.
-### Every Experiment Is Price-Primary (binding, INFR-001)
+Standing enforcement: `docs/references/governance.md` +
+`docs/experiments-docs/INDEX.md`. Programme frame: the live documents in
+`docs/references/`. Historical material is context only and cannot override those rules.
+### Every Experiment Is Price-Primary (binding)
 
 - All strategy logic runs in **NautilusTrader** (`BacktestNode`), emitting
-  `data/nautilus_runs/<run_id>/` under the catalog fence + `fence_attestation.json`.
+  the emission contract to an operator-approved per-run destination under the catalog fence
+  + `fence_attestation.json`.
   No vectorised Python backtest of a price strategy. Analysis is `data-analyst` only.
 - **VAL carve-out** — re-analysis of already-emitted, still-valid data enters at the estimand
   gate → `data-analyst` directly (no design/QA/execute stages). If the prior emission is

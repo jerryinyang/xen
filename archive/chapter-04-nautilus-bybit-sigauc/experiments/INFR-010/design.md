@@ -15,7 +15,7 @@ Replace the research substrate in three coupled moves, preserving the governance
    **full Bybit USDT linear perpetual universe including delisted contracts** (strict
    anti-survivorship). Default dataset for ALL experiments (XENA, EXP, SPDR, VAL).
 3. **Data — SECONDARY (MBP):** reduce-at-ingest orderflow feature store per
-   `docs/references/orderflow-feature-store.md` (ratified from
+   `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-013/orderflow-feature-store.md` (ratified from
    `.ignore/temp/orderflow_feature_store_architecture.md`), **BTCUSDT / ETHUSDT / SOLUSDT
    perps only**. Architecture implemented in this INFR (contracts + skeleton); **collection
    and population deferred** to a later, separately-approved INFR. Until then every
@@ -86,7 +86,7 @@ disclosure-only.
 | `data/timebars/` (815 MB m1 FX/indices), `data/strategy_runs/` (13 GB) | **Archived** — FX/indices holdout obligations remain binding on that data forever |
 | Chart-type generators (linebreak/renko/HA) | **Dormant** — port only on demand |
 | FTMO cost table | **Replaced** — Bybit USDT-perp maker/taker fees + funding accrual + T1 spread model |
-| `.ignore/temp/orderflow_feature_store_architecture.md` | **Ratified** → `docs/references/orderflow-feature-store.md` (Phase E) |
+| `.ignore/temp/orderflow_feature_store_architecture.md` | **Ratified** → `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-013/orderflow-feature-store.md` (Phase E) |
 
 ## 6. Phased plan
 
@@ -185,7 +185,7 @@ anytime after B; D requires A+B+C.
 **Chapter 04 opens** (checkpoint-013 design) only after Phase D passes.
 
 ### Phase E — INFR-013: MBP feature-store contracts + skeleton (NO collection)
-Per ratified `orderflow-feature-store.md`. In scope NOW:
+Per ratified `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-013/orderflow-feature-store.md`. In scope NOW:
 1. Custom Nautilus `Data` subclasses + serialization registration (footprint rows,
    `SessionProfileData`, `BookStateData`, event types) + catalog schemas.
 2. Config-as-code format (per-instrument thresholds, snapshot Δt/N, session windows) with

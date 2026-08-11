@@ -1,6 +1,6 @@
 """Orderflow feature-store contracts + skeleton (INFR-013, Phase E of INFR-010).
 
-Spec: docs/references/orderflow-feature-store.md (ratified).
+Spec: archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-013/orderflow-feature-store.md (historical ratified proposal).
 Scope here: custom Nautilus Data contracts, config-as-code, Bybit book
 reconstruction, and the ingest skeleton. Detector implementations and bulk
 collection are DEFERRED to a separate operator-gated INFR.

@@ -4,7 +4,7 @@
 **Status:** design stub derived from `python/experiments/INFR-010/design.md` §6 Phase E
 **Operator approval:** Phase E execution approved 2026-07-16 (Phases 0/A/B/C/D COMPLETE;
 Phase D PASS per `python/experiments/VAL-008/report.md`)
-**Spec:** `docs/references/orderflow-feature-store.md` (ratified; published by this INFR)
+**Spec:** `archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-013/orderflow-feature-store.md` (historical ratified proposal)
 
 ## Scope (IN)
 

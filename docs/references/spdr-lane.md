@@ -1,188 +1,131 @@
-# SPDR Lane — Speed-Run Exploration Screens
+# SPDR lane — screening and exploration
 
-The SPDR (`SPDR-###`) series is a **lightweight, TRAIN-only availability/exploration lane**
-that gates a `WORTH_EXPLORING` disposition on an idea **before** it is committed to a full
-cTrader-primary experiment and a candidate-family registration. It strips formal steps
-(family registration, checkpoint design, fresh-context QA, referee framework, cTrader
-execution) — but it does **not** strip the integrity firewall. SPDR reuses the already
-sanctioned **availability-screen-first** discipline (methodology-canon: TRAIN-only, 0 slots,
-0 reads, pre-registration).
+**Status:** Binding live lane rules
 
-Ratified 2026-07-07 (operator-signed). Source idea: `.ignore/temp/new-research/mtf.md`.
+SPDR (`SPDR-###`) is a lightweight, TRAIN-only screening lane. It answers whether a registered mechanism or rule produces a measurable, signal-conditional change worth investigating in a full price-primary experiment. It does not make a tradability, deployability, profitability, or family-status claim.
 
-## Purpose
+## 1. Purpose and boundary
 
-Fast, cheap read of whether an idea carries **signal-conditional availability** worth the
-cost of a full experiment. A speed-run compounds several coherent questions in one grid and
-runs vectorised in Python on the local dataset. Its only output is a disposition, never a
-tradability or deployability claim.
+SPDR may scan a predeclared grid of components, devices, combinations, instruments, and holds. It reports availability, lift, distributional change, and diagnostics against matched controls. Its output is evidence and an operator-routing disposition.
 
-**Hard vs flexible.** The integrity boundary below is HARD and never waivable. Everything
-else — execution vehicle, stage shape, artifact extras — is a **default the operator may
-override by directive** (recorded in the leg's `design.md`). Example: the operator may
-direct an SPDR leg to run on the cTrader engine instead of vectorised Python (e.g. when
-fill mechanics matter to the screen question); the leg remains an SPDR — TRAIN-only,
-disposition-only, no estimand-gated verdict, no family action.
+The following boundary is hard:
 
-## Integrity boundary (HARD — this is what keeps L-01 intact)
+| Rule | Requirement |
+|---|---|
+| Population | TRAIN only; use the first 70% of the first 70% of the analysis range unless the design predeclares a narrower window. No TEST or lifetime-HOLDOUT read. |
+| Causality | A decision at bar `t` uses only information available by the registered boundary, normally confirmed bars through `t-1`. Open-to-open outcomes and limit simulations must resolve causally on one-minute data. |
+| Comparator | Treatment is compared with a matched baseline on the same eligible population and timestamps. Random controls use a regenerated battery of at least 25 seeds and report the rank/percentile read. |
+| Reporting | Every instrument × domain pair × filter variant × hold stratum is visible. Pooled summaries are disclosure only. Multiplicity and cell counts are stated. |
+| Accounting | No local P&L or account-state primitive is used to manufacture a verdict. Screen metrics are availability/lift measures and distributional diagnostics. |
+| Uncertainty | Overlapping H-bar outcomes use a dependence-matched block bootstrap with block length at least H, or a non-overlapping/greedy trade series. A library default is not a design choice. |
+| Claim | No SPDR output is net performance, tradability, deployability, or a family verdict. |
 
-| Rule | Why |
-|------|-----|
-| **TRAIN-only.** Train slice of the analysis set (first 70% of the first 70%). Never the TEST set, never the global holdout. Asserted in code. | Holdout/test are reserved for graduated, governed reads. |
-| **Causal `t-1` lag.** Every decision at bar-open on confirmed (≤ `t-1`) bars; open-to-open returns; any limit-fill simulation (e.g. CTRL-03) resolved causally on the 1-minute bars, no intrabar look-ahead. | A Python screen is numerically blind to a leak (L-01). The lag must hold by construction. |
-| **No tradability / deployability claim.** Output = availability/lift disposition only. No net-of-cost tradable-edge number, no counted TEST read, no holdout touch, no family status change. | Only cTrader-primary experiments may make a tradable claim. |
-| **Matched-control + seed battery.** Lift is measured as the treatment (HTF filter) *over the control model* (the baseline). Random controls use a ≥25-seed battery with a percentile/rank read, never a single twin (L-19). | Single random twins are noisy yardsticks that can pass a dead idea or kill a live one. |
-| **Per-stratum reporting; multiplicity disclosed** (L-03). A pooled figure is disclosure-only. Speed-runs sweep large grids — disclose the cell count and the multiplicity treatment. | Pooled verdicts mask the binding stratum; big grids inflate false positives. |
-| **No local accounting primitives** mimicking `xen.adjudication` P&L for a verdict. Screen metrics = availability/lift (`xen.evaluation` toolbox), not a booked P&L. | Local accounting certified three wrong verdicts (L-18 / critical-017). |
-| **Dependence-matched uncertainty.** Any CI on a per-bar estimand with overlapping H-bar forward windows must use a block bootstrap with **block ≥ H** (or resample a non-overlapping / greedy trade series). Library defaults (e.g. block=5) do not substitute for this choice; a mismatch invalidates every CI-clearance call on that estimand. | Phase-010 correction (2026-07-08): block=5 on overlapping H=48 windows (autocorr 0.84 at lag 5) understated uncertainty ~2–3× and manufactured a fade thread that did not exist. |
+Everything outside this boundary is a design choice that must be predeclared. A change to the boundary requires a new full experiment or an operator-recorded amendment before execution.
 
-## Dispositions an SPDR may output
+## 2. Dispositions
 
-Per-stratum disposition, one of:
+SPDR may report one of these operator-facing routing labels per registered series:
 
-| Disposition | Meaning |
-|-------------|---------|
-| `WORTH_EXPLORING` | Signal-conditional lift over the matched baseline is present; route to a full price-primary EXP + family registration. |
-| `NOT_WORTH` | No lift over the matched baseline. |
-| `INCONCLUSIVE` | Event count and/or interval width leave the estimate unresolved for the operator — **descriptive**, not a negative finding and not a hide rule (INFR-022 §2 SPDR disposition language). |
+| Label | Meaning |
+|---|---|
+| `WORTH_EXPLORING` | A measurable change relative to the matched baseline merits a full price-primary investigation. |
+| `NOT_WORTH` | The registered screen provides no useful change relative to its matched baseline for the stated question. |
+| `INCONCLUSIVE` | Counts, coverage, uncertainty, or implementation limits leave the question unresolved. This is descriptive, not a negative finding and not a row-hiding rule. |
 
-SPDR **never** registers a family, spends a read, or makes a tradability claim. A single
-SPDR leg never opens a checkpoint; a multi-leg series' disposition lives in its **phase
-container** checkpoint (e.g. checkpoint-010 for the SPDR-001/002/003 series). A
-`WORTH_EXPLORING` is a *routing signal*, not a verdict.
+The labels are assigned by the operator after reviewing the complete evidence. `WORTH_EXPLORING` is a routing signal, never a verdict. A multi-leg series receives one disposition after its final leg; individual legs remain characterisation evidence.
 
-## SPDR characterisation contract (BINDING — added 2026-07-30)
+## 3. Characterisation contract
 
-The pipeline's general **single-hypothesis-per-experiment** rule does **not** apply literally to
-exploratory SPDR characterisation. It is replaced here by this contract, which permits breadth and
-forbids the vagueness that usually comes with it:
+- The grid, strata, devices, holds, controls, and outcome units are predeclared.
+- Every stratum names its exact direct comparison and emits its own estimate and uncertainty.
+- All strata are reported. Winner-only pruning and experiment-wide supported/refuted labels are prohibited.
+- Individual component × device strata remain visible before any combination is interpreted.
+- Outcomes are device-native; one universal score must not replace the question each device actually asks.
+- Every adaptive or conditioned arm carries the same device unconditioned on the same eligible population as its direct comparator.
+- Event count and effective count are sample-size metadata. They remain visible next to every row and do not create positive/negative labels, prune rows, or gate a companion experiment.
+- The analyst reports magnitudes and uncertainty rather than qualifier-shaped conclusions such as “wash”, “at chance”, or “no systematic effect”. A pooled line may orient the reader, but the per-stratum table is the evidence.
+- The base strategy's own distribution is characterised separately from the conditional effect. A failing base does not prove that the filter is ineffective, and a distributional shift on a weak base is still reported as a measured shift.
 
-- an SPDR **may** traverse a **predeclared** full grid of components, devices and combinations;
-- **every stratum must name the exact comparison** it makes and emit **its own direct estimate and
-  uncertainty** — not a share of a pooled effect, and not an inference from a neighbouring stratum;
-- **all strata are reported.** No winner-only pruning, and no experiment-wide
-  supported / refuted verdict over the grid;
-- **individual component × device strata must remain visible before any combined stratum is
-  interpreted.** A combination read never substitutes for the individual contribution reads;
-- **measures are device-native.** Choose each outcome for what that device actually does; do not
-  impose one universal score across every device in the grid;
-- **every adaptive or conditioned arm carries a direct comparator** — the same device unconditioned,
-  on the same eligible population;
-- for an operator-declared characterisation series, event count and effective count are
-  **sample-size metadata, informative only** (INFR-022): they remain visible next to every row,
-  never create positive/negative labels, never prune rows, never gate companion experiments
-  (N3/N10);
-- the **operator** interprets the resulting map and decides the next research action. The SPDR
-  produces the map, not the decision.
+## 4. Neutral evidence contract
 
-**Why this exists.** A grid whose strata share one scale-free summary score, or whose device
-questions are bundled behind a single shared protocol, cannot say which component helped which
-device — it produces a verdict nobody can attribute. Two designs were withdrawn from the programme
-on 2026-07-30 for exactly that defect.
+SPDR reports the following directly:
 
-## Stages (lean)
+- code emits observations and diagnostics; the operator decides;
+- observed values and inferred explanations are labelled separately;
+- counts are shown as context, never as an adequacy or success gate;
+- the direct predeclared comparator and named population are visible;
+- supportive, null, adverse, and ambiguous evidence is retained symmetrically;
+- validity failures are separated from value findings; invalid observations are `VOID`, not negative evidence;
+- the analyst works from the raw screen output in a fresh context and records unresolved limitations;
+- every money-bearing table carries the zero-cost disclosure below;
+- the handoff is complete enough to reproduce the population, estimator, comparator, uncertainty, exclusions, and validity checks;
+- the final label is operator-only.
 
-```
-1 Design ......... quant-designer (lightweight)   → design.md  (+ screen-boundary declaration)
-2 QA ............. code-asserted self-check         (no fresh-context subagent)
-3 Screen run ..... Python, TRAIN-only, causal       → results/ plots/
-4 Screen summary . neutral quantification          → screen.md
-5 Deep analysis .. FRESH-CONTEXT analyst (subagent) → analysis.md  (+ follow-up threads)
-    [OPERATOR — disposition]
+When a Sharpe-like statistic is reported, the same predeclared per-trade series carries adjacent `psr` and `psr_n` fields. PSR is nonannualized per trade by default, uses `SR* = 0` unless registered otherwise, and emits `NaN` with an explicit reason when `n < 2`, required moments are non-finite, or the denominator is invalid. It is context, not a gate.
+
+For observed Sharpe `SR_hat`, reference `SR*`, sample size `n`, empirical skewness `gamma_3`, empirical kurtosis `gamma_4`, and standard-normal CDF `Phi`:
+
+```text
+PSR(SR*) = Phi((SR_hat - SR*) * sqrt(n - 1)
+               / sqrt(1 - gamma_3 * SR_hat
+                       + ((gamma_4 - 1) / 4) * SR_hat^2))
 ```
 
-**Stage 5 is mandatory (SPDR-001 lesson, 2026-07-07).** A same-context screen summary drifts
-toward a mean-only, verdict-shaped read that buries facets and can invert the conclusion (SPDR-001
-`screen.md` first-pass wrongly booked a drift-confound + NOT_WORTH; the fresh-context analyst
-overturned it — τ≈0, dispersion = normaliser mechanic, HTF-specific coupling on 2 instruments).
-Every SPDR therefore runs a **fresh-context data-analyst pass** (subagent invoking the
-`data-analyst` skill) that **quantifies** the relationship across every facet (effect sizes + CIs,
-distribution shape, dose-response, heterogeneity, power) — magnitudes, not a verdict. `screen.md`
-must stay neutral and quantification-first, subordinate to `analysis.md`; the analyst resolves its
-own open threads before the operator disposition.
+The report uses the same series and population as the reported Sharpe, and places `psr` beside the mean-bps read with `psr_n`.
 
-**Base-conditional interpretation (operator directive 2026-07-07).** The control strategies
-(random / momentum / reversion) are **baselines, not viable strategies**, and their own failure is
-generally uncharacterised. Therefore: (1) do NOT read a small HTF-filter lift over a failing
-baseline as "HTF ineffective" — attributing a broken strategy's continued failure to the HTF
-overlay is a misattribution; (2) quantify HTF context as its **own conditional effect** on the
-outcome distribution — the magnitude by which the LTF forward-return distribution (mean, dispersion,
-sign) moves as the HTF state varies — independent of whether either arm is profitable; lift-vs-
-baseline is one lens, not the frame; (3) characterise the base strategy's own behaviour as a
-**separate facet** so the HTF effect is interpretable; (4) a measurable HTF-induced distributional
-shift on a null base is a **positive quantification** of HTF context, reported as a magnitude —
-never qualified away as "within noise". This is the deeper reason quantify-not-qualify is binding.
+The default zero-cost disclosure is:
 
-**Granularity + quantify-not-qualify are binding (operator directive 2026-07-07).** The analyst
-reports **per stratum** — the stratum is (instrument × domain-pair × filter-variant × hold) — as
-**magnitudes with uncertainty**, so the hypothesis is judgeable one stratum at a time. Two standing
-faults are prohibited: (1) **qualifier/verdict framing** ("wash", "not supported", "at the chance
-rate", "no systematic effect") — report the measured Δ and its CI, not an adjudication; (2)
-**detrimental pooling** — grid-wide summary counts ("X% of cells cross zero", "N+/M− of 872",
-"median percentile") must never be the headline; a pooled line is disclosure-only (L-03). Emit the
-full per-stratum magnitude table to `results/` (nothing hidden behind a pooled count). Small-count
-strata are reported next to their counts — never labelled, never folded into a negative (N3/N10,
-INFR-022 L-63).
-
-**Neutrality + PSR (INFR-022, binding).** The stage-5 analyst binds N1–N11
-(`docs/references/neutrality-standard.md`): no-verdict boundary, observed vs inference labels,
-counts as context, direct comparator reads, populations named and separated, symmetric evidence,
-zero-cost caveat on every money-bearing table, completeness, operator-only labels. Every
-mean-trade/leg bps read carries `psr` + `psr_n` on the same series (`xen.evaluation.psr`).
-
-**Series verdict.** When an idea is split across a multi-leg SPDR series (e.g. CTRL-01/02/03 →
-SPDR-001/002/003), the candidate disposition is taken **once, after the last leg** — individual
-legs are characterisation only, no per-leg disposition.
-
-Stage 2 is a **code-asserted self-check**, not a fresh-context QA subagent: the screen script
-must assert the TRAIN-only fence, the `t-1` lag, and (for random controls) seed-battery
-regeneration; `design.md` carries a short integrity checklist. Fresh-context QA is reserved
-for the full cTrader pipeline the winner graduates into.
-
-## Artifacts
-
+```text
+ZERO-COST-DISCLOSURE
+  cost_model: NO_COST_CHARGED
+  spread: not modeled
+  commissions: not modeled
+  swaps/funding: not modeled
+  implication: every figure in this document is gross and cost-free; no spread,
+    commission, or swap enters any calculation. Realised results would differ
+    (likely worse) under any real cost schedule.
+  prohibited_claims: fully-net, cost-complete, tradable, deployable
+  lifting: only an explicit operator authorization may introduce a cost model
+    for a scoped experiment; that authorization and its schedule are recorded
+    in the experiment design before execution.
 ```
+
+SPDR never uses MDEs, power curves, detection floors, powered labels, minimum-effect gates, or post-outcome thresholds. It may report effect estimates, uncertainty, sign distributions, observed counts, and the direct baseline comparison.
+
+## 5. Lean stages
+
+```text
+1. Design ........ mechanism, grid, controls, units, and screen boundary → design.md
+2. Self-check .... code asserts TRAIN fence, causal lag, and seed regeneration
+3. Screen ........ registered evaluator on TRAIN → results/ and plots/
+4. Summary ....... neutral quantification → screen.md
+5. Fresh analysis  independent raw-output review → analysis.md
+6. Operator ...... disposition and next action
+```
+
+The fresh analysis is mandatory. It covers every declared facet, effect magnitude, uncertainty, distribution shape, dose/hold response, and heterogeneity. It resolves open data questions in its own analysis code and does not turn the screen summary into a machine verdict.
+
+Stage 2 is a code-asserted self-check, not a replacement for a full experiment's fresh-context compliance review. The screen must assert its TRAIN-only fence, causal lag, and random-control regeneration before emitting a result.
+
+## 6. Artifacts and identity
+
+An SPDR run is created under:
+
+```text
 python/experiments/SPDR-###/
-├── design.md      # mechanism, grid, metric, screen-boundary declaration + integrity checklist
-├── screen_code/   # self-contained: signal-gen + HTF filter + matched-baseline lift
-├── analysis_code/ # fresh-context analyst's own richer emissions (stage 5)
-├── results/  plots/
-├── screen.md      # neutral quantification summary (subordinate to analysis.md)
-└── analysis.md    # fresh-context analyst: full-facet quantification — UNCAPPED (binding read)
+├── design.md
+├── screen_code/
+├── analysis_code/
+├── results/
+├── plots/
+├── screen.md
+└── analysis.md
 ```
 
-- IDs zero-padded, never reused: `SPDR-001`, `SPDR-002`, …
-- Indexed in `python/experiments/INDEX.md` with an **SPDR** marker.
-- **Not** listed in family detail indexes (an SPDR has no family).
-- No `estimand_validation.json` gate (that gate adjudicates cTrader emissions / canonical
-  accounting; a screen makes no P&L verdict). The integrity substitute is the code-asserted
-  fence + causal-lag self-check above.
+IDs are zero-padded and never reused. The design names the data catalog, code/config identity, population, bands, comparator, estimator, units, uncertainty method, multiplicity treatment, and all exclusions. The screen does not use a price-emission estimand gate to assign an economic result; its integrity substitute is the code-asserted fence, lag, and control checks above.
 
-## Graduation
+## 7. Graduation
 
-A `WORTH_EXPLORING` disposition routes the idea into the **standard pipeline**: candidate-family
-registration → checkpoint design → mechanism-first `design.md` → fresh-context QA → cTrader
-execution → estimand gate → data-analyst → operator verdict. The SPDR result is prior evidence
-for that experiment; it is never itself promoted to a family verdict.
+`WORTH_EXPLORING` routes the mechanism to a full price-primary experiment with a new registered design, fresh-context compliance review, event-driven engine execution, neutral raw-data analysis, and operator disposition. The full experiment must re-establish the estimand, causal convention, cost boundary, and TEST authorization; an SPDR screen does not carry a hidden performance claim forward.
 
-### Unit convention + zero-cost note (BINDING — amended 2026-07-09 EXP-025 lesson L-21;
-INFR-022 supersedes the money-unit floor)
-
-The screen→graduation handoff is where a dimensionless screen number becomes a money claim.
-EXP-025 inflated its target 4× by asserting the wrong ATR divisor from memory (design declared
-1h HTF ATR; the screen normalised by 5-min LTF ATR(14)[t−1]).
-
-1. **Unit pin (screen side).** Every SPDR `design.md` and `analysis.md` must state the
-   normaliser **object** exactly (indicator, period, timeframe, lag — e.g.
-   `LTF 5min ATR(14)[t−1]`) wherever a normalised effect size is reported. A bare "ATR" is
-   non-compliant.
-2. **Conversion pin (graduation side).** A graduation `design.md` that converts a screen
-   effect into bps/money must state (a) the divisor object verbatim from the screen code,
-   (b) its measured TRAIN-median value in bps on the target instrument(s), (c) the resulting
-   bps/trade effect — each verifiable against data, none asserted from memory. QA traces this
-   as a clause.
-3. **Zero-cost note (INFR-022 — the former money-unit floor is retired).** The programme is
-   ZERO-COST: no cost floor gates a disposition; every money-bearing table carries the
-   ZERO-COST-DISCLOSURE caveat verbatim. A `WORTH_EXPLORING` routes to graduation as an
-   apparatus/characterisation test by default; a tradability-framed test remains refused by
-   rule unless the operator sanctions it separately.
+If a screen effect is later converted into bps or money, the graduation design must state the normalizer object exactly: indicator, period, timeframe, and lag. It must measure the TRAIN conversion value from the target data and show the resulting units. No conversion may be asserted from memory, and no cost floor gates the SPDR disposition.
