@@ -52,6 +52,8 @@ class MemorySample:
 
 
 class MemoryGuard:
+    """Sample process RSS and abort a cell with a mandatory failure marker."""
+
     def __init__(
         self,
         limit_bytes: int | None,
@@ -71,9 +73,15 @@ class MemoryGuard:
         self._next_sample = 0
         self._has_sample = False
         self._last_sample = MemorySample(0, 0, 0, 0, 0, 0, 0)
+        if limit_bytes is not None and incomplete_path is None:
+            raise ValueError("incomplete_path is required when limit_bytes is configured")
+        if limit_bytes is not None and cell_identity is None:
+            raise ValueError("cell_identity is required when limit_bytes is configured")
+        if last_timestamp is not None:
+            raise ValueError("last_timestamp belongs to observe(), not construction")
         self.incomplete_path = Path(incomplete_path) if incomplete_path is not None else None
         self.cell_identity = cell_identity
-        self.last_timestamp = last_timestamp
+        self._last_timestamp: Any = None
 
     @property
     def peak_rss_bytes(self) -> int:
@@ -87,10 +95,15 @@ class MemoryGuard:
         open_levels: int,
         open_raids: int,
         state_bytes: int,
+        last_timestamp: Any = None,
         force: bool = False,
     ) -> MemorySample:
         if processed_bars < 0:
             raise ValueError("processed_bars must be non-negative")
+        if self.limit_bytes is not None and last_timestamp is None:
+            raise ValueError("last_timestamp is required when limit_bytes is configured")
+        if last_timestamp is not None:
+            self._last_timestamp = last_timestamp
         if not force and processed_bars < self._next_sample and self._has_sample:
             return self._last_sample
         current = rss_bytes()
@@ -112,7 +125,7 @@ class MemoryGuard:
                 write_incomplete_marker(
                     self.incomplete_path,
                     cell_identity=self.cell_identity,
-                    last_timestamp=self.last_timestamp,
+                    last_timestamp=self._last_timestamp,
                     limit_bytes=self.limit_bytes,
                     peak_rss_bytes=self._peak_rss_bytes,
                     processed_bars=processed_bars,
@@ -147,6 +160,14 @@ def write_incomplete_marker(
 
 
 class BoundedParquetWriter:
+    """Write bounded row groups with a hard encoded pending-staging budget.
+
+    ``max_bytes`` limits the sum of encoded JSON row sizes retained in the
+    pending staging batch. It does not claim to cap Arrow or native Parquet
+    conversion allocations; those are covered by the process-wide
+    :class:`MemoryGuard` RSS limit.
+    """
+
     def __init__(
         self,
         path: Path,
@@ -163,7 +184,7 @@ class BoundedParquetWriter:
         self.max_bytes = max_bytes
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._rows: list[Mapping[str, Any]] = []
-        self._working_bytes = 0
+        self._pending_staging_bytes = 0
         self._rows_written = 0
         self._writer: pq.ParquetWriter | None = None
         self._closed = False
@@ -181,28 +202,33 @@ class BoundedParquetWriter:
     def pending_rows(self) -> int:
         return len(self._rows)
 
+    @property
+    def pending_staging_bytes(self) -> int:
+        """Encoded staging bytes retained by the pending row batch."""
+        return self._pending_staging_bytes
+
     def append(self, row: Mapping[str, Any]) -> None:
         if self._closed:
             raise RuntimeError("writer is closed")
         if set(row) - set(self.schema.names):
             raise ValueError(f"row contains columns outside schema: {sorted(set(row) - set(self.schema.names))}")
-        encoded = json.dumps(dict(row), sort_keys=True, default=str, separators=(",", ":")).encode()
-        # The budget includes the encoded mapping, Python container allowance,
-        # and a conservative Arrow conversion allowance for the pending batch.
-        estimated = len(encoded) * 2 + 64
-        if estimated > self.max_bytes:
-            raise OversizedRowError(estimated, self.max_bytes)
-        if self._working_bytes + estimated > self.max_bytes:
+        row_copy = dict(row)
+        encoded_bytes = len(
+            json.dumps(row_copy, sort_keys=True, default=str, separators=(",", ":")).encode()
+        )
+        if encoded_bytes > self.max_bytes:
+            raise OversizedRowError(encoded_bytes, self.max_bytes)
+        if self._pending_staging_bytes + encoded_bytes > self.max_bytes:
             self.flush()
-        self._rows.append(row)
-        self._working_bytes += estimated
-        if len(self._rows) >= self.max_rows or self._working_bytes >= self.max_bytes:
+        self._rows.append(row_copy)
+        self._pending_staging_bytes += encoded_bytes
+        if len(self._rows) >= self.max_rows or self._pending_staging_bytes >= self.max_bytes:
             self.flush()
 
     def flush(self) -> None:
         if not self._rows:
             return
-        table = pa.Table.from_pylist([dict(row) for row in self._rows], schema=self.schema)
+        table = pa.Table.from_pylist(self._rows, schema=self.schema)
         if self._writer is None:
             self._writer = pq.ParquetWriter(self._temp_path, self.schema)
         try:
@@ -212,7 +238,7 @@ class BoundedParquetWriter:
             raise
         self._rows_written += table.num_rows
         self._rows.clear()
-        self._working_bytes = 0
+        self._pending_staging_bytes = 0
 
     def close(self) -> None:
         if self._closed:

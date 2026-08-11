@@ -39,11 +39,30 @@ def test_parquet_writer_flushes_and_releases_completed_batch(tmp_path: Path) -> 
     assert pl.read_parquet(tmp_path / "rows.parquet")["i"].to_list() == [1, 2]
 
 
-def test_memory_guard_raises_before_partial_publication(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_memory_guard_raises_before_partial_publication(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr("xen.nautilus.streaming.rss_bytes", lambda: 101)
-    guard = MemoryGuard(limit_bytes=100, sample_every=1)
+    guard = MemoryGuard(
+        limit_bytes=100,
+        sample_every=1,
+        incomplete_path=tmp_path / "cell.parquet",
+        cell_identity={"cell": "synthetic"},
+    )
     with pytest.raises(MemoryBudgetExceeded, match="RSS limit"):
-        guard.observe(10, pending_rows=0, open_levels=1, open_raids=0, state_bytes=20)
+        guard.observe(
+            10,
+            pending_rows=0,
+            open_levels=1,
+            open_raids=0,
+            state_bytes=20,
+            last_timestamp="2024-01-01T00:00:00Z",
+        )
+
+
+def test_configured_memory_guard_requires_abort_context() -> None:
+    with pytest.raises(ValueError, match="incomplete_path"):
+        MemoryGuard(limit_bytes=100)
 
 
 def test_parquet_writer_rejects_oversized_row_before_retaining_it(tmp_path: Path) -> None:
@@ -56,6 +75,17 @@ def test_parquet_writer_rejects_oversized_row_before_retaining_it(tmp_path: Path
     assert writer.rows_written == 0
     writer.close()
     assert (tmp_path / "rows.parquet").exists()
+
+
+def test_pending_encoded_staging_bytes_never_exceed_limit(tmp_path: Path) -> None:
+    writer = BoundedParquetWriter(
+        tmp_path / "rows.parquet", pa.schema([("i", pa.int64())]), max_bytes=10
+    )
+    writer.append({"i": 1})
+    writer.append({"i": 2})
+    assert writer.pending_staging_bytes <= 10
+    assert writer.rows_written == 1
+    writer.close()
 
 
 def test_parquet_write_error_keeps_only_temp_and_incomplete_marker(
@@ -87,10 +117,16 @@ def test_memory_guard_writes_required_abort_marker(
         sample_every=1,
         incomplete_path=marker_base,
         cell_identity={"cell": "synthetic"},
-        last_timestamp="2024-01-01T00:00:00Z",
     )
     with pytest.raises(MemoryBudgetExceeded):
-        guard.observe(10, pending_rows=0, open_levels=1, open_raids=0, state_bytes=20)
+        guard.observe(
+            10,
+            pending_rows=0,
+            open_levels=1,
+            open_raids=0,
+            state_bytes=20,
+            last_timestamp="2024-01-01T00:00:00Z",
+        )
     marker = json.loads((tmp_path / "cell-output.parquet.incomplete.json").read_text())
     assert marker["cell_identity"] == {"cell": "synthetic"}
     assert marker["last_timestamp"] == "2024-01-01T00:00:00Z"
