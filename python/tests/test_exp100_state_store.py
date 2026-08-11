@@ -44,6 +44,23 @@ def test_profile_generation_replaces_active_bins_without_python_history(tmp_path
         store.close()
 
 
+def test_clear_profile_state_is_atomic_and_idempotent(tmp_path: Path) -> None:
+    """Terminal cleanup removes all profile rows and accepts a second call."""
+    store = Exp100StateStore(tmp_path / "state.sqlite")
+    try:
+        generation = store.start_profile_generation("R1", 1, 0.1)
+        store.increment_profile_bin_range("R1", generation, 0, 1)
+        store.clear_profile_state("R1")
+        store.clear_profile_state("R1")
+
+        assert store.current_profile_generation("R1") is None
+        assert store.get_profile_state("R1", generation) is None
+        assert list(store.iter_profile_bins("R1", generation)) == []
+        assert list(store.iter_profile_gap_bins("R1", generation)) == []
+    finally:
+        store.close()
+
+
 def test_legacy_profile_generation_entry_point_rejects_unsafe_use(
     tmp_path: Path,
 ) -> None:

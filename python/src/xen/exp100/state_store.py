@@ -383,6 +383,25 @@ class Exp100StateStore:
         cursor.close()
         return int(row[0]) if row is not None else None
 
+    def clear_profile_state(self, raid_id: str) -> None:
+        """Atomically delete all live profile rows for one terminal raid.
+
+        Deleting an already-cleared profile is deliberately a no-op so a caller
+        can safely resume terminal cleanup after an interrupted output path.
+        """
+        self._connection.execute("BEGIN IMMEDIATE")
+        try:
+            self._connection.execute("DELETE FROM profile_bins WHERE raid_id = ?", (raid_id,))
+            self._connection.execute(
+                "DELETE FROM profile_gap_bins WHERE raid_id = ?", (raid_id,)
+            )
+            self._connection.execute("DELETE FROM profile_state WHERE raid_id = ?", (raid_id,))
+            self._connection.execute("DELETE FROM profile_meta WHERE raid_id = ?", (raid_id,))
+            self._connection.commit()
+        except Exception:
+            self._connection.rollback()
+            raise
+
     def increment_profile_bin_range(
         self, raid_id: str, generation: int, low_bin_index: int, high_bin_index: int
     ) -> None:

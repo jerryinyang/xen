@@ -1,16 +1,17 @@
 """Causal, disk-backed level and raid processing for EXP-100.
 
-All decisions made for a completed observation bar use feature values available
-before that bar.  SQLite retains the live level, raid, and profile state; this
-module keeps only current aggregation and feature scalars in memory.
+Only the current observation window (at most 60 source minutes), feature
+scalars, and one completed reference bar live in Python. SQLite owns every
+active level, raid, and TPO profile.
 """
 
 from __future__ import annotations
 
 import math
+from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from xen.nautilus.streaming import MemoryGuard
 
@@ -19,6 +20,8 @@ from .features import CausalVolatilityRegime, CausalWilderATR, StreamingOHLC
 from .state_store import Exp100StateStore
 from .tpo import TPOProfileStore
 from .types import BarRecord
+
+MINUTE_NS = 60_000_000_000
 
 
 @dataclass
@@ -33,7 +36,7 @@ class Exp100Sinks:
 
 
 class Exp100Processor:
-    """Consume completed one-minute bars without retaining their history."""
+    """Consume contiguous completed source minutes without retaining history."""
 
     def __init__(
         self,
@@ -48,8 +51,12 @@ class Exp100Processor:
         self.sinks = sinks
         self.memory_guard = memory_guard
         self._observations = StreamingOHLC(config.observation_minutes)
-        self._references = StreamingOHLC(60 if config.confirmation_reference == "1H" else 1440)
+        self._references = StreamingOHLC(
+            60 if config.confirmation_reference == "1H" else 1440
+        )
+        self._window: deque[BarRecord] = deque(maxlen=config.observation_minutes)
         self._previous_reference: BarRecord | None = None
+        self._last_source_ts_ns: int | None = None
         self._atr = CausalWilderATR(config.atr_period)
         self._regime = CausalVolatilityRegime(config.regime_window)
         self._last_regime = CausalVolatilityRegime.ATR_UNDEFINED
@@ -79,20 +86,25 @@ class Exp100Processor:
                 "side": side,
                 "price": float(price),
                 "creation_ts_ns": 0,
+                "beyond": False,
                 "active": 1,
             }
         )
 
     def on_one_minute_bar(self, bar: BarRecord) -> None:
-        """Accept one completed real source bar and process closed windows only."""
+        """Accept one contiguous real source minute and process closed windows."""
         if self._finished:
             raise RuntimeError("processor is finished")
-        self._validate_bar(bar)
+        self._validate_source_bar(bar)
+        self._last_source_ts_ns = bar.ts_event_ns
         self._processed_source_bars += 1
+        self._window.append(bar)
+        self._update_active_profiles_from_source(bar)
 
         observation = self._observations.update(bar)
         if observation is not None:
-            self._on_observation_bar(observation)
+            self._on_observation_bar(observation, tuple(self._window))
+            self._window.clear()
 
         reference = self._references.update(bar)
         if reference is not None:
@@ -111,13 +123,11 @@ class Exp100Processor:
         """Right-censor and emit every remaining live object exactly once."""
         if self._finished:
             return
-        censor_ts = last_ts_ns
         for raid in self.state.iter_active_raids():
-            endpoint_ts = censor_ts if censor_ts is not None else int(raid["sweep_ts_ns"])
-            status = self._censor_status(raid)
-            self._terminal_raid(raid, status=status, endpoint_ts_ns=endpoint_ts)
+            endpoint_ts = last_ts_ns if last_ts_ns is not None else int(raid["sweep_ts_ns"])
+            self._terminal_raid(raid, self._censor_status(raid), endpoint_ts)
         for level in self.state.iter_active_levels():
-            endpoint_ts = censor_ts if censor_ts is not None else int(level["creation_ts_ns"])
+            endpoint_ts = last_ts_ns if last_ts_ns is not None else int(level["creation_ts_ns"])
             row = {
                 **level,
                 "active": False,
@@ -126,7 +136,9 @@ class Exp100Processor:
                 "censor_ts_ns": endpoint_ts,
             }
             self.sinks.levels.append(row)
-            self._event("LEVEL_TERMINAL", endpoint_ts, level_id=level["level_id"], status=row["status"])
+            self._event(
+                "LEVEL_TERMINAL", endpoint_ts, level_id=level["level_id"], status=row["status"]
+            )
             self.state.delete_level(str(level["level_id"]))
         self._finished = True
 
@@ -140,54 +152,66 @@ class Exp100Processor:
             "state_bytes": self._state_bytes(),
         }
 
-    def _on_observation_bar(self, bar: BarRecord) -> None:
+    def _update_active_profiles_from_source(self, bar: BarRecord) -> None:
+        for raid in self.state.iter_active_raids():
+            self._apply_source_to_profile(raid, bar)
+
+    def _apply_source_to_profile(self, raid: dict[str, Any], bar: BarRecord) -> dict[str, Any]:
+        """Apply one source minute once to a live profile, resetting at a new max."""
+        if raid.get("profile_finalized", False):
+            return raid
+        generation = raid.get("profile_generation")
+        if not isinstance(generation, int):
+            return raid
+        side = str(raid["side"])
+        extreme = bar.high if side == "HIGH" else bar.low
+        is_new_max = extreme > float(raid["max_price"]) if side == "HIGH" else extreme < float(raid["max_price"])
+        current = dict(raid)
+        if is_new_max:
+            generation = self._profiles.reset(str(raid["raid_id"]), extreme, bar.ts_event_ns)
+            level_price = float(raid["level_price"])
+            current.update(
+                {
+                    "profile_generation": generation,
+                    "max_price": extreme,
+                    "max_excursion": extreme - level_price if side == "HIGH" else level_price - extreme,
+                    "excursion_ts_ns": bar.ts_event_ns,
+                    "excursion_atr": self._atr.value,
+                    "excursion_regime": self._last_regime,
+                }
+            )
+            self.state.update_raid(str(raid["raid_id"]), current)
+        self._profiles.add_bar(str(raid["raid_id"]), generation, bar)
+        return current
+
+    def _on_observation_bar(self, bar: BarRecord, source_window: tuple[BarRecord, ...]) -> None:
         atr_before = self._atr.value
         regime_before = self._last_regime
-
         for raid in self.state.iter_active_raids():
-            level_price = float(raid["level_price"])
-            side = str(raid["side"])
-            updates: dict[str, Any] = {}
-            if side == "HIGH":
-                if bar.high > float(raid["max_price"]):
-                    updates["max_price"] = bar.high
-                    updates["max_excursion"] = bar.high - level_price
-                    self._reset_or_add_profile(raid, bar, reset=True)
-                else:
-                    self._reset_or_add_profile(raid, bar, reset=False)
-                if raid["return_ts_ns"] is None and bar.low <= level_price:
-                    updates["return_ts_ns"] = bar.ts_event_ns
-            else:
-                if bar.low < float(raid["max_price"]):
-                    updates["max_price"] = bar.low
-                    updates["max_excursion"] = level_price - bar.low
-                    self._reset_or_add_profile(raid, bar, reset=True)
-                else:
-                    self._reset_or_add_profile(raid, bar, reset=False)
-                if raid["return_ts_ns"] is None and bar.high >= level_price:
-                    updates["return_ts_ns"] = bar.ts_event_ns
-            if updates:
-                self.state.update_raid(str(raid["raid_id"]), updates)
+            if raid["return_ts_ns"] is not None:
+                continue
+            price = float(raid["level_price"])
+            returned = bar.low <= price if raid["side"] == "HIGH" else bar.high >= price
+            if returned:
+                self.state.update_raid(str(raid["raid_id"]), {"return_ts_ns": bar.ts_event_ns})
 
         for level in self.state.iter_active_levels():
             level_id = str(level["level_id"])
-            if self._has_active_raid(level_id):
-                continue
             price = float(level["price"])
             side = str(level["side"])
-            crossed = bar.high > price if side == "HIGH" else bar.low < price
-            if not crossed:
+            beyond = bar.high > price if side == "HIGH" else bar.low < price
+            previous_beyond = bool(level.get("beyond", False))
+            self.state.update_level(
+                level_id, {"beyond": beyond, "last_observation_ts_ns": bar.ts_event_ns}
+            )
+            if not beyond or previous_beyond:
                 continue
             returned = bar.low <= price if side == "HIGH" else bar.high >= price
             if returned:
-                raid = self._new_raid(level, bar, atr_before, regime_before, ambiguous=True)
-                self._terminal_raid(
-                    raid,
-                    status="AMBIGUOUS_INTRABAR",
-                    endpoint_ts_ns=bar.ts_event_ns,
-                )
-                continue
-            self._new_raid(level, bar, atr_before, regime_before, ambiguous=False)
+                raid = self._new_raid(level, bar, source_window, atr_before, regime_before, True)
+                self._terminal_raid(raid, "AMBIGUOUS_INTRABAR", bar.ts_event_ns)
+            else:
+                self._new_raid(level, bar, source_window, atr_before, regime_before, False)
 
         atr_after = self._atr.update(bar)
         regime_after = self._regime.update(
@@ -211,128 +235,167 @@ class Exp100Processor:
             }
         )
 
-    def _on_reference_bar(self, bar: BarRecord) -> None:
-        previous = self._previous_reference
-        self._previous_reference = bar
-        if previous is None:
-            return
-        for raid in self.state.iter_active_raids():
-            if bar.ts_event_ns <= int(raid["sweep_ts_ns"]):
-                continue
-            side = str(raid["side"])
-            if raid["confirmation_ts_ns"] is None:
-                if self._is_expected_reference_event(
-                    side, float(raid["level_price"]), previous, bar
-                ):
-                    self.state.update_raid(
-                        str(raid["raid_id"]),
-                        {
-                            "confirmation_ts_ns": bar.ts_event_ns,
-                            "confirmation_method": self.config.confirmation_method,
-                            "confirmation_reference": self.config.confirmation_reference,
-                        },
-                    )
-                    self._finalize_profile(raid, bar.ts_event_ns, "CONFIRMED")
-                elif self._is_opposing_reference_event(
-                    side, float(raid["level_price"]), previous, bar
-                ):
-                    self._terminal_raid(raid, status="FAILED_BREAKOUT", endpoint_ts_ns=bar.ts_event_ns)
-                continue
-            if raid["return_ts_ns"] is not None and self._is_opposing_reference_event(
-                side, float(raid["level_price"]), previous, bar
-            ):
-                self._terminal_raid(raid, status="COMPLETED", endpoint_ts_ns=bar.ts_event_ns)
-
     def _new_raid(
         self,
         level: dict[str, Any],
-        bar: BarRecord,
+        observation: BarRecord,
+        source_window: tuple[BarRecord, ...],
         atr: float | None,
         regime: str,
-        *,
         ambiguous: bool,
     ) -> dict[str, Any]:
         level_id = str(level["level_id"])
         side = str(level["side"])
         price = float(level["price"])
+        first_index = self._first_crossing_index(source_window, price, side)
+        first_bar = source_window[first_index]
+        initial_extreme = first_bar.high if side == "HIGH" else first_bar.low
         prior_raid_count = self.state.prior_raid_count(level_id)
         raid_id = f"{level_id}:raid:{prior_raid_count + 1}"
-        max_price = bar.high if side == "HIGH" else bar.low
         raid = {
             "raid_id": raid_id,
             "level_id": level_id,
-            "event_identity": f"{level['event_identity']}|raid|{bar.ts_event_ns}|{prior_raid_count + 1}",
+            "event_identity": f"{level['event_identity']}|raid|{observation.ts_event_ns}|{prior_raid_count + 1}",
             "source_configuration": level["source_configuration"],
             "side": side,
             "level_price": price,
             "level_creation_ts_ns": level["creation_ts_ns"],
-            "sweep_ts_ns": bar.ts_event_ns,
-            "return_ts_ns": bar.ts_event_ns if ambiguous else None,
+            "sweep_ts_ns": observation.ts_event_ns,
+            "first_excursion_ts_ns": first_bar.ts_event_ns,
+            "return_ts_ns": observation.ts_event_ns if ambiguous else None,
             "confirmation_ts_ns": None,
             "endpoint_ts_ns": None,
             "censor_ts_ns": None,
-            "max_price": max_price,
-            "max_excursion": (max_price - price) if side == "HIGH" else (price - max_price),
+            "max_price": initial_extreme,
+            "max_excursion": initial_extreme - price if side == "HIGH" else price - initial_extreme,
             "prior_raid_count": prior_raid_count,
             "raid_atr": atr,
             "raid_regime": regime,
+            "excursion_ts_ns": first_bar.ts_event_ns,
+            "excursion_atr": atr,
+            "excursion_regime": regime,
+            "confirmation_atr": None,
+            "confirmation_regime": None,
+            "endpoint_atr": None,
+            "endpoint_regime": None,
             "profile_generation": None,
             "profile_finalized": False,
             "profile_undefined_reason": "AMBIGUOUS_INTRABAR" if ambiguous else None,
             "active": 1,
         }
         if not ambiguous and atr is not None and atr > 0.0 and math.isfinite(atr):
-            generation = self._profiles.start(raid_id, bar.ts_event_ns, max_price, atr)
-            raid["profile_generation"] = generation
-            self._profiles.add_bar(raid_id, generation, bar)
+            raid["profile_generation"] = self._profiles.start(
+                raid_id, first_bar.ts_event_ns, initial_extreme, atr
+            )
         elif not ambiguous:
             raid["profile_undefined_reason"] = "ATR_UNDEFINED"
         self.state.insert_raid(raid)
-        self._event("RAID_STARTED", bar.ts_event_ns, raid_id=raid_id, level_id=level_id)
+        self._event("RAID_STARTED", observation.ts_event_ns, raid_id=raid_id, level_id=level_id)
+        if isinstance(raid["profile_generation"], int):
+            current = raid
+            for source_bar in source_window[first_index:]:
+                current = self._apply_source_to_profile(current, source_bar)
+            return current
         return raid
 
-    def _reset_or_add_profile(
-        self, raid: dict[str, Any], bar: BarRecord, *, reset: bool
-    ) -> None:
-        if raid.get("profile_finalized", False):
-            return
-        generation = raid.get("profile_generation")
-        if not isinstance(generation, int):
-            return
-        if reset:
-            generation = self._profiles.reset(str(raid["raid_id"]), float(raid["max_price"]), bar.ts_event_ns)
-            self.state.update_raid(str(raid["raid_id"]), {"profile_generation": generation})
-        self._profiles.add_bar(str(raid["raid_id"]), generation, bar)
+    @staticmethod
+    def _first_crossing_index(source_window: tuple[BarRecord, ...], price: float, side: str) -> int:
+        for index, source_bar in enumerate(source_window):
+            if (side == "HIGH" and source_bar.high > price) or (
+                side == "LOW" and source_bar.low < price
+            ):
+                return index
+        raise RuntimeError("completed observation crossed a level without a source crossing")
 
-    def _terminal_raid(self, raid: dict[str, Any], *, status: str, endpoint_ts_ns: int) -> None:
-        raid_id = str(raid["raid_id"])
-        generation = raid.get("profile_generation")
-        if not raid.get("profile_finalized", False):
-            self._finalize_profile(raid, endpoint_ts_ns, status)
-        row = {
-            **raid,
-            "active": False,
-            "status": status,
-            "primary_completed": status == "COMPLETED",
-            "endpoint_ts_ns": endpoint_ts_ns,
-            "censor_ts_ns": endpoint_ts_ns if status.startswith("RIGHT_CENSORED_") else None,
-        }
-        self.sinks.raids.append(row)
-        self._event("RAID_TERMINAL", endpoint_ts_ns, raid_id=raid_id, level_id=raid["level_id"], status=status)
-        if isinstance(generation, int) and not raid.get("profile_finalized", False):
-            self._delete_profile_state(raid_id)
-        self.state.delete_raid(raid_id)
+    def _on_reference_bar(self, bar: BarRecord) -> None:
+        previous = self._previous_reference
+        self._previous_reference = bar
+        if previous is None:
+            return
+        unconfirmed = self._latest_active_raid(
+            lambda raid: raid["confirmation_ts_ns"] is None
+            and raid["return_ts_ns"] is not None
+            and bar.ts_event_ns > int(raid["sweep_ts_ns"])
+        )
+        if unconfirmed is not None:
+            side = str(unconfirmed["side"])
+            price = float(unconfirmed["level_price"])
+            if self._is_expected_reference_event(side, price, previous, bar):
+                updates = {
+                    "confirmation_ts_ns": bar.ts_event_ns,
+                    "confirmation_method": self.config.confirmation_method,
+                    "confirmation_reference": self.config.confirmation_reference,
+                    "confirmation_atr": self._atr.value,
+                    "confirmation_regime": self._last_regime,
+                    "primary_attribution": True,
+                }
+                self.state.update_raid(str(unconfirmed["raid_id"]), updates)
+                self._finalize_profile({**unconfirmed, **updates}, bar.ts_event_ns, "CONFIRMED")
+                return
+            if self._is_opposing_reference_event(side, price, previous, bar):
+                self._terminal_raid(unconfirmed, "FAILED_BREAKOUT", bar.ts_event_ns)
+                return
+        confirmed = self._latest_active_raid(
+            lambda raid: raid["confirmation_ts_ns"] is not None
+            and bool(raid.get("primary_attribution", False))
+            and bar.ts_event_ns > int(raid["confirmation_ts_ns"])
+        )
+        if confirmed is not None and self._is_opposing_reference_event(
+            str(confirmed["side"]), float(confirmed["level_price"]), previous, bar
+        ):
+            self._terminal_raid(confirmed, "COMPLETED", bar.ts_event_ns)
+
+    def _latest_active_raid(
+        self, eligible: Callable[[dict[str, Any]], bool]
+    ) -> dict[str, Any] | None:
+        latest: dict[str, Any] | None = None
+        for raid in self.state.iter_active_raids():
+            if not eligible(raid):
+                continue
+            if latest is None or (int(raid["sweep_ts_ns"]), str(raid["raid_id"])) > (
+                int(latest["sweep_ts_ns"]),
+                str(latest["raid_id"]),
+            ):
+                latest = raid
+        return latest
+
+    def _terminal_raid(self, raid: dict[str, Any], status: str, endpoint_ts_ns: int) -> None:
+        current = dict(raid)
+        if not current.get("profile_finalized", False):
+            self._finalize_profile(current, endpoint_ts_ns, status)
+            current["profile_finalized"] = True
+        current.update(
+            {
+                "active": False,
+                "status": status,
+                "primary_completed": status == "COMPLETED",
+                "endpoint_ts_ns": endpoint_ts_ns,
+                "censor_ts_ns": endpoint_ts_ns if status.startswith("RIGHT_CENSORED_") else None,
+                "endpoint_atr": self._atr.value,
+                "endpoint_regime": self._last_regime,
+            }
+        )
+        self.sinks.raids.append(current)
+        self._event(
+            "RAID_TERMINAL",
+            endpoint_ts_ns,
+            raid_id=current["raid_id"],
+            level_id=current["level_id"],
+            status=status,
+        )
+        self.state.delete_raid(str(current["raid_id"]))
 
     def _finalize_profile(self, raid: dict[str, Any], end_ts_ns: int, raid_status: str) -> None:
-        """Emit the profile at its confirmation boundary, then release its live rows."""
+        """Append terminal profile output before atomically deleting its live state."""
         raid_id = str(raid["raid_id"])
         generation = raid.get("profile_generation")
         if isinstance(generation, int):
             profile = self._profiles.finalize(raid_id, generation, end_ts_ns)
-            self._delete_profile_state(raid_id)
         else:
             profile = self._undefined_profile(
-                raid_id, end_ts_ns, str(raid.get("profile_undefined_reason") or raid_status)
+                raid_id,
+                end_ts_ns,
+                str(raid.get("profile_undefined_reason") or raid_status),
             )
         gap_mask = profile.get("gap_mask")
         if isinstance(gap_mask, dict):
@@ -341,20 +404,17 @@ class Exp100Processor:
             }
         profile.update({"raid_status": raid_status, "endpoint_ts_ns": end_ts_ns})
         self.sinks.tpo_profiles.append(profile)
-        self._event("TPO_PROFILE_TERMINAL", end_ts_ns, raid_id=raid_id, status=profile["profile_status"])
-        if self._raid_is_active(raid_id):
-            self.state.update_raid(raid_id, {"profile_finalized": True})
+        self.state.clear_profile_state(raid_id)
+        self.state.update_raid(raid_id, {"profile_finalized": True})
+        self._event(
+            "TPO_PROFILE_TERMINAL",
+            end_ts_ns,
+            raid_id=raid_id,
+            status=profile["profile_status"],
+        )
 
-    def _delete_profile_state(self, raid_id: str) -> None:
-        """Discard terminal profile rows after their terminal profile has been emitted."""
-        connection = self.state._connection
-        connection.execute("DELETE FROM profile_bins WHERE raid_id = ?", (raid_id,))
-        connection.execute("DELETE FROM profile_gap_bins WHERE raid_id = ?", (raid_id,))
-        connection.execute("DELETE FROM profile_state WHERE raid_id = ?", (raid_id,))
-        connection.execute("DELETE FROM profile_meta WHERE raid_id = ?", (raid_id,))
-        connection.commit()
-
-    def _censor_status(self, raid: dict[str, Any]) -> str:
+    @staticmethod
+    def _censor_status(raid: dict[str, Any]) -> str:
         if raid["return_ts_ns"] is None:
             return "RIGHT_CENSORED_EXCURSION"
         if raid["confirmation_ts_ns"] is None:
@@ -375,17 +435,20 @@ class Exp100Processor:
             return bar.close > price if side == "HIGH" else bar.close < price
         return bar.close > previous.high if side == "HIGH" else bar.close < previous.low
 
-    @staticmethod
-    def _validate_bar(bar: BarRecord) -> None:
-        if bar.source_bars <= 0:
-            raise ValueError("source_bars must be positive")
+    def _validate_source_bar(self, bar: BarRecord) -> None:
+        if bar.source_bars != 1:
+            raise ValueError("source_bars must equal 1 for a source minute")
+        if bar.ts_event_ns % MINUTE_NS != 0:
+            raise ValueError("source timestamp must be minute aligned")
+        if self._last_source_ts_ns is not None and bar.ts_event_ns != self._last_source_ts_ns + MINUTE_NS:
+            raise ValueError("source timestamps must be contiguous and strictly increasing")
         if bar.low > bar.high:
             raise ValueError("bar low cannot exceed high")
-        if not all(math.isfinite(value) for value in (bar.open, bar.high, bar.low, bar.close, bar.volume)):
+        if not all(
+            math.isfinite(value)
+            for value in (bar.open, bar.high, bar.low, bar.close, bar.volume)
+        ):
             raise ValueError("bar OHLCV values must be finite")
-
-    def _has_active_raid(self, level_id: str) -> bool:
-        return any(str(raid["level_id"]) == level_id for raid in self.state.iter_active_raids())
 
     def _count_active_levels(self) -> int:
         return sum(1 for _ in self.state.iter_active_levels())
@@ -394,19 +457,19 @@ class Exp100Processor:
         return sum(1 for _ in self.state.iter_active_raids())
 
     def _pending_rows(self) -> int:
-        return sum(int(getattr(writer, "pending_rows", 0)) for writer in vars(self.sinks).values())
+        return sum(
+            int(getattr(writer, "pending_rows", 0)) for writer in vars(self.sinks).values()
+        )
 
     def _state_bytes(self) -> int:
         path = Path(self.state.path)
         return path.stat().st_size if path.exists() else 0
 
-    def _raid_is_active(self, raid_id: str) -> bool:
-        return any(str(raid["raid_id"]) == raid_id for raid in self.state.iter_active_raids())
-
     def _level_identity(self, level_id: str, price: float, side: str, creation_ts_ns: int) -> str:
         return f"{self.config.level_config}|{level_id}|{side}|{price:.17g}|{creation_ts_ns}"
 
-    def _undefined_profile(self, raid_id: str, end_ts_ns: int, reason: str) -> dict[str, Any]:
+    @staticmethod
+    def _undefined_profile(raid_id: str, end_ts_ns: int, reason: str) -> dict[str, Any]:
         return {
             "raid_id": raid_id,
             "profile_generation": None,
@@ -431,4 +494,6 @@ class Exp100Processor:
         }
 
     def _event(self, event_type: str, ts_event_ns: int, **fields: Any) -> None:
-        self.sinks.event_log.append({"event_type": event_type, "ts_event_ns": ts_event_ns, **fields})
+        self.sinks.event_log.append(
+            {"event_type": event_type, "ts_event_ns": ts_event_ns, **fields}
+        )
