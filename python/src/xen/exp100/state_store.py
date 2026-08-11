@@ -61,6 +61,14 @@ class Exp100StateStore:
                 count INTEGER NOT NULL,
                 PRIMARY KEY (raid_id, generation, bin_index)
             );
+            CREATE TABLE IF NOT EXISTS profile_state (
+                raid_id TEXT PRIMARY KEY,
+                generation INTEGER NOT NULL,
+                profile_start_ts_ns INTEGER NOT NULL,
+                bin_width REAL NOT NULL,
+                bracket_count INTEGER NOT NULL,
+                expected_tpo_total INTEGER NOT NULL
+            );
             CREATE INDEX IF NOT EXISTS levels_active_idx ON levels(active, level_id);
             CREATE INDEX IF NOT EXISTS levels_event_idx ON levels(event_identity);
             CREATE INDEX IF NOT EXISTS raids_active_idx ON raids(active, raid_id);
@@ -246,6 +254,137 @@ class Exp100StateStore:
                 yield int(row[0]), int(row[1])
         finally:
             cursor.close()
+
+    def iter_profile_bins_by_density(
+        self, raid_id: str, generation: int, low_bin_index: int, high_bin_index: int
+    ) -> Iterator[tuple[int, int]]:
+        """Yield stored bins in deterministic low-density order."""
+        cursor = self._connection.execute(
+            """
+            SELECT bin_index, count FROM profile_bins
+            WHERE raid_id = ? AND generation = ?
+              AND bin_index BETWEEN ? AND ?
+            ORDER BY count, bin_index
+            """,
+            (raid_id, generation, low_bin_index, high_bin_index),
+        )
+        try:
+            for row in cursor:
+                yield int(row[0]), int(row[1])
+        finally:
+            cursor.close()
+
+    def set_profile_state(
+        self,
+        raid_id: str,
+        generation: int,
+        profile_start_ts_ns: int,
+        bin_width: float,
+    ) -> None:
+        """Persist the scalar state for the current profile generation."""
+        if generation <= 0:
+            raise ValueError("profile generation must be positive")
+        cursor = self._connection.execute(
+            "SELECT generation FROM profile_meta WHERE raid_id = ?", (raid_id,)
+        )
+        row = cursor.fetchone()
+        cursor.close()
+        if row is None or int(row[0]) != generation:
+            raise KeyError((raid_id, generation))
+        self._connection.execute(
+            """
+            INSERT INTO profile_state(
+                raid_id, generation, profile_start_ts_ns, bin_width,
+                bracket_count, expected_tpo_total
+            ) VALUES(?, ?, ?, ?, 0, 0)
+            ON CONFLICT(raid_id) DO UPDATE SET
+                generation = excluded.generation,
+                profile_start_ts_ns = excluded.profile_start_ts_ns,
+                bin_width = excluded.bin_width,
+                bracket_count = 0,
+                expected_tpo_total = 0
+            """,
+            (raid_id, generation, profile_start_ts_ns, bin_width),
+        )
+        self._connection.commit()
+
+    def get_profile_state(self, raid_id: str, generation: int) -> dict[str, int | float] | None:
+        """Return one current-generation profile row without scanning bins."""
+        cursor = self._connection.execute(
+            """
+            SELECT profile_start_ts_ns, bin_width, bracket_count, expected_tpo_total
+            FROM profile_state WHERE raid_id = ? AND generation = ?
+            """,
+            (raid_id, generation),
+        )
+        row = cursor.fetchone()
+        cursor.close()
+        if row is None:
+            return None
+        return {
+            "profile_start_ts_ns": int(row[0]),
+            "bin_width": float(row[1]),
+            "bracket_count": int(row[2]),
+            "expected_tpo_total": int(row[3]),
+        }
+
+    def current_profile_generation(self, raid_id: str) -> int | None:
+        """Return the current profile generation with one keyed query."""
+        cursor = self._connection.execute(
+            "SELECT generation FROM profile_meta WHERE raid_id = ?", (raid_id,)
+        )
+        row = cursor.fetchone()
+        cursor.close()
+        return int(row[0]) if row is not None else None
+
+    def increment_profile_bin_range(
+        self, raid_id: str, generation: int, low_bin_index: int, high_bin_index: int
+    ) -> None:
+        """Increment each inclusive profile bin and its durable conservation totals."""
+        if low_bin_index > high_bin_index:
+            raise ValueError("profile bin range is inverted")
+        self._connection.execute("BEGIN")
+        try:
+            for bin_index in range(low_bin_index, high_bin_index + 1):
+                self._connection.execute(
+                    """
+                    INSERT INTO profile_bins(raid_id, generation, bin_index, count)
+                    VALUES(?, ?, ?, 1)
+                    ON CONFLICT(raid_id, generation, bin_index) DO UPDATE SET
+                        count = profile_bins.count + 1
+                    """,
+                    (raid_id, generation, bin_index),
+                )
+            cursor = self._connection.execute(
+                """
+                UPDATE profile_state
+                SET bracket_count = bracket_count + 1,
+                    expected_tpo_total = expected_tpo_total + ?
+                WHERE raid_id = ? AND generation = ?
+                """,
+                (high_bin_index - low_bin_index + 1, raid_id, generation),
+            )
+            if cursor.rowcount != 1:
+                raise KeyError((raid_id, generation))
+            self._connection.commit()
+        except Exception:
+            self._connection.rollback()
+            raise
+
+    def profile_bin_count(
+        self, raid_id: str, generation: int, bin_index: int
+    ) -> int | None:
+        """Return a single bin count for cursor-safe value-area expansion."""
+        cursor = self._connection.execute(
+            """
+            SELECT count FROM profile_bins
+            WHERE raid_id = ? AND generation = ? AND bin_index = ?
+            """,
+            (raid_id, generation, bin_index),
+        )
+        row = cursor.fetchone()
+        cursor.close()
+        return int(row[0]) if row is not None else None
 
     def new_profile_generation(self, raid_id: str) -> int:
         cursor = self._connection.execute(
