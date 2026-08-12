@@ -162,7 +162,7 @@ Expected: `BLOCKING_PASS: True`, pinned fence, zero cost.
 
 **Interfaces:**
 - Consumes: current `iter_active_raids()` cursor and source-bar update sequence.
-- Produces: `_update_active_raids_from_source(bar: BarRecord) -> None`, replacing two per-minute cursor passes with one.
+- Produces: `_update_active_raids_from_source(bar: BarRecord) -> None`, replacing two state-processing cursor passes with one; `Exp100StateStore.count_active_raids() -> int` supplies post-minute telemetry without JSON decoding.
 
 - [ ] **Step 1: Write the failing cursor-count test**
 
@@ -201,9 +201,20 @@ cd python
 
 Expected: FAIL with `calls == 2`.
 
+The current telemetry count also uses `iter_active_raids`, so the observed RED
+count is three. Add a separate failing state-store test before production code:
+
+```python
+def test_count_active_raids_reports_only_active_rows(tmp_path: Path) -> None:
+    with Exp100StateStore(tmp_path / "state.sqlite") as store:
+        store.insert_raid({"raid_id": "R1", "level_id": "L1", "active": 1})
+        store.insert_raid({"raid_id": "R2", "level_id": "L1", "active": 0})
+        assert store.count_active_raids() == 1
+```
+
 - [ ] **Step 3: Merge profile/swing/return processing into one cursor loop**
 
-Rename `_update_active_profiles_from_source` to `_update_active_raids_from_source`. For each yielded raid, keep the existing profile and swing operations, then perform the current return test against the updated raid dictionary. Remove only the active-raid loop from `_process_source_raid_state`; retain its level loop unchanged.
+Rename `_update_active_profiles_from_source` to `_update_active_raids_from_source`. For each yielded raid, keep the existing profile and swing operations, then perform the current return test against the updated raid dictionary. Remove only the active-raid loop from `_process_source_raid_state`; retain its level loop unchanged. Add `count_active_raids` using `SELECT COUNT(*) FROM raids WHERE active = 1`, and route `_count_active_raids` through it.
 
 - [ ] **Step 4: Run processor tests and verify GREEN**
 

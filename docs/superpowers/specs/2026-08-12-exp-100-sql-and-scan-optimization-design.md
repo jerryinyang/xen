@@ -74,6 +74,11 @@ its existing position. New raids created from that level pass therefore remain
 ineligible for profile/return processing until the next source minute, exactly as
 before.
 
+Operational open-raid telemetry currently performs a third full cursor/JSON
+decode pass. Replace that implementation with a scalar `SELECT COUNT(*)` after
+the state transaction. It reports the same post-minute count, including newly
+created raids, without another active-raid materialisation pass.
+
 The three reference-bar selection scans remain unchanged. They are lower
 frequency and combine three different eligibility/max-selection operations;
 changing them is outside this scope.
