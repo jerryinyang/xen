@@ -74,7 +74,8 @@ those tests. No unrelated state-store refactor is in scope.
 2. Re-run the three-day BTCUSDT TRAIN smoke with the frozen cell configuration.
 3. Compare the new emission with the retained approved smoke:
    - identical Parquet row counts and values for `bar_marks`, `levels`, `raids`,
-     and `tpo_profiles`;
+     and `tpo_profiles`, except `bar_marks.state_bytes` may differ because it is
+     operational telemetry of SQLite's physical page layout;
    - identical ordered event-log payloads with no permitted differences;
    - identical destroy-control output for the fixed seed;
    - metadata differences limited to generation time, runtime/memory observations,
@@ -84,8 +85,10 @@ those tests. No unrelated state-store refactor is in scope.
 5. Re-profile the same one-day and two-day slices.
 6. Run fresh-context QA because a previously traced execution path changed.
 
-Any output-value or event-order difference is a failed optimization, not an
-acceptable tolerance.
+Any research-bearing output-value or event-order difference is a failed
+optimization, not an acceptable tolerance. The operator approved the sole
+operational exception for `bar_marks.state_bytes` on 2026-08-12 after the first
+equivalence run showed all other fields exactly equal.
 
 ## Later optimization gate
 

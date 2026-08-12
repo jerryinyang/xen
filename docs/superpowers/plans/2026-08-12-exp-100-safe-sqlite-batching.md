@@ -15,7 +15,9 @@
 - Keep `cost_model: NO_COST_CHARGED`; no accounting or cost path changes.
 - Keep cursor-based bounded memory; never materialise all active state.
 - No partitioning, pruning, timeout, schema, or object-lifetime change.
-- Any emission-value or ordered-event difference fails the optimization.
+- Any research-bearing emission-value or ordered-event difference fails the
+  optimization. `bar_marks.state_bytes` is the sole operator-approved exception
+  because it measures SQLite's physical page layout.
 - The worktree contains pre-existing EXP-100 edits. Do not commit implementation files unless the operator separately requests it.
 
 ---
@@ -238,7 +240,7 @@ Use the exact retained cell configuration, a unique temporary run directory, and
 
 - [ ] **Step 3: Compare research-bearing outputs exactly**
 
-For `bar_marks`, `levels`, `raids`, `tpo_profiles`, and `raids_destroyed`, use PyArrow to sort columns into canonical order and assert table equality including null placement and row order. Assert `event_log.jsonl` bytes are identical. Compare metadata after excluding only `generated_utc`, runtime/memory observations, catalog/run-directory textual identity, and hashes derived solely from permitted metadata differences. Expected: no research-bearing difference.
+For `bar_marks`, `levels`, `raids`, `tpo_profiles`, and `raids_destroyed`, use PyArrow to sort columns into canonical order and assert table equality including null placement and row order, excluding only `bar_marks.state_bytes`. Assert `event_log.jsonl` bytes are identical. Compare metadata after excluding only `generated_utc`, runtime/memory observations, catalog/run-directory textual identity, and hashes derived solely from permitted metadata differences. Expected: no research-bearing difference.
 
 - [ ] **Step 4: Run the integrity gate**
 
