@@ -3,6 +3,7 @@
 from .config import Exp100CellConfig
 from .control import destroy_post_confirmation
 from .features import CausalVolatilityRegime, CausalWilderATR, StreamingOHLC
+from .levels import LevelCatalogue, LevelSpec
 from .processor import Exp100Processor, Exp100Sinks
 from .state_store import Exp100StateStore
 from .strategy import Exp100Strategy, Exp100StrategyConfig
@@ -13,6 +14,8 @@ __all__ = [
     "CausalVolatilityRegime",
     "CausalWilderATR",
     "Exp100CellConfig",
+    "LevelCatalogue",
+    "LevelSpec",
     "destroy_post_confirmation",
     "Exp100Processor",
     "Exp100Sinks",

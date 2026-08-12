@@ -1,0 +1,63 @@
+{
+  "gate_version": "v2",
+  "emission_type": "nautilus_v1",
+  "run_dir": "../data/nautilus_runs/exp100_smoke/BTCUSDT_15m_BREAKOUT_PREVIOUS_1H_2023-12-01_2023-12-04",
+  "instrument": null,
+  "domain": null,
+  "schema": {
+    "ok": true,
+    "missing_positions_cols": [],
+    "missing_leg_cols": [],
+    "timestamps_strictly_increasing": true,
+    "emission_contract_version": "nautilus-emission-v1",
+    "missing_emission_files": [],
+    "contract_version_ok": true
+  },
+  "fence": {
+    "ok": true,
+    "mode": "nautilus_v2",
+    "status": "PINNED",
+    "last_bar": "2023-12-03 23:59:00",
+    "analysis_end_utc": "2025-01-08T00:00:00Z",
+    "within_fence": true,
+    "manifest": {
+      "canonical_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/archive/chapter-04-nautilus-bybit-sigauc/experiments/INFR-011/artifacts/fence-manifest.json",
+      "exists": true,
+      "ok": true,
+      "expected_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+      "actual_sha256": "35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448"
+    }
+  },
+  "manifest": {
+    "ok": true,
+    "expected": [
+      "BTCUSDT"
+    ],
+    "emitted": [
+      "BTCUSDT"
+    ],
+    "missing": []
+  },
+  "no_cost_charged": {
+    "ok": true,
+    "cost_model": "NO_COST_CHARGED",
+    "emission_cost_columns": {
+      "ok": true,
+      "non_zero_columns": [],
+      "n_non_zero_rows": 0
+    },
+    "cost_directive": null,
+    "cost_bps": 0.0
+  },
+  "catalog_attestation": {
+    "ok": true,
+    "note": null,
+    "catalog_version": null,
+    "config_hash": "596e3bb635960ec6542bf3ce011254a231845d82aca778882bd21e135f8ae069"
+  },
+  "reconciliation": {
+    "ok": true,
+    "note": "no leg ledger"
+  },
+  "blocking_pass": true
+}

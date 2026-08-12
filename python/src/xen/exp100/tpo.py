@@ -151,12 +151,17 @@ class TPOProfileStore:
             )
         gap_span_value, gap_mask = gap_span
         conservation_ok = total == expected_total
+        # Bin width is frozen at 0.10 × ATR_unit when the profile starts.
+        atr_unit = bin_width / 0.10
+        gap_span_atr = gap_span_value / atr_unit if atr_unit > 0.0 else None
+        gap_span_va = gap_span_value / va_width if va_width > 0.0 else None
         return {
             "raid_id": raid_id,
             "profile_generation": generation,
             "profile_start_ts_ns": int(state["profile_start_ts_ns"]),
             "profile_end_ts_ns": end_ts_ns,
             "bin_width": bin_width,
+            "atr_unit": atr_unit,
             "bracket_count": bracket_count,
             "poc": poc_index * bin_width,
             "val": val,
@@ -166,6 +171,8 @@ class TPOProfileStore:
             "va_mask": {"low_bin_index": va_low, "high_bin_index": va_high},
             "gap_mask": gap_mask,
             "gap_span": gap_span_value,
+            "gap_span_atr": gap_span_atr,
+            "gap_span_va": gap_span_va,
             "va_width": va_width,
             "tight_gap": gap_span_value < self.tight_ratio * va_width,
             "tpo_total": total,

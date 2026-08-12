@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import hashlib
 import sqlite3
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
 
@@ -25,6 +26,7 @@ class Exp100StateStore:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._connection = sqlite3.connect(self.path)
         self._connection.row_factory = sqlite3.Row
+        self._transaction_depth = 0
         self._connection.execute("PRAGMA journal_mode=DELETE")
         self._connection.execute("PRAGMA synchronous=NORMAL")
         self._connection.executescript(
@@ -129,6 +131,34 @@ class Exp100StateStore:
             raise RuntimeError("state payload is not an object")
         return value
 
+    @contextmanager
+    def source_bar_transaction(self) -> Iterator[None]:
+        """Commit all SQLite mutations for one source minute together."""
+        with self._transaction(immediate=True):
+            yield
+
+    @contextmanager
+    def _transaction(self, *, immediate: bool) -> Iterator[None]:
+        outer = self._transaction_depth == 0
+        if outer:
+            self._connection.execute("BEGIN IMMEDIATE" if immediate else "BEGIN")
+        self._transaction_depth += 1
+        try:
+            yield
+        except Exception:
+            self._transaction_depth -= 1
+            if outer:
+                self._connection.rollback()
+            raise
+        else:
+            self._transaction_depth -= 1
+            if outer:
+                self._connection.commit()
+
+    def _commit_if_standalone(self) -> None:
+        if self._transaction_depth == 0:
+            self._connection.commit()
+
     def iter_active_levels(self) -> Iterator[dict[str, Any]]:
         cursor = self._connection.execute(
             "SELECT payload FROM levels WHERE active = 1 ORDER BY level_id"
@@ -153,7 +183,7 @@ class Exp100StateStore:
             """,
             (level_id, active, event_identity, payload),
         )
-        self._connection.commit()
+        self._commit_if_standalone()
 
     def update_level(self, level_id: str, fields: Mapping[str, Any]) -> None:
         if "level_id" in fields:
@@ -162,7 +192,7 @@ class Exp100StateStore:
 
     def delete_level(self, level_id: str) -> None:
         self._connection.execute("DELETE FROM levels WHERE level_id = ?", (level_id,))
-        self._connection.commit()
+        self._commit_if_standalone()
 
     def iter_active_raids(self) -> Iterator[dict[str, Any]]:
         cursor = self._connection.execute(
@@ -174,6 +204,13 @@ class Exp100StateStore:
         finally:
             if not self._closed:
                 cursor.close()
+
+    def count_active_raids(self) -> int:
+        """Return the active-raid count without decoding JSON payloads."""
+        cursor = self._connection.execute("SELECT COUNT(*) FROM raids WHERE active = 1")
+        row = cursor.fetchone()
+        cursor.close()
+        return int(row[0]) if row is not None else 0
 
     def insert_raid(self, row: Mapping[str, Any]) -> None:
         raid_id, event_identity, active, payload = self._payload(row, "raid_id")
@@ -199,7 +236,7 @@ class Exp100StateStore:
             """,
             (raid_id, level_id, event_identity),
         )
-        self._connection.commit()
+        self._commit_if_standalone()
 
     def update_raid(self, raid_id: str, fields: Mapping[str, Any]) -> None:
         if "raid_id" in fields:
@@ -210,7 +247,7 @@ class Exp100StateStore:
 
     def delete_raid(self, raid_id: str) -> None:
         self._connection.execute("DELETE FROM raids WHERE raid_id = ?", (raid_id,))
-        self._connection.commit()
+        self._commit_if_standalone()
 
     def prior_raid_count(self, level_id: str) -> int:
         cursor = self._connection.execute(
@@ -245,7 +282,7 @@ class Exp100StateStore:
                     """,
                     (raid_id, generation, index, value),
                 )
-        self._connection.commit()
+        self._commit_if_standalone()
 
     def iter_profile_bins(self, raid_id: str, generation: int) -> Iterator[tuple[int, int]]:
         cursor = self._connection.execute(
@@ -301,8 +338,7 @@ class Exp100StateStore:
         self, raid_id: str, generation: int, bin_indexes: Iterable[int]
     ) -> tuple[int, int | None, int | None, str]:
         """Persist selected bins and return fixed-size count, bounds, and digest."""
-        self._connection.execute("BEGIN IMMEDIATE")
-        try:
+        with self._transaction(immediate=True):
             self._connection.execute(
                 "DELETE FROM profile_gap_bins WHERE raid_id = ? AND generation = ?",
                 (raid_id, generation),
@@ -331,10 +367,6 @@ class Exp100StateStore:
                     else max(outer_high, bin_index)
                 )
             digest = self._profile_gap_digest(raid_id, generation)
-            self._connection.commit()
-        except Exception:
-            self._connection.rollback()
-            raise
         return selected_count, outer_low, outer_high, digest
 
     def _profile_gap_digest(self, raid_id: str, generation: int) -> str:
@@ -389,18 +421,13 @@ class Exp100StateStore:
         Deleting an already-cleared profile is deliberately a no-op so a caller
         can safely resume terminal cleanup after an interrupted output path.
         """
-        self._connection.execute("BEGIN IMMEDIATE")
-        try:
+        with self._transaction(immediate=True):
             self._connection.execute("DELETE FROM profile_bins WHERE raid_id = ?", (raid_id,))
             self._connection.execute(
                 "DELETE FROM profile_gap_bins WHERE raid_id = ?", (raid_id,)
             )
             self._connection.execute("DELETE FROM profile_state WHERE raid_id = ?", (raid_id,))
             self._connection.execute("DELETE FROM profile_meta WHERE raid_id = ?", (raid_id,))
-            self._connection.commit()
-        except Exception:
-            self._connection.rollback()
-            raise
 
     def increment_profile_bin_range(
         self, raid_id: str, generation: int, low_bin_index: int, high_bin_index: int
@@ -408,18 +435,19 @@ class Exp100StateStore:
         """Increment each inclusive profile bin and its durable conservation totals."""
         if low_bin_index > high_bin_index:
             raise ValueError("profile bin range is inverted")
-        self._connection.execute("BEGIN")
-        try:
-            for bin_index in range(low_bin_index, high_bin_index + 1):
-                self._connection.execute(
-                    """
-                    INSERT INTO profile_bins(raid_id, generation, bin_index, count)
-                    VALUES(?, ?, ?, 1)
-                    ON CONFLICT(raid_id, generation, bin_index) DO UPDATE SET
-                        count = profile_bins.count + 1
-                    """,
-                    (raid_id, generation, bin_index),
-                )
+        with self._transaction(immediate=False):
+            self._connection.executemany(
+                """
+                INSERT INTO profile_bins(raid_id, generation, bin_index, count)
+                VALUES(?, ?, ?, 1)
+                ON CONFLICT(raid_id, generation, bin_index) DO UPDATE SET
+                    count = profile_bins.count + 1
+                """,
+                (
+                    (raid_id, generation, bin_index)
+                    for bin_index in range(low_bin_index, high_bin_index + 1)
+                ),
+            )
             cursor = self._connection.execute(
                 """
                 UPDATE profile_state
@@ -431,10 +459,6 @@ class Exp100StateStore:
             )
             if cursor.rowcount != 1:
                 raise KeyError((raid_id, generation))
-            self._connection.commit()
-        except Exception:
-            self._connection.rollback()
-            raise
 
     def profile_bin_count(
         self, raid_id: str, generation: int, bin_index: int
@@ -455,8 +479,7 @@ class Exp100StateStore:
         self, raid_id: str, profile_start_ts_ns: int, bin_width: float
     ) -> int:
         """Atomically create generation one for a previously unseen raid."""
-        self._connection.execute("BEGIN IMMEDIATE")
-        try:
+        with self._transaction(immediate=True):
             cursor = self._connection.execute(
                 "SELECT generation FROM profile_meta WHERE raid_id = ?", (raid_id,)
             )
@@ -485,18 +508,13 @@ class Exp100StateStore:
                 "INSERT INTO profile_meta(raid_id, generation) VALUES(?, ?)",
                 (raid_id, generation),
             )
-            self._connection.commit()
-        except Exception:
-            self._connection.rollback()
-            raise
         return generation
 
     def reset_profile_generation(
         self, raid_id: str, profile_start_ts_ns: int, bin_width: float
     ) -> int:
         """Atomically publish the next generation while retaining rollback safety."""
-        self._connection.execute("BEGIN IMMEDIATE")
-        try:
+        with self._transaction(immediate=True):
             cursor = self._connection.execute(
                 "SELECT generation FROM profile_meta WHERE raid_id = ?", (raid_id,)
             )
@@ -525,10 +543,6 @@ class Exp100StateStore:
                 "UPDATE profile_meta SET generation = ? WHERE raid_id = ?",
                 (generation, raid_id),
             )
-            self._connection.commit()
-        except Exception:
-            self._connection.rollback()
-            raise
         return generation
 
     def new_profile_generation(self, raid_id: str) -> int:
@@ -559,7 +573,7 @@ class Exp100StateStore:
             f"WHERE {id_column} = ?",
             (active, event_identity, payload, identifier),
         )
-        self._connection.commit()
+        self._commit_if_standalone()
 
     def close(self) -> None:
         if not self._closed:

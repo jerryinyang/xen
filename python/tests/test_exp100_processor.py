@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -135,43 +136,35 @@ def feed_complete_window(
 
 
 def test_processor_keeps_ambiguous_same_bar_raid_out_of_primary_result(tmp_path: Path) -> None:
-    """A same-bar cross and return is retained but cannot become primary."""
+    """A same-1m cross and return is retained but cannot become primary."""
     processor, sinks = make_processor(tmp_path)
     processor.seed_level("L1", price=100.0, side="HIGH")
-    last_ts = feed_complete_observation_window(
-        processor, start_ts_ns=0, high=101.0, low=99.0, close=100.0
-    )
-    processor.finish(last_ts)
+    processor.on_one_minute_bar(BarRecord(0, 100.0, 101.0, 99.0, 100.0, 1.0, 1))
+    processor.finish(0)
 
-    assert len(sinks.bar_marks.rows) == 1
-    assert sinks.bar_marks.rows[0]["source_bars"] == OBSERVATION_MINUTES
     assert len(sinks.raids.rows) == 1
     row = sinks.raids.rows[0]
     assert row["status"] == "AMBIGUOUS_INTRABAR"
     assert row["primary_completed"] is False
+    assert row["sweep_ts_ns"] == 0
+    assert row["return_ts_ns"] == 0
 
 
 def test_processor_uses_later_bar_for_inclusive_return_and_censors_unconfirmed_state(
     tmp_path: Path,
 ) -> None:
-    """A strict raid returns only on a later inclusive observation bar."""
+    """A strict 1m raid returns only on a later inclusive 1m bar."""
     processor, sinks = make_processor(tmp_path)
     processor.seed_level("L1", price=100.0, side="HIGH")
-    feed_complete_observation_window(
-        processor, start_ts_ns=0, high=101.0, low=100.5, close=100.8
+    processor.on_one_minute_bar(BarRecord(0, 100.8, 101.0, 100.5, 100.8, 1.0, 1))
+    processor.on_one_minute_bar(
+        BarRecord(MINUTE_NS, 100.8, 101.1, 100.0, 100.2, 1.0, 1)
     )
-    last_ts = feed_complete_observation_window(
-        processor,
-        start_ts_ns=OBSERVATION_MINUTES * MINUTE_NS,
-        high=101.1,
-        low=100.0,
-        close=100.2,
-    )
-    processor.finish(last_ts)
+    processor.finish(MINUTE_NS)
 
     assert len(sinks.raids.rows) == 1
     row = sinks.raids.rows[0]
-    assert row["return_ts_ns"] == SECOND_WINDOW_END_TS
+    assert row["return_ts_ns"] == MINUTE_NS
     assert row["status"] == "RIGHT_CENSORED_CONFIRMATION"
 
 
@@ -179,10 +172,8 @@ def test_processor_censors_open_state_and_emits_level_before_deletion(tmp_path: 
     """End-of-input censors all remaining state rather than dropping it."""
     processor, sinks = make_processor(tmp_path)
     processor.seed_level("L1", price=100.0, side="LOW")
-    feed_complete_observation_window(
-        processor, start_ts_ns=0, open=99.8, high=99.8, low=99.0, close=99.5
-    )
-    processor.finish(FIRST_WINDOW_END_TS)
+    processor.on_one_minute_bar(BarRecord(0, 99.8, 99.8, 99.0, 99.5, 1.0, 1))
+    processor.finish(0)
 
     assert sinks.raids.rows[0]["status"] == "RIGHT_CENSORED_EXCURSION"
     assert sinks.levels.rows[0]["status"] == "RIGHT_CENSORED"
@@ -195,17 +186,11 @@ def test_processor_replay_is_deterministic_and_leaves_no_terminal_state(tmp_path
     def replay(path: Path) -> tuple[dict[str, list[dict[str, Any]]], dict[str, int]]:
         processor, sinks = make_processor(path)
         processor.seed_level("L1", price=100.0, side="HIGH")
-        feed_complete_observation_window(
-            processor, start_ts_ns=0, high=101.0, low=100.5, close=100.8
+        processor.on_one_minute_bar(BarRecord(0, 100.8, 101.0, 100.5, 100.8, 1.0, 1))
+        processor.on_one_minute_bar(
+            BarRecord(MINUTE_NS, 100.8, 101.1, 100.0, 100.2, 1.0, 1)
         )
-        last_ts = feed_complete_observation_window(
-            processor,
-            start_ts_ns=OBSERVATION_MINUTES * MINUTE_NS,
-            high=101.1,
-            low=100.0,
-            close=100.2,
-        )
-        processor.finish(last_ts)
+        processor.finish(MINUTE_NS)
         rows = {
             "bar_marks": sinks.bar_marks.rows,
             "levels": sinks.levels.rows,
@@ -225,31 +210,69 @@ def test_processor_replay_is_deterministic_and_leaves_no_terminal_state(tmp_path
     assert second_snapshot["open_raids"] == 0
 
 
+def test_processor_uses_one_transaction_for_a_source_minute(tmp_path: Path) -> None:
+    """One source minute commits all of its SQLite state changes once."""
+    processor, _ = make_processor(tmp_path)
+    processor.seed_level("L1", price=100.0, side="HIGH")
+    statements: list[str] = []
+    processor.state._connection.set_trace_callback(statements.append)
+
+    processor.on_one_minute_bar(
+        BarRecord(0, 100.8, 101.0, 100.5, 100.8, 1.0, 1)
+    )
+
+    transaction_statements = [
+        statement
+        for statement in statements
+        if statement in {"BEGIN IMMEDIATE", "BEGIN", "COMMIT", "ROLLBACK"}
+    ]
+    assert transaction_statements == ["BEGIN IMMEDIATE", "COMMIT"]
+    assert next(processor.state.iter_active_raids())["raid_id"] == "L1:raid:1"
+
+
+def test_processor_scans_active_raids_once_per_source_minute(tmp_path: Path) -> None:
+    """Profile, swing, and return handling share one streaming raid cursor."""
+    processor, _ = make_processor(tmp_path)
+    processor.seed_level("L1", price=100.0, side="HIGH")
+    processor.on_one_minute_bar(BarRecord(0, 100.8, 101.0, 100.5, 100.8, 1.0, 1))
+    original = processor.state.iter_active_raids
+    calls = 0
+
+    def counted() -> Iterator[dict[str, Any]]:
+        nonlocal calls
+        calls += 1
+        yield from original()
+
+    processor.state.iter_active_raids = counted
+    processor.on_one_minute_bar(
+        BarRecord(MINUTE_NS, 100.9, 101.2, 100.6, 101.0, 1.0, 1)
+    )
+
+    assert calls == 1
+    raid = next(original())
+    assert raid["raid_id"] == "L1:raid:1"
+    assert raid["return_ts_ns"] is None
+
+
 def test_profile_receives_every_source_minute_after_its_first_excursion(
     tmp_path: Path,
 ) -> None:
-    """Replacing minute updates with an aggregate bar changes TPO bracket count."""
+    """Each source minute after the first excursion contributes one TPO bracket."""
     processor, sinks = make_processor(tmp_path)
+    # Warm ATR with completed observation bars that do not raid.
     start = 0
     for _ in range(15):
         feed_complete_observation_window(
-            processor, start_ts_ns=start, high=101.0, low=99.0, close=100.0
+            processor, start_ts_ns=start, high=100.0, low=99.0, close=99.5
         )
         start += OBSERVATION_MINUTES * MINUTE_NS
 
     processor.seed_level("L1", price=100.0, side="HIGH")
-    last_ts = feed_complete_observation_window(
-        processor,
-        start_ts_ns=start,
-        open=100.8,
-        high=101.0,
-        low=100.5,
-        close=100.8,
-    )
-    for minute in range(3):
+    # 15 beyond-without-return minutes + 3 more = 18 brackets.
+    for minute in range(18):
         processor.on_one_minute_bar(
             BarRecord(
-                last_ts + (minute + 1) * MINUTE_NS,
+                start + minute * MINUTE_NS,
                 100.8,
                 101.0,
                 100.5,
@@ -258,11 +281,14 @@ def test_profile_receives_every_source_minute_after_its_first_excursion(
                 1,
             )
         )
-    processor.finish(last_ts + 3 * MINUTE_NS)
+    processor.finish(start + 17 * MINUTE_NS)
 
     profile = sinks.tpo_profiles.rows[0]
     assert profile["bracket_count"] == 18
     assert profile["tpo_total"] > 18
+    assert profile.get("gap_span_atr") is not None or profile["profile_status"] != "DEFINED"
+    if profile["profile_status"] == "DEFINED":
+        assert profile["gap_span_va"] is not None
 
 
 def test_processor_selects_only_latest_resolvable_raid_for_one_reference_event(
@@ -299,36 +325,22 @@ def test_processor_retains_repeated_raids_after_a_return(tmp_path: Path) -> None
     """An earlier live raid must not suppress a later strict crossing transition."""
     processor, sinks = make_processor(tmp_path)
     processor.seed_level("L1", price=100.0, side="HIGH")
-    feed_complete_observation_window(
-        processor, start_ts_ns=0, open=100.8, high=101.0, low=100.5, close=100.8
+    processor.on_one_minute_bar(BarRecord(0, 100.8, 101.0, 100.5, 100.8, 1.0, 1))
+    processor.on_one_minute_bar(
+        BarRecord(MINUTE_NS, 99.8, 100.0, 99.0, 99.5, 1.0, 1)
     )
-    feed_complete_observation_window(
-        processor,
-        start_ts_ns=OBSERVATION_MINUTES * MINUTE_NS,
-        open=99.8,
-        high=100.0,
-        low=99.0,
-        close=99.5,
+    processor.on_one_minute_bar(
+        BarRecord(2 * MINUTE_NS, 100.8, 101.0, 100.5, 100.8, 1.0, 1)
     )
-    last_ts = feed_complete_observation_window(
-        processor,
-        start_ts_ns=2 * OBSERVATION_MINUTES * MINUTE_NS,
-        open=100.8,
-        high=101.0,
-        low=100.5,
-        close=100.8,
-    )
-    processor.finish(last_ts)
+    processor.finish(2 * MINUTE_NS)
 
     assert [row["prior_raid_count"] for row in sinks.raids.rows] == [0, 1]
 
 
-def test_reference_selects_older_expected_raid_when_newer_price_is_unresolvable(
-    tmp_path: Path,
-) -> None:
-    """Selecting before event predicates lets an unresolvable newer raid block confirmation."""
+def test_level_close_uses_higher_degree_levels_not_raid_price(tmp_path: Path) -> None:
+    """LEVEL_CLOSE must confirm against previous reference extremes, not raid prices."""
     processor, _ = make_processor(tmp_path, confirmation_method="LEVEL_CLOSE")
-    for raid_id, price, sweep_ts_ns in (("R1", 100.0, 10), ("R2", 90.0, 20)):
+    for raid_id, price, sweep_ts_ns in (("R1", 100.0, 10), ("R2", 50.0, 20)):
         processor.state.insert_raid(
             {
                 "raid_id": raid_id,
@@ -340,23 +352,27 @@ def test_reference_selects_older_expected_raid_when_newer_price_is_unresolvable(
                 "return_ts_ns": sweep_ts_ns + 1,
                 "confirmation_ts_ns": None,
                 "max_price": price + 1.0,
+                "max_excursion": 1.0,
                 "profile_generation": None,
                 "profile_finalized": False,
                 "active": 1,
             }
         )
+    # previous reference high/low = 101/99; close 90 is beyond the low → expected.
+    # Both raids share that confirmation level; the most recent resolvable raid wins.
     processor._previous_reference = BarRecord(60, 100.0, 101.0, 99.0, 100.0, 1.0, 1)
     processor._on_reference_bar(BarRecord(120, 95.0, 95.0, 90.0, 90.0, 1.0, 1))
 
     rows = {row["raid_id"]: row for row in processor.state.iter_active_raids()}
-    assert rows["R1"]["confirmation_ts_ns"] == 120
-    assert rows["R2"]["confirmation_ts_ns"] is None
+    assert rows["R1"]["confirmation_ts_ns"] is None
+    assert rows["R2"]["confirmation_ts_ns"] == 120
+    assert rows["R2"]["confirmation_level_high"] == 101.0
+    assert rows["R2"]["confirmation_level_low"] == 99.0
+    assert rows["R2"]["confirmation_level_low"] != rows["R2"]["level_price"]
 
 
-def test_reference_selects_older_endpoint_when_newer_price_is_unresolvable(
-    tmp_path: Path,
-) -> None:
-    """Endpoint selection must also filter by the current opposing event first."""
+def test_level_close_endpoint_uses_higher_degree_levels(tmp_path: Path) -> None:
+    """Endpoint opposing events also use higher-degree levels, not raid prices."""
     processor, sinks = make_processor(tmp_path, confirmation_method="LEVEL_CLOSE")
     for raid_id, price, sweep_ts_ns in (("R1", 100.0, 10), ("R2", 110.0, 20)):
         processor.state.insert_raid(
@@ -371,6 +387,7 @@ def test_reference_selects_older_endpoint_when_newer_price_is_unresolvable(
                 "confirmation_ts_ns": 50,
                 "primary_attribution": True,
                 "max_price": price + 1.0,
+                "max_excursion": 1.0,
                 "profile_generation": None,
                 "profile_finalized": True,
                 "active": 1,
@@ -379,9 +396,10 @@ def test_reference_selects_older_endpoint_when_newer_price_is_unresolvable(
     processor._previous_reference = BarRecord(120, 99.0, 100.0, 98.0, 99.0, 1.0, 1)
     processor._on_reference_bar(BarRecord(180, 105.0, 106.0, 104.0, 105.0, 1.0, 1))
 
-    assert sinks.raids.rows[0]["raid_id"] == "R1"
+    # close 105 > previous.high 100 → opposing for HIGH; most recent primary wins.
+    assert sinks.raids.rows[0]["raid_id"] == "R2"
     assert sinks.raids.rows[0]["status"] == "COMPLETED"
-    assert next(processor.state.iter_active_raids())["raid_id"] == "R2"
+    assert next(processor.state.iter_active_raids())["raid_id"] == "R1"
 
 
 def test_mixed_side_reference_processes_expected_and_opposing_candidates_independently(
@@ -442,14 +460,32 @@ def test_returning_while_still_beyond_rearms_level_for_next_crossing(
     """A return bar may still be beyond; the following crossing must become a new raid."""
     processor, sinks = make_processor(tmp_path)
     processor.seed_level("L1", price=100.0, side=side)
-    feed_complete_observation_window(processor, start_ts_ns=0, **first)
-    feed_complete_observation_window(
-        processor, start_ts_ns=OBSERVATION_MINUTES * MINUTE_NS, **returned
+    processor.on_one_minute_bar(
+        BarRecord(0, first["open"], first["high"], first["low"], first["close"], 1.0, 1)
     )
-    last_ts = feed_complete_observation_window(
-        processor, start_ts_ns=2 * OBSERVATION_MINUTES * MINUTE_NS, **recross
+    processor.on_one_minute_bar(
+        BarRecord(
+            MINUTE_NS,
+            returned["open"],
+            returned["high"],
+            returned["low"],
+            returned["close"],
+            1.0,
+            1,
+        )
     )
-    processor.finish(last_ts)
+    processor.on_one_minute_bar(
+        BarRecord(
+            2 * MINUTE_NS,
+            recross["open"],
+            recross["high"],
+            recross["low"],
+            recross["close"],
+            1.0,
+            1,
+        )
+    )
+    processor.finish(2 * MINUTE_NS)
 
     assert [row["prior_raid_count"] for row in sinks.raids.rows] == [0, 1]
 
@@ -606,6 +642,85 @@ def test_confirmation_and_endpoint_capture_causal_feature_state(tmp_path: Path) 
     assert sinks.raids.rows[0]["endpoint_regime"] == "MID"
 
 
+def test_strong_move_compares_post_confirmation_swing_to_excursion(
+    tmp_path: Path,
+) -> None:
+    """strong_move uses post-confirmation swing vs max excursion, both in ATR units."""
+    processor, sinks = make_processor(tmp_path)
+    processor._atr._atr = 1.0
+    processor._last_regime = "MID"
+    processor.state.insert_raid(
+        {
+            "raid_id": "R1",
+            "level_id": "L1",
+            "event_identity": "R1",
+            "side": "HIGH",
+            "level_price": 100.0,
+            "sweep_ts_ns": 1,
+            "return_ts_ns": 2,
+            "confirmation_ts_ns": 50,
+            "primary_attribution": True,
+            "max_price": 101.0,
+            "max_excursion": 1.0,
+            "raid_atr": 1.0,
+            "swing_extreme": 97.0,
+            "profile_generation": None,
+            "profile_finalized": True,
+            "active": 1,
+        }
+    )
+    processor._terminal_raid(
+        next(processor.state.iter_active_raids()),
+        "COMPLETED",
+        endpoint_ts_ns=180,
+    )
+    row = sinks.raids.rows[0]
+    assert row["max_excursion_atr"] == 1.0
+    assert row["max_excursion_bps"] == 100.0
+    assert row["swing_price"] == 3.0
+    assert row["swing_bps"] == 300.0
+    assert row["swing_atr"] == 3.0
+    assert row["strong_move"] is True
+
+
+def test_raid_start_and_return_use_source_one_minute_bars(tmp_path: Path) -> None:
+    """Golden T1: separate 1m excursion and later 1m return form a completed raid."""
+    processor, sinks = make_processor(tmp_path)
+    processor.seed_level("L1", price=100.0, side="HIGH")
+    # First source minute: strict high excursion only.
+    processor.on_one_minute_bar(BarRecord(0, 100.5, 101.2, 100.5, 101.0, 1.0, 1))
+    open_raids = list(processor.state.iter_active_raids())
+    assert len(open_raids) == 1
+    assert open_raids[0]["return_ts_ns"] is None
+    assert open_raids[0]["max_excursion"] == pytest.approx(1.2)
+    # Later source minute: inclusive return.
+    processor.on_one_minute_bar(BarRecord(MINUTE_NS, 100.5, 100.5, 100.0, 100.0, 1.0, 1))
+    open_raids = list(processor.state.iter_active_raids())
+    assert len(open_raids) == 1
+    assert open_raids[0]["return_ts_ns"] == MINUTE_NS
+    processor.finish(MINUTE_NS)
+    assert sinks.raids.rows[0]["status"] == "RIGHT_CENSORED_CONFIRMATION"
+    assert sinks.raids.rows[0]["prior_raid_count"] == 0
+
+
+def test_processor_creates_previous_period_levels_without_seed(tmp_path: Path) -> None:
+    """Production catalogue must create PREVIOUS_1H levels after a completed hour."""
+    processor, sinks = make_processor(tmp_path)
+    for minute in range(60):
+        processor.on_one_minute_bar(
+            BarRecord(minute * MINUTE_NS, 100.0, 101.0, 99.0, 100.0, 1.0, 1)
+        )
+    active = list(processor.state.iter_active_levels())
+    assert len(active) == 2
+    sides = {row["side"]: row for row in active}
+    assert sides["HIGH"]["price"] == 101.0
+    assert sides["LOW"]["price"] == 99.0
+    assert all(row["source_configuration"] == "PREVIOUS_1H" for row in active)
+    assert any(
+        event["event_type"] == "LEVEL_CREATED" for event in sinks.event_log.rows
+    )
+
+
 def test_processor_replay_is_deterministic_across_persisted_output_directories(
     tmp_path: Path,
 ) -> None:
@@ -619,18 +734,11 @@ def test_processor_replay_is_deterministic_across_persisted_output_directories(
         )
         processor, _ = make_processor(path / "state", sinks=sinks)
         processor.seed_level("L1", price=100.0, side="HIGH")
-        feed_complete_observation_window(
-            processor, start_ts_ns=0, open=100.8, high=101.0, low=100.5, close=100.8
+        processor.on_one_minute_bar(BarRecord(0, 100.8, 101.0, 100.5, 100.8, 1.0, 1))
+        processor.on_one_minute_bar(
+            BarRecord(MINUTE_NS, 99.8, 100.0, 99.0, 99.5, 1.0, 1)
         )
-        last_ts = feed_complete_observation_window(
-            processor,
-            start_ts_ns=OBSERVATION_MINUTES * MINUTE_NS,
-            open=99.8,
-            high=100.0,
-            low=99.0,
-            close=99.5,
-        )
-        processor.finish(last_ts)
+        processor.finish(MINUTE_NS)
         return {
             name: (path / f"{name}.jsonl").read_bytes()
             for name in ("bar_marks", "levels", "raids", "tpo_profiles", "event_log")

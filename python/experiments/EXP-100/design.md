@@ -2,7 +2,7 @@
 
 - **Family:** `CF-LIQSWP-001/HYP-000`
 - **Checkpoint:** `2026-08-11-019-liquidity-sweeps`
-- **Status:** design complete; fresh QA pending
+- **Status:** performance QA APPROVE; full TRAIN matrix execution next
 - **Vehicle:** Nautilus `BacktestNode`, TRAIN only
 - **Amendments:** inherits checkpoint AMENDMENT-2 through AMENDMENT-5; no experiment-specific amendment. Counts: **0L / 1T / 3N**.
 

@@ -13,7 +13,7 @@ from xen.exp100.control import destroy_post_confirmation
 
 
 GROUP_COLUMNS = ("asset", "timeframe", "config")
-VALUE_COLUMNS = ("swing_atr", "duration")
+VALUE_COLUMNS = ("swing_atr", "duration", "strong_move")
 
 
 def write_control_rows(path: Path, *, include_confirmation: bool = False) -> Path:
@@ -24,6 +24,7 @@ def write_control_rows(path: Path, *, include_confirmation: bool = False) -> Pat
         "config": ["PREVIOUS_1H"] * 6,
         "swing_atr": [1.1, 2.2, 3.3, 4.4, 5.5, 6.6],
         "duration": [11, 22, 33, 44, 55, 66],
+        "strong_move": [True, False, True, False, True, False],
     }
     if include_confirmation:
         data["confirmation_ts_ns"] = [None, 2, 3, None, 5, 6]
@@ -108,6 +109,40 @@ def test_destroy_only_remaps_confirmed_rows_when_confirmation_column_exists(
         if source_row["confirmation_ts_ns"] is None:
             assert output_row["swing_atr"] == source_row["swing_atr"]
             assert output_row["duration"] == source_row["duration"]
+            assert output_row["strong_move"] == source_row["strong_move"]
+
+
+def test_destroy_changes_strong_move_when_present(tmp_path: Path) -> None:
+    """Non-vacuity requires the declared strong_move outcome to move with the destroy."""
+    source = write_control_rows(tmp_path / "source.parquet")
+    destination = tmp_path / "destroyed.parquet"
+
+    report = destroy_post_confirmation(
+        source,
+        destination,
+        group_columns=GROUP_COLUMNS,
+        value_columns=VALUE_COLUMNS,
+        seed=17,
+    )
+
+    assert report["changed_rows"] == report["rows"]
+    source_rows = rows(source)
+    output_rows = rows(destination)
+    moved = sum(
+        1
+        for source_row, output_row in zip(source_rows, output_rows)
+        if (
+            source_row["swing_atr"] != output_row["swing_atr"]
+            or source_row["duration"] != output_row["duration"]
+            or source_row["strong_move"] != output_row["strong_move"]
+        )
+    )
+    assert moved == len(source_rows)
+    strong_moved = any(
+        source_row["strong_move"] != output_row["strong_move"]
+        for source_row, output_row in zip(source_rows, output_rows)
+    )
+    assert strong_moved
 
 
 def test_destroy_rejects_singleton_group(tmp_path: Path) -> None:
@@ -121,6 +156,7 @@ def test_destroy_rejects_singleton_group(tmp_path: Path) -> None:
                 "config": ["PREVIOUS_1H"],
                 "swing_atr": [1.1],
                 "duration": [11],
+                "strong_move": [True],
             }
         ),
         source,
@@ -136,7 +172,7 @@ def test_destroy_rejects_singleton_group(tmp_path: Path) -> None:
         )
 
 
-@pytest.mark.parametrize("missing", ["config", "swing_atr", "raid_id"])
+@pytest.mark.parametrize("missing", ["config", "swing_atr", "raid_id", "strong_move"])
 def test_destroy_rejects_missing_required_columns(tmp_path: Path, missing: str) -> None:
     source = write_control_rows(tmp_path / "source.parquet")
     table = pq.read_table(source).drop([missing])

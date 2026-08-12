@@ -228,6 +228,71 @@ def _validate_stream_manifest(work_dir: Path, manifest: dict[str, Any]) -> None:
     snapshot = manifest.get("snapshot", {})
     if snapshot.get("open_levels", 0) != 0 or snapshot.get("open_raids", 0) != 0:
         raise ValueError("cell finished with live EXP-100 state")
+    _validate_publication_integrity(work_dir)
+
+
+def _validate_publication_integrity(work_dir: Path) -> None:
+    """Enforce TPO conservation and raid/profile/event reconciliation before publish."""
+    profiles_path = work_dir / "tpo_profiles.parquet"
+    raids_path = work_dir / "raids.parquet"
+    levels_path = work_dir / "levels.parquet"
+    event_path = work_dir / "event_log.jsonl"
+
+    profiles = pq.ParquetFile(profiles_path).read().to_pylist()
+    raids = pq.ParquetFile(raids_path).read().to_pylist()
+    levels = pq.ParquetFile(levels_path).read().to_pylist()
+
+    for profile in profiles:
+        status = profile.get("profile_status")
+        if status == "DEFINED" and profile.get("tpo_conservation_ok") is not True:
+            raise ValueError(
+                f"TPO conservation failed for raid {profile.get('raid_id')!r}"
+            )
+
+    raid_ids = {row.get("raid_id") for row in raids}
+    profile_raid_ids = {row.get("raid_id") for row in profiles}
+    if raid_ids != profile_raid_ids:
+        missing = sorted(raid_ids - profile_raid_ids)
+        extra = sorted(profile_raid_ids - raid_ids)
+        raise ValueError(
+            f"raid/profile reconciliation failed; missing_profiles={missing} "
+            f"extra_profiles={extra}"
+        )
+
+    for level in levels:
+        if level.get("status") is None:
+            raise ValueError(f"level {level.get('level_id')!r} missing terminal status")
+        if level.get("active") is True:
+            raise ValueError(f"level {level.get('level_id')!r} still marked active")
+
+    for raid in raids:
+        if raid.get("status") is None:
+            raise ValueError(f"raid {raid.get('raid_id')!r} missing terminal status")
+        if raid.get("active") is True:
+            raise ValueError(f"raid {raid.get('raid_id')!r} still marked active")
+
+    terminal_raid_events = 0
+    terminal_level_events = 0
+    with event_path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            if not line.strip():
+                continue
+            payload = json.loads(line)
+            event_type = payload.get("event_type")
+            if event_type == "RAID_TERMINAL":
+                terminal_raid_events += 1
+            elif event_type == "LEVEL_TERMINAL":
+                terminal_level_events += 1
+    if terminal_raid_events != len(raids):
+        raise ValueError(
+            f"raid event reconciliation failed: events={terminal_raid_events} "
+            f"rows={len(raids)}"
+        )
+    if terminal_level_events != len(levels):
+        raise ValueError(
+            f"level event reconciliation failed: events={terminal_level_events} "
+            f"rows={len(levels)}"
+        )
 
 
 def _remove_publish_stage(path: Path) -> None:
@@ -359,20 +424,31 @@ def run_cell(
         for name in ("levels", "raids", "tpo_profiles"):
             _copy_file(work_dir / f"{name}.parquet", publish_stage / f"{name}.parquet")
         if destroy_control:
+            value_columns = ("swing_atr", "duration_ns", "strong_move")
             control_report = destroy_post_confirmation(
                 publish_stage / "raids.parquet",
                 publish_stage / "raids_destroyed.parquet",
                 group_columns=("archive_symbol", "timeframe", "config"),
-                value_columns=("swing_atr", "duration_ns"),
+                value_columns=value_columns,
                 seed=destroy_seed,
             )
+            eligible = int(control_report.get("rows", 0))
+            changed = int(control_report.get("changed_rows", 0))
+            if eligible == 0:
+                control_report["non_vacuity"] = "VACUOUS_NO_ELIGIBLE"
+            elif changed == 0:
+                raise ValueError(
+                    "destroy control is vacuous: swing_atr/duration_ns/strong_move did not change"
+                )
+            else:
+                control_report["non_vacuity"] = "CHANGED"
             metadata_path = publish_stage / "run_metadata.json"
             metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
             metadata["destroy_control"] = {
                 "path": "raids_destroyed.parquet",
                 "seed": int(destroy_seed),
                 "group_columns": ["archive_symbol", "timeframe", "config"],
-                "value_columns": ["swing_atr", "duration_ns"],
+                "value_columns": list(value_columns),
                 **control_report,
             }
             metadata_path.write_text(
