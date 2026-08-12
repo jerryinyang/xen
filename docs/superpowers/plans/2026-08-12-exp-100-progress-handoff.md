@@ -1,28 +1,30 @@
-# EXP-100 Progress Handoff — optimized apparatus ready for execution
+# EXP-100 Progress Handoff — preflight timed out; full matrix blocked
 
 > **Authoritative resume document as of 2026-08-12.** Resume through the Xen
 > `research-pipeline`; do not re-implement or redesign the apparatus. The operator has
-> approved the completed safe optimizations and stated that execution commences after
-> this handoff is updated and the pending changes are committed. This document does not
-> itself launch the full matrix. TEST/holdout remains forbidden.
+> approved the completed safe optimizations and execution apparatus. Fresh-context QA run
+> 8 approved the apparatus. The single 30-day TRAIN preflight hit its planned two-hour
+> timeout after reaching 75.96% of the window; no final emission was published. The
+> 936-cell full matrix has not started and is operationally blocked. TEST/holdout remains
+> forbidden.
 
 **Experiment:** EXP-100 — Liquidity-sweep streaming apparatus  
 **Family:** `CF-LIQSWP-001/HYP-000`  
 **Checkpoint:** `2026-08-11-019-liquidity-sweeps`  
-**Pipeline stage:** post-implementation, post-optimization, post-QA; full TRAIN execution next
+**Pipeline stage:** execution preflight complete as an operational stop; full matrix blocked
 
 ## One-line status
 
-**The apparatus and all three semantics-preserving speedups are QA-APPROVED; exact
-three-day safety smokes and their integrity gates passed. No full matrix has run. Resume
-at TRAIN execution, then validate every emitted cell before analysis.**
+**The safe scheduler and two independent venue fences are QA-APPROVED, and a real cTrader
+safety cell passed. The 30-day BTCUSDT preflight timed out at 75.96% after two hours with
+580 MiB staged. The current 936-cell full-grid requirement is infeasible on this machine.**
 
 ## Pipeline position
 
 ```text
 1 Design .............. DONE
-2 QA pre-exec ......... DONE  (qa-review.md through run 7 — APPROVE)
-3 Execute ............. PARTIAL  (safety smokes only; full matrix next)
+2 QA pre-exec ......... DONE  (qa-review.md through run 8 — APPROVE)
+3 Execute ............. STOPPED  (preflight timeout; full matrix not started)
 4 Estimand gate ....... DONE for safety smokes; REQUIRED per full-run cell
 5 Data analysis ....... NOT STARTED
 6 Document ............ NOT STARTED
@@ -32,8 +34,9 @@ at TRAIN execution, then validate every emitted cell before analysis.**
 |---|---|
 | Apparatus implementation | Complete |
 | Safe performance optimization | Complete and approved |
-| Fresh-context QA | Run 7 **APPROVE**, no blocking findings |
-| Full TRAIN execution | Operator directed this to commence after the handoff commit; not started here |
+| Fresh-context QA | Run 8 **APPROVE**, no blocking findings |
+| 30-day TRAIN preflight | **TIMEOUT** at 2h and 75.96%; no final emission or integrity result |
+| Full TRAIN execution | **Operationally blocked**; do not launch current 936-cell grid |
 | TEST / holdout | **Forbidden**; both programme holdout shots are already spent |
 | Final experiment verdict | Not available until full execution, validation, and analysis |
 
@@ -52,6 +55,63 @@ at TRAIN execution, then validate every emitted cell before analysis.**
 
 The governing methodology, object lifetimes, emission schemas, TRAIN fence, zero-cost
 model, controls, event order, and estimands remain unchanged.
+
+## Execution apparatus and current run
+
+The frozen design expands to **936 cells**: 720 Bybit plus 216 cTrader. A serial,
+resumable scheduler now exists at
+`python/experiments/EXP-100/code/run_matrix.py`. It:
+
+- launches exactly one fresh `BacktestNode` subprocess per cell;
+- pins Bybit to INFR-011 and cTrader to its independent INFR-021 catalog/fence;
+- preserves destroy control, zero cost, the 1.5 GiB RSS ceiling, and atomic publication;
+- stops on less than 20 GiB free, a two-hour cell timeout, stale staging, child failure,
+  or failed integrity validation;
+- skips only a published cell with `blocking_pass=true`; ambiguous state is refused.
+
+The operator approved accepting strictly increasing observed cTrader minutes across normal
+market closures. No synthetic bars or TPO counts are created during closures; incomplete
+aggregation windows reset at the next observed bar. Duplicates and backward timestamps
+remain errors.
+
+Independent QA run 8 verified the exact 936-cell expansion, both fence hashes and paths,
+subprocess isolation, resource/resume guards, closure behavior, and the real cTrader safety
+emission. Final checks: **315 passed, 5 skipped**; Ruff and no-local-accounting clean.
+
+Preflight result:
+
+```text
+cell: bybit-btcusdt-15m-breakout_bar-1h-previous_1h
+window: 2023-11-18T00:00:00Z through 2023-12-17T23:59:00Z
+started: 2026-08-12T02:06:41Z
+stopped: 2026-08-12T04:06:41Z
+status: TIMEOUT after 7200.05 seconds; no final emission published
+last observed event: 2023-12-10T18:52:00Z
+window progress: 75.955% / 22.786 of 30 days
+staged storage: 593844 KiB (~580 MiB)
+state.sqlite: 570585088 bytes; event log: 15969309 bytes / 92397 rows
+live state at stop: 388 levels, 9557 raids, 4009107 profile bins
+run root: data/nautilus_runs/EXP-100/preflight/
+journal: python/experiments/EXP-100/results/execution/preflight-journal.jsonl
+gate: not run — partial work is not a valid emission
+safety: 2h timeout, 1.5 GiB RSS, 20 GiB free-disk reserve
+```
+
+The `.work` directory is deliberately retained for inspection. The scheduler refuses to
+relaunch over it. It is not an emission and must not be analyzed as research evidence.
+
+Operational implication:
+
+- even a simple completion extrapolation puts this 30-day cell above 2.6 hours;
+- the approved full TRAIN span is about 30 times longer and workload grows nonlinearly;
+- 936 such cells cannot fit the current machine's practical runtime budget;
+- 580 MiB for one incomplete representative cell already implies over 500 GiB if every
+  cell used only that much, before full-window growth; only ~89 GiB was free at launch.
+
+These are feasibility observations, not research results. The next action is another
+semantics-preserving performance investigation or an operator-approved design/scope change.
+Do not raise the timeout and launch the full grid: that would consume resources without
+resolving the underlying growth.
 
 ## Completed performance work
 
@@ -111,7 +171,7 @@ runtime and peak memory.
 - QA run 6 approved transaction batching; its correction addendum documents the
   `state_bytes` exception. QA run 7 approved the cumulative TPO and active-raid changes
   with no blocking findings.
-- Final local verification after implementation: **299 passed, 5 skipped**; Ruff clean.
+- Final optimization-only verification: **299 passed, 5 skipped**; Ruff clean.
   The single warning is the existing NumPy warning in `test_xena_search.py`.
 
 The append-only evidence is in `python/experiments/EXP-100/qa-review.md`.
@@ -145,13 +205,12 @@ estimand_validation: blocking_pass true
 
 The retained integrity artifact is
 `python/experiments/EXP-100/results/estimand_validation_smoke.json`.
-Temporary optimization smoke/profile directories under `/tmp` are QA evidence only and
+Temporary optimization and cTrader safety directories under `/tmp` are QA evidence only and
 must not be treated as durable experiment emissions.
 
 ## What has not been done
 
 - Full EXP-100 TRAIN matrix execution.
-- Multi-cell orchestration beyond the one-cell CLI.
 - Integrity validation of full-run cells.
 - Raw-data interrogation and `analysis.md`.
 - Operator verdict, `report.md`, or completion index updates.
@@ -163,12 +222,16 @@ Read, in order:
 
 1. This handoff.
 2. `python/experiments/EXP-100/design.md`.
-3. `python/experiments/EXP-100/qa-review.md`, especially runs 6–7 and the run-6
+3. `python/experiments/EXP-100/qa-review.md`, especially runs 6–8 and the run-6
    correction addendum.
-4. The four optimization spec/plan files listed above.
-5. `python/experiments/EXP-100/code/run_experiment.py`.
+4. `docs/superpowers/specs/2026-08-12-exp-100-execution-apparatus-design.md`.
+5. `docs/superpowers/plans/2026-08-12-exp-100-execution-apparatus.md`.
+6. `python/experiments/EXP-100/code/run_matrix.py` and `run_experiment.py`.
 
-Then execute only the matrix defined by the approved design:
+First inspect the timeout journal and retained `.work` state. Do not resume or launch
+`--mode full`. Profile/optimize only in ways that preserve methodology, or obtain an
+operator-approved design amendment. If a later apparatus passes fresh QA and a complete
+preflight, execute only the frozen matrix:
 
 1. Use TRAIN data only and preserve the pinned fence.
 2. Run one `BacktestNode` per process and a unique output directory per cell.
@@ -191,7 +254,10 @@ QA.
 |---|---|
 | Design | `python/experiments/EXP-100/design.md` |
 | QA log | `python/experiments/EXP-100/qa-review.md` |
-| Runner | `python/experiments/EXP-100/code/run_experiment.py` |
+| One-cell runner | `python/experiments/EXP-100/code/run_experiment.py` |
+| Matrix scheduler | `python/experiments/EXP-100/code/run_matrix.py` |
+| Execution apparatus spec | `docs/superpowers/specs/2026-08-12-exp-100-execution-apparatus-design.md` |
+| Execution apparatus plan | `docs/superpowers/plans/2026-08-12-exp-100-execution-apparatus.md` |
 | Package | `python/src/xen/exp100/` |
 | Original implementation spec | `docs/superpowers/specs/2026-08-11-exp-100-memory-safe-implementation-design.md` |
 | Original implementation plan | `docs/superpowers/plans/2026-08-11-exp-100-memory-safe-implementation.md` |
@@ -201,12 +267,12 @@ QA.
 ## Suggested next-session goal
 
 ```text
-Resume EXP-100 from the execution stage using
-docs/superpowers/plans/2026-08-12-exp-100-progress-handoff.md. Run only the approved
-TRAIN matrix with one BacktestNode per process, unique cell directories, destroy control,
-RSS protection, and per-cell estimand validation. Do not contact TEST/holdout or change
-the methodology. Stop and report any failed integrity gate, memory abort, or operationally
-infeasible runtime before analysis.
+Resume EXP-100 from the failed operational preflight using this handoff. The 30-day
+BTCUSDT cell timed out after two hours at 75.96% with 580 MiB staged; no emission was
+published. Do not launch full mode or delete the retained `.work` evidence. Investigate
+further semantics-preserving performance options and return to fresh QA plus a complete
+preflight before any full-grid execution. Do not contact TEST/holdout or silently change
+the methodology.
 ```
 
 ## Changelog
@@ -215,3 +281,5 @@ infeasible runtime before analysis.
 |---|---|
 | 2026-08-12 | Initial handoff after QA run 5 and the retained real-catalog smoke. |
 | 2026-08-12 | Updated after transaction batching, TPO-bin bulk writes, active-raid scan consolidation, exact safety smokes, QA runs 6–7, and cumulative profiling. Full TRAIN execution is the next stage. |
+| 2026-08-12 | Added venue-specific fences, safe resumable scheduler, operator-approved cTrader closure handling, real cTrader safety PASS, and QA run 8 APPROVE. The single 30-day Bybit preflight is in progress; the full grid is not started. |
+| 2026-08-12 | Finalized preflight: two-hour TIMEOUT at 75.96%, 580 MiB staged, no publication/gate. Current 936-cell full matrix is operationally blocked. |

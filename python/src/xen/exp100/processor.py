@@ -37,7 +37,7 @@ class Exp100Sinks:
 
 
 class Exp100Processor:
-    """Consume contiguous completed source minutes without retaining history."""
+    """Consume ordered observed source minutes without retaining history."""
 
     def __init__(
         self,
@@ -95,7 +95,7 @@ class Exp100Processor:
         )
 
     def on_one_minute_bar(self, bar: BarRecord) -> None:
-        """Accept one contiguous real source minute and process closed windows."""
+        """Accept one real observed source minute and process closed windows."""
         if self._finished:
             raise RuntimeError("processor is finished")
         self._validate_source_bar(bar)
@@ -598,8 +598,8 @@ class Exp100Processor:
             raise ValueError("source_bars must equal 1 for a source minute")
         if bar.ts_event_ns % MINUTE_NS != 0:
             raise ValueError("source timestamp must be minute aligned")
-        if self._last_source_ts_ns is not None and bar.ts_event_ns != self._last_source_ts_ns + MINUTE_NS:
-            raise ValueError("source timestamps must be contiguous and strictly increasing")
+        if self._last_source_ts_ns is not None and bar.ts_event_ns <= self._last_source_ts_ns:
+            raise ValueError("source timestamps must be strictly increasing")
         if bar.low > bar.high:
             raise ValueError("bar low cannot exceed high")
         if not all(

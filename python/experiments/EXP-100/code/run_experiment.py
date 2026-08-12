@@ -7,6 +7,7 @@ import json
 import os
 import platform
 import shutil
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -50,6 +51,50 @@ DEFAULT_RSS_LIMIT_BYTES = 1_610_612_736
 DEFAULT_DESTROY_SEED = 17
 _PARQUET_STREAMS = ("bar_marks", "levels", "raids", "tpo_profiles")
 _CELL_NODE_CREATED = False
+REPO_ROOT = Path(__file__).resolve().parents[4]
+
+
+@dataclass(frozen=True, slots=True)
+class VenueExecutionPin:
+    """Repository-pinned catalog and TRAIN fence for one approved venue."""
+
+    catalog_path: Path
+    fence_path: Path
+    fence_sha256: str
+    train_start: datetime
+    train_end: datetime
+
+
+EXP100_VENUES = {
+    "BYBIT": VenueExecutionPin(
+        catalog_path=Path("data/catalog"),
+        fence_path=Path(
+            "archive/chapter-04-nautilus-bybit-sigauc/experiments/"
+            "INFR-011/artifacts/fence-manifest.json"
+        ),
+        fence_sha256="35d3375ec5ec18b3c6e4c5eec814ade4d492bd60e3fb694fed19e16bc2c00448",
+        train_start=datetime(2021, 6, 29, 6, 53, tzinfo=UTC),
+        train_end=datetime(2023, 12, 18, tzinfo=UTC),
+    ),
+    "CTRADER": VenueExecutionPin(
+        catalog_path=Path("data/catalog_ctrader"),
+        fence_path=Path(
+            "archive/chapter-05-voldir-capture-geometry/experiments/"
+            "INFR-021/artifacts/fence-manifest.json"
+        ),
+        fence_sha256="4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0",
+        train_start=datetime(2021, 6, 2, 0, 1, tzinfo=UTC),
+        train_end=datetime(2023, 11, 22, tzinfo=UTC),
+    ),
+}
+
+
+def execution_pin(venue: str) -> VenueExecutionPin:
+    """Return the frozen execution pin for an approved EXP-100 venue."""
+    try:
+        return EXP100_VENUES[venue]
+    except KeyError as exc:
+        raise ValueError(f"unsupported EXP-100 venue: {venue!r}") from exc
 
 
 def _utc(value: datetime) -> datetime:
@@ -105,7 +150,7 @@ def _build_backtest_run_config(
         run_analysis=False,
     )
     venue = BacktestVenueConfig(
-        name=cell.venue,
+        name=str(instrument_id.venue),
         oms_type="NETTING",
         account_type="MARGIN",
         base_currency="USDT",
@@ -346,7 +391,12 @@ def run_cell(
         raise FileExistsError(f"run_dir already exists: {run_dir}")
     start = _utc(start_time)
     end = _utc(end_time)
-    manifest = load_fence_manifest()
+    pin = execution_pin(cell.venue)
+    manifest = load_fence_manifest(REPO_ROOT / pin.fence_path)
+    if manifest.sha256 != pin.fence_sha256:
+        raise ValueError(
+            f"{cell.venue} fence hash mismatch: {manifest.sha256} != {pin.fence_sha256}"
+        )
     assert_within_fence(manifest, start, end, band="TRAIN")
     fence = fence_attestation_payload(manifest)
 

@@ -11,7 +11,7 @@ MINUTE_NS = 60_000_000_000
 
 
 class StreamingOHLC:
-    """Aggregate complete, contiguous one-minute bars into fixed windows."""
+    """Aggregate complete observed one-minute bars into fixed windows."""
 
     def __init__(self, period_minutes: int) -> None:
         if period_minutes <= 0:

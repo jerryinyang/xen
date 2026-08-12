@@ -28,6 +28,15 @@ Implement the smallest apparatus that can safely measure and later run the froze
 The first execution after QA is the preflight only. Its purpose is operational sizing,
 not research analysis or a value read.
 
+### Approved cTrader closure clarification (operator choice A, 2026-08-12)
+
+cTrader's observed 1-minute stream contains normal market-closure gaps. Source timestamps
+must be minute-aligned and strictly increasing, but need not be contiguous. Closed minutes
+produce no synthetic bars and accrue no TPO counts. Any incomplete fixed aggregation window
+is reset when the next observed bar arrives. Duplicate or backward timestamps remain hard
+errors. This makes the already-approved cTrader scope executable without manufacturing
+prices or time-price observations.
+
 ## Frozen matrix
 
 | Dimension | Values |

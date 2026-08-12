@@ -490,17 +490,20 @@ def test_returning_while_still_beyond_rearms_level_for_next_crossing(
     assert [row["prior_raid_count"] for row in sinks.raids.rows] == [0, 1]
 
 
-def test_processor_rejects_non_minute_and_non_contiguous_source_chronology(
+def test_processor_accepts_market_closure_gaps_but_rejects_non_increasing_chronology(
     tmp_path: Path,
 ) -> None:
-    """Aggregation must not silently reset when the declared source is invalid."""
+    """Observed market bars may skip closed minutes but cannot duplicate or reverse time."""
     processor, _ = make_processor(tmp_path)
     with pytest.raises(ValueError, match="source_bars"):
         processor.on_one_minute_bar(BarRecord(0, 100.0, 100.0, 100.0, 100.0, 1.0, 2))
     with pytest.raises(ValueError, match="aligned"):
         processor.on_one_minute_bar(BarRecord(1, 100.0, 100.0, 100.0, 100.0, 1.0, 1))
     processor.on_one_minute_bar(BarRecord(0, 100.0, 100.0, 100.0, 100.0, 1.0, 1))
-    with pytest.raises(ValueError, match="contiguous"):
+    processor.on_one_minute_bar(
+        BarRecord(2 * MINUTE_NS, 100.0, 100.0, 100.0, 100.0, 1.0, 1)
+    )
+    with pytest.raises(ValueError, match="strictly increasing"):
         processor.on_one_minute_bar(
             BarRecord(2 * MINUTE_NS, 100.0, 100.0, 100.0, 100.0, 1.0, 1)
         )

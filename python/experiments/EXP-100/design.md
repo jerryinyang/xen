@@ -2,7 +2,7 @@
 
 - **Family:** `CF-LIQSWP-001/HYP-000`
 - **Checkpoint:** `2026-08-11-019-liquidity-sweeps`
-- **Status:** performance QA APPROVE; full TRAIN matrix execution next
+- **Status:** execution preflight timed out; full TRAIN matrix operationally blocked
 - **Vehicle:** Nautilus `BacktestNode`, TRAIN only
 - **Amendments:** inherits checkpoint AMENDMENT-2 through AMENDMENT-5; no experiment-specific amendment. Counts: **0L / 1T / 3N**.
 
@@ -42,6 +42,11 @@ configuration. Verify:
 - confirmation and endpoint chronology;
 - TPO profile state, conservation, reset, VA, gap, and tightness fields;
 - deterministic replay and artifact hash equality.
+
+Source bars must be minute-aligned and strictly increasing. Normal market-closure gaps in
+the cTrader replication are accepted as periods with no observed bars: no flat/synthetic
+bars are inserted, no TPO counts accrue during closure, and an incomplete aggregation
+window is reset at the next observed bar. Duplicate or backward timestamps are rejected.
 
 ## Controls
 

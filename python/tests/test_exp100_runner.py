@@ -18,6 +18,7 @@ from nautilus_trader.test_kit.providers import TestInstrumentProvider
 CODE_DIR = Path(__file__).resolve().parents[1] / "experiments" / "EXP-100" / "code"
 sys.path.insert(0, str(CODE_DIR))
 
+import run_experiment  # noqa: E402
 from run_experiment import build_backtest_run_config  # noqa: E402
 from xen.exp100 import Exp100CellConfig  # noqa: E402
 from xen.nautilus.backtest_util import synthetic_bars  # noqa: E402
@@ -135,6 +136,41 @@ def test_backtest_config_is_streaming_and_one_cell() -> None:
     assert len(cfg.venues) == 1
     assert cfg.venues[0].frozen_account is True
     assert len(cfg.engine.strategies) == 1
+
+
+def test_ctrader_execution_pin_is_independent() -> None:
+    assert hasattr(run_experiment, "execution_pin")
+    pin = run_experiment.execution_pin("CTRADER")
+
+    assert pin.catalog_path == Path("data/catalog_ctrader")
+    assert pin.fence_sha256 == (
+        "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0"
+    )
+    assert pin.train_start == datetime(2021, 6, 2, 0, 1, tzinfo=UTC)
+    assert pin.train_end == datetime(2023, 11, 22, tzinfo=UTC)
+
+
+def test_ctrader_backtest_venue_matches_instrument_case() -> None:
+    cell = Exp100CellConfig(
+        venue="CTRADER",
+        archive_symbol="EURUSD",
+        instrument_id="EURUSD.CTrader",
+        observation_minutes=15,
+        confirmation_method="BREAKOUT_BAR",
+        confirmation_reference="1H",
+        level_config="PREVIOUS_1H",
+    )
+
+    cfg = build_backtest_run_config(
+        cell,
+        catalog_path=Path("data/catalog_ctrader"),
+        start_time=datetime(2023, 11, 18, tzinfo=UTC),
+        end_time=datetime(2023, 11, 19, tzinfo=UTC),
+        staging_path=Path("stage"),
+        chunk_size=128,
+    )
+
+    assert cfg.venues[0].name == "CTrader"
 
 
 def test_chunked_synthetic_replay_has_same_hash(tmp_path: Path) -> None:

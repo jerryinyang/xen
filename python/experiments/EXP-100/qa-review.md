@@ -388,3 +388,54 @@ The optimizations do not change event rules. Independent ordered table equality 
 1. **INFO — approved physical-state exception occurs in both safety smokes.** `bar_marks.state_bytes` differs in 24 of 288 rows, while every other bar-mark field is exact. This is SQLite page-layout telemetry and is explicitly permitted by the optimization design.
 
 No blocking REVISE/REJECT findings. The cumulative SQL and active-raid scan optimizations are approved for the operator's profiling gate; QA does not launch profiling.
+
+## QA run 8 — 2026-08-12T02:05:12Z — mode: subagent — HEAD 46116fff4c6c2da0ef364d2cd01eca2f06719c73
+
+Reviewed state before append: modified `docs/superpowers/specs/2026-08-12-exp-100-execution-apparatus-design.md`, `python/experiments/EXP-100/{code/run_experiment.py,design.md}`, `python/src/xen/exp100/{features.py,processor.py}`, `python/src/xen/nautilus/catalog_fence.py`, and `python/tests/{test_estimand_validation_v2.py,test_exp100_processor.py,test_exp100_runner.py}`; untracked `python/experiments/EXP-100/code/run_matrix.py` and `python/tests/test_exp100_matrix_runner.py`. Fresh-context subagent; reviewer did not implement the apparatus. Baseline requested and reviewed: HEAD `46116ff` plus the listed dirty state.
+
+Verdict: **APPROVE**
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code/evidence | Verdict | Notes |
+|---|---|---|---|
+| Venue-specific repository pins and actual attestation paths (apparatus spec §Venue pins) | `run_experiment.py:57-97,394-401`; `catalog_fence.py:153-169`; repository SHA-256 checks | **MATCHES** | Bybit manifest SHA `35d3375e…00448`; cTrader INFR-021 SHA `4cdc7b01…6de0`. Attestation path derives from the loaded manifest and must remain inside the repository. |
+| cTrader engine venue identity uses catalog case (apparatus testing item 2) | `run_experiment.py:130,152-160`; `test_exp100_runner.py:153-173`; real safety emission | **MATCHES** | `InstrumentId("EURUSD.CTrader")` produces engine venue `CTrader`; real BacktestNode safety run completed. |
+| cTrader closure rule: aligned, strictly increasing observations; no synthetic bars/TPO; reset incomplete aggregation (approved clarification) | `processor.py:97-108,596-608`; `features.py:30-56`; focused chronology test; raw safety catalog/emission inspection | **MATCHES** | Raw safety slice has 1,545 observed minutes, 13 absent minutes, strict ordering/alignment; emission has 97 complete 15m bars each with `source_bars=15`. Gaps reset partial windows; TPO consumes observed bars only. |
+| Deterministic exact 936-cell frozen grid (apparatus §Frozen matrix) | `run_matrix.py:18-46,83-131`; `test_exp100_matrix_runner.py:20-31,48-54` | **MATCHES** | Independently expanded 720 Bybit + 216 cTrader cells; 936 unique stable IDs; 1H reference for 15m/30m and 1D for 60m. |
+| Exact one-cell 30-day preflight (apparatus §Scheduler contract) | `run_matrix.py:47-48,108-121`; `test_exp100_matrix_runner.py:34-45` | **MATCHES** | BTCUSDT, 15m, BREAKOUT_BAR, 1H, PREVIOUS_1H; `2023-11-18T00:00Z` through `2023-12-17T23:59Z`. |
+| One fresh subprocess / one BacktestNode per cell (L-31; scheduler contract) | `run_matrix.py:271-381`; `run_experiment.py:408-428`; command inspection | **MATCHES** | Serial loop invokes the one-cell CLI once per cell; process-local guard refuses a second node. No concurrency path exists. |
+| Future-destroy control enabled for every scheduled cell (EXP-100 §Controls/Tripwire) | `run_matrix.py:185-226`; `run_experiment.py:476-507`; `control.py:100-141,163-269` | **MATCHES** | Command always includes `--destroy-control`; zero-fixed-point cyclic derangement and non-vacuity fail closed. Real safety metadata: 9 eligible/changed rows, 0 fixed points. |
+| Venue-specific TRAIN-only bounds (apparatus §Venue pins; OOS rule) | `run_experiment.py:68-97,394-401`; `run_matrix.py:93-105,124-131` | **MATCHES** | Full cells use the exact manifest TRAIN bounds: Bybit `2021-06-29T06:53Z..2023-12-18T00:00Z`; cTrader `2021-06-02T00:01Z..2023-11-22T00:00Z`; one-cell runner rechecks `band="TRAIN"`. |
+| Fail-closed resume, disk, timeout, staging, child, and integrity behavior (apparatus §Scheduler contract) | `run_matrix.py:153-182,257-381`; matrix runner tests | **MATCHES** | Skip requires final emission plus `blocking_pass is True`; stale/orphan/invalid states refuse; journal appends with flush+fsync; low disk, timeout, child/gate failure stop without deletion. |
+| No methodology, cost, TEST, holdout, schema, or estimand change (apparatus §Explicit exclusions) | diff from `46116ff`; runner command/config; no-local-accounting and denylist scans | **MATCHES** | Dirty research-code change is only the operator-approved source-gap validation/reset behavior. Zero-cost remains pinned, control/object lifetimes and emissions unchanged, and no TEST/holdout route was added. |
+
+### Golden-trace diff
+
+| Event | Design expectation | Apparatus implementation/evidence | Verdict |
+|---|---|---|---|
+| **T1** | Strict source-minute excursion; later inclusive return; max excursion 1.20; prior count 0 | Raid lifecycle code is unchanged by this apparatus; source gaps change only admission/reset of missing-market periods. Existing focused golden-trace tests pass. | **PASS** |
+| **T2** | Most-recent resolvable attribution while retaining both objects | Attribution, identities, and object lifetimes are untouched in the reviewed diff; full focused suite passes. | **PASS** |
+| **T3** | Confirmation/profile at completed reference close; later opposing close ends swing/profile | Reference/terminal logic is untouched; closure gaps cannot manufacture confirmations or TPO counts. Real cTrader profile conservation passes. | **PASS** |
+
+### Governance & boundary
+
+| Check | Result | Evidence |
+|---|---|---|
+| Fresh context / append-only QA | PASS | dedicated subagent; prior runs 1–7 retained unchanged; only run 8 appended |
+| Venue hashes and attestation paths | PASS | direct `sha256sum` of both repository manifests; real cTrader attestation and fresh gate resolve INFR-021 |
+| Exact matrix / preflight / process boundary | PASS | independent expansion and command inspection; 936 unique cells; one subprocess command per loop iteration |
+| Real cTrader safety emission | PASS | pointer `/tmp/exp100-ctrader-safety-latest` → `.../three-day`; fresh `/tmp/exp100-ctrader-safety-run8-validation.json` has `blocking_pass=true`, correct expected/emitted `EURUSD`, pinned hash, schema, fence, reconciliation, and no-cost checks |
+| Closure semantics | PASS | raw safety catalog: 1,545 aligned/increasing observed minutes and 13 absent minutes; emitted observations contain only complete `source_bars=15`; no synthetic rows; defined TPO rows conserve counts |
+| Focused tests | PASS | 88 passed, 1 skipped in 11.31 s |
+| Full Python suite | PASS | 315 passed, 5 skipped in 12.41 s; one existing NumPy runtime warning |
+| Static check | PASS | Ruff clean on `src/xen/exp100`, fence, EXP-100 code, focused tests, and estimand validation test |
+| No local accounting | PASS | `check_no_local_accounting("experiments/EXP-100/code")` returned `ok=true` |
+| Zero-cost / no power machinery | PASS | no live cost-stack imports, charged-cost path, MDE/power floor, or machine value verdict in reviewed apparatus |
+| Operator execution gate | PRESERVED | QA did not launch the preflight or full matrix; execution remains an operator decision |
+
+### Issues
+
+1. **INFO — safety smoke starts after the requested Saturday bound because cTrader was closed.** The requested window is `2023-11-18T00:00Z..2023-11-20T23:59Z`; the first observed EURUSD minute is Sunday `2023-11-19T22:02Z`. This is the approved no-synthetic-bars closure behavior, not missing manufactured data.
+
+No blocking REVISE/REJECT findings. The execution apparatus is ready for the operator's 30-day Bybit preflight gate; QA does not launch it or the full matrix.

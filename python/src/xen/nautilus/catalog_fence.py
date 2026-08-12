@@ -155,11 +155,15 @@ def fence_attestation_payload(
 ) -> dict[str, Any]:
     """``fence_attestation.json`` payload for emission writes (estimand gate v2)."""
     m = manifest or load_fence_manifest()
+    try:
+        manifest_relpath = m.path.resolve().relative_to(_repo_root().resolve()).as_posix()
+    except ValueError as exc:
+        raise ValueError("fence manifest must be inside the repository") from exc
     return {
         "status": "PINNED",
         "analysis_end_utc": m.analysis_end_utc.isoformat().replace("+00:00", "Z"),
         "train_end_utc": m.train_end_utc.isoformat().replace("+00:00", "Z"),
         "holdout_start_utc": m.holdout_start_utc.isoformat().replace("+00:00", "Z"),
-        "manifest_path": MANIFEST_RELPATH,
+        "manifest_path": manifest_relpath,
         "manifest_sha256": m.sha256,
     }

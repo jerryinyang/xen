@@ -15,9 +15,20 @@ from xen.estimand_validation import (
     validate_run,
 )
 from xen.nautilus.emission import write_emission_v1
+from xen.nautilus.catalog_fence import fence_attestation_payload, load_fence_manifest
 
 _REPO = Path(__file__).resolve().parents[2]
 _SMOKE_BAR = _REPO / "data" / "nautilus_runs" / "INFR-010-smoke-bar-1.230.0"
+_CTRADER_MANIFEST = (
+    _REPO
+    / "archive"
+    / "chapter-05-voldir-capture-geometry"
+    / "experiments"
+    / "INFR-021"
+    / "artifacts"
+    / "fence-manifest.json"
+)
+_CTRADER_SHA256 = "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0"
 
 
 def _write_minimal_emission(
@@ -123,6 +134,18 @@ def test_pinned_manifest_passes_when_manifest_exists(tmp_path: Path) -> None:
     assert report["fence"]["within_fence"]
     assert report["fence"]["manifest"]["ok"]
     assert report["blocking_pass"]
+
+
+def test_attestation_uses_supplied_manifest_path() -> None:
+    manifest = load_fence_manifest(_CTRADER_MANIFEST)
+
+    payload = fence_attestation_payload(manifest)
+
+    assert payload["manifest_path"] == (
+        "archive/chapter-05-voldir-capture-geometry/experiments/"
+        "INFR-021/artifacts/fence-manifest.json"
+    )
+    assert payload["manifest_sha256"] == _CTRADER_SHA256
 
 
 def test_spread_scale_routing() -> None:
