@@ -484,8 +484,13 @@ def run_cell(
             )
             eligible = int(control_report.get("rows", 0))
             changed = int(control_report.get("changed_rows", 0))
+            skipped = int(control_report.get("skipped_singleton_groups", 0))
             if eligible == 0:
-                control_report["non_vacuity"] = "VACUOUS_NO_ELIGIBLE"
+                control_report["non_vacuity"] = (
+                    "VACUOUS_SINGLETON"
+                    if skipped
+                    else "VACUOUS_NO_ELIGIBLE"
+                )
             elif changed == 0:
                 raise ValueError(
                     "destroy control is vacuous: swing_atr/duration_ns/strong_move did not change"
@@ -536,7 +541,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--confirmation-method", choices=("BREAKOUT_BAR", "LEVEL_CLOSE"), required=True
     )
-    parser.add_argument("--confirmation-reference", choices=("1H", "1D"), required=True)
+    parser.add_argument("--confirmation-reference", choices=("1H", "4H"), required=True)
     parser.add_argument("--level-config", required=True)
     parser.add_argument("--start", required=True)
     parser.add_argument("--end", required=True)

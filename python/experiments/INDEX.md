@@ -1,7 +1,7 @@
 # Chapter 06 Experiment Index
 
-Chapter 06 currently has one registered family and one open checkpoint. The five
-liquidity-sweep experiments below have designs only; none has run.
+Chapter 06 currently has one registered family and one open checkpoint. EXP-100
+has completed its TRAIN analysis; EXP-101–104 remain separate readiness items.
 
 Before designing anything, read `docs/knowledge-base/INDEX.md` — in particular
 `lessons-and-amendments.md` (mechanisms, not just symptoms) and `pitfalls-ledger.md` (do not
@@ -17,11 +17,11 @@ re-run these).
 
 | ID | Family | Status | Purpose |
 |---|---|---|---|
-| EXP-100 | CF-LIQSWP-001 | DESIGN COMPLETE — QA pending | Streaming level/raid/confirmation apparatus and coverage validity |
-| EXP-101 | CF-LIQSWP-001 | DESIGN COMPLETE — QA pending | Level significance versus later swing outcomes |
-| EXP-102 | CF-LIQSWP-001 | DESIGN COMPLETE — QA pending | Repeated raids and prior-raid count |
-| EXP-103 | CF-LIQSWP-001 | DESIGN COMPLETE — QA pending | TPO value gap and tight-gap conditioning |
-| EXP-104 | CF-LIQSWP-001 | DESIGN COMPLETE — QA pending | Volatility-regime conditioning |
+| EXP-100 | CF-LIQSWP-001 | COMPLETED — HYP-000 UPHELD (operator-confirmed 2026-08-13) | 264/264 AMENDMENT-13 TRAIN cells passed validity checks; apparatus hypothesis confirmed; no family action |
+| EXP-101 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | Level significance versus later swing outcomes |
+| EXP-102 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | Repeated raids and prior-raid count |
+| EXP-103 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | TPO value gap and tight-gap conditioning |
+| EXP-104 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | Volatility-regime conditioning |
 
 ## Carried in from Chapter 05
 

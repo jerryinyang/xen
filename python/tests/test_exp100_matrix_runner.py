@@ -17,32 +17,42 @@ def test_matrix_runner_module_exists() -> None:
     assert (CODE_DIR / "run_matrix.py").is_file()
 
 
-def test_full_grid_has_936_unique_cells() -> None:
+def test_full_grid_is_ctrader_only_264_unique_cells() -> None:
     cells = run_matrix.build_cells("full")
 
-    assert len(cells) == 936
-    assert len({cell.cell_id for cell in cells}) == 936
-    assert sum(cell.venue == "BYBIT" for cell in cells) == 720
-    assert sum(cell.venue == "CTRADER" for cell in cells) == 216
-    assert all(
-        cell.confirmation_reference
-        == ("1D" if cell.observation_minutes == 60 else "1H")
-        for cell in cells
+    # 11 configs: 15m/30m 3×2×2×11×1 = 132; 1h 3×1×2×11×2 = 132; total 264
+    assert len(cells) == 264
+    assert len({cell.cell_id for cell in cells}) == 264
+    assert all(cell.venue == "CTRADER" for cell in cells)
+    assert sum(cell.venue == "BYBIT" for cell in cells) == 0
+    assert [cell.observation_minutes for cell in cells] == (
+        [15] * 66 + [30] * 66 + [60] * 132
     )
+    assert all(
+        cell.confirmation_reference == "1H"
+        for cell in cells
+        if cell.observation_minutes in {15, 30}
+    )
+    hour_refs = {
+        cell.confirmation_reference
+        for cell in cells
+        if cell.observation_minutes == 60
+    }
+    assert hour_refs == {"1H", "4H"}
 
 
-def test_preflight_is_exactly_declared_cell() -> None:
+def test_preflight_is_exactly_declared_ctrader_cell() -> None:
     (cell,) = run_matrix.build_cells("preflight")
 
-    assert cell.venue == "BYBIT"
-    assert cell.archive_symbol == "BTCUSDT"
-    assert cell.instrument_id == "BTCUSDT-LINEAR.BYBIT"
+    assert cell.venue == "CTRADER"
+    assert cell.archive_symbol == "EURUSD"
+    assert cell.instrument_id == "EURUSD.CTrader"
     assert cell.observation_minutes == 15
     assert cell.confirmation_method == "BREAKOUT_BAR"
     assert cell.confirmation_reference == "1H"
     assert cell.level_config == "PREVIOUS_1H"
-    assert cell.start == datetime(2023, 11, 18, tzinfo=UTC)
-    assert cell.end == datetime(2023, 12, 17, 23, 59, tzinfo=UTC)
+    assert cell.start == datetime(2023, 10, 23, tzinfo=UTC)
+    assert cell.end == datetime(2023, 11, 21, 23, 59, tzinfo=UTC)
 
 
 def test_cell_ids_are_stable_and_filesystem_safe() -> None:
@@ -126,13 +136,13 @@ def test_cell_and_gate_commands_pin_safety_inputs(tmp_path: Path) -> None:
     assert command[0] == sys.executable
     assert "--destroy-control" in command
     assert command[command.index("--catalog-path") + 1] == str(
-        tmp_path / "data" / "catalog"
+        tmp_path / "data" / "catalog_ctrader"
     )
     assert command[command.index("--start") + 1] == cell.start.isoformat()
     assert command[command.index("--end") + 1] == cell.end.isoformat()
-    assert command[command.index("--venue") + 1] == "BYBIT"
+    assert command[command.index("--venue") + 1] == "CTRADER"
     assert gate[:3] == [sys.executable, "-m", "xen.estimand_validation"]
-    assert gate[gate.index("--expect") + 1] == "BTCUSDT"
+    assert gate[gate.index("--expect") + 1] == "EURUSD"
     assert gate[gate.index("--out") + 1] == str(
         run_matrix.cell_gate_path(tmp_path, "preflight", cell)
     )
@@ -240,3 +250,52 @@ def test_run_matrix_journals_low_disk_and_stops(tmp_path: Path, monkeypatch) -> 
         .splitlines()[-1]
     )
     assert last["status"] == "LOW_DISK"
+
+
+def test_run_matrix_workers_keep_one_subprocess_per_cell(tmp_path: Path, monkeypatch) -> None:
+    seen: list[str] = []
+    inflight = 0
+    max_inflight = 0
+    lock = run_matrix.threading.Lock()
+
+    def fake_run(command, **_kwargs):
+        nonlocal inflight, max_inflight
+        with lock:
+            inflight += 1
+            max_inflight = max(max_inflight, inflight)
+        try:
+            if command[1:3] == ["-m", "xen.estimand_validation"]:
+                gate_path = Path(command[command.index("--out") + 1])
+                gate_path.write_text(json.dumps({"blocking_pass": True}), encoding="utf-8")
+            else:
+                Path(command[command.index("--run-dir") + 1]).mkdir(parents=True)
+                seen.append(command[command.index("--instrument-id") + 1])
+            run_matrix.time.sleep(0.05)
+            return subprocess.CompletedProcess(command, 0, stdout="ok", stderr="")
+        finally:
+            with lock:
+                inflight -= 1
+
+    monkeypatch.setattr(run_matrix.subprocess, "run", fake_run)
+    sample = run_matrix.build_cells("full")[:4]
+    monkeypatch.setattr(run_matrix, "build_cells", lambda _mode: sample)
+
+    result = run_matrix.run_matrix(
+        repo_root=tmp_path,
+        mode="full",
+        min_free_bytes=0,
+        timeout_seconds=60,
+        workers=2,
+    )
+
+    assert result == 0
+    assert max_inflight <= 4
+    assert max_inflight >= 2
+    assert len(seen) == 4
+    entries = [
+        json.loads(line)
+        for line in run_matrix.journal_path(tmp_path, "full")
+        .read_text(encoding="utf-8")
+        .splitlines()
+    ]
+    assert sum(entry["status"] == "VALIDATED" for entry in entries) == 4

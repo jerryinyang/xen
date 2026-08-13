@@ -2,48 +2,24 @@
   "schema": "xen-universe-pin/v1",
   "family": "CF-LIQSWP-001",
   "checkpoint": "2026-08-11-019-liquidity-sweeps",
-  "ranking_metric": "sum(close*volume) over 1m bars",
-  "pool": "894 admitted Bybit USDT linear perpetual symbols",
+  "amendment": "2026-08-13 operator: AMENDMENT-7 cTrader-only; AMENDMENT-9 clocks 1H / 1H+4H; AMENDMENT-10 NY-17:00 1D/1W; AMENDMENT-11 rolling 7/14/22/252; AMENDMENT-12 tightness 50% of VA width; matrix 264 cells",
+  "ranking_metric": "operator-declared replication set (not dollar-volume ranked)",
+  "pool": "cTrader INFR-021 TRAIN fence instruments admitted for CF-LIQSWP-001",
   "band": "TRAIN",
-  "window_start_inclusive": "2023-11-18T00:00:00+00:00",
-  "asof_exclusive": "2023-12-18T00:00:00+00:00",
-  "top_n": 10,
-  "source_pin": "docs/signal-registry/candidate-families/cf-voldir-001-universe.json",
-  "source_pin_note": "The source pin is the existing full-catalog 30-day recomputation; all source top-25 symbols, including this top-10 slice, are in the admitted ledger.",
+  "window_start_inclusive": "2021-06-02T00:01:00+00:00",
+  "asof_exclusive": "2023-11-22T00:00:00+00:00",
+  "top_n": 3,
+  "source_pin": "archive/chapter-05-voldir-capture-geometry/experiments/INFR-021/artifacts/fence-manifest.json",
+  "source_pin_note": "Venue-only pin. Bybit/crypto symbols are out of scope for this family until a later operator amendment re-admits them.",
+  "venues": ["CTRADER"],
   "symbols": [
-    "BTCUSDT",
-    "ETHUSDT",
-    "SOLUSDT",
-    "AVAXUSDT",
-    "ORDIUSDT",
-    "1000BONKUSDT",
-    "TIAUSDT",
-    "DOGEUSDT",
-    "XRPUSDT",
-    "LINKUSDT"
+    "EURUSD",
+    "XAUUSD",
+    "USTEC"
   ],
-  "dollar_volume": {
-    "BTCUSDT": 156502751495.2917,
-    "ETHUSDT": 49204246503.4652,
-    "SOLUSDT": 25350861979.499,
-    "AVAXUSDT": 8764004241.8415,
-    "ORDIUSDT": 8037342400.12723,
-    "1000BONKUSDT": 7927673349.0767,
-    "TIAUSDT": 7067070596.87876,
-    "DOGEUSDT": 5849197825.41456,
-    "XRPUSDT": 5839633099.2994,
-    "LINKUSDT": 4491482525.0686
-  },
-  "window_bar_count": {
-    "BTCUSDT": 43201,
-    "ETHUSDT": 43201,
-    "SOLUSDT": 43201,
-    "AVAXUSDT": 43199,
-    "ORDIUSDT": 43201,
-    "1000BONKUSDT": 43201,
-    "TIAUSDT": 41760,
-    "DOGEUSDT": 43193,
-    "XRPUSDT": 43200,
-    "LINKUSDT": 43198
-  }
+  "instrument_ids": [
+    "EURUSD.CTrader",
+    "XAUUSD.CTrader",
+    "USTEC.CTrader"
+  ]
 }

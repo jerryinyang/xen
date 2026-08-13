@@ -3,12 +3,13 @@
 ## Current checkpoint status
 
 **Checkpoint 019 is open.** `CF-LIQSWP-001` is registered with five TRAIN-only
-experiment designs. No experiment has run; fresh-context QA and operator execution
-approval are still required.
+experiment designs. EXP-100 completed its 264-cell TRAIN analysis and its
+operator upheld HYP-000. EXP-101–104 remain separate readiness items; their
+fresh-context QA and operator progression gates are independent.
 
 | Checkpoint | Family | Status | Design |
 |---|---|---|---|
-| `2026-08-11-019-liquidity-sweeps` | `CF-LIQSWP-001` | OPEN — design complete, QA pending | [`design.md`](checkpoints/2026-08-11-019-liquidity-sweeps/design.md) |
+| `2026-08-11-019-liquidity-sweeps` | `CF-LIQSWP-001` | OPEN — EXP-100 HYP-000 upheld; EXP-101–104 readiness in progress | [`design.md`](checkpoints/2026-08-11-019-liquidity-sweeps/design.md) |
 
 Read `docs/knowledge-base/INDEX.md` before designing anything.
 

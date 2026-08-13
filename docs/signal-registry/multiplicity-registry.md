@@ -1717,7 +1717,7 @@ holdouts sealed; Bybit and cTrader reported separately.
 
 | ID | Experiment | Registered question | Candidate slot | Status |
 |---|---|---|---:|---|
-| `CF-LIQSWP-001/HYP-000` | EXP-100 | Does the streaming state machine preserve causal level, raid, confirmation, breakout, TPO, and later-outcome identity? | 0 | DESIGN COMPLETE; QA pending |
+| `CF-LIQSWP-001/HYP-000` | EXP-100 | Does the streaming state machine preserve causal level, raid, confirmation, breakout, TPO, and later-outcome identity? | 0 | **COMPLETE — HYP-000 UPHELD (operator-confirmed 2026-08-13).** 264/264 AMENDMENT-13 TRAIN cells passed the validity gate; 9,840,478 raids; 0 counted TEST reads; family status unchanged. |
 | `CF-LIQSWP-001/HYP-001` | EXP-101 | Do level-family/configuration significance strata differ in later swing outcomes? | 0 | DESIGN COMPLETE; QA pending |
 | `CF-LIQSWP-001/HYP-002` | EXP-102 | Does previous completed raid count change later swing outcomes? | 0 | DESIGN COMPLETE; QA pending |
 | `CF-LIQSWP-001/HYP-003` | EXP-103 | Are defined tight value gaps associated with different later outcomes? | 0 | DESIGN COMPLETE; QA pending |
@@ -1739,6 +1739,12 @@ same-observation-timeframe Wilder ATR(14) — **DIRECTION: NEUTRAL**. Running co
 **AMENDMENT-L5:** add the SoT tight-gap condition `gap_span < 0.30*(VAH-VAL)` to HYP-003 —
 **DIRECTION: NEUTRAL**. Running count: **0L / 1T / 3N**.
 
-No result-producing code or run has occurred. The value-gap arm must pass TPO conservation,
-70% VA, 30% VA-mass, strict tightness-boundary, reset, causality, and deterministic replay
-checks before an execution gate can open.
+**AMENDMENT-L6 (checkpoint AMENDMENT-8, 2026-08-12):** lock the original SoT raid grain —
+excursions and completed raids are decided **bar by bar on the cell observation timeframe**
+(15m / 30m / 1h), not on 1-minute bars. Confirmation stays 1H/1D. 1m remains TPO / max-excursion
+/ swing-extreme / fill grain. **DIRECTION: NEUTRAL**. Running count: **0L / 1T / 4N**.
+
+**AMENDMENT-L13 (checkpoint AMENDMENT-13, 2026-08-13):** a completed observation bar that
+goes strictly beyond the level starts a live raid. Same-bar return does not close it;
+confirmation/fail settles it. **DIRECTION: LOOSER**. Running family count after A9–A13:
+**2L / 3T / 7N**.

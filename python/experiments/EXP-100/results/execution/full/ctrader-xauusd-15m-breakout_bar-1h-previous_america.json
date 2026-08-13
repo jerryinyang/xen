@@ -1,0 +1,63 @@
+{
+  "gate_version": "v2",
+  "emission_type": "nautilus_v1",
+  "run_dir": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/data/nautilus_runs/EXP-100/full/ctrader-xauusd-15m-breakout_bar-1h-previous_america",
+  "instrument": null,
+  "domain": null,
+  "schema": {
+    "ok": true,
+    "missing_positions_cols": [],
+    "missing_leg_cols": [],
+    "timestamps_strictly_increasing": true,
+    "emission_contract_version": "nautilus-emission-v1",
+    "missing_emission_files": [],
+    "contract_version_ok": true
+  },
+  "fence": {
+    "ok": true,
+    "mode": "nautilus_v2",
+    "status": "PINNED",
+    "last_bar": "2023-11-21 23:59:00",
+    "analysis_end_utc": "2024-12-13T00:00:00Z",
+    "within_fence": true,
+    "manifest": {
+      "canonical_path": "/Users/jerryinyang/cAlgo/Sources/Robots/Xen/Xen/archive/chapter-05-voldir-capture-geometry/experiments/INFR-021/artifacts/fence-manifest.json",
+      "exists": true,
+      "ok": true,
+      "expected_sha256": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0",
+      "actual_sha256": "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0"
+    }
+  },
+  "manifest": {
+    "ok": true,
+    "expected": [
+      "XAUUSD"
+    ],
+    "emitted": [
+      "XAUUSD"
+    ],
+    "missing": []
+  },
+  "no_cost_charged": {
+    "ok": true,
+    "cost_model": "NO_COST_CHARGED",
+    "emission_cost_columns": {
+      "ok": true,
+      "non_zero_columns": [],
+      "n_non_zero_rows": 0
+    },
+    "cost_directive": null,
+    "cost_bps": 0.0
+  },
+  "catalog_attestation": {
+    "ok": true,
+    "note": null,
+    "catalog_version": null,
+    "config_hash": "321de3497a84f3b8c40c00d5c49d778c2db863113b9b4922e4ef8305a84c34f6"
+  },
+  "reconciliation": {
+    "ok": true,
+    "note": "no leg ledger"
+  },
+  "blocking_pass": true
+}

@@ -54,7 +54,7 @@ def test_rolling_levels_require_full_window(tmp_path: Path) -> None:
         observation_minutes=15,
         confirmation_method="BREAKOUT_BAR",
         confirmation_reference="1H",
-        level_config="ROLLING_16",
+        level_config="ROLLING_7",
     )
     sinks = Exp100Sinks(
         bar_marks=Collect(),
@@ -69,7 +69,7 @@ def test_rolling_levels_require_full_window(tmp_path: Path) -> None:
         sinks,
         MemoryGuard(None, sample_every=1),
     )
-    for observation in range(16):
+    for observation in range(7):
         start = observation * 15 * MINUTE_NS
         for minute in range(15):
             processor.on_one_minute_bar(
@@ -79,8 +79,8 @@ def test_rolling_levels_require_full_window(tmp_path: Path) -> None:
         level for level in processor.state.iter_active_levels() if level["side"] == "HIGH"
     ]
     assert len(active_high) == 1
-    assert active_high[0]["price"] == 100.0 + 15
-    assert active_high[0]["source_configuration"] == "ROLLING_16"
+    assert active_high[0]["price"] == 100.0 + 6
+    assert active_high[0]["source_configuration"] == "ROLLING_7"
 
 
 def test_session_levels_emit_after_local_session_close() -> None:
@@ -102,3 +102,37 @@ def test_session_levels_emit_after_local_session_close() -> None:
     sides = {spec.side: spec for spec in created}
     assert sides["HIGH"].price == 110.0
     assert sides["LOW"].price == 100.0
+
+
+def test_previous_1d_emits_at_new_york_seventeen_not_utc_midnight() -> None:
+    catalogue = LevelCatalogue("PREVIOUS_1D", observation_minutes=15)
+    ny = ZoneInfo("America/New_York")
+    created = []
+    # Wednesday 16:00-16:59 NY: still the Wednesday book; no emit at 17:00 yet.
+    for minute in range(60):
+        local = datetime(2023, 1, 4, 16, minute, tzinfo=ny)
+        ts_ns = int(local.astimezone(timezone.utc).timestamp() * 1_000_000_000)
+        created.extend(catalogue.on_source_minute(_bar(ts_ns, 110.0, 100.0)))
+    assert created == []
+    # First minute of Thursday's book (17:00 NY Wednesday) closes Wednesday.
+    close_local = datetime(2023, 1, 4, 17, 0, tzinfo=ny)
+    close_ts = int(close_local.astimezone(timezone.utc).timestamp() * 1_000_000_000)
+    created = catalogue.on_source_minute(_bar(close_ts, 105.0, 104.0))
+    assert len(created) == 2
+    sides = {spec.side: spec for spec in created}
+    assert sides["HIGH"].price == 110.0
+    assert sides["LOW"].price == 100.0
+    assert sides["HIGH"].anchor_key == "2023-01-04"
+    assert sides["HIGH"].creation_ts_ns == close_ts
+
+
+def test_previous_1d_does_not_emit_a_sunday_stub() -> None:
+    catalogue = LevelCatalogue("PREVIOUS_1D", observation_minutes=15)
+    ny = ZoneInfo("America/New_York")
+    created = []
+    # Sunday 18:00 NY is already Monday's book; no Sunday day object.
+    for minute in range(30):
+        local = datetime(2023, 1, 8, 18, minute, tzinfo=ny)
+        ts_ns = int(local.astimezone(timezone.utc).timestamp() * 1_000_000_000)
+        created.extend(catalogue.on_source_minute(_bar(ts_ns, 120.0, 119.0)))
+    assert created == []

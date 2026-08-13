@@ -439,3 +439,102 @@ Verdict: **APPROVE**
 1. **INFO — safety smoke starts after the requested Saturday bound because cTrader was closed.** The requested window is `2023-11-18T00:00Z..2023-11-20T23:59Z`; the first observed EURUSD minute is Sunday `2023-11-19T22:02Z`. This is the approved no-synthetic-bars closure behavior, not missing manufactured data.
 
 No blocking REVISE/REJECT findings. The execution apparatus is ready for the operator's 30-day Bybit preflight gate; QA does not launch it or the full matrix.
+
+## QA run 9 — 2026-08-12T19:11:08Z — mode: subagent — HEAD 3eb18d8683e7b5555331c88870db05d6334eea75
+
+Reviewed dirty/untracked (`git status --short`):
+```
+ M docs/experiments-docs/INDEX.md
+ M docs/experiments-docs/checkpoints/2026-08-11-019-liquidity-sweeps/design.md
+ M docs/experiments-docs/checkpoints/2026-08-11-019-liquidity-sweeps/liquidity.md
+ M docs/signal-registry/README.md
+ M docs/signal-registry/candidate-families/cf-liqswp-001-universe.json
+ M docs/signal-registry/candidate-families/cf-liqswp-001.md
+ M docs/signal-registry/multiplicity-registry.md
+ M docs/superpowers/plans/2026-08-12-exp-100-progress-handoff.md
+ M docs/superpowers/specs/2026-08-11-liquidity-sweeps-design.md
+ M python/experiments/EXP-100/code/run_matrix.py
+ M python/experiments/EXP-100/design.md
+ M python/experiments/EXP-101/design.md
+ M python/experiments/EXP-102/design.md
+ M python/experiments/EXP-103/design.md
+ M python/experiments/EXP-104/design.md
+ M python/experiments/INDEX.md
+ M python/src/xen/exp100/config.py
+ M python/src/xen/exp100/processor.py
+ M python/src/xen/exp100/state_store.py
+ M python/src/xen/exp100/tpo.py
+ M python/tests/test_exp100_matrix_runner.py
+ M python/tests/test_exp100_processor.py
+ M python/tests/test_exp100_state_store.py
+ M python/tests/test_exp100_tpo.py
+?? .pi/
+?? docs/superpowers/specs/2026-08-12-exp-100-late-window-active-raid-optimization-design.md
+?? python/experiments/EXP-100/analysis_code/
+?? python/experiments/EXP-100/results/close_all_eligible_probe_3d.json
+?? python/experiments/EXP-100/results/close_all_eligible_probe_7d.json
+?? python/experiments/EXP-100/results/fullstack_and_close_all_investigation.md
+```
+
+Object judged: AMENDMENT-8 observation-bar raid grain (QA runs 4–8 are stale; they judged the later 1m raid path). Fresh-context subagent; reviewer did not implement EXP-100. No preflight, matrix, BacktestNode, TEST, or holdout launched. AMENDMENT-6/7/8 methodology not reopened.
+
+Verdict: **APPROVE**
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| Raid start / return / beyond / same-bar ambiguity on completed observation bar; 1m wick that is not the observation OHLC is not a raid (EXP-100 scope; golden T1; checkpoint §5.2/§6; AMENDMENT-8) | `processor.py:1-8,97-125,154-164,257-319` | **MATCHES** | `_update_active_raids_from_source` does not create raids. `_process_observation_raid_state` runs only after `StreamingOHLC` completes. Same-observation beyond+return → `AMBIGUOUS_INTRABAR`. |
+| Engine input = 1m; TPO bins, max-excursion reset, post-confirm swing = 1m (AMENDMENT-3/8; checkpoint §5.2/§8) | `processor.py:109-110,154-186,203-252,396-427`; `tpo.py:1-8,88-108,147-182,247-281`; `strategy.py:386-401` | **MATCHES** | 1m updates bins / `max_price` / `swing_extreme`. New raid seeds TPO from first 1m beyond through observation close. |
+| Confirmation + later endpoint = 1H (15m/30m) or 1D (1h) (AMENDMENT-2; checkpoint §7) | `config.py:75-80`; `processor.py:50-52,429-504`; `run_matrix.py:73` | **MATCHES** | Reference aggregator is 60m or 1440m. Matrix and `validate()` pin the pairing. |
+| AMENDMENT-6 close-all-eligible: latest expected-side stays primary; earlier eligible returned → `CONFIRMED_NON_PRIMARY`; opposing unconfirmed → `FAILED_BREAKOUT`; primary completes on later opposing (checkpoint §6–§7; golden T2) | `processor.py:429-504` | **MATCHES** | Eligible rows sorted by `(sweep_ts_ns, raid_id)`; latest expected-side kept live; others settled on the same reference close. |
+| AMENDMENT-7 cTrader-only 216 cells: EURUSD, XAUUSD, USTEC × 3 TF × 2 methods × 12 configs (EXP-100 scope; registry universe pin) | `run_matrix.py:20-98`; `test_exp100_matrix_runner.py:20-32`; `cf-liqswp-001-universe.json` | **MATCHES** | Full grid is 216 unique CTRADER cells; 0 BYBIT. Preflight is EURUSD 15m BREAKOUT_BAR PREVIOUS_1H, 2023-10-23..2023-11-21T23:59Z. |
+| Family A/B/C catalogue incl. 1W; IANA/DST sessions; rolling 16..256 (checkpoint §5.2) | `config.py:21-32`; `levels.py:21-40,99-222`; `processor.py:111-124,655-687` | **MATCHES** | Auto catalogue + `SUPERSEDED_NO_RAID` for unraided same-side. |
+| Causal ATR(14) / regime on completed observation bars; raid uses ATR available before that bar updates (checkpoint §5.3) | `features.py:91-174`; `processor.py:113-118,257-261,321-341` | **MATCHES** | Raid path reads `_atr.value` before `_on_observation_bar`. |
+| Online TPO: 1m bins, `0.10×ATR`, VA≥70%, gap≥30% VA mass, `tight_gap = gap_span < 0.30×VA_width`; reset on new max; no historical replay (checkpoint §8) | `tpo.py:88-108,147-245,283-370`; `processor.py:203-252`; `state_store.py:357-376` | **MATCHES** | Reset starts a new generation. Finalize rematerializes only when `bracket_count==0`; production path increments online after start/seed. |
+| Outcomes: raw/bps/ATR distances; `strong_move = swing_atr > max_excursion_atr`; `gap_span_atr` / `gap_span_va` (checkpoint §9/§11) | `processor.py:506-591`; `strategy.py:164-247`; `tpo.py:219-245` | **MATCHES** | Required raid/profile columns are in the emission schemas. |
+| Future-destroy derangement, zero fixed points, non-vacuity on swing/duration/strong_move (EXP-100 control/tripwire; checkpoint §10) | `control.py:100-141,163-269`; `run_experiment.py:426-454`; `run_matrix.py:185-226` | **MATCHES** | Cyclic derangement; rejects fixed points / singletons. Matrix always passes `--destroy-control`. |
+| One BacktestNode per process; TRAIN-only fence; zero-cost; no strategy fills objective (L-31; EXP-100 HARD) | `run_experiment.py:48-52,199,349-377,409-421`; `run_matrix.py:271-381` | **MATCHES** | Process guard; `assert_within_fence(..., band="TRAIN")`; `cost_model: NO_COST_CHARGED`; empty fills/orders/positions. |
+| cTrader closure: minute-aligned strictly increasing observed bars; no synthetic bars/TPO; reset incomplete window (EXP-100 scope) | `processor.py:704-717`; `features.py:30-56` | **MATCHES** | Duplicate/backward timestamps rejected; gap resets `StreamingOHLC`. |
+| Amendment ledger 0L / 3T / 4N (checkpoint §2; EXP-100 header) | EXP-100 `design.md:6-8`; checkpoint `design.md` AMENDMENT-2..8 | **MATCHES** | AMENDMENT-8 declared NEUTRAL. Consecutive tighter streak is 2 (A6–A7), not ≥3. |
+
+### Golden-trace diff
+
+Expected values from **current design text** (EXP-100 `design.md:86-96`; checkpoint §13), not from running the impl.
+
+| Event | Expected (design) | Implemented logic | Verdict |
+|---|---|---|---|
+| **T1** | Active high 100.00; a **completed observation bar** high=101.20 starts one raid, max excursion 1.20, not returned; a **later observation bar** low=100.00 completes the raid, `prior_raid_count=0`. A 1m wick that is not the observation high does not start a raid. | Raid create/return/ambiguity only in `_process_observation_raid_state` on completed observation OHLC (`processor.py:113-118,257-319`). Initial `max_excursion` is observation high−price (`processor.py:349-356`). 1m path cannot `_new_raid`. Intra-observation beyond+return → `AMBIGUOUS_INTRABAR`, not a live completed raid. Incomplete windows never emit an observation, so a lone 1m wick cannot start a raid. | **PASS** |
+| **T2** | Second high level raided on a later observation bar before confirm; latest eligible returned raid is primary and stays live; earlier eligible returned raid settles `CONFIRMED_NON_PRIMARY` on the same expected-side reference (AMENDMENT-6). | `_eligible_active_raids` + latest `(sweep_ts_ns, raid_id)` kept live with `primary_attribution=true`; earlier rows `_terminal_raid(..., "CONFIRMED_NON_PRIMARY")` (`processor.py:457-479`). Covered by `test_processor_confirms_all_eligible_raids_and_keeps_only_latest_primary`. | **PASS** |
+| **T3** | 1H expected-side close timestamps confirmation at that completed close, not a 15m/1m stamp; 1m TPO ends there; later opposing reference closes the swing. | `confirmation_ts_ns = bar.ts_event_ns` of completed reference (`processor.py:463-479`). Profile finalize at that close for primary; opposing later → `COMPLETED` (`processor.py:481-504,593-627`). | **PASS** |
+
+Note: `test_raid_start_and_return_use_source_one_minute_bars` uses default `observation_minutes=1`, so that test is a 1m-observation cell, not the production 15m T1. Hand-trace of the production observation path still matches T1.
+
+### Governance & boundary
+
+| Check | Result | Evidence |
+|---|---|---|
+| Fresh context / append-only | PASS | mode `subagent`; runs 1–8 left intact; this is run 9 only |
+| Mandatory design blocks | PASS | mechanism, object-identity, control, tripwire, bands, sample-size, golden, hard/informative, ZERO-COST in EXP-100 `design.md` |
+| Zero-cost verbatim + no live cost path | PASS | EXP-100 `design.md:107-119` matches design-requirements §10; runner metadata `NO_COST_CHARGED`; no `spread_scale_route` / `bybit_round_trip` / `PARTIAL_FEES` / `charge_costs` in `xen.exp100` or `EXP-100/code` |
+| No local accounting | PASS (static) | `BANNED_LOCAL_DEFS` (`assemble_realized_bps`, `assemble_multileg_bps`, `per_leg_net`, `build_episodes`) are absent from `python/experiments/EXP-100/code/*.py`. Module import of `check_no_local_accounting` was not executable in this reviewer environment. |
+| No Python strategy backtest | PASS | Nautilus `BacktestNode` only; `run_analysis=False` |
+| Registry | PASS | `CF-LIQSWP-001` REGISTERED; planned counted TEST/holdout reads = 0; universe pin is EURUSD/XAUUSD/USTEC TRAIN |
+| No research powering | PASS | no MDE / `MDE_Z` / detection floors / `UNPOWERED` / `min_powered_seeds` / `n_legs_floor` in EXP-100 design or `xen.exp100` |
+| PSR pairing | N/A | apparatus estimand is coverage/reconciliation, not mean-trade/leg bps |
+| Amendment ledger | PASS | 0 looser / 3 tighter / 4 neutral; AMENDMENT-8 NEUTRAL; no consecutive one-direction streak ≥3 |
+| Derangement destroy | PASS | `destroy form: DERANGEMENT` in design; code builds a cycle and raises on fixed points |
+| One BacktestNode / process | PASS | process-local guard + one subprocess command per matrix cell |
+| Holdout fence | PASS | TRAIN-only pin + `assert_within_fence(..., band="TRAIN")`; no TEST/holdout loader |
+| Screen conversion pin | N/A | no SPDR/money conversion |
+| XENA frozen registry | N/A | not a XENA run |
+| No execution | PASS | review only |
+
+### Issues
+
+1. **INFO — one-cell CLI still accepts Bybit.** `run_experiment.py:57-83,486` and `config.py:7` still pin/validate `BYBIT`. The **scheduled** object is cTrader-only 216 (`run_matrix.py:20-98`). Not a matrix deviation.
+2. **INFO — LEVEL_CLOSE ≡ BREAKOUT_BAR numerically.** Both use previous completed reference high/low (`processor.py:629-653`). Separate strata remain; overlap is disclosed in checkpoint §7. Methodology not reopened.
+3. **INFO — no focused 15m golden-T1 test.** Production path is observation-bar; the named T1 unit test is a 1m-observation cell (`test_exp100_processor.py:61-66,727-744`). Hand-trace still PASSes. Optional follow-up, not blocking.
+4. **INFO — live state is in-memory** (`state_store.py:1-8,64-79`) with an append-only 1m high/low log for deferred TPO (`tpo.py:26-54`). Semantics match the prior store; not a design-fidelity break.
+
+No blocking REVISE/REJECT issues. Ready for the operator's execution gate; QA does not launch it.

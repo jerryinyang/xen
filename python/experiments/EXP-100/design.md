@@ -2,9 +2,17 @@
 
 - **Family:** `CF-LIQSWP-001/HYP-000`
 - **Checkpoint:** `2026-08-11-019-liquidity-sweeps`
-- **Status:** execution preflight timed out; full TRAIN matrix operationally blocked
+- **Status:** AMENDMENT-13 264-cell TRAIN analysis complete; HYP-000 upheld by operator confirmation (2026-08-13)
 - **Vehicle:** Nautilus `BacktestNode`, TRAIN only
-- **Amendments:** inherits checkpoint AMENDMENT-2 through AMENDMENT-5; no experiment-specific amendment. Counts: **0L / 1T / 3N**.
+- **Amendments:** inherits checkpoint AMENDMENT-2 through AMENDMENT-13. Counts: **2L / 3T / 7N**.
+  - **AMENDMENT-8:** raid grain on the observation bar; 1m reserved for TPO / max-excursion / swing / fills.
+  - **AMENDMENT-13:** beyond the level starts a live raid; same-bar return does not close it.
+  - **AMENDMENT-9:** 1h cells confirm on 1H and 4H (not 1D); run 15m then 30m then 1h.
+  - **AMENDMENT-10:** 1D/1W = NY 17:00 trading day / Mon–Fri week, not contiguous minute bars.
+  - **AMENDMENT-11:** rolling windows 7/14/22/252; matrix **264**.
+    - **AMENDMENT-12:** tightness `gap_span < 0.50 * VA_width`; gap selection stays emptiest 30% of VA TPO.
+  - **ONLINE PROFILE:** every closed 1m source bar updates active TPO bins immediately; no full-history source log or deferred rebuild is permitted.
+  - **DURATION FIELDS:** emit `excursion_duration_ns` from first excursion through return or censor and `swing_duration_ns` from confirmation through endpoint; retain `duration_ns` as the exact swing-duration alias.
 
 ## Mechanism
 
@@ -32,16 +40,21 @@ OBJECT-IDENTITY:
 
 ## Scope and estimand
 
-Run all three base timeframes, both confirmation methods, both confirmation
-references (1H for 15m/30m and 1D for 1h), both venues, and every frozen level
-configuration. Verify:
+Run all three base timeframes, both confirmation methods, **cTrader assets only**
+(`EURUSD`, `XAUUSD`, `USTEC`; AMENDMENT-7), and every frozen level
+configuration. Confirmation references: 1H for 15m/30m; **1H and 4H** for 1h
+(AMENDMENT-9). Matrix size: **264 cells** (AMENDMENT-11). Run order: all 15m, then all 30m,
+then all 1h. Verify:
 
 - exact level identity and catalogue membership at each timestamp;
-- strict excursion, inclusive return, and explicit ambiguous intrabar handling;
-- repeated-raid linkage and most-recent-resolvable attribution;
+- strict observation-bar excursion starts a live raid; same-bar return is recorded and does not close it (AMENDMENT-13);
+- repeated-raid linkage and close-all-eligible settlement (AMENDMENT-6):
+  latest expected-side raid stays primary; earlier eligible returned raids close
+  as `CONFIRMED_NON_PRIMARY`; all eligible opposing unconfirmed raids fail;
 - confirmation and endpoint chronology;
 - TPO profile state, conservation, reset, VA, gap, and tightness fields;
-- deterministic replay and artifact hash equality.
+- deterministic replay and artifact hash equality;
+- bounded online profile state and explicit excursion/swing duration fields.
 
 Source bars must be minute-aligned and strictly increasing. Normal market-closure gaps in
 the cTrader replication are accepted as periods with no observed bars: no flat/synthetic
@@ -83,20 +96,27 @@ SAMPLE-SIZE:
   minimum_n_for_primary_inference: none.
   declared_fixed_comparator: the synthetic golden trace and same-stratum replay.
   channels: state counts (count); numeric reconciliation (absolute difference).
-  strata predeclared thin: every venue × asset × timeframe × configuration cell.
+  strata predeclared thin: every cTrader asset × timeframe × configuration cell (AMENDMENT-7).
 ```
 
 ## Golden trace
 
 ```text
 GOLDEN-TRACE:
-  T1: high level 100.00; a 1m bar high=101.20; later 1m low=100.00. Emit one
-      completed raid with max excursion 1.20 and prior raid count 0.
-  T2: a second active high level is raided before confirmation. The later
-      resolvable raid receives attribution; both level objects remain emitted.
+  T1: high level 100.00; a completed observation bar high=101.20; a later
+      observation bar low=100.00. The first bar already started a live raid
+      (max excursion 1.20, prior raid count 0); the later return is recorded
+      on that live object. A same-bar return would also leave it live
+      (AMENDMENT-13). A 1m wick that is not the observation high does not
+      start a raid (AMENDMENT-8).
+  T2: a second active high level is raided on a later observation bar before
+      confirmation. The later resolvable raid receives primary attribution and
+      stays live; the earlier eligible returned raid settles as
+      CONFIRMED_NON_PRIMARY on the same expected-side reference event
+      (AMENDMENT-6).
   T3: the 1H expected-side bar closes; sweep confirmation is timestamped at that
-      completed close, not at the next bar’s open. Later opposing confirmation
-      closes the swing and the profile.
+      completed close, not at a 15m or 1m stamp. Later opposing confirmation
+      closes the swing and the 1m TPO profile.
 ```
 
 ## Hard versus informative
@@ -105,7 +125,7 @@ GOLDEN-TRACE:
 HARD (block): holdout exclusion, causal timestamps, emission completeness,
   deterministic replay, state reconciliation, TPO conservation, future-destroy
   integrity, and zero-cost compliance.
-INFORMATIVE: coverage counts, state frequencies, interval widths, and venue
+INFORMATIVE: coverage counts, state frequencies, interval widths, and asset
   differences.
 ```
 

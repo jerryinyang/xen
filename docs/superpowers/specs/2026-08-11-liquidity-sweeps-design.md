@@ -3,7 +3,7 @@
 - **Date:** 2026-08-11
 - **Checkpoint:** `2026-08-11-019-liquidity-sweeps`
 - **Family:** `CF-LIQSWP-001`
-- **Status:** operator-approved design; implementation and fresh-context QA pending
+- **Status:** operator-approved design; AMENDMENT-13 applied; EXP-100 264-cell TRAIN rerun in flight
 - **Source of truth:** `docs/experiments-docs/checkpoints/2026-08-11-019-liquidity-sweeps/liquidity.md`
 
 ## Objective
@@ -14,14 +14,17 @@ characterisation, not a deployability claim.
 
 ## Frozen scope
 
-- Observation timeframes: 15 minutes, 30 minutes, and 1 hour.
+- Observation timeframes: 15 minutes, 30 minutes, and 1 hour. Raid start,
+  return, and beyond are decided on these bars (SoT bar-by-bar grain;
+  AMENDMENT-8). Same-bar return does not close a raid (AMENDMENT-13).
 - Engine source: 1-minute real OHLCV bars; higher-timeframe state is built
   online. The existing `xen.bar_aggregator` convention is the parity reference.
+  1m remains TPO / max-excursion / swing-extreme / fill grain (AMENDMENT-3).
 - Level families: previous completed 1H/4H/1D/1W levels, previous completed
-  Asia/Europe/America session levels, and causal rolling 16/32/64/128/256-bar
-  levels.
-- Confirmation reference: 1H levels for 15m/30m observations and 1D levels for
-  1h observations.
+  Asia/Europe/America session levels, and causal rolling 7/14/22/252-bar
+  levels. 1D/1W use the NY 17:00 trading day / Mon–Fri week (AMENDMENT-10).
+- Confirmation reference: 1H for 15m/30m observations; both 1H and 4H for 1h
+  observations as separate strata (AMENDMENT-9). Daily confirmation is retired.
 - Confirmation methods are tested separately: higher-timeframe breakout-bar
   confirmation and close beyond a configured higher-degree level.
 - Distances and profile widths are emitted raw and normalised by causal
@@ -41,7 +44,7 @@ TPO count reaches at least 30% of VA TPO count. The exact bin mask and its
 conservative outer span are retained. A gap is tight exactly when:
 
 ```text
-gap_span < 0.30 * (VAH - VAL)
+gap_span < 0.50 * (VAH - VAL)
 ```
 
 The comparison is between TPO mass and price span; it is not a price-width

@@ -68,12 +68,16 @@ Each file in `candidate-families/` must define:
 
 Registered candidate families (full per-phase batches in `multiplicity-registry.md`):
 
-- `CF-LIQSWP-001` — Liquidity Sweeps. **REGISTERED — 2026-08-11, checkpoint-019.**
-  Causal online level/raid/sweep characterisation across cTrader’s three assets and the
-  Bybit TRAIN top-10 universe. Observation timeframes are 15m/30m/1h; Family A includes previous
-  completed 1D/1W/4H/1H levels;
-  confirmation references are 1H for 15m/30m and 1D for 1h. The value-gap arm uses a 1m TPO
-  profile, 70% VA, at-least-30% low-density VA TPO mass, and tightness `gap_span < 0.30*(VAH-VAL)`.
+- `CF-LIQSWP-001` — Liquidity Sweeps. **REGISTERED — 2026-08-11, checkpoint-019;
+  amended 2026-08-13 (AMENDMENT-6/7/8/9/10/11/12/13).** Causal online level/raid/sweep characterisation
+  on cTrader only (`EURUSD`, `XAUUSD`, `USTEC`; AMENDMENT-7). Observation timeframes are
+  15m/30m/1h; raid start/return/beyond follow those bars (SoT grain; AMENDMENT-8).
+  Same-bar pierce stays live until confirm/fail (AMENDMENT-13).
+  Family A includes previous completed 1D/1W/4H/1H levels (1D/1W = NY 17:00 trading
+  day / Mon–Fri week; AMENDMENT-10); confirmation references are
+  1H for 15m/30m and both 1H and 4H for 1h (AMENDMENT-9; 264 cells after AMENDMENT-11).
+  Rolling windows are 7/14/22/252. The value-gap arm uses a 1m TPO profile, 70% VA,
+  at-least-30% low-density VA TPO mass, and tightness `gap_span < 0.50*(VAH-VAL)`.
   TRAIN only, zero-cost, no deployability claim. See `candidate-families/cf-liqswp-001.md`.
 - `CF-VOLDIR-001` — Structural Volatility + Direction Programme. **REGISTERED — 2026-07-23,
   checkpoint-017.** Ordered claims: (A) vol reliability, (B) direction expectancy bps (not win-rate;

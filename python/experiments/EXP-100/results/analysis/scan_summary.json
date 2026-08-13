@@ -1,0 +1,155 @@
+{
+  "n_cells": 264,
+  "family_blocking_pass": true,
+  "family_n_cells": 264,
+  "per_cell_gates": 264,
+  "per_cell_gate_pass": 264,
+  "symbols": [
+    "EURUSD",
+    "USTEC",
+    "XAUUSD"
+  ],
+  "timeframes": [
+    "15m",
+    "30m",
+    "60m"
+  ],
+  "methods": [
+    "breakout_bar",
+    "level_close"
+  ],
+  "confirm_refs": [
+    "1h",
+    "4h"
+  ],
+  "level_configs": [
+    "PREVIOUS_1D",
+    "PREVIOUS_1H",
+    "PREVIOUS_1W",
+    "PREVIOUS_4H",
+    "PREVIOUS_AMERICA",
+    "PREVIOUS_ASIA",
+    "PREVIOUS_EUROPE",
+    "ROLLING_14",
+    "ROLLING_22",
+    "ROLLING_252",
+    "ROLLING_7"
+  ],
+  "level_configs_expected": [
+    "PREVIOUS_1D",
+    "PREVIOUS_1H",
+    "PREVIOUS_1W",
+    "PREVIOUS_4H",
+    "PREVIOUS_AMERICA",
+    "PREVIOUS_ASIA",
+    "PREVIOUS_EUROPE",
+    "ROLLING_14",
+    "ROLLING_22",
+    "ROLLING_252",
+    "ROLLING_7"
+  ],
+  "level_configs_ok": true,
+  "grid_check": {
+    "15m": {
+      "n_cells": 66,
+      "expected_n_cells": 66,
+      "confirm_refs": [
+        "1h"
+      ],
+      "expected_confirm_refs": [
+        "1h"
+      ],
+      "ok": true
+    },
+    "30m": {
+      "n_cells": 66,
+      "expected_n_cells": 66,
+      "confirm_refs": [
+        "1h"
+      ],
+      "expected_confirm_refs": [
+        "1h"
+      ],
+      "ok": true
+    },
+    "60m": {
+      "n_cells": 132,
+      "expected_n_cells": 132,
+      "confirm_refs": [
+        "1h",
+        "4h"
+      ],
+      "expected_confirm_refs": [
+        "1h",
+        "4h"
+      ],
+      "ok": true
+    }
+  },
+  "n_zero_raid_cells": 0,
+  "n_zero_level_cells": 0,
+  "n_zero_1d_cells": 0,
+  "n_zero_1w_cells": 0,
+  "total_raids": 9840478,
+  "total_levels": 6329824,
+  "total_confirmed": 5106432,
+  "total_completed": 789326,
+  "total_ambiguous": 0,
+  "total_return": 9809958,
+  "total_same_bar_return": 7669654,
+  "total_confirm_without_return": 0,
+  "total_same_bar_closed_ambiguous": 0,
+  "min_same_bar_return_frac": 0.7518199867637326,
+  "max_same_bar_return_frac": 0.7991553742389143,
+  "median_same_bar_return_frac": 0.7803076759714318,
+  "min_ambiguous_frac": 0.0,
+  "max_ambiguous_frac": 0.0,
+  "median_ambiguous_frac": 0.0,
+  "cost_ok_cells": 264,
+  "destroy_vacuous_cells": [],
+  "destroy_changed_cells": 264,
+  "destroy_collapse_false_cells": [],
+  "integrity_fail_sums": {
+    "raid_dup": 0,
+    "level_dup": 0,
+    "missing_profiles": 0,
+    "extra_profiles": 0,
+    "defined_conservation_fail": 0,
+    "tight_rule_mismatch": 0,
+    "chrono_fail": 0,
+    "grid_fail": 0,
+    "method_mismatch": 0,
+    "ref_mismatch": 0,
+    "raid_ts_holdout": 0,
+    "mark_holdout": 0,
+    "active_raids": 0,
+    "active_levels": 0,
+    "destroy_fixed_points": 0,
+    "destroy_count_mismatch": 0,
+    "destroy_id_mismatch": 0,
+    "destroy_status_mismatch": 0,
+    "n_fills": 0,
+    "n_ambiguous": 0,
+    "n_confirm_without_return": 0,
+    "n_same_bar_closed_ambiguous": 0,
+    "retired_status_hits": 0
+  },
+  "mark_past_train_cells": 0,
+  "raid_ts_past_train_sum": 63304,
+  "clock_weekend_sunday_anchors": 0,
+  "clock_weekend_saturday_anchors": 0,
+  "clock_zero_level_cells": 0,
+  "method_pairs": 132,
+  "method_id_equal": 132,
+  "method_status_equal": 132,
+  "method_count_diff": 0,
+  "nautilus_versions": [
+    "1.230.0"
+  ],
+  "tight_ratio_values": [
+    0.5
+  ],
+  "gap_mass_values": [
+    0.3
+  ]
+}

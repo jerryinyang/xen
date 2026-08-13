@@ -1,7 +1,7 @@
 # Checkpoint 019 — Liquidity Sweeps
 
 - **Opened:** 2026-08-11
-- **Status:** `OPEN — DESIGNS WRITTEN; FRESH QA PENDING`
+- **Status:** `OPEN — EXP-100 HYP-000 UPHELD BY OPERATOR; EXP-101–104 QA IN PROGRESS`
 - **Family:** `CF-LIQSWP-001`
 - **Source of truth:** `docs/experiments-docs/checkpoints/2026-08-11-019-liquidity-sweeps/liquidity.md`
 - **Superpowers design:** `docs/superpowers/specs/2026-08-11-liquidity-sweeps-design.md`
@@ -16,7 +16,8 @@
 
 The source-of-truth value-gap amendment is binding: a tight gap has price span
 strictly below 30% of the full VA width/magnitude. In implementation this is
-`gap_span < 0.30 * (VAH - VAL)`.
+`gap_span < 0.50 * (VAH - VAL)` (AMENDMENT-12). Gap *selection* stays the
+emptiest 30% of VA TPO mass.
 
 ## 2. Operator amendments
 
@@ -39,11 +40,79 @@ Running count: **0 looser / 1 tighter / 2 neutral**.
 **AMENDMENT-5:** add the SoT tight-value-gap condition to `HYP-003` —
 **DIRECTION: NEUTRAL**. Running count: **0 looser / 1 tighter / 3 neutral**.
 
+**AMENDMENT-6 (2026-08-12):** close-all-eligible reference settlement —
+**DIRECTION: TIGHTER**. On each completed reference event, every eligible
+returned unconfirmed raid is settled. The latest eligible expected-side raid
+receives `primary_attribution=true` and remains live for the later opposing
+endpoint; all earlier eligible expected-side raids close immediately as
+`CONFIRMED_NON_PRIMARY`. Every eligible opposing unconfirmed raid fails as
+`FAILED_BREAKOUT`. Every primary-attributed confirmed raid completes on the
+opposing endpoint. Older open raids are no longer left live until right-censor.
+Running count: **0 looser / 2 tighter / 3 neutral**.
+
+**AMENDMENT-7 (2026-08-12):** restrict the family execution universe to cTrader
+assets only (`EURUSD`, `XAUUSD`, `USTEC`); exclude the Bybit/crypto catalogue —
+**DIRECTION: TIGHTER**. Running count: **0 looser / 3 tighter / 3 neutral**.
+
+**AMENDMENT-8 (2026-08-12):** lock the original SoT raid grain — **DIRECTION:
+NEUTRAL**. The SoT tracks excursions and completed raids **bar by bar** on the
+cell observation timeframe (15m / 30m / 1h). Confirmation and later endpoint
+stay on the confirmation reference (1H for 15m/30m; 1H and 4H for 1h). Downstream
+checkpoint/family text and the first apparatus over-specified 1-minute bars as
+the raid object; that was an implementation choice, not the SoT. AMENDMENT-8
+retires that over-specification. 1-minute input remains for TPO bins,
+max-excursion reset, post-confirmation swing extremes, and any later fill
+model (AMENDMENT-3). Intra-observation 1m wicks that do not survive the
+completed observation OHLC are not raid objects. Running count: **0 looser /
+3 tighter / 4 neutral**.
+
+**AMENDMENT-9 (2026-08-13):** retire 1h→1D confirmation. 15m/30m stay on 1H.
+1h cells keep **both** 1H (same-TF settle) and 4H (the 15m→1H analog). Matrix
+becomes **288 cells** (144 fifteen/thirty-minute + 144 one-hour; later cut to
+264 by AMENDMENT-11). Run order is all 15m, then all 30m, then all 1h. The 13
+finished EURUSD 1h→1D emissions are the old object and are deleted. **DIRECTION: LOOSER** versus AMENDMENT-2's 1D
+confirm clock (more frequent settle events); 4H arm is the tighter of the two
+1h arms. Running count: **1 looser / 3 tighter / 4 neutral**.
+
+**AMENDMENT-10 (2026-08-13):** previous 1D/1W levels are completed **trading**
+sessions, not contiguous 1,440 / 10,080-minute bars — **DIRECTION: NEUTRAL**
+(restores the SoT named-session object; does not change 15m/1H/4H bar grain).
+A trading day is `America/New_York` 17:00 → next 17:00, Monday–Friday, with
+historical DST. Sunday after 17:00 NY belongs to Monday. Friday after 17:00 NY
+is weekend. Observed minutes only; no synthetic fills. A trading week is that
+Mon–Fri book, emitted at Friday 17:00 NY. Last unfinished TRAIN bucket is
+right-censored. Rationale: the AMENDMENT-9 contiguous-minute rule produced 0
+1D/1W levels on sessioned cTrader minutes; UTC calendar days would mint ~128
+Sunday stubs and flip the book at 00:00 UTC (mid-Asia). StreamingOHLC for
+15m/30m/1H/4H is unchanged. Running count: **1 looser / 3 tighter / 5 neutral**.
+
+**AMENDMENT-11 (2026-08-13):** replace rolling windows 16/32/64/128/256 with
+**7 / 14 / 22 / 252** — **DIRECTION: NEUTRAL** (operator: trading-native counts).
+Matrix becomes **264 cells** (11 configs × same confirm grid). Old rolling
+emissions are the old object and are deleted. Running count: **1 looser / 3
+tighter / 6 neutral**.
+
+**AMENDMENT-12 (2026-08-13):** a gap is tight when `gap_span < 0.50 * VA_width`
+— **DIRECTION: NEUTRAL** (operator). Gap *selection* stays the lowest-density
+bins reaching at least **30%** of VA TPO count. Running count: **1 looser / 3
+tighter / 7 neutral**.
+
+**AMENDMENT-13 (2026-08-13):** a raid starts when a completed observation bar
+goes strictly beyond the level. Same-bar return does **not** close it and is
+not `AMBIGUOUS_INTRABAR`. The raid stays live until the later confirmation or
+fail event, or TRAIN right-censor. Return to the level is still recorded when
+it happens; it is not a second-bar requirement for raid identity. A 1-minute
+wick that does not survive the observation OHLC is still not a raid
+(AMENDMENT-8 grain unchanged). Old two-bar / same-bar-close emissions are the
+old object and are deleted. **DIRECTION: LOOSER**. Running count: **2 looser /
+3 tighter / 7 neutral**.
+
 ## 3. Mechanism
 
 ```text
 MECHANISM: A liquidity level is a causal, persistent price object. A raid is an
-online excursion beyond that level followed by a later return. After a raid,
+observation-bar excursion strictly beyond that level (AMENDMENT-8 grain;
+AMENDMENT-13 lifetime). Same-bar return does not close the raid. After a raid,
 the first expected-side higher-timeframe confirmation marks a sweep; an
 excursion-side confirmation marks a breakout and failed sweep. The experiment
 measures the later opposing swing, its ATR-normalised magnitude and duration,
@@ -75,37 +144,31 @@ OBJECT-IDENTITY:
 
 ### 5.1 Universes
 
-**Bybit:** ten admitted USDT linear perpetuals, ranked by the existing full-catalog
-30-day TRAIN pin:
-
-```text
-BTCUSDT ETHUSDT SOLUSDT AVAXUSDT ORDIUSDT 1000BONKUSDT
-TIAUSDT DOGEUSDT XRPUSDT LINKUSDT
-```
+**cTrader only (AMENDMENT-7):** `EURUSD.CTrader`, `XAUUSD.CTrader`,
+`USTEC.CTrader`; each is an independent stratum.
 
 Pin: `docs/signal-registry/candidate-families/cf-liqswp-001-universe.json`.
-The metric is `sum(close*volume)` over `[2023-11-18T00:00:00Z,
-2023-12-18T00:00:00Z)`, pool `894 admitted`.
+Fence: INFR-021 (`train_start=2021-06-02T00:01:00Z`,
+`train_end=2023-11-22T00:00:00Z`, manifest SHA
+`4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0`).
 
-**cTrader:** `EURUSD.CTrader`, `XAUUSD.CTrader`, `USTEC.CTrader`; each is an
-independent replication stratum. The cTrader fence is the INFR-021 manifest
-(`train_start=2021-06-02T00:01:00Z`, `train_end=2023-11-22T00:00:00Z`,
-manifest SHA `4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0`).
-
-Bybit uses the INFR-011 manifest (`analysis_start=2021-06-29T06:53:00Z`,
-`train_end=2023-12-18T00:00:00Z`, `holdout_start=2025-01-08T00:00:00Z`,
-SHA `35d3375ec5ec18b3c4e6c5eec814ade4d492bd60e3fb694fed19e16bc2c00448`).
+**Bybit/crypto:** excluded from this family until a later operator amendment.
 No TEST or holdout data is loaded.
 
 ### 5.2 Time and levels
 
-- Observation timeframes: 15m, 30m, 1h.
+- Observation timeframes: 15m, 30m, 1h. Raid start, return, and beyond are
+  decided on these bars (AMENDMENT-8). Same-bar return does not close a raid
+  (AMENDMENT-13).
 - Engine input: 1m real OHLCV bars. Streaming higher-timeframe state is
   produced online; `xen.bar_aggregator` is the deterministic parity reference.
+  1m remains the TPO / max-excursion / swing-extreme / fill-path grain.
 - Family A: previous completed 1H, 4H, 1D, and 1W highs and lows.
 - Family B: previous completed Asia, Europe, and America session highs and lows.
-- Family C: causal rolling 16, 32, 64, 128, and 256-bar highs and lows of the
-  current observation timeframe.
+- Family C: causal rolling 7, 14, 22, and 252-bar highs and lows of the
+  current observation timeframe (AMENDMENT-11).
+- Family A 1D/1W clocks: completed NY 17:00 trading day / Mon–Fri trading week
+  (AMENDMENT-10). 1H/4H remain contiguous completed StreamingOHLC windows.
 - Levels are identified by source family, configuration, side, and anchor
   period/session. Coincident prices remain distinct objects.
 
@@ -129,18 +192,24 @@ magnitude and duration, return state, prior raid count, confirmation state,
 breakout/failure state, and later-swing outcome fields where available.
 
 High levels are raided above and expect a downward move. Low levels are raided
-below and expect an upward move. A strict excursion is followed by an inclusive
-return. Same-bar cross-and-return is retained as `AMBIGUOUS_INTRABAR` and is
-excluded only from the primary completed-raid count.
+below and expect an upward move. A completed observation bar that goes strictly
+beyond the level starts a live raid (AMENDMENT-13). Inclusive return is still
+recorded on that bar or a later bar; it is not required to *open* the raid and
+does not terminate it. Confirmation or fail on the reference clock settles the
+raid. A 1-minute wick that does not survive the observation OHLC is not a raid.
 
-If multiple levels are raided before confirmation, primary attribution goes to
-the most recent resolvable raid. Same-bar ordering is not fabricated; all
-affected levels retain their own excursion maxima and a tie flag.
+If multiple levels/raids are eligible before confirmation, primary attribution
+goes to the most recent resolvable raid (AMENDMENT-6). Same-bar ordering is not
+fabricated. All eligible earlier returned raids settle on that same reference
+event as `CONFIRMED_NON_PRIMARY` (expected-side) or `FAILED_BREAKOUT`
+(opposing-side); they do not remain live until right-censor. Excursion maxima
+are retained on each raid record through settlement.
 
 ## 7. Confirmation and endpoint rules
 
-For 15m/30m observations the higher confirmation reference is 1H; for 1h it is
-1D. Each method is a separate estimand:
+For 15m/30m observations the confirmation reference is 1H. For 1h it is both
+1H and 4H as separate strata (AMENDMENT-9). 1D confirmation is retired. Each
+method is a separate estimand:
 
 1. `BREAKOUT_BAR`: a completed reference bar closes beyond the previous
    reference bar’s high/low.
@@ -149,10 +218,14 @@ For 15m/30m observations the higher confirmation reference is 1H; for 1h it is
    as its own stratum; any overlap with the previous-bar extreme is disclosed,
    not silently pooled.
 
-The expected-side event confirms a sweep. The excursion-side event confirms a
-breakout and marks the excursion as a failed sweep. The later swing ends at the
-first opposing reference event after sweep confirmation. No arbitrary timeout
-is used. Missing endpoints are right-censored at the relevant TRAIN boundary.
+The expected-side event confirms eligible returned raids. Only the latest
+primary remains live for the later swing; earlier eligible raids close as
+`CONFIRMED_NON_PRIMARY` with profiles finalized at that confirmation close.
+The excursion-side event fails every eligible returned unconfirmed raid as
+`FAILED_BREAKOUT`. The later swing ends at the first opposing reference event
+after primary sweep confirmation; every primary-attributed live raid completes
+there. No arbitrary timeout is used. Missing endpoints are right-censored at
+the relevant TRAIN boundary.
 
 ## 8. TPO value-gap algorithm
 
@@ -177,14 +250,15 @@ the exact selected-bin mask and its conservative outer span.
 ```text
 VA_width       = VAH - VAL
 gap_span       = gap_high - gap_low
-tight_gap      = gap_span < 0.30 * VA_width
+tight_gap      = gap_span < 0.50 * VA_width
 gap_span_atr   = gap_span / ATR_unit
 gap_span_va    = gap_span / VA_width
 ```
 
 `tight_gap` is a deterministic label for analysis, not an automatic quality or
 value verdict. If `VA_width <= 0`, no selected bins exist, or the minimum bin
-span cannot satisfy the strict 30% comparison, emit an explicit profile reason.
+span cannot satisfy the strict 50% tightness comparison, emit an explicit profile reason.
+Gap *selection* uses 30% of VA TPO mass; tightness uses 50% of VA width (AMENDMENT-12).
 
 ## 9. Hypotheses and experiments
 
@@ -276,7 +350,7 @@ SAMPLE-SIZE:
       sigma_denominator: outcome_level
     - name: paired event labels
       sigma_denominator: paired_delta
-  strata predeclared thin: every asset × timeframe × level config × confirmation
+  strata predeclared thin: every cTrader asset × timeframe × level config × confirmation
     method cell; thin rows remain visible and are not called absent.
 ```
 
@@ -284,17 +358,21 @@ SAMPLE-SIZE:
 
 ```text
 GOLDEN-TRACE:
-  T1: 15m high level L-H1=100.00 is active. A 1m bar prints high=101.20,
-      low=100.80, close=101.00: excursion_above=true, max_excursion=1.20,
-      returned=false. A later 1m bar touches 100.00: completed_raid=true,
-      prior_raid_count=0.
+  T1: 15m high level L-H1=100.00 is active. A completed 15m bar prints
+      high=101.20, low=100.80, close=101.00: excursion_above=true,
+      max_excursion=1.20, returned=false. A later completed 15m bar touches
+      100.00: completed_raid=true, prior_raid_count=0. A 1m wick through 101.20
+      that is not the 15m high does not start a raid (AMENDMENT-8). Same-bar
+      return on that 15m bar does not close the raid (AMENDMENT-13).
   T2: before the expected-side reference event, a second active high level is
-      raided on a later bar. The second level receives primary attribution;
-      the first retains its own max excursion and tie/previous-state metadata.
+      raided on a later observation bar. On confirmation the second receives
+      primary attribution and stays live for the swing; the first eligible
+      returned raid settles as CONFIRMED_NON_PRIMARY with its max excursion
+      retained (AMENDMENT-6).
   T3: the 1H reference bar closes below its expected-side reference low. The
-      first future 1m bar may act, but the confirmation timestamp is the
-      completed 1H close. The sweep is confirmed; the TPO profile ends at that
-      close, and later opposing reference confirmation closes the swing.
+      confirmation timestamp is the completed 1H close, not a 15m or 1m stamp.
+      The sweep is confirmed; the TPO profile (1m bins) ends at that close, and
+      later opposing reference confirmation closes the swing.
 ```
 
 QA must independently hand-check the trace against the emission. The developer
@@ -328,9 +406,12 @@ ZERO-COST-DISCLOSURE:
 
 ## 16. Execution sequence
 
-1. Fresh-context QA reviews the checkpoint and five experiment designs.
+1. Fresh-context QA reviews the checkpoint and five experiment designs
+   (including AMENDMENT-6/7/8/9/10/11/12).
 2. Operator execution approval is required after QA approval.
-3. Run cTrader and Bybit separately, beginning with a small cTrader smoke cell.
+3. Run cTrader-only matrix (264 cells), beginning with the EURUSD 30-day
+   preflight cell under the INFR-021 fence.
 4. Run the estimand-validation gate before analysis.
 5. Analyse each experiment separately; no automatic family verdict.
-6. Operator reviews evidence and decides whether any deferred breakout branch is opened.
+6. Operator reviews evidence and decides whether any deferred breakout branch
+   or Bybit re-admission is opened.

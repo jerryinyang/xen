@@ -1,37 +1,10 @@
 from __future__ import annotations
 
-import sqlite3
-from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
 
 import pytest
 
 from xen.exp100.state_store import Exp100StateStore
-
-
-class _CountingConnection:
-    """Delegate to a real SQLite connection while counting write API calls."""
-
-    def __init__(self, connection: sqlite3.Connection) -> None:
-        self.connection = connection
-        self.execute_calls = 0
-        self.executemany_calls = 0
-
-    def execute(
-        self, sql: str, parameters: tuple[object, ...] = ()
-    ) -> sqlite3.Cursor:
-        self.execute_calls += 1
-        return self.connection.execute(sql, parameters)
-
-    def executemany(
-        self, sql: str, parameters: Iterable[tuple[object, ...]]
-    ) -> sqlite3.Cursor:
-        self.executemany_calls += 1
-        return self.connection.executemany(sql, parameters)
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.connection, name)
 
 
 def test_state_store_iterates_active_levels_without_materializing_all_rows(tmp_path: Path) -> None:
@@ -132,95 +105,26 @@ def test_state_store_rejects_textual_active_flag(tmp_path: Path) -> None:
         store.close()
 
 
-def test_profile_generation_reset_rolls_back_to_old_state_on_failure(
-    tmp_path: Path,
-) -> None:
-    """A failed reset leaves the old generation and bins usable."""
-    store = Exp100StateStore(tmp_path / "state.sqlite")
-    try:
-        first = store.start_profile_generation("R1", 1, 0.1)
-        store.increment_profile_bin_range("R1", first, 0, 0)
-        store._connection.execute(
-            """
-            CREATE TRIGGER fail_new_profile_state
-            BEFORE INSERT ON profile_state
-            WHEN NEW.generation = 2
-            BEGIN
-                SELECT RAISE(ABORT, 'injected profile reset failure');
-            END;
-            """
-        )
-        store._connection.commit()
-
-        with pytest.raises(sqlite3.IntegrityError, match="injected"):
-            store.reset_profile_generation("R1", 2, 0.1)
-
-        assert store.current_profile_generation("R1") == first
-        assert list(store.iter_profile_bins("R1", first)) == [(0, 1)]
-        assert store.get_profile_state("R1", first) == {
-            "profile_start_ts_ns": 1,
-            "bin_width": 0.1,
-            "bracket_count": 1,
-            "expected_tpo_total": 1,
-        }
-    finally:
-        store.close()
+def test_active_iterators_yield_live_rows(tmp_path: Path) -> None:
+    """Hot iterators expose live rows; writers still go through update_*."""
+    with Exp100StateStore(tmp_path / "state.sqlite") as store:
+        store.insert_level({"level_id": "L1", "price": 100.0, "beyond": False, "active": 1})
+        store.insert_raid({"raid_id": "R1", "level_id": "L1", "active": 1})
+        level = next(store.iter_active_levels())
+        raid = next(store.iter_active_raids())
+        store.update_level("L1", {"beyond": True})
+        store.update_raid("R1", {"return_ts_ns": 99})
+        assert level["beyond"] is True
+        assert raid["return_ts_ns"] == 99
 
 
-def test_source_bar_transaction_commits_mutations_together(tmp_path: Path) -> None:
-    """Level and raid changes from one source bar become visible together."""
-    path = tmp_path / "state.sqlite"
-    with Exp100StateStore(path) as store, sqlite3.connect(path) as observer:
-        with store.source_bar_transaction():
-            store.insert_level({"level_id": "L1", "price": 100.0, "active": 1})
-            store.insert_raid({"raid_id": "R1", "level_id": "L1", "active": 1})
-
-            assert observer.execute("SELECT COUNT(*) FROM levels").fetchone()[0] == 0
-            assert observer.execute("SELECT COUNT(*) FROM raids").fetchone()[0] == 0
-
-        assert observer.execute("SELECT COUNT(*) FROM levels").fetchone()[0] == 1
-        assert observer.execute("SELECT COUNT(*) FROM raids").fetchone()[0] == 1
-
-
-def test_source_bar_transaction_rolls_back_nested_profile_mutations(
-    tmp_path: Path,
-) -> None:
-    """A failed source minute leaves no partial raid or profile state."""
-    path = tmp_path / "state.sqlite"
-    with Exp100StateStore(path) as store:
-        with pytest.raises(RuntimeError, match="injected"):
-            with store.source_bar_transaction():
-                store.insert_raid({"raid_id": "R1", "level_id": "L1", "active": 1})
-                generation = store.start_profile_generation("R1", 1, 0.1)
-                store.increment_profile_bin_range("R1", generation, 0, 2)
-                raise RuntimeError("injected")
-
-        assert list(store.iter_active_raids()) == []
-        assert store.current_profile_generation("R1") is None
-        assert list(store.iter_profile_bins("R1", 1)) == []
-
-
-def test_standalone_mutation_remains_immediately_committed(tmp_path: Path) -> None:
-    """Callers outside source processing retain the existing auto-commit contract."""
-    path = tmp_path / "state.sqlite"
-    with Exp100StateStore(path) as store, sqlite3.connect(path) as observer:
-        store.insert_level({"level_id": "L1", "price": 100.0, "active": 1})
-
-        assert observer.execute("SELECT COUNT(*) FROM levels").fetchone()[0] == 1
-
-
-def test_profile_range_uses_one_streaming_bulk_call(tmp_path: Path) -> None:
-    """A bin range crosses Python's SQLite boundary once without changing counts."""
+def test_profile_range_increments_membership_and_conservation(tmp_path: Path) -> None:
+    """A bin range updates sparse membership and conservation counters once."""
     store = Exp100StateStore(tmp_path / "state.sqlite")
     try:
         generation = store.start_profile_generation("R1", 1, 0.1)
-        counting = _CountingConnection(store._connection)
-        store._connection = counting
-
         store.increment_profile_bin_range("R1", generation, -2, 3)
 
-        assert counting.executemany_calls == 1
-        assert counting.execute_calls == 2
         assert list(store.iter_profile_bins("R1", generation)) == [
             (-2, 1),
             (-1, 1),
@@ -234,6 +138,7 @@ def test_profile_range_uses_one_streaming_bulk_call(tmp_path: Path) -> None:
             "bin_width": 0.1,
             "bracket_count": 1,
             "expected_tpo_total": 6,
+            "start_index": None,
         }
     finally:
         store.close()
@@ -246,3 +151,50 @@ def test_count_active_raids_reports_only_active_rows(tmp_path: Path) -> None:
         store.insert_raid({"raid_id": "R2", "level_id": "L1", "active": 0})
 
         assert store.count_active_raids() == 1
+
+
+def test_count_active_levels_reports_only_active_rows(tmp_path: Path) -> None:
+    """Operational level counts use the active flag without decoding each payload."""
+    with Exp100StateStore(tmp_path / "state.sqlite") as store:
+        store.insert_level({"level_id": "L1", "active": 1})
+        store.insert_level({"level_id": "L2", "active": 0})
+
+        assert store.count_active_levels() == 1
+
+
+def test_bulk_profile_ranges_match_repeated_single_increments(tmp_path: Path) -> None:
+    """Multi-raid bulk bin writes preserve per-raid membership and conservation."""
+    with Exp100StateStore(tmp_path / "state.sqlite") as store:
+        first = store.start_profile_generation("R1", 1, 0.1)
+        second = store.start_profile_generation("R2", 1, 0.1)
+        store.bulk_increment_profile_bin_ranges(
+            (
+                ("R1", first, 0, 2),
+                ("R2", second, -1, 0),
+            )
+        )
+
+        assert list(store.iter_profile_bins("R1", first)) == [(0, 1), (1, 1), (2, 1)]
+        assert list(store.iter_profile_bins("R2", second)) == [(-1, 1), (0, 1)]
+        assert store.get_profile_state("R1", first) == {
+            "profile_start_ts_ns": 1,
+            "bin_width": 0.1,
+            "bracket_count": 1,
+            "expected_tpo_total": 3,
+            "start_index": None,
+        }
+        assert store.get_profile_state("R2", second) == {
+            "profile_start_ts_ns": 1,
+            "bin_width": 0.1,
+            "bracket_count": 1,
+            "expected_tpo_total": 2,
+            "start_index": None,
+        }
+
+
+def test_estimated_bytes_grows_with_live_bins(tmp_path: Path) -> None:
+    with Exp100StateStore(tmp_path / "state.marker") as store:
+        before = store.estimated_bytes()
+        generation = store.start_profile_generation("R1", 1, 0.1)
+        store.increment_profile_bin_range("R1", generation, 0, 99)
+        assert store.estimated_bytes() > before

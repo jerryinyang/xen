@@ -57,7 +57,9 @@ class PersistingWriter:
 def make_processor(
     tmp_path: Path,
     *,
-    observation_minutes: int = OBSERVATION_MINUTES,
+    # Default 1m observation so unit tests exercise raid lifecycle one-for-one
+    # with fed bars. Production cells use 15/30/60; raid lifecycle follows that TF.
+    observation_minutes: int = 1,
     confirmation_method: str = "BREAKOUT_BAR",
     memory_guard: MemoryGuard | None = None,
     sinks: Exp100Sinks | None = None,
@@ -68,7 +70,9 @@ def make_processor(
         instrument_id="BTCUSDT-LINEAR.BYBIT",
         observation_minutes=observation_minutes,
         confirmation_method=confirmation_method,
-        confirmation_reference="1H" if observation_minutes in {15, 30} else "1D",
+        confirmation_reference=(
+            "1H" if observation_minutes in {1, 15, 30} else "4H"
+        ),
         level_config="PREVIOUS_1H",
     )
     if sinks is None:
@@ -135,16 +139,23 @@ def feed_complete_window(
     return start_ts_ns + (minutes - 1) * MINUTE_NS
 
 
-def test_processor_keeps_ambiguous_same_bar_raid_out_of_primary_result(tmp_path: Path) -> None:
-    """A same-1m cross and return is retained but cannot become primary."""
+def test_processor_keeps_same_bar_cross_and_return_as_live_raid(tmp_path: Path) -> None:
+    """AMENDMENT-13: same-bar beyond+return starts a live raid, not AMBIGUOUS."""
     processor, sinks = make_processor(tmp_path)
     processor.seed_level("L1", price=100.0, side="HIGH")
     processor.on_one_minute_bar(BarRecord(0, 100.0, 101.0, 99.0, 100.0, 1.0, 1))
-    processor.finish(0)
 
+    live = list(processor.state.iter_active_raids())
+    assert len(live) == 1
+    assert live[0]["sweep_ts_ns"] == 0
+    assert live[0]["return_ts_ns"] == 0
+    assert live[0]["confirmation_ts_ns"] is None
+    assert sinks.raids.rows == []
+
+    processor.finish(0)
     assert len(sinks.raids.rows) == 1
     row = sinks.raids.rows[0]
-    assert row["status"] == "AMBIGUOUS_INTRABAR"
+    assert row["status"] == "RIGHT_CENSORED_CONFIRMATION"
     assert row["primary_completed"] is False
     assert row["sweep_ts_ns"] == 0
     assert row["return_ts_ns"] == 0
@@ -210,28 +221,51 @@ def test_processor_replay_is_deterministic_and_leaves_no_terminal_state(tmp_path
     assert second_snapshot["open_raids"] == 0
 
 
-def test_processor_uses_one_transaction_for_a_source_minute(tmp_path: Path) -> None:
-    """One source minute commits all of its SQLite state changes once."""
+def test_processor_source_minute_creates_raid_under_transaction(tmp_path: Path) -> None:
+    """One source minute applies level/raid mutations through the bar transaction."""
     processor, _ = make_processor(tmp_path)
     processor.seed_level("L1", price=100.0, side="HIGH")
-    statements: list[str] = []
-    processor.state._connection.set_trace_callback(statements.append)
 
     processor.on_one_minute_bar(
         BarRecord(0, 100.8, 101.0, 100.5, 100.8, 1.0, 1)
     )
 
-    transaction_statements = [
-        statement
-        for statement in statements
-        if statement in {"BEGIN IMMEDIATE", "BEGIN", "COMMIT", "ROLLBACK"}
-    ]
-    assert transaction_statements == ["BEGIN IMMEDIATE", "COMMIT"]
+    assert processor.state._transaction_depth == 0
     assert next(processor.state.iter_active_raids())["raid_id"] == "L1:raid:1"
 
 
-def test_processor_scans_active_raids_once_per_source_minute(tmp_path: Path) -> None:
-    """Profile, swing, and return handling share one streaming raid cursor."""
+def test_processor_skips_level_writes_when_beyond_flag_is_unchanged(
+    tmp_path: Path,
+) -> None:
+    """Unchanged beyond state must not rewrite the level row every source minute."""
+    processor, _ = make_processor(tmp_path)
+    processor.seed_level("L1", price=100.0, side="HIGH")
+    # Establish beyond=true once.
+    processor.on_one_minute_bar(BarRecord(0, 100.8, 101.0, 100.5, 100.8, 1.0, 1))
+    updates: list[tuple[str, dict[str, Any]]] = []
+    original = processor.state.update_level
+
+    def counted(level_id: str, fields: dict[str, Any]) -> None:
+        updates.append((level_id, dict(fields)))
+        original(level_id, fields)
+
+    processor.state.update_level = counted  # type: ignore[method-assign]
+
+    # Still beyond without a return; beyond flag is unchanged.
+    processor.on_one_minute_bar(
+        BarRecord(MINUTE_NS, 100.9, 101.2, 100.6, 101.0, 1.0, 1)
+    )
+
+    assert updates == []
+    raid = next(processor.state.iter_active_raids())
+    assert raid["return_ts_ns"] is None
+    assert next(processor.state.iter_active_levels())["beyond"] is True
+
+
+def test_processor_scans_active_raids_for_tpo_and_observation_lifecycle(
+    tmp_path: Path,
+) -> None:
+    """1m TPO pass and observation-TF return pass each stream active raids once."""
     processor, _ = make_processor(tmp_path)
     processor.seed_level("L1", price=100.0, side="HIGH")
     processor.on_one_minute_bar(BarRecord(0, 100.8, 101.0, 100.5, 100.8, 1.0, 1))
@@ -248,7 +282,8 @@ def test_processor_scans_active_raids_once_per_source_minute(tmp_path: Path) -> 
         BarRecord(MINUTE_NS, 100.9, 101.2, 100.6, 101.0, 1.0, 1)
     )
 
-    assert calls == 1
+    # observation_minutes=1 collapses both passes onto the same bar.
+    assert calls == 2
     raid = next(original())
     assert raid["raid_id"] == "L1:raid:1"
     assert raid["return_ts_ns"] is None
@@ -291,11 +326,11 @@ def test_profile_receives_every_source_minute_after_its_first_excursion(
         assert profile["gap_span_va"] is not None
 
 
-def test_processor_selects_only_latest_resolvable_raid_for_one_reference_event(
+def test_processor_confirms_all_eligible_raids_and_keeps_only_latest_primary(
     tmp_path: Path,
 ) -> None:
-    """Confirming every active raid would duplicate one reference outcome."""
-    processor, _ = make_processor(tmp_path)
+    """Close-all-eligible: earlier raids settle non-primary; latest stays primary."""
+    processor, sinks = make_processor(tmp_path)
     for raid_id, level_id, sweep_ts_ns in (("R1", "L1", 10), ("R2", "L2", 20)):
         processor.state.insert_raid(
             {
@@ -316,9 +351,14 @@ def test_processor_selects_only_latest_resolvable_raid_for_one_reference_event(
     processor._previous_reference = BarRecord(60, 100.0, 101.0, 100.0, 100.5, 1.0, 1)
     processor._on_reference_bar(BarRecord(120, 100.0, 100.0, 99.0, 99.5, 1.0, 1))
 
-    rows = {row["raid_id"]: row for row in processor.state.iter_active_raids()}
-    assert rows["R1"]["confirmation_ts_ns"] is None
-    assert rows["R2"]["confirmation_ts_ns"] == 120
+    live = list(processor.state.iter_active_raids())
+    assert len(live) == 1
+    assert live[0]["raid_id"] == "R2"
+    assert live[0]["confirmation_ts_ns"] == 120
+    assert live[0]["primary_attribution"] is True
+    assert sinks.raids.rows[0]["raid_id"] == "R1"
+    assert sinks.raids.rows[0]["status"] == "CONFIRMED_NON_PRIMARY"
+    assert sinks.raids.rows[0]["primary_attribution"] is False
 
 
 def test_processor_retains_repeated_raids_after_a_return(tmp_path: Path) -> None:
@@ -359,16 +399,17 @@ def test_level_close_uses_higher_degree_levels_not_raid_price(tmp_path: Path) ->
             }
         )
     # previous reference high/low = 101/99; close 90 is beyond the low → expected.
-    # Both raids share that confirmation level; the most recent resolvable raid wins.
+    # Both raids share that confirmation level; latest stays primary, earlier closes.
     processor._previous_reference = BarRecord(60, 100.0, 101.0, 99.0, 100.0, 1.0, 1)
     processor._on_reference_bar(BarRecord(120, 95.0, 95.0, 90.0, 90.0, 1.0, 1))
 
-    rows = {row["raid_id"]: row for row in processor.state.iter_active_raids()}
-    assert rows["R1"]["confirmation_ts_ns"] is None
-    assert rows["R2"]["confirmation_ts_ns"] == 120
-    assert rows["R2"]["confirmation_level_high"] == 101.0
-    assert rows["R2"]["confirmation_level_low"] == 99.0
-    assert rows["R2"]["confirmation_level_low"] != rows["R2"]["level_price"]
+    live = list(processor.state.iter_active_raids())
+    assert len(live) == 1
+    assert live[0]["raid_id"] == "R2"
+    assert live[0]["confirmation_ts_ns"] == 120
+    assert live[0]["confirmation_level_high"] == 101.0
+    assert live[0]["confirmation_level_low"] == 99.0
+    assert live[0]["confirmation_level_low"] != live[0]["level_price"]
 
 
 def test_level_close_endpoint_uses_higher_degree_levels(tmp_path: Path) -> None:
@@ -396,10 +437,10 @@ def test_level_close_endpoint_uses_higher_degree_levels(tmp_path: Path) -> None:
     processor._previous_reference = BarRecord(120, 99.0, 100.0, 98.0, 99.0, 1.0, 1)
     processor._on_reference_bar(BarRecord(180, 105.0, 106.0, 104.0, 105.0, 1.0, 1))
 
-    # close 105 > previous.high 100 → opposing for HIGH; most recent primary wins.
-    assert sinks.raids.rows[0]["raid_id"] == "R2"
-    assert sinks.raids.rows[0]["status"] == "COMPLETED"
-    assert next(processor.state.iter_active_raids())["raid_id"] == "R1"
+    # close 105 > previous.high 100 → opposing for HIGH; every primary completes.
+    completed = {row["raid_id"]: row["status"] for row in sinks.raids.rows}
+    assert completed == {"R1": "COMPLETED", "R2": "COMPLETED"}
+    assert list(processor.state.iter_active_raids()) == []
 
 
 def test_mixed_side_reference_processes_expected_and_opposing_candidates_independently(
@@ -427,8 +468,10 @@ def test_mixed_side_reference_processes_expected_and_opposing_candidates_indepen
     processor._previous_reference = BarRecord(60, 100.0, 101.0, 100.0, 100.5, 1.0, 1)
     processor._on_reference_bar(BarRecord(120, 100.0, 100.0, 99.0, 99.5, 1.0, 1))
 
-    assert next(processor.state.iter_active_raids())["raid_id"] == "R1"
-    assert next(processor.state.iter_active_raids())["confirmation_ts_ns"] == 120
+    live = list(processor.state.iter_active_raids())
+    assert len(live) == 1
+    assert live[0]["raid_id"] == "R1"
+    assert live[0]["confirmation_ts_ns"] == 120
     assert sinks.raids.rows[0]["raid_id"] == "R2"
     assert sinks.raids.rows[0]["status"] == "FAILED_BREAKOUT"
 
@@ -535,7 +578,9 @@ def test_profile_is_emitted_before_public_cleanup_and_terminal_raid_is_refreshed
 ) -> None:
     """A sink failure must not erase a profile before its terminal row is appended."""
     processor, sinks = make_processor(tmp_path)
-    generation = processor._profiles.start("R1", 1, excursion_price=101.0, atr_unit=1.0)
+    generation, _bin_width = processor._profiles.start(
+        "R1", 1, excursion_price=101.0, atr_unit=1.0
+    )
     processor._profiles.add_bar(
         "R1", generation, BarRecord(2, 100.0, 101.0, 100.0, 100.5, 1.0, 1)
     )
@@ -567,8 +612,8 @@ def test_profile_is_emitted_before_public_cleanup_and_terminal_raid_is_refreshed
     assert sinks.raids.rows[0]["profile_finalized"] is True
 
 
-def test_processor_uses_closed_one_hour_and_one_day_references(tmp_path: Path) -> None:
-    """A 1H/1D event is unavailable until its completed reference closes."""
+def test_processor_uses_closed_one_hour_and_four_hour_references(tmp_path: Path) -> None:
+    """A 1H/4H event is unavailable until its completed reference closes."""
     hourly, _ = make_processor(tmp_path / "hourly")
     hourly.state.insert_raid(
         {
@@ -590,8 +635,8 @@ def test_processor_uses_closed_one_hour_and_one_day_references(tmp_path: Path) -
     hourly._on_reference_bar(BarRecord(120, 100.0, 100.0, 99.0, 99.5, 1.0, 60))
     assert next(hourly.state.iter_active_raids())["confirmation_ts_ns"] == 120
 
-    daily, _ = make_processor(tmp_path / "daily", observation_minutes=60)
-    daily.state.insert_raid(
+    four_hour, _ = make_processor(tmp_path / "four_hour", observation_minutes=60)
+    four_hour.state.insert_raid(
         {
             "raid_id": "R1",
             "level_id": "L1",
@@ -607,9 +652,9 @@ def test_processor_uses_closed_one_hour_and_one_day_references(tmp_path: Path) -
             "active": 1,
         }
     )
-    daily._previous_reference = BarRecord(1_440, 100.0, 101.0, 100.0, 100.5, 1.0, 1_440)
-    daily._on_reference_bar(BarRecord(2_880, 100.0, 100.0, 99.0, 99.5, 1.0, 1_440))
-    assert next(daily.state.iter_active_raids())["confirmation_ts_ns"] == 2_880
+    four_hour._previous_reference = BarRecord(240, 100.0, 101.0, 100.0, 100.5, 1.0, 240)
+    four_hour._on_reference_bar(BarRecord(480, 100.0, 100.0, 99.0, 99.5, 1.0, 240))
+    assert next(four_hour.state.iter_active_raids())["confirmation_ts_ns"] == 480
 
 
 def test_confirmation_and_endpoint_capture_causal_feature_state(tmp_path: Path) -> None:

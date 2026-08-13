@@ -1,6 +1,6 @@
 # CF-LIQSWP-001 — Liquidity Sweeps
 
-- **Status:** `REGISTERED` — 2026-08-11, checkpoint-019
+- **Status:** `REGISTERED` — 2026-08-11, checkpoint-019; amended 2026-08-13 (AMENDMENT-6/7/8/9/10/11/12/13)
 - **Chapter:** 06
 - **Source of truth:** `docs/experiments-docs/checkpoints/2026-08-11-019-liquidity-sweeps/liquidity.md`
 - **Checkpoint:** `docs/experiments-docs/checkpoints/2026-08-11-019-liquidity-sweeps/design.md`
@@ -19,12 +19,15 @@ the raid live and does not make a cost-complete trading or deployment claim.
 
 ### Universes and timeframes
 
-- Bybit: top 10 admitted USDT linear perpetuals by 30-day `sum(close*volume)`
-  at the TRAIN boundary. Pin: `cf-liqswp-001-universe.json`.
-- cTrader: `EURUSD.CTrader`, `XAUUSD.CTrader`, and `USTEC.CTrader`, kept
-  separate from Bybit and from one another.
-- Observation timeframes: 15m, 30m, 1h.
-- Engine input: 1m bars. Base-bar parity uses `xen.bar_aggregator`.
+- **cTrader only (AMENDMENT-7):** `EURUSD.CTrader`, `XAUUSD.CTrader`, and
+  `USTEC.CTrader`, kept separate from one another. Pin:
+  `cf-liqswp-001-universe.json`.
+- **Bybit/crypto:** excluded until a later operator amendment.
+- Observation timeframes: 15m, 30m, 1h. Raid start, return, and beyond are
+  decided on these bars (SoT bar-by-bar grain; AMENDMENT-8). Same-bar return
+  does not close a raid (AMENDMENT-13).
+- Engine input: 1m bars. Base-bar parity uses `xen.bar_aggregator`. 1m remains
+  the TPO / max-excursion / swing-extreme / fill-path grain (AMENDMENT-3).
 - All distances are emitted in raw price, bps, and ATR units. The ATR unit is
   causal Wilder ATR(14) on the observation timeframe, using only completed bars.
 
@@ -33,29 +36,38 @@ the raid live and does not make a cost-complete trading or deployment claim.
 1. Previous completed 1H, 4H, 1D, and 1W highs and lows.
 2. Previous completed Asia, Europe, and America session highs and lows using
    the approved local IANA/DST-aware windows.
-3. Causal rolling highest-high and lowest-low over 16, 32, 64, 128, and 256
-   completed observation bars.
+3. Causal rolling highest-high and lowest-low over 7, 14, 22, and 252
+   completed observation bars (AMENDMENT-11).
 
-All four timeframe levels are included. Each level keeps a stable source identity and remains
-tracked until its direction-opposing event. Coincident prices are not merged.
+Previous 1D/1W levels are the last completed New York 17:00 trading day and the
+last completed Monday–Friday trading week (AMENDMENT-10). They are not
+contiguous 1,440/10,080-minute bars.
+
+All four timeframe levels are included. Each level keeps a stable source identity.
+Coincident prices are not merged. Raid lifetime follows AMENDMENT-6 (below).
 
 ### Raid state
 
-- High excursion: a 1m high strictly above the level.
-- Low excursion: a 1m low strictly below the level.
-- Return: a later inclusive touch back to the level.
-- A same-bar cross-and-return is retained as `AMBIGUOUS_INTRABAR` and excluded
-  from the primary completed-raid estimand.
+- High excursion / raid start: a completed observation-bar high strictly above the level.
+- Low excursion / raid start: a completed observation-bar low strictly below the level.
+- Return: an inclusive observation-bar touch back to the level, same bar or later.
+  Recorded; does not open or close the raid (AMENDMENT-13).
+- Same-bar pierce-and-return stays live until confirmation/fail or TRAIN censor.
+  `AMBIGUOUS_INTRABAR` is retired.
+- A 1-minute wick that does not survive the observation OHLC is not a raid
+  (AMENDMENT-8; original SoT grain).
 - Every completed raid is retained. Previous raids on the same level are linked
   and counted; they are not collapsed.
-- If multiple levels are raided before confirmation, the most recent resolvable
-  raid receives primary attribution. Same-bar ties remain explicitly tied while
-  all levels retain their excursion state.
+- If multiple levels/raids are eligible before confirmation, the most recent
+  resolvable raid receives primary attribution (AMENDMENT-6). Same-bar ties
+  remain explicitly tied. Each raid retains its own excursion state through
+  settlement.
 
 ### Confirmation and outcome
 
-For 15m/30m observations, confirmation events use 1H levels. For 1h
-observations, they use 1D levels. The two confirmation definitions are separate:
+For 15m/30m observations, confirmation events use 1H. For 1h observations,
+both 1H and 4H are kept as separate strata (AMENDMENT-9). 1D confirmation is
+retired. The two confirmation definitions are separate:
 
 - `BREAKOUT_BAR`: the completed higher-timeframe bar closes beyond the previous
   completed higher-timeframe bar’s high or low.
@@ -63,10 +75,14 @@ observations, they use 1D levels. The two confirmation definitions are separate:
   configured higher-degree level. Every level configuration is reported
   separately; overlapping configurations are not silently pooled.
 
-The expected-side event confirms a sweep. An excursion-side event confirms a
-breakout and retains the raid as a failed sweep. The later swing ends at the
-first opposing confirmation event after sweep confirmation. No arbitrary
-timeout is imposed; unresolved paths are right-censored at the TRAIN boundary.
+**AMENDMENT-6 (close-all-eligible):** on each completed reference event, every
+eligible returned unconfirmed raid is settled. Expected-side: latest raid stays
+primary and live for the later swing; earlier eligible raids close immediately
+as `CONFIRMED_NON_PRIMARY` with profiles finalized at that close. Opposing-side:
+every eligible returned unconfirmed raid fails as `FAILED_BREAKOUT`. Every
+primary-attributed confirmed raid completes on the first opposing reference
+event after confirmation. No arbitrary timeout; unresolved paths are
+right-censored at the TRAIN boundary.
 
 ### TPO value gap
 
@@ -84,7 +100,7 @@ outer span are emitted.
 ```text
 VA_width = VAH - VAL
 gap_span = gap_high - gap_low
-tight_gap = gap_span < 0.30 * VA_width
+tight_gap = gap_span < 0.50 * VA_width
 ```
 
 `tight_gap` is an event label, not a machine verdict. Zero/undefined ATR,
@@ -108,7 +124,7 @@ degenerate profiles, and bin-resolution limits receive explicit reason codes.
   `swing_atr > max_excursion_atr` are used.
 - No cost, spread, funding, commission, tradability, or deployability claim.
 - No TEST or holdout reads.
-- No pooled Bybit/cTrader verdict.
+- No pooled cross-asset verdict. Bybit is out of scope (AMENDMENT-7).
 
 ## Implementation path
 
@@ -119,6 +135,15 @@ Python validates emitted state and computes the registered estimands only.
 ## Real-price and holdout discipline
 
 Signals and event states use confirmed data through `t-1` at the decision bar
-open. One-minute fill simulation remains engine-native. The global Bybit and
-cTrader fences are asserted before data access, and holdout data is never
+open. One-minute fill simulation remains engine-native. The cTrader INFR-021
+fence is asserted before data access (AMENDMENT-7). Holdout data is never
 loaded.
+
+## Evidence record
+
+| Experiment | Evidence disposition | Read accounting |
+|---|---|---|
+| `EXP-100` / `HYP-000` | Complete; 264/264 AMENDMENT-13 TRAIN cells passed validity checks. Operator verdict: HYP-000 upheld — “EXP-100 approved as recommended and confirmed.” | 0 counted TEST reads; holdout sealed |
+
+This is an evidence row only. The family status remains `REGISTERED`; family
+promotion, closure, or retirement is reserved for a checkpoint retrospective.
