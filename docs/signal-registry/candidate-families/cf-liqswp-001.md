@@ -1,6 +1,6 @@
 # CF-LIQSWP-001 — Liquidity Sweeps
 
-- **Status:** `REGISTERED` — 2026-08-11, checkpoint-019; amended 2026-08-13 (AMENDMENT-6/7/8/9/10/11/12/13)
+- **Status:** `REGISTERED` — 2026-08-11, checkpoint-019; amended 2026-08-13 (AMENDMENT-6/7/8/9/10/11/12/13/14); family status unchanged
 - **Chapter:** 06
 - **Source of truth:** `docs/experiments-docs/checkpoints/2026-08-11-019-liquidity-sweeps/liquidity.md`
 - **Checkpoint:** `docs/experiments-docs/checkpoints/2026-08-11-019-liquidity-sweeps/design.md`
@@ -84,6 +84,11 @@ primary-attributed confirmed raid completes on the first opposing reference
 event after confirmation. No arbitrary timeout; unresolved paths are
 right-censored at the TRAIN boundary.
 
+AMENDMENT-14 adds `pre_mfe_retrace={price,status}` for the side-aware maximum
+pre-terminal-MFE retracement after confirmation. `AMBIGUOUS_SAME_BAR` and
+`NO_POST_CONFIRMATION_MFE` remain explicit states; the field changes no population,
+control, or HYP-000 false qualifier.
+
 ### TPO value gap
 
 The profile is built online from 1m bars between the maximum-excursion-setting
@@ -143,8 +148,12 @@ loaded.
 
 | Experiment | Evidence disposition | Read accounting |
 |---|---|---|
-| `EXP-100` / `HYP-000` | Complete; 264/264 AMENDMENT-13 TRAIN cells passed validity checks. Operator verdict: HYP-000 upheld — “EXP-100 approved as recommended and confirmed.” | 0 counted TEST reads; holdout sealed |
-| `EXP-100` / `HYP-000` AMENDMENT-14 | Operator authorised one neutral forward emission field (`pre_mfe_retrace`), stale-output replacement, full 264-cell TRAIN rerun, and fresh analysis. Prior AMENDMENT-13 evidence remains historical; no family-status change. | 0 counted TEST reads; holdout sealed |
+| `EXP-100` / `HYP-000` AMENDMENT-14 | **COMPLETED — operator-approved with scoped exclusion.** Retain the current 264-cell TRAIN run. Exclude every ATR-undefined excursion and derived value: 780/9,840,478 emitted rows affected (0.007926%); 390 unique affected objects after method deduplication; 84 affected primary/completed rows; median affected understatement 71.43%. Coverage, chronology, lifecycle, status, attribution, and the finite-population future-destroy result are retained. Analyst assigned no replacement verdict; operator verdict is recorded separately in the report. | 0 counted TEST reads; 0 holdout reads; 0 candidate slots |
 
-This is an evidence row only. The family status remains `REGISTERED`; family
-promotion, closure, or retirement is reserved for a checkpoint retrospective.
+Binding operator verdict: “retain the current run; ATR-undefined excursion values are
+limited/invalid and must be excluded from all interpretations; make no implementation changes;
+perform no reruns/emissions.”
+
+This is an evidence row only. The family status remains `REGISTERED`; no checkpoint family
+decision exists. Family promotion, closure, or retirement is reserved for an operator-signed
+checkpoint retrospective.

@@ -48,14 +48,15 @@ Only integrity findings in this section have blocking authority. Research observ
 | Identity, joins, chronology, statuses | **PASS** | `scan_summary.json.integrity_fail_sums`: duplicate raid/level IDs, missing/extra profiles, chronology/grid failures, active residuals, retired statuses, invalid AMENDMENT-14 fields, fills, and ambiguous retired closures are all 0 |
 | Future-destroy integrity control | **PASS for its declared finite-primary population** | `amendment_summary.json.control`: 264/264 cell summaries pass. Each cell uses 462–6,580 aligned finite primary raid pairs (115–5,269 level clusters). Alignment-collapse fractions are 0.02695–0.32993; destroyed-alignment survival fractions are 0.67007–0.97305; 0 block-fragile cells. Definitions are in §2.2. |
 | Golden lifecycle fixture | **PASS after fixture correction** | `probe_integrity.json.golden.checks` and `.same_bar_return_golden.checks`: all lifecycle/cardinality/attribution booleans are true. The old fixture allowed valid re-piercing, then incorrectly required one terminal row per level. |
-| ATR-undefined initial maximum excursion | **FAIL (scoped implementation defect)** | `probe_integrity.json.atr_undefined_initial_observation_extreme`: a 15m observation whose first beyond minute is 100.8 and later high is 101.2 emits `max_excursion=0.8`, not 1.2, when `profile_generation=null` / `ATR_UNDEFINED`. |
+| ATR-undefined initial maximum excursion | **FAIL (scoped implementation defect)** | `atr_undefined_prevalence.json`: 868 ATR-undefined raids took the no-profile path; 780 (89.862%) emit a smaller max than the side-aware high/low of their completed initial observation. `probe_integrity.json` supplies the targeted trace. |
 | Price-primary / no trading path | **Artifact-consistent** | `scan_summary.json`: Nautilus version `1.230.0`, `n_fills: 0`; no P&L or fill estimand is analysed. The supplied artifacts do not independently attest every implementation provenance line |
 
 **Blocking conclusion (observed):** the supplied family gate still reports `blocking_pass: true`,
 but the independent golden follow-up found a scoped state-measurement defect. Interpretation stops
-for `max_price`, `max_excursion`, and derived excursion fields on ATR-undefined raids; TPO already
-reports those profiles as undefined. Count, identity, chronology, status, finite-primary control,
-and grid-marginal reads below do not use the defective value path. This is not evidence of economic value.
+for `max_price`, `max_excursion`, and derived excursion fields on the 868 ATR-undefined raids; 780
+are numerically understated and 88 have zero observed initial-bar impact. Count, identity,
+chronology, status, finite-primary control, and grid-marginal reads below do not use the defective
+value path. This is not evidence of economic value.
 
 ## 2. Question list and answers
 
@@ -81,14 +82,16 @@ artifacts.
    789,326 completed primary raids. No 264-row listing is needed to disclose layer concentration.
 6. **Identity/profile/status integrity?** ANSWERED — duplicate raid/level IDs, missing/extra
    profiles, active residuals, and retired status hits are all 0. Defined TPO profiles total
-   9,794,210; undefined profiles total 46,268.
+   9,794,210; undefined profiles total 46,268: 45,400 `GAP_UNDEFINED` and 868
+   `ATR_UNDEFINED`.
 7. **Causal timestamps and fences?** ANSWERED — chronology and minute-grid failure sums are 0;
    only 31,652 censor and 31,652 endpoint stamps equal TRAIN end; none is later or in holdout.
 8. **Independent and golden reproduction?** ANSWERED with a scoped failure — three sampled
    finite-ATR EURUSD-15m raids reproduce emitted max excursion exactly from observation marks.
    Corrected lifecycle fixtures are uniformly green and show CONFIRMED_NON_PRIMARY and primary
-   COMPLETED paths. A separate ATR-undefined trace fails maximum-excursion identity: 0.8 emitted
-   versus the completed observation's 1.2 (§1/§4).
+   COMPLETED paths. The targeted ATR-undefined trace fails maximum-excursion identity: 0.8 emitted
+   versus the completed observation's 1.2. Family-wide reconstruction finds 780/868 exposed rows
+   with the same direction of mismatch (§6.1).
 9. **AMENDMENT-3 grain?** ANSWERED — 14,583,052 source minutes are not themselves completed
    observations, consistent with real 1m input feeding coarser observations; invalid
    observation-source count is 0. The artifact does not expose a standalone synthetic-bar
@@ -133,10 +136,11 @@ artifacts.
     ranges 0.02695–0.32993 (median 0.19697). Destroyed-alignment survival fraction
     `destroyed alignment fraction / raw alignment fraction` ranges 0.67007–0.97305. Each raw
     or destroyed alignment fraction uses the cell's 462–6,580 aligned finite primary raid pairs
-    as denominator; the numerator is pairs where the emitted `strong_move` agrees with the
-    corresponding raw or destroyed swing/max-excursion comparison. CI-low is 0.01845–0.27397;
-    seed-band global bounds are 0.01768–0.27669; 0 cells are block-fragile. These are
-    integrity-control statistics only.
+    as denominator (789,646 pooled pairs); the numerator is pairs where emitted `strong_move`
+    agrees with the corresponding raw or destroyed swing/max-excursion comparison. CI-low is
+    0.01845–0.27397; seed-band global bounds are 0.01768–0.27669; 0 cells are block-fragile.
+    All ATR-undefined rows are excluded because `max_excursion_atr` is null; the excluded primary
+    subset is 112 rows, 84 materially affected (§6.1). These are integrity-control statistics only.
 23. **Direct method comparison?** ANSWERED — 132/132 same-stratum pairs have equal IDs and
     statuses and 0 count differences. This total overlap is evidence of equivalence for the
     emitted state object, not a ranking or economic comparison.
@@ -253,12 +257,11 @@ and the destroyed equivalent uses the same denominator. Collapse and survival ar
 
 ## 4. Evidence AGAINST the hypothesis
 
-1. **ATR-undefined maximum excursion is under-recorded in the targeted trace (observed).** With
-   no profile generation, the processor retains the first beyond-minute extreme (100.8) and does
-   not advance to the later completed-observation high (101.2): emitted excursion is 0.8 rather
-   than 1.2. This is an implementation defect, not a fixture expectation defect. The emission has
-   46,268 undefined TPO profiles, but this follow-up does not quantify how many have a later within-
-   observation extreme; affected maximum-excursion fields are therefore not interpreted.
+1. **ATR-undefined maximum excursion is under-recorded (observed).** With no profile generation,
+   the processor retains the first beyond-minute extreme and does not advance to a later extreme
+   inside the same completed observation. Exact emission-only reconstruction identifies 868
+   exposed raids and 780 materially changed values (89.862%); 88 have zero observed impact.
+   Affected maximum-excursion fields are not interpreted (§6.1).
 2. **The old aggregate golden cardinality failures were fixture defects (observed).** A same-bar
    return legitimately resets the level for a later re-pierce; subsequent synthetic observations
    then created additional T1/T2 rows, while the harness incorrectly required one row per level.
@@ -313,16 +316,84 @@ and the destroyed equivalent uses the same denominator. Collapse and survival ar
    aggregate checks. The corrected lifecycle checks are all true.
 2. The layer-count question is resolved by `coverage_marginals.json`, which retains all declared
    values and relevant count/status fields.
-3. The control denominator question is resolved in §2.2 and in renamed artifact fields. The open
-   issue is the ATR-undefined maximum-excursion implementation defect and its unquantified reach
-   across the frozen emission.
-4. The 46,268 undefined TPO profiles are counted but not broken down by reason in the summaries.
+3. The control denominator question is resolved in §2.2 and in renamed artifact fields. The
+   ATR-undefined maximum-excursion defect is quantified in §6.1; only still-later post-observation
+   maxima are not identifiable from the frozen emissions.
+4. The 46,268 undefined TPO profiles split into 45,400 `GAP_UNDEFINED` and 868
+   `ATR_UNDEFINED`; only the latter can take the defective no-generation path.
 5. Year totals are not normalized by eligible bars/anchors, so state-frequency stationarity is
    not established.
 6. The 53,496 AMBIGUOUS_SAME_BAR retraces are correctly separated, but the artifacts do not show
    how their fraction varies by stratum.
-7. No implementation or result change is proposed here. Any economic, fill, cost, P&L, or PSR
-   question requires a different trading experiment and cannot be answered from EXP-100.
+7. No strategy, emission, or verdict change is proposed here. Any economic, fill, cost, P&L,
+   or PSR question requires a different trading experiment and cannot be answered from EXP-100.
+
+### 6.1 ATR-undefined defect prevalence and decision impact
+
+Source: `analysis_code/atr_undefined_prevalence.py` →
+`results/analysis/atr_undefined_prevalence.json`. No rerun, catalogue read, strategy import, or
+strategy change was used.
+
+**Identification.** Exposure is the exact intersection of raid
+`profile_undefined_reason=ATR_UNDEFINED` and matching TPO `UNDEFINED/ATR_UNDEFINED`. Joining
+`sweep_ts_ns` to the emitted completed observation mark reconstructs the side-aware initial
+maximum from `RealHigh/RealLow`. Because `first_excursion_ts_ns` is the first source minute
+beyond the level, a larger completed-observation extreme proves a later source minute exceeded
+it. The full source-minute path, exact minute attaining that maximum, and any maximum after the
+initial observation were not emitted and are not reconstructible.
+
+| Population | Explicit denominator | ATR-undefined exposure | Materially changed |
+|---|---:|---:|---:|
+| All raids | 9,840,478 | 868 (0.008821%) | 780 (0.007926%) |
+| All profile-undefined raids | 46,268 | 868 (1.8760%) | 780 (1.6858%) |
+| ATR-undefined raids | 868 | 868 (100%) | 780 (89.8618%) |
+| Primary-attributed raids | 789,832 | 112 (0.014180%) | 84 (0.010635%) |
+| Completed raids | 789,326 | 112 (0.014189%) | 84 (0.010642%) |
+| Future-destroy aligned finite-primary pairs | 789,646 | 0 (0%) | 0 (0%) |
+
+The remaining 88/868 exposed rows (10.1382%) have zero initial-observation understatement.
+Both confirmation methods duplicate the same state objects exactly: 434 exposed / 390 changed
+after method deduplication, versus 868 / 780 emitted cell rows.
+
+**Understatement distribution.** Relative understatement = missing excursion / reconstructed
+initial-observation excursion. “Materially changed” means the side-aware reconstructed max price
+exceeds emitted `max_price` by more than `1e-12 × (1 + |reconstructed max price|)`; this is
+numerical materiality, not an economic threshold.
+
+| Population | n | Absolute mean / median / p95 / max (raw price units) | Relative mean / median / p95 / max |
+|---|---:|---:|---:|
+| All ATR-undefined, zeros included | 868 | 4.6982 / 0.6100 / 24.1000 / 37.1000 | 59.13% / 63.75% / 96.77% / 99.57% |
+| Materially changed only | 780 | 5.2283 / 0.8800 / 24.1000 / 37.1000 | 65.80% / 71.43% / 96.81% / 99.57% |
+
+Pooled absolute magnitudes mix instrument units; use the instrument rows below. Relative values
+are comparable across layers. The compact JSON retains absolute and relative q0/q25/q50/q75/
+q90/q95/q99/q100 for every layer value, including zero-exposure configs.
+
+| Layer | Value | Exposed | Changed (% exposed) | Changed absolute median / p95 | Changed relative median / p95 |
+|---|---|---:|---:|---:|---:|
+| Instrument | EURUSD | 216 | 202 (93.52%) | 0.00055 / 0.00164 | 66.87% / 96.81% |
+| Instrument | XAUUSD | 342 | 320 (93.57%) | 0.83 / 5.71 | 64.25% / 95.73% |
+| Instrument | USTEC | 310 | 258 (83.23%) | 11.20 / 37.10 | 73.51% / 97.01% |
+| Timeframe | 15m | 30 | 28 (93.33%) | 0.58 / 0.63 | 43.61% / 95.45% |
+| Timeframe | 30m | 198 | 170 (85.86%) | 0.30 / 10.30 | 60.59% / 95.56% |
+| Timeframe | 60m | 640 | 582 (90.94%) | 1.66 / 24.10 | 72.89% / 97.01% |
+| Reference | 1h | 536 | 478 (89.18%) | 0.63 / 21.10 | 64.37% / 96.77% |
+| Reference | 4h | 332 | 302 (90.96%) | 2.04 / 24.10 | 73.36% / 97.06% |
+| Method | BREAKOUT_BAR | 434 | 390 (89.86%) | 0.88 / 24.10 | 71.43% / 96.81% |
+| Method | LEVEL_CLOSE | 434 | 390 (89.86%) | 0.88 / 24.10 | 71.43% / 96.81% |
+
+Only five configs have exposure: PREVIOUS_1H 602/534 changed, PREVIOUS_4H 40/40,
+PREVIOUS_ASIA 48/44, ROLLING_7 174/158, and ROLLING_14 4/4. The other six declared configs
+have zero ATR-undefined rows; full denominators and distributions are in the JSON.
+
+**Decision impact.** Coverage/lifecycle/status/attribution totals include these objects but do
+not use the biased values. The raw-bps identity check includes them only by re-deriving bps from
+the same biased `max_excursion`; finite-ATR and `strong_move` checks exclude them. The
+future-destroy control also excludes every exposed row because `max_excursion_atr` is null,
+including 112 primary rows (84 changed completed rows), so its published result does not change.
+The exact-state hypothesis is still not clean for maximum excursion: low prevalence among all
+raids does not offset 780/868 changed values on the exposed path. Unaffected count, chronology,
+lifecycle, and finite-primary control findings remain numerically unchanged.
 
 ## 7. Interpretation boundary — no verdict assigned
 

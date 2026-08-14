@@ -1,0 +1,750 @@
+{
+  "analysis": "EXP-100 ATR_UNDEFINED initial-observation maximum-excursion defect",
+  "boundary_statement": "No final verdict, strategy change, rerun, tradability claim, or family action. Observed quantities come only from the frozen emissions.",
+  "zero_cost_disclosure": "ZERO-COST-DISCLOSURE\n  cost_model: NO_COST_CHARGED\n  spread: not modeled\n  commissions: not modeled\n  swaps/funding: not modeled\n  implication: every figure in this document is gross and cost-free; no spread,\n    commission, or swap enters any calculation. Realised results would differ\n    (likely worse) under any real cost schedule.\n  prohibited_claims: fully-net, cost-complete, tradable, deployable\n  lifting: only an explicit operator directive may introduce a cost model for a\n    scoped experiment; the directive is recorded in that experiment's design.md.",
+  "source_boundary": {
+    "rerun": false,
+    "strategy_code_changed": false,
+    "emissions": [
+      "data/nautilus_runs/EXP-100/full/*/raids.parquet",
+      "data/nautilus_runs/EXP-100/full/*/tpo_profiles.parquet",
+      "data/nautilus_runs/EXP-100/full/*/bar_marks.parquet",
+      "data/nautilus_runs/EXP-100/full/*/raids_destroyed.parquet"
+    ],
+    "cells": 264
+  },
+  "definitions": {
+    "exposed": "raid profile_undefined_reason=ATR_UNDEFINED and matching TPO profile status/reason UNDEFINED/ATR_UNDEFINED",
+    "reconstructed_initial_maximum": "side-aware RealHigh/RealLow on the emitted completed observation mark joined at sweep_ts_ns",
+    "absolute_understatement": "reconstructed excursion - emitted max_excursion",
+    "relative_understatement": "absolute understatement / reconstructed excursion",
+    "materially_changed": "side-aware reconstructed max_price exceeds emitted max_price by more than 1e-12 * (1 + abs(reconstructed max_price)); numerical materiality only, not an economic threshold"
+  },
+  "identifiability": {
+    "exactly_identifiable": "exposure, the completed initial-observation maximum, whether a later source minute exceeded the emitted first-minute extreme, and the understatement",
+    "not_identifiable": "the full source-minute path, the exact minute attaining the reconstructed maximum, and any still-later maximum after the initial completed observation; individual source minutes were not emitted",
+    "why_later_is_identified": "first_excursion_ts_ns is the first source minute beyond the level; when the completed observation extreme is larger, that larger extreme must occur later"
+  },
+  "population_prevalence": [
+    {
+      "population": "all emitted raids",
+      "denominator_n": 9840478,
+      "atr_undefined_exposed_n": 868,
+      "atr_undefined_exposed_pct": 0.008820709725686089,
+      "affected_n": 780,
+      "affected_pct": 0.0079264442235428
+    },
+    {
+      "population": "all TPO-profile-undefined raids",
+      "denominator_n": 46268,
+      "atr_undefined_exposed_n": 868,
+      "atr_undefined_exposed_pct": 1.8760266274747126,
+      "affected_n": 780,
+      "affected_pct": 1.6858303795279674
+    },
+    {
+      "population": "ATR_UNDEFINED raids",
+      "denominator_n": 868,
+      "atr_undefined_exposed_n": 868,
+      "atr_undefined_exposed_pct": 100.0,
+      "affected_n": 780,
+      "affected_pct": 89.86175115207374
+    },
+    {
+      "population": "all primary-attributed raids",
+      "denominator_n": 789832,
+      "atr_undefined_exposed_n": 112,
+      "atr_undefined_exposed_pct": 0.014180230732611493,
+      "affected_n": 84,
+      "affected_pct": 0.010635173049458619
+    },
+    {
+      "population": "all completed raids",
+      "denominator_n": 789326,
+      "atr_undefined_exposed_n": 112,
+      "atr_undefined_exposed_pct": 0.014189321015651327,
+      "affected_n": 84,
+      "affected_pct": 0.010641990761738496
+    },
+    {
+      "population": "future-destroy aligned finite-primary pairs",
+      "denominator_n": 789646,
+      "atr_undefined_exposed_n": 0,
+      "atr_undefined_exposed_pct": 0.0,
+      "affected_n": 0,
+      "affected_pct": 0.0,
+      "excluded_atr_undefined_primary_n": 112,
+      "excluded_affected_primary_n": 84
+    }
+  ],
+  "impact": {
+    "atr_undefined_n": 868,
+    "materially_changed_n": 780,
+    "zero_impact_n": 88,
+    "materially_changed_pct_of_atr_undefined": 89.86175115207374,
+    "method_deduplicated_atr_undefined_n": 434,
+    "method_deduplicated_materially_changed_n": 390,
+    "all_exposed_distribution_including_zero": {
+      "n": 868,
+      "absolute": {
+        "mean": 4.698214078340939,
+        "q00": 0.0,
+        "q25": 0.0008900000000000574,
+        "q50": 0.6099999999999,
+        "q75": 5.700000000000728,
+        "q90": 19.5,
+        "q95": 24.100000000000364,
+        "q99": 37.099999999998545,
+        "q100": 37.099999999998545
+      },
+      "relative": {
+        "mean": 0.5912985384790045,
+        "q00": 0.0,
+        "q25": 0.3689320388349661,
+        "q50": 0.6374622356495508,
+        "q75": 0.8803418803420344,
+        "q90": 0.955555555555742,
+        "q95": 0.967741935483871,
+        "q99": 0.9935275080906206,
+        "q100": 0.9956896551724176
+      }
+    },
+    "materially_changed_distribution": {
+      "n": 780,
+      "absolute": {
+        "mean": 5.228268999999917,
+        "q00": 1.0000000000065512e-05,
+        "q25": 0.0017900000000001803,
+        "q50": 0.8799999999998818,
+        "q75": 5.710000000000036,
+        "q90": 19.69999999999891,
+        "q95": 24.100000000000364,
+        "q99": 37.099999999998545,
+        "q100": 37.099999999998545
+      },
+      "relative": {
+        "mean": 0.6580091428202255,
+        "q00": 0.12666666666675153,
+        "q25": 0.4577006507592234,
+        "q50": 0.7142857142856937,
+        "q75": 0.897872340425529,
+        "q90": 0.9569892473117895,
+        "q95": 0.9680851063830038,
+        "q99": 0.9935275080906206,
+        "q100": 0.9956896551724176
+      }
+    }
+  },
+  "by_layer": {
+    "instrument": [
+      {
+        "value": "EURUSD",
+        "all_raids_n": 3315732,
+        "atr_undefined_n": 216,
+        "atr_undefined_pct_of_all_raids": 0.006514398630528643,
+        "affected_n": 202,
+        "affected_pct_of_atr_undefined": 93.51851851851852,
+        "zero_impact_n": 14,
+        "affected_distribution": {
+          "n": 202,
+          "absolute": {
+            "mean": 0.0006426732673267285,
+            "q00": 1.0000000000065512e-05,
+            "q25": 0.00020999999999982144,
+            "q50": 0.0005500000000000504,
+            "q75": 0.0009099999999999664,
+            "q90": 0.0011099999999999444,
+            "q95": 0.0016399999999998638,
+            "q99": 0.0018799999999998818,
+            "q100": 0.0018799999999998818
+          },
+          "relative": {
+            "mean": 0.6380372687458258,
+            "q00": 0.12666666666675153,
+            "q25": 0.37383177570092685,
+            "q50": 0.6686746987951493,
+            "q75": 0.9230769230763975,
+            "q90": 0.9590643274853687,
+            "q95": 0.9680851063830038,
+            "q99": 0.9891304347825378,
+            "q100": 0.9891304347825378
+          }
+        }
+      },
+      {
+        "value": "USTEC",
+        "all_raids_n": 3250370,
+        "atr_undefined_n": 310,
+        "atr_undefined_pct_of_all_raids": 0.009537375744915194,
+        "affected_n": 258,
+        "affected_pct_of_atr_undefined": 83.2258064516129,
+        "zero_impact_n": 52,
+        "affected_distribution": {
+          "n": 258,
+          "absolute": {
+            "mean": 13.798449612402889,
+            "q00": 0.1999999999989086,
+            "q25": 5.700000000000728,
+            "q50": 11.199999999998909,
+            "q75": 21.100000000000364,
+            "q90": 24.100000000000364,
+            "q95": 37.099999999998545,
+            "q99": 37.099999999998545,
+            "q100": 37.099999999998545
+          },
+          "relative": {
+            "mean": 0.6953504191680278,
+            "q00": 0.14285714285640042,
+            "q25": 0.5454545454545454,
+            "q50": 0.7350746268656508,
+            "q75": 0.9039999999999417,
+            "q90": 0.9604519774011399,
+            "q95": 0.9701492537313258,
+            "q99": 0.9941176470588021,
+            "q100": 0.9941176470588021
+          }
+        }
+      },
+      {
+        "value": "XAUUSD",
+        "all_raids_n": 3274376,
+        "atr_undefined_n": 342,
+        "atr_undefined_pct_of_all_raids": 0.010444738173013729,
+        "affected_n": 320,
+        "affected_pct_of_atr_undefined": 93.5672514619883,
+        "zero_impact_n": 22,
+        "affected_distribution": {
+          "n": 320,
+          "absolute": {
+            "mean": 1.6184999999999719,
+            "q00": 0.009999999999990905,
+            "q25": 0.38999999999987267,
+            "q50": 0.8299999999999272,
+            "q75": 2.1699999999998454,
+            "q90": 4.7999999999999545,
+            "q95": 5.710000000000036,
+            "q99": 5.710000000000036,
+            "q100": 5.710000000000036
+          },
+          "relative": {
+            "mean": 0.6405099842742743,
+            "q00": 0.16666666666603508,
+            "q25": 0.4444444444445006,
+            "q50": 0.6424870466321836,
+            "q75": 0.8633093525179859,
+            "q90": 0.9318181818179939,
+            "q95": 0.9572649572648044,
+            "q99": 0.9935275080906206,
+            "q100": 0.9956896551724176
+          }
+        }
+      }
+    ],
+    "timeframe": [
+      {
+        "value": "15m",
+        "all_raids_n": 4631206,
+        "atr_undefined_n": 30,
+        "atr_undefined_pct_of_all_raids": 0.0006477794336939449,
+        "affected_n": 28,
+        "affected_pct_of_atr_undefined": 93.33333333333333,
+        "zero_impact_n": 2,
+        "affected_distribution": {
+          "n": 28,
+          "absolute": {
+            "mean": 0.4514292857141187,
+            "q00": 1.0000000000065512e-05,
+            "q25": 0.1999999999989086,
+            "q50": 0.5800000000001546,
+            "q75": 0.6299999999998818,
+            "q90": 0.6299999999998818,
+            "q95": 0.6299999999998818,
+            "q99": 0.6299999999998818,
+            "q100": 0.6299999999998818
+          },
+          "relative": {
+            "mean": 0.412099831130844,
+            "q00": 0.14285714285640042,
+            "q25": 0.16666666666790025,
+            "q50": 0.4360902255639753,
+            "q75": 0.597826086956425,
+            "q90": 0.6395348837209518,
+            "q95": 0.9545454545454859,
+            "q99": 0.9545454545454859,
+            "q100": 0.9545454545454859
+          }
+        }
+      },
+      {
+        "value": "30m",
+        "all_raids_n": 2333912,
+        "atr_undefined_n": 198,
+        "atr_undefined_pct_of_all_raids": 0.0084836103503474,
+        "affected_n": 170,
+        "affected_pct_of_atr_undefined": 85.85858585858585,
+        "zero_impact_n": 28,
+        "affected_distribution": {
+          "n": 170,
+          "absolute": {
+            "mean": 2.107925176470581,
+            "q00": 1.0000000000065512e-05,
+            "q25": 0.0008299999999998864,
+            "q50": 0.2999999999999545,
+            "q75": 1.8999999999996362,
+            "q90": 9.200000000000728,
+            "q95": 10.299999999999272,
+            "q99": 11.899999999999636,
+            "q100": 11.899999999999636
+          },
+          "relative": {
+            "mean": 0.6157932389468118,
+            "q00": 0.14285714285640042,
+            "q25": 0.4279069767442199,
+            "q50": 0.6058823529411337,
+            "q75": 0.8636363636364576,
+            "q90": 0.9230769230763975,
+            "q95": 0.955555555555742,
+            "q99": 0.9861111111111243,
+            "q100": 0.9880952380951943
+          }
+        }
+      },
+      {
+        "value": "60m",
+        "all_raids_n": 2875360,
+        "atr_undefined_n": 640,
+        "atr_undefined_pct_of_all_raids": 0.02225808246619554,
+        "affected_n": 582,
+        "affected_pct_of_atr_undefined": 90.9375,
+        "zero_impact_n": 58,
+        "affected_distribution": {
+          "n": 582,
+          "absolute": {
+            "mean": 6.369523230240448,
+            "q00": 1.0000000000065512e-05,
+            "q25": 0.009999999999990905,
+            "q50": 1.6600000000000819,
+            "q75": 9.0,
+            "q90": 21.100000000000364,
+            "q95": 24.100000000000364,
+            "q99": 37.099999999998545,
+            "q100": 37.099999999998545
+          },
+          "relative": {
+            "mean": 0.6821709372975158,
+            "q00": 0.12666666666675153,
+            "q25": 0.5027932960893957,
+            "q50": 0.7288801571709,
+            "q75": 0.9058823529412621,
+            "q90": 0.9590643274853687,
+            "q95": 0.9701492537313258,
+            "q99": 0.9935275080906206,
+            "q100": 0.9956896551724176
+          }
+        }
+      }
+    ],
+    "config": [
+      {
+        "value": "PREVIOUS_1D",
+        "all_raids_n": 248292,
+        "atr_undefined_n": 0,
+        "atr_undefined_pct_of_all_raids": 0.0,
+        "affected_n": 0,
+        "affected_pct_of_atr_undefined": null,
+        "zero_impact_n": 0,
+        "affected_distribution": {
+          "n": 0,
+          "absolute": null,
+          "relative": null
+        }
+      },
+      {
+        "value": "PREVIOUS_1H",
+        "all_raids_n": 1935994,
+        "atr_undefined_n": 602,
+        "atr_undefined_pct_of_all_raids": 0.031095137691542433,
+        "affected_n": 534,
+        "affected_pct_of_atr_undefined": 88.70431893687707,
+        "zero_impact_n": 68,
+        "affected_distribution": {
+          "n": 534,
+          "absolute": {
+            "mean": 4.506594569288302,
+            "q00": 1.0000000000065512e-05,
+            "q25": 0.01999999999998181,
+            "q50": 1.1199999999998909,
+            "q75": 5.710000000000036,
+            "q90": 15.399999999999636,
+            "q95": 19.69999999999891,
+            "q99": 37.099999999998545,
+            "q100": 37.099999999998545
+          },
+          "relative": {
+            "mean": 0.6737780274900591,
+            "q00": 0.12666666666675153,
+            "q25": 0.49397590361439514,
+            "q50": 0.7350746268656508,
+            "q75": 0.9038461538461336,
+            "q90": 0.9590643274853687,
+            "q95": 0.9787234042554146,
+            "q99": 0.9941176470588021,
+            "q100": 0.9956896551724176
+          }
+        }
+      },
+      {
+        "value": "PREVIOUS_1W",
+        "all_raids_n": 90616,
+        "atr_undefined_n": 0,
+        "atr_undefined_pct_of_all_raids": 0.0,
+        "affected_n": 0,
+        "affected_pct_of_atr_undefined": null,
+        "zero_impact_n": 0,
+        "affected_distribution": {
+          "n": 0,
+          "absolute": null,
+          "relative": null
+        }
+      },
+      {
+        "value": "PREVIOUS_4H",
+        "all_raids_n": 723758,
+        "atr_undefined_n": 40,
+        "atr_undefined_pct_of_all_raids": 0.005526709203905173,
+        "affected_n": 40,
+        "affected_pct_of_atr_undefined": 100.0,
+        "zero_impact_n": 0,
+        "affected_distribution": {
+          "n": 40,
+          "absolute": {
+            "mean": 9.110155999999877,
+            "q00": 0.0001900000000001345,
+            "q25": 0.0011099999999999444,
+            "q50": 4.7999999999999545,
+            "q75": 15.0,
+            "q90": 24.100000000000364,
+            "q95": 37.099999999998545,
+            "q99": 37.099999999998545,
+            "q100": 37.099999999998545
+          },
+          "relative": {
+            "mean": 0.674298269787185,
+            "q00": 0.34210526315788686,
+            "q25": 0.4381818181818248,
+            "q50": 0.7288801571709,
+            "q75": 0.918006430868169,
+            "q90": 0.9285714285717684,
+            "q95": 0.967741935483871,
+            "q99": 0.967741935483871,
+            "q100": 0.967741935483871
+          }
+        }
+      },
+      {
+        "value": "PREVIOUS_AMERICA",
+        "all_raids_n": 289434,
+        "atr_undefined_n": 0,
+        "atr_undefined_pct_of_all_raids": 0.0,
+        "affected_n": 0,
+        "affected_pct_of_atr_undefined": null,
+        "zero_impact_n": 0,
+        "affected_distribution": {
+          "n": 0,
+          "absolute": null,
+          "relative": null
+        }
+      },
+      {
+        "value": "PREVIOUS_ASIA",
+        "all_raids_n": 328066,
+        "atr_undefined_n": 48,
+        "atr_undefined_pct_of_all_raids": 0.014631202258082215,
+        "affected_n": 44,
+        "affected_pct_of_atr_undefined": 91.66666666666667,
+        "zero_impact_n": 4,
+        "affected_distribution": {
+          "n": 44,
+          "absolute": {
+            "mean": 9.493833636363497,
+            "q00": 0.00038000000000004697,
+            "q25": 0.0008999999999999009,
+            "q50": 4.129999999999882,
+            "q75": 21.100000000000364,
+            "q90": 24.100000000000364,
+            "q95": 37.099999999998545,
+            "q99": 37.099999999998545,
+            "q100": 37.099999999998545
+          },
+          "relative": {
+            "mean": 0.6497667479739121,
+            "q00": 0.34210526315788686,
+            "q25": 0.4577006507592234,
+            "q50": 0.6353846153845972,
+            "q75": 0.897872340425529,
+            "q90": 0.9207920792079358,
+            "q95": 0.9569892473117895,
+            "q99": 0.9569892473117895,
+            "q100": 0.9569892473117895
+          }
+        }
+      },
+      {
+        "value": "PREVIOUS_EUROPE",
+        "all_raids_n": 303722,
+        "atr_undefined_n": 0,
+        "atr_undefined_pct_of_all_raids": 0.0,
+        "affected_n": 0,
+        "affected_pct_of_atr_undefined": null,
+        "zero_impact_n": 0,
+        "affected_distribution": {
+          "n": 0,
+          "absolute": null,
+          "relative": null
+        }
+      },
+      {
+        "value": "ROLLING_14",
+        "all_raids_n": 1740190,
+        "atr_undefined_n": 4,
+        "atr_undefined_pct_of_all_raids": 0.00022985995782069774,
+        "affected_n": 4,
+        "affected_pct_of_atr_undefined": 100.0,
+        "zero_impact_n": 0,
+        "affected_distribution": {
+          "n": 4,
+          "absolute": {
+            "mean": 0.950294999999818,
+            "q00": 0.0005899999999998684,
+            "q25": 0.0005899999999998684,
+            "q50": 1.8999999999996362,
+            "q75": 1.8999999999996362,
+            "q90": 1.8999999999996362,
+            "q95": 1.8999999999996362,
+            "q99": 1.8999999999996362,
+            "q100": 1.8999999999996362
+          },
+          "relative": {
+            "mean": 0.5719696969696466,
+            "q00": 0.24999999999994016,
+            "q25": 0.24999999999994016,
+            "q50": 0.8939393939393532,
+            "q75": 0.8939393939393532,
+            "q90": 0.8939393939393532,
+            "q95": 0.8939393939393532,
+            "q99": 0.8939393939393532,
+            "q100": 0.8939393939393532
+          }
+        }
+      },
+      {
+        "value": "ROLLING_22",
+        "all_raids_n": 1372976,
+        "atr_undefined_n": 0,
+        "atr_undefined_pct_of_all_raids": 0.0,
+        "affected_n": 0,
+        "affected_pct_of_atr_undefined": null,
+        "zero_impact_n": 0,
+        "affected_distribution": {
+          "n": 0,
+          "absolute": null,
+          "relative": null
+        }
+      },
+      {
+        "value": "ROLLING_252",
+        "all_raids_n": 373824,
+        "atr_undefined_n": 0,
+        "atr_undefined_pct_of_all_raids": 0.0,
+        "affected_n": 0,
+        "affected_pct_of_atr_undefined": null,
+        "zero_impact_n": 0,
+        "affected_distribution": {
+          "n": 0,
+          "absolute": null,
+          "relative": null
+        }
+      },
+      {
+        "value": "ROLLING_7",
+        "all_raids_n": 2433606,
+        "atr_undefined_n": 174,
+        "atr_undefined_pct_of_all_raids": 0.007149883752752089,
+        "affected_n": 158,
+        "affected_pct_of_atr_undefined": 90.80459770114942,
+        "zero_impact_n": 16,
+        "affected_distribution": {
+          "n": 158,
+          "absolute": {
+            "mean": 5.60501405063288,
+            "q00": 0.0001100000000000545,
+            "q25": 0.0008300000000001084,
+            "q50": 0.38999999999987267,
+            "q75": 7.799999999999272,
+            "q90": 21.100000000000364,
+            "q95": 24.100000000000364,
+            "q99": 37.099999999998545,
+            "q100": 37.099999999998545
+          },
+          "relative": {
+            "mean": 0.6050640394295325,
+            "q00": 0.14285714285640042,
+            "q25": 0.443181818181733,
+            "q50": 0.5882352941175703,
+            "q75": 0.8636363636364576,
+            "q90": 0.9545454545454859,
+            "q95": 0.9604519774011399,
+            "q99": 0.9652173913043126,
+            "q100": 0.9680851063830038
+          }
+        }
+      }
+    ],
+    "method": [
+      {
+        "value": "breakout_bar",
+        "all_raids_n": 4920239,
+        "atr_undefined_n": 434,
+        "atr_undefined_pct_of_all_raids": 0.008820709725686089,
+        "affected_n": 390,
+        "affected_pct_of_atr_undefined": 89.86175115207374,
+        "zero_impact_n": 44,
+        "affected_distribution": {
+          "n": 390,
+          "absolute": {
+            "mean": 5.228268999999918,
+            "q00": 1.0000000000065512e-05,
+            "q25": 0.0017900000000001803,
+            "q50": 0.8799999999998818,
+            "q75": 5.710000000000036,
+            "q90": 19.69999999999891,
+            "q95": 24.100000000000364,
+            "q99": 37.099999999998545,
+            "q100": 37.099999999998545
+          },
+          "relative": {
+            "mean": 0.6580091428202254,
+            "q00": 0.12666666666675153,
+            "q25": 0.4577006507592234,
+            "q50": 0.7142857142856937,
+            "q75": 0.897872340425529,
+            "q90": 0.9569892473117895,
+            "q95": 0.9680851063830038,
+            "q99": 0.9935275080906206,
+            "q100": 0.9956896551724176
+          }
+        }
+      },
+      {
+        "value": "level_close",
+        "all_raids_n": 4920239,
+        "atr_undefined_n": 434,
+        "atr_undefined_pct_of_all_raids": 0.008820709725686089,
+        "affected_n": 390,
+        "affected_pct_of_atr_undefined": 89.86175115207374,
+        "zero_impact_n": 44,
+        "affected_distribution": {
+          "n": 390,
+          "absolute": {
+            "mean": 5.228268999999918,
+            "q00": 1.0000000000065512e-05,
+            "q25": 0.0017900000000001803,
+            "q50": 0.8799999999998818,
+            "q75": 5.710000000000036,
+            "q90": 19.69999999999891,
+            "q95": 24.100000000000364,
+            "q99": 37.099999999998545,
+            "q100": 37.099999999998545
+          },
+          "relative": {
+            "mean": 0.6580091428202254,
+            "q00": 0.12666666666675153,
+            "q25": 0.4577006507592234,
+            "q50": 0.7142857142856937,
+            "q75": 0.897872340425529,
+            "q90": 0.9569892473117895,
+            "q95": 0.9680851063830038,
+            "q99": 0.9935275080906206,
+            "q100": 0.9956896551724176
+          }
+        }
+      }
+    ],
+    "confirm_ref": [
+      {
+        "value": "1h",
+        "all_raids_n": 8164150,
+        "atr_undefined_n": 536,
+        "atr_undefined_pct_of_all_raids": 0.006565288486860237,
+        "affected_n": 478,
+        "affected_pct_of_atr_undefined": 89.17910447761194,
+        "zero_impact_n": 58,
+        "affected_distribution": {
+          "n": 478,
+          "absolute": {
+            "mean": 4.488909414225877,
+            "q00": 1.0000000000065512e-05,
+            "q25": 0.0011099999999999444,
+            "q50": 0.6299999999998818,
+            "q75": 5.710000000000036,
+            "q90": 15.0,
+            "q95": 21.100000000000364,
+            "q99": 37.099999999998545,
+            "q100": 37.099999999998545
+          },
+          "relative": {
+            "mean": 0.6423577914385794,
+            "q00": 0.12666666666675153,
+            "q25": 0.443181818181733,
+            "q50": 0.6436781609194909,
+            "q75": 0.8939393939393532,
+            "q90": 0.9545454545454859,
+            "q95": 0.967741935483871,
+            "q99": 0.9911504424778433,
+            "q100": 0.9941176470588021
+          }
+        }
+      },
+      {
+        "value": "4h",
+        "all_raids_n": 1676328,
+        "atr_undefined_n": 332,
+        "atr_undefined_pct_of_all_raids": 0.019805193255735154,
+        "affected_n": 302,
+        "affected_pct_of_atr_undefined": 90.96385542168674,
+        "zero_impact_n": 30,
+        "affected_distribution": {
+          "n": 302,
+          "absolute": {
+            "mean": 6.398513642383997,
+            "q00": 1.0000000000065512e-05,
+            "q25": 0.1999999999989086,
+            "q50": 2.0399999999999636,
+            "q75": 9.0,
+            "q90": 21.100000000000364,
+            "q95": 24.100000000000364,
+            "q99": 37.099999999998545,
+            "q100": 37.099999999998545
+          },
+          "relative": {
+            "mean": 0.6827818115633602,
+            "q00": 0.12666666666675153,
+            "q25": 0.5027932960893957,
+            "q50": 0.7336065573771238,
+            "q75": 0.9058823529412621,
+            "q90": 0.9590643274853687,
+            "q95": 0.9705882352940502,
+            "q99": 0.9941176470588021,
+            "q100": 0.9956896551724176
+          }
+        }
+      }
+    ]
+  },
+  "decision_impact": {
+    "coverage_and_lifecycle_counts": "include these raid rows as count/state objects; chronology, identity, attribution, completion, and TPO-undefined counts do not depend on corrected max values",
+    "max_excursion_identity_checks": "raw max_excursion_bps self-reconciliation includes ATR-undefined rows but only re-derives the biased field; finite-ATR and strong_move checks exclude them",
+    "future_destroy": "excludes all ATR-undefined rows because max_excursion_atr is null; 112 exposed primary rows, including 84 affected completed rows, are outside its finite-primary population, so its published result is numerically unchanged",
+    "hypothesis": "the small all-raid prevalence does not restore exact max-excursion integrity: 780/868 exposed rows are understated. Unaffected count/lifecycle/control findings stand, while max_price/max_excursion and descendants remain invalid for this subset"
+  }
+}

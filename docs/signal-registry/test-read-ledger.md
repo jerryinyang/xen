@@ -598,3 +598,13 @@ Notes:
   violation is evidenced; the assertion is simply absent. Operator verdict `HYP-D5` **PARTIALLY
   SUPPORTED**. **0 counted TEST reads, 0 holdout reads, 0 multiplicity slots.** Report
   `python/experiments/SPDR-018B/report.md`.
+
+## Chapter 06 — CF-LIQSWP-001
+
+- **EXP-100 completion (2026-08-13, checkpoint-019):** the 264-cell cTrader run and all
+  follow-up interrogation are TRAIN-only under the INFR-021 fence. The operator retained the
+  current run and excluded all ATR-undefined excursion values from interpretation; unaffected
+  coverage, chronology, lifecycle, status, attribution, and finite-population control findings
+  remain. No analysis-TEST or holdout row was read, and no stratum-specific TEST inference was
+  made. This is a TRAIN-only apparatus disclosure: **0 counted TEST reads, 0 holdout reads,
+  0 candidate slots; all ledger tallies unchanged.** Family status remains `REGISTERED`.

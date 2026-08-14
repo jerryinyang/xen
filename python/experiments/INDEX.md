@@ -1,7 +1,8 @@
 # Chapter 06 Experiment Index
 
 Chapter 06 currently has one registered family and one open checkpoint. EXP-100
-has completed its TRAIN analysis; EXP-101–104 remain separate readiness items.
+is completed and operator-approved with ATR-undefined excursion values excluded;
+EXP-101–104 remain separate readiness items.
 
 Before designing anything, read `docs/knowledge-base/INDEX.md` — in particular
 `lessons-and-amendments.md` (mechanisms, not just symptoms) and `pitfalls-ledger.md` (do not
@@ -17,7 +18,7 @@ re-run these).
 
 | ID | Family | Status | Purpose |
 |---|---|---|---|
-| EXP-100 | CF-LIQSWP-001 | AMENDMENT-14 FULL TRAIN RERUN AUTHORISED | One forward pre-MFE retracement field added; stale AMENDMENT-13 outputs are being replaced; prior verdict remains historical |
+| EXP-100 | CF-LIQSWP-001 | COMPLETED — OPERATOR-APPROVED | Current 264-cell TRAIN run retained; ATR-undefined excursion values excluded, unaffected apparatus findings retained |
 | EXP-101 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | Level significance versus later swing outcomes |
 | EXP-102 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | Repeated raids and prior-raid count |
 | EXP-103 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | TPO value gap and tight-gap conditioning |

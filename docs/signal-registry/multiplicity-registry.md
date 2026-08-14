@@ -1712,12 +1712,12 @@ Amendments must state whether the changed item consumes a new multiplicity slot.
 **Checkpoint:** `2026-08-11-019-liquidity-sweeps`
 **Source of truth:** `docs/experiments-docs/checkpoints/2026-08-11-019-liquidity-sweeps/liquidity.md`
 **Route:** `EXP-100` apparatus → `EXP-101` significance → `EXP-102` repeated raids →
-`EXP-103` value gap → `EXP-104` volatility regime. TRAIN only; 0 counted TEST reads;
-holdouts sealed; Bybit and cTrader reported separately.
+`EXP-103` value gap → `EXP-104` volatility regime. cTrader TRAIN only; 0 counted TEST reads;
+holdouts sealed; Bybit excluded under AMENDMENT-7.
 
 | ID | Experiment | Registered question | Candidate slot | Status |
 |---|---|---|---:|---|
-| `CF-LIQSWP-001/HYP-000` | EXP-100 | Does the streaming state machine preserve causal level, raid, confirmation, breakout, TPO, and later-outcome identity? | 0 | **COMPLETE — HYP-000 UPHELD (operator-confirmed 2026-08-13).** 264/264 AMENDMENT-13 TRAIN cells passed the validity gate; 9,840,478 raids; 0 counted TEST reads; family status unchanged. |
+| `CF-LIQSWP-001/HYP-000` | EXP-100 | Does the streaming state machine preserve causal level, raid, confirmation, breakout, TPO, and later-outcome identity? | 0 | **COMPLETED — OPERATOR-APPROVED WITH SCOPED EXCLUSION (2026-08-13).** Retain the 264-cell AMENDMENT-14 TRAIN run. Exclude ATR-undefined excursion values: 780/9,840,478 emitted rows affected (0.007926%); 390 unique affected objects after method deduplication; 84 affected primary/completed rows; 71.43% median affected understatement. Coverage/chronology/lifecycle/status/attribution and the finite-population future-destroy result remain usable. 0 counted TEST reads; family `REGISTERED` unchanged. |
 | `CF-LIQSWP-001/HYP-001` | EXP-101 | Do level-family/configuration significance strata differ in later swing outcomes? | 0 | DESIGN COMPLETE; QA pending |
 | `CF-LIQSWP-001/HYP-002` | EXP-102 | Does previous completed raid count change later swing outcomes? | 0 | DESIGN COMPLETE; QA pending |
 | `CF-LIQSWP-001/HYP-003` | EXP-103 | Are defined tight value gaps associated with different later outcomes? | 0 | DESIGN COMPLETE; QA pending |
@@ -1748,3 +1748,11 @@ excursions and completed raids are decided **bar by bar on the cell observation 
 goes strictly beyond the level starts a live raid. Same-bar return does not close it;
 confirmation/fail settles it. **DIRECTION: LOOSER**. Running family count after A9–A13:
 **2L / 3T / 7N**.
+
+**AMENDMENT-L14 (checkpoint AMENDMENT-14, 2026-08-13):** add the structured
+`pre_mfe_retrace={price,status}` field without changing population, estimand, control, HYP-000
+false qualifier, or matrix. **DIRECTION: NEUTRAL**. Running family count: **2L / 3T / 8N**.
+The completed evidence disposition retains the current run but excludes every ATR-undefined
+excursion value from interpretation. The future-destroy control is unchanged because those rows
+are outside its finite normalized population. No new candidate slot, TEST read, holdout read, or
+family-status transition.
