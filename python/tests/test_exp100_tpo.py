@@ -23,6 +23,28 @@ def test_tpo_conservation_and_strict_tight_boundary(tmp_path: Path) -> None:
     assert result["tight_gap"] == (result["gap_span"] < 0.50 * result["va_width"])
 
 
+def test_tpo_add_bar_uses_cached_bin_width_without_profile_lookup(
+    tmp_path: Path,
+) -> None:
+    """A cached raid width removes the per-minute profile-state read."""
+    with Exp100StateStore(tmp_path / "state.sqlite") as store:
+        profile = TPOProfileStore(store)
+        generation, bin_width = profile.start("R1", 1, 100.0, 1.0)
+
+        def unexpected_lookup(*_args: object) -> None:
+            raise AssertionError("cached bin width must bypass profile-state lookup")
+
+        store.get_profile_state = unexpected_lookup  # type: ignore[method-assign]
+        profile.add_bar(
+            "R1",
+            generation,
+            BarRecord(2, 100.0, 100.2, 99.8, 100.0, 1.0, 1),
+            bin_width=bin_width,
+        )
+
+        assert list(store.iter_profile_bins("R1", generation))
+
+
 def test_tpo_reset_discards_previous_generation_without_rebuild(tmp_path: Path) -> None:
     """A new maximum starts a clean generation at its own one-minute bar."""
     with Exp100StateStore(tmp_path / "state.sqlite") as store:

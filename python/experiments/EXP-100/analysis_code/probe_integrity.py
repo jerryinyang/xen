@@ -125,11 +125,11 @@ def probe_destroy_cells() -> dict[str, Any]:
         )
         row: dict[str, Any] = {
             "cell_id": cell_id,
-            "n_raids": raids.height,
-            "n_confirmed": confirmed.height,
+            "emitted_raid_rows": raids.height,
+            "primary_confirmed_rows": confirmed.height,
             "status": raids["status"].value_counts().to_dicts(),
             "destroy": meta["destroy_control"],
-            "n_finite_swing": finite.height,
+            "aligned_finite_primary_pairs": finite.height,
         }
         if finite.height:
             delta = (finite["swing_atr"] - finite["swing_atr_d"]).abs()
@@ -140,8 +140,10 @@ def probe_destroy_cells() -> dict[str, Any]:
                 se = float(finite["swing_atr"].std() / (finite.height**0.5))
                 row["raw_se"] = se
                 row["integrity_bite"] = 2.8 * se
-                row["collapses"] = float(delta.mean()) >= 2.8 * se
-            row["pairs"] = [
+                row["mean_abs_swing_change_clears_integrity_bite"] = (
+                    float(delta.mean()) >= 2.8 * se
+                )
+            row["aligned_finite_primary_pair_rows"] = [
                 {
                     "raid_id": r["raid_id"],
                     "status": r["status"],
@@ -158,12 +160,12 @@ def probe_destroy_cells() -> dict[str, Any]:
     return {"cells": out}
 
 
-def _bar(i: int, o: float, h: float, l: float, c: float) -> BarRecord:
+def _bar(i: int, o: float, h: float, low: float, c: float) -> BarRecord:
     return BarRecord(
         ts_event_ns=i * MINUTE_NS,
         open=o,
         high=h,
-        low=l,
+        low=low,
         close=c,
         volume=1.0,
         source_bars=1,
@@ -175,12 +177,163 @@ def _flat(i: int, price: float = 100.0) -> BarRecord:
 
 
 def run_golden() -> dict[str, Any]:
-    """Independent feed of design T1/T2/T3 through the shared processor."""
+    """Feed design T1 and T2/T3 through isolated shared-processor traces."""
     from tempfile import TemporaryDirectory
 
-    results: dict[str, Any] = {}
     with TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
+        config = Exp100CellConfig(
+            venue="CTRADER",
+            archive_symbol="EURUSD",
+            instrument_id="EURUSD.CTrader",
+            observation_minutes=15,
+            confirmation_method="BREAKOUT_BAR",
+            confirmation_reference="1H",
+            level_config="PREVIOUS_1H",
+        )
+        t1_sinks = Exp100Sinks(
+            bar_marks=CollectingWriter(),
+            levels=CollectingWriter(),
+            raids=CollectingWriter(),
+            tpo_profiles=CollectingWriter(),
+            event_log=CollectingWriter(),
+        )
+        t1_processor = Exp100Processor(
+            config,
+            Exp100StateStore(tmp_path / "t1-state.sqlite"),
+            t1_sinks,
+            MemoryGuard(limit_bytes=None, sample_every=10_000),
+            auto_catalogue=False,
+        )
+        t1_processor.seed_level("T1-HIGH", price=100.0, side="HIGH")
+        minute = 0
+        # Keep the first observation wholly beyond the high level.  Using flat
+        # 100.00 source bars here would make it an AMENDMENT-13 same-bar return
+        # and legitimately allow a later completed observation to start raid 2.
+        for _ in range(14):
+            t1_processor.on_one_minute_bar(_flat(minute, 101.2))
+            minute += 1
+        t1_processor.on_one_minute_bar(
+            _bar(minute, 101.2, 101.2, 100.8, 101.0)
+        )
+        minute += 1
+        after_excursion = [
+            dict(row) for row in t1_processor.state.iter_active_raids()
+        ]
+
+        # A source-minute wick cannot create another observation-grain raid.
+        t1_processor.on_one_minute_bar(
+            _bar(minute, 101.0, 101.5, 101.0, 101.1)
+        )
+        minute += 1
+        for _ in range(14):
+            t1_processor.on_one_minute_bar(_flat(minute, 100.0))
+            minute += 1
+        after_return = [dict(row) for row in t1_processor.state.iter_active_raids()]
+
+        # Isolate the reference settlement trace so aggregation boundaries cannot
+        # accidentally settle T1 while constructing T2.
+        settle_sinks = Exp100Sinks(
+            bar_marks=CollectingWriter(),
+            levels=CollectingWriter(),
+            raids=CollectingWriter(),
+            tpo_profiles=CollectingWriter(),
+            event_log=CollectingWriter(),
+        )
+        settle_processor = Exp100Processor(
+            config,
+            Exp100StateStore(tmp_path / "settle-state.sqlite"),
+            settle_sinks,
+            MemoryGuard(limit_bytes=None, sample_every=10_000),
+            auto_catalogue=False,
+        )
+        for raid_id, level_id, sweep_ts_ns in (
+            ("T1-HIGH:raid:1", "T1-HIGH", 10),
+            ("T2-HIGH:raid:1", "T2-HIGH", 20),
+        ):
+            settle_processor.state.insert_raid(
+                {
+                    "raid_id": raid_id,
+                    "level_id": level_id,
+                    "event_identity": raid_id,
+                    "side": "HIGH",
+                    "level_price": 100.0,
+                    "sweep_ts_ns": sweep_ts_ns,
+                    "first_excursion_ts_ns": sweep_ts_ns,
+                    "return_ts_ns": sweep_ts_ns + 1,
+                    "confirmation_ts_ns": None,
+                    "max_price": 101.2,
+                    "max_excursion": 1.2,
+                    "profile_generation": None,
+                    "profile_finalized": False,
+                    "active": 1,
+                }
+            )
+        settle_processor._previous_reference = BarRecord(
+            60, 100.0, 101.0, 99.0, 100.5, 1.0, 1
+        )
+        confirmation = BarRecord(120, 99.0, 100.0, 98.0, 98.5, 1.0, 1)
+        settle_processor._on_reference_bar(confirmation)
+        live_after_confirmation = [
+            dict(row) for row in settle_processor.state.iter_active_raids()
+        ]
+        endpoint = BarRecord(180, 101.0, 102.0, 100.5, 101.5, 1.0, 1)
+        settle_processor._on_reference_bar(endpoint)
+
+        settled = [dict(row) for row in settle_sinks.raids.rows]
+        t1_settled = next(
+            row for row in settled if row["raid_id"] == "T1-HIGH:raid:1"
+        )
+        t2_settled = next(
+            row for row in settled if row["raid_id"] == "T2-HIGH:raid:1"
+        )
+        checks = {
+            "t1_started_once": len(after_excursion) == 1,
+            "t1_max_excursion_1_20": bool(
+                after_excursion
+                and abs(float(after_excursion[0]["max_excursion"]) - 1.2) < 1e-9
+            ),
+            "t1_prior_0": bool(
+                after_excursion and after_excursion[0]["prior_raid_count"] == 0
+            ),
+            "t1_wick_did_not_add_raid": bool(
+                len(after_return) == 1
+                and after_return[0]["raid_id"] == "T1-HIGH:raid:1"
+            ),
+            "t1_still_live_after_return": bool(
+                after_return and after_return[0]["return_ts_ns"] is not None
+            ),
+            "t1_not_ambiguous": not t1_sinks.raids.rows,
+            "t1_non_primary_if_both_confirmed": (
+                t1_settled["status"] == "CONFIRMED_NON_PRIMARY"
+                and not t1_settled["primary_attribution"]
+            ),
+            "t2_primary_if_both_confirmed": bool(
+                len(live_after_confirmation) == 1
+                and live_after_confirmation[0]["raid_id"] == "T2-HIGH:raid:1"
+                and live_after_confirmation[0]["primary_attribution"]
+            ),
+            "t2_completed_on_opposing_reference": (
+                t2_settled["status"] == "COMPLETED"
+            ),
+            "t3_confirmation_timestamp_is_reference_close": (
+                t2_settled["confirmation_ts_ns"] == confirmation.ts_event_ns
+                and t2_settled["endpoint_ts_ns"] == endpoint.ts_event_ns
+            ),
+        }
+        return {
+            "checks": checks,
+            "t1_after_excursion": after_excursion[0] if after_excursion else None,
+            "t1_after_return": after_return[0] if after_return else None,
+            "settled_raids": settled,
+        }
+
+
+def probe_atr_undefined_initial_observation_extreme() -> dict[str, Any]:
+    """Characterize max-excursion tracking before an ATR-backed profile exists."""
+    from tempfile import TemporaryDirectory
+
+    with TemporaryDirectory() as tmp:
         config = Exp100CellConfig(
             venue="CTRADER",
             archive_symbol="EURUSD",
@@ -199,124 +352,29 @@ def run_golden() -> dict[str, Any]:
         )
         processor = Exp100Processor(
             config,
-            Exp100StateStore(tmp_path / "state.sqlite"),
+            Exp100StateStore(Path(tmp) / "state.sqlite"),
             sinks,
             MemoryGuard(limit_bytes=None, sample_every=10_000),
             auto_catalogue=False,
         )
-        # Warm ATR with 20 flat 15m windows so raid_atr is defined.
-        minute = 0
-        for _ in range(20 * 15):
-            processor.on_one_minute_bar(_flat(minute, 100.0))
-            minute += 1
-        # Seed high level 100 after ATR warmup.
-        processor.seed_level("T1-HIGH", price=100.00, side="HIGH")
-        # Observation window A: completed 15m high=101.20, low=100.80, close=101.00
-        # First 14 minutes stay inside, last minute prints the observation extreme.
-        for _offset in range(14):
-            processor.on_one_minute_bar(_flat(minute, 100.90))
-            minute += 1
-        processor.on_one_minute_bar(_bar(minute, 100.90, 101.20, 100.80, 101.00))
-        minute += 1
-        snap_after_exc = processor.snapshot()
-        t1_after_exc_terminal = [dict(r) for r in sinks.raids.rows]
-        # A 1m wick to 101.50 that does not survive the next observation OHLC
-        # must not start a second raid.
-        processor.on_one_minute_bar(_bar(minute, 101.00, 101.50, 101.00, 101.10))
-        minute += 1
-        for _offset in range(14):
-            processor.on_one_minute_bar(_flat(minute, 101.10))
-            minute += 1
-        snap_after_wick = processor.snapshot()
-        t1_after_wick_terminal = [dict(r) for r in sinks.raids.rows]
-        # Later observation bar returns to 100.00 (inclusive).
-        for _offset in range(14):
-            processor.on_one_minute_bar(_flat(minute, 100.50))
-            minute += 1
-        processor.on_one_minute_bar(_bar(minute, 100.50, 100.60, 100.00, 100.20))
-        minute += 1
-        snap_after_return = processor.snapshot()
-
-        # T2: second high level raided on a later observation bar before confirmation.
-        processor.seed_level("T2-HIGH", price=100.40, side="HIGH")
-        for _offset in range(14):
-            processor.on_one_minute_bar(_flat(minute, 100.50))
-            minute += 1
-        processor.on_one_minute_bar(_bar(minute, 100.50, 100.80, 100.50, 100.60))
-        minute += 1
-        for _offset in range(14):
-            processor.on_one_minute_bar(_flat(minute, 100.50))
-            minute += 1
-        processor.on_one_minute_bar(_bar(minute, 100.50, 100.55, 100.40, 100.45))
-        minute += 1
-
-        # Expected-side 1H: close < previous 1H low. Opposing 1H for endpoint.
-        for _ in range(60):
-            processor.on_one_minute_bar(_bar(minute, 99.50, 99.60, 99.00, 99.10))
-            minute += 1
-        for _ in range(60):
-            processor.on_one_minute_bar(_bar(minute, 101.00, 102.00, 100.90, 101.80))
-            minute += 1
-        processor.finish(minute * MINUTE_NS)
-
-        raids = sinks.raids.rows
-        results = {
-            "n_raids": len(raids),
-            "raid_summaries": [
-                {
-                    "raid_id": r.get("raid_id"),
-                    "level_id": r.get("level_id"),
-                    "status": r.get("status"),
-                    "max_excursion": r.get("max_excursion"),
-                    "prior_raid_count": r.get("prior_raid_count"),
-                    "primary_attribution": r.get("primary_attribution"),
-                    "return_ts_ns": r.get("return_ts_ns"),
-                    "confirmation_ts_ns": r.get("confirmation_ts_ns"),
-                    "endpoint_ts_ns": r.get("endpoint_ts_ns"),
-                    "confirmation_reference": r.get("confirmation_reference"),
-                }
-                for r in raids
-            ],
-            "snap_after_exc": snap_after_exc,
-            "snap_after_wick": snap_after_wick,
-            "snap_after_return": snap_after_return,
-            "t1_terminal_before_return_n": len(t1_after_exc_terminal),
-            "t1_after_1m_wick_terminal_n": len(t1_after_wick_terminal),
-            "tpo_n": len(sinks.tpo_profiles.rows),
+        processor.seed_level("ATR-U-HIGH", price=100.0, side="HIGH")
+        for minute in range(14):
+            processor.on_one_minute_bar(_flat(minute, 100.8))
+        processor.on_one_minute_bar(_bar(14, 100.8, 101.2, 100.8, 101.0))
+        raid = dict(next(processor.state.iter_active_raids()))
+        expected = 1.2
+        observed = float(raid["max_excursion"])
+        return {
+            "population": "single synthetic 15m raid with ATR_UNDEFINED",
+            "expected_completed_observation_max_excursion": expected,
+            "observed_max_excursion": observed,
+            "difference": observed - expected,
+            "implementation_matches_completed_observation_extreme": (
+                abs(observed - expected) < 1e-9
+            ),
+            "profile_generation": raid.get("profile_generation"),
+            "profile_undefined_reason": raid.get("profile_undefined_reason"),
         }
-        t1 = [r for r in raids if r.get("level_id") == "T1-HIGH"]
-        t2 = [r for r in raids if r.get("level_id") == "T2-HIGH"]
-        checks = {
-            "t1_one_completed_or_settled": len(t1) == 1,
-            "t1_max_excursion_1_20": bool(
-                t1 and abs(float(t1[0]["max_excursion"]) - 1.20) < 1e-9
-            ),
-            "t1_prior_0": bool(t1 and t1[0]["prior_raid_count"] == 0),
-            "t1_live_after_first_beyond": snap_after_exc["open_raids"] == 1,
-            "t1_wick_did_not_add_raid": (
-                snap_after_wick["open_raids"] == snap_after_exc["open_raids"]
-                and len(t1_after_wick_terminal) == len(t1_after_exc_terminal)
-            ),
-            "t1_still_live_after_return": snap_after_return["open_raids"] >= 1,
-            "t1_return_recorded": bool(t1 and t1[0].get("return_ts_ns") is not None),
-            "t1_not_ambiguous": bool(
-                t1 and t1[0].get("status") != "AMBIGUOUS_INTRABAR"
-            ),
-            "t2_exists": len(t2) == 1,
-            "t2_primary_if_both_confirmed": None,
-            "t1_non_primary_if_both_confirmed": None,
-        }
-        if t1 and t2 and t1[0].get("confirmation_ts_ns") and t2[0].get("confirmation_ts_ns"):
-            checks["t2_primary_if_both_confirmed"] = bool(t2[0].get("primary_attribution"))
-            checks["t1_non_primary_if_both_confirmed"] = t1[0].get("status") == (
-                "CONFIRMED_NON_PRIMARY"
-            )
-            checks["t3_confirm_on_1h_grid"] = (
-                t2[0]["confirmation_ts_ns"] % (60 * MINUTE_NS) == (60 * MINUTE_NS - MINUTE_NS)
-                or t2[0]["confirmation_ts_ns"] % (60 * MINUTE_NS) == 0
-            )
-        results["checks"] = checks
-    return results
 
 
 def run_same_bar_return_golden() -> dict[str, Any]:
@@ -360,14 +418,21 @@ def run_same_bar_return_golden() -> dict[str, Any]:
         processor.on_one_minute_bar(_bar(minute, 100.10, 101.20, 99.90, 100.05))
         minute += 1
         snap = processor.snapshot()
-        # Later expected-side confirm + opposing endpoint so the raid can settle.
-        for _ in range(60):
-            processor.on_one_minute_bar(_bar(minute, 99.50, 99.60, 99.00, 99.10))
-            minute += 1
-        for _ in range(60):
-            processor.on_one_minute_bar(_bar(minute, 101.00, 102.00, 100.90, 101.80))
-            minute += 1
-        processor.finish(minute * MINUTE_NS)
+        # Drive only the reference state transitions. Feeding another observation
+        # above 100 would correctly start a second raid after this same-bar return,
+        # which tests re-piercing rather than the single-raid golden expectation.
+        processor._previous_reference = BarRecord(
+            minute * MINUTE_NS, 100.0, 101.0, 99.0, 100.5, 1.0, 1
+        )
+        confirmation = BarRecord(
+            (minute + 60) * MINUTE_NS, 99.0, 100.0, 98.0, 98.5, 1.0, 1
+        )
+        endpoint = BarRecord(
+            (minute + 120) * MINUTE_NS, 101.0, 102.0, 100.5, 101.5, 1.0, 1
+        )
+        processor._on_reference_bar(confirmation)
+        processor._on_reference_bar(endpoint)
+        processor.finish(endpoint.ts_event_ns)
         raids = [dict(r) for r in sinks.raids.rows]
         sb = [r for r in raids if r.get("level_id") == "SB-HIGH"]
         checks = {
@@ -448,6 +513,9 @@ def main() -> None:
         "past_train": probe_past_train(),
         "destroy": probe_destroy_cells(),
         "golden": run_golden(),
+        "atr_undefined_initial_observation_extreme": (
+            probe_atr_undefined_initial_observation_extreme()
+        ),
         "same_bar_return_golden": run_same_bar_return_golden(),
         "independent_raid_sample": probe_independent_raid_sample(),
     }

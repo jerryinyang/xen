@@ -21,12 +21,28 @@ sys.path.insert(0, str(CODE_DIR))
 import run_experiment  # noqa: E402
 from run_experiment import build_backtest_run_config  # noqa: E402
 from xen.exp100 import Exp100CellConfig  # noqa: E402
+from xen.exp100.strategy import _raid_schema  # noqa: E402
 from xen.nautilus.backtest_util import synthetic_bars  # noqa: E402
 
 
 START = datetime(2023, 1, 1, tzinfo=UTC)
 END = START + timedelta(minutes=31)
 INSTRUMENT_ID = "XRPUSDT-LINEAR.BYBIT"
+
+
+def test_raid_schema_exposes_both_duration_clocks() -> None:
+    """The Parquet boundary must not silently discard either duration field."""
+    names = _raid_schema().names
+    assert "excursion_duration_ns" in names
+    assert "swing_duration_ns" in names
+    assert "duration_ns" in names
+
+
+def test_raid_schema_exposes_single_structured_pre_mfe_retrace_column() -> None:
+    """The path price and ordering status stay atomic at the Parquet boundary."""
+    schema = _raid_schema()
+    field = schema.field("pre_mfe_retrace")
+    assert field.type.names == ["price", "status"]
 
 
 def make_cell() -> Exp100CellConfig:

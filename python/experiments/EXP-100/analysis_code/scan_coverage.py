@@ -7,7 +7,6 @@ from published parquet + run_metadata + the family estimand gate.
 from __future__ import annotations
 
 import json
-from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -85,7 +84,7 @@ def _status_counts(series: pl.Series) -> dict[str, int]:
     table = series.value_counts()
     return {
         str(status): int(count)
-        for status, count in zip(table["status"], table["count"], strict=True)
+        for status, count in zip(table[series.name], table["count"], strict=True)
     }
 
 
@@ -95,7 +94,6 @@ def _scan_one(cell_dir: Path) -> dict[str, Any]:
     fence = json.loads((cell_dir / "fence_attestation.json").read_text(encoding="utf-8"))
     dc = meta["destroy_control"]
     cell_cfg = meta["run_config"]["cell"]
-    obs_min = int(cell_cfg["observation_minutes"])
 
     raids = pl.read_parquet(cell_dir / "raids.parquet")
     levels = pl.read_parquet(cell_dir / "levels.parquet")
@@ -125,9 +123,9 @@ def _scan_one(cell_dir: Path) -> dict[str, Any]:
     defined = tpo.filter(pl.col("profile_status") == "DEFINED") if tpo.height else tpo
     undefined = tpo.filter(pl.col("profile_status") == "UNDEFINED") if tpo.height else tpo
     defined_bad = (
-        defined.filter(pl.col("tpo_conservation_ok") != True).height if defined.height else 0
+        defined.filter(~pl.col("tpo_conservation_ok")).height if defined.height else 0
     )
-    tight = defined.filter(pl.col("tight_gap") == True).height if defined.height else 0
+    tight = defined.filter(pl.col("tight_gap")).height if defined.height else 0
     if defined.height:
         ratio_ok = defined.filter(
             (pl.col("gap_span") < 0.50 * pl.col("va_width")) == pl.col("tight_gap")
@@ -146,9 +144,50 @@ def _scan_one(cell_dir: Path) -> dict[str, Any]:
     ambiguous = (
         raids.filter(pl.col("status") == "AMBIGUOUS_INTRABAR") if raids.height else raids
     )
-    primary = (
-        raids.filter(pl.col("primary_attribution") == True) if raids.height else raids
-    )
+    primary = raids.filter(pl.col("primary_attribution")) if raids.height else raids
+    retrace_status_counts: dict[str, int] = {}
+    retrace_invalid_status = 0
+    retrace_invalid_price = 0
+    retrace_missing_primary = 0
+    retrace_unexpected_non_primary = 0
+    if "pre_mfe_retrace" not in raids.columns:
+        raise ValueError(f"missing AMENDMENT-14 pre_mfe_retrace column: {cell_dir.name}")
+    if raids.height:
+        retrace = raids.select(
+            [
+                "primary_attribution",
+                "confirmation_ts_ns",
+                pl.col("pre_mfe_retrace").struct.field("price").alias("retrace_price"),
+                pl.col("pre_mfe_retrace").struct.field("status").alias("retrace_status"),
+            ]
+        )
+        retrace_status_counts = _status_counts(
+            retrace.filter(pl.col("retrace_status").is_not_null())["retrace_status"]
+        )
+        valid_retrace_statuses = {
+            "DEFINED",
+            "AMBIGUOUS_SAME_BAR",
+            "NO_POST_CONFIRMATION_MFE",
+        }
+        retrace_invalid_status = int(
+            retrace.filter(
+                pl.col("retrace_status").is_not_null()
+                & ~pl.col("retrace_status").is_in(valid_retrace_statuses)
+            ).height
+        )
+        retrace_invalid_price = int(
+            retrace.filter(
+                pl.col("retrace_status").is_not_null()
+                & ~pl.col("retrace_price").is_finite()
+            ).height
+        )
+        expected_retrace = pl.col("primary_attribution")
+        retrace_missing_primary = int(
+            retrace.filter(expected_retrace & pl.col("retrace_status").is_null()).height
+        )
+        retrace_unexpected_non_primary = int(
+            retrace.filter(~expected_retrace & pl.col("retrace_status").is_not_null()).height
+        )
 
     # AMENDMENT-13: same-bar return is recorded and stays live until confirm/fail.
     n_same_bar_return = 0
@@ -223,6 +262,7 @@ def _scan_one(cell_dir: Path) -> dict[str, Any]:
     destroy_status_mismatch = 0
     n_value_changed = 0
     n_swing_changed = 0
+    n_retrace_changed = 0
     mean_abs_d_swing = None
     raw_mean_swing = None
     raw_se_swing = None
@@ -241,6 +281,7 @@ def _scan_one(cell_dir: Path) -> dict[str, Any]:
                 "swing_atr",
                 "duration_ns",
                 "strong_move",
+                "pre_mfe_retrace",
             ]
         ).join(
             destroyed.select(
@@ -249,6 +290,7 @@ def _scan_one(cell_dir: Path) -> dict[str, Any]:
                     pl.col("swing_atr").alias("d_swing_atr"),
                     pl.col("duration_ns").alias("d_duration_ns"),
                     pl.col("strong_move").alias("d_strong_move"),
+                    pl.col("pre_mfe_retrace").alias("d_pre_mfe_retrace"),
                 ]
             ),
             on="raid_id",
@@ -272,6 +314,11 @@ def _scan_one(cell_dir: Path) -> dict[str, Any]:
                     pl.col("strong_move").is_null()
                     != pl.col("d_strong_move").is_null()
                 )
+                | (pl.col("pre_mfe_retrace") != pl.col("d_pre_mfe_retrace"))
+                | (
+                    pl.col("pre_mfe_retrace").is_null()
+                    != pl.col("d_pre_mfe_retrace").is_null()
+                )
             )
             n_value_changed = changed.height
             swing_changed = eligible.filter(
@@ -279,6 +326,13 @@ def _scan_one(cell_dir: Path) -> dict[str, Any]:
                 | (pl.col("swing_atr").is_null() != pl.col("d_swing_atr").is_null())
             )
             n_swing_changed = swing_changed.height
+            n_retrace_changed = eligible.filter(
+                (pl.col("pre_mfe_retrace") != pl.col("d_pre_mfe_retrace"))
+                | (
+                    pl.col("pre_mfe_retrace").is_null()
+                    != pl.col("d_pre_mfe_retrace").is_null()
+                )
+            ).height
             finite = eligible.filter(
                 pl.col("swing_atr").is_finite() & pl.col("d_swing_atr").is_finite()
             )
@@ -293,10 +347,8 @@ def _scan_one(cell_dir: Path) -> dict[str, Any]:
 
     live_end = int(meta.get("n_fills") or 0) != 0
     cost_ok = meta.get("cost_model") == "NO_COST_CHARGED"
-    active_raids = int(raids.filter(pl.col("active") == True).height) if raids.height else 0
-    active_levels = (
-        int(levels.filter(pl.col("active") == True).height) if levels.height else 0
-    )
+    active_raids = int(raids.filter(pl.col("active")).height) if raids.height else 0
+    active_levels = int(levels.filter(pl.col("active")).height) if levels.height else 0
 
     return {
         **ident,
@@ -313,6 +365,18 @@ def _scan_one(cell_dir: Path) -> dict[str, Any]:
         "n_completed": int(completed.height) if completed is not None else 0,
         "n_ambiguous": int(ambiguous.height) if ambiguous is not None else 0,
         "n_primary_attr": int(primary.height) if primary is not None else 0,
+        "pre_mfe_retrace_status_json": json.dumps(retrace_status_counts, sort_keys=True),
+        "n_pre_mfe_defined": int(retrace_status_counts.get("DEFINED", 0)),
+        "n_pre_mfe_ambiguous": int(
+            retrace_status_counts.get("AMBIGUOUS_SAME_BAR", 0)
+        ),
+        "n_pre_mfe_no_mfe": int(
+            retrace_status_counts.get("NO_POST_CONFIRMATION_MFE", 0)
+        ),
+        "pre_mfe_invalid_status": retrace_invalid_status,
+        "pre_mfe_invalid_price": retrace_invalid_price,
+        "pre_mfe_missing_primary": retrace_missing_primary,
+        "pre_mfe_unexpected_non_primary": retrace_unexpected_non_primary,
         "n_failed": int(raid_status.get("FAILED_BREAKOUT", 0)),
         "n_non_primary": int(raid_status.get("CONFIRMED_NON_PRIMARY", 0)),
         "n_censor_exc": int(raid_status.get("RIGHT_CENSORED_EXCURSION", 0)),
@@ -370,6 +434,7 @@ def _scan_one(cell_dir: Path) -> dict[str, Any]:
         "destroy_status_mismatch": destroy_status_mismatch,
         "destroy_n_value_changed": n_value_changed,
         "destroy_n_swing_changed": n_swing_changed,
+        "destroy_n_retrace_changed": n_retrace_changed,
         "mean_abs_d_swing": mean_abs_d_swing,
         "raw_mean_swing": raw_mean_swing,
         "raw_se_swing": raw_se_swing,
@@ -506,10 +571,10 @@ def scan_method_overlap() -> dict[str, Any]:
     frame = pl.DataFrame(pairs)
     return {
         "n_pairs": frame.height,
-        "n_id_equal": int(frame.filter(pl.col("raid_id_equal") == True).height)
+        "n_id_equal": int(frame.filter(pl.col("raid_id_equal")).height)
         if "raid_id_equal" in frame.columns
         else 0,
-        "n_status_equal": int(frame.filter(pl.col("status_equal") == True).height)
+        "n_status_equal": int(frame.filter(pl.col("status_equal")).height)
         if "status_equal" in frame.columns
         else 0,
         "n_count_diff": int(frame.filter(pl.col("n_bb") != pl.col("n_lc")).height)
@@ -579,12 +644,16 @@ def main() -> None:
         "n_ambiguous",
         "n_confirm_without_return",
         "n_same_bar_closed_ambiguous",
+        "pre_mfe_invalid_status",
+        "pre_mfe_invalid_price",
+        "pre_mfe_missing_primary",
+        "pre_mfe_unexpected_non_primary",
         "retired_status_hits",
     ]
     fail_counts = {col: int(frame[col].sum()) for col in integrity_fail_cols}
     vacuous = frame.filter(pl.col("destroy_non_vacuity") == "VACUOUS_SINGLETON")
     changed = frame.filter(pl.col("destroy_non_vacuity") == "CHANGED")
-    collapse = changed.filter(pl.col("destroy_collapses") == False)
+    collapse = changed.filter(~pl.col("destroy_collapses"))
 
     observed_configs = set(frame["level_config"].unique().to_list())
     grid_check: dict[str, Any] = {}
@@ -636,18 +705,21 @@ def main() -> None:
         "total_same_bar_closed_ambiguous": int(
             frame["n_same_bar_closed_ambiguous"].sum()
         ),
+        "total_pre_mfe_defined": int(frame["n_pre_mfe_defined"].sum()),
+        "total_pre_mfe_ambiguous": int(frame["n_pre_mfe_ambiguous"].sum()),
+        "total_pre_mfe_no_mfe": int(frame["n_pre_mfe_no_mfe"].sum()),
         "min_same_bar_return_frac": float(frame["same_bar_return_frac"].min()),
         "max_same_bar_return_frac": float(frame["same_bar_return_frac"].max()),
         "median_same_bar_return_frac": float(frame["same_bar_return_frac"].median()),
         "min_ambiguous_frac": float(frame["ambiguous_frac"].min()),
         "max_ambiguous_frac": float(frame["ambiguous_frac"].max()),
         "median_ambiguous_frac": float(frame["ambiguous_frac"].median()),
-        "cost_ok_cells": int(frame.filter(pl.col("cost_ok") == True).height),
+        "cost_ok_cells": int(frame.filter(pl.col("cost_ok")).height),
         "destroy_vacuous_cells": vacuous["cell_id"].to_list(),
         "destroy_changed_cells": int(changed.height),
         "destroy_collapse_false_cells": collapse["cell_id"].to_list(),
         "integrity_fail_sums": fail_counts,
-        "mark_past_train_cells": int(frame.filter(pl.col("mark_past_train") == True).height),
+        "mark_past_train_cells": int(frame.filter(pl.col("mark_past_train")).height),
         "raid_ts_past_train_sum": int(frame["raid_ts_past_train"].sum()),
         "clock_weekend_sunday_anchors": clock["weekend_date_anchors_1d_sunday"],
         "clock_weekend_saturday_anchors": clock["weekend_date_anchors_1d_saturday"],

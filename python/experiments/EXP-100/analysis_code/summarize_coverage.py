@@ -17,6 +17,44 @@ def _write(name: str, frame: pl.DataFrame) -> None:
     frame.write_csv(OUT_DIR / name)
 
 
+MARGINAL_LAYERS = (
+    ("venue", "venue"),
+    ("instrument", "symbol"),
+    ("timeframe", "timeframe"),
+    ("confirmation_method", "method"),
+    ("confirmation_reference", "confirm_ref"),
+    ("level_configuration", "level_config"),
+)
+MARGINAL_SUMS = (
+    ("n_levels", "levels"),
+    ("n_raids", "raids"),
+    ("n_return", "returned"),
+    ("n_confirmed", "primary_confirmed"),
+    ("n_primary_attr", "primary_attributed"),
+    ("n_completed", "completed"),
+    ("n_non_primary", "confirmed_non_primary"),
+    ("n_failed", "failed_breakout"),
+    ("n_censor_exc", "right_censored_excursion"),
+    ("n_censor_conf", "right_censored_confirmation"),
+    ("n_censor_end", "right_censored_endpoint"),
+    ("n_pre_mfe_defined", "pre_mfe_defined"),
+    ("n_pre_mfe_ambiguous", "pre_mfe_ambiguous_same_bar"),
+    ("n_pre_mfe_no_mfe", "pre_mfe_no_post_confirmation_mfe"),
+)
+
+
+def coverage_marginals(census: pl.DataFrame) -> pl.DataFrame:
+    """Return one count row for every value of every declared grid layer."""
+    tables = []
+    for layer, column in MARGINAL_LAYERS:
+        table = census.group_by(column).agg(
+            pl.len().alias("cells"),
+            *[pl.col(source).sum().alias(output) for source, output in MARGINAL_SUMS],
+        ).rename({column: "value"}).with_columns(pl.lit(layer).alias("layer"))
+        tables.append(table.select("layer", "value", *table.columns[1:-1]))
+    return pl.concat(tables, how="vertical").sort(["layer", "value"])
+
+
 def destroy_collapse_table(census: pl.DataFrame) -> pl.DataFrame:
     changed = census.filter(pl.col("destroy_non_vacuity") == "CHANGED")
     return changed.select(
@@ -27,9 +65,9 @@ def destroy_collapse_table(census: pl.DataFrame) -> pl.DataFrame:
             "method",
             "confirm_ref",
             "level_config",
-            "n_confirmed",
-            "destroy_n_value_changed",
-            "destroy_n_swing_changed",
+            pl.col("n_confirmed").alias("primary_confirmed_rows"),
+            pl.col("destroy_n_value_changed").alias("changed_primary_rows"),
+            pl.col("destroy_n_swing_changed").alias("swing_changed_primary_rows"),
             "mean_abs_d_swing",
             "raw_mean_swing",
             "raw_se_swing",
@@ -37,12 +75,17 @@ def destroy_collapse_table(census: pl.DataFrame) -> pl.DataFrame:
             "destroy_collapses",
             "destroy_contrast_meta",
         ]
-    ).sort(["n_confirmed", "cell_id"])
+    ).sort(["primary_confirmed_rows", "cell_id"])
 
 
 def main() -> None:
     census = pl.read_parquet(CENSUS)
     clock = pl.read_parquet(CLOCK)
+
+    marginals = coverage_marginals(census)
+    (OUT_DIR / "coverage_marginals.json").write_text(
+        json.dumps(marginals.to_dicts(), indent=2) + "\n", encoding="utf-8"
+    )
 
     by_cfg = (
         census.group_by(["symbol", "timeframe", "level_config"])
@@ -75,6 +118,9 @@ def main() -> None:
                 pl.col("n_confirmed").sum(),
                 pl.col("n_completed").sum(),
                 pl.col("n_same_bar_return").sum(),
+                pl.col("n_pre_mfe_defined").sum(),
+                pl.col("n_pre_mfe_ambiguous").sum(),
+                pl.col("n_pre_mfe_no_mfe").sum(),
                 pl.col("n_ambiguous").sum().alias("n_ambiguous_retired"),
                 pl.col("n_failed").sum(),
                 pl.col("n_non_primary").sum(),
@@ -113,15 +159,15 @@ def main() -> None:
 
     destroy = destroy_collapse_table(census)
     _write("destroy_cells.csv", destroy)
-    n_lt5 = destroy.filter(pl.col("n_confirmed") < 5).height
-    n_ge5 = destroy.filter(pl.col("n_confirmed") >= 5).height
+    n_lt5 = destroy.filter(pl.col("primary_confirmed_rows") < 5).height
+    n_ge5 = destroy.filter(pl.col("primary_confirmed_rows") >= 5).height
     fail_ge5 = destroy.filter(
-        (pl.col("n_confirmed") >= 5) & (pl.col("destroy_collapses") == False)
+        (pl.col("primary_confirmed_rows") >= 5) & ~pl.col("destroy_collapses")
     )
     fail_lt5 = destroy.filter(
-        (pl.col("n_confirmed") < 5) & (pl.col("destroy_collapses") == False)
+        (pl.col("primary_confirmed_rows") < 5) & ~pl.col("destroy_collapses")
     )
-    meta_changed = destroy.filter(pl.col("destroy_n_value_changed") == 0)
+    meta_changed = destroy.filter(pl.col("changed_primary_rows") == 0)
 
     clock_1d = clock.filter(pl.col("level_config") == "PREVIOUS_1D").select(
         [
@@ -151,14 +197,14 @@ def main() -> None:
 
     summary = {
         "destroy_changed_cells": destroy.height,
-        "destroy_n_confirmed_lt5": n_lt5,
-        "destroy_n_confirmed_ge5": n_ge5,
+        "destroy_primary_confirmed_rows_lt5": n_lt5,
+        "destroy_primary_confirmed_rows_ge5": n_ge5,
         "destroy_collapse_false_ge5": fail_ge5["cell_id"].to_list(),
         "destroy_collapse_false_lt5_n": fail_lt5.height,
         "destroy_collapse_false_lt5": fail_lt5.select(
-            ["cell_id", "n_confirmed", "mean_abs_d_swing", "integrity_bite"]
+            ["cell_id", "primary_confirmed_rows", "mean_abs_d_swing", "integrity_bite"]
         ).to_dicts(),
-        "destroy_changed_but_zero_value_swaps": meta_changed["cell_id"].to_list(),
+        "destroy_changed_but_zero_primary_value_swaps": meta_changed["cell_id"].to_list(),
         "min_1d_anchors": int(clock_1d["n_anchors"].min()),
         "max_1d_anchors": int(clock_1d["n_anchors"].max()),
         "min_1w_anchors": int(clock_1w["n_anchors"].min()),
@@ -182,6 +228,9 @@ def main() -> None:
         "same_bar_closed_ambiguous_total": int(
             census["n_same_bar_closed_ambiguous"].sum()
         ),
+        "pre_mfe_defined_total": int(census["n_pre_mfe_defined"].sum()),
+        "pre_mfe_ambiguous_total": int(census["n_pre_mfe_ambiguous"].sum()),
+        "pre_mfe_no_mfe_total": int(census["n_pre_mfe_no_mfe"].sum()),
     }
     (OUT_DIR / "coverage_summary.json").write_text(
         json.dumps(summary, indent=2) + "\n", encoding="utf-8"

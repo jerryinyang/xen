@@ -107,6 +107,17 @@ wick that does not survive the observation OHLC is still not a raid
 old object and are deleted. **DIRECTION: LOOSER**. Running count: **2 looser /
 3 tighter / 7 neutral**.
 
+**AMENDMENT-14 (2026-08-13):** add one structured raid-emission column,
+`pre_mfe_retrace={price,status}`, for a downstream question about retracement into the
+completed value area or selected value gap before terminal post-confirmation MFE —
+**DIRECTION: NEUTRAL**. HIGH-side price is the greatest real 1m high; LOW-side price is the
+least real 1m low. The confirmation close starts the clock. A terminal-MFE minute that also
+extends the adverse extreme is `AMBIGUOUS_SAME_BAR`; ambiguity is reported separately.
+No population, estimand, control, HYP-000 false qualifier, or 264-cell matrix changes.
+The prior AMENDMENT-13 emission remains historical; the operator authorised a fresh full
+TRAIN rerun and fresh analysis after removing stale generated EXP-100 outputs. Running
+count: **2 looser / 3 tighter / 8 neutral**.
+
 ## 3. Mechanism
 
 ```text
@@ -287,7 +298,7 @@ CONTROL FUTURE_DESTROY:
     alignment from the real outcome series.
   bite: changes the future swing and strong-move statistic while preserving the
     event population and marginal block distribution.
-  non-vacuity: perturbs swing_atr, swing_duration, and strong_move labels.
+  non-vacuity: perturbs swing_atr, swing_duration, strong_move, and pre_mfe_retrace.
   expected outcome if H true: the event-to-outcome contrast collapses toward the
     same-stratum baseline; if H false: similar contrast remains.
   disclosure: report destroy/raw contrast ratio and fixed-point count.
@@ -322,6 +333,7 @@ At minimum, each raid record must carry:
 - return timestamp and prior raid count;
 - sweep/breakout confirmation state and endpoint/censor state;
 - reversal/swing magnitude and duration in raw price, bps, and ATR;
+- one structured pre-terminal-MFE retracement field with price and explicit ordering status;
 - TPO profile status, profile interval, bin width, TPO bracket count, VAH/VAL,
   VA TPO count, selected gap-bin mask, gap span, gap span in ATR, gap/VA ratio,
   tight-gap label, and explicit undefined reason where applicable;

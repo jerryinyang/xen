@@ -134,6 +134,13 @@ def _coerce_value(value: Any, data_type: pa.DataType) -> Any:
         return int(value)
     if pa.types.is_floating(data_type):
         return float(value)
+    if pa.types.is_struct(data_type):
+        if not isinstance(value, dict):
+            raise TypeError("EXP-100 struct output must be a dictionary")
+        return {
+            field.name: _coerce_value(value.get(field.name), field.type)
+            for field in data_type
+        }
     raise TypeError(f"unsupported EXP-100 output type: {data_type}")
 
 
@@ -211,6 +218,17 @@ def _raid_schema() -> pa.Schema:
             ("swing_bps", pa.float64()),
             ("swing_atr", pa.float64()),
             ("strong_move", pa.bool_()),
+            (
+                "pre_mfe_retrace",
+                pa.struct(
+                    [
+                        pa.field("price", pa.float64(), nullable=False),
+                        pa.field("status", pa.string(), nullable=False),
+                    ]
+                ),
+            ),
+            ("excursion_duration_ns", pa.int64()),
+            ("swing_duration_ns", pa.int64()),
             ("duration_ns", pa.int64()),
         ]
     )

@@ -39,6 +39,8 @@ For the purpose of the experiment,
     * reversal or swing magnitude
     * reversal or swing duration
     * whether the later swing exceeded the initial excursion
+    * the side-aware maximum retracement before terminal post-confirmation MFE,
+      with same-1m-bar ordering marked ambiguous (AMENDMENT-14)
     * number of previous raids on the level
     * whether a value gap occurred
     * whether the level was eventually confirmed as a sweep or invalidated by a breakout

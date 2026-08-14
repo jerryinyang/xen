@@ -144,6 +144,7 @@ loaded.
 | Experiment | Evidence disposition | Read accounting |
 |---|---|---|
 | `EXP-100` / `HYP-000` | Complete; 264/264 AMENDMENT-13 TRAIN cells passed validity checks. Operator verdict: HYP-000 upheld — “EXP-100 approved as recommended and confirmed.” | 0 counted TEST reads; holdout sealed |
+| `EXP-100` / `HYP-000` AMENDMENT-14 | Operator authorised one neutral forward emission field (`pre_mfe_retrace`), stale-output replacement, full 264-cell TRAIN rerun, and fresh analysis. Prior AMENDMENT-13 evidence remains historical; no family-status change. | 0 counted TEST reads; holdout sealed |
 
 This is an evidence row only. The family status remains `REGISTERED`; family
 promotion, closure, or retirement is reserved for a checkpoint retrospective.

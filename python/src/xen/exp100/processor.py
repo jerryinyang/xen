@@ -10,7 +10,6 @@ from __future__ import annotations
 import math
 from collections import deque
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Callable
 
 from xen.nautilus.streaming import MemoryGuard
@@ -54,9 +53,8 @@ class Exp100Processor:
         self.sinks = sinks
         self.memory_guard = memory_guard
         self._observations = StreamingOHLC(config.observation_minutes)
-        self._references = StreamingOHLC(
-            60 if config.confirmation_reference == "1H" else 1440
-        )
+        reference_minutes = {"1H": 60, "4H": 240}[config.confirmation_reference]
+        self._references = StreamingOHLC(reference_minutes)
         self._window: deque[BarRecord] = deque(maxlen=config.observation_minutes)
         self._previous_reference: BarRecord | None = None
         self._last_source_ts_ns: int | None = None
@@ -99,17 +97,24 @@ class Exp100Processor:
         if self._finished:
             raise RuntimeError("processor is finished")
         self._validate_source_bar(bar)
+        previous_source_ts_ns = self._last_source_ts_ns
+        if (
+            previous_source_ts_ns is not None
+            and bar.ts_event_ns - previous_source_ts_ns != MINUTE_NS
+        ):
+            # Do not let an incomplete pre-gap observation window seed a later raid.
+            self._window.clear()
         self._last_source_ts_ns = bar.ts_event_ns
         self._processed_source_bars += 1
         self._window.append(bar)
         with self.state.source_bar_transaction():
-            # Existing open raids receive this minute first (profile + swing).
+            # 1m path: profile bins and post-confirmation swing only.
             self._update_active_raids_from_source(bar)
-            # Raid start / return / same-1m ambiguity are decided on source minutes.
-            self._process_source_raid_state(bar)
 
             observation = self._observations.update(bar)
             if observation is not None:
+                # Raid lifecycle is defined on the completed observation bar.
+                self._process_observation_raid_state(observation)
                 self._on_observation_bar(observation)
                 self._window.clear()
                 if self._auto_catalogue:
@@ -167,20 +172,13 @@ class Exp100Processor:
         }
 
     def _update_active_raids_from_source(self, bar: BarRecord) -> None:
+        """Update source-grain TPO and post-confirmation swing state."""
+        bin_ranges: list[tuple[str, int, int, int]] = []
         for raid in self.state.iter_active_raids():
-            current = self._apply_source_to_profile(raid, bar)
+            current = self._apply_source_to_profile(raid, bar, bin_ranges=bin_ranges)
             if current.get("confirmation_ts_ns") is not None:
                 self._update_swing_extreme(current, bar)
-            if current["return_ts_ns"] is not None:
-                continue
-            price = float(current["level_price"])
-            returned = (
-                bar.low <= price if current["side"] == "HIGH" else bar.high >= price
-            )
-            if returned:
-                self.state.update_raid(
-                    str(current["raid_id"]), {"return_ts_ns": bar.ts_event_ns}
-                )
+        self._profiles.add_bars_bulk(bin_ranges)
 
     def _update_swing_extreme(self, raid: dict[str, Any], bar: BarRecord) -> None:
         """Track the post-confirmation favorable extreme for swing magnitude."""
@@ -193,11 +191,54 @@ class Exp100Processor:
             updated = min(float(current_extreme), extreme)
         else:
             updated = max(float(current_extreme), extreme)
+        updates = self._pre_mfe_retrace_updates(raid, bar)
         if current_extreme is None or updated != float(current_extreme):
-            self.state.update_raid(str(raid["raid_id"]), {"swing_extreme": updated})
-            raid["swing_extreme"] = updated
+            updates["swing_extreme"] = updated
+        if updates:
+            self.state.update_raid(str(raid["raid_id"]), updates)
+            raid.update(updates)
 
-    def _apply_source_to_profile(self, raid: dict[str, Any], bar: BarRecord) -> dict[str, Any]:
+    @staticmethod
+    def _pre_mfe_retrace_updates(
+        raid: dict[str, Any], bar: BarRecord
+    ) -> dict[str, Any]:
+        """Return bounded online updates for the adverse path before terminal MFE."""
+        if raid.get("confirmation_ts_ns") is None or not bool(
+            raid.get("primary_attribution", False)
+        ):
+            return {}
+        side = str(raid["side"])
+        current_mfe = float(raid["post_confirmation_mfe"])
+        running_retrace = float(raid["pre_mfe_running_retrace"])
+        favorable = bar.low if side == "HIGH" else bar.high
+        adverse = bar.high if side == "HIGH" else bar.low
+        new_mfe = favorable < current_mfe if side == "HIGH" else favorable > current_mfe
+        adverse_extends = (
+            adverse > running_retrace if side == "HIGH" else adverse < running_retrace
+        )
+        next_running = (
+            max(running_retrace, adverse)
+            if side == "HIGH"
+            else min(running_retrace, adverse)
+        )
+        updates: dict[str, Any] = {}
+        if adverse_extends:
+            updates["pre_mfe_running_retrace"] = next_running
+        if new_mfe:
+            updates["post_confirmation_mfe"] = favorable
+            updates["pre_mfe_retrace"] = {
+                "price": next_running if adverse_extends else running_retrace,
+                "status": "AMBIGUOUS_SAME_BAR" if adverse_extends else "DEFINED",
+            }
+        return updates
+
+    def _apply_source_to_profile(
+        self,
+        raid: dict[str, Any],
+        bar: BarRecord,
+        *,
+        bin_ranges: list[tuple[str, int, int, int]] | None = None,
+    ) -> dict[str, Any]:
         """Apply one source minute once to a live profile, resetting at a new max."""
         if raid.get("profile_finalized", False):
             return raid
@@ -213,6 +254,7 @@ class Exp100Processor:
             level_price = float(raid["level_price"])
             updates = {
                 "profile_generation": generation,
+                "profile_bin_width": raid.get("profile_bin_width"),
                 "max_price": extreme,
                 "max_excursion": (
                     extreme - level_price if side == "HIGH" else level_price - extreme
@@ -223,13 +265,42 @@ class Exp100Processor:
             }
             current.update(updates)
             self.state.update_raid(str(raid["raid_id"]), updates)
-        self._profiles.add_bar(str(raid["raid_id"]), generation, bar)
+        cached_bin_width = current.get("profile_bin_width")
+        if isinstance(cached_bin_width, (int, float)):
+            bin_width = float(cached_bin_width)
+        else:
+            state = self.state.get_profile_state(str(raid["raid_id"]), generation)
+            if state is None:
+                raise KeyError((str(raid["raid_id"]), generation))
+            bin_width = float(state["bin_width"])
+        low_bin, high_bin = self._profiles.bar_bin_range(bar, bin_width)
+        if bin_ranges is None:
+            self._profiles.add_bars_bulk(
+                [(str(raid["raid_id"]), generation, low_bin, high_bin)]
+            )
+        else:
+            bin_ranges.append((str(raid["raid_id"]), generation, low_bin, high_bin))
         return current
 
-    def _process_source_raid_state(self, bar: BarRecord) -> None:
-        """Detect strict 1m excursion, inclusive return, and same-1m ambiguity."""
+    def _process_observation_raid_state(self, bar: BarRecord) -> None:
+        """Detect observation-bar excursion and record inclusive return.
+
+        A strict beyond on a completed observation bar starts a live raid even
+        when the same bar also returns to the level (AMENDMENT-13). Source
+        minutes remain reserved for profiles, excursion resets, and swings.
+        """
         atr = self._atr.value
         regime = self._last_regime
+
+        for raid in self.state.iter_active_raids():
+            if raid.get("return_ts_ns") is not None:
+                continue
+            price = float(raid["level_price"])
+            returned = bar.low <= price if raid["side"] == "HIGH" else bar.high >= price
+            if returned:
+                self.state.update_raid(
+                    str(raid["raid_id"]), {"return_ts_ns": bar.ts_event_ns}
+                )
 
         for level in self.state.iter_active_levels():
             level_id = str(level["level_id"])
@@ -239,21 +310,22 @@ class Exp100Processor:
             returned = bar.low <= price if side == "HIGH" else bar.high >= price
             beyond = current_beyond and not returned
             previous_beyond = bool(level.get("beyond", False))
-            self.state.update_level(
-                level_id,
-                {
-                    "beyond": beyond,
-                    "last_source_ts_ns": bar.ts_event_ns,
-                    "last_observation_ts_ns": bar.ts_event_ns,
-                },
-            )
+            if beyond != previous_beyond:
+                self.state.update_level(
+                    level_id,
+                    {
+                        "beyond": beyond,
+                        "last_observation_ts_ns": bar.ts_event_ns,
+                    },
+                )
             if not current_beyond or previous_beyond:
                 continue
+            raid = self._new_raid(level, bar, atr, regime)
             if returned:
-                raid = self._new_raid(level, bar, atr, regime, True)
-                self._terminal_raid(raid, "AMBIGUOUS_INTRABAR", bar.ts_event_ns)
-            else:
-                self._new_raid(level, bar, atr, regime, False)
+                raid["return_ts_ns"] = bar.ts_event_ns
+                self.state.update_raid(
+                    str(raid["raid_id"]), {"return_ts_ns": bar.ts_event_ns}
+                )
 
     def _on_observation_bar(self, bar: BarRecord) -> None:
         """Update causal ATR/regime and emit one observation bar mark."""
@@ -279,18 +351,56 @@ class Exp100Processor:
             }
         )
 
+    def _first_excursion_bar(
+        self, side: str, price: float, fallback: BarRecord
+    ) -> BarRecord:
+        """Find the first causal source minute beyond a completed observation bar."""
+        for minute in self._window:
+            beyond = minute.high > price if side == "HIGH" else minute.low < price
+            if beyond:
+                return minute
+        return fallback
+
+    def _seed_profile_from_window(
+        self, raid: dict[str, Any], side: str, price: float
+    ) -> None:
+        """Seed a new profile from the bounded current observation window."""
+        if not isinstance(raid.get("profile_generation"), int):
+            return
+        started = False
+        pending = list(self._window)
+        for minute in pending:
+            if not started:
+                beyond = minute.high > price if side == "HIGH" else minute.low < price
+                if not beyond:
+                    continue
+                started = True
+            raid.update(self._apply_source_to_profile(raid, minute))
+        if started:
+            self.state.update_raid(
+                str(raid["raid_id"]),
+                {
+                    "profile_generation": raid.get("profile_generation"),
+                    "max_price": raid.get("max_price"),
+                    "max_excursion": raid.get("max_excursion"),
+                    "excursion_ts_ns": raid.get("excursion_ts_ns"),
+                    "excursion_atr": raid.get("excursion_atr"),
+                    "excursion_regime": raid.get("excursion_regime"),
+                },
+            )
+
     def _new_raid(
         self,
         level: dict[str, Any],
-        source_bar: BarRecord,
+        observation_bar: BarRecord,
         atr: float | None,
         regime: str,
-        ambiguous: bool,
     ) -> dict[str, Any]:
         level_id = str(level["level_id"])
         side = str(level["side"])
         price = float(level["price"])
-        initial_extreme = source_bar.high if side == "HIGH" else source_bar.low
+        first_bar = self._first_excursion_bar(side, price, observation_bar)
+        initial_extreme = first_bar.high if side == "HIGH" else first_bar.low
         prior_raid_count = self.state.prior_raid_count(level_id)
         raid_id = f"{level_id}:raid:{prior_raid_count + 1}"
         max_excursion = (
@@ -300,15 +410,16 @@ class Exp100Processor:
             "raid_id": raid_id,
             "level_id": level_id,
             "event_identity": (
-                f"{level['event_identity']}|raid|{source_bar.ts_event_ns}|{prior_raid_count + 1}"
+                f"{level['event_identity']}|raid|{observation_bar.ts_event_ns}|"
+                f"{prior_raid_count + 1}"
             ),
             "source_configuration": level["source_configuration"],
             "side": side,
             "level_price": price,
             "level_creation_ts_ns": level["creation_ts_ns"],
-            "sweep_ts_ns": source_bar.ts_event_ns,
-            "first_excursion_ts_ns": source_bar.ts_event_ns,
-            "return_ts_ns": source_bar.ts_event_ns if ambiguous else None,
+            "sweep_ts_ns": observation_bar.ts_event_ns,
+            "first_excursion_ts_ns": first_bar.ts_event_ns,
+            "return_ts_ns": None,
             "confirmation_ts_ns": None,
             "endpoint_ts_ns": None,
             "censor_ts_ns": None,
@@ -317,7 +428,7 @@ class Exp100Processor:
             "prior_raid_count": prior_raid_count,
             "raid_atr": atr,
             "raid_regime": regime,
-            "excursion_ts_ns": source_bar.ts_event_ns,
+            "excursion_ts_ns": first_bar.ts_event_ns,
             "excursion_atr": atr,
             "excursion_regime": regime,
             "confirmation_atr": None,
@@ -325,22 +436,27 @@ class Exp100Processor:
             "endpoint_atr": None,
             "endpoint_regime": None,
             "profile_generation": None,
+            "profile_bin_width": None,
             "profile_finalized": False,
-            "profile_undefined_reason": "AMBIGUOUS_INTRABAR" if ambiguous else None,
+            "profile_undefined_reason": None,
             "active": 1,
         }
-        if not ambiguous and atr is not None and atr > 0.0 and math.isfinite(atr):
-            raid["profile_generation"] = self._profiles.start(
-                raid_id, source_bar.ts_event_ns, initial_extreme, atr
+        if atr is not None and atr > 0.0 and math.isfinite(atr):
+            generation, bin_width = self._profiles.start(
+                raid_id, first_bar.ts_event_ns, initial_extreme, atr
             )
-        elif not ambiguous:
+            raid["profile_generation"] = generation
+            raid["profile_bin_width"] = bin_width
+        else:
             raid["profile_undefined_reason"] = "ATR_UNDEFINED"
         self.state.insert_raid(raid)
         self._event(
-            "RAID_STARTED", source_bar.ts_event_ns, raid_id=raid_id, level_id=level_id
+            "RAID_STARTED",
+            observation_bar.ts_event_ns,
+            raid_id=raid_id,
+            level_id=level_id,
         )
-        if isinstance(raid["profile_generation"], int):
-            return self._apply_source_to_profile(raid, source_bar)
+        self._seed_profile_from_window(raid, side, price)
         return raid
 
     def _on_reference_bar(self, bar: BarRecord) -> None:
@@ -348,26 +464,30 @@ class Exp100Processor:
         self._previous_reference = bar
         if previous is None:
             return
-        expected = self._latest_active_raid(
+        expected = self._eligible_active_raids(
             lambda raid: raid["confirmation_ts_ns"] is None
             and raid["return_ts_ns"] is not None
             and bar.ts_event_ns > int(raid["sweep_ts_ns"])
             and self._is_expected_reference_event(str(raid["side"]), previous, bar)
         )
-        opposing_unconfirmed = self._latest_active_raid(
+        opposing_unconfirmed = self._eligible_active_raids(
             lambda raid: raid["confirmation_ts_ns"] is None
             and raid["return_ts_ns"] is not None
             and bar.ts_event_ns > int(raid["sweep_ts_ns"])
             and self._is_opposing_reference_event(str(raid["side"]), previous, bar)
         )
-        endpoint = self._latest_active_raid(
+        endpoint = self._eligible_active_raids(
             lambda raid: raid["confirmation_ts_ns"] is not None
             and bool(raid.get("primary_attribution", False))
             and bar.ts_event_ns > int(raid["confirmation_ts_ns"])
             and self._is_opposing_reference_event(str(raid["side"]), previous, bar)
         )
-        if expected is not None:
-            side = str(expected["side"])
+        if expected:
+            primary = max(
+                expected,
+                key=lambda raid: (int(raid["sweep_ts_ns"]), str(raid["raid_id"])),
+            )
+            side = str(primary["side"])
             initial_extreme = bar.low if side == "HIGH" else bar.high
             updates = {
                 "confirmation_ts_ns": bar.ts_event_ns,
@@ -381,34 +501,49 @@ class Exp100Processor:
                 "confirmation_level_low": float(previous.low),
                 "confirmation_price": float(bar.close),
                 "swing_extreme": float(initial_extreme),
+                "post_confirmation_mfe": float(bar.close),
+                "pre_mfe_running_retrace": float(bar.close),
+                "pre_mfe_retrace": {
+                    "price": float(bar.close),
+                    "status": "NO_POST_CONFIRMATION_MFE",
+                },
                 "primary_attribution": True,
             }
-            self.state.update_raid(str(expected["raid_id"]), updates)
-            self._finalize_profile({**expected, **updates}, bar.ts_event_ns, "CONFIRMED")
-        if opposing_unconfirmed is not None:
-            self._terminal_raid(opposing_unconfirmed, "FAILED_BREAKOUT", bar.ts_event_ns)
-        if endpoint is not None:
-            self._terminal_raid(endpoint, "COMPLETED", bar.ts_event_ns)
+            self.state.update_raid(str(primary["raid_id"]), updates)
+            self._finalize_profile({**primary, **updates}, bar.ts_event_ns, "CONFIRMED")
+            for earlier in expected:
+                if earlier["raid_id"] != primary["raid_id"]:
+                    self._terminal_raid(
+                        earlier, "CONFIRMED_NON_PRIMARY", bar.ts_event_ns
+                    )
+        for raid in opposing_unconfirmed:
+            self._terminal_raid(raid, "FAILED_BREAKOUT", bar.ts_event_ns)
+        for raid in endpoint:
+            self._terminal_raid(raid, "COMPLETED", bar.ts_event_ns)
+
+    def _eligible_active_raids(
+        self, eligible: Callable[[dict[str, Any]], bool]
+    ) -> list[dict[str, Any]]:
+        """Snapshot eligible raids before terminal settlement mutates state."""
+        return [raid for raid in self.state.iter_active_raids() if eligible(raid)]
 
     def _latest_active_raid(
         self, eligible: Callable[[dict[str, Any]], bool]
     ) -> dict[str, Any] | None:
-        latest: dict[str, Any] | None = None
-        for raid in self.state.iter_active_raids():
-            if not eligible(raid):
-                continue
-            if latest is None or (int(raid["sweep_ts_ns"]), str(raid["raid_id"])) > (
-                int(latest["sweep_ts_ns"]),
-                str(latest["raid_id"]),
-            ):
-                latest = raid
-        return latest
+        raids = self._eligible_active_raids(eligible)
+        return max(
+            raids,
+            key=lambda raid: (int(raid["sweep_ts_ns"]), str(raid["raid_id"])),
+            default=None,
+        )
 
     def _terminal_raid(self, raid: dict[str, Any], status: str, endpoint_ts_ns: int) -> None:
         current = dict(raid)
         if not current.get("profile_finalized", False):
             self._finalize_profile(current, endpoint_ts_ns, status)
             current["profile_finalized"] = True
+        current.setdefault("primary_attribution", False)
+        current.setdefault("pre_mfe_retrace", None)
         confirmation_ts_ns = current.get("confirmation_ts_ns")
         raid_atr = current.get("raid_atr")
         level_price = float(current["level_price"])
@@ -442,9 +577,16 @@ class Exp100Processor:
                 if level_price != 0.0 and math.isfinite(level_price):
                     swing_bps = (swing_price / abs(level_price)) * 10_000.0
                 strong_move = bool(swing_atr > max_excursion_atr)
-        duration_ns = None
+        excursion_duration_ns = None
+        first_excursion_ts_ns = current.get("first_excursion_ts_ns")
+        if first_excursion_ts_ns is not None:
+            duration_end_ns = current.get("return_ts_ns")
+            if duration_end_ns is None:
+                duration_end_ns = endpoint_ts_ns
+            excursion_duration_ns = int(duration_end_ns) - int(first_excursion_ts_ns)
+        swing_duration_ns = None
         if confirmation_ts_ns is not None:
-            duration_ns = endpoint_ts_ns - int(confirmation_ts_ns)
+            swing_duration_ns = endpoint_ts_ns - int(confirmation_ts_ns)
         current.update(
             {
                 "active": False,
@@ -464,7 +606,10 @@ class Exp100Processor:
                 "swing_bps": swing_bps,
                 "swing_atr": swing_atr,
                 "strong_move": strong_move,
-                "duration_ns": duration_ns,
+                "excursion_duration_ns": excursion_duration_ns,
+                "swing_duration_ns": swing_duration_ns,
+                # Backward-compatible alias used by the frozen EXP-101–104 readers.
+                "duration_ns": swing_duration_ns,
             }
         )
         self.sinks.raids.append(current)
@@ -609,7 +754,7 @@ class Exp100Processor:
             raise ValueError("bar OHLCV values must be finite")
 
     def _count_active_levels(self) -> int:
-        return sum(1 for _ in self.state.iter_active_levels())
+        return self.state.count_active_levels()
 
     def _count_active_raids(self) -> int:
         return self.state.count_active_raids()
@@ -620,8 +765,7 @@ class Exp100Processor:
         )
 
     def _state_bytes(self) -> int:
-        path = Path(self.state.path)
-        return path.stat().st_size if path.exists() else 0
+        return self.state.estimated_bytes()
 
     def _level_identity(self, level_id: str, price: float, side: str, creation_ts_ns: int) -> str:
         return f"{self.config.level_config}|{level_id}|{side}|{price:.17g}|{creation_ts_ns}"
@@ -631,6 +775,7 @@ class Exp100Processor:
         return {
             "raid_id": raid_id,
             "profile_generation": None,
+            "profile_bin_width": None,
             "profile_start_ts_ns": None,
             "profile_end_ts_ns": end_ts_ns,
             "bin_width": None,

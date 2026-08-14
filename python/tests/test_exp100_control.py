@@ -145,7 +145,7 @@ def test_destroy_changes_strong_move_when_present(tmp_path: Path) -> None:
     assert strong_moved
 
 
-def test_destroy_records_singleton_group_as_empty(tmp_path: Path) -> None:
+def test_destroy_rejects_singleton_group(tmp_path: Path) -> None:
     source = tmp_path / "source.parquet"
     destination = tmp_path / "destroyed.parquet"
     pq.write_table(
@@ -163,20 +163,16 @@ def test_destroy_records_singleton_group_as_empty(tmp_path: Path) -> None:
         source,
     )
 
-    report = destroy_post_confirmation(
-        source,
-        destination,
-        group_columns=GROUP_COLUMNS,
-        value_columns=VALUE_COLUMNS,
-        seed=17,
-    )
+    with pytest.raises(ValueError, match="singleton group cannot be deranged"):
+        destroy_post_confirmation(
+            source,
+            destination,
+            group_columns=GROUP_COLUMNS,
+            value_columns=VALUE_COLUMNS,
+            seed=17,
+        )
 
-    assert report["rows"] == 0
-    assert report["groups"] == 0
-    assert report["changed_rows"] == 0
-    assert report["skipped_singleton_groups"] == 1
-    assert destination.exists()
-    assert pq.read_table(destination).num_rows == 1
+    assert not destination.exists()
 
 
 @pytest.mark.parametrize("missing", ["config", "swing_atr", "raid_id", "strong_move"])

@@ -17,7 +17,7 @@ re-run these).
 
 | ID | Family | Status | Purpose |
 |---|---|---|---|
-| EXP-100 | CF-LIQSWP-001 | COMPLETED — HYP-000 UPHELD (operator-confirmed 2026-08-13) | 264/264 AMENDMENT-13 TRAIN cells passed validity checks; apparatus hypothesis confirmed; no family action |
+| EXP-100 | CF-LIQSWP-001 | AMENDMENT-14 FULL TRAIN RERUN AUTHORISED | One forward pre-MFE retracement field added; stale AMENDMENT-13 outputs are being replaced; prior verdict remains historical |
 | EXP-101 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | Level significance versus later swing outcomes |
 | EXP-102 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | Repeated raids and prior-raid count |
 | EXP-103 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | TPO value gap and tight-gap conditioning |

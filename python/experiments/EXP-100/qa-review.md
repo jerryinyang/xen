@@ -538,3 +538,184 @@ Note: `test_raid_start_and_return_use_source_one_minute_bars` uses default `obse
 4. **INFO — live state is in-memory** (`state_store.py:1-8,64-79`) with an append-only 1m high/low log for deferred TPO (`tpo.py:26-54`). Semantics match the prior store; not a design-fidelity break.
 
 No blocking REVISE/REJECT issues. Ready for the operator's execution gate; QA does not launch it.
+
+## QA run 10 — 2026-08-13T18:54:22Z — mode: subagent — HEAD 3eb18d8683e7b5555331c88870db05d6334eea75
+
+Reviewed dirty-file list: see `git status --short` snapshot supplied by supervisor; `python/experiments/EXP-100/qa-review.md` was already modified. This independent review supersedes the stale AMENDMENT-8-era run 9 scope. No Nautilus, preflight, matrix, TEST, or holdout reads were launched.
+
+Verdict: REVISE
+
+### Design-fidelity trace
+
+| Design clause | Code/artifact | Verdict | Notes |
+|---|---|---|---|
+| cTrader TRAIN universe: EURUSD, XAUUSD, USTEC; 264 cells; 66 15m, 66 30m, 132 1h | `python/experiments/EXP-100/code/run_matrix.py:16-148`; `results/analysis/scan_summary.json` | MATCHES | Family gate reports 264 cells with exact 66/66/132 split and no zero-level or zero-raid cells. |
+| AMENDMENT-6 close-all settlement | `python/src/xen/exp100/processor.py:429-504`; `design.md:48-53,109-113`; `analysis.md:Q19` | MATCHES | Latest eligible expected-side raid remains primary; earlier eligible raids become `CONFIRMED_NON_PRIMARY`; opposing eligible raids become `FAILED_BREAKOUT`. |
+| AMENDMENT-8 observation-bar grain; 1m reserved for TPO, excursion reset, swing path | `processor.py:257-319`; `design.md:47-48,106-108`; `analysis.md:Q18` | MATCHES | Raid creation/return uses completed observation OHLC; 1m source bars update profile/swing state and cannot independently create raids. |
+| AMENDMENT-9 references: 15m/30m → 1H; 1h → 1H and 4H | `config.py:65-85`; `run_matrix.py:91-148`; scan summary grid check | MATCHES | No 1D confirmation cells; 1h has both reference strata. |
+| AMENDMENT-10 NY trading clocks for 1D/1W | `levels.py:191-278`; `config.py:21-29`; `analysis.md:Q20` | MATCHES | America/New_York 17:00 trading day and Monday–Friday week logic; no weekend anchor keys. |
+| AMENDMENT-11 rolling 7/14/22/252 and 264-cell matrix | `levels.py:35-40`; `run_matrix.py:21-35`; scan summary | MATCHES | All four rolling configurations are present; observed configuration set exactly matches expected. |
+| AMENDMENT-12 50% tightness and 30% gap selection | `config.py:45-47,93-99`; `tpo.py:218-245,385-416`; `strategy.py:218-245`; scan summary | MATCHES | `tight_gap` uses 0.50 VA width and gap mass uses 0.30; `tight_rule_mismatch=0`. |
+| AMENDMENT-13 same-bar return lifetime | `processor.py:257-319`; `design.md:48,105-107`; `analysis.md:Q17` | MATCHES | Same-bar beyond plus return records `return_ts_ns` while leaving the raid active; emission reports 7,669,654 same-bar returns and zero ambiguous rows. |
+| Causal ATR/regime and 1m TPO/profile path | `features.py:91-174`; `processor.py:109-215,321-427`; `tpo.py:88-245` | MATCHES | ATR is read before observation update; TPO bin width is frozen at 0.10×ATR and source bars update profile/swing state. |
+| Required raid/profile emissions, including raw/bps/ATR distances and gap ratios | `strategy.py:164-247`; `processor.py:506-579`; `tpo.py:218-245` | DEVIATES | Most fields are present, but excursion duration is absent; `duration_ns` is only endpoint minus confirmation and is not an excursion-duration field. |
+| Online streaming profile with no historical replay | `tpo.py:1-8,26-54,156-178,247-281`; `processor.py:109-110,169-215` | DEVIATES | Every source minute is retained in unbounded `SourceMinuteLog` lists. This violates the design’s bounded online/no-replay boundary even though normal paths also increment profile bins online. |
+| Future-destroy derangement and non-vacuity | `control.py:100-269`; `run_experiment.py:426-454`; per-cell metadata | MATCHES | Full emission reports 264/264 changed controls and zero fixed points. |
+| TRAIN fence, no holdout, one BacktestNode per process, zero cost | `run_experiment.py:349-377,408-421`; `run_matrix.py:271-381`; per-cell gates | MATCHES | All 264 per-cell gates and family gate have `blocking_pass=true`; pinned cTrader fence and `NO_COST_CHARGED` are present. |
+
+### Golden-trace diff
+
+| Event | Expected from current design | Implemented/emitted behavior | Verdict |
+|---|---|---|---|
+| T1 | Observation bar strictly beyonds high level; later observation return records on same raid; same-bar return leaves raid live; non-surviving 1m wick does not create raid | Observation path creates the raid and records return without terminal settlement; source 1m path cannot create raids. | PASS |
+| T2 | Latest eligible expected-side raid is primary; earlier eligible raid settles `CONFIRMED_NON_PRIMARY`; opposing eligible raid fails | `_on_reference_bar` sorts eligible rows by sweep time/raid ID, retains only latest primary, and terminally settles the others. | PASS |
+| T3 | Confirmation occurs at completed 1H/4H close; profile ends at that close; later opposing reference ends primary swing | `confirmation_ts_ns` and profile endpoint use completed reference timestamp; later opposing event emits `COMPLETED`. | PASS |
+
+### Governance & boundary
+
+- Fresh independent `subagent` review; prior QA sections were not rewritten.
+- Current final object is AMENDMENT-13, not the stale AMENDMENT-8-era 216-cell object.
+- Family gate: `python/experiments/EXP-100/results/estimand_validation.json` reports `blocking_pass=true`, `n_cells=264`.
+- Per-cell artifacts: `python/experiments/EXP-100/results/execution/full/` contains 264 gate files; scan summary reports 264/264 passing.
+- Registry family is registered; counted TEST reads are 0; no TEST or holdout reads were performed in this review.
+- Holdout and TRAIN boundary checks report no holdout timestamps; only endpoint/censor timestamps reach the TRAIN boundary.
+- Zero-cost disclosure is present in `design.md`; per-cell gates report `NO_COST_CHARGED` and zero non-zero cost columns.
+- Future-destroy uses a zero-fixed-point derangement; all 264 cells changed non-vacuously.
+- No MDE, power floor, detection floor, or machine-assigned value verdict was found in the reviewed EXP-100 design/code.
+- PSR is not applicable because the apparatus has no trade/leg ledger or mean-trade read.
+- No XENA run, SPDR conversion pin, or cost directive applies.
+- No tests or execution commands were run; the task explicitly prohibited launches and reads outside existing artifacts.
+
+### Issues
+
+1. **REVISE — high — required excursion-duration emission is missing.**
+   - Design: `python/experiments/EXP-100/design.md:11` required-emissions clause and checkpoint `design.md:11`.
+   - Code: `python/src/xen/exp100/strategy.py:164-214` defines no excursion-duration column; `python/src/xen/exp100/processor.py:557-579` computes only `duration_ns = endpoint_ts_ns - confirmation_ts_ns`.
+   - Required change: emit an explicit excursion duration from first excursion through return/settlement (with the contract’s required duration representation), and retain the specified swing/reversal duration separately or explicitly map it to a named contract field.
+   - `FAILING_ARTIFACT`: `python/src/xen/exp100/processor.py`, `python/src/xen/exp100/strategy.py`.
+   - `REQUIRED_SKILL`: experiment-developer.
+
+2. **REVISE — high — unbounded source-minute history violates the online streaming boundary.**
+   - Design: `python/experiments/EXP-100/design.md:8,44,96-98`; checkpoint `design.md:160-164,237-261` requires online state and says historical bars are never retrospectively replayed.
+   - Code: `python/src/xen/exp100/tpo.py:1-8,26-54` stores every source minute in unbounded `SourceMinuteLog` lists; `tpo.py:156-178,247-281` retains a deferred materialization path over that log.
+   - Required change: remove unbounded full-history retention from the live path and maintain only bounded online profile state, or submit an operator-approved design amendment explicitly changing the streaming/memory contract. Do not silently retain an entire TRAIN source history per cell.
+   - `FAILING_ARTIFACT`: `python/src/xen/exp100/tpo.py` and the corresponding processor wiring at `processor.py:60-68,109-110`.
+   - `REQUIRED_SKILL`: experiment-developer; quant-designer if the design is intentionally changed.
+
+No REJECT finding: no holdout contact, surviving future-destroy control, or unapproved causal timestamp breach was established. Execution remains prohibited until both REVISE issues are resolved and a fresh QA run is completed.
+
+## QA run 11 — 2026-08-13T20:47:00Z — mode: subagent — HEAD 477287b81d93b2830e10aaa1384bf469a8908983
+
+Reviewed dirty state: modified `python/experiments/EXP-100/{code/run_experiment.py,design.md,qa-review.md}`, `python/src/xen/exp100/{config.py,control.py,levels.py,processor.py,state_store.py,strategy.py,tpo.py}`, and `python/tests/{test_exp100_processor.py,test_exp100_runner.py,test_exp100_tpo.py}`; untracked `docs/superpowers/plans/2026-08-13-exp-100-implementation-handoff.md`. Fresh-context subagent; reviewer did not implement this tree. No Nautilus, preflight, matrix, TEST, holdout, or new-result read was launched.
+
+Verdict: **REVISE**
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| cTrader TRAIN scope: EURUSD/XAUUSD/USTEC; 15m/30m→1H, 1h→1H+4H; 264 cells (EXP-100 Scope; checkpoint §5/§7) | `config.py:7-99`; `levels.py:21-278`; `run_matrix.py:21-148` | **MATCHES** | Current config carries rolling 7/14/22/252, NY-17 trading clocks, and the declared confirmation references. |
+| Observation-bar raid grain and AMENDMENT-13 same-bar lifetime (EXP-100 Scope/Golden T1; checkpoint §5.2/§6) | `processor.py:95-130,236-280,305-411` | **MATCHES** | Source minutes cannot create/return a raid. Completed observation OHLC creates the raid; same-bar return is recorded without terminal settlement. The bounded current observation deque locates/seeds the first causal 1m excursion. |
+| AMENDMENT-6 close-all-eligible settlement (EXP-100 Scope/Golden T2; checkpoint §7) | `processor.py:413-485` | **MATCHES** | Expected-side candidates are sorted and only the latest remains primary; earlier and opposing candidates settle under their distinct states. |
+| Reference confirmation and swing endpoint chronology (EXP-100 Golden T3; checkpoint §7) | `processor.py:55-57,413-485` | **MATCHES** | Reference aggregation is 1H/4H; confirmation and later opposing endpoint use completed reference timestamps. |
+| Explicit excursion vs swing duration fields (EXP-100:15,58; checkpoint §6/§9/§11) | `processor.py:524-556`; `strategy.py:164-217` | **MATCHES** | `excursion_duration_ns = return-or-censor − first_excursion`; `swing_duration_ns = endpoint − confirmation`; `duration_ns` is the exact swing alias. Both new fields cross the Parquet schema. |
+| Bounded online profile; no full-history source log or deferred replay (EXP-100:14,58; checkpoint §8) | `processor.py:38-70,174-234,305-341`; `tpo.py:1-105,209-296`; `state_store.py:64-88,417-548` | **MATCHES** | No `SourceMinuteLog` remains. Each 1m bar directly increments sparse SQLite bins; reset replaces the current generation; finalization uses cursor passes over current profile state. Only the bounded observation deque is replayed once to seed a newly known observation-bar raid. |
+| Future-destroy is a zero-fixed-point derangement over the declared population (EXP-100 Controls/Tripwire; checkpoint §10; L-28) | `control.py:100-148,228-276`; `run_experiment.py:476-516` | **DEVIATES** | Groups of size ≥2 are deranged. Singleton eligible groups are skipped, copied unchanged, omitted from `rows`, and still permit a published artifact reporting `fixed_points=0`; this is not a derangement of the declared same-emitted-object population. |
+| TRAIN fence, one BacktestNode/process, zero-cost, no strategy fills (EXP-100 HARD; L-31) | `run_experiment.py:48-52,349-421`; `run_matrix.py:271-381` | **MATCHES** | Static path remains TRAIN-pinned and cost-free; no Python strategy backtest exists. No engine was launched in this review. |
+| Amendment direction ledger for the next execution object (EXP-100:7-16; design requirements §12) | EXP-100 `design.md:5-16`; checkpoint `design.md:22-108`; registry `cf-liqswp-001.md:1-146` | **MISSING** | `AMENDMENT-14 IMPLEMENTATION` is named without LOOSER/TIGHTER/NEUTRAL, running count, final false-qualifier re-derivation, or checkpoint/registry approval record. |
+
+### Golden-trace diff
+
+Expected behavior comes from current EXP-100 `design.md:103-121` and checkpoint §13, not implementation output.
+
+| Event | Expected | Implemented logic | Verdict |
+|---|---|---|---|
+| T1 | Completed observation bar starts raid; later/same-bar inclusive return is recorded; non-surviving 1m wick is not a raid | `_process_observation_raid_state` is called only for completed observations; `_new_raid` uses bounded source window for first-excursion/profile seed; source path only updates profile/swing | **PASS** |
+| T2 | Latest eligible expected-side raid remains primary; earlier eligible returned raid settles `CONFIRMED_NON_PRIMARY`; opposing eligible raid fails | `_on_reference_bar` separates expected/opposing populations, sorts deterministically, and terminally settles all non-primary candidates | **PASS** |
+| T3 | Completed 1H/4H close timestamps confirmation; later opposing close ends swing and profile | reference aggregator is selected from `confirmation_reference`; confirmation/profile finalization and endpoint use the reference event timestamp | **PASS** |
+
+### Governance & boundary
+
+| Check | Result | Evidence |
+|---|---|---|
+| Fresh context / append-only | PASS | mode `subagent`; exact missing run 10 section restored first; runs 1–10 otherwise unchanged |
+| Run-10 duration blocker | PASS | distinct tested fields in processor + Parquet schema |
+| Run-10 online-profile blocker | PASS | source-history log/rebuild removed; online SQLite profile updates only |
+| Focused EXP-100 tests | PASS | 87 non-execution tests passed in 5.90s, including all control/features/levels/matrix/processor/state-store/TPO tests and runner config/schema pins |
+| Runner engine tests | NOT RUN | three runner tests launch `run_experiment.py`/Nautilus and were excluded by the explicit no-launch instruction |
+| Ruff | PASS | `ruff check` clean on `src/xen/exp100`, EXP-100 code, and all EXP-100 tests |
+| No local accounting | PASS | `check_no_local_accounting("experiments/EXP-100/code")` → `ok=true`, no banned definitions |
+| No TEST/holdout | PASS (static) | no TEST/holdout loader in EXP-100 code; no data was inspected |
+| Zero cost | PASS | canonical disclosure present; no live cost symbol found in design/code |
+| No research powering | PASS | no MDE/power-floor/UNPOWERED machinery in EXP-100 design/code |
+| Registry | PASS for AMENDMENT-13; REVISE for next object | family remains REGISTERED; AMENDMENT-13 is COMPLETE with 0 counted TEST reads; named AMENDMENT-14 is not registered |
+| Derangement | REVISE | singleton eligible groups are silently outside the mapping and unchanged in the published destroy artifact |
+| PSR / XENA / SPDR conversion | N/A | no trade/leg mean read, XENA route, or SPDR money conversion |
+| No execution | PASS | no Nautilus, preflight, matrix, result-data, TEST, or holdout command run |
+
+### Issues
+
+1. **REVISE — high — singleton control groups violate the declared derangement population and can publish a misleading zero-fixed-point attestation.**
+   - Design: EXP-100 `design.md:68-77` says the same emitted raid objects are deranged within the declared groups, with zero fixed points; checkpoint `design.md:282-295` binds a derangement destroy.
+   - Code: `control.py:107-115` skips singleton groups; `control.py:248-265` copies those eligible rows unchanged; `run_experiment.py:489-516` publishes `VACUOUS_SINGLETON` metadata instead of failing the integrity control.
+   - Required change: fail closed when any eligible singleton group exists, or predeclare and operator-approve a different grouping/population that can be fully deranged. Do not publish unchanged eligible rows under a zero-fixed-point control claim.
+   - `FAILING_ARTIFACT`: `python/src/xen/exp100/control.py`, `python/experiments/EXP-100/code/run_experiment.py`.
+   - `REQUIRED_SKILL`: experiment-developer; quant-designer if grouping/population changes.
+
+2. **REVISE — high — the next execution object is not governed as an amendment.**
+   - Design: EXP-100 `design.md:16` names `AMENDMENT-14 IMPLEMENTATION`, while `design.md:5-7` and checkpoint/registry still end at AMENDMENT-13 with `2L / 3T / 7N`.
+   - Governance: design requirements §12 require direction, running count, and re-derived false-qualifier expectation for every pre-measurement amendment; the checkpoint/registry contains no AMENDMENT-14 operator record.
+   - Required change: either record operator approval and fully register AMENDMENT-14 (direction, count, final-null false-qualifier expectation, checkpoint/registry synchronization), or remove the amendment label and clearly classify this as a non-methodological implementation correction under the existing approved design. The current text cannot authorize a new execution.
+   - `FAILING_ARTIFACT`: `python/experiments/EXP-100/design.md` plus checkpoint/registry if it is truly an amendment.
+   - `REQUIRED_SKILL`: quant-designer.
+
+No REJECT finding: no holdout contact, executed invalid emission, or established causal timestamp breach occurred in this review. Execution remains blocked until both issues are resolved and fresh QA approves the exact tree.
+
+## QA run 12 — 2026-08-13T20:55:22Z — mode: subagent — HEAD 477287b81d93b2830e10aaa1384bf469a8908983
+
+Reviewed dirty state: modified `python/experiments/EXP-100/{code/run_experiment.py,design.md,qa-review.md}`, `python/src/xen/exp100/{config.py,levels.py,processor.py,state_store.py,strategy.py,tpo.py}`, and `python/tests/{test_exp100_control.py,test_exp100_processor.py,test_exp100_runner.py,test_exp100_tpo.py}`; untracked `docs/superpowers/plans/2026-08-13-exp-100-implementation-handoff.md`. Fresh-context subagent; reviewer did not implement the tree. Run-12 scope was the run-11 remediation plus retained run-10 fixes. No Nautilus, preflight, matrix, TEST, holdout, or new-result analysis was launched.
+
+Verdict: **APPROVE**
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| Explicit excursion and swing duration clocks (EXP-100:15,58; checkpoint §6/§9/§11) | `processor.py:524-556`; `strategy.py:164-217` | **MATCHES** | `excursion_duration_ns` ends at return/censor; `swing_duration_ns` ends at endpoint; `duration_ns` remains the exact swing alias for frozen downstream readers. |
+| Bounded online profile, no source-history replay (EXP-100:14,58; checkpoint §8) | `processor.py:38-70,174-234,305-341`; `tpo.py:1-105,209-296`; `state_store.py:64-88,417-548` | **MATCHES** | Every source minute updates sparse current-generation bins directly; no full-history source log/deferred rebuild exists. The only seed replay is the bounded current observation window. |
+| Future-destroy is a derangement with zero fixed points over every eligible declared group (EXP-100 Controls/Tripwire; checkpoint §10; L-28) | `control.py:100-141,221-269`; `run_experiment.py:476-512`; `test_exp100_control.py:148-175` | **MATCHES** | A singleton eligible group raises before the destination writer is created. The test proves the exception and absence of a destination artifact. Groups of size ≥2 retain cyclic zero-fixed-point mapping. |
+| No `VACUOUS_SINGLETON` publication path (EXP-100 Controls/Tripwire) | `run_experiment.py:489-512`; `control.py:106-112` | **MATCHES** | Runner metadata has only `VACUOUS_NO_ELIGIBLE` for a genuinely empty eligible population. Singleton eligibility cannot return a control report, reach metadata writing, or publish the staged run. |
+| Existing amendment ledger and frozen-emission separation (EXP-100:5-16; design requirements §12) | EXP-100 `design.md:5-16,42-58`; checkpoint `design.md:22-108`; registry `cf-liqswp-001.md:142-149` | **MATCHES** | Text now calls the work a `POST-QA IMPLEMENTATION CORRECTION` conforming to AMENDMENT-2–13, explicitly preserves the `2L / 3T / 7N` ledger, and forbids relabeling the frozen 264-cell AMENDMENT-13 emission. No AMENDMENT-14 is claimed. |
+| Observation-bar raid grain, AMENDMENT-13 lifetime, close-all settlement, and reference chronology (EXP-100 Scope/Golden T1–T3) | `processor.py:95-130,236-485` | **MATCHES** | Run-11 hand trace remains valid; remediation did not touch event identity or chronology. |
+| TRAIN fence, one BacktestNode/process, zero cost, no strategy fills (EXP-100 HARD; L-31) | `run_experiment.py:48-52,349-421`; `run_matrix.py:271-381` | **MATCHES** | Static boundary unchanged. No engine was launched. |
+
+### Golden-trace diff
+
+Expected behavior remains current EXP-100 `design.md:104-121` and checkpoint §13.
+
+| Event | Expected vs implementation | Verdict |
+|---|---|---|
+| T1 | Completed observation OHLC starts the raid; same/later observation return is recorded without closing it; a non-surviving 1m wick cannot create a raid. Run-11 trace unchanged. | **PASS** |
+| T2 | Latest eligible expected-side raid remains primary; earlier expected and opposing candidates settle under their declared states. Run-11 trace unchanged. | **PASS** |
+| T3 | Completed 1H/4H reference timestamps confirmation; later opposing reference closes swing/profile. Run-11 trace unchanged. | **PASS** |
+
+### Governance & boundary
+
+| Check | Result | Evidence |
+|---|---|---|
+| Fresh context / append-only | PASS | mode `subagent`; runs 1–11 unchanged; run 12 appended only |
+| Run-11 singleton block | PASS | fail-closed implementation + focused regression; no destination artifact |
+| Run-11 amendment block | PASS | correction is explicitly non-methodological under AMENDMENT-2–13; frozen emission remains separate |
+| Non-execution EXP-100 tests | PASS | 87 tests passed in 4.48s: control/features/levels/matrix/processor/state-store/TPO plus runner config/schema pins |
+| Nautilus runner tests | NOT RUN | tests that execute `run_experiment.py` were excluded by the no-launch instruction |
+| Ruff | PASS | EXP-100 source, code, and test surface clean |
+| No local accounting | PASS | `check_no_local_accounting("experiments/EXP-100/code")` → `ok=true`, no banned definitions |
+| No TEST/holdout | PASS (static) | no TEST/holdout path introduced; no such run launched |
+| Zero cost / no research powering | PASS | canonical disclosure retained; no live cost or research-power machinery introduced |
+| Registry / amendment ledger | PASS | registered AMENDMENT-13 evidence remains frozen; implementation correction does not change the ledger or registry state |
+| PSR / XENA / SPDR conversion | N/A | no mean trade/leg read, XENA route, or SPDR conversion |
+| No execution | PASS | no Nautilus, preflight, matrix, TEST, or holdout command run |
+
+### Issues
+
+None. Run-11 blockers are resolved. This approval applies to the exact dirty implementation tree as a candidate for a future operator-authorized execution; it does not alter or revalidate the frozen AMENDMENT-13 emission and does not itself authorize execution.

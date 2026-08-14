@@ -3,7 +3,8 @@
 ## Current checkpoint status
 
 **Checkpoint 019 is open.** `CF-LIQSWP-001` is registered with five TRAIN-only
-experiment designs. EXP-100 completed its 264-cell TRAIN analysis and its
+experiment designs. EXP-100 completed its AMENDMENT-13 analysis and now has an
+operator-authorised AMENDMENT-14 full TRAIN rerun for one forward pre-MFE retracement field; its
 operator upheld HYP-000. EXP-101–104 remain separate readiness items; their
 fresh-context QA and operator progression gates are independent.
 

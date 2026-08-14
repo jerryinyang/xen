@@ -2,14 +2,12 @@
 
 ## 0. Boundary statement (N1 — binding)
 
-This record issues NO verdict, names NO winner, ranks NO arm, claims NO tradability/
+This record issues NO final verdict, names NO winner, ranks NO arm, claims NO tradability/
 deployability, and gates NO companion experiment or family action. Every observation below
 is labelled observed (read directly from an emitted artifact) or inference (a mechanism
-reading of observed numbers that is not itself measured). Zero-cost model: every figure is
-gross and cost-free (ZERO-COST-DISCLOSURE). EXP-100 tests measurement validity and coverage
-of the streaming level/raid apparatus, not market value.
+reading of observed numbers that is not itself measured). The recommendation in §7 is
+non-final and applies only to EXP-100/HYP-000; the operator decides.
 
-```text
 ZERO-COST-DISCLOSURE
   cost_model: NO_COST_CHARGED
   spread: not modeled
@@ -21,308 +19,317 @@ ZERO-COST-DISCLOSURE
   prohibited_claims: fully-net, cost-complete, tradable, deployable
   lifting: only an explicit operator directive may introduce a cost model for a
     scoped experiment; the directive is recorded in that experiment's design.md.
-```
 
-Hypothesis under test (`CF-LIQSWP-001/HYP-000`): a causal streaming state machine
-preserves identity and chronology of active liquidity levels, excursions, completed
-raids, confirmation, breakout, and later-swing states on the AMENDMENT-13 object.
+**N2–N11 reporting discipline.** N2: the measured object is emitted level/raid/TPO state,
+not a trade, leg, or P&L episode. N3 and N10: all available counts and their context are
+reported; no row is suppressed for sample size. Compact marginals retain every value of every
+declared grid layer; a low-information 264-cell listing is not requested. N4: BREAKOUT_BAR is compared directly with
+its declared same-stratum LEVEL_CLOSE counterpart. N5: pooled totals are disclosures, not
+substitutes for strata. N6/N6b: the only thresholded inferential statement is the
+future-destroy *integrity* tripwire (`2.8 × bootstrap_SE`); it is not a value, power, or MDE
+gate. N7: falsification probes are explicit in §5. N8: TEST/global holdout observations are
+not interpreted. N9: all quantities are gross and zero-cost as disclosed above. N11: no
+machine row labels such as `WASH`, `UNPOWERED`, `SUPPORTED`, or `REFUTED` are assigned.
+There are no mean-leg/mean-trade returns, P&L, Sharpe, or PSR claims in this record.
 
 ## 1. Integrity gate (blocking)
 
-Family gate artifact: `results/estimand_validation.json`. Per-cell gates:
-`results/execution/full/<cell_id>.json` (264 files).
+Only integrity findings in this section have blocking authority. Research observations in
+§§3–7 do not.
 
-| Check | Result | Evidence |
+| Integrity check | Observed result | Artifact evidence |
 |---|---|---|
-| Estimand validation — family `blocking_pass` | **PASS** | `blocking_pass: true`, `n_cells: 264` |
-| Estimand validation — per-cell `blocking_pass` | **PASS** | 264/264 cells `blocking_pass: true` |
-| Manifest / catalogue identity | **PASS** | expected `[EURUSD, XAUUSD, USTEC]`, emitted all three, `missing: []` |
-| Zero-cost compliance (`no_cost_charged`) | **PASS** | `cost_model: NO_COST_CHARGED`, `non_zero_columns: []`, `n_non_zero_rows: 0`, `cost_bps: 0.0`, `cost_directive: null` (264/264 cells `cost_ok`) |
-| Fence (holdout / TRAIN boundary) | **PASS** | `status: PINNED`, `within_fence: true`, `train_end_utc: 2023-11-22`, `holdout_start_utc: 2024-12-13`, manifest sha256 matches expected (`4cdc7b01…`) |
-| Reconciliation | **PASS** | `note: "no leg ledger"` — measurement apparatus, no trade/P&L ledger (consistent with design) |
-| Provenance trace (verdict-bearing columns ≤ t-1) | **PASS** | signal timestamps `sweep/first_excursion/return/confirmation` all `< TRAIN_END`; only `endpoint/censor` stamped at exactly TRAIN_END (right-censoring). Details §Q25/Q29. |
-| Leak tripwire collapsed + non-vacuous | **PASS** | future-destroy derangement: 264/264 cells `CHANGED`, `collapse=true`, `fixed_points=0`, `vacuous=[]` |
-| Holdout untouched | **PASS** | `raid_ts_holdout: 0`, `mark_holdout: 0`; no timestamp ≥ `holdout_start_utc` |
-| Price-primary (engine emission, non-STUB) | **PASS** | Nautilus `BacktestNode` 1.230.0; fence `PINNED` (non-STUB); `n_fills: 0` (no fills = no local accounting path) |
-| No experiment-local accounting defs | **PASS** | analyst scripts import only `xen.*` + own code; `check_no_local_accounting` clean (no accounting primitives in `code/`) |
+| Family and cell estimand gates | **PASS** | `results/estimand_validation.json`: `blocking_pass: true`, `n_cells: 264`; 264/264 cell `blocking_pass: true` |
+| Schema / catalogue / expected family | **PASS** | 264/264 schema, catalogue, and cell manifests `ok`; family expected EURUSD/XAUUSD/USTEC, emitted all three, `missing: []` |
+| Fence | **PASS** | 264/264 `fence.ok: true`, `status: PINNED`, `within_fence: true`, `analysis_end_utc: 2024-12-13T00:00:00Z`; expected and actual manifest hash both `4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0` |
+| TRAIN / global holdout tripwire | **PASS** | `probe_integrity.json.past_train`: 63,304 exact-TRAIN-end stamps, all split equally between `censor_ts_ns` and `endpoint_ts_ns`; `after_train_end: 0`, `holdout: 0`. `scan_summary.json`: `raid_ts_holdout`, `mark_holdout`, and `mark_past_train_cells` all 0 |
+| Zero-cost integrity | **PASS** | 264/264 `no_cost_charged.ok: true`; `NO_COST_CHARGED`, no non-zero columns or rows, `cost_bps: 0.0`, directive `null` |
+| State reconciliation | **PASS for the emitted object** | 264/264 `reconciliation.ok: true`, note `no leg ledger`; this attests the non-trading state object and does not attest P&L |
+| Identity, joins, chronology, statuses | **PASS** | `scan_summary.json.integrity_fail_sums`: duplicate raid/level IDs, missing/extra profiles, chronology/grid failures, active residuals, retired statuses, invalid AMENDMENT-14 fields, fills, and ambiguous retired closures are all 0 |
+| Future-destroy integrity control | **PASS for its declared finite-primary population** | `amendment_summary.json.control`: 264/264 cell summaries pass. Each cell uses 462–6,580 aligned finite primary raid pairs (115–5,269 level clusters). Alignment-collapse fractions are 0.02695–0.32993; destroyed-alignment survival fractions are 0.67007–0.97305; 0 block-fragile cells. Definitions are in §2.2. |
+| Golden lifecycle fixture | **PASS after fixture correction** | `probe_integrity.json.golden.checks` and `.same_bar_return_golden.checks`: all lifecycle/cardinality/attribution booleans are true. The old fixture allowed valid re-piercing, then incorrectly required one terminal row per level. |
+| ATR-undefined initial maximum excursion | **FAIL (scoped implementation defect)** | `probe_integrity.json.atr_undefined_initial_observation_extreme`: a 15m observation whose first beyond minute is 100.8 and later high is 101.2 emits `max_excursion=0.8`, not 1.2, when `profile_generation=null` / `ATR_UNDEFINED`. |
+| Price-primary / no trading path | **Artifact-consistent** | `scan_summary.json`: Nautilus version `1.230.0`, `n_fills: 0`; no P&L or fill estimand is analysed. The supplied artifacts do not independently attest every implementation provenance line |
 
-Integrity verdict: **no blocking failure.** The emission is valid for analysis.
+**Blocking conclusion (observed):** the supplied family gate still reports `blocking_pass: true`,
+but the independent golden follow-up found a scoped state-measurement defect. Interpretation stops
+for `max_price`, `max_excursion`, and derived excursion fields on ATR-undefined raids; TPO already
+reports those profiles as undefined. Count, identity, chronology, status, finite-primary control,
+and grid-marginal reads below do not use the defective value path. This is not evidence of economic value.
 
-## 2. Question list — answers
+## 2. Question list and answers
 
-### Accounting & object identity
+The list below was frozen before the post-gate interrogation. Answers use only the supplied
+artifacts.
 
-**Q1. Do per-bar and per-leg totals reconcile per cell?**
-ANSWERED — PASS. No leg ledger exists (measurement apparatus). Estimand-gate
-`reconciliation.ok: true` ("no leg ledger") on all 264 cells. Object identity: each raid
-owns one event record; `raid_id` unique per cell (duplicate check §Q3).
+1. **Gate completeness?** ANSWERED — 264/264 cells pass schema, fence, catalogue, manifest,
+   reconciliation, and zero-cost checks (§1).
+2. **Object identity?** ANSWERED — this is a level/raid/TPO state object. The gate explicitly
+   says `no leg ledger`, and `scan_summary.json` reports `n_fills: 0`; therefore trade P&L is
+   outside the object.
+3. **Non-trading metrics?** ANSWERED — per-leg returns, PSR, P&L episode anatomy, trading
+   occupancy/exposure, return, Sharpe, drawdown, and fill quality are **not applicable**, not
+   zero. State occupancy is described only through level/raid/profile counts.
+4. **Declared family?** ANSWERED — EURUSD, XAUUSD, USTEC; 15m/30m/60m; BREAKOUT_BAR and
+   LEVEL_CLOSE; 1H for 15m/30m and 1H+4H for 60m; eleven declared configs; 264 cells. Cell
+   counts are 66/66/132 by timeframe, with no 1D confirmation cells.
+5. **All rows and per-stratum counts?** ANSWERED with informative marginals — all 264 cells
+   are retained and none has zero raids, levels, 1D anchors, or 1W anchors. `coverage_marginals.json`
+   retains every venue, instrument, timeframe, confirmation method, confirmation reference, and
+   level-configuration value with cells, levels, raids, lifecycle, and pre-MFE counts (§2.1).
+   Pooled totals are 9,840,478 raids, 6,329,824 levels, 789,832 primary confirmations, and
+   789,326 completed primary raids. No 264-row listing is needed to disclose layer concentration.
+6. **Identity/profile/status integrity?** ANSWERED — duplicate raid/level IDs, missing/extra
+   profiles, active residuals, and retired status hits are all 0. Defined TPO profiles total
+   9,794,210; undefined profiles total 46,268.
+7. **Causal timestamps and fences?** ANSWERED — chronology and minute-grid failure sums are 0;
+   only 31,652 censor and 31,652 endpoint stamps equal TRAIN end; none is later or in holdout.
+8. **Independent and golden reproduction?** ANSWERED with a scoped failure — three sampled
+   finite-ATR EURUSD-15m raids reproduce emitted max excursion exactly from observation marks.
+   Corrected lifecycle fixtures are uniformly green and show CONFIRMED_NON_PRIMARY and primary
+   COMPLETED paths. A separate ATR-undefined trace fails maximum-excursion identity: 0.8 emitted
+   versus the completed observation's 1.2 (§1/§4).
+9. **AMENDMENT-3 grain?** ANSWERED — 14,583,052 source minutes are not themselves completed
+   observations, consistent with real 1m input feeding coarser observations; invalid
+   observation-source count is 0. The artifact does not expose a standalone synthetic-bar
+   count, so absence of synthetic closure bars is supported indirectly, not independently.
+10. **AMENDMENT-4 ATR fields?** ANSWERED with scope — reported identity failures are 0 on
+    their finite-ATR populations. The ATR-undefined probe does not fabricate a normalized value,
+    but does under-record the raw initial-observation maximum excursion (§1); that path is stopped.
+11. **AMENDMENT-6 attribution?** ANSWERED — maximum primary per confirmation/side is 1;
+    invalid primary status, completed non-primary, and unlinked non-primary failures are 0.
+    Corrected golden settlement examples have T2 primary COMPLETED and earlier T1
+    CONFIRMED_NON_PRIMARY; the old cross-raid harness caveat is resolved.
+12. **AMENDMENT-7 universe?** ANSWERED — only the three declared cTrader symbols appear; no
+    Bybit instrument is present.
+13. **AMENDMENT-8 observation-bar starts?** ANSWERED — invalid observation-source count is 0;
+    golden `t1_wick_did_not_add_raid: true` shows a non-surviving 1m wick did not start a raid.
+14. **AMENDMENT-9 grid?** ANSWERED — exact 66/66/132 grid described in answer 4.
+15. **AMENDMENT-10 clock?** ANSWERED — across the 48 daily/weekly cells, 1D anchors span
+    640–644 and 1W anchors equal 129; weekend-dated Saturday/Sunday anchors and zero-level
+    cells are 0. The 6,000 Sunday creation rows in each daily/weekly summary are compatible
+    with NY-session creation and are not weekend anchor keys.
+16. **AMENDMENT-11 windows?** ANSWERED — only rolling 7/14/22/252 appear alongside the seven
+    declared previous-period/session configurations; observed and expected lists match.
+17. **AMENDMENT-12 TPO rules?** ANSWERED — conservation, VA-mass-short, and tight-rule failure
+    counts are 0. Defined profiles are 9,794,210; tight profiles 1,439,234 (14.695%, per-cell
+    9.186%–18.137%). VA mass has p1 0.70 and median 0.7273; selected-bin range is 1–1,927.
+    Gap span/VA is below 0.5 for 14.695% and at least 1 for 53.515%.
+18. **AMENDMENT-13 same-bar return?** ANSWERED — 7,669,654 of 9,809,958 returned raids return
+    on the same observation bar; per-cell fraction 75.182%–79.916% (median 78.031%). Retired
+    ambiguous closure and same-bar-closed-ambiguous counts are 0. Golden confirms the raid is
+    live immediately after same-bar pierce/return and later reaches COMPLETED.
+19. **AMENDMENT-14 retrace?** ANSWERED — 728,936 DEFINED, 53,496 AMBIGUOUS_SAME_BAR, and 7,400
+    NO_POST_CONFIRMATION_MFE. Invalid status/price, missing primary, unexpected non-primary,
+    side-bound, and no-MFE-price failure counts are all 0. Ambiguity is explicitly represented,
+    not silently folded into a numeric retrace.
+20. **Duration definitions?** ANSWERED — excursion-duration, swing-duration, unconfirmed
+    non-null swing-duration, and frozen duration-alias failure counts are all 0.
+21. **Future-destroy validity?** ANSWERED — all 264 cells changed and pass the integrity bite;
+    no fixed points/count/ID/status mismatches are reported. The control changes aligned future
+    fields while preserving IDs/statuses and outcome marginals.
+22. **Collapse fractions?** ANSWERED — across 264 cell-level summaries, alignment-collapse
+    fraction `(raw alignment fraction − destroyed alignment fraction) / raw alignment fraction`
+    ranges 0.02695–0.32993 (median 0.19697). Destroyed-alignment survival fraction
+    `destroyed alignment fraction / raw alignment fraction` ranges 0.67007–0.97305. Each raw
+    or destroyed alignment fraction uses the cell's 462–6,580 aligned finite primary raid pairs
+    as denominator; the numerator is pairs where the emitted `strong_move` agrees with the
+    corresponding raw or destroyed swing/max-excursion comparison. CI-low is 0.01845–0.27397;
+    seed-band global bounds are 0.01768–0.27669; 0 cells are block-fragile. These are
+    integrity-control statistics only.
+23. **Direct method comparison?** ANSWERED — 132/132 same-stratum pairs have equal IDs and
+    statuses and 0 count differences. This total overlap is evidence of equivalence for the
+    emitted state object, not a ranking or economic comparison.
+24. **Calendar concentration?** ANSWERED descriptively — raids/primary/completed are
+    2,197,572/171,060/171,060 in 2021; 4,025,596/327,522/327,522 in 2022; and
+    3,617,310/291,250/290,744 in 2023. State production is present in every year but is not
+    uniform; 2022 has the largest mass. The artifacts provide no exposure-normalized yearly
+    rate, so stability per unit time is UNANSWERED.
+25. **Headline falsification?** ANSWERED in §5; all declared probes ran, with limitations
+    stated rather than converted to passes.
+26. **Physical meaning of no orders/fills?** ANSWERED — EXP-100 characterizes a state machine
+    that creates many overlapping levels and raids and settles them causally. It does not show
+    that any state can be entered, filled, monetized, or survive costs.
 
-**Q2. What is the P&L-bearing object, and does the design estimand match it? (L-16)**
-ANSWERED. There is no P&L/trade object — `n_fills = 0`, `orders_submitted: false` across
-all cells. The measured object is the level/raid/TPO state; design `OBJECT-IDENTITY` says
-"measurement object == trading object: YES" for later experiments. Estimand =
-emitted-state coverage/reconciliation + deterministic replay. Match: exact.
+### 2.1 Declared-grid count marginals
 
-**Q3. Raid-status / event-count distribution per cell (no trade ledger)?**
-ANSWERED — PASS. `raid_dup: 0`, `level_dup: 0` across all 264 cells (every `raid_id` and
-`level_id` unique within its cell). `unknown_raid_status: []`, `unknown_level_status: []`,
-`retired_status_hits: 0`.
+The compact source artifact is `results/analysis/coverage_marginals.json`. `Primary confirmed`
+counts non-null `confirmation_ts_ns`; in this emission it equals `primary_attributed`. Pre-MFE
+`D / A / N` means `DEFINED / AMBIGUOUS_SAME_BAR / NO_POST_CONFIRMATION_MFE`. The artifact also
+retains returned, failed, confirmed-non-primary, and all three right-censor counts.
 
-### Structure & concentration
+**Venue**
 
-**Q4. Raid anatomy: status counts, confirmation, completion, right-censor; residual live.**
-ANSWERED. Observed totals (264 cells): raids 9,840,478; confirmed 5,106,432; completed
-789,326; `FAILED_BREAKOUT` 4,702,900; `CONFIRMED_NON_PRIMARY` 4,316,600;
-`RIGHT_CENSORED_EXCURSION` 30,520; `RIGHT_CENSORED_CONFIRMATION` 626;
-`RIGHT_CENSORED_ENDPOINT` 506. Residual live at finish: `active_raids: 0`,
-`active_levels: 0` (every object settled or right-censored — no leaked-live state).
+| Value | Cells | Levels | Raids | Primary confirmed / attributed | Completed | Pre-MFE D / A / N |
+|---|---:|---:|---:|---:|---:|---:|
+| ctrader | 264 | 6,329,824 | 9,840,478 | 789,832 / 789,832 | 789,326 | 728,936 / 53,496 / 7,400 |
 
-**Q5. Does one symbol/TF/config dominate event mass?**
-ANSWERED — no, structure is stable. Per symbol×TF (n_raids): EURUSD 15m 1.56M / 30m 0.78M /
-60m 0.97M; USTEC 15m 1.51M / 30m 0.77M / 60m 0.97M; XAUUSD 15m 1.56M / 30m 0.78M / 60m
-0.94M. Cross-asset spread within ~±3% at each TF; 15m ≫ 30m/60m (observation frequency),
-not a single-asset concentration.
+**Instrument**
 
-**Q6. Event production stable across TRAIN calendar, or one regime?**
-ANSWERED — partially. Anchor counts are stable (1D anchors 640–644/cell, 1W = 129 exact).
-A formal regime-stationarity read is not in the predeclared scope; flagged as open (Q§6).
+| Value | Cells | Levels | Raids | Primary confirmed / attributed | Completed | Pre-MFE D / A / N |
+|---|---:|---:|---:|---:|---:|---:|
+| EURUSD | 88 | 2,114,528 | 3,315,732 | 260,738 / 260,738 | 260,428 | 242,296 / 15,758 / 2,684 |
+| USTEC | 88 | 2,133,056 | 3,250,370 | 274,206 / 274,206 | 274,114 | 250,778 / 20,228 / 3,200 |
+| XAUUSD | 88 | 2,082,240 | 3,274,376 | 254,888 / 254,888 | 254,784 | 235,862 / 17,510 / 1,516 |
 
-**Q7. Per-stratum: every headline re-derived per instrument × TF × confirm-ref × method × config.**
-ANSWERED. See `results/analysis/coverage_by_config.csv`,
-`coverage_by_symbol_tf.csv`, `coverage_by_symbol_tf_config.csv`. No config/symbol/TF cell is
-zero (min raids per cell ≥ 2,418; min confirmed ≥ 1,346). Same-bar-return fraction is the
-most stable cross-section (median 0.780; range 0.752–0.799 across all 264 cells).
+**Timeframe**
 
-### Physicality & behaviour
+| Value | Cells | Levels | Raids | Primary confirmed / attributed | Completed | Pre-MFE D / A / N |
+|---|---:|---:|---:|---:|---:|---:|
+| 15m | 66 | 2,994,184 | 4,631,206 | 252,434 / 252,434 | 252,306 | 231,864 / 18,022 / 2,548 |
+| 30m | 66 | 1,579,144 | 2,333,912 | 242,758 / 242,758 | 242,632 | 222,948 / 17,362 / 2,448 |
+| 60m | 132 | 1,756,496 | 2,875,360 | 294,640 / 294,640 | 294,388 | 274,124 / 18,112 / 2,404 |
 
-**Q8. Finish residuals match the design story (no live raids/levels left)?**
-ANSWERED — PASS. `active_raids: 0`, `active_levels: 0` across all cells. All objects settle
-or right-censor; no dangling live state.
+**Confirmation method**
 
-**Q9. Occupancy-like counts — what does the apparatus IS?**
-ANSWERED. Per cell (median): levels 1,280–41,677 depending on config (PREVIOUS_* session
-configs ≈1,280; ROLLING_* recompute per bar → 26K–116K); raids 3.3K–81.6K; confirmed
-1.7K–42.3K. Defined TPO profiles 9,794,068 vs undefined 46,410 (0.47%). Inference: a
-high-frequency level-raid state machine — most raid mass is excursion→return on the
-observation bar, ~78% of raids return on the same bar they sweep (AMENDMENT-13 keeps these
-live).
+| Value | Cells | Levels | Raids | Primary confirmed / attributed | Completed | Pre-MFE D / A / N |
+|---|---:|---:|---:|---:|---:|---:|
+| breakout_bar | 132 | 3,164,912 | 4,920,239 | 394,916 / 394,916 | 394,663 | 364,468 / 26,748 / 3,700 |
+| level_close | 132 | 3,164,912 | 4,920,239 | 394,916 / 394,916 | 394,663 | 364,468 / 26,748 / 3,700 |
 
-**Q10. Confirmation/endpoint duration and strong-move fields present/absent as designed?**
-ANSWERED — PASS. `confirm_without_return: 0` (confirmation never fires without a recorded
-return); duration/strong-move/swing populated on confirmed rows (destroy non-vacuity proves
-they are live values, §Q13). 30,520 raids right-censor at excursion, 626 at confirmation,
-506 at endpoint — as designed.
+**Confirmation reference**
 
-### Robustness & falsification
+| Value | Cells | Levels | Raids | Primary confirmed / attributed | Completed | Pre-MFE D / A / N |
+|---|---:|---:|---:|---:|---:|---:|
+| 1h | 198 | 5,451,576 | 8,164,150 | 714,312 / 714,312 | 713,934 | 656,020 / 51,100 / 7,192 |
+| 4h | 66 | 878,248 | 1,676,328 | 75,520 / 75,520 | 75,392 | 72,916 / 2,396 / 208 |
 
-**Q11. Zero-cost verification.**
-ANSWERED — PASS (table above). No cost column, no net figure; caveat present in this document
-and in design.
+**Level configuration**
 
-**Q12. PSR pairing.**
-ANSWERED — N/A. No mean-trade/leg bps read exists (no trade ledger). No PSR reported.
+| Value | Cells | Levels | Raids | Primary confirmed / attributed | Completed | Pre-MFE D / A / N |
+|---|---:|---:|---:|---:|---:|---:|
+| PREVIOUS_1D | 24 | 30,784 | 248,292 | 49,558 / 49,558 | 49,520 | 45,964 / 3,178 / 416 |
+| PREVIOUS_1H | 24 | 650,496 | 1,935,994 | 113,546 / 113,546 | 113,486 | 104,718 / 7,734 / 1,094 |
+| PREVIOUS_1W | 24 | 6,192 | 90,616 | 21,100 / 21,100 | 21,082 | 19,430 / 1,412 / 258 |
+| PREVIOUS_4H | 24 | 145,152 | 723,758 | 90,312 / 90,312 | 90,264 | 83,338 / 6,184 / 790 |
+| PREVIOUS_AMERICA | 24 | 30,800 | 289,434 | 55,000 / 55,000 | 54,962 | 51,038 / 3,448 / 514 |
+| PREVIOUS_ASIA | 24 | 30,784 | 328,066 | 58,004 / 58,004 | 57,986 | 53,588 / 3,934 / 482 |
+| PREVIOUS_EUROPE | 24 | 30,768 | 303,722 | 57,352 / 57,352 | 57,330 | 53,032 / 3,832 / 488 |
+| ROLLING_14 | 24 | 1,354,080 | 1,740,190 | 104,420 / 104,420 | 104,352 | 96,262 / 7,150 / 1,008 |
+| ROLLING_22 | 24 | 1,353,696 | 1,372,976 | 93,612 / 93,612 | 93,544 | 86,248 / 6,462 / 902 |
+| ROLLING_252 | 24 | 1,342,656 | 373,824 | 32,678 / 32,678 | 32,618 | 29,998 / 2,338 / 342 |
+| ROLLING_7 | 24 | 1,354,416 | 2,433,606 | 114,250 / 114,250 | 114,182 | 105,320 / 7,824 / 1,106 |
 
-**Q13. Future-destroy: collapse fraction / bite, non-vacuity, zero fixed points (L-28).**
-ANSWERED — PASS. 264/264 cells `destroy_non_vacuity: CHANGED`, `fixed_points: 0`,
-`destroy_collapses: true` (mean|Δswing_atr| ≥ 2.8×SE of swing_atr in every cell).
-`contrast_ratio` ≈ 0.9996 (raw/destroy marginals nearly identical — expected for a
-block-derangement that preserves marginal block values; the *per-raid alignment* contrast is
-what collapses). Inference: swing/strong-move/duration are genuinely future-path-derived,
-non-vacuous, and causally aligned — no fixed-point leak.
+### 2.2 Future-destroy populations and fractions
 
-**Q14. One "what would make this wrong?" probe per headline.**
-ANSWERED. (a) Coverage counts → recompute 3 completed raids from raw `bar_marks`:
-emitted `max_excursion` matches recomputed exactly in all 3 (§Q28-independent). (b) Method
-overlap → BREAKOUT_BAR vs LEVEL_CLOSE compared head-to-head: identical (§Q26). (c) Golden
-trace → independent synthetic feed through the shared processor (§Q28). (d) TRAIN boundary →
-probe every raid timestamp field vs TRAIN_END (§Q25/Q29).
+The 264-cell artifact is a summary population: one row per declared cell. Within each row, the
+analysis population is `aligned_finite_primary_raid_pairs`: raw/destroyed rows joined by `raid_id`,
+with non-null primary confirmation and finite raw/destroyed swing plus finite max excursion.
+There are 462–6,580 such pairs and 115–5,269 level clusters per cell. The six detailed probe cells
+are examples, not a second denominator: they contain 4,931–9,988 total emitted raid rows, of which
+495–1,074 are primary-confirmed and all 495–1,074 are aligned finite primary pairs.
 
-**Q15. Sample-size context: every row keeps its n; no hide/drop.**
-ANSWERED — held. Per-stratum CSVs carry min/median/max per cell; no cell dropped (264/264
-reported). No minimum-n gate declared by design.
-
-**Q16. Direct comparison against declared comparators (golden T1–T3; same-stratum replay).**
-ANSWERED — golden trace run (§Q28); same-stratum replay = the independent recompute (§Q28).
-No adaptive arm exists to compare — this is a coverage/validity object.
-
-### Mechanism / amendment-specific
-
-**Q17. AMENDMENT-13: beyond-starts-live-raid; same-bar return recorded, does not close; no AMBIGUOUS.**
-ANSWERED — PASS. `n_ambiguous: 0`, `n_same_bar_closed_ambiguous: 0`; 7,669,654 same-bar
-returns recorded (78% of 9,809,958 returns). Golden: `t1_still_live_after_return: true`,
-`return_equals_sweep: true`, `not_ambiguous: true`.
-
-**Q18. AMENDMENT-8: 1m wick not surviving observation OHLC is not a raid.**
-ANSWERED — PASS. Golden `t1_wick_did_not_add_raid: true`.
-
-**Q19. AMENDMENT-6: latest expected-side primary; earlier eligible returned → CONFIRMED_NON_PRIMARY; opposing eligible → FAILED_BREAKOUT.**
-ANSWERED — PASS. Golden raw summaries: `T2-HIGH:raid:1` `COMPLETED`, `primary_attribution:
-true`; `T1-HIGH:raid:2` `CONFIRMED_NON_PRIMARY`, `primary_attribution: false`;
-`T1-HIGH:raid:1` `FAILED_BREAKOUT`. (Boolean probe returned null here — see §5 caveat.)
-
-**Q20. AMENDMENT-10: 1D/1W = NY 17:00 day / Mon–Fri week; no weekend stubs; no zero-level.**
-ANSWERED — PASS. 1D anchors 640–644/cell, 1W = 129 exact; `weekend_date_anchors` (anchor
-key on Sat/Sun) = 0; `zero_level_cells: 0`. Note: ~125 levels/cell are *created* on a Sunday
-NY session (the Monday open at Sunday 17:00 NY) — correct cTrader session behaviour, not a
-stub; anchor keys remain weekday-dated.
-
-**Q21. AMENDMENT-9: 15m/30m confirm on 1H only; 1h confirms on 1H and 4H; no 1D confirm cells.**
-ANSWERED — PASS. Grid: 15m→{1h}, 30m→{1h}, 60m→{1h,4h}; counts 66/66/132. No 1D confirm.
-
-**Q22. AMENDMENT-11: matrix is 264; rolling windows 7/14/22/252 only.**
-ANSWERED — PASS. 264 cells; level_configs observed == expected (11 configs incl.
-ROLLING_7/14/22/252).
-
-**Q23. AMENDMENT-12: `tight_gap == (gap_span < 0.50*VA_width)`; gap selection 30% VA TPO.**
-ANSWERED — PASS. `tight_rule_mismatch: 0`; `va_mass_short: 0`; `tpo_tight_ratio: 0.5` and
-`tpo_gap_mass: 0.3` uniform across all cells.
-
-**Q24. TPO conservation holds on DEFINED; every raid has exactly one profile row.**
-ANSWERED — PASS. `defined_conservation_fail: 0`; `missing_profiles: 0`, `extra_profiles: 0`.
-
-**Q25. Chronology: first excursion ≤ return; confirmation > sweep; endpoint ≥ confirmation; minute grid.**
-ANSWERED — PASS. `chrono_fail: 0`, `grid_fail: 0` across all cells.
-
-**Q26. BREAKOUT_BAR vs LEVEL_CLOSE numeric overlap disclosed, not pooled.**
-ANSWERED — PASS + disclosed. 132 method pairs, `raid_id_equal: 132`, `status_equal: 132`,
-`count_diff: 0`. Observed: the two methods emit byte-identical raid objects on the shared
-previous-reference test (the overlap is total, as the design disclosed).
-
-**Q27. Deterministic replay / artifact hash equality.**
-ANSWERED — PASS. `manifest_sha256` equals expected `4cdc7b01…` on all cells; nautilus
-version uniform 1.230.0; golden replay reproduces emitted behaviour from a fresh feed.
-
-**Q28. Golden T1–T3.**
-ANSWERED — PASS (mechanism), with probe-strictness caveat. Independent synthetic feed through
-the shared processor: first-beyond starts a live raid (`t1_live_after_first_beyond: true`)
-with `max_excursion 1.20`, `prior_raid_count 0`; 1m wick adds no raid (AMENDMENT-8); return
-recorded, raid stays live (AMENDMENT-13); T2 primary / T1 non-primary / T1 first
-FAILED_BREAKOUT all appear in the terminal raid summaries. Two aggregate booleans
-(`t1_one_completed_or_settled`, `t2_exists`) read `false` because the synthetic feed kept
-re-piercing the levels, minting extra right-censored raids — a probe-script indexing
-artifact, not a state-machine defect (§5).
-
-**Q29. No raid/level/bar timestamp touches the global holdout; last bar_mark < TRAIN end.**
-ANSWERED — PASS. `raid_ts_holdout: 0`; `mark_holdout: 0`; `mark_past_train_cells: 0`.
-The 63,304 timestamps ≥ TRAIN_END are exactly `endpoint_ts_ns` (31,652) and `censor_ts_ns`
-(31,652) stamped at TRAIN_END (2023-11-22T00:00) — right-censoring, `after_train_end: 0`,
-`holdout: 0`. No signal field (sweep/first/return/confirmation) reaches TRAIN_END.
-
-**Q30. Confirmation never fires without a recorded return.**
-ANSWERED — PASS. `n_confirm_without_return: 0` (264 cells).
-
-**Q31. Unknown raid/level statuses empty.**
-ANSWERED — PASS. `unknown_raid_status: []`, `unknown_level_status: []`.
-
-**Q32. Catalogue identity: 11 configs × 3 assets × declared TF/confirm grid; no Bybit cells.**
-ANSWERED — PASS. Symbols `{EURUSD, USTEC, XAUUSD}` only (cTrader); 11 configs; grid exact.
-No Bybit/perp cells.
+For each cell, `raw_alignment_fraction = raw_alignment_numerator_n / aligned_pair_denominator_n`
+and the destroyed equivalent uses the same denominator. Collapse and survival are defined in Q22.
 
 ## 3. Evidence FOR the hypothesis
 
-1. **Integrity gate clean end-to-end.** Family `blocking_pass: true`; 264/264 per-cell gates
-   `blocking_pass: true`; manifest and zero-cost and fence all clean (§1). No blocking
-   finding exists.
-2. **State identity preserved.** `raid_dup: 0`, `level_dup: 0`, `missing/extra_profiles: 0`,
-   `unknown_*_status: []` across all 264 cells — every object is unique, every raid owns
-   exactly one TPO profile, no orphan profile.
-3. **Chronology correct.** `chrono_fail: 0`, `grid_fail: 0` (excursion ≤ return, confirm >
-   sweep, endpoint ≥ confirm, minute-grid timestamps).
-4. **Future-destroy tripwire collapses, non-vacuously.** 264/264 cells `CHANGED`,
-   `fixed_points: 0`, mean|Δswing_atr| ≥ 2.8×SE. The later-swing fields genuinely depend on
-   the aligned future path — causal-by-construction, no fixed-point leak.
-5. **AMENDMENT-13 verified two ways.** (a) Golden replay: same-bar pierce+return leaves the
-   raid live (`live_after_same_bar_pierce_return: true`), `return_equals_sweep: true`,
-   `not_ambiguous: true`. (b) Emission: 7,669,654 same-bar returns recorded, 0 ambiguous.
-6. **AMENDMENT-8 verified.** 1m wick that does not survive the observation OHLC adds no raid
-   (`t1_wick_did_not_add_raid: true`).
-7. **AMENDMENT-6 verified.** T2 raid `COMPLETED` + primary; earlier eligible returned T1 raid
-   `CONFIRMED_NON_PRIMARY`; opposing T1 raid `FAILED_BREAKOUT`.
-8. **Independent recomputation matches.** 3 completed raids recomputed from raw `bar_marks`
-   reproduce emitted `max_excursion` exactly; first-beyond, same-bar-return, and later-return
-   paths all identified correctly.
-9. **Grid and config coverage complete.** 264 cells exactly as designed (15m 66, 30m 66, 60m
-   132); confirm refs correct; 11 level configs; rolling 7/14/22/252. No zero-level, no
-   zero-raid, no zero-1D/1W cell; every cell ≥ 2 confirmed raids.
-10. **AMENDMENT-10 trading clock correct.** 1D anchors 640–644, 1W = 129 (stable); zero
-    weekend-dated anchor keys; zero zero-level cells.
-11. **AMENDMENT-12 tight/gap rule exact.** `tight_rule_mismatch: 0`, `va_mass_short: 0`,
-    `tpo_tight_ratio: 0.5`, `tpo_gap_mass: 0.3` uniform.
-12. **TRAIN boundary respected.** Signal fields never reach TRAIN_END; only right-censor
-    stamps sit at TRAIN_END; nothing touches holdout.
+1. **The unaffected integrity checks are clean across the declared grid (observed).** Family and
+   264/264 published gates pass for manifest, catalogue, fence, zero-cost, identity, chronology,
+   holdout, and reconciliation. The scoped ATR-undefined defect in §1 prevents extending this
+   evidence to every emitted value field.
+2. **The intended state object is populated broadly (observed).** All 264 cells contain raids,
+   levels, daily anchors, and weekly anchors. The family emits 9,840,478 raids and 6,329,824
+   levels across three instruments, three timeframes, two methods, valid confirmation grids,
+   and all eleven configurations; calendar-year production is non-zero in 2021–2023.
+3. **Identity and lifecycle rules reconcile (observed).** There are no duplicate IDs, orphan
+   profiles, active end-state objects, unknown/retired states, chronology failures, or
+   confirmation-without-return events. Status totals reconcile to raid total: 4,702,900
+   FAILED_BREAKOUT, 4,316,600 CONFIRMED_NON_PRIMARY, 789,326 COMPLETED, plus 30,520/626/506
+   excursion/confirmation/endpoint right-censors.
+4. **Most amendment mechanics agree across aggregate and trace evidence (observed).** The audits
+   report zero failures for finite-ATR identities, primary attribution, TPO conservation/tightness,
+   retrace bounds/statuses, and duration aliases. Corrected golden rows exhibit non-primary,
+   primary-completed, and same-bar-live paths; three sampled finite-ATR raw-mark reconstructions
+   match. This evidence explicitly excludes the ATR-undefined maximum-excursion defect (§1).
+5. **The leak control is non-vacuous and clears its predeclared integrity bite (observed).** All
+   264 cells change future fields and pass; collapse fractions are 0.02695–0.32993 with positive
+   CI-low bounds and no block-fragile cells. This supports aligned future-path provenance; it
+   does not measure market edge.
+6. **Method comparison is exact rather than selectively favorable (observed).** All 132 direct
+   BREAKOUT_BAR/LEVEL_CLOSE counterparts have identical IDs/statuses/counts. This supports
+   stable measurement under the two declared method labels, while also showing they provide no
+   differentiating evidence here.
 
 ## 4. Evidence AGAINST the hypothesis
 
-1. **Golden-trace probe aggregate booleans partially false/null.** `t1_one_completed_or_settled:
-   false`, `t2_exists: false`, `t1_non_primary_if_both_confirmed: null`. Cause: the synthetic
-   feed re-pierced levels after settlement, minting extra right-censored raids, and the check
-   indexed the first raid per level rather than the settled one. The raw raid summaries show
-   correct AMENDMENT-6/13 behaviour, but the *automated* golden check is not fully green —
-   the T2/T1-non-primary demonstration rests on raw-summary reading, not a boolean pass.
-2. **No per-raid 1-minute path stored from raid → confirm (or confirm → swing end).** The
-   "did price retrace into the value-gap box?" question is unanswerable from this emission —
-   a new column or a later 1m catalog pass would be required (handoff, binding).
-3. **No fill/trade ledger exists** (`n_fills: 0`, `orders_submitted: false`). The apparatus is
-   measurement-only; there is no economic/P&L object, so no PSR/mean-trade-bps read is
-   possible (and none is claimed).
-4. **~78% of raids return on the same observation bar.** This is the dominant event shape
-   (median fraction 0.780, tight range 0.752–0.799). Under AMENDMENT-13 these stay live, so
-   this is a coverage characteristic, not a defect — but it means "return then confirm on a
-   later bar" is the rarer path.
-5. **46,410 undefined TPO profiles (0.47%)** — not yet summarized by reason. Minor; the
-   design permits UNDEFINED where TPO data is insufficient, but the reason distribution was
-   not interrogated here.
-6. **Right-censoring tail.** 30,520 excursions, 626 confirmations, 506 endpoints censor at
-   TRAIN_END. As designed; the censored object carries no post-TRAIN information (stamps sit
-   exactly at TRAIN_END).
+1. **ATR-undefined maximum excursion is under-recorded in the targeted trace (observed).** With
+   no profile generation, the processor retains the first beyond-minute extreme (100.8) and does
+   not advance to the later completed-observation high (101.2): emitted excursion is 0.8 rather
+   than 1.2. This is an implementation defect, not a fixture expectation defect. The emission has
+   46,268 undefined TPO profiles, but this follow-up does not quantify how many have a later within-
+   observation extreme; affected maximum-excursion fields are therefore not interpreted.
+2. **The old aggregate golden cardinality failures were fixture defects (observed).** A same-bar
+   return legitimately resets the level for a later re-pierce; subsequent synthetic observations
+   then created additional T1/T2 rows, while the harness incorrectly required one row per level.
+   Isolated lifecycle traces now make every cardinality/attribution boolean true without changing
+   strategy code.
+3. **Marginals show concentration without dropping grid values (observed).** Raid mass ranges from
+   90,616 for PREVIOUS_1W to 2,433,606 for ROLLING_7 and from 2,333,912 at 30m to 4,631,206 at 15m.
+   These are descriptive counts, not exposure-normalized rates.
+4. **Same-bar returns dominate (observed).** 7,669,654 returns occur on the sweep bar, with a
+   narrow 75.182%–79.916% cell range. This is explicitly valid under AMENDMENT-13, yet it means
+   evidence about longer-lived return paths is a minority of return events.
+5. **Not every profile/retrace is numeric (observed).** There are 46,268 undefined TPO profiles;
+   53,496 retraces are AMBIGUOUS_SAME_BAR and 7,400 have no post-confirmation MFE. These are
+   explicit states rather than integrity failures, but downstream hypotheses must not silently
+   treat them as measured numeric values.
+6. **Calendar mass is uneven (observed).** 2022 contributes 4.03M raids versus 2.20M in 2021
+   and 3.62M in 2023. Without an exposure-normalized denominator, the artifacts cannot establish
+   rate stability across years.
+7. **There is no economic observation (observed).** No orders, fills, leg ledger, costs, returns,
+   P&L, or PSR exist. Thus the evidence cannot support profitability, tradability, or deployment,
+   even if the state-object hypothesis is accepted.
 
 ## 5. What would make the headline numbers wrong (N7)
 
-- **Coverage counts** could be inflated by duplicate object ids or orphan profiles → ruled out
-  (`raid_dup/level_dup/missing/extra_profiles = 0`), and 3 raids independently recomputed from
-  `bar_marks` match emitted values exactly.
-- **Method overlap** could silently pool two different tests → ruled out by head-to-head
-  comparison (132/132 id+status equal), and disclosed as total overlap.
-- **Golden trace** could pass on a hand-written fixture instead of the real processor → the
-  golden feed runs through the shared `xen.exp100.processor`, not a fixture.
-- **TRAIN/holdout** could leak via endpoint/censor stamps → probed field-by-field: only
-  endpoint/censor reach TRAIN_END (exact), nothing exceeds it, nothing reaches holdout.
-- **Future-destroy** could be vacuous (derangement changes nothing) → ruled out:
-  `fixed_points: 0`, 264/264 `CHANGED`, mean|Δ| ≥ 2.8×SE.
+- **Stale/wrong family root:** compare manifest identity, emitted instruments, pinned fence, and
+  hash → executed; expected/emitted family matches, and expected/actual hash is identical.
+- **Incomplete grid:** enumerate symbols, timeframes, methods, refs, and configs and check zero
+  cells → executed; 264 cells and 66/66/132 timeframe grid match, with no zero raid/level cells.
+- **Pooled masking:** inspect every value of every declared grid layer → executed through
+  `coverage_marginals.json`; no value is dropped, and count concentration is visible without a
+  264-row cell dump.
+- **Duplicate/orphan inflation:** check raid/level duplicates and missing/extra profiles → executed;
+  all failure sums are 0.
+- **Wrong clock or holdout leak:** check weekend anchor keys and every boundary class → executed;
+  no weekend-dated anchors, post-TRAIN stamps, or holdout timestamps; exact TRAIN-end stamps are
+  only endpoint/censor pairs.
+- **Invalid TPO reconstruction:** test conservation, minimum VA mass, selection/tight rule, and
+  profile joins → executed; all failure sums are 0, with undefined profiles disclosed.
+- **Vacuous future-destroy control:** require changed future fields, zero fixed points, preserved
+  IDs/status/counts, positive collapse, and block robustness → executed; all 264 pass. The
+  `2.8 × bootstrap_SE` bite remains integrity-only (N6b), never a value/MDE claim.
+- **Malformed AMENDMENT-14 bounds:** check eligible status, finite price, primary-only assignment,
+  side-aware bounds, and no-MFE handling → executed; all failure sums are 0 and ambiguous/no-MFE
+  counts are disclosed separately.
+- **Trace false positive:** isolate raid identity from valid re-piercing and separately vary the
+  first/later source extremes → executed. Lifecycle booleans turn uniformly true after the fixture
+  correction, while the ATR-undefined maximum-excursion mismatch remains reproducible.
 
 ## 6. Anomalies & open questions
 
-- **Golden-trace probe indexing.** The `t1_one_completed_or_settled` / `t2_exists` booleans
-  are false due to probe strictness, while the terminal summaries show correct behaviour.
-  Recommendation: if the operator wants a fully-green automated golden check, re-run the
-  probe with per-raid (not per-level-first) assertions — analysis-only, no re-emission.
-- **Undefined-TPO reason distribution** not summarized (0.47% of profiles). Could be probed
-  from `profile_undefined_reason`.
-- **Regime stability across the TRAIN calendar** (Q6) not formally read — would need a
-  predeclared stratum split if pursued.
-- **1m retrace-into-gap path** not stored (binding handoff constraint) — a proposal for a
-  later 1m catalog pass, not part of this experiment.
+1. The fixture/cardinality question is resolved: valid re-piercing caused the old false/null
+   aggregate checks. The corrected lifecycle checks are all true.
+2. The layer-count question is resolved by `coverage_marginals.json`, which retains all declared
+   values and relevant count/status fields.
+3. The control denominator question is resolved in §2.2 and in renamed artifact fields. The open
+   issue is the ATR-undefined maximum-excursion implementation defect and its unquantified reach
+   across the frozen emission.
+4. The 46,268 undefined TPO profiles are counted but not broken down by reason in the summaries.
+5. Year totals are not normalized by eligible bars/anchors, so state-frequency stationarity is
+   not established.
+6. The 53,496 AMBIGUOUS_SAME_BAR retraces are correctly separated, but the artifacts do not show
+   how their fraction varies by stratum.
+7. No implementation or result change is proposed here. Any economic, fill, cost, P&L, or PSR
+   question requires a different trading experiment and cannot be answered from EXP-100.
 
-## 7. Recommended verdict (experiment hypothesis only — NOT final, NOT family)
+## 7. Interpretation boundary — no verdict assigned
 
-**Recommendation:** the hypothesis is upheld by the evidence — the streaming state machine
-preserves identity and chronology of levels, excursions, raids, confirmation, breakout, and
-later-swing states on the AMENDMENT-13 object, and the 264-cell TRAIN emission is
-measurement-valid and coverage-complete. No integrity failure was found, and no evidence
-against the hypothesis survives scrutiny (the two "against" items that touch the mechanism —
-golden-probe booleans — are probe-indexing artifacts, not state-machine defects).
+This follow-up assigns no final or replacement verdict. It resolves the old fixture/cardinality
+contradiction, supplies complete declared-layer marginals, and names every future-destroy
+population and fraction. It also finds a real, scoped implementation defect in ATR-undefined
+maximum-excursion tracking. Accordingly, this analysis stops interpretation of the affected
+maximum-excursion value path rather than changing strategy code or relabelling the frozen run.
 
-Evidence most driving this: (1) the clean family+per-cell estimand gate with zero integrity
-fail sums across 264 cells; (2) the future-destroy tripwire collapsing non-vacuously with
-zero fixed points in all 264 cells; (3) the AMENDMENT-13/8/6 golden replay + independent
-raw-bar recomputation matching emitted values exactly.
-
-What could change it: a probe demonstrating a real chronology/identity violation on a
-specific cell (none found), or a failure of the golden trace under per-raid assertions (the
-raw summaries already show correct behaviour, so low risk).
-
-Explicit hand-off: **final verdict is the operator's.** This is a measurement-validity read,
-not a value read — no tradability, no edge, no family action. Suggested follow-up probes if
-the operator wants to push: (a) per-raid golden assertions to turn the boolean caveat green;
-(b) undefined-TPO reason distribution; (c) a predeclared TRAIN-regime stratum split. EXP-101–104
-remain design-only and are not opened by this analysis.
+**Final verdict is the operator's.** No tradability, P&L, Sharpe, or PSR conclusion follows.

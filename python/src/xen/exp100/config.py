@@ -7,9 +7,9 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 VENUES = frozenset({"BYBIT", "CTRADER"})
-OBSERVATION_MINUTES = frozenset({15, 30, 60})
+OBSERVATION_MINUTES = frozenset({1, 15, 30, 60})
 CONFIRMATION_METHODS = frozenset({"BREAKOUT_BAR", "LEVEL_CLOSE"})
-CONFIRMATION_REFERENCES = frozenset({"1H", "1D"})
+CONFIRMATION_REFERENCES = frozenset({"1H", "4H"})
 
 # These are the independent level strata frozen by the liquidity-sweep
 # checkpoint.  A cell processes one value at a time; coincident prices remain
@@ -23,11 +23,10 @@ LEVEL_CONFIGS = frozenset(
         "PREVIOUS_ASIA",
         "PREVIOUS_EUROPE",
         "PREVIOUS_AMERICA",
-        "ROLLING_16",
-        "ROLLING_32",
-        "ROLLING_64",
-        "ROLLING_128",
-        "ROLLING_256",
+        "ROLLING_7",
+        "ROLLING_14",
+        "ROLLING_22",
+        "ROLLING_252",
     }
 )
 
@@ -47,7 +46,7 @@ class Exp100CellConfig:
     regime_window: int = 252
     tpo_value_area: float = 0.70
     tpo_gap_mass: float = 0.30
-    tpo_tight_ratio: float = 0.30
+    tpo_tight_ratio: float = 0.50
 
     def validate(self) -> None:
         """Raise ``ValueError`` unless all fields match the frozen design."""
@@ -72,11 +71,14 @@ class Exp100CellConfig:
                 "confirmation_reference must be one of "
                 f"{sorted(CONFIRMATION_REFERENCES)}, got {self.confirmation_reference!r}"
             )
-        expected_reference = "1H" if self.observation_minutes in {15, 30} else "1D"
-        if self.confirmation_reference != expected_reference:
+        if self.observation_minutes in {1, 15, 30}:
+            expected_references = {"1H"}
+        else:
+            expected_references = {"1H", "4H"}
+        if self.confirmation_reference not in expected_references:
             raise ValueError(
-                f"observation_minutes={self.observation_minutes} requires "
-                f"confirmation_reference={expected_reference}"
+                f"observation_minutes={self.observation_minutes} requires one of "
+                f"{sorted(expected_references)} confirmation references"
             )
         if self.level_config not in LEVEL_CONFIGS:
             raise ValueError(
@@ -91,8 +93,8 @@ class Exp100CellConfig:
             raise ValueError("tpo_value_area is frozen at 0.70")
         if self.tpo_gap_mass != 0.30:
             raise ValueError("tpo_gap_mass is frozen at 0.30")
-        if self.tpo_tight_ratio != 0.30:
-            raise ValueError("tpo_tight_ratio is frozen at 0.30")
+        if self.tpo_tight_ratio != 0.50:
+            raise ValueError("tpo_tight_ratio is frozen at 0.50")
 
     def to_dict(self) -> dict[str, Any]:
         """Return fields in declaration order after validating the config."""

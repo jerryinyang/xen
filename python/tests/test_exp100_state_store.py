@@ -192,9 +192,12 @@ def test_bulk_profile_ranges_match_repeated_single_increments(tmp_path: Path) ->
         }
 
 
-def test_estimated_bytes_grows_with_live_bins(tmp_path: Path) -> None:
+def test_estimated_bytes_is_non_negative_page_estimate(tmp_path: Path) -> None:
+    """Hot-path telemetry must stay O(1); it reports allocated page bytes."""
     with Exp100StateStore(tmp_path / "state.marker") as store:
         before = store.estimated_bytes()
+        assert before >= 0
         generation = store.start_profile_generation("R1", 1, 0.1)
         store.increment_profile_bin_range("R1", generation, 0, 99)
-        assert store.estimated_bytes() > before
+        after = store.estimated_bytes()
+        assert after >= before

@@ -731,6 +731,233 @@ def test_strong_move_compares_post_confirmation_swing_to_excursion(
     assert row["strong_move"] is True
 
 
+def test_pre_mfe_retrace_marks_same_bar_ambiguity_then_resolves_on_later_mfe(
+    tmp_path: Path,
+) -> None:
+    """A later MFE makes every earlier source bar unambiguously prior to it."""
+    processor, sinks = make_processor(tmp_path)
+    processor.state.insert_raid(
+        {
+            "raid_id": "R1",
+            "level_id": "L1",
+            "event_identity": "R1",
+            "side": "HIGH",
+            "level_price": 100.0,
+            "sweep_ts_ns": 1,
+            "return_ts_ns": 2,
+            "confirmation_ts_ns": None,
+            "max_price": 101.0,
+            "max_excursion": 1.0,
+            "raid_atr": 1.0,
+            "profile_generation": None,
+            "profile_finalized": False,
+            "active": 1,
+        }
+    )
+    processor._previous_reference = BarRecord(60, 100.0, 101.0, 100.0, 100.5, 1.0, 1)
+    processor._on_reference_bar(BarRecord(120, 100.0, 100.0, 99.0, 99.5, 1.0, 1))
+
+    raid = next(processor.state.iter_active_raids())
+    processor._update_swing_extreme(
+        raid, BarRecord(121, 99.5, 100.5, 98.0, 99.0, 1.0, 1)
+    )
+    ambiguous = next(processor.state.iter_active_raids())["pre_mfe_retrace"]
+    assert ambiguous == {"price": 100.5, "status": "AMBIGUOUS_SAME_BAR"}
+
+    raid = next(processor.state.iter_active_raids())
+    processor._update_swing_extreme(
+        raid, BarRecord(122, 99.0, 101.0, 98.5, 100.0, 1.0, 1)
+    )
+    raid = next(processor.state.iter_active_raids())
+    processor._update_swing_extreme(
+        raid, BarRecord(123, 100.0, 100.0, 97.0, 98.0, 1.0, 1)
+    )
+    processor._terminal_raid(
+        next(processor.state.iter_active_raids()), "COMPLETED", endpoint_ts_ns=180
+    )
+
+    assert sinks.raids.rows[0]["pre_mfe_retrace"] == {
+        "price": 101.0,
+        "status": "DEFINED",
+    }
+
+
+def test_pre_mfe_retrace_is_side_symmetric_for_low_sweep(tmp_path: Path) -> None:
+    """LOW sweeps retain the least prior low before a later upward MFE."""
+    processor, sinks = make_processor(tmp_path)
+    processor.state.insert_raid(
+        {
+            "raid_id": "R1",
+            "level_id": "L1",
+            "event_identity": "R1",
+            "side": "LOW",
+            "level_price": 100.0,
+            "sweep_ts_ns": 1,
+            "return_ts_ns": 2,
+            "confirmation_ts_ns": 50,
+            "confirmation_price": 100.0,
+            "primary_attribution": True,
+            "max_price": 99.0,
+            "max_excursion": 1.0,
+            "raid_atr": 1.0,
+            "swing_extreme": 100.0,
+            "post_confirmation_mfe": 100.0,
+            "pre_mfe_running_retrace": 100.0,
+            "pre_mfe_retrace": {
+                "price": 100.0,
+                "status": "NO_POST_CONFIRMATION_MFE",
+            },
+            "profile_generation": None,
+            "profile_finalized": True,
+            "active": 1,
+        }
+    )
+    raid = next(processor.state.iter_active_raids())
+    processor._update_swing_extreme(
+        raid, BarRecord(51, 100.0, 101.0, 99.0, 100.5, 1.0, 1)
+    )
+    raid = next(processor.state.iter_active_raids())
+    processor._update_swing_extreme(
+        raid, BarRecord(52, 100.5, 100.8, 98.0, 99.0, 1.0, 1)
+    )
+    raid = next(processor.state.iter_active_raids())
+    processor._update_swing_extreme(
+        raid, BarRecord(53, 99.0, 102.0, 99.5, 101.5, 1.0, 1)
+    )
+    processor._terminal_raid(raid, "COMPLETED", endpoint_ts_ns=60)
+
+    assert sinks.raids.rows[0]["pre_mfe_retrace"] == {
+        "price": 98.0,
+        "status": "DEFINED",
+    }
+
+
+def test_pre_mfe_retrace_is_null_without_primary_confirmation(tmp_path: Path) -> None:
+    """Failed and unconfirmed raids do not fabricate a post-confirmation path."""
+    processor, sinks = make_processor(tmp_path)
+    processor.state.insert_raid(
+        {
+            "raid_id": "R1",
+            "level_id": "L1",
+            "event_identity": "R1",
+            "side": "HIGH",
+            "level_price": 100.0,
+            "sweep_ts_ns": 1,
+            "return_ts_ns": 2,
+            "confirmation_ts_ns": None,
+            "max_price": 101.0,
+            "profile_generation": None,
+            "profile_finalized": True,
+            "active": 1,
+        }
+    )
+    processor._terminal_raid(
+        next(processor.state.iter_active_raids()), "FAILED_BREAKOUT", endpoint_ts_ns=10
+    )
+
+    assert sinks.raids.rows[0]["pre_mfe_retrace"] is None
+
+
+def test_pre_mfe_retrace_skips_unchanged_source_bar_write(tmp_path: Path) -> None:
+    """Bounded online tracking must not rewrite SQLite for unchanged extremes."""
+    processor, _ = make_processor(tmp_path)
+    raid = {
+        "raid_id": "R1",
+        "side": "HIGH",
+        "confirmation_ts_ns": 50,
+        "primary_attribution": True,
+        "swing_extreme": 98.0,
+        "post_confirmation_mfe": 98.0,
+        "pre_mfe_running_retrace": 101.0,
+    }
+    writes: list[dict[str, Any]] = []
+    processor.state.update_raid = (  # type: ignore[method-assign]
+        lambda _raid_id, fields: writes.append(dict(fields))
+    )
+
+    processor._update_swing_extreme(
+        raid, BarRecord(51, 99.0, 100.0, 99.0, 99.5, 1.0, 1)
+    )
+
+    assert writes == []
+
+
+def test_terminal_raid_emits_distinct_excursion_and_swing_durations(
+    tmp_path: Path,
+) -> None:
+    """The two clocks retain their independently defined start and end events."""
+    processor, sinks = make_processor(tmp_path)
+    processor.state.insert_raid(
+        {
+            "raid_id": "R1",
+            "level_id": "L1",
+            "event_identity": "R1",
+            "side": "HIGH",
+            "level_price": 100.0,
+            "sweep_ts_ns": 20,
+            "first_excursion_ts_ns": 10,
+            "return_ts_ns": 40,
+            "confirmation_ts_ns": 50,
+            "primary_attribution": True,
+            "max_price": 101.0,
+            "max_excursion": 1.0,
+            "raid_atr": 1.0,
+            "swing_extreme": 99.0,
+            "profile_generation": None,
+            "profile_finalized": True,
+            "active": 1,
+        }
+    )
+
+    processor._terminal_raid(
+        next(processor.state.iter_active_raids()),
+        "COMPLETED",
+        endpoint_ts_ns=90,
+    )
+
+    row = sinks.raids.rows[0]
+    assert row["excursion_duration_ns"] == 30
+    assert row["swing_duration_ns"] == 40
+    assert row["duration_ns"] == row["swing_duration_ns"]
+
+
+def test_unreturned_raid_excursion_duration_ends_at_censor(
+    tmp_path: Path,
+) -> None:
+    """An unresolved excursion uses its explicit censor boundary, not null duration."""
+    processor, sinks = make_processor(tmp_path)
+    processor.state.insert_raid(
+        {
+            "raid_id": "R1",
+            "level_id": "L1",
+            "event_identity": "R1",
+            "side": "HIGH",
+            "level_price": 100.0,
+            "sweep_ts_ns": 20,
+            "first_excursion_ts_ns": 10,
+            "return_ts_ns": None,
+            "confirmation_ts_ns": None,
+            "max_price": 101.0,
+            "max_excursion": 1.0,
+            "raid_atr": 1.0,
+            "profile_generation": None,
+            "profile_finalized": True,
+            "active": 1,
+        }
+    )
+
+    processor._terminal_raid(
+        next(processor.state.iter_active_raids()),
+        "RIGHT_CENSORED_RETURN",
+        endpoint_ts_ns=90,
+    )
+
+    row = sinks.raids.rows[0]
+    assert row["excursion_duration_ns"] == 80
+    assert row["swing_duration_ns"] is None
+    assert row["duration_ns"] is None
+
+
 def test_raid_start_and_return_use_source_one_minute_bars(tmp_path: Path) -> None:
     """Golden T1: separate 1m excursion and later 1m return form a completed raid."""
     processor, sinks = make_processor(tmp_path)

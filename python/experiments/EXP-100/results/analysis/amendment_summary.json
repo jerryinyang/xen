@@ -1,0 +1,102 @@
+{
+  "n_cells": 264,
+  "all_config_matches_cell_id": true,
+  "all_level_configs_current": true,
+  "all_confirmation_grids_current": true,
+  "max_primary_per_confirmation_side": 1,
+  "failure_sums": {
+    "invalid_observation_source_count": 0,
+    "max_excursion_atr_identity_fail": 0,
+    "max_excursion_bps_identity_fail": 0,
+    "swing_atr_identity_fail": 0,
+    "strong_move_identity_fail": 0,
+    "excursion_duration_fail": 0,
+    "swing_duration_fail": 0,
+    "unconfirmed_swing_duration_nonnull": 0,
+    "duration_alias_fail": 0,
+    "primary_status_fail": 0,
+    "completed_nonprimary": 0,
+    "nonprimary_unlinked_to_primary_confirmation": 0,
+    "retrace_side_bound_fail": 0,
+    "retrace_no_mfe_price_fail": 0,
+    "tpo_bin_width_fail": 0,
+    "tpo_va_width_fail": 0,
+    "tpo_gap_atr_fail": 0,
+    "tpo_gap_va_fail": 0,
+    "tpo_tight_rule_fail": 0,
+    "tpo_va_mass_short": 0,
+    "tpo_conservation_fail": 0
+  },
+  "source_minutes_not_in_complete_observations": 14583052,
+  "year_range": [
+    2021,
+    2023
+  ],
+  "year_totals": [
+    {
+      "year": 2021,
+      "n_raids": 2197572,
+      "n_primary": 171060,
+      "n_completed": 171060
+    },
+    {
+      "year": 2022,
+      "n_raids": 4025596,
+      "n_primary": 327522,
+      "n_completed": 327522
+    },
+    {
+      "year": 2023,
+      "n_raids": 3617310,
+      "n_primary": 291250,
+      "n_completed": 290744
+    }
+  ],
+  "pre_mfe_status_totals": {
+    "DEFINED": 728936,
+    "AMBIGUOUS_SAME_BAR": 53496,
+    "NO_POST_CONFIRMATION_MFE": 7400
+  },
+  "control": {
+    "all_264_integrity_pass": true,
+    "n_integrity_pass": 264,
+    "population": "264 cell-level summaries of aligned finite primary raid pairs",
+    "aligned_pair_denominator_range": [
+      462,
+      6580
+    ],
+    "aligned_level_cluster_range": [
+      115,
+      5269
+    ],
+    "alignment_collapse_fraction_definition": "(raw_alignment_fraction - destroyed_alignment_fraction) / raw_alignment_fraction",
+    "destroyed_alignment_survival_fraction_definition": "destroyed_alignment_fraction / raw_alignment_fraction",
+    "alignment_fraction_denominator": "aligned_pair_denominator_n",
+    "alignment_collapse_fraction_range": [
+      0.026946107784431184,
+      0.3299319727891157
+    ],
+    "alignment_collapse_fraction_median": 0.19697043398951125,
+    "alignment_collapse_ci_low_range": [
+      0.01844758064516129,
+      0.2739723418552328
+    ],
+    "alignment_collapse_ci_low_seed_range_global": [
+      0.017679900744416874,
+      0.27669301406388924
+    ],
+    "destroyed_alignment_survival_fraction_range": [
+      0.6700680272108843,
+      0.9730538922155688
+    ],
+    "swing_perturbation_fraction_range": [
+      0.5291336224717974,
+      0.7967865312839092
+    ],
+    "retrace_changed_fraction_range": [
+      0.9598802395209581,
+      0.9895953757225433
+    ],
+    "block_fragile_cells": 0
+  }
+}

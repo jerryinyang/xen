@@ -2,9 +2,9 @@
 
 - **Family:** `CF-LIQSWP-001/HYP-000`
 - **Checkpoint:** `2026-08-11-019-liquidity-sweeps`
-- **Status:** AMENDMENT-13 264-cell TRAIN analysis complete; HYP-000 upheld by operator confirmation (2026-08-13)
+- **Status:** AMENDMENT-14 full TRAIN rerun authorised; prior AMENDMENT-13 evidence remains historical
 - **Vehicle:** Nautilus `BacktestNode`, TRAIN only
-- **Amendments:** inherits checkpoint AMENDMENT-2 through AMENDMENT-13. Counts: **2L / 3T / 7N**.
+- **Amendments:** inherits checkpoint AMENDMENT-2 through AMENDMENT-14. Counts: **2L / 3T / 8N**.
   - **AMENDMENT-8:** raid grain on the observation bar; 1m reserved for TPO / max-excursion / swing / fills.
   - **AMENDMENT-13:** beyond the level starts a live raid; same-bar return does not close it.
   - **AMENDMENT-9:** 1h cells confirm on 1H and 4H (not 1D); run 15m then 30m then 1h.
@@ -12,7 +12,13 @@
   - **AMENDMENT-11:** rolling windows 7/14/22/252; matrix **264**.
     - **AMENDMENT-12:** tightness `gap_span < 0.50 * VA_width`; gap selection stays emptiest 30% of VA TPO.
   - **ONLINE PROFILE:** every closed 1m source bar updates active TPO bins immediately; no full-history source log or deferred rebuild is permitted.
-  - **DURATION FIELDS:** emit `excursion_duration_ns` from first excursion through return or censor and `swing_duration_ns` from confirmation through endpoint; retain `duration_ns` as the exact swing-duration alias.
+  - **DURATION FIELDS:** the engine emits `excursion_duration_ns` from first excursion through return or censor and `swing_duration_ns` from confirmation through endpoint; `duration_ns` remains the exact swing-duration alias for the frozen EXP-101–104 source contract. These fields are a forward implementation contract and are not retrofitted into the frozen AMENDMENT-13 emission.
+  - **POST-QA IMPLEMENTATION CORRECTION:** the corrected implementation below conforms to the existing AMENDMENT-2–13 design; it does not change the research question, population, estimands, or amendment ledger. It is a candidate for a future execution only. The existing 264-cell emission remains frozen and must not be relabeled as corrected.
+  - **AMENDMENT-14 (2026-08-13, NEUTRAL):** add the single structured raid field
+    `pre_mfe_retrace={price,status}` for downstream path analysis. It changes no population,
+    outcome, control, or HYP-000 false qualifier. The operator authorised documentation,
+    implementation, deletion of stale generated EXP-100 outputs, and a full 264-cell TRAIN
+    rerun. Running count: **2 looser / 3 tighter / 8 neutral**.
 
 ## Mechanism
 
@@ -54,7 +60,17 @@ then all 1h. Verify:
 - confirmation and endpoint chronology;
 - TPO profile state, conservation, reset, VA, gap, and tightness fields;
 - deterministic replay and artifact hash equality;
-- bounded online profile state and explicit excursion/swing duration fields.
+- bounded online profile state, explicit excursion/swing duration fields, and the
+  AMENDMENT-14 pre-MFE retracement field in future executions.
+
+`pre_mfe_retrace` is one nullable struct in `raids.parquet`. For a primary confirmed HIGH
+sweep its price is the greatest real 1m high before the terminal post-confirmation MFE bar;
+for LOW it is the least real 1m low. The confirmation close initializes both clocks. If the
+terminal-MFE bar also extends the adverse extreme, its possible retracement price is emitted
+with `AMBIGUOUS_SAME_BAR`; otherwise status is `DEFINED`. If no post-confirmation source bar
+sets an MFE beyond confirmation, status is `NO_POST_CONFIRMATION_MFE`. Non-primary or
+unconfirmed raids emit null. Downstream VA/gap touches must join the profile by `raid_id`,
+apply side-aware bounds, and report ambiguous rows separately.
 
 Source bars must be minute-aligned and strictly increasing. Normal market-closure gaps in
 the cTrader replication are accepted as periods with no observed bars: no flat/synthetic
@@ -68,7 +84,7 @@ CONTROL FUTURE_DESTROY:
   question answered: does later outcome state depend on the aligned future path?
   population: the same emitted raid objects with post-confirmation blocks
     deranged within asset × timeframe × configuration.
-  bite: changes swing, duration, and strong-move fields while preserving event
+  bite: changes swing, duration, strong-move, and pre-MFE retracement fields while preserving event
     counts and marginal block values.
   non-vacuity: swing_atr and strong_move must change when future blocks move.
   expected outcome if H true: alignment contrast collapses; if H false: it remains.

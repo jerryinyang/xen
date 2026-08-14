@@ -19,7 +19,7 @@ class TPOProfileStore:
         *,
         value_area_mass: float = 0.70,
         gap_mass: float = 0.30,
-        tight_ratio: float = 0.30,
+        tight_ratio: float = 0.50,
     ) -> None:
         self.store = store
         self.value_area_mass = self._mass("value_area_mass", value_area_mass)
@@ -50,28 +50,53 @@ class TPOProfileStore:
         start_ts_ns: int,
         excursion_price: float,
         atr_unit: float,
-    ) -> int:
+    ) -> tuple[int, float]:
         """Start generation one with a bin width frozen from the causal ATR."""
         self._finite("excursion_price", excursion_price)
         atr_decimal = Decimal(str(self._positive_finite("atr_unit", atr_unit)))
         bin_width = float(Decimal("0.10") * atr_decimal)
-        return self.store.start_profile_generation(raid_id, start_ts_ns, bin_width)
+        generation = self.store.start_profile_generation(raid_id, start_ts_ns, bin_width)
+        return generation, bin_width
 
-    def add_bar(self, raid_id: str, generation: int, bar: BarRecord) -> None:
-        """Apply one closed one-minute bar to each directly intersected bin."""
-        state = self.store.get_profile_state(raid_id, generation)
-        if state is None:
-            raise KeyError((raid_id, generation))
+    def bar_bin_range(
+        self,
+        bar: BarRecord,
+        bin_width: float,
+    ) -> tuple[int, int]:
+        """Return the inclusive bin indexes touched by one closed source bar."""
+        bin_width = self._positive_finite("bin_width", bin_width)
         low = self._finite("bar.low", bar.low)
         high = self._finite("bar.high", bar.high)
         if low > high:
             raise ValueError("bar low cannot exceed high")
-        bin_width = float(state["bin_width"])
-        low_bin_index = self._bin_index(low, bin_width)
-        high_bin_index = self._bin_index(high, bin_width)
+        return self._bin_index(low, bin_width), self._bin_index(high, bin_width)
+
+    def add_bar(
+        self,
+        raid_id: str,
+        generation: int,
+        bar: BarRecord,
+        *,
+        bin_width: float | None = None,
+    ) -> None:
+        """Apply one closed one-minute bar to each directly intersected bin."""
+        if bin_width is None:
+            state = self.store.get_profile_state(raid_id, generation)
+            if state is None:
+                raise KeyError((raid_id, generation))
+            bin_width = float(state["bin_width"])
+        low_bin_index, high_bin_index = self.bar_bin_range(bar, float(bin_width))
         self.store.increment_profile_bin_range(
             raid_id, generation, low_bin_index, high_bin_index
         )
+
+    def add_bars_bulk(
+        self,
+        ranges: list[tuple[str, int, int, int]],
+    ) -> None:
+        """Apply many precomputed inclusive bin ranges in one store write."""
+        if ranges:
+            self.store.bulk_increment_profile_bin_ranges(ranges)
 
     def reset(self, raid_id: str, new_max_price: float, ts_ns: int) -> int:
         """Replace the active profile without reconstructing historical bars."""

@@ -474,7 +474,12 @@ def run_cell(
         for name in ("levels", "raids", "tpo_profiles"):
             _copy_file(work_dir / f"{name}.parquet", publish_stage / f"{name}.parquet")
         if destroy_control:
-            value_columns = ("swing_atr", "duration_ns", "strong_move")
+            value_columns = (
+                "swing_atr",
+                "duration_ns",
+                "strong_move",
+                "pre_mfe_retrace",
+            )
             control_report = destroy_post_confirmation(
                 publish_stage / "raids.parquet",
                 publish_stage / "raids_destroyed.parquet",
@@ -484,16 +489,11 @@ def run_cell(
             )
             eligible = int(control_report.get("rows", 0))
             changed = int(control_report.get("changed_rows", 0))
-            skipped = int(control_report.get("skipped_singleton_groups", 0))
             if eligible == 0:
-                control_report["non_vacuity"] = (
-                    "VACUOUS_SINGLETON"
-                    if skipped
-                    else "VACUOUS_NO_ELIGIBLE"
-                )
+                control_report["non_vacuity"] = "VACUOUS_NO_ELIGIBLE"
             elif changed == 0:
                 raise ValueError(
-                    "destroy control is vacuous: swing_atr/duration_ns/strong_move did not change"
+                    "destroy control is vacuous: post-confirmation outcome block did not change"
                 )
             else:
                 control_report["non_vacuity"] = "CHANGED"
