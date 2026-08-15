@@ -208,7 +208,7 @@ def run_fixture(
     n_destroy: int = DEFAULT_DESTROYS,
     seeds: Sequence[int] = SEEDS,
     output: Path | None = None,
-    n_boot: int = 200,
+    n_boot: int = 10,
 ) -> dict[str, Any]:
     """Run the fixture through the production integrity/runtime path."""
     destination = output or Path(__file__).resolve().parents[1] / "results/fixture_integrity.json"
@@ -231,10 +231,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     adapter = Adapter()
     if args.live:
         source = args.source_root or experiment_root.parents[2] / "data/nautilus_runs/EXP-100/full"
-        gate = args.gate or experiment_root / "results/estimand_validation.json"
+        gate = args.gate or (
+            experiment_root.parent / "EXP-100/results/estimand_validation.json"
+        )
         run_live(adapter, source, gate, output)
     else:
-        _run_fixture(adapter, args.output or experiment_root / "results/fixture_integrity.json")
+        run_fixture(output=args.output or experiment_root / "results/fixture_integrity.json")
     return 0
 
 
