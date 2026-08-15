@@ -61,7 +61,9 @@ def scan_train_columns(
     return (
         pl.scan_parquet([str(path) for path in paths])
         .select(requested)
-        .filter(pl.col(train_end_column) <= int(train_end_ns))
+        .filter(
+            pl.col(train_end_column).is_null() | (pl.col(train_end_column) <= int(train_end_ns))
+        )
         .select(list(columns))
     )
 
@@ -132,7 +134,23 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
     if len(gate_paths) != spec.expected_cells:
         reasons.append("VOID_CELL_GATE_COUNT")
     gates_by_name = {path.stem: _read_json(path) for path in gate_paths}
-    frames: list[pl.DataFrame] = []
+    family_by_name = {
+        Path(str(cell.get("run_dir", ""))).name: cell for cell in family_gate.get("cells", [])
+    }
+    if set(family_by_name) != set(gates_by_name):
+        reasons.append("VOID_GATE_RECONCILIATION")
+    else:
+        for name, gate in gates_by_name.items():
+            family_cell = family_by_name[name]
+            if (
+                family_cell.get("blocking_pass") != gate.get("blocking_pass")
+                or family_cell.get("catalog_attestation", {}).get("config_hash")
+                != gate.get("catalog_attestation", {}).get("config_hash")
+                or family_cell.get("no_cost_charged", {}).get("ok")
+                != gate.get("no_cost_charged", {}).get("ok")
+            ):
+                reasons.append("VOID_GATE_RECONCILIATION")
+    id_frames: list[pl.LazyFrame] = []
     table_paths: list[Path] = []
     for cell_dir in cell_dirs:
         gate = gates_by_name.get(cell_dir.name)
@@ -140,6 +158,8 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
             continue
         if not gate.get("blocking_pass"):
             reasons.append("VOID_CELL_GATE")
+        if Path(str(gate.get("run_dir", ""))).resolve() != cell_dir.resolve():
+            reasons.append("VOID_GATE_RUN_DIR")
         metadata_path = cell_dir / "run_metadata.json"
         event_path = cell_dir / "event_log.jsonl"
         fence_path = cell_dir / "fence_attestation.json"
@@ -160,37 +180,87 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
             reasons.append("VOID_ZERO_COST")
         if fence.get("status") != "PINNED":
             reasons.append("VOID_FENCE_STATUS")
-        frame = pl.read_parquet(table_path, columns=list(spec.required_columns))
-        missing = [column for column in spec.required_columns if column not in frame.columns]
+        if int(fence.get("train_end_ns", -1)) != int(spec.train_end_ns):
+            reasons.append("VOID_FENCE_BOUNDARY")
+        available = set(pl.scan_parquet(table_path).collect_schema().names())
+        missing = [column for column in spec.required_columns if column not in available]
         if missing:
             reasons.append("VOID_SCHEMA")
             continue
-        if "source_configuration" in frame.columns and "config" in frame.columns:
-            if frame.filter(pl.col("source_configuration") != pl.col("config")).height:
+        lazy = pl.scan_parquet(table_path).select(spec.required_columns)
+        row_count = lazy.select(pl.len()).collect(engine="streaming").item()
+        evidence["rows"] += int(row_count)
+        if "source_configuration" in available and "config" in available:
+            mismatch = (
+                lazy.select((pl.col("source_configuration") != pl.col("config")).sum())
+                .collect(engine="streaming")
+                .item()
+            )
+            if mismatch:
                 reasons.append("VOID_SOURCE_CONFIGURATION_MISMATCH")
-        reasons.extend(_metadata_identity_failures(frame, metadata))
-        expected_rows = metadata.get(f"n_{Path(spec.table).stem}")
-        if expected_rows is not None and int(expected_rows) != frame.height:
-            reasons.append("VOID_ROW_COUNT_MISMATCH")
-        if frame.filter(pl.col(spec.train_end_column) > int(spec.train_end_ns)).height:
-            reasons.append("VOID_AFTER_TRAIN")
-        causal_failures = validate_causal_order(
-            frame,
-            (
-                ("raid_ts_ns", "sweep_ts_ns"),
-                ("sweep_ts_ns", "confirmation_ts_ns"),
-                ("confirmation_ts_ns", "endpoint_ts_ns"),
-            ),
+        identity_frame = (
+            lazy.select(
+                column
+                for column in (
+                    "archive_symbol",
+                    "timeframe",
+                    "confirmation_method",
+                    "confirmation_reference",
+                    "config",
+                )
+                if column in available
+            )
+            .unique()
+            .collect(engine="streaming")
         )
+        reasons.extend(_metadata_identity_failures(identity_frame, metadata))
+        expected_rows = metadata.get(f"n_{Path(spec.table).stem}")
+        if expected_rows is not None and int(expected_rows) != row_count:
+            reasons.append("VOID_ROW_COUNT_MISMATCH")
+        if (
+            lazy.select((pl.col(spec.train_end_column) > int(spec.train_end_ns)).sum())
+            .collect(engine="streaming")
+            .item()
+        ):
+            reasons.append("VOID_AFTER_TRAIN")
+        causal_failures = []
+        for earlier, later in (
+            ("raid_ts_ns", "sweep_ts_ns"),
+            ("sweep_ts_ns", "return_ts_ns"),
+            ("return_ts_ns", "confirmation_ts_ns"),
+            ("sweep_ts_ns", "confirmation_ts_ns"),
+            ("confirmation_ts_ns", "endpoint_ts_ns"),
+        ):
+            if earlier not in available or later not in available:
+                continue
+            invalid = (
+                lazy.select(
+                    (
+                        pl.col(earlier).is_not_null()
+                        & pl.col(later).is_not_null()
+                        & (pl.col(earlier) > pl.col(later))
+                    ).sum()
+                )
+                .collect(engine="streaming")
+                .item()
+            )
+            if invalid:
+                causal_failures.append({"earlier": earlier, "later": later, "rows": int(invalid)})
         if causal_failures:
             reasons.append("VOID_CAUSAL_ORDER")
             evidence["causal_failures"].extend(causal_failures)
-        frames.append(frame)
+        id_frames.append(lazy.select(spec.object_id_column))
         table_paths.append(table_path)
-    if frames:
-        combined = pl.concat(frames, how="vertical_relaxed")
-        evidence["rows"] = combined.height
-        duplicates = combined.select(pl.col(spec.object_id_column).is_duplicated().sum()).item()
+    if id_frames:
+        duplicates = (
+            pl.concat(id_frames)
+            .group_by(spec.object_id_column)
+            .len()
+            .filter(pl.col("len") > 1)
+            .select(pl.col("len").sum().fill_null(0))
+            .collect(engine="streaming")
+            .item()
+        )
         evidence["duplicate_object_ids"] = int(duplicates)
         if duplicates:
             reasons.append("VOID_DUPLICATE_OBJECT_ID")

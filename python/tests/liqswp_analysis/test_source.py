@@ -175,6 +175,51 @@ def test_projected_scan_exposes_only_requested_columns(tmp_path: Path) -> None:
     assert collected.height == 2
 
 
+def test_projected_scan_retains_null_censored_endpoint(tmp_path: Path) -> None:
+    spec = _source_tree(tmp_path)
+    path = spec.root / "cell-0" / "raids.parquet"
+    frame = pl.read_parquet(path).with_columns(pl.lit(None, dtype=pl.Int64).alias("endpoint_ts_ns"))
+    frame.write_parquet(path)
+    collected = scan_train_columns(
+        [path],
+        columns=("raid_id", "endpoint_ts_ns"),
+        train_end_column="endpoint_ts_ns",
+        train_end_ns=TRAIN_END_NS,
+    ).collect()
+    assert collected.height == 1
+    assert collected["endpoint_ts_ns"].null_count() == 1
+
+
+def test_missing_required_column_fails_closed_without_read_error(tmp_path: Path) -> None:
+    spec = _source_tree(tmp_path)
+    path = spec.root / "cell-1" / "raids.parquet"
+    pl.read_parquet(path).drop("confirmation_reference").write_parquet(path)
+    result = validate_source_contract(spec)
+    assert not result.integrity.blocking_pass
+    assert "VOID_SCHEMA" in result.integrity.reasons
+
+
+def test_gate_run_directory_mismatch_fails_closed(tmp_path: Path) -> None:
+    spec = _source_tree(tmp_path)
+    gate_path = spec.cell_gate_dir / "cell-1.json"
+    gate = json.loads(gate_path.read_text())
+    gate["run_dir"] = str(spec.root / "cell-0")
+    _write_json(gate_path, gate)
+    result = validate_source_contract(spec)
+    assert not result.integrity.blocking_pass
+    assert "VOID_GATE_RUN_DIR" in result.integrity.reasons
+
+
+def test_family_and_cell_gate_disagreement_fails_closed(tmp_path: Path) -> None:
+    spec = _source_tree(tmp_path)
+    family = json.loads(spec.family_gate.read_text())
+    family["cells"][1]["catalog_attestation"]["config_hash"] = "different"
+    _write_json(spec.family_gate, family)
+    result = validate_source_contract(spec)
+    assert not result.integrity.blocking_pass
+    assert "VOID_GATE_RECONCILIATION" in result.integrity.reasons
+
+
 def test_causal_order_returns_named_failed_pair() -> None:
     frame = pl.DataFrame({"raid": [10], "confirm": [9], "end": [11]})
     failures = validate_causal_order(frame, (("raid", "confirm"), ("confirm", "end")))

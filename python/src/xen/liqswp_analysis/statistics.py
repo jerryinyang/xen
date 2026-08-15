@@ -85,6 +85,29 @@ def _cluster_rows(view: PopulationView) -> tuple[np.ndarray, list[np.ndarray]]:
     ]
 
 
+def _cluster_contrast_totals(
+    view: PopulationView, rows_by_cluster: Sequence[np.ndarray]
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Precompute the four sufficient statistics needed by every bootstrap draw."""
+    values = np.asarray(view.values, dtype=float)
+    arm_sum = np.zeros(len(rows_by_cluster), dtype=float)
+    arm_n = np.zeros(len(rows_by_cluster), dtype=np.int64)
+    comparator_sum = np.zeros(len(rows_by_cluster), dtype=float)
+    comparator_n = np.zeros(len(rows_by_cluster), dtype=np.int64)
+    for index, rows in enumerate(rows_by_cluster):
+        labels = view.labels[rows]
+        cluster_values = values[rows]
+        arm_values = cluster_values[(labels == view.arm) & np.isfinite(cluster_values)]
+        comparator_values = cluster_values[
+            (labels == view.comparator) & np.isfinite(cluster_values)
+        ]
+        arm_sum[index] = arm_values.sum()
+        arm_n[index] = arm_values.size
+        comparator_sum[index] = comparator_values.sum()
+        comparator_n[index] = comparator_values.size
+    return arm_sum, arm_n, comparator_sum, comparator_n
+
+
 def clustered_contrast_bootstrap(
     view: PopulationView,
     *,
@@ -116,13 +139,21 @@ def clustered_contrast_bootstrap(
     seed_rows: list[dict[str, Any]] = []
     total_finite = 0
     total_nonfinite = 0
+    arm_sum, arm_n, comparator_sum, comparator_n = _cluster_contrast_totals(view, rows_by_cluster)
     for seed in seeds:
         rng = np.random.default_rng(seed)
         draws = np.empty(int(n_boot), dtype=float)
         for draw_index in range(int(n_boot)):
             chosen = circular_cluster_indices(len(clusters), block_length, rng)
-            row_indices = np.concatenate([rows_by_cluster[int(index)] for index in chosen])
-            draws[draw_index] = estimate_contrast(view, row_indices)["estimate"]
+            selected_arm_n = int(arm_n[chosen].sum())
+            selected_comparator_n = int(comparator_n[chosen].sum())
+            if selected_arm_n == 0 or selected_comparator_n == 0:
+                draws[draw_index] = float("nan")
+            else:
+                draws[draw_index] = float(
+                    arm_sum[chosen].sum() / selected_arm_n
+                    - comparator_sum[chosen].sum() / selected_comparator_n
+                )
         finite = draws[np.isfinite(draws)]
         total_finite += int(finite.size)
         total_nonfinite += int(draws.size - finite.size)
@@ -134,6 +165,9 @@ def clustered_contrast_bootstrap(
                     "high": float(np.quantile(finite, 0.975)),
                     "finite_draws": int(finite.size),
                     "nonfinite_draws": int(draws.size - finite.size),
+                    "bootstrap_se": float(np.std(finite, ddof=1))
+                    if finite.size > 1
+                    else float("nan"),
                 }
             )
     if not seed_rows:
@@ -147,6 +181,7 @@ def clustered_contrast_bootstrap(
         return base
     lows = [row["low"] for row in seed_rows]
     highs = [row["high"] for row in seed_rows]
+    standard_errors = [row["bootstrap_se"] for row in seed_rows if np.isfinite(row["bootstrap_se"])]
     base.update(
         reason=None,
         interval=[float(np.median(lows)), float(np.median(highs))],
@@ -155,6 +190,7 @@ def clustered_contrast_bootstrap(
         seeds=seed_rows,
         finite_draws=total_finite,
         nonfinite_draws=total_nonfinite,
+        bootstrap_se=float(np.median(standard_errors)) if standard_errors else float("nan"),
     )
     return base
 

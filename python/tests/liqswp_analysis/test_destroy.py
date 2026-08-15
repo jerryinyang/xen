@@ -10,6 +10,7 @@ from xen.liqswp_analysis.destroy import (
     destroyed_contrasts,
     future_destroy_attestation,
     reference_destroyed_contrasts,
+    stream_destroy_control,
 )
 from xen.liqswp_analysis.statistics import PopulationView
 
@@ -157,3 +158,24 @@ def test_batched_destroy_equals_simple_reference() -> None:
         destroyed_contrasts(population, mappings),
         reference_destroyed_contrasts(population, mappings),
     )
+
+
+def test_streamed_destroy_matches_reference_and_bounds_mapping_batch() -> None:
+    population = _population()
+    seeds = tuple(range(25))
+    reference = build_destroy_mappings(
+        _columns(), _spec(), seeds=seeds, population_id=population.population_id
+    )
+    run = stream_destroy_control(
+        population,
+        _columns(),
+        _spec(),
+        seeds=seeds,
+        batch_size=4,
+    )
+    assert np.array_equal(run.estimates, destroyed_contrasts(population, reference))
+    assert np.allclose(
+        run.average_values, apply_destroy_mappings(population.values, reference).mean(0)
+    )
+    assert run.max_materialized_mappings == 4
+    assert run.summary.permutations.shape == (0, 4)

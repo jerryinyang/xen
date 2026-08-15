@@ -72,6 +72,7 @@ def test_nonfinite_draws_are_counted_not_allowed_to_poison_interval() -> None:
     assert result["finite_draws"] > 0
     assert result["interval"] is not None
     assert all(np.isfinite(result["interval"]))
+    assert np.isfinite(result["bootstrap_se"])
 
 
 def test_block_sensitivity_always_reports_2_5_10_without_hiding_thin_rows() -> None:

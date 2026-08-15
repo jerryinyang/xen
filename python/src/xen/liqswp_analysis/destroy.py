@@ -35,6 +35,16 @@ class DestroyMappings:
     moved_eligible_values: int
 
 
+@dataclass(frozen=True)
+class StreamedDestroyRun:
+    """Bounded-memory destroy outputs and their integrity summary."""
+
+    summary: DestroyMappings
+    estimates: np.ndarray
+    average_values: np.ndarray
+    max_materialized_mappings: int
+
+
 def derange_indices(n: int, rng: np.random.Generator) -> np.ndarray:
     """Generate a uniform-enough zero-fixed-point permutation for integrity controls."""
     if n < 2:
@@ -122,6 +132,87 @@ def build_destroy_mappings(
         moved_rows=int(np.count_nonzero(movable_mask)),
         moved_eligible_values=changed_values,
     )
+
+
+def stream_destroy_control(
+    view: PopulationView,
+    columns: Mapping[str, np.ndarray],
+    spec: DestroySpec,
+    *,
+    seeds: Sequence[int],
+    batch_size: int = 8,
+) -> StreamedDestroyRun:
+    """Compute destroy draws in fixed-size mapping batches instead of a 2-D full run."""
+    n_rows = _validate_columns(columns, spec)
+    if n_rows != len(view.values):
+        raise ValueError("mapping/value population size mismatch")
+    if batch_size < 1:
+        raise ValueError("batch_size must be positive")
+    groups: dict[tuple[Any, ...], list[int]] = {}
+    for index in range(n_rows):
+        group_key = tuple(columns[column][index] for column in spec.group_columns)
+        null_key = tuple(_is_null(columns[column][index]) for column in spec.null_columns)
+        groups.setdefault((*group_key, *null_key), []).append(index)
+    ordered_groups = tuple(np.asarray(indices, dtype=int) for indices in groups.values())
+    movable = np.zeros(n_rows, dtype=bool)
+    for indices in ordered_groups:
+        if len(indices) >= 2:
+            movable[indices] = True
+    reasons: list[str] = []
+    if any(len(indices) < 2 for indices in ordered_groups):
+        reasons.append("VOID_SINGLETON_GROUP")
+
+    seed_values = tuple(int(seed) for seed in seeds)
+    estimates = np.empty(len(seed_values), dtype=float)
+    average = np.zeros(n_rows, dtype=float)
+    changed_values = 0
+    max_batch = 0
+    source_values = np.asarray(view.values)
+    for offset in range(0, len(seed_values), batch_size):
+        batch_seeds = seed_values[offset : offset + batch_size]
+        max_batch = max(max_batch, len(batch_seeds))
+        mappings = np.tile(np.arange(n_rows, dtype=int), (len(batch_seeds), 1))
+        for seed_index, seed in enumerate(batch_seeds):
+            rng = np.random.default_rng(seed)
+            for indices in ordered_groups:
+                if len(indices) >= 2:
+                    mappings[seed_index, indices] = indices[derange_indices(len(indices), rng)]
+        moved_batch = source_values[mappings].astype(float)
+        average += moved_batch.sum(axis=0)
+        for local_index, moved in enumerate(moved_batch):
+            destroyed = PopulationView(
+                population_id=view.population_id,
+                labels=view.labels,
+                arm=view.arm,
+                comparator=view.comparator,
+                cluster_ids=view.cluster_ids,
+                values=moved,
+            )
+            estimates[offset + local_index] = estimate_contrast(destroyed)["estimate"]
+        original = source_values[movable]
+        finite_original = np.asarray([not _is_null(value) for value in original])
+        for mapping in mappings:
+            moved = source_values[mapping[movable]]
+            finite = finite_original & np.asarray([not _is_null(value) for value in moved])
+            changed_values += int(np.count_nonzero(finite & (original != moved)))
+    if seed_values:
+        average /= len(seed_values)
+    else:
+        average.fill(float("nan"))
+        reasons.append("VOID_NO_DESTROY_DRAWS")
+    if movable.any() and changed_values == 0:
+        reasons.append("VOID_NO_CHANGED_VALUE")
+    fixed_points = int(np.count_nonzero(~movable) * len(seed_values))
+    summary = DestroyMappings(
+        population_id=view.population_id,
+        permutations=np.empty((0, n_rows), dtype=int),
+        group_sizes=tuple(len(indices) for indices in ordered_groups),
+        reasons=tuple(dict.fromkeys(reasons)),
+        fixed_points=fixed_points,
+        moved_rows=int(np.count_nonzero(movable)),
+        moved_eligible_values=changed_values,
+    )
+    return StreamedDestroyRun(summary, estimates, average, max_batch)
 
 
 def apply_destroy_mappings(values: np.ndarray, mappings: DestroyMappings) -> np.ndarray:
@@ -226,6 +317,14 @@ def future_destroy_attestation(
             "raw_bootstrap_se": float(raw_bootstrap_se),
             "raw_bite": raw_bite,
             "destroyed_mean": destroyed_mean,
+            "destroyed_interval": (
+                [
+                    float(np.quantile(finite_destroyed, 0.025)),
+                    float(np.quantile(finite_destroyed, 0.975)),
+                ]
+                if finite_destroyed.size
+                else None
+            ),
             "destroyed_bootstrap_se": float(destroyed_bootstrap_se),
             "destroyed_draws": int(finite_destroyed.size),
             "destroyed_survives": destroyed_survives,
