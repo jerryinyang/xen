@@ -19,10 +19,10 @@ re-run these).
 | ID | Family | Status | Purpose |
 |---|---|---|---|
 | EXP-100 | CF-LIQSWP-001 | COMPLETED — OPERATOR-APPROVED | Current 264-cell TRAIN run retained; ATR-undefined excursion values excluded, unaffected apparatus findings retained |
-| EXP-101 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | Level significance versus later swing outcomes |
-| EXP-102 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | Repeated raids and prior-raid count |
-| EXP-103 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | TPO value gap and tight-gap conditioning |
-| EXP-104 | CF-LIQSWP-001 | DESIGN AMENDED (2–13) — fresh QA pending | Volatility-regime conditioning |
+| EXP-101 | CF-LIQSWP-001 | QA REVISE FINDINGS REPAIRED — operator execution pending | Level significance versus later swing outcomes |
+| EXP-102 | CF-LIQSWP-001 | QA REVISE FINDINGS REPAIRED — operator execution pending | Repeated raids and prior-raid count |
+| EXP-103 | CF-LIQSWP-001 | QA REVISE FINDINGS REPAIRED — operator execution pending | TPO value gap and tight-gap conditioning |
+| EXP-104 | CF-LIQSWP-001 | QA REVISE FINDINGS REPAIRED — operator execution pending | Volatility-regime conditioning |
 
 ## Carried in from Chapter 05
 
