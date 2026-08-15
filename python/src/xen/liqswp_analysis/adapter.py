@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from pathlib import Path
+import sys
 from typing import Any, Hashable, Sequence
 
 import numpy as np
@@ -123,6 +124,11 @@ class BaseContrastAdapter:
     label_column = ""
     contrasts: tuple[tuple[Hashable, Hashable], ...] = ()
     channels: tuple[str, ...] = CHANNELS
+    control_channels: tuple[str, ...] = (
+        "swing_atr",
+        "swing_duration_ns",
+        "strong_move",
+    )
     control_group_columns: tuple[str, ...] = ()
     control_null_columns: tuple[str, ...] = NULL_COLUMNS
     required_columns: tuple[str, ...] = BASE_COLUMNS
@@ -148,6 +154,7 @@ class BaseContrastAdapter:
         self._control_records: list[dict[str, Any]] = []
         self._extra_integrity_evidence: dict[str, Any] = {}
         self._control_status: dict[tuple[Any, ...], bool] = {}
+        self._live_mode = False
 
     def fixture_frame(self) -> pl.DataFrame:
         raise NotImplementedError
@@ -174,6 +181,7 @@ class BaseContrastAdapter:
     def live_frame(
         self, source_root: Path, gate_path: Path
     ) -> tuple[pl.DataFrame, dict[str, Any], IntegrityStatus]:
+        self._live_mode = True
         attestation = validate_source_contract(self.source_spec(source_root, gate_path))
         source = {
             "mode": "live",
@@ -203,6 +211,15 @@ class BaseContrastAdapter:
                 pl.col("profile_undefined_reason").fill_null("") != "ATR_UNDEFINED"
             )
         return eligible
+
+    def _progress(self, phase: str, stratum: dict[str, Any], arm: Hashable, channel: str) -> None:
+        if self._live_mode:
+            identity = "/".join(str(stratum[column]) for column in self.stratum_columns)
+            print(
+                f"{self.experiment} {phase}: {identity} {arm} {channel}",
+                file=sys.stderr,
+                flush=True,
+            )
 
     def _population_view(
         self,
@@ -264,7 +281,8 @@ class BaseContrastAdapter:
         destroy_seeds = tuple(range(self.n_destroy))
         for stratum, stratum_frame in self._strata(frame):
             for arm, comparator in self.contrasts:
-                for channel in self.channels:
+                for channel in self.control_channels:
+                    self._progress("integrity", stratum, arm, channel)
                     population, view = self._population_view(
                         stratum_frame, arm=arm, comparator=comparator, channel=channel
                     )
@@ -373,13 +391,18 @@ class BaseContrastAdapter:
         for stratum, stratum_frame in self._strata(frame):
             for arm, comparator in self.contrasts:
                 for channel in self.channels:
+                    self._progress("analysis", stratum, arm, channel)
                     status_key = (
                         *(stratum[column] for column in self.stratum_columns),
                         arm,
                         comparator,
                         channel,
                     )
-                    if self._control_status and not self._control_status.get(status_key, False):
+                    if (
+                        channel in self.control_channels
+                        and self._control_status
+                        and not self._control_status.get(status_key, False)
+                    ):
                         continue
                     _, view = self._population_view(
                         stratum_frame, arm=arm, comparator=comparator, channel=channel

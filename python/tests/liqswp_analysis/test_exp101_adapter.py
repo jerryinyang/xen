@@ -44,6 +44,11 @@ def test_exp101_adapter_emits_every_registered_channel_and_sensitivity(
     )
     assert all(set(row) >= {"observed", "ideal", "interpretation"} for row in rows)
     extra = adapter.extra(frame)
+    assert {row["channel"] for row in extra["control"]["records"]} == {
+        "swing_atr",
+        "swing_duration_ns",
+        "strong_move",
+    }
     assert extra["control"]["fixed_points"] == 0
     assert extra["control"]["population_match"] is True
     assert set(extra["census"]) >= {"arm", "comparator", "status", "missingness"}

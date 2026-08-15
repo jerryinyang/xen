@@ -194,6 +194,7 @@ class Adapter(BaseContrastAdapter):
     def live_frame(
         self, source_root: Path, gate_path: Path
     ) -> tuple[pl.DataFrame, dict[str, Any], IntegrityStatus]:
+        self._live_mode = True
         attestation = validate_source_contract(self.source_spec(source_root, gate_path))
         source = {
             "mode": "live",
