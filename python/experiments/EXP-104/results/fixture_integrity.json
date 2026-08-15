@@ -1,0 +1,3918 @@
+{
+  "experiment": "EXP-104",
+  "extra": {
+    "census": {
+      "by_stratum_arm": [
+        {
+          "archive_symbol": "EURUSD",
+          "atr_undefined": 0,
+          "config": "FIXTURE_CONFIG",
+          "confirmation_method": "BREAKOUT_BAR",
+          "confirmation_reference": "1H",
+          "missingness": {
+            "strong_move": 0,
+            "swing_atr": 0,
+            "swing_bps": 0,
+            "swing_duration_ns": 0,
+            "swing_price": 0
+          },
+          "raid_regime": "MID",
+          "rows": 200,
+          "side": "HIGH",
+          "status": {
+            "COMPLETED": 200
+          },
+          "timeframe": "15m"
+        },
+        {
+          "archive_symbol": "EURUSD",
+          "atr_undefined": 0,
+          "config": "FIXTURE_CONFIG",
+          "confirmation_method": "BREAKOUT_BAR",
+          "confirmation_reference": "1H",
+          "missingness": {
+            "strong_move": 0,
+            "swing_atr": 0,
+            "swing_bps": 0,
+            "swing_duration_ns": 0,
+            "swing_price": 0
+          },
+          "raid_regime": "LOW",
+          "rows": 200,
+          "side": "HIGH",
+          "status": {
+            "COMPLETED": 200
+          },
+          "timeframe": "15m"
+        },
+        {
+          "archive_symbol": "EURUSD",
+          "atr_undefined": 0,
+          "config": "FIXTURE_CONFIG",
+          "confirmation_method": "BREAKOUT_BAR",
+          "confirmation_reference": "1H",
+          "missingness": {
+            "strong_move": 0,
+            "swing_atr": 0,
+            "swing_bps": 0,
+            "swing_duration_ns": 0,
+            "swing_price": 0
+          },
+          "raid_regime": "HIGH",
+          "rows": 200,
+          "side": "HIGH",
+          "status": {
+            "COMPLETED": 200
+          },
+          "timeframe": "15m"
+        }
+      ],
+      "missingness": {
+        "strong_move": 0,
+        "swing_atr": 0,
+        "swing_bps": 0,
+        "swing_duration_ns": 0,
+        "swing_price": 0
+      },
+      "status": {
+        "COMPLETED": 600
+      }
+    },
+    "confirmation_regime_census": {
+      "MID": 600
+    },
+    "control": {
+      "fixed_points": 0,
+      "population_match": true,
+      "records": [
+        {
+          "arm": "LOW",
+          "blocking_pass": true,
+          "channel": "swing_price",
+          "collapse_ratio": -0.0032898999999995196,
+          "comparator": "MID",
+          "destroyed_bootstrap_se": 0.0007872506838862765,
+          "destroyed_data_bootstrap_se": 0.0005520183577968268,
+          "destroyed_draws": 2000,
+          "destroyed_interval": [
+            -0.05050749999999944,
+            0.04650499999999515
+          ],
+          "destroyed_mapping_monte_carlo_se": 0.0005612836822273604,
+          "destroyed_mean": -0.0016449499999997598,
+          "destroyed_survives": false,
+          "fixed_points": 0,
+          "group_sizes": [
+            400
+          ],
+          "max_materialized_mappings": 8,
+          "moved_eligible_values": 765497,
+          "moved_rows": 400,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_price",
+          "population_match": true,
+          "raw_bite": true,
+          "raw_bootstrap_se": 0.004021134162454464,
+          "raw_estimate": 0.5,
+          "reasons": [],
+          "stratum": {
+            "archive_symbol": "EURUSD",
+            "config": "FIXTURE_CONFIG",
+            "confirmation_method": "BREAKOUT_BAR",
+            "confirmation_reference": "1H",
+            "side": "HIGH",
+            "timeframe": "15m"
+          }
+        },
+        {
+          "arm": "LOW",
+          "blocking_pass": true,
+          "channel": "swing_bps",
+          "collapse_ratio": -0.0032898999999999975,
+          "comparator": "MID",
+          "destroyed_bootstrap_se": 0.0007872506838865786,
+          "destroyed_data_bootstrap_se": 0.0005520183577972453,
+          "destroyed_draws": 2000,
+          "destroyed_interval": [
+            -0.050507499999999574,
+            0.046504999999998214
+          ],
+          "destroyed_mapping_monte_carlo_se": 0.0005612836822273726,
+          "destroyed_mean": -0.0016449499999999988,
+          "destroyed_survives": false,
+          "fixed_points": 0,
+          "group_sizes": [
+            400
+          ],
+          "max_materialized_mappings": 8,
+          "moved_eligible_values": 765497,
+          "moved_rows": 400,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_bps",
+          "population_match": true,
+          "raw_bite": true,
+          "raw_bootstrap_se": 0.004021134162453964,
+          "raw_estimate": 0.5,
+          "reasons": [],
+          "stratum": {
+            "archive_symbol": "EURUSD",
+            "config": "FIXTURE_CONFIG",
+            "confirmation_method": "BREAKOUT_BAR",
+            "confirmation_reference": "1H",
+            "side": "HIGH",
+            "timeframe": "15m"
+          }
+        },
+        {
+          "arm": "LOW",
+          "blocking_pass": true,
+          "channel": "swing_atr",
+          "collapse_ratio": -0.0032899000000000036,
+          "comparator": "MID",
+          "destroyed_bootstrap_se": 0.0007872506838864832,
+          "destroyed_data_bootstrap_se": 0.0005520183577971101,
+          "destroyed_draws": 2000,
+          "destroyed_interval": [
+            -0.05050750000000042,
+            0.046504999999999956
+          ],
+          "destroyed_mapping_monte_carlo_se": 0.0005612836822273718,
+          "destroyed_mean": -0.0016449500000000024,
+          "destroyed_survives": false,
+          "fixed_points": 0,
+          "group_sizes": [
+            400
+          ],
+          "max_materialized_mappings": 8,
+          "moved_eligible_values": 765497,
+          "moved_rows": 400,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_atr",
+          "population_match": true,
+          "raw_bite": true,
+          "raw_bootstrap_se": 0.004021134162453968,
+          "raw_estimate": 0.5000000000000002,
+          "reasons": [],
+          "stratum": {
+            "archive_symbol": "EURUSD",
+            "config": "FIXTURE_CONFIG",
+            "confirmation_method": "BREAKOUT_BAR",
+            "confirmation_reference": "1H",
+            "side": "HIGH",
+            "timeframe": "15m"
+          }
+        },
+        {
+          "arm": "LOW",
+          "blocking_pass": true,
+          "channel": "swing_duration_ns",
+          "collapse_ratio": -0.00342,
+          "comparator": "MID",
+          "destroyed_bootstrap_se": 781026.6467621715,
+          "destroyed_data_bootstrap_se": 549680.1304067372,
+          "destroyed_draws": 2000,
+          "destroyed_interval": [
+            -50000000.0,
+            45000000.0
+          ],
+          "destroyed_mapping_monte_carlo_se": 554846.2644630441,
+          "destroyed_mean": -1710000.0,
+          "destroyed_survives": false,
+          "fixed_points": 0,
+          "group_sizes": [
+            400
+          ],
+          "max_materialized_mappings": 8,
+          "moved_eligible_values": 401368,
+          "moved_rows": 400,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_duration_ns",
+          "population_match": true,
+          "raw_bite": true,
+          "raw_bootstrap_se": 0.0,
+          "raw_estimate": 500000000.0,
+          "reasons": [],
+          "stratum": {
+            "archive_symbol": "EURUSD",
+            "config": "FIXTURE_CONFIG",
+            "confirmation_method": "BREAKOUT_BAR",
+            "confirmation_reference": "1H",
+            "side": "HIGH",
+            "timeframe": "15m"
+          }
+        },
+        {
+          "arm": "LOW",
+          "blocking_pass": true,
+          "channel": "strong_move",
+          "collapse_ratio": 0.021399999999999992,
+          "comparator": "MID",
+          "destroyed_bootstrap_se": 0.0012123789234116352,
+          "destroyed_data_bootstrap_se": 0.0008398230909053394,
+          "destroyed_draws": 2000,
+          "destroyed_interval": [
+            -0.06999999999999998,
+            0.07999999999999999
+          ],
+          "destroyed_mapping_monte_carlo_se": 0.0008743911195311612,
+          "destroyed_mean": 0.00107,
+          "destroyed_survives": false,
+          "fixed_points": 0,
+          "group_sizes": [
+            400
+          ],
+          "max_materialized_mappings": 8,
+          "moved_eligible_values": 231648,
+          "moved_rows": 400,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:strong_move",
+          "population_match": true,
+          "raw_bite": false,
+          "raw_bootstrap_se": 0.08589611033006271,
+          "raw_estimate": 0.05000000000000002,
+          "reasons": [],
+          "stratum": {
+            "archive_symbol": "EURUSD",
+            "config": "FIXTURE_CONFIG",
+            "confirmation_method": "BREAKOUT_BAR",
+            "confirmation_reference": "1H",
+            "side": "HIGH",
+            "timeframe": "15m"
+          }
+        },
+        {
+          "arm": "HIGH",
+          "blocking_pass": true,
+          "channel": "swing_price",
+          "collapse_ratio": -0.0033549499999996897,
+          "comparator": "MID",
+          "destroyed_bootstrap_se": 0.001565295889669028,
+          "destroyed_data_bootstrap_se": 0.001099751533562338,
+          "destroyed_draws": 2000,
+          "destroyed_interval": [
+            -0.10100750000001284,
+            0.09189999999998158
+          ],
+          "destroyed_mapping_monte_carlo_se": 0.0011138661439517947,
+          "destroyed_mean": -0.0033549499999996897,
+          "destroyed_survives": false,
+          "fixed_points": 0,
+          "group_sizes": [
+            400
+          ],
+          "max_materialized_mappings": 8,
+          "moved_eligible_values": 765497,
+          "moved_rows": 400,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_price",
+          "population_match": true,
+          "raw_bite": true,
+          "raw_bootstrap_se": 0.004021134162454464,
+          "raw_estimate": 1.0,
+          "reasons": [],
+          "stratum": {
+            "archive_symbol": "EURUSD",
+            "config": "FIXTURE_CONFIG",
+            "confirmation_method": "BREAKOUT_BAR",
+            "confirmation_reference": "1H",
+            "side": "HIGH",
+            "timeframe": "15m"
+          }
+        },
+        {
+          "arm": "HIGH",
+          "blocking_pass": true,
+          "channel": "swing_bps",
+          "collapse_ratio": -0.003354949999999989,
+          "comparator": "MID",
+          "destroyed_bootstrap_se": 0.0015652958896692937,
+          "destroyed_data_bootstrap_se": 0.0010997515335627013,
+          "destroyed_draws": 2000,
+          "destroyed_interval": [
+            -0.10100750000000085,
+            0.09189999999999902
+          ],
+          "destroyed_mapping_monte_carlo_se": 0.001113866143951809,
+          "destroyed_mean": -0.003354949999999989,
+          "destroyed_survives": false,
+          "fixed_points": 0,
+          "group_sizes": [
+            400
+          ],
+          "max_materialized_mappings": 8,
+          "moved_eligible_values": 765497,
+          "moved_rows": 400,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_bps",
+          "population_match": true,
+          "raw_bite": true,
+          "raw_bootstrap_se": 0.0040211341624540094,
+          "raw_estimate": 1.0,
+          "reasons": [],
+          "stratum": {
+            "archive_symbol": "EURUSD",
+            "config": "FIXTURE_CONFIG",
+            "confirmation_method": "BREAKOUT_BAR",
+            "confirmation_reference": "1H",
+            "side": "HIGH",
+            "timeframe": "15m"
+          }
+        },
+        {
+          "arm": "HIGH",
+          "blocking_pass": true,
+          "channel": "swing_atr",
+          "collapse_ratio": -0.0033549500000000032,
+          "comparator": "MID",
+          "destroyed_bootstrap_se": 0.0015652958896691595,
+          "destroyed_data_bootstrap_se": 0.001099751533562511,
+          "destroyed_draws": 2000,
+          "destroyed_interval": [
+            -0.10100749999999997,
+            0.09190000000000009
+          ],
+          "destroyed_mapping_monte_carlo_se": 0.0011138661439518084,
+          "destroyed_mean": -0.0033549500000000032,
+          "destroyed_survives": false,
+          "fixed_points": 0,
+          "group_sizes": [
+            400
+          ],
+          "max_materialized_mappings": 8,
+          "moved_eligible_values": 765497,
+          "moved_rows": 400,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_atr",
+          "population_match": true,
+          "raw_bite": true,
+          "raw_bootstrap_se": 0.00402113416245394,
+          "raw_estimate": 1.0,
+          "reasons": [],
+          "stratum": {
+            "archive_symbol": "EURUSD",
+            "config": "FIXTURE_CONFIG",
+            "confirmation_method": "BREAKOUT_BAR",
+            "confirmation_reference": "1H",
+            "side": "HIGH",
+            "timeframe": "15m"
+          }
+        },
+        {
+          "arm": "HIGH",
+          "blocking_pass": true,
+          "channel": "swing_duration_ns",
+          "collapse_ratio": -0.00342,
+          "comparator": "MID",
+          "destroyed_bootstrap_se": 1562053.2935557645,
+          "destroyed_data_bootstrap_se": 1099360.2608581204,
+          "destroyed_draws": 2000,
+          "destroyed_interval": [
+            -100000000.0,
+            90000000.0
+          ],
+          "destroyed_mapping_monte_carlo_se": 1109692.5289260882,
+          "destroyed_mean": -3420000.0,
+          "destroyed_survives": false,
+          "fixed_points": 0,
+          "group_sizes": [
+            400
+          ],
+          "max_materialized_mappings": 8,
+          "moved_eligible_values": 401368,
+          "moved_rows": 400,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_duration_ns",
+          "population_match": true,
+          "raw_bite": true,
+          "raw_bootstrap_se": 0.0,
+          "raw_estimate": 1000000000.0,
+          "reasons": [],
+          "stratum": {
+            "archive_symbol": "EURUSD",
+            "config": "FIXTURE_CONFIG",
+            "confirmation_method": "BREAKOUT_BAR",
+            "confirmation_reference": "1H",
+            "side": "HIGH",
+            "timeframe": "15m"
+          }
+        },
+        {
+          "arm": "HIGH",
+          "blocking_pass": true,
+          "channel": "strong_move",
+          "collapse_ratio": 0.01195,
+          "comparator": "MID",
+          "destroyed_bootstrap_se": 0.00127656158749212,
+          "destroyed_data_bootstrap_se": 0.0008953125078208176,
+          "destroyed_draws": 2000,
+          "destroyed_interval": [
+            -0.06999999999999998,
+            0.07999999999999999
+          ],
+          "destroyed_mapping_monte_carlo_se": 0.0009099587902756914,
+          "destroyed_mean": 0.001195,
+          "destroyed_survives": false,
+          "fixed_points": 0,
+          "group_sizes": [
+            400
+          ],
+          "max_materialized_mappings": 8,
+          "moved_eligible_values": 256756,
+          "moved_rows": 400,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:strong_move",
+          "population_match": true,
+          "raw_bite": false,
+          "raw_bootstrap_se": 0.09045040965341324,
+          "raw_estimate": 0.1,
+          "reasons": [],
+          "stratum": {
+            "archive_symbol": "EURUSD",
+            "config": "FIXTURE_CONFIG",
+            "confirmation_method": "BREAKOUT_BAR",
+            "confirmation_reference": "1H",
+            "side": "HIGH",
+            "timeframe": "15m"
+          }
+        }
+      ]
+    },
+    "endpoint_regime_census": {
+      "MID": 600
+    },
+    "frequency_census": {
+      "exposure": "fixture-only",
+      "starts": {
+        "HIGH": 200,
+        "LOW": 200,
+        "MID": 200
+      }
+    },
+    "integrity_evidence": {
+      "causal_regime_rows": 600,
+      "profile_join": {
+        "MATCHED": 600
+      }
+    },
+    "profile_join": {
+      "unmatched_raids": 0
+    },
+    "regime_census": {
+      "HIGH": 200,
+      "LOW": 200,
+      "MID": 200
+    },
+    "void_populations": []
+  },
+  "integrity": {
+    "blocking_pass": true,
+    "evidence": {
+      "experiment": {
+        "blocking_pass": true,
+        "evidence": {
+          "common": {
+            "duration_alias_mismatches": 0
+          },
+          "controls": [
+            {
+              "arm": "LOW",
+              "blocking_pass": true,
+              "channel": "swing_price",
+              "collapse_ratio": -0.0032898999999995196,
+              "comparator": "MID",
+              "destroyed_bootstrap_se": 0.0007872506838862765,
+              "destroyed_data_bootstrap_se": 0.0005520183577968268,
+              "destroyed_draws": 2000,
+              "destroyed_interval": [
+                -0.05050749999999944,
+                0.04650499999999515
+              ],
+              "destroyed_mapping_monte_carlo_se": 0.0005612836822273604,
+              "destroyed_mean": -0.0016449499999997598,
+              "destroyed_survives": false,
+              "fixed_points": 0,
+              "group_sizes": [
+                400
+              ],
+              "max_materialized_mappings": 8,
+              "moved_eligible_values": 765497,
+              "moved_rows": 400,
+              "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_price",
+              "population_match": true,
+              "raw_bite": true,
+              "raw_bootstrap_se": 0.004021134162454464,
+              "raw_estimate": 0.5,
+              "reasons": [],
+              "stratum": {
+                "archive_symbol": "EURUSD",
+                "config": "FIXTURE_CONFIG",
+                "confirmation_method": "BREAKOUT_BAR",
+                "confirmation_reference": "1H",
+                "side": "HIGH",
+                "timeframe": "15m"
+              }
+            },
+            {
+              "arm": "LOW",
+              "blocking_pass": true,
+              "channel": "swing_bps",
+              "collapse_ratio": -0.0032898999999999975,
+              "comparator": "MID",
+              "destroyed_bootstrap_se": 0.0007872506838865786,
+              "destroyed_data_bootstrap_se": 0.0005520183577972453,
+              "destroyed_draws": 2000,
+              "destroyed_interval": [
+                -0.050507499999999574,
+                0.046504999999998214
+              ],
+              "destroyed_mapping_monte_carlo_se": 0.0005612836822273726,
+              "destroyed_mean": -0.0016449499999999988,
+              "destroyed_survives": false,
+              "fixed_points": 0,
+              "group_sizes": [
+                400
+              ],
+              "max_materialized_mappings": 8,
+              "moved_eligible_values": 765497,
+              "moved_rows": 400,
+              "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_bps",
+              "population_match": true,
+              "raw_bite": true,
+              "raw_bootstrap_se": 0.004021134162453964,
+              "raw_estimate": 0.5,
+              "reasons": [],
+              "stratum": {
+                "archive_symbol": "EURUSD",
+                "config": "FIXTURE_CONFIG",
+                "confirmation_method": "BREAKOUT_BAR",
+                "confirmation_reference": "1H",
+                "side": "HIGH",
+                "timeframe": "15m"
+              }
+            },
+            {
+              "arm": "LOW",
+              "blocking_pass": true,
+              "channel": "swing_atr",
+              "collapse_ratio": -0.0032899000000000036,
+              "comparator": "MID",
+              "destroyed_bootstrap_se": 0.0007872506838864832,
+              "destroyed_data_bootstrap_se": 0.0005520183577971101,
+              "destroyed_draws": 2000,
+              "destroyed_interval": [
+                -0.05050750000000042,
+                0.046504999999999956
+              ],
+              "destroyed_mapping_monte_carlo_se": 0.0005612836822273718,
+              "destroyed_mean": -0.0016449500000000024,
+              "destroyed_survives": false,
+              "fixed_points": 0,
+              "group_sizes": [
+                400
+              ],
+              "max_materialized_mappings": 8,
+              "moved_eligible_values": 765497,
+              "moved_rows": 400,
+              "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_atr",
+              "population_match": true,
+              "raw_bite": true,
+              "raw_bootstrap_se": 0.004021134162453968,
+              "raw_estimate": 0.5000000000000002,
+              "reasons": [],
+              "stratum": {
+                "archive_symbol": "EURUSD",
+                "config": "FIXTURE_CONFIG",
+                "confirmation_method": "BREAKOUT_BAR",
+                "confirmation_reference": "1H",
+                "side": "HIGH",
+                "timeframe": "15m"
+              }
+            },
+            {
+              "arm": "LOW",
+              "blocking_pass": true,
+              "channel": "swing_duration_ns",
+              "collapse_ratio": -0.00342,
+              "comparator": "MID",
+              "destroyed_bootstrap_se": 781026.6467621715,
+              "destroyed_data_bootstrap_se": 549680.1304067372,
+              "destroyed_draws": 2000,
+              "destroyed_interval": [
+                -50000000.0,
+                45000000.0
+              ],
+              "destroyed_mapping_monte_carlo_se": 554846.2644630441,
+              "destroyed_mean": -1710000.0,
+              "destroyed_survives": false,
+              "fixed_points": 0,
+              "group_sizes": [
+                400
+              ],
+              "max_materialized_mappings": 8,
+              "moved_eligible_values": 401368,
+              "moved_rows": 400,
+              "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_duration_ns",
+              "population_match": true,
+              "raw_bite": true,
+              "raw_bootstrap_se": 0.0,
+              "raw_estimate": 500000000.0,
+              "reasons": [],
+              "stratum": {
+                "archive_symbol": "EURUSD",
+                "config": "FIXTURE_CONFIG",
+                "confirmation_method": "BREAKOUT_BAR",
+                "confirmation_reference": "1H",
+                "side": "HIGH",
+                "timeframe": "15m"
+              }
+            },
+            {
+              "arm": "LOW",
+              "blocking_pass": true,
+              "channel": "strong_move",
+              "collapse_ratio": 0.021399999999999992,
+              "comparator": "MID",
+              "destroyed_bootstrap_se": 0.0012123789234116352,
+              "destroyed_data_bootstrap_se": 0.0008398230909053394,
+              "destroyed_draws": 2000,
+              "destroyed_interval": [
+                -0.06999999999999998,
+                0.07999999999999999
+              ],
+              "destroyed_mapping_monte_carlo_se": 0.0008743911195311612,
+              "destroyed_mean": 0.00107,
+              "destroyed_survives": false,
+              "fixed_points": 0,
+              "group_sizes": [
+                400
+              ],
+              "max_materialized_mappings": 8,
+              "moved_eligible_values": 231648,
+              "moved_rows": 400,
+              "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:strong_move",
+              "population_match": true,
+              "raw_bite": false,
+              "raw_bootstrap_se": 0.08589611033006271,
+              "raw_estimate": 0.05000000000000002,
+              "reasons": [],
+              "stratum": {
+                "archive_symbol": "EURUSD",
+                "config": "FIXTURE_CONFIG",
+                "confirmation_method": "BREAKOUT_BAR",
+                "confirmation_reference": "1H",
+                "side": "HIGH",
+                "timeframe": "15m"
+              }
+            },
+            {
+              "arm": "HIGH",
+              "blocking_pass": true,
+              "channel": "swing_price",
+              "collapse_ratio": -0.0033549499999996897,
+              "comparator": "MID",
+              "destroyed_bootstrap_se": 0.001565295889669028,
+              "destroyed_data_bootstrap_se": 0.001099751533562338,
+              "destroyed_draws": 2000,
+              "destroyed_interval": [
+                -0.10100750000001284,
+                0.09189999999998158
+              ],
+              "destroyed_mapping_monte_carlo_se": 0.0011138661439517947,
+              "destroyed_mean": -0.0033549499999996897,
+              "destroyed_survives": false,
+              "fixed_points": 0,
+              "group_sizes": [
+                400
+              ],
+              "max_materialized_mappings": 8,
+              "moved_eligible_values": 765497,
+              "moved_rows": 400,
+              "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_price",
+              "population_match": true,
+              "raw_bite": true,
+              "raw_bootstrap_se": 0.004021134162454464,
+              "raw_estimate": 1.0,
+              "reasons": [],
+              "stratum": {
+                "archive_symbol": "EURUSD",
+                "config": "FIXTURE_CONFIG",
+                "confirmation_method": "BREAKOUT_BAR",
+                "confirmation_reference": "1H",
+                "side": "HIGH",
+                "timeframe": "15m"
+              }
+            },
+            {
+              "arm": "HIGH",
+              "blocking_pass": true,
+              "channel": "swing_bps",
+              "collapse_ratio": -0.003354949999999989,
+              "comparator": "MID",
+              "destroyed_bootstrap_se": 0.0015652958896692937,
+              "destroyed_data_bootstrap_se": 0.0010997515335627013,
+              "destroyed_draws": 2000,
+              "destroyed_interval": [
+                -0.10100750000000085,
+                0.09189999999999902
+              ],
+              "destroyed_mapping_monte_carlo_se": 0.001113866143951809,
+              "destroyed_mean": -0.003354949999999989,
+              "destroyed_survives": false,
+              "fixed_points": 0,
+              "group_sizes": [
+                400
+              ],
+              "max_materialized_mappings": 8,
+              "moved_eligible_values": 765497,
+              "moved_rows": 400,
+              "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_bps",
+              "population_match": true,
+              "raw_bite": true,
+              "raw_bootstrap_se": 0.0040211341624540094,
+              "raw_estimate": 1.0,
+              "reasons": [],
+              "stratum": {
+                "archive_symbol": "EURUSD",
+                "config": "FIXTURE_CONFIG",
+                "confirmation_method": "BREAKOUT_BAR",
+                "confirmation_reference": "1H",
+                "side": "HIGH",
+                "timeframe": "15m"
+              }
+            },
+            {
+              "arm": "HIGH",
+              "blocking_pass": true,
+              "channel": "swing_atr",
+              "collapse_ratio": -0.0033549500000000032,
+              "comparator": "MID",
+              "destroyed_bootstrap_se": 0.0015652958896691595,
+              "destroyed_data_bootstrap_se": 0.001099751533562511,
+              "destroyed_draws": 2000,
+              "destroyed_interval": [
+                -0.10100749999999997,
+                0.09190000000000009
+              ],
+              "destroyed_mapping_monte_carlo_se": 0.0011138661439518084,
+              "destroyed_mean": -0.0033549500000000032,
+              "destroyed_survives": false,
+              "fixed_points": 0,
+              "group_sizes": [
+                400
+              ],
+              "max_materialized_mappings": 8,
+              "moved_eligible_values": 765497,
+              "moved_rows": 400,
+              "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_atr",
+              "population_match": true,
+              "raw_bite": true,
+              "raw_bootstrap_se": 0.00402113416245394,
+              "raw_estimate": 1.0,
+              "reasons": [],
+              "stratum": {
+                "archive_symbol": "EURUSD",
+                "config": "FIXTURE_CONFIG",
+                "confirmation_method": "BREAKOUT_BAR",
+                "confirmation_reference": "1H",
+                "side": "HIGH",
+                "timeframe": "15m"
+              }
+            },
+            {
+              "arm": "HIGH",
+              "blocking_pass": true,
+              "channel": "swing_duration_ns",
+              "collapse_ratio": -0.00342,
+              "comparator": "MID",
+              "destroyed_bootstrap_se": 1562053.2935557645,
+              "destroyed_data_bootstrap_se": 1099360.2608581204,
+              "destroyed_draws": 2000,
+              "destroyed_interval": [
+                -100000000.0,
+                90000000.0
+              ],
+              "destroyed_mapping_monte_carlo_se": 1109692.5289260882,
+              "destroyed_mean": -3420000.0,
+              "destroyed_survives": false,
+              "fixed_points": 0,
+              "group_sizes": [
+                400
+              ],
+              "max_materialized_mappings": 8,
+              "moved_eligible_values": 401368,
+              "moved_rows": 400,
+              "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_duration_ns",
+              "population_match": true,
+              "raw_bite": true,
+              "raw_bootstrap_se": 0.0,
+              "raw_estimate": 1000000000.0,
+              "reasons": [],
+              "stratum": {
+                "archive_symbol": "EURUSD",
+                "config": "FIXTURE_CONFIG",
+                "confirmation_method": "BREAKOUT_BAR",
+                "confirmation_reference": "1H",
+                "side": "HIGH",
+                "timeframe": "15m"
+              }
+            },
+            {
+              "arm": "HIGH",
+              "blocking_pass": true,
+              "channel": "strong_move",
+              "collapse_ratio": 0.01195,
+              "comparator": "MID",
+              "destroyed_bootstrap_se": 0.00127656158749212,
+              "destroyed_data_bootstrap_se": 0.0008953125078208176,
+              "destroyed_draws": 2000,
+              "destroyed_interval": [
+                -0.06999999999999998,
+                0.07999999999999999
+              ],
+              "destroyed_mapping_monte_carlo_se": 0.0009099587902756914,
+              "destroyed_mean": 0.001195,
+              "destroyed_survives": false,
+              "fixed_points": 0,
+              "group_sizes": [
+                400
+              ],
+              "max_materialized_mappings": 8,
+              "moved_eligible_values": 256756,
+              "moved_rows": 400,
+              "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:strong_move",
+              "population_match": true,
+              "raw_bite": false,
+              "raw_bootstrap_se": 0.09045040965341324,
+              "raw_estimate": 0.1,
+              "reasons": [],
+              "stratum": {
+                "archive_symbol": "EURUSD",
+                "config": "FIXTURE_CONFIG",
+                "confirmation_method": "BREAKOUT_BAR",
+                "confirmation_reference": "1H",
+                "side": "HIGH",
+                "timeframe": "15m"
+              }
+            }
+          ],
+          "experiment": {
+            "causal_regime_rows": 600,
+            "profile_join": {
+              "MATCHED": 600
+            }
+          }
+        },
+        "reasons": []
+      },
+      "source": {
+        "blocking_pass": true,
+        "evidence": {},
+        "reasons": []
+      }
+    },
+    "reasons": []
+  },
+  "population": {
+    "labels": {
+      "HIGH": 200,
+      "LOW": 200,
+      "MID": 200
+    },
+    "rows": 600
+  },
+  "source": {
+    "mode": "fixture"
+  },
+  "value_rows": [
+    {
+      "arm": "LOW",
+      "channel": "swing_price",
+      "comparator": "MID",
+      "ideal": "direct arm-minus-fixed-comparator estimate with uncertainty",
+      "interpretation": "operator judges; no machine value label",
+      "medians": {
+        "arm": 100.55,
+        "comparator": 100.05,
+        "contrast": 0.5
+      },
+      "observed": {
+        "L_eff": 5,
+        "arm_mean": 100.54955,
+        "arm_n": 200,
+        "block_length": 5,
+        "bootstrap_se": 0.004021134162454464,
+        "comparator_mean": 100.04955,
+        "comparator_n": 200,
+        "estimate": 0.5,
+        "finite_draws": 1000,
+        "interval": [
+          0.49308530322809324,
+          0.5081135006394032
+        ],
+        "n_clusters": 400,
+        "nonfinite_draws": 0,
+        "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_price",
+        "reason": null,
+        "seed_high_range": [
+          0.5072507422129355,
+          0.5090941408321423
+        ],
+        "seed_low_range": [
+          0.49198473778323726,
+          0.493389460670981
+        ],
+        "seeds": [
+          {
+            "bootstrap_se": 0.0036482891598310667,
+            "finite_draws": 200,
+            "high": 0.5072507422129355,
+            "low": 0.493389460670981,
+            "nonfinite_draws": 0,
+            "seed": 0
+          },
+          {
+            "bootstrap_se": 0.004021134162454464,
+            "finite_draws": 200,
+            "high": 0.5090941408321423,
+            "low": 0.4931044924260203,
+            "nonfinite_draws": 0,
+            "seed": 1
+          },
+          {
+            "bootstrap_se": 0.0037163219794793595,
+            "finite_draws": 200,
+            "high": 0.5077370990733705,
+            "low": 0.49308530322809324,
+            "nonfinite_draws": 0,
+            "seed": 2
+          },
+          {
+            "bootstrap_se": 0.004103058366712943,
+            "finite_draws": 200,
+            "high": 0.5085593116273536,
+            "low": 0.49218467090261947,
+            "nonfinite_draws": 0,
+            "seed": 3
+          },
+          {
+            "bootstrap_se": 0.004180208070910162,
+            "finite_draws": 200,
+            "high": 0.5081135006394032,
+            "low": 0.49198473778323726,
+            "nonfinite_draws": 0,
+            "seed": 4
+          }
+        ]
+      },
+      "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_price",
+      "sensitivities": {
+        "10": {
+          "L_eff": 10,
+          "arm_mean": 100.54955,
+          "arm_n": 200,
+          "block_length": 10,
+          "bootstrap_se": 0.0013924060360018039,
+          "comparator_mean": 100.04955,
+          "comparator_n": 200,
+          "estimate": 0.5,
+          "finite_draws": 1000,
+          "interval": [
+            0.4974003261556025,
+            0.5026137122843977
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_price",
+          "reason": null,
+          "seed_high_range": [
+            0.5025448964569132,
+            0.5030417655613683
+          ],
+          "seed_low_range": [
+            0.49680714725092623,
+            0.49771175191400835
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.001328099482332486,
+              "finite_draws": 200,
+              "high": 0.5026078272388848,
+              "low": 0.4973898558064853,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0013924060360018039,
+              "finite_draws": 200,
+              "high": 0.5026769162210268,
+              "low": 0.4974003261556025,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.001404780441151181,
+              "finite_draws": 200,
+              "high": 0.5030417655613683,
+              "low": 0.49771175191400835,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0014121111286456841,
+              "finite_draws": 200,
+              "high": 0.5025448964569132,
+              "low": 0.49680714725092623,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.001336957315277195,
+              "finite_draws": 200,
+              "high": 0.5026137122843977,
+              "low": 0.4974632227272345,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "2": {
+          "L_eff": 2,
+          "arm_mean": 100.54955,
+          "arm_n": 200,
+          "block_length": 2,
+          "bootstrap_se": 0.004031105215314945,
+          "comparator_mean": 100.04955,
+          "comparator_n": 200,
+          "estimate": 0.5,
+          "finite_draws": 1000,
+          "interval": [
+            0.49217833789057225,
+            0.5070025062137716
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_price",
+          "reason": null,
+          "seed_high_range": [
+            0.5063131743072248,
+            0.5086911294786514
+          ],
+          "seed_low_range": [
+            0.491353985395509,
+            0.4928656039397289
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0035814036047521944,
+              "finite_draws": 200,
+              "high": 0.5068562474395037,
+              "low": 0.49277186361776126,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.004213579256483349,
+              "finite_draws": 200,
+              "high": 0.5086911294786514,
+              "low": 0.49217833789057225,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.004160414398640751,
+              "finite_draws": 200,
+              "high": 0.5075588001753708,
+              "low": 0.4913884495347361,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.004031105215314945,
+              "finite_draws": 200,
+              "high": 0.5063131743072248,
+              "low": 0.491353985395509,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0037182124624826115,
+              "finite_draws": 200,
+              "high": 0.5070025062137716,
+              "low": 0.4928656039397289,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "5": {
+          "L_eff": 5,
+          "arm_mean": 100.54955,
+          "arm_n": 200,
+          "block_length": 5,
+          "bootstrap_se": 0.004021134162454464,
+          "comparator_mean": 100.04955,
+          "comparator_n": 200,
+          "estimate": 0.5,
+          "finite_draws": 1000,
+          "interval": [
+            0.49308530322809324,
+            0.5081135006394032
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_price",
+          "reason": null,
+          "seed_high_range": [
+            0.5072507422129355,
+            0.5090941408321423
+          ],
+          "seed_low_range": [
+            0.49198473778323726,
+            0.493389460670981
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0036482891598310667,
+              "finite_draws": 200,
+              "high": 0.5072507422129355,
+              "low": 0.493389460670981,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.004021134162454464,
+              "finite_draws": 200,
+              "high": 0.5090941408321423,
+              "low": 0.4931044924260203,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0037163219794793595,
+              "finite_draws": 200,
+              "high": 0.5077370990733705,
+              "low": 0.49308530322809324,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.004103058366712943,
+              "finite_draws": 200,
+              "high": 0.5085593116273536,
+              "low": 0.49218467090261947,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.004180208070910162,
+              "finite_draws": 200,
+              "high": 0.5081135006394032,
+              "low": 0.49198473778323726,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        }
+      },
+      "stratum": {
+        "archive_symbol": "EURUSD",
+        "config": "FIXTURE_CONFIG",
+        "confirmation_method": "BREAKOUT_BAR",
+        "confirmation_reference": "1H",
+        "side": "HIGH",
+        "timeframe": "15m"
+      }
+    },
+    {
+      "arm": "LOW",
+      "channel": "swing_bps",
+      "comparator": "MID",
+      "ideal": "direct arm-minus-fixed-comparator estimate with uncertainty",
+      "interpretation": "operator judges; no machine value label",
+      "medians": {
+        "arm": 10.55,
+        "comparator": 10.05,
+        "contrast": 0.5
+      },
+      "observed": {
+        "L_eff": 5,
+        "arm_mean": 10.54955,
+        "arm_n": 200,
+        "block_length": 5,
+        "bootstrap_se": 0.004021134162453964,
+        "comparator_mean": 10.04955,
+        "comparator_n": 200,
+        "estimate": 0.5,
+        "finite_draws": 1000,
+        "interval": [
+          0.4930853032281103,
+          0.5081135006393854
+        ],
+        "n_clusters": 400,
+        "nonfinite_draws": 0,
+        "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_bps",
+        "reason": null,
+        "seed_high_range": [
+          0.5072507422129316,
+          0.5090941408321269
+        ],
+        "seed_low_range": [
+          0.49198473778325785,
+          0.49338946067098993
+        ],
+        "seeds": [
+          {
+            "bootstrap_se": 0.003648289159830206,
+            "finite_draws": 200,
+            "high": 0.5072507422129316,
+            "low": 0.49338946067098993,
+            "nonfinite_draws": 0,
+            "seed": 0
+          },
+          {
+            "bootstrap_se": 0.004021134162453964,
+            "finite_draws": 200,
+            "high": 0.5090941408321269,
+            "low": 0.4931044924260136,
+            "nonfinite_draws": 0,
+            "seed": 1
+          },
+          {
+            "bootstrap_se": 0.003716321979479106,
+            "finite_draws": 200,
+            "high": 0.5077370990733688,
+            "low": 0.4930853032281103,
+            "nonfinite_draws": 0,
+            "seed": 2
+          },
+          {
+            "bootstrap_se": 0.004103058366711658,
+            "finite_draws": 200,
+            "high": 0.5085593116273308,
+            "low": 0.49218467090261836,
+            "nonfinite_draws": 0,
+            "seed": 3
+          },
+          {
+            "bootstrap_se": 0.004180208070908502,
+            "finite_draws": 200,
+            "high": 0.5081135006393854,
+            "low": 0.49198473778325785,
+            "nonfinite_draws": 0,
+            "seed": 4
+          }
+        ]
+      },
+      "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_bps",
+      "sensitivities": {
+        "10": {
+          "L_eff": 10,
+          "arm_mean": 10.54955,
+          "arm_n": 200,
+          "block_length": 10,
+          "bootstrap_se": 0.0013924060360031938,
+          "comparator_mean": 10.04955,
+          "comparator_n": 200,
+          "estimate": 0.5,
+          "finite_draws": 1000,
+          "interval": [
+            0.497400326155607,
+            0.5026137122844098
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_bps",
+          "reason": null,
+          "seed_high_range": [
+            0.5025448964569131,
+            0.5030417655613716
+          ],
+          "seed_low_range": [
+            0.49680714725091585,
+            0.49771175191403405
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.001328099482333327,
+              "finite_draws": 200,
+              "high": 0.5026078272389043,
+              "low": 0.49738985580647976,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0013924060360031938,
+              "finite_draws": 200,
+              "high": 0.5026769162210338,
+              "low": 0.497400326155607,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0014047804411507405,
+              "finite_draws": 200,
+              "high": 0.5030417655613716,
+              "low": 0.49771175191403405,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0014121111286458797,
+              "finite_draws": 200,
+              "high": 0.5025448964569131,
+              "low": 0.49680714725091585,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0013369573152777728,
+              "finite_draws": 200,
+              "high": 0.5026137122844098,
+              "low": 0.4974632227272343,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "2": {
+          "L_eff": 2,
+          "arm_mean": 10.54955,
+          "arm_n": 200,
+          "block_length": 2,
+          "bootstrap_se": 0.004031105215314105,
+          "comparator_mean": 10.04955,
+          "comparator_n": 200,
+          "estimate": 0.5,
+          "finite_draws": 1000,
+          "interval": [
+            0.4921783378905718,
+            0.5070025062137545
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_bps",
+          "reason": null,
+          "seed_high_range": [
+            0.5063131743072041,
+            0.5086911294786634
+          ],
+          "seed_low_range": [
+            0.4913539853955148,
+            0.49286560393972156
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0035814036047516823,
+              "finite_draws": 200,
+              "high": 0.5068562474395123,
+              "low": 0.4927718636177595,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.004213579256484576,
+              "finite_draws": 200,
+              "high": 0.5086911294786634,
+              "low": 0.4921783378905718,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.004160414398641929,
+              "finite_draws": 200,
+              "high": 0.5075588001753883,
+              "low": 0.49138844953470673,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.004031105215314105,
+              "finite_draws": 200,
+              "high": 0.5063131743072041,
+              "low": 0.4913539853955148,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0037182124624825785,
+              "finite_draws": 200,
+              "high": 0.5070025062137545,
+              "low": 0.49286560393972156,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "5": {
+          "L_eff": 5,
+          "arm_mean": 10.54955,
+          "arm_n": 200,
+          "block_length": 5,
+          "bootstrap_se": 0.004021134162453964,
+          "comparator_mean": 10.04955,
+          "comparator_n": 200,
+          "estimate": 0.5,
+          "finite_draws": 1000,
+          "interval": [
+            0.4930853032281103,
+            0.5081135006393854
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_bps",
+          "reason": null,
+          "seed_high_range": [
+            0.5072507422129316,
+            0.5090941408321269
+          ],
+          "seed_low_range": [
+            0.49198473778325785,
+            0.49338946067098993
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.003648289159830206,
+              "finite_draws": 200,
+              "high": 0.5072507422129316,
+              "low": 0.49338946067098993,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.004021134162453964,
+              "finite_draws": 200,
+              "high": 0.5090941408321269,
+              "low": 0.4931044924260136,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.003716321979479106,
+              "finite_draws": 200,
+              "high": 0.5077370990733688,
+              "low": 0.4930853032281103,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.004103058366711658,
+              "finite_draws": 200,
+              "high": 0.5085593116273308,
+              "low": 0.49218467090261836,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.004180208070908502,
+              "finite_draws": 200,
+              "high": 0.5081135006393854,
+              "low": 0.49198473778325785,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        }
+      },
+      "stratum": {
+        "archive_symbol": "EURUSD",
+        "config": "FIXTURE_CONFIG",
+        "confirmation_method": "BREAKOUT_BAR",
+        "confirmation_reference": "1H",
+        "side": "HIGH",
+        "timeframe": "15m"
+      }
+    },
+    {
+      "arm": "LOW",
+      "channel": "swing_atr",
+      "comparator": "MID",
+      "ideal": "direct arm-minus-fixed-comparator estimate with uncertainty",
+      "interpretation": "operator judges; no machine value label",
+      "medians": {
+        "arm": 1.55,
+        "comparator": 1.05,
+        "contrast": 0.5
+      },
+      "observed": {
+        "L_eff": 5,
+        "arm_mean": 1.5495500000000002,
+        "arm_n": 200,
+        "block_length": 5,
+        "bootstrap_se": 0.004021134162453968,
+        "comparator_mean": 1.04955,
+        "comparator_n": 200,
+        "estimate": 0.5000000000000002,
+        "finite_draws": 1000,
+        "interval": [
+          0.4930853032281096,
+          0.5081135006393863
+        ],
+        "n_clusters": 400,
+        "nonfinite_draws": 0,
+        "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_atr",
+        "reason": null,
+        "seed_high_range": [
+          0.5072507422129282,
+          0.509094140832127
+        ],
+        "seed_low_range": [
+          0.4919847377832572,
+          0.49338946067098993
+        ],
+        "seeds": [
+          {
+            "bootstrap_se": 0.0036482891598299473,
+            "finite_draws": 200,
+            "high": 0.5072507422129282,
+            "low": 0.49338946067098993,
+            "nonfinite_draws": 0,
+            "seed": 0
+          },
+          {
+            "bootstrap_se": 0.004021134162453968,
+            "finite_draws": 200,
+            "high": 0.509094140832127,
+            "low": 0.4931044924260128,
+            "nonfinite_draws": 0,
+            "seed": 1
+          },
+          {
+            "bootstrap_se": 0.003716321979479071,
+            "finite_draws": 200,
+            "high": 0.5077370990733697,
+            "low": 0.4930853032281096,
+            "nonfinite_draws": 0,
+            "seed": 2
+          },
+          {
+            "bootstrap_se": 0.004103058366711667,
+            "finite_draws": 200,
+            "high": 0.5085593116273317,
+            "low": 0.49218467090261697,
+            "nonfinite_draws": 0,
+            "seed": 3
+          },
+          {
+            "bootstrap_se": 0.004180208070908491,
+            "finite_draws": 200,
+            "high": 0.5081135006393863,
+            "low": 0.4919847377832572,
+            "nonfinite_draws": 0,
+            "seed": 4
+          }
+        ]
+      },
+      "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_atr",
+      "sensitivities": {
+        "10": {
+          "L_eff": 10,
+          "arm_mean": 1.5495500000000002,
+          "arm_n": 200,
+          "block_length": 10,
+          "bootstrap_se": 0.0013924060360031717,
+          "comparator_mean": 1.04955,
+          "comparator_n": 200,
+          "estimate": 0.5000000000000002,
+          "finite_draws": 1000,
+          "interval": [
+            0.4974003261556072,
+            0.502613712284409
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_atr",
+          "reason": null,
+          "seed_high_range": [
+            0.5025448964569127,
+            0.503041765561372
+          ],
+          "seed_low_range": [
+            0.4968071472509157,
+            0.49771175191403433
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0013280994823333414,
+              "finite_draws": 200,
+              "high": 0.5026078272389041,
+              "low": 0.4973898558064767,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0013924060360031717,
+              "finite_draws": 200,
+              "high": 0.502676916221034,
+              "low": 0.4974003261556072,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0014047804411508509,
+              "finite_draws": 200,
+              "high": 0.503041765561372,
+              "low": 0.49771175191403433,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0014121111286460178,
+              "finite_draws": 200,
+              "high": 0.5025448964569127,
+              "low": 0.4968071472509157,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0013369573152778786,
+              "finite_draws": 200,
+              "high": 0.502613712284409,
+              "low": 0.4974632227272346,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "2": {
+          "L_eff": 2,
+          "arm_mean": 1.5495500000000002,
+          "arm_n": 200,
+          "block_length": 2,
+          "bootstrap_se": 0.004031105215313882,
+          "comparator_mean": 1.04955,
+          "comparator_n": 200,
+          "estimate": 0.5000000000000002,
+          "finite_draws": 1000,
+          "interval": [
+            0.49217833789057186,
+            0.507002506213753
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_atr",
+          "reason": null,
+          "seed_high_range": [
+            0.5063131743072049,
+            0.5086911294786636
+          ],
+          "seed_low_range": [
+            0.49135398539551434,
+            0.49286560393972284
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0035814036047515842,
+              "finite_draws": 200,
+              "high": 0.5068562474395121,
+              "low": 0.49277186361775926,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.004213579256484475,
+              "finite_draws": 200,
+              "high": 0.5086911294786636,
+              "low": 0.49217833789057186,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.004160414398641858,
+              "finite_draws": 200,
+              "high": 0.5075588001753883,
+              "low": 0.4913884495347069,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.004031105215313882,
+              "finite_draws": 200,
+              "high": 0.5063131743072049,
+              "low": 0.49135398539551434,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0037182124624826037,
+              "finite_draws": 200,
+              "high": 0.507002506213753,
+              "low": 0.49286560393972284,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "5": {
+          "L_eff": 5,
+          "arm_mean": 1.5495500000000002,
+          "arm_n": 200,
+          "block_length": 5,
+          "bootstrap_se": 0.004021134162453968,
+          "comparator_mean": 1.04955,
+          "comparator_n": 200,
+          "estimate": 0.5000000000000002,
+          "finite_draws": 1000,
+          "interval": [
+            0.4930853032281096,
+            0.5081135006393863
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_atr",
+          "reason": null,
+          "seed_high_range": [
+            0.5072507422129282,
+            0.509094140832127
+          ],
+          "seed_low_range": [
+            0.4919847377832572,
+            0.49338946067098993
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0036482891598299473,
+              "finite_draws": 200,
+              "high": 0.5072507422129282,
+              "low": 0.49338946067098993,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.004021134162453968,
+              "finite_draws": 200,
+              "high": 0.509094140832127,
+              "low": 0.4931044924260128,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.003716321979479071,
+              "finite_draws": 200,
+              "high": 0.5077370990733697,
+              "low": 0.4930853032281096,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.004103058366711667,
+              "finite_draws": 200,
+              "high": 0.5085593116273317,
+              "low": 0.49218467090261697,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.004180208070908491,
+              "finite_draws": 200,
+              "high": 0.5081135006393863,
+              "low": 0.4919847377832572,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        }
+      },
+      "stratum": {
+        "archive_symbol": "EURUSD",
+        "config": "FIXTURE_CONFIG",
+        "confirmation_method": "BREAKOUT_BAR",
+        "confirmation_reference": "1H",
+        "side": "HIGH",
+        "timeframe": "15m"
+      }
+    },
+    {
+      "arm": "LOW",
+      "channel": "swing_duration_ns",
+      "comparator": "MID",
+      "ideal": "direct arm-minus-fixed-comparator estimate with uncertainty",
+      "interpretation": "operator judges; no machine value label",
+      "medians": {
+        "arm": 3600500000000.0,
+        "comparator": 3600000000000.0,
+        "contrast": 500000000.0
+      },
+      "observed": {
+        "L_eff": 5,
+        "arm_mean": 3600500000000.0,
+        "arm_n": 200,
+        "block_length": 5,
+        "bootstrap_se": 0.0,
+        "comparator_mean": 3600000000000.0,
+        "comparator_n": 200,
+        "estimate": 500000000.0,
+        "finite_draws": 1000,
+        "interval": [
+          500000000.0,
+          500000000.0
+        ],
+        "n_clusters": 400,
+        "nonfinite_draws": 0,
+        "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_duration_ns",
+        "reason": null,
+        "seed_high_range": [
+          500000000.0,
+          500000000.0
+        ],
+        "seed_low_range": [
+          500000000.0,
+          500000000.0
+        ],
+        "seeds": [
+          {
+            "bootstrap_se": 0.0,
+            "finite_draws": 200,
+            "high": 500000000.0,
+            "low": 500000000.0,
+            "nonfinite_draws": 0,
+            "seed": 0
+          },
+          {
+            "bootstrap_se": 0.0,
+            "finite_draws": 200,
+            "high": 500000000.0,
+            "low": 500000000.0,
+            "nonfinite_draws": 0,
+            "seed": 1
+          },
+          {
+            "bootstrap_se": 0.0,
+            "finite_draws": 200,
+            "high": 500000000.0,
+            "low": 500000000.0,
+            "nonfinite_draws": 0,
+            "seed": 2
+          },
+          {
+            "bootstrap_se": 0.0,
+            "finite_draws": 200,
+            "high": 500000000.0,
+            "low": 500000000.0,
+            "nonfinite_draws": 0,
+            "seed": 3
+          },
+          {
+            "bootstrap_se": 0.0,
+            "finite_draws": 200,
+            "high": 500000000.0,
+            "low": 500000000.0,
+            "nonfinite_draws": 0,
+            "seed": 4
+          }
+        ]
+      },
+      "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_duration_ns",
+      "sensitivities": {
+        "10": {
+          "L_eff": 10,
+          "arm_mean": 3600500000000.0,
+          "arm_n": 200,
+          "block_length": 10,
+          "bootstrap_se": 0.0,
+          "comparator_mean": 3600000000000.0,
+          "comparator_n": 200,
+          "estimate": 500000000.0,
+          "finite_draws": 1000,
+          "interval": [
+            500000000.0,
+            500000000.0
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_duration_ns",
+          "reason": null,
+          "seed_high_range": [
+            500000000.0,
+            500000000.0
+          ],
+          "seed_low_range": [
+            500000000.0,
+            500000000.0
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "2": {
+          "L_eff": 2,
+          "arm_mean": 3600500000000.0,
+          "arm_n": 200,
+          "block_length": 2,
+          "bootstrap_se": 0.0,
+          "comparator_mean": 3600000000000.0,
+          "comparator_n": 200,
+          "estimate": 500000000.0,
+          "finite_draws": 1000,
+          "interval": [
+            500000000.0,
+            500000000.0
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_duration_ns",
+          "reason": null,
+          "seed_high_range": [
+            500000000.0,
+            500000000.0
+          ],
+          "seed_low_range": [
+            500000000.0,
+            500000000.0
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "5": {
+          "L_eff": 5,
+          "arm_mean": 3600500000000.0,
+          "arm_n": 200,
+          "block_length": 5,
+          "bootstrap_se": 0.0,
+          "comparator_mean": 3600000000000.0,
+          "comparator_n": 200,
+          "estimate": 500000000.0,
+          "finite_draws": 1000,
+          "interval": [
+            500000000.0,
+            500000000.0
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:swing_duration_ns",
+          "reason": null,
+          "seed_high_range": [
+            500000000.0,
+            500000000.0
+          ],
+          "seed_low_range": [
+            500000000.0,
+            500000000.0
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 500000000.0,
+              "low": 500000000.0,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        }
+      },
+      "stratum": {
+        "archive_symbol": "EURUSD",
+        "config": "FIXTURE_CONFIG",
+        "confirmation_method": "BREAKOUT_BAR",
+        "confirmation_reference": "1H",
+        "side": "HIGH",
+        "timeframe": "15m"
+      }
+    },
+    {
+      "arm": "LOW",
+      "channel": "strong_move",
+      "comparator": "MID",
+      "ideal": "direct arm-minus-fixed-comparator estimate with uncertainty",
+      "interpretation": "operator judges; no machine value label",
+      "medians": {
+        "arm": 0.0,
+        "comparator": 0.0,
+        "contrast": 0.0
+      },
+      "observed": {
+        "L_eff": 5,
+        "arm_mean": 0.2,
+        "arm_n": 200,
+        "block_length": 5,
+        "bootstrap_se": 0.08589611033006271,
+        "comparator_mean": 0.15,
+        "comparator_n": 200,
+        "estimate": 0.05000000000000002,
+        "finite_draws": 1000,
+        "interval": [
+          -0.11057963572493931,
+          0.1968376764748561
+        ],
+        "n_clusters": 400,
+        "nonfinite_draws": 0,
+        "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:strong_move",
+        "reason": null,
+        "seed_high_range": [
+          0.19300034187827303,
+          0.22082382774916945
+        ],
+        "seed_low_range": [
+          -0.14670305800045136,
+          -0.10344001292087861
+        ],
+        "seeds": [
+          {
+            "bootstrap_se": 0.0872275915699309,
+            "finite_draws": 200,
+            "high": 0.2164188853776955,
+            "low": -0.10662949390282428,
+            "nonfinite_draws": 0,
+            "seed": 0
+          },
+          {
+            "bootstrap_se": 0.08019266306939696,
+            "finite_draws": 200,
+            "high": 0.1968376764748561,
+            "low": -0.11057963572493931,
+            "nonfinite_draws": 0,
+            "seed": 1
+          },
+          {
+            "bootstrap_se": 0.08659276952115355,
+            "finite_draws": 200,
+            "high": 0.19650616265406637,
+            "low": -0.14670305800045136,
+            "nonfinite_draws": 0,
+            "seed": 2
+          },
+          {
+            "bootstrap_se": 0.0769131018335657,
+            "finite_draws": 200,
+            "high": 0.19300034187827303,
+            "low": -0.10344001292087861,
+            "nonfinite_draws": 0,
+            "seed": 3
+          },
+          {
+            "bootstrap_se": 0.08589611033006271,
+            "finite_draws": 200,
+            "high": 0.22082382774916945,
+            "low": -0.1132642053068882,
+            "nonfinite_draws": 0,
+            "seed": 4
+          }
+        ]
+      },
+      "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:strong_move",
+      "sensitivities": {
+        "10": {
+          "L_eff": 10,
+          "arm_mean": 0.2,
+          "arm_n": 200,
+          "block_length": 10,
+          "bootstrap_se": 0.11776814919510613,
+          "comparator_mean": 0.15,
+          "comparator_n": 200,
+          "estimate": 0.05000000000000002,
+          "finite_draws": 1000,
+          "interval": [
+            -0.18780555555555556,
+            0.28836230503306226
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:strong_move",
+          "reason": null,
+          "seed_high_range": [
+            0.25090271570798667,
+            0.31299558080808093
+          ],
+          "seed_low_range": [
+            -0.19929630668692597,
+            -0.1599651619297268
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.11975611074801629,
+              "finite_draws": 200,
+              "high": 0.2901962995139886,
+              "low": -0.1599651619297268,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.1236924535629376,
+              "finite_draws": 200,
+              "high": 0.31299558080808093,
+              "low": -0.18131198131648735,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.11776814919510613,
+              "finite_draws": 200,
+              "high": 0.28836230503306226,
+              "low": -0.19929630668692597,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.11618011265114651,
+              "finite_draws": 200,
+              "high": 0.25090271570798667,
+              "low": -0.18780555555555556,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.11763167923462424,
+              "finite_draws": 200,
+              "high": 0.2734745955798588,
+              "low": -0.19103586112380083,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "2": {
+          "L_eff": 2,
+          "arm_mean": 0.2,
+          "arm_n": 200,
+          "block_length": 2,
+          "bootstrap_se": 0.051503757371596764,
+          "comparator_mean": 0.15,
+          "comparator_n": 200,
+          "estimate": 0.05000000000000002,
+          "finite_draws": 1000,
+          "interval": [
+            -0.04949602922970074,
+            0.14295833825007065
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:strong_move",
+          "reason": null,
+          "seed_high_range": [
+            0.1250859412147312,
+            0.15512425472724473
+          ],
+          "seed_low_range": [
+            -0.07106622940329546,
+            -0.03870074456073947
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.05156511276941686,
+              "finite_draws": 200,
+              "high": 0.1519067077055714,
+              "low": -0.04555635222377757,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.04957622671004668,
+              "finite_draws": 200,
+              "high": 0.14295833825007065,
+              "low": -0.03870074456073947,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.04922619426923387,
+              "finite_draws": 200,
+              "high": 0.1250859412147312,
+              "low": -0.05483713544106437,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.05307203070488248,
+              "finite_draws": 200,
+              "high": 0.14182945609436437,
+              "low": -0.07106622940329546,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.051503757371596764,
+              "finite_draws": 200,
+              "high": 0.15512425472724473,
+              "low": -0.04949602922970074,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "5": {
+          "L_eff": 5,
+          "arm_mean": 0.2,
+          "arm_n": 200,
+          "block_length": 5,
+          "bootstrap_se": 0.08589611033006271,
+          "comparator_mean": 0.15,
+          "comparator_n": 200,
+          "estimate": 0.05000000000000002,
+          "finite_draws": 1000,
+          "interval": [
+            -0.11057963572493931,
+            0.1968376764748561
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:LOW-vs-MID:strong_move",
+          "reason": null,
+          "seed_high_range": [
+            0.19300034187827303,
+            0.22082382774916945
+          ],
+          "seed_low_range": [
+            -0.14670305800045136,
+            -0.10344001292087861
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0872275915699309,
+              "finite_draws": 200,
+              "high": 0.2164188853776955,
+              "low": -0.10662949390282428,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.08019266306939696,
+              "finite_draws": 200,
+              "high": 0.1968376764748561,
+              "low": -0.11057963572493931,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.08659276952115355,
+              "finite_draws": 200,
+              "high": 0.19650616265406637,
+              "low": -0.14670305800045136,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0769131018335657,
+              "finite_draws": 200,
+              "high": 0.19300034187827303,
+              "low": -0.10344001292087861,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.08589611033006271,
+              "finite_draws": 200,
+              "high": 0.22082382774916945,
+              "low": -0.1132642053068882,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        }
+      },
+      "stratum": {
+        "archive_symbol": "EURUSD",
+        "config": "FIXTURE_CONFIG",
+        "confirmation_method": "BREAKOUT_BAR",
+        "confirmation_reference": "1H",
+        "side": "HIGH",
+        "timeframe": "15m"
+      }
+    },
+    {
+      "arm": "HIGH",
+      "channel": "swing_price",
+      "comparator": "MID",
+      "ideal": "direct arm-minus-fixed-comparator estimate with uncertainty",
+      "interpretation": "operator judges; no machine value label",
+      "medians": {
+        "arm": 101.05,
+        "comparator": 100.05,
+        "contrast": 1.0
+      },
+      "observed": {
+        "L_eff": 5,
+        "arm_mean": 101.04955,
+        "arm_n": 200,
+        "block_length": 5,
+        "bootstrap_se": 0.004021134162454464,
+        "comparator_mean": 100.04955,
+        "comparator_n": 200,
+        "estimate": 1.0,
+        "finite_draws": 1000,
+        "interval": [
+          0.9930853032280933,
+          1.008113500639403
+        ],
+        "n_clusters": 400,
+        "nonfinite_draws": 0,
+        "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_price",
+        "reason": null,
+        "seed_high_range": [
+          1.0072507422129355,
+          1.0090941408321423
+        ],
+        "seed_low_range": [
+          0.9919847377832373,
+          0.993389460670981
+        ],
+        "seeds": [
+          {
+            "bootstrap_se": 0.0036482891598310667,
+            "finite_draws": 200,
+            "high": 1.0072507422129355,
+            "low": 0.993389460670981,
+            "nonfinite_draws": 0,
+            "seed": 0
+          },
+          {
+            "bootstrap_se": 0.004021134162454464,
+            "finite_draws": 200,
+            "high": 1.0090941408321423,
+            "low": 0.9931044924260203,
+            "nonfinite_draws": 0,
+            "seed": 1
+          },
+          {
+            "bootstrap_se": 0.003716321979479359,
+            "finite_draws": 200,
+            "high": 1.0077370990733705,
+            "low": 0.9930853032280933,
+            "nonfinite_draws": 0,
+            "seed": 2
+          },
+          {
+            "bootstrap_se": 0.004103058366712943,
+            "finite_draws": 200,
+            "high": 1.0085593116273537,
+            "low": 0.9921846709026194,
+            "nonfinite_draws": 0,
+            "seed": 3
+          },
+          {
+            "bootstrap_se": 0.004180208070910162,
+            "finite_draws": 200,
+            "high": 1.008113500639403,
+            "low": 0.9919847377832373,
+            "nonfinite_draws": 0,
+            "seed": 4
+          }
+        ]
+      },
+      "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_price",
+      "sensitivities": {
+        "10": {
+          "L_eff": 10,
+          "arm_mean": 101.04955,
+          "arm_n": 200,
+          "block_length": 10,
+          "bootstrap_se": 0.0013924060360018039,
+          "comparator_mean": 100.04955,
+          "comparator_n": 200,
+          "estimate": 1.0,
+          "finite_draws": 1000,
+          "interval": [
+            0.9974003261556025,
+            1.0026137122843977
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_price",
+          "reason": null,
+          "seed_high_range": [
+            1.0025448964569132,
+            1.0030417655613681
+          ],
+          "seed_low_range": [
+            0.9968071472509262,
+            0.9977117519140084
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.001328099482332486,
+              "finite_draws": 200,
+              "high": 1.0026078272388848,
+              "low": 0.9973898558064853,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0013924060360018039,
+              "finite_draws": 200,
+              "high": 1.0026769162210267,
+              "low": 0.9974003261556025,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.001404780441151181,
+              "finite_draws": 200,
+              "high": 1.0030417655613681,
+              "low": 0.9977117519140084,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0014121111286456841,
+              "finite_draws": 200,
+              "high": 1.0025448964569132,
+              "low": 0.9968071472509262,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0013369573152771951,
+              "finite_draws": 200,
+              "high": 1.0026137122843977,
+              "low": 0.9974632227272344,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "2": {
+          "L_eff": 2,
+          "arm_mean": 101.04955,
+          "arm_n": 200,
+          "block_length": 2,
+          "bootstrap_se": 0.004031105215314944,
+          "comparator_mean": 100.04955,
+          "comparator_n": 200,
+          "estimate": 1.0,
+          "finite_draws": 1000,
+          "interval": [
+            0.9921783378905722,
+            1.0070025062137717
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_price",
+          "reason": null,
+          "seed_high_range": [
+            1.0063131743072247,
+            1.0086911294786514
+          ],
+          "seed_low_range": [
+            0.991353985395509,
+            0.9928656039397289
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0035814036047521944,
+              "finite_draws": 200,
+              "high": 1.0068562474395037,
+              "low": 0.9927718636177613,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.004213579256483349,
+              "finite_draws": 200,
+              "high": 1.0086911294786514,
+              "low": 0.9921783378905722,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.004160414398640751,
+              "finite_draws": 200,
+              "high": 1.0075588001753708,
+              "low": 0.991388449534736,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.004031105215314944,
+              "finite_draws": 200,
+              "high": 1.0063131743072247,
+              "low": 0.991353985395509,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.003718212462482611,
+              "finite_draws": 200,
+              "high": 1.0070025062137717,
+              "low": 0.9928656039397289,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "5": {
+          "L_eff": 5,
+          "arm_mean": 101.04955,
+          "arm_n": 200,
+          "block_length": 5,
+          "bootstrap_se": 0.004021134162454464,
+          "comparator_mean": 100.04955,
+          "comparator_n": 200,
+          "estimate": 1.0,
+          "finite_draws": 1000,
+          "interval": [
+            0.9930853032280933,
+            1.008113500639403
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_price",
+          "reason": null,
+          "seed_high_range": [
+            1.0072507422129355,
+            1.0090941408321423
+          ],
+          "seed_low_range": [
+            0.9919847377832373,
+            0.993389460670981
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0036482891598310667,
+              "finite_draws": 200,
+              "high": 1.0072507422129355,
+              "low": 0.993389460670981,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.004021134162454464,
+              "finite_draws": 200,
+              "high": 1.0090941408321423,
+              "low": 0.9931044924260203,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.003716321979479359,
+              "finite_draws": 200,
+              "high": 1.0077370990733705,
+              "low": 0.9930853032280933,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.004103058366712943,
+              "finite_draws": 200,
+              "high": 1.0085593116273537,
+              "low": 0.9921846709026194,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.004180208070910162,
+              "finite_draws": 200,
+              "high": 1.008113500639403,
+              "low": 0.9919847377832373,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        }
+      },
+      "stratum": {
+        "archive_symbol": "EURUSD",
+        "config": "FIXTURE_CONFIG",
+        "confirmation_method": "BREAKOUT_BAR",
+        "confirmation_reference": "1H",
+        "side": "HIGH",
+        "timeframe": "15m"
+      }
+    },
+    {
+      "arm": "HIGH",
+      "channel": "swing_bps",
+      "comparator": "MID",
+      "ideal": "direct arm-minus-fixed-comparator estimate with uncertainty",
+      "interpretation": "operator judges; no machine value label",
+      "medians": {
+        "arm": 11.05,
+        "comparator": 10.05,
+        "contrast": 1.0
+      },
+      "observed": {
+        "L_eff": 5,
+        "arm_mean": 11.04955,
+        "arm_n": 200,
+        "block_length": 5,
+        "bootstrap_se": 0.0040211341624540094,
+        "comparator_mean": 10.04955,
+        "comparator_n": 200,
+        "estimate": 1.0,
+        "finite_draws": 1000,
+        "interval": [
+          0.9930853032281086,
+          1.008113500639387
+        ],
+        "n_clusters": 400,
+        "nonfinite_draws": 0,
+        "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_bps",
+        "reason": null,
+        "seed_high_range": [
+          1.0072507422129318,
+          1.009094140832127
+        ],
+        "seed_low_range": [
+          0.9919847377832578,
+          0.99338946067099
+        ],
+        "seeds": [
+          {
+            "bootstrap_se": 0.003648289159830187,
+            "finite_draws": 200,
+            "high": 1.0072507422129318,
+            "low": 0.99338946067099,
+            "nonfinite_draws": 0,
+            "seed": 0
+          },
+          {
+            "bootstrap_se": 0.0040211341624540094,
+            "finite_draws": 200,
+            "high": 1.009094140832127,
+            "low": 0.9931044924260136,
+            "nonfinite_draws": 0,
+            "seed": 1
+          },
+          {
+            "bootstrap_se": 0.0037163219794790524,
+            "finite_draws": 200,
+            "high": 1.0077370990733687,
+            "low": 0.9930853032281086,
+            "nonfinite_draws": 0,
+            "seed": 2
+          },
+          {
+            "bootstrap_se": 0.004103058366711756,
+            "finite_draws": 200,
+            "high": 1.0085593116273308,
+            "low": 0.9921846709026166,
+            "nonfinite_draws": 0,
+            "seed": 3
+          },
+          {
+            "bootstrap_se": 0.004180208070908407,
+            "finite_draws": 200,
+            "high": 1.008113500639387,
+            "low": 0.9919847377832578,
+            "nonfinite_draws": 0,
+            "seed": 4
+          }
+        ]
+      },
+      "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_bps",
+      "sensitivities": {
+        "10": {
+          "L_eff": 10,
+          "arm_mean": 11.04955,
+          "arm_n": 200,
+          "block_length": 10,
+          "bootstrap_se": 0.0013924060360032266,
+          "comparator_mean": 10.04955,
+          "comparator_n": 200,
+          "estimate": 1.0,
+          "finite_draws": 1000,
+          "interval": [
+            0.997400326155607,
+            1.0026137122844099
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_bps",
+          "reason": null,
+          "seed_high_range": [
+            1.002544896456913,
+            1.0030417655613717
+          ],
+          "seed_low_range": [
+            0.9968071472509159,
+            0.997711751914034
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0013280994823333728,
+              "finite_draws": 200,
+              "high": 1.0026078272389043,
+              "low": 0.997389855806478,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0013924060360032266,
+              "finite_draws": 200,
+              "high": 1.0026769162210338,
+              "low": 0.997400326155607,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0014047804411507839,
+              "finite_draws": 200,
+              "high": 1.0030417655613717,
+              "low": 0.997711751914034,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0014121111286458632,
+              "finite_draws": 200,
+              "high": 1.002544896456913,
+              "low": 0.9968071472509159,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0013369573152778255,
+              "finite_draws": 200,
+              "high": 1.0026137122844099,
+              "low": 0.9974632227272343,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "2": {
+          "L_eff": 2,
+          "arm_mean": 11.04955,
+          "arm_n": 200,
+          "block_length": 2,
+          "bootstrap_se": 0.004031105215314053,
+          "comparator_mean": 10.04955,
+          "comparator_n": 200,
+          "estimate": 1.0,
+          "finite_draws": 1000,
+          "interval": [
+            0.9921783378905717,
+            1.0070025062137529
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_bps",
+          "reason": null,
+          "seed_high_range": [
+            1.0063131743072058,
+            1.0086911294786634
+          ],
+          "seed_low_range": [
+            0.9913539853955148,
+            0.9928656039397216
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0035814036047516306,
+              "finite_draws": 200,
+              "high": 1.0068562474395124,
+              "low": 0.9927718636177595,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.004213579256484566,
+              "finite_draws": 200,
+              "high": 1.0086911294786634,
+              "low": 0.9921783378905717,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.00416041439864195,
+              "finite_draws": 200,
+              "high": 1.0075588001753883,
+              "low": 0.9913884495347067,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.004031105215314053,
+              "finite_draws": 200,
+              "high": 1.0063131743072058,
+              "low": 0.9913539853955148,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.003718212462482637,
+              "finite_draws": 200,
+              "high": 1.0070025062137529,
+              "low": 0.9928656039397216,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "5": {
+          "L_eff": 5,
+          "arm_mean": 11.04955,
+          "arm_n": 200,
+          "block_length": 5,
+          "bootstrap_se": 0.0040211341624540094,
+          "comparator_mean": 10.04955,
+          "comparator_n": 200,
+          "estimate": 1.0,
+          "finite_draws": 1000,
+          "interval": [
+            0.9930853032281086,
+            1.008113500639387
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_bps",
+          "reason": null,
+          "seed_high_range": [
+            1.0072507422129318,
+            1.009094140832127
+          ],
+          "seed_low_range": [
+            0.9919847377832578,
+            0.99338946067099
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.003648289159830187,
+              "finite_draws": 200,
+              "high": 1.0072507422129318,
+              "low": 0.99338946067099,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0040211341624540094,
+              "finite_draws": 200,
+              "high": 1.009094140832127,
+              "low": 0.9931044924260136,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0037163219794790524,
+              "finite_draws": 200,
+              "high": 1.0077370990733687,
+              "low": 0.9930853032281086,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.004103058366711756,
+              "finite_draws": 200,
+              "high": 1.0085593116273308,
+              "low": 0.9921846709026166,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.004180208070908407,
+              "finite_draws": 200,
+              "high": 1.008113500639387,
+              "low": 0.9919847377832578,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        }
+      },
+      "stratum": {
+        "archive_symbol": "EURUSD",
+        "config": "FIXTURE_CONFIG",
+        "confirmation_method": "BREAKOUT_BAR",
+        "confirmation_reference": "1H",
+        "side": "HIGH",
+        "timeframe": "15m"
+      }
+    },
+    {
+      "arm": "HIGH",
+      "channel": "swing_atr",
+      "comparator": "MID",
+      "ideal": "direct arm-minus-fixed-comparator estimate with uncertainty",
+      "interpretation": "operator judges; no machine value label",
+      "medians": {
+        "arm": 2.05,
+        "comparator": 1.05,
+        "contrast": 0.9999999999999998
+      },
+      "observed": {
+        "L_eff": 5,
+        "arm_mean": 2.04955,
+        "arm_n": 200,
+        "block_length": 5,
+        "bootstrap_se": 0.00402113416245394,
+        "comparator_mean": 1.04955,
+        "comparator_n": 200,
+        "estimate": 1.0,
+        "finite_draws": 1000,
+        "interval": [
+          0.9930853032281092,
+          1.008113500639386
+        ],
+        "n_clusters": 400,
+        "nonfinite_draws": 0,
+        "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_atr",
+        "reason": null,
+        "seed_high_range": [
+          1.0072507422129278,
+          1.009094140832127
+        ],
+        "seed_low_range": [
+          0.9919847377832571,
+          0.9933894606709897
+        ],
+        "seeds": [
+          {
+            "bootstrap_se": 0.0036482891598299664,
+            "finite_draws": 200,
+            "high": 1.0072507422129278,
+            "low": 0.9933894606709897,
+            "nonfinite_draws": 0,
+            "seed": 0
+          },
+          {
+            "bootstrap_se": 0.00402113416245394,
+            "finite_draws": 200,
+            "high": 1.009094140832127,
+            "low": 0.9931044924260127,
+            "nonfinite_draws": 0,
+            "seed": 1
+          },
+          {
+            "bootstrap_se": 0.0037163219794790663,
+            "finite_draws": 200,
+            "high": 1.0077370990733694,
+            "low": 0.9930853032281092,
+            "nonfinite_draws": 0,
+            "seed": 2
+          },
+          {
+            "bootstrap_se": 0.004103058366711676,
+            "finite_draws": 200,
+            "high": 1.0085593116273315,
+            "low": 0.9921846709026172,
+            "nonfinite_draws": 0,
+            "seed": 3
+          },
+          {
+            "bootstrap_se": 0.004180208070908491,
+            "finite_draws": 200,
+            "high": 1.008113500639386,
+            "low": 0.9919847377832571,
+            "nonfinite_draws": 0,
+            "seed": 4
+          }
+        ]
+      },
+      "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_atr",
+      "sensitivities": {
+        "10": {
+          "L_eff": 10,
+          "arm_mean": 2.04955,
+          "arm_n": 200,
+          "block_length": 10,
+          "bootstrap_se": 0.0013924060360031721,
+          "comparator_mean": 1.04955,
+          "comparator_n": 200,
+          "estimate": 1.0,
+          "finite_draws": 1000,
+          "interval": [
+            0.9974003261556071,
+            1.0026137122844088
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_atr",
+          "reason": null,
+          "seed_high_range": [
+            1.002544896456913,
+            1.0030417655613721
+          ],
+          "seed_low_range": [
+            0.9968071472509157,
+            0.9977117519140344
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0013280994823333479,
+              "finite_draws": 200,
+              "high": 1.0026078272389043,
+              "low": 0.9973898558064769,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0013924060360031721,
+              "finite_draws": 200,
+              "high": 1.002676916221034,
+              "low": 0.9974003261556071,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0014047804411508435,
+              "finite_draws": 200,
+              "high": 1.0030417655613721,
+              "low": 0.9977117519140344,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.001412111128646007,
+              "finite_draws": 200,
+              "high": 1.002544896456913,
+              "low": 0.9968071472509157,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0013369573152778762,
+              "finite_draws": 200,
+              "high": 1.0026137122844088,
+              "low": 0.9974632227272345,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "2": {
+          "L_eff": 2,
+          "arm_mean": 2.04955,
+          "arm_n": 200,
+          "block_length": 2,
+          "bootstrap_se": 0.0040311052153138875,
+          "comparator_mean": 1.04955,
+          "comparator_n": 200,
+          "estimate": 1.0,
+          "finite_draws": 1000,
+          "interval": [
+            0.9921783378905721,
+            1.0070025062137533
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_atr",
+          "reason": null,
+          "seed_high_range": [
+            1.0063131743072053,
+            1.0086911294786636
+          ],
+          "seed_low_range": [
+            0.9913539853955146,
+            0.9928656039397228
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.003581403604751594,
+              "finite_draws": 200,
+              "high": 1.0068562474395122,
+              "low": 0.992771863617759,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.004213579256484479,
+              "finite_draws": 200,
+              "high": 1.0086911294786636,
+              "low": 0.9921783378905721,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.004160414398641869,
+              "finite_draws": 200,
+              "high": 1.0075588001753883,
+              "low": 0.9913884495347071,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0040311052153138875,
+              "finite_draws": 200,
+              "high": 1.0063131743072053,
+              "low": 0.9913539853955146,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.003718212462482587,
+              "finite_draws": 200,
+              "high": 1.0070025062137533,
+              "low": 0.9928656039397228,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "5": {
+          "L_eff": 5,
+          "arm_mean": 2.04955,
+          "arm_n": 200,
+          "block_length": 5,
+          "bootstrap_se": 0.00402113416245394,
+          "comparator_mean": 1.04955,
+          "comparator_n": 200,
+          "estimate": 1.0,
+          "finite_draws": 1000,
+          "interval": [
+            0.9930853032281092,
+            1.008113500639386
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_atr",
+          "reason": null,
+          "seed_high_range": [
+            1.0072507422129278,
+            1.009094140832127
+          ],
+          "seed_low_range": [
+            0.9919847377832571,
+            0.9933894606709897
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0036482891598299664,
+              "finite_draws": 200,
+              "high": 1.0072507422129278,
+              "low": 0.9933894606709897,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.00402113416245394,
+              "finite_draws": 200,
+              "high": 1.009094140832127,
+              "low": 0.9931044924260127,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0037163219794790663,
+              "finite_draws": 200,
+              "high": 1.0077370990733694,
+              "low": 0.9930853032281092,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.004103058366711676,
+              "finite_draws": 200,
+              "high": 1.0085593116273315,
+              "low": 0.9921846709026172,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.004180208070908491,
+              "finite_draws": 200,
+              "high": 1.008113500639386,
+              "low": 0.9919847377832571,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        }
+      },
+      "stratum": {
+        "archive_symbol": "EURUSD",
+        "config": "FIXTURE_CONFIG",
+        "confirmation_method": "BREAKOUT_BAR",
+        "confirmation_reference": "1H",
+        "side": "HIGH",
+        "timeframe": "15m"
+      }
+    },
+    {
+      "arm": "HIGH",
+      "channel": "swing_duration_ns",
+      "comparator": "MID",
+      "ideal": "direct arm-minus-fixed-comparator estimate with uncertainty",
+      "interpretation": "operator judges; no machine value label",
+      "medians": {
+        "arm": 3601000000000.0,
+        "comparator": 3600000000000.0,
+        "contrast": 1000000000.0
+      },
+      "observed": {
+        "L_eff": 5,
+        "arm_mean": 3601000000000.0,
+        "arm_n": 200,
+        "block_length": 5,
+        "bootstrap_se": 0.0,
+        "comparator_mean": 3600000000000.0,
+        "comparator_n": 200,
+        "estimate": 1000000000.0,
+        "finite_draws": 1000,
+        "interval": [
+          1000000000.0,
+          1000000000.0
+        ],
+        "n_clusters": 400,
+        "nonfinite_draws": 0,
+        "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_duration_ns",
+        "reason": null,
+        "seed_high_range": [
+          1000000000.0,
+          1000000000.0
+        ],
+        "seed_low_range": [
+          1000000000.0,
+          1000000000.0
+        ],
+        "seeds": [
+          {
+            "bootstrap_se": 0.0,
+            "finite_draws": 200,
+            "high": 1000000000.0,
+            "low": 1000000000.0,
+            "nonfinite_draws": 0,
+            "seed": 0
+          },
+          {
+            "bootstrap_se": 0.0,
+            "finite_draws": 200,
+            "high": 1000000000.0,
+            "low": 1000000000.0,
+            "nonfinite_draws": 0,
+            "seed": 1
+          },
+          {
+            "bootstrap_se": 0.0,
+            "finite_draws": 200,
+            "high": 1000000000.0,
+            "low": 1000000000.0,
+            "nonfinite_draws": 0,
+            "seed": 2
+          },
+          {
+            "bootstrap_se": 0.0,
+            "finite_draws": 200,
+            "high": 1000000000.0,
+            "low": 1000000000.0,
+            "nonfinite_draws": 0,
+            "seed": 3
+          },
+          {
+            "bootstrap_se": 0.0,
+            "finite_draws": 200,
+            "high": 1000000000.0,
+            "low": 1000000000.0,
+            "nonfinite_draws": 0,
+            "seed": 4
+          }
+        ]
+      },
+      "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_duration_ns",
+      "sensitivities": {
+        "10": {
+          "L_eff": 10,
+          "arm_mean": 3601000000000.0,
+          "arm_n": 200,
+          "block_length": 10,
+          "bootstrap_se": 0.0,
+          "comparator_mean": 3600000000000.0,
+          "comparator_n": 200,
+          "estimate": 1000000000.0,
+          "finite_draws": 1000,
+          "interval": [
+            1000000000.0,
+            1000000000.0
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_duration_ns",
+          "reason": null,
+          "seed_high_range": [
+            1000000000.0,
+            1000000000.0
+          ],
+          "seed_low_range": [
+            1000000000.0,
+            1000000000.0
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "2": {
+          "L_eff": 2,
+          "arm_mean": 3601000000000.0,
+          "arm_n": 200,
+          "block_length": 2,
+          "bootstrap_se": 0.0,
+          "comparator_mean": 3600000000000.0,
+          "comparator_n": 200,
+          "estimate": 1000000000.0,
+          "finite_draws": 1000,
+          "interval": [
+            1000000000.0,
+            1000000000.0
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_duration_ns",
+          "reason": null,
+          "seed_high_range": [
+            1000000000.0,
+            1000000000.0
+          ],
+          "seed_low_range": [
+            1000000000.0,
+            1000000000.0
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "5": {
+          "L_eff": 5,
+          "arm_mean": 3601000000000.0,
+          "arm_n": 200,
+          "block_length": 5,
+          "bootstrap_se": 0.0,
+          "comparator_mean": 3600000000000.0,
+          "comparator_n": 200,
+          "estimate": 1000000000.0,
+          "finite_draws": 1000,
+          "interval": [
+            1000000000.0,
+            1000000000.0
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:swing_duration_ns",
+          "reason": null,
+          "seed_high_range": [
+            1000000000.0,
+            1000000000.0
+          ],
+          "seed_low_range": [
+            1000000000.0,
+            1000000000.0
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0,
+              "finite_draws": 200,
+              "high": 1000000000.0,
+              "low": 1000000000.0,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        }
+      },
+      "stratum": {
+        "archive_symbol": "EURUSD",
+        "config": "FIXTURE_CONFIG",
+        "confirmation_method": "BREAKOUT_BAR",
+        "confirmation_reference": "1H",
+        "side": "HIGH",
+        "timeframe": "15m"
+      }
+    },
+    {
+      "arm": "HIGH",
+      "channel": "strong_move",
+      "comparator": "MID",
+      "ideal": "direct arm-minus-fixed-comparator estimate with uncertainty",
+      "interpretation": "operator judges; no machine value label",
+      "medians": {
+        "arm": 0.0,
+        "comparator": 0.0,
+        "contrast": 0.0
+      },
+      "observed": {
+        "L_eff": 5,
+        "arm_mean": 0.25,
+        "arm_n": 200,
+        "block_length": 5,
+        "bootstrap_se": 0.09045040965341324,
+        "comparator_mean": 0.15,
+        "comparator_n": 200,
+        "estimate": 0.1,
+        "finite_draws": 1000,
+        "interval": [
+          -0.07527305384137829,
+          0.2596522992451119
+        ],
+        "n_clusters": 400,
+        "nonfinite_draws": 0,
+        "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:strong_move",
+        "reason": null,
+        "seed_high_range": [
+          0.23747365854556676,
+          0.2935120436001068
+        ],
+        "seed_low_range": [
+          -0.09113943612617648,
+          -0.057182073608352056
+        ],
+        "seeds": [
+          {
+            "bootstrap_se": 0.09299312337492836,
+            "finite_draws": 200,
+            "high": 0.2935120436001068,
+            "low": -0.07527305384137829,
+            "nonfinite_draws": 0,
+            "seed": 0
+          },
+          {
+            "bootstrap_se": 0.08260145340449407,
+            "finite_draws": 200,
+            "high": 0.23747365854556676,
+            "low": -0.06621575903088507,
+            "nonfinite_draws": 0,
+            "seed": 1
+          },
+          {
+            "bootstrap_se": 0.09045040965341324,
+            "finite_draws": 200,
+            "high": 0.2596522992451119,
+            "low": -0.09113943612617648,
+            "nonfinite_draws": 0,
+            "seed": 2
+          },
+          {
+            "bootstrap_se": 0.07948250879900384,
+            "finite_draws": 200,
+            "high": 0.25185411805808366,
+            "low": -0.057182073608352056,
+            "nonfinite_draws": 0,
+            "seed": 3
+          },
+          {
+            "bootstrap_se": 0.0917054248109833,
+            "finite_draws": 200,
+            "high": 0.2675541187739464,
+            "low": -0.07877477241629255,
+            "nonfinite_draws": 0,
+            "seed": 4
+          }
+        ]
+      },
+      "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:strong_move",
+      "sensitivities": {
+        "10": {
+          "L_eff": 10,
+          "arm_mean": 0.25,
+          "arm_n": 200,
+          "block_length": 10,
+          "bootstrap_se": 0.12497874045671532,
+          "comparator_mean": 0.15,
+          "comparator_n": 200,
+          "estimate": 0.1,
+          "finite_draws": 1000,
+          "interval": [
+            -0.13435999558562345,
+            0.35002578968037407
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:strong_move",
+          "reason": null,
+          "seed_high_range": [
+            0.30810858585858597,
+            0.3602836244215555
+          ],
+          "seed_low_range": [
+            -0.1812720374509276,
+            -0.13044593175837396
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.12666906286162005,
+              "finite_draws": 200,
+              "high": 0.35002578968037407,
+              "low": -0.13071598495323905,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.12951636324546703,
+              "finite_draws": 200,
+              "high": 0.3602836244215555,
+              "low": -0.1812720374509276,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.12497874045671532,
+              "finite_draws": 200,
+              "high": 0.3577592420965916,
+              "low": -0.13044593175837396,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.1184296346843907,
+              "finite_draws": 200,
+              "high": 0.3149204891388607,
+              "low": -0.13435999558562345,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.12301852517880044,
+              "finite_draws": 200,
+              "high": 0.30810858585858597,
+              "low": -0.15907003200320033,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "2": {
+          "L_eff": 2,
+          "arm_mean": 0.25,
+          "arm_n": 200,
+          "block_length": 2,
+          "bootstrap_se": 0.054318492313441324,
+          "comparator_mean": 0.15,
+          "comparator_n": 200,
+          "estimate": 0.1,
+          "finite_draws": 1000,
+          "interval": [
+            -0.012428918705887741,
+            0.21019523378946123
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:strong_move",
+          "reason": null,
+          "seed_high_range": [
+            0.18809087381315384,
+            0.21338445920075563
+          ],
+          "seed_low_range": [
+            -0.018848577534824315,
+            0.005443466860428388
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.05547997278959104,
+              "finite_draws": 200,
+              "high": 0.21019523378946123,
+              "low": 0.005443466860428388,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.054318492313441324,
+              "finite_draws": 200,
+              "high": 0.21338445920075563,
+              "low": -0.012428918705887741,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.05172300993212095,
+              "finite_draws": 200,
+              "high": 0.18809087381315384,
+              "low": -0.01826805747136431,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.055257849487975304,
+              "finite_draws": 200,
+              "high": 0.19590055960667604,
+              "low": -0.018848577534824315,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0535032494231563,
+              "finite_draws": 200,
+              "high": 0.21270863876663176,
+              "low": 0.004537992414988284,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        },
+        "5": {
+          "L_eff": 5,
+          "arm_mean": 0.25,
+          "arm_n": 200,
+          "block_length": 5,
+          "bootstrap_se": 0.09045040965341324,
+          "comparator_mean": 0.15,
+          "comparator_n": 200,
+          "estimate": 0.1,
+          "finite_draws": 1000,
+          "interval": [
+            -0.07527305384137829,
+            0.2596522992451119
+          ],
+          "n_clusters": 400,
+          "nonfinite_draws": 0,
+          "population_id": "EXP-104:EURUSD/15m/BREAKOUT_BAR/1H/HIGH/FIXTURE_CONFIG:HIGH-vs-MID:strong_move",
+          "reason": null,
+          "seed_high_range": [
+            0.23747365854556676,
+            0.2935120436001068
+          ],
+          "seed_low_range": [
+            -0.09113943612617648,
+            -0.057182073608352056
+          ],
+          "seeds": [
+            {
+              "bootstrap_se": 0.09299312337492836,
+              "finite_draws": 200,
+              "high": 0.2935120436001068,
+              "low": -0.07527305384137829,
+              "nonfinite_draws": 0,
+              "seed": 0
+            },
+            {
+              "bootstrap_se": 0.08260145340449407,
+              "finite_draws": 200,
+              "high": 0.23747365854556676,
+              "low": -0.06621575903088507,
+              "nonfinite_draws": 0,
+              "seed": 1
+            },
+            {
+              "bootstrap_se": 0.09045040965341324,
+              "finite_draws": 200,
+              "high": 0.2596522992451119,
+              "low": -0.09113943612617648,
+              "nonfinite_draws": 0,
+              "seed": 2
+            },
+            {
+              "bootstrap_se": 0.07948250879900384,
+              "finite_draws": 200,
+              "high": 0.25185411805808366,
+              "low": -0.057182073608352056,
+              "nonfinite_draws": 0,
+              "seed": 3
+            },
+            {
+              "bootstrap_se": 0.0917054248109833,
+              "finite_draws": 200,
+              "high": 0.2675541187739464,
+              "low": -0.07877477241629255,
+              "nonfinite_draws": 0,
+              "seed": 4
+            }
+          ]
+        }
+      },
+      "stratum": {
+        "archive_symbol": "EURUSD",
+        "config": "FIXTURE_CONFIG",
+        "confirmation_method": "BREAKOUT_BAR",
+        "confirmation_reference": "1H",
+        "side": "HIGH",
+        "timeframe": "15m"
+      }
+    }
+  ],
+  "zero_cost_disclosure": {
+    "commissions": "not modeled",
+    "cost_model": "NO_COST_CHARGED",
+    "heading": "ZERO-COST-DISCLOSURE",
+    "implication": "every figure in this document is gross and cost-free; no spread, commission, or swap enters any calculation. Realised results would differ (likely worse) under any real cost schedule.",
+    "lifting": "only an explicit operator directive may introduce a cost model for a scoped experiment; the directive is recorded in that experiment's design.md.",
+    "prohibited_claims": "fully-net, cost-complete, tradable, deployable",
+    "spread": "not modeled",
+    "swaps/funding": "not modeled"
+  }
+}
