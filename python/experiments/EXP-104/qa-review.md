@@ -459,3 +459,44 @@ focused synthetic traces: thin two-cluster bootstrap; singleton destroy groups
 SHA256 comparison: EXP-100 and EXP-104 estimand_validation.json both
   1593851873c318f3040fe1f04cedb8460dcb86470a296821548015079ffd3488
 ```
+
+## QA run 6 — 2026-08-15T05:39:26Z — mode: subagent — HEAD 99bc9bd52812471281e806871275b16ac26fc226
+
+Verdict: **REVISE**
+
+Scope: fresh design-first analysis-readiness review; retained EXP-100 TRAIN only. No
+TEST/holdout, live analysis, engine run, or implementation/design edit. Dirty state before
+append: modified EXP-101/102 adapters and untracked EXP-101/102/103 live tests.
+
+### Design-fidelity trace
+
+| Design clause | Evidence | Verdict | Notes |
+|---|---|---|---|
+| Frozen source/gate/composite identity (§1) | `source.py:111-276`; `analysis.py:419-426` | **DEVIATES** | Default uses EXP-104 copied gate, not EXP-100 authority. Shared validation falsely rejects pinned UTC fence and globally repeated cell-local raid IDs; composite audit is clean. |
+| Causal preceding-mark regime (§2–3) | `analysis.py:194-341` | MATCHES in core | Source-cell/timestamp join, preceding mark, and mismatch checks are causal. |
+| Frequency one-day blocks (§3) | `analysis.py:301-324` | **DEVIATES** | Design requires base 96/48/24 for 15m/30m/1h plus half/double. Code uses 2/5/10 for every timeframe, filters warmup/undefined exposure before census, and incompletely emits empty regimes. |
+| All-regime destroy donors (§5) | shared `_population_view` | **DEVIATES** | LOW-vs-MID excludes HIGH and HIGH-vs-MID excludes LOW; design pools all regime labels. |
+| Exact nested 10,000×2,000 (§5) | `adapter.py:295-343` | **DEVIATES** | Average-then-bootstrap is numerically non-equivalent to rebuild-inside-outer (shared literal 1.229006032152678 vs 0.7083849310412494). |
+| Per-control propagation/disclosure (§5 HARD) | `adapter.py:270-386` | **DEVIATES** | Failed controls can be hidden by passing companions; invalid rows are skipped; alias nullness mismatch and all destroyed draws are absent. |
+| Secondary outcomes / boundedness (§3–6) | `analysis.py:373-395`; shared adapter | PARTIAL | Primary outcomes/censuses exist; confirmation/endpoint outcome strata are census-only. Exact production runtime unproved. |
+
+### Golden-trace diff
+
+- T1–T3 causal regimes: MATCHES retained engine semantics.
+- Frequency uncertainty: DEVIATES (wrong block scale).
+- Outcome destroy: DEVIATES (wrong donor pool and nested SE).
+- Live source: MISSING/FAIL-CLOSED.
+
+### Governance & boundary
+
+Fresh context, TRAIN-only, passing gate, zero cost, causal join, no-local-accounting/backtest,
+neutrality/powering/PSR N/A: PASS. Source, frequency, donor/nested control, completeness: FAIL.
+
+### Issues
+
+1. **CRITICAL:** fix UTC fence/composite identity and default to EXP-100 gate.
+2. **CRITICAL:** pool LOW/MID/HIGH and implement/prove exact nested integrity semantics.
+3. **HIGH:** use 96/48/24 one-day blocks plus half/double; retain warmup/undefined/empty exposure rows.
+4. **HIGH:** propagate all failed controls, preserve invalid rows/reasons, emit all draws, and add declared confirmation/endpoint outcome strata.
+
+Focused suite: **47 passed, 9 failed** (shared hard-control/source failures apply). Composite duplicates=0. `check_no_local_accounting`: PASS.

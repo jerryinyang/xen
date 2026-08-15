@@ -571,3 +571,42 @@ focused in-memory destroy/count probe
 # two rows -> groups=2, mapped_rows=0, void_no_derangement=2, unchanged=True;
 # classify_count_band(None|-1|1.5|'0') -> '2+'
 ```
+
+## QA run 7 — 2026-08-15T05:39:26Z — mode: subagent — HEAD 99bc9bd52812471281e806871275b16ac26fc226
+
+Verdict: **REVISE**
+
+Scope: fresh design-first analysis-readiness review; retained EXP-100 TRAIN only. No
+TEST/holdout, live analysis, engine run, or implementation/design edit. Dirty state before
+append: modified EXP-101/102 adapters and untracked EXP-101/102/103 live tests.
+
+### Design-fidelity trace
+
+| Design clause | Evidence | Verdict | Notes |
+|---|---|---|---|
+| Frozen source/fence/composite identity (§1) | `source.py:111-276` | **DEVIATES** | Accepted source is rejected by absent numeric fence and bare global raid ID checks. Actual composite duplicates are zero. |
+| Count bands, fixed zero, all-band donors (§3–5) | `analysis.py:124-166`; live regression | MATCHES in core | `0/1/2+`, joint level population, and all-band donors are implemented. Fixture intentionally has only 0/1 under §7; the old test expecting fixture 2+ conflicts with design. |
+| Exact nested outer/destroy (§5) | `adapter.py:295-343` | **DEVIATES** | Average-then-bootstrap + `hypot` is not rebuild-inside-each-outer; literal shared trace differs 1.229006032152678 vs 0.7083849310412494. |
+| Failed-control propagation (§5 HARD) | `adapter.py:344-386`; new regression | **DEVIATES** | Singleton invalidity is reduced to `VOID_NO_VALID_POPULATION`; the required `VOID_SINGLETON_GROUP` is lost. With another passing control overall status may pass and failed rows are skipped. |
+| Previous-completed-count audit (§1–3) | `analysis.py:222-231` | **DEVIATES** | Code demands counts equal `range(len(all raid rows))`; failed/censored raids may legitimately repeat a previous-completed count. This stronger undeclared rule can reject valid data. |
+| Completeness/boundedness | shared adapter/runtime | PARTIAL | Five channels, L=2/5/10, count census and statuses exist; destroyed draws/invalid rows are incomplete and exact runtime is unproved. |
+
+### Golden-trace diff
+
+- Count plant (+0.50 ATR, +3.6e12 ns, +0.25): MATCHES.
+- Nested hard control: DEVIATES.
+- Live source handoff: MISSING/FAIL-CLOSED due false source validation.
+
+### Governance & boundary
+
+Fresh context, TRAIN-only, gate, zero cost, no-local-accounting/backtest, neutrality and
+powering: PASS. Source identity/fence, nested destroy, control propagation: FAIL.
+
+### Issues
+
+1. **CRITICAL:** validate pinned UTC fence and `(source_cell, raid_id)` in `source.py`.
+2. **CRITICAL:** implement/prove the exact nested estimator, or amend design before analysis.
+3. **HIGH:** retain and propagate every per-control invalid reason and all destroyed draws.
+4. **HIGH:** reconcile `prior_raid_count` against completed-raid chronology, allowing legitimate repeats.
+
+Focused suite: **47 passed, 9 failed**; EXP-102 donor/plant tests passed, invalid-control reason test failed. `check_no_local_accounting`: PASS.

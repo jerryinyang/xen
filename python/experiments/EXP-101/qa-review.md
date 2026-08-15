@@ -454,3 +454,46 @@ PYTHONPATH=python/src python/.venv/bin/python - <two-row exact-group trace>
 sha256sum python/experiments/EXP-{100,101}/results/estimand_validation.json
 # byte-identical: 1593851873c318f3040fe1f04cedb8460dcb86470a296821548015079ffd3488
 ```
+
+## QA run 7 — 2026-08-15T05:39:26Z — mode: subagent — HEAD 99bc9bd52812471281e806871275b16ac26fc226
+
+Verdict: **REVISE**
+
+Scope: fresh design-first analysis-readiness review of the current dirty workspace. Only
+retained EXP-100 TRAIN artifacts were opened; no TEST/holdout, live analysis, Nautilus run,
+or implementation/design edit occurred. Dirty state before append: modified EXP-101/102
+adapters; untracked `test_exp101/102/103_analysis_live.py`.
+
+### Design-fidelity trace
+
+| Design clause | Evidence | Verdict | Notes |
+|---|---|---|---|
+| Frozen TRAIN fence and source identity (§1) | `source.py:111-276`; direct 264-cell validation | **DEVIATES** | Validator expects absent numeric `train_end_ns` instead of pinned `train_end_utc` and treats cell-local `raid_id` as globally unique. It returned `VOID_FENCE_BOUNDARY` + `VOID_DUPLICATE_OBJECT_ID` on 9,840,478 accepted rows. Independent audit found zero within-cell and zero `(source_cell, raid_id)` duplicates. Live cannot start. |
+| All-configuration destroy donors (§5) | `adapter.py:224-251`; new regression | **DEVIATES** | Shared population filters to current arm+comparator. Design pools all 11 configs. Expected donor group 2,200; observed 400. |
+| Independent arm/comparator bootstrap (§4) | `statistics.py:111-195` | **DEVIATES** | Shared bootstrap jointly resamples one combined cluster sequence; EXP-101 requires independent resampling of the distinct configuration populations. |
+| Exact 10,000 outer × 2,000 inner destroys (§5) | `adapter.py:295-343` | **DEVIATES** | Code destroys once, averages outcomes, bootstraps the average, then combines SEs by `hypot`. Design rebuilds 2,000 destroys inside every outer population. Literal shared-path trace: code 1.229006032152678 vs registered 0.7083849310412494. |
+| Per-control hard propagation and complete output (§5 HARD) | `adapter.py:344-386`; `runtime.py:83-99` | **DEVIATES** | Individual failed controls do not enter overall reasons if a companion passes; failed rows are silently skipped. Null/non-null duration alias mismatch is missed and all 2,000 destroyed contrasts are not emitted. |
+| Output layers / boundedness (§4–6) | `adapter.py:388-495`; `destroy.py:137-215` | PARTIAL | Five channels, L=2/5/10, census and report layers exist. Memory is bounded only for the non-registered approximation; exactness plus production runtime is unproved. |
+
+### Golden-trace diff
+
+- T1–T3 frozen engine events: MATCHES prior hand trace; engine source is unchanged.
+- Control plant: DEVIATES — pair-only donors, joint rather than independent clusters, non-nested SE.
+- Live handoff: MISSING/FAIL-CLOSED — accepted TRAIN source is rejected before analysis.
+
+### Governance & boundary
+
+- Fresh context / TRAIN-only / no TEST-holdout: PASS.
+- EXP-100 gate: PASS (`blocking_pass=true`, 264 cells); copied gates byte-identical.
+- Zero cost, no local accounting, no Python price backtest: PASS (`check_no_local_accounting ok=true`).
+- Mandatory declarations, powering strip, PSR N/A: PASS.
+- Source, future-destroy fidelity, completeness, practical exact execution: FAIL.
+
+### Issues
+
+1. **CRITICAL:** fix `source.py:181-184,254-266` to validate the pinned UTC fence and composite `(source_cell, raid_id)` identity. `REQUIRED_SKILL: data-analyst`.
+2. **CRITICAL:** pool all 11 config donors and independently resample arm/comparator clusters. `FAILING_ARTIFACTS: adapter.py, EXP-101 adapter`; `REQUIRED_SKILL: data-analyst`.
+3. **CRITICAL:** implement/prove an exactly equivalent bounded nested 10,000×2,000 estimator; current numeric parity fails. Route to `quant-designer` if semantics must change.
+4. **HIGH:** propagate every failed control, preserve explicit invalid rows/reasons, catch alias nullness mismatch, and emit every destroyed contrast. `FAILING_ARTIFACTS: adapter.py, runtime.py`.
+
+Focused suite: **47 passed, 9 failed**; EXP-101 all-donor regression failed.

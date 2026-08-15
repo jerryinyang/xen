@@ -439,3 +439,43 @@ fixture-only deterministic smoke
 focused malformed-profile, singleton-VOID, thin-bootstrap, and orchestration probes
 # reproduced issues 1-4 above without live-source analysis
 ```
+
+## QA run 6 — 2026-08-15T05:39:26Z — mode: subagent — HEAD 99bc9bd52812471281e806871275b16ac26fc226
+
+Verdict: **REVISE**
+
+Scope: fresh design-first analysis-readiness review; retained EXP-100 TRAIN only. No
+TEST/holdout, live analysis, engine run, or implementation/design edit. Dirty state before
+append: modified EXP-101/102 adapters and untracked EXP-101/102/103 live tests.
+
+### Design-fidelity trace
+
+| Design clause | Evidence | Verdict | Notes |
+|---|---|---|---|
+| Frozen source, authoritative gate, composite identity (§1) | `source.py:111-276`; `analysis.py:430-434` | **DEVIATES** | Default uses EXP-103's copied gate, not EXP-100 authority. Source test fails `VOID_FENCE_BOUNDARY` + `VOID_DUPLICATE_OBJECT_ID`; composite audit is clean. |
+| Complete cluster order (§4) | new live regression | **DEVIATES** | Expected `(first_raid_timestamp, level_id)` gave `L-A,L-A,L-B,L-B`; code retained `L-B,L-A,L-B,L-A`. |
+| Exact nested 10,000×2,000 (§6) | `adapter.py:295-343`; literal test | **DEVIATES** | Expected destroyed SE 0.7083849310412494, observed 1.229006032152678. |
+| Per-control hard propagation / duration alias (§6) | new regressions; `adapter.py:270-386` | **DEVIATES** | Constant ATR vacuous control still leaves overall pass; null/non-null duration alias mismatch lacks `VOID_DURATION_ALIAS`. |
+| Full destroy disclosure (§6) | `adapter.py:351-370` | **MISSING** | No `destroyed_contrasts` list; registered 2,000 values are absent. |
+| Frozen profile integrity (§5) | `analysis.py:174-231` | PARTIAL | Geometry/conservation/scalars/strict boundary checked; live POC tie-break, upper-first VA, 30% gap mass, reset, and deterministic replay are not independently reconciled. |
+| Left join/output/boundedness | `analysis.py:265-322`; shared runtime | PARTIAL | Composite left join exists. Failed rows are skipped; exact nested runtime is unproved. |
+
+### Golden-trace diff
+
+- T1/T2/T3 profile fixture: MATCHES.
+- Cluster chronology and nested destroy: DEVIATE (both focused regressions fail).
+- Live source: MISSING/FAIL-CLOSED.
+
+### Governance & boundary
+
+Fresh context, TRAIN-only, passing 264-cell gate, zero cost, no-local-accounting/backtest,
+neutrality/powering/PSR N/A: PASS. Source, chronology, hard control, completeness: FAIL.
+
+### Issues
+
+1. **CRITICAL:** fix UTC fence/composite identity and default to EXP-100 gate.
+2. **CRITICAL:** implement exact nested semantics; numeric parity currently fails.
+3. **CRITICAL:** aggregate all failed controls, preserve invalid rows/reasons, catch alias nullness mismatch, emit all 2,000 draws.
+4. **HIGH:** sort complete level histories and fully reconcile the frozen live profile algorithm.
+
+Focused suite: **47 passed, 9 failed**; six EXP-103 live-contract failures cover source, propagation, alias, order, nested SE, and disclosure. `check_no_local_accounting`: PASS.
