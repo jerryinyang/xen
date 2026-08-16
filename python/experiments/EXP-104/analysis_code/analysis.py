@@ -32,6 +32,7 @@ CONTROL_GROUP_COLUMNS = (
     "status",
     "primary_completed",
 )
+# 5 bits: swing_duration_ns is canonical; duration_ns is byte-equal alias (not duplicated)
 CONTROL_NULL_COLUMNS = (
     "swing_price",
     "swing_bps",
@@ -39,6 +40,13 @@ CONTROL_NULL_COLUMNS = (
     "swing_duration_ns",
     "strong_move",
 )
+
+# Frequency block lengths: one-day blocks for 15m/30m/1h + half/double
+# 15m: 96 bars/day, half=48, double=192
+# 30m: 48 bars/day, half=24, double=96
+# 1h: 24 bars/day, half=12, double=48
+FREQUENCY_BLOCK_LENGTHS = (12, 24, 48, 96, 192)
+FREQUENCY_BLOCK_LENGTHS_DEFAULT = (24, 48, 96)  # 1h, 30m, 15m one-day blocks
 
 
 def _build_frequency_units(
@@ -77,11 +85,14 @@ def _frequency_from_units(units: Sequence[dict[str, Any]], block_length: int) ->
     exposure = Counter({regime: 0 for regime in regimes})
     starts = Counter({regime: 0 for regime in regimes})
     excluded = Counter()
+    warmup_undefined_exposure = Counter()
     for unit in units:
         regime = unit["preceding_regime"]
         if regime in regimes:
             exposure[regime] += 1
             starts[regime] += len(unit["starts"])
+        elif regime in ("REGIME_WARMUP", "ATR_UNDEFINED"):
+            warmup_undefined_exposure[regime] += 1
         else:
             excluded[str(regime)] += 1
     rates = {
@@ -103,6 +114,7 @@ def _frequency_from_units(units: Sequence[dict[str, Any]], block_length: int) ->
         "block_length": int(block_length),
         "empty_exposure": [regime for regime in regimes if exposure[regime] == 0],
         "excluded_exposure": dict(excluded),
+        "warmup_undefined_exposure": dict(warmup_undefined_exposure),
         "eligible_marks": len(units),
     }
 
@@ -186,6 +198,7 @@ class Adapter(BaseContrastAdapter):
     contrasts = (("LOW", "MID"), ("HIGH", "MID"))
     control_group_columns = CONTROL_GROUP_COLUMNS
     control_null_columns = CONTROL_NULL_COLUMNS
+    # EXP-104: joint resampling (default independent_arms=False)
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -195,6 +208,7 @@ class Adapter(BaseContrastAdapter):
         self, source_root: Path, gate_path: Path
     ) -> tuple[pl.DataFrame, dict[str, Any], IntegrityStatus]:
         self._live_mode = True
+        # Default to EXP-100 authoritative gate
         attestation = validate_source_contract(self.source_spec(source_root, gate_path))
         source = {
             "mode": "live",
@@ -319,7 +333,7 @@ class Adapter(BaseContrastAdapter):
                             n_boot=self.n_boot,
                             seeds=self.seeds,
                         )
-                        for length in (2, 5, 10)
+                        for length in FREQUENCY_BLOCK_LENGTHS_DEFAULT
                     },
                 }
             )
@@ -432,3 +446,5 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+

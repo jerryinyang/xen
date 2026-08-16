@@ -479,3 +479,155 @@ neutrality/powering/PSR N/A: PASS. Source, chronology, hard control, completenes
 4. **HIGH:** sort complete level histories and fully reconcile the frozen live profile algorithm.
 
 Focused suite: **47 passed, 9 failed**; six EXP-103 live-contract failures cover source, propagation, alias, order, nested SE, and disclosure. `check_no_local_accounting`: PASS.
+
+
+## QA run 7 — 2026-08-15T22:37:03Z — mode: subagent — HEAD 6d816e8603a6b4d9c7edd86a13639d582a7f4958
+
+Verdict: REVISE
+
+Scope: fresh-context design-to-code fidelity review of the EXP-103 analysis implementation against the current design (AMENDMENT-14 frozen), retained EXP-100 AMENDMENT-14 TRAIN emission, checkpoint 2026-08-11-019-liquidity-sweeps, family CF-LIQSWP-001/HYP-003, and shared pipeline/governance rules. No live analysis was executed; no TEST/holdout data was accessed; no engine process was launched. The prior QA runs (1-6) were read for context but this review derives expected behaviour from the design text before inspecting code.
+
+### Reviewed git state
+
+Dirty files before this append:
+
+```text
+ M python/experiments/EXP-102/results/fixture_integrity.json
+```
+
+### Design-fidelity trace
+
+| Design clause (Sref) | Code / artifact evidence | Verdict | Notes |
+|---|---|---|---|
+| Frozen source, gate-first, 264 cells, TRAIN fence, left join (S1 FROZEN-SOURCE/JOIN) | `analysis.py:149-220` (live_frame); `source.py:87-276` (validate_source_contract); `adapter.py:152-184` (source_spec) | **DEVIATES** | Gate/file/fence checks run and pass for 264 cells, but `config_hash` is only shape-checked (64-char hex), never compared byte-for-byte to the gate's pinned `catalog_attestation.config_hash`. Parquet inputs (`raids.parquet`, `tpo_profiles.parquet`, `bar_marks.parquet`) have no immutable digest check. The left join retains all raids but the live entry point emits only total row count; required per-cell join census is never persisted (S1: "report every missing/extra key"). |
+| Mechanism and derived estimand (S2 MECHANISM/DERIVED) | `analysis.py:8-12`; `adapter.py:54-66` (channels/control_channels) | MATCHES (design-level) | Tight-gap vs non-tight defined-profile outcome contrasts and cross-gap future-destroy null are aligned. No trade/leg/P&L object - correctly N/A. |
+| Object identity and non-overlapping windows (S2 OBJECT-IDENTITY) | `analysis.py:25-36`; `adapter.py:118-132` (_channel_frame filter) | MATCHES | Measurement object = trading object (same raid/profile). Conditioning ends at confirmation; later swing begins after. Level clustering declared. |
+| Frozen TPO profile contract (S2 frozen profile; S5) | Shared `tpo.py:142-207,241-311`; `analysis.py:34-82` (replay/validate) | **DEVIATES** | Shared EXP-100 TPO logic emits required fields and strict `<0.50` tightness. EXP-103's `validate_profile_frame` checks scalar ratios, mask bounding, geometry, conservation, and strict boundary - but does **not** parse/verify the emitted `va_mask` bin indices against POC/VA expansion (upper-first tie-break), 30% gap-mass selection ordering, bin assignment determinism, reset-on-new-maximum, or deterministic replay. It labels replay "attested" without performing it. A malformed row with nonsense masks but passing scalar ratios returns `blocking_pass=true`. |
+| Outcome population and fixed comparator (S3) | `analysis.py:25-36` (_channel_frame); `adapter.py:118-132` | **PARTIAL** | Primary filter (`COMPLETED` + `primary_attribution` + `primary_completed` + `DEFINED`) and tight-minus-non-tight arm are present. The second emitted arm is `False - False` (placeholder) instead of the required all-defined descriptive baseline (S3: "all-defined is a separate disclosure"). `duration_ns == swing_duration_ns` alias is asserted in `integrity()` but mismatches are only counted; null/non-null mismatches do not produce `VOID_DURATION_ALIAS`. Finite `swing_price`/`swing_bps` summaries are declared in channels but not emitted by live orchestration. |
+| Estimator/bootstrap/report contract (S4) | `analysis.py:100-160` (analyze/block_sensitivity); `statistics.py:75-175` (clustered_contrast_bootstrap) | **DEVIATES** | Core joint circular bootstrap is implemented. **Missing**: L=2 and L=10 sensitivity outputs (only L=5 requested in `analyze()`). Sparse resamples with an empty arm feed NaN draws to `np.quantile`/`np.std`, producing silent NaN bounds/SE without reason code - stratum is not disclosed with `EMPTY_ARM`. The fixture outer bootstrap independently resamples arms (iid rows) instead of the registered joint whole-level circular sequence, so the pre-read fixture does not validate the live estimator. |
+| Profile integrity checks (S5) | `analysis.py:34-82` (validate_profile_frame); `tests/test_exp10x_analysis_contract.py:140-162` | **MISSING / PARTIAL** | Required: one-to-one join counts, TPO conservation, fixed bin assignment, POC tie-breaking, VA mass, 30% gap mass, strict 50% comparison, positive VA_width, minimum-bin, zero-ATR, empty-profile, undefined-reason, reset-on-new-maximum, deterministic replay. Implemented: scalar ratios, mask bounding, geometry, conservation, strict boundary. **Not independently reconciled**: POC tie-break, upper-first VA expansion, 30% gap-mass selection, bin assignment, reset, replay. Golden trace T2/T3 fixtures absent; only T1-like scalar test exists. |
+| Future-destroy control (S6 CONTROL) | `destroy.py:50-120` (build_destroy_mappings); `analysis.py:130-150` (CONTROL_GROUP_COLUMNS/NULL_COLUMNS) | **DEVIATES** | Design requires per-seed `default_rng(d).permutation(n)` derangements with rejection until zero fixed points, grouped by exact stratum x nullness class. Shared `build_destroy_mappings` implements this. **Deviation**: groups with `n<2` remain unchanged inside the contrast; their `VOID_NO_DERANGEMENT` is only counted and does not invalidate the affected channel/stratum. Non-finite destroyed draws are silently removed; required destroyed 95% interval and VOID detail are not emitted. The design's "same-label donors allowed" is correctly implemented. |
+| Tripwire and live survival rule (S6 TRIPWIRE) | `adapter.py:186-275` (integrity); `destroy.py:180-230` (future_destroy_attestation) | **DEVIATES** | Live rule has declared SE families, but can return `ATTESTED_OR_NOT_APPLICABLE` despite `VOID_NO_DERANGEMENT` or `VOID_POPULATION_MISMATCH`. Executable path expands to 5 x 10,000 x 2,000 = 100M Python `future_destroy` calls per arm/stratum (each deep-copying rows) and is invoked for a redundant second arm (`False - False`), making the registered full run operationally infeasible. Duration/strong-move plants are declared in design but the fixture outer bootstrap uses independent arm resampling, not joint cluster resampling, so the pre-read fixture does not prove the live estimator/control contract. |
+| Sample-size, hard/informative split, PSR N/A (S7) | `design.md:263-301`; `analysis.py` denylist scan | MATCHES at code level | No MDE, power floor, row-count veto, or trade/leg-bps read exists. Thin rows are not deliberately hidden, but missing live orchestration prevents required reporting. PSR correctly N/A (no trade/leg estimand). |
+| Golden trace (S8) | `analysis.py:34-82` (replay_profile/golden_profile_frame/validate); `tests/test_exp10x_analysis_contract.py:140-162` | **PARTIAL** | T1/T2/T3 arithmetic fixtures are hand-reproducible and match the shared TPO logic. **Missing**: EXP-103-specific golden trace output proving implementation preserves frozen labels and strict boundary. Tests cover only a T1-like scalar ratio; no T2/T3 output; malformed/missing masks, POC, VA path, selected mass can pass `profile_integrity_report`. |
+| Amendment ledger and final selection accounting (S9) | `design.md:321-365`; code denylist scan | MATCHES | 2 looser / 3 tighter / 8 neutral declared; no machine qualification/selection or family disposition added. |
+| Zero-cost disclosure (S10) | `contract.py:5-22` (ZERO_COST_DISCLOSURE); `analysis.py:100-120` (extra); `results/fixture_integrity.json:4-10` | **DEVIATES** | No cost function is called on any live path. **But**: fixture results artifact omits `prohibited_claims` and `lifting` keys and alters the canonical `implication` wording. The artifact does not carry the required verbatim disclosure. |
+
+### Golden-trace diff
+
+| Event | Expected from design | Implemented evidence | Verdict |
+|---|---|---|---|
+| T1 tight profile | Counts `[29,12,23,23,27,26]`; VA bins 100-104 total 114; gap bins 101-102; span 2; ratio 0.40; tight | Shared TPO logic supports strict tightness and inclusive span. EXP-103 test supplies final scalars only - never proves POC/VA/mask construction. | **MISSING EXP-103 trace** |
+| T2 non-tight profile | Counts `[10,18,13,7,7,30]`; VA bins 101-105 total 75; gap outer bins 102-104; span 3; ratio 0.60; non-tight | No EXP-103 fixture/test/output. | **MISSING** |
+| T3 strict boundary | `gap_span_va=0.50` produces `tight_gap=false`; outcomes cannot rewrite label; non-primary stays profile-only | Scalar strict `<` checked in `validate_profile_frame`; no boundary fixture or label-immutability trace emitted. | **PARTIAL** |
+| Future-destroy plants | ATR +0.50, duration +3.6e12 ns, strong-move +0.25; joint level-cluster outer bootstrap; every seed satisfies raw-bite/destroyed-non-bite | Fixture artifact reports all three plants passing with 2,000 derangements and zero fixed points, but uses arm-wise iid outer resampler, not the registered joint circular cluster sequence. | **DEVIATES** |
+
+### Governance & boundary
+
+- **Fresh context:** PASS - this subagent did not produce the implementation.
+- **Registry/read accounting:** PASS - `CF-LIQSWP-001/HYP-003` is registered; 0 counted TEST reads; no TEST/HOLDOUT access occurred.
+- **Source gate/fence:** PARTIAL - static 264-cell gate-first/hash check passed, but pinned `config_hash` is not compared to gate's `catalog_attestation.config_hash`; input parquet identity not sealed by EXP-103.
+- **No Python backtest / one node:** PASS - analysis-only module; no `BacktestNode` or engine execution.
+- **No local accounting:** PASS - `check_no_local_accounting("python/experiments/EXP-103/analysis_code")` returns `ok=true`; no experiment code is imported.
+- **Zero cost:** PARTIAL - no live cost path, but fixture/results disclosure is not canonical (missing `prohibited_claims`, `lifting`; altered `implication`).
+- **Future destroy:** REVISE - derangement core exists; singleton/null-class VOID propagation incomplete; exact fixture estimator deviates; full disclosure missing; computational feasibility not addressed.
+- **Neutrality/powering/PSR:** PASS for prohibited value machinery; REVISE for incomplete reporting. PSR correctly N/A.
+- **Prior findings:** implementation now exists and basic derangement/boundary fixtures pass. Prior missing-runtime, full golden-trace, exact control-contract, computational feasibility, and source-seal findings are not completely resolved.
+
+### Issues
+
+1. **CRITICAL - the live command does not execute or save the registered analysis.**
+   **Design:** S3-S7, `design.md:93-310`.
+   **Evidence:** `analysis.py:162-220` (`live_frame` + `main` `--live`) reads all live rows and prints only their count. The `run_live` call in `main()` uses the shared runtime, but the adapter's `analyze()` requests only `L=5`; it omits L=2/L=10 sensitivity, all-defined baseline, `swing_price`/`swing_bps`, duration hours display, result layers, and result persistence. It also emits a meaningless `False - False` arm (`analysis.py:77-79` in Adapter `contrasts = ((True, False),)` but the live path composition includes only one contrast - the second arm is a placeholder).
+   **Impact:** there is no executable path that can produce the predeclared evidence package; running `--live` can appear successful while answering none of HYP-003.
+   **Required change:** implement one bounded live orchestrator that writes every predeclared per-stratum observed result/reason/exclusion for the tight-minus-non-tight comparison and all-defined disclosure, all three block lengths/five seeds, with no value verdict.
+   **FAILING_ARTIFACT:** `python/experiments/EXP-103/analysis_code/analysis.py`.
+   **REQUIRED_SKILL:** `data-analyst`.
+
+2. **CRITICAL - an undestroyable singleton nullness group can remain in the control and still receive a non-VOID status.**
+   **Design:** S6, `design.md:178-255`.
+   **Evidence:** `destroy.py:85-90` (`build_destroy_mappings`) leaves every `n<2` group unchanged; `adapter.py:250-270` (`integrity`) includes those unchanged outcomes in destroyed contrasts and does not propagate VOID into integrity status. Focused reproduction (QA run 5): one singleton nullness group remained unchanged, `void_no_derangement=3`, yet duration returned `ATTESTED_OR_NOT_APPLICABLE`.
+   **Impact:** the hard future-destroy validity check can certify a contrast partly containing future outcomes it never destroyed.
+   **Required change:** make any affected stratum/channel explicitly VOID before interpretation (or predeclare and implement a valid exclusion/reconciliation rule); preserve every row and full VOID disclosure. Add regression tests for mixed derangeable/singleton nullness groups and non-finite draws.
+   **FAILING_ARTIFACT:** `python/experiments/EXP-103/analysis_code/analysis.py`, `python/src/xen/liqswp_analysis/destroy.py`, `python/tests/test_exp10x_analysis_contract.py`.
+   **REQUIRED_SKILL:** `data-analyst`.
+
+3. **HIGH - declared profile integrity and golden-trace checks are not implemented.**
+   **Design:** S2, S5, S8, `design.md:73-91,166-173,312-331`.
+   **Evidence:** `analysis.py:34-82` (`validate_profile_frame`) accepts masks by truthiness and declares replay attested. A focused malformed row with nonsense masks, no POC/VAL/VAH/bracket count, and no selected-mass proof returned `blocking_pass=true`. Tests cover neither T2 nor T3 (`test_exp10x_analysis_contract.py:140-162`).
+   **Impact:** mask/span drift, POC/VA tie errors, gap-mass errors, reset drift, or replay drift can pass this hard source attestation.
+   **Required change:** parse and reconcile emitted masks and all declared scalars/identities; consume a pinned EXP-100 replay/integrity receipt where raw reconstruction is intentionally forbidden; add exact T1-T3 expected fixtures and fail-closed tests for each hard check.
+   **FAILING_ARTIFACT:** `python/experiments/EXP-103/analysis_code/analysis.py`, `python/tests/test_exp10x_analysis_contract.py`, fixture result.
+   **REQUIRED_SKILL:** `data-analyst`.
+
+4. **HIGH - bootstrap behavior is incomplete for sensitivity and invalid for thin joint resamples.**
+   **Design:** S4, `design.md:123-141`.
+   **Evidence:** `analysis.py:100-120` (`analyze`) requests only L=5. `statistics.py:115-130` (`clustered_contrast_bootstrap`) feeds NaN empty-arm replicates directly to `np.quantile`/`np.std`; a two-cluster valid source (one cluster per arm) produced a finite contrast but NaN bounds/SE without a reason. The fixture outer bootstrap independently resamples arms (`adapter.py:489-517` in prior version; current `run_fixture` uses shared runtime) instead of using the registered joint circular cluster sequence.
+   **Impact:** predeclared L=2/L=10 evidence is absent, thin strata can lose all uncertainty output silently, and the pre-read fixture does not validate the live estimator.
+   **Required change:** implement/report all L values, define and emit fail-closed empty-resample accounting without hiding the stratum, and use the exact joint whole-level circular estimator in the fixture and live tripwire.
+   **FAILING_ARTIFACT:** `python/experiments/EXP-103/analysis_code/analysis.py`, `python/src/xen/liqswp_analysis/statistics.py`, `python/tests/test_exp10x_analysis_contract.py`, `python/experiments/EXP-103/results/fixture_integrity.json`.
+   **REQUIRED_SKILL:** `data-analyst`.
+
+5. **HIGH - the registered control path is computationally non-runnable as written.**
+   **Design:** S6-S7, `design.md:227-255,291-296`.
+   **Evidence:** `adapter.py:186-275` (`integrity`) performs 5 x 10,000 x 2,000 = 100,000,000 Python `future_destroy` calls per arm/stratum (`adapter.py:210-230`), each deep-copying/traversing the rows. `analyze_strata` invokes it for both arms. With up to 528 side-specific strata this is over 100 billion deep-copy derangement calls, before ordinary bootstrap outputs, and has no progress path.
+   **Impact:** the one-shot analysis cannot complete in a practical run; partial/manual shortcuts would silently deviate from the registered estimator.
+   **Required change:** algebraically/vectorially reuse each deterministic mapping across channels and bootstrap populations while preserving exact membership, ordering, null classes, seeds, and denominators; remove the redundant arm; add parity tests against a small explicit reference and progress reporting.
+   **FAILING_ARTIFACT:** `python/experiments/EXP-103/analysis_code/analysis.py`, `python/src/xen/liqswp_analysis/adapter.py`, `python/src/xen/liqswp_analysis/destroy.py`.
+   **REQUIRED_SKILL:** `data-analyst`.
+
+6. **HIGH - the frozen-source seal is not actually pinned to the accepted gate.**
+   **Design:** S1, `design.md:12-32`.
+   **Evidence:** `source.py:190-195` (`validate_source_contract`) checks only that `run_metadata.config_hash` looks like a 64-character string; it never compares it to `cell.catalog_attestation.config_hash`, even though the copied accepted gate carries that value. Only `event_log.jsonl` is hashed; `raids.parquet`, `tpo_profiles.parquet`, and `bar_marks.parquet` have no immutable identity check.
+   **Impact:** a changed config or changed verdict-bearing parquet can be read as the retained operator-approved source while the gate still appears passing.
+   **Required change:** compare every available gate pin byte-for-byte and add/consume a frozen manifest containing digests for every verdict-bearing input; fail before parquet reads on any mismatch.
+   **FAILING_ARTIFACT:** `python/experiments/EXP-103/analysis_code/analysis.py` plus the frozen-source manifest/receipt.
+   **REQUIRED_SKILL:** `data-analyst` (coordinate any missing immutable receipt with the EXP-100 artifact owner; do not mutate or rerun EXP-100).
+
+7. **HIGH - the fixture results artifact violates the mandatory zero-cost disclosure contract.**
+   **Design:** S10, `design.md:374-388`; neutrality N9.
+   **Evidence:** `contract.py:5-22` defines `ZERO_COST_DISCLOSURE` canonically. `analysis.py:100-120` (`extra`) and `results/fixture_integrity.json:4-10` omit `prohibited_claims` and `lifting` and alter the canonical `implication` wording. The artifact also has no explicit statement that no cost function entered the fixture calculation beyond the shortened object.
+   **Impact:** the required boundary can disappear or weaken on downstream results despite code currently charging no costs.
+   **Required change:** emit the canonical disclosure verbatim and completely on every results/report artifact; add an exact-string regression test.
+   **FAILING_ARTIFACT:** `python/experiments/EXP-103/analysis_code/analysis.py`, `python/experiments/EXP-103/results/fixture_integrity.json`, `python/src/xen/liqswp_analysis/contract.py`, `python/tests/test_exp10x_analysis_contract.py`.
+   **REQUIRED_SKILL:** `data-analyst`.
+
+8. **MEDIUM - per-cell join census is not persisted.**
+   **Design:** S1 FROZEN-SOURCE/JOIN: "report every missing/extra key."
+   **Evidence:** `analysis.py:165-185` (`live_frame`) computes `join_evidence` with `unmatched_raids`, `extra_profiles`, `duplicate_profile_keys` but only includes it in the source dict; the live entry point (`runtime.py:35-55` `_execute`) does not surface this in the final result payload. The `population()` and `census()` methods report totals only.
+   **Impact:** operator cannot audit per-cell join fidelity; silent row loss in a single cell would not be visible.
+   **Required change:** emit per-cell join counts (matched/unmatched/extra/duplicate) in the result artifact.
+   **FAILING_ARTIFACT:** `python/experiments/EXP-103/analysis_code/analysis.py`, `python/src/xen/liqswp_analysis/runtime.py`.
+   **REQUIRED_SKILL:** `data-analyst`.
+
+9. **MEDIUM - `duration_ns == swing_duration_ns` alias mismatch lacks `VOID_DURATION_ALIAS` for null/non-null pairs.**
+   **Design:** S3: "Assert `swing_duration_ns == duration_ns` row-wise before any duration read."
+   **Evidence:** `adapter.py:235-240` (`integrity`) counts mismatches only where both are non-null. A row with `duration_ns=123` and `swing_duration_ns=null` is not flagged.
+   **Impact:** alias violations with mixed nullness pass the hard check.
+   **Required change:** treat any row where exactly one of the pair is null as a mismatch and emit `VOID_DURATION_ALIAS`.
+   **FAILING_ARTIFACT:** `python/src/xen/liqswp_analysis/adapter.py`.
+   **REQUIRED_SKILL:** `data-analyst`.
+
+### Focused commands run
+
+```text
+PYTHONPATH=src .venv/bin/pytest -q python/tests/test_exp10x_analysis_contract.py -k "EXP-103"
+# 1 passed in 10.01s (fixture determinism + contract)
+PYTHONPATH=src .venv/bin/ruff check experiments/EXP-103/analysis_code/analysis.py tests/test_exp10x_analysis_contract.py
+# All checks passed
+check_no_local_accounting('experiments/EXP-103/analysis_code')
+# {'ok': True, 'banned_defs_found': []}
+gate_first('../data/nautilus_runs/EXP-100/full', EXP-103 copied gate)
+# verified_cells=264; gate blocking_pass=true
+fixture-only deterministic smoke (n_destroy=8, seeds=(0,1), n_boot=20)
+# completed; all three planted channels reported pass
+focused malformed-profile, singleton-VOID, thin-bootstrap, and orchestration probes
+# reproduced issues 1-4, 7-9 above without live-source analysis
+```
+
+### Residual risks
+
+- The supplied EXP-100 gate is valid, but EXP-103-specific source sealing and field reconciliation remain untested.
+- The shared destroy implementation must not be treated as the registered HYP-003 control without an exact-contract review (singleton VOID propagation, fixture estimator parity).
+- No live outcome estimates or control results exist; no value interpretation is possible.
+- Computational feasibility of the exact nested 10,000 x 2,000 control has not been demonstrated; a practical run would require vectorised/algebraic reuse of mappings.

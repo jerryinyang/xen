@@ -40,7 +40,6 @@ REQUIRED_OUTCOME = (
     "swing_bps",
     "swing_atr",
     "swing_duration_ns",
-    "duration_ns",
     "strong_move",
 )
 CONTROL_GROUP_COLUMNS = (
@@ -53,6 +52,7 @@ CONTROL_GROUP_COLUMNS = (
     "status",
     "primary_completed",
 )
+# 5 bits: swing_duration_ns is canonical; duration_ns is byte-equal alias (not duplicated)
 CONTROL_NULL_COLUMNS = (
     "swing_price",
     "swing_bps",
@@ -91,6 +91,7 @@ class Adapter(BaseContrastAdapter):
     contrasts = (("1", "0"), ("2+", "0"))
     control_group_columns = CONTROL_GROUP_COLUMNS
     control_null_columns = CONTROL_NULL_COLUMNS
+    # EXP-102: joint resampling (default independent_arms=False)
 
     def fixture_frame(self) -> pl.DataFrame:
         rows = make_fixture_frame(("0", "1"), label_column=LABEL_COLUMN).to_dicts()
@@ -249,7 +250,7 @@ class Adapter(BaseContrastAdapter):
 
 
 def _fixture_rows() -> list[dict[str, Any]]:
-    return Adapter(n_boot=40, n_destroy=20, seeds=(0, 1)).fixture_frame().to_dicts()
+    return Adapter(n_boot=FIXTURE_N_BOOT, n_destroy=DEFAULT_DESTROYS, seeds=SEEDS).fixture_frame().to_dicts()
 
 
 def future_destroy(
@@ -325,3 +326,5 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+

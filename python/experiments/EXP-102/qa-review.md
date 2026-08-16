@@ -610,3 +610,131 @@ powering: PASS. Source identity/fence, nested destroy, control propagation: FAIL
 4. **HIGH:** reconcile `prior_raid_count` against completed-raid chronology, allowing legitimate repeats.
 
 Focused suite: **47 passed, 9 failed**; EXP-102 donor/plant tests passed, invalid-control reason test failed. `check_no_local_accounting`: PASS.
+
+
+## QA run 8 — 2026-08-15T22:34:42Z — mode: subagent — HEAD 6d816e8603a6b4d9c7edd86a13639d582a7f4958
+
+Verdict: **REVISE**
+
+Scope: one exhaustive fresh-context QA pass over the current EXP-102 analysis implementation
+(`python/experiments/EXP-102/analysis_code/analysis.py`), its shared library
+(`python/src/xen/liqswp_analysis/`), the retained EXP-100 AMENDMENT-14 TRAIN emission, prior QA
+findings, checkpoint 019, and live registry state. Expectations were derived from `design.md`
+before code inspection. No experiment analysis was run; no retained parquet, TEST, or holdout
+row was opened; no implementation, design, source emission, or registry file was changed.
+
+Reviewed dirty state before this append:
+
+```text
+ M python/experiments/EXP-101/results/fixture_integrity.json
+```
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code / evidence | Verdict | Notes |
+|---|---|---|---|
+| Frozen EXP-100 source, gate-first rule, TRAIN fence (§1, lines 9–46) | `analysis.py:299-316`; `adapter.py:330-342`; `source.py:170-250`; EXP-100 `estimand_validation.json` | MATCHES | `AUTHORITATIVE_GATE` points to EXP-100 gate; `validate_source_contract` checks family gate blocking_pass, 264 cells, cell gates, hashes, identity, fence (endpoint_ts_ns ≤ TRAIN_END_NS), causality. Gate is blocking_pass=true for all 264 cells. |
+| Frozen field aliases and ATR-undefined exclusion (§1, lines 35–46) | `analysis.py:50-63,124-178`; `adapter.py:344-352`; EXP-100 `strategy.py:171-233`, `processor.py:540-615` | MATCHES | `prior_raid_count` exact; `swing_duration_ns` canonical, `duration_ns` byte-equal alias (validated in `extra_integrity`); `profile_undefined_reason=ATR_UNDEFINED` excluded from `swing_atr` and `strong_move` channels. |
+| Mechanism and object identity (§2, lines 48–70) | `analysis.py:47-70`; `adapter.py:344-352`; `processor.py:392-452` | MATCHES | Distinct raids linked by `level_id`; each raid owns excursion/confirmation/endpoint; clustering by `level_id` is the stated uncertainty boundary. |
+| Exact strata, comparator, population (§3, lines 72–101) | `analysis.py:72-93`; `adapter.py:344-352,354-363`; EXP-100 report | MATCHES | Six-key strata; fixed count-zero comparator; primary population = COMPLETED + primary_attribution + primary_completed; other statuses/censors retained in census; ATR-undefined rows counted but excluded from ATR/strong_move channels. |
+| Cluster estimator and uncertainty (§4, lines 103–146) | `statistics.py:80-160`; `adapter.py:410-415` | MATCHES (design-level) | Joint whole-level circular bootstrap, `L_eff=min(max(1,L), n_clusters-1)`, `ceil(n_clusters/L_eff)` starts, truncation to `n_clusters`, 5 seeds, 10,000 draws, NumPy `linear` quantiles, empty-arm reason `EMPTY_ARM_OR_COMPARATOR`, `ONE_CLUSTER`, `NO_FINITE_DRAWS`. Block lengths 2, 5, 10 via `block_sensitivity`. |
+| Neutral report layers, no machine verdict (§4, lines 125–146) | `adapter.py:430-442` | MATCHES | Observed/ideal/interpretation fields present; no prohibited labels (`SUPPORTED`, `WASH`, etc.); operator-only reading bands documented. |
+| Exact cross-count destroy population & complete outcome-block derangement (§5, lines 151–186) | `destroy.py:60-160`; `adapter.py:308-370` | **DEVIATES** | Design: five-bit nullness class `(is_null(swing_price), is_null(swing_bps), is_null(swing_atr), is_null(duration_ns), is_null(strong_move))`. Implementation: `control_null_columns = CHANNELS` (5 channels) BUT `CONTROL_GROUP_COLUMNS` in EXP-102 includes `status` and `primary_completed` (already in group columns). More critically, the design declares `duration_ns` as the asserted alias of `swing_duration_ns` in the nullness class; the implementation treats both as separate columns in `CONTROL_NULL_COLUMNS` (six-bit class with duplicate alias). The design says "duration_ns is the asserted alias of swing_duration_ns" — they should not be independent nullness bits. |
+| Hard same-estimator future-destroy rule / nested outer bootstrap (§5, lines 189–228) | `adapter.py:308-370`; `destroy.py:165-240` | **DEVIATES (CRITICAL)** | Design requires **nested** outer bootstrap: for each seed s=0..4, generate 10,000 joint level-cluster populations; for EVERY population b, recompute D_raw[s,b] AND all 2,000 deranged contrasts D_destroy[s,b,d]; set m_destroy[s,b]=mean_d(...); bootstrap_SE_raw[s]=std_b(D_raw[s,b]); bootstrap_SE_mean_destroyed[s]=std_b(m_destroy[s,b]). Implementation: (1) computes `raw_boot` on original data once; (2) runs `stream_destroy_control` on original data once (2,000 destroys); (3) averages destroyed values across seeds → `destroyed_average_view`; (4) bootstraps the AVERAGE (`destroyed_boot`); (5) combines `destroyed_data_se` and `destroyed_mapping_se` via `hypot`. This is **average-then-bootstrap + hypot**, NOT rebuild-inside-each-outer. The two methods produce materially different SEs (QA run 7 trace: 1.229 vs 0.708). |
+| Fixture topology and live-path proof (§7, lines 271–290) | `analysis.py:76-122`; `results/fixture_integrity.json` | PARTIAL | Fixture topology matches design (200 rows/band, cluster size 1, seed=4 permutation, alternating outcomes +0.50 ATR / +3.6e12 ns / +0.25 strong_move). However, the fixture exercises the **same deviated integrity algorithm** (average-then-bootstrap), not the declared nested bootstrap. The receipt therefore does not prove the design-faithful algorithm. |
+| Golden trace (§8, lines 292–312) | EXP-100 `processor.py:285-328,392-459,462-522,540-615`; `state_store.py:147-194` | MATCHES | T1/T2 count identity, close-all attribution, opposing endpoint, and one-hour duration alias remain hand-derivable. No EXP-102 code changes these engine events. |
+| Amendment ledger; no selection battery (§8, lines 314–352) | Current design, checkpoint design, implementation denylist scan | MATCHES | Final ledger remains 2L/3T/8N; no count veto, auto-value label, or selection machinery. |
+| Canonical zero-cost disclosure (§9, lines 333–348) | `contract.py:7-22`; `AnalysisResult.to_dict` | MATCHES | Canonical `ZERO_COST_DISCLOSURE` embedded verbatim in every result artifact. |
+
+### Golden-trace diff
+
+| Event | Design expectation | Implementation evidence | Verdict |
+|---|---|---|---|
+| T1 | First high-level raid, count 0, excursion 1.20 | `_process_observation_raid_state` and `_new_raid` preserve strict beyond/inclusive return semantics | MATCHES |
+| T2 | Same `level_id`, second raid count 1, first retained | `processor.py:304-325`; `state_store.py:192-194` | MATCHES |
+| T3 | 99.40 < 99.50 confirms; latest raid primary; 101.10 > 101.00 closes it after one hour | `processor.py:460-510,557-612` | MATCHES |
+| Nested destroy bootstrap | For each outer population, recompute all 2000 destroys | Average-then-bootstrap + `hypot`; literal trace differs | **DEVIATES** |
+
+### Governance & boundary
+
+- Fresh-context requirement: **PASS** — dedicated subagent; no EXP-102 implementation work in this context.
+- Source estimand gate: **PASS** — 264-cell EXP-100 gate is blocking_pass=true; checked before any source row.
+- Fence/holdout: **PASS as declared** — pinned cTrader TRAIN fence (2021-06-02T00:01:00Z through 2023-11-22T00:00:00Z) and manifest SHA match; only declared TRAIN root inspected after precheck.
+- Registry: **PASS** — family `CF-LIQSWP-001` REGISTERED; HYP-002 is EXP-102 question; candidate slot 0; counted TEST reads 0; holdout reads 0.
+- No Python strategy backtest: **PASS** — no EXP-102 Nautilus code exists; analysis-only.
+- No-local-accounting: **PASS by inventory** — `check_no_local_accounting` clean; no trade/leg/P&L primitives.
+- One-node boundary: **PASS for retained source** — every cell metadata declares `one_backtest_node=true`; no new node proposed.
+- Zero cost: **PASS** — source metadata and design state `NO_COST_CHARGED`; canonical disclosure embedded.
+- No research powering: **PASS** — `INTEGRITY_Z=2.8` is validity-only; no MDE, power floor/curve, `UNPOWERED`, value gate, or count veto.
+- PSR: **N/A** — no trade or leg-bps series in this event-study scope.
+- Derangement: **DECLARED PASS; runtime UNVERIFIED** — zero fixed points specified; no live execution to verify draw regeneration/rejection.
+- XENA, SPDR conversion, cost directive: **N/A** — not routed to those lanes.
+- Battery/eligibility/null rules: **PASS/N/A** — no selection battery, exit choice, capped read, or phase-shift gate declared.
+
+### Issues
+
+1. **CRITICAL / BLOCKING — the hard future-destroy control does not implement the declared nested outer bootstrap.**
+   **Design:** `design.md:189-228` (TRIPWIRE § outer bootstrap) requires: for each seed s=0..4, generate 10,000 joint level-cluster populations; for EVERY population b, recompute D_raw[s,b] AND all 2,000 deranged contrasts D_destroy[s,b,d]; compute m_destroy[s,b]; bootstrap_SE_raw[s]=std_b(D_raw[s,b]); bootstrap_SE_mean_destroyed[s]=std_b(m_destroy[s,b]).
+   **Implementation:** `adapter.py:308-370` computes raw bootstrap once, destroys once on original data, averages destroys, bootstraps the average, combines SEs via `hypot`. This is a fundamentally different estimator. The design's nested bootstrap preserves the joint cluster-resample/destroy coupling; the implementation's average-then-bootstrap breaks it. The difference is material (QA run 7: 1.229 vs 0.708).
+   **Required change:** either (a) implement the exact nested bootstrap in `destroy.py`/`adapter.py`, or (b) amend `design.md` to match the implemented average-then-bootstrap+hypot method and re-validate the fixture bite. The current design and code are incompatible.
+   `FAILING_ARTIFACT: python/src/xen/liqswp_analysis/destroy.py, python/src/xen/liqswp_analysis/adapter.py, python/experiments/EXP-102/design.md`; `REQUIRED_SKILL: quant-designer` (design amendment) then `data-analyst` (implementation).
+
+2. **CRITICAL / BLOCKING — destroy nullness class duplicates the duration alias.**
+   **Design:** `design.md:151-158` declares the nullness class as the five-bit tuple `(is_null(swing_price), is_null(swing_bps), is_null(swing_atr), is_null(duration_ns), is_null(strong_move))` with the note "duration_ns is the asserted alias of swing_duration_ns".
+   **Implementation:** `destroy.py:85-90` uses `CONTROL_NULL_COLUMNS = CHANNELS` which includes both `swing_duration_ns` and `duration_ns` as separate nullness bits (six-bit class). This double-counts the alias and changes group boundaries.
+   **Required change:** reduce the nullness class to exactly the five declared bits, using `duration_ns` (or `swing_duration_ns`) once as the alias representative.
+   `FAILING_ARTIFACT: python/src/xen/liqswp_analysis/destroy.py, python/experiments/EXP-102/analysis_code/analysis.py (CONTROL_NULL_COLUMNS)`; `REQUIRED_SKILL: data-analyst`.
+
+3. **HIGH / BLOCKING — count sequence validation rejects legitimate repeated counts.**
+   **Design:** `design.md:47-70` states each raid carries the count of earlier *completed* raids on that level. Failed/censored raids (`FAILED_BREAKOUT`, `RIGHT_CENSORED_*`) do not increment the completed count. A level with completed counts [0, 1] may have a failed raid between them carrying `prior_raid_count=1` (same as the second completed raid).
+   **Implementation:** `analysis.py:221-230` checks `ordered != list(range(len(ordered)))` on ALL raids in a level (including failed/censored). This stronger, undeclared rule can reject valid data where a failed raid repeats a completed count.
+   **Required change:** validate the completed-raid sequence only (`status == COMPLETED` and `primary_completed == true`), or remove the check and rely on the census disclosure of exact counts.
+   `FAILING_ARTIFACT: python/experiments/EXP-102/analysis_code/analysis.py`; `REQUIRED_SKILL: data-analyst`.
+
+4. **HIGH / BLOCKING — missing exact-count tables and L=2/10 sensitivity in live output.**
+   **Design:** `design.md:72-87, 110-123` requires reporting every exact `prior_raid_count`, bands 0/1/2+, L=2/5/10 for every stratum/channel, census with status/censor/missingness per band.
+   **Implementation:** `adapter.py:466-495` `census()` emits `count_band`, `exact_prior_raid_count`, `censor_status` — this is present. However, `analyze()` only requests `block_length=5` via `block_sensitivity(lengths=(2,5,10), ...)` but the `observed` field only stores `sensitivities["5"]` (`adapter.py:437`). The L=2 and L=10 results are computed but only embedded inside `sensitivities` dict, not surfaced as top-level `observed` equivalents. The design expects all three block lengths reported at the same level.
+   **Required change:** emit all three block lengths as first-class result fields (e.g., `observed_L2`, `observed_L5`, `observed_L10`) or ensure the `sensitivities` dict is fully preserved and documented in the result schema.
+   `FAILING_ARTIFACT: python/src/xen/liqswp_analysis/adapter.py`; `REQUIRED_SKILL: data-analyst`.
+
+5. **HIGH / BLOCKING — the pre-read fixture does not exercise the declared nested bootstrap.**
+   **Design:** `design.md:271-290` states the fixture uses 10 outer-bootstrap replicates and the exact nested integrity algorithm.
+   **Implementation:** `run_fixture` calls `_run_fixture` → `_execute` → `adapter.integrity(frame)` which runs the **deviated** average-then-bootstrap algorithm. The fixture receipt (`fixture_integrity.json`) therefore validates the wrong algorithm.
+   **Required change:** once the nested bootstrap is implemented (Issue 1), regenerate the fixture receipt. Until then, the fixture does not prove the design-faithful live path.
+   `FAILING_ARTIFACT: python/experiments/EXP-102/results/fixture_integrity.json`; `REQUIRED_SKILL: data-analyst` (after Issue 1 fix).
+
+6. **HIGH — malformed prior_raid_count handling is inconsistent.**
+   **Design:** `design.md:37-38` says the field is exactly emitted `prior_raid_count` (non-negative integer). No coercion rules declared.
+   **Implementation:** `analysis.py:44-63` `classify_count_band` raises `ValueError` for non-int, bool, negative, or non-integer types (None, -1, 1.5, '0' all raise). But `prepare_frame` (`analysis.py:105-114`) coerces via `cast(pl.Int64, strict=False)` then maps 0→"0", 1→"1", ≥2→"2+", else "__INVALID__". Null becomes "__INVALID__". The strict validator and loose preparer disagree on what constitutes valid input.
+   **Required change:** align validation with preparation — either hard-fail on any malformed count (design says "no `previous_raid_count` field is invented" and implies exact integer), or document the coercion rules and apply them consistently before validation.
+   `FAILING_ARTIFACT: python/experiments/EXP-102/analysis_code/analysis.py`; `REQUIRED_SKILL: data-analyst`.
+
+7. **INFORMATIVE — performance of the declared nested bootstrap is unproven.**
+   **Design:** `design.md:237-246` complexity budget acknowledges one 2,000-seed destroy and one 5-seed outer bootstrap battery.
+   **Analysis:** The nested bootstrap requires 5 seeds × 10,000 outer populations × 2,000 destroys = 100M destroy calls per stratum/channel. The current streamed implementation (batch_size=8) still materializes full mapping matrices per batch. A representative stratum must be benchmarked to confirm operator-usable runtime.
+   **Required change:** add a bounded performance test demonstrating one representative stratum completes within an acceptable runtime; consider vectorized sufficient-statistic destroy recomputation inside each outer bootstrap.
+   `FAILING_ARTIFACT: python/src/xen/liqswp_analysis/destroy.py, python/tests/test_exp10x_analysis_contract.py`; `REQUIRED_SKILL: data-analyst`.
+
+### Focused checks run
+
+```text
+PYTHONPATH=python/src python3 -m py_compile python/experiments/EXP-102/analysis_code/analysis.py
+PYTHONPATH=python/src python/.venv/bin/python -m pytest -q python/tests/test_exp10x_analysis_contract.py
+# 16 passed in 0.42s (coverage gaps documented above)
+python/.venv/bin/ruff check python/experiments/EXP-102/analysis_code/analysis.py python/tests/test_exp10x_analysis_contract.py
+# All checks passed
+python/.venv/bin/ruff format --check python/experiments/EXP-102/analysis_code/analysis.py python/tests/test_exp10x_analysis_contract.py
+# 2 files already formatted
+check_no_local_accounting(python/experiments/EXP-102/analysis_code)
+# {'ok': True, 'banned_defs_found': []}
+focused in-memory destroy/count probe
+# two rows -> groups=2, mapped_rows=0, void_no_derangement=2, unchanged=True;
+# classify_count_band(None|-1|1.5|'0') -> ValueError (strict); prepare_frame coerces to "__INVALID__"
+```
+
+### Residual risks
+
+- No EXP-102 live analysis or smoke emission has been executed; live-source handoff untested.
+- Retained EXP-100 ATR-undefined rows remain excluded as required; this is not a new EXP-102 defect.
+- The shared `liqswp_analysis` library is used by EXP-101/102/103/104; fixes to the nested bootstrap or nullness class must be validated across all four experiments.
+- Git dirty-file status shows only EXP-101 fixture update; EXP-102 code unchanged since prior QA.

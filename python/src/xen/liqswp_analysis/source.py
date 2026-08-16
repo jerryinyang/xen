@@ -26,6 +26,8 @@ class SourceSpec:
     object_id_column: str
     train_end_column: str
     train_end_ns: int
+    # New: UTC fence timestamp for human-readable validation
+    train_end_utc: str | None = None
 
 
 @dataclass(frozen=True)
@@ -108,6 +110,49 @@ def _metadata_identity_failures(frame: pl.DataFrame, metadata: dict[str, Any]) -
     return failures
 
 
+def _validate_utc_fence(train_end_ns: int, train_end_utc: str | None) -> list[str]:
+    """Validate that train_end_ns matches the declared UTC fence."""
+    reasons = []
+    if train_end_utc is not None:
+        # Parse UTC string and convert to ns
+        # Expected format: "2023-11-22T00:00:00Z" or similar ISO format
+        import datetime
+        try:
+            dt = datetime.datetime.fromisoformat(train_end_utc.replace("Z", "+00:00"))
+            expected_ns = int(dt.timestamp() * 1_000_000_000)
+            if expected_ns != train_end_ns:
+                reasons.append(f"VOID_UTC_FENCE_MISMATCH: expected {expected_ns}, got {train_end_ns}")
+        except (ValueError, AttributeError):
+            reasons.append("VOID_UTC_FENCE_PARSE_ERROR")
+    return reasons
+
+
+def _validate_composite_uniqueness(
+    frame: pl.DataFrame,
+    source_cell: str,
+    object_id_column: str,
+) -> tuple[int, list[str]]:
+    """Validate composite (source_cell, raid_id) uniqueness."""
+    reasons = []
+    # Add source_cell column if not present
+    if "source_cell" not in frame.columns:
+        frame = frame.with_columns(pl.lit(source_cell).alias("source_cell"))
+
+    # Check composite key uniqueness
+    composite_key = ["source_cell", object_id_column]
+    duplicates = (
+        frame.group_by(composite_key)
+        .len()
+        .filter(pl.col("len") > 1)
+        .select(pl.col("len").sum().fill_null(0))
+        .collect(engine="streaming")
+        .item()
+    )
+    if duplicates:
+        reasons.append("VOID_COMPOSITE_DUPLICATE_OBJECT_ID")
+    return int(duplicates), reasons
+
+
 def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
     """Validate gates, hashes, identities, counts, fence, and causality before analysis."""
     reasons: list[str] = []
@@ -116,8 +161,13 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
         "cells": 0,
         "rows": 0,
         "duplicate_object_ids": 0,
+        "composite_duplicate_object_ids": 0,
         "causal_failures": [],
     }
+
+    # UTC fence validation
+    reasons.extend(_validate_utc_fence(spec.train_end_ns, spec.train_end_utc))
+
     if not spec.family_gate.exists():
         return SourceAttestation(IntegrityStatus(False, ("VOID_MISSING_FAMILY_GATE",)), evidence)
     family_gate = _read_json(spec.family_gate)
@@ -251,6 +301,8 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
             evidence["causal_failures"].extend(causal_failures)
         id_frames.append(lazy.select(spec.object_id_column))
         table_paths.append(table_path)
+
+    # Check object_id uniqueness within each cell (existing check)
     if id_frames:
         duplicates = (
             pl.concat(id_frames)
@@ -264,6 +316,27 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
         evidence["duplicate_object_ids"] = int(duplicates)
         if duplicates:
             reasons.append("VOID_DUPLICATE_OBJECT_ID")
+
+    # New: Check composite (source_cell, raid_id) uniqueness across all cells
+    # This requires loading the data with source_cell column
+    composite_duplicates_total = 0
+    for cell_dir in cell_dirs:
+        gate = gates_by_name.get(cell_dir.name)
+        if gate is None or not gate.get("blocking_pass"):
+            continue
+        table_path = cell_dir / spec.table
+        if not table_path.exists():
+            continue
+        # Load with source_cell
+        lazy = pl.scan_parquet(table_path).select([spec.object_id_column])
+        lazy = lazy.with_columns(pl.lit(cell_dir.name).alias("source_cell"))
+        composite_duplicates, comp_reasons = _validate_composite_uniqueness(
+            lazy.collect(engine="streaming"), cell_dir.name, spec.object_id_column
+        )
+        composite_duplicates_total += composite_duplicates
+        reasons.extend(comp_reasons)
+    evidence["composite_duplicate_object_ids"] = composite_duplicates_total
+
     unique_reasons = tuple(dict.fromkeys(reasons))
     return SourceAttestation(
         integrity=IntegrityStatus(
@@ -292,3 +365,4 @@ def join_profiles_left(
         "unmatched_raids": raids.height - matched,
         "duplicate_profile_keys": int(duplicate_profiles),
     }
+

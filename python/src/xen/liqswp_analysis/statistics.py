@@ -85,6 +85,54 @@ def _cluster_rows(view: PopulationView) -> tuple[np.ndarray, list[np.ndarray]]:
     ]
 
 
+def _split_arm_comparator_clusters(
+    view: PopulationView,
+) -> tuple[np.ndarray, list[np.ndarray], np.ndarray, list[np.ndarray]]:
+    """Split clusters into arm and comparator populations for independent resampling.
+    Returns cluster names and row indices into the ORIGINAL arrays.
+    """
+    arm_mask = (view.labels == view.arm) & np.isfinite(view.values)
+    comparator_mask = (view.labels == view.comparator) & np.isfinite(view.values)
+
+    arm_indices = np.where(arm_mask)[0]
+    comparator_indices = np.where(comparator_mask)[0]
+
+    arm_cluster_ids = view.cluster_ids[arm_indices]
+    comparator_cluster_ids = view.cluster_ids[comparator_indices]
+
+    # Get unique clusters and their ORIGINAL row indices for arm
+    arm_names: list[Any] = []
+    arm_positions: dict[Any, list[int]] = {}
+    for idx, orig_idx in enumerate(arm_indices):
+        cluster = arm_cluster_ids[idx]
+        if cluster not in arm_positions:
+            arm_names.append(cluster)
+            arm_positions[cluster] = []
+        arm_positions[cluster].append(orig_idx)
+    arm_cluster_names = np.asarray(arm_names, dtype=object)
+    arm_rows_by_cluster = [
+        np.asarray(arm_positions[name], dtype=int) for name in arm_names
+    ]
+
+    # Get unique clusters and their ORIGINAL row indices for comparator
+    comparator_names: list[Any] = []
+    comparator_positions: dict[Any, list[int]] = {}
+    for idx, orig_idx in enumerate(comparator_indices):
+        cluster = comparator_cluster_ids[idx]
+        if cluster not in comparator_positions:
+            comparator_names.append(cluster)
+            comparator_positions[cluster] = []
+        comparator_positions[cluster].append(orig_idx)
+    comparator_cluster_names = np.asarray(comparator_names, dtype=object)
+    comparator_rows_by_cluster = [
+        np.asarray(comparator_positions[name], dtype=int) for name in comparator_names
+    ]
+
+    return (
+        arm_cluster_names, arm_rows_by_cluster,
+        comparator_cluster_names, comparator_rows_by_cluster
+    )
+
 def _cluster_contrast_totals(
     view: PopulationView, rows_by_cluster: Sequence[np.ndarray]
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -108,20 +156,50 @@ def _cluster_contrast_totals(
     return arm_sum, arm_n, comparator_sum, comparator_n
 
 
+def _cluster_arm_totals(
+    cluster_names: np.ndarray,
+    rows_by_cluster: Sequence[np.ndarray],
+    values: np.ndarray,
+    labels: np.ndarray,
+    arm_label: Any,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Precompute arm sum and count per cluster."""
+    arm_sum = np.zeros(len(rows_by_cluster), dtype=float)
+    arm_n = np.zeros(len(rows_by_cluster), dtype=np.int64)
+    for index, rows in enumerate(rows_by_cluster):
+        cluster_labels = labels[rows]
+        cluster_values = values[rows]
+        arm_values = cluster_values[(cluster_labels == arm_label) & np.isfinite(cluster_values)]
+        arm_sum[index] = arm_values.sum()
+        arm_n[index] = arm_values.size
+    return arm_sum, arm_n
+
+
 def clustered_contrast_bootstrap(
     view: PopulationView,
     *,
     block_length: int,
     n_boot: int,
     seeds: Sequence[int],
+    independent_arms: bool = False,
 ) -> dict[str, Any]:
-    """Bootstrap a contrast by complete clusters and report non-finite draws explicitly."""
+    """Bootstrap a contrast by complete clusters and report non-finite draws explicitly.
+
+    Args:
+        view: Population view with arm and comparator labels.
+        block_length: Circular block length for cluster resampling.
+        n_boot: Number of bootstrap draws per seed.
+        seeds: Seed sequence for reproducibility.
+        independent_arms: If True, resample arm and comparator clusters independently
+            (EXP-101 design). If False, resample jointly (EXP-102/103 design).
+    """
     base = estimate_contrast(view)
     clusters, rows_by_cluster = _cluster_rows(view)
     base.update(
         block_length=int(block_length),
         L_eff=max(0, min(int(block_length), len(clusters) - 1)),
         n_clusters=int(len(clusters)),
+        independent_arms=independent_arms,
     )
     if base["reason"] is not None:
         base.update(interval=None, seeds=[], finite_draws=0, nonfinite_draws=0)
@@ -139,37 +217,98 @@ def clustered_contrast_bootstrap(
     seed_rows: list[dict[str, Any]] = []
     total_finite = 0
     total_nonfinite = 0
-    arm_sum, arm_n, comparator_sum, comparator_n = _cluster_contrast_totals(view, rows_by_cluster)
-    for seed in seeds:
-        rng = np.random.default_rng(seed)
-        draws = np.empty(int(n_boot), dtype=float)
-        for draw_index in range(int(n_boot)):
-            chosen = circular_cluster_indices(len(clusters), block_length, rng)
-            selected_arm_n = int(arm_n[chosen].sum())
-            selected_comparator_n = int(comparator_n[chosen].sum())
-            if selected_arm_n == 0 or selected_comparator_n == 0:
-                draws[draw_index] = float("nan")
-            else:
-                draws[draw_index] = float(
-                    arm_sum[chosen].sum() / selected_arm_n
-                    - comparator_sum[chosen].sum() / selected_comparator_n
-                )
-        finite = draws[np.isfinite(draws)]
-        total_finite += int(finite.size)
-        total_nonfinite += int(draws.size - finite.size)
-        if finite.size:
-            seed_rows.append(
-                {
-                    "seed": int(seed),
-                    "low": float(np.quantile(finite, 0.025)),
-                    "high": float(np.quantile(finite, 0.975)),
-                    "finite_draws": int(finite.size),
-                    "nonfinite_draws": int(draws.size - finite.size),
-                    "bootstrap_se": float(np.std(finite, ddof=1))
-                    if finite.size > 1
-                    else float("nan"),
-                }
+
+    if independent_arms:
+        # EXP-101: Independent arm/comparator resampling
+        arm_cluster_names, arm_rows_by_cluster, comparator_cluster_names, comparator_rows_by_cluster = _split_arm_comparator_clusters(view)
+        values = np.asarray(view.values, dtype=float)
+        labels = view.labels
+
+        # Precompute arm and comparator totals per cluster
+        arm_sum, arm_n = _cluster_arm_totals(arm_cluster_names, arm_rows_by_cluster, values, labels, view.arm)
+        comparator_sum, comparator_n = _cluster_arm_totals(comparator_cluster_names, comparator_rows_by_cluster, values, labels, view.comparator)
+
+        n_arm_clusters = len(arm_cluster_names)
+        n_comparator_clusters = len(comparator_cluster_names)
+
+        if n_arm_clusters < 1 or n_comparator_clusters < 1:
+            base.update(
+                reason="EMPTY_ARM_OR_COMPARATOR_CLUSTERS",
+                interval=None,
+                seeds=[],
+                finite_draws=0,
+                nonfinite_draws=0,
             )
+            return base
+
+        for seed in seeds:
+            rng = np.random.default_rng(seed)
+            draws = np.empty(int(n_boot), dtype=float)
+            for draw_index in range(int(n_boot)):
+                # Resample arm clusters independently
+                arm_chosen = circular_cluster_indices(n_arm_clusters, block_length, rng)
+                selected_arm_n = int(arm_n[arm_chosen].sum())
+                arm_mean = float(arm_sum[arm_chosen].sum() / selected_arm_n) if selected_arm_n > 0 else float("nan")
+
+                # Resample comparator clusters independently
+                comparator_chosen = circular_cluster_indices(n_comparator_clusters, block_length, rng)
+                selected_comparator_n = int(comparator_n[comparator_chosen].sum())
+                comparator_mean = float(comparator_sum[comparator_chosen].sum() / selected_comparator_n) if selected_comparator_n > 0 else float("nan")
+
+                if not np.isfinite(arm_mean) or not np.isfinite(comparator_mean):
+                    draws[draw_index] = float("nan")
+                else:
+                    draws[draw_index] = arm_mean - comparator_mean
+            finite = draws[np.isfinite(draws)]
+            total_finite += int(finite.size)
+            total_nonfinite += int(draws.size - finite.size)
+            if finite.size:
+                seed_rows.append(
+                    {
+                        "seed": int(seed),
+                        "low": float(np.quantile(finite, 0.025)),
+                        "high": float(np.quantile(finite, 0.975)),
+                        "finite_draws": int(finite.size),
+                        "nonfinite_draws": int(draws.size - finite.size),
+                        "bootstrap_se": float(np.std(finite, ddof=1))
+                        if finite.size > 1
+                        else float("nan"),
+                    }
+                )
+    else:
+        # EXP-102/103: Joint resampling (original behavior)
+        arm_sum, arm_n, comparator_sum, comparator_n = _cluster_contrast_totals(view, rows_by_cluster)
+        for seed in seeds:
+            rng = np.random.default_rng(seed)
+            draws = np.empty(int(n_boot), dtype=float)
+            for draw_index in range(int(n_boot)):
+                chosen = circular_cluster_indices(len(clusters), block_length, rng)
+                selected_arm_n = int(arm_n[chosen].sum())
+                selected_comparator_n = int(comparator_n[chosen].sum())
+                if selected_arm_n == 0 or selected_comparator_n == 0:
+                    draws[draw_index] = float("nan")
+                else:
+                    draws[draw_index] = float(
+                        arm_sum[chosen].sum() / selected_arm_n
+                        - comparator_sum[chosen].sum() / selected_comparator_n
+                    )
+            finite = draws[np.isfinite(draws)]
+            total_finite += int(finite.size)
+            total_nonfinite += int(draws.size - finite.size)
+            if finite.size:
+                seed_rows.append(
+                    {
+                        "seed": int(seed),
+                        "low": float(np.quantile(finite, 0.025)),
+                        "high": float(np.quantile(finite, 0.975)),
+                        "finite_draws": int(finite.size),
+                        "nonfinite_draws": int(draws.size - finite.size),
+                        "bootstrap_se": float(np.std(finite, ddof=1))
+                        if finite.size > 1
+                        else float("nan"),
+                    }
+                )
+
     if not seed_rows:
         base.update(
             reason="NO_FINITE_DRAWS",
@@ -201,6 +340,7 @@ def block_sensitivity(
     lengths: Sequence[int],
     n_boot: int,
     seeds: Sequence[int],
+    independent_arms: bool = False,
 ) -> dict[str, dict[str, Any]]:
     """Return all registered block-length reads without dropping unavailable rows."""
     return {
@@ -209,6 +349,8 @@ def block_sensitivity(
             block_length=int(length),
             n_boot=int(n_boot),
             seeds=seeds,
+            independent_arms=independent_arms,
         )
         for length in lengths
     }
+

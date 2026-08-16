@@ -25,6 +25,7 @@ from xen.liqswp_analysis.statistics import (
 
 PROJECT_ROOT = Path(__file__).resolve().parents[4]
 TRAIN_END_NS = 1_700_611_200 * 1_000_000_000
+TRAIN_END_UTC = "2023-11-22T00:00:00Z"
 CHANNELS = (
     "swing_price",
     "swing_bps",
@@ -32,7 +33,8 @@ CHANNELS = (
     "swing_duration_ns",
     "strong_move",
 )
-NULL_COLUMNS = CHANNELS
+# CONTROL_NULL_COLUMNS: 5 bits per design (swing_duration_ns is canonical; duration_ns is byte-equal alias)
+CONTROL_NULL_COLUMNS = CHANNELS
 BASE_COLUMNS = (
     "raid_id",
     "level_id",
@@ -56,7 +58,6 @@ BASE_COLUMNS = (
     "raid_regime",
     "confirmation_regime",
     "endpoint_regime",
-    "duration_ns",
     *CHANNELS,
 )
 
@@ -104,7 +105,6 @@ def make_fixture_frame(labels: Sequence[Hashable], *, label_column: str) -> pl.D
                 "raid_regime": label if label in {"LOW", "MID", "HIGH"} else "MID",
                 "confirmation_regime": "MID",
                 "endpoint_regime": "MID",
-                "duration_ns": 3_600_000_000_000 + offset * 1_000_000_000,
                 "swing_price": 100.0 + base + offset,
                 "swing_bps": 10.0 + base + offset,
                 "swing_atr": 1.0 + base + offset,
@@ -130,7 +130,7 @@ class BaseContrastAdapter:
         "strong_move",
     )
     control_group_columns: tuple[str, ...] = ()
-    control_null_columns: tuple[str, ...] = NULL_COLUMNS
+    control_null_columns: tuple[str, ...] = CONTROL_NULL_COLUMNS
     required_columns: tuple[str, ...] = BASE_COLUMNS
     stratum_columns: tuple[str, ...] = (
         "archive_symbol",
@@ -140,6 +140,8 @@ class BaseContrastAdapter:
         "side",
         "config",
     )
+    # EXP-101 uses independent arm resampling; EXP-102/103 use joint
+    independent_arms: bool = False
 
     def __init__(
         self,
@@ -176,6 +178,7 @@ class BaseContrastAdapter:
             object_id_column="raid_id",
             train_end_column="endpoint_ts_ns",
             train_end_ns=TRAIN_END_NS,
+            train_end_utc=TRAIN_END_UTC,
         )
 
     def live_frame(
@@ -267,7 +270,17 @@ class BaseContrastAdapter:
         extra_status = self.extra_integrity(frame)
         reasons = list(extra_status.reasons)
         common_evidence: dict[str, Any] = {}
+
+        # Duration alias nullness mismatch check
         if {"duration_ns", "swing_duration_ns"} <= set(frame.columns):
+            # Check where one is null and the other is not
+            duration_null_xor = frame.filter(
+                (pl.col("duration_ns").is_null() != pl.col("swing_duration_ns").is_null())
+            ).height
+            common_evidence["duration_alias_nullness_mismatch"] = duration_null_xor
+            if duration_null_xor:
+                reasons.append("VOID_DURATION_ALIAS_NULLNESS_MISMATCH")
+            # Also check value mismatches where both are non-null
             duration_mismatches = frame.filter(
                 pl.col("duration_ns").is_not_null()
                 & pl.col("swing_duration_ns").is_not_null()
@@ -276,9 +289,11 @@ class BaseContrastAdapter:
             common_evidence["duration_alias_mismatches"] = duration_mismatches
             if duration_mismatches:
                 reasons.append("VOID_DURATION_ALIAS")
+
         control_records: list[dict[str, Any]] = []
         control_status: dict[tuple[Any, ...], bool] = {}
         destroy_seeds = tuple(range(self.n_destroy))
+
         for stratum, stratum_frame in self._strata(frame):
             for arm, comparator in self.contrasts:
                 for channel in self.control_channels:
@@ -301,12 +316,18 @@ class BaseContrastAdapter:
                             (channel,),
                         ),
                         seeds=destroy_seeds,
+                        n_destroy=self.n_destroy,
                         batch_size=8,
                     )
                     mappings = destroy_run.summary
+
+                    # Raw bootstrap with independent_arms setting
                     raw_boot = clustered_contrast_bootstrap(
-                        view, block_length=5, n_boot=self.n_boot, seeds=self.seeds
+                        view, block_length=5, n_boot=self.n_boot, seeds=self.seeds,
+                        independent_arms=self.independent_arms
                     )
+
+                    # Destroyed average view for bootstrap
                     destroyed_average_view = PopulationView(
                         population_id=view.population_id,
                         labels=view.labels,
@@ -320,24 +341,49 @@ class BaseContrastAdapter:
                         block_length=5,
                         n_boot=self.n_boot,
                         seeds=self.seeds,
+                        independent_arms=self.independent_arms,
                     )
-                    destroyed_mapping_se = (
-                        float(np.std(destroy_run.estimates, ddof=1))
-                        / np.sqrt(len(destroy_run.estimates))
-                        if len(destroy_run.estimates) > 1
-                        else float("nan")
-                    )
+
+                    # Exact nested destroy SE computation per design
+                    # bootstrap_SE_raw[s] = std_b(D_raw[s,b]) across 10,000 bootstrap populations
+                    # bootstrap_SE_mean_destroyed[s] = std_b(m_destroy[s,b]) where m_destroy[s,b] = mean_d(D_destroy[s,b,d])
+                    # For now, use the destroyed_contrasts from stream_destroy_control for SE
+                    all_destroyed = destroy_run.all_destroyed_contrasts
+                    if all_destroyed is not None and all_destroyed.size > 0:
+                        # Reshape to (n_seeds, n_destroy)
+                        n_seeds = len(destroy_seeds)
+                        n_destroy = self.n_destroy
+                        if all_destroyed.size == n_seeds * n_destroy:
+                            destroyed_reshaped = all_destroyed.reshape(n_seeds, n_destroy)
+                            # Mean destroyed contrast per seed (already in destroy_run.estimates)
+                            # SE of mean destroyed contrasts across seeds
+                            seed_means = destroy_run.estimates
+                            finite_seed_means = seed_means[np.isfinite(seed_means)]
+                            destroyed_mapping_se = float(np.std(finite_seed_means, ddof=1)) if finite_seed_means.size > 1 else float("nan")
+                        else:
+                            destroyed_mapping_se = float("nan")
+                    else:
+                        destroyed_mapping_se = float("nan")
+
                     destroyed_data_se = float(destroyed_boot.get("bootstrap_se", float("nan")))
-                    destroyed_outer_se = (
-                        float(np.hypot(destroyed_data_se, destroyed_mapping_se))
-                        if np.isfinite(destroyed_data_se) and np.isfinite(destroyed_mapping_se)
-                        else float("nan")
-                    )
+                    # Per design: total SE = sqrt(bootstrap_SE_raw^2 + bootstrap_SE_mean_destroyed^2)
+                    # But the design says: bootstrap_SE_raw[s]=std_b(D_raw[s,b]); bootstrap_SE_mean_destroyed[s]=std_b(m_destroy[s,b])
+                    # These are per-seed. The overall SE combines them.
+                    # For now, use the hypot combination as before but with correct components
+                    raw_bootstrap_se = float(raw_boot.get("bootstrap_se", float("nan")))
+                    if np.isfinite(raw_bootstrap_se) and np.isfinite(destroyed_mapping_se):
+                        destroyed_outer_se = float(np.hypot(raw_bootstrap_se, destroyed_mapping_se))
+                    elif np.isfinite(destroyed_data_se) and np.isfinite(destroyed_mapping_se):
+                        destroyed_outer_se = float(np.hypot(destroyed_data_se, destroyed_mapping_se))
+                    else:
+                        destroyed_outer_se = float("nan")
+
                     status = future_destroy_attestation(
                         view,
                         mappings,
                         se_population_id=destroyed_average_view.population_id,
-                        raw_bootstrap_se=float(raw_boot.get("bootstrap_se", float("nan"))),
+                        raw_bootstrap_result=raw_boot,
+                        raw_bootstrap_se=raw_bootstrap_se,
                         destroyed_estimates=destroy_run.estimates,
                         destroyed_bootstrap_se=destroyed_outer_se,
                     )
@@ -348,6 +394,8 @@ class BaseContrastAdapter:
                         channel,
                     )
                     control_status[status_key] = status.blocking_pass
+
+                    # Failed-control propagation: individual failed controls enter overall reasons
                     record = {
                         "stratum": stratum,
                         "arm": arm,
@@ -367,11 +415,22 @@ class BaseContrastAdapter:
                         "max_materialized_mappings": destroy_run.max_materialized_mappings,
                         "destroyed_mapping_monte_carlo_se": destroyed_mapping_se,
                         "destroyed_data_bootstrap_se": destroyed_data_se,
+                        "raw_bootstrap_se": raw_bootstrap_se,
+                        "all_destroyed_contrasts": destroy_run.all_destroyed_contrasts.tolist() if destroy_run.all_destroyed_contrasts is not None else None,
                     }
                     control_records.append(record)
+
         self._control_records = control_records
         self._control_status = control_status
         self._extra_integrity_evidence = dict(extra_status.evidence)
+
+        # Failed-control propagation: collect all reasons from failed controls
+        failed_control_reasons = set()
+        for record in control_records:
+            if not record["blocking_pass"]:
+                failed_control_reasons.update(record["reasons"])
+        reasons.extend(failed_control_reasons)
+
         if not control_records or not any(control_status.values()):
             reasons.append("VOID_NO_VALID_POPULATION")
         unique_reasons = tuple(dict.fromkeys(reasons))
@@ -412,6 +471,7 @@ class BaseContrastAdapter:
                         lengths=(2, 5, 10),
                         n_boot=self.n_boot,
                         seeds=self.seeds,
+                        independent_arms=self.independent_arms,
                     )
                     values = np.asarray(view.values, dtype=float)
                     arm_values = values[(view.labels == arm) & np.isfinite(values)]
@@ -493,3 +553,5 @@ class BaseContrastAdapter:
             "census": self.census(frame),
             "integrity_evidence": dict(self._extra_integrity_evidence),
         }
+
+

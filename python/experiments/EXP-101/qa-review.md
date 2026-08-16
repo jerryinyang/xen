@@ -497,3 +497,140 @@ adapters; untracked `test_exp101/102/103_analysis_live.py`.
 4. **HIGH:** propagate every failed control, preserve explicit invalid rows/reasons, catch alias nullness mismatch, and emit every destroyed contrast. `FAILING_ARTIFACTS: adapter.py, runtime.py`.
 
 Focused suite: **47 passed, 9 failed**; EXP-101 all-donor regression failed.
+
+
+## QA run 8 — 2026-08-15T22:34:08Z — mode: subagent — HEAD 6d816e8603a6b4d9c7edd86a13639d582a7f4958
+
+Verdict: **REVISE**
+
+Scope: fresh-context design-to-code fidelity review of EXP-101's analysis implementation
+against the frozen AMENDMENT-14 design. Only retained EXP-100 TRAIN artifacts and the
+EXP-101 `analysis_code/` were inspected; no TEST/holdout access, no Nautilus run, no
+design or implementation edits. The fixture was executed to verify the integrity pipeline.
+
+Reviewed dirty state before append: `M python/experiments/EXP-101/results/fixture_integrity.json`
+
+### Prior-finding resolution audit
+
+| Prior issue (QA run 7) | Current verdict | Evidence |
+|---|---|---|
+| Validator expects absent `train_end_ns` field | RESOLVED | `source.py:143` now reads `train_end_utc` and converts; fence check passes. |
+| Cell-local `raid_id` treated as globally unique | RESOLVED | `source.py:178-180` checks uniqueness per cell directory. |
+| Missing per-cell execution-gate reads | PARTIAL | `source.py:158-165` reads family gate; cell gates reconciled by name but not all 264 individually re-verified in the focused trace. |
+| Fixture topology mismatches design | **PERSISTS** | `adapter.py:126-173` `make_fixture_frame` uses synthetic timestamps and `L-{idx}` level_ids; design §5 requires specific epoch, `FIXTURE-{arm}-level-{i:04d}`, seed=4 permutation. |
+| Cluster bootstrap resamples combined pool | **PERSISTS** | `statistics.py:240-288` draws from combined arm+comparator clusters; design §4 requires independent resampling per population. |
+| Destroy outer SE adds Monte Carlo term | **PERSISTS** | `adapter.py:353-358` `destroyed_outer_se = hypot(destroyed_data_se, destroyed_mapping_se)`; design §5 tripwire specifies `bootstrap_SE_mean_destroyed = std_b(m_destroy[s,b])` only. |
+| Live analysis entry point incomplete | **PERSISTS** | `analysis.py:1007-1027` `--live` prints row count only; no orchestration of contrasts, sensitivities, controls, or result artifact. |
+| Zero-cost disclosure verbatim | RESOLVED | Fixture output matches canonical disclosure exactly (verified). |
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| Gate-first source validation; 264 passing cells; per-cell execution gates; config-hash equality; event-log hashes; causal fence (§1) | `source.py:111-276` `validate_source_contract` | PARTIAL | Family gate and cell-gate reconciliation by name implemented; per-cell `blocking_pass`, `config_hash`, `event_log_sha256`, `NO_COST_CHARGED`, fence boundary all checked. Causal timestamp ordering (`raid_ts_ns ≤ sweep_ts_ns ≤ return_ts_ns ≤ confirmation_ts_ns ≤ endpoint_ts_ns`) validated. **Gap**: metadata↔row identity for `archive_symbol`, `timeframe`, `confirmation_method`, `confirmation_reference`, `config` not explicitly asserted after parquet read (only unique-value check on lazy frame). |
+| Frozen schema: `config`/`source_configuration`, IDs, outcome fields; `swing_duration_ns` canonical, `duration_ns` byte-equal alias; `pre_mfe_retrace` excluded (§1) | `adapter.py:997-998` (assert); `adapter.py:44-47` (common evidence) | MATCHES | Assertion and mismatch counter present. |
+| Configuration populations: 11 configs, Family A/B/C fixed baselines (§3) | `analysis.py:44-51` `Adapter.contrasts` | MATCHES | Exact match to design catalogue and comparator mapping. |
+| Population: `status==COMPLETED ∧ primary_attribution ∧ primary_completed`; ATR-undefined excluded from `swing_atr`/`strong_move` (§3) | `adapter.py:409-418` `_channel_frame` | MATCHES | Filter logic matches design exactly. |
+| Estimators: arm-minus-comparator mean `swing_atr`, mean `swing_duration_ns`, unpaired `strong_move` proportion; median disclosures (§3–4) | `statistics.py:80-110` `estimate_contrast`; `adapter.py:597-656` `analyze` | MATCHES | Contrast orientation, median dict, and unpaired proportion (mean of booleans) correct. |
+| Uncertainty: circular cluster bootstrap, `L_eff=min(max(1,L), n_clusters-1)`, independent arm/comparator resampling, 10k resamples, seeds 0–4, numpy linear quantile, L=5 default + L=2/10 sensitivity (§4) | `statistics.py:130-185` `circular_cluster_indices`; `statistics.py:240-288` `clustered_contrast_bootstrap`; `statistics.py:330-350` `block_sensitivity` | **DEVIATES** | Circular draw and `L_eff` correct; seeds, resamples, quantile method correct. **Critical deviation**: bootstrap draws from combined arm+comparator cluster pool (§4: "arm and fixed-baseline clusters are distinct configuration populations and are resampled independently"). Current code pools all clusters then draws, varying arm/comparator counts per replicate. |
+| Cross-config destroy grouping: exact stratum + `status` + `primary_completed` + 5-bit outcome-nullness class; config pooled; 2,000 derangements (zero fixed points) (§5) | `analysis.py:30-37` `CONTROL_GROUP_COLUMNS`, `CONTROL_NULL_COLUMNS`; `destroy.py:140-200` `build_destroy_mappings` | MATCHES | Grouping columns and nullness class match design; `derange_indices` rejects fixed points; singleton groups → `VOID_NO_DERANGEMENT`. |
+| Hard tripwire: outer bootstrap 10k×5 seeds; same population & estimator for raw, destroyed mean, both SEs; `INTEGRITY_Z=2.8`; `abs(D_raw) > 2.8×SE_raw ⇒ abs(m_destroy) ≤ 2.8×SE_destroyed` else `VOID_FUTURE_DESTROY_SURVIVAL`; missing/failed derangement = invalidity (§5) | `adapter.py:340-370` `integrity`; `destroy.py:260-330` `future_destroy_attestation` | **DEVIATES** | Population/estimator identity enforced (`population_match`). Raw bootstrap SE correct. **Deviation**: `destroyed_outer_se = hypot(destroyed_data_se, destroyed_mapping_se)` adds Monte Carlo SE from 2,000 destroys; design specifies `bootstrap_SE_mean_destroyed = std_b(m_destroy[s,b])` only (the bootstrap SE of the destroyed mean across outer replicates). The extra term makes the inequality harder to fail (wider destroyed SE), weakening the tripwire. |
+| Fixture topology: 200 rows/arm, one-row clusters, `FIXTURE-{arm}-level-{i:04d}`, epoch `1_700_000_000_000_000_000 + i*900_000_000_000`, seed=4 permutation, `raid_id=fixture-raid-{pos:04d}`, outer bootstrap=10 (§5) | `adapter.py:126-173` `make_fixture_frame` | **DEVIATES** | Uses `R-{idx}-{i}` / `L-{idx}-{i}` IDs, synthetic timestamps `100+i*10`, no seed=4 permutation step, `config=FIXTURE_CONFIG` for all. The fixture does not exercise the declared cluster bootstrap (L=5 with one-row clusters still changes adjacent selection) because the shared fixture is generic. |
+| Golden trace T1–T3: independent PREVIOUS_1H/ROLLING_7 cells, inclusive return, primary completion, 2.00 price/ATR, 200 bps, 1h duration, `strong_move=true` (§7) | Frozen EXP-100 logic (`processor.py:285-328,400-458,462-612`); hand-diffed in prior QA | MATCHES | Engine behavior matches; no EXP-101 analysis-level golden trace emitted (no live run). |
+| Report layers: observed/ideal/interpretation/analyst_boundary; no machine value labels (§4) | `adapter.py:620-630` `analyze` output dict | MATCHES | Fields present; `interpretation` string correct. |
+| Amendment ledger: 2L/3T/8N, no machine qualifier, no row hiding (§8) | `design.md:214-245` | MATCHES | Ledger correct; design declares no selection gates. |
+| Zero-cost disclosure: canonical verbatim on every artifact (§9) | `contract.py:10-25` `ZERO_COST_DISCLOSURE`; `fixture_integrity.json` | MATCHES | Fixture output verified verbatim. |
+
+### Golden-trace diff
+
+| Event | Expected from design | Implemented behavior | Verdict |
+|---|---|---|---|
+| Pre-read fixture | 200 one-row clusters/arm; circular cluster bootstrap L=5; +0.50 ATR, +3.6e12 ns, +0.25 proportion; every seed bites then collapses | Plant values match; **bootstrap uses combined pool, not independent arm/comparator resampling**; outer bootstrap=10 (design) vs 10k (live) | DEVIATES |
+| Exact control group | Two rows sharing declared fields/nullness form one derangeable group | `build_destroy_mappings` uses exact design grouping; verified in fixture (`group_sizes=[400]`, `moved_rows=400`, `fixed_points=0`) | MATCHES |
+| Live configuration result | All arm/comparator estimates, uncertainties (L=5 + L=2/10), status/censor/missingness per arm, control evidence, hard integrity state | `--live` prints `{"rows": n}` only; no orchestration, no result artifact | MISSING |
+| T1–T3 engine events | Independent PREVIOUS_1H/ROLLING_7 rows; 2.00 price/ATR, 200 bps, 1h duration, strong=true | Frozen engine logic matched; no implementation path re-emits or mutates | MATCHES |
+
+### Governance & boundary
+
+- **Fresh-context independence:** PASS — dedicated `subagent`; no EXP-101 implementation authorship in this context.
+- **Source gate and seals:** PARTIAL — `validate_source_contract` checks family gate, cell-gate reconciliation, config-hash, event-hash, zero-cost, fence boundary, causal ordering, schema, duplicate object IDs per cell. **Missing**: explicit metadata↔row identity assertion after parquet collection for `archive_symbol`, `timeframe`, `confirmation_method`, `confirmation_reference`, `config`.
+- **TRAIN/holdout:** PASS for this QA — only TRAIN metadata/schema and fixture data inspected; no TEST/holdout row opened. Static review confirms no live path beyond pinned TRAIN root.
+- **Registry/read accounting:** PASS — `CF-LIQSWP-001/HYP-001` registered; 0 candidate slots; 0 counted TEST reads; family `REGISTERED`.
+- **Zero cost:** PASS — source metadata/gate `NO_COST_CHARGED`; fixture artifact disclosure verbatim canonical; no cost function imports or calls in analysis code.
+- **Future destroy:** **FAIL** — population/estimator identity correct; derangement correct; **but** outer SE adds Monte Carlo term (weakens tripwire), bootstrap pools arm/comparator (changes null distribution), and live orchestration absent so tripwire never actually blocks.
+- **Neutrality/completeness:** FAIL — no live result artifact; `--live` does not execute the experiment.
+- **Powering/PSR/XENA/screen conversion:** PASS/N/A — no research MDE/power/floor, no trade/leg mean, no XENA route, no screen-money claim.
+- **One `BacktestNode`:** PASS — EXP-100 metadata `one_backtest_node=true`; EXP-101 analysis-only, no new engine process.
+- **Derangement:** PASS — `derange_indices` rejection-samples zero fixed points; singleton groups produce `VOID_NO_DERANGEMENT`.
+
+### Issues
+
+1. **CRITICAL — Cluster bootstrap does not resample arm and comparator independently.**  
+   **Design:** §4 "arm and fixed-baseline clusters are distinct configuration populations and are resampled independently."  
+   **Code:** `statistics.py:240-288` `clustered_contrast_bootstrap` builds a single cluster list from the combined `PopulationView` and draws circular blocks from it.  
+   **Why it matters:** The bootstrap null distribution is wrong; arm/comparator cluster counts vary randomly per replicate instead of being drawn independently, altering the contrast variance and interval coverage.  
+   **Required fix:** Refactor `clustered_contrast_bootstrap` (or add a variant) to accept separate arm/comparator cluster arrays and draw independently per the design. Prove equivalence on fixtures.  
+   **FAILING_ARTIFACT:** `python/src/xen/liqswp_analysis/statistics.py`; **REQUIRED_SKILL:** `experiment-developer` / `data-analyst`.
+
+2. **CRITICAL — Destroy outer SE incorrectly includes Monte Carlo term, weakening the hard tripwire.**  
+   **Design:** §5 tripwire: `bootstrap_SE_mean_destroyed[s] = std_b(m_destroy[s,b], ddof=1)` (bootstrap SE of destroyed mean across outer replicates only).  
+   **Code:** `adapter.py:353-358` `destroyed_outer_se = hypot(destroyed_data_se, destroyed_mapping_se)` where `destroyed_mapping_se = std(destroy_run.estimates)/√n_destroy`.  
+   **Why it matters:** The extra Monte Carlo term inflates the destroyed SE, making `abs(m_destroy) ≤ INTEGRITY_Z × SE_destroyed` easier to satisfy. A surviving contrast could pass when it should be flagged `VOID_FUTURE_DESTROY_SURVIVAL`.  
+   **Required fix:** Use `destroyed_data_se` alone (the bootstrap SE of the destroyed mean) as `destroyed_bootstrap_se` in the attestation. Remove the `hypot` combination.  
+   **FAILING_ARTIFACT:** `python/src/xen/liqswp_analysis/adapter.py`; **REQUIRED_SKILL:** `experiment-developer` / `data-analyst`.
+
+3. **CRITICAL — Live entry point does not execute the experiment.**  
+   **Design:** §4, §6 HARD require complete neutral result artifact with all contrasts, uncertainties, sensitivities, control evidence, and integrity state.  
+   **Code:** `analysis.py:1007-1027` `main()` `--live` loads source and prints row count only.  
+   **Why it matters:** The experiment cannot be run; no result artifact is produced for the operator's execution gate.  
+   **Required fix:** Implement a deterministic live orchestrator that (a) runs integrity first, (b) blocks affected strata/channels, (c) computes all registered contrasts/sensitivities, (d) composes the neutral report layers, (e) writes the complete result artifact with canonical zero-cost disclosure.  
+   **FAILING_ARTIFACT:** `python/experiments/EXP-101/analysis_code/analysis.py`; **REQUIRED_SKILL:** `experiment-developer`.
+
+4. **HIGH — Fixture topology does not match the design's FIXTURE-TOPOLOGY specification.**  
+   **Design:** §5 `FIXTURE-TOPOLOGY` block specifies exact timestamps, `level_id` format, seed=4 permutation, `raid_id` format, outer bootstrap=10.  
+   **Code:** `adapter.py:126-173` `make_fixture_frame` uses generic synthetic data (`R-{idx}-{i}`, `L-{idx}-{i}`, timestamps `100+i*10`, all `config=FIXTURE_CONFIG`).  
+   **Why it matters:** The fixture does not validate the exact cluster bootstrap mechanics (L=5 with one-row clusters) or the declared derangement seeding. A passing fixture gives false confidence.  
+   **Required fix:** Either (a) make the shared `make_fixture_frame` configurable to match EXP-101's declared topology, or (b) override `fixture_frame` in EXP-101's `Adapter` to construct the exact design fixture. Run the fixture through the production integrity path and assert regression on all control channels.  
+   **FAILING_ARTIFACTS:** `python/src/xen/liqswp_analysis/adapter.py`, `python/experiments/EXP-101/analysis_code/analysis.py`; **REQUIRED_SKILL:** `experiment-developer`.
+
+5. **HIGH — Source provenance: metadata↔row identity not explicitly asserted post-read.**  
+   **Design:** §1 "seal: retain each cell's config_hash and event_log_sha256; require emission_contract_version=nautilus-emission-v1..." and gate-first rule.  
+   **Code:** `source.py:180-190` checks unique values on lazy frame; no row-level assertion after collection that every row matches the cell's declared `archive_symbol`, `timeframe`, `confirmation_method`, `confirmation_reference`, `config`.  
+   **Why it matters:** A schema-valid but identity-mismatched parquet would pass current checks.  
+   **Required fix:** After `collect(engine="streaming")`, assert `frame.filter(pl.col(c) != expected).height == 0` for each identity column per cell.  
+   **FAILING_ARTIFACT:** `python/src/xen/liqswp_analysis/source.py`; **REQUIRED_SKILL:** `experiment-developer`.
+
+6. **HIGH — Zero-cost disclosure verified on fixture but live artifact path untested.**  
+   **Design:** §9 "canonical disclosure on every results artifact."  
+   **Code:** `contract.py:10-25` `ZERO_COST_DISCLOSURE` included in `AnalysisResult.to_dict()`; fixture output verified verbatim. Live artifact never produced.  
+   **Required fix:** Resolved by Issue 3 (live orchestrator will emit the disclosure via `AnalysisResult.to_dict()`).  
+   **FAILING_ARTIFACT:** `python/experiments/EXP-101/analysis_code/analysis.py`; **REQUIRED_SKILL:** `experiment-developer`.
+
+### Summary
+
+**REVISE.** The frozen source, design, golden trace (engine level), registry, fence, and zero-cost disclosure are consistent. The analysis implementation has three critical fidelity deviations (independent bootstrap, destroy SE, live orchestration) and two high-severity gaps (fixture topology, source identity assertion) that must be resolved before the operator's execution gate. The fixture passes its internal integrity checks but validates a different bootstrap and destroy SE than the design specifies.
+
+---
+
+**Commands run during this review**
+
+```text
+PYTHONPATH=python/src python3 -m python.experiments.EXP-101.analysis_code.analysis --fixture
+# → fixture_integrity.json generated; all controls blocking_pass=true; fixed_points=0; population_match=true
+PYTHONPATH=python/src python3 -c "from xen.liqswp_analysis.source import validate_source_contract; print('import OK')"
+# → source validation module loads
+PYTHONPATH=python/src python3 -c "
+from pathlib import Path
+import json
+fixture = json.loads(Path('python/experiments/EXP-101/results/fixture_integrity.json').read_text())
+disc = fixture['zero_cost_disclosure']
+canonical = {'heading':'ZERO-COST-DISCLOSURE','cost_model':'NO_COST_CHARGED','spread':'not modeled','commissions':'not modeled','swaps/funding':'not modeled','implication':'every figure in this document is gross and cost-free; no spread, commission, or swap enters any calculation. Realised results would differ (likely worse) under any real cost schedule.','prohibited_claims':'fully-net, cost-complete, tradable, deployable','lifting':'only an explicit operator directive may introduce a cost model for a scoped experiment; the directive is recorded in that experiment\'s design.md.'}
+print('Zero-cost verbatim:', disc == canonical)
+"
+# → True
+git rev-parse HEAD
+# → 6d816e8603a6b4d9c7edd86a13639d582a7f4958
+git status --short
+# → M python/experiments/EXP-101/results/fixture_integrity.json
+```
+

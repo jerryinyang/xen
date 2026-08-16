@@ -36,7 +36,6 @@ REQUIRED_OUTCOME = (
     "swing_bps",
     "swing_atr",
     "swing_duration_ns",
-    "duration_ns",
     "strong_move",
 )
 CONTROL_GROUP_COLUMNS = (
@@ -48,6 +47,7 @@ CONTROL_GROUP_COLUMNS = (
     "status",
     "primary_completed",
 )
+# 5 bits: swing_duration_ns is canonical; duration_ns is byte-equal alias (not duplicated)
 CONTROL_NULL_COLUMNS = (
     "swing_price",
     "swing_bps",
@@ -143,6 +143,8 @@ class Adapter(BaseContrastAdapter):
     )
     control_group_columns = CONTROL_GROUP_COLUMNS
     control_null_columns = CONTROL_NULL_COLUMNS
+    # EXP-101: independent arm/comparator resampling per design §4
+    independent_arms = True
 
     def fixture_frame(self) -> pl.DataFrame:
         frame = make_fixture_frame(
@@ -242,3 +244,5 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
