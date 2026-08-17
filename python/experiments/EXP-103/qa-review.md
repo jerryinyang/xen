@@ -631,3 +631,105 @@ focused malformed-profile, singleton-VOID, thin-bootstrap, and orchestration pro
 - The shared destroy implementation must not be treated as the registered HYP-003 control without an exact-contract review (singleton VOID propagation, fixture estimator parity).
 - No live outcome estimates or control results exist; no value interpretation is possible.
 - Computational feasibility of the exact nested 10,000 x 2,000 control has not been demonstrated; a practical run would require vectorised/algebraic reuse of mappings.
+
+## QA run 8 — 2026-08-16T23:30:55Z — mode: subagent — HEAD 8127c23e9d034af967f7ecc1f1e7508a3473ef8d
+
+Verdict: **REVISE**
+
+Scope: fresh-context pre-execution review of EXP-103 (CF-LIQSWP-001/HYP-003) analysis implementation against the frozen EXP-100 AMENDMENT-14 TRAIN emission at git HEAD 8127c23. No EXP-100 modification, execution, rerun, or re-emission; no EXP-103 live execution; no TEST or holdout access. Reviewed git state was clean.
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| **§1 Frozen source authority & gate-first** | `source.py:155-348` `validate_source_contract` | MATCHES | Family gate checked before any source rows; 264 cells verified; config_hash, event_log_sha256, NO_COST_CHARGED, one_backtest_node, nautilus-emission-v1, Nautilus=1.230.0 all validated. |
+| **§1 TRAIN fence & UTC fence** | `source.py:112-126` `_validate_utc_fence`; `source.py:168` | MATCHES | `train_end_ns` (1_700_611_200 * 1_000_000_000) validated against `train_end_utc` "2023-11-22T00:00:00Z". |
+| **§1 Composite ID uniqueness** | `source.py:129-152` `_validate_composite_uniqueness`; `source.py:319-337` | MATCHES | `(source_cell, raid_id)` uniqueness checked across all 264 cells. |
+| **§1 Causal timestamp provenance** | `source.py:275-297` | MATCHES | `raid_ts_ns ≤ sweep_ts_ns ≤ return_ts_ns ≤ confirmation_ts_ns ≤ endpoint_ts_ns` validated per cell. |
+| **§1 Schema/object/count reconciliation** | `source.py:234-268` | MATCHES | Required columns present; row counts match metadata; `source_configuration == config`; no rows after TRAIN fence. |
+| **§1 Binding ATR_UNDEFINED exclusion** | `analysis.py:134-142` `_channel_frame` override | MATCHES | `swing_atr` and `strong_move` exclude rows where `profile_undefined_reason == "ATR_UNDEFINED"`. |
+| **§1 Profile join & left-join retention** | `analysis.py:205-260` `live_frame` | MATCHES | Left join on `(source_cell, raid_id, profile_generation)`; unmatched/extra/duplicate keys tracked; failed/censored/undefined rows retained with `profile_join_reason`. |
+| **§2 Mechanism, object identity & frozen profile** | `design.md:47-67`; `analysis.py:134-142`; `analysis.py:30-85` | MATCHES | Profile assigned at confirmation; gap label is retrospective; clustering by `level_id`; no proxy entry. |
+| **§2 Frozen profile contract** | `analysis.py:30-85` `replay_profile`; `analysis.py:87-160` `validate_profile_frame` | MATCHES | POC = lowest-price max-count bin; VA expands upper-first on ties to 70%; gap = lowest-density VA bins reaching 30%; `tight_gap = gap_span < 0.50 * VA_width`. |
+| **§3 Population & estimand** | `analysis.py:134-142` `_channel_frame`; `analysis.py:126-135` `contrasts` | MATCHES | Primary population = COMPLETED & primary_attribution & primary_completed & DEFINED profile; fixed comparator = non-tight defined profiles within stratum; all-defined is disclosure-only. |
+| **§3 Primary estimators** | `analysis.py:126-135` `contrasts`; `adapter.py:127-130` `control_channels` | MATCHES | Mean `swing_atr`, mean `swing_duration_ns`, unpaired `strong_move` proportion difference. |
+| **§4 Joint cluster bootstrap** | `statistics.py:80-160` default `independent_arms=False` | MATCHES | Level clusters resampled jointly (level may contribute to both tight/non-tight arms); circular block bootstrap, L=2/5/10, 5 seeds, 10k draws. |
+| **§4 Empty arm handling** | `statistics.py:203-214` | MATCHES | Returns `EMPTY_ARM` reason with counts, null estimate/interval; row not removed. |
+| **§4 Report layers** | `adapter.py:489-502` | MATCHES | Observed/ideal/interpretation/analyst_boundary fields; no prohibited value labels. |
+| **§5 Profile integrity checks** | `analysis.py:87-160` `validate_profile_frame`; `analysis.py:162-180` `golden_profile_frame` | MATCHES | One-to-one join, TPO conservation, bin assignment, POC tie-breaking, VA mass, 30% gap mass, strict 50% comparison, positive VA_width, minimum-bin, zero-ATR, empty-profile, undefined-reason, reset-on-new-maximum, deterministic replay. |
+| **§5 Cross-gap future destroy grouping** | `destroy.py:230-256` `stream_destroy_control` | MATCHES | Groups by `archive_symbol × timeframe × confirmation_method × confirmation_reference × side × config × status × primary_completed × 5-bit nullness class`; tight/non-tight labels pooled. |
+| **§5 Derangement (zero fixed points)** | `destroy.py:72-85` `derange_indices`; `destroy.py:241-246` | MATCHES | Rejection sampling until `perm[i] != i`; singleton groups VOIDed. |
+| **§5 Exact nested 10k×2k destroy** | `destroy.py:507-532` `compute_exact_nested_destroy_se` | **MISSING** | Placeholder (`pass`). Design requires per-bootstrap-population destroy recomputation. Current implementation uses average-then-bootstrap + hypot. |
+| **§5 Fixture topology & plants** | `analysis.py:262-300` `fixture_frame` | DEVIATES | Design specifies 200 rows/arm with explicit plants (+0.50 ATR, +3.6e12 ns, +0.25 proportion). Shared fixture uses gradient across configs. |
+| **§5 Nullness class: `duration_ns` vs `swing_duration_ns`** | `analysis.py:50-55` `CONTROL_NULL_COLUMNS` uses `swing_duration_ns` | DEVIATES | Design declares `duration_ns` as the nullness bit alias. Code uses canonical `swing_duration_ns`. |
+| **§6 Sample size & complexity** | `design.md:164-177`; `adapter.py` | MATCHES | No minimum n; all rows retained; channels with sigma_denominator; 1 independent analysis module. |
+| **§6 Hard/informative split** | `design.md:179-186`; `contract.py` `IntegrityStatus` | MATCHES | Hard blocks: gate-first, fence, causality, schema, no-local-accounting, deterministic, ATR exclusion, future-destroy validity, zero-cost. Informative: operator judges all effects. |
+| **§7 Golden trace** | `design.md:182-195`; `analysis.py:162-180` `golden_profile_frame` | MATCHES | T1 tight fixture: POC=100, VA=[100,105], gap_span=2, tight_gap=true. T2 non-tight: POC=105, VA=[101,106], gap_span=3, tight_gap=false. Strict 0.50 boundary verified. |
+| **§8 Amendment ledger & final null** | `design.md:198-245` | MATCHES | 2L/3T/8N; no machine qualifier; no row hiding; F02/F04/F06 N/A; F07 satisfied. |
+| **§9 Zero-cost disclosure** | `contract.py:10-25` `ZERO_COST_DISCLOSURE` | MATCHES | Canonical text verbatim; `NO_COST_CHARGED`; no prohibited claims. |
+| **Failed-control propagation** | `adapter.py:426-431` | MATCHES | Failed control reasons collected into overall integrity reasons. |
+| **Live orchestration & integrity gating** | `runtime.py:75-99` `_execute`; `analysis.py:233-238` | MATCHES | `--live` runs `run_live` → `adapter.integrity` → blocks `analyze` if integrity fails → atomic write. |
+
+### Golden-trace diff
+
+| Event | Expected from design | Implemented logic | Verdict |
+|---|---|---|---|
+| T1 tight profile | POC=100, VA=[100,105], gap=[101,102], tight=true | `replay_profile` hand-verified | MATCHES |
+| T2 non-tight profile | POC=105, VA=[101,106], gap=[102,104], tight=false | `replay_profile` hand-verified | MATCHES |
+| T3 strict boundary | gap_span=2, VA_width=4 → 0.50, tight=false | `validate_profile_frame` enforces strict `<` | MATCHES |
+| Fixture plants | +0.50 ATR, +3.6e12 ns, +0.25 proportion | Shared fixture gradient across configs | DEVIATES |
+| Nested destroy | Per-outer-population recompute | Average-then-bootstrap + hypot | **DEVIATES** |
+
+### Governance & boundary
+
+- **Fresh context:** PASS — dedicated subagent; no implementation authorship in this context.
+- **Gate-first:** PASS — `validate_source_contract` checks family gate (264 cells) before any parquet read.
+- **TRAIN/holdout:** PASS — `train_end_ns` fence enforced; no TEST/holdout paths in code.
+- **Registry:** PASS — `CF-LIQSWP-001/HYP-003` registered; 0 candidate slots; 0 counted TEST reads.
+- **No Python backtest/local accounting:** PASS — `check_no_local_accounting` would pass; no accounting primitives.
+- **One BacktestNode:** PASS — EXP-103 is analysis-only; EXP-100 metadata attests `one_backtest_node=true`.
+- **Derangement:** PASS — `derange_indices` uses rejection sampling; `VOID_FIXED_POINTS` if any.
+- **Zero cost:** PASS — Canonical disclosure verbatim; `NO_COST_CHARGED` in all metadata.
+- **No research powering:** PASS — No MDE, power curves, `UNPOWERED`, detection floors.
+- **PSR:** N/A — No trade/leg bps series.
+- **Screen conversion/XENA:** N/A.
+- **Battery rules:** PASS — No adaptive selection, capped read, exit selection, or phase-shift gate.
+
+### Issues
+
+1. **HIGH — Exact nested 10k×2k destroy not implemented.**
+   **Design:** §5 "outer bootstrap: for each seed s=0..4, generate 10,000 cluster-bootstrap populations... For every population b, recompute the raw contrast D_raw[s,b] AND all 2,000 deranged contrasts D_destroy[s,b,d]."
+   **Code:** `destroy.py:507-532` `compute_exact_nested_destroy_se` is a placeholder (`pass`). `adapter.py:323-378` computes destroy contrasts only once on the original population, then bootstraps the *average* destroyed values.
+   **Required change:** Implement the exact nested destroy per bootstrap population.
+   **Failing artifact:** `python/src/xen/liqswp_analysis/destroy.py`, `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `experiment-developer`.
+
+2. **HIGH — Fixture plants deviate from design specification.**
+   **Design:** §5 FIXTURE-TOPOLOGY specifies 200 rows per arm (non-tight/tight) with explicit plants.
+   **Code:** `analysis.py:262-300` `fixture_frame` uses shared `make_fixture_frame` with gradient values.
+   **Required change:** Implement dedicated two-arm fixture matching design's explicit plants.
+   **Failing artifact:** `python/experiments/EXP-103/analysis_code/analysis.py`. **Required skill:** `quant-designer` or `experiment-developer`.
+
+3. **MEDIUM — Nullness class uses `swing_duration_ns` instead of declared `duration_ns`.**
+   **Design:** §5 nullness class tuple includes `is_null(duration_ns)`.
+   **Code:** `analysis.py:50-55` `CONTROL_NULL_COLUMNS` uses `swing_duration_ns`.
+   **Required change:** Use `duration_ns` in nullness class for traceability.
+   **Failing artifact:** `python/experiments/EXP-103/analysis_code/analysis.py`, `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `experiment-developer`.
+
+4. **MEDIUM — Missing `swing_price`/`swing_bps` source-field summaries in analysis output.**
+   **Design:** §4 "Raw `swing_price` and `swing_bps` are source-field summaries."
+   **Code:** `adapter.py:489-502` does not include raw mean/summary for these channels.
+   **Required change:** Add source-field summaries to output.
+   **Failing artifact:** `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `experiment-developer`.
+
+5. **LOW — Empirical 95% destroyed interval missing from live control disclosure.**
+   **Design:** §5 "disclosure: ... empirical 95% interval".
+   **Code:** Live control path uses `destroyed_outer_se` (hypot), not empirical quantiles from 2,000 destroyed contrasts.
+   **Required change:** Include empirical 95% interval from destroyed contrasts in live records.
+   **Failing artifact:** `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `experiment-developer`.
+
+### Summary
+
+**REVISE.** EXP-103 correctly implements profile integrity checks (`replay_profile`, `validate_profile_frame`, `golden_profile_frame`), left-join profile retention, joint cluster bootstrap, derangement-based cross-gap destroy, singleton VOID, UTC fence + composite ID, failed-control propagation, and neutral report layers. The golden trace matches the frozen profile logic.
+
+The critical **HIGH** issue shared across all experiments: exact nested 10k×2k destroy is not implemented (average-then-bootstrap+hypot used instead). Additional **HIGH/MEDIUM** issues: fixture plant deviation, nullness class field name mismatch, missing source-field summaries, missing empirical destroyed interval. Route to `experiment-developer` for implementation fixes and `quant-designer` for fixture design alignment.
+

@@ -634,3 +634,228 @@ git status --short
 # → M python/experiments/EXP-101/results/fixture_integrity.json
 ```
 
+
+## QA run 7 — 2026-08-15T00:00:00Z — mode: subagent — HEAD 8127c23e9d034af967f7ecc1f1e7508a3473ef8d
+
+Verdict: **REVISE**
+
+Scope: Fresh-context pre-execution review of EXP-101 (CF-LIQSWP-001/HYP-001) analysis implementation against the frozen EXP-100 AMENDMENT-14 TRAIN emission. No EXP-100 modification, execution, rerun, or re-emission; no EXP-101 live execution; no TEST or holdout access. Reviewed git state was clean (no dirty files).
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| **§1 Frozen source authority & gate-first** | `source.py:155-348` `validate_source_contract` | MATCHES | Family gate checked before any source rows; 264 cells verified; config_hash, event_log_sha256, NO_COST_CHARGED, one_backtest_node, nautilus-emission-v1, Nautilus=1.230.0 all validated. |
+| **§1 TRAIN fence & UTC fence** | `source.py:112-126` `_validate_utc_fence`; `source.py:168` | MATCHES | `train_end_ns` (1_700_611_200 * 1_000_000_000) validated against `train_end_utc` "2023-11-22T00:00:00Z". |
+| **§1 Composite ID uniqueness** | `source.py:129-152` `_validate_composite_uniqueness`; `source.py:319-337` | MATCHES | `(source_cell, raid_id)` uniqueness checked across all 264 cells. |
+| **§1 Causal timestamp provenance** | `source.py:275-297` | MATCHES | `raid_ts_ns ≤ sweep_ts_ns ≤ return_ts_ns ≤ confirmation_ts_ns ≤ endpoint_ts_ns` validated per cell. |
+| **§1 Schema/object/count reconciliation** | `source.py:234-268` | MATCHES | Required columns present; row counts match metadata; `source_configuration == config`; no rows after TRAIN fence. |
+| **§1 Binding ATR_UNDEFINED exclusion** | `adapter.py:205-215` `_channel_frame` | MATCHES | `swing_atr` and `strong_move` exclude rows where `profile_undefined_reason == "ATR_UNDEFINED"`. |
+| **§2 Mechanism & object identity** | `design.md:47-67`; `adapter.py:250` `cluster_ids=level_id` | MATCHES | Level-linked raid is measurement object; clustering by `level_id`; no orders/fills. |
+| **§3 Configuration strata & fixed comparators** | `analysis.py:126-135` `contrasts`; `analysis.py:136-142` `stratum_columns` | MATCHES | 11 configs in 3 families; fixed comparators (PREVIOUS_1H, PREVIOUS_ASIA, ROLLING_7); strata exclude `config` so contrasts are within-stratum. |
+| **§3 Population & censoring rules** | `adapter.py:205-215` `_channel_frame` | MATCHES | Primary population = COMPLETED & primary_attribution & primary_completed; failed/non-primary/censored/null/thin rows remain in census. |
+| **§3 Primary estimators** | `analysis.py:126-135` `contrasts`; `adapter.py:127-130` `control_channels` | MATCHES | Mean `swing_atr`, mean `swing_duration_ns`, unpaired `strong_move` proportion difference. |
+| **§4 Independent arm/comparator bootstrap** | `statistics.py:220-276` `clustered_contrast_bootstrap` `independent_arms=True` | MATCHES | Arm and comparator clusters resampled independently per design; `circular_cluster_indices` implements circular block bootstrap with `L_eff = min(max(1,L), n_clusters-1)`. |
+| **§4 Block lengths L=2,5,10** | `statistics.py:336-354` `block_sensitivity`; `adapter.py:468-474` | MATCHES | Sensitivities computed for all three block lengths; L=5 is primary. |
+| **§4 Empty arm handling** | `statistics.py:203-214` | MATCHES | Returns `EMPTY_ARM` reason with counts, null estimate/interval; row not removed. |
+| **§4 Report layers (observed/ideal/interpretation)** | `adapter.py:489-502` | MATCHES | Output includes `observed`, `ideal`, `interpretation` fields; no machine value labels. |
+| **§4 No prohibited value labels** | `adapter.py:489-502`; `contract.py:50-60` | MATCHES | No `SUPPORTED`, `WASH`, `CONTRADICTED`, `WORTH_EXPLORING`, `NOT_WORTH`, `INCONCLUSIVE` in output. |
+| **§5 Cross-config destroy grouping** | `destroy.py:230-256` `stream_destroy_control` | MATCHES | Groups by `archive_symbol × timeframe × confirmation_method × confirmation_reference × side × status × primary_completed × 5-bit nullness class`; configuration pooled within group. |
+| **§5 Derangement (zero fixed points)** | `destroy.py:72-85` `derange_indices`; `destroy.py:241-246` | MATCHES | Rejection sampling until `perm[i] != i` for all movable rows; singleton groups VOIDed. |
+| **§5 Singleton VOID** | `destroy.py:237-246` | MATCHES | Groups with `n<2` produce `VOID_SINGLETON_GROUP`; rows not moved. |
+| **§5 Destroy disclosure fields** | `adapter.py:397-419` control record evidence | PARTIAL | Includes raw contrast, destroyed draws, mean, interval, collapse_ratio, fixed_points, moved_rows, moved_eligible_values. Missing: empirical 95% destroyed interval for live (only fixture has it). |
+| **§5 Exact nested 10k×2k destroy** | `destroy.py:507-532` `compute_exact_nested_destroy_se` | **MISSING** | Function is a placeholder (`pass`). Design requires: for each seed s=0..4, 10k bootstrap populations; for EVERY population b, recompute D_raw[s,b] AND all 2k deranged contrasts D_destroy[s,b,d]; compute m_destroy[s,b]; bootstrap_SE_raw[s]=std_b(D_raw); bootstrap_SE_mean_destroyed[s]=std_b(m_destroy). Current implementation computes destroy contrasts only ONCE on original population, not per bootstrap population. |
+| **§5 Fixture topology & plants** | `adapter.py:77-116` `make_fixture_frame` | DEVIATES | Design specifies explicit plants: swing_atr baseline 0.90/1.10 vs arm 1.40/1.60 (+0.50); duration baseline 3e12/4.2e12 vs arm 6.6e12/7.8e12 (+3.6e12 ns); strong_move baseline 1/4 vs arm 1/2 (+0.25). Shared fixture creates gradient values across 11 configs, not the two-arm explicit plants. |
+| **§5 Nullness class: `duration_ns` vs `swing_duration_ns`** | `analysis.py:50-55` `CONTROL_NULL_COLUMNS` uses `swing_duration_ns` | DEVIATES | Design §5 defines 5-bit nullness class as `(is_null(swing_price), is_null(swing_bps), is_null(swing_atr), is_null(duration_ns), is_null(strong_move))`. Code uses `swing_duration_ns` (canonical). Byte-equal in practice but technically deviates from declared field name. |
+| **§6 Sample size & complexity** | `design.md:164-177`; `adapter.py` | MATCHES | No minimum n; all rows retained; channels declared with sigma_denominator; 1 independent analysis module. |
+| **§6 Hard/informative split** | `design.md:179-186`; `contract.py` `IntegrityStatus` | MATCHES | Hard blocks: gate-first, fence, causality, schema, no-local-accounting, deterministic, ATR exclusion, future-destroy validity, zero-cost. Informative: operator judges all effects. |
+| **§7 Golden trace T1–T3** | `design.md:182-195`; EXP-100 `processor.py` | MATCHES | Hand-verified: independent PREVIOUS_1H/ROLLING_7 cells; inclusive return; primary attribution; swing_price=2.00, swing_atr=2.00, swing_bps=200, swing_duration_ns=3.6e12, strong_move=true. |
+| **§8 Amendment ledger & final null** | `design.md:198-245` | MATCHES | 2L/3T/8N; no machine qualifier; no row hiding; F02/F04/F06 N/A; F07 satisfied. |
+| **§9 Zero-cost disclosure** | `contract.py:10-25` `ZERO_COST_DISCLOSURE`; fixture output | MATCHES | Canonical text verbatim; `NO_COST_CHARGED`; no prohibited claims. |
+| **Failed-control propagation** | `adapter.py:426-431` | MATCHES | Failed control reasons collected into overall integrity reasons; `VOID_FUTURE_DESTROY_SURVIVAL` blocks affected stratum/channel. |
+| **Live orchestration & integrity gating** | `runtime.py:75-99` `_execute`; `analysis.py:233-238` | MATCHES | `--live` runs `run_live` → `adapter.integrity` → blocks `analyze` if integrity fails → atomic write. |
+
+### Golden-trace diff
+
+| Event | Expected from design | Implemented logic | Verdict |
+|---|---|---|---|
+| T1 — Separate PREVIOUS_1H/ROLLING_7 cells at 100.00 | Each starts own raid; excursion 1.20; count 0 | `processor.py:400-458` cell-local level/raid identity; side-aware excursion | MATCHES |
+| T2 — Inclusive 100.00 return; expected-side 1H close | Return recorded; primary_attribution=true per cell | `processor.py:285-328,462-522` inclusive return; cell-local primary selection | MATCHES |
+| T3 — Opposing endpoint at 98.00 | swing_price=2.00, swing_atr=2.00, swing_bps=200, duration=3.6e12 ns, strong_move=true | `processor.py:540-612` terminal arithmetic; duration alias implemented | MATCHES |
+| Fixture plants | +0.50 ATR, +3.6e12 ns, +0.25 proportion per design plants | Shared fixture uses gradient values across 11 configs | DEVIATES |
+
+### Governance & boundary
+
+- **Fresh context:** PASS — dedicated subagent; no implementation authorship in this context.
+- **Gate-first:** PASS — `validate_source_contract` checks family gate (264 cells, `blocking_pass=true`) and all 264 per-cell gates before any parquet read.
+- **TRAIN/holdout:** PASS — `train_end_ns` fence enforced; `VOID_AFTER_TRAIN` blocks any row beyond 2023-11-22T00:00:00Z; no TEST/holdout paths in code.
+- **Registry:** PASS — `CF-LIQSWP-001/HYP-001` registered; 0 candidate slots; 0 counted TEST reads.
+- **No Python backtest/local accounting:** PASS — `check_no_local_accounting` would pass; no accounting primitives; no strategy backtest in EXP-101.
+- **One BacktestNode:** PASS — EXP-101 is analysis-only; EXP-100 metadata attests `one_backtest_node=true`.
+- **Derangement:** PASS — `derange_indices` uses rejection sampling; `VOID_FIXED_POINTS` if any.
+- **Zero cost:** PASS — Canonical disclosure verbatim; `NO_COST_CHARGED` in all metadata.
+- **No research powering:** PASS — No MDE, power curves, `UNPOWERED`, detection floors. Only `INTEGRITY_Z=2.8` for validity.
+- **PSR:** N/A — No trade/leg bps series.
+- **Screen conversion/XENA:** N/A.
+- **Battery rules:** PASS — No adaptive selection, capped read, exit selection, or phase-shift gate.
+
+### Issues
+
+1. **HIGH — Exact nested 10k×2k destroy not implemented.**
+   **Design:** §5 "outer bootstrap: for each seed s=0..4, generate 10,000 cluster-bootstrap populations... For every population b, recompute the raw contrast D_raw[s,b] and all 2,000 deranged contrasts D_destroy[s,b,d]."
+   **Code:** `destroy.py:507-532` `compute_exact_nested_destroy_se` is a placeholder (`pass`). `adapter.py:323-378` computes destroy contrasts only once on the original population, then bootstraps the *average* destroyed values. The design requires per-bootstrap-population destroy recomputation.
+   **Required change:** Implement the exact nested destroy in `adapter.integrity` (or a called function): for each seed, for each of 10,000 bootstrap draws, resample clusters, then run all 2,000 derangements on that resampled population. Compute `m_destroy[s,b]` per draw, then `bootstrap_SE_mean_destroyed[s] = std_b(m_destroy[s,b])`.
+   **Failing artifact:** `python/src/xen/liqswp_analysis/destroy.py`, `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `experiment-developer`.
+
+2. **HIGH — Fixture plants deviate from design specification.**
+   **Design:** §5 FIXTURE-TOPOLOGY specifies 200 rows per arm (BASELINE/ARM) with explicit plants: swing_atr baseline 0.90/1.10 vs arm 1.40/1.60 (+0.50); duration baseline 3e12/4.2e12 vs arm 6.6e12/7.8e12 (+3.6e12 ns); strong_move baseline 1/4 vs arm 1/2 (+0.25).
+   **Code:** `adapter.py:77-116` `make_fixture_frame` creates 200 rows × 11 configs with gradient values; no explicit two-arm plants.
+   **Required change:** Either update the design to match the implemented multi-config fixture (with documented rationale), or implement a dedicated two-arm fixture matching the design's explicit plants for the pre-read smoke test.
+   **Failing artifact:** `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `quant-designer` (if design change) or `experiment-developer` (if implementation change).
+
+3. **MEDIUM — Nullness class uses `swing_duration_ns` instead of declared `duration_ns`.**
+   **Design:** §5 "nullness class is the five-bit tuple (is_null(swing_price), is_null(swing_bps), is_null(swing_atr), is_null(duration_ns), is_null(strong_move)); duration_ns is the asserted alias of swing_duration_ns."
+   **Code:** `analysis.py:50-55` `CONTROL_NULL_COLUMNS` uses `swing_duration_ns`; `adapter.py:132` inherits `CONTROL_NULL_COLUMNS = CHANNELS`.
+   **Why it matters:** The design explicitly names `duration_ns` in the nullness class definition. While byte-equal in the frozen emission, the code should reference the declared alias name for traceability.
+   **Required change:** Change `CONTROL_NULL_COLUMNS` to use `duration_ns` (or add both and verify equality), and update the 5-bit class computation accordingly.
+   **Failing artifact:** `python/experiments/EXP-101/analysis_code/analysis.py`, `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `experiment-developer`.
+
+4. **MEDIUM — Missing `swing_price`/`swing_bps` source-field summaries in analysis output.**
+   **Design:** §4 "Report counts, missingness, status/censor composition, mean, median, direct difference, interval, seed range, and every requested configuration. Raw `swing_price` and `swing_bps` are source-field summaries, not separate hard tripwire estimands."
+   **Code:** `adapter.py:489-502` `analyze` method outputs medians for all channels but does not include raw mean/summary statistics for `swing_price` and `swing_bps` in the result rows.
+   **Required change:** Add `swing_price` and `swing_bps` mean/median summaries to the analysis output (can be in `observed` or as separate fields).
+   **Failing artifact:** `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `experiment-developer`.
+
+5. **LOW — Empirical 95% destroyed interval missing from live control disclosure.**
+   **Design:** §5 "disclosure: raw contrast; all 2,000 destroyed contrasts; their mean and empirical 95% interval; collapse_fraction..."
+   **Code:** `adapter.py:397-419` fixture control records include `destroyed_interval` (from `future_destroy_attestation`), but live control path uses `destroyed_outer_se` (hypot combination) and does not compute the empirical quantile interval from the 2,000 destroyed contrasts.
+   **Required change:** Ensure live control records include the empirical 95% interval from the 2,000 destroyed contrasts (not just the bootstrap SE interval).
+   **Failing artifact:** `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `experiment-developer`.
+
+### Summary
+
+**REVISE.** The EXP-101 analysis implementation correctly implements the majority of the design: frozen source validation, independent arm/comparator bootstrap, derangement-based cross-configuration destroy, singleton VOID, UTC fence + composite ID, failed-control propagation, live orchestration with integrity gating, and neutral report layers. The golden trace matches the frozen EXP-100 logic.
+
+Two **HIGH** issues block execution readiness:
+1. The exact nested 10k×2k destroy (per-bootstrap-population destroy recomputation) is not implemented — the current code computes destroy contrasts only once on the original population.
+2. The fixture plants do not match the design's explicit two-arm plant specification.
+
+Three **MEDIUM/LOW** issues should be addressed before execution:
+3. Nullness class field name mismatch (`duration_ns` vs `swing_duration_ns`).
+4. Missing `swing_price`/`swing_bps` source-field summaries in output.
+5. Live control disclosure missing empirical 95% destroyed interval.
+
+Route to `experiment-developer` for implementation fixes (issues 1, 3, 4, 5) and `quant-designer` for design/implementation alignment on fixture plants (issue 2).
+
+## QA run 10 — 2026-08-16T23:30:55Z — mode: subagent — HEAD 8127c23e9d034af967f7ecc1f1e7508a3473ef8d
+
+Verdict: **REVISE**
+
+Scope: fresh-context pre-execution review of EXP-101 (CF-LIQSWP-001/HYP-001) analysis implementation against the frozen EXP-100 AMENDMENT-14 TRAIN emission at git HEAD 8127c23. No EXP-100 modification, execution, rerun, or re-emission; no EXP-101 live execution; no TEST or holdout access. Reviewed git state was clean.
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| **§1 Frozen source authority & gate-first** | `source.py:155-348` `validate_source_contract` | MATCHES | Family gate checked before any source rows; 264 cells verified; config_hash, event_log_sha256, NO_COST_CHARGED, one_backtest_node, nautilus-emission-v1, Nautilus=1.230.0 all validated. |
+| **§1 TRAIN fence & UTC fence** | `source.py:112-126` `_validate_utc_fence`; `source.py:168` | MATCHES | `train_end_ns` (1_700_611_200 * 1_000_000_000) validated against `train_end_utc` "2023-11-22T00:00:00Z". |
+| **§1 Composite ID uniqueness** | `source.py:129-152` `_validate_composite_uniqueness`; `source.py:319-337` | MATCHES | `(source_cell, raid_id)` uniqueness checked across all 264 cells. |
+| **§1 Causal timestamp provenance** | `source.py:275-297` | MATCHES | `raid_ts_ns ≤ sweep_ts_ns ≤ return_ts_ns ≤ confirmation_ts_ns ≤ endpoint_ts_ns` validated per cell. |
+| **§1 Schema/object/count reconciliation** | `source.py:234-268` | MATCHES | Required columns present; row counts match metadata; `source_configuration == config`; no rows after TRAIN fence. |
+| **§1 Binding ATR_UNDEFINED exclusion** | `adapter.py:205-215` `_channel_frame` | MATCHES | `swing_atr` and `strong_move` exclude rows where `profile_undefined_reason == "ATR_UNDEFINED"`. |
+| **§2 Mechanism & object identity** | `design.md:47-67`; `adapter.py:250` `cluster_ids=level_id` | MATCHES | Level-linked raid is measurement object; clustering by `level_id`; no orders/fills. |
+| **§3 Configuration strata & fixed comparators** | `analysis.py:126-135` `contrasts`; `analysis.py:136-142` `stratum_columns` | MATCHES | 11 configs in 3 families; fixed comparators (PREVIOUS_1H, PREVIOUS_ASIA, ROLLING_7); strata exclude `config` so contrasts are within-stratum. |
+| **§3 Population & censoring rules** | `adapter.py:205-215` `_channel_frame` | MATCHES | Primary population = COMPLETED & primary_attribution & primary_completed; failed/non-primary/censored/null/thin rows remain in census. |
+| **§3 Primary estimators** | `analysis.py:126-135` `contrasts`; `adapter.py:127-130` `control_channels` | MATCHES | Mean `swing_atr`, mean `swing_duration_ns`, unpaired `strong_move` proportion difference. |
+| **§4 Independent arm/comparator bootstrap** | `statistics.py:220-276` `clustered_contrast_bootstrap` `independent_arms=True` | MATCHES | Arm and comparator clusters resampled independently per design; `circular_cluster_indices` implements circular block bootstrap with `L_eff = min(max(1,L), n_clusters-1)`. |
+| **§4 Block lengths L=2,5,10** | `statistics.py:336-354` `block_sensitivity`; `adapter.py:468-474` | MATCHES | Sensitivities computed for all three block lengths; L=5 is primary. |
+| **§4 Empty arm handling** | `statistics.py:203-214` | MATCHES | Returns `EMPTY_ARM` reason with counts, null estimate/interval; row not removed. |
+| **§4 Report layers (observed/ideal/interpretation)** | `adapter.py:489-502` | MATCHES | Output includes `observed`, `ideal`, `interpretation` fields; no machine value labels. |
+| **§4 No prohibited value labels** | `adapter.py:489-502`; `contract.py:50-60` | MATCHES | No `SUPPORTED`, `WASH`, `CONTRADICTED`, `WORTH_EXPLORING`, `NOT_WORTH`, `INCONCLUSIVE` in output. |
+| **§5 Cross-config destroy grouping** | `destroy.py:230-256` `stream_destroy_control` | MATCHES | Groups by `archive_symbol × timeframe × confirmation_method × confirmation_reference × side × status × primary_completed × 5-bit nullness class`; configuration pooled within group. |
+| **§5 Derangement (zero fixed points)** | `destroy.py:72-85` `derange_indices`; `destroy.py:241-246` | MATCHES | Rejection sampling until `perm[i] != i` for all movable rows; singleton groups VOIDed. |
+| **§5 Singleton VOID** | `destroy.py:237-246` | MATCHES | Groups with `n<2` produce `VOID_SINGLETON_GROUP`; rows not moved. |
+| **§5 Destroy disclosure fields** | `adapter.py:397-419` control record evidence | PARTIAL | Includes raw contrast, destroyed draws, mean, interval, collapse_ratio, fixed_points, moved_rows, moved_eligible_values. Missing: empirical 95% destroyed interval for live (only fixture has it). |
+| **§5 Exact nested 10k×2k destroy** | `destroy.py:507-532` `compute_exact_nested_destroy_se` | **MISSING** | Function is a placeholder (`pass`). Design requires: for each seed s=0..4, 10k bootstrap populations; for EVERY population b, recompute D_raw[s,b] AND all 2k deranged contrasts D_destroy[s,b,d]; compute m_destroy[s,b]; bootstrap_SE_raw[s]=std_b(D_raw); bootstrap_SE_mean_destroyed[s]=std_b(m_destroy). Current implementation computes destroy contrasts only ONCE on original population, not per bootstrap population. |
+| **§5 Fixture topology & plants** | `adapter.py:77-116` `make_fixture_frame` | DEVIATES | Design specifies explicit plants: swing_atr baseline 0.90/1.10 vs arm 1.40/1.60 (+0.50); duration baseline 3e12/4.2e12 vs arm 6.6e12/7.8e12 (+3.6e12 ns); strong_move baseline 1/4 vs arm 1/2 (+0.25). Shared fixture creates gradient values across 11 configs, not the two-arm explicit plants. |
+| **§5 Nullness class: `duration_ns` vs `swing_duration_ns`** | `analysis.py:50-55` `CONTROL_NULL_COLUMNS` uses `swing_duration_ns` | DEVIATES | Design §5 defines 5-bit nullness class as `(is_null(swing_price), is_null(swing_bps), is_null(swing_atr), is_null(duration_ns), is_null(strong_move))`. Code uses `swing_duration_ns` (canonical). Byte-equal in practice but technically deviates from declared field name. |
+| **§6 Sample size & complexity** | `design.md:164-177`; `adapter.py` | MATCHES | No minimum n; all rows retained; channels declared with sigma_denominator; 1 independent analysis module. |
+| **§6 Hard/informative split** | `design.md:179-186`; `contract.py` `IntegrityStatus` | MATCHES | Hard blocks: gate-first, fence, causality, schema, no-local-accounting, deterministic, ATR exclusion, future-destroy validity, zero-cost. Informative: operator judges all effects. |
+| **§7 Golden trace T1–T3** | `design.md:182-195`; EXP-100 `processor.py` | MATCHES | Hand-verified: independent PREVIOUS_1H/ROLLING_7 cells; inclusive return; primary attribution; swing_price=2.00, swing_atr=2.00, swing_bps=200, swing_duration_ns=3.6e12, strong_move=true. |
+| **§8 Amendment ledger & final null** | `design.md:198-245` | MATCHES | 2L/3T/8N; no machine qualifier; no row hiding; F02/F04/F06 N/A; F07 satisfied. |
+| **§9 Zero-cost disclosure** | `contract.py:10-25` `ZERO_COST_DISCLOSURE`; fixture output | MATCHES | Canonical text verbatim; `NO_COST_CHARGED`; no prohibited claims. |
+| **Failed-control propagation** | `adapter.py:426-431` | MATCHES | Failed control reasons collected into overall integrity reasons; `VOID_FUTURE_DESTROY_SURVIVAL` blocks affected stratum/channel. |
+| **Live orchestration & integrity gating** | `runtime.py:75-99` `_execute`; `analysis.py:233-238` | MATCHES | `--live` runs `run_live` → `adapter.integrity` → blocks `analyze` if integrity fails → atomic write. |
+
+### Golden-trace diff
+
+| Event | Expected from design | Implemented logic | Verdict |
+|---|---|---|---|
+| T1 — Separate PREVIOUS_1H/ROLLING_7 cells at 100.00 | Each starts own raid; excursion 1.20; count 0 | `processor.py:400-458` cell-local level/raid identity; side-aware excursion | MATCHES |
+| T2 — Inclusive 100.00 return; expected-side 1H close | Return recorded; primary_attribution=true per cell | `processor.py:285-328,462-522` inclusive return; cell-local primary selection | MATCHES |
+| T3 — Opposing endpoint at 98.00 | swing_price=2.00, swing_atr=2.00, swing_bps=200, duration=3.6e12 ns, strong_move=true | `processor.py:540-612` terminal arithmetic; duration alias implemented | MATCHES |
+| Fixture plants | +0.50 ATR, +3.6e12 ns, +0.25 proportion per design plants | Shared fixture uses gradient values across 11 configs | DEVIATES |
+
+### Governance & boundary
+
+- **Fresh context:** PASS — dedicated subagent; no implementation authorship in this context.
+- **Gate-first:** PASS — `validate_source_contract` checks family gate (264 cells, `blocking_pass=true`) and all 264 per-cell gates before any parquet read.
+- **TRAIN/holdout:** PASS — `train_end_ns` fence enforced; `VOID_AFTER_TRAIN` blocks any row beyond 2023-11-22T00:00:00Z; no TEST/holdout paths in code.
+- **Registry:** PASS — `CF-LIQSWP-001/HYP-001` registered; 0 candidate slots; 0 counted TEST reads.
+- **No Python backtest/local accounting:** PASS — `check_no_local_accounting` would pass; no accounting primitives; no strategy backtest in EXP-101.
+- **One BacktestNode:** PASS — EXP-101 is analysis-only; EXP-100 metadata attests `one_backtest_node=true`.
+- **Derangement:** PASS — `derange_indices` uses rejection sampling; `VOID_FIXED_POINTS` if any.
+- **Zero cost:** PASS — Canonical disclosure verbatim; `NO_COST_CHARGED` in all metadata.
+- **No research powering:** PASS — No MDE, power curves, `UNPOWERED`, detection floors. Only `INTEGRITY_Z=2.8` for validity.
+- **PSR:** N/A — No trade/leg bps series.
+- **Screen conversion/XENA:** N/A.
+- **Battery rules:** PASS — No adaptive selection, capped read, exit selection, or phase-shift gate.
+
+### Issues
+
+1. **HIGH — Exact nested 10k×2k destroy not implemented.**
+   **Design:** §5 "outer bootstrap: for each seed s=0..4, generate 10,000 cluster-bootstrap populations... For every population b, recompute the raw contrast D_raw[s,b] AND all 2,000 deranged contrasts D_destroy[s,b,d]."
+   **Code:** `destroy.py:507-532` `compute_exact_nested_destroy_se` is a placeholder (`pass`). `adapter.py:323-378` computes destroy contrasts only once on the original population, then bootstraps the *average* destroyed values. The design requires per-bootstrap-population destroy recomputation.
+   **Required change:** Implement the exact nested destroy in `adapter.integrity` (or a called function): for each seed, for each of 10,000 bootstrap draws, resample clusters, then run all 2,000 derangements on that resampled population. Compute `m_destroy[s,b]` per draw, then `bootstrap_SE_mean_destroyed[s] = std_b(m_destroy[s,b])`.
+   **Failing artifact:** `python/src/xen/liqswp_analysis/destroy.py`, `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `experiment-developer`.
+
+2. **HIGH — Fixture plants deviate from design specification.**
+   **Design:** §5 FIXTURE-TOPOLOGY specifies 200 rows per arm (BASELINE/ARM) with explicit plants: swing_atr baseline 0.90/1.10 vs arm 1.40/1.60 (+0.50); duration baseline 3e12/4.2e12 vs arm 6.6e12/7.8e12 (+3.6e12 ns); strong_move baseline 1/4 vs arm 1/2 (+0.25).
+   **Code:** `adapter.py:77-116` `make_fixture_frame` creates 200 rows × 11 configs with gradient values; no explicit two-arm plants.
+   **Required change:** Either update the design to match the implemented multi-config fixture (with documented rationale), or implement a dedicated two-arm fixture matching the design's explicit plants for the pre-read smoke test.
+   **Failing artifact:** `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `quant-designer` (if design change) or `experiment-developer` (if implementation change).
+
+3. **MEDIUM — Nullness class uses `swing_duration_ns` instead of declared `duration_ns`.**
+   **Design:** §5 "nullness class is the five-bit tuple (is_null(swing_price), is_null(swing_bps), is_null(swing_atr), is_null(duration_ns), is_null(strong_move)); duration_ns is the asserted alias of swing_duration_ns."
+   **Code:** `analysis.py:50-55` `CONTROL_NULL_COLUMNS` uses `swing_duration_ns`; `adapter.py:132` inherits `CONTROL_NULL_COLUMNS = CHANNELS`.
+   **Why it matters:** The design explicitly names `duration_ns` in the nullness class definition. While byte-equal in the frozen emission, the code should reference the declared alias name for traceability.
+   **Required change:** Change `CONTROL_NULL_COLUMNS` to use `duration_ns` (or add both and verify equality), and update the 5-bit class computation accordingly.
+   **Failing artifact:** `python/experiments/EXP-101/analysis_code/analysis.py`, `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `experiment-developer`.
+
+4. **MEDIUM — Missing `swing_price`/`swing_bps` source-field summaries in analysis output.**
+   **Design:** §4 "Report counts, missingness, status/censor composition, mean, median, direct difference, interval, seed range, and every requested configuration. Raw `swing_price` and `swing_bps` are source-field summaries, not separate hard tripwire estimands."
+   **Code:** `adapter.py:489-502` `analyze` method outputs medians for all channels but does not include raw mean/summary statistics for `swing_price` and `swing_bps` in the result rows.
+   **Required change:** Add `swing_price` and `swing_bps` mean/median summaries to the analysis output (can be in `observed` or as separate fields).
+   **Failing artifact:** `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `experiment-developer`.
+
+5. **LOW — Empirical 95% destroyed interval missing from live control disclosure.**
+   **Design:** §5 "disclosure: raw contrast; all 2,000 destroyed contrasts; their mean and empirical 95% interval; collapse_fraction..."
+   **Code:** `adapter.py:397-419` fixture control records include `destroyed_interval` (from `future_destroy_attestation`), but live control path uses `destroyed_outer_se` (hypot combination) and does not compute the empirical quantile interval from the 2,000 destroyed contrasts.
+   **Required change:** Ensure live control records include the empirical 95% interval from the 2,000 destroyed contrasts (not just the bootstrap SE interval).
+   **Failing artifact:** `python/src/xen/liqswp_analysis/adapter.py`. **Required skill:** `experiment-developer`.
+
+### Summary
+
+**REVISE.** The EXP-101 analysis implementation correctly implements the majority of the design: frozen source validation, independent arm/comparator bootstrap, derangement-based cross-configuration destroy, singleton VOID, UTC fence + composite ID, failed-control propagation, live orchestration with integrity gating, and neutral report layers. The golden trace matches the frozen EXP-100 logic.
+
+Two **HIGH** issues block execution readiness:
+1. The exact nested 10k×2k destroy (per-bootstrap-population destroy recomputation) is not implemented — the current code computes destroy contrasts only once on the original population.
+2. The fixture plants do not match the design's explicit two-arm plant specification.
+
+Three **MEDIUM/LOW** issues should be addressed before execution:
+3. Nullness class field name mismatch (`duration_ns` vs `swing_duration_ns`).
+4. Missing `swing_price`/`swing_bps` source-field summaries in output.
+5. Live control disclosure missing empirical 95% destroyed interval.
+
+Route to `experiment-developer` for implementation fixes (issues 1, 3, 4, 5) and `quant-designer` for design/implementation alignment on fixture plants (issue 2).
+
