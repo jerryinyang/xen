@@ -145,7 +145,6 @@ def _validate_composite_uniqueness(
         .len()
         .filter(pl.col("len") > 1)
         .select(pl.col("len").sum().fill_null(0))
-        .collect(engine="streaming")
         .item()
     )
     if duplicates:
@@ -200,7 +199,6 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
                 != gate.get("no_cost_charged", {}).get("ok")
             ):
                 reasons.append("VOID_GATE_RECONCILIATION")
-    id_frames: list[pl.LazyFrame] = []
     table_paths: list[Path] = []
     for cell_dir in cell_dirs:
         gate = gates_by_name.get(cell_dir.name)
@@ -230,7 +228,11 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
             reasons.append("VOID_ZERO_COST")
         if fence.get("status") != "PINNED":
             reasons.append("VOID_FENCE_STATUS")
-        if int(fence.get("train_end_ns", -1)) != int(spec.train_end_ns):
+        # The pinned fence declares train_end_utc; train_end_ns is validated
+        # only when present (older receipts carry the UTC fence only).
+        if spec.train_end_utc is not None and fence.get("train_end_utc") != spec.train_end_utc:
+            reasons.append("VOID_FENCE_BOUNDARY")
+        if "train_end_ns" in fence and int(fence["train_end_ns"]) != int(spec.train_end_ns):
             reasons.append("VOID_FENCE_BOUNDARY")
         available = set(pl.scan_parquet(table_path).collect_schema().names())
         missing = [column for column in spec.required_columns if column not in available]
@@ -299,23 +301,24 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
         if causal_failures:
             reasons.append("VOID_CAUSAL_ORDER")
             evidence["causal_failures"].extend(causal_failures)
-        id_frames.append(lazy.select(spec.object_id_column))
-        table_paths.append(table_path)
-
-    # Check object_id uniqueness within each cell (existing check)
-    if id_frames:
-        duplicates = (
-            pl.concat(id_frames)
-            .group_by(spec.object_id_column)
+        # Within-cell object-id uniqueness (cell-scoped identities in the frozen
+        # emission); cross-cell identity is covered by the composite check below.
+        cell_duplicates = (
+            lazy.group_by(spec.object_id_column)
             .len()
             .filter(pl.col("len") > 1)
             .select(pl.col("len").sum().fill_null(0))
             .collect(engine="streaming")
             .item()
         )
-        evidence["duplicate_object_ids"] = int(duplicates)
-        if duplicates:
+        evidence["duplicate_object_ids"] += int(cell_duplicates)
+        if cell_duplicates:
             reasons.append("VOID_DUPLICATE_OBJECT_ID")
+        table_paths.append(table_path)
+
+    # Object-id uniqueness is cell-scoped in the frozen emission (level and raid
+    # identities repeat across instruments/timeframes); the authoritative check
+    # is the composite (source_cell, raid_id) uniqueness below.
 
     # New: Check composite (source_cell, raid_id) uniqueness across all cells
     # This requires loading the data with source_cell column
@@ -336,6 +339,7 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
         composite_duplicates_total += composite_duplicates
         reasons.extend(comp_reasons)
     evidence["composite_duplicate_object_ids"] = composite_duplicates_total
+    evidence["duplicate_object_ids"] = composite_duplicates_total
 
     unique_reasons = tuple(dict.fromkeys(reasons))
     return SourceAttestation(

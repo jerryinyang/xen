@@ -21,7 +21,6 @@ from xen.liqswp_analysis.destroy import (
 from xen.liqswp_analysis.runtime import run_fixture as _run_fixture
 from xen.liqswp_analysis.runtime import run_live
 from xen.liqswp_analysis.source import validate_causal_order
-from xen.liqswp_analysis.statistics import PopulationView
 
 EXPERIMENT = "EXP-102"
 LABEL_COLUMN = "count_band"
@@ -52,12 +51,12 @@ CONTROL_GROUP_COLUMNS = (
     "status",
     "primary_completed",
 )
-# 5 bits: swing_duration_ns is canonical; duration_ns is byte-equal alias (not duplicated)
+# 5 bits: duration_ns is the declared alias of swing_duration_ns (not duplicated)
 CONTROL_NULL_COLUMNS = (
     "swing_price",
     "swing_bps",
     "swing_atr",
-    "swing_duration_ns",
+    "duration_ns",
     "strong_move",
 )
 
@@ -94,46 +93,26 @@ class Adapter(BaseContrastAdapter):
     # EXP-102: joint resampling (default independent_arms=False)
 
     def fixture_frame(self) -> pl.DataFrame:
-        rows = make_fixture_frame(("0", "1"), label_column=LABEL_COLUMN).to_dicts()
-        for row in rows:
-            band = int(row[LABEL_COLUMN])
-            index = int(str(row["raid_id"]).rsplit("-", 1)[1])
-            first_timestamp = 1_700_000_000_000_000_000 + index * 900_000_000_000
-            row.update(
-                prior_raid_count=band,
-                level_id=f"FIXTURE-{band}-level-{index:04d}",
-                first_raid_timestamp=first_timestamp,
-                sweep_ts_ns=first_timestamp,
-                return_ts_ns=first_timestamp + 1,
-                confirmation_ts_ns=first_timestamp + 2,
-                endpoint_ts_ns=first_timestamp + 3,
-                swing_atr=(0.9 if index % 2 == 0 else 1.1) + 0.5 * band,
-                swing_duration_ns=(
-                    (3_000_000_000_000 if index % 2 == 0 else 4_200_000_000_000)
-                    + 3_600_000_000_000 * band
-                ),
-                strong_move=index < (50 if band == 0 else 100),
-                profile_generation="DEFINED",
-            )
-            row["duration_ns"] = row["swing_duration_ns"]
-        permutation = np.random.default_rng(4).permutation(len(rows))
-        permuted = [rows[int(index)] for index in permutation]
-        for position, row in enumerate(permuted):
-            row["raid_id"] = f"fixture-raid-{position:04d}"
-        return pl.DataFrame(permuted).sort("first_raid_timestamp", "level_id")
+        return make_fixture_frame(
+            (("0", "1"),),
+            label_column=LABEL_COLUMN,
+            config_value="FIXTURE_CONFIG",
+        ).with_columns(pl.col(LABEL_COLUMN).cast(pl.Int64).alias("prior_raid_count"))
 
     def prepare_frame(self, frame: pl.DataFrame) -> pl.DataFrame:
-        integer_count = pl.col("prior_raid_count").cast(pl.Int64, strict=False)
-        prepared = frame.with_columns(
-            pl.when(integer_count == 0)
-            .then(pl.lit("0"))
-            .when(integer_count == 1)
-            .then(pl.lit("1"))
-            .when(integer_count >= 2)
-            .then(pl.lit("2+"))
-            .otherwise(pl.lit("__INVALID__"))
-            .alias(LABEL_COLUMN)
-        )
+        # Fail-closed: the registered design declares no coercion rules for
+        # prior_raid_count, so any malformed value aborts rather than being
+        # silently mapped to an analysis band.
+        bands: list[str] = []
+        for value in frame["prior_raid_count"].to_list():
+            try:
+                bands.append(classify_count_band(value))
+            except ValueError as error:
+                raise ValueError(
+                    "prior_raid_count must be a non-negative integer; "
+                    f"got {value!r} (fail-closed: no coercion rules are declared)"
+                ) from error
+        prepared = frame.with_columns(pl.Series(LABEL_COLUMN, bands))
         cluster_columns = (*self.stratum_columns, "level_id")
         return (
             prepared.with_columns(
@@ -141,29 +120,6 @@ class Adapter(BaseContrastAdapter):
             )
             .sort((*self.stratum_columns, "__first_raid_timestamp", "level_id"))
             .drop("__first_raid_timestamp")
-        )
-
-    def _population_view(
-        self,
-        frame: pl.DataFrame,
-        *,
-        arm: Any,
-        comparator: Any,
-        channel: str,
-    ) -> tuple[pl.DataFrame, PopulationView]:
-        """Keep every count band in the registered destroy/bootstrap donor population."""
-        population = self._channel_frame(frame, channel)
-        stratum_id = "/".join(
-            str(population[column][0]) if population.height else "EMPTY"
-            for column in self.stratum_columns
-        )
-        return population, PopulationView(
-            population_id=f"{EXPERIMENT}:{stratum_id}:{arm}-vs-{comparator}:{channel}",
-            labels=population[LABEL_COLUMN].to_numpy(),
-            arm=arm,
-            comparator=comparator,
-            cluster_ids=population["level_id"].to_numpy(),
-            values=population[channel].cast(pl.Float64).to_numpy(),
         )
 
     def extra_integrity(self, frame: pl.DataFrame):
@@ -220,12 +176,22 @@ class Adapter(BaseContrastAdapter):
             if causal:
                 reasons.append("VOID_CAUSAL_ORDER")
 
+            # Count sequence reconciliation: the completed-raid subsequence must
+            # be strictly increasing in sweep order on each level. This is the
+            # property shared by the design text (count of earlier completed
+            # raids) and the frozen emission (sequential raid index per level);
+            # it deliberately does not demand contiguity across non-completed
+            # raids, which the emission is not required to provide.
             sequence_failures = 0
-            for group in frame.partition_by(
+            completed_raids = frame.filter(
+                (pl.col("status") == "COMPLETED")
+                & pl.col("primary_completed").fill_null(False)
+            )
+            for group in completed_raids.partition_by(
                 [*self.stratum_columns, "level_id"], maintain_order=True
             ):
                 ordered = group.sort("sweep_ts_ns")["prior_raid_count"].to_list()
-                if ordered != list(range(len(ordered))):
+                if any(later <= earlier for earlier, later in zip(ordered, ordered[1:])):
                     sequence_failures += 1
             evidence["level_count_sequence_failures"] = sequence_failures
             if sequence_failures:
@@ -266,6 +232,7 @@ def future_destroy(
         DestroySpec(CONTROL_GROUP_COLUMNS, CONTROL_NULL_COLUMNS, CONTROL_NULL_COLUMNS),
         seeds=(seed,),
         population_id=f"fixture:{label}",
+        n_destroy=1,
     )
     destroyed = [dict(row) for row in rows]
     for channel in CONTROL_NULL_COLUMNS:

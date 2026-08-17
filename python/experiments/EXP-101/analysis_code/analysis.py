@@ -47,12 +47,12 @@ CONTROL_GROUP_COLUMNS = (
     "status",
     "primary_completed",
 )
-# 5 bits: swing_duration_ns is canonical; duration_ns is byte-equal alias (not duplicated)
+# 5 bits: duration_ns is the declared alias of swing_duration_ns (not duplicated)
 CONTROL_NULL_COLUMNS = (
     "swing_price",
     "swing_bps",
     "swing_atr",
-    "swing_duration_ns",
+    "duration_ns",
     "strong_move",
 )
 
@@ -148,20 +148,9 @@ class Adapter(BaseContrastAdapter):
 
     def fixture_frame(self) -> pl.DataFrame:
         frame = make_fixture_frame(
-            (
-                "PREVIOUS_1H",
-                "PREVIOUS_4H",
-                "PREVIOUS_1D",
-                "PREVIOUS_1W",
-                "PREVIOUS_ASIA",
-                "PREVIOUS_EUROPE",
-                "PREVIOUS_AMERICA",
-                "ROLLING_7",
-                "ROLLING_14",
-                "ROLLING_22",
-                "ROLLING_252",
-            ),
+            tuple((comparator, arm) for arm, comparator in self.contrasts),
             label_column=LABEL_COLUMN,
+            config_value=None,
         )
         return frame.with_columns(pl.col("config").alias("source_configuration"))
 
@@ -192,6 +181,7 @@ def future_destroy(
         DestroySpec(CONTROL_GROUP_COLUMNS, CONTROL_NULL_COLUMNS, CONTROL_NULL_COLUMNS),
         seeds=(seed,),
         population_id=f"fixture:{label}",
+        n_destroy=1,
     )
     destroyed = [dict(row) for row in rows]
     for channel in CONTROL_NULL_COLUMNS:

@@ -13,8 +13,9 @@ import polars as pl
 from xen.liqswp_analysis.contract import IntegrityStatus
 from xen.liqswp_analysis.destroy import (
     DestroySpec,
+    draw_destroy_contrasts,
     future_destroy_attestation,
-    stream_destroy_control,
+    nested_destroy_bootstrap,
 )
 from xen.liqswp_analysis.source import SourceSpec, scan_train_columns, validate_source_contract
 from xen.liqswp_analysis.statistics import (
@@ -33,8 +34,15 @@ CHANNELS = (
     "swing_duration_ns",
     "strong_move",
 )
-# CONTROL_NULL_COLUMNS: 5 bits per design (swing_duration_ns is canonical; duration_ns is byte-equal alias)
-CONTROL_NULL_COLUMNS = CHANNELS
+# Registered 5-bit nullness class: duration_ns is the declared alias of
+# swing_duration_ns (asserted byte-equal before grouping).
+CONTROL_NULL_COLUMNS = (
+    "swing_price",
+    "swing_bps",
+    "swing_atr",
+    "duration_ns",
+    "strong_move",
+)
 BASE_COLUMNS = (
     "raid_id",
     "level_id",
@@ -59,7 +67,13 @@ BASE_COLUMNS = (
     "confirmation_regime",
     "endpoint_regime",
     *CHANNELS,
+    "duration_ns",
 )
+
+FIXTURE_ROWS_PER_ARM = 200
+FIXTURE_TIMESTAMP_BASE = 1_700_000_000_000_000_000
+FIXTURE_TIMESTAMP_STEP = 900_000_000_000
+FIXTURE_PERMUTATION_SEED = 4
 
 
 def _finite(value: Any) -> bool:
@@ -75,46 +89,86 @@ def _jsonable_key(value: Hashable) -> str:
     return str(value).lower() if isinstance(value, bool) else str(value)
 
 
-def make_fixture_frame(labels: Sequence[Hashable], *, label_column: str) -> pl.DataFrame:
-    """Create a deterministic multi-cluster fixture with literal arm effects."""
+def make_fixture_frame(
+    pairs: Sequence[tuple[Hashable, Hashable]],
+    *,
+    label_column: str,
+    rows_per_arm: int = FIXTURE_ROWS_PER_ARM,
+    config_value: Hashable | None = "FIXTURE_CONFIG",
+) -> pl.DataFrame:
+    """Build the registered two-arm pre-read fixture with the explicit plants.
+
+    Each (baseline, arm) pair contributes `rows_per_arm` rows per arm. The
+    registered FIXTURE-TOPOLOGY and tripwire plants are applied exactly:
+
+      swing_atr:        baseline 0.90/1.10 alternating, arm 1.40/1.60 (+0.50)
+      swing_duration_ns: baseline 3e12/4.2e12, arm 6.6e12/7.8e12 (+3.6e12 ns)
+      strong_move:      baseline true at 1/4 of positions, arm at 1/2 (+0.25)
+
+    level_id=FIXTURE-{arm}-level-{i:04d};
+    first_raid_timestamp=1_700_000_000_000_000_000 + i*900_000_000_000;
+    deterministic row permutation seed=4, then raid_id=fixture-raid-{position:04d};
+    ordering is (first_raid_timestamp, level_id); no source row is read. All
+    status/nullness/fixed fields are identical except the declared arm label and
+    the planted outcome values; there are no nulls.
+    """
     rows: list[dict[str, Any]] = []
-    for label_index, label in enumerate(labels):
-        for index in range(200):
-            base = float(index % 11) / 100.0
-            offset = float(label_index) * 0.5
-            strong_fraction = min(0.15 + 0.05 * label_index, 0.85)
-            row = {
-                "raid_id": f"R-{label_index}-{index}",
-                "level_id": f"L-{label_index}-{index}",
-                "source_configuration": "FIXTURE_CONFIG",
-                "archive_symbol": "EURUSD",
-                "timeframe": "15m",
-                "config": "FIXTURE_CONFIG",
-                "side": "HIGH",
-                "sweep_ts_ns": 100 + index * 10,
-                "return_ts_ns": 110 + index * 10,
-                "confirmation_ts_ns": 120 + index * 10,
-                "endpoint_ts_ns": 130 + index * 10,
-                "confirmation_method": "BREAKOUT_BAR",
-                "confirmation_reference": "1H",
-                "primary_attribution": True,
-                "primary_completed": True,
-                "status": "COMPLETED",
-                "prior_raid_count": label_index,
-                "profile_undefined_reason": None,
-                "raid_regime": label if label in {"LOW", "MID", "HIGH"} else "MID",
-                "confirmation_regime": "MID",
-                "endpoint_regime": "MID",
-                "swing_price": 100.0 + base + offset,
-                "swing_bps": 10.0 + base + offset,
-                "swing_atr": 1.0 + base + offset,
-                "swing_duration_ns": 3_600_000_000_000 + offset * 1_000_000_000,
-                "strong_move": index < int(200 * strong_fraction),
-                "fixture": True,
-                label_column: label,
-            }
-            rows.append(row)
-    return pl.DataFrame(rows)
+    for baseline_label, arm_label in pairs:
+        for arm_index, (label, arm_flag) in enumerate(
+            ((baseline_label, False), (arm_label, True))
+        ):
+            for index in range(int(rows_per_arm)):
+                even = index % 2 == 0
+                first_raid_timestamp = FIXTURE_TIMESTAMP_BASE + index * FIXTURE_TIMESTAMP_STEP
+                if arm_flag:
+                    swing_atr = 1.40 if even else 1.60
+                    duration = 6_600_000_000_000 if even else 7_800_000_000_000
+                    strong = index < int(rows_per_arm / 2)
+                else:
+                    swing_atr = 0.90 if even else 1.10
+                    duration = 3_000_000_000_000 if even else 4_200_000_000_000
+                    strong = index < int(rows_per_arm / 4)
+                rows.append(
+                    {
+                        "raid_id": "",  # assigned after the deterministic permutation
+                        "level_id": f"FIXTURE-{label}-level-{index:04d}",
+                        "source_configuration": "FIXTURE_CONFIG",
+                        "archive_symbol": "EURUSD",
+                        "timeframe": "15m",
+                        "config": label if config_value is None else config_value,
+                        "side": "HIGH",
+                        "sweep_ts_ns": first_raid_timestamp,
+                        "return_ts_ns": first_raid_timestamp + 1,
+                        "confirmation_ts_ns": first_raid_timestamp + 2,
+                        "endpoint_ts_ns": first_raid_timestamp + 3,
+                        "confirmation_method": "BREAKOUT_BAR",
+                        "confirmation_reference": "1H",
+                        "primary_attribution": True,
+                        "primary_completed": True,
+                        "status": "COMPLETED",
+                        "prior_raid_count": 0,
+                        "profile_undefined_reason": None,
+                        "raid_regime": "MID",
+                        "confirmation_regime": "MID",
+                        "endpoint_regime": "MID",
+                        "swing_price": 100.0 + (0.5 if arm_flag else 0.0),
+                        "swing_bps": 10.0 + (0.5 if arm_flag else 0.0),
+                        "swing_atr": swing_atr,
+                        "swing_duration_ns": duration,
+                        "duration_ns": duration,
+                        "strong_move": strong,
+                        "fixture": True,
+                        label_column: label,
+                    }
+                )
+    permutation = np.random.default_rng(FIXTURE_PERMUTATION_SEED).permutation(len(rows))
+    permuted = [rows[int(index)] for index in permutation]
+    for position, row in enumerate(permuted):
+        row["raid_id"] = f"fixture-raid-{position:04d}"
+    return pl.DataFrame(permuted).sort(
+        pl.col("sweep_ts_ns"),
+        pl.col("level_id"),
+    )
 
 
 class BaseContrastAdapter:
@@ -140,8 +194,10 @@ class BaseContrastAdapter:
         "side",
         "config",
     )
-    # EXP-101 uses independent arm resampling; EXP-102/103 use joint
+    # EXP-101 uses independent arm resampling; EXP-102/103/104 use joint
     independent_arms: bool = False
+    # primary block length for the nested outer bootstrap (the §4 default)
+    nested_block_length: int = 5
 
     def __init__(
         self,
@@ -235,6 +291,13 @@ class BaseContrastAdapter:
         population = self._channel_frame(frame, channel).filter(
             pl.col(self.label_column).is_in([arm, comparator])
         )
+        # Registered §4 ordering: clusters are complete level_id histories sorted
+        # by (first_raid_timestamp, level_id); rows keep their order within a
+        # selected cluster.
+        population = population.sort(
+            pl.col("sweep_ts_ns").min().over("level_id"),
+            "level_id",
+        )
         values = population[channel].cast(pl.Float64).to_numpy()
         stratum_id = "/".join(
             str(population[column][0]) if population.height else "EMPTY"
@@ -271,16 +334,14 @@ class BaseContrastAdapter:
         reasons = list(extra_status.reasons)
         common_evidence: dict[str, Any] = {}
 
-        # Duration alias nullness mismatch check
+        # Duration alias nullness/value mismatch check (asserted alias).
         if {"duration_ns", "swing_duration_ns"} <= set(frame.columns):
-            # Check where one is null and the other is not
             duration_null_xor = frame.filter(
                 (pl.col("duration_ns").is_null() != pl.col("swing_duration_ns").is_null())
             ).height
             common_evidence["duration_alias_nullness_mismatch"] = duration_null_xor
             if duration_null_xor:
                 reasons.append("VOID_DURATION_ALIAS_NULLNESS_MISMATCH")
-            # Also check value mismatches where both are non-null
             duration_mismatches = frame.filter(
                 pl.col("duration_ns").is_not_null()
                 & pl.col("swing_duration_ns").is_not_null()
@@ -292,100 +353,59 @@ class BaseContrastAdapter:
 
         control_records: list[dict[str, Any]] = []
         control_status: dict[tuple[Any, ...], bool] = {}
-        destroy_seeds = tuple(range(self.n_destroy))
 
         for stratum, stratum_frame in self._strata(frame):
             for arm, comparator in self.contrasts:
                 for channel in self.control_channels:
                     self._progress("integrity", stratum, arm, channel)
+                    donor_population = self._channel_frame(stratum_frame, channel)
                     population, view = self._population_view(
                         stratum_frame, arm=arm, comparator=comparator, channel=channel
                     )
-                    columns = {
+                    spec = DestroySpec(
+                        self.control_group_columns,
+                        self.control_null_columns,
+                        (channel,),
+                    )
+                    donor_columns = {
+                        column: donor_population[column].to_numpy()
+                        for column in set(
+                            (*self.control_group_columns, *self.control_null_columns, channel)
+                        )
+                    }
+                    donor_labels = donor_population[self.label_column].to_numpy()
+                    donor_run = draw_destroy_contrasts(
+                        f"{view.population_id}|donor",
+                        donor_columns,
+                        donor_labels,
+                        arm=arm,
+                        comparator=comparator,
+                        channel=channel,
+                        spec=spec,
+                        n_destroy=self.n_destroy,
+                        batch_size=8,
+                    )
+                    view_columns = {
                         column: population[column].to_numpy()
                         for column in set(
                             (*self.control_group_columns, *self.control_null_columns, channel)
                         )
                     }
-                    destroy_run = stream_destroy_control(
+                    nested = nested_destroy_bootstrap(
                         view,
-                        columns,
-                        DestroySpec(
-                            self.control_group_columns,
-                            self.control_null_columns,
-                            (channel,),
-                        ),
-                        seeds=destroy_seeds,
-                        n_destroy=self.n_destroy,
-                        batch_size=8,
-                    )
-                    mappings = destroy_run.summary
-
-                    # Raw bootstrap with independent_arms setting
-                    raw_boot = clustered_contrast_bootstrap(
-                        view, block_length=5, n_boot=self.n_boot, seeds=self.seeds,
-                        independent_arms=self.independent_arms
-                    )
-
-                    # Destroyed average view for bootstrap
-                    destroyed_average_view = PopulationView(
-                        population_id=view.population_id,
-                        labels=view.labels,
-                        arm=view.arm,
-                        comparator=view.comparator,
-                        cluster_ids=view.cluster_ids,
-                        values=destroy_run.average_values,
-                    )
-                    destroyed_boot = clustered_contrast_bootstrap(
-                        destroyed_average_view,
-                        block_length=5,
+                        view_columns,
+                        spec,
+                        channel=channel,
+                        outer_seeds=self.seeds,
                         n_boot=self.n_boot,
-                        seeds=self.seeds,
+                        block_length=self.nested_block_length,
+                        n_destroy=self.n_destroy,
                         independent_arms=self.independent_arms,
                     )
-
-                    # Exact nested destroy SE computation per design
-                    # bootstrap_SE_raw[s] = std_b(D_raw[s,b]) across 10,000 bootstrap populations
-                    # bootstrap_SE_mean_destroyed[s] = std_b(m_destroy[s,b]) where m_destroy[s,b] = mean_d(D_destroy[s,b,d])
-                    # For now, use the destroyed_contrasts from stream_destroy_control for SE
-                    all_destroyed = destroy_run.all_destroyed_contrasts
-                    if all_destroyed is not None and all_destroyed.size > 0:
-                        # Reshape to (n_seeds, n_destroy)
-                        n_seeds = len(destroy_seeds)
-                        n_destroy = self.n_destroy
-                        if all_destroyed.size == n_seeds * n_destroy:
-                            destroyed_reshaped = all_destroyed.reshape(n_seeds, n_destroy)
-                            # Mean destroyed contrast per seed (already in destroy_run.estimates)
-                            # SE of mean destroyed contrasts across seeds
-                            seed_means = destroy_run.estimates
-                            finite_seed_means = seed_means[np.isfinite(seed_means)]
-                            destroyed_mapping_se = float(np.std(finite_seed_means, ddof=1)) if finite_seed_means.size > 1 else float("nan")
-                        else:
-                            destroyed_mapping_se = float("nan")
-                    else:
-                        destroyed_mapping_se = float("nan")
-
-                    destroyed_data_se = float(destroyed_boot.get("bootstrap_se", float("nan")))
-                    # Per design: total SE = sqrt(bootstrap_SE_raw^2 + bootstrap_SE_mean_destroyed^2)
-                    # But the design says: bootstrap_SE_raw[s]=std_b(D_raw[s,b]); bootstrap_SE_mean_destroyed[s]=std_b(m_destroy[s,b])
-                    # These are per-seed. The overall SE combines them.
-                    # For now, use the hypot combination as before but with correct components
-                    raw_bootstrap_se = float(raw_boot.get("bootstrap_se", float("nan")))
-                    if np.isfinite(raw_bootstrap_se) and np.isfinite(destroyed_mapping_se):
-                        destroyed_outer_se = float(np.hypot(raw_bootstrap_se, destroyed_mapping_se))
-                    elif np.isfinite(destroyed_data_se) and np.isfinite(destroyed_mapping_se):
-                        destroyed_outer_se = float(np.hypot(destroyed_data_se, destroyed_mapping_se))
-                    else:
-                        destroyed_outer_se = float("nan")
-
                     status = future_destroy_attestation(
                         view,
-                        mappings,
-                        se_population_id=destroyed_average_view.population_id,
-                        raw_bootstrap_result=raw_boot,
-                        raw_bootstrap_se=raw_bootstrap_se,
-                        destroyed_estimates=destroy_run.estimates,
-                        destroyed_bootstrap_se=destroyed_outer_se,
+                        donor_run=donor_run,
+                        nested=nested,
                     )
                     status_key = (
                         *(stratum[column] for column in self.stratum_columns),
@@ -395,7 +415,16 @@ class BaseContrastAdapter:
                     )
                     control_status[status_key] = status.blocking_pass
 
-                    # Failed-control propagation: individual failed controls enter overall reasons
+                    raw_boot = clustered_contrast_bootstrap(
+                        view,
+                        block_length=self.nested_block_length,
+                        n_boot=self.n_boot,
+                        seeds=self.seeds,
+                        independent_arms=self.independent_arms,
+                    )
+                    donor_contrast_rows = donor_population.filter(
+                        pl.col(self.label_column).is_in([arm, comparator])
+                    ).height
                     record = {
                         "stratum": stratum,
                         "arm": arm,
@@ -404,19 +433,9 @@ class BaseContrastAdapter:
                         "blocking_pass": status.blocking_pass,
                         "reasons": list(status.reasons),
                         **status.evidence,
-                        "population_match": len(
-                            {
-                                view.population_id,
-                                mappings.population_id,
-                                destroyed_average_view.population_id,
-                            }
-                        )
-                        == 1,
-                        "max_materialized_mappings": destroy_run.max_materialized_mappings,
-                        "destroyed_mapping_monte_carlo_se": destroyed_mapping_se,
-                        "destroyed_data_bootstrap_se": destroyed_data_se,
-                        "raw_bootstrap_se": raw_bootstrap_se,
-                        "all_destroyed_contrasts": destroy_run.all_destroyed_contrasts.tolist() if destroy_run.all_destroyed_contrasts is not None else None,
+                        "population_match": population.height == donor_contrast_rows,
+                        "raw_bootstrap_interval": raw_boot.get("interval"),
+                        "raw_bootstrap_seed_rows": raw_boot.get("seeds"),
                     }
                     control_records.append(record)
 
@@ -424,7 +443,7 @@ class BaseContrastAdapter:
         self._control_status = control_status
         self._extra_integrity_evidence = dict(extra_status.evidence)
 
-        # Failed-control propagation: collect all reasons from failed controls
+        # Failed-control propagation: individual failed controls enter overall reasons
         failed_control_reasons = set()
         for record in control_records:
             if not record["blocking_pass"]:
@@ -487,6 +506,45 @@ class BaseContrastAdapter:
                             else None
                         ),
                     }
+                    source_fields: dict[str, dict[str, Any]] = {}
+                    for source_channel in ("swing_price", "swing_bps"):
+                        source_view = self._population_view(
+                            stratum_frame,
+                            arm=arm,
+                            comparator=comparator,
+                            channel=source_channel,
+                        )[1]
+                        source_values = np.asarray(source_view.values, dtype=float)
+                        arm_source = source_values[
+                            (source_view.labels == arm) & np.isfinite(source_values)
+                        ]
+                        comparator_source = source_values[
+                            (source_view.labels == comparator) & np.isfinite(source_values)
+                        ]
+                        source_fields[source_channel] = {
+                            "arm": {
+                                "n": int(arm_source.size),
+                                "non_null": int(arm_source.size),
+                                "mean": float(arm_source.mean()) if arm_source.size else None,
+                                "median": (
+                                    float(np.median(arm_source)) if arm_source.size else None
+                                ),
+                            },
+                            "comparator": {
+                                "n": int(comparator_source.size),
+                                "non_null": int(comparator_source.size),
+                                "mean": (
+                                    float(comparator_source.mean())
+                                    if comparator_source.size
+                                    else None
+                                ),
+                                "median": (
+                                    float(np.median(comparator_source))
+                                    if comparator_source.size
+                                    else None
+                                ),
+                            },
+                        }
                     rows.append(
                         {
                             "population_id": view.population_id,
@@ -495,7 +553,11 @@ class BaseContrastAdapter:
                             "comparator": comparator,
                             "channel": channel,
                             "observed": sensitivities["5"],
+                            "observed_L2": sensitivities["2"],
+                            "observed_L5": sensitivities["5"],
+                            "observed_L10": sensitivities["10"],
                             "medians": medians,
+                            "source_field_summaries": source_fields,
                             "ideal": "direct arm-minus-fixed-comparator estimate with uncertainty",
                             "interpretation": "operator judges; no machine value label",
                             "sensitivities": sensitivities,
@@ -553,5 +615,3 @@ class BaseContrastAdapter:
             "census": self.census(frame),
             "integrity_evidence": dict(self._extra_integrity_evidence),
         }
-
-

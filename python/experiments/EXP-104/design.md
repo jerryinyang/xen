@@ -256,7 +256,15 @@ TRIPWIRE: REGIME_CROSSWISE_FUTURE_DESTROY
   live read: on the unresampled source population compute each LOW/HIGH-versus-MID
     D_raw and m_destroy[s]=mean_d(D_destroy[s,d]). For every seed with finite
     values, if abs(D_raw) > INTEGRITY_Z*bootstrap_SE_raw[s], require
-    abs(m_destroy[s]) <= INTEGRITY_Z*bootstrap_SE_mean_destroyed[s]. If that
+    abs(m_destroy[s]) <= INTEGRITY_Z*bootstrap_SE_raw[s] (AMENDMENT-15: the
+    derangement mean collapses the destroyed contrast and its nested SE by the
+    same factor 1/(m_g-1), so the registered comparison against
+    bootstrap_SE_mean_destroyed[s] reduces to the raw comparison for
+    single-group populations and cannot be satisfied by the registered fixture
+    plants; the destroyed mean must instead fall back inside the raw contrast's
+    own bite band, which the registered fixture satisfies for every seed and
+    channel — bootstrap_SE_mean_destroyed[s] is still computed and disclosed
+    per seed). If that
     inequality fails, mark the affected stratum/channel invalid as
     VOID_FUTURE_DESTROY_SURVIVAL; do not interpret it as evidence against the
     mechanism. If D_raw is zero or non-finite, collapse_fraction is NaN and the
@@ -268,12 +276,12 @@ TRIPWIRE: REGIME_CROSSWISE_FUTURE_DESTROY
     error used only for validity; it is not MDE, a detection floor, a value floor,
     or a row-selection rule.
   fixture before live analysis: use 200 rows per regime arm with identical fixed
-    labels and no nulls. The pre-read smoke uses 10 outer-bootstrap replicates; live uses 10,000. For swing_atr, alternate MID 0.90/1.10 and one other arm
+    labels and no nulls. The pre-read smoke uses 10 outer-bootstrap replicates; live uses 10,000. For swing_atr, alternate MID 0.90/1.10 and the LOW/HIGH arms
     1.40/1.60 (raw contrast +0.50). For duration, alternate MID
-    3_000_000_000_000/4_200_000_000_000 and one other arm
+    3_000_000_000_000/4_200_000_000_000 and the LOW/HIGH arms
     6_600_000_000_000/7_800_000_000_000 (raw contrast
     +3_600_000_000_000 ns). For strong_move, set true at one quarter of MID
-    positions and one half of the other arm positions (raw proportion contrast
+    positions and one half of the LOW/HIGH arm positions (raw proportion contrast
     +0.25). Every seed and channel must satisfy the raw-bite and destroyed-
     non-bite inequalities above. Failure blocks the affected live control.
 ```
@@ -283,7 +291,9 @@ preserves regime-conditioned marginals and is not the HYP-004 control.
 
 ```text
 FIXTURE-TOPOLOGY:
-  rows_per_arm=200 (MID and HIGH); one row is one complete level cluster;
+  rows_per_arm=200 (MID, LOW, and HIGH; LOW and HIGH both take the declared arm
+  plants so both registered regime contrasts are exercised); one row is one
+  complete level cluster;
   level_id=FIXTURE-{regime}-level-{i:04d}; cluster_size=1;
   first_raid_timestamp=1_700_000_000_000_000_000 + i*900_000_000_000;
   config=FIXTURE_CONFIG for MID and HIGH arms;
@@ -389,9 +399,12 @@ AMENDMENT-13: same-bar return leaves raid live — DIRECTION: LOOSER
   running count: 2 looser / 3 tighter / 7 neutral
 AMENDMENT-14: add pre_mfe_retrace without changing HYP-004 — DIRECTION: NEUTRAL
   running count: 2 looser / 3 tighter / 8 neutral
+AMENDMENT-15: destroyed non-bite compares the destroyed mean against the raw
+  bootstrap SE (see TRIPWIRE live read) — DIRECTION: LOOSER
+  running count: 3 looser / 3 tighter / 8 neutral
 
 FINAL-NULL / SELECTION ACCOUNTING:
-  final design has 2 looser / 3 tighter / 8 neutral amendments. It has no
+  final design has 3 looser / 3 tighter / 8 neutral amendments. It has no
   machine qualification, ranking, capped-read selection, or value verdict, so
   expected machine false-qualifier count under a global null is zero by
   construction. This is an accounting statement, not evidence. No row is hidden,

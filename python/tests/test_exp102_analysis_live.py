@@ -19,7 +19,10 @@ def _load_exp102():
 
 
 def _small_adapter(module):
-    return module.Adapter(n_boot=8, n_destroy=4, seeds=(0, 1))
+    # Integrity-passing tests use the registered 2,000 destroy draws: the live
+    # destroyed mean carries draw noise ~ sigma_d/sqrt(n_destroy), so small
+    # test-only destroy counts can push the fixed draw mean past the bite.
+    return module.Adapter(n_boot=8, n_destroy=2000, seeds=(0, 1))
 
 
 def test_destroy_population_includes_every_count_band() -> None:

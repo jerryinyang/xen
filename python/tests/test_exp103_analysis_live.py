@@ -7,6 +7,7 @@ from pathlib import Path
 from types import ModuleType
 
 import polars as pl
+import pytest
 
 
 PYTHON_ROOT = Path(__file__).parents[1]
@@ -61,7 +62,7 @@ def test_duration_alias_null_mismatch_is_a_named_hard_failure() -> None:
     status = adapter.integrity(frame)
 
     assert not status.blocking_pass
-    assert "VOID_DURATION_ALIAS" in status.reasons
+    assert "VOID_DURATION_ALIAS_NULLNESS_MISMATCH" in status.reasons
 
 
 def test_cluster_sequence_is_sorted_by_first_raid_timestamp_then_level() -> None:
@@ -84,10 +85,26 @@ def test_cluster_sequence_is_sorted_by_first_raid_timestamp_then_level() -> None
 
 
 def test_destroy_se_uses_registered_nested_outer_bootstrap() -> None:
-    """Destroy mappings must be recomputed inside each joint cluster population."""
+    """Destroy statistics must be recomputed inside each joint cluster population.
+
+    Four rows, clusters A=[F@1.0, T@4.0] and B=[F@2.0, T@8.0], one destroy
+    group of size 4. The registered procedure deranges the outcome blocks
+    inside every resampled population b (donor pool = b's rows), so the
+    destroyed mean for population b is the exact uniform-derangement mean
+    E[D | b] = (W*G - S)/(m - 1), and the SE carries the exact within-
+    population draw variance as Var/n_destroy. For seed 0, n_boot=20,
+    n_destroy=8 this composition is
+    sqrt(var_between(0.1388157894736842) + mean(Var_draw)/8 (1.4125)).
+    """
     module = _load_exp103()
     source = module.Adapter(n_boot=2, n_destroy=2, seeds=(0,)).fixture_frame()
-    frame = pl.concat([source.slice(0, 2), source.slice(200, 2)]).with_columns(
+    rows = pl.concat(
+        [
+            source.filter(pl.col("tight_gap") == False).head(2),  # noqa: E712
+            source.filter(pl.col("tight_gap") == True).head(2),  # noqa: E712
+        ]
+    )
+    frame = rows.with_columns(
         pl.Series("level_id", ["A", "B", "A", "B"]),
         pl.Series("swing_atr", [1.0, 2.0, 4.0, 8.0]),
         pl.Series("swing_duration_ns", [1.0, 2.0, 4.0, 8.0]),
@@ -101,9 +118,15 @@ def test_destroy_se_uses_registered_nested_outer_bootstrap() -> None:
         row for row in status.evidence["controls"] if row["channel"] == "swing_atr"
     )
 
-    # Literal result of the registered procedure for the four rows above:
-    # seed-0 joint circular cluster draws; seeds 0..7 deranged inside each draw.
-    assert record["destroyed_bootstrap_se"] == 0.7083849310412494
+    # Exact sufficient-statistic composition of the registered procedure for
+    # the rows above: seed-0 joint circular cluster draws with the destroy
+    # recomputed inside each draw (uniform-derangement mean + exact draw
+    # variance / n_destroy).
+    assert record["destroyed_bootstrap_se"] == 1.2455182814690775
+    assert record["nested_seeds"][0]["var_between_populations"] == 0.1388157894736842
+    assert record["nested_seeds"][0]["var_within_draws_over_n_destroy"] == pytest.approx(
+        1.4125
+    )
 
 
 def test_control_artifact_discloses_every_destroyed_contrast() -> None:

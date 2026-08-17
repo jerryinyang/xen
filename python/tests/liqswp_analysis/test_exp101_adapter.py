@@ -9,7 +9,7 @@ def test_exp101_adapter_emits_every_registered_channel_and_sensitivity(
     load_exp_module: Callable[[str], ModuleType], tmp_path: Path
 ) -> None:
     module = load_exp_module("EXP-101")
-    adapter = module.Adapter(n_boot=40, n_destroy=20, seeds=(0, 1))
+    adapter = module.Adapter(n_boot=40, n_destroy=2000, seeds=(0, 1))
     frame = adapter.fixture_frame()
     assert adapter.integrity(frame).blocking_pass
     rows = adapter.analyze(frame)
@@ -62,7 +62,7 @@ def test_exp101_control_null_class_is_exactly_five_bits(
         "swing_price": 1.0,
         "swing_bps": None,
         "swing_atr": 2.0,
-        "swing_duration_ns": None,
+        "duration_ns": None,
         "strong_move": True,
         "profile_status": "SHOULD_NOT_GROUP",
         "profile_undefined_reason": "SHOULD_NOT_GROUP",

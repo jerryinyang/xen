@@ -68,8 +68,8 @@ def test_future_destroy_uses_all_eleven_configurations_as_donors(
     adapter.integrity(frame)
     first_control = adapter.extra(frame)["control"]["records"][0]
 
-    assert first_control["group_sizes"] == [2_200]
-    assert first_control["moved_rows"] == 2_200
+    assert first_control["group_sizes"] == [3_200]
+    assert first_control["moved_rows"] == 3_200
 
 
 def test_fixture_cli_uses_the_registered_bounded_fixture_runner(

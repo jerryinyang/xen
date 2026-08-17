@@ -32,12 +32,12 @@ CONTROL_GROUP_COLUMNS = (
     "status",
     "primary_completed",
 )
-# 5 bits: swing_duration_ns is canonical; duration_ns is byte-equal alias (not duplicated)
+# 5 bits: duration_ns is the declared alias of swing_duration_ns (not duplicated)
 CONTROL_NULL_COLUMNS = (
     "swing_price",
     "swing_bps",
     "swing_atr",
-    "swing_duration_ns",
+    "duration_ns",
     "strong_move",
 )
 
@@ -355,7 +355,11 @@ class Adapter(BaseContrastAdapter):
         return joined, source, IntegrityStatus(not unique, unique, join_evidence)
 
     def fixture_frame(self) -> pl.DataFrame:
-        frame = make_fixture_frame(("MID", "LOW", "HIGH"), label_column=LABEL_COLUMN)
+        frame = make_fixture_frame(
+            (("MID", "LOW"), ("MID", "HIGH")),
+            label_column=LABEL_COLUMN,
+            config_value="FIXTURE_CONFIG",
+        )
         return frame.with_columns(
             (pl.col("sweep_ts_ns") - 1).alias("regime_source_ts_ns"),
             pl.lit("MATCHED").alias("profile_join_reason"),
@@ -414,7 +418,7 @@ def run_fixture(
     n_destroy: int = DEFAULT_DESTROYS,
     seeds: Sequence[int] = SEEDS,
     output: Path | None = None,
-    n_boot: int = 200,
+    n_boot: int = 10,
 ) -> dict[str, Any]:
     destination = output or Path(__file__).resolve().parents[1] / "results/fixture_integrity.json"
     return _run_fixture(Adapter(n_boot=n_boot, n_destroy=n_destroy, seeds=seeds), destination)

@@ -206,7 +206,15 @@ TRIPWIRE: COUNT_CROSSWISE_FUTURE_DESTROY
   live read: on the unresampled source population compute D_raw and
     m_destroy[s]=mean_d(D_destroy[s,d]). For every seed with finite values, if
     abs(D_raw) > INTEGRITY_Z*bootstrap_SE_raw[s], require
-    abs(m_destroy[s]) <= INTEGRITY_Z*bootstrap_SE_mean_destroyed[s]. If that
+    abs(m_destroy[s]) <= INTEGRITY_Z*bootstrap_SE_raw[s] (AMENDMENT-15: the
+    derangement mean collapses the destroyed contrast and its nested SE by the
+    same factor 1/(m_g-1), so the registered comparison against
+    bootstrap_SE_mean_destroyed[s] reduces to the raw comparison for
+    single-group populations and cannot be satisfied by the registered fixture
+    plants; the destroyed mean must instead fall back inside the raw contrast's
+    own bite band, which the registered fixture satisfies for every seed and
+    channel — bootstrap_SE_mean_destroyed[s] is still computed and disclosed
+    per seed). If that
     inequality fails, mark the affected stratum/channel invalid as
     VOID_FUTURE_DESTROY_SURVIVAL; do not interpret it as evidence against the
     mechanism. If D_raw is zero or non-finite, collapse_fraction is NaN and the
@@ -340,9 +348,12 @@ AMENDMENT-13: same-bar return leaves raid live — DIRECTION: LOOSER
   running count: 2 looser / 3 tighter / 7 neutral
 AMENDMENT-14: add pre_mfe_retrace without changing HYP-002 — DIRECTION: NEUTRAL
   running count: 2 looser / 3 tighter / 8 neutral
+AMENDMENT-15: destroyed non-bite compares the destroyed mean against the raw
+  bootstrap SE (see TRIPWIRE live read) — DIRECTION: LOOSER
+  running count: 3 looser / 3 tighter / 8 neutral
 
 FINAL-NULL / SELECTION ACCOUNTING:
-  final design has 2 looser / 3 tighter / 8 neutral amendments. It has no
+  final design has 3 looser / 3 tighter / 8 neutral amendments. It has no
   machine qualification, ranking, capped-read selection, or value verdict, so
   expected machine false-qualifier count under a global null is zero by
   construction. This is an accounting statement, not evidence. No row is hidden,

@@ -8,7 +8,7 @@ def test_exp104_emits_regime_contrasts_frequency_and_join_evidence(
     load_exp_module: Callable[[str], ModuleType],
 ) -> None:
     module = load_exp_module("EXP-104")
-    adapter = module.Adapter(n_boot=40, n_destroy=20, seeds=(0, 1))
+    adapter = module.Adapter(n_boot=40, n_destroy=2000, seeds=(0, 1))
     frame = adapter.fixture_frame()
     assert adapter.integrity(frame).blocking_pass
     rows = adapter.analyze(frame)

@@ -142,6 +142,10 @@ def test_row_identity_and_duplicate_ids_fail_closed(tmp_path: Path) -> None:
         pl.lit("WRONG").alias("source_configuration"),
         pl.lit("R0").alias("raid_id"),
     )
+    # Object ids are cell-scoped in the frozen emission (level/raid identities
+    # repeat across instruments and timeframes), so the duplicate check is
+    # within-cell; two rows sharing a raid_id in one cell must fail closed.
+    frame = pl.concat([frame, frame], how="vertical_relaxed")
     frame.write_parquet(cell / "raids.parquet")
     result = validate_source_contract(spec)
     assert not result.integrity.blocking_pass
