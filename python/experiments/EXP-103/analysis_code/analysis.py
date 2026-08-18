@@ -145,6 +145,8 @@ def replay_profile(counts: Sequence[int], *, start_bin: int = 100) -> dict[str, 
         ),
         "va_count": selected_count,
         "tpo_total": total,
+        "gap_target_mass": int(gap_target),
+        "gap_mass": int(gap_count),
         "tpo_conservation_ok": True,
         "tight_gap": gap_span < 0.5 * va_width,
         "undefined_reason": None,
@@ -208,6 +210,20 @@ def validate_profile_frame(frame: pl.DataFrame) -> tuple[IntegrityStatus, dict[s
             reasons.append("VOID_GAP_SPAN_VA")
         if not np.isclose(float(row["va_mass"]), row["va_count"] / row["tpo_total"]):
             reasons.append("VOID_VA_MASS")
+        # §5 threshold re-verification: the emitted VA mass must reach the
+        # registered 70% target and the selected gap mass must reach its 30%
+        # target (the latter only where the per-bin counts are emitted — the
+        # live profile table carries masks only, so those rows are counted as
+        # not recomputable per design §2).
+        if int(row["va_count"]) < int(np.ceil(0.70 * int(row["tpo_total"]))):
+            reasons.append("VOID_VA_MASS_THRESHOLD")
+        gap_target_mass = row.get("gap_target_mass")
+        gap_mass = row.get("gap_mass")
+        if gap_target_mass is not None and gap_mass is not None:
+            if int(gap_mass) < int(gap_target_mass):
+                reasons.append("VOID_GAP_MASS_THRESHOLD")
+            if int(row["va_count"]) > 1 and int(gap_mass) >= int(row["va_count"]):
+                reasons.append("VOID_GAP_MASS_THRESHOLD")
         if int(row["bracket_count"]) < 1 or float(row["val"]) > float(row["poc"]):
             reasons.append("VOID_PROFILE_GEOMETRY")
         if float(row["poc"]) >= float(row["vah"]):
@@ -227,6 +243,14 @@ def validate_profile_frame(frame: pl.DataFrame) -> tuple[IntegrityStatus, dict[s
         "defined": defined.height,
         "undefined": frame.height - defined.height,
         "reasons": list(unique),
+        "thresholds": {
+            "va_rows_checked": defined.height,
+            "gap_rows_checked": (
+                int(defined.select(pl.col("gap_target_mass").is_not_null()).height)
+                if "gap_target_mass" in defined.columns
+                else 0
+            ),
+        },
     }
     return IntegrityStatus(not unique, unique, evidence), evidence
 

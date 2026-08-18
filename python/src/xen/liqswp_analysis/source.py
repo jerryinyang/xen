@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 from dataclasses import dataclass
@@ -11,6 +12,19 @@ from typing import Any, Sequence
 import polars as pl
 
 from xen.liqswp_analysis.contract import IntegrityStatus
+
+# §1 frozen-source seal: INFR-021 cTrader TRAIN fence window and emission
+# contract pinned by the family design (checked fail-closed on every cell).
+SEAL_EMISSION_CONTRACT_VERSION = "nautilus-emission-v1"
+SEAL_NAUTILUS_VERSION = "1.230.0"
+SEAL_MANIFEST_SHA256 = (
+    "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0"
+)
+TRAIN_START_UTC = "2021-06-02T00:01:00Z"
+TRAIN_START_NS = int(
+    datetime.datetime.fromisoformat(TRAIN_START_UTC.replace("Z", "+00:00")).timestamp()
+    * 1_000_000_000
+)
 
 
 @dataclass(frozen=True)
@@ -26,8 +40,12 @@ class SourceSpec:
     object_id_column: str
     train_end_column: str
     train_end_ns: int
-    # New: UTC fence timestamp for human-readable validation
+    # UTC fence timestamps for human-readable validation
     train_end_utc: str | None = None
+    train_start_ns: int | None = None
+    train_start_utc: str | None = None
+    # Repo root for resolving repo-relative manifest_path entries in fence files
+    manifest_root: Path | None = None
 
 
 @dataclass(frozen=True)
@@ -234,6 +252,35 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
             reasons.append("VOID_FENCE_BOUNDARY")
         if "train_end_ns" in fence and int(fence["train_end_ns"]) != int(spec.train_end_ns):
             reasons.append("VOID_FENCE_BOUNDARY")
+        # §1 seal: emission contract, Nautilus pin, single-node execution, and
+        # the manifest that binds the TRAIN window (fail-closed on every cell).
+        if metadata.get("emission_contract_version") != SEAL_EMISSION_CONTRACT_VERSION:
+            reasons.append("VOID_EMISSION_CONTRACT_VERSION")
+        if metadata.get("nautilus_version") != SEAL_NAUTILUS_VERSION:
+            reasons.append("VOID_NAUTILUS_VERSION")
+        if metadata.get("one_backtest_node") is not True:
+            reasons.append("VOID_ONE_BACKTEST_NODE")
+        if fence.get("manifest_sha256") != SEAL_MANIFEST_SHA256:
+            reasons.append("VOID_MANIFEST_SHA256")
+        manifest_file = fence.get("manifest_path")
+        if manifest_file is not None:
+            manifest_path_ = Path(str(manifest_file))
+            if not manifest_path_.is_absolute() and spec.manifest_root is not None:
+                manifest_path_ = spec.manifest_root / manifest_path_
+            if not manifest_path_.exists():
+                reasons.append("VOID_MANIFEST_MISSING")
+            else:
+                manifest = _read_json(manifest_path_)
+                if manifest.get("analysis_start_utc") != TRAIN_START_UTC:
+                    reasons.append("VOID_TRAIN_START_FENCE")
+                if manifest.get("nautilus_pin") != SEAL_NAUTILUS_VERSION:
+                    reasons.append("VOID_NAUTILUS_PIN")
+        if (
+            spec.train_start_utc is not None
+            and fence.get("train_start_utc") is not None
+            and fence.get("train_start_utc") != spec.train_start_utc
+        ):
+            reasons.append("VOID_FENCE_BOUNDARY")
         available = set(pl.scan_parquet(table_path).collect_schema().names())
         missing = [column for column in spec.required_columns if column not in available]
         if missing:
@@ -275,6 +322,19 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
             .item()
         ):
             reasons.append("VOID_AFTER_TRAIN")
+        if spec.train_start_ns is not None:
+            before_start = (
+                lazy.select(
+                    (
+                        pl.col(spec.train_end_column).is_not_null()
+                        & (pl.col(spec.train_end_column) < int(spec.train_start_ns))
+                    ).sum()
+                )
+                .collect(engine="streaming")
+                .item()
+            )
+            if before_start:
+                reasons.append("VOID_BEFORE_TRAIN_START")
         causal_failures = []
         for earlier, later in (
             ("raid_ts_ns", "sweep_ts_ns"),

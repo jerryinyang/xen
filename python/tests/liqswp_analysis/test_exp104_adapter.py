@@ -26,6 +26,34 @@ def test_exp104_emits_regime_contrasts_frequency_and_join_evidence(
     assert extra["profile_join"]["unmatched_raids"] == 0
 
 
+def test_frequency_blocks_dispatch_per_timeframe(
+    load_exp_module: Callable[[str], ModuleType],
+) -> None:
+    """Per-timeframe one-day blocks must reach the registered L/2, L, 2L."""
+    module = load_exp_module("EXP-104")
+    assert module.FREQUENCY_BLOCKS_BY_TIMEFRAME["15m"] == (48, 96, 192)
+    assert module.FREQUENCY_BLOCKS_BY_TIMEFRAME["30m"] == (24, 48, 96)
+    assert module.FREQUENCY_BLOCKS_BY_TIMEFRAME["1h"] == (12, 24, 48)
+
+
+def test_frequency_reports_warmup_undefined_and_observed_layers(
+    load_exp_module: Callable[[str], ModuleType],
+) -> None:
+    module = load_exp_module("EXP-104")
+    marks = [
+        {"ts_event_ns": 1, "regime": "LOW"},
+        {"ts_event_ns": 2, "regime": "MID"},
+        {"ts_event_ns": 3, "regime": "REGIME_WARMUP"},
+        {"ts_event_ns": 4, "regime": "HIGH"},
+    ]
+    raids = [{"raid_id": "r1", "sweep_ts_ns": 2, "raid_regime": "LOW"}]
+    result = module.frequency_rate(marks, raids, block_length=96)
+    assert result["exposure"] == {"LOW": 1, "MID": 1, "HIGH": 0}
+    assert result["rates_per_1000"]["LOW"] == 1000.0
+    assert result["warmup_undefined_exposure"] == {"REGIME_WARMUP": 1}
+    assert "HIGH" in result["empty_exposure"]
+
+
 def test_frequency_uses_preceding_mark_and_reports_empty_exposure(
     load_exp_module: Callable[[str], ModuleType],
 ) -> None:

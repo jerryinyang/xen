@@ -47,6 +47,12 @@ CONTROL_NULL_COLUMNS = (
 # 1h: 24 bars/day, half=12, double=48
 FREQUENCY_BLOCK_LENGTHS = (12, 24, 48, 96, 192)
 FREQUENCY_BLOCK_LENGTHS_DEFAULT = (24, 48, 96)  # 1h, 30m, 15m one-day blocks
+# Per-timeframe primary one-day block L with sensitivities L/2 and 2L.
+FREQUENCY_BLOCKS_BY_TIMEFRAME = {
+    "15m": (48, 96, 192),  # L=96
+    "30m": (24, 48, 96),  # L=48
+    "1h": (12, 24, 48),  # L=24
+}
 
 
 def _build_frequency_units(
@@ -312,9 +318,13 @@ class Adapter(BaseContrastAdapter):
             right_on=["source_cell", "sweep_ts_ns"],
             how="left",
         ).with_columns(pl.col("starts").fill_null(0))
-        sensitivities = []
+        sensitivities: list[dict[str, Any]] = []
+        observed_by_stratum: dict[tuple[Any, ...], dict[str, Any]] = {}
         for partition in units_frame.partition_by(list(self.stratum_columns), maintain_order=True):
             stratum = {column: partition[column][0] for column in self.stratum_columns}
+            blocks = FREQUENCY_BLOCKS_BY_TIMEFRAME.get(
+                str(stratum.get("timeframe")), FREQUENCY_BLOCK_LENGTHS_DEFAULT
+            )
             units = [
                 {"preceding_regime": regime, "starts": (None,) * int(count)}
                 for regime, count in zip(
@@ -323,6 +333,9 @@ class Adapter(BaseContrastAdapter):
                     strict=True,
                 )
             ]
+            observed_by_stratum[
+                tuple(stratum[column] for column in self.stratum_columns)
+            ] = _frequency_from_units(units, block_length=blocks[len(blocks) // 2])
             sensitivities.append(
                 {
                     "stratum": stratum,
@@ -333,10 +346,24 @@ class Adapter(BaseContrastAdapter):
                             n_boot=self.n_boot,
                             seeds=self.seeds,
                         )
-                        for length in FREQUENCY_BLOCK_LENGTHS_DEFAULT
+                        for length in blocks
                     },
                 }
             )
+        # §3 observed layers on the live census: rate, LOW/HIGH-minus-MID
+        # contrast, and the separately-reported warmup/undefined exposure.
+        for row in frequency_rows:
+            observed = observed_by_stratum.get(
+                tuple(row[column] for column in self.stratum_columns)
+            )
+            if observed is None:
+                continue
+            regime = row["causal_regime"]
+            row["rate_per_1000"] = observed["rates_per_1000"].get(regime)
+            row["contrast_minus_mid"] = observed["contrasts_minus_mid"].get(regime)
+            row["warmup_undefined_exposure"] = observed["warmup_undefined_exposure"]
+            row["excluded_exposure"] = observed["excluded_exposure"]
+            row["eligible_marks"] = observed["eligible_marks"]
         self._frequency_live = [{"census": frequency_rows, "uncertainty": sensitivities}]
         join_evidence = {
             "duplicate_profile_keys": int(duplicate_profiles),
@@ -436,7 +463,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     adapter = Adapter()
     if args.live:
         source = args.source_root or experiment_root.parents[2] / "data/nautilus_runs/EXP-100/full"
-        gate = args.gate or experiment_root / "results/estimand_validation.json"
+        gate = args.gate or experiment_root.parent / "EXP-100/results/estimand_validation.json"
         run_live(
             adapter,
             source,

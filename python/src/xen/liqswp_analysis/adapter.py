@@ -17,7 +17,13 @@ from xen.liqswp_analysis.destroy import (
     future_destroy_attestation,
     nested_destroy_bootstrap,
 )
-from xen.liqswp_analysis.source import SourceSpec, scan_train_columns, validate_source_contract
+from xen.liqswp_analysis.source import (
+    TRAIN_START_NS,
+    TRAIN_START_UTC,
+    SourceSpec,
+    scan_train_columns,
+    validate_source_contract,
+)
 from xen.liqswp_analysis.statistics import (
     PopulationView,
     block_sensitivity,
@@ -235,6 +241,9 @@ class BaseContrastAdapter:
             train_end_column="endpoint_ts_ns",
             train_end_ns=TRAIN_END_NS,
             train_end_utc=TRAIN_END_UTC,
+            train_start_ns=TRAIN_START_NS,
+            train_start_utc=TRAIN_START_UTC,
+            manifest_root=PROJECT_ROOT,
         )
 
     def live_frame(

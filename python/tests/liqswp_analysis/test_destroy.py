@@ -14,6 +14,7 @@ from xen.liqswp_analysis.destroy import (
     destroyed_contrasts,
     draw_destroy_contrasts,
     future_destroy_attestation,
+    nested_destroy_bootstrap,
     reference_destroyed_contrasts,
 )
 from xen.liqswp_analysis.statistics import PopulationView
@@ -208,6 +209,71 @@ def test_empty_arm_is_valid_and_skips_destroy_attestation() -> None:
         n_destroy=8,
     )
     status = future_destroy_attestation(view, donor_run=donor_run, nested=_nested_evidence())
+    assert status.blocking_pass
+    assert status.evidence["note"] == "EMPTY_ARM_OR_COMPARATOR - no estimate possible"
+
+
+def test_empty_donor_draw_discloses_without_array_operations() -> None:
+    """An empty donor population must disclose EMPTY_ARM, never crash.
+
+    Regression for the destroy.py:382 TypeError on an empty object-dtype label
+    array (the `(labels == arm) & finite_channel` bitwise-and)."""
+    columns = {
+        "symbol": np.asarray([], dtype=object),
+        "status": np.asarray([], dtype=object),
+        "profile_reason": np.asarray([], dtype=object),
+        "swing_atr": np.asarray([], dtype=float),
+    }
+    donor_run = draw_destroy_contrasts(
+        "empty|donor",
+        columns,
+        np.asarray([], dtype=object),
+        arm="ARM",
+        comparator="BASE",
+        channel="swing_atr",
+        spec=_spec(),
+        n_destroy=8,
+    )
+    assert donor_run.contrasts.shape == (8,)
+    assert np.isnan(donor_run.contrasts).all()
+    assert donor_run.summary.group_sizes == ()
+
+
+def test_empty_view_nested_bootstrap_returns_empty_seeds() -> None:
+    """An empty arm-vs-comparator view must return empty seeds, never crash.
+
+    Regression for the np.stack(group_matrices) ValueError on an empty group
+    matrix (the earlier n_clusters == 0 guard was dead code behind the stack)."""
+    view = PopulationView(
+        population_id="empty",
+        labels=np.asarray([], dtype=object),
+        arm="ARM",
+        comparator="BASE",
+        cluster_ids=np.asarray([], dtype=object),
+        values=np.asarray([], dtype=float),
+    )
+    columns = {
+        "symbol": np.asarray([], dtype=object),
+        "status": np.asarray([], dtype=object),
+        "profile_reason": np.asarray([], dtype=object),
+        "swing_atr": np.asarray([], dtype=float),
+    }
+    nested = nested_destroy_bootstrap(view, columns, _spec(), channel="swing_atr")
+    assert len(nested["seeds"]) == 5
+    for seed_row in nested["seeds"]:
+        assert seed_row["bootstrap_se_raw"] is None
+        assert seed_row["finite_draws"] == 0
+    donor_run = draw_destroy_contrasts(
+        "empty|donor",
+        columns,
+        view.labels,
+        arm=view.arm,
+        comparator=view.comparator,
+        channel="swing_atr",
+        spec=_spec(),
+        n_destroy=8,
+    )
+    status = future_destroy_attestation(view, donor_run=donor_run, nested=nested)
     assert status.blocking_pass
     assert status.evidence["note"] == "EMPTY_ARM_OR_COMPARATOR - no estimate possible"
 

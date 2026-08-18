@@ -7,6 +7,10 @@ from pathlib import Path
 import polars as pl
 
 from xen.liqswp_analysis.source import (
+    SEAL_EMISSION_CONTRACT_VERSION,
+    SEAL_MANIFEST_SHA256,
+    SEAL_NAUTILUS_VERSION,
+    TRAIN_START_UTC,
     SourceSpec,
     join_profiles_left,
     scan_train_columns,
@@ -38,6 +42,9 @@ def _source_tree(tmp_path: Path) -> SourceSpec:
             "config_hash": config_hash,
             "event_log_sha256": hashlib.sha256(event_bytes).hexdigest(),
             "cost_model": "NO_COST_CHARGED",
+            "emission_contract_version": SEAL_EMISSION_CONTRACT_VERSION,
+            "nautilus_version": SEAL_NAUTILUS_VERSION,
+            "one_backtest_node": True,
             "n_raids": 1,
             "run_config": {
                 "cell": {
@@ -50,9 +57,25 @@ def _source_tree(tmp_path: Path) -> SourceSpec:
             },
         }
         _write_json(cell / "run_metadata.json", metadata)
+        manifest = tmp_path / "fence-manifest.json"
+        manifest.write_text(
+            json.dumps(
+                {
+                    "analysis_start_utc": TRAIN_START_UTC,
+                    "nautilus_pin": SEAL_NAUTILUS_VERSION,
+                    "holdout_start_utc": "2024-12-13T00:00:00Z",
+                }
+            ),
+            encoding="utf-8",
+        )
         _write_json(
             cell / "fence_attestation.json",
-            {"status": "PINNED", "train_end_ns": TRAIN_END_NS},
+            {
+                "status": "PINNED",
+                "train_end_ns": TRAIN_END_NS,
+                "manifest_path": str(manifest),
+                "manifest_sha256": SEAL_MANIFEST_SHA256,
+            },
         )
         pl.DataFrame(
             {
@@ -122,6 +145,28 @@ def test_missing_cell_gate_fails_closed(tmp_path: Path) -> None:
     result = validate_source_contract(spec)
     assert not result.integrity.blocking_pass
     assert "VOID_CELL_GATE_COUNT" in result.integrity.reasons
+
+
+def test_seal_violation_fails_closed(tmp_path: Path) -> None:
+    spec = _source_tree(tmp_path)
+    cell = spec.root / "cell-1"
+    metadata = json.loads((cell / "run_metadata.json").read_text())
+    metadata["one_backtest_node"] = False
+    _write_json(cell / "run_metadata.json", metadata)
+    result = validate_source_contract(spec)
+    assert not result.integrity.blocking_pass
+    assert "VOID_ONE_BACKTEST_NODE" in result.integrity.reasons
+
+
+def test_manifest_tamper_fails_closed(tmp_path: Path) -> None:
+    spec = _source_tree(tmp_path)
+    manifest = tmp_path / "fence-manifest.json"
+    payload = json.loads(manifest.read_text())
+    payload["analysis_start_utc"] = "2021-06-03T00:01:00Z"
+    manifest.write_text(json.dumps(payload), encoding="utf-8")
+    result = validate_source_contract(spec)
+    assert not result.integrity.blocking_pass
+    assert "VOID_TRAIN_START_FENCE" in result.integrity.reasons
 
 
 def test_config_hash_mismatch_fails_closed(tmp_path: Path) -> None:

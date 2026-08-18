@@ -357,6 +357,24 @@ def draw_destroy_contrasts(
     channel_values = np.asarray(donor_columns[channel], dtype=float)
     finite_channel = np.asarray([not _is_null(value) for value in channel_values])
 
+    if n_rows == 0:
+        # An empty donor population is the registered EMPTY_ARM disclosure, not
+        # a crash: no array operations may run on an empty object-dtype label
+        # array. future_destroy_attestation emits the "no estimate possible"
+        # note for this population.
+        return DestroyDrawRun(
+            summary=DestroyMappings(
+                population_id=population_id,
+                permutations=np.empty((0, 0), dtype=int),
+                group_sizes=(),
+                reasons=(),
+                fixed_points=0,
+                moved_rows=0,
+                moved_eligible_values=0,
+            ),
+            contrasts=np.full(n_destroy, float("nan")),
+        )
+
     groups: dict[tuple[Any, ...], list[int]] = {}
     for index in range(n_rows):
         group_key = tuple(donor_columns[column][index] for column in spec.group_columns)
@@ -550,18 +568,10 @@ def nested_destroy_bootstrap(
     n_clusters = len(cluster_names)
     n_groups = len(group_arrays)
     group_keys = list(group_arrays.keys())
-    group_matrices = [group_arrays[key] for key in group_keys]
-    group_arrays_np = np.stack(group_matrices, axis=0)  # (n_groups, n_clusters, 6)
-
-    totals = group_arrays_np.sum(axis=0)  # (n_clusters, 6): A, SA, SAQ, C, SC, SCQ
-    a_total = totals[:, 0]
-    sa_total = totals[:, 1]
-    saq_total = totals[:, 2]
-    c_total = totals[:, 3]
-    sc_total = totals[:, 4]
-    scq_total = totals[:, 5]
-
-    if n_clusters == 0:
+    if n_clusters == 0 or n_groups == 0:
+        # Empty view (no rows, or no arm/comparator rows at all): the registered
+        # EMPTY_ARM disclosure, not a stack over an empty matrix. The guard must
+        # run before np.stack below (the stack cannot build from no groups).
         empty_seeds = [
             {
                 "seed": int(seed),
@@ -580,11 +590,21 @@ def nested_destroy_bootstrap(
             "block_length": int(block_length),
             "n_boot": int(n_boot),
             "n_destroy": int(n_destroy),
-            "n_clusters": 0,
+            "n_clusters": int(n_clusters),
             "n_groups": n_groups,
             "independent_arms": bool(independent_arms),
             "seeds": empty_seeds,
         }
+    group_matrices = [group_arrays[key] for key in group_keys]
+    group_arrays_np = np.stack(group_matrices, axis=0)  # (n_groups, n_clusters, 6)
+
+    totals = group_arrays_np.sum(axis=0)  # (n_clusters, 6): A, SA, SAQ, C, SC, SCQ
+    a_total = totals[:, 0]
+    sa_total = totals[:, 1]
+    saq_total = totals[:, 2]
+    c_total = totals[:, 3]
+    sc_total = totals[:, 4]
+    scq_total = totals[:, 5]
 
     if independent_arms:
         arm_cluster_idx = np.where(a_total > 0)[0]

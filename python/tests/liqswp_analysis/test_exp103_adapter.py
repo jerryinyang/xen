@@ -34,6 +34,31 @@ def test_profile_integrity_rejects_bad_mask_conservation_and_boundary(
     assert module.validate_profile_frame(strict_boundary)[0].blocking_pass
 
 
+def test_profile_thresholds_reject_sub_seventy_va_mass_and_gap_target(
+    load_exp_module: Callable[[str], ModuleType],
+) -> None:
+    module = load_exp_module("EXP-103")
+    valid = module.golden_profile_frame()
+
+    low_va = valid.with_columns(
+        pl.lit(90).alias("va_count"),
+        (pl.lit(90.0) / pl.col("tpo_total")).alias("va_mass"),
+    )
+    status, _ = module.validate_profile_frame(low_va)
+    assert not status.blocking_pass
+    assert "VOID_VA_MASS_THRESHOLD" in status.reasons
+
+    under_target_gap = valid.with_columns(
+        pl.when(pl.col("raid_id") == "GOLDEN-T1")
+        .then(pl.col("gap_mass") - 1)
+        .otherwise(pl.col("gap_mass"))
+        .alias("gap_mass")
+    )
+    gap_status, _ = module.validate_profile_frame(under_target_gap)
+    assert not gap_status.blocking_pass
+    assert "VOID_GAP_MASS_THRESHOLD" in gap_status.reasons
+
+
 def test_exp103_emits_all_defined_and_tight_contrast_without_false_arm(
     load_exp_module: Callable[[str], ModuleType],
 ) -> None:
