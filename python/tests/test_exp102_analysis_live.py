@@ -88,22 +88,15 @@ def test_analysis_is_invariant_to_source_row_order() -> None:
 def test_one_invalid_control_blocks_the_complete_result() -> None:
     module = _load_exp102()
     adapter = _small_adapter(module)
-    frame = (
-        adapter.fixture_frame()
-        .with_row_index("row_number")
-        .with_columns(
-            pl.when(pl.col("row_number") == 0)
-            .then(None)
-            .otherwise(pl.col("swing_atr"))
-            .alias("swing_atr")
-        )
-        .drop("row_number")
-    )
+    # A destroy that cannot change any eligible value (every row identical) is
+    # vacuous and must block the complete result (AMENDMENT-16 keeps singleton
+    # groups non-blocking, so vacuity is the fail-closed channel).
+    frame = adapter.fixture_frame().with_columns(pl.lit(1.0).alias("swing_atr"))
 
     status = adapter.integrity(frame)
 
     assert not status.blocking_pass
-    assert "VOID_SINGLETON_GROUP" in status.reasons
+    assert "VOID_NO_CHANGED_VALUE" in status.reasons
 
 
 def test_malformed_prior_count_and_out_of_fence_rows_fail_integrity() -> None:

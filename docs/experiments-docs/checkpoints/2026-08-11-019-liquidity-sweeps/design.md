@@ -132,6 +132,17 @@ Recorded in the EXP-101–104 design amendment ledgers and verified by fresh-con
 QA runs at HEAD 62983d0 (2026-08-17). — **DIRECTION: LOOSER**.
 Running count: **3 looser / 3 tighter / 8 neutral**.
 
+**AMENDMENT-16 (2026-08-18, OPERATOR-APPROVED):** singleton destroy groups
+(n<2) stay fixed and are disclosed via the group-size report; they do not void
+the control, because their rows contribute identically to the raw and destroyed
+contrasts. The control voids only when no group is movable
+(`VOID_NO_MOVABLE_ROWS`) or no eligible value changes (`VOID_NO_CHANGED_VALUE`).
+Motivated by the first live run (2026-08-18): real strata contain rare rows
+with partial outcome nullness that form 1-row destroy groups; the prior strict
+reading voided the whole control (and thereby the experiment) over rows the
+control's contrast is indifferent to. — **DIRECTION: LOOSER**.
+Running count: **4 looser / 3 tighter / 8 neutral**.
+
 ## 3. Mechanism
 
 ```text
@@ -334,13 +345,13 @@ effect threshold. Other controls and all value/quality reads are informative.
 
 **AMENDMENT-15 live read (OPERATOR-APPROVED 2026-08-17):** the destroyed non-bite
 compares the destroyed mean against the RAW bootstrap SE per seed (see §2
-AMENDMENT-15). Destroy groups with fewer than two rows disclose as
-`VOID_SINGLETON_GROUP` and void the control (the design text refers to this as
-`VOID_NO_DERANGEMENT`; the reason string is the registered alias, semantics
-identical). A stratum whose eligible rows are empty is disclosed as
-`EMPTY_ARM_OR_COMPARATOR` with no estimate (it never aborts the run). A
-single-cluster stratum yields `bootstrap_SE_raw = 0` and therefore cannot attest
-the control (fail-closed, disclosed).
+AMENDMENT-15). Destroy groups with fewer than two rows stay fixed and are
+disclosed via the group-size report without voiding the control (AMENDMENT-16,
+OPERATOR-APPROVED 2026-08-18); the control voids only when no group is movable
+or no eligible value changes. A stratum whose eligible rows are empty is
+disclosed as `EMPTY_ARM_OR_COMPARATOR` with no estimate (it never aborts the
+run). A single-cluster stratum yields `bootstrap_SE_raw = 0` and therefore
+cannot attest the control (fail-closed, disclosed).
 
 Uncertainty is clustered by `level_id` within asset, venue, observation
 timeframe, confirmation method, and level configuration. Repeated raids on one

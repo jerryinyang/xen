@@ -238,8 +238,13 @@ def build_destroy_mappings(
     movable_groups: list[np.ndarray] = []
     for indices in ordered_groups:
         if len(indices) < 2:
+            # AMENDMENT-16 (operator-approved 2026-08-18): singleton groups
+            # stay fixed and are disclosed via group_sizes; they do not void
+            # the control, because their rows contribute identically to the
+            # raw and destroyed contrasts. The control voids only when no
+            # group is movable (VOID_NO_MOVABLE_ROWS) or no eligible value
+            # changes (VOID_NO_CHANGED_VALUE).
             voided_rows.update(indices.tolist())
-            reasons.append("VOID_SINGLETON_GROUP")
         else:
             movable_groups.append(indices)
 
@@ -392,7 +397,10 @@ def draw_destroy_contrasts(
     movable_groups: list[np.ndarray] = []
     for indices in ordered_groups:
         if len(indices) < 2:
-            reasons.append("VOID_SINGLETON_GROUP")
+            # AMENDMENT-16 (operator-approved 2026-08-18): singleton groups
+            # stay fixed and are disclosed via group_sizes; they do not void
+            # the control (see build_destroy_mappings for the rationale).
+            continue
         else:
             movable_groups.append(indices)
 

@@ -173,8 +173,11 @@ CONTROL CONFIG_CROSSWISE_FUTURE_DESTROY:
     strong_move) from donor perm[i] to recipient i. The donor configuration may
     equal the recipient configuration; forbidding that can swap two arms rather
     than destroy their association. Event fields, configuration, status,
-    eligibility, nullness, and row counts stay fixed. A group with n<2 produces
-    VOID_NO_DERANGEMENT for that control population and remains disclosed.
+    eligibility, nullness, and row counts stay fixed. A group with n<2 stays
+    fixed and is disclosed via the group-size report; it does not void the
+    control, because its rows contribute identically to the raw and destroyed
+    contrasts (AMENDMENT-16). The control voids only when no group is movable
+    (VOID_NO_MOVABLE_ROWS) or no eligible value changes (VOID_NO_CHANGED_VALUE).
   DISJOINT from signal population: the destroy is computed on a separate copy
     after the raw estimate; it cannot alter raw rows, labels, source timestamps, or
     the signal population.
@@ -354,9 +357,16 @@ AMENDMENT-15: destroyed non-bite compares the destroyed mean against the raw
   bootstrap SE (see TRIPWIRE live read) — DIRECTION: LOOSER
   running count: 3 looser / 3 tighter / 8 neutral
   (OPERATOR-APPROVED 2026-08-17 — checkpoint 019 §2)
+AMENDMENT-16: singleton destroy groups (n<2) stay fixed and are disclosed via
+  the group-size report; they do not void the control (their rows contribute
+  identically to raw and destroyed contrasts); the control voids only when no
+  group is movable (VOID_NO_MOVABLE_ROWS) or no eligible value changes
+  (VOID_NO_CHANGED_VALUE) — DIRECTION: LOOSER
+  running count: 4 looser / 3 tighter / 8 neutral
+  (OPERATOR-APPROVED 2026-08-18 — checkpoint 019 §2)
 
 FINAL-NULL / SELECTION ACCOUNTING:
-  final design has 3 looser / 3 tighter / 8 neutral amendments. It has no
+  final design has 4 looser / 3 tighter / 8 neutral amendments. It has no
   machine qualification, ranking, capped-read selection, or value verdict, so
   expected machine false-qualifier count under a global null is zero by
   construction. This is an accounting statement, not evidence. No row is hidden,

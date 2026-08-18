@@ -107,7 +107,9 @@ def test_exact_grouping_does_not_use_undeclared_columns() -> None:
     assert np.count_nonzero(mappings.permutations[0, 0] == np.arange(4)) == 0
 
 
-def test_singleton_group_is_blocking_void() -> None:
+def test_singleton_group_is_disclosed_without_blocking() -> None:
+    """AMENDMENT-16: a singleton destroy group stays fixed and is disclosed;
+    it does not void the control while other groups move values."""
     columns = _columns()
     columns["status"] = np.asarray(["A", "B", "B", "B"], dtype=object)
     view = _population()
@@ -122,8 +124,29 @@ def test_singleton_group_is_blocking_void() -> None:
         n_destroy=8,
     )
     status = future_destroy_attestation(view, donor_run=donor_run, nested=_nested_evidence())
+    assert status.blocking_pass
+    assert status.evidence["group_sizes"] == [1, 3]
+    assert status.evidence["moved_rows"] == 3
+
+
+def test_all_singleton_groups_block_as_immovable() -> None:
+    """When no group has >= 2 rows nothing can move: fail-closed."""
+    columns = _columns()
+    columns["status"] = np.asarray(["A", "B", "C", "D"], dtype=object)
+    view = _population()
+    donor_run = draw_destroy_contrasts(
+        f"{view.population_id}|donor",
+        columns,
+        view.labels,
+        arm=view.arm,
+        comparator=view.comparator,
+        channel="swing_atr",
+        spec=_spec(),
+        n_destroy=8,
+    )
+    status = future_destroy_attestation(view, donor_run=donor_run, nested=_nested_evidence())
     assert not status.blocking_pass
-    assert "VOID_SINGLETON_GROUP" in status.reasons
+    assert "VOID_NO_MOVABLE_ROWS" in status.reasons
 
 
 def test_population_mismatch_blocks_before_statistics() -> None:
