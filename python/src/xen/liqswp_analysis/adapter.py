@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import sys
 from typing import Any, Hashable, Sequence
@@ -177,6 +178,191 @@ def make_fixture_frame(
     )
 
 
+# ── threaded control parallelism ─────────────────────────────────────────────
+# Each (stratum, arm, comparator, channel) control is an independent, seeded,
+# deterministic computation. With workers > 1 the parent partitions the frame
+# once and publishes the partitions and the adapter into module globals; the
+# control tasks run over a thread pool (the work is numpy/polars heavy and
+# releases the GIL). Threads — not processes — are used because polars is not
+# fork-safe and spawn would re-pickle multi-gigabyte frames per worker.
+# ThreadPoolExecutor.map preserves the registered order, so outputs are
+# identical to the sequential path regardless of scheduling.
+
+_SHARED_ADAPTER: Any = None
+_SHARED_PARTITIONS: list[tuple[dict[str, Any], pl.DataFrame]] = []
+
+
+def _integrity_control(
+    args: tuple[int, Hashable, Hashable, str],
+) -> tuple[tuple[Any, ...], dict[str, Any]]:
+    adapter = _SHARED_ADAPTER
+    partition_index, arm, comparator, channel = args
+    stratum, stratum_frame = _SHARED_PARTITIONS[partition_index]
+    donor_population = adapter._channel_frame(stratum_frame, channel)
+    population, view = adapter._population_view(
+        stratum_frame, arm=arm, comparator=comparator, channel=channel
+    )
+    spec = DestroySpec(
+        adapter.control_group_columns,
+        adapter.control_null_columns,
+        (channel,),
+    )
+    donor_columns = {
+        column: donor_population[column].to_numpy()
+        for column in set(
+            (*adapter.control_group_columns, *adapter.control_null_columns, channel)
+        )
+    }
+    donor_labels = donor_population[adapter.label_column].to_numpy()
+    donor_run = draw_destroy_contrasts(
+        f"{view.population_id}|donor",
+        donor_columns,
+        donor_labels,
+        arm=arm,
+        comparator=comparator,
+        channel=channel,
+        spec=spec,
+        n_destroy=adapter.n_destroy,
+        batch_size=8,
+    )
+    view_columns = {
+        column: population[column].to_numpy()
+        for column in set(
+            (*adapter.control_group_columns, *adapter.control_null_columns, channel)
+        )
+    }
+    nested = nested_destroy_bootstrap(
+        view,
+        view_columns,
+        spec,
+        channel=channel,
+        outer_seeds=adapter.seeds,
+        n_boot=adapter.n_boot,
+        block_length=adapter.nested_block_length,
+        n_destroy=adapter.n_destroy,
+        independent_arms=adapter.independent_arms,
+    )
+    status = future_destroy_attestation(view, donor_run=donor_run, nested=nested)
+    status_key = (
+        *(stratum[column] for column in adapter.stratum_columns),
+        arm,
+        comparator,
+        channel,
+    )
+    raw_boot = clustered_contrast_bootstrap(
+        view,
+        block_length=adapter.nested_block_length,
+        n_boot=adapter.n_boot,
+        seeds=adapter.seeds,
+        independent_arms=adapter.independent_arms,
+    )
+    donor_contrast_rows = donor_population.filter(
+        pl.col(adapter.label_column).is_in([arm, comparator])
+    ).height
+    record = {
+        "stratum": stratum,
+        "arm": arm,
+        "comparator": comparator,
+        "channel": channel,
+        "blocking_pass": status.blocking_pass,
+        "reasons": list(status.reasons),
+        **status.evidence,
+        "population_match": population.height == donor_contrast_rows,
+        "raw_bootstrap_interval": raw_boot.get("interval"),
+        "raw_bootstrap_seed_rows": raw_boot.get("seeds"),
+    }
+    return status_key, record
+
+
+def _analyze_control(
+    args: tuple[int, Hashable, Hashable, str],
+) -> tuple[tuple[Any, ...], dict[str, Any] | None]:
+    adapter = _SHARED_ADAPTER
+    partition_index, arm, comparator, channel = args
+    stratum, stratum_frame = _SHARED_PARTITIONS[partition_index]
+    status_key = (
+        *(stratum[column] for column in adapter.stratum_columns),
+        arm,
+        comparator,
+        channel,
+    )
+    if (
+        channel in adapter.control_channels
+        and adapter._control_status
+        and not adapter._control_status.get(status_key, False)
+    ):
+        return status_key, None
+    _, view = adapter._population_view(
+        stratum_frame, arm=arm, comparator=comparator, channel=channel
+    )
+    sensitivities = block_sensitivity(
+        view,
+        lengths=(2, 5, 10),
+        n_boot=adapter.n_boot,
+        seeds=adapter.seeds,
+        independent_arms=adapter.independent_arms,
+    )
+    values = np.asarray(view.values, dtype=float)
+    arm_values = values[(view.labels == arm) & np.isfinite(values)]
+    comparator_values = values[(view.labels == comparator) & np.isfinite(values)]
+    medians = {
+        "arm": float(np.median(arm_values)) if arm_values.size else None,
+        "comparator": (
+            float(np.median(comparator_values)) if comparator_values.size else None
+        ),
+        "contrast": (
+            float(np.median(arm_values) - np.median(comparator_values))
+            if arm_values.size and comparator_values.size
+            else None
+        ),
+    }
+    source_fields: dict[str, dict[str, Any]] = {}
+    for source_channel in ("swing_price", "swing_bps"):
+        source_view = adapter._population_view(
+            stratum_frame,
+            arm=arm,
+            comparator=comparator,
+            channel=source_channel,
+        )[1]
+        source_values = np.asarray(source_view.values, dtype=float)
+        arm_source = source_values[(source_view.labels == arm) & np.isfinite(source_values)]
+        comparator_source = source_values[
+            (source_view.labels == comparator) & np.isfinite(source_values)
+        ]
+        source_fields[source_channel] = {
+            "arm": {
+                "n": int(arm_source.size),
+                "non_null": int(arm_source.size),
+                "mean": float(arm_source.mean()) if arm_source.size else None,
+                "median": float(np.median(arm_source)) if arm_source.size else None,
+            },
+            "comparator": {
+                "n": int(comparator_source.size),
+                "non_null": int(comparator_source.size),
+                "mean": float(comparator_source.mean()) if comparator_source.size else None,
+                "median": (
+                    float(np.median(comparator_source)) if comparator_source.size else None
+                ),
+            },
+        }
+    return status_key, {
+        "population_id": view.population_id,
+        "stratum": stratum,
+        "arm": arm,
+        "comparator": comparator,
+        "channel": channel,
+        "observed": sensitivities["5"],
+        "observed_L2": sensitivities["2"],
+        "observed_L5": sensitivities["5"],
+        "observed_L10": sensitivities["10"],
+        "medians": medians,
+        "source_field_summaries": source_fields,
+        "ideal": "direct arm-minus-fixed-comparator estimate with uncertainty",
+        "interpretation": "operator judges; no machine value label",
+        "sensitivities": sensitivities,
+    }
+
+
 class BaseContrastAdapter:
     """Shared integrity/statistics flow for one explicit experiment adapter."""
 
@@ -211,10 +397,12 @@ class BaseContrastAdapter:
         n_boot: int = 10_000,
         n_destroy: int = 2_000,
         seeds: Sequence[int] = tuple(range(5)),
+        workers: int = 1,
     ) -> None:
         self.n_boot = int(n_boot)
         self.n_destroy = int(n_destroy)
         self.seeds = tuple(int(seed) for seed in seeds)
+        self.workers = int(workers)
         self._control_records: list[dict[str, Any]] = []
         self._extra_integrity_evidence: dict[str, Any] = {}
         self._control_status: dict[tuple[Any, ...], bool] = {}
@@ -363,90 +551,107 @@ class BaseContrastAdapter:
         control_records: list[dict[str, Any]] = []
         control_status: dict[tuple[Any, ...], bool] = {}
 
-        for stratum, stratum_frame in self._strata(frame):
-            for arm, comparator in self.contrasts:
-                for channel in self.control_channels:
-                    self._progress("integrity", stratum, arm, channel)
-                    donor_population = self._channel_frame(stratum_frame, channel)
-                    population, view = self._population_view(
-                        stratum_frame, arm=arm, comparator=comparator, channel=channel
-                    )
-                    spec = DestroySpec(
-                        self.control_group_columns,
-                        self.control_null_columns,
-                        (channel,),
-                    )
-                    donor_columns = {
-                        column: donor_population[column].to_numpy()
-                        for column in set(
-                            (*self.control_group_columns, *self.control_null_columns, channel)
-                        )
-                    }
-                    donor_labels = donor_population[self.label_column].to_numpy()
-                    donor_run = draw_destroy_contrasts(
-                        f"{view.population_id}|donor",
-                        donor_columns,
-                        donor_labels,
-                        arm=arm,
-                        comparator=comparator,
-                        channel=channel,
-                        spec=spec,
-                        n_destroy=self.n_destroy,
-                        batch_size=8,
-                    )
-                    view_columns = {
-                        column: population[column].to_numpy()
-                        for column in set(
-                            (*self.control_group_columns, *self.control_null_columns, channel)
-                        )
-                    }
-                    nested = nested_destroy_bootstrap(
-                        view,
-                        view_columns,
-                        spec,
-                        channel=channel,
-                        outer_seeds=self.seeds,
-                        n_boot=self.n_boot,
-                        block_length=self.nested_block_length,
-                        n_destroy=self.n_destroy,
-                        independent_arms=self.independent_arms,
-                    )
-                    status = future_destroy_attestation(
-                        view,
-                        donor_run=donor_run,
-                        nested=nested,
-                    )
-                    status_key = (
-                        *(stratum[column] for column in self.stratum_columns),
-                        arm,
-                        comparator,
-                        channel,
-                    )
-                    control_status[status_key] = status.blocking_pass
-
-                    raw_boot = clustered_contrast_bootstrap(
-                        view,
-                        block_length=self.nested_block_length,
-                        n_boot=self.n_boot,
-                        seeds=self.seeds,
-                        independent_arms=self.independent_arms,
-                    )
-                    donor_contrast_rows = donor_population.filter(
-                        pl.col(self.label_column).is_in([arm, comparator])
-                    ).height
-                    record = {
-                        "stratum": stratum,
-                        "arm": arm,
-                        "comparator": comparator,
-                        "channel": channel,
-                        "blocking_pass": status.blocking_pass,
-                        "reasons": list(status.reasons),
-                        **status.evidence,
-                        "population_match": population.height == donor_contrast_rows,
-                        "raw_bootstrap_interval": raw_boot.get("interval"),
-                        "raw_bootstrap_seed_rows": raw_boot.get("seeds"),
-                    }
+        partitions = self._strata(frame)
+        if self.workers > 1 and partitions:
+            global _SHARED_ADAPTER, _SHARED_PARTITIONS
+            _SHARED_ADAPTER = self
+            _SHARED_PARTITIONS[:] = partitions
+            tasks = [
+                (index, arm, comparator, channel)
+                for index, (_, _) in enumerate(partitions)
+                for arm, comparator in self.contrasts
+                for channel in self.control_channels
+            ]
+            ctx = None
+            with ThreadPoolExecutor(max_workers=self.workers) as pool:
+                for status_key, record in pool.map(_integrity_control, tasks, chunksize=4):
+                    control_status[status_key] = record["blocking_pass"]
                     control_records.append(record)
+        else:
+            for stratum, stratum_frame in partitions:
+                for arm, comparator in self.contrasts:
+                    for channel in self.control_channels:
+                        self._progress("integrity", stratum, arm, channel)
+                        donor_population = self._channel_frame(stratum_frame, channel)
+                        population, view = self._population_view(
+                            stratum_frame, arm=arm, comparator=comparator, channel=channel
+                        )
+                        spec = DestroySpec(
+                            self.control_group_columns,
+                            self.control_null_columns,
+                            (channel,),
+                        )
+                        donor_columns = {
+                            column: donor_population[column].to_numpy()
+                            for column in set(
+                                (*self.control_group_columns, *self.control_null_columns, channel)
+                            )
+                        }
+                        donor_labels = donor_population[self.label_column].to_numpy()
+                        donor_run = draw_destroy_contrasts(
+                            f"{view.population_id}|donor",
+                            donor_columns,
+                            donor_labels,
+                            arm=arm,
+                            comparator=comparator,
+                            channel=channel,
+                            spec=spec,
+                            n_destroy=self.n_destroy,
+                            batch_size=8,
+                        )
+                        view_columns = {
+                            column: population[column].to_numpy()
+                            for column in set(
+                                (*self.control_group_columns, *self.control_null_columns, channel)
+                            )
+                        }
+                        nested = nested_destroy_bootstrap(
+                            view,
+                            view_columns,
+                            spec,
+                            channel=channel,
+                            outer_seeds=self.seeds,
+                            n_boot=self.n_boot,
+                            block_length=self.nested_block_length,
+                            n_destroy=self.n_destroy,
+                            independent_arms=self.independent_arms,
+                        )
+                        status = future_destroy_attestation(
+                            view,
+                            donor_run=donor_run,
+                            nested=nested,
+                        )
+                        status_key = (
+                            *(stratum[column] for column in self.stratum_columns),
+                            arm,
+                            comparator,
+                            channel,
+                        )
+                        control_status[status_key] = status.blocking_pass
+
+                        raw_boot = clustered_contrast_bootstrap(
+                            view,
+                            block_length=self.nested_block_length,
+                            n_boot=self.n_boot,
+                            seeds=self.seeds,
+                            independent_arms=self.independent_arms,
+                        )
+                        donor_contrast_rows = donor_population.filter(
+                            pl.col(self.label_column).is_in([arm, comparator])
+                        ).height
+                        record = {
+                            "stratum": stratum,
+                            "arm": arm,
+                            "comparator": comparator,
+                            "channel": channel,
+                            "blocking_pass": status.blocking_pass,
+                            "reasons": list(status.reasons),
+                            **status.evidence,
+                            "population_match": population.height == donor_contrast_rows,
+                            "raw_bootstrap_interval": raw_boot.get("interval"),
+                            "raw_bootstrap_seed_rows": raw_boot.get("seeds"),
+                        }
+                        control_records.append(record)
 
         self._control_records = control_records
         self._control_status = control_status
@@ -475,7 +680,23 @@ class BaseContrastAdapter:
     def analyze(self, frame: pl.DataFrame) -> tuple[dict[str, Any], ...]:
         frame = self.prepare_frame(frame)
         rows: list[dict[str, Any]] = []
-        for stratum, stratum_frame in self._strata(frame):
+        partitions = self._strata(frame)
+        if self.workers > 1 and partitions:
+            global _SHARED_ADAPTER, _SHARED_PARTITIONS
+            _SHARED_ADAPTER = self
+            _SHARED_PARTITIONS[:] = partitions
+            tasks = [
+                (index, arm, comparator, channel)
+                for index, (_, _) in enumerate(partitions)
+                for arm, comparator in self.contrasts
+                for channel in self.channels
+            ]
+            with ThreadPoolExecutor(max_workers=self.workers) as pool:
+                for _, row in pool.map(_analyze_control, tasks, chunksize=4):
+                    if row is not None:
+                        rows.append(row)
+            return tuple(rows)
+        for stratum, stratum_frame in partitions:
             for arm, comparator in self.contrasts:
                 for channel in self.channels:
                     self._progress("analysis", stratum, arm, channel)

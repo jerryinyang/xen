@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
-from typing import Any, Sequence
+from typing import Any, Iterator, Sequence
 
 import numpy as np
 
@@ -70,6 +71,87 @@ def circular_cluster_indices(
         parts.append((start + np.arange(take, dtype=int)) % n_clusters)
         remaining -= take
     return np.concatenate(parts)
+
+
+def _circular_block_selections(
+    n_clusters: int,
+    block_length: int,
+    starts: np.ndarray,
+    effective: int,
+) -> np.ndarray:
+    """Assemble circular-block selections from batched start positions."""
+    parts_per_draw = int(math.ceil(n_clusters / effective))
+    n_draws = starts.size // parts_per_draw
+    blocks = (
+        starts.reshape(n_draws, parts_per_draw)[:, :, None] + np.arange(effective, dtype=int)
+    ) % n_clusters
+    return blocks.reshape(n_draws, parts_per_draw * effective)[:, :n_clusters]
+
+
+def _selection_chunks(
+    n_clusters: int,
+    block_length: int,
+    n_boot: int,
+    rng: np.random.Generator,
+    *,
+    chunk: int = 256,
+) -> Iterator[np.ndarray]:
+    """Yield (C, n_clusters) joint circular-block selections in draw order.
+
+    Consumes exactly ceil(n_clusters / L_eff) integers per draw from the
+    generator — the same stream values as the registered per-draw
+    ``circular_cluster_indices`` path — so every selection is bit-identical
+    to the per-draw form.
+    """
+    if n_clusters < 1:
+        return
+    effective = 1 if n_clusters == 1 else min(max(1, int(block_length)), n_clusters - 1)
+    parts_per_draw = int(math.ceil(n_clusters / effective))
+    remaining = int(n_boot)
+    while remaining:
+        chunk_now = min(chunk, remaining)
+        starts = rng.integers(0, n_clusters, size=chunk_now * parts_per_draw)
+        yield _circular_block_selections(n_clusters, block_length, starts, effective)
+        remaining -= chunk_now
+
+
+def _independent_selection_chunks(
+    n_arm_clusters: int,
+    n_comparator_clusters: int,
+    block_length: int,
+    n_boot: int,
+    rng: np.random.Generator,
+    *,
+    chunk: int = 256,
+) -> Iterator[tuple[np.ndarray, np.ndarray]]:
+    """Yield (arm_sel, comp_sel) pairs for independent arm/comparator resampling.
+
+    Arm starts for the whole chunk are consumed before comparator starts; the
+    per-draw interleaved stream is not preserved, so independent-arm draws are
+    a fresh deterministic realization of the registered procedure.
+    """
+    if n_arm_clusters < 1 or n_comparator_clusters < 1:
+        return
+    eff_arm = 1 if n_arm_clusters == 1 else min(max(1, int(block_length)), n_arm_clusters - 1)
+    eff_comp = (
+        1
+        if n_comparator_clusters == 1
+        else min(max(1, int(block_length)), n_comparator_clusters - 1)
+    )
+    parts_arm = int(math.ceil(n_arm_clusters / eff_arm))
+    parts_comp = int(math.ceil(n_comparator_clusters / eff_comp))
+    remaining = int(n_boot)
+    while remaining:
+        chunk_now = min(chunk, remaining)
+        arm_starts = rng.integers(0, n_arm_clusters, size=chunk_now * parts_arm)
+        comp_starts = rng.integers(0, n_comparator_clusters, size=chunk_now * parts_comp)
+        yield (
+            _circular_block_selections(n_arm_clusters, block_length, arm_starts, eff_arm),
+            _circular_block_selections(
+                n_comparator_clusters, block_length, comp_starts, eff_comp
+            ),
+        )
+        remaining -= chunk_now
 
 
 def _cluster_rows(view: PopulationView) -> tuple[np.ndarray, list[np.ndarray]]:
@@ -219,7 +301,7 @@ def clustered_contrast_bootstrap(
     total_nonfinite = 0
 
     if independent_arms:
-        # EXP-101: Independent arm/comparator resampling
+        # EXP-101: Independent arm/comparator resampling (vectorized chunks).
         arm_cluster_names, arm_rows_by_cluster, comparator_cluster_names, comparator_rows_by_cluster = _split_arm_comparator_clusters(view)
         values = np.asarray(view.values, dtype=float)
         labels = view.labels
@@ -241,24 +323,29 @@ def clustered_contrast_bootstrap(
             )
             return base
 
+        arm_sum_a = np.asarray(arm_sum, dtype=float)
+        arm_n_a = np.asarray(arm_n, dtype=np.int64)
+        comparator_sum_a = np.asarray(comparator_sum, dtype=float)
+        comparator_n_a = np.asarray(comparator_n, dtype=np.int64)
         for seed in seeds:
             rng = np.random.default_rng(seed)
             draws = np.empty(int(n_boot), dtype=float)
-            for draw_index in range(int(n_boot)):
-                # Resample arm clusters independently
-                arm_chosen = circular_cluster_indices(n_arm_clusters, block_length, rng)
-                selected_arm_n = int(arm_n[arm_chosen].sum())
-                arm_mean = float(arm_sum[arm_chosen].sum() / selected_arm_n) if selected_arm_n > 0 else float("nan")
-
-                # Resample comparator clusters independently
-                comparator_chosen = circular_cluster_indices(n_comparator_clusters, block_length, rng)
-                selected_comparator_n = int(comparator_n[comparator_chosen].sum())
-                comparator_mean = float(comparator_sum[comparator_chosen].sum() / selected_comparator_n) if selected_comparator_n > 0 else float("nan")
-
-                if not np.isfinite(arm_mean) or not np.isfinite(comparator_mean):
-                    draws[draw_index] = float("nan")
-                else:
-                    draws[draw_index] = arm_mean - comparator_mean
+            offset = 0
+            for arm_sel, comp_sel in _independent_selection_chunks(
+                n_arm_clusters, n_comparator_clusters, block_length, int(n_boot), rng
+            ):
+                c = arm_sel.shape[0]
+                an = arm_n_a[arm_sel].sum(axis=1)
+                cn = comparator_n_a[comp_sel].sum(axis=1)
+                est = np.full(c, float("nan"))
+                with np.errstate(divide="ignore", invalid="ignore"):
+                    valid = (an > 0) & (cn > 0)
+                    est[valid] = (
+                        arm_sum_a[arm_sel][valid].sum(axis=1) / an[valid]
+                        - comparator_sum_a[comp_sel][valid].sum(axis=1) / cn[valid]
+                    )
+                draws[offset : offset + c] = est
+                offset += c
             finite = draws[np.isfinite(draws)]
             total_finite += int(finite.size)
             total_nonfinite += int(draws.size - finite.size)
@@ -276,22 +363,31 @@ def clustered_contrast_bootstrap(
                     }
                 )
     else:
-        # EXP-102/103: Joint resampling (original behavior)
+        # EXP-102/103: Joint resampling (vectorized chunks; the chunked integer
+        # stream is identical to the registered per-draw form, so every draw
+        # and statistic is bit-identical to the scalar implementation).
         arm_sum, arm_n, comparator_sum, comparator_n = _cluster_contrast_totals(view, rows_by_cluster)
+        arm_sum_a = np.asarray(arm_sum, dtype=float)
+        arm_n_a = np.asarray(arm_n, dtype=np.int64)
+        comparator_sum_a = np.asarray(comparator_sum, dtype=float)
+        comparator_n_a = np.asarray(comparator_n, dtype=np.int64)
         for seed in seeds:
             rng = np.random.default_rng(seed)
             draws = np.empty(int(n_boot), dtype=float)
-            for draw_index in range(int(n_boot)):
-                chosen = circular_cluster_indices(len(clusters), block_length, rng)
-                selected_arm_n = int(arm_n[chosen].sum())
-                selected_comparator_n = int(comparator_n[chosen].sum())
-                if selected_arm_n == 0 or selected_comparator_n == 0:
-                    draws[draw_index] = float("nan")
-                else:
-                    draws[draw_index] = float(
-                        arm_sum[chosen].sum() / selected_arm_n
-                        - comparator_sum[chosen].sum() / selected_comparator_n
+            offset = 0
+            for sel in _selection_chunks(len(clusters), block_length, int(n_boot), rng):
+                c = sel.shape[0]
+                an = arm_n_a[sel].sum(axis=1)
+                cn = comparator_n_a[sel].sum(axis=1)
+                est = np.full(c, float("nan"))
+                with np.errstate(divide="ignore", invalid="ignore"):
+                    valid = (an > 0) & (cn > 0)
+                    est[valid] = (
+                        arm_sum_a[sel][valid].sum(axis=1) / an[valid]
+                        - comparator_sum_a[sel][valid].sum(axis=1) / cn[valid]
                     )
+                draws[offset : offset + c] = est
+                offset += c
             finite = draws[np.isfinite(draws)]
             total_finite += int(finite.size)
             total_nonfinite += int(draws.size - finite.size)

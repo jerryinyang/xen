@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 from collections import Counter
 from pathlib import Path
 from typing import Any, Iterable, Sequence
@@ -220,7 +221,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     experiment_root = Path(__file__).resolve().parents[1]
     output = args.output or experiment_root / "results/analysis_results.json"
-    adapter = Adapter()
+    adapter = Adapter(workers=int(os.environ.get("XEN_WORKERS", "1")))
     if args.live:
         source = args.source_root or experiment_root.parents[2] / "data/nautilus_runs/EXP-100/full"
         gate = args.gate or (

@@ -44,7 +44,13 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 
 from xen.liqswp_analysis.contract import IntegrityStatus
-from xen.liqswp_analysis.statistics import PopulationView, circular_cluster_indices, estimate_contrast
+from xen.liqswp_analysis.statistics import (
+    PopulationView,
+    _independent_selection_chunks,
+    _selection_chunks,
+    circular_cluster_indices,
+    estimate_contrast,
+)
 
 INTEGRITY_Z = 2.8
 
@@ -520,19 +526,107 @@ def _nested_aggregates(
     )
 
 
-def _circular_block_selections(
-    n_clusters: int,
-    block_length: int,
-    starts: np.ndarray,
-    effective: int,
-) -> np.ndarray:
-    """Assemble circular-block selections from batched start positions."""
-    parts_per_draw = int(math.ceil(n_clusters / effective))
-    n_draws = starts.size // parts_per_draw
-    blocks = (
-        starts.reshape(n_draws, parts_per_draw)[:, :, None] + np.arange(effective, dtype=int)
-    ) % n_clusters
-    return blocks.reshape(n_draws, parts_per_draw * effective)[:, :n_clusters]
+def _derangement_ratios(max_m: int) -> np.ndarray:
+    """Float64 derangement ratios r_m = !(m-1)/!m for m >= 2, left-padded by 2.
+
+    r_2 = 0 and r_m = 1 / ((m-1) * (1 + r_{m-1})) for m >= 3 — a stable
+    recurrence that never materializes the huge integer subfactorials. The
+    two-element left pad makes negative-index reads plain indexing: with
+    rp = _derangement_ratios(M), rp[k] == r[k-2].
+    """
+    r = np.zeros(max(3, int(max_m) + 1), dtype=float)
+    r[2] = 0.0
+    for m in range(3, int(max_m) + 1):
+        r[m] = 1.0 / ((m - 1) * (1.0 + r[m - 1]))
+    return np.concatenate([np.zeros(2, dtype=float), r])
+
+
+# Exact scalar constants for the small group sizes where the ratio products do
+# not exist (r_1 involves division by zero): m=2..6, verified against the
+# scalar exact-integer function (see the A/B probe in the QA records).
+_DERANGEMENT_SMALL: dict[int, tuple[float, float, float]] = {
+    m: _derangement_pair_constants(m) for m in range(2, 7)
+}
+_SMALL_A = np.asarray([_DERANGEMENT_SMALL[m][0] for m in range(2, 7)], dtype=float)
+_SMALL_B = np.asarray([_DERANGEMENT_SMALL[m][1] for m in range(2, 7)], dtype=float)
+_SMALL_C = np.asarray([_DERANGEMENT_SMALL[m][2] for m in range(2, 7)], dtype=float)
+
+
+def _destroy_group_vectors(
+    a: np.ndarray,
+    sa: np.ndarray,
+    saq: np.ndarray,
+    c: np.ndarray,
+    sc: np.ndarray,
+    scq: np.ndarray,
+    wa: np.ndarray,
+    wc: np.ndarray,
+    rp: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Closed-form destroyed mean and exact derangement variance per population.
+
+    Vectorized (chunk) equivalent of the scalar ``_destroy_draw`` group loop:
+    m = a + c per population; the destroyed contribution is (W*G - S)/(m - 1)
+    for m >= 2 and S for m == 1 (rows stay fixed); the variance uses the
+    registered uniform-derangement pair probabilities in closed form
+
+        a_m = r_{m-1} * r_m
+        b_m = (m-2) r_{m-2} r_{m-1} r_m + (m-3) r_{m-3} r_{m-2} r_{m-1} r_m
+        c_m = (m-2)(m-3) r_{m-3} r_{m-2} r_{m-1} r_m
+              + 2(m-4)(m-3) r_{m-4} r_{m-3} r_{m-2} r_{m-1} r_m
+              + (m-4)(m-5) r_{m-5} r_{m-4} r_{m-3} r_{m-2} r_{m-1} r_m
+
+    with r_m = !(m-1)/!m; m <= 6 uses the exact small constants (the ratio
+    products start at m >= 7). Elementwise operations are IEEE-identical to
+    the scalar reference; the float ratios carry ~1e-15 relative rounding vs
+    the exact-integer scalar constants (values differ in the last ulp only).
+    """
+    with np.errstate(divide="ignore", invalid="ignore"):
+        m = np.rint(a + c).astype(np.int64)
+        G = sa + sc
+        Q = saq + scq
+        W = wa * a + wc * c
+        S = wa * sa + wc * sc
+        destroyed = np.where(m >= 2, (W * G - S) / np.maximum(m - 1, 1), S)
+        U = wa * wa * a + wc * wc * c
+        Uv = wa * wa * sa + wc * wc * sc
+        Uv2 = wa * wa * saq + wc * wc * scq
+        V2 = wa * saq + wc * scq
+        idx = m + 2  # rp[idx - k] == r_{m - k}
+        a_pc = np.where(m >= 3, rp[idx - 1] * rp[idx], np.where(m == 2, 1.0, 0.0))
+        small_idx = np.clip(m, 2, 6) - 2
+        b_pc = np.where(
+            m >= 7,
+            (m - 2) * rp[idx - 2] * rp[idx - 1] * rp[idx]
+            + (m - 3) * rp[idx - 3] * rp[idx - 2] * rp[idx - 1] * rp[idx],
+            _SMALL_B[small_idx],
+        )
+        c_pc = np.where(
+            m >= 7,
+            (m - 2) * (m - 3)
+            * rp[idx - 3] * rp[idx - 2] * rp[idx - 1] * rp[idx]
+            + 2.0 * (m - 4) * (m - 3)
+            * rp[idx - 4] * rp[idx - 3] * rp[idx - 2] * rp[idx - 1] * rp[idx]
+            + (m - 4) * (m - 5)
+            * rp[idx - 5] * rp[idx - 4] * rp[idx - 3] * rp[idx - 2] * rp[idx - 1]
+            * rp[idx],
+            _SMALL_C[small_idx],
+        )
+        first = (Q * U - Uv2) / np.maximum(m - 1, 1)
+        t_a = a_pc * (S * S - Uv2)
+        t_b = b_pc * (G * (W * S - Uv) - (S * S - Uv2) - (W * V2 - Uv2))
+        t_c = t_b
+        t_d = c_pc * (
+            (G * G - Q) * (W * W - U)
+            + 4.0 * W * V2
+            - 6.0 * Uv2
+            + 2.0 * S * S
+            - 4.0 * G * (W * S - Uv)
+        )
+        expectation_square = first + t_a + t_b + t_c + t_d
+        expectation = (W * G - S) / np.maximum(m - 1, 1)
+        variance = np.maximum(0.0, expectation_square - expectation * expectation)
+    return destroyed, np.where(m >= 2, variance, 0.0)
 
 
 def nested_destroy_bootstrap(
@@ -644,80 +738,121 @@ def nested_destroy_bootstrap(
         group_arm = group_arrays_np[:, arm_cluster_idx, :]  # (n_groups, n_arm_clusters, 6)
         group_comp = group_arrays_np[:, comparator_cluster_idx, :]
 
-    def _one_draw(seed: int) -> list[tuple[float, float, float]]:
+    # ── vectorized outer bootstrap ────────────────────────────────────────────
+    # Each seed's n_boot cluster populations are drawn in vectorized chunks.
+    # For the joint path the chunked integer stream is identical to the
+    # registered per-draw form, so every selection — and therefore every
+    # disclosed statistic — is bit-identical to the scalar reference. Per
+    # chunk the raw contrast, the closed-form destroyed mean and the exact
+    # within-population derangement variance are computed with array
+    # operations, accumulating groups in the registered group order.
+    max_m = 2
+    if n_clusters:
+        max_m = max(
+            2,
+            int(
+                math.ceil(
+                    n_clusters * (float(a_total.max()) + float(c_total.max())) + 1.0
+                )
+            ),
+        )
+    rp = _derangement_ratios(max_m)
+
+    def _one_seed(seed: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         rng = np.random.default_rng(seed)
-        rows: list[tuple[float, float, float]] = []
+        raw_all = np.empty(int(n_boot), dtype=float)
+        destroyed_all = np.empty(int(n_boot), dtype=float)
+        variance_all = np.empty(int(n_boot), dtype=float)
+        offset = 0
         if independent_arms:
-            effective_arm = (
-                1
-                if n_arm_clusters == 1
-                else min(max(1, int(block_length)), n_arm_clusters - 1)
-            )
-            effective_comp = (
-                1
-                if n_comparator_clusters == 1
-                else min(max(1, int(block_length)), n_comparator_clusters - 1)
-            )
-            arm_parts = int(math.ceil(n_arm_clusters / effective_arm))
-            comp_parts = int(math.ceil(n_comparator_clusters / effective_comp))
-            for _ in range(n_boot):
-                arm_starts = rng.integers(0, n_arm_clusters, size=arm_parts)
-                comp_starts = rng.integers(0, n_comparator_clusters, size=comp_parts)
-                arm_chosen = _circular_block_selections(
-                    n_arm_clusters, block_length, arm_starts, effective_arm
-                )[0]
-                comp_chosen = _circular_block_selections(
-                    n_comparator_clusters, block_length, comp_starts, effective_comp
-                )[0]
-                rows.append(
-                    _destroy_draw(
-                        n_arm=float(arm_a[arm_chosen].sum()),
-                        sa=float(arm_sa[arm_chosen].sum()),
-                        saq=float(arm_saq[arm_chosen].sum()),
-                        n_comp=float(comp_c[comp_chosen].sum()),
-                        sc=float(comp_sc[comp_chosen].sum()),
-                        scq=float(comp_scq[comp_chosen].sum()),
-                        group_arm=group_arm,
-                        group_comp=group_comp,
-                        arm_chosen=arm_chosen,
-                        comp_chosen=comp_chosen,
-                        independent=True,
+            for arm_sel, comp_sel in _independent_selection_chunks(
+                n_arm_clusters,
+                n_comparator_clusters,
+                block_length,
+                int(n_boot),
+                rng,
+                chunk=chunk,
+            ):
+                c = arm_sel.shape[0]
+                n_arm_b = arm_a[arm_sel].sum(axis=1)
+                n_comp_b = comp_c[comp_sel].sum(axis=1)
+                with np.errstate(divide="ignore", invalid="ignore"):
+                    wa = 1.0 / n_arm_b
+                    wc = -1.0 / n_comp_b
+                sa_T = arm_sa[arm_sel].sum(axis=1)
+                sc_T = comp_sc[comp_sel].sum(axis=1)
+                destroyed = np.zeros(c, dtype=float)
+                variance = np.zeros(c, dtype=float)
+                for g in range(n_groups):
+                    garm = group_arm[g]
+                    gcomp = group_comp[g]
+                    dg, vg = _destroy_group_vectors(
+                        garm[:, 0][arm_sel].sum(axis=1),
+                        garm[:, 1][arm_sel].sum(axis=1),
+                        garm[:, 2][arm_sel].sum(axis=1),
+                        gcomp[:, 3][comp_sel].sum(axis=1),
+                        gcomp[:, 4][comp_sel].sum(axis=1),
+                        gcomp[:, 5][comp_sel].sum(axis=1),
+                        wa,
+                        wc,
+                        rp,
                     )
-                )
-            return rows
-        effective = 1 if n_clusters == 1 else min(max(1, int(block_length)), n_clusters - 1)
-        parts_per_draw = int(math.ceil(n_clusters / effective))
-        remaining = int(n_boot)
-        while remaining:
-            chunk_now = min(chunk, remaining)
-            starts = rng.integers(0, n_clusters, size=chunk_now * parts_per_draw)
-            chosen = _circular_block_selections(n_clusters, block_length, starts, effective)
-            for draw_index in range(chunk_now):
-                selection = chosen[draw_index]
-                rows.append(
-                    _destroy_draw(
-                        n_arm=float(a_total[selection].sum()),
-                        sa=float(sa_total[selection].sum()),
-                        saq=float(saq_total[selection].sum()),
-                        n_comp=float(c_total[selection].sum()),
-                        sc=float(sc_total[selection].sum()),
-                        scq=float(scq_total[selection].sum()),
-                        group_arm=group_arrays_np,
-                        group_comp=None,
-                        arm_chosen=selection,
-                        comp_chosen=None,
-                        independent=False,
+                    destroyed += dg
+                    variance += vg
+                with np.errstate(divide="ignore", invalid="ignore"):
+                    raw = sa_T / n_arm_b - sc_T / n_comp_b
+                invalid = (n_arm_b <= 0) | (n_comp_b <= 0)
+                raw[invalid] = np.nan
+                destroyed[invalid] = np.nan
+                variance[invalid] = np.nan
+                raw_all[offset : offset + c] = raw
+                destroyed_all[offset : offset + c] = destroyed
+                variance_all[offset : offset + c] = variance
+                offset += c
+        else:
+            for sel in _selection_chunks(
+                n_clusters, block_length, int(n_boot), rng, chunk=chunk
+            ):
+                c = sel.shape[0]
+                n_arm_b = a_total[sel].sum(axis=1)
+                n_comp_b = c_total[sel].sum(axis=1)
+                with np.errstate(divide="ignore", invalid="ignore"):
+                    wa = 1.0 / n_arm_b
+                    wc = -1.0 / n_comp_b
+                sa_T = sa_total[sel].sum(axis=1)
+                sc_T = sc_total[sel].sum(axis=1)
+                destroyed = np.zeros(c, dtype=float)
+                variance = np.zeros(c, dtype=float)
+                for g in range(n_groups):
+                    garr = group_arrays_np[g]
+                    dg, vg = _destroy_group_vectors(
+                        garr[:, 0][sel].sum(axis=1),
+                        garr[:, 1][sel].sum(axis=1),
+                        garr[:, 2][sel].sum(axis=1),
+                        garr[:, 3][sel].sum(axis=1),
+                        garr[:, 4][sel].sum(axis=1),
+                        garr[:, 5][sel].sum(axis=1),
+                        wa,
+                        wc,
+                        rp,
                     )
-                )
-            remaining -= chunk_now
-        return rows
+                    destroyed += dg
+                    variance += vg
+                with np.errstate(divide="ignore", invalid="ignore"):
+                    raw = sa_T / n_arm_b - sc_T / n_comp_b
+                invalid = (n_arm_b <= 0) | (n_comp_b <= 0)
+                raw[invalid] = np.nan
+                destroyed[invalid] = np.nan
+                variance[invalid] = np.nan
+                raw_all[offset : offset + c] = raw
+                destroyed_all[offset : offset + c] = destroyed
+                variance_all[offset : offset + c] = variance
+                offset += c
+        return raw_all, destroyed_all, variance_all
 
     seed_rows: list[dict[str, Any]] = []
     for seed in outer_seeds:
-        draws = _one_draw(int(seed))
-        raw_draws = np.asarray([row[0] for row in draws], dtype=float)
-        destroyed_draws = np.asarray([row[1] for row in draws], dtype=float)
-        variance_draws = np.asarray([row[2] for row in draws], dtype=float)
+        raw_draws, destroyed_draws, variance_draws = _one_seed(int(seed))
 
         finite_raw = np.isfinite(raw_draws)
         finite_destroyed = np.isfinite(destroyed_draws)

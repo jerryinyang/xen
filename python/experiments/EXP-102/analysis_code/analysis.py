@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 from collections import Counter
 from pathlib import Path
 from typing import Any, Sequence
@@ -277,6 +278,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             n_boot=DEFAULT_N_BOOT,
             n_destroy=DEFAULT_DESTROYS,
             seeds=SEEDS,
+            workers=int(os.environ.get("XEN_WORKERS", "1")),
         )
         source = args.source_root or DEFAULT_SOURCE_ROOT
         gate = args.gate or AUTHORITATIVE_GATE
