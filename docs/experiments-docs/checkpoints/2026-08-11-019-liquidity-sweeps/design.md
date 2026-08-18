@@ -118,6 +118,20 @@ The prior AMENDMENT-13 emission remains historical; the operator authorised a fr
 TRAIN rerun and fresh analysis after removing stale generated EXP-100 outputs. Running
 count: **2 looser / 3 tighter / 8 neutral**.
 
+**AMENDMENT-15 (2026-08-17, OPERATOR-APPROVED):** future-destroy tripwire live
+read — when the raw contrast bites, the destroyed non-bite compares the destroyed
+mean against the RAW bootstrap SE (`abs(m_destroy[s]) <= INTEGRITY_Z ×
+bootstrap_SE_raw[s]`), not the destroyed distribution's nested SE. The
+uniform-derangement mean collapses the destroyed contrast and its nested SE by
+the same factor `1/(m_g−1)`, so for single-group populations the nested-SE
+comparison reduces to the raw inequality and cannot be satisfied by the
+registered fixture plants; the destroyed mean must instead fall back inside the
+raw contrast's own bite band. The nested SE
+(`bootstrap_SE_mean_destroyed[s]`) remains computed and disclosed per seed.
+Recorded in the EXP-101–104 design amendment ledgers and verified by fresh-context
+QA runs at HEAD 62983d0 (2026-08-17). — **DIRECTION: LOOSER**.
+Running count: **3 looser / 3 tighter / 8 neutral**.
+
 ## 3. Mechanism
 
 ```text
@@ -317,6 +331,16 @@ TRIPWIRE: future-destroyed post-confirmation outcome blocks
 The future-destroy tripwire is the only blocking control. Its integrity bite is
 `INTEGRITY_Z × bootstrap_SE`, with `INTEGRITY_Z = 2.8`; it is not a research
 effect threshold. Other controls and all value/quality reads are informative.
+
+**AMENDMENT-15 live read (OPERATOR-APPROVED 2026-08-17):** the destroyed non-bite
+compares the destroyed mean against the RAW bootstrap SE per seed (see §2
+AMENDMENT-15). Destroy groups with fewer than two rows disclose as
+`VOID_SINGLETON_GROUP` and void the control (the design text refers to this as
+`VOID_NO_DERANGEMENT`; the reason string is the registered alias, semantics
+identical). A stratum whose eligible rows are empty is disclosed as
+`EMPTY_ARM_OR_COMPARATOR` with no estimate (it never aborts the run). A
+single-cluster stratum yields `bootstrap_SE_raw = 0` and therefore cannot attest
+the control (fail-closed, disclosed).
 
 Uncertainty is clustered by `level_id` within asset, venue, observation
 timeframe, confirmation method, and level configuration. Repeated raids on one

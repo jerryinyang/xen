@@ -172,6 +172,18 @@ maximum, and deterministic replay checks. A missing/extra join, mask/span mismat
 conservation failure, or non-deterministic replay is a hard validity finding. These
 checks attest the frozen source; they do not assign a value label.
 
+**Fix-round clarification (2026-08-17):** the analysis re-verifies the computable
+subset of this list from emitted fields — one-to-one joins, conservation, mask
+binding, bin width, VA-mass ratio, gap-span geometry, strict 50% tight boundary,
+and the ≥70% VA-mass target (`va_count >= ceil(0.70 × tpo_total)`). The ≥30%
+gap-mass target is re-verified wherever the per-bin counts are emitted
+(fixture/golden replay rows: `gap_mass >= gap_target_mass`, proper-subset bound);
+the live profile table carries masks only, so gap mass is not recomputable there
+(design §2 forbids reconstruction from emitted fields). Minimum-bin, zero-ATR,
+empty-profile, reset-on-new-maximum, and per-cell live deterministic replay are
+EXP-100 gate obligations attested at the EXP-100 gate (`VOID_*` reasons surface
+only on the computable subset; the full list remains binding at the gate).
+
 ## 6. Cross-gap future destroy and validity tripwire
 
 ```text
@@ -370,6 +382,7 @@ AMENDMENT-14: add pre_mfe_retrace without changing HYP-003 — DIRECTION: NEUTRA
 AMENDMENT-15: destroyed non-bite compares the destroyed mean against the raw
   bootstrap SE (see TRIPWIRE live read) — DIRECTION: LOOSER
   running count: 3 looser / 3 tighter / 8 neutral
+  (OPERATOR-APPROVED 2026-08-17 — checkpoint 019 §2)
 
 FINAL-NULL / SELECTION ACCOUNTING:
   final design has 3 looser / 3 tighter / 8 neutral amendments. It has no

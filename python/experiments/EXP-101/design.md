@@ -353,6 +353,7 @@ AMENDMENT-14: add pre_mfe_retrace without changing HYP-001 — DIRECTION: NEUTRA
 AMENDMENT-15: destroyed non-bite compares the destroyed mean against the raw
   bootstrap SE (see TRIPWIRE live read) — DIRECTION: LOOSER
   running count: 3 looser / 3 tighter / 8 neutral
+  (OPERATOR-APPROVED 2026-08-17 — checkpoint 019 §2)
 
 FINAL-NULL / SELECTION ACCOUNTING:
   final design has 3 looser / 3 tighter / 8 neutral amendments. It has no

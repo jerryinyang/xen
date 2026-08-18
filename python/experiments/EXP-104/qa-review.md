@@ -606,3 +606,127 @@ Scope: fresh-context pre-execution review of EXP-104 (CF-LIQSWP-001/HYP-004) ana
 
 The critical **HIGH** issue shared across all experiments: exact nested 10k×2k destroy is not implemented (average-then-bootstrap+hypot used instead). Additional **HIGH/MEDIUM** issues: fixture plant deviation, nullness class field name mismatch, missing source-field summaries, missing empirical destroyed interval. Route to `experiment-developer` for implementation fixes and `quant-designer` for fixture design alignment.
 
+
+## QA run 8 — 2026-08-17T23:50:23Z — mode: subagent — HEAD 62983d0cf0136b7caf1ec2aea8c41d3b92abdec1
+
+Reviewed git state: working tree clean; `git rev-parse HEAD` = 62983d0; the last commit touching experiment code is `e57847c` ("fix(EXP-101-104): implement exact nested destroy and registered fixture plants").
+Scope: verify the run-7 (HEAD 8127c23) REVISE findings are resolved and no new issues are introduced. Fresh-context review; no implementation/design/test/receipt file was modified. No live analysis, engine, TEST, or holdout access; EXP-100 retained as read-only source (its gate was read first).
+
+Verdict: **REVISE**
+
+The five run-7 REVISE items and the AMENDMENT-15 contract are correctly resolved in code and receipt. Two MEDIUM design-to-code gaps remain in the frequency-leg live report (§3): sensitivity block lengths are not dispatched per timeframe (only {24,48,96} run for every stratum; 12 and 192 never orchestrated), and the live frequency census omits the observed rates/contrasts and the separately-required warmup/undefined exposure counts. Both are informative-disclosure fixes before execution.
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §5 TRIPWIRE live read — AMENDMENT-15 acceptance inequality per seed | `destroy.py:657-699` `future_destroy_attestation` | MATCHES | For each seed with finite raw stats and `abs(D_raw) > INTEGRITY_Z*bootstrap_SE_raw[s]`, requires `abs(m_destroy) <= INTEGRITY_Z*bootstrap_SE_raw[s]`; violation adds `VOID_FUTURE_DESTROY_SURVIVAL` and blocks. Principle uses the live empirical 2,000-draw destroyed mean (`finite_destroyed`), raw SE from the nested bootstrap; `destroyed_survives_threshold` string matches AMENDMENT-15. |
+| §5 AMENDMENT-15 — bootstrap_SE_mean_destroyed still computed/disclosed per seed | `destroy.py:647-697`; `adapter.py:379-400` | MATCHES | `nested_seeds` per control record carry `bootstrap_se_raw` and `bootstrap_se_mean_destroyed` per seed 0..4 (verified in `fixture_integrity.json` for all 6 records). |
+| §5 closed-form nested destroy (10k × 2k per seed) | `destroy.py:538-646` `nested_destroy_bootstrap`; `_destroy_draw` `destroy.py:644-727` | MATCHES | Per outer population b, m_destroy[b] = Σ_g (W_g·G_g − S_g)/(m_g−1) for m_g≥2 else S_g, on b's own rows via per-cluster per-group sufficient statistics (A/SA/SAQ/C/SC/SCQ); within-population derangement expectation/variance formulas independently re-derived and verified against exact derangement enumeration (see below). SE = sqrt(var_between + mean_b(Var_draw)/n_destroy); both components disclosed. |
+| §5 outer-bootstrap mechanics (joint cluster resampling, L=5 primary seeds 0..4, 10k) | `destroy.py:563-645`; `statistics.py:76-101` `circular_cluster_indices` | MATCHES | Circular whole-cluster blocks, cap L at n_clusters−1, `ceil(n/effective)` starts drawn from [0,n), truncate to n; same default_rng(seed) stream order as `clustered_contrast_bootstrap` (integer-draw count per population matches), so bootstrap_SE_raw is comparable to the raw bootstrap intervals disclosed in control records. |
+| §5 live donor derangement draws (2,000 seeds, zero fixed points, full donor pool, all regimes pooled) | `destroy.py:319-401` `draw_destroy_contrasts`; `derange_indices` `destroy.py:85-92` | MATCHES | Groups on exact stratum × status × primary_completed × 5-bit nullness (regime labels pooled within group; per-group derangements, rejection sampling, fixed_points=0); non-arm/comparator rows remain in the group as donors (config-pooled donor). Empirically verified against the seeded reference mapping in `test_destroy.py`. |
+| §5 non-vacuity / VOID handling | `destroy.py:352-400`; `future_destroy_attestation` | MATCHES | VOID_SINGLETON_GROUP, VOID_NO_MOVABLE_ROWS, VOID_NO_CHANGED_VALUE, VOID_POPULATION_MISMATCH, VOID_NONFINITE_* reasons block; empty-arm returns EMPTY_ARM_OR_COMPARATOR note with pass (disclosed). Minor edge: an empty-arm early return carries reasons but sets `blocking_pass=True` (see issue F4). |
+| §5 fixture plants and topology | `adapter.py:88-160` `make_fixture_frame`; EXP-104 `Adapter.fixture_frame` | MATCHES (with note) | +0.50 ATR (MID 0.90/1.10, arms 1.40/1.60), +3.6e12 ns duration, +0.25 strong_move (1/4 vs 1/2); 200 rows/arm, deterministic permutation seed 4, ordering (first_raid_timestamp, level_id), first_raid_timestamp = 1.7e18 + i·9e11; both (MID,LOW) and (MID,HIGH) contrasts planted. Note (F5): MID rows repeat `FIXTURE-MID-level-####` across the two pairs, so MID level clusters hold two identical rows (statistically equivalent to cluster_size=1, literal topology differs). |
+| §5 every-seed/every-channel fixture must pass, blocks live control | `results/fixture_integrity.json` (regenerated, receipt mtime 2026-08-17 12:26) | MATCHES | 6 control records (2 arms × 3 channels), all `blocking_pass=true`, empty reasons, `raw_bite=true` with seeds [0,1,2,3,4], `destroyed_survives=false`, 2,000 destroyed contrasts, empirical `destroyed_interval`, `nested_seeds` per record. Production `run_fixture(n_boot=10)` reproduces the receipt byte-for-byte (verified). |
+| §8 amendment ledger / final null accounting | `design.md:347-406` (AMENDMENT-15 at 402-406) | MATCHES | 3 looser / 3 tighter / 8 neutral running count; A-15 declared LOOSER; no ≥3 one-directional streak (tightest run is A6/A7 = 2); zero expected machine false-qualifiers by construction. |
+| §2/§7 golden-trace regime causality | `exp100/processor.py:114-126,285-350,462-498`; `features.py:151-185` | MATCHES | Raid/excursion read `_last_regime` (pre-update cached state) before `_on_observation_bar`; regime appends the current value before ranking with linear (n−1)·0.33/(n−1)·0.67 bounds and strict tie rules; reference events processed after the observation update, so same-timestamp confirmation/endpoint consume post-update MID. |
+| §3 raid-frequency estimand (exposure/starts/rates/contrasts) | `analysis.py:83-129` `_frequency_from_units`/`frequency_rate` | PARTIAL | Core estimator correct (preceding-mark exposure, unique raid starts per bar, rate=1000·starts/exposure, LOW/HIGH-minus-MID, empty-exposure lists, warmup/undefined listed in the fixture-facing path). However the **live** census (`analysis.py:296-322`) emits only exposure/starts counts — observed rates and contrasts, and warmup/undefined exposure counts, are not in the live output (F2). |
+| §3 frequency uncertainty — one-day blocks L=96/48/24 with sensitivities L/2 and 2L | `analysis.py:48-49,330-336` | DEVIATES | `FREQUENCY_BLOCK_LENGTHS=(12,24,48,96,192)` is defined but never used; the live loop runs `FREQUENCY_BLOCK_LENGTHS_DEFAULT=(24,48,96)` identically for every stratum/timeframe. Per design, 15m cells need {48,96,192}, 30m {24,48,96}, 1h {12,24,48}; 192 and 12 are never orchestrated (F1). |
+| §4 outcome estimator, joint bootstrap, L=2/5/10, seeds | `statistics.py:157-270`; `adapter.py:462-520` | MATCHES | Joint cluster resampling, L=5 primary with L=2/L=10 sensitivities, 10k draws, 5 seeds, linear percentiles, finite-draw counting (NaN draws excluded with counts — run-5 issue resolved), EMPTY_ARM/ONE_CLUSTER reasons retained. |
+| §4 secondary summaries — swing_price/swing_bps | `adapter.py:474-500` | MATCHES | `source_field_summaries` arm/comparator n, non_null, mean, median for both channels in every value row (run-7 issue resolved). |
+| §5 nullness class uses `duration_ns` alias | `adapter.py:39-44`; `analysis.py:56-64`; alias assertion `adapter.py:284-298` | MATCHES | 5-bit tuple (swing_price, swing_bps, swing_atr, duration_ns, strong_move); `duration_alias_nullness_mismatch` and `duration_alias_mismatches` asserted in `integrity()` (run-7 issue resolved). |
+| §5 empirical 95% destroyed interval in control records | `destroy.py:692-694`; receipt records | MATCHES | `destroyed_interval` = [q0.025, q0.975] of the 2,000 destroyed contrasts per control record (run-7 issue resolved). |
+| §5 non-bite threshold is raw SE (AMENDMENT-15), not destroyed SE | `destroy.py:671-682` | MATCHES | Verified in receipt: destroyed means (−6.2e−4 ATR, −4.6e9 ns, −1.8e−3 strong) are inside ±2.8·bootstrap_se_raw (0.0125 ATR at 10k scale) for every seed/channel. |
+| §1 gate-first / frozen source / UTC fence / composite ID | `source.py:180-345`; repair diff `e57847c` | MATCHES | Family gate (264 cells) checked before any parquet read; fence receipts validate `train_end_utc` when present and `train_end_ns` when present; object-id uniqueness cell-scoped with composite (source_cell, raid_id) check; EXP-100 vs EXP-104 gate copies byte-identical (SHA256 1593851873…). Issues F3 (default gate path) noted. |
+| §1 no source mutation / analysis-only | `analysis_code/analysis.py`; `runtime.py` | MATCHES | Reads only; atomic result write; no strategy, order, engine, or holdout path. |
+| No-order/PSR, no cost, no powering | design §§6/9; code scan | MATCHES | PSR declared N/A (no trade/leg-bps estimand); `ZERO_COST_DISCLOSURE` verbatim (contract test asserts equality); no cost-function import (`PARTIAL_FEES`, `spread_scale_route`, `bybit_round_trip_cost_bps` absent); INTEGRITY_Z=2.8 is the only scale constant and is validity-only. |
+
+### Golden-trace diff
+
+| Event | Expected (from design) | Implemented logic | Verdict |
+|---|---|---|---|
+| T1 (10:00, pre-update) | Cached x=0.80 below lower=0.90 → raid/excursion regime LOW before the current observation update | `processor.py:285-293` captures `atr`/`regime = self._last_regime` before `_on_observation_bar`; `_on_reference_bar` unchanged afterwards | MATCHES |
+| T2 (10:15, post-update) | x=1.20 appended before ranking; retained 252-window bounds 0.90/1.10 → bar_marks.regime HIGH; equality would be MID | `features.py:151-165` appends then ranks with strict `<`/`>` comparisons; bar mark emitted post-update | MATCHES |
+| T3 (11:00 observation + reference) | Observation x=1.00 updates to MID before the same-timestamp reference → confirmation_regime=MID (not HIGH); endpoint stays MID through 12:00; original raid LOW unchanged | `processor.py:114-126` observation processed before reference; confirmation/endpoint read `self._last_regime` (post-update); raid fields never rewritten | MATCHES |
+| Fixture plants | +0.50 ATR, +3.6e12 ns, +0.25 proportion; destroyed non-bite vs raw SE for every seed/channel | `make_fixture_frame`; receipt shows raw=0.5/3.6e12/0.25, raw-bite seeds [0..4], destroyed non-bite for all 6 records | MATCHES |
+| Nested destroy | Closed-form mean/variance of the 2,000-draw destroyed contrast inside every resampled population b | `_derangement_variance` and expectation `(W·G−S)/(m−1)` verified this run against exact derangement enumeration for 2 groups (m=3..6 and arbitrary weights); unit test covers m=2..6 | MATCHES |
+| Frequency uncertainty set | Per-timeframe L/2, L, 2L (192 for 15m, 12 for 1h) | Live loop runs {24,48,96} for all strata; 12/192 unreachable | DEVIATES |
+
+### Governance & boundary
+
+- **Fresh context:** PASS — dedicated subagent; no authorship of the reviewed implementation in this context.
+- **Gate-first:** PASS — `validate_source_contract` checks the family gate (blocking_pass, 264 cells) before cell scans; per-cell gates cross-checked (config_hash, no_cost ok, blocking_pass).
+- **TRAIN/holdout fence:** PASS — `train_end_ns = 1_700_611_200·1e9` = 2023-11-22T00:00:00Z (recomputed); `scan_train_columns` filters rows after the fence; no TEST/holdout path.
+- **Registry preconditions:** PASS — `CF-LIQSWP-001/HYP-004` registered (multiplicity-registry.md:1724), 0 counted TEST reads, family REGISTERED.
+- **Zero-cost verbatim:** PASS — receipt `zero_cost_disclosure` equals `contract.py ZERO_COST_DISCLOSURE`; no cost function on any live path; no prohibited claims.
+- **No research powering:** PASS — no MDE, MDE_Z, power curve, detection floor, `UNPOWERED`, `min_powered_seeds`, `n_legs_floor` in EXP-104 code/design; INTEGRITY_Z=2.8 appears only in the tripwire validity check.
+- **No local accounting:** PASS — `check_no_local_accounting("python/experiments/EXP-104/analysis_code")` → `{'ok': True, 'banned_defs_found': []}`.
+- **Derangement:** PASS — zero fixed points by rejection sampling; VOID on singleton/no-change groups; test coverage present.
+- **One BacktestNode:** PASS — analysis-only; no BacktestNode, no engine process, in EXP-104 code.
+- **PSR:** N/A — no trade/leg-bps or Sharpe series; design declares PSR N/A.
+- **XENA / conversion pin / battery rules:** N/A — no XENA route, no SPDR/screen money conversion, no battery/capped-read gate; F02/F04/F06 declared N/A, F07 satisfied.
+- **Amendment ledger:** PASS — 3 looser / 3 tighter / 8 neutral; no streak ≥3; final-null accounting statement present.
+- **Bounded runtime proof:** PASS — `test_exp10x_nested_destroy_performance.py` at registered live scale (5 seeds × 10k outer × 2k destroys on 4,000 rows / 1,000 clusters): 4.58s joint, 2.33s independent (bound 120s); fixture stratum at live scale completes in ~1.4s.
+- **Tests run:** `pytest python/tests/liqswp_analysis python/tests/test_exp10x_analysis_contract.py python/tests/test_exp10x_nested_destroy_performance.py -q` → 49 passed; `pytest test_exp101/102/103_analysis_live.py -q` → 16 passed (shared source-contract path against the real EXP-100 source, exercising the source.py repairs).
+
+### Issues
+
+1. **MEDIUM — frequency sensitivity block lengths are not dispatched per timeframe (design §3 DEVIATES).**
+   `analysis.py:48-49` defines `FREQUENCY_BLOCK_LENGTHS=(12,24,48,96,192)` but it is never referenced; the live orchestration (`analysis.py:330-336`) runs the same `(24,48,96)` for every stratum regardless of timeframe. The design requires, per cell: 15m → L=96 with sensitivities 48 (=L/2) and **192 (=2L)**; 30m → 24/48/96; 1h → L=24 with sensitivities **12 (=L/2)** and 48. Lengths 12 and 192 are therefore never produced. (The RNG/mechanics themselves are exact.)
+   **Required change:** dispatch block lengths per observation timeframe in the live frequency-uncertainty loop so each cell emits {L/2, L, 2L} with L∈{96,48,24}, e.g. use `FREQUENCY_BLOCK_LENGTHS` per the partition's `timeframe`.
+   `Failing artifact: python/experiments/EXP-104/analysis_code/analysis.py`; `REQUIRED_SKILL: experiment-developer`.
+
+2. **MEDIUM — live frequency census omits the registered observed layers (design §3 DEVATES).**
+   The live census (`analysis.py:296-322` `frequency_rows`) emits only per-regime `exposure` and `starts` counts. The design defines `rate_r = 1,000·starts_r/exposure_r` and `contrast_r = rate_r − rate_MID` as the estimand and the REPORT-LAYERS §4 list observed "rates ... direct contrasts" (and design §3 requires warmup/undefined exposure "reported separately"). The fixture-path `_frequency_from_units` computes these, but the live branch never calls it for the observed row and never counts warmup/undefined EXPOSURE marks (`marked_exposure` at `analysis.py:280-281` filters to LOW/MID/HIGH only). The uncertainty section reports only bootstrap intervals.
+   **Required change:** emit the observed rate/contrast plus warmup/undefined exposure counts per stratum in the live census (reuse `_frequency_from_units` on the stratum's units), while keeping exposure/start counts.
+   `Failing artifact: python/experiments/EXP-104/analysis_code/analysis.py`; `REQUIRED_SKILL: experiment-developer`.
+
+3. **LOW — CLI live default gate points at the EXP-104 local copy, not the EXP-100 authority (design §1).**
+   `analysis.py:439` defaults `--gate` to `experiment_root/"results/estimand_validation.json"` (EXP-104 copy). The copy is byte-identical to EXP-100's today (SHA256 1593851873…), and `validate_source_contract` cross-checks family vs per-cell gates, so a drift would be caught; but the pinned authority in design §1 is `python/experiments/EXP-100/results/estimand_validation.json`.
+   **Required change:** default to the authoritative EXP-100 gate path (as EXP-102 does), or add an explicit guard that the file is byte-identical to the authoritative gate.
+   `Failing artifact: python/experiments/EXP-104/analysis_code/analysis.py`; `REQUIRED_SKILL: experiment-developer`.
+
+4. **LOW — empty-arm early return keeps blocking_pass=True even when VOID reasons exist.**
+   `destroy.py:612-629` returns `blocking_pass=True` for an EMPTY_ARM_OR_COMPARATOR population while passing through any collected `VOID_SINGLETON_GROUP`/`VOID_NO_MOVABLE_ROWS` reasons. Because an empty arm already makes the row uninterpretable (EMPTY_ARM disclosed), this is acceptable in effect, but it means a control record can carry a VOID reason with pass=true.
+   **Required change (optional):** in the empty-arm branch, drop or explicitly annotate non-applicable destroy reasons, or document the pass-with-reasons semantics in the receipt schema.
+   `Failing artifact: python/src/xen/liqswp_analysis/destroy.py`; `REQUIRED_SKILL: experiment-developer`.
+
+5. **LOW (informational) — fixture MID clusters are duplicated across the two baseline pairs.**
+   `adapter.py:88-160`: pairs (MID,LOW) and (MID,HIGH) both emit 200 MID rows with level_id `FIXTURE-MID-level-####`, so `FIXTURE-TOPOLOGY`'s "one row is one complete level cluster" holds for LOW/HIGH but not MID (200 two-row identical clusters). Statistically equivalent (identical rows), including the receipt's single 800-row destroy group and raw estimates.
+   **Required change (optional):** reserve distinct MID level ids per pair (e.g. `level-{pair}-{i:04d}`) for literal topology fidelity.
+   `Failing artifact: python/src/xen/liqswp_analysis/adapter.py`; `REQUIRED_SKILL: experiment-developer`.
+
+6. **Coverage gap (not a design breach) — no EXP-104 live-path test.**
+   There is no `python/tests/test_exp104_analysis_live.py`; EXP-101/102/103 each have one. EXP-104's live path (its `live_frame` profile-key joins, `VOID_PROFILE_JOIN_MISMATCH`, `VOID_REGIME_PROVENANCE`, per-cell mark scans, and frequency-census orchestration) is only covered indirectly — the shared `validate_source_contract` is exercised by the other experiments' live tests against the real EXP-100 source, and EXP-104 fixture behavior is covered by `test_exp104_adapter.py` + the parametrized `test_exp10x_analysis_contract.py`. Live-path coverage exists but is not EXP-104-specific.
+   **Recommended change:** add a `test_exp104_analysis_live.py` mirroring EXP-103's (gate-first on the retained source + a fixture regression for the EXP-104 control), which also asserts the §3 frequency census fields (see issues 1-2).
+   `Failing artifact: python/tests/`; `REQUIRED_SKILL: experiment-developer`.
+
+### Run-7 items verified as resolved
+
+1. Exact nested 10k×2k destroy — **resolved** (`nested_destroy_bootstrap` closed-form; math independently re-derived and matched against exact derangement enumeration; 2,000-draw live read kept; performance proof 4.58s/2.33s).
+2. Registered fixture plants — **resolved** (two-arm +0.50 ATR / +3.6e12 ns / +0.25 strong_move; receipt regenerated and passing, 6/6 control records).
+3. Nullness class `duration_ns` alias — **resolved** (5-bit class uses `duration_ns`; alias equality asserted).
+4. swing_price/swing_bps source summaries — **resolved** (`source_field_summaries` in every value row).
+5. Empirical 95% destroyed interval — **resolved** (`destroyed_interval` per control record).
+
+### Independent checks run (this review)
+
+```text
+git rev-parse HEAD / status: clean at 62983d0
+pytest python/tests/liqswp_analysis python/tests/test_exp10x_analysis_contract.py \
+      python/tests/test_exp10x_nested_destroy_performance.py -q          -> 49 passed
+pytest test_exp101/102/103_analysis_live.py -q                            -> 16 passed
+check_no_local_accounting(python/experiments/EXP-104/analysis_code)      -> {'ok': True, 'banned_defs_found': []}
+closed-form destroy (sum of (W·G−S)/(m−1) per group) vs exact derangement enumeration -> equal (2 groups, m=3)
+fixture receipt: 6 control records, all blocking_pass, 2000 destroyed contrasts each, nested seeds 0..4
+live-scale nested run on fixture stratum (10k outer): ~1.4s, destroyed non-bite holds (0.00062 <= 2.8·0.00446)
+TRAIN fence recompute: 1700611200 s == 2023-11-22T00:00:00Z
+gate byte-identity: EXP-100 vs EXP-104 estimand_validation.json SHA256 1593851873…
+```
+
+### Residual risks
+
+- The two MEDIUM frequency-report gaps (issues 1-2) affect only the informative frequency leg and its disclosure; the hard/validity layer is clean.
+- The nested closed form follows the "same per-population donor pool" reading of §4/§5 (cluster resamples carry the arm/comparator rows of each contrast); the live donor additionally pools all regime rows per §5. The two populations are identical in row set only for two-regime strata; residual nuance is disclosed in the docstring.
+- No live execution artifact exists yet (`results/analysis_results.json` absent) — this remains the operator's gate.
+

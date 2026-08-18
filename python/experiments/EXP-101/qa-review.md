@@ -859,3 +859,88 @@ Three **MEDIUM/LOW** issues should be addressed before execution:
 
 Route to `experiment-developer` for implementation fixes (issues 1, 3, 4, 5) and `quant-designer` for design/implementation alignment on fixture plants (issue 2).
 
+
+## QA run 11 — 2026-08-17T23:50:59Z — mode: subagent — HEAD 62983d0cf0136b7caf1ec2aea8c41d3b92abdec1
+
+Verdict: **REVISE**
+
+Scope: fresh-context verification that the run-10 REVISE findings at HEAD 8127c23 are correctly resolved in the e57847c working tree (HEAD 62983d0; tree clean; later commits touch only skill/QA docs). Reviewed state: `git rev-parse HEAD` = 62983d0cf0136b7caf1ec2aea8c41d3b92abdec1, `git status --short` = clean. Read-only review; no file modified except this append-only record. Design text was read first; code was verified independently of the developer's summary.
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §1 FROZEN-SOURCE gate-first authority | `source.py:155-176` `validate_source_contract` | MATCHES | Family gate (`EXP-100/results/estimand_validation.json`, blocking_pass=true, n_cells=264 verified on disk) checked before any parquet read; per-cell gates all checked (`VOID_CELL_GATE` source.py:208). |
+| §1 TRAIN fence & UTC fence | `source.py:113-127` `_validate_utc_fence`; `source.py:168`; `adapter.py:28-29` `TRAIN_END_NS`/`TRAIN_END_UTC` | MATCHES | 1_700_611_200e9 == 2023-11-22T00:00:00Z (re-derived by ISO parse; string carries "Z" so the aware-datetime path is taken); fence files PINNED with matching train_end_utc (all 264); endpoint scan filters rows <= train_end. |
+| §1 Seal: config_hash / event_log_sha256 / cost_model | `source.py:222-230` | MATCHES | config_hash vs gate attestation, event log SHA256 vs metadata, cost_model=NO_COST_CHARGED all enforced fail-closed. |
+| §1 Seal: emission_contract_version / Nautilus / one_backtest_node / manifest SHA256 | `source.py:155-340` | **DEVIATES** | None of these §1 "seal/require" fields are validated. All 264 `run_metadata.json` carry emission_contract_version=nautilus-emission-v1, nautilus_version=1.230.0, one_backtest_node=true (verified on disk), and fence manifest_sha256 matches the design text — but the check is absent, so the hard seal is fail-open for these fields. See Issue 1. |
+| §1 Composite (source_cell, raid_id) uniqueness | `source.py:130-153`, `source.py:330-337` | MATCHES | Eager per-cell composite key check (run-10 f-item). |
+| §1 Within-cell object-id duplicate detection | `source.py:306-316` | MATCHES | Cell-scoped group-by on raid_id with explicit cell-scope comment (run-10 f-item). |
+| §1 Causal timestamp provenance | `source.py:286-303` | MATCHES | raid<=sweep<=return<=confirmation<=endpoint per cell; `VOID_CAUSAL_ORDER`. |
+| §1 Binding ATR_UNDEFINED exclusion | `adapter.py:262-270` `_channel_frame` | MATCHES | swing_atr/strong_move exclude ATR_UNDEFINED rows; excluded count reported in census (`adapter.py:595`). |
+| §3 Strata, 11 configs, fixed comparators | `analysis.py:127-143` | MATCHES | 8 (arm, comparator) contrasts with fixed comparators PREVIOUS_1H / PREVIOUS_ASIA / ROLLING_7; stratum key is the 5-tuple, config pooled within stratum (configuration pooling per §3/§5). |
+| §3 Population & censoring | `adapter.py:262-270` | MATCHES | Outcome population = COMPLETED & primary_attribution & primary_completed; failures stay in census; swing_price/bps finite-only. |
+| §3 Primary estimators | `adapter.py:180-186`; `statistics.py:37-60` | MATCHES | Mean swing_atr, mean swing_duration_ns, unpaired strong_move proportion difference; time is reported in hours in live output per design. |
+| §4 §7 Independent arm/comparator bootstrap | `statistics.py:120-243`; `analysis.py:147` `independent_arms=True` | MATCHES | Arm and comparator clusters resampled independently; `L_eff=min(max(1,L), n_clusters-1)`; circular blocks; single-cluster annotated `ONE_CLUSTER` (not silently treated as valid). |
+| §4 Block lengths 2/5/10; L=5 primary | `statistics.py:336-354`; `adapter.py:489-493` | MATCHES | `observed_L2/L5/L10` all emitted; nested outer bootstrap uses block_length=5 (`nested_block_length`, adapter.py:199). |
+| §4 Empty-arm handling | `statistics.py:46-53`; `destroy.py:845-862` | MATCHES | Counts + EMPTY_ARM_OR_COMPARATOR reason + null interval; row retained; integrity passes with a disclosed "no estimate possible" note (design §4 "do not remove the row or infer a direction"). |
+| §4 Report layers / no value labels | `adapter.py:555-560` | MATCHES | observed/ideal/interpretation fields; no SUPPORTED/WASH/CONTRADICTED/etc. machine labels. |
+| §5 CONTROL grouping (8-tuple + 5-bit nullness, config pooled) | `analysis.py:41-50`, `adapter.py:26-43`; `destroy.py:196-210` | MATCHES | Group = (archive_symbol, timeframe, confirmation_method, confirmation_reference, side, status, primary_completed) × 5-bit nullness; **nullness uses declared `duration_ns` alias** (run-10 issue 3 closed); alias byte-equality asserted in `adapter.py:338-352` (`VOID_DURATION_ALIAS_NULLNESS_MISMATCH`, `VOID_DURATION_ALIAS`). |
+| §5 Derangement (zero fixed points) | `destroy.py:87-95` `derange_indices` | MATCHES | Rejection sampling until no fixed points; mappings assert fixed_points=0; brute-force test coverage (`test_destroy.py:258`). |
+| §5 Singleton groups (n<2) | `destroy.py:236`, `destroy.py:371` | MATCHES (label note) | Rows stay fixed, control voided and disclosed, but the emitted label is `VOID_SINGLETON_GROUP` whereas the design names it `VOID_NO_DERANGEMENT`. Same semantics; label not aligned. See Issue 3. |
+| §5 Exact nested 10k×2k outer bootstrap | `destroy.py:520-747` `nested_destroy_bootstrap`; `destroy.py:750-816` `_destroy_draw` | MATCHES | **run-10 issue 1 closed.** For each seed s, 10,000 cluster populations via §4 mechanics (independent arms for EXP-101); RAW and the full 2,000-destroy statistic recomputed inside EVERY population b from per-cluster/per-group sufficient statistics (group aggregates re-derived on b's rows, so the donor pool follows the resample). Closed form `m_destroy[b]=Σ_g(W_gG_g−S_g)/(m_g−1)` for m_g≥2 (else S_g) verified against the design's literal draw-recompute procedure by an independent numeric probe (std_b(raw) and std_b(m_destroy) agreement); `bootstrap_SE_raw[s]=std_b(D_raw,ddof=1)`; `bootstrap_SE_mean_destroyed[s]=sqrt(var_between + mean_b(Var_draw)/n_destroy)` computed and disclosed per seed. Docstring and code match. |
+| §5 AMENDMENT-15 live read inequality | `destroy.py:818-939` `future_destroy_attestation` | MATCHES | If `abs(D_raw) > INTEGRITY_Z*bootstrap_SE_raw[s]` then `abs(m_destroy) > INTEGRITY_Z*bootstrap_SE_raw[s]` => survival seed => `VOID_FUTURE_DESTROY_SURVIVAL` (destroyed mean compared against the RAW bootstrap SE, not `bootstrap_SE_mean_destroyed`); threshold string in evidence is "INTEGRITY_Z * bootstrap_SE_raw[s]"; nested SE still disclosed per seed (requirement (a),(b) met). Non-finite raw / missing destroyed statistic => VOID reasons (invalidity, never null-result); collapse_ratio NaN when D_raw zero/non-finite; no raw-bite seeds => control reported without collapse claim (requirement (c) met). |
+| §5 INTEGRITY_Z=2.8 validity-only | `destroy.py:49` | MATCHES | Only power-unrelated scale constant; no MDE/power/detection-floor code anywhere. |
+| §5 Fixture topology & plants | `adapter.py:92-170` `make_fixture_frame`; `analysis.py:150-154` | MATCHES (note) | **run-10 issue 2 closed.** Two-arm explicit plants per pair: swing_atr 0.90/1.10 vs 1.40/1.60 (+0.50); duration 3e12/4.2e12 vs 6.6e12/7.8e12 (+3.6e12 ns); strong_move at 1/4 vs 1/2 (+0.25); 200 rows/arm; permutation seed 4; timestamp base/step per design; receipt raw_estimates = exactly +0.5 / +3.6e12 / +0.25 for every contrast. Shared baseline labels reuse `FIXTURE-{label}-level-{i:04d}` across pair blocks => 3-row clusters (topology says cluster_size=1); statistically inert (identical rows). See Issue 2. |
+| §6 Complexity/no-power/no-veto | `design.md:167-187`; analysis code | MATCHES | No MDE/power curve/detection floor/`UNPOWERED`/`min_powered_seeds`/`n_legs_floor`; PSR N/A (no trade/leg-bps series); no cost function in live path. |
+| §7 Golden trace T1–T3 | `processor.py:286-330` (inclusive return), `462-522` (primary attribution), `555-612` (terminal swing arithmetic, duration_ns alias) | MATCHES | Hand-verified below. |
+| §8 Amendment ledger | `design.md:198-263` | MATCHES | 14 amendments; running counts re-derived and consistent; AMENDMENT-15 DIRECTION: LOOSER, final tally exactly 3 looser / 3 tighter / 8 neutral; no ≥3 one-directional streak (max 2); final null selection accounting consistent. |
+| §9 / ZERO-COST disclosure | `contract.py:10-27`; `test_contract.py:33` | MATCHES | Canonical text verbatim (test asserts byte equality); emitted in every receipt; NO_COST_CHARGED confirmed in all 264 source metadata cells. |
+| Fixture control gating / receipt | `runtime.py:24-61`; `fixture_integrity.json` | MATCHES | **run-10 issue 5 closed / receipt regenerated** (committed in e57847c): 24/24 control records `blocking_pass=true`, `destroyed_interval` (empirical 95%, np.quantile 0.025/0.975) present on every record, nested seeds disclosed per seed with both SEs, raw_bite seeds listed, zero survived seeds anywhere. |
+| swing_price/swing_bps source-field summaries | `adapter.py:515-549`, `adapter.py:560` | MATCHES | **run-10 issue 4 closed** — `source_field_summaries` with arm/comparator n, non_null, mean, median for both channels in every value row. |
+
+### Golden-trace diff
+
+| Event | Expected (from design §7) | Implemented logic (hand-verified) | Verdict |
+|---|---|---|---|
+| T1 — separate PREVIOUS_1H / ROLLING_7 cells, level high 100.00, bar 101.20/100.80/101.00, raid_atr=1.00 | Each cell starts its own raid, prior_raid_count=0, max_excursion=1.20, null return, no cross-cell ordering | `processor.py` is cell-local (per-cell processor/state); excursion 101.20−100.00=1.20; strictly-beyond start on the completed observation bar; return recorded if same bar returns (`processor.py:303-325`, AMENDMENT-13 keeps raid live) | MATCHES |
+| T2 — completed observation low=100.00 returns; 11:00 expected-side 1H close assigns primary_attribution=true per cell; equal-price cross-config level does not demote | Inclusive `bar.low <= price` return; primary=max(expected, (sweep_ts, raid_id)); equal-price level in another configuration cannot CONFIRMED_NON_PRIMARY this raid (cell-local identity) | `processor.py:303-315`, `processor.py:480-520` | MATCHES |
+| T3 — 12:00 opposing reference event ends primary swing; level=100.00, raid_atr=1.00, swing_extreme=98.00 | swing_price=2.00, swing_atr=2.00 (2.00/1.00), swing_bps=200 (2.00/100×10⁴), swing_duration_ns=duration_ns=3.6e12 (12:00−11:00), strong_move=true (2.00>1.20) | `processor.py:555-612`: swing_price=level−swing_extreme (HIGH), swing_atr=swing_price/raid_atr, swing_bps=(swing_price/level_price)×10_000, strong_move=swing_atr>max_excursion_atr (2.00>1.20), swing_duration_ns=endpoint−confirmation, duration_ns=swing_duration_ns (alias, line 612) | MATCHES |
+| Fixture plants | +0.50 ATR, +3.6e12 ns, +0.25 proportion, destroyed means inside the raw bite band per seed | Receipt raw_estimates exactly 0.5 / 3.6e12 / 0.25 for all 24 controls; destroyed means ~0.0002–0.0004 ≪ 2.8·SE_raw; survived seeds [] everywhere | MATCHES |
+
+### Governance & boundary
+
+- **Fresh context:** PASS — dedicated subagent; no implementation authorship in this context.
+- **Gate-first & per-cell gates:** PASS — family gate and all 264 cell gates blocking before any row read.
+- **TRAIN/holdout fence:** PASS — `VOID_AFTER_TRAIN` plus scan-time endpoint filter ≤ 2023-11-22T00:00:00Z; no TEST/holdout path in the analysis.
+- **Registry preconditions:** PASS — CF-LIQSWP-001 REGISTERED (docs/signal-registry/candidate-families/cf-liqswp-001.md), HYP-001 registered with EXP-101; EXP-100/HYP-000 AMENDMENT-14 COMPLETED, 0 counted TEST reads / 0 holdout reads / 0 candidate slots.
+- **No local accounting / no backtest:** PASS — `check_no_local_accounting("experiments/EXP-101")` → `{'ok': True, 'banned_defs_found': []}`; EXP-101 runs only fixture/live analysis entry points (no BacktestNode).
+- **One BacktestNode:** PASS for EXP-101 (analysis-only); EXP-100 metadata attests `one_backtest_node=true` in all 264 cells (source metadata verified; the analysis does not itself reconstruct a node).
+- **Derangement destroy:** PASS — `derange_indices` rejection sampling (zero fixed points); `build_destroy_mappings`/draw path assert fixed_points=0; brute-force parity test green.
+- **Zero cost:** PASS — disclosure verbatim; NO_COST_CHARGED in all source metadata; no cost/scoped legacy cost-model imports in the live path.
+- **No research powering:** PASS — no MDE/power/floor terms found; only INTEGRITY_Z=2.8 validity.
+- **PSR / screen conversion / XENA:** N/A — no trade/leg-bps series, no SPDR-cited money effects, no XENA routing.
+- **Amendment direction ledger:** PASS — final 3 looser / 3 tighter / 8 neutral; no ≥3 streak requiring an operator flag.
+
+### Issues
+
+1. **MEDIUM — §1 seal attestations not validated by the source contract (NEW, pre-existing).**
+   **Design:** §1 `seal` — "require emission_contract_version=nautilus-emission-v1, Nautilus=1.230.0, cost_model=NO_COST_CHARGED, and one_backtest_node=true"; §1 fence — "manifest SHA256 4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0".
+   **Code:** `source.py:155-340` `validate_source_contract` validates config_hash, event_log_sha256, cost_model, fence status/UTC, counts, schema, causality, composite uniqueness — but never reads or checks `emission_contract_version`, `nautilus_version`, `one_backtest_node`, or the fence `manifest_sha256` (verified by grep: no such identifiers in `python/src/xen/liqswp_analysis`). The data currently attests all of these correctly (264/264 metadata + fence hashes match the design), so this is unenforced enforcement rather than an active violation — but prior QA run 10's trace claimed these fields were "all validated", which is inaccurate. The hard-block seal is fail-open for these fields.
+   **Required change:** In `validate_source_contract` (source.py), read `run_metadata.json` for `emission_contract_version == "nautilus-emission-v1"`, `nautilus_version == "1.230.0"`, `one_backtest_node == true`, and the fence `manifest_sha256 == "4cdc7b01dd47200710d0d961639d55d52e1129ca89096e841eafd816b6061de0"`, appending VOID reasons on any mismatch; alternatively record an operator-approved deviation to the §1 seal. Route: `experiment-developer`.
+
+2. **LOW — Fixture shared baseline labels reuse level_ids across pair blocks.**
+   **Design:** §5 FIXTURE-TOPOLOGY — "level_id=FIXTURE-{arm}-level-{i:04d}; cluster_size=1; one row is one complete level cluster".
+   **Code:** `adapter.py:128` — `level_id = f"FIXTURE-{label}-level-{index:04d}"` using the label only; PREVIOUS_1H (3 pairs), PREVIOUS_ASIA (2), ROLLING_7 (3) each reuse the same 200 level_ids across their pair blocks, so those "clusters" hold 2–3 rows instead of 1. Affects nothing statistically (rows within a reused cluster are identical values and identical timestamps, so bootstrap moments match cluster_size=1) and the bite passes on every control, but the literal topology statement is not met.
+   **Required change (optional):** scope the level_id by pair block (e.g., `FIXTURE-{arm}-{pair}-level-{i:04d}`) to make every cluster exactly one row, then regenerate the fixture receipt. Route: `experiment-developer`.
+
+3. **LOW — Destroy VOID label differs from design term.**
+   **Design:** §5 — "A group with n<2 produces VOID_NO_DERANGEMENT for that control population and remains disclosed."
+   **Code:** `destroy.py:236,371` emit `VOID_SINGLETON_GROUP` (and `VOID_NO_MOVABLE_ROWS` when no group is movable). Behaviour identical (rows fixed, population void, disclosed); only the machine label differs.
+   **Required change (optional):** rename the reason to the registered label `VOID_NO_DERANGEMENT`, and note the near-null `m_g==1` nested-arm path (`destroy.py:800-802`, rows stay fixed and contribute S_g) is consistent with the same rule.
+
+Non-issue note (recorded for the operator): at the smoke scale (10 outer replicates), the strong_move raw bite fires on seeds 0 and 4 only (per-seed SEs 0.074–0.151 inflated by 10-draw sampling); under AMENDMENT-15's seed-conditional live-read the control still passes (destroyed mean 0.00024 ≪ 2.8·SE_raw on every biting seed, no destroyed survival). At live scale (10,000 replicates) the strong_move SE tightens to ≈0.04 and every seed bites, so the design's "every seed and channel must satisfy the raw-bite" fixture clause is fully exercised on live settings.
+
+### Prior run-10 findings — verification result
+
+All five run-10 REVISE items are verified RESOLVED in the e57847c state: (1) exact nested 10k×2k destroy implemented and numerically verified, (2) registered two-arm fixture plants implemented with exact raw contrasts, (3) nullness class uses the `duration_ns` alias with asserted byte-equality, (4) swing_price/swing_bps source-field summaries emitted, (5) empirical 95% destroyed interval present in live control evidence; source.py repairs (composite uniqueness, UTC fence, within-cell duplicate detection) and the regenerated, all-passing `fixture_integrity.json` receipts are confirmed. No functional regression found in the resolved areas.
