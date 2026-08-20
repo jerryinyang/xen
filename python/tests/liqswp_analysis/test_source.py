@@ -13,6 +13,7 @@ from xen.liqswp_analysis.source import (
     TRAIN_START_UTC,
     SourceSpec,
     join_profiles_left,
+    key_join_evidence,
     scan_train_columns,
     validate_causal_order,
     validate_source_contract,
@@ -273,6 +274,31 @@ def test_causal_order_returns_named_failed_pair() -> None:
     frame = pl.DataFrame({"raid": [10], "confirm": [9], "end": [11]})
     failures = validate_causal_order(frame, (("raid", "confirm"), ("confirm", "end")))
     assert failures == [{"earlier": "raid", "later": "confirm", "rows": 1}]
+
+
+def test_null_profile_generation_keys_count_as_matched() -> None:
+    raids = pl.DataFrame(
+        {
+            "source_cell": ["c", "c"],
+            "raid_id": ["R0", "R1"],
+            "profile_generation": [1, None],
+        }
+    )
+    profiles = pl.DataFrame(
+        {
+            "source_cell": ["c", "c"],
+            "raid_id": ["R0", "R1"],
+            "profile_generation": [1, None],
+        }
+    )
+    counts = key_join_evidence(
+        raids, profiles, ("source_cell", "raid_id", "profile_generation")
+    )
+    assert counts == {
+        "unmatched_raids": 0,
+        "extra_profiles": 0,
+        "duplicate_profile_keys": 0,
+    }
 
 
 def test_profile_left_join_keeps_unmatched_evidence() -> None:

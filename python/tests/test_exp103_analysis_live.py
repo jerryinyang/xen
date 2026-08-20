@@ -129,8 +129,8 @@ def test_destroy_se_uses_registered_nested_outer_bootstrap() -> None:
     )
 
 
-def test_control_artifact_discloses_every_destroyed_contrast() -> None:
-    """The neutral handoff retains every registered control draw, not summaries only."""
+def test_control_artifact_discloses_destroyed_summaries_not_draw_list() -> None:
+    """Live JSON keeps mean/interval/draw-count; the 2,000-draw list is omitted."""
     module = _load_exp103()
     adapter = module.Adapter(n_boot=20, n_destroy=8, seeds=(0, 1))
 
@@ -139,4 +139,6 @@ def test_control_artifact_discloses_every_destroyed_contrast() -> None:
         row for row in status.evidence["controls"] if row["channel"] == "swing_atr"
     )
 
-    assert len(record["destroyed_contrasts"]) == 8
+    assert record["destroyed_draws"] == 8
+    assert record["destroyed_interval"] is not None
+    assert "destroyed_contrasts" not in record

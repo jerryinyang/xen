@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import os
 from collections import Counter, defaultdict
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -15,8 +16,11 @@ from xen.liqswp_analysis.adapter import BaseContrastAdapter, make_fixture_frame
 from xen.liqswp_analysis.contract import IntegrityStatus
 from xen.liqswp_analysis.runtime import run_fixture as _run_fixture
 from xen.liqswp_analysis.runtime import run_live
-from xen.liqswp_analysis.source import scan_train_columns, validate_source_contract
-from xen.liqswp_analysis.statistics import circular_cluster_indices
+from xen.liqswp_analysis.source import (
+    key_join_evidence,
+    scan_train_columns,
+    validate_source_contract,
+)
 
 EXPERIMENT = "EXP-104"
 LABEL_COLUMN = "raid_regime"
@@ -45,14 +49,16 @@ CONTROL_NULL_COLUMNS = (
 # Frequency block lengths: one-day blocks for 15m/30m/1h + half/double
 # 15m: 96 bars/day, half=48, double=192
 # 30m: 48 bars/day, half=24, double=96
-# 1h: 24 bars/day, half=12, double=48
+# 1h / live 60m: 24 bars/day, half=12, double=48
 FREQUENCY_BLOCK_LENGTHS = (12, 24, 48, 96, 192)
-FREQUENCY_BLOCK_LENGTHS_DEFAULT = (24, 48, 96)  # 1h, 30m, 15m one-day blocks
+FREQUENCY_BLOCK_LENGTHS_DEFAULT = (24, 48, 96)  # unknown TF: 1h/30m/15m one-day blocks
 # Per-timeframe primary one-day block L with sensitivities L/2 and 2L.
+# Live observation cells are labelled 60m (confirmation refs stay 1H/4H).
 FREQUENCY_BLOCKS_BY_TIMEFRAME = {
     "15m": (48, 96, 192),  # L=96
     "30m": (24, 48, 96),  # L=48
     "1h": (12, 24, 48),  # L=24
+    "60m": (12, 24, 48),  # L=24; same as 1h
 }
 
 
@@ -87,43 +93,193 @@ def _build_frequency_units(
     return units
 
 
-def _frequency_from_units(units: Sequence[dict[str, Any]], block_length: int) -> dict[str, Any]:
-    regimes = ("LOW", "MID", "HIGH")
-    exposure = Counter({regime: 0 for regime in regimes})
-    starts = Counter({regime: 0 for regime in regimes})
-    excluded = Counter()
-    warmup_undefined_exposure = Counter()
-    for unit in units:
-        regime = unit["preceding_regime"]
-        if regime in regimes:
-            exposure[regime] += 1
-            starts[regime] += len(unit["starts"])
-        elif regime in ("REGIME_WARMUP", "ATR_UNDEFINED"):
-            warmup_undefined_exposure[regime] += 1
-        else:
-            excluded[str(regime)] += 1
+_REGIME_CODE = {
+    "LOW": 0,
+    "MID": 1,
+    "HIGH": 2,
+    "REGIME_WARMUP": 3,
+    "ATR_UNDEFINED": 4,
+}
+_REGIME_NAMES = ("LOW", "MID", "HIGH")
+
+
+def _start_count(value: Any) -> int:
+    if isinstance(value, (int, np.integer)):
+        return int(value)
+    return len(value)
+
+
+def _encode_frequency_marks(
+    regimes: Sequence[Any], starts: Sequence[Any]
+) -> tuple[np.ndarray, np.ndarray]:
+    codes = np.fromiter(
+        (_REGIME_CODE.get(str(regime) if regime is not None else "", 5) for regime in regimes),
+        dtype=np.int8,
+        count=len(regimes),
+    )
+    counts = np.fromiter(
+        (_start_count(value) for value in starts), dtype=np.int64, count=len(starts)
+    )
+    return codes, counts
+
+
+def _frequency_from_codes(
+    codes: np.ndarray, start_counts: np.ndarray, block_length: int
+) -> dict[str, Any]:
+    tallies = np.bincount(codes.astype(np.intp), minlength=6)
+    start_sums = np.bincount(
+        codes.astype(np.intp), weights=start_counts.astype(np.float64), minlength=6
+    )
+    exposure = {name: int(tallies[index]) for index, name in enumerate(_REGIME_NAMES)}
+    starts = {name: int(start_sums[index]) for index, name in enumerate(_REGIME_NAMES)}
+    warmup_undefined = {
+        name: int(tallies[index])
+        for name, index in (("REGIME_WARMUP", 3), ("ATR_UNDEFINED", 4))
+        if int(tallies[index])
+    }
+    excluded = {"other": int(tallies[5])} if int(tallies[5]) else {}
     rates = {
-        regime: (1000.0 * starts[regime] / exposure[regime] if exposure[regime] else None)
-        for regime in regimes
+        name: (1000.0 * starts[name] / exposure[name] if exposure[name] else None)
+        for name in _REGIME_NAMES
     }
     return {
-        "exposure": dict(exposure),
-        "starts": dict(starts),
+        "exposure": exposure,
+        "starts": starts,
         "rates_per_1000": rates,
         "contrasts_minus_mid": {
-            regime: (
-                rates[regime] - rates["MID"]
-                if rates[regime] is not None and rates["MID"] is not None
+            name: (
+                rates[name] - rates["MID"]
+                if rates[name] is not None and rates["MID"] is not None
                 else None
             )
-            for regime in ("LOW", "HIGH")
+            for name in ("LOW", "HIGH")
         },
         "block_length": int(block_length),
-        "empty_exposure": [regime for regime in regimes if exposure[regime] == 0],
-        "excluded_exposure": dict(excluded),
-        "warmup_undefined_exposure": dict(warmup_undefined_exposure),
-        "eligible_marks": len(units),
+        "empty_exposure": [name for name in _REGIME_NAMES if exposure[name] == 0],
+        "excluded_exposure": excluded,
+        "warmup_undefined_exposure": warmup_undefined,
+        "eligible_marks": int(sum(exposure.values())),
     }
+
+
+def _frequency_from_units(units: Sequence[dict[str, Any]], block_length: int) -> dict[str, Any]:
+    codes, start_counts = _encode_frequency_marks(
+        [unit["preceding_regime"] for unit in units],
+        [unit["starts"] for unit in units],
+    )
+    return _frequency_from_codes(codes, start_counts, block_length)
+
+
+def _py_value(value: Any) -> Any:
+    """Plain-Python scalar (polars scalars expose .item)."""
+    return value.item() if hasattr(value, "item") else value
+
+
+def _partition_payloads(
+    units_frame: pl.DataFrame,
+    stratum_columns: Sequence[str],
+    n_boot: int,
+    seeds: Sequence[int],
+) -> list[dict[str, Any]]:
+    """Census input for each stratum partition as plain, picklable data."""
+    payloads: list[dict[str, Any]] = []
+    for partition in units_frame.partition_by(list(stratum_columns), maintain_order=True):
+        stratum = {column: _py_value(partition[column][0]) for column in stratum_columns}
+        payloads.append(
+            {
+                "stratum": stratum,
+                "blocks": FREQUENCY_BLOCKS_BY_TIMEFRAME.get(
+                    str(stratum.get("timeframe")),
+                    FREQUENCY_BLOCK_LENGTHS_DEFAULT,
+                ),
+                "n_boot": n_boot,
+                "seeds": tuple(seeds),
+                "causal_regime": partition["causal_regime"].to_list(),
+                "starts": partition["starts"].to_list(),
+            }
+        )
+    return payloads
+
+
+def _frequency_arm_table(
+    marked_exposure: pl.DataFrame,
+    starts: pl.DataFrame,
+    stratum_columns: Sequence[str],
+) -> pl.DataFrame:
+    """LOW/MID/HIGH rows per stratum, including EMPTY_EXPOSURE arms.
+
+    Warmup/undefined marks stay out of this table; they are disclosure on the
+    census, never converted to an arm.
+    """
+    arm_exposure = (
+        marked_exposure.filter(pl.col("causal_regime").is_in(list(_REGIME_NAMES)))
+        .group_by(*stratum_columns, "causal_regime")
+        .len(name="exposure")
+    )
+    grid = marked_exposure.select(*stratum_columns).unique().join(
+        pl.DataFrame({"causal_regime": list(_REGIME_NAMES)}),
+        how="cross",
+    )
+    return (
+        grid.join(
+            arm_exposure,
+            on=[*stratum_columns, "causal_regime"],
+            how="left",
+        )
+        .join(
+            starts,
+            left_on=[*stratum_columns, "causal_regime"],
+            right_on=[*stratum_columns, LABEL_COLUMN],
+            how="left",
+        )
+        .with_columns(
+            pl.col("exposure").fill_null(0),
+            pl.col("starts").fill_null(0),
+        )
+        .with_columns(
+            pl.when(pl.col("exposure") == 0)
+            .then(pl.lit("EMPTY_EXPOSURE"))
+            .otherwise(pl.lit(None))
+            .alias("empty_exposure_reason")
+        )
+    )
+
+
+def _run_census(
+    payloads: Sequence[dict[str, Any]], workers: int
+) -> list[dict[str, Any]]:
+    """Census over strata. Processes (not threads) when workers>1: the payloads
+    are small plain data (so no polars pickling), the draw loop is numpy-heavy,
+    and processes sidestep the GIL. map() preserves order, so outputs are
+    identical to the sequential path."""
+    if workers > 1 and payloads:
+        with ProcessPoolExecutor(max_workers=workers) as pool:
+            return list(pool.map(_census_partition, payloads, chunksize=1))
+    return [_census_partition(payload) for payload in payloads]
+
+
+def _census_partition(payload: dict[str, Any]) -> dict[str, Any]:
+    """Frequency census for one stratum partition: observed rates plus block-
+    bootstrap sensitivities. Stateless and deterministic per seed."""
+    stratum = payload["stratum"]
+    blocks = payload["blocks"]
+    codes, start_counts = _encode_frequency_marks(
+        payload["causal_regime"], payload["starts"]
+    )
+    observed = _frequency_from_codes(
+        codes, start_counts, block_length=blocks[len(blocks) // 2]
+    )
+    sensitivities = {
+        str(length): _frequency_bootstrap_codes(
+            codes,
+            start_counts,
+            block_length=length,
+            n_boot=payload["n_boot"],
+            seeds=payload["seeds"],
+        )
+        for length in blocks
+    }
+    return {"stratum": stratum, "observed": observed, "sensitivities": sensitivities}
 
 
 def frequency_rate(
@@ -136,6 +292,154 @@ def frequency_rate(
     return _frequency_from_units(_build_frequency_units(bar_marks, raids), block_length)
 
 
+def _prefix_mark_tables(
+    codes: np.ndarray, start_counts: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Inclusive prefix counts/start-sums for LOW/MID/HIGH (cols 0..2)."""
+    n = int(codes.size)
+    inc_c = np.zeros((n, 3), dtype=np.int64)
+    inc_s = np.zeros((n, 3), dtype=np.int64)
+    eligible = (codes >= 0) & (codes <= 2)
+    if eligible.any():
+        rows = np.nonzero(eligible)[0]
+        cols = codes[eligible].astype(np.intp)
+        inc_c[rows, cols] = 1
+        inc_s[rows, cols] = start_counts[eligible]
+    prefix_c = np.zeros((n + 1, 3), dtype=np.int64)
+    prefix_s = np.zeros((n + 1, 3), dtype=np.int64)
+    prefix_c[1:] = np.cumsum(inc_c, axis=0)
+    prefix_s[1:] = np.cumsum(inc_s, axis=0)
+    return prefix_c, prefix_s
+
+
+def _add_circular_blocks(
+    prefix_c: np.ndarray,
+    prefix_s: np.ndarray,
+    starts: np.ndarray,
+    take: int,
+    n: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Sum prefix tables over circular ranges [start, start+take)."""
+    out_shape = (*starts.shape, 3)
+    if take <= 0 or starts.size == 0:
+        zeros = np.zeros(out_shape, dtype=np.int64)
+        return zeros, zeros
+    end = starts + int(take)
+    wrap = end > n
+    counts = prefix_c[np.minimum(end, n)] - prefix_c[starts]
+    sums = prefix_s[np.minimum(end, n)] - prefix_s[starts]
+    if np.any(wrap):
+        wrapped_starts = starts[wrap]
+        wrapped_end = end[wrap] - n
+        counts = np.array(counts, copy=True)
+        sums = np.array(sums, copy=True)
+        counts[wrap] = prefix_c[n] - prefix_c[wrapped_starts] + prefix_c[wrapped_end]
+        sums[wrap] = prefix_s[n] - prefix_s[wrapped_starts] + prefix_s[wrapped_end]
+    return counts, sums
+
+
+def _frequency_contrasts_from_totals(
+    exposure: np.ndarray, start_sums: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """LOW-minus-MID and HIGH-minus-MID rate contrasts; NaN if an arm is empty."""
+    rates = np.where(
+        exposure > 0, 1000.0 * start_sums / np.maximum(exposure, 1), np.nan
+    )
+    mid = rates[..., 1]
+    return rates[..., 0] - mid, rates[..., 2] - mid
+
+
+def _interval_from_values(values: np.ndarray) -> list[float] | None:
+    finite = values[np.isfinite(values)]
+    if finite.size == 0:
+        return None
+    return [float(np.quantile(finite, 0.025)), float(np.quantile(finite, 0.975))]
+
+
+def _frequency_bootstrap_codes(
+    codes: np.ndarray,
+    start_counts: np.ndarray,
+    *,
+    block_length: int,
+    n_boot: int,
+    seeds: Sequence[int],
+) -> dict[str, Any]:
+    """Registered circular-block frequency bootstrap on mark codes.
+
+    Same starts and block layout as circular_cluster_indices (one
+    rng.integers(0, n) per block, last block truncated). Contrasts are the
+    sums of those circular ranges, via prefix tables — identical to gathering
+    every resampled mark, without building an 80k-index array per draw.
+    """
+    n_units = int(codes.size)
+    if n_units < 1 or int(n_boot) < 1:
+        empty = {"LOW": None, "HIGH": None}
+        return {
+            "block_length": int(block_length),
+            "seeds": [
+                {
+                    "seed": int(seed),
+                    "n_boot": int(n_boot),
+                    "finite_draws": {"LOW": 0, "HIGH": 0},
+                    "intervals": empty,
+                }
+                for seed in seeds
+            ],
+            "intervals": empty,
+        }
+    effective = 1 if n_units == 1 else min(max(1, int(block_length)), n_units - 1)
+    n_blocks = (n_units + effective - 1) // effective
+    remainder = n_units - (n_blocks - 1) * effective
+    prefix_c, prefix_s = _prefix_mark_tables(codes, start_counts)
+    seed_rows = []
+    all_low: list[np.ndarray] = []
+    all_high: list[np.ndarray] = []
+    for seed in seeds:
+        rng = np.random.default_rng(seed)
+        # C-order (n_boot, n_blocks) matches n_boot sequential size=n_blocks draws.
+        block_starts = rng.integers(0, n_units, size=(int(n_boot), n_blocks))
+        if n_blocks == 1:
+            exposure, start_sums = _add_circular_blocks(
+                prefix_c, prefix_s, block_starts[:, 0], remainder, n_units
+            )
+        else:
+            head_c, head_s = _add_circular_blocks(
+                prefix_c, prefix_s, block_starts[:, :-1], effective, n_units
+            )
+            last_c, last_s = _add_circular_blocks(
+                prefix_c, prefix_s, block_starts[:, -1], remainder, n_units
+            )
+            exposure = head_c.sum(axis=1) + last_c
+            start_sums = head_s.sum(axis=1) + last_s
+        low, high = _frequency_contrasts_from_totals(exposure, start_sums)
+        seed_rows.append(
+            {
+                "seed": int(seed),
+                "n_boot": int(n_boot),
+                "finite_draws": {
+                    "LOW": int(np.isfinite(low).sum()),
+                    "HIGH": int(np.isfinite(high).sum()),
+                },
+                "intervals": {
+                    "LOW": _interval_from_values(low),
+                    "HIGH": _interval_from_values(high),
+                },
+            }
+        )
+        all_low.append(low)
+        all_high.append(high)
+    stacked_low = np.concatenate(all_low) if all_low else np.asarray([], dtype=float)
+    stacked_high = np.concatenate(all_high) if all_high else np.asarray([], dtype=float)
+    return {
+        "block_length": int(block_length),
+        "seeds": seed_rows,
+        "intervals": {
+            "LOW": _interval_from_values(stacked_low),
+            "HIGH": _interval_from_values(stacked_high),
+        },
+    }
+
+
 def _frequency_bootstrap_units(
     units: Sequence[dict[str, Any]],
     *,
@@ -143,46 +447,17 @@ def _frequency_bootstrap_units(
     n_boot: int,
     seeds: Sequence[int],
 ) -> dict[str, Any]:
-    seed_rows = []
-    samples_by_regime: dict[str, list[float]] = {"LOW": [], "HIGH": []}
-    for seed in seeds:
-        rng = np.random.default_rng(seed)
-        samples: dict[str, list[float]] = {"LOW": [], "HIGH": []}
-        for _ in range(n_boot):
-            indices = circular_cluster_indices(len(units), block_length, rng)
-            estimate = _frequency_from_units([units[int(index)] for index in indices], block_length)
-            for regime in samples:
-                value = estimate["contrasts_minus_mid"][regime]
-                if value is not None and np.isfinite(value):
-                    samples[regime].append(float(value))
-                    samples_by_regime[regime].append(float(value))
-        seed_rows.append(
-            {
-                "seed": int(seed),
-                "n_boot": int(n_boot),
-                "finite_draws": {key: len(values) for key, values in samples.items()},
-                "intervals": {
-                    key: (
-                        [float(np.quantile(values, 0.025)), float(np.quantile(values, 0.975))]
-                        if values
-                        else None
-                    )
-                    for key, values in samples.items()
-                },
-            }
-        )
-    return {
-        "block_length": block_length,
-        "seeds": seed_rows,
-        "intervals": {
-            key: (
-                [float(np.quantile(values, 0.025)), float(np.quantile(values, 0.975))]
-                if values
-                else None
-            )
-            for key, values in samples_by_regime.items()
-        },
-    }
+    codes, start_counts = _encode_frequency_marks(
+        [unit["preceding_regime"] for unit in units],
+        [unit["starts"] for unit in units],
+    )
+    return _frequency_bootstrap_codes(
+        codes,
+        start_counts,
+        block_length=block_length,
+        n_boot=n_boot,
+        seeds=seeds,
+    )
 
 
 def frequency_bootstrap(
@@ -256,25 +531,20 @@ class Adapter(BaseContrastAdapter):
         raids = pl.concat(raid_frames).collect(engine="streaming")
         marks = pl.concat(mark_frames).collect(engine="streaming")
         profiles = pl.concat(profile_key_frames).collect(engine="streaming")
-        key = ["source_cell", "raid_id", "profile_generation"]
-        duplicate_profiles = profiles.select(pl.struct(key).is_duplicated().sum()).item()
-        unmatched_profiles = raids.join(profiles, on=key, how="anti").height
-        extra_profiles = profiles.join(raids.select(key), on=key, how="anti").height
+        profile_key = ["source_cell", "raid_id", "profile_generation"]
+        join_counts = key_join_evidence(raids, profiles, profile_key)
         joined = raids.join(
             marks.select("source_cell", "ts_event_ns", "regime_source_ts_ns", "causal_regime"),
             left_on=["source_cell", "sweep_ts_ns"],
             right_on=["source_cell", "ts_event_ns"],
             how="left",
-        ).with_columns(
-            pl.when(pl.struct(key).is_not_null())
-            .then(pl.lit("MATCHED"))
-            .otherwise(pl.lit("MISSING_PROFILE"))
-            .alias("profile_join_reason")
         )
-        # Determine profile membership without adding outcome-bearing profile fields.
         joined = (
             joined.join(
-                profiles.with_columns(pl.lit(True).alias("__profile_matched")), on=key, how="left"
+                profiles.with_columns(pl.lit(True).alias("__profile_matched")),
+                on=profile_key,
+                how="left",
+                nulls_equal=True,
             )
             .with_columns(
                 pl.when(pl.col("__profile_matched").fill_null(False))
@@ -290,26 +560,37 @@ class Adapter(BaseContrastAdapter):
             & pl.col("causal_regime").is_not_null()
             & (pl.col(LABEL_COLUMN) != pl.col("causal_regime"))
         ).height
+        join_evidence = {
+            **join_counts,
+            "missing_preceding_marks": missing_mark,
+            "regime_mismatches": regime_mismatch,
+        }
+        source["profile_regime_join"] = join_evidence
+        reasons = list(attestation.integrity.reasons)
+        if (
+            join_counts["duplicate_profile_keys"]
+            or join_counts["unmatched_raids"]
+            or join_counts["extra_profiles"]
+        ):
+            reasons.append("VOID_PROFILE_JOIN_MISMATCH")
+        if missing_mark or regime_mismatch:
+            reasons.append("VOID_REGIME_PROVENANCE")
+        unique = tuple(dict.fromkeys(reasons))
+        if unique:
+            # Integrity first: do not spend the frequency bootstrap on a voided source.
+            return joined, source, IntegrityStatus(False, unique, join_evidence)
         identity = raids.select("source_cell", *self.stratum_columns).unique()
-        marked_exposure = marks.filter(pl.col("causal_regime").is_in(["LOW", "MID", "HIGH"])).join(
+        # Preceding mark must exist. Keep warmup/undefined in the census;
+        # do not convert them to LOW/MID/HIGH arms.
+        marked_exposure = marks.filter(pl.col("causal_regime").is_not_null()).join(
             identity, on="source_cell", how="left"
-        )
-        exposure = marked_exposure.group_by(*self.stratum_columns, "causal_regime").len(
-            name="exposure"
         )
         starts = joined.group_by(*self.stratum_columns, LABEL_COLUMN).agg(
             pl.col("raid_id").n_unique().alias("starts")
         )
-        frequency_rows = (
-            exposure.join(
-                starts,
-                left_on=[*self.stratum_columns, "causal_regime"],
-                right_on=[*self.stratum_columns, LABEL_COLUMN],
-                how="left",
-            )
-            .with_columns(pl.col("starts").fill_null(0))
-            .to_dicts()
-        )
+        frequency_rows = _frequency_arm_table(
+            marked_exposure, starts, self.stratum_columns
+        ).to_dicts()
         starts_by_mark = joined.group_by("source_cell", "sweep_ts_ns").agg(
             pl.col("raid_id").n_unique().alias("starts")
         )
@@ -319,40 +600,16 @@ class Adapter(BaseContrastAdapter):
             right_on=["source_cell", "sweep_ts_ns"],
             how="left",
         ).with_columns(pl.col("starts").fill_null(0))
-        sensitivities: list[dict[str, Any]] = []
+        payloads = _partition_payloads(units_frame, self.stratum_columns, self.n_boot, self.seeds)
+        results = _run_census(payloads, self.workers)
         observed_by_stratum: dict[tuple[Any, ...], dict[str, Any]] = {}
-        for partition in units_frame.partition_by(list(self.stratum_columns), maintain_order=True):
-            stratum = {column: partition[column][0] for column in self.stratum_columns}
-            blocks = FREQUENCY_BLOCKS_BY_TIMEFRAME.get(
-                str(stratum.get("timeframe")), FREQUENCY_BLOCK_LENGTHS_DEFAULT
-            )
-            units = [
-                {"preceding_regime": regime, "starts": (None,) * int(count)}
-                for regime, count in zip(
-                    partition["causal_regime"].to_list(),
-                    partition["starts"].to_list(),
-                    strict=True,
-                )
-            ]
-            observed_by_stratum[
-                tuple(stratum[column] for column in self.stratum_columns)
-            ] = _frequency_from_units(units, block_length=blocks[len(blocks) // 2])
+        sensitivities: list[dict[str, Any]] = []
+        for result in results:
+            stratum_key = tuple(result["stratum"][column] for column in self.stratum_columns)
+            observed_by_stratum[stratum_key] = result["observed"]
             sensitivities.append(
-                {
-                    "stratum": stratum,
-                    "sensitivities": {
-                        str(length): _frequency_bootstrap_units(
-                            units,
-                            block_length=length,
-                            n_boot=self.n_boot,
-                            seeds=self.seeds,
-                        )
-                        for length in blocks
-                    },
-                }
+                {"stratum": result["stratum"], "sensitivities": result["sensitivities"]}
             )
-        # §3 observed layers on the live census: rate, LOW/HIGH-minus-MID
-        # contrast, and the separately-reported warmup/undefined exposure.
         for row in frequency_rows:
             observed = observed_by_stratum.get(
                 tuple(row[column] for column in self.stratum_columns)
@@ -366,21 +623,7 @@ class Adapter(BaseContrastAdapter):
             row["excluded_exposure"] = observed["excluded_exposure"]
             row["eligible_marks"] = observed["eligible_marks"]
         self._frequency_live = [{"census": frequency_rows, "uncertainty": sensitivities}]
-        join_evidence = {
-            "duplicate_profile_keys": int(duplicate_profiles),
-            "unmatched_raids": unmatched_profiles,
-            "extra_profiles": extra_profiles,
-            "missing_preceding_marks": missing_mark,
-            "regime_mismatches": regime_mismatch,
-        }
-        source["profile_regime_join"] = join_evidence
-        reasons = list(attestation.integrity.reasons)
-        if duplicate_profiles or unmatched_profiles or extra_profiles:
-            reasons.append("VOID_PROFILE_JOIN_MISMATCH")
-        if missing_mark or regime_mismatch:
-            reasons.append("VOID_REGIME_PROVENANCE")
-        unique = tuple(dict.fromkeys(reasons))
-        return joined, source, IntegrityStatus(not unique, unique, join_evidence)
+        return joined, source, IntegrityStatus(True, (), join_evidence)
 
     def fixture_frame(self) -> pl.DataFrame:
         frame = make_fixture_frame(
@@ -461,8 +704,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
     experiment_root = Path(__file__).resolve().parents[1]
-    adapter = Adapter(workers=int(os.environ.get("XEN_WORKERS", "1")))
     if args.live:
+        adapter = Adapter(
+            workers=int(os.environ.get("XEN_WORKERS", "1")),
+            n_boot=int(os.environ.get("XEN_N_BOOT", str(DEFAULT_N_BOOT))),
+        )
         source = args.source_root or experiment_root.parents[2] / "data/nautilus_runs/EXP-100/full"
         gate = args.gate or experiment_root.parent / "EXP-100/results/estimand_validation.json"
         run_live(
@@ -472,7 +718,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.output or experiment_root / "results/analysis_results.json",
         )
     else:
-        _run_fixture(adapter, args.output or experiment_root / "results/fixture_integrity.json")
+        _run_fixture(
+            Adapter(n_boot=10, n_destroy=DEFAULT_DESTROYS, seeds=SEEDS),
+            args.output or experiment_root / "results/fixture_integrity.json",
+        )
     return 0
 
 

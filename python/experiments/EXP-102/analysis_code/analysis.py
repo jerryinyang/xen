@@ -137,8 +137,25 @@ class Adapter(BaseContrastAdapter):
         if invalid_counts:
             reasons.append("VOID_PRIOR_RAID_COUNT")
 
-        duplicate_raids = frame.select(pl.col("raid_id").is_duplicated().sum()).item()
-        evidence["duplicate_raid_ids"] = int(duplicate_raids)
+        # Raid identity is cell-scoped. BREAKOUT_BAR and LEVEL_CLOSE cells share
+        # raid_id values by EXP-100 construction; uniqueness is per cell, not global.
+        if "source_cell" in frame.columns:
+            identity = ["source_cell", "raid_id"]
+        else:
+            identity = [
+                column
+                for column in (
+                    "archive_symbol",
+                    "timeframe",
+                    "confirmation_method",
+                    "confirmation_reference",
+                    "config",
+                    "raid_id",
+                )
+                if column in frame.columns
+            ]
+        duplicate_raids = int(frame.select(pl.struct(identity).is_duplicated().sum()).item())
+        evidence["duplicate_raid_ids"] = duplicate_raids
         if duplicate_raids:
             reasons.append("VOID_DUPLICATE_RAID_ID")
 

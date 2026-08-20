@@ -413,20 +413,39 @@ def validate_source_contract(spec: SourceSpec) -> SourceAttestation:
     )
 
 
+def key_join_evidence(
+    left: pl.DataFrame, right: pl.DataFrame, key: Sequence[str]
+) -> dict[str, int]:
+    """Anti-join counts with null keys treated as equal (ATR_UNDEFINED generation)."""
+    columns = list(key)
+    unmatched = left.join(
+        right.select(columns), on=columns, how="anti", nulls_equal=True
+    ).height
+    extras = right.join(
+        left.select(columns), on=columns, how="anti", nulls_equal=True
+    ).height
+    duplicate = int(right.select(pl.struct(columns).is_duplicated().sum()).item())
+    return {
+        "unmatched_raids": unmatched,
+        "extra_profiles": extras,
+        "duplicate_profile_keys": duplicate,
+    }
+
+
 def join_profiles_left(
     raids: pl.DataFrame, profiles: pl.DataFrame, *, key: str
 ) -> tuple[pl.DataFrame, dict[str, int]]:
     """Left-join profiles while retaining duplicate and unmatched evidence."""
-    duplicate_profiles = profiles.select(pl.col(key).is_duplicated().sum()).item()
+    counts = key_join_evidence(raids, profiles, (key,))
     marked = profiles.with_columns(pl.lit(True).alias("__profile_match"))
-    joined = raids.join(marked, on=key, how="left")
+    joined = raids.join(marked, on=key, how="left", nulls_equal=True)
     matched = joined.filter(pl.col("__profile_match") == True).height  # noqa: E712
     joined = joined.drop("__profile_match")
     return joined, {
         "raid_rows": raids.height,
         "profile_rows": profiles.height,
         "matched_rows": matched,
-        "unmatched_raids": raids.height - matched,
-        "duplicate_profile_keys": int(duplicate_profiles),
+        "unmatched_raids": counts["unmatched_raids"],
+        "duplicate_profile_keys": counts["duplicate_profile_keys"],
     }
 

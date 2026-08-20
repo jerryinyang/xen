@@ -1017,7 +1017,6 @@ def future_destroy_attestation(
                 "raw_bite": False,
                 "destroyed_mean": float("nan"),
                 "destroyed_interval": None,
-                "destroyed_contrasts": destroyed.tolist(),
                 "destroyed_bootstrap_se": None,
                 "destroyed_draws": int(finite_destroyed.size),
                 "destroyed_survives": False,
@@ -1091,7 +1090,6 @@ def future_destroy_attestation(
                 if finite_destroyed.size
                 else None
             ),
-            "destroyed_contrasts": destroyed.tolist(),
             "destroyed_bootstrap_se": (
                 float(np.median(seed_destroyed_se)) if seed_destroyed_se else None
             ),

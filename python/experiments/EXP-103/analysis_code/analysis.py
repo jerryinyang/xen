@@ -23,7 +23,11 @@ from xen.liqswp_analysis.destroy import (
 from xen.liqswp_analysis.runtime import run_fixture as _run_fixture
 from xen.liqswp_analysis.runtime import run_live
 from xen.liqswp_analysis.source import join_profiles_left as _join_profiles_frame
-from xen.liqswp_analysis.source import scan_train_columns, validate_source_contract
+from xen.liqswp_analysis.source import (
+    key_join_evidence,
+    scan_train_columns,
+    validate_source_contract,
+)
 
 EXPERIMENT = "EXP-103"
 LABEL_COLUMN = "tight_gap"
@@ -322,10 +326,8 @@ class Adapter(BaseContrastAdapter):
         raids = pl.concat(raid_frames).collect(engine="streaming")
         profiles = pl.concat(profile_frames).collect(engine="streaming")
         key = ["source_cell", "raid_id", "profile_generation"]
-        duplicate_profiles = profiles.select(pl.struct(key).is_duplicated().sum()).item()
-        unmatched = raids.join(profiles.select(key), on=key, how="anti").height
-        extras = profiles.join(raids.select(key), on=key, how="anti").height
-        joined = raids.join(profiles, on=key, how="left").with_columns(
+        join_counts = key_join_evidence(raids, profiles, key)
+        joined = raids.join(profiles, on=key, how="left", nulls_equal=True).with_columns(
             pl.when(pl.col("profile_status").is_null())
             .then(pl.lit("MISSING_PROFILE"))
             .otherwise(pl.lit("MATCHED"))
@@ -334,15 +336,13 @@ class Adapter(BaseContrastAdapter):
         join_evidence = {
             "raid_rows": raids.height,
             "profile_rows": profiles.height,
-            "unmatched_raids": unmatched,
-            "extra_profiles": extras,
-            "duplicate_profile_keys": int(duplicate_profiles),
+            **join_counts,
         }
         source["profile_join"] = join_evidence
         reasons = list(attestation.integrity.reasons)
-        if duplicate_profiles:
+        if join_counts["duplicate_profile_keys"]:
             reasons.append("VOID_DUPLICATE_PROFILE_KEY")
-        if unmatched or extras:
+        if join_counts["unmatched_raids"] or join_counts["extra_profiles"]:
             reasons.append("VOID_PROFILE_JOIN_MISMATCH")
         unique = tuple(dict.fromkeys(reasons))
         return joined, source, IntegrityStatus(not unique, unique, join_evidence)

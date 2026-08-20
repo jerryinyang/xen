@@ -99,6 +99,21 @@ def test_one_invalid_control_blocks_the_complete_result() -> None:
     assert "VOID_NO_CHANGED_VALUE" in status.reasons
 
 
+def test_duplicate_raid_id_is_cell_scoped_not_global() -> None:
+    module = _load_exp102()
+    adapter = _small_adapter(module)
+    frame = adapter.fixture_frame()
+    other_method = frame.with_columns(pl.lit("LEVEL_CLOSE").alias("confirmation_method"))
+    across_cells = pl.concat((frame, other_method))
+    within_cell = pl.concat((frame, frame))
+
+    across = adapter.extra_integrity(across_cells)
+    within = adapter.extra_integrity(within_cell)
+
+    assert "VOID_DUPLICATE_RAID_ID" not in across.reasons
+    assert "VOID_DUPLICATE_RAID_ID" in within.reasons
+
+
 def test_malformed_prior_count_and_out_of_fence_rows_fail_integrity() -> None:
     module = _load_exp102()
     adapter = _small_adapter(module)
