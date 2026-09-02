@@ -1,6 +1,10 @@
 # Experiment Report: EXP-102 — Repeated raids and prior-raid count
 
-## Status: COMPLETED — DESCRIPTIVE ATR / STRONG-MOVE ONLY
+**SUPERSEDED 2026-09-02.** AMENDMENT-17 rebuilds the later-swing population on
+every raid eligible at confirmation. Numbers below are the old primary-only
+slice and must not be used. Replacement analysis is in progress.
+
+## Status: COMPLETED — DESCRIPTIVE ATR / STRONG-MOVE ONLY — SUPERSEDED
 
 **Date:** 2026-09-02
 **Family:** `CF-LIQSWP-001/HYP-002`

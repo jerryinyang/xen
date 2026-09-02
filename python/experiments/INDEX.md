@@ -20,10 +20,10 @@ re-run these).
 | ID | Family | Status | Purpose |
 |---|---|---|---|
 | EXP-100 | CF-LIQSWP-001 | COMPLETED — OPERATOR-APPROVED | Current 264-cell TRAIN run retained; ATR-undefined excursion values excluded, unaffected apparatus findings retained |
-| EXP-101 | CF-LIQSWP-001 | INCONCLUSIVE (2026-09-02) | Strong-move rate falls on some longer windows; ATR/duration do not jointly move; not a trade |
-| EXP-102 | CF-LIQSWP-001 | COMPLETED — descriptive ATR/strong-move only (2026-09-02) | Later completed raids usually leave a smaller leftover; duration does not confirm |
-| EXP-103 | CF-LIQSWP-001 | INCONCLUSIVE (2026-09-02) | Tight-gap leftovers often smaller in ATR; duration does not separate; rare arm |
-| EXP-104 | CF-LIQSWP-001 | COMPLETED — descriptive ATR/strong-move only (2026-09-02) | Calm leftovers larger, wild smaller; clock and start-rate disagree |
+| EXP-101 | CF-LIQSWP-001 | AMENDMENT-17 REBUILD IN PROGRESS | Later-swing set is every raid eligible at confirmation, not only the latest primary |
+| EXP-102 | CF-LIQSWP-001 | AMENDMENT-17 REBUILD IN PROGRESS | Later-swing set is every raid eligible at confirmation, not only the latest primary |
+| EXP-103 | CF-LIQSWP-001 | AMENDMENT-17 REBUILD IN PROGRESS | Later-swing set is every raid eligible at confirmation, not only the latest primary |
+| EXP-104 | CF-LIQSWP-001 | AMENDMENT-17 REBUILD IN PROGRESS | Later-swing set is every raid eligible at confirmation, not only the latest primary |
 
 ## Carried in from Chapter 05
 

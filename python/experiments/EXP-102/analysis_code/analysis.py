@@ -101,6 +101,7 @@ class Adapter(BaseContrastAdapter):
         ).with_columns(pl.col(LABEL_COLUMN).cast(pl.Int64).alias("prior_raid_count"))
 
     def prepare_frame(self, frame: pl.DataFrame) -> pl.DataFrame:
+        frame = super().prepare_frame(frame)
         # Fail-closed: the registered design declares no coercion rules for
         # prior_raid_count, so any malformed value aborts rather than being
         # silently mapped to an analysis band.

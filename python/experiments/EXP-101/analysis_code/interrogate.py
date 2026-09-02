@@ -19,6 +19,8 @@ from typing import Any
 import numpy as np
 import polars as pl
 
+from xen.liqswp_analysis.leftover import attach_shared_leftover
+
 ROOT = Path(__file__).resolve().parents[4]
 EXP = ROOT / "python/experiments/EXP-101"
 EXP100 = ROOT / "python/experiments/EXP-100"
@@ -71,6 +73,8 @@ RAID_COLS = [
     "confirmation_ts_ns",
     "endpoint_ts_ns",
     "censor_ts_ns",
+    "raid_id",
+    "max_excursion_atr",
 ]
 CELL_GROUPS = (
     "ctrader-eurusd-15m-breakout_bar-1h-*",
@@ -103,10 +107,17 @@ def _atr_keep(frame: pl.DataFrame) -> pl.DataFrame:
 
 
 def _outcome(frame: pl.DataFrame) -> pl.DataFrame:
-    return frame.filter(
-        (pl.col("status") == "COMPLETED")
-        & (pl.col("primary_attribution") == True)  # noqa: E712
-        & (pl.col("primary_completed") == True)  # noqa: E712
+    attached = attach_shared_leftover(frame)
+    return attached.filter(
+        pl.col("swing_duration_ns").is_not_null()
+        & (
+            (
+                (pl.col("status") == "COMPLETED")
+                & (pl.col("primary_attribution") == True)  # noqa: E712
+                & (pl.col("primary_completed") == True)  # noqa: E712
+            )
+            | (pl.col("status") == "CONFIRMED_NON_PRIMARY")
+        )
     )
 
 
@@ -207,7 +218,14 @@ def main() -> int:
     cross = []
     for pattern in CELL_GROUPS:
         files = sorted(SOURCE.glob(f"{pattern}/raids.parquet"))
-        frame = pl.concat([pl.read_parquet(path, columns=RAID_COLS) for path in files])
+        frame = pl.concat(
+            [
+                pl.read_parquet(path, columns=RAID_COLS).with_columns(
+                    pl.lit(path.parent.name).alias("source_cell")
+                )
+                for path in files
+            ]
+        )
         outcome = _outcome(frame)
         mismatches = 0
         checked = 0

@@ -1,6 +1,10 @@
 # Experiment Report: EXP-103 — TPO value gaps and tight-gap outcomes
 
-## Status: INCONCLUSIVE
+**SUPERSEDED 2026-09-02.** AMENDMENT-17 rebuilds the later-swing population on
+every raid eligible at confirmation. Numbers below are the old primary-only
+slice and must not be used. Replacement analysis is in progress.
+
+## Status: INCONCLUSIVE — SUPERSEDED
 
 **Date:** 2026-09-02
 **Family:** `CF-LIQSWP-001/HYP-003`

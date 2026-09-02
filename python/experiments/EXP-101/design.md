@@ -2,7 +2,7 @@
 
 - **Family:** `CF-LIQSWP-001/HYP-001`
 - **Checkpoint:** `2026-08-11-019-liquidity-sweeps`
-- **Status:** holistic design freeze through AMENDMENT-14; fresh QA required
+- **Status:** holistic design freeze through AMENDMENT-17; analysis rebuild required
 - **Vehicle:** analysis-only re-analysis of the retained EXP-100 Nautilus emission; no new `BacktestNode`, re-emission, TEST read, or holdout access
 - **Scope:** cTrader TRAIN only; `EURUSD`, `XAUUSD`, `USTEC`; 264 retained cells
 
@@ -88,17 +88,19 @@ no adaptive arm is selected after seeing an outcome.
 
 The census contains every raid row: `COMPLETED`, `CONFIRMED_NON_PRIMARY`,
 `FAILED_BREAKOUT`, all right-censor statuses, null outcomes, and thin cells. The
-outcome population is exactly:
+outcome population is every raid eligible at an expected-side confirmation
+(AMENDMENT-17):
 
 ```text
-status == COMPLETED
-and primary_attribution == true
-and primary_completed == true
+completed primary of a confirmation set
+OR CONFIRMED_NON_PRIMARY in the same source_cell × side whose endpoint_ts_ns
+equals that primary's confirmation_ts_ns, after the primary leftover is attached
 ```
 
-Failed, non-primary, excursion-censored, confirmation-censored, endpoint-censored,
-and missing-outcome rows remain in status/count tables and never enter the completed
-outcome denominator. `swing_price`, `swing_bps`, and `swing_duration_ns` are read
+Each raid keeps its own first push. The leftover path is the set's completed
+primary leftover. `strong_move` is leftover ATR vs own max_excursion_atr.
+Failed, excursion-censored, confirmation-censored, unmatched non-primary, and
+missing-outcome rows remain in status/count tables. `swing_price`, `swing_bps`, and `swing_duration_ns` are read
 only when finite. `swing_atr` and `strong_move` exclude ATR-undefined rows under the
 binding EXP-100 decision. The excluded count is printed beside every affected row.
 
@@ -364,9 +366,14 @@ AMENDMENT-16: singleton destroy groups (n<2) stay fixed and are disclosed via
   (VOID_NO_CHANGED_VALUE) — DIRECTION: LOOSER
   running count: 4 looser / 3 tighter / 8 neutral
   (OPERATOR-APPROVED 2026-08-18 — checkpoint 019 §2)
+AMENDMENT-17: later-swing population is every raid eligible at confirmation,
+  not only the latest primary. Shared leftover from the completed primary;
+  own first push retained; no EXP-100 rerun — DIRECTION: LOOSER
+  running count: 5 looser / 3 tighter / 8 neutral
+  FLAG: third consecutive looser after A-15/A-16; operator 2026-09-02 overrode.
 
 FINAL-NULL / SELECTION ACCOUNTING:
-  final design has 4 looser / 3 tighter / 8 neutral amendments. It has no
+  final design has 5 looser / 3 tighter / 8 neutral amendments. It has no
   machine qualification, ranking, capped-read selection, or value verdict, so
   expected machine false-qualifier count under a global null is zero by
   construction. This is an accounting statement, not evidence. No row is hidden,

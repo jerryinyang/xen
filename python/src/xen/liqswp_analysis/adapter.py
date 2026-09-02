@@ -25,6 +25,7 @@ from xen.liqswp_analysis.source import (
     scan_train_columns,
     validate_source_contract,
 )
+from xen.liqswp_analysis.leftover import attach_shared_leftover
 from xen.liqswp_analysis.statistics import (
     PopulationView,
     block_sensitivity,
@@ -70,6 +71,7 @@ BASE_COLUMNS = (
     "prior_raid_count",
     "profile_generation",
     "profile_undefined_reason",
+    "max_excursion_atr",
     "raid_regime",
     "confirmation_regime",
     "endpoint_regime",
@@ -412,7 +414,7 @@ class BaseContrastAdapter:
         raise NotImplementedError
 
     def prepare_frame(self, frame: pl.DataFrame) -> pl.DataFrame:
-        return frame
+        return attach_shared_leftover(frame)
 
     def extra_integrity(self, frame: pl.DataFrame) -> IntegrityStatus:
         return IntegrityStatus(True)
@@ -463,9 +465,15 @@ class BaseContrastAdapter:
 
     def _channel_frame(self, frame: pl.DataFrame, channel: str) -> pl.DataFrame:
         eligible = frame.filter(
-            (pl.col("status") == "COMPLETED")
-            & pl.col("primary_attribution").fill_null(False)
-            & pl.col("primary_completed").fill_null(False)
+            pl.col("swing_duration_ns").is_not_null()
+            & (
+                (
+                    (pl.col("status") == "COMPLETED")
+                    & pl.col("primary_attribution").fill_null(False)
+                    & pl.col("primary_completed").fill_null(False)
+                )
+                | (pl.col("status") == "CONFIRMED_NON_PRIMARY")
+            )
         )
         if channel in {"swing_atr", "strong_move"}:
             eligible = eligible.filter(

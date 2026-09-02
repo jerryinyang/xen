@@ -40,6 +40,14 @@ Running count: **0 looser / 1 tighter / 2 neutral**.
 **AMENDMENT-5:** add the SoT tight-value-gap condition to `HYP-003` —
 **DIRECTION: NEUTRAL**. Running count: **0 looser / 1 tighter / 3 neutral**.
 
+**AMENDMENT-17 (2026-09-02):** later-swing analysis includes every raid eligible
+at an expected-side confirmation, not only the latest primary. The leftover path
+is copied from the completed primary onto `CONFIRMED_NON_PRIMARY` members of the
+same `source_cell × side × confirmation` set; each raid keeps its own first push
+and `strong_move` is leftover ATR vs own excursion. Engine settlement (AMENDMENT-6)
+is unchanged; no EXP-100 rerun. **DIRECTION: LOOSER**. Operator overrode the
+three-consecutive-looser flag (A-15/A-16/A-17).
+
 **AMENDMENT-6 (2026-08-12):** close-all-eligible reference settlement —
 **DIRECTION: TIGHTER**. On each completed reference event, every eligible
 returned unconfirmed raid is settled. The latest eligible expected-side raid

@@ -2,7 +2,7 @@
 
 - **Family:** `CF-LIQSWP-001/HYP-002`
 - **Checkpoint:** `2026-08-11-019-liquidity-sweeps`
-- **Status:** holistic design freeze through AMENDMENT-14; fresh QA required
+- **Status:** holistic design freeze through AMENDMENT-17; analysis rebuild required
 - **Vehicle:** analysis-only re-analysis of the retained EXP-100 Nautilus emission; no new `BacktestNode`, re-emission, TEST read, or holdout access
 - **Scope:** cTrader TRAIN only; `EURUSD`, `XAUUSD`, `USTEC`; 264 retained cells
 
@@ -78,19 +78,19 @@ bands `0`, `1`, and `2+`; these bands are grouping variables, not new emission l
 gates, or selection rules.
 
 The fixed comparator is `prior_raid_count=0` within the same named stratum. No band is
-compared with another adaptive or selected band. The later-swing population is exactly:
+compared with another adaptive or selected band. The later-swing population is every raid eligible at an expected-side confirmation
+(AMENDMENT-17):
 
 ```text
-status == COMPLETED
-and primary_attribution == true
-and primary_completed == true
+completed primary of a confirmation set
+OR CONFIRMED_NON_PRIMARY in the same source_cell × side whose endpoint_ts_ns
+equals that primary's confirmation_ts_ns, after the primary leftover is attached
 ```
 
-`CONFIRMED_NON_PRIMARY`, `FAILED_BREAKOUT`,
-`RIGHT_CENSORED_EXCURSION`, `RIGHT_CENSORED_CONFIRMATION`, and
-`RIGHT_CENSORED_ENDPOINT` rows remain in status/censor tables. Non-primary rows are
-never treated as later-swing endpoints merely because a convenience field is non-null.
-No imputation or silent denominator change is allowed.
+Each raid keeps its own first push and `prior_raid_count`. The leftover path is
+the set's completed primary leftover. `FAILED_BREAKOUT` and right-censor rows
+remain in status/censor tables. Unmatched non-primary rows do not enter the
+later-swing denominator.
 
 Primary estimators are arm-minus-count-zero differences in mean `swing_atr` (where
 finite) and mean `swing_duration_ns`; medians are robust secondary disclosures.
@@ -362,9 +362,14 @@ AMENDMENT-16: singleton destroy groups (n<2) stay fixed and are disclosed via
   (VOID_NO_CHANGED_VALUE) — DIRECTION: LOOSER
   running count: 4 looser / 3 tighter / 8 neutral
   (OPERATOR-APPROVED 2026-08-18 — checkpoint 019 §2)
+AMENDMENT-17: later-swing population is every raid eligible at confirmation,
+  not only the latest primary. Shared leftover from the completed primary;
+  own first push retained; no EXP-100 rerun — DIRECTION: LOOSER
+  running count: 5 looser / 3 tighter / 8 neutral
+  FLAG: third consecutive looser after A-15/A-16; operator 2026-09-02 overrode.
 
 FINAL-NULL / SELECTION ACCOUNTING:
-  final design has 4 looser / 3 tighter / 8 neutral amendments. It has no
+  final design has 5 looser / 3 tighter / 8 neutral amendments. It has no
   machine qualification, ranking, capped-read selection, or value verdict, so
   expected machine false-qualifier count under a global null is zero by
   construction. This is an accounting statement, not evidence. No row is hidden,
