@@ -1,52 +1,34 @@
 # Checkpoint 019 — Current status
 
-**Recorded:** 2026-09-02 (EXP-101–104 close); EXP-100 block unchanged from 2026-08-13
-**Checkpoint:** OPEN
-**Family:** `CF-LIQSWP-001` — `REGISTERED` (unchanged)
+**Recorded:** 2026-09-02
+**Checkpoint:** CLOSED
+**Family:** `CF-LIQSWP-001` — **RETIRED — CHARACTERISED, NOT TRADABLE**
 
-## EXP-100 disposition
+Operator-signed at the retrospective. Binding record:
 
-EXP-100 is completed and operator-approved on the retained 264-cell AMENDMENT-14 TRAIN run.
-The binding operator verdict is:
+> Close checkpoint 019. Document EXP-100–104 and VAL-009–011. Winner-only leftover
+> tables are not a live-raid object. AMENDMENT-17 was not computed. No TEST, no
+> promotion, no tradability.
 
-> “retain the current run; ATR-undefined excursion values are limited/invalid and must be excluded from all interpretations; make no implementation changes; perform no reruns/emissions.”
+See [retrospective.md](retrospective.md).
 
-Accordingly, ATR-undefined excursion values are excluded. Coverage, chronology, lifecycle,
-status, attribution, and the future-destroy result for its finite normalized population are
-retained. The future-destroy control is unaffected because ATR-undefined rows are outside that
-population.
+## Experiment records
 
-Prevalence: 780/9,840,478 emitted raid rows affected (0.007926%); 390 unique affected objects
-after method deduplication; 84 affected primary/completed rows; median understatement among
-affected rows 71.43%.
-
-## EXP-101–104 disposition (2026-09-02)
-
-Operator completed the four characterisation experiments on the retained EXP-100 TRAIN
-emission. Binding operator call: treat 101–104 as descriptions of selected completed
-raids, not as an edge; annotate 102/104 to ATR/strong-move only; keep 101/103
-inconclusive; do not change family status.
-
-| ID | Operator record |
+| ID | Record |
 |---|---|
-| EXP-101 | INCONCLUSIVE |
-| EXP-102 | COMPLETED — leftover ATR / strong-move description only; duration does not confirm |
-| EXP-103 | INCONCLUSIVE |
-| EXP-104 | COMPLETED — leftover ATR / strong-move description only; duration and frequency do not confirm |
+| EXP-100 | COMPLETED — apparatus retained; ATR-undefined excursions excluded |
+| EXP-101 | INCONCLUSIVE on winner-only leftover slice |
+| EXP-102 | Descriptive ATR/strong-move only on that slice |
+| EXP-103 | INCONCLUSIVE on that slice |
+| EXP-104 | Descriptive ATR/strong-move only; duration and start-rate disagree |
+| VAL-009 | Selection: completed ~8%; confirmed-not-primary ~44% |
+| VAL-010 | Anatomy: repeat drop is first-push/surplus, not duration |
+| VAL-011 | HIGH starts more, leftover smaller; duration the other way |
 
-Independent physical settings collapse BB/LC (about 132, not 264 methods). VAL-009/010/011
-are the supporting characterisation reads.
+Counted TEST reads: 0. Holdout reads: 0.
 
 ## Checkpoint boundary
 
-- These are experiment-level completions, not a family promotion, retirement, or closure.
-- `CF-LIQSWP-001` remains `REGISTERED`; no checkpoint family decision exists.
-- No retrospective is issued because checkpoint 019 remains open.
-- No TEST or holdout read was used; counted TEST reads remain 0.
-
-See [EXP-100 report](../../../../python/experiments/EXP-100/report.md),
-[EXP-101](../../../../python/experiments/EXP-101/report.md),
-[EXP-102](../../../../python/experiments/EXP-102/report.md),
-[EXP-103](../../../../python/experiments/EXP-103/report.md),
-[EXP-104](../../../../python/experiments/EXP-104/report.md), and
-[family detail](../../families/cf-liqswp-001.md).
+- Family is retired as characterised, not tradable.
+- Re-opening needs an eligible-at-confirmation (or earlier) leftover estimand.
+- HYP-005 was never run.

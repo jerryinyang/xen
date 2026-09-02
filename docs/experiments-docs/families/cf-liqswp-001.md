@@ -4,9 +4,10 @@ This Chapter 06 working-family index points to the binding
 [candidate-family contract](../../signal-registry/candidate-families/cf-liqswp-001.md) and
 [checkpoint-019 design](../checkpoints/2026-08-11-019-liquidity-sweeps/design.md).
 
-Status: `REGISTERED` (unchanged). EXP-100 is complete and operator-approved with a scoped
-ATR-undefined exclusion. EXP-101–104 are complete as experiment records (2026-09-02).
-No family promotion, retirement, or closure has occurred.
+Status: **RETIRED — CHARACTERISED, NOT TRADABLE** (2026-09-02, checkpoint-019
+retrospective). EXP-100 apparatus retained with ATR-undefined exclusion.
+EXP-101–104 leftover tables are winner-only. VAL-009–011 record the selection
+caveat. AMENDMENT-17 was not computed.
 
 ## Contents
 
@@ -15,6 +16,9 @@ No family promotion, retirement, or closure has occurred.
 - [EXP-102 — Repeated raids and prior-raid count](#exp-102--repeated-raids-and-prior-raid-count)
 - [EXP-103 — TPO value gaps and tight-gap outcomes](#exp-103--tpo-value-gaps-and-tight-gap-outcomes)
 - [EXP-104 — Causal volatility regime and later-swing outcomes](#exp-104--causal-volatility-regime-and-later-swing-outcomes)
+- [VAL-009 — Raid selection and lifecycle](#val-009--raid-selection-and-lifecycle)
+- [VAL-010 — Later-swing anatomy](#val-010--later-swing-anatomy)
+- [VAL-011 — TPO geometry, regime, and all-raid frequency](#val-011--tpo-geometry-regime-and-all-raid-frequency)
 
 ## EXP-100 — Liquidity-sweep streaming apparatus
 
@@ -223,3 +227,87 @@ Not a trade.
 - Confirmation-regime is null on the bulk of VAL-011 transition rows.
 
 See [EXP-104 report](../../../python/experiments/EXP-104/report.md).
+
+## VAL-009 — Raid selection and lifecycle
+
+**Status:** COMPLETED — characterisation
+**Date:** 2026-09-02
+**Instruments:** `EURUSD`, `XAUUSD`, `USTEC` cTrader TRAIN
+**Data views:** all TRAIN raid rows; physical grid
+
+### Hypothesis Tests
+
+1. How do lifecycle, primary selection, level age, and exact prior count co-occur?
+
+### Scope
+
+- TRAIN only; physical grid collapses BB/LC.
+- No leftover, P&L, or tradability claim.
+
+### Results / Observations
+
+- Physical n=4,920,239: COMPLETED 8.0%; CONFIRMED_NON_PRIMARY 43.9%; FAILED_BREAKOUT 47.8%.
+- 394,916 selection sets; exactly one primary each; 76.2% compete.
+- Prior count 2+ is 78.2% of all raid rows.
+
+### Hypothesis-Specific Conclusion
+
+**Answered as description.** Completed primaries are a selected 8% slice.
+
+### Hypothesis-Agnostic Observations
+
+- Confirmed-not-primary is the live-looking object EXP-101–104 did not score.
+
+See [VAL-009 report](../../../python/experiments/VAL-009/report.md).
+
+## VAL-010 — Later-swing anatomy
+
+**Status:** COMPLETED — characterisation
+**Date:** 2026-09-02
+**Instruments:** `EURUSD`, `XAUUSD`, `USTEC` cTrader TRAIN
+**Data views:** completed-primary ATR-defined leftovers
+
+### Hypothesis Tests
+
+1. Where does the strong-move inequality sit (first push, leftover, surplus, clock)?
+
+### Scope
+
+- Winner-only leftover slice; ATR_UNDEFINED excluded from ATR/strong-move.
+
+### Results / Observations
+
+- n=394,607; mean leftover 3.69 ATR; strong-move 0.831; median clock 5 h.
+- 1 vs 0: strong-move down 255/264 side-strata; duration 130/134 split.
+
+### Hypothesis-Specific Conclusion
+
+**Answered as description.** Repeat drop is first-push/surplus, not duration.
+
+See [VAL-010 report](../../../python/experiments/VAL-010/report.md).
+
+## VAL-011 — TPO geometry, regime, and all-raid frequency
+
+**Status:** COMPLETED — characterisation
+**Date:** 2026-09-02
+**Instruments:** `EURUSD`, `XAUUSD`, `USTEC` cTrader TRAIN
+**Data views:** profiles, marks, leftover contrasts with channels kept separate
+
+### Hypothesis Tests
+
+1. Do geometry, transitions, and all-raid start rates describe different populations?
+
+### Scope
+
+- 132 physical settings; frequency is all starts vs preceding marks.
+
+### Results / Observations
+
+- Starts/1,000 marks: HIGH 1451, MID 1277, LOW 1244.
+- HIGH leftover ATR/strong-move down; duration up. Confirmation-regime mostly null.
+
+### Hypothesis-Specific Conclusion
+
+**Answered as description.** Start-rate and duration do not confirm leftover ATR.
+
+See [VAL-011 report](../../../python/experiments/VAL-011/report.md).

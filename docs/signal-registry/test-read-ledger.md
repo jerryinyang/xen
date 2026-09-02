@@ -611,6 +611,8 @@ Notes:
 - **EXP-101–104 completion (2026-09-02, checkpoint-019):** TRAIN-only re-reads of the retained
   EXP-100 emission plus VAL-009/010/011 characterisation. Operator records: HYP-001/HYP-003
   INCONCLUSIVE; HYP-002/HYP-004 leftover ATR/strong-move description only (duration and, for
-  HYP-004, frequency do not confirm). No analysis-TEST or holdout row was read.
+  HYP-004, frequency do not confirm). Winner-only slice. AMENDMENT-17 not computed.
+  No analysis-TEST or holdout row was read.
   **0 counted TEST reads, 0 holdout reads, 0 candidate slots; all ledger tallies unchanged.**
-  Family status remains `REGISTERED`.
+- **Checkpoint 019 close (2026-09-02):** family `CF-LIQSWP-001` **RETIRED — CHARACTERISED,
+  NOT TRADABLE.** Still **0 counted TEST reads, 0 holdout reads.**

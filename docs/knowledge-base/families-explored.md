@@ -781,6 +781,23 @@ planning record, not a family registration or disposition change.
 
 ---
 
+## 8. Chapter 06 — CF-LIQSWP-001 (closed 2026-09-02)
+
+**Thesis.** Liquidity levels as causal objects; leftover after a raid may differ by level
+type, repeat count, TPO tightness, or volatility state. Not a live prediction and not a
+costed trade.
+
+**What was tested.** EXP-100 apparatus (264-cell cTrader TRAIN). EXP-101–104 leftover
+contrasts on **completed primaries only**. VAL-009–011 selection/anatomy/frequency on the
+same emission. AMENDMENT-17 (score every raid eligible at confirmation) specified, not
+computed.
+
+**Verdict.** **RETIRED — CHARACTERISED, NOT TRADABLE** (operator-signed, checkpoint-019).
+Completed primaries are ~8% of raid rows; ~44% confirm but are not primary. Winner-only
+leftover differences are not a live-raid object and are not an edge. 0 TEST reads.
+
+---
+
 ## Source map
 
 - **This file consolidates:** `docs/knowledge-base/INDEX.md`,

@@ -1,6 +1,6 @@
 # CF-LIQSWP-001 — Liquidity Sweeps
 
-- **Status:** `REGISTERED` — 2026-08-11, checkpoint-019; amended 2026-08-13 (AMENDMENT-6/7/8/9/10/11/12/13/14); family status unchanged
+- **Status:** **RETIRED — CHARACTERISED, NOT TRADABLE** — 2026-09-02, checkpoint-019 retrospective. Prior: `REGISTERED` 2026-08-11; amended through AMENDMENT-17 (leftover attach specified; full rebuild not computed).
 - **Chapter:** 06
 - **Source of truth:** `docs/experiments-docs/checkpoints/2026-08-11-019-liquidity-sweeps/liquidity.md`
 - **Checkpoint:** `docs/experiments-docs/checkpoints/2026-08-11-019-liquidity-sweeps/design.md`
@@ -152,12 +152,19 @@ loaded.
 | `EXP-101` / `HYP-001` | **INCONCLUSIVE (2026-09-02).** Strong-move rate falls vs short baselines on previous-period and rolling families; session family and declared ATR/duration means do not jointly move. Operator: not a general higher-degree leftover mechanism. | 0 counted TEST reads; 0 holdout reads; 0 candidate slots |
 | `EXP-102` / `HYP-002` | **COMPLETED — descriptive ATR/strong-move only (2026-09-02).** Later completed raids usually leave a smaller leftover and a lower strong-move rate than first raids. Duration does not confirm. Operator narrowed the analyst SUPPORTED tag. | 0 counted TEST reads; 0 holdout reads; 0 candidate slots |
 | `EXP-103` / `HYP-003` | **INCONCLUSIVE (2026-09-02).** Tight DEFINED leftovers often smaller in ATR; duration does not separate; tight arm ~6% of the outcome population; BB/LC duplicates. | 0 counted TEST reads; 0 holdout reads; 0 candidate slots |
-| `EXP-104` / `HYP-004` | **COMPLETED — descriptive ATR/strong-move only (2026-09-02).** LOW leftovers larger vs MID, HIGH smaller. Duration goes the other way on HIGH; start-rate is highest in HIGH while leftover ATR is weaker. Operator narrowed the analyst SUPPORTED tag. | 0 counted TEST reads; 0 holdout reads; 0 candidate slots |
+| `EXP-104` / `HYP-004` | **COMPLETED — descriptive ATR/strong-move only (2026-09-02).** LOW leftovers larger vs MID, HIGH smaller. Duration goes the other way on HIGH; start-rate is highest in HIGH while leftover ATR is weaker. Operator narrowed the analyst SUPPORTED tag. Winner-only slice. | 0 counted TEST reads; 0 holdout reads; 0 candidate slots |
+| `VAL-009` | **COMPLETED — characterisation.** Physical completed share 8.0%; confirmed-not-primary 43.9%. | 0 counted TEST reads |
+| `VAL-010` | **COMPLETED — characterisation.** Repeat-band leftover drop is first-push/surplus; duration does not confirm. | 0 counted TEST reads |
+| `VAL-011` | **COMPLETED — characterisation.** All-raid start-rate and leftover duration do not confirm leftover ATR. | 0 counted TEST reads |
 
 Binding operator verdict: “retain the current run; ATR-undefined excursion values are
 limited/invalid and must be excluded from all interpretations; make no implementation changes;
 perform no reruns/emissions.”
 
-This is an evidence row only. The family status remains `REGISTERED`; no checkpoint family
-decision exists. Family promotion, closure, or retirement is reserved for an operator-signed
-checkpoint retrospective.
+This was an evidence row only until checkpoint close.
+
+**2026-09-02 — FAMILY RETIRED — CHARACTERISED, NOT TRADABLE.** Operator-signed at the
+checkpoint-019 retrospective. Winner-only leftover tables (EXP-101–104) are not a
+live-raid object (VAL-009: completed ~8%, confirmed-not-primary ~44%). AMENDMENT-17
+was specified and stopped. 0 TEST reads. Re-opening requires an eligible-at-confirmation
+(or earlier) leftover estimand, not more winner-only tables.

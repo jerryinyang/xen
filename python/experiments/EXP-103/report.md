@@ -1,10 +1,10 @@
 # Experiment Report: EXP-103 — TPO value gaps and tight-gap outcomes
 
-**SUPERSEDED 2026-09-02.** AMENDMENT-17 rebuilds the later-swing population on
-every raid eligible at confirmation. Numbers below are the old primary-only
-slice and must not be used. Replacement analysis is in progress.
+**Checkpoint 019 closed 2026-09-02.** Numbers below are the **winner-only** leftover
+slice (completed primaries). AMENDMENT-17 was specified and then stopped. Operator:
+inconclusive on that slice; not a live-raid object; not a trade.
 
-## Status: INCONCLUSIVE — SUPERSEDED
+## Status: INCONCLUSIVE — WINNER-ONLY SLICE; CHECKPOINT CLOSED
 
 **Date:** 2026-09-02
 **Family:** `CF-LIQSWP-001/HYP-003`

@@ -1,9 +1,9 @@
 # Chapter 06 Experiment Index
 
-Chapter 06 currently has one registered family and one open checkpoint. EXP-100
-is completed and operator-approved with ATR-undefined excursion values excluded.
-EXP-101–104 are complete as experiment records (2026-09-02): 101/103 inconclusive;
-102/104 descriptive ATR/strong-move only. Family status remains `REGISTERED`.
+Chapter 06 checkpoint 019 is **closed**. `CF-LIQSWP-001` is **retired —
+characterised, not tradable** (2026-09-02). EXP-100 apparatus retained with
+ATR-undefined exclusion. EXP-101–104 leftover tables are winner-only; VAL-009–011
+record the selection/anatomy caveats. AMENDMENT-17 was not computed.
 
 Before designing anything, read `docs/knowledge-base/INDEX.md` — in particular
 `lessons-and-amendments.md` (mechanisms, not just symptoms) and `pitfalls-ledger.md` (do not
@@ -20,10 +20,13 @@ re-run these).
 | ID | Family | Status | Purpose |
 |---|---|---|---|
 | EXP-100 | CF-LIQSWP-001 | COMPLETED — OPERATOR-APPROVED | Current 264-cell TRAIN run retained; ATR-undefined excursion values excluded, unaffected apparatus findings retained |
-| EXP-101 | CF-LIQSWP-001 | AMENDMENT-17 REBUILD IN PROGRESS | Later-swing set is every raid eligible at confirmation, not only the latest primary |
-| EXP-102 | CF-LIQSWP-001 | AMENDMENT-17 REBUILD IN PROGRESS | Later-swing set is every raid eligible at confirmation, not only the latest primary |
-| EXP-103 | CF-LIQSWP-001 | AMENDMENT-17 REBUILD IN PROGRESS | Later-swing set is every raid eligible at confirmation, not only the latest primary |
-| EXP-104 | CF-LIQSWP-001 | AMENDMENT-17 REBUILD IN PROGRESS | Later-swing set is every raid eligible at confirmation, not only the latest primary |
+| EXP-101 | CF-LIQSWP-001 | INCONCLUSIVE — winner-only slice; checkpoint closed | Strong-move rate falls on some windows; not a live-raid object |
+| EXP-102 | CF-LIQSWP-001 | COMPLETED — descriptive ATR/strong-move; winner-only | Later winners usually leave a smaller leftover; duration does not confirm |
+| EXP-103 | CF-LIQSWP-001 | INCONCLUSIVE — winner-only slice; checkpoint closed | Tight-gap leftovers often smaller in ATR; rare arm; duration does not separate |
+| EXP-104 | CF-LIQSWP-001 | COMPLETED — descriptive ATR/strong-move; winner-only | Calm leftovers larger, wild smaller; clock and start-rate disagree |
+| VAL-009 | CF-LIQSWP-001 | COMPLETED — characterisation | Completed primaries ~8%; confirmed-not-primary ~44% |
+| VAL-010 | CF-LIQSWP-001 | COMPLETED — characterisation | Repeat drop is larger first push / smaller leftover, not duration |
+| VAL-011 | CF-LIQSWP-001 | COMPLETED — characterisation | HIGH starts more raids; leftover ATR weaker; duration the other way |
 
 ## Carried in from Chapter 05
 

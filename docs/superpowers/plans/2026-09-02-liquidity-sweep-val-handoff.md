@@ -29,13 +29,10 @@ Read-only TRAIN-only re-analysis of frozen EXP-100, without editing EXP-100–10
 
 ## Current stop / next action
 
-Operator closed EXP-101–104 on 2026-09-02 using these VAL notes. Reports and indexes are
-written. Checkpoint 019 stays **open**; family stays `REGISTERED`.
+Checkpoint 019 **closed** 2026-09-02. Family **retired — characterised, not tradable**.
+AMENDMENT-17 leftover attach exists in code; the 10k-resample rebuild was stopped.
 
-Optional follow-ups (not started):
-
-- Why `confirmation_regime` is null on most VAL-011 rows (emission field vs projection).
-- Checkpoint retrospective only if the operator asks for a family decision.
+No next action on this checkpoint.
 
 ## Verify
 

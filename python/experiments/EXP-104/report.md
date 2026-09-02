@@ -1,10 +1,10 @@
 # Experiment Report: EXP-104 — Causal volatility regime and later-swing outcomes
 
-**SUPERSEDED 2026-09-02.** AMENDMENT-17 rebuilds the later-swing population on
-every raid eligible at confirmation. Numbers below are the old primary-only
-slice and must not be used. Replacement analysis is in progress.
+**Checkpoint 019 closed 2026-09-02.** Numbers below are the **winner-only** leftover
+slice (completed primaries). AMENDMENT-17 was specified and then stopped. Operator:
+descriptive ATR/strong-move only; duration and start-rate do not confirm; not a trade.
 
-## Status: COMPLETED — DESCRIPTIVE ATR / STRONG-MOVE ONLY — SUPERSEDED
+## Status: COMPLETED — DESCRIPTIVE ATR / STRONG-MOVE ONLY — WINNER-ONLY SLICE; CHECKPOINT CLOSED
 
 **Date:** 2026-09-02
 **Family:** `CF-LIQSWP-001/HYP-004`

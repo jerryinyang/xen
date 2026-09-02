@@ -1,10 +1,11 @@
 # Experiment Report: EXP-101 — Level configuration and later-swing outcomes
 
-**SUPERSEDED 2026-09-02.** AMENDMENT-17 rebuilds the later-swing population on
-every raid eligible at confirmation. Numbers below are the old primary-only
-slice and must not be used. Replacement analysis is in progress.
+**Checkpoint 019 closed 2026-09-02.** Numbers below are the **winner-only** leftover
+slice (completed primaries). AMENDMENT-17 (every eligible confirmed raid) was specified
+and then stopped; those tables were not produced. Operator: this slice is not a
+live-raid object and is not a trade.
 
-## Status: INCONCLUSIVE — SUPERSEDED
+## Status: INCONCLUSIVE — WINNER-ONLY SLICE; CHECKPOINT CLOSED
 
 **Date:** 2026-09-02
 **Family:** `CF-LIQSWP-001/HYP-001`
