@@ -149,6 +149,10 @@ loaded.
 | Experiment | Evidence disposition | Read accounting |
 |---|---|---|
 | `EXP-100` / `HYP-000` AMENDMENT-14 | **COMPLETED — operator-approved with scoped exclusion.** Retain the current 264-cell TRAIN run. Exclude every ATR-undefined excursion and derived value: 780/9,840,478 emitted rows affected (0.007926%); 390 unique affected objects after method deduplication; 84 affected primary/completed rows; median affected understatement 71.43%. Coverage, chronology, lifecycle, status, attribution, and the finite-population future-destroy result are retained. Analyst assigned no replacement verdict; operator verdict is recorded separately in the report. | 0 counted TEST reads; 0 holdout reads; 0 candidate slots |
+| `EXP-101` / `HYP-001` | **INCONCLUSIVE (2026-09-02).** Strong-move rate falls vs short baselines on previous-period and rolling families; session family and declared ATR/duration means do not jointly move. Operator: not a general higher-degree leftover mechanism. | 0 counted TEST reads; 0 holdout reads; 0 candidate slots |
+| `EXP-102` / `HYP-002` | **COMPLETED — descriptive ATR/strong-move only (2026-09-02).** Later completed raids usually leave a smaller leftover and a lower strong-move rate than first raids. Duration does not confirm. Operator narrowed the analyst SUPPORTED tag. | 0 counted TEST reads; 0 holdout reads; 0 candidate slots |
+| `EXP-103` / `HYP-003` | **INCONCLUSIVE (2026-09-02).** Tight DEFINED leftovers often smaller in ATR; duration does not separate; tight arm ~6% of the outcome population; BB/LC duplicates. | 0 counted TEST reads; 0 holdout reads; 0 candidate slots |
+| `EXP-104` / `HYP-004` | **COMPLETED — descriptive ATR/strong-move only (2026-09-02).** LOW leftovers larger vs MID, HIGH smaller. Duration goes the other way on HIGH; start-rate is highest in HIGH while leftover ATR is weaker. Operator narrowed the analyst SUPPORTED tag. | 0 counted TEST reads; 0 holdout reads; 0 candidate slots |
 
 Binding operator verdict: “retain the current run; ATR-undefined excursion values are
 limited/invalid and must be excluded from all interpretations; make no implementation changes;

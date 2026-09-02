@@ -1,8 +1,9 @@
 # Chapter 06 Experiment Index
 
 Chapter 06 currently has one registered family and one open checkpoint. EXP-100
-is completed and operator-approved with ATR-undefined excursion values excluded;
-EXP-101–104 remain separate readiness items.
+is completed and operator-approved with ATR-undefined excursion values excluded.
+EXP-101–104 are complete as experiment records (2026-09-02): 101/103 inconclusive;
+102/104 descriptive ATR/strong-move only. Family status remains `REGISTERED`.
 
 Before designing anything, read `docs/knowledge-base/INDEX.md` — in particular
 `lessons-and-amendments.md` (mechanisms, not just symptoms) and `pitfalls-ledger.md` (do not
@@ -19,10 +20,10 @@ re-run these).
 | ID | Family | Status | Purpose |
 |---|---|---|---|
 | EXP-100 | CF-LIQSWP-001 | COMPLETED — OPERATOR-APPROVED | Current 264-cell TRAIN run retained; ATR-undefined excursion values excluded, unaffected apparatus findings retained |
-| EXP-101 | CF-LIQSWP-001 | QA REVISE FINDINGS REPAIRED — operator execution pending | Level significance versus later swing outcomes |
-| EXP-102 | CF-LIQSWP-001 | QA REVISE FINDINGS REPAIRED — operator execution pending | Repeated raids and prior-raid count |
-| EXP-103 | CF-LIQSWP-001 | QA REVISE FINDINGS REPAIRED — operator execution pending | TPO value gap and tight-gap conditioning |
-| EXP-104 | CF-LIQSWP-001 | QA REVISE FINDINGS REPAIRED — operator execution pending | Volatility-regime conditioning |
+| EXP-101 | CF-LIQSWP-001 | INCONCLUSIVE (2026-09-02) | Strong-move rate falls on some longer windows; ATR/duration do not jointly move; not a trade |
+| EXP-102 | CF-LIQSWP-001 | COMPLETED — descriptive ATR/strong-move only (2026-09-02) | Later completed raids usually leave a smaller leftover; duration does not confirm |
+| EXP-103 | CF-LIQSWP-001 | INCONCLUSIVE (2026-09-02) | Tight-gap leftovers often smaller in ATR; duration does not separate; rare arm |
+| EXP-104 | CF-LIQSWP-001 | COMPLETED — descriptive ATR/strong-move only (2026-09-02) | Calm leftovers larger, wild smaller; clock and start-rate disagree |
 
 ## Carried in from Chapter 05
 

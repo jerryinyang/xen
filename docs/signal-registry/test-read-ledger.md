@@ -608,3 +608,9 @@ Notes:
   remain. No analysis-TEST or holdout row was read, and no stratum-specific TEST inference was
   made. This is a TRAIN-only apparatus disclosure: **0 counted TEST reads, 0 holdout reads,
   0 candidate slots; all ledger tallies unchanged.** Family status remains `REGISTERED`.
+- **EXP-101–104 completion (2026-09-02, checkpoint-019):** TRAIN-only re-reads of the retained
+  EXP-100 emission plus VAL-009/010/011 characterisation. Operator records: HYP-001/HYP-003
+  INCONCLUSIVE; HYP-002/HYP-004 leftover ATR/strong-move description only (duration and, for
+  HYP-004, frequency do not confirm). No analysis-TEST or holdout row was read.
+  **0 counted TEST reads, 0 holdout reads, 0 candidate slots; all ledger tallies unchanged.**
+  Family status remains `REGISTERED`.

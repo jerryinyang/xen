@@ -29,13 +29,13 @@ Read-only TRAIN-only re-analysis of frozen EXP-100, without editing EXP-100–10
 
 ## Current stop / next action
 
-Analyst artefacts for the three VALs are in place. Safest next step is **operator read of the three `analysis.md` files**.
+Operator closed EXP-101–104 on 2026-09-02 using these VAL notes. Reports and indexes are
+written. Checkpoint 019 stays **open**; family stays `REGISTERED`.
 
 Optional follow-ups (not started):
 
 - Why `confirmation_regime` is null on most VAL-011 rows (emission field vs projection).
-- Index / `report.md` only after an operator verdict.
-- Do not treat a new EXP-105 as required for these questions; they used the frozen emission.
+- Checkpoint retrospective only if the operator asks for a family decision.
 
 ## Verify
 

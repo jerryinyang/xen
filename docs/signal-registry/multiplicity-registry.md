@@ -1718,10 +1718,10 @@ holdouts sealed; Bybit excluded under AMENDMENT-7.
 | ID | Experiment | Registered question | Candidate slot | Status |
 |---|---|---|---:|---|
 | `CF-LIQSWP-001/HYP-000` | EXP-100 | Does the streaming state machine preserve causal level, raid, confirmation, breakout, TPO, and later-outcome identity? | 0 | **COMPLETED — OPERATOR-APPROVED WITH SCOPED EXCLUSION (2026-08-13).** Retain the 264-cell AMENDMENT-14 TRAIN run. Exclude ATR-undefined excursion values: 780/9,840,478 emitted rows affected (0.007926%); 390 unique affected objects after method deduplication; 84 affected primary/completed rows; 71.43% median affected understatement. Coverage/chronology/lifecycle/status/attribution and the finite-population future-destroy result remain usable. 0 counted TEST reads; family `REGISTERED` unchanged. |
-| `CF-LIQSWP-001/HYP-001` | EXP-101 | Do level-family/configuration significance strata differ in later swing outcomes? | 0 | DESIGN COMPLETE; QA pending |
-| `CF-LIQSWP-001/HYP-002` | EXP-102 | Does previous completed raid count change later swing outcomes? | 0 | DESIGN COMPLETE; QA pending |
-| `CF-LIQSWP-001/HYP-003` | EXP-103 | Are defined tight value gaps associated with different later outcomes? | 0 | DESIGN COMPLETE; QA pending |
-| `CF-LIQSWP-001/HYP-004` | EXP-104 | Does causal volatility regime describe raid frequency and outcome quality? | 0 | DESIGN COMPLETE; QA pending |
+| `CF-LIQSWP-001/HYP-001` | EXP-101 | Do level-family/configuration significance strata differ in later swing outcomes? | 0 | **INCONCLUSIVE (2026-09-02).** Strong-move rate falls on some longer windows; ATR/duration do not jointly move; BB/LC copies are not independent. 0 TEST reads; family `REGISTERED` unchanged. |
+| `CF-LIQSWP-001/HYP-002` | EXP-102 | Does previous completed raid count change later swing outcomes? | 0 | **COMPLETED — descriptive ATR/strong-move only (2026-09-02).** Later completed leftovers usually smaller / less often strong-move; duration does not confirm. Operator narrowed analyst SUPPORTED. 0 TEST reads; family `REGISTERED` unchanged. |
+| `CF-LIQSWP-001/HYP-003` | EXP-103 | Are defined tight value gaps associated with different later outcomes? | 0 | **INCONCLUSIVE (2026-09-02).** Tight-arm ATR often smaller; duration does not separate; rare arm; BB/LC duplicates. 0 TEST reads; family `REGISTERED` unchanged. |
+| `CF-LIQSWP-001/HYP-004` | EXP-104 | Does causal volatility regime describe raid frequency and outcome quality? | 0 | **COMPLETED — descriptive ATR/strong-move only (2026-09-02).** LOW leftovers larger vs MID, HIGH smaller; duration and start-rate do not confirm. Operator narrowed analyst SUPPORTED. 0 TEST reads; family `REGISTERED` unchanged. |
 | `CF-LIQSWP-001/HYP-005` | deferred | Are breakout-causing levels uniquely significant? | 0 | DEFERRED; operator-gated |
 
 **AMENDMENT-L1 (withdrawn during revision):** the proposed exclusion of 1W levels was not

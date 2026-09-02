@@ -5,12 +5,13 @@
 **Checkpoint 019 is open.** `CF-LIQSWP-001` remains `REGISTERED`. EXP-100 is
 completed and operator-approved on the retained 264-cell TRAIN run: ATR-undefined excursion
 values are excluded from interpretation, while coverage, chronology, lifecycle, status,
-attribution, and finite-population control findings are retained. EXP-101–104 remain separate
-readiness items with independent operator decisions.
+attribution, and finite-population control findings are retained. EXP-101–104 are complete
+as experiment records (2026-09-02): 101/103 inconclusive; 102/104 descriptive on
+ATR/strong-move only. No family promotion, retirement, or closure.
 
 | Checkpoint | Family | Status | Design | Current status |
 |---|---|---|---|---|
-| `2026-08-11-019-liquidity-sweeps` | `CF-LIQSWP-001` | OPEN — EXP-100 complete; no family decision; EXP-101–104 pending | [`design.md`](checkpoints/2026-08-11-019-liquidity-sweeps/design.md) | [`status.md`](checkpoints/2026-08-11-019-liquidity-sweeps/status.md) |
+| `2026-08-11-019-liquidity-sweeps` | `CF-LIQSWP-001` | OPEN — EXP-100–104 complete as experiments; no family decision | [`design.md`](checkpoints/2026-08-11-019-liquidity-sweeps/design.md) | [`status.md`](checkpoints/2026-08-11-019-liquidity-sweeps/status.md) |
 
 Read `docs/knowledge-base/INDEX.md` before designing anything.
 
@@ -18,7 +19,7 @@ Read `docs/knowledge-base/INDEX.md` before designing anything.
 
 | Family | EXP range | Live status | Detail |
 |---|---|---|---|
-| `CF-LIQSWP-001` | `EXP-100`–`EXP-104` | `REGISTERED` — EXP-100 complete with scoped exclusion; EXP-101–104 pending | [`families/cf-liqswp-001.md`](families/cf-liqswp-001.md) |
+| `CF-LIQSWP-001` | `EXP-100`–`EXP-104` | `REGISTERED` — EXP-100–104 complete as experiments; no family decision | [`families/cf-liqswp-001.md`](families/cf-liqswp-001.md) |
 
 ## Standing constraints (carried across the rollover, not re-litigated)
 

@@ -71,7 +71,9 @@ Registered candidate families (full per-phase batches in `multiplicity-registry.
 - `CF-LIQSWP-001` — Liquidity Sweeps. **REGISTERED — 2026-08-11, checkpoint-019;
   amended 2026-08-13 (AMENDMENT-6/7/8/9/10/11/12/13/14); family status unchanged.**
   EXP-100 is complete and operator-approved on the retained run with ATR-undefined excursion
-  values excluded from interpretation. Causal online level/raid/sweep characterisation
+  values excluded from interpretation. EXP-101–104 are complete as experiment records
+  (2026-09-02): 101/103 inconclusive; 102/104 descriptive ATR/strong-move only; family
+  status unchanged. Causal online level/raid/sweep characterisation
   on cTrader only (`EURUSD`, `XAUUSD`, `USTEC`; AMENDMENT-7). Observation timeframes are
   15m/30m/1h; raid start/return/beyond follow those bars (SoT grain; AMENDMENT-8).
   Same-bar pierce stays live until confirm/fail (AMENDMENT-13).
