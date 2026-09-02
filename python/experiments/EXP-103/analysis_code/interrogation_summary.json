@@ -1,0 +1,1022 @@
+{
+  "experiment": "EXP-103",
+  "method": "registered live JSON per-stratum tables + one-cell raw recompute; no bootstrap/destroy rerun",
+  "gate": {
+    "blocking_pass": true,
+    "n_cells": 264,
+    "cell_fail": 0,
+    "cost_fail": 0,
+    "sha16": "1593851873c318f3",
+    "sha16_exp100": "1593851873c318f3"
+  },
+  "live_integrity": true,
+  "live_reasons": [],
+  "code_dir_exists": false,
+  "one_cell": {
+    "path": "data/nautilus_runs/EXP-100/full/ctrader-eurusd-15m-breakout_bar-1h-previous_1d",
+    "raid_rows": 13580,
+    "unmatched_profiles": 0,
+    "outcome_n": 2225,
+    "defined": 13567,
+    "conservation_fail": 0,
+    "tight_boundary_fail": 0,
+    "duration_mismatch": 0,
+    "profile_end_eq_confirm": 2225,
+    "holdout_after_train": 0,
+    "raw_vs_live_matches": 10,
+    "raw_vs_live_rows": 10,
+    "cell_match": [
+      {
+        "side": "LOW",
+        "channel": "swing_atr",
+        "raw_arm_n": 59,
+        "raw_comp_n": 1165,
+        "raw_estimate": -1.8248829209453827,
+        "live_arm_n": 59,
+        "live_comp_n": 1165,
+        "live_estimate": -1.8248829209453827,
+        "match": true
+      },
+      {
+        "side": "LOW",
+        "channel": "swing_duration_ns",
+        "raw_arm_n": 59,
+        "raw_comp_n": 1165,
+        "raw_estimate": -6075193133047.211,
+        "live_arm_n": 59,
+        "live_comp_n": 1165,
+        "live_estimate": -6075193133047.211,
+        "match": true
+      },
+      {
+        "side": "LOW",
+        "channel": "strong_move",
+        "raw_arm_n": 59,
+        "raw_comp_n": 1165,
+        "raw_estimate": 0.03845202589655927,
+        "live_arm_n": 59,
+        "live_comp_n": 1165,
+        "live_estimate": 0.03845202589655927,
+        "match": true
+      },
+      {
+        "side": "LOW",
+        "channel": "swing_bps",
+        "raw_arm_n": 59,
+        "raw_comp_n": 1165,
+        "raw_estimate": -12.873196009307506,
+        "live_arm_n": 59,
+        "live_comp_n": 1165,
+        "live_estimate": -12.873196009307513,
+        "match": true
+      },
+      {
+        "side": "LOW",
+        "channel": "swing_price",
+        "raw_arm_n": 59,
+        "raw_comp_n": 1165,
+        "raw_estimate": -0.0013654350767440281,
+        "live_arm_n": 59,
+        "live_comp_n": 1165,
+        "live_estimate": -0.0013654350767440281,
+        "match": true
+      },
+      {
+        "side": "HIGH",
+        "channel": "swing_atr",
+        "raw_arm_n": 54,
+        "raw_comp_n": 947,
+        "raw_estimate": -0.9688016396822876,
+        "live_arm_n": 54,
+        "live_comp_n": 947,
+        "live_estimate": -0.968801639682288,
+        "match": true
+      },
+      {
+        "side": "HIGH",
+        "channel": "swing_duration_ns",
+        "raw_arm_n": 54,
+        "raw_comp_n": 947,
+        "raw_estimate": 17103766279479.059,
+        "live_arm_n": 54,
+        "live_comp_n": 947,
+        "live_estimate": 17103766279479.059,
+        "match": true
+      },
+      {
+        "side": "HIGH",
+        "channel": "strong_move",
+        "raw_arm_n": 54,
+        "raw_comp_n": 947,
+        "raw_estimate": 0.10852986037780121,
+        "live_arm_n": 54,
+        "live_comp_n": 947,
+        "live_estimate": 0.10852986037780121,
+        "match": true
+      },
+      {
+        "side": "HIGH",
+        "channel": "swing_bps",
+        "raw_arm_n": 54,
+        "raw_comp_n": 947,
+        "raw_estimate": -5.3380048965582425,
+        "live_arm_n": 54,
+        "live_comp_n": 947,
+        "live_estimate": -5.338004896558239,
+        "match": true
+      },
+      {
+        "side": "HIGH",
+        "channel": "swing_price",
+        "raw_arm_n": 54,
+        "raw_comp_n": 947,
+        "raw_estimate": -0.0005643539051194643,
+        "live_arm_n": 54,
+        "live_comp_n": 947,
+        "live_estimate": -0.0005643539051194651,
+        "match": true
+      }
+    ],
+    "meta": "NO_COST_CHARGED",
+    "n_fills": 0,
+    "lc_outcome_n": 2225,
+    "lc_raids_sha16": "cf339b0d87dd5029",
+    "bb_raids_sha16": "1ea9103cc5e3fc66",
+    "lc_profiles_sha16": "5344a8df4e90e7d4",
+    "bb_profiles_sha16": "5344a8df4e90e7d4"
+  },
+  "signs": {
+    "swing_atr": {
+      "counts": {
+        "empty": 198,
+        "neg": 504,
+        "below0": 344,
+        "overlap0": 184,
+        "pos": 24
+      },
+      "sum_arm_n": 46528,
+      "sum_comp_n": 742516
+    },
+    "swing_duration_ns": {
+      "counts": {
+        "empty": 198,
+        "neg": 332,
+        "overlap0": 436,
+        "pos": 196,
+        "below0": 90,
+        "above0": 2
+      },
+      "sum_arm_n": 46528,
+      "sum_comp_n": 742516
+    },
+    "strong_move": {
+      "counts": {
+        "empty": 198,
+        "pos": 382,
+        "overlap0": 350,
+        "above0": 158,
+        "neg": 146,
+        "below0": 20
+      },
+      "sum_arm_n": 46528,
+      "sum_comp_n": 742516
+    },
+    "swing_bps": {
+      "counts": {
+        "empty": 198,
+        "neg": 502,
+        "below0": 336,
+        "overlap0": 192,
+        "pos": 26
+      },
+      "sum_arm_n": 46528,
+      "sum_comp_n": 742516
+    },
+    "swing_price": {
+      "counts": {
+        "empty": 198,
+        "neg": 502,
+        "below0": 336,
+        "overlap0": 192,
+        "pos": 26
+      },
+      "sum_arm_n": 46528,
+      "sum_comp_n": 742516
+    }
+  },
+  "layers": {
+    "archive_symbol": {
+      "swing_atr": {
+        "EURUSD": {
+          "n": 176,
+          "neg": 174,
+          "below0": 130,
+          "arm_n": 15546,
+          "comp_n": 244798,
+          "overlap0": 46,
+          "pos": 2
+        },
+        "USTEC": {
+          "n": 176,
+          "neg": 172,
+          "below0": 118,
+          "arm_n": 15856,
+          "comp_n": 258110,
+          "overlap0": 58,
+          "pos": 4
+        },
+        "XAUUSD": {
+          "n": 176,
+          "neg": 158,
+          "below0": 96,
+          "arm_n": 15126,
+          "comp_n": 239608,
+          "overlap0": 80,
+          "pos": 18
+        }
+      },
+      "swing_duration_ns": {
+        "EURUSD": {
+          "n": 176,
+          "neg": 102,
+          "overlap0": 144,
+          "arm_n": 15546,
+          "comp_n": 244798,
+          "pos": 74,
+          "below0": 30,
+          "above0": 2
+        },
+        "USTEC": {
+          "n": 176,
+          "neg": 136,
+          "below0": 34,
+          "arm_n": 15856,
+          "comp_n": 258110,
+          "overlap0": 142,
+          "pos": 40
+        },
+        "XAUUSD": {
+          "n": 176,
+          "pos": 82,
+          "overlap0": 150,
+          "arm_n": 15126,
+          "comp_n": 239608,
+          "neg": 94,
+          "below0": 26
+        }
+      },
+      "strong_move": {
+        "EURUSD": {
+          "n": 176,
+          "pos": 124,
+          "overlap0": 118,
+          "arm_n": 15546,
+          "comp_n": 244798,
+          "above0": 50,
+          "neg": 52,
+          "below0": 8
+        },
+        "USTEC": {
+          "n": 176,
+          "pos": 136,
+          "overlap0": 114,
+          "arm_n": 15856,
+          "comp_n": 258110,
+          "neg": 40,
+          "above0": 54,
+          "below0": 8
+        },
+        "XAUUSD": {
+          "n": 176,
+          "pos": 122,
+          "overlap0": 118,
+          "arm_n": 15126,
+          "comp_n": 239608,
+          "neg": 54,
+          "above0": 54,
+          "below0": 4
+        }
+      }
+    },
+    "timeframe": {
+      "swing_atr": {
+        "15m": {
+          "n": 132,
+          "neg": 132,
+          "below0": 110,
+          "arm_n": 17394,
+          "comp_n": 234846,
+          "overlap0": 22
+        },
+        "30m": {
+          "n": 132,
+          "neg": 130,
+          "below0": 76,
+          "arm_n": 11658,
+          "comp_n": 230930,
+          "overlap0": 56,
+          "pos": 2
+        },
+        "60m": {
+          "n": 264,
+          "neg": 242,
+          "below0": 158,
+          "arm_n": 17476,
+          "comp_n": 276740,
+          "overlap0": 106,
+          "pos": 22
+        }
+      },
+      "swing_duration_ns": {
+        "15m": {
+          "n": 132,
+          "neg": 62,
+          "overlap0": 110,
+          "arm_n": 17394,
+          "comp_n": 234846,
+          "pos": 70,
+          "below0": 20,
+          "above0": 2
+        },
+        "30m": {
+          "n": 132,
+          "neg": 70,
+          "overlap0": 122,
+          "arm_n": 11658,
+          "comp_n": 230930,
+          "pos": 62,
+          "below0": 10
+        },
+        "60m": {
+          "n": 264,
+          "neg": 200,
+          "below0": 60,
+          "arm_n": 17476,
+          "comp_n": 276740,
+          "overlap0": 204,
+          "pos": 64
+        }
+      },
+      "strong_move": {
+        "15m": {
+          "n": 132,
+          "pos": 78,
+          "overlap0": 100,
+          "arm_n": 17394,
+          "comp_n": 234846,
+          "above0": 16,
+          "neg": 54,
+          "below0": 16
+        },
+        "30m": {
+          "n": 132,
+          "pos": 120,
+          "overlap0": 52,
+          "arm_n": 11658,
+          "comp_n": 230930,
+          "above0": 80,
+          "neg": 12
+        },
+        "60m": {
+          "n": 264,
+          "pos": 184,
+          "overlap0": 198,
+          "arm_n": 17476,
+          "comp_n": 276740,
+          "above0": 62,
+          "neg": 80,
+          "below0": 4
+        }
+      }
+    },
+    "confirmation_method": {
+      "swing_atr": {
+        "BREAKOUT_BAR": {
+          "n": 264,
+          "neg": 252,
+          "below0": 172,
+          "arm_n": 23264,
+          "comp_n": 371258,
+          "overlap0": 92,
+          "pos": 12
+        },
+        "LEVEL_CLOSE": {
+          "n": 264,
+          "neg": 252,
+          "below0": 172,
+          "arm_n": 23264,
+          "comp_n": 371258,
+          "overlap0": 92,
+          "pos": 12
+        }
+      },
+      "swing_duration_ns": {
+        "BREAKOUT_BAR": {
+          "n": 264,
+          "neg": 166,
+          "overlap0": 218,
+          "arm_n": 23264,
+          "comp_n": 371258,
+          "pos": 98,
+          "below0": 45,
+          "above0": 1
+        },
+        "LEVEL_CLOSE": {
+          "n": 264,
+          "neg": 166,
+          "overlap0": 218,
+          "arm_n": 23264,
+          "comp_n": 371258,
+          "pos": 98,
+          "below0": 45,
+          "above0": 1
+        }
+      },
+      "strong_move": {
+        "BREAKOUT_BAR": {
+          "n": 264,
+          "pos": 191,
+          "overlap0": 175,
+          "arm_n": 23264,
+          "comp_n": 371258,
+          "above0": 79,
+          "neg": 73,
+          "below0": 10
+        },
+        "LEVEL_CLOSE": {
+          "n": 264,
+          "pos": 191,
+          "overlap0": 175,
+          "arm_n": 23264,
+          "comp_n": 371258,
+          "above0": 79,
+          "neg": 73,
+          "below0": 10
+        }
+      }
+    },
+    "confirmation_reference": {
+      "swing_atr": {
+        "1H": {
+          "n": 396,
+          "neg": 386,
+          "below0": 272,
+          "arm_n": 41836,
+          "comp_n": 671910,
+          "overlap0": 124,
+          "pos": 10
+        },
+        "4H": {
+          "n": 132,
+          "neg": 118,
+          "below0": 72,
+          "arm_n": 4692,
+          "comp_n": 70606,
+          "overlap0": 60,
+          "pos": 14
+        }
+      },
+      "swing_duration_ns": {
+        "1H": {
+          "n": 396,
+          "neg": 224,
+          "overlap0": 316,
+          "arm_n": 41836,
+          "comp_n": 671910,
+          "pos": 172,
+          "below0": 78,
+          "above0": 2
+        },
+        "4H": {
+          "n": 132,
+          "neg": 108,
+          "overlap0": 120,
+          "arm_n": 4692,
+          "comp_n": 70606,
+          "pos": 24,
+          "below0": 12
+        }
+      },
+      "strong_move": {
+        "1H": {
+          "n": 396,
+          "pos": 322,
+          "overlap0": 232,
+          "arm_n": 41836,
+          "comp_n": 671910,
+          "above0": 148,
+          "neg": 74,
+          "below0": 16
+        },
+        "4H": {
+          "n": 132,
+          "pos": 60,
+          "overlap0": 118,
+          "arm_n": 4692,
+          "comp_n": 70606,
+          "neg": 72,
+          "below0": 4,
+          "above0": 10
+        }
+      }
+    },
+    "side": {
+      "swing_atr": {
+        "HIGH": {
+          "n": 264,
+          "neg": 252,
+          "below0": 186,
+          "arm_n": 23284,
+          "comp_n": 362526,
+          "overlap0": 78,
+          "pos": 12
+        },
+        "LOW": {
+          "n": 264,
+          "neg": 252,
+          "below0": 158,
+          "arm_n": 23244,
+          "comp_n": 379990,
+          "overlap0": 106,
+          "pos": 12
+        }
+      },
+      "swing_duration_ns": {
+        "HIGH": {
+          "n": 264,
+          "pos": 120,
+          "overlap0": 238,
+          "arm_n": 23284,
+          "comp_n": 362526,
+          "neg": 144,
+          "below0": 24,
+          "above0": 2
+        },
+        "LOW": {
+          "n": 264,
+          "neg": 188,
+          "overlap0": 198,
+          "arm_n": 23244,
+          "comp_n": 379990,
+          "pos": 76,
+          "below0": 66
+        }
+      },
+      "strong_move": {
+        "HIGH": {
+          "n": 264,
+          "pos": 182,
+          "above0": 74,
+          "arm_n": 23284,
+          "comp_n": 362526,
+          "neg": 82,
+          "overlap0": 180,
+          "below0": 10
+        },
+        "LOW": {
+          "n": 264,
+          "pos": 200,
+          "overlap0": 170,
+          "arm_n": 23244,
+          "comp_n": 379990,
+          "neg": 64,
+          "below0": 10,
+          "above0": 84
+        }
+      }
+    },
+    "config": {
+      "swing_atr": {
+        "PREVIOUS_1D": {
+          "n": 48,
+          "neg": 42,
+          "below0": 22,
+          "arm_n": 2346,
+          "comp_n": 47170,
+          "overlap0": 26,
+          "pos": 6
+        },
+        "PREVIOUS_1H": {
+          "n": 48,
+          "neg": 48,
+          "below0": 42,
+          "arm_n": 7464,
+          "comp_n": 105930,
+          "overlap0": 6
+        },
+        "PREVIOUS_1W": {
+          "n": 48,
+          "neg": 46,
+          "below0": 24,
+          "arm_n": 960,
+          "comp_n": 20120,
+          "overlap0": 24,
+          "pos": 2
+        },
+        "PREVIOUS_4H": {
+          "n": 48,
+          "neg": 48,
+          "below0": 38,
+          "arm_n": 4960,
+          "comp_n": 85280,
+          "overlap0": 10
+        },
+        "PREVIOUS_AMERICA": {
+          "n": 48,
+          "neg": 46,
+          "below0": 22,
+          "arm_n": 2628,
+          "comp_n": 52330,
+          "overlap0": 26,
+          "pos": 2
+        },
+        "PREVIOUS_ASIA": {
+          "n": 48,
+          "neg": 44,
+          "overlap0": 22,
+          "arm_n": 2656,
+          "comp_n": 55300,
+          "below0": 26,
+          "pos": 4
+        },
+        "PREVIOUS_EUROPE": {
+          "n": 48,
+          "neg": 42,
+          "below0": 28,
+          "arm_n": 2660,
+          "comp_n": 54664,
+          "overlap0": 20,
+          "pos": 6
+        },
+        "ROLLING_14": {
+          "n": 48,
+          "neg": 48,
+          "below0": 38,
+          "arm_n": 6872,
+          "comp_n": 97456,
+          "overlap0": 10
+        },
+        "ROLLING_22": {
+          "n": 48,
+          "neg": 48,
+          "below0": 36,
+          "arm_n": 5940,
+          "comp_n": 87582,
+          "overlap0": 12
+        },
+        "ROLLING_252": {
+          "n": 48,
+          "neg": 46,
+          "below0": 26,
+          "arm_n": 1934,
+          "comp_n": 30674,
+          "overlap0": 22,
+          "pos": 2
+        },
+        "ROLLING_7": {
+          "n": 48,
+          "neg": 46,
+          "below0": 42,
+          "arm_n": 8108,
+          "comp_n": 106010,
+          "pos": 2,
+          "overlap0": 6
+        }
+      },
+      "swing_duration_ns": {
+        "PREVIOUS_1D": {
+          "n": 48,
+          "neg": 30,
+          "overlap0": 38,
+          "arm_n": 2346,
+          "comp_n": 47170,
+          "pos": 18,
+          "below0": 10
+        },
+        "PREVIOUS_1H": {
+          "n": 48,
+          "neg": 40,
+          "overlap0": 36,
+          "arm_n": 7464,
+          "comp_n": 105930,
+          "pos": 8,
+          "below0": 12
+        },
+        "PREVIOUS_1W": {
+          "n": 48,
+          "pos": 18,
+          "overlap0": 40,
+          "arm_n": 960,
+          "comp_n": 20120,
+          "neg": 30,
+          "below0": 8
+        },
+        "PREVIOUS_4H": {
+          "n": 48,
+          "neg": 34,
+          "overlap0": 40,
+          "arm_n": 4960,
+          "comp_n": 85280,
+          "pos": 14,
+          "below0": 8
+        },
+        "PREVIOUS_AMERICA": {
+          "n": 48,
+          "pos": 20,
+          "overlap0": 40,
+          "arm_n": 2628,
+          "comp_n": 52330,
+          "above0": 2,
+          "neg": 28,
+          "below0": 6
+        },
+        "PREVIOUS_ASIA": {
+          "n": 48,
+          "pos": 24,
+          "overlap0": 44,
+          "arm_n": 2656,
+          "comp_n": 55300,
+          "neg": 24,
+          "below0": 4
+        },
+        "PREVIOUS_EUROPE": {
+          "n": 48,
+          "neg": 24,
+          "overlap0": 40,
+          "arm_n": 2660,
+          "comp_n": 54664,
+          "pos": 24,
+          "below0": 8
+        },
+        "ROLLING_14": {
+          "n": 48,
+          "neg": 30,
+          "below0": 10,
+          "arm_n": 6872,
+          "comp_n": 97456,
+          "pos": 18,
+          "overlap0": 38
+        },
+        "ROLLING_22": {
+          "n": 48,
+          "neg": 28,
+          "overlap0": 40,
+          "arm_n": 5940,
+          "comp_n": 87582,
+          "pos": 20,
+          "below0": 8
+        },
+        "ROLLING_252": {
+          "n": 48,
+          "pos": 16,
+          "overlap0": 40,
+          "arm_n": 1934,
+          "comp_n": 30674,
+          "neg": 32,
+          "below0": 8
+        },
+        "ROLLING_7": {
+          "n": 48,
+          "neg": 32,
+          "below0": 8,
+          "arm_n": 8108,
+          "comp_n": 106010,
+          "pos": 16,
+          "overlap0": 40
+        }
+      },
+      "strong_move": {
+        "PREVIOUS_1D": {
+          "n": 48,
+          "pos": 42,
+          "overlap0": 38,
+          "arm_n": 2346,
+          "comp_n": 47170,
+          "above0": 10,
+          "neg": 6
+        },
+        "PREVIOUS_1H": {
+          "n": 48,
+          "neg": 20,
+          "overlap0": 26,
+          "arm_n": 7464,
+          "comp_n": 105930,
+          "pos": 28,
+          "above0": 22
+        },
+        "PREVIOUS_1W": {
+          "n": 48,
+          "pos": 38,
+          "overlap0": 40,
+          "arm_n": 960,
+          "comp_n": 20120,
+          "above0": 8,
+          "neg": 10
+        },
+        "PREVIOUS_4H": {
+          "n": 48,
+          "pos": 32,
+          "overlap0": 32,
+          "arm_n": 4960,
+          "comp_n": 85280,
+          "neg": 16,
+          "above0": 14,
+          "below0": 2
+        },
+        "PREVIOUS_AMERICA": {
+          "n": 48,
+          "pos": 36,
+          "overlap0": 34,
+          "arm_n": 2628,
+          "comp_n": 52330,
+          "above0": 12,
+          "neg": 12,
+          "below0": 2
+        },
+        "PREVIOUS_ASIA": {
+          "n": 48,
+          "pos": 42,
+          "overlap0": 26,
+          "arm_n": 2656,
+          "comp_n": 55300,
+          "neg": 6,
+          "above0": 22
+        },
+        "PREVIOUS_EUROPE": {
+          "n": 48,
+          "pos": 44,
+          "overlap0": 28,
+          "arm_n": 2660,
+          "comp_n": 54664,
+          "above0": 20,
+          "neg": 4
+        },
+        "ROLLING_14": {
+          "n": 48,
+          "neg": 20,
+          "below0": 4,
+          "arm_n": 6872,
+          "comp_n": 97456,
+          "overlap0": 36,
+          "pos": 28,
+          "above0": 8
+        },
+        "ROLLING_22": {
+          "n": 48,
+          "neg": 14,
+          "overlap0": 30,
+          "arm_n": 5940,
+          "comp_n": 87582,
+          "pos": 34,
+          "above0": 16,
+          "below0": 2
+        },
+        "ROLLING_252": {
+          "n": 48,
+          "pos": 34,
+          "overlap0": 36,
+          "arm_n": 1934,
+          "comp_n": 30674,
+          "above0": 12,
+          "neg": 14
+        },
+        "ROLLING_7": {
+          "n": 48,
+          "neg": 24,
+          "below0": 10,
+          "arm_n": 8108,
+          "comp_n": 106010,
+          "pos": 24,
+          "above0": 14,
+          "overlap0": 24
+        }
+      }
+    }
+  },
+  "bb_lc_identical_estimates": {
+    "swing_atr": {
+      "pairs": 264,
+      "equal": 264
+    },
+    "swing_duration_ns": {
+      "pairs": 264,
+      "equal": 264
+    },
+    "strong_move": {
+      "pairs": 264,
+      "equal": 264
+    }
+  },
+  "control_registered_not_recomputed": {
+    "n_records": 2178,
+    "raw_bite": {
+      "false": 1774,
+      "true": 404
+    },
+    "destroyed_survives": {
+      "false": 2178
+    },
+    "fixed_points": [
+      0
+    ],
+    "singleton_groups": 0,
+    "n_groups": 1584,
+    "min_group": 174,
+    "a15_destroyed_inside_raw_bite_band": 404,
+    "a15_fail": 0,
+    "a15_flag_vs_median_se_mismatch": 4,
+    "biter_abs_collapse_median": 0.0053904232181679924,
+    "biter_abs_collapse_max": 0.03380520244161953,
+    "void_reasons_any": 0
+  },
+  "golden": {
+    "T1": {
+      "poc": 100,
+      "va_count": 114,
+      "val": 100.0,
+      "vah": 105.0,
+      "va_width": 5.0,
+      "gap_span": 2.0,
+      "gap_span_va": 0.4,
+      "tight_gap": true,
+      "gap_bins": [
+        101,
+        102
+      ],
+      "gap_mass": 35
+    },
+    "T2": {
+      "poc": 105,
+      "va_count": 75,
+      "val": 101.0,
+      "vah": 106.0,
+      "va_width": 5.0,
+      "gap_span": 3.0,
+      "gap_span_va": 0.6,
+      "tight_gap": false,
+      "gap_bins": [
+        103,
+        104,
+        102
+      ],
+      "gap_mass": 27
+    },
+    "T3_tight": false
+  },
+  "fixture_blocking_pass": true,
+  "census_live": {
+    "COMPLETED": 789326,
+    "CONFIRMED_NON_PRIMARY": 4316600,
+    "FAILED_BREAKOUT": 4702900,
+    "RIGHT_CENSORED_CONFIRMATION": 626,
+    "RIGHT_CENSORED_ENDPOINT": 506,
+    "RIGHT_CENSORED_EXCURSION": 30520
+  },
+  "profile_census_live": {
+    "all": 9840478,
+    "defined": 9794210,
+    "non_tight": 8354976,
+    "tight": 1439234,
+    "undefined_reasons": {
+      "ATR_UNDEFINED": 868,
+      "GAP_UNDEFINED": 45400,
+      "None": 9794210
+    }
+  },
+  "all_defined_live": {
+    "strong_move": {
+      "mean": 0.8305693116332088,
+      "median": 1.0,
+      "n": 789550
+    },
+    "swing_atr": {
+      "mean": 3.6845182858668237,
+      "median": 2.58729904721752,
+      "n": 789550
+    },
+    "swing_bps": {
+      "mean": 66.07583503472158,
+      "median": 41.864675265896494,
+      "n": 789550
+    },
+    "swing_duration_ns": {
+      "mean": 39506531011335.58,
+      "median": 18000000000000.0,
+      "n": 789550
+    },
+    "swing_price": {
+      "mean": 50.34024174742576,
+      "median": 8.069999999999936,
+      "n": 789550
+    }
+  },
+  "disclosure_weighted_swing_atr": {
+    "tight": 2.8463726240175373,
+    "nontight": 3.737673672483097,
+    "contrast": -0.8913010484655595,
+    "n_tight": 46528.0,
+    "n_nontight": 742516.0
+  },
+  "zero_cost": "NO_COST_CHARGED",
+  "n_value_rows": 3630
+}

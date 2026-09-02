@@ -911,3 +911,62 @@ All seven QA run 9 items are verified resolved at the current HEAD: exact nested
 - Live execution has not been run; any real live stratum with zero eligible rows (or a single band) will hit Issues 1-2 before analysis produces a receipt.
 - Only 10 outer replicates are used in the fixture (per design §7); the 10,000-replicate live nested SE is unverified in the receipt, only in the performance test.
 - The closed-form destroy is a sufficient-statistic equivalent of the empirical 2,000-draw mean, verified by probe and by brute-force variance parity tests, but not by an end-to-end live emission.
+
+## QA run 11 — 2026-08-20T19:40:49Z — mode: subagent — HEAD 0f08bd13a68393be9d1f8344b69af6c6cff79f7b
+Verdict: APPROVE
+
+Review scope: fresh-context pre-exec of EXP-102 only (HYP-002 prior-raid count). Vehicle is analysis-only re-read of the frozen EXP-100 AMENDMENT-14 TRAIN 264-cell emission. No new engine, no TEST, no holdout, no EXP-100 rerun. Previous on-disk QA treated as history, not evidence. Unofficial `analysis_results.json` not read. Dirty/untracked paths named in the task were ignored.
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| Frozen analysis-only vehicle; 264 TRAIN cells; no new engine/TEST/holdout (`EXP-102` §1) | `analysis.py:26-41,276-309`; `runtime.py:80-87`; `source.py:157-407` | MATCHES | Live path reads `data/nautilus_runs/EXP-100/full` after the EXP-100 family gate; fixture is required first; no `BacktestNode`. |
+| Field map: `prior_raid_count`; `duration_ns` alias of `swing_duration_ns` (`EXP-102` §1) | `analysis.py:69-85,108-120`; `adapter.py:47-54,535-552` | MATCHES | No `previous_raid_count`. Alias nullness/value mismatch voids. |
+| Bands `0` / `1` / `2+` vs fixed comparator `0` (`EXP-102` §3–4) | `analysis.py:69-80,89`; `statistics.py:29-54` | MATCHES | `classify_count_band`; contrasts `(("1","0"),("2+","0"))`; arm-minus-zero means; medians secondary. |
+| Later-swing population `COMPLETED ∧ primary_attribution ∧ primary_completed`; ATR_UNDEFINED excluded from `swing_atr`/`strong_move` (`EXP-102` §1, §3) | `adapter.py:459-468` | MATCHES | Duration not ATR-filtered. Non-primary/censor statuses stay in census (`analysis.py:218-234`; `adapter.py:798-831`). |
+| Joint whole-level-cluster resampling; `L=5` default, `L=2,10` sensitivity; 10k×seeds `0..4`; linear quantiles (`EXP-102` §4) | `analysis.py:94`; `adapter.py:386-392,303-309`; `statistics.py:57-73,155-167,260-434` | MATCHES | EXP-102 does not override `independent_arms`; base default is `False` (joint). `L_eff=min(max(1,L), n_clusters-1)` for `n≥2`. Empty arm → null estimate + `EMPTY_ARM_OR_COMPARATOR` (checkpoint synonym of §4 `EMPTY_ARM`); row kept. |
+| Destroy groups pool counts; 2,000 derangements; complete outcome block per authorized channel (`EXP-102` §5) | `analysis.py:53-70`; `destroy.py:226-268,348-447`; `adapter.py:201-244` | MATCHES | Group columns omit `count_band`. Live donor is the full eligible channel frame (all bands). `default_rng(d)` per `d=0..1999`. |
+| AMENDMENT-15: destroyed non-bite vs **raw** SE (`EXP-102` §5, §8; checkpoint §2/§10) | `destroy.py:981-1099` | MATCHES | Bite: `abs(D_raw)>2.8×SE_raw[s]` ⇒ require `abs(m_destroy)≤2.8×SE_raw[s]`. Nested `bootstrap_SE_mean_destroyed` still disclosed. `INTEGRITY_Z=2.8` validity-only. |
+| AMENDMENT-16: singleton groups stay fixed; void only `VOID_NO_MOVABLE_ROWS` / `VOID_NO_CHANGED_VALUE` | `destroy.py:240-256,399-412` | MATCHES | `n<2` skipped, disclosed in `group_sizes`; does not void. |
+| Empty donor / empty arm must disclose, not crash (`EXP-102` §4 step 1; checkpoint §10) | `destroy.py:371-386,673-699`; `destroy.py:1017-1036`; tests `test_destroy.py:210-301` | MATCHES | `n_rows==0` returns NaN contrasts before label bitwise-and. Empty view returns empty nested seeds **before** `np.stack`. Attestation notes `EMPTY_ARM_OR_COMPARATOR` and does not abort. |
+| `raid_id` uniqueness per cell; BREAKOUT_BAR and LEVEL_CLOSE may share ids (`EXP-102` focus; EXP-100 matrix) | `analysis.py:129-148`; `source.py:114-118,364-402`; `test_exp102_analysis_live.py:102-114` | MATCHES | Source checks within-cell + composite `(source_cell, raid_id)`. Concatenated extra check uses `source_cell` if present, else method/reference/config so shared ids across methods do not void. |
+| Live 1-hour observation labelled `60m` not `1h` (binding) | `source.py:114-118`; EXP-100 `run_matrix.py:24,68,104-108`; `exp100/processor.py:600` | MATCHES | `f"{observation_minutes}m"` → `60m`. Confirmation refs stay `1H`/`4H` (golden-trace reference clock, not observation). |
+| Fixture 200+200, plants, seed-4 permute, 10 outer boots, 2,000 destroys (`EXP-102` §7) | `adapter.py:77-177`; `analysis.py:32,96-101`; `test_exp102_analysis_live.py:51-73` | MATCHES | `FIXTURE-{0,1}-level-{i:04d}`; `config=FIXTURE_CONFIG`; `raid_id` after permutation; plants +0.50 ATR / +3.6e12 ns / +0.25 `strong_move`. `2+` remains reportable (empty on fixture). |
+| Neutral report layers; no machine value labels (`EXP-102` §4) | `adapter.py:314-318`; `contract.py:36-61` | MATCHES | `observed`/`ideal`/`interpretation` only. No `SUPPORTED`/`WASH`/`CONTRADICTED` fields. |
+| Zero-cost; no P&L/PSR (`EXP-102` §6, §9) | `contract.py:7-22`; `source.py` `NO_COST_CHARGED` | MATCHES | Canonical disclosure on results. No cost import on live path. PSR N/A. |
+| Amendment ledger through AMENDMENT-16 (`EXP-102` §8) | `design.md` AMENDMENT-2..16; checkpoint §2 | MATCHES | Final 4 looser / 3 tighter / 8 neutral; no ≥3 one-way streak; false-qualifier count 0 by construction (no machine qualification). |
+
+### Golden-trace diff
+
+| Event | Expected from design (`EXP-102` §8) | Implemented logic | Verdict |
+|---|---|---|---|
+| T1 2023-01-03T10:00Z — first 15m raid of PREVIOUS_1H high 100.00 | Distinct raid, `prior_raid_count=0`, excursion 1.20, same-bar return does not close | Frozen EXP-100 emission (not re-run). Analysis maps that field as `prior_raid_count` band `0`; census keeps the row even before completion | MATCHES |
+| T2 10:15 / 10:30 — second raid on the same level | Same `level_id`, `prior_raid_count=1`, first row retained | Band `1`; clusters are `level_id` histories; both rows remain in census; 1-vs-0 contrast uses both bands jointly | MATCHES |
+| T3 11:00 expected-side 1H close, 12:00 opposing close | Later raid `primary_attribution=true`; first `CONFIRMED_NON_PRIMARY`; only primary completes; `swing_duration_ns=duration_ns=3_600_000_000_000` | `_channel_frame` later-swing requires `COMPLETED` + both primary flags, so non-primary is never an endpoint. Duration channel is the ns field (hour display is `ns/3.6e12` in reporting, not a second estimand). Reference label is `1H`, observation would be `15m` (not `1h`) | MATCHES |
+| Fixture bite (pre-live) | Every seed/channel: raw plants bite; destroyed mean inside raw `2.8×SE_raw` band | Same `integrity()` path as live (`runtime.py:74-75`); 2+ vs 0 disclosed empty, non-blocking | MATCHES |
+
+### Governance & boundary
+
+- Fresh context: **PASS** — subagent; this session did not implement the code.
+- Holdout / TEST / new engine: **PASS** — TRAIN fence `2021-06-02T00:01:00Z`–`2023-11-22T00:00:00Z`; manifest SHA pinned; no catalog/holdout query; no `BacktestNode`.
+- Gate-first: **PASS** (design/code) — family `estimand_validation.json` + 264 per-cell gates required before rows.
+- Registry: **PASS** — `CF-LIQSWP-001/HYP-002` registered; 0 counted TEST reads (`multiplicity-registry.md`).
+- No local accounting / Python strategy backtest: **PASS** — no `code/` runner; analysis_code and `liqswp_analysis` define no adjudication primitives.
+- Zero-cost: **PASS** — verbatim `NO_COST_CHARGED` block; no `spread_scale_route` / `bybit_round_trip_cost_bps` / live cost call.
+- No research powering: **PASS** — `INTEGRITY_Z=2.8` validity-only; no MDE / `UNPOWERED` / count veto.
+- Derangement (L-28): **PASS** — rejection sampling, zero fixed points; singletons fixed under AMENDMENT-16.
+- PSR: **N/A** — no trade/leg-bps series.
+- One BacktestNode / XENA / SPDR conversion pin / cost directive: **N/A**.
+- Shared-library boundary: **PASS** for EXP-102 — joint resampling is the default; EXP-101 independently sets `independent_arms=True`.
+- Operator-only bands: **PASS**.
+- Prior QA run 10 empty-donor / empty-view crashes: **resolved in current tree** (guards + tests). Not used as evidence; re-read independently.
+
+### Issues
+
+None.
+
+Notes (non-blocking):
+1. Nested outer destroy uses the closed-form derangement mean/variance rather than 2,000 literal draws per bootstrap population. Live bite still uses the 2,000 unresampled draws. AMENDMENT-15 nested SE is disclosure-only.
+2. Checkpoint: a one-cluster stratum cannot attest collapse (`SE_raw=0`). Value bootstrap already returns `ONE_CLUSTER`; nested SE may still be 0.0 and, if a nonzero raw contrast is treated as a bite, fail closed as `VOID_FUTURE_DESTROY_SURVIVAL`. Fail-closed and disclosed; not a design miss for this review.
+3. This reviewer did not execute tests or open live parquet rows. Supervisor should run `python/tests/liqswp_analysis/test_exp102_adapter.py`, `test_destroy.py`, and `python/tests/test_exp102_analysis_live.py` before the execution gate.

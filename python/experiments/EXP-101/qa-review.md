@@ -944,3 +944,81 @@ Non-issue note (recorded for the operator): at the smoke scale (10 outer replica
 ### Prior run-10 findings — verification result
 
 All five run-10 REVISE items are verified RESOLVED in the e57847c state: (1) exact nested 10k×2k destroy implemented and numerically verified, (2) registered two-arm fixture plants implemented with exact raw contrasts, (3) nullness class uses the `duration_ns` alias with asserted byte-equality, (4) swing_price/swing_bps source-field summaries emitted, (5) empirical 95% destroyed interval present in live control evidence; source.py repairs (composite uniqueness, UTC fence, within-cell duplicate detection) and the regenerated, all-passing `fixture_integrity.json` receipts are confirmed. No functional regression found in the resolved areas.
+
+## QA run 12 — 2026-08-20T19:40:49Z — mode: subagent — HEAD 0f08bd13a68393be9d1f8344b69af6c6cff79f7b
+Verdict: APPROVE
+
+Scope: fresh-context, analysis-only re-read of the frozen EXP-100 AMENDMENT-14 TRAIN emission (264 cells) against the current EXP-101 design through AMENDMENT-16. No new engine, TEST, holdout, or EXP-100 rerun. Design text was read first; code was verified independently of prior QA. Unofficial `analysis_results.json` was not read. Dirty/untracked paths present and ignored: `.jspace/`, `docs/superpowers/plans/2026-08-20-exp-101-104-handoff.md`, `python/experiments/EXP-10{1,2,3,4}/results/analysis_results.json`.
+
+Prior run-11 (17 Aug, REVISE) resolution:
+| Run-11 issue | Current verdict | Evidence |
+|---|---|---|
+| §1 seal fields not checked | **RESOLVED** | `source.py:16-22,221-238` fail-closed on `emission_contract_version`, `nautilus_version`, `one_backtest_node`, `manifest_sha256`; tests in `test_source.py:151-170` |
+| Fixture shared baseline `level_id` reuse | **PERSISTS (info)** | `adapter.py:128` still `FIXTURE-{label}-level-{index:04d}`; plants and bite still exact (see Notes) |
+| `VOID_SINGLETON_GROUP` vs `VOID_NO_DERANGEMENT` | **SUPERSEDED** | AMENDMENT-16 (operator-approved 2026-08-18): n<2 groups stay fixed and do not void; code emits only `VOID_NO_MOVABLE_ROWS` / `VOID_NO_CHANGED_VALUE` |
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §1 Frozen AMENDMENT-14 TRAIN source; 264-cell gate-first; no EXP-100 rerun | `source.py:155-176`; `adapter.py:354-363`; `analysis.py:194-201`; EXP-100 `estimand_validation.json` `blocking_pass=true`, `n_cells=264` | MATCHES | Live path validates the family gate and per-cell gates before parquet collect; root is `data/nautilus_runs/EXP-100/full` |
+| §1 Seal: contract v1, Nautilus 1.230.0, `NO_COST_CHARGED`, one node, manifest SHA256 `4cdc7b01…1de0` | `source.py:16-22,191-196,221-238` | MATCHES | Run-11 gap closed. Fail-closed VOID reasons for each seal field; manifest start/pin also checked |
+| §1 TRAIN fence 2021-06-02T00:01:00Z–2023-11-22T00:00:00Z; no holdout | `source.py:23-28,112-126,197-218,247-266`; `adapter.py:31-32`; `scan_train_columns` | MATCHES | Endpoint filter `<= train_end_ns`; `VOID_AFTER_TRAIN` / `VOID_BEFORE_TRAIN_START`; no TEST/holdout path |
+| §1 Identity: `config`==`source_configuration`; metadata↔row; composite `(cell, raid_id)` | `source.py:112-119,239-246,306-337` | MATCHES | Timeframe identity is `f"{observation_minutes}m"` (60-minute cells → `60m`, not `1h`) |
+| §1 Duration alias; `pre_mfe_retrace` out of HYP-001 | `adapter.py:40-48,438-454`; CHANNELS omit `pre_mfe_retrace` | MATCHES | Byte-equal `duration_ns`/`swing_duration_ns` asserted (`VOID_DURATION_ALIAS*`). Hours display is a later report conversion, not the estimand unit (Note 2) |
+| §1 Binding ATR_UNDEFINED exclusion | `adapter.py:365-375`; `analysis.py:70-77` | MATCHES | `swing_atr` / `strong_move` drop `ATR_UNDEFINED`; other channels and census keep the rows; excluded count in census |
+| §2 Mechanism / object identity: level-linked raid vs later swing; cluster by `level_id` | `adapter.py:387-416`; `statistics.py:38-81` | MATCHES | No orders/fills/P&L; clusters are complete `level_id` histories sorted by `(min(sweep_ts_ns), level_id)` |
+| §3 11 configs; fixed comparators PREVIOUS_1H / PREVIOUS_ASIA / ROLLING_7 | `analysis.py:79-88` | MATCHES | Eight (arm, comparator) pairs only; no adaptive arm |
+| §3 Result rows by symbol×TF×method×reference×side×config; **stratum key omits config** so both arms share a partition | `analysis.py:89-95`; `adapter.py:437` `_strata` | MATCHES | Override drops base `config` stratum. Fixture value-row `stratum` is the 5-tuple. If config were in the key, arm and comparator would split and every contrast would be empty |
+| §3 Outcome population COMPLETED ∧ primary_attribution ∧ primary_completed; finite price/bps/duration | `adapter.py:365-375`; `statistics.py:47-51` | MATCHES | Census retains failed/non-primary/censored/null/thin |
+| §3 Primary estimators: arm−comparator mean `swing_atr`, mean `swing_duration_ns`; unpaired `strong_move` proportion | `statistics.py:38-81`; `adapter.py:180-186` | MATCHES | Boolean mean is the unpaired proportion; medians are secondary; `swing_price`/`swing_bps` are summaries (`adapter.py:271-298`) not tripwire channels |
+| §4 Independent arm/comparator cluster resampling; `L_eff=min(max(1,L), n_clusters-1)`; 10k draws; seeds 0–4; NumPy linear quantile; L=5 + L=2/10 | `analysis.py:99` `independent_arms=True`; `statistics.py:84-97,113-147,220-276,318-399`; `adapter.py:199,468-474` | MATCHES | Distinct configuration populations resampled separately. Empty arm → `EMPTY_ARM_OR_COMPARATOR` with counts, null interval, row kept. One cluster → `ONE_CLUSTER`, not a silent SE |
+| §4 Report layers; no machine value labels | `adapter.py:489-502,691-704`; `contract.py:50-60`; `runtime.py:75-99` | MATCHES | `observed`/`ideal`/`interpretation`; prohibited names absent |
+| §5 Destroy grouping: 7-tuple + 5-bit nullness; **config pooled**; sort note | `analysis.py:40-55`; `destroy.py:196-210,355-368` | MATCHES | Nullness uses declared `duration_ns`. Fixture control `group_sizes=[3200]` = all 11 configs in one group. Groups follow frame encounter order rather than an explicit `(raid_id, original_row_position)` sort (Note 3); still a uniform derangement |
+| §5 Derangement; AMENDMENT-16 singletons stay fixed; void only `VOID_NO_MOVABLE_ROWS` / `VOID_NO_CHANGED_VALUE` | `destroy.py:156-163,237-259,277-278,401-411,450-451`; `test_destroy.py:110-150` | MATCHES | n<2 rows unmapped and listed in `group_sizes`; they do not void. All-singleton → `VOID_NO_MOVABLE_ROWS`; unchanged values → `VOID_NO_CHANGED_VALUE`. No `VOID_SINGLETON_GROUP` on the live path |
+| §5 Live destroy on unresampled donor (all configs in stratum); 2,000 draws `default_rng(d)` | `adapter.py:186-214,447-478`; `destroy.py:318-468` | MATCHES | Donor = `_channel_frame` (config-pooled); contrast evaluated on arm/comparator labels. All 2,000 destroyed contrasts disclosed (`destroyed_draws: 2000` plus the vector) |
+| §5 Nested 10k×2k using §4 mechanics; `bootstrap_SE_raw` / `bootstrap_SE_mean_destroyed` disclosed | `destroy.py:599-816`; independent branch `759-791` | MATCHES | Closed-form per-population destroy mean; nested SE disclosed with between + within/n_destroy. Under AMENDMENT-15 the bite does not use the nested SE |
+| §5 AMENDMENT-15 live read: if `abs(D_raw) > 2.8×SE_raw[s]` then require `abs(m_destroy) ≤ 2.8×SE_raw[s]` | `destroy.py:49,949-1105` | MATCHES | Threshold string `INTEGRITY_Z * bootstrap_se_raw[s]`; survival → `VOID_FUTURE_DESTROY_SURVIVAL`. No raw bite → control reported, no collapse claim. Empty arm disclosed, not failed |
+| §5 Fixture topology and plants | `adapter.py:49-52,92-170`; `analysis.py:150-154`; `runtime.py:101-107`; `fixture_integrity.json` | MATCHES (note) | 200 rows/arm/pair; plants +0.50 ATR / +3.6e12 ns / +0.25; seed-4 permutation; `raid_id=fixture-raid-{pos:04d}`; fixture `n_boot=10`, live 10,000. Shared comparator `level_id`s yield 3-row clusters for PREVIOUS_1H/ASIA/ROLLING_7 (Note 1); raw estimates remain exact |
+| §6 HARD/INFORMATIVE; no MDE/power/PSR; complexity | `design.md` §6; `liqswp_analysis/` (no MDE/`UNPOWERED`/cost imports) | MATCHES | PSR N/A (no trade/leg series). `INTEGRITY_Z=2.8` validity-only |
+| §7 Golden trace T1–T3 (frozen engine; no re-emit) | `processor.py:286-330,400-458,462-522,540-612` | MATCHES | See golden-trace table. Observation hour cells emit `f"{observation_minutes}m"` → `60m` (`processor.py:601`) |
+| §8 Amendment ledger through AMENDMENT-16 | `design.md` §8; checkpoint `design.md:121-140` | MATCHES | 4 looser / 3 tighter / 8 neutral; A15+A16 looser streak = 2 (<3). No machine qualifier; F02/F04/F06 N/A; F07 retain every row |
+| §9 Zero-cost verbatim | `contract.py:10-27`; `test_contract.py:33`; fixture `zero_cost_disclosure` | MATCHES | Canonical text; no live cost function; no `evaluation_cost_legacy` / `spread_scale` / `bybit_round_trip` on this path |
+| Live one-hour observation label `60m` not `1h` | `processor.py:601`; `source.py:113-116` | MATCHES | Identity check reconstructs timeframe as `{observation_minutes}m`. Confirmation reference stays `1H` |
+
+### Golden-trace diff
+
+| Event | Expected from design | Implemented logic | Verdict |
+|---|---|---|---|
+| T1 — separate PREVIOUS_1H / ROLLING_7 cells; level 100.00; bar 101.20/100.80/101.00; `raid_atr=1.00` | Each cell starts its own raid; `prior_raid_count=0`; `max_excursion=1.20`; null return; no cross-cell ordering | Cell-local processor; HIGH start on `high>100`; T1 `low=100.80` does not return; excursion 101.20−100.00=1.20 (`processor.py:286-330,400-458`) | MATCHES |
+| T2 — 10:15/11:00 return and expected-side 1H close | Inclusive `low<=100` records return; AMENDMENT-13 keeps raid live; 11:00 expected-side close sets `primary_attribution=true` per cell; equal-price other config does not demote | Inclusive return (`processor.py:303-315`); cell-local primary = latest expected (`processor.py:480-520`) | MATCHES |
+| T3 — 12:00 opposing endpoint; extreme 98.00 | `swing_price=2.00`, `swing_atr=2.00`, `swing_bps=200.0`, `swing_duration_ns=duration_ns=3.6e12`, `strong_move=true` (2.00>1.20) | HIGH `level−extreme`; ATR and bps arithmetic; duration = endpoint−confirmation; alias `duration_ns` (`processor.py:555-612`) | MATCHES |
+| Observation hour cell label | Live 60-minute observation cells labelled `60m`, not `1h` | `timeframe = f"{observation_minutes}m"` | MATCHES (golden-trace prose still says “15m/1H source cells”; that is confirmation/wording, not the parquet label) |
+| Fixture plants | +0.50 / +3.6e12 ns / +0.25; destroyed mean inside raw bite band; 2,000 derangements, 0 fixed points | Receipt `raw_estimate` 0.5 / 3600000000000.0 / 0.25; `destroyed_mean` ~4e-4; `destroyed_survives_seeds=[]`; `fixed_points=0`; `group_sizes=[3200]`; `population_match=true`; threshold is raw SE | MATCHES |
+
+### Governance & boundary
+
+- **Fresh context:** PASS — dedicated subagent; this conversation did not implement the code.
+- **Gate-first / 264 cells:** PASS — EXP-100 `estimand_validation.json` `blocking_pass=true`, `n_cells=264`; live validator requires the same before row collect.
+- **TRAIN / holdout:** PASS — pinned INFR-021 TRAIN window only; no TEST/holdout query in the analysis path.
+- **Registry:** PASS — `CF-LIQSWP-001` REGISTERED; HYP-001 → EXP-101; vehicle is TRAIN re-analysis, not a counted TEST read.
+- **No Python price backtest / no local accounting:** PASS by inspection — EXP-101 has `analysis_code/` only (no `code/` runner). No accounting primitives in `analysis.py` or `xen.liqswp_analysis`. `check_no_local_accounting` was not executed this run (read-only; no shell).
+- **One BacktestNode:** PASS — analysis-only; no new `BacktestNode`. Seal still requires source `one_backtest_node=true`.
+- **Derangement (L-28):** PASS — rejection sampling, zero fixed points.
+- **AMENDMENT-15 / 16 (binding, not relitigated):** PASS — destroyed non-bite uses raw SE; singletons stay fixed and disclosed; void only no-movable / no-changed-value.
+- **Zero cost:** PASS — verbatim disclosure; no live cost call; no cost directive.
+- **Powering strip / PSR:** PASS / N/A — no MDE, detection floor, `UNPOWERED`, or trade/leg series.
+- **Screen conversion / XENA:** N/A.
+- **Battery §13:** PASS as declared — no battery selection, capped read, or path-dependent exit gate.
+- **Amendment streak:** PASS — no ≥3 one-directional streak.
+- **Mandatory design blocks:** PASS — MECHANISM, OBJECT-IDENTITY, CONTROL, TRIPWIRE, operator-only bands, SAMPLE-SIZE, GOLDEN-TRACE, HARD/INFORMATIVE, ZERO-COST, amendment ledger. CONVERSION-PIN / COST-DIRECTIVE N/A.
+
+### Issues
+
+No blocking issues.
+
+1. **INFO — Fixture comparator `level_id`s are reused across pair blocks.** Design §5 `cluster_size=1`; `adapter.py:128` keys `level_id` by label only, so PREVIOUS_1H / PREVIOUS_ASIA / ROLLING_7 clusters hold 2–3 identical rows. Means and planted contrasts stay exact (`raw_estimate` 0.5 / 3.6e12 / 0.25). Optional: scope `level_id` by pair if a literal one-row cluster receipt is wanted.
+2. **INFO — Duration remains nanoseconds in the machine artifact.** Design §1 asks hours as `swing_duration_ns / 3_600_000_000_000` for display. The registered estimand is still mean `swing_duration_ns`. Convert at analysis.md time; do not change the estimator.
+3. **INFO — Destroy groups are not re-sorted by `(raid_id, original_row_position)`.** `destroy.py:196-210,355-368` uses encounter order. The mapping is still a uniform zero-fixed-point derangement of the declared groups.
+
+Supervisor may run (not run here): `PYTHONPATH=python/src python -m pytest -q python/tests/liqswp_analysis python/tests/test_exp101_analysis_live.py`; `check_no_local_accounting("python/experiments/EXP-101")`.

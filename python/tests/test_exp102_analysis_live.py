@@ -113,6 +113,20 @@ def test_duplicate_raid_id_is_cell_scoped_not_global() -> None:
     assert "VOID_DUPLICATE_RAID_ID" not in across.reasons
     assert "VOID_DUPLICATE_RAID_ID" in within.reasons
 
+    # Live unconfirmed rows have null confirmation_method; method cells still
+    # share raid_id. Cell tagging is what keeps them distinct.
+    unconfirmed_a = frame.with_columns(
+        pl.lit(None).cast(pl.String).alias("confirmation_method"),
+        pl.lit("cell-a").alias("source_cell"),
+    )
+    unconfirmed_b = unconfirmed_a.with_columns(pl.lit("cell-b").alias("source_cell"))
+    tagged = adapter.extra_integrity(pl.concat((unconfirmed_a, unconfirmed_b)))
+    untagged = adapter.extra_integrity(
+        pl.concat((unconfirmed_a.drop("source_cell"), unconfirmed_b.drop("source_cell")))
+    )
+    assert "VOID_DUPLICATE_RAID_ID" not in tagged.reasons
+    assert "VOID_DUPLICATE_RAID_ID" in untagged.reasons
+
 
 def test_malformed_prior_count_and_out_of_fence_rows_fail_integrity() -> None:
     module = _load_exp102()

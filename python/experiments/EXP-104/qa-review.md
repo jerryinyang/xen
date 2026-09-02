@@ -730,3 +730,89 @@ gate byte-identity: EXP-100 vs EXP-104 estimand_validation.json SHA256 159385187
 - The nested closed form follows the "same per-population donor pool" reading of §4/§5 (cluster resamples carry the arm/comparator rows of each contrast); the live donor additionally pools all regime rows per §5. The two populations are identical in row set only for two-regime strata; residual nuance is disclosed in the docstring.
 - No live execution artifact exists yet (`results/analysis_results.json` absent) — this remains the operator's gate.
 
+
+## QA run 9 — 2026-08-20T19:40:49Z — mode: subagent — HEAD 0f08bd13a68393be9d1f8344b69af6c6cff79f7b
+Verdict: APPROVE
+
+Reviewed git state: HEAD `0f08bd13a68393be9d1f8344b69af6c6cff79f7b`. Dirty/untracked paths named in the task (`.jspace/`, `docs/superpowers/plans/2026-08-20-exp-101-104-handoff.md`, unofficial `python/experiments/EXP-10{1,2,3,4}/results/analysis_results.json`) were ignored and were not the review target. Unofficial `analysis_results.json` was not read. Fresh context: this session did not author the implementation. Previous on-disk QA runs 1–8 treated as history only; every clause below was re-derived from EXP-104 `design.md` (through AMENDMENT-16) then checked in code.
+
+Vehicle: analysis-only re-read of the retained EXP-100 AMENDMENT-14 TRAIN emission (264 cells). No new engine, no TEST, no holdout, no EXP-100 rerun.
+
+### Design-fidelity trace
+
+| Design clause (§ref) | Code (file:line) | Verdict | Notes |
+|---|---|---|---|
+| §1 Frozen source / gate-first / 264 cells / TRAIN fence SHA | `source.py:180–345` `validate_source_contract`; `analysis.py:493–504`, `713` | MATCHES | Family gate `blocking_pass` and `n_cells=264` before parquet; per-cell gates, `config_hash`, `event_log_sha256`, `emission_contract_version=nautilus-emission-v1`, Nautilus `1.230.0`, `one_backtest_node=true`, `cost_model=NO_COST_CHARGED`, manifest SHA `4cdc7b01…1de0`. CLI `--gate` defaults to `python/experiments/EXP-100/results/estimand_validation.json`. |
+| §1 JOIN: left join profiles; report missing/extra; never inner / outcome-drop | `analysis.py:534–575`; `source.py:key_join_evidence` | MATCHES | Left join on `(source_cell, raid_id, profile_generation)`; `MATCHED` / `MISSING_PROFILE`; unmatched/extra/duplicate → `VOID_PROFILE_JOIN_MISMATCH` (fail-closed, not silent inner join). |
+| §1 Binding ATR_UNDEFINED exclusion from excursion / `strong_move` | `adapter.py:411–418` `_channel_frame` | MATCHES | `profile_undefined_reason==ATR_UNDEFINED` dropped only for `swing_atr` and `strong_move`. Duration and census retain the rows. `pre_mfe_retrace` not in required columns (outside HYP-004). |
+| §2/§3 Primary conditioning = `raid_regime`; LOW/HIGH vs fixed MID | `analysis.py:49–50`, `474–476` | MATCHES | `LABEL_COLUMN="raid_regime"`; `contrasts=(("LOW","MID"),("HIGH","MID"))`. Confirmation/endpoint regimes are census-only (`analysis.py:675–680`). |
+| §3 Later-swing population | `adapter.py:411–415` | MATCHES | `status==COMPLETED` and `primary_attribution` and `primary_completed`. Right-censor/failed/non-primary stay in `census()`, not in the contrast denominator. |
+| §3 Duration alias `swing_duration_ns == duration_ns` | `adapter.py:430–448` | MATCHES | Nullness XOR → `VOID_DURATION_ALIAS_NULLNESS_MISMATCH`; value mismatch → `VOID_DURATION_ALIAS`. Nullness class uses `duration_ns` (`analysis.py:56–64`). |
+| §3 Frequency: preceding completed observation mark | `analysis.py:65–102` `_build_frequency_units`; `508–517` `shift(1)` → `causal_regime` | MATCHES | Eligible `b_i` requires a preceding mark; `starts` join on `sweep_ts_ns == b_i.ts_event_ns`; `raid_regime` must equal preceding `bar_marks.regime` or `VOID_REGIME_PROVENANCE`. Multiple unique `raid_id` on one bar count as multiple starts. |
+| §3 Warmup/undefined exposure reported separately, never an arm | `analysis.py:142–147`, `204–245`, `584–587` | MATCHES | `REGIME_WARMUP` / `ATR_UNDEFINED` go to `warmup_undefined_exposure`. Arm table is a LOW/MID/HIGH grid only. Tests: `test_partition_payloads_maps_60m_and_keeps_warmup`, `test_frequency_arm_table_emits_empty_exposure_not_warmup_arm`. |
+| §3 `EMPTY_EXPOSURE` when `exposure_r=0`; MID-zero nulls contrasts | `analysis.py:148–157`, `234–244`; `_frequency_contrasts_from_totals` `341–349` | MATCHES | Cross-join emits LOW/MID/HIGH rows; `exposure==0` → `empty_exposure_reason="EMPTY_EXPOSURE"` and null rate/contrast. |
+| §3 `FREQUENCY_BLOCKS_BY_TIMEFRAME`: 15m (48,96,192), 30m (24,48,96), 1h and live **60m** (12,24,48) | `analysis.py:87–92`, `189–192` | MATCHES | Live observation cells labelled `60m` map to L=24 with L/2=12 and 2L=48. `1h` kept as the same triple. Primary observed `block_length` is `blocks[len(blocks)//2]` (the one-day L). Test asserts all four keys. |
+| §3 Integrity/join before frequency bootstrap | `analysis.py:578–582` | MATCHES | Join/provenance void returns before `_run_census`. Comment: “do not spend the frequency bootstrap on a voided source.” |
+| §3 Frequency is descriptive; not under future-destroy | `adapter.py:376–381` `control_channels`; `runtime.py:79–81` | MATCHES | Destroy channels are `swing_atr`, `swing_duration_ns`, `strong_move` only. Frequency has its own provenance/exposure voids. |
+| §3 Frequency uncertainty = circular blocks on chronological marks; prefix-sum ≡ gather | `analysis.py:359–441`; `tests/liqswp_analysis/test_exp104_adapter.py:154–220` | MATCHES | Same `L_eff=min(max(1,L), n-1)`, `ceil(n/L_eff)` starts from `[0,n)`, last block truncated. Prefix-sum is the registered circular-gather estimator (oracle test vs `circular_cluster_indices`). Not a Rust port; not demanded. NumPy default quantile = linear. |
+| §4 Joint level-cluster resampling of arms (a level may sit in several regimes) | `adapter.py:389–390` `independent_arms=False`; `statistics.py:80–160`, `303–439` | MATCHES | Default joint circular whole-cluster blocks L=5 with sensitivities L=2 and L=10; seeds 0–4; 10k draws. Each contrast view is arm+MID jointly (not EXP-101 independent-arm). EMPTY_ARM / ONE_CLUSTER retained. |
+| §4 Report layers; no machine value labels | `adapter.py:304–307`, `718–720`; `contract.py:AnalysisResult` | MATCHES | `interpretation` is operator-judges prose. No `SUPPORTED`/`WASH`/`CONTRADICTED`/`UNPOWERED` fields in EXP-104 analysis or `liqswp_analysis`. Medians and `swing_price`/`swing_bps` `source_field_summaries` present. |
+| §5 Destroy grouping: stratum × status × primary_completed × 5-bit nullness; regimes pooled | `analysis.py:53–64`; `destroy.py:draw_destroy_contrasts` | MATCHES | `CONTROL_GROUP_COLUMNS` match the named keys; nullness is `(swing_price, swing_bps, swing_atr, duration_ns, strong_move)`. Donor is the later-swing channel frame (all regimes); contrast evaluated on LOW/HIGH vs MID. |
+| §5 Derangement, 2,000 draws, zero fixed points | `destroy.py:87–95` `derange_indices`; `319–478` | MATCHES | Rejection sampling until `perm[i] != i`. `fixed_points=0`. Same-regime donors allowed. |
+| §5 AMENDMENT-15: destroyed non-bite vs **raw** SE | `destroy.py:990–1107` `future_destroy_attestation` | MATCHES | If `abs(D_raw) > 2.8 * bootstrap_SE_raw[s]`, require `abs(m_destroy) <= 2.8 * bootstrap_SE_raw[s]`. Survival → `VOID_FUTURE_DESTROY_SURVIVAL`. `destroyed_survives_threshold` string is `INTEGRITY_Z * bootstrap_se_raw[s]`. `bootstrap_SE_mean_destroyed[s]` still disclosed per seed. Fixture receipt: 6/6 controls `blocking_pass=true`. |
+| §5 AMENDMENT-16: n<2 groups stay fixed and disclosed; void only no-movable / no-changed-value | `destroy.py:236–246`, `395–405`; `tests/liqswp_analysis/test_destroy.py:110–149` | MATCHES | Singletons contribute identically to raw and destroyed; `group_sizes` disclosed; do not void. All-singleton → `VOID_NO_MOVABLE_ROWS`. No `VOID_SINGLETON_GROUP` on the live destroy path. Nested closed form uses `S` when `m_g==1` (`destroy.py:18–19`, `586`). |
+| §5 Nested outer bootstrap (joint, L=5, seeds 0–4, live 10k / fixture 10) | `destroy.py:630–908`; `analysis.py:688–695`, `704` | MATCHES | Closed-form mean/variance of the uniform-derangement contrast inside every resampled population b (same estimator as 2,000 draws; Monte-Carlo term disclosed). Fixture `n_boot=10`; live `DEFAULT_N_BOOT=10_000`. |
+| §5 FIXTURE-TOPOLOGY plants | `adapter.py:88–160`; `analysis.py:628–637` | MATCHES (note) | Plants +0.50 ATR, +3.6e12 ns, +0.25 strong_move; 200 rows per (MID,LOW) and (MID,HIGH) pair; permutation seed 4; order `(sweep_ts_ns, level_id)`; `config=FIXTURE_CONFIG`. Literal topology repeats MID `level_id`s (400 MID rows / 200 two-row clusters). Contrast means unchanged; fixture receipt still green. See Issues note 1. |
+| §6 SAMPLE-SIZE / no powering / PSR N/A | design §§6,9; code scan | MATCHES | No MDE / `UNPOWERED` / detection floor / `n_legs_floor`. `INTEGRITY_Z=2.8` validity-only. No trade/leg-bps series; PSR N/A. Every empty arm/exposure retained with counts. |
+| §8 Amendment ledger through AMENDMENT-16 | `design.md` §8; checkpoint §2 | MATCHES | 4 looser / 3 tighter / 8 neutral. A-15 and A-16 operator-approved LOOSER. Longest one-direction streak = 2 (not ≥3). Final-null: zero machine false-qualifiers by construction. |
+| §9 ZERO-COST-DISCLOSURE | `design.md` §9; `contract.py:8–26` | MATCHES | Canonical text present. No live `PARTIAL_FEES_FUNDING_ONLY`, `spread_scale_route`, or `bybit_round_trip_cost_bps`. No `operator_cost_directive.json`. |
+| Analysis-only / no local accounting / no Python backtest | `analysis_code/analysis.py`; `runtime.py` | MATCHES | Reads EXP-100 emission only; atomic JSON write. No `BacktestNode`. No `def assemble_realized_bps` / `assemble_multileg_bps` / `per_leg_net` / `build_episodes` in EXP-104 `analysis_code/`. |
+
+Run-8 REVISE items independently re-checked as resolved in this tree: per-timeframe block dispatch including **60m→(12,24,48)**; live census rates/contrasts/warmup; CLI gate path to EXP-100; AMENDMENT-16 singleton non-void; live-path test `python/tests/test_exp104_analysis_live.py`.
+
+### Golden-trace diff
+
+| Event | Expected (from design §7) | Implemented logic | Verdict |
+|---|---|---|---|
+| T1 10:00 pre-update LOW | Cached x=0.80 < lower=0.90 → `raid_regime=LOW` (pre-update cache) | Analysis does not recompute ATR. It treats emitted `raid_regime` as the cached pre-update label and asserts it equals the **preceding** `bar_marks.regime` (`causal_regime = regime.shift(1)`). Mismatch → `VOID_REGIME_PROVENANCE`. | MATCHES |
+| T2 10:15 post-update HIGH | Current x=1.20 appended before rank; bounds still 0.90/1.10 → `bar_marks.regime=HIGH`; prior raid stays LOW; equality would be MID | `bar_marks.regime` is the post-update label and is never written onto raid rows. Frequency/provenance use the preceding mark, so the T1 raid remains LOW. | MATCHES |
+| T3 same-timestamp confirmation MID | 11:00 observation update runs before `_on_reference_bar` → `confirmation_regime=MID`; endpoint stays MID; original raid LOW unchanged | Confirmation/endpoint are emitted event-time fields (post-update when timestamps coincide). Analysis does **not** join them to the preceding-mark rule (that rule is raid/frequency only). Secondary census keeps confirmation/endpoint labels. | MATCHES |
+| Frequency unit | Raid starting on `b_i` uses cached state from `b_(i-1)` | `_build_frequency_units` / live `shift(1)` implement exactly that. First mark of each cell is ineligible. | MATCHES |
+| Fixture plants + AMENDMENT-15 inequalities | Raw +0.50 / +3.6e12 ns / +0.25; destroyed mean inside raw bite band for every seed/channel | `make_fixture_frame` plants; `results/fixture_integrity.json` 6 control records all `blocking_pass=true`. | MATCHES |
+| Prefix-sum frequency bootstrap | Same circular gather as `circular_cluster_indices` | `test_frequency_bootstrap_matches_gathered_circular_blocks` compares seed finite-draws and linear intervals to the gather oracle. | MATCHES |
+
+### Governance & boundary
+
+- **Fresh context:** PASS — dedicated subagent; this conversation did not implement EXP-104.
+- **Gate-first / frozen EXP-100:** PASS — source contract before any estimator; no EXP-100 mutation/rerun path.
+- **TRAIN / holdout:** PASS — raids scanned with `endpoint_ts_ns <= 2023-11-22T00:00:00Z`; no TEST/holdout query. Bar-marks scan relies on the frozen TRAIN emission (no extra TRAIN filter; residual note 2).
+- **Registry:** PASS — `CF-LIQSWP-001/HYP-004` registered (`multiplicity-registry.md`); 0 counted TEST reads; family REGISTERED. No XENA route.
+- **Zero-cost:** PASS — disclosure verbatim; no cost function on the live path; no cost directive.
+- **No research powering / no machine value labels:** PASS.
+- **PSR:** N/A — no trade/leg-bps estimand.
+- **Derangement:** PASS — zero fixed points; AMENDMENT-16 singleton disclosure; void only `VOID_NO_MOVABLE_ROWS` / `VOID_NO_CHANGED_VALUE`.
+- **One BacktestNode:** PASS — analysis-only.
+- **No local accounting / no Python strategy backtest:** PASS by source inspection of EXP-104 `analysis_code/` (banned defs absent). Supervisor should still run `check_no_local_accounting("python/experiments/EXP-104/analysis_code")`.
+- **Screen conversion pin / XENA frozen registry / battery F02–F06:** N/A. F07: every realised regime/status/exposure/count retained.
+- **Amendment streak ≥3:** PASS — none.
+- **Mandatory design blocks:** MECHANISM, OBJECT-IDENTITY, CONTROL, TRIPWIRE, operator-only bands, SAMPLE-SIZE, GOLDEN-TRACE, HARD/INFORMATIVE, ZERO-COST-DISCLOSURE, amendment ledger all present. CONVERSION-PIN / COST-DIRECTIVE N/A.
+
+Supervisor should run (not run in this read-only review):
+
+```text
+pytest python/tests/liqswp_analysis/test_exp104_adapter.py \
+       python/tests/test_exp104_analysis_live.py \
+       python/tests/liqswp_analysis/test_destroy.py -q
+```
+
+### Issues
+
+None blocking.
+
+1. **LOW (informational) — fixture MID `level_id`s repeat across the two pairs.** `adapter.py:88–160` + `analysis.py:628–632`: `(MID,LOW)` and `(MID,HIGH)` both emit `FIXTURE-MID-level-####`, so the receipt has 400 MID rows (200 two-row clusters) vs topology “one row = one cluster”. Planted means and AMENDMENT-15 inequalities are unchanged (`fixture_integrity.json` green). No code change required before execution.
+
+2. **LOW (informational) — frequency headline interval is the pooled-seed linear 95%**, not an extra `median bounds` / `seed_*_range` field (`analysis.py:430–440`). Each seed’s linear interval is reported; empty-exposure reasons sit on the observed arm table. Outcome rows already emit median-of-seed bounds. Reconstructable; not a wrong estimator.
+
+3. **Residual — `bar_marks.parquet` is not TRAIN-filtered in `live_frame`.** Provenance/frequency trust the frozen EXP-100 TRAIN emission. Raids are fenced. No holdout path exists.
+
+4. **Residual — destroy groups are not re-sorted by `(raid_id, original_row_position)`.** Groups follow frame encounter order. Still derangements with zero fixed points; bite uses the 2,000-draw mean. Validity unaffected.

@@ -447,13 +447,18 @@ class BaseContrastAdapter:
         }
         if not attestation.integrity.blocking_pass:
             return pl.DataFrame(), source, attestation.integrity
-        lazy = scan_train_columns(
-            attestation.paths,
-            columns=self.required_columns,
-            train_end_column="endpoint_ts_ns",
-            train_end_ns=TRAIN_END_NS,
-        )
-        frame = lazy.collect(engine="streaming")
+        # Cell name is the identity that stays filled when confirmation method/reference
+        # are null on unconfirmed rows. BREAKOUT_BAR and LEVEL_CLOSE share raid_id.
+        lazy_frames = [
+            scan_train_columns(
+                [path],
+                columns=self.required_columns,
+                train_end_column="endpoint_ts_ns",
+                train_end_ns=TRAIN_END_NS,
+            ).with_columns(pl.lit(path.parent.name).alias("source_cell"))
+            for path in attestation.paths
+        ]
+        frame = pl.concat(lazy_frames).collect(engine="streaming")
         return self.prepare_frame(frame), source, attestation.integrity
 
     def _channel_frame(self, frame: pl.DataFrame, channel: str) -> pl.DataFrame:
