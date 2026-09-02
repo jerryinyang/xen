@@ -1,0 +1,257 @@
+{
+  "gate": {
+    "blocking_pass": true,
+    "n_physical_cells": 132,
+    "n_source_cells": 264
+  },
+  "physical_grid": {
+    "all_raid_frequency": {
+      "ATR_UNDEFINED": {
+        "exposure": 1848,
+        "rate_per_1000_marks": 234.84848484848484,
+        "starts": 434
+      },
+      "HIGH": {
+        "exposure": 1223893,
+        "rate_per_1000_marks": 1451.2722925942055,
+        "starts": 1776202
+      },
+      "LOW": {
+        "exposure": 1296548,
+        "rate_per_1000_marks": 1244.4552766268584,
+        "starts": 1613496
+      },
+      "MID": {
+        "exposure": 1169883,
+        "rate_per_1000_marks": 1276.61313139861,
+        "starts": 1493488
+      },
+      "REGIME_WARMUP": {
+        "exposure": 33132,
+        "rate_per_1000_marks": 1105.245683930943,
+        "starts": 36619
+      }
+    },
+    "defined_geometry": {
+      "gap_span_va_median": 0.9999999999998821,
+      "n": 4897105,
+      "p10": 0.4999999999999069,
+      "p90": 1.000000000000041,
+      "va_width_median": 2.2145985468187064
+    },
+    "outcome_regime_contrasts": {
+      "HIGH_vs_MID": {
+        "duration_hours": {
+          "mean_stratum_difference": 2.1673225226948136,
+          "median_stratum_difference": 2.4090383737511782,
+          "n_negative": 45,
+          "n_positive": 219,
+          "n_strata": 264,
+          "n_zero": 0
+        },
+        "strong_move_rate": {
+          "mean_stratum_difference": -0.07224080174716051,
+          "median_stratum_difference": -0.06837299737159441,
+          "n_negative": 257,
+          "n_positive": 7,
+          "n_strata": 264,
+          "n_zero": 0
+        },
+        "swing_atr": {
+          "mean_stratum_difference": -0.9218777766060892,
+          "median_stratum_difference": -0.8709062247223989,
+          "n_negative": 258,
+          "n_positive": 6,
+          "n_strata": 264,
+          "n_zero": 0
+        }
+      },
+      "LOW_vs_MID": {
+        "duration_hours": {
+          "mean_stratum_difference": -0.9139721290360049,
+          "median_stratum_difference": -1.183312363572354,
+          "n_negative": 217,
+          "n_positive": 47,
+          "n_strata": 264,
+          "n_zero": 0
+        },
+        "strong_move_rate": {
+          "mean_stratum_difference": 0.04915494722881834,
+          "median_stratum_difference": 0.04701899287785499,
+          "n_negative": 23,
+          "n_positive": 241,
+          "n_strata": 264,
+          "n_zero": 0
+        },
+        "swing_atr": {
+          "mean_stratum_difference": 0.8485572096369974,
+          "median_stratum_difference": 0.791423631966454,
+          "n_negative": 1,
+          "n_positive": 263,
+          "n_strata": 264,
+          "n_zero": 0
+        }
+      }
+    },
+    "profile_join": {
+      "joined": 4920239,
+      "profiles": 4920239,
+      "raids": 4920239
+    },
+    "top_regime_transitions": [
+      {
+        "confirmation_regime": null,
+        "endpoint_regime": "HIGH",
+        "len": 1169084,
+        "raid_regime": "HIGH"
+      },
+      {
+        "confirmation_regime": null,
+        "endpoint_regime": "LOW",
+        "len": 960826,
+        "raid_regime": "LOW"
+      },
+      {
+        "confirmation_regime": null,
+        "endpoint_regime": "MID",
+        "len": 653906,
+        "raid_regime": "MID"
+      },
+      {
+        "confirmation_regime": null,
+        "endpoint_regime": "HIGH",
+        "len": 424247,
+        "raid_regime": "MID"
+      },
+      {
+        "confirmation_regime": null,
+        "endpoint_regime": "MID",
+        "len": 371395,
+        "raid_regime": "LOW"
+      },
+      {
+        "confirmation_regime": null,
+        "endpoint_regime": "MID",
+        "len": 334342,
+        "raid_regime": "HIGH"
+      },
+      {
+        "confirmation_regime": null,
+        "endpoint_regime": "LOW",
+        "len": 296202,
+        "raid_regime": "MID"
+      },
+      {
+        "confirmation_regime": null,
+        "endpoint_regime": "HIGH",
+        "len": 154740,
+        "raid_regime": "LOW"
+      },
+      {
+        "confirmation_regime": null,
+        "endpoint_regime": "LOW",
+        "len": 126572,
+        "raid_regime": "HIGH"
+      },
+      {
+        "confirmation_regime": "HIGH",
+        "endpoint_regime": "HIGH",
+        "len": 62719,
+        "raid_regime": "HIGH"
+      },
+      {
+        "confirmation_regime": "LOW",
+        "endpoint_regime": "LOW",
+        "len": 55434,
+        "raid_regime": "LOW"
+      },
+      {
+        "confirmation_regime": "HIGH",
+        "endpoint_regime": "MID",
+        "len": 32528,
+        "raid_regime": "HIGH"
+      },
+      {
+        "confirmation_regime": null,
+        "endpoint_regime": "REGIME_WARMUP",
+        "len": 31662,
+        "raid_regime": "REGIME_WARMUP"
+      },
+      {
+        "confirmation_regime": "MID",
+        "endpoint_regime": "MID",
+        "len": 28628,
+        "raid_regime": "MID"
+      },
+      {
+        "confirmation_regime": "LOW",
+        "endpoint_regime": "MID",
+        "len": 24923,
+        "raid_regime": "LOW"
+      },
+      {
+        "confirmation_regime": "MID",
+        "endpoint_regime": "HIGH",
+        "len": 21539,
+        "raid_regime": "MID"
+      },
+      {
+        "confirmation_regime": "MID",
+        "endpoint_regime": "LOW",
+        "len": 21068,
+        "raid_regime": "MID"
+      },
+      {
+        "confirmation_regime": "HIGH",
+        "endpoint_regime": "HIGH",
+        "len": 16884,
+        "raid_regime": "MID"
+      },
+      {
+        "confirmation_regime": "HIGH",
+        "endpoint_regime": "LOW",
+        "len": 16868,
+        "raid_regime": "HIGH"
+      },
+      {
+        "confirmation_regime": "LOW",
+        "endpoint_regime": "HIGH",
+        "len": 14747,
+        "raid_regime": "LOW"
+      }
+    ]
+  },
+  "raw_source_parity": {
+    "all_raid_frequency": {
+      "ATR_UNDEFINED": {
+        "exposure": 3696,
+        "rate_per_1000_marks": 234.84848484848484,
+        "starts": 868
+      },
+      "HIGH": {
+        "exposure": 2447786,
+        "rate_per_1000_marks": 1451.2722925942055,
+        "starts": 3552404
+      },
+      "LOW": {
+        "exposure": 2593096,
+        "rate_per_1000_marks": 1244.4552766268584,
+        "starts": 3226992
+      },
+      "MID": {
+        "exposure": 2339766,
+        "rate_per_1000_marks": 1276.61313139861,
+        "starts": 2986976
+      },
+      "REGIME_WARMUP": {
+        "exposure": 66264,
+        "rate_per_1000_marks": 1105.245683930943,
+        "starts": 73238
+      }
+    },
+    "profile_join": {
+      "profiles": 9840478,
+      "raids": 9840478
+    }
+  }
+}
